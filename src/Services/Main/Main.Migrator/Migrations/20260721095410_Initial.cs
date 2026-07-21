@@ -26,6 +26,9 @@ namespace Main.Migrator.Migrations
             migrationBuilder.EnsureSchema(
                 name: "auth");
 
+            migrationBuilder.EnsureSchema(
+                name: "product_enrichment");
+
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:PostgresExtension:dblink", ",,")
                 .Annotation("Npgsql:PostgresExtension:pg_trgm", ",,")
@@ -43,20 +46,6 @@ namespace Main.Migrator.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("categories_pk", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "coefficients",
-                schema: "public",
-                columns: table => new
-                {
-                    name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    value = table.Column<decimal>(type: "numeric", nullable: false),
-                    type = table.Column<string>(type: "character varying(56)", maxLength: 56, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("coefficients_pk", x => x.name);
                 });
 
             migrationBuilder.CreateTable(
@@ -161,6 +150,8 @@ namespace Main.Migrator.Migrations
                     locked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     lease_expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     lease_holder_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    job_type = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
+                    natural_key = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     who_created = table.Column<Guid>(type: "uuid", nullable: true),
@@ -278,6 +269,26 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "supplier_products",
+                schema: "product_enrichment",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    producer = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    normalized_sku = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    sku = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("supplier_products_pk", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "users",
                 schema: "auth",
                 columns: table => new
@@ -298,31 +309,6 @@ namespace Main.Migrator.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("users_pk", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "product_coefficients",
-                schema: "public",
-                columns: table => new
-                {
-                    product_id = table.Column<int>(type: "integer", nullable: false),
-                    coefficient_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    valid_till = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
-                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("product_coefficients_pk", x => new { x.product_id, x.coefficient_name });
-                    table.ForeignKey(
-                        name: "article_coefficients_coefficients_name_fk",
-                        column: x => x.coefficient_name,
-                        principalSchema: "public",
-                        principalTable: "coefficients",
-                        principalColumn: "name",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -549,6 +535,56 @@ namespace Main.Migrator.Migrations
                         principalSchema: "auth",
                         principalTable: "roles",
                         principalColumn: "normalized_name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "supplier_product_analogues",
+                schema: "product_enrichment",
+                columns: table => new
+                {
+                    supplier_product_id = table.Column<int>(type: "integer", nullable: false),
+                    supplier_analogue_product_id = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("supplier_product_analogues_pk", x => new { x.supplier_product_id, x.supplier_analogue_product_id });
+                    table.ForeignKey(
+                        name: "supplier_product_analogues_supplier_analogue_product_id_fk",
+                        column: x => x.supplier_analogue_product_id,
+                        principalSchema: "product_enrichment",
+                        principalTable: "supplier_products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "supplier_product_analogues_supplier_product_id_fk",
+                        column: x => x.supplier_product_id,
+                        principalSchema: "product_enrichment",
+                        principalTable: "supplier_products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "supplier_product_names",
+                schema: "product_enrichment",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    supplier_product_id = table.Column<int>(type: "integer", nullable: false),
+                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    supplier = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("supplier_product_names_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "supplier_product_names_supplier_product_id_fk",
+                        column: x => x.supplier_product_id,
+                        principalSchema: "product_enrichment",
+                        principalTable: "supplier_products",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -1374,6 +1410,41 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "supplier_product_mappings",
+                schema: "product_enrichment",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    product_id = table.Column<int>(type: "integer", nullable: false),
+                    supplier_product_id = table.Column<int>(type: "integer", nullable: false),
+                    status = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    last_checked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("supplier_product_mappings_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "supplier_product_mappings_product_id_fk",
+                        column: x => x.product_id,
+                        principalSchema: "public",
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "supplier_product_mappings_supplier_product_id_fk",
+                        column: x => x.supplier_product_id,
+                        principalSchema: "product_enrichment",
+                        principalTable: "supplier_products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "order_items",
                 schema: "public",
                 columns: table => new
@@ -1908,13 +1979,13 @@ namespace Main.Migrator.Migrations
                 column: "name");
 
             migrationBuilder.CreateIndex(
-                name: "domain.commonentities.job_who_created_idx",
+                name: "domain.commonentities.uniqjob_who_created_idx",
                 schema: "job",
                 table: "jobs",
                 column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "domain.commonentities.job_who_updated_idx",
+                name: "domain.commonentities.uniqjob_who_updated_idx",
                 schema: "job",
                 table: "jobs",
                 column: "who_updated");
@@ -1924,6 +1995,14 @@ namespace Main.Migrator.Migrations
                 schema: "job",
                 table: "jobs",
                 column: "locked_at");
+
+            migrationBuilder.CreateIndex(
+                name: "jobs_pending_system_name_natural_key_uq",
+                schema: "job",
+                table: "jobs",
+                columns: new[] { "system_name", "natural_key" },
+                unique: true,
+                filter: "status = 'Pending'");
 
             migrationBuilder.CreateIndex(
                 name: "jobs_status_id_idx",
@@ -2092,24 +2171,6 @@ namespace Main.Migrator.Migrations
                 schema: "public",
                 table: "product_characteristics",
                 columns: new[] { "name", "value" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_product_coefficients_coefficient_name",
-                schema: "public",
-                table: "product_coefficients",
-                column: "coefficient_name");
-
-            migrationBuilder.CreateIndex(
-                name: "main.entities.product.productcoefficient_who_created_idx",
-                schema: "public",
-                table: "product_coefficients",
-                column: "who_created");
-
-            migrationBuilder.CreateIndex(
-                name: "main.entities.product.productcoefficient_who_updated_idx",
-                schema: "public",
-                table: "product_coefficients",
-                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "product_contents_child_id_idx",
@@ -2565,6 +2626,68 @@ namespace Main.Migrator.Migrations
                 column: "type");
 
             migrationBuilder.CreateIndex(
+                name: "supplier_product_analogues_supplier_analogue_product_id_idx",
+                schema: "product_enrichment",
+                table: "supplier_product_analogues",
+                column: "supplier_analogue_product_id");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.product.supplier.supplierproductmapping_who_created_idx",
+                schema: "product_enrichment",
+                table: "supplier_product_mappings",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.product.supplier.supplierproductmapping_who_updated_idx",
+                schema: "product_enrichment",
+                table: "supplier_product_mappings",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "supplier_product_mappings_product_supplier_product_uidx",
+                schema: "product_enrichment",
+                table: "supplier_product_mappings",
+                columns: new[] { "product_id", "supplier_product_id" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "supplier_product_mappings_status_idx",
+                schema: "product_enrichment",
+                table: "supplier_product_mappings",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "supplier_product_mappings_supplier_product_id_idx",
+                schema: "product_enrichment",
+                table: "supplier_product_mappings",
+                column: "supplier_product_id");
+
+            migrationBuilder.CreateIndex(
+                name: "supplier_product_names_product_supplier_name_uidx",
+                schema: "product_enrichment",
+                table: "supplier_product_names",
+                columns: new[] { "supplier_product_id", "name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.product.supplier.supplierproduct_who_created_idx",
+                schema: "product_enrichment",
+                table: "supplier_products",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.product.supplier.supplierproduct_who_updated_idx",
+                schema: "product_enrichment",
+                table: "supplier_products",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "supplier_products_producer_idx",
+                schema: "product_enrichment",
+                table: "supplier_products",
+                column: "producer");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_transactions_currency_id",
                 schema: "public",
                 table: "transactions",
@@ -2951,6 +3074,13 @@ namespace Main.Migrator.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "supplier_products_normalized_sku_producer_uidx",
+                schema: "product_enrichment",
+                table: "supplier_products",
+                columns: new[] { "normalized_sku", "producer" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "users_normalized_user_name_index",
                 schema: "auth",
                 table: "users",
@@ -3005,10 +3135,6 @@ namespace Main.Migrator.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "product_coefficients",
-                schema: "public");
-
-            migrationBuilder.DropTable(
                 name: "product_contents",
                 schema: "public");
 
@@ -3055,6 +3181,18 @@ namespace Main.Migrator.Migrations
             migrationBuilder.DropTable(
                 name: "storage_owners",
                 schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "supplier_product_analogues",
+                schema: "product_enrichment");
+
+            migrationBuilder.DropTable(
+                name: "supplier_product_mappings",
+                schema: "product_enrichment");
+
+            migrationBuilder.DropTable(
+                name: "supplier_product_names",
+                schema: "product_enrichment");
 
             migrationBuilder.DropTable(
                 name: "user_balances",
@@ -3129,10 +3267,6 @@ namespace Main.Migrator.Migrations
                 schema: "msg");
 
             migrationBuilder.DropTable(
-                name: "coefficients",
-                schema: "public");
-
-            migrationBuilder.DropTable(
                 name: "purchase_content",
                 schema: "public");
 
@@ -3143,6 +3277,10 @@ namespace Main.Migrator.Migrations
             migrationBuilder.DropTable(
                 name: "sale_content",
                 schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "supplier_products",
+                schema: "product_enrichment");
 
             migrationBuilder.DropTable(
                 name: "permissions",
