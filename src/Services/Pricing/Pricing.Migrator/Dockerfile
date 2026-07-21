@@ -22,7 +22,6 @@ COPY ["src/Infrastructure/Localization/Localization.Abstractions/Localization.Ab
 COPY ["src/Services/Pricing/Pricing.Entities/Pricing.Entities.csproj", "src/Services/Pricing/Pricing.Entities/"]
 COPY ["src/Services/Pricing/Pricing.Enums/Pricing.Enums.csproj", "src/Services/Pricing/Pricing.Enums/"]
 COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
-COPY ["src/Core/Utils/Utils.csproj", "src/Core/Utils/"]
 COPY ["src/Infrastructure/Cache/Cache.csproj", "src/Infrastructure/Cache/"]
 COPY ["src/Infrastructure/RabbitMq/RabbitMq.csproj", "src/Infrastructure/RabbitMq/"]
 COPY ["src/Infrastructure/S3/S3.csproj", "src/Infrastructure/S3/"]

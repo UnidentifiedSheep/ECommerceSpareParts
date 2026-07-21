@@ -26,7 +26,6 @@ COPY ["src/Services/Analytics/Analytics.Application/Analytics.Application.csproj
 COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Core/Internal.Integration.Core.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Core/"]
 COPY ["src/Services/Analytics/Analytics.Utils/Analytics.Utils.csproj", "src/Services/Analytics/Analytics.Utils/"]
 COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
-COPY ["src/Core/Utils/Utils.csproj", "src/Core/Utils/"]
 COPY ["src/Infrastructure/Cache/Cache.csproj", "src/Infrastructure/Cache/"]
 COPY ["src/Infrastructure/RabbitMq/RabbitMq.csproj", "src/Infrastructure/RabbitMq/"]
 COPY ["src/Infrastructure/S3/S3.csproj", "src/Infrastructure/S3/"]

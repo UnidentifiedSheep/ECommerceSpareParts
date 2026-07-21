@@ -23,7 +23,6 @@ COPY ["src/Infrastructure/RabbitMq/RabbitMq.csproj", "src/Infrastructure/RabbitM
 COPY ["src/Infrastructure/S3/S3.csproj", "src/Infrastructure/S3/"]
 COPY ["src/Infrastructure/Security/Security.csproj", "src/Infrastructure/Security/"]
 COPY ["src/Core/Exceptions/Exceptions.csproj", "src/Core/Exceptions/"]
-COPY ["src/Core/Utils/Utils.csproj", "src/Core/Utils/"]
 COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
 COPY ["src/Core/Extensions/Extensions.csproj", "src/Core/Extensions/"]
 COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.csproj", "src/Infrastructure/Localization/Localization.Domain/"]

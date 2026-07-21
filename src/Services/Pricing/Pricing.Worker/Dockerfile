@@ -17,7 +17,6 @@ COPY ["src/Infrastructure/Security/Security.csproj", "src/Infrastructure/Securit
 COPY ["src/Core/Abstractions/Abstractions.csproj", "src/Core/Abstractions/"]
 COPY ["src/Core/Attributes/Attributes.csproj", "src/Core/Attributes/"]
 COPY ["src/Core/Exceptions/Exceptions.csproj", "src/Core/Exceptions/"]
-COPY ["src/Core/Utils/Utils.csproj", "src/Core/Utils/"]
 COPY ["src/Core/Extensions/Extensions.csproj", "src/Core/Extensions/"]
 COPY ["src/Infrastructure/Cache/Cache.csproj", "src/Infrastructure/Cache/"]
 COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services/Application.Common/"]
