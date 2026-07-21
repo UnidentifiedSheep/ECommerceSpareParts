@@ -5,6 +5,7 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Localization.Abstractions.Interfaces;
 using Localization.Domain;
+using Main.Application.Handlers.ProducerAliases;
 using Main.Application.Handlers.Producers;
 using Main.Application.Lrts.Base;
 using MassTransit;

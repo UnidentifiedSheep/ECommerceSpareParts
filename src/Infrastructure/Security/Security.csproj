@@ -24,7 +24,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Core\Abstractions\Abstractions.csproj"/>
         <ProjectReference Include="..\..\Core\Exceptions\Exceptions.csproj"/>
-        <ProjectReference Include="..\..\Core\Utils\Utils.csproj"/>
+        <ProjectReference Include="..\..\Core\Extensions\Extensions.csproj" />
     </ItemGroup>
 
 </Project>

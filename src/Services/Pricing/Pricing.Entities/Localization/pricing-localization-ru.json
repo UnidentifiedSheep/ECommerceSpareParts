@@ -9,11 +9,21 @@
     "price.applier.minimum.supplier.price.description": "Повышает цену до минимальной цены предложения поставщика, если доступны рыночные данные.",
     "price.applier.uniqueness.additional.markup.name": "Дополнительная наценка для уникального товара",
     "price.applier.uniqueness.additional.markup.description": "Применяет дополнительную наценку, если у товара нет рыночных предложений.",
+    "price.applier.order.required": "Порядок применения правила цены обязателен.",
+    "price.applier.name.required": "Название правила цены обязательно.",
+    "price.applier.name.max.length": "Название правила цены не должно превышать 128 символов.",
+    "price.applier.order.duplicate": "Этот порядок уже используется другим включённым правилом цены.",
+    "price.applier.dsl.logic.required": "DSL-логика обязательна для динамического правила цены.",
+    "price.applier.dsl.logic.invalid": "DSL-логика должна быть корректным правилом JSON Logic, возвращающим неотрицательную цену типа decimal.",
+    "price.applier.usage.not.supported": "Правило цены не поддерживает указанный тип использования.",
+    "price.applier.system.name.conflict": "Правило цены с таким системным именем уже существует с другим типом.",
+    "price.applier.system.name.required": "Системное имя правила цены обязательно.",
+    "price.applier.not.found": "Правило формирования цены не найдено.",
+    "price.applier.local.cannot.be.deleted": "Локальное правило цены нельзя удалить, его можно только отключить.",
+    "price.applier.usage.duplicate": "Типы использования правила цены не должны повторяться.",
     "pricing.setting.name": "Настройки ценообразования",
     "pricing.setting.description": "Управляют расчетом цен, выбором наценки, сроком жизни предложений и оценкой доставки поставщиков.",
     "pricing.setting.input.invalid": "Переданы некорректные данные настроек ценообразования.",
-    "pricing.setting.pricing.strategy.name": "Стратегия ценообразования",
-    "pricing.setting.pricing.strategy.description": "Определяет, какая цена предложения поставщика используется как базовая.",
     "pricing.setting.selected.markup.id.name": "Выбранная группа наценок",
     "pricing.setting.selected.markup.id.description": "Группа наценок, используемая для расчета цены. Оставьте пустым, чтобы использовать последнюю автоматически созданную группу.",
     "pricing.setting.default.markup.name": "Наценка по умолчанию",
@@ -31,6 +41,8 @@
     "lrt.price.candidate.calculation.product.id.name": "Товар",
     "lrt.price.candidate.calculation.product.id.description": "Товар, для которого нужно рассчитать варианты цены.",
     "lrt.price.candidate.calculation.storage.name.name": "Склад",
-    "lrt.price.candidate.calculation.storage.name.description": "Склад, для которого нужно рассчитать варианты цены."
+    "lrt.price.candidate.calculation.storage.name.description": "Склад, для которого нужно рассчитать варианты цены.",
+    "lrt.invalidate.stale.price.options.name": "Инвалидация устаревших вариантов цены",
+    "lrt.invalidate.stale.price.options.description": "Удаляет варианты цены, рассчитанные с устаревшей конфигурацией ценообразования, и ставит задачи на перерасчет."
   }
 }

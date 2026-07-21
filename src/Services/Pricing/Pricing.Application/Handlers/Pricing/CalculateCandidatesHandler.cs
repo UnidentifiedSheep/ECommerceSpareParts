@@ -42,9 +42,13 @@ public class CalculateCandidatesHandler(
             .CalculateAsync(candidates, cancellationToken);
         
         var priceOptions = calculated
+            .Candidates
             .Select(x => 
                 ProductPriceOption.Create(
                     x.PriceOfferId,
+                    calculated.MarkupVersion,
+                    calculated.AppliersVersion,
+                    calculated.PricingSettingsVersion,
                     x.StorageName,
                     x.Score,
                     x.Price,

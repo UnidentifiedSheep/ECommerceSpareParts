@@ -59,7 +59,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
         CurrencyId = currencyId;
         BuyPrice = buyPrice;
         BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
-        Count = count.AgainstLessOrEqual(
+        Count = count.EnsureGreaterThan(
             0,
             () => new InvalidInputException("sale.fact.content.detail.count.required"));
         PurchaseDate = purchaseDate;

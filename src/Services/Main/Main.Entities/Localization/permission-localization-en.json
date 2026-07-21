@@ -103,6 +103,8 @@
     "permissions.prices.get.detailed.description": "Permission to view detailed prices.",
     "permissions.prices.get.standard.name": "View prices",
     "permissions.prices.get.standard.description": "Permission to view prices.",
+    "permissions.price.appliers.manage.name": "Manage price appliers",
+    "permissions.price.appliers.manage.description": "Permission to manage price appliers.",
     "permissions.purchase.create.name": "Create purchase",
     "permissions.purchase.create.description": "Permission to create purchases.",
     "permissions.purchase.edit.name": "Edit purchase",

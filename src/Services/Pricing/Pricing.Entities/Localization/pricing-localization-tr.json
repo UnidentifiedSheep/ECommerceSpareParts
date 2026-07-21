@@ -9,11 +9,21 @@
     "price.applier.minimum.supplier.price.description": "Piyasa verisi mevcut olduğunda fiyatı minimum tedarikçi teklif fiyatına yükseltir.",
     "price.applier.uniqueness.additional.markup.name": "Benzersiz ürün ek kâr marjı",
     "price.applier.uniqueness.additional.markup.description": "Ürünün piyasa teklifi olmadığında ek kâr marjı uygular.",
+    "price.applier.order.required": "Fiyat uygulayıcı sırası zorunludur.",
+    "price.applier.name.required": "Fiyat uygulayıcı adı zorunludur.",
+    "price.applier.name.max.length": "Fiyat uygulayıcı adı 128 karakteri aşmamalıdır.",
+    "price.applier.order.duplicate": "Bu sıra başka bir etkin fiyat uygulayıcı tarafından zaten kullanılıyor.",
+    "price.applier.dsl.logic.required": "Dinamik fiyat uygulayıcı için DSL mantığı zorunludur.",
+    "price.applier.dsl.logic.invalid": "DSL mantığı, negatif olmayan ondalık bir fiyat döndüren geçerli bir JSON Logic kuralı olmalıdır.",
+    "price.applier.usage.not.supported": "Fiyat uygulayıcı belirtilen kullanım türünü desteklemiyor.",
+    "price.applier.system.name.conflict": "Bu sistem adına sahip farklı türde bir fiyat uygulayıcı zaten mevcut.",
+    "price.applier.system.name.required": "Fiyat uygulayıcı sistem adı zorunludur.",
+    "price.applier.not.found": "Fiyat uygulayıcı bulunamadı.",
+    "price.applier.local.cannot.be.deleted": "Yerel fiyat uygulayıcı silinemez; yalnızca devre dışı bırakılabilir.",
+    "price.applier.usage.duplicate": "Fiyat uygulayıcı kullanım türleri benzersiz olmalıdır.",
     "pricing.setting.name": "Fiyatlandırma ayarları",
     "pricing.setting.description": "Fiyat hesaplamasını, kâr marjı seçimini, teklif ömrünü ve tedarikçi teslimat puanlamasını yönetir.",
     "pricing.setting.input.invalid": "Geçersiz fiyatlandırma ayarları verisi sağlandı.",
-    "pricing.setting.pricing.strategy.name": "Fiyatlandırma stratejisi",
-    "pricing.setting.pricing.strategy.description": "Hangi tedarikçi teklif fiyatının temel fiyat olarak kullanılacağını belirler.",
     "pricing.setting.selected.markup.id.name": "Seçili kâr marjı grubu",
     "pricing.setting.selected.markup.id.description": "Fiyat hesaplamasında kullanılan kâr marjı grubu. En son otomatik oluşturulan grubu kullanmak için boş bırakın.",
     "pricing.setting.default.markup.name": "Varsayılan kâr marjı",
@@ -31,6 +41,8 @@
     "lrt.price.candidate.calculation.product.id.name": "Ürün",
     "lrt.price.candidate.calculation.product.id.description": "Fiyat adayları hesaplanacak ürün.",
     "lrt.price.candidate.calculation.storage.name.name": "Depo",
-    "lrt.price.candidate.calculation.storage.name.description": "Fiyat adayları hesaplanacak depo."
+    "lrt.price.candidate.calculation.storage.name.description": "Fiyat adayları hesaplanacak depo.",
+    "lrt.invalidate.stale.price.options.name": "Eski fiyat seçeneklerini geçersiz kıl",
+    "lrt.invalidate.stale.price.options.description": "Eski fiyatlandırma yapılandırmasıyla hesaplanan fiyat seçeneklerini siler ve yeniden hesaplama işleri kuyruğa alır."
   }
 }

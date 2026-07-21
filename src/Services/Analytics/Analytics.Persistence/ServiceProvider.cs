@@ -11,6 +11,7 @@ using Persistence;
 using Persistence.Common;
 using Persistence.DbValidator;
 using Persistence.Extensions;
+using Persistence.Interceptors;
 
 namespace Analytics.Persistence;
 
@@ -18,10 +19,14 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
     {
+        collection.AddScoped<AuditableEntitySaveChangesInterceptor>();
+        collection.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
         collection.AddDbContext<DContext>((sp, options) =>
         {
             var op = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(op.ConnectionString);
+            options.AddInterceptors(sp.GetRequiredService<AuditableEntitySaveChangesInterceptor>());
+            options.AddInterceptors(sp.GetRequiredService<DomainEventFlusherSaveChangesInterceptor>());
         });
 
         collection.AddUnitOfWork<DContext>();

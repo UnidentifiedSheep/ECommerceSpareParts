@@ -3,8 +3,8 @@ using System.Text;
 using System.Text.Json;
 using Abstractions.Interfaces.Services;
 using Abstractions.Models.Options;
+using Extensions;
 using Microsoft.Extensions.Options;
-using Utils;
 
 namespace Security.Services;
 

@@ -111,19 +111,19 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
 
     private void SetRoute(string from, string to)
     {
-        (from, to).Against(x => x.from.Trim() == x.to.Trim(), "storage.route.same.storages");
+        (from, to).Ensure(x => x.from.Trim() != x.to.Trim(), "storage.route.same.storages");
         FromStorageName = from;
         ToStorageName = to;
     }
 
     public void SetDistanceM(int distanceM)
     {
-        DistanceM = distanceM.AgainstTooSmall(1, "storage.route.distance.min");
+        DistanceM = distanceM.EnsureAtLeast(1, "storage.route.distance.min");
     }
 
     public void SetDeliveryTime(int minutes)
     {
-        DeliveryTimeMinutes = minutes.AgainstTooSmall(1, "storage.route.delivery.time.min");
+        DeliveryTimeMinutes = minutes.EnsureAtLeast(1, "storage.route.delivery.time.min");
     }
 
     public void SetPrices(
@@ -138,27 +138,27 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
 
     public void SetPriceKg(decimal priceKg)
     {
-        PriceKg = priceKg.AgainstTooManyDecimalPlaces(2, "storage.route.price.kg.precision")
-            .AgainstTooSmall(0, "storage.route.price.kg.min");
+        PriceKg = priceKg.EnsureMaxDecimalPlaces(2, "storage.route.price.kg.precision")
+            .EnsureAtLeast(0, "storage.route.price.kg.min");
     }
 
     public void SetPricePerM3(decimal pricePerM3)
     {
-        PricePerM3 = pricePerM3.AgainstTooManyDecimalPlaces(2, "storage.route.price.m3.precision")
-            .AgainstTooSmall(0, "storage.route.price.m3.min");
+        PricePerM3 = pricePerM3.EnsureMaxDecimalPlaces(2, "storage.route.price.m3.precision")
+            .EnsureAtLeast(0, "storage.route.price.m3.min");
     }
 
     public void SetPricePerOrder(decimal pricePerOrder)
     {
-        PricePerOrder = pricePerOrder.AgainstTooManyDecimalPlaces(2, "storage.route.price.order.precision")
-            .AgainstTooSmall(0, "storage.route.price.order.min");
+        PricePerOrder = pricePerOrder.EnsureMaxDecimalPlaces(2, "storage.route.price.order.precision")
+            .EnsureAtLeast(0, "storage.route.price.order.min");
     }
 
     public void SetMinimumPrice(decimal minimumPrice)
     {
         MinimumPrice = minimumPrice
-            .AgainstTooManyDecimalPlaces(2, "storage.route.minimum.price.precision")
-            .AgainstTooSmall(0, "storage.route.minimum.price.min");
+            .EnsureMaxDecimalPlaces(2, "storage.route.minimum.price.precision")
+            .EnsureAtLeast(0, "storage.route.minimum.price.min");
     }
 
     public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }

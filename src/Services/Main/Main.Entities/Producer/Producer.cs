@@ -54,7 +54,7 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
     public void SetImagePath(string? imagePath)
     {
         imagePath = imagePath?.Trim()
-            .AgainstTooLong(255, "producer.image.too.long");
+            .EnsureMaxLength(255, "producer.image.too.long");
 
         ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
     }
@@ -62,7 +62,7 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
     public void SetDescription(string? description)
     {
         description = description?.Trim()
-            .AgainstTooLong(500, "producer.description.max.length");
+            .EnsureMaxLength(500, "producer.description.max.length");
 
         Description = string.IsNullOrEmpty(description) ? null : description;
     }
@@ -71,9 +71,9 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
     {
         var value = name.Trim();
 
-        value.AgainstNullOrWhiteSpace("producer.name.not.empty")
-            .AgainstTooShort(2, "producer.name.min.length")
-            .AgainstTooLong(64, "producer.name.max.length");
+        value.EnsureNotNullOrWhiteSpace("producer.name.not.empty")
+            .EnsureMinLength(2, "producer.name.min.length")
+            .EnsureMaxLength(64, "producer.name.max.length");
 
         Name = ToNormalizedName(value);
     }

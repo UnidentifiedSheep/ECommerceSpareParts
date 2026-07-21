@@ -33,7 +33,7 @@ public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount
 
     internal void SetDiscount(decimal discount)
     {
-        Discount = discount.AgainstOutOfRange(
+        Discount = discount.EnsureInRange(
             0m,
             0.99m,
             "user.discount.range");

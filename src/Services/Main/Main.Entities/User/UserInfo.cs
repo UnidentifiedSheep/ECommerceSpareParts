@@ -50,20 +50,20 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
     public void SetName(string name)
     {
         Name = name.Trim()
-            .AgainstNullOrWhiteSpace("user.name.required")
-            .AgainstTooShort(3, "user.name.min.length")
-            .Against(x => x.Any(char.IsSymbol), "user.name.no.special.chars")
-            .AgainstTooLong(30, "user.name.max.length");
+            .EnsureNotNullOrWhiteSpace("user.name.required")
+            .EnsureMinLength(3, "user.name.min.length")
+            .Ensure(x => x.All(c => !char.IsSymbol(c)), "user.name.no.special.chars")
+            .EnsureMaxLength(30, "user.name.max.length");
         UpdateSearchColumn();
     }
 
     public void SetSurname(string surname)
     {
         Surname = surname.Trim()
-            .AgainstNullOrWhiteSpace("user.surname.required")
-            .AgainstTooShort(3, "user.surname.min.length")
-            .Against(x => x.Any(char.IsSymbol), "user.surname.no.special.chars")
-            .AgainstTooLong(30, "user.surname.max.length");
+            .EnsureNotNullOrWhiteSpace("user.surname.required")
+            .EnsureMinLength(3, "user.surname.min.length")
+            .Ensure(x => x.All(c => !char.IsSymbol(c)), "user.surname.no.special.chars")
+            .EnsureMaxLength(30, "user.surname.max.length");
         UpdateSearchColumn();
     }
 
@@ -71,7 +71,7 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
     {
         Description = description
             .NullIfWhiteSpace()
-            ?.AgainstTooLong(300, "user.description.max.length");
+            ?.EnsureMaxLength(300, "user.description.max.length");
         UpdateSearchColumn();
     }
 

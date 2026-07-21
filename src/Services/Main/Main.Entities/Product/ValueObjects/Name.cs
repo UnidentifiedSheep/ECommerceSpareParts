@@ -10,9 +10,9 @@ public record Name
     {
         value = value.Trim();
 
-        value.AgainstNullOrWhiteSpace("article.name.must.not.be.empty")
-            .AgainstTooShort(3, "article.name.min.length.3")
-            .AgainstTooLong(255, "article.name.max.length.255");
+        value.EnsureNotNullOrWhiteSpace("article.name.must.not.be.empty")
+            .EnsureMinLength(3, "article.name.min.length.3")
+            .EnsureMaxLength(255, "article.name.max.length.255");
 
         Value = char.ToUpperInvariant(value[0]) + value[1..];
     }

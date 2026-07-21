@@ -70,11 +70,11 @@ public class PurchasesFact : Entity<PurchasesFact, Guid>, IDependency
     private void ApplyContents(IEnumerable<PurchaseContent> contents)
     {
         var incomingContents = contents
-            .AgainstNull(() => new InvalidInputException("purchase.fact.content.required"))
+            .EnsureNotNull(() => new InvalidInputException("purchase.fact.content.required"))
             .ToList();
 
         incomingContents
-            .AgainstEmpty(() => new InvalidInputException("purchase.fact.content.required"));
+            .EnsureNotEmpty(() => new InvalidInputException("purchase.fact.content.required"));
 
         var existingContents = PurchaseContents.ToDictionary(x => x.Id);
         var toRemove = new Dictionary<int, PurchaseContent>(existingContents);

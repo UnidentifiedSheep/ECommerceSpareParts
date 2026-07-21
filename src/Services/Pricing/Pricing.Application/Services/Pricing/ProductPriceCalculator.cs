@@ -1,9 +1,13 @@
+using Application.Common.Interfaces.Settings;
+using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing;
+using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PricePolicy;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.MarketInfo;
 using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Enums;
+using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Services.Pricing;
 
@@ -11,12 +15,20 @@ public sealed class ProductPriceCalculator(
     ISupplierPricePolicy supplierPolicy,
     IInternalPricePolicy internalPolicy,
     IOfferScorer offerScorer,
-    IMarketInfoFactory marketInfoFactory) : IProductPriceCalculator
+    IMarkupContainer markupContainer,
+    IPriceApplierService priceApplierService,
+    IMarketInfoFactory marketInfoFactory,
+    ISettingsService settingsService) : IProductPriceCalculator
 {
-    public async Task<IReadOnlyCollection<CalculatedScoredPriceCandidate>> CalculateAsync(
+    public async Task<ProductPriceCalculationResult> CalculateAsync(
         IReadOnlyCollection<PriceCandidate> candidates,
         CancellationToken ct)
     {
+        var appliersVersion = await priceApplierService
+            .GetCurrentConfigurationVersionAsync(ct);
+        var pricingSettingsVersion = (await settingsService
+            .GetOrDefault<PricingSetting>(ct)).Data.Version;
+
         var supplierCandidates = candidates
             .Where(x => x.SourceType == PriceOfferSourceType.Supplier)
             .ToArray();
@@ -41,6 +53,12 @@ public sealed class ProductPriceCalculator(
             .Concat(internalCalculated)
             .ToList();
 
-        return await offerScorer.GetResultingScoreAsync(all, ct);
+        return new ProductPriceCalculationResult
+        {
+            Candidates = await offerScorer.GetResultingScoreAsync(all, ct),
+            MarkupVersion = markupContainer.CurrentVersion,
+            AppliersVersion = appliersVersion,
+            PricingSettingsVersion = pricingSettingsVersion
+        };
     }
 }

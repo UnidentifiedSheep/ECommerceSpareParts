@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
 using Enums;
 
-namespace Pricing.Application.Lrts.PriceCandidateCalculationLrt;
+namespace Pricing.Application.Lrts.PriceCandidateCalculation;
 
 public class PriceCandidateCalculationState : IInputState
 {

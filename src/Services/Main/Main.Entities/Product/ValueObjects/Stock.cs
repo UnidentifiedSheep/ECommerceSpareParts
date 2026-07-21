@@ -8,7 +8,7 @@ public record Stock
 
     public Stock(int value)
     {
-        value.AgainstNegative(() => new InvalidOperationException("Stock can not be negative"));
+        value.EnsureNonNegative(() => new InvalidOperationException("Stock can not be negative"));
         ArgumentOutOfRangeException.ThrowIfNegative(value);
         Value = value;
     }

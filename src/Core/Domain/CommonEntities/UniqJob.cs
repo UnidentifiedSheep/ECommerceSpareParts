@@ -26,6 +26,6 @@ public class UniqJob : Job
     private void SetNaturalKey(string naturalKey)
     {
         NaturalKey = naturalKey.TrimSafe()
-            .AgainstNullOrWhiteSpace(() => new InvalidOperationException("Natural key cannot be null or empty."));
+            .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Natural key cannot be null or empty."));
     }
 }

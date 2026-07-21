@@ -1,15 +1,16 @@
+using System.Text.Json.Serialization;
 using Pricing.Entities;
 using Pricing.Entities.Offers;
 
 namespace Pricing.Application.Models.Pricing;
 
 public sealed record FulfillmentRouteInfo(
-    string SourceStorageName,
-    string TargetStorageName,
-    decimal LogisticsCostInBaseCurrency,
-    TimeSpan DeliveryTime,
-    TimeSpan GuaranteedDeliveryTime,
-    int DeliveryProbability)
+    [property: JsonPropertyName("sourceStorageName")] string SourceStorageName,
+    [property: JsonPropertyName("targetStorageName")] string TargetStorageName,
+    [property: JsonPropertyName("logisticsCostInBaseCurrency")] decimal LogisticsCostInBaseCurrency,
+    [property: JsonPropertyName("deliveryTime")] TimeSpan DeliveryTime,
+    [property: JsonPropertyName("guaranteedDeliveryTime")] TimeSpan GuaranteedDeliveryTime,
+    [property: JsonPropertyName("deliveryProbability")] int DeliveryProbability)
 {
     public static FulfillmentRouteInfo SameStorage(string storageName)
     {
@@ -28,8 +29,12 @@ public sealed record FulfillmentRouteInfo(
             SourceStorageName: offer.OfferForStorage,
             TargetStorageName: offer.OfferForStorage,
             LogisticsCostInBaseCurrency: 0,
-            DeliveryTime: offer.DeliveryDate - offer.UpdatedAt,
-            GuaranteedDeliveryTime: offer.GuaranteedDeliveryDate - offer.UpdatedAt,
+            DeliveryTime: offer.DeliveryDate == null 
+                ? TimeSpan.Zero 
+                : offer.DeliveryDate.Value - offer.UpdatedAt,
+            GuaranteedDeliveryTime: offer.GuaranteedDeliveryDate == null
+                ? TimeSpan.Zero 
+                : offer.GuaranteedDeliveryDate.Value - offer.UpdatedAt,
             DeliveryProbability: offer.DeliveryProbability);
     }
 }

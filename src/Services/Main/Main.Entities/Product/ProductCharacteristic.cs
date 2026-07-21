@@ -49,16 +49,16 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
     public void SetValue(string value)
     {
         Value = value.Trim()
-            .AgainstTooShort(3, "article.characteristic.value.min.length")
-            .AgainstTooLong(128, "article.characteristic.value.max.length");
+            .EnsureMinLength(3, "article.characteristic.value.min.length")
+            .EnsureMaxLength(128, "article.characteristic.value.max.length");
     }
 
     public void SetName(string name)
     {
         Name = name.Trim()
-            .AgainstNullOrWhiteSpace(() =>
+            .EnsureNotNullOrWhiteSpace(() =>
                 throw new InvalidOperationException("Product characteristic name cannot be null or empty."))
-            .AgainstTooLong(128, "article.characteristic.name.max.length");
+            .EnsureMaxLength(128, "article.characteristic.name.max.length");
     }
 
     public override (int, string) GetId() { return (ProductId, Name); }

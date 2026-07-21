@@ -74,6 +74,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<SettingUpdatedConsumer>();
     x.AddConsumer<ProductPriceOffersUpdatedConsumer, ProductPriceOffersUpdatedDefinition>();
+    x.AddConsumer<StorageContentUpdatedConsumer, StorageContentUpdatedDefinition>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -114,6 +115,7 @@ builder.Services.AddMassTransit(x =>
                 ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
                 ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
                 ep.ConfigureConsumer<ProductPriceOffersUpdatedConsumer>(context);
+                ep.ConfigureConsumer<StorageContentUpdatedConsumer>(context);
                 ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
             });
     });

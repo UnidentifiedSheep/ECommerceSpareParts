@@ -11,7 +11,7 @@ using Pricing.Enums;
 namespace Pricing.Application.Services.Pricing.PricePolicies;
 
 public class SupplierPricePolicy(
-    IEnumerable<ISupplierPriceApplier> appliers
+    IPriceApplierService applierService
     ) : ISupplierPricePolicy
 {
     public PriceOfferSourceType SourceType => PriceOfferSourceType.Supplier;
@@ -21,9 +21,9 @@ public class SupplierPricePolicy(
         CancellationToken ct)
     {
         var result = new List<CalculatedPriceCandidate>();
-        var orderedAppliers = appliers
-            .OrderBy(x => x.Order)
-            .ToArray();
+        var orderedAppliers = await applierService.GetPriceAppliersAsync(
+            SourceType, 
+            ct);
 
         foreach (var candidate in candidates)
         {

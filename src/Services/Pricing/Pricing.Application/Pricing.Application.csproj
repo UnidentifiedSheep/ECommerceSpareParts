@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="IntervalMap" Version="1.0.3"/>
+        <PackageReference Include="JsonLogic" Version="6.1.0" />
         <PackageReference Include="MassTransit" Version="8.5.8"/>
     </ItemGroup>
 

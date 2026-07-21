@@ -9,11 +9,21 @@
     "price.applier.minimum.supplier.price.description": "Raises the price to the minimum supplier offer price when market data is available.",
     "price.applier.uniqueness.additional.markup.name": "Unique product additional markup",
     "price.applier.uniqueness.additional.markup.description": "Applies an additional markup when the product has no market offers.",
+    "price.applier.order.required": "Price applier order is required.",
+    "price.applier.name.required": "Price applier name is required.",
+    "price.applier.name.max.length": "Price applier name must not exceed 128 characters.",
+    "price.applier.order.duplicate": "Another enabled price applier already uses this order.",
+    "price.applier.dsl.logic.required": "DSL logic is required for a dynamic price applier.",
+    "price.applier.dsl.logic.invalid": "DSL logic must be a valid JSON Logic rule that returns a non-negative decimal price.",
+    "price.applier.usage.not.supported": "The price applier does not support the specified usage.",
+    "price.applier.system.name.conflict": "A price applier with this system name already exists with a different type.",
+    "price.applier.system.name.required": "Price applier system name is required.",
+    "price.applier.not.found": "Price applier was not found.",
+    "price.applier.local.cannot.be.deleted": "A local price applier cannot be deleted; it can only be disabled.",
+    "price.applier.usage.duplicate": "Price applier usage values must be unique.",
     "pricing.setting.name": "Pricing settings",
     "pricing.setting.description": "Controls price calculation, markup selection, offer lifetime, and supplier delivery scoring.",
     "pricing.setting.input.invalid": "Invalid pricing settings data was provided.",
-    "pricing.setting.pricing.strategy.name": "Pricing strategy",
-    "pricing.setting.pricing.strategy.description": "Defines which supplier offer price is used as the base price.",
     "pricing.setting.selected.markup.id.name": "Selected markup group",
     "pricing.setting.selected.markup.id.description": "Markup group used for price calculation. Leave empty to use the latest auto-generated markup group.",
     "pricing.setting.default.markup.name": "Default markup",
@@ -31,6 +41,8 @@
     "lrt.price.candidate.calculation.product.id.name": "Product",
     "lrt.price.candidate.calculation.product.id.description": "Product for which price candidates should be calculated.",
     "lrt.price.candidate.calculation.storage.name.name": "Storage",
-    "lrt.price.candidate.calculation.storage.name.description": "Storage for which price candidates should be calculated."
+    "lrt.price.candidate.calculation.storage.name.description": "Storage for which price candidates should be calculated.",
+    "lrt.invalidate.stale.price.options.name": "Invalidate stale price options",
+    "lrt.invalidate.stale.price.options.description": "Removes price options calculated with an outdated pricing configuration and enqueues recalculation jobs."
   }
 }

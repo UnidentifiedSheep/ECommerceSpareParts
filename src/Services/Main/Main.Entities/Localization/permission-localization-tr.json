@@ -103,6 +103,8 @@
     "permissions.prices.get.detailed.description": "Detaylı fiyatları görüntüleme izni.",
     "permissions.prices.get.standard.name": "Fiyatları görüntüleme",
     "permissions.prices.get.standard.description": "Fiyatları görüntüleme izni.",
+    "permissions.price.appliers.manage.name": "Fiyat uygulayıcılarını yönetme",
+    "permissions.price.appliers.manage.description": "Fiyat uygulayıcılarını yönetme izni.",
     "permissions.purchase.create.name": "Satın alma oluşturma",
     "permissions.purchase.create.description": "Satın alma oluşturma izni.",
     "permissions.purchase.edit.name": "Satın alma düzenleme",

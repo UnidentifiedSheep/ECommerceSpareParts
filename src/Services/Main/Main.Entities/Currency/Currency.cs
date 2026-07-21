@@ -65,36 +65,36 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
     {
         Name = name
             .Trim()
-            .AgainstNullOrWhiteSpace("currency.name.not.empty")
-            .AgainstTooLong(128, "currency.name.max.length")
-            .AgainstTooShort(3, "currency.name.min.length");
+            .EnsureNotNullOrWhiteSpace("currency.name.not.empty")
+            .EnsureMaxLength(128, "currency.name.max.length")
+            .EnsureMinLength(3, "currency.name.min.length");
     }
 
     private void SetShortName(string name)
     {
         ShortName = name
             .Trim()
-            .AgainstNullOrWhiteSpace("currency.shortName.not.empty")
-            .AgainstTooLong(5, "currency.shortName.max.length")
-            .AgainstTooShort(2, "currency.shortName.min.length");
+            .EnsureNotNullOrWhiteSpace("currency.shortName.not.empty")
+            .EnsureMaxLength(5, "currency.shortName.max.length")
+            .EnsureMinLength(2, "currency.shortName.min.length");
     }
 
     private void SetCurrencySign(string currencySign)
     {
         CurrencySign = currencySign
             .Trim()
-            .AgainstNullOrWhiteSpace("currency.sign.not.empty")
-            .AgainstTooLong(3, "currency.sign.max.length")
-            .AgainstTooShort(1, "currency.sign.min.length");
+            .EnsureNotNullOrWhiteSpace("currency.sign.not.empty")
+            .EnsureMaxLength(3, "currency.sign.max.length")
+            .EnsureMinLength(1, "currency.sign.min.length");
     }
 
     private void SetCode(string code)
     {
         Code = code
             .Trim()
-            .AgainstNullOrWhiteSpace("currency.code.not.empty")
-            .AgainstTooLong(26, "currency.code.max.length")
-            .AgainstTooShort(2, "currency.code.min.length");
+            .EnsureNotNullOrWhiteSpace("currency.code.not.empty")
+            .EnsureMaxLength(26, "currency.code.max.length")
+            .EnsureMinLength(2, "currency.code.min.length");
     }
 
     public override int GetId() { return Id; }

@@ -38,4 +38,10 @@ public static class CacheKeys
                 => $"offer:refresh:lock:{supplier.ToString()}:{productId}:{storageName}";
         }
     }
+
+    public static class PriceAppliers
+    {
+        public static TimeSpan Ttl { get; } = TimeSpan.FromMinutes(60);
+        public static string ConfigurationKey => "price-appliers:configuration:v1";
+    }
 }

@@ -86,13 +86,13 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
     private void SetAmount(decimal newAmount)
     {
-        Amount = newAmount.AgainstTooManyDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
-            .AgainstLessOrEqual(0m, "transaction.amount.must.be.positive");
+        Amount = newAmount.EnsureMaxDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
+            .EnsureGreaterThan(0m, "transaction.amount.must.be.positive");
     }
 
     private void SetCurrencyId(int currencyId)
     {
-        currencyId.AgainstLessOrEqual(
+        currencyId.EnsureGreaterThan(
             0,
             () => new ArgumentException("CurrencyId must be greater than zero"));
         CurrencyId = currencyId;

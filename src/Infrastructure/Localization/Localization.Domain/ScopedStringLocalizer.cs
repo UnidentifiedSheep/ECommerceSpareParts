@@ -1,14 +1,20 @@
 ﻿using Localization.Abstractions.Interfaces;
 using Localization.Abstractions.Models;
+using Microsoft.Extensions.Options;
 
 namespace Localization.Domain;
 
-public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IScopedStringLocalizer
+public sealed class ScopedStringLocalizer(
+    IStringLocalizer stringLocalizer,
+    IOptions<LocalesOptions>? localeOptions = null) : IScopedStringLocalizer
 {
     private bool _disposed;
     private Locale? _locale;
+    private readonly Locale? _defaultLocale = GetDefaultLocale(localeOptions);
 
-    public Locale Locale => _locale ?? throw new ArgumentNullException(nameof(Locale));
+    public Locale Locale => _locale
+                            ?? _defaultLocale
+                            ?? throw new ArgumentNullException(nameof(Locale));
 
     public void SetLocale(Locale locale)
     {
@@ -19,30 +25,27 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
     public string Get(string key)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        ArgumentNullException.ThrowIfNull(_locale);
 
-        return stringLocalizer.Get(key, _locale.Value);
+        return stringLocalizer.Get(key, Locale);
     }
 
     public string Get(string key, params object[] arguments)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        ArgumentNullException.ThrowIfNull(_locale);
 
         return stringLocalizer.Get(
             key,
-            _locale.Value,
+            Locale,
             arguments);
     }
 
     public bool TryGet(string key, out string? value)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        ArgumentNullException.ThrowIfNull(_locale);
 
         return stringLocalizer.TryGet(
             key,
-            _locale.Value,
+            Locale,
             out value);
     }
 
@@ -52,11 +55,10 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
         params object[] arguments)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        ArgumentNullException.ThrowIfNull(_locale);
 
         return stringLocalizer.TryGet(
             key,
-            _locale.Value,
+            Locale,
             out value,
             arguments);
     }
@@ -76,4 +78,13 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
     public string this[string key] => Get(key);
 
     public void Dispose() { _disposed = true; }
+
+    private static Locale? GetDefaultLocale(
+        IOptions<LocalesOptions>? localeOptions)
+    {
+        var defaultLocale = localeOptions?.Value.Default;
+        return string.IsNullOrWhiteSpace(defaultLocale)
+            ? (Locale?)null
+            : new Locale(defaultLocale);
+    }
 }

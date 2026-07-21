@@ -5,7 +5,7 @@ namespace Pricing.Application.Interfaces.Pricing;
 
 public interface IProductPriceCalculator
 {
-    Task<IReadOnlyCollection<CalculatedScoredPriceCandidate>> CalculateAsync(
+    Task<ProductPriceCalculationResult> CalculateAsync(
         IReadOnlyCollection<PriceCandidate> candidates,
         CancellationToken ct);
 }

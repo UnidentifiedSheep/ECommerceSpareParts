@@ -10,7 +10,7 @@ public class UniquenessAdditionalMarkupApplier(
     ISettingsService settingsService
     ) : ApplierNamedObjectBase, IInternalPriceApplier
 {
-    public override int Order => 1;
+    public override int Order => 10000;
     public override string SystemName => nameof(UniquenessAdditionalMarkupApplier);
     public override string NameLocalizationKey => "price.applier.uniqueness.additional.markup.name";
     public override string DescriptionLocalizationKey => "price.applier.uniqueness.additional.markup.description";

@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.Producers.AddAlias;
+using Main.Application.Handlers.ProducerAliases.AddAlias;
 using Main.Application.Static;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;

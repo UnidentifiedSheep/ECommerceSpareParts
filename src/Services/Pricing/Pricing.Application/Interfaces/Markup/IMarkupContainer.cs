@@ -10,6 +10,7 @@ public interface IMarkupContainer
     int DefaultCurrencyId { get; }
     Models.Markup? GetForDefaultOrNull(double value);
     Models.Markup? GetForCurrencyOrNull(int currencyId, double value);
+    string CurrentVersion { get; }
 
     void Initialize(
         int defaultCurrencyId,

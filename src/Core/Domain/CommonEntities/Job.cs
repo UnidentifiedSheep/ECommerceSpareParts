@@ -83,7 +83,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
     private void SetMaxAttempts(int maxAttempts)
     {
-        MaxAttempts = maxAttempts.AgainstLessOrEqual(
+        MaxAttempts = maxAttempts.EnsureGreaterThan(
             0,
             () => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
     }

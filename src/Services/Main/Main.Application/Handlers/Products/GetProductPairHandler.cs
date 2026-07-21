@@ -20,7 +20,7 @@ public class GetProductPairHandler(IReadRepository<Product, int> context)
     {
         var product = await context.Query
             .Where(x => x.Id == request.ProductId && x.PairId != null)
-            .Include(x => x.Pair)
+            .Select(x => x.Pair!)
             .FirstProductDtoAsync(cancellationToken: cancellationToken);
 
         return new GetProductPairResult(product);

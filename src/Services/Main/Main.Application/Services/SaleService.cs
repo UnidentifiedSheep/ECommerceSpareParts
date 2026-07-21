@@ -14,7 +14,6 @@ using Main.Entities.Product;
 using Main.Entities.Sale;
 using Main.Enums;
 using MediatR;
-using Utils;
 
 namespace Main.Application.Services;
 
@@ -327,7 +326,7 @@ public class SaleService(
             var art = products[id];
             var key = $"{art.Producer.Name}_{art.Sku.NormalizedValue}";
             res[key] = count;
-            codeBuilder.Append(HashUtils.ComputeHash(key, count));
+            codeBuilder.Append($"{key}:{count}");
         }
 
         var currentCode = codeBuilder.ToString();

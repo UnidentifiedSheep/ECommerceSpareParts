@@ -25,7 +25,6 @@ public static class ServiceProvider
                 typeof(ServiceProvider).Assembly,
                 typeof(TransactionBehavior<,>),
                 typeof(SaveChangesBehavior<,>),
-                typeof(EventSideEffectsSaveChangesBehavior<,>),
                 typeof(IntegrationEventPublisherBehavior<,>),
                 typeof(DbValidationBehavior<,>));
 

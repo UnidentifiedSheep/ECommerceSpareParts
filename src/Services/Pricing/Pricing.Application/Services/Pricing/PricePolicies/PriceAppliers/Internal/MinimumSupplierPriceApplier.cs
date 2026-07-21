@@ -8,7 +8,7 @@ public class MinimumSupplierPriceApplier(
     ICurrencyConverter currencyConverter
     ) : ApplierNamedObjectBase, IInternalPriceApplier
 {
-    public override int Order => int.MinValue;
+    public override int Order => -1000;
     public override string SystemName => nameof(MinimumSupplierPriceApplier);
     public override string NameLocalizationKey => "price.applier.minimum.supplier.price.name";
     public override string DescriptionLocalizationKey => "price.applier.minimum.supplier.price.description";

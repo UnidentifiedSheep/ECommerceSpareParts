@@ -10,7 +10,7 @@ using Pricing.Enums;
 namespace Pricing.Application.Services.Pricing.PricePolicies;
 
 public class InternalPricePolicy(
-    IEnumerable<IInternalPriceApplier> appliers
+    IPriceApplierService applierService
 ) : IInternalPricePolicy
 {
     public PriceOfferSourceType SourceType => PriceOfferSourceType.OurWarehouse;
@@ -20,9 +20,9 @@ public class InternalPricePolicy(
         MarketInfo market,
         CancellationToken ct)
     {
-        var orderedAppliers = appliers
-            .OrderBy(x => x.Order)
-            .ToArray();
+        var orderedAppliers = await applierService.GetPriceAppliersAsync(
+            SourceType, 
+            ct);
 
         var result = new List<CalculatedPriceCandidate>(candidates.Count);
 

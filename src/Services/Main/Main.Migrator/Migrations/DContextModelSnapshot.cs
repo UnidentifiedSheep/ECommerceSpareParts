@@ -1622,6 +1622,190 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_weights", "public");
                 });
 
+            modelBuilder.Entity("Main.Entities.Product.Supplier.SupplierProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Producer")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("producer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Sku", "Main.Entities.Product.Supplier.SupplierProduct.Sku#Sku", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("NormalizedValue")
+                                .IsRequired()
+                                .HasMaxLength(128)
+                                .HasColumnType("character varying(128)")
+                                .HasColumnName("normalized_sku");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(128)
+                                .HasColumnType("character varying(128)")
+                                .HasColumnName("sku");
+                        });
+
+                    b.HasKey("Id")
+                        .HasName("supplier_products_pk");
+
+                    b.HasIndex("Producer")
+                        .HasDatabaseName("supplier_products_producer_idx");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("main.entities.product.supplier.supplierproduct_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("main.entities.product.supplier.supplierproduct_who_updated_idx");
+
+                    b.ToTable("supplier_products", "product_enrichment");
+
+                    b.HasAnnotation("CustomIndex:CompositeIndexes", "[{\"paths\":[\"Sku.NormalizedValue\",\"Producer\"],\"unique\":true,\"name\":\"supplier_products_normalized_sku_producer_uidx\"}]");
+                });
+
+            modelBuilder.Entity("Main.Entities.Product.Supplier.SupplierProductAnalogue", b =>
+                {
+                    b.Property<int>("SupplierProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("supplier_product_id");
+
+                    b.Property<int>("SupplierAnalogueProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("supplier_analogue_product_id");
+
+                    b.HasKey("SupplierProductId", "SupplierAnalogueProductId")
+                        .HasName("supplier_product_analogues_pk");
+
+                    b.HasIndex("SupplierAnalogueProductId")
+                        .HasDatabaseName("supplier_product_analogues_supplier_analogue_product_id_idx");
+
+                    b.ToTable("supplier_product_analogues", "product_enrichment");
+                });
+
+            modelBuilder.Entity("Main.Entities.Product.Supplier.SupplierProductMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("LastCheckedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_checked_at");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("status");
+
+                    b.Property<int>("SupplierProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("supplier_product_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Id")
+                        .HasName("supplier_product_mappings_pk");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("supplier_product_mappings_status_idx");
+
+                    b.HasIndex("SupplierProductId")
+                        .HasDatabaseName("supplier_product_mappings_supplier_product_id_idx");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("main.entities.product.supplier.supplierproductmapping_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("main.entities.product.supplier.supplierproductmapping_who_updated_idx");
+
+                    b.HasIndex("ProductId", "SupplierProductId")
+                        .IsUnique()
+                        .HasDatabaseName("supplier_product_mappings_product_supplier_product_uidx");
+
+                    b.ToTable("supplier_product_mappings", "product_enrichment");
+                });
+
+            modelBuilder.Entity("Main.Entities.Product.Supplier.SupplierProductName", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Supplier")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("supplier");
+
+                    b.Property<int>("SupplierProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("supplier_product_id");
+
+                    b.HasKey("Id")
+                        .HasName("supplier_product_names_pk");
+
+                    b.HasIndex("SupplierProductId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("supplier_product_names_product_supplier_name_uidx");
+
+                    b.ToTable("supplier_product_names", "product_enrichment");
+                });
+
             modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3464,6 +3648,52 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("product_weight_products_id_fk");
                 });
 
+            modelBuilder.Entity("Main.Entities.Product.Supplier.SupplierProductAnalogue", b =>
+                {
+                    b.HasOne("Main.Entities.Product.Supplier.SupplierProduct", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierAnalogueProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("supplier_product_analogues_supplier_analogue_product_id_fk");
+
+                    b.HasOne("Main.Entities.Product.Supplier.SupplierProduct", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("supplier_product_analogues_supplier_product_id_fk");
+                });
+
+            modelBuilder.Entity("Main.Entities.Product.Supplier.SupplierProductMapping", b =>
+                {
+                    b.HasOne("Main.Entities.Product.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("supplier_product_mappings_product_id_fk");
+
+                    b.HasOne("Main.Entities.Product.Supplier.SupplierProduct", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("supplier_product_mappings_supplier_product_id_fk");
+                });
+
+            modelBuilder.Entity("Main.Entities.Product.Supplier.SupplierProductName", b =>
+                {
+                    b.HasOne("Main.Entities.Product.Supplier.SupplierProduct", "SupplierProduct")
+                        .WithMany("Names")
+                        .HasForeignKey("SupplierProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("supplier_product_names_supplier_product_id_fk");
+
+                    b.Navigation("SupplierProduct");
+                });
+
             modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", "Currency")
@@ -3912,6 +4142,11 @@ namespace Main.Migrator.Migrations
                     b.Navigation("ProductSize");
 
                     b.Navigation("ProductWeight");
+                });
+
+            modelBuilder.Entity("Main.Entities.Product.Supplier.SupplierProduct", b =>
+                {
+                    b.Navigation("Names");
                 });
 
             modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>

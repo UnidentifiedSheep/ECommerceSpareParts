@@ -25,6 +25,10 @@ public static class NamedObjectDiRegistry
             .RegisterNamedObject<SettingDefinitionNamedObjectBase>(
                 assembly: typeof(PricingSettingDefinition).Assembly,
                 objectsLifetime: ServiceLifetime.Scoped)
-            .RegisterNamedObject<ApplierNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
+            .RegisterNamedObject<ApplierNamedObjectBase>(
+                objectsLifetime: ServiceLifetime.Scoped,
+                objectsToExclude: [
+                    typeof(DynamicApplierNamedObject)
+                ]);
     }
 }

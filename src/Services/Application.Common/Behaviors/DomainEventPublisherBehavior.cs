@@ -1,11 +1,13 @@
-﻿using Application.Common.Interfaces.Events;
+﻿using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using MediatR;
 
 namespace Application.Common.Behaviors;
 
 public class DomainEventPublisherBehavior<TRequest, TResponse>(
     IDomainEventScope eventScope,
-    IPublisher publisher
+    IPublisher publisher,
+    IUnitOfWork? unitOfWork = null
 ) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
@@ -27,6 +29,9 @@ public class DomainEventPublisherBehavior<TRequest, TResponse>(
 
             foreach (var @event in events)
                 await publisher.Publish((object)@event, cancellationToken);
+
+            if (unitOfWork is { Context.SuppressAutoSave: false })
+                await unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
         throw new InvalidOperationException(

@@ -27,4 +27,8 @@
         <ProjectReference Include="..\Pricing.Entities\Pricing.Entities.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Contexts\Configurations\PriceAppliers\" />
+    </ItemGroup>
+
 </Project>

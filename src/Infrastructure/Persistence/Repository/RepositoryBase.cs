@@ -56,6 +56,9 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(
         IEnumerable<TKey> ids,
         Criteria<TEntity>? criteria = null,
         CancellationToken ct = default);
+    public abstract Task DeleteManyAsync(
+        IEnumerable<TKey> ids,
+        CancellationToken cancellationToken = default);
 
     private static object[] ToKeyValues(TKey key)
     {

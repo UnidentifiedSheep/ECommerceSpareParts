@@ -174,7 +174,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     public void SetPasswordHash(string passwordHash)
     {
         PasswordHash = passwordHash
-            .AgainstNullOrWhiteSpace(() =>
+            .EnsureNotNullOrWhiteSpace(() =>
                 new InvalidOperationException("Password hash must not be null or empty."));
     }
 

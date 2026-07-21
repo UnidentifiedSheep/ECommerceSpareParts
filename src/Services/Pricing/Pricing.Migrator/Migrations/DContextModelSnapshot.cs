@@ -550,7 +550,7 @@ namespace Pricing.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("days_to_refund");
 
-                    b.Property<DateTime>("DeliveryDate")
+                    b.Property<DateTime?>("DeliveryDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("delivery_date");
 
@@ -562,7 +562,7 @@ namespace Pricing.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at");
 
-                    b.Property<DateTime>("GuaranteedDeliveryDate")
+                    b.Property<DateTime?>("GuaranteedDeliveryDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("guaranteed_delivery_date");
 
@@ -576,7 +576,7 @@ namespace Pricing.Migrator.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("offer_for_storage");
 
-                    b.Property<DateTime>("OrderTill")
+                    b.Property<DateTime?>("OrderTill")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("order_till");
 
@@ -603,6 +603,10 @@ namespace Pricing.Migrator.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
                         .HasColumnName("source_key");
+
+                    b.Property<DateTime?>("SourceOccurredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("source_occurred_at");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -675,6 +679,11 @@ namespace Pricing.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("price_offer_id");
 
+                    b.Property<string>("AppliersVersion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("appliers_version");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -705,9 +714,18 @@ namespace Pricing.Migrator.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("markup");
 
+                    b.Property<string>("MarkupVersion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("markup_version");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric")
                         .HasColumnName("price");
+
+                    b.Property<Guid>("PricingSettingsVersion")
+                        .HasColumnType("uuid")
+                        .HasColumnName("pricing_settings_version");
 
                     b.Property<decimal>("Score")
                         .HasColumnType("numeric")
@@ -739,6 +757,99 @@ namespace Pricing.Migrator.Migrations
                     b.HasIndex(new[] { "Score" }, "product_price_option_score_index");
 
                     b.ToTable("product_price_options", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Pricing.PriceApplier", b =>
+                {
+                    b.Property<string>("SystemName")
+                        .HasColumnType("text")
+                        .HasColumnName("system_name");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DslLogic")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("dsl_logic");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("SystemName")
+                        .HasName("price_appliers_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("pricing.entities.pricing.priceapplier_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("pricing.entities.pricing.priceapplier_who_updated_idx");
+
+                    b.ToTable("price_appliers", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Pricing.PriceApplierState", b =>
+                {
+                    b.Property<string>("PriceApplierSystemName")
+                        .HasColumnType("text")
+                        .HasColumnName("price_applier_system_name");
+
+                    b.Property<string>("Usage")
+                        .HasColumnType("text")
+                        .HasColumnName("usage");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("enabled");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer")
+                        .HasColumnName("order");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("PriceApplierSystemName", "Usage")
+                        .HasName("price_applier_states_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("pricing.entities.pricing.priceapplierstate_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("pricing.entities.pricing.priceapplierstate_who_updated_idx");
+
+                    b.HasIndex(new[] { "Usage", "Order" }, "price_applier_states_enabled_usage_order_uq")
+                        .IsUnique()
+                        .HasFilter("enabled = true");
+
+                    b.ToTable("price_applier_states", "public");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.UniqJob", b =>
@@ -818,6 +929,16 @@ namespace Pricing.Migrator.Migrations
                     b.Navigation("PriceOffer");
                 });
 
+            modelBuilder.Entity("Pricing.Entities.Pricing.PriceApplierState", b =>
+                {
+                    b.HasOne("Pricing.Entities.Pricing.PriceApplier", null)
+                        .WithMany("States")
+                        .HasForeignKey("PriceApplierSystemName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("price_applier_states_price_applier_system_name_fk");
+                });
+
             modelBuilder.Entity("Domain.CommonEntities.JobSchedule", b =>
                 {
                     b.Navigation("Runs");
@@ -826,6 +947,11 @@ namespace Pricing.Migrator.Migrations
             modelBuilder.Entity("Pricing.Entities.MarkupGroup", b =>
                 {
                     b.Navigation("MarkupRanges");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Pricing.PriceApplier", b =>
+                {
+                    b.Navigation("States");
                 });
 #pragma warning restore 612, 618
         }

@@ -74,7 +74,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
         Comment = comment
             .NullIfWhiteSpace()
             ?
-            .AgainstTooLong(
+            .EnsureMaxLength(
                 256,
                 () => throw new InvalidInputException("purchase.comment.too.long"));
     }

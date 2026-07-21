@@ -32,7 +32,7 @@ public class Role : AuditableEntity<Role, string>, ILinqEntity<Role, string>
     {
         Description = description.NullIfWhiteSpace()
             ?
-            .AgainstTooLong(255, "role.description.max.length");
+            .EnsureMaxLength(255, "role.description.max.length");
     }
 
     public void AddPermission(string name)

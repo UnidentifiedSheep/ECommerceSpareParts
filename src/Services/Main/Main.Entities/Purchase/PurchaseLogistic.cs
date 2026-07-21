@@ -174,20 +174,20 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
 
     private void SetPriceKg(decimal priceKg)
     {
-        PriceKg = priceKg.AgainstTooManyDecimalPlaces(2, "storage.route.price.kg.precision")
-            .AgainstTooSmall(0, "storage.route.price.kg.min");
+        PriceKg = priceKg.EnsureMaxDecimalPlaces(2, "storage.route.price.kg.precision")
+            .EnsureAtLeast(0, "storage.route.price.kg.min");
     }
 
     private void SetPricePerM3(decimal pricePerM3)
     {
-        PricePerM3 = pricePerM3.AgainstTooManyDecimalPlaces(2, "storage.route.price.m3.precision")
-            .AgainstTooSmall(0, "storage.route.price.m3.min");
+        PricePerM3 = pricePerM3.EnsureMaxDecimalPlaces(2, "storage.route.price.m3.precision")
+            .EnsureAtLeast(0, "storage.route.price.m3.min");
     }
 
     private void SetPricePerOrder(decimal pricePerOrder)
     {
-        PricePerOrder = pricePerOrder.AgainstTooManyDecimalPlaces(2, "storage.route.price.order.precision")
-            .AgainstTooSmall(0, "storage.route.price.order.min");
+        PricePerOrder = pricePerOrder.EnsureMaxDecimalPlaces(2, "storage.route.price.order.precision")
+            .EnsureAtLeast(0, "storage.route.price.order.min");
     }
 
     private void SetMinimumPrice(decimal? minimumPrice)
@@ -199,8 +199,8 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
         }
 
         MinimumPrice = minimumPrice.Value
-            .AgainstTooManyDecimalPlaces(2, "storage.route.minimum.price.precision")
-            .AgainstTooSmall(0, "storage.route.minimum.price.min");
+            .EnsureMaxDecimalPlaces(2, "storage.route.minimum.price.precision")
+            .EnsureAtLeast(0, "storage.route.minimum.price.min");
     }
 
     private void SetMinimumPriceApplied(bool minimumPriceApplied)

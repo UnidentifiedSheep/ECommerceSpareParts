@@ -57,7 +57,7 @@ public class SupplierOfferConverterService(
                 continue;
             }
                 
-            offers.Add(PriceOffer.Create(
+            offers.Add(PriceOffer.CreateForSupplier(
                 productId,
                 currencyId.Value,
                 storageName,

@@ -11,7 +11,7 @@ using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PricePolicy;
-using Pricing.Application.Lrts.PriceCandidateCalculationLrt;
+using Pricing.Application.Lrts.PriceCandidateCalculation;
 using Pricing.Application.Services;
 using Pricing.Application.Services.Markup;
 using Pricing.Application.Services.Pricing;
@@ -49,6 +49,7 @@ public static class ServiceProvider
         collection.AddSingleton<IMarkupContainer, MarkupContainer>();
         collection.AddScoped<IMarkupCalculator, MarkupCalculator>();
         collection.AddScoped<IMarkupInitializer, MarkupInitializer>();
+        collection.AddScoped<IPriceApplierService, PriceApplierService>();
 
         collection.AddScoped<ISupplierOfferRequestMarkerService, SupplierOfferRequestMarkerService>();
         collection.AddScoped<ISupplierOfferExtractorService, SupplierOfferExtractorService>();
@@ -63,7 +64,6 @@ public static class ServiceProvider
     private static IServiceCollection AddPricingServices(this IServiceCollection collection)
     {
         collection
-            .AddPriceAppliers()
             .AddScoped<IOfferScorer, OfferScorerByEffectiveCost>()
             .AddScoped<IInternalPricePolicy, InternalPricePolicy>()
             .AddScoped<ISupplierPricePolicy, SupplierPricePolicy>()
@@ -71,19 +71,6 @@ public static class ServiceProvider
             .AddScoped<IPriceCandidateBuilder, PriceCandidateBuilder>()
             .AddScoped<IProductPriceCalculator, ProductPriceCalculator>();
         
-        return collection;
-    }
-
-    private static IServiceCollection AddPriceAppliers(this IServiceCollection collection)
-    {
-        collection.AddScoped<IInternalPriceApplier, MinimumSupplierPriceApplier>();
-        
-        collection.AddScoped<IInternalPriceApplier, MarkupApplier>();
-        collection.AddScoped<IInternalPriceApplier, PriceRoundingApplier>();
-        collection.AddScoped<IInternalPriceApplier, UniquenessAdditionalMarkupApplier>();
-        
-        collection.AddScoped<ISupplierPriceApplier, MarkupApplier>();
-        collection.AddScoped<ISupplierPriceApplier, PriceRoundingApplier>();
         return collection;
     }
 }

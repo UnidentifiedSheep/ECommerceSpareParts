@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Application.Common.Handlers.Jobs;
-using Pricing.Application.Lrts.PriceCandidateCalculationLrt;
+using Pricing.Application.Lrts.PriceCandidateCalculation;
 
 namespace Pricing.Application.Models.Jobs;
 

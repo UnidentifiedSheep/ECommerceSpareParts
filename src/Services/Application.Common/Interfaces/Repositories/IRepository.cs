@@ -23,4 +23,8 @@ public interface IRepository<TEntity, TKey> where TEntity : Entity<TEntity, TKey
         IEnumerable<TKey> ids,
         Criteria<TEntity>? criteria = null,
         CancellationToken ct = default);
+    
+    Task DeleteManyAsync(
+        IEnumerable<TKey> ids, 
+        CancellationToken cancellationToken = default);
 }

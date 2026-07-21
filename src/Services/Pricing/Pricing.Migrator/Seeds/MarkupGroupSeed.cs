@@ -25,7 +25,6 @@ public class MarkupGroupSeed : ISeed<DContext>
             MarkupRange.Create(5_000m, 10_000m, 0.40m),
             MarkupRange.Create(10_000m, 25_000m, 0.30m),
             MarkupRange.Create(25_000m, 50_000m, 0.20m),
-            MarkupRange.Create(50_000m, decimal.MaxValue, 0.10m)
         };
 
         var group = MarkupGroup.CreateGenerated(1, ranges);

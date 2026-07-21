@@ -1,17 +1,18 @@
+using System.Text.Json.Serialization;
 using Pricing.Enums;
 
 namespace Pricing.Application.Models.Pricing.PriceCandidates;
 
 public sealed record PriceCandidate(
-    Guid PriceOfferId,
-    int ProductId,
-    string TargetStorageName,
+    [property: JsonPropertyName("priceOfferId")] Guid PriceOfferId,
+    [property: JsonPropertyName("productId")] int ProductId,
+    [property: JsonPropertyName("targetStorageName")] string TargetStorageName,
 
-    PriceOfferSourceType SourceType,
+    [property: JsonPropertyName("sourceType")] PriceOfferSourceType SourceType,
 
-    decimal Cost,
-    int CurrencyId,
+    [property: JsonPropertyName("cost")] decimal Cost,
+    [property: JsonPropertyName("currencyId")] int CurrencyId,
     
-    int AvailableQuantity,
-    FulfillmentRouteInfo Fulfillment
+    [property: JsonPropertyName("availableQuantity")] int AvailableQuantity,
+    [property: JsonPropertyName("fulfillment")] FulfillmentRouteInfo Fulfillment
 );

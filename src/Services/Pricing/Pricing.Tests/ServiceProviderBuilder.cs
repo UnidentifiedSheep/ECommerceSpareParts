@@ -7,8 +7,11 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Moq;
 using Npgsql;
 using Persistence;
+using Pricing.Application.Interfaces.Cache;
+using Pricing.Cache;
 using Pricing.Persistence;
 using Serilog;
 using Tests.Abstractions.Test;
@@ -39,6 +42,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
         ApplicationServiceProvider
             .AddApplicationLayer(services, null!)
+            .AddApplicationCache()
             .AddLocalization(
                 "ru-RU",
                 "ru-RU",
@@ -78,6 +82,9 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
         services.RemoveAll<IFusionCacheBackplane>();
         services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 
+        services.RemoveAll<ICachedCurrencyProvider>();
+        services.AddScoped(_ => Mock.Of<ICachedCurrencyProvider>());
+        
         var serviceProvider = services.BuildServiceProvider();
         return serviceProvider;
     }
