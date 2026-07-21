@@ -24,15 +24,17 @@ for host in $SWARM_WORKER_HOSTS; do
   echo "Uploading shared configs to worker node"
 
   ssh $SSH_OPTS "$user@$target_host" \
-    "mkdir -p '${SWARM_PATH}' '${SWARM_PATH}/certs' && rm -rf '${SWARM_PATH}/configs.next' '${SWARM_PATH}/init.next'"
+    "mkdir -p '${SWARM_PATH}' '${SWARM_PATH}/certs' && \
+     rm -rf '${SWARM_PATH}/configs.next' '${SWARM_PATH}/init.next' && \
+     mkdir -p '${SWARM_PATH}/configs.next' '${SWARM_PATH}/init.next'"
 
   scp $SSH_OPTS -r \
-    deploy-payload/configs \
-    "$user@$target_host:${SWARM_PATH}/configs.next"
+    deploy-payload/configs/. \
+    "$user@$target_host:${SWARM_PATH}/configs.next/"
 
   scp $SSH_OPTS -r \
-    deploy-payload/init \
-    "$user@$target_host:${SWARM_PATH}/init.next"
+    deploy-payload/init/. \
+    "$user@$target_host:${SWARM_PATH}/init.next/"
 
   scp $SSH_OPTS \
     deploy-payload/prometheus.yml \
