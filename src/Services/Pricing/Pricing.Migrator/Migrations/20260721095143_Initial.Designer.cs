@@ -12,8 +12,8 @@ using Pricing.Persistence.Contexts;
 namespace Pricing.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260720192718_PriceAppliers")]
-    partial class PriceAppliers
+    [Migration("20260721095143_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -682,6 +682,11 @@ namespace Pricing.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("price_offer_id");
 
+                    b.Property<string>("AppliersVersion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("appliers_version");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -720,6 +725,10 @@ namespace Pricing.Migrator.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric")
                         .HasColumnName("price");
+
+                    b.Property<Guid>("PricingSettingsVersion")
+                        .HasColumnType("uuid")
+                        .HasColumnName("pricing_settings_version");
 
                     b.Property<decimal>("Score")
                         .HasColumnType("numeric")
