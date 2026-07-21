@@ -46,4 +46,16 @@ public class SkuTests
         exception.Should().BeOfType<InvalidInputException>();
         ((InvalidInputException)exception!).MessageKey.Should().Be(expectedErrorKey);
     }
+
+    [Fact]
+    public void IsValid_WhenSkuExceedsMaximumLength_ReturnsFalseWithException()
+    {
+        var result = Sku.IsValid(new string('A', 129), out var exception);
+
+        result.Should().BeFalse();
+        exception.Should().BeOfType<InvalidInputException>();
+        ((InvalidInputException)exception!).MessageKey
+            .Should()
+            .Be("article.articleNumber.max.length.128");
+    }
 }

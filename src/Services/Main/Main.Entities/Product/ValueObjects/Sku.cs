@@ -47,7 +47,7 @@ public partial record Sku
             return false;
         }
 
-        if (sku.HasMaxLength(128))
+        if (!sku.HasMaxLength(128))
         {
             exception = new InvalidInputException("article.articleNumber.max.length.128");
             return false;
