@@ -12,6 +12,8 @@ public class S3Options
     [Required]
     public required string ExternalUrl { get; init; }
 
+    public string Region { get; init; } = "";
+
     [Required]
     public required string Login { get; init; }
 
