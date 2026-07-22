@@ -2,7 +2,7 @@ using System.Text;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.ProductReservations.GetProductsWithNotEnoughStock;
-using Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
+using Main.Application.Handlers.ProductReservations.UpdateOrganizationReservationCounts;
 using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Application.Interfaces.Persistence;
@@ -54,7 +54,7 @@ public class SaleService(
 
     public Task CheckReservations(
         IEnumerable<NewSaleContentDto> saleContents,
-        Guid buyerId,
+        Guid buyerOrganizationId,
         string storageName,
         bool takeFromOtherStorages,
         string? confirmationCode,
@@ -68,7 +68,7 @@ public class SaleService(
                 x.PriceWithDiscount,
                 x.Count,
                 x.Comment)),
-            buyerId,
+            buyerOrganizationId,
             storageName,
             takeFromOtherStorages,
             confirmationCode,
@@ -77,7 +77,7 @@ public class SaleService(
 
     public Task CheckReservations(
         IEnumerable<EditSaleContentDto> saleContents,
-        Guid buyerId,
+        Guid buyerOrganizationId,
         string storageName,
         bool takeFromOtherStorages,
         string? confirmationCode,
@@ -91,7 +91,7 @@ public class SaleService(
                 x.PriceWithDiscount,
                 x.Count,
                 x.Comment)),
-            buyerId,
+            buyerOrganizationId,
             storageName,
             takeFromOtherStorages,
             confirmationCode,
@@ -134,8 +134,8 @@ public class SaleService(
         return DistributeDetails(takenFromStorage.Contents, contents);
     }
 
-    public async Task UpdateReservationsCounts(
-        Guid buyerId,
+    public async Task UpdateOrganizationReservationCounts(
+        Guid buyerOrganizationId,
         Dictionary<int, int> counts,
         CancellationToken cancellationToken = default)
     {
@@ -145,20 +145,22 @@ public class SaleService(
 
         if (toSubtract.Count == 0) return;
 
-        await sender.Send(new UpdateReservationsCountsCommand(buyerId, toSubtract), cancellationToken);
+        await sender.Send(
+            new UpdateOrganizationReservationCountsCommand(buyerOrganizationId, toSubtract),
+            cancellationToken);
     }
 
-    public Task SubtractCountFromReservations(
+    public Task ConsumeOrganizationReservations(
         Sale sale,
-        Guid buyerId,
+        Guid buyerOrganizationId,
         CancellationToken cancellationToken = default)
     {
         var toSubtract = sale.Contents
             .GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
-        return UpdateReservationsCounts(
-            buyerId,
+        return UpdateOrganizationReservationCounts(
+            buyerOrganizationId,
             toSubtract,
             cancellationToken);
     }
@@ -292,7 +294,7 @@ public class SaleService(
 
     private async Task CheckReservations(
         IEnumerable<SaleContentInput> saleContents,
-        Guid buyerId,
+        Guid buyerOrganizationId,
         string storageName,
         bool takeFromOtherStorages,
         string? confirmationCode,
@@ -301,7 +303,7 @@ public class SaleService(
         var contentList = saleContents.ToList();
         var (byReservation, byStock) = await GetStockReservations(
             contentList,
-            buyerId,
+            buyerOrganizationId,
             storageName,
             takeFromOtherStorages,
             cancellationToken);
@@ -336,7 +338,7 @@ public class SaleService(
     private async Task<(Dictionary<int, int> byReservation, Dictionary<int, int> byStock)>
         GetStockReservations(
             IEnumerable<SaleContentInput> saleContents,
-            Guid buyerId,
+            Guid buyerOrganizationId,
             string storageName,
             bool takeFromOtherStorages,
             CancellationToken cancellationToken = default)
@@ -349,7 +351,7 @@ public class SaleService(
 
         var result = await sender.Send(
             new GetProductsWithNotEnoughStockQuery(
-                buyerId,
+                buyerOrganizationId,
                 storageName,
                 takeFromOtherStorages,
                 neededProductCounts),

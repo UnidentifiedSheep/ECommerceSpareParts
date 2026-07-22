@@ -12,7 +12,7 @@ namespace Main.Application.Handlers.ProductReservations.DeleteProductReservation
 public record DeleteProductReservationCommand(int ReservationId) : ICommand;
 
 public class DeleteProductReservationHandler(
-    IRepository<StorageContentReservation, int> repository
+    IRepository<ProductReservation, int> repository
 ) : ICommandHandler<DeleteProductReservationCommand>
 {
     public async Task<Unit> Handle(

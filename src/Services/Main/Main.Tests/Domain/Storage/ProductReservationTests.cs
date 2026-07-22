@@ -5,23 +5,23 @@ using Main.Enums;
 
 namespace Tests.Domain.Storage;
 
-public class StorageContentReservationTests
+public class ProductReservationTests
 {
     [Fact]
     public void Create_ValidData_Succeeds()
     {
-        var userId = Guid.NewGuid();
+        var organizationId = Guid.NewGuid();
 
-        var reservation = StorageContentReservation.Create(
-            userId,
+        var reservation = ProductReservation.Create(
+            organizationId,
             10,
             3);
 
-        reservation.UserId.Should().Be(userId);
+        reservation.OrganizationId.Should().Be(organizationId);
         reservation.ProductId.Should().Be(10);
         reservation.ReservedCount.Should().Be(3);
         reservation.CurrentCount.Should().Be(0);
-        reservation.Status.Should().Be(StorageContentReservationStatus.Active);
+        reservation.Status.Should().Be(ProductReservationStatus.Active);
         reservation.ProposedPrice.Should().BeNull();
         reservation.ProposedCurrencyId.Should().BeNull();
         reservation.Comment.Should().BeNull();
@@ -32,7 +32,7 @@ public class StorageContentReservationTests
     [InlineData(-1)]
     public void Create_InvalidReservedCount_Throws(int reservedCount)
     {
-        var act = () => StorageContentReservation.Create(
+        var act = () => ProductReservation.Create(
             Guid.NewGuid(),
             10,
             reservedCount);
@@ -128,7 +128,7 @@ public class StorageContentReservationTests
         reservation.AddCount(2);
 
         reservation.CurrentCount.Should().Be(2);
-        reservation.Status.Should().Be(StorageContentReservationStatus.Locked);
+        reservation.Status.Should().Be(ProductReservationStatus.Locked);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class StorageContentReservationTests
         reservation.AddCount(3);
 
         reservation.CurrentCount.Should().Be(3);
-        reservation.Status.Should().Be(StorageContentReservationStatus.Done);
+        reservation.Status.Should().Be(ProductReservationStatus.Done);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class StorageContentReservationTests
         reservation.AddCount(-2);
 
         reservation.CurrentCount.Should().Be(0);
-        reservation.Status.Should().Be(StorageContentReservationStatus.Active);
+        reservation.Status.Should().Be(ProductReservationStatus.Active);
     }
 
     [Theory]
@@ -176,7 +176,7 @@ public class StorageContentReservationTests
 
         reservation.ProposedPrice.Should().Be(100m);
         reservation.ProposedCurrencyId.Should().Be(1);
-        reservation.Status.Should().Be(StorageContentReservationStatus.Locked);
+        reservation.Status.Should().Be(ProductReservationStatus.Locked);
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class StorageContentReservationTests
         var act = () => reservation.ProposePrice(100m, 1);
 
         act.Should().Throw<InvalidInputException>();
-        reservation.Status.Should().Be(StorageContentReservationStatus.Done);
+        reservation.Status.Should().Be(ProductReservationStatus.Done);
     }
 
     [Fact]
@@ -198,7 +198,7 @@ public class StorageContentReservationTests
 
         reservation.Cancel();
 
-        reservation.Status.Should().Be(StorageContentReservationStatus.Canceled);
+        reservation.Status.Should().Be(ProductReservationStatus.Canceled);
     }
 
     [Fact]
@@ -223,9 +223,9 @@ public class StorageContentReservationTests
         act.Should().Throw<InvalidInputException>();
     }
 
-    private static StorageContentReservation Create(int reservedCount = 3)
+    private static ProductReservation Create(int reservedCount = 3)
     {
-        return StorageContentReservation.Create(
+        return ProductReservation.Create(
             Guid.NewGuid(),
             10,
             reservedCount);

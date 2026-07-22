@@ -54,7 +54,7 @@ public class CreateSaleHandler(
 
         await saleService.CheckReservations(
             contents,
-            request.UserId,
+            request.OrganizationId,
             request.StorageName,
             false,
             request.ConfirmationCode,
@@ -111,9 +111,9 @@ public class CreateSaleHandler(
 
         sale.Complete();
 
-        await saleService.SubtractCountFromReservations(
+        await saleService.ConsumeOrganizationReservations(
             sale,
-            request.UserId,
+            request.OrganizationId,
             cancellationToken);
 
         await unitOfWork.AddAsync(sale, cancellationToken);

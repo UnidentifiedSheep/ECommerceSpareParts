@@ -11,7 +11,7 @@ public class CreateProductReservationDbValidation : AbstractDbValidation<CreateP
         var reservation = request.Reservation;
 
         plan.ValidateProductExistsId(reservation.ProductId)
-            .ValidateUserExistsId(reservation.UserId);
+            .ValidateOrganizationExistsId(reservation.OrganizationId);
 
         if (reservation.GivenCurrencyId.HasValue)
             plan.ValidateCurrencyExistsId(reservation.GivenCurrencyId.Value);

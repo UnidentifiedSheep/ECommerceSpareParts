@@ -50,11 +50,11 @@ public static class SortByConfig
             .Map<Sale, Guid>("id", x => x.Id);
 
         QueryableSortBy.Value
-            .MapDefault<StorageContentReservation, DateTime>(x => x.CreatedAt)
-            .Map<StorageContentReservation, int>("id", x => x.Id)
-            .Map<StorageContentReservation, DateTime>("createAt", x => x.CreatedAt)
-            .Map<StorageContentReservation, DateTime>("updatedAt", x => x.UpdatedAt)
-            .Map<StorageContentReservation, StorageContentReservationStatus>("status", x => x.Status);
+            .MapDefault<ProductReservation, DateTime>(x => x.CreatedAt)
+            .Map<ProductReservation, int>("id", x => x.Id)
+            .Map<ProductReservation, DateTime>("createAt", x => x.CreatedAt)
+            .Map<ProductReservation, DateTime>("updatedAt", x => x.UpdatedAt)
+            .Map<ProductReservation, ProductReservationStatus>("status", x => x.Status);
 
         QueryableSortBy.Value.ConfigureForJob();
     }

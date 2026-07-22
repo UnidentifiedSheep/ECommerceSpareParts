@@ -19,7 +19,7 @@ public record CreateProductReservationResult(ProductReservationDto Reservation);
 
 public class CreateProductReservationHandler(
     IUnitOfWork unitOfWork,
-    IReadRepository<StorageContentReservation, int> repository
+    IReadRepository<ProductReservation, int> repository
 ) : ICommandHandler<CreateProductReservationCommand, CreateProductReservationResult>
 {
     public async Task<CreateProductReservationResult> Handle(
@@ -27,8 +27,8 @@ public class CreateProductReservationHandler(
         CancellationToken cancellationToken)
     {
         var dto = request.Reservation;
-        var reservation = StorageContentReservation.Create(
-            dto.UserId,
+        var reservation = ProductReservation.Create(
+            dto.OrganizationId,
             dto.ProductId,
             dto.ReservedCount);
 

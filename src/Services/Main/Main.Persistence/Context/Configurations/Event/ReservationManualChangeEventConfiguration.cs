@@ -18,7 +18,7 @@ public class
         builder.HasIndex(e => e.ReservationId)
             .HasDatabaseName("reservation_manual_change_event_reservation_id_idx");
 
-        builder.HasOne<StorageContentReservation>()
+        builder.HasOne<ProductReservation>()
             .WithMany()
             .HasForeignKey(e => e.ReservationId)
             .OnDelete(DeleteBehavior.Cascade)

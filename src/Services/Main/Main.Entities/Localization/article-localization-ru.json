@@ -30,7 +30,7 @@
     "article.reservation.initial.count.must.be.positive": "Начальное количество должно быть больше 0.",
     "article.reservation.current.count.must.be.positive": "Текущее количество должно быть больше 0.",
     "article.reservation.initial.count.not.less.than.current": "Начальное количество не может быть меньше текущего.",
-    "article.reservation.buyer.id.must.not.be.empty": "Id покупателя не может быть пустым.",
+    "article.reservation.organization.id.must.not.be.empty": "Id организации не может быть пустым.",
     "article.reservation.storage.name.must.not.be.empty": "Название склада не может быть пустым.",
     "article.reservation.needed.count.must.be.positive": "Запрашиваемое количество должно быть больше 0.",
     "article.create.articles.must.have.at.least.one": "Список артикулов не может быть пустым.",

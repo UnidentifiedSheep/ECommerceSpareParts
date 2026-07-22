@@ -30,7 +30,7 @@
     "article.reservation.initial.count.must.be.positive": "Başlangıç miktarı 0'dan büyük olmalıdır.",
     "article.reservation.current.count.must.be.positive": "Geçerli miktar 0'dan büyük olmalıdır.",
     "article.reservation.initial.count.not.less.than.current": "Başlangıç miktarı geçerli miktardan az olamaz.",
-    "article.reservation.buyer.id.must.not.be.empty": "Alıcı kimliği boş olmamalıdır.",
+    "article.reservation.organization.id.must.not.be.empty": "Kuruluş kimliği boş olmamalıdır.",
     "article.reservation.storage.name.must.not.be.empty": "Depo adı boş olmamalıdır.",
     "article.reservation.needed.count.must.be.positive": "İstenen miktar 0'dan büyük olmalıdır.",
     "article.create.articles.must.have.at.least.one": "En az bir ürün sağlanmalıdır.",

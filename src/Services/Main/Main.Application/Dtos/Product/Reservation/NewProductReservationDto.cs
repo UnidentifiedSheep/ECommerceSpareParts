@@ -4,8 +4,8 @@ namespace Main.Application.Dtos.Product.Reservation;
 
 public record NewProductReservationDto
 {
-    [JsonPropertyName("userId")]
-    public required Guid UserId { get; init; }
+    [JsonPropertyName("organizationId")]
+    public required Guid OrganizationId { get; init; }
 
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }

@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Auth;
+using Main.Application.Dtos.Organizations;
 using Main.Enums;
 
 namespace Main.Application.Dtos.Product.Reservation;
@@ -9,8 +9,8 @@ public record ProductReservationDto
     [JsonPropertyName("id")]
     public required int Id { get; init; }
 
-    [JsonPropertyName("user")]
-    public required UserPartyDto User { get; init; }
+    [JsonPropertyName("organization")]
+    public required OrganizationDto Organization { get; init; }
 
     [JsonPropertyName("reservedCount")]
     public required int ReservedCount { get; init; }
@@ -26,7 +26,7 @@ public record ProductReservationDto
 
     [JsonPropertyName("status")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required StorageContentReservationStatus Status { get; init; }
+    public required ProductReservationStatus Status { get; init; }
 
     [JsonPropertyName("comment")]
     public string? Comment { get; init; }

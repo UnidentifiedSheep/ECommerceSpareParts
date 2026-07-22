@@ -35,25 +35,25 @@ public class CreateProductReservationTests : IntegrationTest
         var result = await Mediator.Send(command);
 
         result.Reservation.Id.Should().BeGreaterThan(0);
-        result.Reservation.User.User!.Id.Should().Be(dto.UserId);
+        result.Reservation.Organization.Id.Should().Be(dto.OrganizationId);
         result.Reservation.ReservedCount.Should().Be(dto.ReservedCount);
         result.Reservation.CurrentCount.Should().Be(dto.CurrentCount);
         result.Reservation.ProposedPrice.Should().Be(dto.ProposedPrice);
         result.Reservation.ProposedCurrencyId.Should().Be(dto.GivenCurrencyId);
         result.Reservation.Comment.Should().Be(dto.Comment);
 
-        var db = await Context.StorageContentReservations
+        var db = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == result.Reservation.Id);
 
         db.Comment.Should().Be(dto.Comment);
         db.ProductId.Should().Be(dto.ProductId);
-        db.UserId.Should().Be(dto.UserId);
+        db.OrganizationId.Should().Be(dto.OrganizationId);
         db.ReservedCount.Should().Be(dto.ReservedCount);
         db.CurrentCount.Should().Be(dto.CurrentCount);
         db.ProposedPrice.Should().Be(dto.ProposedPrice);
         db.ProposedCurrencyId.Should().Be(dto.GivenCurrencyId);
-        db.Status.Should().Be(StorageContentReservationStatus.Locked);
+        db.Status.Should().Be(ProductReservationStatus.Locked);
     }
 
     [Fact]
@@ -81,12 +81,12 @@ public class CreateProductReservationTests : IntegrationTest
 
         var result = await Mediator.Send(command);
 
-        result.Reservation.Status.Should().Be(StorageContentReservationStatus.Done);
+        result.Reservation.Status.Should().Be(ProductReservationStatus.Done);
 
-        var db = await Context.StorageContentReservations
+        var db = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == result.Reservation.Id);
-        db.Status.Should().Be(StorageContentReservationStatus.Done);
+        db.Status.Should().Be(ProductReservationStatus.Done);
     }
 
     [Fact]
@@ -188,15 +188,15 @@ public class CreateProductReservationTests : IntegrationTest
     }
 
     [Fact]
-    public async Task WithMissingUser_ThrowsDbValidationException()
+    public async Task WithMissingOrganization_ThrowsDbValidationException()
     {
         var dto = GetValidDto() with
         {
-            UserId = Guid.NewGuid()
+            OrganizationId = Guid.NewGuid()
         };
-        var command = new CreateProductReservationCommand(dto);
 
-        await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+        await Assert.ThrowsAsync<DbValidationException>(() =>
+            Mediator.Send(new CreateProductReservationCommand(dto)));
     }
 
     [Fact]
@@ -216,6 +216,7 @@ public class CreateProductReservationTests : IntegrationTest
     {
         var reservedCount = Faker.Random.Int(10, 1000);
         var hasProposedPrice = Faker.Random.Bool();
+        var user = Faker.PickRandom<User>(UsersContext.Users);
         return new NewProductReservationDto
         {
             ProductId = Faker.PickRandom<Product>(ProductContext.Products).Id,
@@ -225,7 +226,7 @@ public class CreateProductReservationTests : IntegrationTest
             ReservedCount = reservedCount,
             CurrentCount = Faker.Random.Int(1, reservedCount - 1),
             ProposedPrice = hasProposedPrice ? Math.Round(Faker.Random.Decimal(1, 1000), 2) : null,
-            UserId = Faker.PickRandom<User>(UsersContext.Users).Id
+            OrganizationId = user.Id
         };
     }
 }

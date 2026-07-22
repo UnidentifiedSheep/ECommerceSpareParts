@@ -7,27 +7,26 @@ using Main.Enums;
 
 namespace Main.Entities.Storage;
 
-//Product reservation. It should be renamed.
-public class StorageContentReservation : AuditableEntity<StorageContentReservation, int>,
-    ILinqEntity<StorageContentReservation, int>
+public class ProductReservation : AuditableEntity<ProductReservation, int>,
+    ILinqEntity<ProductReservation, int>
 {
-    private StorageContentReservation() { }
+    private ProductReservation() { }
 
-    private StorageContentReservation(
-        Guid userId,
+    private ProductReservation(
+        Guid organizationId,
         int productId,
         int reservedCount)
     {
-        UserId = userId;
+        OrganizationId = organizationId;
         ProductId = productId;
         CurrentCount = 0;
-        Status = StorageContentReservationStatus.Active;
+        Status = ProductReservationStatus.Active;
         SetReservedCount(reservedCount);
     }
 
     public int Id { get; private set; }
 
-    public Guid UserId { get; private set; }
+    public Guid OrganizationId { get; private set; }
 
     public int ProductId { get; private set; }
 
@@ -39,26 +38,26 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
     public int? ProposedCurrencyId { get; private set; }
 
-    public StorageContentReservationStatus Status { get; private set; }
+    public ProductReservationStatus Status { get; private set; }
 
     public string? Comment { get; private set; }
 
-    public User.User User { get; private set; } = null!;
+    public Organization.Organization Organization { get; private set; } = null!;
 
-    public static Expression<Func<StorageContentReservation, int>> GetKeySelector() { return x => x.Id; }
+    public static Expression<Func<ProductReservation, int>> GetKeySelector() { return x => x.Id; }
 
-    public static Expression<Func<StorageContentReservation, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<ProductReservation, bool>> GetEqualityExpression(int key)
     {
         return x => x.Id == key;
     }
 
-    public static StorageContentReservation Create(
-        Guid userId,
+    public static ProductReservation Create(
+        Guid organizationId,
         int productId,
         int reservedCount)
     {
-        return new StorageContentReservation(
-            userId,
+        return new ProductReservation(
+            organizationId,
             productId,
             reservedCount);
     }
@@ -120,17 +119,17 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         UpdateStatus();
     }
 
-    public void Cancel() { Status = StorageContentReservationStatus.Canceled; }
+    public void Cancel() { Status = ProductReservationStatus.Canceled; }
 
     private void UpdateStatus()
     {
-        if (Status == StorageContentReservationStatus.Canceled) return;
+        if (Status == ProductReservationStatus.Canceled) return;
 
         Status = CurrentCount switch
         {
-            _ when CurrentCount == ReservedCount => StorageContentReservationStatus.Done,
-            > 0 => StorageContentReservationStatus.Locked,
-            _ => StorageContentReservationStatus.Active
+            _ when CurrentCount == ReservedCount => ProductReservationStatus.Done,
+            > 0 => ProductReservationStatus.Locked,
+            _ => ProductReservationStatus.Active
         };
     }
 
@@ -142,13 +141,13 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
     private void ThrowIfDone()
     {
-        if (Status == StorageContentReservationStatus.Done)
+        if (Status == ProductReservationStatus.Done)
             throw new InvalidInputException("article.reservation.is.done");
     }
 
     private void ThrowIfCanceled()
     {
-        if (Status == StorageContentReservationStatus.Canceled)
+        if (Status == ProductReservationStatus.Canceled)
             throw new InvalidInputException("article.reservation.is.canceled");
     }
 

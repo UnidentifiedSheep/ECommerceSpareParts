@@ -7,9 +7,9 @@ public class GetProductsWithNotEnoughStockValidation : AbstractValidator<GetProd
 {
     public GetProductsWithNotEnoughStockValidation()
     {
-        RuleFor(x => x.BuyerId)
+        RuleFor(x => x.BuyerOrganizationId)
             .NotEmpty()
-            .WithLocalizationKey("article.reservation.buyer.id.must.not.be.empty");
+            .WithLocalizationKey("article.reservation.organization.id.must.not.be.empty");
 
         RuleFor(x => x.StorageName)
             .NotEmpty()

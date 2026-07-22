@@ -1,6 +1,6 @@
 namespace Main.Enums;
 
-public enum StorageContentReservationStatus
+public enum ProductReservationStatus
 {
     Active,
     Locked,

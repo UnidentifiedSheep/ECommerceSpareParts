@@ -109,7 +109,7 @@ public partial class DContext : DbContext
 
     public virtual DbSet<StorageContent> StorageContents { get; set; }
 
-    public virtual DbSet<StorageContentReservation> StorageContentReservations { get; set; }
+    public virtual DbSet<ProductReservation> ProductReservations { get; set; }
 
     public virtual DbSet<StorageOwner> StorageOwners { get; set; }
 

@@ -17,7 +17,7 @@ public interface ISaleService
 
     Task CheckReservations(
         IEnumerable<NewSaleContentDto> saleContents,
-        Guid buyerId,
+        Guid buyerOrganizationId,
         string storageName,
         bool takeFromOtherStorages,
         string? confirmationCode,
@@ -25,7 +25,7 @@ public interface ISaleService
 
     Task CheckReservations(
         IEnumerable<EditSaleContentDto> saleContents,
-        Guid buyerId,
+        Guid buyerOrganizationId,
         string storageName,
         bool takeFromOtherStorages,
         string? confirmationCode,
@@ -45,14 +45,14 @@ public interface ISaleService
         bool takeFromOtherStorages,
         CancellationToken cancellationToken = default);
 
-    Task UpdateReservationsCounts(
-        Guid buyerId,
+    Task UpdateOrganizationReservationCounts(
+        Guid buyerOrganizationId,
         Dictionary<int, int> counts,
         CancellationToken cancellationToken = default);
 
-    Task SubtractCountFromReservations(
+    Task ConsumeOrganizationReservations(
         Sale sale,
-        Guid buyerId,
+        Guid buyerOrganizationId,
         CancellationToken cancellationToken = default);
 
     Task RestoreContents(

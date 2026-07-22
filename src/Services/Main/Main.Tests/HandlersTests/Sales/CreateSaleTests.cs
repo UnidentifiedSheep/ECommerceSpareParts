@@ -12,6 +12,7 @@ using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
+using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -238,8 +239,8 @@ public class CreateSaleTests : IntegrationTest
     {
         var buyer = Buyer();
         var storageContent = StorageContentWithCountAtLeast(2);
-        var reservation = await new StorageContentReservationBuilder(Faker)
-            .WithUserId(buyer.Id)
+        var reservation = await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(buyer.Id)
             .WithProductId(storageContent.ProductId)
             .WithReservedCount(2)
             .BuildAndAddToDb(Context);
@@ -252,11 +253,43 @@ public class CreateSaleTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var updatedReservation = await Context.StorageContentReservations
+        var updatedReservation = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
         updatedReservation.CurrentCount.Should().Be(2);
-        updatedReservation.Status.Should().Be(StorageContentReservationStatus.Done);
+        updatedReservation.Status.Should().Be(ProductReservationStatus.Done);
+    }
+
+    [Fact]
+    public async Task CreateSale_ByAnotherOrganizationMember_UsesOrganizationReservation()
+    {
+        var users = GetContext<UsersTestContext>().Users.ToArray();
+        var organization = await new OrganizationBuilder(Faker)
+            .WithOwnerId(users[0].Id)
+            .WithMember(users[1].Id)
+            .BuildAndAddToDb(Context);
+        var storageContent = StorageContent();
+        var reservation = await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(organization.Id)
+            .WithProductId(storageContent.ProductId)
+            .WithReservedCount(1)
+            .BuildAndAddToDb(Context);
+        var command = CreateCommand(
+            users[1].Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, 1)]) with
+        {
+            OrganizationId = organization.Id
+        };
+
+        await Mediator.Send(command);
+
+        var updatedReservation = await Context.ProductReservations
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == reservation.Id);
+        updatedReservation.CurrentCount.Should().Be(1);
+        updatedReservation.Status.Should().Be(ProductReservationStatus.Done);
     }
 
     [Fact]
@@ -327,8 +360,8 @@ public class CreateSaleTests : IntegrationTest
         var otherBuyer = GetContext<UsersTestContext>().Users.First(x => x.Id != buyer.Id);
         var storageContent = StorageContent();
         var countOnStorage = await CountOnStorage(storageContent);
-        await new StorageContentReservationBuilder(Faker)
-            .WithUserId(otherBuyer.Id)
+        await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(otherBuyer.Id)
             .WithProductId(storageContent.ProductId)
             .WithReservedCount(countOnStorage + 1)
             .WithCurrentCount(countOnStorage)
@@ -350,8 +383,8 @@ public class CreateSaleTests : IntegrationTest
         var otherBuyer = GetContext<UsersTestContext>().Users.First(x => x.Id != buyer.Id);
         var storageContent = StorageContent();
         var countOnStorage = await CountOnStorage(storageContent);
-        await new StorageContentReservationBuilder(Faker)
-            .WithUserId(otherBuyer.Id)
+        await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(otherBuyer.Id)
             .WithProductId(storageContent.ProductId)
             .WithReservedCount(countOnStorage + 1)
             .WithCurrentCount(countOnStorage)

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Storage;
 
-public class StorageContentReservationConfiguration : IEntityTypeConfiguration<StorageContentReservation>
+public class ProductReservationConfiguration : IEntityTypeConfiguration<ProductReservation>
 {
-    public void Configure(EntityTypeBuilder<StorageContentReservation> builder)
+    public void Configure(EntityTypeBuilder<ProductReservation> builder)
     {
         builder.ToTable("storage_content_reservations", "public");
 
@@ -25,8 +25,8 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
         builder.HasIndex(e => e.Status, "storage_content_reservations_status_index");
 
         builder.HasIndex(
-            e => new { e.UserId, e.Status },
-            "storage_content_reservations_user_id_status_index");
+            e => new { e.OrganizationId, e.Status },
+            "storage_content_reservations_organization_id_status_index");
 
         builder.Property(e => e.Id)
             .HasColumnName("id");
@@ -53,8 +53,8 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
         builder.Property(e => e.Status)
             .HasColumnName("status");
 
-        builder.Property(e => e.UserId)
-            .HasColumnName("user_id");
+        builder.Property(e => e.OrganizationId)
+            .HasColumnName("organization_id");
 
         builder.HasOne<Entities.Product.Product>()
             .WithMany()
@@ -68,20 +68,10 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("storage_content_reservations_currency_id_fk");
 
-        builder.HasOne<Entities.User.User>(e => e.User)
+        builder.HasOne<Entities.Organization.Organization>(e => e.Organization)
             .WithMany()
-            .HasForeignKey(d => d.UserId)
-            .HasConstraintName("storage_content_reservations_users_id_fk");
-
-        builder.HasOne<Entities.User.User>()
-            .WithMany()
-            .HasForeignKey(d => d.WhoCreated)
-            .HasConstraintName("storage_content_reservations_users_id_fk_3");
-
-        builder.HasOne<Entities.User.User>()
-            .WithMany()
-            .HasForeignKey(d => d.WhoUpdated)
-            .OnDelete(DeleteBehavior.Cascade)
-            .HasConstraintName("storage_content_reservations_users_id_fk_2");
+            .HasForeignKey(d => d.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("storage_content_reservations_organization_id_fk");
     }
 }

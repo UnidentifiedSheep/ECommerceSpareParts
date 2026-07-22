@@ -4,35 +4,38 @@ using Attributes;
 using Main.Entities.Storage;
 using Main.Enums;
 
-namespace Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
+namespace Main.Application.Handlers.ProductReservations.UpdateOrganizationReservationCounts;
 
 [AutoSave]
 [Transactional]
-public record UpdateReservationsCountsCommand(Guid UserId, Dictionary<int, int> Contents)
-    : ICommand<UpdateReservationsCountsResult>;
+public record UpdateOrganizationReservationCountsCommand(
+    Guid OrganizationId,
+    Dictionary<int, int> Contents)
+    : ICommand<UpdateOrganizationReservationCountsResult>;
 
-/// <param name="NotFoundReservations">Id артикулов и количество, которые не были найдены в резервациях у пользователя.</param>
-public record UpdateReservationsCountsResult(Dictionary<int, int> NotFoundReservations);
+/// <param name="NotFoundReservations">Id продуктов и количество, не найденное в резервациях организации.</param>
+public record UpdateOrganizationReservationCountsResult(
+    Dictionary<int, int> NotFoundReservations);
 
-public class UpdateReservationsCountsHandler(
-    IRepository<StorageContentReservation, int> repository
-) : ICommandHandler<UpdateReservationsCountsCommand, UpdateReservationsCountsResult>
+public class UpdateOrganizationReservationCountsHandler(
+    IRepository<ProductReservation, int> repository
+) : ICommandHandler<UpdateOrganizationReservationCountsCommand, UpdateOrganizationReservationCountsResult>
 {
-    public async Task<UpdateReservationsCountsResult> Handle(
-        UpdateReservationsCountsCommand request,
+    public async Task<UpdateOrganizationReservationCountsResult> Handle(
+        UpdateOrganizationReservationCountsCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.Contents.Count == 0) return new UpdateReservationsCountsResult([]);
+        if (request.Contents.Count == 0) return new UpdateOrganizationReservationCountsResult([]);
 
-        var userId = request.UserId;
+        var organizationId = request.OrganizationId;
         var remaining = new Dictionary<int, int>(request.Contents);
         var productIds = remaining.Keys;
 
-        var criteria = Criteria<StorageContentReservation>.New()
-            .Where(x => x.UserId == userId &&
+        var criteria = Criteria<ProductReservation>.New()
+            .Where(x => x.OrganizationId == organizationId &&
                         productIds.Contains(x.ProductId) &&
-                        (x.Status == StorageContentReservationStatus.Active ||
-                         x.Status == StorageContentReservationStatus.Locked))
+                        (x.Status == ProductReservationStatus.Active ||
+                         x.Status == ProductReservationStatus.Locked))
             .Track()
             .ForUpdate()
             .Build();
@@ -62,6 +65,6 @@ public class UpdateReservationsCountsHandler(
             .Where(x => x.Value > 0)
             .ToDictionary(x => x.Key, x => x.Value);
 
-        return new UpdateReservationsCountsResult(notFoundReservations);
+        return new UpdateOrganizationReservationCountsResult(notFoundReservations);
     }
 }

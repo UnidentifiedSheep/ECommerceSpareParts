@@ -9,43 +9,43 @@ using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Storage;
 
-public class StorageContentReservationRepository(DContext context, IQueryableExtensions extensions)
-    : LinqRepositoryBase<DContext, StorageContentReservation, int>(context, extensions),
-        IStorageContentReservationRepository
+public class ProductReservationRepository(DContext context, IQueryableExtensions extensions)
+    : LinqRepositoryBase<DContext, ProductReservation, int>(context, extensions),
+        IProductReservationRepository
 {
-    public Task<Dictionary<int, int>> GetReservationsCountForUserAsync(
-        Guid userId,
+    public Task<Dictionary<int, int>> GetReservationsCountForOrganizationAsync(
+        Guid organizationId,
         IEnumerable<int> productIds,
         CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
             r =>
-                r.UserId == userId &&
+                r.OrganizationId == organizationId &&
                 productIds.Contains(r.ProductId) &&
-                (r.Status == StorageContentReservationStatus.Active ||
-                 r.Status == StorageContentReservationStatus.Locked),
+                (r.Status == ProductReservationStatus.Active ||
+                 r.Status == ProductReservationStatus.Locked),
             cancellationToken);
     }
 
-    public Task<Dictionary<int, int>> GetReservationsCountForOthersAsync(
-        Guid userId,
+    public Task<Dictionary<int, int>> GetOtherOrganizationsReservationsCountAsync(
+        Guid organizationId,
         IEnumerable<int> productIds,
         CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
             r =>
-                r.UserId != userId &&
+                r.OrganizationId != organizationId &&
                 productIds.Contains(r.ProductId) &&
-                (r.Status == StorageContentReservationStatus.Active ||
-                 r.Status == StorageContentReservationStatus.Locked),
+                (r.Status == ProductReservationStatus.Active ||
+                 r.Status == ProductReservationStatus.Locked),
             cancellationToken);
     }
 
     private Task<Dictionary<int, int>> GetReservationsCountInternalAsync(
-        Expression<Func<StorageContentReservation, bool>> predicate,
+        Expression<Func<ProductReservation, bool>> predicate,
         CancellationToken cancellationToken)
     {
-        return Context.StorageContentReservations
+        return Context.ProductReservations
             .AsNoTracking()
             .Where(predicate)
             .GroupBy(x => x.ProductId)

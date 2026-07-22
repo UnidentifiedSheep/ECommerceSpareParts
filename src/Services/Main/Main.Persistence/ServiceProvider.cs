@@ -41,7 +41,7 @@ public static class ServiceProvider
         collection.AddScoped<IProducerRepository, ProducerRepository>();
         collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
         collection.AddScoped<IStorageContentRepository, StorageContentRepository>();
-        collection.AddScoped<IStorageContentReservationRepository, StorageContentReservationRepository>();
+        collection.AddScoped<IProductReservationRepository, ProductReservationRepository>();
         collection.AddScoped<IUserRepository, UserRepository>();
         collection.AddScoped<ITransactionRepository, TransactionRepository>();
         collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
