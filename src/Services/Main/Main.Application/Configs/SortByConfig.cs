@@ -1,11 +1,13 @@
 using Abstractions;
 using Application.Common.Extensions;
+using Main.Entities.Organization;
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
 using Main.Enums;
+using Main.Enums.Organization;
 
 namespace Main.Application.Configs;
 
@@ -27,6 +29,13 @@ public static class SortByConfig
             .MapDefault<Producer, int>(x => x.Id)
             .Map<Producer, int>("id", x => x.Id)
             .Map<Producer, string>("name", x => x.Name);
+
+        QueryableSortBy.Value
+            .MapDefault<Organization, string>(x => x.Name)
+            .Map<Organization, Guid>("id", x => x.Id)
+            .Map<Organization, string>("name", x => x.Name)
+            .Map<Organization, string>("systemName", x => x.SystemName)
+            .Map<Organization, OrganizationType>("type", x => x.Type);
 
         QueryableSortBy.Value
             .MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime, true)

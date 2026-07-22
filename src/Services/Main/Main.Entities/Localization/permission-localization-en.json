@@ -171,6 +171,8 @@
     "permissions.users.storages.get.description": "Permission to view user storages.",
     "permissions.users.storages.delete.name": "Delete user storage",
     "permissions.users.storages.delete.description": "Permission to delete user storage.",
+    "permissions.organizations.get.name": "View organizations",
+    "permissions.organizations.get.description": "Permission to search and view organizations.",
     "permissions.permissions.create.name": "Create permission",
     "permissions.permissions.create.description": "Permission to create permissions.",
     "permissions.permissions.get.name": "View all permissions",

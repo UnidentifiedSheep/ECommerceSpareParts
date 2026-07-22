@@ -134,6 +134,9 @@ public enum PermissionCodes
     USERS_STORAGES_GET,
     USERS_STORAGES_DELETE,
 
+    // ===== ORGANIZATIONS =====
+    ORGANIZATIONS_GET,
+
     // ===== PERMISSIONS =====
     PERMISSIONS_CREATE,
     PERMISSIONS_GET,

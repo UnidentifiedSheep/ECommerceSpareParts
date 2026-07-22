@@ -171,6 +171,8 @@
     "permissions.users.storages.get.description": "Право на получение складов пользователя.",
     "permissions.users.storages.delete.name": "Удаление склада пользователя",
     "permissions.users.storages.delete.description": "Право на удаление склада пользователя.",
+    "permissions.organizations.get.name": "Просмотр организаций",
+    "permissions.organizations.get.description": "Право на поиск и просмотр организаций.",
     "permissions.permissions.create.name": "Создание права доступа",
     "permissions.permissions.create.description": "Право на создание прав доступа.",
     "permissions.permissions.get.name": "Просмотр всех прав доступа",
