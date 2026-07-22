@@ -1,4 +1,5 @@
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Entities.User;
 using Main.Persistence.Context;
 using Tests.Abstractions;
@@ -41,8 +42,8 @@ public class BalanceTestContext(
             .WithCurrencyId(currency.Id)
             .Build();
 
-        var senderProfile = UserFinancialProfile.Create(users[0].Id);
-        var receiverProfile = UserFinancialProfile.Create(users[1].Id);
+        var senderProfile = OrganizationFinancialProfile.Create(users[0].Id);
+        var receiverProfile = OrganizationFinancialProfile.Create(users[1].Id);
         receiverProfile.Credit(100m);
 
         var transaction = new TransactionBuilder(Faker)

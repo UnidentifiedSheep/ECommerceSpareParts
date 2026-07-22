@@ -1,6 +1,7 @@
 ﻿using Exceptions;
 using FluentAssertions;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 
 namespace Tests.Domain.Balance;
@@ -65,8 +66,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         sender.IncrementBalance(200m);
 
@@ -83,8 +84,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         sender.IncrementBalance(200m);
 
@@ -102,10 +103,10 @@ public class TransactionTests
     public void ApplyProfile_CompletionApplied_UsesBaseAmountForProfiles()
     {
         var tx = Create();
-        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
-        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
-        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
         senderBalance.IncrementBalance(200m);
         senderProfile.Credit(200m);
 
@@ -130,10 +131,10 @@ public class TransactionTests
     public void ApplyProfile_ReversalAfterCompletionProfileApplied_RollsBackProfile()
     {
         var tx = Create();
-        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
-        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
-        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
         senderBalance.IncrementBalance(200m);
         senderProfile.Credit(200m);
 
@@ -163,10 +164,10 @@ public class TransactionTests
     public void ApplyProfile_SenderProfileMismatch_Throws()
     {
         var tx = Create();
-        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
-        var senderProfile = UserFinancialProfile.Create(Guid.NewGuid());
-        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(Guid.NewGuid());
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
@@ -187,10 +188,10 @@ public class TransactionTests
     public void ApplyProfile_CompletionProfileAppliedTwice_Throws()
     {
         var tx = Create();
-        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
-        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
-        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
         senderProfile.Credit(200m);
 
         tx.Complete();
@@ -224,10 +225,10 @@ public class TransactionTests
             senderId,
             SystemId,
             sourceType);
-        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
-        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
-        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId, decimal.MinValue);
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId, decimal.MinValue);
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
@@ -250,10 +251,10 @@ public class TransactionTests
             SystemId,
             buyerId,
             TransactionSourceType.Sale);
-        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
-        var senderProfile = UserFinancialProfile.Create(tx.SenderId, decimal.MinValue);
-        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId, decimal.MinValue);
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
         receiverProfile.Credit(100m);
 
         tx.Complete();
@@ -274,10 +275,10 @@ public class TransactionTests
     {
         var senderId = Guid.NewGuid();
         var tx = Create(senderId, SystemId);
-        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
-        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
-        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId, decimal.MinValue);
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId, decimal.MinValue);
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
@@ -297,10 +298,10 @@ public class TransactionTests
     {
         var receiverId = Guid.NewGuid();
         var tx = Create(SystemId, receiverId);
-        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
-        var senderProfile = UserFinancialProfile.Create(tx.SenderId, decimal.MinValue);
-        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId, decimal.MinValue);
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
         receiverProfile.Credit(100m);
 
         tx.Complete();
@@ -331,8 +332,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, 999);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, 999);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         tx.Complete();
 
@@ -346,8 +347,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         sender.IncrementBalance(200m);
 
@@ -364,8 +365,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         var act = () => tx.Apply(sender, receiver);
 
@@ -379,8 +380,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         sender.IncrementBalance(200m);
 
@@ -402,8 +403,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         sender.IncrementBalance(200m);
 
@@ -422,8 +423,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         sender.IncrementBalance(200m);
 
@@ -442,8 +443,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(Guid.NewGuid(), tx.CurrencyId);
-        var receiver = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var sender = OrganizationBalance.Create(Guid.NewGuid(), tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
 
         tx.Complete();
 
@@ -457,8 +458,8 @@ public class TransactionTests
     {
         var tx = Create();
 
-        var sender = UserBalance.Create(tx.SenderId, tx.CurrencyId);
-        var receiver = UserBalance.Create(Guid.NewGuid(), tx.CurrencyId);
+        var sender = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiver = OrganizationBalance.Create(Guid.NewGuid(), tx.CurrencyId);
 
         tx.Complete();
 
@@ -484,8 +485,8 @@ public class TransactionTests
 
     private static void ApplyProfile(
         Transaction transaction,
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
+        OrganizationFinancialProfile senderProfile,
+        OrganizationFinancialProfile receiverProfile,
         decimal amountInBaseCurrency,
         Guid systemId,
         bool forceDebit = false)

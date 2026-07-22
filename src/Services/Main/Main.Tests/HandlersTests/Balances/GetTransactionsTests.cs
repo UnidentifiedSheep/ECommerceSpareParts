@@ -3,6 +3,7 @@ using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.GetTransactions;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
@@ -172,9 +173,9 @@ public class GetTransactionsTests : IntegrationTest
             .FirstAsync(x => x.Id == TestContext.Transactions[0].Id);
 
         var senderBalance = await Context.UserBalances
-            .FirstAsync(x => x.UserId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
+            .FirstAsync(x => x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
         var receiverBalance = await Context.UserBalances
-            .FirstAsync(x => x.UserId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
+            .FirstAsync(x => x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
 
         transaction.Reverse(TestContext.Users[0].Id);
         transaction.Apply(senderBalance, receiverBalance);
@@ -189,13 +190,13 @@ public class GetTransactionsTests : IntegrationTest
         var receiver = TestContext.Users[1];
         var currency = TestContext.Currencies[0];
         var senderBalance = await Context.UserBalances
-            .FirstAsync(x => x.UserId == sender.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
         var receiverBalance = await Context.UserBalances
-            .FirstAsync(x => x.UserId == receiver.Id && x.CurrencyId == currency.Id);
-        var senderProfile = await Context.Set<UserFinancialProfile>()
-            .FirstAsync(x => x.UserId == sender.Id);
-        var receiverProfile = await Context.Set<UserFinancialProfile>()
-            .FirstAsync(x => x.UserId == receiver.Id);
+            .FirstAsync(x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
+        var senderProfile = await Context.Set<OrganizationFinancialProfile>()
+            .FirstAsync(x => x.OrganizationId == sender.Id);
+        var receiverProfile = await Context.Set<OrganizationFinancialProfile>()
+            .FirstAsync(x => x.OrganizationId == receiver.Id);
         senderProfile.Credit(100m);
 
         var transaction = Transaction.Create(

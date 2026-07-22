@@ -3,6 +3,7 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Static;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
@@ -57,10 +58,10 @@ public class CreateTransactionTests : IntegrationTest
 
         var senderBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == sender.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
         var receiverBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == receiver.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
 
         senderBalance.Balance.Should().Be(amount);
         receiverBalance.Balance.Should().Be(-amount);
@@ -180,7 +181,7 @@ public class CreateTransactionTests : IntegrationTest
 
     private async Task CreditProfile(Guid userId, decimal amount)
     {
-        var profile = UserFinancialProfile.Create(userId);
+        var profile = OrganizationFinancialProfile.Create(userId);
         profile.Credit(amount);
 
         await Context.AddAsync(profile);

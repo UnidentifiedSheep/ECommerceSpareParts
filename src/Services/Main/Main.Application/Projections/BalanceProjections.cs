@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using LinqKit;
 using Main.Application.Dtos.Balances;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 
 namespace Main.Application.Projections;
 
@@ -21,14 +22,14 @@ public static class BalanceProjections
             SourceType = x.SourceType
         };
 
-    public static readonly Expression<Func<UserBalance, UserBalanceDto>> ToUserBalanceDto =
+    public static readonly Expression<Func<OrganizationBalance, UserBalanceDto>> ToUserBalanceDto =
         x => new UserBalanceDto
         {
             Balance = x.Balance,
             Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
         };
 
-    public static readonly Expression<Func<UserFinancialProfile, UserFinancialProfileDto>>
+    public static readonly Expression<Func<OrganizationFinancialProfile, UserFinancialProfileDto>>
         ToUserFinancialProfileDto = x => new UserFinancialProfileDto
         {
             Balance = x.Balance,

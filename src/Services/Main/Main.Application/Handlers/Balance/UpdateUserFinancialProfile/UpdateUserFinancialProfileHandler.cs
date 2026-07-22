@@ -7,6 +7,7 @@ using Attributes;
 using Main.Application.Dtos.Balances;
 using Main.Application.Projections;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 
 namespace Main.Application.Handlers.Balance.UpdateUserFinancialProfile;
 
@@ -24,7 +25,7 @@ public record UpdateUserFinancialProfileCommand(
 public record UpdateUserFinancialProfileResult(UserFinancialProfileDto Profile);
 
 public class UpdateUserFinancialProfileHandler(
-    IRepository<UserFinancialProfile, Guid> repository,
+    IRepository<OrganizationFinancialProfile, Guid> repository,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<UpdateUserFinancialProfileCommand, UpdateUserFinancialProfileResult>
 {
@@ -36,7 +37,7 @@ public class UpdateUserFinancialProfileHandler(
 
         if (profile == null)
         {
-            profile = UserFinancialProfile.Create(request.UserId);
+            profile = OrganizationFinancialProfile.Create(request.UserId);
             await unitOfWork.AddAsync(profile, cancellationToken);
         }
 

@@ -1,19 +1,20 @@
 using Exceptions;
 using FluentAssertions;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 
 namespace Tests.Domain.Balance;
 
-public class UserFinancialProfileTests
+public class OrganizationFinancialProfileTests
 {
     [Fact]
     public void Create_ValidData_SetsInitialValues()
     {
         var userId = Guid.NewGuid();
 
-        var profile = UserFinancialProfile.Create(userId, -100m);
+        var profile = OrganizationFinancialProfile.Create(userId, -100m);
 
-        profile.UserId.Should().Be(userId);
+        profile.OrganizationId.Should().Be(userId);
         profile.GetId().Should().Be(userId);
         profile.Balance.Should().Be(0);
         profile.MinAllowedBalance.Should().Be(-100m);
@@ -22,7 +23,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void Credit_PositiveAmount_IncreasesBalance()
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid());
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
 
         profile.Credit(150.25m);
 
@@ -32,7 +33,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void Debit_WhenBalanceEnough_DecreasesBalance()
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid());
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
         profile.Credit(150m);
 
         profile.Debit(50m);
@@ -43,7 +44,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void Debit_WhenBalanceWouldBecomeLessThanMinimum_Throws()
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid());
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
         profile.Credit(100m);
 
         var act = () => profile.Debit(101m);
@@ -55,7 +56,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void Debit_WithForce_AllowsBalanceBelowMinimum()
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid());
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
 
         profile.Debit(100m, true);
 
@@ -66,7 +67,7 @@ public class UserFinancialProfileTests
     [InlineData(-1)]
     public void BalanceOperations_NegativeAmount_Throws(decimal amount)
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid());
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
 
         var credit = () => profile.Credit(amount);
         var debit = () => profile.Debit(amount);
@@ -78,7 +79,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void SetMinAllowedBalance_ValidValue_UpdatesMinimum()
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid());
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
 
         profile.SetMinAllowedBalance(-10.25m);
 
@@ -88,7 +89,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void SetMinAllowedBalance_Zero_UpdatesMinimum()
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid(), -10m);
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid(), -10m);
 
         profile.SetMinAllowedBalance(0m);
 
@@ -98,7 +99,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void SetMinAllowedBalance_PositiveValue_Throws()
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid(), -10m);
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid(), -10m);
 
         var act = () => profile.SetMinAllowedBalance(0.01m);
 
@@ -109,7 +110,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void SetMinAllowedBalance_MoreThanTwoDecimals_Throws()
     {
-        var profile = UserFinancialProfile.Create(Guid.NewGuid(), -10m);
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid(), -10m);
 
         var act = () => profile.SetMinAllowedBalance(-1.123m);
 
@@ -120,7 +121,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void Create_PositiveMinAllowedBalance_Throws()
     {
-        var act = () => UserFinancialProfile.Create(Guid.NewGuid(), 0.01m);
+        var act = () => OrganizationFinancialProfile.Create(Guid.NewGuid(), 0.01m);
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -128,7 +129,7 @@ public class UserFinancialProfileTests
     [Fact]
     public void Create_MinAllowedBalanceWithMoreThanTwoDecimals_Throws()
     {
-        var act = () => UserFinancialProfile.Create(Guid.NewGuid(), -1.123m);
+        var act = () => OrganizationFinancialProfile.Create(Guid.NewGuid(), -1.123m);
 
         act.Should().Throw<InvalidInputException>();
     }

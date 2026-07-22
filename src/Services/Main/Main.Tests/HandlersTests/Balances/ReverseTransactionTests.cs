@@ -39,10 +39,10 @@ public class ReverseTransactionTests : IntegrationTest
 
         var senderBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
+            .FirstAsync(x => x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
         var receiverBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
+            .FirstAsync(x => x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
 
         senderBalance.Balance.Should().Be(0m);
         receiverBalance.Balance.Should().Be(0m);
@@ -103,9 +103,9 @@ public class ReverseTransactionTests : IntegrationTest
         var receiverId = TestContext.Users[1].Id;
 
         var senderBalance = await Context.UserBalances
-            .FirstAsync(x => x.UserId == senderId && x.CurrencyId == currencyId);
+            .FirstAsync(x => x.OrganizationId == senderId && x.CurrencyId == currencyId);
         var receiverBalance = await Context.UserBalances
-            .FirstAsync(x => x.UserId == receiverId && x.CurrencyId == currencyId);
+            .FirstAsync(x => x.OrganizationId == receiverId && x.CurrencyId == currencyId);
 
         var transaction = new TransactionBuilder(Faker)
             .WithSenderId(senderId)

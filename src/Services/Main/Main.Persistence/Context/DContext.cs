@@ -119,7 +119,7 @@ public partial class DContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<UserBalance> UserBalances { get; set; }
+    public virtual DbSet<OrganizationBalance> UserBalances { get; set; }
 
     public virtual DbSet<UserDiscount> UserDiscounts { get; set; }
 

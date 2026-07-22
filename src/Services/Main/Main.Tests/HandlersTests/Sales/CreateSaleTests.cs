@@ -6,6 +6,7 @@ using Main.Application.Static;
 using Main.Entities.Balance;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
+using Main.Entities.Organization;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
@@ -158,9 +159,9 @@ public class CreateSaleTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var profile = await Context.Set<UserFinancialProfile>()
+        var profile = await Context.Set<OrganizationFinancialProfile>()
             .AsNoTracking()
-            .SingleAsync(x => x.UserId == buyer.Id);
+            .SingleAsync(x => x.OrganizationId == buyer.Id);
         profile.Balance.Should().Be(0m);
     }
 
@@ -205,9 +206,9 @@ public class CreateSaleTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var profile = await Context.Set<UserFinancialProfile>()
+        var profile = await Context.Set<OrganizationFinancialProfile>()
             .AsNoTracking()
-            .SingleAsync(x => x.UserId == buyer.Id);
+            .SingleAsync(x => x.OrganizationId == buyer.Id);
         profile.Balance.Should().Be(0m);
     }
 

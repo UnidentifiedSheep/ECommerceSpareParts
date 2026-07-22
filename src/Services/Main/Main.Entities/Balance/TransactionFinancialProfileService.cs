@@ -1,3 +1,4 @@
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 
 namespace Main.Entities.Balance;
@@ -6,8 +7,8 @@ public class TransactionFinancialProfileService : ITransactionFinancialProfileSe
 {
     public void Apply(
         Transaction transaction,
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
+        OrganizationFinancialProfile senderProfile,
+        OrganizationFinancialProfile receiverProfile,
         decimal amountInBaseCurrency,
         Guid systemId,
         bool forceDebit = false)
@@ -39,8 +40,8 @@ public class TransactionFinancialProfileService : ITransactionFinancialProfileSe
 
     private static void ApplyCompletion(
         Transaction transaction,
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
+        OrganizationFinancialProfile senderProfile,
+        OrganizationFinancialProfile receiverProfile,
         decimal amountInBaseCurrency,
         Guid systemId,
         bool forceDebit)
@@ -72,8 +73,8 @@ public class TransactionFinancialProfileService : ITransactionFinancialProfileSe
 
     private static void ApplyReversal(
         Transaction transaction,
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
+        OrganizationFinancialProfile senderProfile,
+        OrganizationFinancialProfile receiverProfile,
         decimal amountInBaseCurrency,
         Guid systemId,
         bool forceDebit)

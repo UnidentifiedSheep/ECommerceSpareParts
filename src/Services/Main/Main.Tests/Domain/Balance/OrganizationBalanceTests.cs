@@ -3,12 +3,12 @@ using Main.Entities.Balance;
 
 namespace Tests.Domain.Balance;
 
-public class UserBalanceTests
+public class OrganizationBalanceTests
 {
     [Fact]
     public void Create_InitialBalance_IsZero()
     {
-        var balance = UserBalance.Create(Guid.NewGuid(), 1);
+        var balance = OrganizationBalance.Create(Guid.NewGuid(), 1);
 
         balance.Balance.Should().Be(0);
     }
@@ -16,7 +16,7 @@ public class UserBalanceTests
     [Fact]
     public void IncrementBalance_AddsValue()
     {
-        var balance = UserBalance.Create(Guid.NewGuid(), 1);
+        var balance = OrganizationBalance.Create(Guid.NewGuid(), 1);
 
         balance.IncrementBalance(10.5m);
 
@@ -26,7 +26,7 @@ public class UserBalanceTests
     [Fact]
     public void IncrementBalance_AllowsNegative()
     {
-        var balance = UserBalance.Create(Guid.NewGuid(), 1);
+        var balance = OrganizationBalance.Create(Guid.NewGuid(), 1);
 
         balance.IncrementBalance(10m);
         balance.IncrementBalance(-3m);
@@ -37,7 +37,7 @@ public class UserBalanceTests
     [Fact]
     public void IncrementBalance_MoreThanTwoDecimals_Throws()
     {
-        var balance = UserBalance.Create(Guid.NewGuid(), 1);
+        var balance = OrganizationBalance.Create(Guid.NewGuid(), 1);
 
         var act = () => balance.IncrementBalance(1.123m);
 
@@ -49,16 +49,16 @@ public class UserBalanceTests
     {
         var userId = Guid.NewGuid();
 
-        var balance = UserBalance.Create(userId, 42);
+        var balance = OrganizationBalance.Create(userId, 42);
 
         balance.CurrencyId.Should().Be(42);
-        balance.UserId.Should().Be(userId);
+        balance.OrganizationId.Should().Be(userId);
     }
 
     [Fact]
     public void IncrementBalance_AllowsExactlyTwoDecimals()
     {
-        var balance = UserBalance.Create(Guid.NewGuid(), 1);
+        var balance = OrganizationBalance.Create(Guid.NewGuid(), 1);
 
         balance.IncrementBalance(1.23m);
 
@@ -68,7 +68,7 @@ public class UserBalanceTests
     [Fact]
     public void IncrementBalance_MultipleOperations_PrecisionStable()
     {
-        var balance = UserBalance.Create(Guid.NewGuid(), 1);
+        var balance = OrganizationBalance.Create(Guid.NewGuid(), 1);
 
         balance.IncrementBalance(0.10m);
         balance.IncrementBalance(0.20m);
@@ -80,7 +80,7 @@ public class UserBalanceTests
     [Fact]
     public void IncrementBalance_LargeValues_HandlesCorrectly()
     {
-        var balance = UserBalance.Create(Guid.NewGuid(), 1);
+        var balance = OrganizationBalance.Create(Guid.NewGuid(), 1);
 
         balance.IncrementBalance(1_000_000m);
         balance.IncrementBalance(2_000_000m);
@@ -91,7 +91,7 @@ public class UserBalanceTests
     [Fact]
     public void IncrementBalance_AllowsNegativeBalance()
     {
-        var balance = UserBalance.Create(Guid.NewGuid(), 1);
+        var balance = OrganizationBalance.Create(Guid.NewGuid(), 1);
 
         balance.IncrementBalance(-100m);
 

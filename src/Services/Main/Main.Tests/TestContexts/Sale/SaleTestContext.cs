@@ -1,4 +1,5 @@
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
@@ -30,8 +31,8 @@ public class SaleTestContext(
     public StorageContent StorageContent { get; private set; } = null!;
     public DomainSale Sale { get; private set; } = null!;
     public Transaction Transaction { get; private set; } = null!;
-    public UserBalance SenderBalance { get; private set; } = null!;
-    public UserBalance ReceiverBalance { get; private set; } = null!;
+    public OrganizationBalance SenderBalance { get; private set; } = null!;
+    public OrganizationBalance ReceiverBalance { get; private set; } = null!;
     public int SoldCount { get; private set; }
 
     public static Type[] DependsOn { get; } =
@@ -45,7 +46,7 @@ public class SaleTestContext(
     {
         var currencyId = currencyContext.Currencies[0].Id;
         Buyer = await new MemberUserBuilder(Faker).BuildAndAddToDb(DbContext);
-        var buyerProfile = UserFinancialProfile.Create(Buyer.Id);
+        var buyerProfile = OrganizationFinancialProfile.Create(Buyer.Id);
         buyerProfile.Credit(10_000m);
         StorageContent = storageContentContext.StorageContents.First(x => x.Count > 0);
         Product = productContext.Products.Single(x => x.Id == StorageContent.ProductId);
@@ -63,8 +64,8 @@ public class SaleTestContext(
         SenderBalance.IncrementBalance(20m);
 
         Transaction = new TransactionBuilder(Faker)
-            .WithSenderId(SenderBalance.UserId)
-            .WithReceiverId(ReceiverBalance.UserId)
+            .WithSenderId(SenderBalance.OrganizationId)
+            .WithReceiverId(ReceiverBalance.OrganizationId)
             .WithCurrencyId(currencyId)
             .WithAmount(20m)
             .WithBalances(SenderBalance, ReceiverBalance)

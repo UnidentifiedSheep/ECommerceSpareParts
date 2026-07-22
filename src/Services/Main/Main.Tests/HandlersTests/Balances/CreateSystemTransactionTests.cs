@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Application.Handlers.Balance;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
@@ -52,10 +53,10 @@ public class CreateSystemTransactionTests : IntegrationTest
 
         var userBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == user.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id);
         var systemBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == systemUser.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id);
 
         userBalance.Balance.Should().Be(amount);
         systemBalance.Balance.Should().Be(-amount);
@@ -90,10 +91,10 @@ public class CreateSystemTransactionTests : IntegrationTest
 
         var userBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == user.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id);
         var systemBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == systemUser.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id);
 
         userBalance.Balance.Should().Be(-amount);
         systemBalance.Balance.Should().Be(amount);
@@ -101,7 +102,7 @@ public class CreateSystemTransactionTests : IntegrationTest
 
     private async Task CreditProfile(Guid userId, decimal amount)
     {
-        var profile = UserFinancialProfile.Create(userId);
+        var profile = OrganizationFinancialProfile.Create(userId);
         profile.Credit(amount);
 
         await Context.AddAsync(profile);

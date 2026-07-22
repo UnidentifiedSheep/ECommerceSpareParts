@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -267,17 +268,17 @@ public class BalanceServiceTests : IntegrationTest
         (await GetUserBalance(receiver.Id, currency.Id)).Balance.Should().Be(0m);
     }
 
-    private Task<UserFinancialProfile> GetProfile(Guid userId)
+    private Task<OrganizationFinancialProfile> GetProfile(Guid userId)
     {
-        return Context.Set<UserFinancialProfile>()
+        return Context.Set<OrganizationFinancialProfile>()
             .AsNoTracking()
-            .SingleAsync(x => x.UserId == userId);
+            .SingleAsync(x => x.OrganizationId == userId);
     }
 
-    private Task<UserBalance> GetUserBalance(Guid userId, int currencyId)
+    private Task<OrganizationBalance> GetUserBalance(Guid userId, int currencyId)
     {
         return Context.UserBalances
             .AsNoTracking()
-            .SingleAsync(x => x.UserId == userId && x.CurrencyId == currencyId);
+            .SingleAsync(x => x.OrganizationId == userId && x.CurrencyId == currencyId);
     }
 }

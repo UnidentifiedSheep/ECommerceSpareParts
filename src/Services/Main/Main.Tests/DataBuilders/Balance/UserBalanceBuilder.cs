@@ -4,7 +4,7 @@ using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Balance;
 
-public class UserBalanceBuilder(Faker faker) : BuilderBase<UserBalance>(faker)
+public class UserBalanceBuilder(Faker faker) : BuilderBase<OrganizationBalance>(faker)
 {
     public Guid? UserId { get; private set; }
     public int? CurrencyId { get; private set; }
@@ -21,9 +21,9 @@ public class UserBalanceBuilder(Faker faker) : BuilderBase<UserBalance>(faker)
         return this;
     }
 
-    public override UserBalance Build()
+    public override OrganizationBalance Build()
     {
-        return UserBalance.Create(
+        return OrganizationBalance.Create(
             UserId ?? Guid.NewGuid(),
             CurrencyId ?? Faker.Random.Int(1, 100));
     }

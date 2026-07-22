@@ -3,6 +3,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
+using Main.Entities.Balance;
 using Main.Enums.Organization;
 
 namespace Main.Entities.Organization;
@@ -16,6 +17,11 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
     
     private readonly List<OrganizationMember> _members = [];
     public IReadOnlyList<OrganizationMember> Members => _members;
+    
+    private readonly List<OrganizationBalance> _balances = [];
+    public IReadOnlyList<OrganizationBalance> Balances => _balances;
+    
+    public OrganizationFinancialProfile? FinancialProfile { get; private set; }
     
     private Organization() { }
 
