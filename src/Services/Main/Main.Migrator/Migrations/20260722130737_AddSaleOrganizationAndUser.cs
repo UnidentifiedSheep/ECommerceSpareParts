@@ -154,41 +154,6 @@ namespace Main.Migrator.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.Sql(
-                """
-                INSERT INTO auth.organizations
-                    (id, type, name, system_name, created_at, updated_at)
-                SELECT
-                    id,
-                    CASE WHEN user_name = 'MainApp' THEN 'System' ELSE 'Individual' END,
-                    CASE WHEN user_name = 'MainApp' THEN 'System' ELSE user_name END,
-                    CASE WHEN user_name = 'MainApp'
-                        THEN 'system'
-                        ELSE 'individual-' || replace(id::text, '-', '')
-                    END,
-                    now(),
-                    now()
-                FROM auth.users;
-
-                INSERT INTO auth.organization_members
-                    (organization_id, user_id, role, created_at, updated_at)
-                SELECT id, id, 'Owner', now(), now()
-                FROM auth.users;
-
-                INSERT INTO public.organization_balances
-                    (organization_id, currency_id, balance, created_at, updated_at, who_created, who_updated)
-                SELECT user_id, currency_id, balance, created_at, updated_at, who_created, who_updated
-                FROM public.user_balances;
-
-                INSERT INTO public.organization_financial_profile
-                    (organization_id, min_allowed_balance, created_at, updated_at, who_created, who_updated)
-                SELECT user_id, min_allowed_balance, created_at, updated_at, who_created, who_updated
-                FROM public.user_financial_profile;
-
-                UPDATE public.sale
-                SET organization_id = user_id;
-                """);
-
             migrationBuilder.AlterColumn<Guid>(
                 name: "organization_id",
                 schema: "public",
