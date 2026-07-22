@@ -1,7 +1,6 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
@@ -10,22 +9,17 @@ using Contracts.Purchase;
 using LinqKit;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
-using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Projections;
-using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Main.Entities.Storage;
-using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
@@ -53,7 +47,6 @@ public record CreatePurchaseResult(PurchaseDto Purchase);
 public class CreatePurchaseHandler(
     ISender sender,
     IOptions<SystemOptions> systemOptions,
-    IUserRepository userRepository,
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
     IReadRepository<Purchase, Guid> readRepository,
@@ -65,14 +58,6 @@ public class CreatePurchaseHandler(
         CancellationToken cancellationToken)
     {
         var systemId = systemOptions.Value.SystemId;
-
-        await userRepository.EnsureExistAsync(
-            request.SupplierUserId,
-            _ => new UserIsNotInNeededRole(Role.Supplier),
-            Criteria<User>
-                .New()
-                .WhereHasRole(Role.Supplier),
-            cancellationToken);
 
         var purchaseContents = request.PurchaseContent.ToList();
 

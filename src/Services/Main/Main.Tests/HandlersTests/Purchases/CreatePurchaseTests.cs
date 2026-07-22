@@ -127,7 +127,7 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreatePurchase_WhenSupplierHasNoSupplierRole_ThrowsUserIsNotInNeededRole()
+    public async Task CreatePurchase_WhenOrganizationMemberHasNoSupplierRole_CreatesPurchase()
     {
         var member = GetContext<UsersTestContext>().Users.First();
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
@@ -146,7 +146,10 @@ public class CreatePurchaseTests : IntegrationTest
                     false)
             ]);
 
-        await Assert.ThrowsAsync<UserIsNotInNeededRole>(() => Mediator.Send(command));
+        var result = await Mediator.Send(command);
+
+        result.Purchase.Supplier.Id.Should().Be(member.Id);
+        result.Purchase.SupplierOrganization.Id.Should().Be(member.Id);
     }
 
     [Fact]
