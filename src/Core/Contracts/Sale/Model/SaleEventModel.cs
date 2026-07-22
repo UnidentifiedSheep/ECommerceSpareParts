@@ -7,9 +7,12 @@ public record SaleEventModel
     [JsonPropertyName("id")]
     public required Guid Id { get; init; }
 
-    [JsonPropertyName("buyerId")]
-    public required Guid BuyerId { get; init; }
+    [JsonPropertyName("organizationId")]
+    public required Guid OrganizationId { get; init; }
 
+    [JsonPropertyName("userId")]
+    public required Guid UserId { get; init; }
+    
     [JsonPropertyName("comment")]
     public string? Comment { get; init; }
 

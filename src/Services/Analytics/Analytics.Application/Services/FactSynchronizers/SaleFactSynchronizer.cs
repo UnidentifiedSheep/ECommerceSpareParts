@@ -156,7 +156,7 @@ public class SaleFactSynchronizer(
                 sale.Id,
                 sale.CurrencyId,
                 saleUpdatedEvent.BaseCurrencyId,
-                sale.BuyerId,
+                sale.OrganizationId,
                 sale.SaleDatetime,
                 saleUpdatedEvent.OccurredAt,
                 contents);
@@ -178,7 +178,7 @@ public class SaleFactSynchronizer(
         dbFact.Update(
             sale.CurrencyId,
             saleUpdatedEvent.BaseCurrencyId,
-            sale.BuyerId,
+            sale.OrganizationId,
             sale.SaleDatetime,
             saleUpdatedEvent.OccurredAt,
             contents);
