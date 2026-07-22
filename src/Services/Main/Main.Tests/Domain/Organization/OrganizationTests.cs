@@ -56,7 +56,7 @@ public class OrganizationTests
 
         organization.Id.Should().Be(systemId);
         organization.Name.Should().Be("System");
-        organization.SystemName.Should().Be("system");
+        organization.SystemName.Should().Be($"system-{systemId:N}");
         organization.Type.Should().Be(OrganizationType.System);
         organization.Members.Should().ContainSingle(x =>
             x.UserId == systemId &&

@@ -65,7 +65,7 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 
     public static Organization CreateSystem(Guid id, Guid ownerId)
         => new(
-            "system",
+            $"system-{id:N}",
             "System",
             OrganizationType.System,
             ownerId,

@@ -28,7 +28,8 @@ public class GetOrganizationsHandler(IReadRepository<Organization, Guid> reposit
         GetOrganizationsQuery request,
         CancellationToken cancellationToken)
     {
-        var query = repository.Query;
+        var query = repository.Query
+            .Where(x => x.Type != OrganizationType.System);
 
         if (request.Ids.Count > 0)
             query = query.Where(x => request.Ids.Contains(x.Id));

@@ -12,35 +12,40 @@ public class SystemOrganizationSeed : ISeed<DContext>
 {
     public async Task SeedAsync(DContext context)
     {
-        var systemUser = await context.Users.SingleOrDefaultAsync(x =>
-            x.UserName == nameof(ServiceSecrets.MainApp) &&
-            x.Roles.Any(role => role.RoleName == RoleNames.Normalize(nameof(Role.System))));
+        var systemUserIds = await context.Users
+            .Where(x => x.Roles.Any(role =>
+                role.RoleName == RoleNames.Normalize(nameof(Role.System))))
+            .Select(x => x.Id)
+            .ToListAsync();
 
-        if (systemUser is null)
-            throw new InvalidOperationException("MainApp system user was not found.");
+        if (systemUserIds.Count == 0)
+            throw new InvalidOperationException("System users were not found.");
 
-        var systemId = systemUser.Id;
-
-        var organization = await context.Organizations
+        var systemUserIdSet = systemUserIds.ToHashSet();
+        var organizations = await context.Organizations
+            .Where(x => systemUserIdSet.Contains(x.Id))
             .Include(x => x.Members)
             .Include(x => x.FinancialProfile)
-            .SingleOrDefaultAsync(x => x.Id == systemId);
+            .ToDictionaryAsync(x => x.Id);
 
-        if (organization is null)
+        foreach (var systemUserId in systemUserIds)
         {
-            organization = Organization.CreateSystem(systemId, systemId);
-            await context.Organizations.AddAsync(organization);
-        }
-        else
-        {
-            EnsureSystemOrganizationIsValid(organization, systemId);
-        }
+            if (!organizations.TryGetValue(systemUserId, out var organization))
+            {
+                organization = Organization.CreateSystem(systemUserId, systemUserId);
+                await context.Organizations.AddAsync(organization);
+            }
+            else
+            {
+                EnsureSystemOrganizationIsValid(organization, systemUserId);
+            }
 
-        if (organization.FinancialProfile is null)
-            await context.Set<OrganizationFinancialProfile>()
-                .AddAsync(OrganizationFinancialProfile.Create(systemId, decimal.MinValue));
-        else if (organization.FinancialProfile.MinAllowedBalance != decimal.MinValue)
-            organization.FinancialProfile.SetMinAllowedBalance(decimal.MinValue);
+            if (organization.FinancialProfile is null)
+                await context.Set<OrganizationFinancialProfile>()
+                    .AddAsync(OrganizationFinancialProfile.Create(systemUserId, decimal.MinValue));
+            else if (organization.FinancialProfile.MinAllowedBalance != decimal.MinValue)
+                organization.FinancialProfile.SetMinAllowedBalance(decimal.MinValue);
+        }
 
         await context.SaveChangesAsync();
     }
@@ -58,6 +63,6 @@ public class SystemOrganizationSeed : ISeed<DContext>
         if (organization.Members.Count != 1 || organization.Members[0].UserId != systemId ||
             organization.Members[0].Role != OrganizationRole.Owner)
             throw new InvalidOperationException(
-                $"System organization '{systemId}' must be owned by the MainApp system user.");
+                $"System organization '{systemId}' must be owned by its system user.");
     }
 }
