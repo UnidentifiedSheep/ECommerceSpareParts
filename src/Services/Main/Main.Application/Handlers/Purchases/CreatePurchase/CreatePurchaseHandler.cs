@@ -44,7 +44,8 @@ public record CreatePurchaseCommand(
     string? Comment,
     decimal? PayedSum,
     bool WithLogistics,
-    string? StorageFrom
+    string? StorageFrom,
+    bool ForcePayment = false
 ) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(PurchaseDto Purchase);
@@ -112,7 +113,8 @@ public class CreatePurchaseHandler(
                     request.CurrencyId,
                     request.PurchaseDate,
                     TransactionSourceType.Manual,
-                    TransactionCreationMode.System),
+                    TransactionCreationMode.System,
+                    request.ForcePayment),
                 cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

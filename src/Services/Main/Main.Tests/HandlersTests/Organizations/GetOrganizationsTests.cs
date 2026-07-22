@@ -29,6 +29,10 @@ public class GetOrganizationsTests : IntegrationTest
 
         result.Organizations.Should().ContainSingle();
         result.Organizations[0].Id.Should().Be(expected.Id);
+        result.Organizations[0].Owner.OrganizationId.Should().Be(expected.Id);
+        result.Organizations[0].Owner.Role.Should().Be(OrganizationRole.Owner);
+        result.Organizations[0].Owner.User.Id.Should().Be(
+            GetContext<UsersTestContext>().Users.First().Id);
     }
 
     [Fact]

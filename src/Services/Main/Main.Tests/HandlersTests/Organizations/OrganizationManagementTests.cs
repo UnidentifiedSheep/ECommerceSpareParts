@@ -36,6 +36,9 @@ public class OrganizationManagementTests : IntegrationTest
         result.Organization.Name.Should().Be(command.Name);
         result.Organization.SystemName.Should().Be(command.SystemName);
         result.Organization.Type.Should().Be(OrganizationType.Business);
+        result.Organization.Owner.OrganizationId.Should().Be(result.Organization.Id);
+        result.Organization.Owner.Role.Should().Be(OrganizationRole.Owner);
+        result.Organization.Owner.User.Id.Should().Be(owner.Id);
 
         var organization = await Context.Organizations
             .Include(x => x.Members)

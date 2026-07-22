@@ -1,10 +1,13 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
+using LinqKit;
 using Main.Application.Dtos.Organizations;
 using Main.Application.Projections;
 using Main.Entities.Organization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Organizations.CreateOrganization;
 
@@ -18,7 +21,9 @@ public record CreateOrganizationCommand(
 
 public record CreateOrganizationResult(OrganizationDto Organization);
 
-public class CreateOrganizationHandler(IUnitOfWork unitOfWork)
+public class CreateOrganizationHandler(
+    IUnitOfWork unitOfWork,
+    IReadRepository<Organization, Guid> organizationRepository)
     : ICommandHandler<CreateOrganizationCommand, CreateOrganizationResult>
 {
     public async Task<CreateOrganizationResult> Handle(
@@ -31,8 +36,12 @@ public class CreateOrganizationHandler(IUnitOfWork unitOfWork)
             request.OwnerId);
 
         await unitOfWork.AddAsync(organization, cancellationToken);
-
-        return new CreateOrganizationResult(
-            OrganizationProjections.ToDto.AsFunc()(organization));
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        var dbValue = await organizationRepository.Query
+            .AsExpandable()
+            .Select(OrganizationProjections.ToDto)
+            .FirstAsync(x => x.Id == organization.Id, cancellationToken);
+        return new CreateOrganizationResult(dbValue);
     }
 }

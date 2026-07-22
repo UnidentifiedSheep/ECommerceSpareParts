@@ -47,6 +47,9 @@ public record CreatePurchaseRequest
 
     [JsonPropertyName("storageFrom")]
     public string? StorageFrom { get; init; }
+
+    [JsonPropertyName("forcePayment")]
+    public bool ForcePayment { get; init; }
 }
 
 public record CreatePurchaseResponse
@@ -120,7 +123,8 @@ public class PurchaseEndPoints : ICarterModule
                         request.Comment,
                         request.PayedSum,
                         request.WithLogistics,
-                        request.StorageFrom);
+                        request.StorageFrom,
+                        request.ForcePayment);
                     var result = await sender.Send(command, token);
                     return Results.Created(
                         new Uri($"/purchases/{result.Purchase.Id}"),

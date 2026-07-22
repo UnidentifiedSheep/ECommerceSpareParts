@@ -244,6 +244,27 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     [Fact]
+    public async Task CreatePurchase_WithOverpaymentAndForcePayment_CreatesPurchase()
+    {
+        var command = CreateValidCommand() with
+        {
+            PayedSum = 9_999m,
+            ForcePayment = true
+        };
+
+        await Mediator.Send(command);
+
+        var supplierBalance = await Context.UserBalances
+            .AsNoTracking()
+            .SingleAsync(x =>
+                x.OrganizationId == command.SupplierOrganizationId &&
+                x.CurrencyId == command.CurrencyId);
+        var purchaseTotal = command.PurchaseContent.Sum(x => x.Price * x.Count);
+
+        supplierBalance.Balance.Should().Be(purchaseTotal - command.PayedSum.Value);
+    }
+
+    [Fact]
     public async Task CreatePurchase_WithZeroPayedSum_DoesNotCreatePaymentTransaction()
     {
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
