@@ -65,7 +65,7 @@ public class CreatePurchaseHandler(
     {
         var systemId = systemOptions.Value.SystemId;
 
-        var supplier = await userRepository.EnsureExistAsync(
+        await userRepository.EnsureExistAsync(
             request.SupplierUserId,
             _ => new UserIsNotInNeededRole(Role.Supplier),
             Criteria<User>

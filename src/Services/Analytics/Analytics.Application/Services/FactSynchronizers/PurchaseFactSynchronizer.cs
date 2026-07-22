@@ -83,7 +83,7 @@ public class PurchaseFactSynchronizer(
             dbFact = PurchasesFact.Create(
                 purchase.Id,
                 purchase.Currency.Id,
-                purchase.Supplier.Id,
+                purchase.SupplierOrganization.Id,
                 purchase.PurchaseDatetime,
                 synchronizationStartedAt,
                 contents);
@@ -104,7 +104,7 @@ public class PurchaseFactSynchronizer(
 
         dbFact.Update(
             purchase.Currency.Id,
-            purchase.Supplier.Id,
+            purchase.SupplierOrganization.Id,
             purchase.PurchaseDatetime,
             synchronizationStartedAt,
             contents);
