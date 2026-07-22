@@ -5,13 +5,13 @@ using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Static;
 using Main.Entities.Exceptions;
-using Main.Entities.Organization;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
+using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -98,12 +98,11 @@ public class CreatePurchaseTests : IntegrationTest
     [Fact]
     public async Task CreatePurchase_ForBusinessOrganization_UsesOrganizationForTransaction()
     {
-        var organization = Organization.CreateBusiness(
-            "Supplier organization",
-            $"supplier-{Guid.NewGuid():N}",
-            _supplier.Id);
-        Context.Organizations.Add(organization);
-        await Context.SaveChangesAsync();
+        var organization = await new OrganizationBuilder(Faker)
+            .WithOwnerId(_supplier.Id)
+            .WithName("Supplier organization")
+            .WithSystemName($"supplier-{Guid.NewGuid():N}")
+            .BuildAndAddToDb(Context);
 
         var command = CreateValidCommand() with
         {

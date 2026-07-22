@@ -3,7 +3,6 @@ using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Organizations;
-using Main.Application.Handlers.Organizations.GetOrganizationMembers;
 using Main.Application.Handlers.Organizations.GetOrganizations;
 using Main.Enums.Organization;
 using MediatR;
@@ -24,7 +23,6 @@ public record GetOrganizationsRequest : SortablePaginationQueryModel
 }
 
 public record GetOrganizationsResponse(IReadOnlyList<OrganizationDto> Organizations);
-public record GetOrganizationMembersResponse(IReadOnlyList<OrganizationMemberDto> Members);
 
 public class OrganizationEndPoints : ICarterModule
 {
@@ -32,6 +30,8 @@ public class OrganizationEndPoints : ICarterModule
     {
         var organizations = app.MapGroup("/organizations")
             .WithTags("Organizations");
+
+        organizations.MapOrganizationMemberEndPoints();
 
         organizations.MapGet(
                 "",
@@ -45,6 +45,7 @@ public class OrganizationEndPoints : ICarterModule
                             request,
                             request.SortBy,
                             request.SearchTerm,
+                            null,
                             request.Ids,
                             request.Types),
                         cancellationToken);
@@ -59,26 +60,5 @@ public class OrganizationEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ORGANIZATIONS_GET);
 
-        organizations.MapGet(
-                "/{organizationId:guid}/members",
-                async (
-                    ISender sender,
-                    Guid organizationId,
-                    [AsParameters] PaginationQueryModel pagination,
-                    CancellationToken cancellationToken) =>
-                {
-                    var result = await sender.Send(
-                        new GetOrganizationMembersQuery(organizationId, pagination),
-                        cancellationToken);
-
-                    return Results.Ok(new GetOrganizationMembersResponse(result.Members));
-                })
-            .WithName("GetOrganizationMembers")
-            .WithSummary("Получить участников организации")
-            .WithDescription("Получение участников организации с пагинацией")
-            .Produces<GetOrganizationMembersResponse>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.ORGANIZATIONS_GET);
     }
 }

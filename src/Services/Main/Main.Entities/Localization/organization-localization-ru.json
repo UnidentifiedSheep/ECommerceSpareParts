@@ -2,6 +2,8 @@
   "locale": "ru",
   "keyValues": {
     "organization.system.name.required": "Системное имя организации обязательно.",
+    "organization.system.name.max.length": "Системное имя организации должно содержать не более 128 символов.",
+    "organization.system.name.already.exists": "Организация с таким системным именем уже существует.",
     "organization.not.found": "Организация не найдена.",
     "organization.name.required": "Название организации обязательно.",
     "organization.name.min.length": "Название организации должно содержать не менее 3 символов.",
@@ -11,6 +13,7 @@
     "organization.owner.already.exists": "У организации уже есть владелец.",
     "organization.owner.cannot.be.removed": "Владельца организации нельзя удалить.",
     "organization.member.not.found": "Участник организации не найден.",
+    "organization.member.role.invalid": "Недопустимая роль участника организации.",
     "organization.owner.role.cannot.be.changed": "Роль владельца организации нельзя изменить."
   }
 }

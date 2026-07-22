@@ -15,6 +15,8 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
     public Guid Id { get; private set; }
     public OrganizationType Type { get; private set; }
     public string Name { get; private set; } = null!;
+
+    [Validate]
     public string SystemName { get; private set; } = null!;
     
     private readonly List<OrganizationMember> _members = [];
@@ -37,7 +39,8 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
         Id = id ?? Guid.NewGuid();
         Type = type;
         SystemName = systemName.TrimSafe()
-            .EnsureNotNullOrWhiteSpace("organization.system.name.required");
+            .EnsureNotNullOrWhiteSpace("organization.system.name.required")
+            .EnsureMaxLength(128, "organization.system.name.max.length");
         SetName(name);
         AddMember(ownerId, OrganizationRole.Owner);
     }

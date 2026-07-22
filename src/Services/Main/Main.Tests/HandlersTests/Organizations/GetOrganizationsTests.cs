@@ -1,8 +1,12 @@
 using Abstractions.Models;
+using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Organizations.GetOrganizations;
+using Main.Application.Static;
 using Main.Entities.Organization;
 using Main.Enums.Organization;
+using Tests.DataBuilders.Organization;
+using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -30,8 +34,8 @@ public class GetOrganizationsTests : IntegrationTest
     [Fact]
     public async Task GetOrganizations_BySystemName_ReturnsMatchingOrganization()
     {
-        var expected = await CreateOrganization("Supplier One", "unique-supplier-code");
-        await CreateOrganization("Supplier Two", "another-supplier-code");
+        var expected = await CreateOrganization("First organization", "unique-supplier-code");
+        await CreateOrganization("Unrelated warehouse", "warehouse-code");
 
         var result = await Mediator.Send(CreateQuery(searchTerm: "UNIQUE-SUPPLIER"));
 
@@ -46,13 +50,11 @@ public class GetOrganizationsTests : IntegrationTest
         var member = users[1];
         member.SetUserInfo("Distinctive", "Membername", "Organization contact");
 
-        var expected = Organization.CreateBusiness(
-            "Member organization",
-            $"member-organization-{Guid.NewGuid():N}",
-            users[0].Id);
-        expected.AddMember(member.Id, OrganizationRole.Member);
-        Context.Organizations.Add(expected);
-        await Context.SaveChangesAsync();
+        var expected = await new OrganizationBuilder(Faker)
+            .WithOwnerId(users[0].Id)
+            .WithName("Member organization")
+            .WithMember(member.Id)
+            .BuildAndAddToDb(Context);
 
         var result = await Mediator.Send(CreateQuery(searchTerm: "Distinctive Membername"));
 
@@ -81,6 +83,33 @@ public class GetOrganizationsTests : IntegrationTest
 
         result.Organizations.Should().NotBeEmpty();
         result.Organizations.Should().OnlyContain(x => x.Type == OrganizationType.Business);
+    }
+
+    [Fact]
+    public async Task GetOrganizations_ByUserId_ReturnsOrganizationsWhereUserIsMember()
+    {
+        var users = GetContext<UsersTestContext>().Users.ToArray();
+        var member = users[1];
+        var expected = await CreateOrganization("Member organization", "member-organization");
+        expected.AddMember(member.Id, OrganizationRole.Member);
+        await Context.SaveChangesAsync();
+        var notExpected = await CreateOrganization("Other organization", "other-organization");
+
+        var result = await Mediator.Send(CreateQuery(userId: member.Id));
+
+        result.Organizations.Should().Contain(x => x.Id == expected.Id);
+        result.Organizations.Should().Contain(x => x.Id == member.Id);
+        result.Organizations.Should().NotContain(x => x.Id == notExpected.Id);
+    }
+
+    [Fact]
+    public async Task GetOrganizations_MissingUser_ThrowsDbValidationException()
+    {
+        var query = CreateQuery(userId: Guid.NewGuid());
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
+
+        exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.UsersNotFound);
     }
 
     [Fact]
@@ -118,6 +147,7 @@ public class GetOrganizationsTests : IntegrationTest
 
     private GetOrganizationsQuery CreateQuery(
         string? searchTerm = null,
+        Guid? userId = null,
         IReadOnlyCollection<Guid>? ids = null,
         IReadOnlyCollection<OrganizationType>? types = null,
         string? sortBy = null,
@@ -128,6 +158,7 @@ public class GetOrganizationsTests : IntegrationTest
             new Pagination(page, size),
             sortBy,
             searchTerm,
+            userId,
             ids ?? [],
             types ?? []);
     }
@@ -137,14 +168,10 @@ public class GetOrganizationsTests : IntegrationTest
         string systemName)
     {
         var owner = GetContext<UsersTestContext>().Users.First();
-        var organization = Organization.CreateBusiness(
-            name,
-            $"{systemName}-{Guid.NewGuid():N}",
-            owner.Id);
-
-        Context.Organizations.Add(organization);
-        await Context.SaveChangesAsync();
-
-        return organization;
+        return await new OrganizationBuilder(Faker)
+            .WithOwnerId(owner.Id)
+            .WithName(name)
+            .WithSystemName($"{systemName}-{Guid.NewGuid():N}")
+            .BuildAndAddToDb(Context);
     }
 }

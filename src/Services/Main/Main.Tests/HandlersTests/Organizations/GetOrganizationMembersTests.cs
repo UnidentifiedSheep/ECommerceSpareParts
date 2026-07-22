@@ -5,6 +5,8 @@ using Main.Application.Handlers.Organizations.GetOrganizationMembers;
 using Main.Application.Static;
 using Main.Entities.Organization;
 using Main.Enums.Organization;
+using Tests.DataBuilders.Organization;
+using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -81,16 +83,11 @@ public class GetOrganizationMembersTests : IntegrationTest
 
     private async Task<Organization> CreateOrganization(Guid[] userIds)
     {
-        var organization = Organization.CreateBusiness(
-            "Members organization",
-            $"members-organization-{Guid.NewGuid():N}",
-            userIds[0]);
-        organization.AddMember(userIds[1], OrganizationRole.Admin);
-        organization.AddMember(userIds[2], OrganizationRole.Member);
-
-        Context.Organizations.Add(organization);
-        await Context.SaveChangesAsync();
-
-        return organization;
+        return await new OrganizationBuilder(Faker)
+            .WithOwnerId(userIds[0])
+            .WithName("Members organization")
+            .WithMember(userIds[1], OrganizationRole.Admin)
+            .WithMember(userIds[2])
+            .BuildAndAddToDb(Context);
     }
 }

@@ -79,6 +79,7 @@ public class UsersEndPoints : ICarterModule
         users.MapUserPermissionEndPoints();
         users.MapUserEmailEndPoints();
         users.MapUserRoleEndPoints();
+        users.MapUserOrganizationEndPoints();
 
         users.MapPost(
                 "/",

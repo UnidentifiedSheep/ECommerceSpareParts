@@ -2,6 +2,8 @@
   "locale": "en",
   "keyValues": {
     "organization.system.name.required": "Organization system name is required.",
+    "organization.system.name.max.length": "Organization system name must be at most 128 characters long.",
+    "organization.system.name.already.exists": "An organization with this system name already exists.",
     "organization.not.found": "Organization was not found.",
     "organization.name.required": "Organization name is required.",
     "organization.name.min.length": "Organization name must be at least 3 characters long.",
@@ -11,6 +13,7 @@
     "organization.owner.already.exists": "The organization already has an owner.",
     "organization.owner.cannot.be.removed": "The organization owner cannot be removed.",
     "organization.member.not.found": "Organization member was not found.",
+    "organization.member.role.invalid": "Organization member role is invalid.",
     "organization.owner.role.cannot.be.changed": "The organization owner's role cannot be changed."
   }
 }

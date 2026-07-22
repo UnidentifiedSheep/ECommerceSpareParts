@@ -12,6 +12,8 @@ public static class ApplicationErrors
     public const string UsersNotFound = "UsersNotFound";
     public const string OrganizationsNotFound = "OrganizationsNotFound";
     public const string OrganizationMemberNotFound = "OrganizationMemberNotFound";
+    public const string OrganizationMemberAlreadyExists = "OrganizationMemberAlreadyExists";
+    public const string OrganizationSystemNameAlreadyTaken = "OrganizationSystemNameAlreadyTaken";
     public const string UserNameAlreadyTaken = "UserNameAlreadyTaken";
     public const string UserEmailAlreadyTaken = "UserEmailAlreadyTaken";
     public const string UserEmailNotFound = "UserEmailNotFound";

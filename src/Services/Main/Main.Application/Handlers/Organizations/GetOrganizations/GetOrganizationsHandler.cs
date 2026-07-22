@@ -15,6 +15,7 @@ public record GetOrganizationsQuery(
     Pagination Pagination,
     string? SortBy,
     string? SearchTerm,
+    Guid? UserId,
     IReadOnlyCollection<Guid> Ids,
     IReadOnlyCollection<OrganizationType> Types
 ) : IQuery<GetOrganizationsResult>;
@@ -37,8 +38,14 @@ public class GetOrganizationsHandler(IReadRepository<Organization, Guid> reposit
         if (request.Types.Count > 0)
             query = query.Where(x => request.Types.Contains(x.Type));
 
+        if (request.UserId.HasValue)
+            query = query.Where(x => x.Members.Any(member =>
+                member.UserId == request.UserId.Value));
+
         var searchTerm = request.SearchTerm?.Trim();
         if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var pattern = $"%{searchTerm}%";
             query = query
                 .Select(x => new
                 {
@@ -58,9 +65,14 @@ public class GetOrganizationsHandler(IReadRepository<Organization, Guid> reposit
                         .OrderByDescending(rank => rank)
                         .FirstOrDefault()
                 })
-                .Where(x => x.MemberRank >= 0.3 || x.OrganizationRank >= 0.3)
+                .Where(x =>
+                    EF.Functions.ILike(x.Organization.Name, pattern) ||
+                    EF.Functions.ILike(x.Organization.SystemName, pattern) ||
+                    x.MemberRank >= 0.3 ||
+                    x.OrganizationRank >= 0.3)
                 .OrderByDescending(x => x.OrganizationRank + x.MemberRank)
                 .Select(x => x.Organization);
+        }
 
         var organizations = await query
             .SortBy(request.SortBy)

@@ -2,6 +2,8 @@
   "locale": "tr",
   "keyValues": {
     "organization.system.name.required": "Kuruluş sistem adı zorunludur.",
+    "organization.system.name.max.length": "Kuruluş sistem adı en fazla 128 karakter olmalıdır.",
+    "organization.system.name.already.exists": "Bu sistem adına sahip bir kuruluş zaten mevcut.",
     "organization.not.found": "Kuruluş bulunamadı.",
     "organization.name.required": "Kuruluş adı zorunludur.",
     "organization.name.min.length": "Kuruluş adı en az 3 karakter uzunluğunda olmalıdır.",
@@ -11,6 +13,7 @@
     "organization.owner.already.exists": "Kuruluşun zaten bir sahibi vardır.",
     "organization.owner.cannot.be.removed": "Kuruluş sahibi kaldırılamaz.",
     "organization.member.not.found": "Kuruluş üyesi bulunamadı.",
+    "organization.member.role.invalid": "Kuruluş üyesi rolü geçersiz.",
     "organization.owner.role.cannot.be.changed": "Kuruluş sahibinin rolü değiştirilemez."
   }
 }
