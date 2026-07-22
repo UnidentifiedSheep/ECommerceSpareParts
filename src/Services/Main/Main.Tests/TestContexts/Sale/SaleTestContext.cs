@@ -47,7 +47,6 @@ public class SaleTestContext(
         var currencyId = currencyContext.Currencies[0].Id;
         Buyer = await new MemberUserBuilder(Faker).BuildAndAddToDb(DbContext);
         var buyerProfile = OrganizationFinancialProfile.Create(Buyer.Id);
-        buyerProfile.Credit(10_000m);
         StorageContent = storageContentContext.StorageContents.First(x => x.Count > 0);
         Product = productContext.Products.Single(x => x.Id == StorageContent.ProductId);
         SoldCount = 1;
@@ -56,6 +55,7 @@ public class SaleTestContext(
             .WithUserId(Buyer.Id)
             .WithCurrencyId(currencyId)
             .Build();
+        ReceiverBalance.IncrementBalance(10_000m);
         SenderBalance = new UserBalanceBuilder(Faker)
             .WithUserId(userContext.SystemUser.Id)
             .WithCurrencyId(currencyId)

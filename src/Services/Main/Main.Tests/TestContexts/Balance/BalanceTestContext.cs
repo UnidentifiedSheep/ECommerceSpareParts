@@ -44,7 +44,7 @@ public class BalanceTestContext(
 
         var senderProfile = OrganizationFinancialProfile.Create(users[0].Id);
         var receiverProfile = OrganizationFinancialProfile.Create(users[1].Id);
-        receiverProfile.Credit(100m);
+        receiverBalance.IncrementBalance(100m);
 
         var transaction = new TransactionBuilder(Faker)
             .WithSenderId(users[0].Id)

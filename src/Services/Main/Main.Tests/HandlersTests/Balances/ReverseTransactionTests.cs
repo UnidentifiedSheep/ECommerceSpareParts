@@ -45,7 +45,7 @@ public class ReverseTransactionTests : IntegrationTest
             .FirstAsync(x => x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
 
         senderBalance.Balance.Should().Be(0m);
-        receiverBalance.Balance.Should().Be(0m);
+        receiverBalance.Balance.Should().Be(100m);
     }
 
     [Fact]

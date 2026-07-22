@@ -12,27 +12,61 @@ namespace Main.Application.Services;
 public class BalanceService(
     IRepository<OrganizationBalance, UserBalanceKey> userBalanceRepository,
     IRepository<OrganizationFinancialProfile, Guid> userFinancialProfileRepository,
+    IRepository<Organization, Guid> organizationRepository,
     ICurrencyConverter currencyConverter,
     IOptions<SystemOptions> systemOptions,
     ITransactionFinancialProfileService transactionFinancialProfileService,
     IUnitOfWork unitOfWork
 ) : IBalanceService
 {
+    public async Task<decimal> GetBalanceInBaseCurrencyAsync(
+        Guid organizationId,
+        CancellationToken cancellationToken = default)
+    {
+        var criteria = Criteria<OrganizationBalance>.New()
+            .Where(x => x.OrganizationId == organizationId)
+            .Build();
+        var balances = await userBalanceRepository.ListAsync(criteria, cancellationToken);
+
+        return await SumBalanceInBaseCurrencyAsync(balances, cancellationToken);
+    }
+
     public async Task ChangeSenderReceiverBalancesAsync(
         Transaction transaction,
         bool forceFinancialProfileDebit = false,
         CancellationToken cancellationToken = default)
     {
-        var senderProfile = await GetFinancialProfile(transaction.SenderId, cancellationToken);
-        var receiverProfile = await GetFinancialProfile(transaction.ReceiverId, cancellationToken);
+        await LockOrganizationsAsync(
+            transaction.SenderId,
+            transaction.ReceiverId,
+            cancellationToken);
+        var profiles = await GetFinancialProfiles(
+            transaction.SenderId,
+            transaction.ReceiverId,
+            cancellationToken);
+        var senderProfile = profiles[transaction.SenderId];
+        var receiverProfile = profiles[transaction.ReceiverId];
 
-        var senderBalance = await GetUserBalanceAsync(
+        var balances = await GetBalancesAsync(
+            transaction.SenderId,
+            transaction.ReceiverId,
+            cancellationToken);
+        var senderBalance = await GetOrCreateBalanceAsync(
+            balances,
             transaction.SenderId,
             transaction.CurrencyId,
             cancellationToken);
-        var receiverBalance = await GetUserBalanceAsync(
+        var receiverBalance = await GetOrCreateBalanceAsync(
+            balances,
             transaction.ReceiverId,
             transaction.CurrencyId,
+            cancellationToken);
+
+        var senderBalanceInBaseCurrency = await SumBalanceInBaseCurrencyAsync(
+            balances.Where(x => x.OrganizationId == transaction.SenderId),
+            cancellationToken);
+        var receiverBalanceInBaseCurrency = await SumBalanceInBaseCurrencyAsync(
+            balances.Where(x => x.OrganizationId == transaction.ReceiverId),
             cancellationToken);
 
         var amountInBaseCurrency = await currencyConverter
@@ -46,54 +80,101 @@ public class BalanceService(
             transaction,
             senderProfile,
             receiverProfile,
+            senderBalanceInBaseCurrency,
+            receiverBalanceInBaseCurrency,
             amountInBaseCurrency,
-            systemOptions.Value.SystemId,
             forceFinancialProfileDebit);
     }
 
-    private async Task<OrganizationBalance> GetUserBalanceAsync(
-        Guid userId,
-        int currencyId,
-        CancellationToken cancellationToken = default)
+    private async Task LockOrganizationsAsync(
+        Guid senderId,
+        Guid receiverId,
+        CancellationToken cancellationToken)
     {
-        var criteria = Criteria<OrganizationBalance>.New()
-            .Where(x => x.OrganizationId == userId && x.CurrencyId == currencyId)
+        var criteria = Criteria<Organization>.New()
+            .Where(x => x.Id == senderId || x.Id == receiverId)
+            .OrderByAsc(x => x.Id)
             .ForUpdate()
             .Track()
             .Build();
 
-        var dbValue = await userBalanceRepository.FirstOrDefaultAsync(criteria, cancellationToken);
+        var organizations = await organizationRepository.ListAsync(criteria, cancellationToken);
+        if (organizations.Count != 2)
+            throw new InvalidOperationException("Sender or receiver organization does not exist");
+    }
 
-        if (dbValue != null) return dbValue;
+    private async Task<List<OrganizationBalance>> GetBalancesAsync(
+        Guid senderId,
+        Guid receiverId,
+        CancellationToken cancellationToken)
+    {
+        var criteria = Criteria<OrganizationBalance>.New()
+            .Where(x => x.OrganizationId == senderId || x.OrganizationId == receiverId)
+            .Track()
+            .Build();
 
-        dbValue = OrganizationBalance.Create(userId, currencyId);
+        return await userBalanceRepository.ListAsync(criteria, cancellationToken);
+    }
+
+    private async Task<OrganizationBalance> GetOrCreateBalanceAsync(
+        List<OrganizationBalance> balances,
+        Guid organizationId,
+        int currencyId,
+        CancellationToken cancellationToken)
+    {
+        var dbValue = balances.FirstOrDefault(
+            x => x.OrganizationId == organizationId && x.CurrencyId == currencyId);
+        if (dbValue is not null) return dbValue;
+
+        dbValue = OrganizationBalance.Create(organizationId, currencyId);
         await unitOfWork.AddAsync(dbValue, cancellationToken);
+        balances.Add(dbValue);
 
         return dbValue;
     }
 
-    private async Task<OrganizationFinancialProfile> GetFinancialProfile(
-        Guid userId,
+    private async Task<Dictionary<Guid, OrganizationFinancialProfile>> GetFinancialProfiles(
+        Guid senderId,
+        Guid receiverId,
         CancellationToken cancellationToken)
     {
         var criteria = Criteria<OrganizationFinancialProfile>.New()
-            .Where(x => x.OrganizationId == userId)
+            .Where(x => x.OrganizationId == senderId || x.OrganizationId == receiverId)
+            .OrderByAsc(x => x.OrganizationId)
             .ForUpdate()
             .Track()
             .Build();
 
-        var dbValue = await userFinancialProfileRepository
-            .FirstOrDefaultAsync(
-                criteria,
+        var profiles = (await userFinancialProfileRepository.ListAsync(criteria, cancellationToken))
+            .ToDictionary(x => x.OrganizationId);
+
+        foreach (var organizationId in new[] { senderId, receiverId }.Order())
+        {
+            if (profiles.ContainsKey(organizationId)) continue;
+
+            var profile = systemOptions.Value.SystemId == organizationId
+                ? OrganizationFinancialProfile.Create(organizationId, decimal.MinValue)
+                : OrganizationFinancialProfile.Create(organizationId);
+            await unitOfWork.AddAsync(profile, cancellationToken);
+            profiles.Add(organizationId, profile);
+        }
+
+        return profiles;
+    }
+
+    private async Task<decimal> SumBalanceInBaseCurrencyAsync(
+        IEnumerable<OrganizationBalance> balances,
+        CancellationToken cancellationToken)
+    {
+        var result = 0m;
+        foreach (var balance in balances)
+        {
+            result += await currencyConverter.ConvertToBaseAsync(
+                balance.Balance,
+                balance.CurrencyId,
                 cancellationToken);
+        }
 
-        if (dbValue != null) return dbValue;
-
-        dbValue = systemOptions.Value.SystemId == userId
-            ? OrganizationFinancialProfile.Create(userId, decimal.MinValue)
-            : OrganizationFinancialProfile.Create(userId);
-
-        await unitOfWork.AddAsync(dbValue, cancellationToken);
-        return dbValue;
+        return result;
     }
 }

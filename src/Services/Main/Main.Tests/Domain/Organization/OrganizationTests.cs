@@ -16,7 +16,7 @@ public class OrganizationTests
             "  Test organization  ",
             ownerId);
 
-        organization.Id.Should().NotBeEmpty();
+        organization.Id.Should().Be(ownerId);
         organization.Name.Should().Be("Test organization");
         organization.SystemName.Should().StartWith("individual-");
         organization.Type.Should().Be(OrganizationType.Individual);
@@ -45,6 +45,23 @@ public class OrganizationTests
             x.UserId == ownerId
             && x.OrganizationId == organization.Id
             && x.Role == OrganizationRole.Owner);
+    }
+
+    [Fact]
+    public void CreateSystem_UsesConfiguredIdAndSystemOwner()
+    {
+        var systemId = Guid.NewGuid();
+
+        var organization = OrganizationDomain.CreateSystem(systemId, systemId);
+
+        organization.Id.Should().Be(systemId);
+        organization.Name.Should().Be("System");
+        organization.SystemName.Should().Be("system");
+        organization.Type.Should().Be(OrganizationType.System);
+        organization.Members.Should().ContainSingle(x =>
+            x.UserId == systemId &&
+            x.OrganizationId == systemId &&
+            x.Role == OrganizationRole.Owner);
     }
 
     [Theory]

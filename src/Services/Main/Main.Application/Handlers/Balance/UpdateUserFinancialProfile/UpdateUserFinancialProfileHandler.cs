@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Balances;
+using Main.Application.Interfaces.Services;
 using Main.Application.Projections;
 using Main.Entities.Balance;
 using Main.Entities.Organization;
@@ -26,6 +27,7 @@ public record UpdateUserFinancialProfileResult(UserFinancialProfileDto Profile);
 
 public class UpdateUserFinancialProfileHandler(
     IRepository<OrganizationFinancialProfile, Guid> repository,
+    IBalanceService balanceService,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<UpdateUserFinancialProfileCommand, UpdateUserFinancialProfileResult>
 {
@@ -42,7 +44,10 @@ public class UpdateUserFinancialProfileHandler(
         }
 
         request.Patch.MinimalAllowedBalance.Apply(x => profile.SetMinAllowedBalance(x));
+        var netPosition = await balanceService.GetBalanceInBaseCurrencyAsync(
+            request.UserId,
+            cancellationToken);
         return new UpdateUserFinancialProfileResult(
-            BalanceProjections.ToUserFinancialProfileDto.AsFunc()(profile));
+            BalanceProjections.ToUserFinancialProfileDto(profile, netPosition));
     }
 }

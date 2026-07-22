@@ -3,5 +3,6 @@ namespace Main.Enums.Organization;
 public enum OrganizationType
 {
     Individual,
-    Business
+    Business,
+    System
 }

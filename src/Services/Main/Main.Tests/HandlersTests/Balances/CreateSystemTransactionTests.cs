@@ -31,8 +31,6 @@ public class CreateSystemTransactionTests : IntegrationTest
         var currency = CurrencyContext.Currencies[0];
         var amount = 125.50m;
 
-        await CreditProfile(user.Id, amount);
-
         var result = await Mediator.Send(
             new CreateSystemTransactionCommand(
                 user.Id,
@@ -69,7 +67,7 @@ public class CreateSystemTransactionTests : IntegrationTest
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         var amount = 75m;
-        await CreditProfile(user.Id, amount);
+        await AllowDebit(user.Id, amount);
 
         var result = await Mediator.Send(
             new CreateSystemTransactionCommand(
@@ -100,10 +98,9 @@ public class CreateSystemTransactionTests : IntegrationTest
         systemBalance.Balance.Should().Be(amount);
     }
 
-    private async Task CreditProfile(Guid userId, decimal amount)
+    private async Task AllowDebit(Guid userId, decimal amount)
     {
-        var profile = OrganizationFinancialProfile.Create(userId);
-        profile.Credit(amount);
+        var profile = OrganizationFinancialProfile.Create(userId, -amount);
 
         await Context.AddAsync(profile);
         await Context.SaveChangesAsync();

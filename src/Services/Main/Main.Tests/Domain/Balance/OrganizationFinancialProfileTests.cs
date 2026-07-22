@@ -16,64 +16,7 @@ public class OrganizationFinancialProfileTests
 
         profile.OrganizationId.Should().Be(userId);
         profile.GetId().Should().Be(userId);
-        profile.Balance.Should().Be(0);
         profile.MinAllowedBalance.Should().Be(-100m);
-    }
-
-    [Fact]
-    public void Credit_PositiveAmount_IncreasesBalance()
-    {
-        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
-
-        profile.Credit(150.25m);
-
-        profile.Balance.Should().Be(150.25m);
-    }
-
-    [Fact]
-    public void Debit_WhenBalanceEnough_DecreasesBalance()
-    {
-        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
-        profile.Credit(150m);
-
-        profile.Debit(50m);
-
-        profile.Balance.Should().Be(100m);
-    }
-
-    [Fact]
-    public void Debit_WhenBalanceWouldBecomeLessThanMinimum_Throws()
-    {
-        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
-        profile.Credit(100m);
-
-        var act = () => profile.Debit(101m);
-
-        act.Should().Throw<InvalidInputException>();
-        profile.Balance.Should().Be(100m);
-    }
-
-    [Fact]
-    public void Debit_WithForce_AllowsBalanceBelowMinimum()
-    {
-        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
-
-        profile.Debit(100m, true);
-
-        profile.Balance.Should().Be(-100m);
-    }
-
-    [Theory]
-    [InlineData(-1)]
-    public void BalanceOperations_NegativeAmount_Throws(decimal amount)
-    {
-        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
-
-        var credit = () => profile.Credit(amount);
-        var debit = () => profile.Debit(amount);
-
-        credit.Should().Throw<InvalidInputException>();
-        debit.Should().Throw<InvalidInputException>();
     }
 
     [Fact]

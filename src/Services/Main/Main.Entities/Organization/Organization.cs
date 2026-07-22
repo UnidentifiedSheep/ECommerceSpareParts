@@ -29,9 +29,10 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
         string systemName, 
         string name,
         OrganizationType type,
-        Guid ownerId)
+        Guid ownerId,
+        Guid? id = null)
     {
-        Id = Guid.NewGuid();
+        Id = id ?? Guid.NewGuid();
         Type = type;
         SystemName = systemName.TrimSafe()
             .EnsureNotNullOrWhiteSpace("organization.system.name.required");
@@ -46,6 +47,7 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
             $"individual-{Guid.NewGuid():N}",
             name, 
             OrganizationType.Individual, 
+            ownerId,
             ownerId);
     
     
@@ -58,6 +60,14 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
             name,
             OrganizationType.Business,
             ownerId);
+
+    public static Organization CreateSystem(Guid id, Guid ownerId)
+        => new(
+            "system",
+            "System",
+            OrganizationType.System,
+            ownerId,
+            id);
 
     public void AddMember(Guid userId, OrganizationRole role)
     {

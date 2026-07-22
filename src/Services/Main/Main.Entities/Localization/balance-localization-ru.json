@@ -19,6 +19,7 @@
     "transaction.range.start.before.end": "Дата начала диапазона не может быть позже даты конца.",
     "transaction.range.max.months": "Максимальный диапазон — 5 месяцев.",
     "financial.profile.min.allowed.balance.max.two.decimal.places": "Минимально допустимый баланс может содержать не более 2 знаков после запятой.",
-    "financial.profile.min.allowed.balance.must.not.be.positive": "Минимально допустимый баланс не может быть положительным."
+    "financial.profile.min.allowed.balance.must.not.be.positive": "Минимально допустимый баланс не может быть положительным.",
+    "financial.profile.balance.below.minimum": "Транзакция уменьшит баланс организации ниже допустимого минимума."
   }
 }

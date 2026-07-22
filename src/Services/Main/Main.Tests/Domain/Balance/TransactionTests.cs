@@ -100,35 +100,29 @@ public class TransactionTests
     }
 
     [Fact]
-    public void ApplyProfile_CompletionApplied_UsesBaseAmountForProfiles()
+    public void ApplyProfile_CompletionWithinLimit_MarksProfileApplied()
     {
         var tx = Create();
         var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
         var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
         var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
-        senderBalance.IncrementBalance(200m);
-        senderProfile.Credit(200m);
-
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
         ApplyProfile(
             tx,
             senderProfile,
             receiverProfile,
-            120m,
-            SystemId);
+            0m,
+            100m,
+            100m);
 
-        senderBalance.Balance.Should().Be(300m);
-        receiverBalance.Balance.Should().Be(-100m);
-        senderProfile.Balance.Should().Be(80m);
-        receiverProfile.Balance.Should().Be(120m);
         tx.IsCompletionApplied.Should().BeTrue();
         tx.IsCompletionProfileApplied.Should().BeTrue();
     }
 
     [Fact]
-    public void ApplyProfile_ReversalAfterCompletionProfileApplied_RollsBackProfile()
+    public void ApplyProfile_ReversalBelowLimit_IsAllowed()
     {
         var tx = Create();
         var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
@@ -136,27 +130,25 @@ public class TransactionTests
         var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
         var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
         senderBalance.IncrementBalance(200m);
-        senderProfile.Credit(200m);
-
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
         ApplyProfile(
             tx,
             senderProfile,
             receiverProfile,
+            200m,
             120m,
-            SystemId);
+            120m);
         tx.Reverse(Guid.NewGuid());
         tx.Apply(senderBalance, receiverBalance);
         ApplyProfile(
             tx,
             senderProfile,
             receiverProfile,
-            120m,
-            SystemId);
+            decimal.MinValue,
+            decimal.MinValue,
+            120m);
 
-        senderProfile.Balance.Should().Be(200m);
-        receiverProfile.Balance.Should().Be(0m);
         tx.IsReversalProfileApplied.Should().BeTrue();
     }
 
@@ -176,8 +168,9 @@ public class TransactionTests
             tx,
             senderProfile,
             receiverProfile,
+            0m,
             100m,
-            SystemId);
+            100m);
 
         act.Should()
             .Throw<InvalidOperationException>()
@@ -192,23 +185,23 @@ public class TransactionTests
         var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
         var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
-        senderProfile.Credit(200m);
-
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
         ApplyProfile(
             tx,
             senderProfile,
             receiverProfile,
+            0m,
             100m,
-            SystemId);
+            100m);
 
         var act = () => ApplyProfile(
             tx,
             senderProfile,
             receiverProfile,
+            0m,
             100m,
-            SystemId);
+            100m);
 
         act.Should()
             .Throw<InvalidOperationException>()
@@ -218,7 +211,7 @@ public class TransactionTests
     [Theory]
     [InlineData(TransactionSourceType.Purchase)]
     [InlineData(TransactionSourceType.Logistic)]
-    public void ApplyProfile_SystemOwesUser_CreditsSenderProfile(TransactionSourceType sourceType)
+    public void ApplyProfile_SourceType_DoesNotChangeLimitSemantics(TransactionSourceType sourceType)
     {
         var senderId = Guid.NewGuid();
         var tx = Create(
@@ -236,15 +229,16 @@ public class TransactionTests
             tx,
             senderProfile,
             receiverProfile,
+            0m,
+            0m,
             100m,
-            SystemId);
+            true);
 
-        senderProfile.Balance.Should().Be(100m);
-        receiverProfile.Balance.Should().Be(0m);
+        tx.IsCompletionProfileApplied.Should().BeTrue();
     }
 
     [Fact]
-    public void ApplyProfile_Sale_DebitsBuyerProfile()
+    public void ApplyProfile_ProjectingBelowMinimum_Throws()
     {
         var buyerId = Guid.NewGuid();
         var tx = Create(
@@ -255,23 +249,23 @@ public class TransactionTests
         var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId, decimal.MinValue);
         var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
-        receiverProfile.Credit(100m);
-
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(
+        var act = () => ApplyProfile(
             tx,
             senderProfile,
             receiverProfile,
+            0m,
+            50m,
             100m,
-            SystemId);
+            false);
 
-        senderProfile.Balance.Should().Be(0m);
-        receiverProfile.Balance.Should().Be(0m);
+        act.Should().Throw<InvalidInputException>();
+        tx.IsCompletionProfileApplied.Should().BeFalse();
     }
 
     [Fact]
-    public void ApplyProfile_ManualUserToSystem_CreditsUserProfile()
+    public void ApplyProfile_ForceDebit_AllowsProjectedBalanceBelowMinimum()
     {
         var senderId = Guid.NewGuid();
         var tx = Create(senderId, SystemId);
@@ -286,15 +280,16 @@ public class TransactionTests
             tx,
             senderProfile,
             receiverProfile,
+            0m,
+            0m,
             100m,
-            SystemId);
+            true);
 
-        senderProfile.Balance.Should().Be(100m);
-        receiverProfile.Balance.Should().Be(0m);
+        tx.IsCompletionProfileApplied.Should().BeTrue();
     }
 
     [Fact]
-    public void ApplyProfile_ManualSystemToUser_DebitsUserProfile()
+    public void ApplyProfile_AlreadyBelowMinimumButImprovingSide_IsAllowed()
     {
         var receiverId = Guid.NewGuid();
         var tx = Create(SystemId, receiverId);
@@ -302,19 +297,18 @@ public class TransactionTests
         var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId, decimal.MinValue);
         var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
-        receiverProfile.Credit(100m);
-
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
         ApplyProfile(
             tx,
             senderProfile,
             receiverProfile,
+            -1_000m,
             100m,
-            SystemId);
+            100m,
+            false);
 
-        senderProfile.Balance.Should().Be(0m);
-        receiverProfile.Balance.Should().Be(0m);
+        tx.IsCompletionProfileApplied.Should().BeTrue();
     }
 
     [Fact]
@@ -487,16 +481,18 @@ public class TransactionTests
         Transaction transaction,
         OrganizationFinancialProfile senderProfile,
         OrganizationFinancialProfile receiverProfile,
+        decimal senderBalanceInBaseCurrency,
+        decimal receiverBalanceInBaseCurrency,
         decimal amountInBaseCurrency,
-        Guid systemId,
         bool forceDebit = false)
     {
         FinancialProfileService.Apply(
             transaction,
             senderProfile,
             receiverProfile,
+            senderBalanceInBaseCurrency,
+            receiverBalanceInBaseCurrency,
             amountInBaseCurrency,
-            systemId,
             forceDebit);
     }
 }

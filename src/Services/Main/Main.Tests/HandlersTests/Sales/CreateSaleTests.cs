@@ -159,10 +159,10 @@ public class CreateSaleTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var profile = await Context.Set<OrganizationFinancialProfile>()
+        var balance = await Context.UserBalances
             .AsNoTracking()
-            .SingleAsync(x => x.OrganizationId == buyer.Id);
-        profile.Balance.Should().Be(0m);
+            .SingleAsync(x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId);
+        balance.Balance.Should().Be(0m);
     }
 
     [Fact]
@@ -206,10 +206,10 @@ public class CreateSaleTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var profile = await Context.Set<OrganizationFinancialProfile>()
+        var balance = await Context.UserBalances
             .AsNoTracking()
-            .SingleAsync(x => x.OrganizationId == buyer.Id);
-        profile.Balance.Should().Be(0m);
+            .SingleAsync(x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId);
+        balance.Balance.Should().Be(0m);
     }
 
     [Fact]

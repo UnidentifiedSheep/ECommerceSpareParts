@@ -9,7 +9,6 @@ public class UserFinancialProfileBuilder(Faker faker) : BuilderBase<Organization
 {
     public Guid? UserId { get; private set; }
     public decimal? MinAllowedBalance { get; private set; }
-    public decimal? Balance { get; private set; }
 
     public UserFinancialProfileBuilder WithUserId(Guid userId)
     {
@@ -23,25 +22,10 @@ public class UserFinancialProfileBuilder(Faker faker) : BuilderBase<Organization
         return this;
     }
 
-    public UserFinancialProfileBuilder WithBalance(decimal balance)
-    {
-        Balance = balance;
-        return this;
-    }
-
     public override OrganizationFinancialProfile Build()
     {
-        var profile = OrganizationFinancialProfile.Create(
+        return OrganizationFinancialProfile.Create(
             UserId ?? Guid.NewGuid(),
             MinAllowedBalance ?? 0m);
-
-        if (!Balance.HasValue) return profile;
-
-        if (Balance.Value >= 0)
-            profile.Credit(Balance.Value);
-        else
-            profile.Debit(Math.Abs(Balance.Value), true);
-
-        return profile;
     }
 }

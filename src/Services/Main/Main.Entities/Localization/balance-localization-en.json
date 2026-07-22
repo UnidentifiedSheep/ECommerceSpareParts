@@ -19,6 +19,7 @@
     "transaction.range.start.before.end": "Start date cannot be later than end date.",
     "transaction.range.max.months": "Maximum range is 5 months.",
     "financial.profile.min.allowed.balance.max.two.decimal.places": "Minimum allowed balance can have at most 2 decimal places.",
-    "financial.profile.min.allowed.balance.must.not.be.positive": "Minimum allowed balance cannot be positive."
+    "financial.profile.min.allowed.balance.must.not.be.positive": "Minimum allowed balance cannot be positive.",
+    "financial.profile.balance.below.minimum": "The transaction would reduce the organization's balance below the allowed minimum."
   }
 }

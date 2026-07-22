@@ -29,10 +29,14 @@ public static class BalanceProjections
             Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
         };
 
-    public static readonly Expression<Func<OrganizationFinancialProfile, UserFinancialProfileDto>>
-        ToUserFinancialProfileDto = x => new UserFinancialProfileDto
+    public static UserFinancialProfileDto ToUserFinancialProfileDto(
+        OrganizationFinancialProfile profile,
+        decimal netPositionInBaseCurrency)
+    {
+        return new UserFinancialProfileDto
         {
-            Balance = x.Balance,
-            MinimalAllowedBalance = x.MinAllowedBalance
+            NetPositionInBaseCurrency = netPositionInBaseCurrency,
+            MinimalAllowedBalance = profile.MinAllowedBalance
         };
+    }
 }

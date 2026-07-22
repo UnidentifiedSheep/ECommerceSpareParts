@@ -8,7 +8,8 @@ public interface ITransactionFinancialProfileService
         Transaction transaction,
         OrganizationFinancialProfile senderProfile,
         OrganizationFinancialProfile receiverProfile,
+        decimal senderBalanceInBaseCurrency,
+        decimal receiverBalanceInBaseCurrency,
         decimal amountInBaseCurrency,
-        Guid systemId,
         bool forceDebit = false);
 }

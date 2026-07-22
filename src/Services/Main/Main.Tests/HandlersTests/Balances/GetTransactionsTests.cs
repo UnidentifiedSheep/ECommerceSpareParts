@@ -197,7 +197,6 @@ public class GetTransactionsTests : IntegrationTest
             .FirstAsync(x => x.OrganizationId == sender.Id);
         var receiverProfile = await Context.Set<OrganizationFinancialProfile>()
             .FirstAsync(x => x.OrganizationId == receiver.Id);
-        senderProfile.Credit(100m);
 
         var transaction = Transaction.Create(
             sender.Id,
@@ -214,8 +213,10 @@ public class GetTransactionsTests : IntegrationTest
             transaction,
             senderProfile,
             receiverProfile,
+            0m,
             100m,
-            Guid.NewGuid());
+            100m,
+            false);
 
         await Context.AddAsync(transaction);
         await Context.SaveChangesAsync();
