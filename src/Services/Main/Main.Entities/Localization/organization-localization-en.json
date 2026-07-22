@@ -2,6 +2,7 @@
   "locale": "en",
   "keyValues": {
     "organization.system.name.required": "Organization system name is required.",
+    "organization.not.found": "Organization was not found.",
     "organization.name.required": "Organization name is required.",
     "organization.name.min.length": "Organization name must be at least 3 characters long.",
     "organization.name.max.length": "Organization name must be at most 128 characters long.",

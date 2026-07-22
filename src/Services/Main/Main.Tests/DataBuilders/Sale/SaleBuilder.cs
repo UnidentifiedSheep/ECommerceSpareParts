@@ -7,7 +7,8 @@ namespace Tests.DataBuilders.Sale;
 public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(faker)
 {
     private readonly List<SaleContent> _contents = [];
-    public Guid? BuyerId { get; private set; }
+    public Guid? UserId { get; private set; }
+    public Guid? OrganizationId { get; private set; }
     public Guid? TransactionId { get; private set; }
     public int? CurrencyId { get; private set; }
     public string? StorageName { get; private set; }
@@ -15,9 +16,15 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
     public bool CompleteSale { get; private set; }
     public IReadOnlyList<SaleContent> Contents => _contents;
 
-    public SaleBuilder WithBuyerId(Guid id)
+    public SaleBuilder WithUserId(Guid id)
     {
-        BuyerId = id;
+        UserId = id;
+        return this;
+    }
+
+    public SaleBuilder WithOrganizationId(Guid id)
+    {
+        OrganizationId = id;
         return this;
     }
 
@@ -60,8 +67,10 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
 
     public override Main.Entities.Sale.Sale Build()
     {
+        var userId = UserId ?? Guid.NewGuid();
         var sale = Main.Entities.Sale.Sale.Create(
-            BuyerId ?? Guid.NewGuid(),
+            userId,
+            OrganizationId ?? userId,
             TransactionId ?? Guid.NewGuid(),
             CurrencyId ?? Faker.Random.Int(1),
             StorageName ?? Faker.Lorem.Letter(8),

@@ -20,6 +20,7 @@
     "sale.payed.sum.min": "Paid sum must be greater than or equal to 0 if specified.",
     "sale.payed.sum.precision": "Paid sum must have at most 2 decimal places.",
     "sale.buyer.id.not.empty": "Buyer ID must not be empty.",
+    "sale.organization.id.not.empty": "Organization ID must not be empty.",
     "sale.created.user.id.not.empty": "Created user ID must not be empty.",
     "sale.articles.missing": "We couldn't find articles required to build sale details.",
     "sale.comment.max": "Overall comment must be at most 256 characters long.",

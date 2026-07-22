@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Main.Enums.Organization;
@@ -9,7 +10,10 @@ public class OrganizationMember :
     AuditableEntity<OrganizationMember, OrganizationMemberKey>, 
     ILinqEntity<OrganizationMember, OrganizationMemberKey>
 {
+    [ValidateTuple("PK")]
     public Guid UserId { get; private set; }
+
+    [ValidateTuple("PK")]
     public Guid OrganizationId { get; private set; }
     public OrganizationRole Role { get; private set; }
 

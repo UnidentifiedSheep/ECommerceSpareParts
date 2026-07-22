@@ -14,7 +14,8 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
     private Sale() { }
 
     private Sale(
-        Guid buyerId,
+        Guid userId,
+        Guid organizationId,
         Guid transactionId,
         int currencyId,
         string storageName,
@@ -22,21 +23,24 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
     {
         TransactionId = transactionId;
         CurrencyId = currencyId;
-        BuyerId = buyerId;
+        UserId = userId;
+        OrganizationId = organizationId;
         StorageName = storageName;
         SaleDatetime = saleDate;
         State = SaleState.Draft;
     }
 
     public Guid Id { get; private set; }
-    public Guid BuyerId { get; private set; }
+    public Guid UserId { get; private set; }
+    public Guid OrganizationId { get; private set; }
     public Guid TransactionId { get; private set; }
     public int CurrencyId { get; private set; }
     public string StorageName { get; private set; } = null!;
     public string? Comment { get; private set; }
     public DateTime SaleDatetime { get; private set; }
     public SaleState State { get; private set; }
-    public User.User Buyer { get; private set; } = null!;
+    public User.User User { get; private set; } = null!;
+    public Organization.Organization Organization { get; private set; } = null!;
     public Currency.Currency Currency { get; private set; } = null!;
     public Transaction Transaction { get; private set; } = null!;
     public IReadOnlyList<SaleContent> Contents => _contents;
@@ -48,14 +52,16 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
     public uint RowVersion { get; private set; }
 
     public static Sale Create(
-        Guid buyerId,
+        Guid userId,
+        Guid organizationId,
         Guid transactionId,
         int currencyId,
         string storageName,
         DateTime saleDate)
     {
         return new Sale(
-            buyerId,
+            userId,
+            organizationId,
             transactionId,
             currencyId,
             storageName,

@@ -57,6 +57,7 @@ public class CreateSaleTests : IntegrationTest
 
         result.Sale.Id.Should().NotBeEmpty();
         result.Sale.Buyer.Id.Should().Be(buyer.Id);
+        result.Sale.OrganizationId.Should().Be(buyer.Id);
         result.Sale.Currency.Id.Should().Be(storageContent.CurrencyId);
         result.Sale.Storage.Should().Be(storageContent.StorageName);
         result.Sale.Comment.Should().Be(command.Comment);
@@ -67,7 +68,8 @@ public class CreateSaleTests : IntegrationTest
             .ThenInclude(x => x.Details)
             .AsNoTracking()
             .SingleAsync(x => x.Id == result.Sale.Id);
-        sale.BuyerId.Should().Be(buyer.Id);
+        sale.UserId.Should().Be(buyer.Id);
+        sale.OrganizationId.Should().Be(buyer.Id);
         sale.CurrencyId.Should().Be(storageContent.CurrencyId);
         sale.StorageName.Should().Be(storageContent.StorageName);
 
@@ -454,9 +456,17 @@ public class CreateSaleTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateSale_WithEmptyBuyerId_ThrowsValidationException()
+    public async Task CreateSale_WithEmptyUserId_ThrowsValidationException()
     {
-        var command = CreateValidCommand() with { BuyerId = Guid.Empty };
+        var command = CreateValidCommand() with { UserId = Guid.Empty };
+
+        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreateSale_WithEmptyOrganizationId_ThrowsValidationException()
+    {
+        var command = CreateValidCommand() with { OrganizationId = Guid.Empty };
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
     }
@@ -482,13 +492,39 @@ public class CreateSaleTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateSale_WithMissingBuyer_ThrowsDbValidationException()
+    public async Task CreateSale_WithMissingUser_ThrowsDbValidationException()
     {
-        var command = CreateValidCommand() with { BuyerId = Guid.NewGuid() };
+        var command = CreateValidCommand() with { UserId = Guid.NewGuid() };
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
 
         exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.UsersNotFound);
+    }
+
+    [Fact]
+    public async Task CreateSale_WithMissingOrganization_ThrowsDbValidationException()
+    {
+        var command = CreateValidCommand() with { OrganizationId = Guid.NewGuid() };
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+
+        exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationsNotFound);
+    }
+
+    [Fact]
+    public async Task CreateSale_WhenUserIsNotOrganizationMember_ThrowsDbValidationException()
+    {
+        var users = GetContext<UsersTestContext>().Users.ToArray();
+        var command = CreateValidCommand() with
+        {
+            UserId = users[0].Id,
+            OrganizationId = users[1].Id
+        };
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+
+        exception.Failures.Should().Contain(x =>
+            x.ErrorName == ApplicationErrors.OrganizationMemberNotFound);
     }
 
     [Fact]
@@ -516,7 +552,7 @@ public class CreateSaleTests : IntegrationTest
     }
 
     private CreateSaleCommand CreateCommand(
-        Guid buyerId,
+        Guid userId,
         int currencyId,
         string storageName,
         IEnumerable<NewSaleContentDto> contents,
@@ -525,7 +561,8 @@ public class CreateSaleTests : IntegrationTest
         bool forcePayment = true)
     {
         return new CreateSaleCommand(
-            buyerId,
+            userId,
+            userId,
             currencyId,
             storageName,
             DateTime.UtcNow,

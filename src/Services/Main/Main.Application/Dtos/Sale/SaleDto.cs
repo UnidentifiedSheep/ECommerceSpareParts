@@ -13,6 +13,9 @@ public record SaleDto
     [JsonPropertyName("buyer")]
     public required UserDto Buyer { get; init; }
 
+    [JsonPropertyName("organizationId")]
+    public required Guid OrganizationId { get; init; }
+
     [JsonPropertyName("comment")]
     public string? Comment { get; init; }
 

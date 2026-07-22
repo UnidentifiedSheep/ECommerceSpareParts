@@ -42,7 +42,7 @@ public class GetSalesHandler(
 
         if (request.CurrencyIds.Any()) query = query.Where(x => request.CurrencyIds.Contains(x.CurrencyId));
 
-        if (request.BuyerIds.Any()) query = query.Where(x => request.BuyerIds.Contains(x.BuyerId));
+        if (request.BuyerIds.Any()) query = query.Where(x => request.BuyerIds.Contains(x.UserId));
 
         if (request.ProductIds.Any())
             query = query.Where(x => x.Contents.Any(z => request.ProductIds.Contains(z.ProductId)));
@@ -69,7 +69,7 @@ public class GetSalesHandler(
 
         return query.Where(x =>
             EF.Functions.ILike(x.Comment!, pattern) ||
-            EF.Functions.ILike(x.Buyer.UserName!, pattern) ||
+            EF.Functions.ILike(x.User.UserName!, pattern) ||
             x.Contents.Any(z =>
                 EF.Functions.ILike(z.Comment!, pattern) ||
                 EF.Functions.ILike(z.Product.Name.Value, pattern) ||

@@ -15,6 +15,7 @@ public static class ValidationConfiguration
         ConfigureArticles();
         ConfigureProducer();
         ConfigureUser();
+        ConfigureOrganization();
         //ConfigureUserEmail();
         ConfigureTransaction();
         ConfigureStorage();
@@ -26,6 +27,25 @@ public static class ValidationConfiguration
         ConfigureStorageRoutes();
         ConfigureStorageOwners();
         ConfigureStorageContents();
+    }
+
+    private static void ConfigureOrganization()
+    {
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateOrganizationExistsId,
+            KeyValueType.Single,
+            config => config.WithErrorName(ApplicationErrors.OrganizationsNotFound)
+                .WithMessageTemplate("organization.not.found")
+                .WithErrorCode((int)HttpStatusCode.NotFound)
+                .WithErrorType(typeof(NotFoundException)));
+
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateOrganizationMemberExistsPK,
+            KeyValueType.Tuple,
+            config => config.WithErrorName(ApplicationErrors.OrganizationMemberNotFound)
+                .WithMessageTemplate("organization.member.not.found")
+                .WithErrorCode((int)HttpStatusCode.BadRequest)
+                .WithErrorType(typeof(BadRequestException)));
     }
 
     private static void ConfigureStorageContents()

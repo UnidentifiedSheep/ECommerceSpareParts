@@ -2,6 +2,7 @@
   "locale": "ru",
   "keyValues": {
     "organization.system.name.required": "Системное имя организации обязательно.",
+    "organization.not.found": "Организация не найдена.",
     "organization.name.required": "Название организации обязательно.",
     "organization.name.min.length": "Название организации должно содержать не менее 3 символов.",
     "organization.name.max.length": "Название организации должно содержать не более 128 символов.",

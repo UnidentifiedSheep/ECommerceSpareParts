@@ -9,7 +9,9 @@ public class CreateSaleDbValidation : AbstractDbValidation<CreateSaleCommand>
     public override void Build(IValidationPlan plan, CreateSaleCommand request)
     {
         plan.ValidateCurrencyExistsId(request.CurrencyId)
-            .ValidateUserExistsId(request.BuyerId)
+            .ValidateUserExistsId(request.UserId)
+            .ValidateOrganizationExistsId(request.OrganizationId)
+            .ValidateOrganizationMemberExistsPK((request.OrganizationId, request.UserId))
             .ValidateStorageExistsName(request.StorageName);
     }
 }

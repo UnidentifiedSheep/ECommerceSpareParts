@@ -11,7 +11,8 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 
         builder.HasKey(e => e.Id).HasName("sale_pk");
 
-        builder.HasIndex(e => e.BuyerId, "sale_buyer_id_index");
+        builder.HasIndex(e => e.UserId, "sale_user_id_index");
+        builder.HasIndex(e => e.OrganizationId, "sale_organization_id_index");
 
         builder.HasIndex(e => e.Comment, "sale_comment_index")
             .HasMethod("gin")
@@ -32,8 +33,11 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
 
-        builder.Property(e => e.BuyerId)
-            .HasColumnName("buyer_id");
+        builder.Property(e => e.UserId)
+            .HasColumnName("user_id");
+
+        builder.Property(e => e.OrganizationId)
+            .HasColumnName("organization_id");
 
         builder.Property(e => e.Comment)
             .HasMaxLength(256)
@@ -57,11 +61,17 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
             .HasColumnName("xmin")
             .IsRowVersion();
 
-        builder.HasOne(d => d.Buyer)
+        builder.HasOne(d => d.User)
             .WithMany()
-            .HasForeignKey(d => d.BuyerId)
+            .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("sale_users_id_fk");
+            .HasConstraintName("sale_user_id_fk");
+
+        builder.HasOne(d => d.Organization)
+            .WithMany()
+            .HasForeignKey(d => d.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("sale_organizations_id_fk");
 
         builder.HasOne(d => d.Currency)
             .WithMany()
