@@ -3,7 +3,7 @@ using Main.Application.Dtos.Currencies;
 
 namespace Main.Application.Dtos.Balances;
 
-public record UserBalanceDto
+public record OrganizationBalanceDto
 {
     [JsonPropertyName("balance")]
     public required decimal Balance { get; init; }

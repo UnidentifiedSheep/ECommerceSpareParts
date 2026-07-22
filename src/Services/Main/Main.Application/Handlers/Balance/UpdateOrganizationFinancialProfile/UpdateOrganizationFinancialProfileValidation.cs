@@ -1,11 +1,12 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.Balance.UpdateUserFinancialProfile;
+namespace Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 
-public class UpdateUserFinancialProfileValidation : AbstractValidator<UpdateUserFinancialProfileCommand>
+public class UpdateOrganizationFinancialProfileValidation
+    : AbstractValidator<UpdateOrganizationFinancialProfileCommand>
 {
-    public UpdateUserFinancialProfileValidation()
+    public UpdateOrganizationFinancialProfileValidation()
     {
         When(
             x => x.Patch.MinimalAllowedBalance.IsSet,

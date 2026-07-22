@@ -10,7 +10,7 @@ using Main.Application.Projections;
 using Main.Entities.Balance;
 using Main.Entities.Organization;
 
-namespace Main.Application.Handlers.Balance.UpdateUserFinancialProfile;
+namespace Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 
 [Diagnostics(maxExecutionTimeMs: 200)]
 [AutoSave]
@@ -18,36 +18,36 @@ namespace Main.Application.Handlers.Balance.UpdateUserFinancialProfile;
     IsolationLevel.ReadCommitted,
     20,
     2)]
-public record UpdateUserFinancialProfileCommand(
-    Guid UserId,
-    PatchUserFinancialProfileDto Patch
-) : ICommand<UpdateUserFinancialProfileResult>;
+public record UpdateOrganizationFinancialProfileCommand(
+    Guid OrganizationId,
+    PatchOrganizationFinancialProfileDto Patch
+) : ICommand<UpdateOrganizationFinancialProfileResult>;
 
-public record UpdateUserFinancialProfileResult(UserFinancialProfileDto Profile);
+public record UpdateOrganizationFinancialProfileResult(OrganizationFinancialProfileDto Profile);
 
-public class UpdateUserFinancialProfileHandler(
+public class UpdateOrganizationFinancialProfileHandler(
     IRepository<OrganizationFinancialProfile, Guid> repository,
     IBalanceService balanceService,
     IUnitOfWork unitOfWork
-) : ICommandHandler<UpdateUserFinancialProfileCommand, UpdateUserFinancialProfileResult>
+) : ICommandHandler<UpdateOrganizationFinancialProfileCommand, UpdateOrganizationFinancialProfileResult>
 {
-    public async Task<UpdateUserFinancialProfileResult> Handle(
-        UpdateUserFinancialProfileCommand request,
+    public async Task<UpdateOrganizationFinancialProfileResult> Handle(
+        UpdateOrganizationFinancialProfileCommand request,
         CancellationToken cancellationToken)
     {
-        var profile = await repository.GetById(request.UserId, cancellationToken);
+        var profile = await repository.GetById(request.OrganizationId, cancellationToken);
 
         if (profile == null)
         {
-            profile = OrganizationFinancialProfile.Create(request.UserId);
+            profile = OrganizationFinancialProfile.Create(request.OrganizationId);
             await unitOfWork.AddAsync(profile, cancellationToken);
         }
 
         request.Patch.MinimalAllowedBalance.Apply(x => profile.SetMinAllowedBalance(x));
         var netPosition = await balanceService.GetBalanceInBaseCurrencyAsync(
-            request.UserId,
+            request.OrganizationId,
             cancellationToken);
-        return new UpdateUserFinancialProfileResult(
-            BalanceProjections.ToUserFinancialProfileDto(profile, netPosition));
+        return new UpdateOrganizationFinancialProfileResult(
+            BalanceProjections.ToOrganizationFinancialProfileDto(profile, netPosition));
     }
 }

@@ -5,18 +5,19 @@ using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Balance;
 
-public class UserFinancialProfileBuilder(Faker faker) : BuilderBase<OrganizationFinancialProfile>(faker)
+public class OrganizationFinancialProfileBuilder(Faker faker)
+    : BuilderBase<OrganizationFinancialProfile>(faker)
 {
-    public Guid? UserId { get; private set; }
+    public Guid? OrganizationId { get; private set; }
     public decimal? MinAllowedBalance { get; private set; }
 
-    public UserFinancialProfileBuilder WithUserId(Guid userId)
+    public OrganizationFinancialProfileBuilder WithOrganizationId(Guid organizationId)
     {
-        UserId = userId;
+        OrganizationId = organizationId;
         return this;
     }
 
-    public UserFinancialProfileBuilder WithMinAllowedBalance(decimal minAllowedBalance)
+    public OrganizationFinancialProfileBuilder WithMinAllowedBalance(decimal minAllowedBalance)
     {
         MinAllowedBalance = minAllowedBalance;
         return this;
@@ -25,7 +26,7 @@ public class UserFinancialProfileBuilder(Faker faker) : BuilderBase<Organization
     public override OrganizationFinancialProfile Build()
     {
         return OrganizationFinancialProfile.Create(
-            UserId ?? Guid.NewGuid(),
+            OrganizationId ?? Guid.NewGuid(),
             MinAllowedBalance ?? 0m);
     }
 }

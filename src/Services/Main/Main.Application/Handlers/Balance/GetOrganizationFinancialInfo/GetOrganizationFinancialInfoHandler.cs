@@ -7,32 +7,32 @@ using Main.Application.Dtos.Balances;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Projections;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 using Main.Entities.Organization;
 using Main.Entities.Settings;
 using Main.Application.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Balance;
+namespace Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
 
-public record GetUserFinancialInfoQuery(Guid UserId) : IQuery<GetUserFinancialInfoResult>;
+public record GetOrganizationFinancialInfoQuery(Guid OrganizationId)
+    : IQuery<GetOrganizationFinancialInfoResult>;
 
-public record GetUserFinancialInfoResult
+public record GetOrganizationFinancialInfoResult
 {
-    public required UserFinancialProfileDto? FinancialProfile { get; init; }
+    public required OrganizationFinancialProfileDto? FinancialProfile { get; init; }
     public required CurrencyDto BaseCurrency { get; init; }
-    public required IEnumerable<UserBalanceDto> Balances { get; init; }
+    public required IEnumerable<OrganizationBalanceDto> Balances { get; init; }
 }
 
-public class GetUserFinancialInfoHandler(
+public class GetOrganizationFinancialInfoHandler(
     ISettingsService settingsService,
     IReadRepository<Organization, Guid> readRepository,
     IReadRepository<Currency, int> currencyReadRepository,
     IBalanceService balanceService
-) : IQueryHandler<GetUserFinancialInfoQuery, GetUserFinancialInfoResult>
+) : IQueryHandler<GetOrganizationFinancialInfoQuery, GetOrganizationFinancialInfoResult>
 {
-    public async Task<GetUserFinancialInfoResult> Handle(
-        GetUserFinancialInfoQuery request,
+    public async Task<GetOrganizationFinancialInfoResult> Handle(
+        GetOrganizationFinancialInfoQuery request,
         CancellationToken cancellationToken)
     {
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
@@ -45,24 +45,24 @@ public class GetUserFinancialInfoHandler(
         //we need to cache it.
 
         var organization = await readRepository.Query
-            .Where(x => x.Id == request.UserId)
+            .Where(x => x.Id == request.OrganizationId)
             .Include(x => x.FinancialProfile)
             .Include(x => x.Balances)
             .ThenInclude(x => x.Currency)
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new UserNotFoundException(request.UserId);
+            .FirstAsync(cancellationToken);
         var netPosition = await balanceService.GetBalanceInBaseCurrencyAsync(
             organization.Id,
             cancellationToken);
 
-        return new GetUserFinancialInfoResult
+        return new GetOrganizationFinancialInfoResult
         {
             FinancialProfile = organization.FinancialProfile is null
                 ? null
-                : BalanceProjections.ToUserFinancialProfileDto(
+                : BalanceProjections.ToOrganizationFinancialProfileDto(
                     organization.FinancialProfile,
                     netPosition),
-            Balances = organization.Balances.Select(BalanceProjections.ToUserBalanceDto.AsFunc()),
+            Balances = organization.Balances.Select(
+                BalanceProjections.ToOrganizationBalanceDto.AsFunc()),
             BaseCurrency = baseCurrency
         };
     }

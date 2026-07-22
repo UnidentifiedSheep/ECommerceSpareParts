@@ -3,7 +3,7 @@ using Abstractions.Models;
 
 namespace Main.Application.Dtos.Balances;
 
-public record PatchUserFinancialProfileDto
+public record PatchOrganizationFinancialProfileDto
 {
     [JsonPropertyName("minimalAllowedBalance")]
     public PatchField<decimal> MinimalAllowedBalance { get; init; } = PatchField<decimal>.NotSet();

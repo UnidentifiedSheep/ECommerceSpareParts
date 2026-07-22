@@ -11,7 +11,7 @@ namespace Main.Application.Services;
 
 public class BalanceService(
     IRepository<OrganizationBalance, UserBalanceKey> userBalanceRepository,
-    IRepository<OrganizationFinancialProfile, Guid> userFinancialProfileRepository,
+    IRepository<OrganizationFinancialProfile, Guid> organizationFinancialProfileRepository,
     IRepository<Organization, Guid> organizationRepository,
     ICurrencyConverter currencyConverter,
     IOptions<SystemOptions> systemOptions,
@@ -145,7 +145,9 @@ public class BalanceService(
             .Track()
             .Build();
 
-        var profiles = (await userFinancialProfileRepository.ListAsync(criteria, cancellationToken))
+        var profiles = (await organizationFinancialProfileRepository.ListAsync(
+                criteria,
+                cancellationToken))
             .ToDictionary(x => x.OrganizationId);
 
         foreach (var organizationId in new[] { senderId, receiverId }.Order())

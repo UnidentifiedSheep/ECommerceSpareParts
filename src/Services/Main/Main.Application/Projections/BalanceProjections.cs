@@ -22,18 +22,18 @@ public static class BalanceProjections
             SourceType = x.SourceType
         };
 
-    public static readonly Expression<Func<OrganizationBalance, UserBalanceDto>> ToUserBalanceDto =
-        x => new UserBalanceDto
+    public static readonly Expression<Func<OrganizationBalance, OrganizationBalanceDto>> ToOrganizationBalanceDto =
+        x => new OrganizationBalanceDto
         {
             Balance = x.Balance,
             Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
         };
 
-    public static UserFinancialProfileDto ToUserFinancialProfileDto(
+    public static OrganizationFinancialProfileDto ToOrganizationFinancialProfileDto(
         OrganizationFinancialProfile profile,
         decimal netPositionInBaseCurrency)
     {
-        return new UserFinancialProfileDto
+        return new OrganizationFinancialProfileDto
         {
             NetPositionInBaseCurrency = netPositionInBaseCurrency,
             MinimalAllowedBalance = profile.MinAllowedBalance

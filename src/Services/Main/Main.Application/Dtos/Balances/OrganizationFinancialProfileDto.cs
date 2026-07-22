@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Main.Application.Dtos.Balances;
 
-public record UserFinancialProfileDto
+public record OrganizationFinancialProfileDto
 {
     [JsonPropertyName("netPositionInBaseCurrency")]
     public required decimal NetPositionInBaseCurrency { get; init; }

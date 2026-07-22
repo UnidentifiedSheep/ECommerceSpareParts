@@ -91,8 +91,8 @@ public class BalanceServiceTests : IntegrationTest
         var receiver = UsersContext.Users.ElementAt(1);
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(
-            new UserFinancialProfileBuilder(Faker)
-                .WithUserId(sender.Id)
+            new OrganizationFinancialProfileBuilder(Faker)
+                .WithOrganizationId(sender.Id)
                 .Build());
         await Context.SaveChangesAsync();
 
@@ -119,8 +119,8 @@ public class BalanceServiceTests : IntegrationTest
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(
-            new UserFinancialProfileBuilder(Faker)
-                .WithUserId(user.Id)
+            new OrganizationFinancialProfileBuilder(Faker)
+                .WithOrganizationId(user.Id)
                 .Build());
         await Context.SaveChangesAsync();
 
@@ -147,8 +147,8 @@ public class BalanceServiceTests : IntegrationTest
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(
-            new UserFinancialProfileBuilder(Faker)
-                .WithUserId(user.Id)
+            new OrganizationFinancialProfileBuilder(Faker)
+                .WithOrganizationId(user.Id)
                 .Build());
         await Context.SaveChangesAsync();
 
@@ -178,8 +178,8 @@ public class BalanceServiceTests : IntegrationTest
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(
-            new UserFinancialProfileBuilder(Faker)
-                .WithUserId(user.Id)
+            new OrganizationFinancialProfileBuilder(Faker)
+                .WithOrganizationId(user.Id)
                 .Build());
         await Context.SaveChangesAsync();
 
@@ -205,8 +205,8 @@ public class BalanceServiceTests : IntegrationTest
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(
-            new UserFinancialProfileBuilder(Faker)
-                .WithUserId(buyer.Id)
+            new OrganizationFinancialProfileBuilder(Faker)
+                .WithOrganizationId(buyer.Id)
                 .Build());
         await Context.SaveChangesAsync();
 
@@ -232,8 +232,8 @@ public class BalanceServiceTests : IntegrationTest
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(
-            new UserFinancialProfileBuilder(Faker)
-                .WithUserId(supplier.Id)
+            new OrganizationFinancialProfileBuilder(Faker)
+                .WithOrganizationId(supplier.Id)
                 .Build());
         await Context.SaveChangesAsync();
         Context.ChangeTracker.Clear();
@@ -267,8 +267,8 @@ public class BalanceServiceTests : IntegrationTest
         var reversedBy = UsersContext.Users.ElementAt(2);
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(
-            new UserFinancialProfileBuilder(Faker)
-                .WithUserId(sender.Id)
+            new OrganizationFinancialProfileBuilder(Faker)
+                .WithOrganizationId(sender.Id)
                 .Build());
         await Context.SaveChangesAsync();
 

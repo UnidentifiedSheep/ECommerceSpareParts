@@ -75,7 +75,7 @@ public class UsersEndPoints : ICarterModule
 
         users.MapUserInfoEndPoints();
         users.MapUserStorageEndPoints();
-        users.MapUserFinancialEndPoints();
+        users.MapUserDiscountEndPoints();
         users.MapUserPermissionEndPoints();
         users.MapUserEmailEndPoints();
         users.MapUserRoleEndPoints();

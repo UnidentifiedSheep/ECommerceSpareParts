@@ -20,9 +20,9 @@ public class OrganizationFinancialProfile : AuditableEntity<OrganizationFinancia
 
     public override Guid GetId() { return OrganizationId; }
 
-    public static OrganizationFinancialProfile Create(Guid userId, decimal minAllowedBalance = 0)
+    public static OrganizationFinancialProfile Create(Guid organizationId, decimal minAllowedBalance = 0)
     {
-        return new OrganizationFinancialProfile(userId, minAllowedBalance);
+        return new OrganizationFinancialProfile(organizationId, minAllowedBalance);
     }
 
     public void SetMinAllowedBalance(decimal minAllowedBalance)
