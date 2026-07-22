@@ -62,9 +62,9 @@ public class GetOrganizationsHandler(IReadRepository<Organization, Guid> reposit
                 .Select(x => x.Organization);
 
         var organizations = await query
+            .SortBy(request.SortBy)
             .AsExpandable()
             .Select(OrganizationProjections.ToDto)
-            .SortBy(request.SortBy)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 
