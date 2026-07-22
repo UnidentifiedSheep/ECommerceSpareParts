@@ -52,6 +52,7 @@ builder.ConfigureServices((_, services) =>
     services.AddScoped<ISeed<DContext>, RoleSeed>();
     services.AddScoped<ISeed<DContext>, RolePermissionSeed>();
     services.AddScoped<ISeed<DContext>, UserSeed>();
+    services.AddScoped<ISeed<DContext>, SystemOrganizationSeed>();
     services.AddScoped<ISeed<DContext>, CurrencySeed>();
     services.AddScoped<ISeed<DContext>, AdminSeed>();
 });

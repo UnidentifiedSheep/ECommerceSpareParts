@@ -16,7 +16,9 @@ public static class PurchaseProjections
             Logistics = x.PurchaseLogistic == null ? null : ToPurchaseLogisticDto.Invoke(x.PurchaseLogistic),
             PurchaseDatetime = x.PurchaseDatetime,
             Storage = x.Storage,
-            Supplier = UserProjections.UserProjection.Invoke(x.Supplier),
+            Supplier = UserProjections.UserProjection.Invoke(x.SupplierUser),
+            SupplierOrganization = OrganizationProjections.ToDto.Invoke(
+                x.SupplierOrganization),
             TotalSum = x.Transaction.Amount,
             TransactionId = x.TransactionId
         };

@@ -6,6 +6,7 @@ using Main.Entities.Balance;
 using Main.Entities.Cart;
 using Main.Entities.Currency;
 using Main.Entities.Order;
+using Main.Entities.Organization;
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.Supplier;
@@ -76,6 +77,10 @@ public partial class DContext : DbContext
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
+    public virtual DbSet<Organization> Organizations { get; set; }
+
+    public virtual DbSet<OrganizationMember> OrganizationMembers { get; set; }
+
     public virtual DbSet<Permission> Permissions { get; set; }
 
     public virtual DbSet<Producer> Producers { get; set; }
@@ -104,7 +109,7 @@ public partial class DContext : DbContext
 
     public virtual DbSet<StorageContent> StorageContents { get; set; }
 
-    public virtual DbSet<StorageContentReservation> StorageContentReservations { get; set; }
+    public virtual DbSet<ProductReservation> ProductReservations { get; set; }
 
     public virtual DbSet<StorageOwner> StorageOwners { get; set; }
 
@@ -114,7 +119,7 @@ public partial class DContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<UserBalance> UserBalances { get; set; }
+    public virtual DbSet<OrganizationBalance> UserBalances { get; set; }
 
     public virtual DbSet<UserDiscount> UserDiscounts { get; set; }
 

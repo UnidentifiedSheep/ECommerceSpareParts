@@ -30,7 +30,7 @@
     "article.reservation.initial.count.must.be.positive": "Initial quantity must be greater than 0.",
     "article.reservation.current.count.must.be.positive": "Current quantity must be greater than 0.",
     "article.reservation.initial.count.not.less.than.current": "Initial quantity cannot be less than current quantity.",
-    "article.reservation.buyer.id.must.not.be.empty": "Buyer ID must not be empty.",
+    "article.reservation.organization.id.must.not.be.empty": "Organization ID must not be empty.",
     "article.reservation.storage.name.must.not.be.empty": "Storage name must not be empty.",
     "article.reservation.needed.count.must.be.positive": "Requested quantity must be greater than 0.",
     "article.create.articles.must.have.at.least.one": "At least one article must be provided.",

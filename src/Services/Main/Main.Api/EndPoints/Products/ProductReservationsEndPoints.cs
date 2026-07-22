@@ -37,8 +37,8 @@ public record GetProductReservationsRequest : SortablePaginationQueryModel
     [FromQuery(Name = "productId")]
     public int? ProductId { get; init; }
 
-    [FromQuery(Name = "userId")]
-    public Guid? UserId { get; init; }
+    [FromQuery(Name = "organizationId")]
+    public Guid? OrganizationId { get; init; }
 
     [FromQuery(Name = "showDeleted")]
     public bool ShowDeleted { get; init; }
@@ -80,7 +80,7 @@ public static class ProductReservationsEndPoints
             .WithName("CreateProductReservations")
             .WithSummary("Создать резервации продуктов")
             .WithDisplayName("Создать резервацию")
-            .WithDescription("Создать резервацию для пользователя")
+            .WithDescription("Создать резервацию для организации")
             .Accepts<CreateProductReservationRequest>(false, "application/json")
             .Produces<CreateProductReservationResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -136,7 +136,7 @@ public static class ProductReservationsEndPoints
                 {
                     var query = new GetProductReservationsQuery(
                         queryParams.ProductId,
-                        queryParams.UserId,
+                        queryParams.OrganizationId,
                         queryParams.SortBy,
                         queryParams.ShowDeleted,
                         queryParams);
@@ -166,7 +166,7 @@ public static class ProductReservationsEndPoints
                 {
                     var query = new GetProductReservationsQuery(
                         productId,
-                        queryParams.UserId,
+                        queryParams.OrganizationId,
                         queryParams.SortBy,
                         queryParams.ShowDeleted,
                         queryParams);

@@ -16,11 +16,11 @@ public class EditProductReservationTests : IntegrationTest
 {
     public EditProductReservationTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        RegisterBasicContext<StorageContentReservationTestContext>();
+        RegisterBasicContext<ProductReservationTestContext>();
     }
 
-    private StorageContentReservationTestContext ReservationContext =>
-        GetContext<StorageContentReservationTestContext>();
+    private ProductReservationTestContext ReservationContext =>
+        GetContext<ProductReservationTestContext>();
 
     private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
 
@@ -43,14 +43,14 @@ public class EditProductReservationTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var db = await Context.StorageContentReservations
+        var db = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
 
         db.ProposedPrice.Should().Be(250m);
         db.ProposedCurrencyId.Should().Be(currency.Id);
         db.Comment.Should().Be("updated comment");
-        db.Status.Should().Be(StorageContentReservationStatus.Active);
+        db.Status.Should().Be(ProductReservationStatus.Active);
 
         var @event = await Context.Events
             .OfType<ReservationManualChangeEvent>()
@@ -77,7 +77,7 @@ public class EditProductReservationTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var db = await Context.StorageContentReservations
+        var db = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
 
@@ -101,11 +101,11 @@ public class EditProductReservationTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var db = await Context.StorageContentReservations
+        var db = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
 
-        db.Status.Should().Be(StorageContentReservationStatus.Locked);
+        db.Status.Should().Be(ProductReservationStatus.Locked);
         db.ProposedPrice.Should().Be(300m);
         db.ProposedCurrencyId.Should().Be(currency.Id);
         db.Comment.Should().Be("locked comment");
@@ -182,17 +182,17 @@ public class EditProductReservationTests : IntegrationTest
     public async Task WithDoneReservation_ThrowsInvalidInputException()
     {
         var reservation = ReservationContext.DoneReservation;
-        var oldValue = await Context.StorageContentReservations
+        var oldValue = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
         var command = new EditProductReservationCommand(reservation.Id, ValidDto());
 
         await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-        var db = await Context.StorageContentReservations
+        var db = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
-        db.Status.Should().Be(StorageContentReservationStatus.Done);
+        db.Status.Should().Be(ProductReservationStatus.Done);
         db.Comment.Should().Be(oldValue.Comment);
         db.ProposedPrice.Should().Be(oldValue.ProposedPrice);
     }
@@ -201,17 +201,17 @@ public class EditProductReservationTests : IntegrationTest
     public async Task WithCanceledReservation_ThrowsInvalidInputException()
     {
         var reservation = ReservationContext.CanceledReservation;
-        var oldValue = await Context.StorageContentReservations
+        var oldValue = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
         var command = new EditProductReservationCommand(reservation.Id, ValidDto());
 
         await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-        var db = await Context.StorageContentReservations
+        var db = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
-        db.Status.Should().Be(StorageContentReservationStatus.Canceled);
+        db.Status.Should().Be(ProductReservationStatus.Canceled);
         db.Comment.Should().Be(oldValue.Comment);
         db.ProposedPrice.Should().Be(oldValue.ProposedPrice);
     }

@@ -30,6 +30,6 @@ public class TransactionSourceCannotBeReversedByUserException(TransactionSourceT
         new { SourceType = sourceType },
         [sourceType.ToString()]);
 
-public class TransactionWithSystemUserCannotBeCreatedByUserException()
+public class TransactionWithSystemOrganizationCannotBeCreatedByUserException()
     : LocalizedBadRequestException(
-        "transaction.with.system.user.cannot.be.created.by.user");
+        "transaction.with.system.organization.cannot.be.created.by.user");

@@ -16,7 +16,7 @@ public record EditProductReservationCommand(int ReservationId, EditProductReserv
     : ICommand;
 
 public class EditProductReservationHandler(
-    IRepository<StorageContentReservation, int> repository,
+    IRepository<ProductReservation, int> repository,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<EditProductReservationCommand>
 {

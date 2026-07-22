@@ -11,18 +11,21 @@ public class SaleTests
     [Fact]
     public void Create_ValidData_CreatesDraftSale()
     {
-        var buyerId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var organizationId = Guid.NewGuid();
         var transactionId = Guid.NewGuid();
         var saleDate = DateTime.UtcNow;
 
         var sale = DomainSale.Create(
-            buyerId,
+            userId,
+            organizationId,
             transactionId,
             1,
             "WH-1",
             saleDate);
 
-        sale.BuyerId.Should().Be(buyerId);
+        sale.UserId.Should().Be(userId);
+        sale.OrganizationId.Should().Be(organizationId);
         sale.TransactionId.Should().Be(transactionId);
         sale.CurrencyId.Should().Be(1);
         sale.StorageName.Should().Be("WH-1");
@@ -172,6 +175,7 @@ public class SaleTests
     private static DomainSale Create()
     {
         return DomainSale.Create(
+            Guid.NewGuid(),
             Guid.NewGuid(),
             Guid.NewGuid(),
             1,

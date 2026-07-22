@@ -64,7 +64,7 @@ public static class ProductProjections
                     VolumeM3 = x.VolumeM3
                 };
 
-    public static readonly Expression<Func<StorageContentReservation, ProductReservationDto>>
+    public static readonly Expression<Func<ProductReservation, ProductReservationDto>>
         ToReservationDto =
             x => new ProductReservationDto
             {
@@ -77,6 +77,6 @@ public static class ProductProjections
                 ReservedCount = x.ReservedCount,
                 Status = x.Status,
                 UpdatedAt = x.UpdatedAt,
-                User = UserProjections.UserPartyProjection.Invoke(x.User)
+                Organization = OrganizationProjections.ToDto.Invoke(x.Organization)
             };
 }

@@ -6,7 +6,7 @@
     "transaction.already.deleted": "This transaction has already been deleted.",
     "transaction.not.found": "The transaction could not be found.",
     "transaction.source.cannot.be.reversed.by.user": "A transaction with source '{0}' cannot be reversed by a user.",
-    "transaction.with.system.user.cannot.be.created.by.user": "A user cannot create a transaction where sender or receiver is the system user.",
+    "transaction.with.system.organization.cannot.be.created.by.user": "A user cannot create a transaction where sender or receiver is the system organization.",
     "transaction.sender.id.required": "Sender ID must be provided.",
     "transaction.receiver.id.required": "Receiver ID must be provided.",
     "transaction.date.out.of.range": "Transaction date must be within the last 2 months and no more than 1 hour in the future.",
@@ -18,9 +18,8 @@
     "transaction.sender.or.receiver.required": "At least one of sender or receiver must be specified.",
     "transaction.range.start.before.end": "Start date cannot be later than end date.",
     "transaction.range.max.months": "Maximum range is 5 months.",
-    "financial.profile.amount.must.not.be.negative": "Amount cannot be negative.",
-    "financial.profile.balance.must.not.be.less.than.minimum": "Insufficient funds to complete the operation.",
     "financial.profile.min.allowed.balance.max.two.decimal.places": "Minimum allowed balance can have at most 2 decimal places.",
-    "financial.profile.min.allowed.balance.must.not.be.positive": "Minimum allowed balance cannot be positive."
+    "financial.profile.min.allowed.balance.must.not.be.positive": "Minimum allowed balance cannot be positive.",
+    "financial.profile.balance.below.minimum": "The transaction would reduce the organization's balance below the allowed minimum."
   }
 }

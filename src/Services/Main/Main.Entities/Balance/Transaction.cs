@@ -4,6 +4,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 
 namespace Main.Entities.Balance;
@@ -55,8 +56,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
     public bool IsReversalProfileApplied => Status.HasFlag(TransactionStatus.ReversalProfileApplied);
     public bool IsCompletionProfileApplied => Status.HasFlag(TransactionStatus.CompletionProfileApplied);
-    public User.User Receiver { get; private set; } = null!;
-    public User.User Sender { get; private set; } = null!;
+    public Organization.Organization Receiver { get; private set; } = null!;
+    public Organization.Organization Sender { get; private set; } = null!;
 
     public static Expression<Func<Transaction, Guid>> GetKeySelector() { return x => x.Id; }
 
@@ -133,8 +134,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     }
 
     internal void EnsureCanApplyProfile(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile)
+        OrganizationFinancialProfile senderProfile,
+        OrganizationFinancialProfile receiverProfile)
     {
         ValidateProfiles(senderProfile, receiverProfile);
 
@@ -175,18 +176,18 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     }
 
     private void ValidateProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile)
+        OrganizationFinancialProfile senderProfile,
+        OrganizationFinancialProfile receiverProfile)
     {
-        if (SenderId != senderProfile.UserId)
-            throw new InvalidOperationException("Sender profile user mismatch");
-        if (ReceiverId != receiverProfile.UserId)
-            throw new InvalidOperationException("Receiver profile user mismatch");
+        if (SenderId != senderProfile.OrganizationId)
+            throw new InvalidOperationException("Sender profile organization mismatch");
+        if (ReceiverId != receiverProfile.OrganizationId)
+            throw new InvalidOperationException("Receiver profile organization mismatch");
     }
 
     public void Apply(
-        UserBalance senderBalance,
-        UserBalance receiverBalance)
+        OrganizationBalance senderBalance,
+        OrganizationBalance receiverBalance)
     {
         ValidateBalances(senderBalance, receiverBalance);
 
@@ -209,22 +210,22 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     }
 
     private void ValidateBalances(
-        UserBalance senderBalance,
-        UserBalance receiverBalance)
+        OrganizationBalance senderBalance,
+        OrganizationBalance receiverBalance)
     {
         if (senderBalance.CurrencyId != CurrencyId)
             throw new InvalidOperationException("Sender balance currency mismatch");
         if (receiverBalance.CurrencyId != CurrencyId)
             throw new InvalidOperationException("Receiver balance currency mismatch");
-        if (senderBalance.UserId != SenderId)
-            throw new InvalidOperationException("Sender balance user mismatch");
-        if (receiverBalance.UserId != ReceiverId)
-            throw new InvalidOperationException("Receiver balance user mismatch");
+        if (senderBalance.OrganizationId != SenderId)
+            throw new InvalidOperationException("Sender balance organization mismatch");
+        if (receiverBalance.OrganizationId != ReceiverId)
+            throw new InvalidOperationException("Receiver balance organization mismatch");
     }
 
     private void ApplyCompleted(
-        UserBalance sender,
-        UserBalance receiver)
+        OrganizationBalance sender,
+        OrganizationBalance receiver)
     {
         sender.IncrementBalance(Amount);
         receiver.IncrementBalance(-Amount);
@@ -232,8 +233,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     }
 
     private void ApplyReversed(
-        UserBalance sender,
-        UserBalance receiver)
+        OrganizationBalance sender,
+        OrganizationBalance receiver)
     {
         sender.IncrementBalance(-Amount);
         receiver.IncrementBalance(Amount);

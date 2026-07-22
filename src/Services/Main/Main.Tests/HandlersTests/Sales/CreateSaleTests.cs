@@ -6,11 +6,13 @@ using Main.Application.Static;
 using Main.Entities.Balance;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
+using Main.Entities.Organization;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
+using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -56,6 +58,7 @@ public class CreateSaleTests : IntegrationTest
 
         result.Sale.Id.Should().NotBeEmpty();
         result.Sale.Buyer.Id.Should().Be(buyer.Id);
+        result.Sale.Organization.Id.Should().Be(buyer.Id);
         result.Sale.Currency.Id.Should().Be(storageContent.CurrencyId);
         result.Sale.Storage.Should().Be(storageContent.StorageName);
         result.Sale.Comment.Should().Be(command.Comment);
@@ -66,7 +69,8 @@ public class CreateSaleTests : IntegrationTest
             .ThenInclude(x => x.Details)
             .AsNoTracking()
             .SingleAsync(x => x.Id == result.Sale.Id);
-        sale.BuyerId.Should().Be(buyer.Id);
+        sale.UserId.Should().Be(buyer.Id);
+        sale.OrganizationId.Should().Be(buyer.Id);
         sale.CurrencyId.Should().Be(storageContent.CurrencyId);
         sale.StorageName.Should().Be(storageContent.StorageName);
 
@@ -158,10 +162,10 @@ public class CreateSaleTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var profile = await Context.Set<UserFinancialProfile>()
+        var balance = await Context.UserBalances
             .AsNoTracking()
-            .SingleAsync(x => x.UserId == buyer.Id);
-        profile.Balance.Should().Be(0m);
+            .SingleAsync(x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId);
+        balance.Balance.Should().Be(0m);
     }
 
     [Fact]
@@ -205,10 +209,10 @@ public class CreateSaleTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var profile = await Context.Set<UserFinancialProfile>()
+        var balance = await Context.UserBalances
             .AsNoTracking()
-            .SingleAsync(x => x.UserId == buyer.Id);
-        profile.Balance.Should().Be(0m);
+            .SingleAsync(x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId);
+        balance.Balance.Should().Be(0m);
     }
 
     [Fact]
@@ -235,8 +239,8 @@ public class CreateSaleTests : IntegrationTest
     {
         var buyer = Buyer();
         var storageContent = StorageContentWithCountAtLeast(2);
-        var reservation = await new StorageContentReservationBuilder(Faker)
-            .WithUserId(buyer.Id)
+        var reservation = await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(buyer.Id)
             .WithProductId(storageContent.ProductId)
             .WithReservedCount(2)
             .BuildAndAddToDb(Context);
@@ -249,11 +253,43 @@ public class CreateSaleTests : IntegrationTest
 
         await Mediator.Send(command);
 
-        var updatedReservation = await Context.StorageContentReservations
+        var updatedReservation = await Context.ProductReservations
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
         updatedReservation.CurrentCount.Should().Be(2);
-        updatedReservation.Status.Should().Be(StorageContentReservationStatus.Done);
+        updatedReservation.Status.Should().Be(ProductReservationStatus.Done);
+    }
+
+    [Fact]
+    public async Task CreateSale_ByAnotherOrganizationMember_UsesOrganizationReservation()
+    {
+        var users = GetContext<UsersTestContext>().Users.ToArray();
+        var organization = await new OrganizationBuilder(Faker)
+            .WithOwnerId(users[0].Id)
+            .WithMember(users[1].Id)
+            .BuildAndAddToDb(Context);
+        var storageContent = StorageContent();
+        var reservation = await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(organization.Id)
+            .WithProductId(storageContent.ProductId)
+            .WithReservedCount(1)
+            .BuildAndAddToDb(Context);
+        var command = CreateCommand(
+            users[1].Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, 1)]) with
+        {
+            OrganizationId = organization.Id
+        };
+
+        await Mediator.Send(command);
+
+        var updatedReservation = await Context.ProductReservations
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == reservation.Id);
+        updatedReservation.CurrentCount.Should().Be(1);
+        updatedReservation.Status.Should().Be(ProductReservationStatus.Done);
     }
 
     [Fact]
@@ -324,8 +360,8 @@ public class CreateSaleTests : IntegrationTest
         var otherBuyer = GetContext<UsersTestContext>().Users.First(x => x.Id != buyer.Id);
         var storageContent = StorageContent();
         var countOnStorage = await CountOnStorage(storageContent);
-        await new StorageContentReservationBuilder(Faker)
-            .WithUserId(otherBuyer.Id)
+        await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(otherBuyer.Id)
             .WithProductId(storageContent.ProductId)
             .WithReservedCount(countOnStorage + 1)
             .WithCurrentCount(countOnStorage)
@@ -347,8 +383,8 @@ public class CreateSaleTests : IntegrationTest
         var otherBuyer = GetContext<UsersTestContext>().Users.First(x => x.Id != buyer.Id);
         var storageContent = StorageContent();
         var countOnStorage = await CountOnStorage(storageContent);
-        await new StorageContentReservationBuilder(Faker)
-            .WithUserId(otherBuyer.Id)
+        await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(otherBuyer.Id)
             .WithProductId(storageContent.ProductId)
             .WithReservedCount(countOnStorage + 1)
             .WithCurrentCount(countOnStorage)
@@ -453,9 +489,17 @@ public class CreateSaleTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateSale_WithEmptyBuyerId_ThrowsValidationException()
+    public async Task CreateSale_WithEmptyUserId_ThrowsValidationException()
     {
-        var command = CreateValidCommand() with { BuyerId = Guid.Empty };
+        var command = CreateValidCommand() with { UserId = Guid.Empty };
+
+        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreateSale_WithEmptyOrganizationId_ThrowsValidationException()
+    {
+        var command = CreateValidCommand() with { OrganizationId = Guid.Empty };
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
     }
@@ -481,13 +525,39 @@ public class CreateSaleTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateSale_WithMissingBuyer_ThrowsDbValidationException()
+    public async Task CreateSale_WithMissingUser_ThrowsDbValidationException()
     {
-        var command = CreateValidCommand() with { BuyerId = Guid.NewGuid() };
+        var command = CreateValidCommand() with { UserId = Guid.NewGuid() };
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
 
         exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.UsersNotFound);
+    }
+
+    [Fact]
+    public async Task CreateSale_WithMissingOrganization_ThrowsDbValidationException()
+    {
+        var command = CreateValidCommand() with { OrganizationId = Guid.NewGuid() };
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+
+        exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationsNotFound);
+    }
+
+    [Fact]
+    public async Task CreateSale_WhenUserIsNotOrganizationMember_ThrowsDbValidationException()
+    {
+        var users = GetContext<UsersTestContext>().Users.ToArray();
+        var command = CreateValidCommand() with
+        {
+            UserId = users[0].Id,
+            OrganizationId = users[1].Id
+        };
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+
+        exception.Failures.Should().Contain(x =>
+            x.ErrorName == ApplicationErrors.OrganizationMemberNotFound);
     }
 
     [Fact]
@@ -515,7 +585,7 @@ public class CreateSaleTests : IntegrationTest
     }
 
     private CreateSaleCommand CreateCommand(
-        Guid buyerId,
+        Guid userId,
         int currencyId,
         string storageName,
         IEnumerable<NewSaleContentDto> contents,
@@ -524,7 +594,8 @@ public class CreateSaleTests : IntegrationTest
         bool forcePayment = true)
     {
         return new CreateSaleCommand(
-            buyerId,
+            userId,
+            userId,
             currencyId,
             storageName,
             DateTime.UtcNow,

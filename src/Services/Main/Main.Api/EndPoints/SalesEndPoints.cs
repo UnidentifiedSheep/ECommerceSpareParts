@@ -18,8 +18,11 @@ namespace Main.Api.EndPoints;
 
 public record CreateSaleRequest
 {
-    [JsonPropertyName("buyerId")]
-    public required Guid BuyerId { get; init; }
+    [JsonPropertyName("userId")]
+    public required Guid UserId { get; init; }
+
+    [JsonPropertyName("organizationId")]
+    public required Guid OrganizationId { get; init; }
 
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }
@@ -127,7 +130,8 @@ public class SalesEndPoints : ICarterModule
                 {
                     var result = await sender.Send(
                         new CreateSaleCommand(
-                            request.BuyerId,
+                            request.UserId,
+                            request.OrganizationId,
                             request.CurrencyId,
                             request.StorageName,
                             request.SaleDateTime,

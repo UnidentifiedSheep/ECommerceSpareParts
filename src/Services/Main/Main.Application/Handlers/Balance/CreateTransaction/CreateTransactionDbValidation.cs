@@ -9,7 +9,7 @@ public class CreateTransactionDbValidation : AbstractDbValidation<CreateTransact
 {
     public override void Build(IValidationPlan plan, CreateTransactionCommand request)
     {
-        plan.ValidateUserExistsId(
+        plan.ValidateOrganizationExistsId(
                 Quantifier.All,
                 request.ReceiverId,
                 request.SenderId)

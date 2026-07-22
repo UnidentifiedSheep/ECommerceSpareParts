@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Internal.Integration.Core.Models.Main.Organization;
 using Internal.Integration.Core.Models.Main.User;
 
 namespace Internal.Integration.Core.Models.Main.Sale;
@@ -10,6 +11,9 @@ public record InternalSale
 
     [JsonPropertyName("buyer")]
     public required InternalUser Buyer { get; init; }
+
+    [JsonPropertyName("organization")]
+    public required InternalOrganization Organization { get; init; }
 
     [JsonPropertyName("comment")]
     public string? Comment { get; init; }

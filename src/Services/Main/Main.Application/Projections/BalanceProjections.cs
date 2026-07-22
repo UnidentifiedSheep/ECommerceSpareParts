@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using LinqKit;
 using Main.Application.Dtos.Balances;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 
 namespace Main.Application.Projections;
 
@@ -13,25 +14,29 @@ public static class BalanceProjections
             Amount = x.Amount,
             Id = x.Id,
             CurrencyId = x.CurrencyId,
-            Receiver = UserProjections.UserPartyProjection.Invoke(x.Receiver),
-            Sender = UserProjections.UserPartyProjection.Invoke(x.Sender),
+            Receiver = OrganizationProjections.ToDto.Invoke(x.Receiver),
+            Sender = OrganizationProjections.ToDto.Invoke(x.Sender),
             Status = x.Status,
             Type = x.Type,
             TransactionDate = x.TransactionDatetime,
             SourceType = x.SourceType
         };
 
-    public static readonly Expression<Func<UserBalance, UserBalanceDto>> ToUserBalanceDto =
-        x => new UserBalanceDto
+    public static readonly Expression<Func<OrganizationBalance, OrganizationBalanceDto>> ToOrganizationBalanceDto =
+        x => new OrganizationBalanceDto
         {
             Balance = x.Balance,
             Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
         };
 
-    public static readonly Expression<Func<UserFinancialProfile, UserFinancialProfileDto>>
-        ToUserFinancialProfileDto = x => new UserFinancialProfileDto
+    public static OrganizationFinancialProfileDto ToOrganizationFinancialProfileDto(
+        OrganizationFinancialProfile profile,
+        decimal netPositionInBaseCurrency)
+    {
+        return new OrganizationFinancialProfileDto
         {
-            Balance = x.Balance,
-            MinimalAllowedBalance = x.MinAllowedBalance
+            NetPositionInBaseCurrency = netPositionInBaseCurrency,
+            MinimalAllowedBalance = profile.MinAllowedBalance
         };
+    }
 }

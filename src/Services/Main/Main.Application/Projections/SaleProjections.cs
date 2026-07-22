@@ -11,7 +11,8 @@ public static class SaleProjections
         x => new SaleDto
         {
             Id = x.Id,
-            Buyer = UserProjections.UserProjection.Invoke(x.Buyer),
+            Buyer = UserProjections.UserProjection.Invoke(x.User),
+            Organization = OrganizationProjections.ToDto.Invoke(x.Organization),
             Comment = x.Comment,
             Currency = CurrencyProjections.ToDto.Invoke(x.Currency),
             SaleDatetime = x.SaleDatetime,

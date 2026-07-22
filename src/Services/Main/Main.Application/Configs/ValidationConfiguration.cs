@@ -15,6 +15,7 @@ public static class ValidationConfiguration
         ConfigureArticles();
         ConfigureProducer();
         ConfigureUser();
+        ConfigureOrganization();
         //ConfigureUserEmail();
         ConfigureTransaction();
         ConfigureStorage();
@@ -26,6 +27,49 @@ public static class ValidationConfiguration
         ConfigureStorageRoutes();
         ConfigureStorageOwners();
         ConfigureStorageContents();
+    }
+
+    private static void ConfigureOrganization()
+    {
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateOrganizationExistsId,
+            KeyValueType.Single,
+            config => config.WithErrorName(ApplicationErrors.OrganizationsNotFound)
+                .WithMessageTemplate("organization.not.found")
+                .WithErrorCode((int)HttpStatusCode.NotFound)
+                .WithErrorType(typeof(NotFoundException)));
+
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateOrganizationExistsId,
+            KeyValueType.MultipleKeys,
+            config => config.WithErrorName(ApplicationErrors.OrganizationsNotFound)
+                .WithMessageTemplate("organization.not.found")
+                .WithErrorCode((int)HttpStatusCode.NotFound)
+                .WithErrorType(typeof(NotFoundException)));
+
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateOrganizationMemberExistsPK,
+            KeyValueType.Tuple,
+            config => config.WithErrorName(ApplicationErrors.OrganizationMemberNotFound)
+                .WithMessageTemplate("organization.member.not.found")
+                .WithErrorCode((int)HttpStatusCode.BadRequest)
+                .WithErrorType(typeof(BadRequestException)));
+
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateOrganizationMemberNotExistsPK,
+            KeyValueType.Tuple,
+            config => config.WithErrorName(ApplicationErrors.OrganizationMemberAlreadyExists)
+                .WithMessageTemplate("organization.member.already.exists")
+                .WithErrorCode((int)HttpStatusCode.Conflict)
+                .WithErrorType(typeof(ConflictException)));
+
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateOrganizationNotExistsSystemName,
+            KeyValueType.Single,
+            config => config.WithErrorName(ApplicationErrors.OrganizationSystemNameAlreadyTaken)
+                .WithMessageTemplate("organization.system.name.already.exists")
+                .WithErrorCode((int)HttpStatusCode.Conflict)
+                .WithErrorType(typeof(ConflictException)));
     }
 
     private static void ConfigureStorageContents()

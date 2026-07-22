@@ -1,4 +1,5 @@
-using Main.Enums.Balances;
+using Main.Entities.Organization;
+using Exceptions;
 
 namespace Main.Entities.Balance;
 
@@ -6,100 +7,44 @@ public class TransactionFinancialProfileService : ITransactionFinancialProfileSe
 {
     public void Apply(
         Transaction transaction,
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
+        OrganizationFinancialProfile senderProfile,
+        OrganizationFinancialProfile receiverProfile,
+        decimal senderBalanceInBaseCurrency,
+        decimal receiverBalanceInBaseCurrency,
         decimal amountInBaseCurrency,
-        Guid systemId,
         bool forceDebit = false)
     {
         transaction.EnsureCanApplyProfile(senderProfile, receiverProfile);
 
         if (transaction.IsReversalApplied)
         {
-            ApplyReversal(
-                transaction,
-                senderProfile,
-                receiverProfile,
-                amountInBaseCurrency,
-                systemId,
-                forceDebit);
             transaction.MarkReversalProfileApplied();
             return;
         }
 
-        ApplyCompletion(
-            transaction,
+        EnsureBalanceIsAllowed(
             senderProfile,
-            receiverProfile,
+            senderBalanceInBaseCurrency,
             amountInBaseCurrency,
-            systemId,
             forceDebit);
+        EnsureBalanceIsAllowed(
+            receiverProfile,
+            receiverBalanceInBaseCurrency,
+            -amountInBaseCurrency,
+            forceDebit);
+
         transaction.MarkCompletionProfileApplied();
     }
 
-    private static void ApplyCompletion(
-        Transaction transaction,
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        Guid systemId,
+    private static void EnsureBalanceIsAllowed(
+        OrganizationFinancialProfile profile,
+        decimal currentBalance,
+        decimal delta,
         bool forceDebit)
     {
-        switch (transaction.SourceType)
-        {
-            case TransactionSourceType.Purchase:
-            case TransactionSourceType.Logistic:
-                senderProfile.Credit(amountInBaseCurrency);
-                break;
-            case TransactionSourceType.Sale:
-                receiverProfile.Debit(amountInBaseCurrency, forceDebit);
-                break;
-            case TransactionSourceType.Manual when transaction.ReceiverId == systemId:
-                senderProfile.Credit(amountInBaseCurrency);
-                break;
-            case TransactionSourceType.Manual when transaction.SenderId == systemId:
-                receiverProfile.Debit(amountInBaseCurrency, forceDebit);
-                break;
-            case TransactionSourceType.Manual:
-                senderProfile.Debit(amountInBaseCurrency, forceDebit);
-                receiverProfile.Credit(amountInBaseCurrency);
-                break;
-            default:
-                throw new InvalidOperationException(
-                    $"Unsupported transaction source type: {transaction.SourceType}");
-        }
-    }
+        if (forceDebit || delta >= 0 || currentBalance + delta >= profile.MinAllowedBalance)
+            return;
 
-    private static void ApplyReversal(
-        Transaction transaction,
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        Guid systemId,
-        bool forceDebit)
-    {
-        switch (transaction.SourceType)
-        {
-            case TransactionSourceType.Purchase:
-            case TransactionSourceType.Logistic:
-                senderProfile.Debit(amountInBaseCurrency, forceDebit);
-                break;
-            case TransactionSourceType.Sale:
-                receiverProfile.Credit(amountInBaseCurrency);
-                break;
-            case TransactionSourceType.Manual when transaction.ReceiverId == systemId:
-                senderProfile.Debit(amountInBaseCurrency, forceDebit);
-                break;
-            case TransactionSourceType.Manual when transaction.SenderId == systemId:
-                receiverProfile.Credit(amountInBaseCurrency);
-                break;
-            case TransactionSourceType.Manual:
-                senderProfile.Credit(amountInBaseCurrency);
-                receiverProfile.Debit(amountInBaseCurrency, forceDebit);
-                break;
-            default:
-                throw new InvalidOperationException(
-                    $"Unsupported transaction source type: {transaction.SourceType}");
-        }
+        throw new InvalidInputException("financial.profile.balance.below.minimum");
     }
 }

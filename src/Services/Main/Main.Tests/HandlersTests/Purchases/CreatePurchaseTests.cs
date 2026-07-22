@@ -11,6 +11,7 @@ using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
+using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -65,7 +66,8 @@ public class CreatePurchaseTests : IntegrationTest
             .AsNoTracking()
             .SingleAsync();
 
-        purchase.SupplierId.Should().Be(_supplier.Id);
+        purchase.SupplierUserId.Should().Be(_supplier.Id);
+        purchase.SupplierOrganizationId.Should().Be(_supplier.Id);
         purchase.CurrencyId.Should().Be(currency.Id);
         purchase.Storage.Should().Be(storage.Name);
         purchase.State.Should().Be(PurchaseState.Completed);
@@ -94,7 +96,38 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreatePurchase_WhenSupplierHasNoSupplierRole_ThrowsUserIsNotInNeededRole()
+    public async Task CreatePurchase_ForBusinessOrganization_UsesOrganizationForTransaction()
+    {
+        var organization = await new OrganizationBuilder(Faker)
+            .WithOwnerId(_supplier.Id)
+            .WithName("Supplier organization")
+            .WithSystemName($"supplier-{Guid.NewGuid():N}")
+            .BuildAndAddToDb(Context);
+
+        var command = CreateValidCommand() with
+        {
+            SupplierOrganizationId = organization.Id
+        };
+
+        var result = await Mediator.Send(command);
+
+        result.Purchase.Supplier.Id.Should().Be(_supplier.Id);
+        result.Purchase.SupplierOrganization.Id.Should().Be(organization.Id);
+
+        var purchase = await Context.Purchases
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == result.Purchase.Id);
+        purchase.SupplierUserId.Should().Be(_supplier.Id);
+        purchase.SupplierOrganizationId.Should().Be(organization.Id);
+
+        var transaction = await Context.Transactions
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == purchase.TransactionId);
+        transaction.SenderId.Should().Be(organization.Id);
+    }
+
+    [Fact]
+    public async Task CreatePurchase_WhenOrganizationMemberHasNoSupplierRole_CreatesPurchase()
     {
         var member = GetContext<UsersTestContext>().Users.First();
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
@@ -113,7 +146,10 @@ public class CreatePurchaseTests : IntegrationTest
                     false)
             ]);
 
-        await Assert.ThrowsAsync<UserIsNotInNeededRole>(() => Mediator.Send(command));
+        var result = await Mediator.Send(command);
+
+        result.Purchase.Supplier.Id.Should().Be(member.Id);
+        result.Purchase.SupplierOrganization.Id.Should().Be(member.Id);
     }
 
     [Fact]
@@ -208,6 +244,27 @@ public class CreatePurchaseTests : IntegrationTest
         paymentTransaction.ReceiverId.Should().Be(_supplier.Id);
         paymentTransaction.CurrencyId.Should().Be(currency.Id);
         paymentTransaction.SourceType.Should().Be(TransactionSourceType.Manual);
+    }
+
+    [Fact]
+    public async Task CreatePurchase_WithOverpaymentAndForcePayment_CreatesPurchase()
+    {
+        var command = CreateValidCommand() with
+        {
+            PayedSum = 9_999m,
+            ForcePayment = true
+        };
+
+        await Mediator.Send(command);
+
+        var supplierBalance = await Context.UserBalances
+            .AsNoTracking()
+            .SingleAsync(x =>
+                x.OrganizationId == command.SupplierOrganizationId &&
+                x.CurrencyId == command.CurrencyId);
+        var purchaseTotal = command.PurchaseContent.Sum(x => x.Price * x.Count);
+
+        supplierBalance.Balance.Should().Be(purchaseTotal - command.PayedSum.Value);
     }
 
     [Fact]
@@ -313,11 +370,45 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreatePurchase_WithEmptySupplierId_ThrowsValidationException()
+    public async Task CreatePurchase_WithEmptySupplierUserId_ThrowsValidationException()
     {
-        var command = CreateValidCommand() with { SupplierId = Guid.Empty };
+        var command = CreateValidCommand() with { SupplierUserId = Guid.Empty };
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreatePurchase_WithEmptySupplierOrganizationId_ThrowsValidationException()
+    {
+        var command = CreateValidCommand() with { SupplierOrganizationId = Guid.Empty };
+
+        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreatePurchase_WithMissingSupplierOrganization_ThrowsDbValidationException()
+    {
+        var command = CreateValidCommand() with { SupplierOrganizationId = Guid.NewGuid() };
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+
+        exception.Failures.Should().Contain(x =>
+            x.ErrorName == ApplicationErrors.OrganizationsNotFound);
+    }
+
+    [Fact]
+    public async Task CreatePurchase_WhenSupplierIsNotOrganizationMember_ThrowsDbValidationException()
+    {
+        var otherOrganizationId = GetContext<UsersTestContext>().Users.First().Id;
+        var command = CreateValidCommand() with
+        {
+            SupplierOrganizationId = otherOrganizationId
+        };
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+
+        exception.Failures.Should().Contain(x =>
+            x.ErrorName == ApplicationErrors.OrganizationMemberNotFound);
     }
 
     [Fact]
@@ -436,16 +527,18 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     private CreatePurchaseCommand CreateCommand(
-        Guid supplierId,
+        Guid supplierUserId,
         int currencyId,
         string storageName,
         bool withLogistics,
         string? storageFrom,
         IEnumerable<NewPurchaseContentDto> contents,
-        decimal? payedSum = null)
+        decimal? payedSum = null,
+        Guid? supplierOrganizationId = null)
     {
         return new CreatePurchaseCommand(
-            supplierId,
+            supplierUserId,
+            supplierOrganizationId ?? supplierUserId,
             currencyId,
             storageName,
             DateTime.UtcNow,

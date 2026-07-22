@@ -25,7 +25,8 @@ namespace Main.Application.Handlers.Sales.CreateSale;
     2)]
 [AutoSave]
 public record CreateSaleCommand(
-    Guid BuyerId,
+    Guid UserId,
+    Guid OrganizationId,
     int CurrencyId,
     string StorageName,
     DateTime SaleDateTime,
@@ -53,7 +54,7 @@ public class CreateSaleHandler(
 
         await saleService.CheckReservations(
             contents,
-            request.BuyerId,
+            request.OrganizationId,
             request.StorageName,
             false,
             request.ConfirmationCode,
@@ -66,7 +67,7 @@ public class CreateSaleHandler(
         if (request.PayedSum > 0)
             await sender.Send(
                 new CreateTransactionCommand(
-                    request.BuyerId,
+                    request.OrganizationId,
                     systemId,
                     request.PayedSum.Value,
                     request.CurrencyId,
@@ -79,7 +80,7 @@ public class CreateSaleHandler(
         var saleTransaction = (await sender.Send(
             new CreateTransactionCommand(
                 systemId,
-                request.BuyerId,
+                request.OrganizationId,
                 totalSum,
                 request.CurrencyId,
                 request.SaleDateTime,
@@ -89,7 +90,8 @@ public class CreateSaleHandler(
             cancellationToken)).Transaction;
 
         var sale = Sale.Create(
-            request.BuyerId,
+            request.UserId,
+            request.OrganizationId,
             saleTransaction.Id,
             request.CurrencyId,
             request.StorageName,
@@ -109,9 +111,9 @@ public class CreateSaleHandler(
 
         sale.Complete();
 
-        await saleService.SubtractCountFromReservations(
+        await saleService.ConsumeOrganizationReservations(
             sale,
-            request.BuyerId,
+            request.OrganizationId,
             cancellationToken);
 
         await unitOfWork.AddAsync(sale, cancellationToken);

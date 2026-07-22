@@ -73,9 +73,9 @@ public class DeletePurchaseTests : IntegrationTest
         var originalStock = product.Stock.Value;
 
         var supplierBalance = await Context.UserBalances
-            .SingleAsync(x => x.UserId == supplier.Id && x.CurrencyId == currencyId);
+            .SingleAsync(x => x.OrganizationId == supplier.Id && x.CurrencyId == currencyId);
         var systemBalance = await Context.UserBalances
-            .SingleAsync(x => x.UserId == systemUserId && x.CurrencyId == currencyId);
+            .SingleAsync(x => x.OrganizationId == systemUserId && x.CurrencyId == currencyId);
         var carrierBalance = new UserBalanceBuilder(Faker)
             .WithUserId(route.CarrierId!.Value)
             .WithCurrencyId(currencyId)
@@ -129,7 +129,8 @@ public class DeletePurchaseTests : IntegrationTest
             5m);
 
         var purchase = await new PurchaseBuilder(Faker)
-            .WithSupplierId(supplier.Id)
+            .WithSupplierUserId(supplier.Id)
+            .WithSupplierOrganizationId(supplier.Id)
             .WithCurrencyId(currencyId)
             .WithTransactionId(purchaseTransaction.Id)
             .WithStorage(route.ToStorageName)

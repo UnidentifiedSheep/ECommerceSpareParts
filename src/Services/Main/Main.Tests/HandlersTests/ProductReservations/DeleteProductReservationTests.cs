@@ -12,11 +12,11 @@ public class DeleteProductReservationTests : IntegrationTest
 {
     public DeleteProductReservationTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        RegisterBasicContext<StorageContentReservationTestContext>();
+        RegisterBasicContext<ProductReservationTestContext>();
     }
 
-    public StorageContentReservationTestContext TestContext =>
-        GetContext<StorageContentReservationTestContext>();
+    public ProductReservationTestContext TestContext =>
+        GetContext<ProductReservationTestContext>();
 
     [Fact]
     public async Task WhenInvalidId_ThrowsReservationNotFoundException()
@@ -35,12 +35,12 @@ public class DeleteProductReservationTests : IntegrationTest
 
         await act.Should().NotThrowAsync();
 
-        var dbValue = await Context.StorageContentReservations
+        var dbValue = await Context.ProductReservations
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == command.ReservationId);
 
         dbValue.Should().NotBeNull();
-        dbValue.Status.Should().Be(StorageContentReservationStatus.Canceled);
+        dbValue.Status.Should().Be(ProductReservationStatus.Canceled);
     }
 
     [Fact]
@@ -52,11 +52,11 @@ public class DeleteProductReservationTests : IntegrationTest
 
         await act.Should().NotThrowAsync();
 
-        var dbValue = await Context.StorageContentReservations
+        var dbValue = await Context.ProductReservations
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == command.ReservationId);
 
         dbValue.Should().NotBeNull();
-        dbValue.Status.Should().Be(StorageContentReservationStatus.Canceled);
+        dbValue.Status.Should().Be(ProductReservationStatus.Canceled);
     }
 }

@@ -70,7 +70,7 @@ public class EditPurchaseHandler(
 
         var totalSum = contentDtos.Sum(x => x.Price * x.Count);
         var purchaseTransaction = await CreateTransaction(
-            purchase.SupplierId,
+            purchase.SupplierOrganizationId,
             GetSystemUserId(),
             totalSum,
             request.CurrencyId,
@@ -123,8 +123,8 @@ public class EditPurchaseHandler(
         if (request is not { WithLogistics: true, StorageFrom: not null }) return;
 
         await storageOwnerRepository.EnsureExistAsync(
-            (request.StorageFrom, purchase.SupplierId),
-            _ => new StorageOwnerNotFoundException(purchase.SupplierId, request.StorageFrom),
+            (request.StorageFrom, purchase.SupplierUserId),
+            _ => new StorageOwnerNotFoundException(purchase.SupplierUserId, request.StorageFrom),
             ct: cancellationToken);
     }
 

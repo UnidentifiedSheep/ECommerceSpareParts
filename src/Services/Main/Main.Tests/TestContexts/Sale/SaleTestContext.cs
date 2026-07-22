@@ -1,4 +1,5 @@
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
@@ -30,8 +31,8 @@ public class SaleTestContext(
     public StorageContent StorageContent { get; private set; } = null!;
     public DomainSale Sale { get; private set; } = null!;
     public Transaction Transaction { get; private set; } = null!;
-    public UserBalance SenderBalance { get; private set; } = null!;
-    public UserBalance ReceiverBalance { get; private set; } = null!;
+    public OrganizationBalance SenderBalance { get; private set; } = null!;
+    public OrganizationBalance ReceiverBalance { get; private set; } = null!;
     public int SoldCount { get; private set; }
 
     public static Type[] DependsOn { get; } =
@@ -45,8 +46,7 @@ public class SaleTestContext(
     {
         var currencyId = currencyContext.Currencies[0].Id;
         Buyer = await new MemberUserBuilder(Faker).BuildAndAddToDb(DbContext);
-        var buyerProfile = UserFinancialProfile.Create(Buyer.Id);
-        buyerProfile.Credit(10_000m);
+        var buyerProfile = OrganizationFinancialProfile.Create(Buyer.Id);
         StorageContent = storageContentContext.StorageContents.First(x => x.Count > 0);
         Product = productContext.Products.Single(x => x.Id == StorageContent.ProductId);
         SoldCount = 1;
@@ -55,6 +55,7 @@ public class SaleTestContext(
             .WithUserId(Buyer.Id)
             .WithCurrencyId(currencyId)
             .Build();
+        ReceiverBalance.IncrementBalance(10_000m);
         SenderBalance = new UserBalanceBuilder(Faker)
             .WithUserId(userContext.SystemUser.Id)
             .WithCurrencyId(currencyId)
@@ -63,8 +64,8 @@ public class SaleTestContext(
         SenderBalance.IncrementBalance(20m);
 
         Transaction = new TransactionBuilder(Faker)
-            .WithSenderId(SenderBalance.UserId)
-            .WithReceiverId(ReceiverBalance.UserId)
+            .WithSenderId(SenderBalance.OrganizationId)
+            .WithReceiverId(ReceiverBalance.OrganizationId)
             .WithCurrencyId(currencyId)
             .WithAmount(20m)
             .WithBalances(SenderBalance, ReceiverBalance)
@@ -91,7 +92,8 @@ public class SaleTestContext(
         Sale = new SaleBuilder(Faker)
             .WithCurrencyId(currencyId)
             .WithContents([saleContent])
-            .WithBuyerId(Buyer.Id)
+            .WithUserId(Buyer.Id)
+            .WithOrganizationId(Buyer.Id)
             .WithStorageName(StorageContent.StorageName)
             .WithTransactionId(Transaction.Id)
             .Completed()

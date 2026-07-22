@@ -7,6 +7,10 @@ public class CreateProductReservationValidation : AbstractValidator<CreateProduc
 {
     public CreateProductReservationValidation()
     {
+        RuleFor(x => x.Reservation.OrganizationId)
+            .NotEmpty()
+            .WithLocalizationKey("article.reservation.organization.id.must.not.be.empty");
+
         RuleFor(x => x.Reservation.ProposedPrice)
             .Must(z => !z.HasValue || Math.Round(z.Value, 2) > 0)
             .When(z => z.Reservation.ProposedPrice.HasValue)

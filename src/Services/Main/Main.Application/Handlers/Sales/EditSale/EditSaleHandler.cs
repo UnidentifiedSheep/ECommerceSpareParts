@@ -67,7 +67,7 @@ public class EditSaleHandler(
 
         await saleService.CheckReservations(
             contentDtos,
-            sale.BuyerId,
+            sale.OrganizationId,
             sale.StorageName,
             false,
             request.ConfirmationCode,
@@ -76,7 +76,7 @@ public class EditSaleHandler(
         await ReverseSaleTransaction(sale, cancellationToken);
 
         var transaction = await CreateSaleTransaction(
-            sale.BuyerId,
+            sale.OrganizationId,
             contentDtos.Sum(x => x.PriceWithDiscount * x.Count),
             request.CurrencyId,
             request.SaleDateTime,
@@ -93,7 +93,7 @@ public class EditSaleHandler(
             contentDtos,
             false,
             cancellationToken);
-        await UpdateReservationsCounts(
+        await UpdateOrganizationReservationCounts(
             sale,
             oldCounts,
             cancellationToken);
@@ -118,7 +118,7 @@ public class EditSaleHandler(
     }
 
     private async Task<Transaction> CreateSaleTransaction(
-        Guid buyerId,
+        Guid organizationId,
         decimal amount,
         int currencyId,
         DateTime transactionDateTime,
@@ -128,7 +128,7 @@ public class EditSaleHandler(
         return (await sender.Send(
                 new CreateTransactionCommand(
                     systemOptions.Value.SystemId,
-                    buyerId,
+                    organizationId,
                     amount,
                     currencyId,
                     transactionDateTime,
@@ -206,7 +206,7 @@ public class EditSaleHandler(
         unitOfWork.Remove(content);
     }
 
-    private async Task UpdateReservationsCounts(
+    private async Task UpdateOrganizationReservationCounts(
         Sale sale,
         IReadOnlyDictionary<int, int> oldCounts,
         CancellationToken cancellationToken)
@@ -217,8 +217,8 @@ public class EditSaleHandler(
                 x => x.Key,
                 x => x.Sum(z => z.Count) - oldCounts.GetValueOrDefault(x.Key));
 
-        await saleService.UpdateReservationsCounts(
-            sale.BuyerId,
+        await saleService.UpdateOrganizationReservationCounts(
+            sale.OrganizationId,
             deltas,
             cancellationToken);
     }

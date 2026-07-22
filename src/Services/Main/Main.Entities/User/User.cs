@@ -6,6 +6,7 @@ using Domain.Interfaces;
 using Exceptions;
 using Main.Entities.Auth;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 
@@ -13,7 +14,6 @@ namespace Main.Entities.User;
 
 public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 {
-    private readonly List<UserBalance> _balances = [];
     private readonly List<Cart.Cart> _cartItems = [];
 
     private readonly List<UserEmail> _emails = [];
@@ -30,6 +30,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 
     private User(UserName userName, string passwordHash)
     {
+        Id = Guid.NewGuid();
         UserName = userName;
         PasswordHash = passwordHash;
     }
@@ -45,14 +46,13 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     public DateTime? LastLoginAt { get; private set; }
     public UserInfo? UserInfo { get; private set; }
     public UserDiscount? Discount { get; private set; }
-    public UserFinancialProfile? FinancialProfile { get; private set; }
     public IReadOnlyList<UserEmail> Emails => _emails;
     public IReadOnlyList<UserPermission> Permissions => _permissions;
     public IReadOnlyList<UserPhone> Phones => _phones;
     public IReadOnlyList<UserRole> Roles => _roles;
     public IReadOnlyList<UserVehicle> Vehicles => _vehicles;
     public IReadOnlyList<Cart.Cart> CartItems => _cartItems;
-    public IReadOnlyList<UserBalance> Balances => _balances;
+    
 
     public static Expression<Func<User, Guid>> GetKeySelector() { return x => x.Id; }
 

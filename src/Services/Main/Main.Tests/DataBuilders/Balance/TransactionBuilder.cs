@@ -15,8 +15,8 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
     public DateTime? TransactionDateTime { get; private set; }
     public bool CompleteTransaction { get; private set; }
     public bool ApplyTransaction { get; private set; }
-    public UserBalance? SenderBalance { get; private set; }
-    public UserBalance? ReceiverBalance { get; private set; }
+    public OrganizationBalance? SenderBalance { get; private set; }
+    public OrganizationBalance? ReceiverBalance { get; private set; }
     public TransactionSourceType? SourceType { get; private set; }
 
     public TransactionBuilder WithSenderId(Guid senderId)
@@ -61,7 +61,7 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
         return this;
     }
 
-    public TransactionBuilder WithBalances(UserBalance senderBalance, UserBalance receiverBalance)
+    public TransactionBuilder WithBalances(OrganizationBalance senderBalance, OrganizationBalance receiverBalance)
     {
         SenderBalance = senderBalance;
         ReceiverBalance = receiverBalance;

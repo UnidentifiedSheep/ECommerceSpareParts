@@ -3,6 +3,7 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Static;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
@@ -32,7 +33,7 @@ public class CreateTransactionTests : IntegrationTest
         var amount = 125.50m;
         var transactionDateTime = DateTime.UtcNow;
 
-        await CreditProfile(sender.Id, amount);
+        await AllowDebit(receiver.Id, amount);
 
         var result = await Mediator.Send(
             new CreateTransactionCommand(
@@ -57,10 +58,10 @@ public class CreateTransactionTests : IntegrationTest
 
         var senderBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == sender.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
         var receiverBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == receiver.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
 
         senderBalance.Balance.Should().Be(amount);
         receiverBalance.Balance.Should().Be(-amount);
@@ -95,14 +96,14 @@ public class CreateTransactionTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateTransaction_MissingUser_ThrowsDbValidationException()
+    public async Task CreateTransaction_MissingOrganization_ThrowsDbValidationException()
     {
         var command = GetValidCommand();
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
             Mediator.Send(command with { SenderId = Guid.NewGuid() }));
 
-        exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.UsersNotFound);
+        exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.OrganizationsNotFound);
     }
 
     [Fact]
@@ -118,27 +119,27 @@ public class CreateTransactionTests : IntegrationTest
 
     [Fact]
     public async Task
-        CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
+        CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemOrganizationCannotBeCreatedByUserException()
     {
         var command = GetValidCommand() with
         {
             SenderId = GetContext<UserContextTestContext>().SystemUser.Id
         };
 
-        await Assert.ThrowsAsync<TransactionWithSystemUserCannotBeCreatedByUserException>(() =>
+        await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
             Mediator.Send(command));
     }
 
     [Fact]
     public async Task
-        CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
+        CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemOrganizationCannotBeCreatedByUserException()
     {
         var command = GetValidCommand() with
         {
             ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id
         };
 
-        await Assert.ThrowsAsync<TransactionWithSystemUserCannotBeCreatedByUserException>(() =>
+        await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
             Mediator.Send(command));
     }
 
@@ -150,8 +151,6 @@ public class CreateTransactionTests : IntegrationTest
             ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id,
             Mode = TransactionCreationMode.System
         };
-
-        await CreditProfile(command.SenderId, command.Amount);
 
         var result = await Mediator.Send(command);
 
@@ -178,10 +177,9 @@ public class CreateTransactionTests : IntegrationTest
             TransactionSourceType.Manual);
     }
 
-    private async Task CreditProfile(Guid userId, decimal amount)
+    private async Task AllowDebit(Guid userId, decimal amount)
     {
-        var profile = UserFinancialProfile.Create(userId);
-        profile.Credit(amount);
+        var profile = OrganizationFinancialProfile.Create(userId, -amount);
 
         await Context.AddAsync(profile);
         await Context.SaveChangesAsync();

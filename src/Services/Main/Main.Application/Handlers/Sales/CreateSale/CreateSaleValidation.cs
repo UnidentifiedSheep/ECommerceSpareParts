@@ -25,8 +25,12 @@ public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
             .When(x => x.PayedSum != null)
             .WithLocalizationKey("sale.payed.sum.precision");
 
-        RuleFor(x => x.BuyerId)
+        RuleFor(x => x.UserId)
             .NotEmpty()
             .WithLocalizationKey("sale.buyer.id.not.empty");
+
+        RuleFor(x => x.OrganizationId)
+            .NotEmpty()
+            .WithLocalizationKey("sale.organization.id.not.empty");
     }
 }

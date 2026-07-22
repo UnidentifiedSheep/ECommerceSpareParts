@@ -1,10 +1,10 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Main.Entities.Settings;
 using Main.Entities.User;
+using Main.Entities.Organization;
 using Main.Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.User;
-using Tests.Extensions;
 using Tests.Stubs;
 
 namespace Tests.TestContexts;
@@ -19,9 +19,13 @@ public abstract class GlobalApplicationSettingTestContext(
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        SystemUser = await new SystemUserBuilder(Faker)
+        SystemUser = new SystemUserBuilder(Faker)
             .WithUserName("SYSTEM")
-            .BuildAndAddToDb(DbContext);
+            .Build();
+        var systemOrganization = Organization.CreateSystem(SystemUser.Id, SystemUser.Id);
+        var financialProfile = OrganizationFinancialProfile.Create(SystemUser.Id, decimal.MinValue);
+        await DbContext.AddRangeAsync(SystemUser, systemOrganization, financialProfile);
+        await DbContext.SaveChangesAsync(cancellationToken);
         systemOptionsAccessor.SystemId = SystemUser.Id;
 
         var setting = new GlobalApplicationSetting(

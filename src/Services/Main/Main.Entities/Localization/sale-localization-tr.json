@@ -20,6 +20,7 @@
     "sale.payed.sum.min": "Belirtilmişse ödenen tutar 0 veya daha büyük olmalıdır.",
     "sale.payed.sum.precision": "Ödenen tutar en fazla 2 ondalık basamak içermelidir.",
     "sale.buyer.id.not.empty": "Alıcı kimliği boş olmamalıdır.",
+    "sale.organization.id.not.empty": "Kuruluş kimliği boş olmamalıdır.",
     "sale.created.user.id.not.empty": "Oluşturan kullanıcı kimliği boş olmamalıdır.",
     "sale.articles.missing": "Satış detaylarını oluşturmak için gereken ürünleri bulamadık.",
     "sale.comment.max": "Genel yorum en fazla 256 karakter uzunluğunda olmalıdır.",

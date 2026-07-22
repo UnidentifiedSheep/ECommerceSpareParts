@@ -6,7 +6,7 @@
     "transaction.already.deleted": "Bu işlem zaten silinmiş.",
     "transaction.not.found": "İşlem bulunamadı.",
     "transaction.source.cannot.be.reversed.by.user": "Kaynağı '{0}' olan bir işlem kullanıcı tarafından geri alınamaz.",
-    "transaction.with.system.user.cannot.be.created.by.user": "Göndereni veya alıcısı sistem kullanıcısı olan bir işlem kullanıcı tarafından oluşturulamaz.",
+    "transaction.with.system.organization.cannot.be.created.by.user": "Göndereni veya alıcısı sistem kuruluşu olan bir işlem kullanıcı tarafından oluşturulamaz.",
     "transaction.sender.id.required": "Gönderen kimliği belirtilmelidir.",
     "transaction.receiver.id.required": "Alıcı kimliği belirtilmelidir.",
     "transaction.date.out.of.range": "İşlem tarihi son 2 ay içinde olmalı ve gelecekte en fazla 1 saat olmalıdır.",
@@ -18,9 +18,8 @@
     "transaction.sender.or.receiver.required": "Gönderen veya alıcıdan en az biri belirtilmelidir.",
     "transaction.range.start.before.end": "Başlangıç tarihi bitiş tarihinden sonra olamaz.",
     "transaction.range.max.months": "Maksimum aralık 5 aydır.",
-    "financial.profile.amount.must.not.be.negative": "Tutar negatif olamaz.",
-    "financial.profile.balance.must.not.be.less.than.minimum": "İşlemi tamamlamak için yeterli bakiye yok.",
     "financial.profile.min.allowed.balance.max.two.decimal.places": "İzin verilen minimum bakiye en fazla 2 ondalık basamak içerebilir.",
-    "financial.profile.min.allowed.balance.must.not.be.positive": "İzin verilen minimum bakiye pozitif olamaz."
+    "financial.profile.min.allowed.balance.must.not.be.positive": "İzin verilen minimum bakiye pozitif olamaz.",
+    "financial.profile.balance.below.minimum": "İşlem, kuruluş bakiyesini izin verilen minimumun altına düşürecektir."
   }
 }

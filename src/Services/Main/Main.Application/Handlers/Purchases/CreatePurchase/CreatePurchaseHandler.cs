@@ -1,7 +1,6 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
@@ -10,22 +9,17 @@ using Contracts.Purchase;
 using LinqKit;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
-using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Projections;
-using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Main.Entities.Storage;
-using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
@@ -35,7 +29,8 @@ namespace Main.Application.Handlers.Purchases.CreatePurchase;
     20,
     2)]
 public record CreatePurchaseCommand(
-    Guid SupplierId,
+    Guid SupplierUserId,
+    Guid SupplierOrganizationId,
     int CurrencyId,
     string StorageName,
     DateTime PurchaseDate,
@@ -43,7 +38,8 @@ public record CreatePurchaseCommand(
     string? Comment,
     decimal? PayedSum,
     bool WithLogistics,
-    string? StorageFrom
+    string? StorageFrom,
+    bool ForcePayment = false
 ) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(PurchaseDto Purchase);
@@ -51,7 +47,6 @@ public record CreatePurchaseResult(PurchaseDto Purchase);
 public class CreatePurchaseHandler(
     ISender sender,
     IOptions<SystemOptions> systemOptions,
-    IUserRepository userRepository,
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
     IReadRepository<Purchase, Guid> readRepository,
@@ -64,21 +59,13 @@ public class CreatePurchaseHandler(
     {
         var systemId = systemOptions.Value.SystemId;
 
-        var supplier = await userRepository.EnsureExistAsync(
-            request.SupplierId,
-            _ => new UserIsNotInNeededRole(Role.Supplier),
-            Criteria<User>
-                .New()
-                .WhereHasRole(Role.Supplier),
-            cancellationToken);
-
         var purchaseContents = request.PurchaseContent.ToList();
 
         var totalSum = purchaseContents.Sum(x => x.Price * x.Count);
 
         var purchaseTransaction = (await sender.Send(
                 new CreateTransactionCommand(
-                    supplier.Id,
+                    request.SupplierOrganizationId,
                     systemId,
                     totalSum,
                     request.CurrencyId,
@@ -106,12 +93,13 @@ public class CreatePurchaseHandler(
             await sender.Send(
                 new CreateTransactionCommand(
                     systemId,
-                    supplier.Id,
+                    request.SupplierOrganizationId,
                     request.PayedSum.Value,
                     request.CurrencyId,
                     request.PurchaseDate,
                     TransactionSourceType.Manual,
-                    TransactionCreationMode.System),
+                    TransactionCreationMode.System,
+                    request.ForcePayment),
                 cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -159,7 +147,8 @@ public class CreatePurchaseHandler(
     {
         List<PurchaseLogisticsItem> toCalculate = [];
         var purchase = Purchase.Create(
-            request.SupplierId,
+            request.SupplierUserId,
+            request.SupplierOrganizationId,
             request.CurrencyId,
             transactionId,
             request.StorageName,

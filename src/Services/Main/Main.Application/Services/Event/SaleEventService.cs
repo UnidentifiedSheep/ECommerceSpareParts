@@ -26,7 +26,8 @@ public sealed class SaleEventService(
         x => new SaleEventModel
         {
             Id = x.Id,
-            BuyerId = x.BuyerId,
+            OrganizationId = x.OrganizationId,
+            UserId = x.UserId,
             Comment = x.Comment,
             CurrencyId = x.CurrencyId,
             RowVersion = x.RowVersion,

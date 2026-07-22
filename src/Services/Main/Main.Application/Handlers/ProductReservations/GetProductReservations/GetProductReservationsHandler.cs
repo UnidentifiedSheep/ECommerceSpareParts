@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.ProductReservations.GetProductReservations;
 
 public record GetProductReservationsQuery(
     int? ProductId,
-    Guid? UserId,
+    Guid? OrganizationId,
     string? SortBy,
     bool ShowDeleted,
     Pagination Pagination
@@ -22,7 +22,7 @@ public record GetProductReservationsQuery(
 public record GetProductReservationsResult(IReadOnlyList<ProductReservationDto> Reservations);
 
 public class GetProductReservationsHandler(
-    IReadRepository<StorageContentReservation, int> repository
+    IReadRepository<ProductReservation, int> repository
 ) : IQueryHandler<GetProductReservationsQuery, GetProductReservationsResult>
 {
     public async Task<GetProductReservationsResult> Handle(
@@ -32,8 +32,9 @@ public class GetProductReservationsHandler(
         var result = await repository
             .Query
             .Where(x => !request.ProductId.HasValue || x.ProductId == request.ProductId.Value)
-            .Where(x => !request.UserId.HasValue || x.UserId == request.UserId.Value)
-            .Where(x => request.ShowDeleted || x.Status != StorageContentReservationStatus.Canceled)
+            .Where(x => !request.OrganizationId.HasValue ||
+                        x.OrganizationId == request.OrganizationId.Value)
+            .Where(x => request.ShowDeleted || x.Status != ProductReservationStatus.Canceled)
             .SortBy(request.SortBy)
             .AsExpandable()
             .Select(ProductProjections.ToReservationDto)

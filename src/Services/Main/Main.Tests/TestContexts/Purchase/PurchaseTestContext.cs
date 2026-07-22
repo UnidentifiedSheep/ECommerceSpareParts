@@ -87,7 +87,8 @@ public class PurchaseTestContext(
             .Build();
 
         Purchase = await new PurchaseBuilder(Faker)
-            .WithSupplierId(Supplier.Id)
+            .WithSupplierUserId(Supplier.Id)
+            .WithSupplierOrganizationId(Supplier.Id)
             .WithCurrencyId(currencyId)
             .WithTransactionId(transaction.Id)
             .WithStorage(storageRouteContext.ActiveRoute.ToStorageName)

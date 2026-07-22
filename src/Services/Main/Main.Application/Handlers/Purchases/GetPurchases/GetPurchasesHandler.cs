@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Purchases.GetPurchases;
 public record GetPurchasesQuery(
     RangeModel<DateTime> DateRange,
     Pagination Pagination,
-    IEnumerable<Guid> SupplierIds,
+    IEnumerable<Guid> SupplierOrganizationIds,
     IEnumerable<int> CurrencyIds,
     IEnumerable<int> ProductIds,
     string? SortBy,
@@ -38,7 +38,9 @@ public class GetPurchasesHandler(
         if (request.DateRange.Max.HasValue)
             query = query.Where(x => x.PurchaseDatetime <= request.DateRange.Max.Value);
 
-        if (request.SupplierIds.Any()) query = query.Where(x => request.SupplierIds.Contains(x.SupplierId));
+        if (request.SupplierOrganizationIds.Any())
+            query = query.Where(x =>
+                request.SupplierOrganizationIds.Contains(x.SupplierOrganizationId));
 
         if (request.CurrencyIds.Any()) query = query.Where(x => request.CurrencyIds.Contains(x.CurrencyId));
 

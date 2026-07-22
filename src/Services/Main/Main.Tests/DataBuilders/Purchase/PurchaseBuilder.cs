@@ -10,7 +10,8 @@ public class PurchaseBuilder(Faker faker) : BuilderBase<DomainPurchase>(faker)
 {
     private readonly List<PurchaseContent> _contents = [];
 
-    public Guid? SupplierId { get; private set; }
+    public Guid? SupplierUserId { get; private set; }
+    public Guid? SupplierOrganizationId { get; private set; }
     public int? CurrencyId { get; private set; }
     public Guid? TransactionId { get; private set; }
     public string? Storage { get; private set; }
@@ -19,9 +20,15 @@ public class PurchaseBuilder(Faker faker) : BuilderBase<DomainPurchase>(faker)
     public Guid? LogisticTransactionId { get; private set; }
     public bool LogisticMinimumPriceApplied { get; private set; }
 
-    public PurchaseBuilder WithSupplierId(Guid supplierId)
+    public PurchaseBuilder WithSupplierUserId(Guid supplierUserId)
     {
-        SupplierId = supplierId;
+        SupplierUserId = supplierUserId;
+        return this;
+    }
+
+    public PurchaseBuilder WithSupplierOrganizationId(Guid supplierOrganizationId)
+    {
+        SupplierOrganizationId = supplierOrganizationId;
         return this;
     }
 
@@ -68,8 +75,10 @@ public class PurchaseBuilder(Faker faker) : BuilderBase<DomainPurchase>(faker)
 
     public override DomainPurchase Build()
     {
+        var supplierUserId = SupplierUserId ?? Guid.NewGuid();
         var purchase = DomainPurchase.Create(
-            SupplierId ?? Guid.NewGuid(),
+            supplierUserId,
+            SupplierOrganizationId ?? supplierUserId,
             CurrencyId ?? Faker.Random.Int(1),
             TransactionId ?? Guid.NewGuid(),
             Storage ?? Faker.Lorem.Word(),

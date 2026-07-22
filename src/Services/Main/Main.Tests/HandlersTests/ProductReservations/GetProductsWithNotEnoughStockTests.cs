@@ -326,14 +326,14 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
             .BuildAndAddToDb(Context);
     }
 
-    private async Task<StorageContentReservation> AddReservation(
-        Guid userId,
+    private async Task<ProductReservation> AddReservation(
+        Guid organizationId,
         int productId,
         int reservedCount,
         int currentCount)
     {
-        return await new StorageContentReservationBuilder(Faker)
-            .WithUserId(userId)
+        return await new ProductReservationBuilder(Faker)
+            .WithOrganizationId(organizationId)
             .WithProductId(productId)
             .WithReservedCount(reservedCount)
             .WithCurrentCount(currentCount)

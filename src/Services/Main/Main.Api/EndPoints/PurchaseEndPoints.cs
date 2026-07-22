@@ -18,8 +18,11 @@ namespace Main.Api.EndPoints;
 
 public record CreatePurchaseRequest
 {
-    [JsonPropertyName("supplierId")]
-    public required Guid SupplierId { get; init; }
+    [JsonPropertyName("supplierUserId")]
+    public required Guid SupplierUserId { get; init; }
+
+    [JsonPropertyName("supplierOrganizationId")]
+    public required Guid SupplierOrganizationId { get; init; }
 
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }
@@ -44,6 +47,9 @@ public record CreatePurchaseRequest
 
     [JsonPropertyName("storageFrom")]
     public string? StorageFrom { get; init; }
+
+    [JsonPropertyName("forcePayment")]
+    public bool ForcePayment { get; init; }
 }
 
 public record CreatePurchaseResponse
@@ -80,8 +86,8 @@ public record GetPurchasesRequest : SortablePaginationQueryModel
     [FromQuery(Name = "rangeEndDate")]
     public DateTime RangeEndDate { get; init; }
 
-    [FromQuery(Name = "supplierIds")]
-    public Guid[] SupplierIds { get; init; } = [];
+    [FromQuery(Name = "supplierOrganizationIds")]
+    public Guid[] SupplierOrganizationIds { get; init; } = [];
 
     [FromQuery(Name = "currencyIds")]
     public int[] CurrencyIds { get; init; } = [];
@@ -108,7 +114,8 @@ public class PurchaseEndPoints : ICarterModule
                     CancellationToken token) =>
                 {
                     var command = new CreatePurchaseCommand(
-                        request.SupplierId,
+                        request.SupplierUserId,
+                        request.SupplierOrganizationId,
                         request.CurrencyId,
                         request.StorageName,
                         request.PurchaseDate,
@@ -116,7 +123,8 @@ public class PurchaseEndPoints : ICarterModule
                         request.Comment,
                         request.PayedSum,
                         request.WithLogistics,
-                        request.StorageFrom);
+                        request.StorageFrom,
+                        request.ForcePayment);
                     var result = await sender.Send(command, token);
                     return Results.Created(
                         new Uri($"/purchases/{result.Purchase.Id}"),
@@ -235,7 +243,7 @@ public class PurchaseEndPoints : ICarterModule
                     var query = new GetPurchasesQuery(
                         new RangeModel<DateTime>(request.RangeStartDate, request.RangeEndDate),
                         request,
-                        request.SupplierIds,
+                        request.SupplierOrganizationIds,
                         request.CurrencyIds,
                         request.ProductIds,
                         request.SortBy,

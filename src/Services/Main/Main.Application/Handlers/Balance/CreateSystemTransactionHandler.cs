@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Main.Application.Handlers.Balance;
 
 public record CreateSystemTransactionCommand(
-    Guid UserId,
+    Guid OrganizationId,
     decimal Amount,
     int CurrencyId,
     DateTime TransactionDateTime,
@@ -25,15 +25,15 @@ public class CreateSystemTransactionHandler(
         CreateSystemTransactionCommand request,
         CancellationToken cancellationToken)
     {
-        var systemUserId = systemOptions.Value.SystemId;
+        var systemOrganizationId = systemOptions.Value.SystemId;
 
         var senderId = request.Direction == SystemTransactionDirection.UserToSystem
-            ? request.UserId
-            : systemUserId;
+            ? request.OrganizationId
+            : systemOrganizationId;
 
         var receiverId = request.Direction == SystemTransactionDirection.UserToSystem
-            ? systemUserId
-            : request.UserId;
+            ? systemOrganizationId
+            : request.OrganizationId;
 
         return await sender.Send(
             new CreateTransactionCommand(

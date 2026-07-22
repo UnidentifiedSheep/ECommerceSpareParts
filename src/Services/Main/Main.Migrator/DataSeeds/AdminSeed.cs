@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Validators;
 using Main.Entities.Auth;
+using Main.Entities.Organization;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
@@ -15,26 +16,35 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
 
     public async Task SeedAsync(DContext context)
     {
-        if (await context.Users.AnyAsync(x => x.UserName == AdministratorName)) return;
+        var user = await context.Users
+            .SingleOrDefaultAsync(x => x.UserName == AdministratorName);
 
-        var upperName = AdministratorName.ToUpperInvariant();
-        var email = $"{upperName}@example.com";
+        if (user is null)
+        {
+            var upperName = AdministratorName.ToUpperInvariant();
+            var email = $"{upperName}@example.com";
 
-        var user = User.Create(
-            AdministratorName,
-            passwordManager.GetHashOfPassword("SuperSecretPassword.21"));
-        user.AddRole(RoleNames.Normalize(nameof(Role.Admin)));
-        user.SetUserInfo(
-            AdministratorName,
-            AdministratorName,
-            null);
-        user.AddUserEmail(
-            email,
-            EmailType.Personal,
-            true,
-            true);
+            user = User.Create(
+                AdministratorName,
+                passwordManager.GetHashOfPassword("SuperSecretPassword.21"));
+            user.AddRole(RoleNames.Normalize(nameof(Role.Admin)));
+            user.SetUserInfo(
+                AdministratorName,
+                AdministratorName,
+                null);
+            user.AddUserEmail(
+                email,
+                EmailType.Personal,
+                true,
+                true);
 
-        await context.Users.AddAsync(user);
+            await context.Users.AddAsync(user);
+        }
+
+        if (!await context.Organizations.AnyAsync(x => x.Id == user.Id))
+            await context.Organizations.AddAsync(
+                Organization.CreateIndividual(AdministratorName, user.Id));
+
         await context.SaveChangesAsync();
     }
 

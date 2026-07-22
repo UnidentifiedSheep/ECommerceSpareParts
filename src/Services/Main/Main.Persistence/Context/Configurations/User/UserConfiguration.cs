@@ -15,7 +15,6 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
             .HasName("users_pk");
 
         builder.Property(e => e.Id)
-            .HasDefaultValueSql("gen_random_uuid()")
             .HasColumnName("id");
 
         builder.Property(e => e.AccessFailedCount)
@@ -78,10 +77,6 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
 
         builder.Navigation(e => e.CartItems)
             .HasField("_cartItems")
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.Navigation(e => e.Balances)
-            .HasField("_balances")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

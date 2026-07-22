@@ -23,7 +23,7 @@ public class ReservationManualChangeEvent : Event<ReservationManualChangeEventDa
         return new ReservationManualChangeEvent(reservationId, data);
     }
 
-    public static ReservationManualChangeEvent Create(StorageContentReservation reservation)
+    public static ReservationManualChangeEvent Create(ProductReservation reservation)
     {
         var data = new ReservationManualChangeEventData
         {

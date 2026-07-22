@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Application.Handlers.Balance;
 using Main.Entities.Balance;
+using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
@@ -30,8 +31,6 @@ public class CreateSystemTransactionTests : IntegrationTest
         var currency = CurrencyContext.Currencies[0];
         var amount = 125.50m;
 
-        await CreditProfile(user.Id, amount);
-
         var result = await Mediator.Send(
             new CreateSystemTransactionCommand(
                 user.Id,
@@ -52,10 +51,10 @@ public class CreateSystemTransactionTests : IntegrationTest
 
         var userBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == user.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id);
         var systemBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == systemUser.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id);
 
         userBalance.Balance.Should().Be(amount);
         systemBalance.Balance.Should().Be(-amount);
@@ -68,7 +67,7 @@ public class CreateSystemTransactionTests : IntegrationTest
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         var amount = 75m;
-        await CreditProfile(user.Id, amount);
+        await AllowDebit(user.Id, amount);
 
         var result = await Mediator.Send(
             new CreateSystemTransactionCommand(
@@ -90,19 +89,18 @@ public class CreateSystemTransactionTests : IntegrationTest
 
         var userBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == user.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id);
         var systemBalance = await Context.UserBalances
             .AsNoTracking()
-            .FirstAsync(x => x.UserId == systemUser.Id && x.CurrencyId == currency.Id);
+            .FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id);
 
         userBalance.Balance.Should().Be(-amount);
         systemBalance.Balance.Should().Be(amount);
     }
 
-    private async Task CreditProfile(Guid userId, decimal amount)
+    private async Task AllowDebit(Guid userId, decimal amount)
     {
-        var profile = UserFinancialProfile.Create(userId);
-        profile.Credit(amount);
+        var profile = OrganizationFinancialProfile.Create(userId, -amount);
 
         await Context.AddAsync(profile);
         await Context.SaveChangesAsync();
