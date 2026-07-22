@@ -40,6 +40,14 @@ public static class ValidationConfiguration
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateOrganizationExistsId,
+            KeyValueType.MultipleKeys,
+            config => config.WithErrorName(ApplicationErrors.OrganizationsNotFound)
+                .WithMessageTemplate("organization.not.found")
+                .WithErrorCode((int)HttpStatusCode.NotFound)
+                .WithErrorType(typeof(NotFoundException)));
+
+        ConfigureDbValidation.AddConfig(
             ValidationFunctions.ValidateOrganizationMemberExistsPK,
             KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.OrganizationMemberNotFound)

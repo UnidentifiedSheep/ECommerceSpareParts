@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Main.Application.Dtos.Currencies;
+using Main.Application.Dtos.Organizations;
 using Main.Application.Dtos.Users;
 
 namespace Main.Application.Dtos.Purchase;
@@ -11,6 +12,9 @@ public record PurchaseDto
 
     [JsonPropertyName("supplier")]
     public required UserDto Supplier { get; init; }
+
+    [JsonPropertyName("supplierOrganization")]
+    public required OrganizationDto SupplierOrganization { get; init; }
 
     [JsonPropertyName("currency")]
     public required CurrencyDto Currency { get; init; }

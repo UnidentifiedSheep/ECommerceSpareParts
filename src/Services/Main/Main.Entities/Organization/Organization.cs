@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
@@ -10,7 +11,7 @@ namespace Main.Entities.Organization;
 
 public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Organization, Guid>
 {
-    [BulkValidation.Core.Attributes.Validate]
+    [Validate]
     public Guid Id { get; private set; }
     public OrganizationType Type { get; private set; }
     public string Name { get; private set; } = null!;

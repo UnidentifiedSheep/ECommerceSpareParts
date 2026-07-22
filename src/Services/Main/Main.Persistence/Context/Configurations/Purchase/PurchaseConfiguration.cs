@@ -25,7 +25,11 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
 
         builder.HasIndex(e => e.Storage, "purchase_storage_index");
 
-        builder.HasIndex(e => e.SupplierId, "purchase_supplier_id_index");
+        builder.HasIndex(e => e.SupplierUserId, "purchase_supplier_user_id_index");
+
+        builder.HasIndex(
+            e => e.SupplierOrganizationId,
+            "purchase_supplier_organization_id_index");
 
         builder.HasIndex(e => e.TransactionId, "purchase_transaction_id_index");
 
@@ -52,8 +56,11 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
             .HasMaxLength(128)
             .HasColumnName("storage");
 
-        builder.Property(e => e.SupplierId)
-            .HasColumnName("supplier_id");
+        builder.Property(e => e.SupplierUserId)
+            .HasColumnName("supplier_user_id");
+
+        builder.Property(e => e.SupplierOrganizationId)
+            .HasColumnName("supplier_organization_id");
 
         builder.Property(e => e.TransactionId)
             .HasColumnName("transaction_id");
@@ -70,11 +77,17 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_storages_name_fk");
 
-        builder.HasOne(d => d.Supplier)
+        builder.HasOne(d => d.SupplierUser)
             .WithMany()
-            .HasForeignKey(d => d.SupplierId)
+            .HasForeignKey(d => d.SupplierUserId)
             .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("purchase_users_id_fk_2");
+            .HasConstraintName("purchase_supplier_user_id_fk");
+
+        builder.HasOne(d => d.SupplierOrganization)
+            .WithMany()
+            .HasForeignKey(d => d.SupplierOrganizationId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("purchase_supplier_organization_id_fk");
 
         builder.HasOne(d => d.Transaction)
             .WithMany()

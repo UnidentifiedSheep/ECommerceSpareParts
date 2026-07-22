@@ -35,7 +35,8 @@ namespace Main.Application.Handlers.Purchases.CreatePurchase;
     20,
     2)]
 public record CreatePurchaseCommand(
-    Guid SupplierId,
+    Guid SupplierUserId,
+    Guid SupplierOrganizationId,
     int CurrencyId,
     string StorageName,
     DateTime PurchaseDate,
@@ -65,7 +66,7 @@ public class CreatePurchaseHandler(
         var systemId = systemOptions.Value.SystemId;
 
         var supplier = await userRepository.EnsureExistAsync(
-            request.SupplierId,
+            request.SupplierUserId,
             _ => new UserIsNotInNeededRole(Role.Supplier),
             Criteria<User>
                 .New()
@@ -78,7 +79,7 @@ public class CreatePurchaseHandler(
 
         var purchaseTransaction = (await sender.Send(
                 new CreateTransactionCommand(
-                    supplier.Id,
+                    request.SupplierOrganizationId,
                     systemId,
                     totalSum,
                     request.CurrencyId,
@@ -106,7 +107,7 @@ public class CreatePurchaseHandler(
             await sender.Send(
                 new CreateTransactionCommand(
                     systemId,
-                    supplier.Id,
+                    request.SupplierOrganizationId,
                     request.PayedSum.Value,
                     request.CurrencyId,
                     request.PurchaseDate,
@@ -159,7 +160,8 @@ public class CreatePurchaseHandler(
     {
         List<PurchaseLogisticsItem> toCalculate = [];
         var purchase = Purchase.Create(
-            request.SupplierId,
+            request.SupplierUserId,
+            request.SupplierOrganizationId,
             request.CurrencyId,
             transactionId,
             request.StorageName,

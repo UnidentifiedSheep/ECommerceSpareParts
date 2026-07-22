@@ -57,7 +57,7 @@ public class CreateSaleTests : IntegrationTest
 
         result.Sale.Id.Should().NotBeEmpty();
         result.Sale.Buyer.Id.Should().Be(buyer.Id);
-        result.Sale.OrganizationId.Should().Be(buyer.Id);
+        result.Sale.Organization.Id.Should().Be(buyer.Id);
         result.Sale.Currency.Id.Should().Be(storageContent.CurrencyId);
         result.Sale.Storage.Should().Be(storageContent.StorageName);
         result.Sale.Comment.Should().Be(command.Comment);

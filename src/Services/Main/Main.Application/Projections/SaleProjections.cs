@@ -12,7 +12,7 @@ public static class SaleProjections
         {
             Id = x.Id,
             Buyer = UserProjections.UserProjection.Invoke(x.User),
-            OrganizationId = x.OrganizationId,
+            Organization = OrganizationProjections.ToDto.Invoke(x.Organization),
             Comment = x.Comment,
             Currency = CurrencyProjections.ToDto.Invoke(x.Currency),
             SaleDatetime = x.SaleDatetime,

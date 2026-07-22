@@ -129,7 +129,8 @@ public class DeletePurchaseTests : IntegrationTest
             5m);
 
         var purchase = await new PurchaseBuilder(Faker)
-            .WithSupplierId(supplier.Id)
+            .WithSupplierUserId(supplier.Id)
+            .WithSupplierOrganizationId(supplier.Id)
             .WithCurrencyId(currencyId)
             .WithTransactionId(purchaseTransaction.Id)
             .WithStorage(route.ToStorageName)

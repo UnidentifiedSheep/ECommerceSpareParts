@@ -11,10 +11,10 @@ public class OrganizationMember :
     ILinqEntity<OrganizationMember, OrganizationMemberKey>
 {
     [ValidateTuple("PK")]
-    public Guid UserId { get; private set; }
+    public Guid OrganizationId { get; private set; }
 
     [ValidateTuple("PK")]
-    public Guid OrganizationId { get; private set; }
+    public Guid UserId { get; private set; }
     public OrganizationRole Role { get; private set; }
 
     public Organization Organization { get; private set; } = null!;

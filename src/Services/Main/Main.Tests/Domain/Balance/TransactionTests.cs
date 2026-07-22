@@ -174,7 +174,7 @@ public class TransactionTests
 
         act.Should()
             .Throw<InvalidOperationException>()
-            .WithMessage("Sender profile user mismatch");
+            .WithMessage("Sender profile organization mismatch");
     }
 
     [Fact]

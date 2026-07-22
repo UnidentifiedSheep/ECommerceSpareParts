@@ -1,15 +1,13 @@
 using System.Data;
+using Abstractions.Models.Options;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Enums;
-using Main.Application.Extensions;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
-using Main.Entities.User;
 using Main.Enums.Balances;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
@@ -33,7 +31,7 @@ public record CreateTransactionResult(Transaction Transaction);
 
 public class CreateTransactionHandler(
     IBalanceService balanceService,
-    IRepository<User, Guid> userRepository,
+    IOptions<SystemOptions> systemOptions,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
 {
@@ -41,7 +39,7 @@ public class CreateTransactionHandler(
         CreateTransactionCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.Mode == TransactionCreationMode.User) await WhenUserCreates(request, cancellationToken);
+        if (request.Mode == TransactionCreationMode.User) WhenUserCreates(request);
 
         var transaction = Transaction.Create(
             request.SenderId,
@@ -62,20 +60,11 @@ public class CreateTransactionHandler(
         return new CreateTransactionResult(transaction);
     }
 
-    private async Task WhenUserCreates(
-        CreateTransactionCommand command,
-        CancellationToken cancellationToken)
+    private void WhenUserCreates(CreateTransactionCommand command)
     {
-        var criteria = UserRoleFilter
-            .Apply(
-                Criteria<User>.New()
-                    .Where(x => x.Id == command.SenderId || x.Id == command.ReceiverId)
-                    .Track(false),
-                [Role.System],
-                true)
-            .Build();
-
-        if (await userRepository.FirstOrDefaultAsync(criteria, cancellationToken) is not null)
-            throw new TransactionWithSystemUserCannotBeCreatedByUserException();
+        var systemOrganizationId = systemOptions.Value.SystemId;
+        if (command.SenderId == systemOrganizationId ||
+            command.ReceiverId == systemOrganizationId)
+            throw new TransactionWithSystemOrganizationCannotBeCreatedByUserException();
     }
 }

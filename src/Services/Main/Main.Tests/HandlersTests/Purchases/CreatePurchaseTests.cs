@@ -5,6 +5,7 @@ using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Static;
 using Main.Entities.Exceptions;
+using Main.Entities.Organization;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
@@ -65,7 +66,8 @@ public class CreatePurchaseTests : IntegrationTest
             .AsNoTracking()
             .SingleAsync();
 
-        purchase.SupplierId.Should().Be(_supplier.Id);
+        purchase.SupplierUserId.Should().Be(_supplier.Id);
+        purchase.SupplierOrganizationId.Should().Be(_supplier.Id);
         purchase.CurrencyId.Should().Be(currency.Id);
         purchase.Storage.Should().Be(storage.Name);
         purchase.State.Should().Be(PurchaseState.Completed);
@@ -91,6 +93,38 @@ public class CreatePurchaseTests : IntegrationTest
         purchaseTransaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
         purchaseTransaction.Amount.Should().Be(command.PurchaseContent.Sum(x => x.Price * x.Count));
         purchaseTransaction.SourceType.Should().Be(TransactionSourceType.Purchase);
+    }
+
+    [Fact]
+    public async Task CreatePurchase_ForBusinessOrganization_UsesOrganizationForTransaction()
+    {
+        var organization = Organization.CreateBusiness(
+            "Supplier organization",
+            $"supplier-{Guid.NewGuid():N}",
+            _supplier.Id);
+        Context.Organizations.Add(organization);
+        await Context.SaveChangesAsync();
+
+        var command = CreateValidCommand() with
+        {
+            SupplierOrganizationId = organization.Id
+        };
+
+        var result = await Mediator.Send(command);
+
+        result.Purchase.Supplier.Id.Should().Be(_supplier.Id);
+        result.Purchase.SupplierOrganization.Id.Should().Be(organization.Id);
+
+        var purchase = await Context.Purchases
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == result.Purchase.Id);
+        purchase.SupplierUserId.Should().Be(_supplier.Id);
+        purchase.SupplierOrganizationId.Should().Be(organization.Id);
+
+        var transaction = await Context.Transactions
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == purchase.TransactionId);
+        transaction.SenderId.Should().Be(organization.Id);
     }
 
     [Fact]
@@ -313,11 +347,45 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreatePurchase_WithEmptySupplierId_ThrowsValidationException()
+    public async Task CreatePurchase_WithEmptySupplierUserId_ThrowsValidationException()
     {
-        var command = CreateValidCommand() with { SupplierId = Guid.Empty };
+        var command = CreateValidCommand() with { SupplierUserId = Guid.Empty };
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreatePurchase_WithEmptySupplierOrganizationId_ThrowsValidationException()
+    {
+        var command = CreateValidCommand() with { SupplierOrganizationId = Guid.Empty };
+
+        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreatePurchase_WithMissingSupplierOrganization_ThrowsDbValidationException()
+    {
+        var command = CreateValidCommand() with { SupplierOrganizationId = Guid.NewGuid() };
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+
+        exception.Failures.Should().Contain(x =>
+            x.ErrorName == ApplicationErrors.OrganizationsNotFound);
+    }
+
+    [Fact]
+    public async Task CreatePurchase_WhenSupplierIsNotOrganizationMember_ThrowsDbValidationException()
+    {
+        var otherOrganizationId = GetContext<UsersTestContext>().Users.First().Id;
+        var command = CreateValidCommand() with
+        {
+            SupplierOrganizationId = otherOrganizationId
+        };
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+
+        exception.Failures.Should().Contain(x =>
+            x.ErrorName == ApplicationErrors.OrganizationMemberNotFound);
     }
 
     [Fact]
@@ -436,16 +504,18 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     private CreatePurchaseCommand CreateCommand(
-        Guid supplierId,
+        Guid supplierUserId,
         int currencyId,
         string storageName,
         bool withLogistics,
         string? storageFrom,
         IEnumerable<NewPurchaseContentDto> contents,
-        decimal? payedSum = null)
+        decimal? payedSum = null,
+        Guid? supplierOrganizationId = null)
     {
         return new CreatePurchaseCommand(
-            supplierId,
+            supplierUserId,
+            supplierOrganizationId ?? supplierUserId,
             currencyId,
             storageName,
             DateTime.UtcNow,

@@ -5,6 +5,7 @@ using System.Net;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Main.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    partial class DContextModelSnapshot : ModelSnapshot
+    [Migration("20260722133816_AddPurchaseSupplierOrganization")]
+    partial class AddPurchaseSupplierOrganization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3487,12 +3490,12 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("transactions_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "Receiver")
+                    b.HasOne("Main.Entities.User.User", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("transactions_receiver_organization_id_fk");
+                        .HasConstraintName("transactions_users_id_fk_2");
 
                     b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
@@ -3500,12 +3503,12 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("transactions_users_id_fk_4");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "Sender")
+                    b.HasOne("Main.Entities.User.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("transactions_sender_organization_id_fk");
+                        .HasConstraintName("transactions_users_id_fk");
 
                     b.Navigation("Receiver");
 

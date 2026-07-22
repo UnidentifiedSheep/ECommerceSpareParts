@@ -18,8 +18,11 @@ namespace Main.Api.EndPoints;
 
 public record CreatePurchaseRequest
 {
-    [JsonPropertyName("supplierId")]
-    public required Guid SupplierId { get; init; }
+    [JsonPropertyName("supplierUserId")]
+    public required Guid SupplierUserId { get; init; }
+
+    [JsonPropertyName("supplierOrganizationId")]
+    public required Guid SupplierOrganizationId { get; init; }
 
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }
@@ -80,8 +83,8 @@ public record GetPurchasesRequest : SortablePaginationQueryModel
     [FromQuery(Name = "rangeEndDate")]
     public DateTime RangeEndDate { get; init; }
 
-    [FromQuery(Name = "supplierIds")]
-    public Guid[] SupplierIds { get; init; } = [];
+    [FromQuery(Name = "supplierOrganizationIds")]
+    public Guid[] SupplierOrganizationIds { get; init; } = [];
 
     [FromQuery(Name = "currencyIds")]
     public int[] CurrencyIds { get; init; } = [];
@@ -108,7 +111,8 @@ public class PurchaseEndPoints : ICarterModule
                     CancellationToken token) =>
                 {
                     var command = new CreatePurchaseCommand(
-                        request.SupplierId,
+                        request.SupplierUserId,
+                        request.SupplierOrganizationId,
                         request.CurrencyId,
                         request.StorageName,
                         request.PurchaseDate,
@@ -235,7 +239,7 @@ public class PurchaseEndPoints : ICarterModule
                     var query = new GetPurchasesQuery(
                         new RangeModel<DateTime>(request.RangeStartDate, request.RangeEndDate),
                         request,
-                        request.SupplierIds,
+                        request.SupplierOrganizationIds,
                         request.CurrencyIds,
                         request.ProductIds,
                         request.SortBy,

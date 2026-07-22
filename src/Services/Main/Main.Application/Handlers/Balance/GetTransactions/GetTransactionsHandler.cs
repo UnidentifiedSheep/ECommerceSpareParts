@@ -96,8 +96,9 @@ public class GetTransactionsHandler(
 
         if (senderId == receiverId)
         {
-            var userId = senderId ?? receiverId!.Value;
-            return query.Where(e => e.SenderId == userId || e.ReceiverId == userId);
+            var organizationId = senderId ?? receiverId!.Value;
+            return query.Where(e =>
+                e.SenderId == organizationId || e.ReceiverId == organizationId);
         }
 
         return query.Where(e =>

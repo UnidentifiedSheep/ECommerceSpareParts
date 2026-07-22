@@ -96,14 +96,14 @@ public class CreateTransactionTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateTransaction_MissingUser_ThrowsDbValidationException()
+    public async Task CreateTransaction_MissingOrganization_ThrowsDbValidationException()
     {
         var command = GetValidCommand();
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
             Mediator.Send(command with { SenderId = Guid.NewGuid() }));
 
-        exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.UsersNotFound);
+        exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.OrganizationsNotFound);
     }
 
     [Fact]
@@ -119,27 +119,27 @@ public class CreateTransactionTests : IntegrationTest
 
     [Fact]
     public async Task
-        CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
+        CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemOrganizationCannotBeCreatedByUserException()
     {
         var command = GetValidCommand() with
         {
             SenderId = GetContext<UserContextTestContext>().SystemUser.Id
         };
 
-        await Assert.ThrowsAsync<TransactionWithSystemUserCannotBeCreatedByUserException>(() =>
+        await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
             Mediator.Send(command));
     }
 
     [Fact]
     public async Task
-        CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
+        CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemOrganizationCannotBeCreatedByUserException()
     {
         var command = GetValidCommand() with
         {
             ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id
         };
 
-        await Assert.ThrowsAsync<TransactionWithSystemUserCannotBeCreatedByUserException>(() =>
+        await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
             Mediator.Send(command));
     }
 

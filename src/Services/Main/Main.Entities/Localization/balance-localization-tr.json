@@ -6,7 +6,7 @@
     "transaction.already.deleted": "Bu işlem zaten silinmiş.",
     "transaction.not.found": "İşlem bulunamadı.",
     "transaction.source.cannot.be.reversed.by.user": "Kaynağı '{0}' olan bir işlem kullanıcı tarafından geri alınamaz.",
-    "transaction.with.system.user.cannot.be.created.by.user": "Göndereni veya alıcısı sistem kullanıcısı olan bir işlem kullanıcı tarafından oluşturulamaz.",
+    "transaction.with.system.organization.cannot.be.created.by.user": "Göndereni veya alıcısı sistem kuruluşu olan bir işlem kullanıcı tarafından oluşturulamaz.",
     "transaction.sender.id.required": "Gönderen kimliği belirtilmelidir.",
     "transaction.receiver.id.required": "Alıcı kimliği belirtilmelidir.",
     "transaction.date.out.of.range": "İşlem tarihi son 2 ay içinde olmalı ve gelecekte en fazla 1 saat olmalıdır.",

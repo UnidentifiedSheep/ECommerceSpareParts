@@ -11,14 +11,19 @@ public class PurchaseTests
     [Fact]
     public void Create_ValidData_Succeeds()
     {
+        var supplierUserId = Guid.NewGuid();
+        var supplierOrganizationId = Guid.NewGuid();
         var purchase = DomainPurchase.Create(
-            Guid.NewGuid(),
+            supplierUserId,
+            supplierOrganizationId,
             1,
             Guid.NewGuid(),
             "WH-1",
             DateTime.UtcNow);
 
         purchase.State.Should().Be(PurchaseState.Draft);
+        purchase.SupplierUserId.Should().Be(supplierUserId);
+        purchase.SupplierOrganizationId.Should().Be(supplierOrganizationId);
     }
 
     [Fact]
@@ -54,6 +59,7 @@ public class PurchaseTests
     private static DomainPurchase Create()
     {
         return DomainPurchase.Create(
+            Guid.NewGuid(),
             Guid.NewGuid(),
             1,
             Guid.NewGuid(),

@@ -14,8 +14,8 @@ namespace Main.Api.EndPoints.Transactions;
 
 public record CreateTransactionRequest
 {
-    [JsonPropertyName("userId")]
-    public Guid UserId { get; init; }
+    [JsonPropertyName("organizationId")]
+    public Guid OrganizationId { get; init; }
 
     [JsonPropertyName("direction")]
     public SystemTransactionDirection Direction { get; init; }
@@ -71,7 +71,7 @@ public static class TransactionEndPoints
                 {
                     await sender.Send(
                         new CreateSystemTransactionCommand(
-                            request.UserId,
+                            request.OrganizationId,
                             request.Amount,
                             request.CurrencyId,
                             request.TransactionDateTime,
@@ -83,7 +83,7 @@ public static class TransactionEndPoints
                 })
             .WithName("CreateSystemTransaction")
             .WithSummary("Создать системную транзакцию баланса")
-            .WithDescription("Создание ручной транзакции между пользователем и системой")
+            .WithDescription("Создание ручной транзакции между организацией и системой")
             .WithDisplayName("Создание системной транзакции")
             .Accepts<CreateTransactionRequest>(false, "application/json")
             .Produces(StatusCodes.Status200OK)

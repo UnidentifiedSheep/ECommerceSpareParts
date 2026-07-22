@@ -12,9 +12,13 @@ public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
             .NotEmpty()
             .WithLocalizationKey("purchase.content.not.empty");
 
-        RuleFor(x => x.SupplierId)
+        RuleFor(x => x.SupplierUserId)
             .NotEmpty()
             .WithLocalizationKey("purchase.supplier.id.not.empty");
+
+        RuleFor(x => x.SupplierOrganizationId)
+            .NotEmpty()
+            .WithLocalizationKey("purchase.supplier.organization.id.not.empty");
 
         RuleForEach(x => x.PurchaseContent)
             .SetValidator(new NewPurchaseContentValidation());

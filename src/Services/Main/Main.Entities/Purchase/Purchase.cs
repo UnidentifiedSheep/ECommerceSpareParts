@@ -17,13 +17,15 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
     private Purchase() { }
 
     private Purchase(
-        Guid supplierId,
+        Guid supplierUserId,
+        Guid supplierOrganizationId,
         int currencyId,
         Guid transactionId,
         string storage,
         DateTime purchaseDatetime)
     {
-        SupplierId = supplierId;
+        SupplierUserId = supplierUserId;
+        SupplierOrganizationId = supplierOrganizationId;
         SetPurchaseDate(purchaseDatetime);
         SetCurrencyId(currencyId);
         TransactionId = transactionId;
@@ -34,7 +36,8 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
     [Validate]
     public Guid Id { get; private set; }
 
-    public Guid SupplierId { get; private set; }
+    public Guid SupplierUserId { get; private set; }
+    public Guid SupplierOrganizationId { get; private set; }
     public int CurrencyId { get; private set; }
     public Guid TransactionId { get; private set; }
     public string Storage { get; private set; } = null!;
@@ -43,7 +46,8 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
     public PurchaseState State { get; private set; }
     public virtual Currency.Currency Currency { get; private set; } = null!;
     public virtual PurchaseLogistic? PurchaseLogistic { get; private set; }
-    public virtual User.User Supplier { get; private set; } = null!;
+    public virtual User.User SupplierUser { get; private set; } = null!;
+    public virtual Organization.Organization SupplierOrganization { get; private set; } = null!;
     public virtual Transaction Transaction { get; private set; } = null!;
     public IReadOnlyCollection<PurchaseContent> Contents => _contents;
 
@@ -55,14 +59,16 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
     }
 
     public static Purchase Create(
-        Guid supplierId,
+        Guid supplierUserId,
+        Guid supplierOrganizationId,
         int currencyId,
         Guid transactionId,
         string storage,
         DateTime purchaseDatetime)
     {
         return new Purchase(
-            supplierId,
+            supplierUserId,
+            supplierOrganizationId,
             currencyId,
             transactionId,
             storage,

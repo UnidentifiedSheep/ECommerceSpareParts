@@ -28,7 +28,7 @@ public class GetTransactionsTests : IntegrationTest
         var result = await Mediator.Send(GetQuery(senderId));
 
         result.Transactions.Should().ContainSingle();
-        result.Transactions[0].Sender.User?.Id.Should().Be(senderId);
+        result.Transactions[0].Sender.Id.Should().Be(senderId);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class GetTransactionsTests : IntegrationTest
         var result = await Mediator.Send(GetQuery(receiverId: receiverId));
 
         result.Transactions.Should().ContainSingle();
-        result.Transactions[0].Receiver.User?.Id.Should().Be(receiverId);
+        result.Transactions[0].Receiver.Id.Should().Be(receiverId);
     }
 
     [Fact]
@@ -77,8 +77,7 @@ public class GetTransactionsTests : IntegrationTest
         result.Transactions.Should().NotBeEmpty();
         result.Transactions.Should()
             .OnlyContain(x =>
-                x.Sender.User != null && x.Sender.User.Id == userId ||
-                x.Receiver.User != null && x.Receiver.User.Id == userId);
+                x.Sender.Id == userId || x.Receiver.Id == userId);
     }
 
     [Fact]
