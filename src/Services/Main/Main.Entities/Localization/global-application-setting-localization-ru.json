@@ -1,0 +1,16 @@
+{
+  "locale": "ru",
+  "keyValues": {
+    "global.application.setting.name": "Глобальные настройки приложения",
+    "global.application.setting.description": "Управляет публичными адресами, используемыми сервисами приложения.",
+    "global.application.setting.input.invalid": "Переданы некорректные глобальные настройки приложения.",
+    "global.application.setting.s3.service.url.name": "Адрес S3",
+    "global.application.setting.s3.service.url.description": "Публичный базовый адрес для доступа к файлам в S3.",
+    "global.application.setting.s3.service.url.not.configured": "Адрес S3 не настроен. Укажите его в глобальных настройках приложения.",
+    "global.application.setting.api.service.url.name": "Адрес API",
+    "global.application.setting.api.service.url.description": "Публичный базовый адрес API приложения.",
+    "global.application.setting.app.service.url.name": "Адрес приложения",
+    "global.application.setting.app.service.url.description": "Публичный базовый адрес клиентского приложения.",
+    "global.application.setting.app.service.url.not.configured": "Адрес приложения не настроен. Укажите его в глобальных настройках приложения."
+  }
+}

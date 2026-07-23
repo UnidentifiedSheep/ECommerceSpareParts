@@ -2,6 +2,7 @@
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
+using Exceptions;
 using Main.Application.Dtos.Uploads;
 using Main.Application.Static;
 using Main.Entities.Settings;
@@ -23,10 +24,12 @@ public class GetUploadsHandler(
 {
     public async Task<GetUploadsResult> Handle(GetUploadsQuery request, CancellationToken cancellationToken)
     {
-        var s3Url = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
+        var s3ServiceUrl = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
             .Data
             .S3ServiceUrl
-            .TrimEnd('/') + $"/{BucketNames.Uploads}/";
+            ?? throw new InvalidInputException(
+                "global.application.setting.s3.service.url.not.configured");
+        var s3Url = s3ServiceUrl.TrimEnd('/') + $"/{BucketNames.Uploads}/";
 
         var result = await s3StorageService.ListFilesAsync(
             BucketNames.Uploads,
