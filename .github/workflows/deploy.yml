@@ -8,9 +8,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      CLOUD_RU_SECRET_PREFIX: ${{ secrets.CLOUD_RU_SECRET_PREFIX || '/appsettings' }}
-      CLOUD_RU_CONFIGS_OUT: ./cloud-configs
-      CLOUD_RU_SECRET_DEPTH: ${{ secrets.CLOUD_RU_SECRET_DEPTH || '-1' }}
       SWARM_PATH: ${{ secrets.SWARM_PATH || '/opt/ecommerce' }}
       STACK_NAME: ${{ secrets.SWARM_STACK_NAME || 'ecommerce' }}
 
@@ -18,24 +15,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Load Cloud.ru configs
-        env:
-          CLOUD_RU_KEY_ID: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
-          CLOUD_RU_KEY_SECRET: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
-          CLOUD_RU_SECRET_PROJECT_ID: ${{ secrets.CLOUD_RU_SECRET_PROJECT_ID }}
-          CLOUD_RU_SECRET_NAMES: ${{ secrets.CLOUD_RU_SECRET_NAMES }}
-          CLOUD_RU_SECRET_VERSION: ${{ secrets.CLOUD_RU_SECRET_VERSION }}
-        run: python scripts/deploy/load-secrets.py
-
       - name: Prepare deploy payload
         run: |
-          mkdir -p deploy-payload/configs deploy-payload/init deploy-payload/scripts/deploy
+          mkdir -p deploy-payload/deploy deploy-payload/init deploy-payload/scripts/deploy
 
-          cp compose.stack.yaml deploy-payload/compose.stack.yaml
-          cp compose.stack.database.yaml deploy-payload/compose.stack.database.yaml
+          cp deploy/stack.*.yml deploy-payload/deploy/
           cp prometheus.yml deploy-payload/prometheus.yml
           cp scripts/deploy/deploy-swarm.sh deploy-payload/scripts/deploy/deploy-swarm.sh
-          cp -R "$CLOUD_RU_CONFIGS_OUT"/. deploy-payload/configs/
+          cp scripts/deploy/load-secrets.py deploy-payload/scripts/deploy/load-secrets.py
           cp -R init/. deploy-payload/init/
 
       - name: Prepare leader directory
@@ -50,8 +37,8 @@ jobs:
             mkdir -p '${{ env.SWARM_PATH }}'
             cd '${{ env.SWARM_PATH }}'
 
-            rm -rf release configs.next
-            mkdir -p release init certs
+            rm -rf release configs.next configs.old
+            mkdir -p release configs
 
       - name: Upload stack files to leader
         uses: appleboy/scp-action@v0.1.7
@@ -75,30 +62,15 @@ jobs:
 
             cd '${{ env.SWARM_PATH }}'
 
-            rm -rf configs.next configs.old
-            mv release/configs configs.next
-            if [ -d configs ]; then
-              mv configs configs.old
-            fi
-            mv configs.next configs
-
             rm -rf init
             mv release/init init
 
-            cp release/compose.stack.yaml compose.stack.yaml
-            cp release/compose.stack.database.yaml compose.stack.database.yaml
+            rm -rf deploy
+            mv release/deploy deploy
             cp release/prometheus.yml prometheus.yml
             rm -rf scripts
             mv release/scripts scripts
             rm -rf release
-
-      - name: Upload shared configs to worker nodes
-        env:
-          SWARM_WORKER_HOSTS: ${{ secrets.SWARM_WORKER_HOSTS }}
-          SWARM_SSH_USER: ${{ secrets.SWARM_SSH_USER }}
-          SWARM_SSH_KEY: ${{ secrets.SWARM_SSH_KEY }}
-          SWARM_PATH: ${{ env.SWARM_PATH }}
-        run: bash scripts/deploy/upload-swarm-shared-files.sh
 
       - name: Deploy stack
         uses: appleboy/ssh-action@v1.2.5
@@ -123,19 +95,27 @@ jobs:
             export ARTIFACT_REGISTRY_USERNAME='${{ secrets.ARTIFACT_REGISTRY_USERNAME }}'
             export ARTIFACT_REGISTRY_PASSWORD='${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}'
             export IMAGE_TAG='${{ github.sha }}'
-            export DEPLOY_RUN_ID='${{ github.run_id }}'
+            export DEPLOY_RUN_ID='${{ github.run_id }}-${{ github.run_attempt }}'
+            export CLOUD_RU_SECRET_PROJECT_ID='${{ vars.CLOUD_RU_SECRET_PROJECT_ID }}'
+            export CLOUD_RU_SECRET_PREFIX='${{ vars.CLOUD_RU_SECRET_PREFIX || '/appsettings' }}'
+            export CLOUD_RU_SECRET_DEPTH='${{ vars.CLOUD_RU_SECRET_DEPTH || '-1' }}'
+            export CLOUD_RU_SECRET_NAMES='${{ vars.CLOUD_RU_SECRET_NAMES }}'
+            export CLOUD_RU_SECRET_VERSION='${{ vars.CLOUD_RU_SECRET_VERSION }}'
             export DOTNET_ENVIRONMENT='Staging'
             export ASPNETCORE_ENVIRONMENT='Staging'
-            export CONFIGS_PATH='${{ env.SWARM_PATH }}/configs'
-            export CERTS_PATH='${{ env.SWARM_PATH }}/certs'
-            export INIT_PATH='${{ env.SWARM_PATH }}/init'
-            export PROMETHEUS_CONFIG_PATH='${{ env.SWARM_PATH }}/prometheus.yml'
-            export TRAEFIK_NETWORK="${TRAEFIK_NETWORK:-${STACK_NAME}_backend-network}"
+            export CONFIGS_PATH="${CONFIGS_PATH:-${{ env.SWARM_PATH }}/configs}"
+            export PUBLIC_NETWORK="${PUBLIC_NETWORK:-public}"
+            export BACKEND_NETWORK="${BACKEND_NETWORK:-backend}"
+            export MONITORING_NETWORK="${MONITORING_NETWORK:-monitoring}"
+            export VOLUME_PREFIX="${VOLUME_PREFIX:-${STACK_NAME}}"
             export MAIN_API_REPLICAS="${MAIN_API_REPLICAS:-1}"
             export SEARCH_API_REPLICAS="${SEARCH_API_REPLICAS:-1}"
             export PRICING_API_REPLICAS="${PRICING_API_REPLICAS:-1}"
             export ANALYTICS_API_REPLICAS="${ANALYTICS_API_REPLICAS:-1}"
+            export MAIN_WORKER_REPLICAS="${MAIN_WORKER_REPLICAS:-1}"
+            export PRICING_WORKER_REPLICAS="${PRICING_WORKER_REPLICAS:-1}"
             export ANALYTICS_WORKER_REPLICAS="${ANALYTICS_WORKER_REPLICAS:-1}"
+            export MIGRATE_LEGACY_STACK="${MIGRATE_LEGACY_STACK:-true}"
             export DOCKER_CONFIG="${{ env.SWARM_PATH }}/.docker"
 
             bash scripts/deploy/deploy-swarm.sh

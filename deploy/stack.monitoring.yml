@@ -1,0 +1,138 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+        mode: 0444
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      backend:
+        aliases:
+          - prometheus
+      monitoring:
+        aliases:
+          - prometheus
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring.prometheus == true
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 60s
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+    networks:
+      backend:
+        aliases:
+          - loki
+      monitoring:
+        aliases:
+          - loki
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring.loki == true
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 60s
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SERVER_PROTOCOL=http
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+    networks:
+      monitoring:
+        aliases:
+          - grafana
+      public:
+        aliases:
+          - grafana
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring.grafana == true
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=${PUBLIC_NETWORK:-public}
+        - traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOST:?GRAFANA_HOST is required}`)
+        - traefik.http.routers.grafana.entrypoints=websecure
+        - traefik.http.routers.grafana.tls.certresolver=letsencrypt
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
+        - traefik.http.services.grafana.loadbalancer.server.scheme=http
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 60s
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    environment:
+      - OPENSEARCH_HOSTS=["https://opensearch:9200"]
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}
+      - OPENSEARCH_SSL_VERIFICATIONMODE=none
+    networks:
+      backend:
+        aliases:
+          - opensearch-dashboards
+      monitoring:
+        aliases:
+          - opensearch-dashboards
+      public:
+        aliases:
+          - opensearch-dashboards
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring.opensearch-dashboards == true
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=${PUBLIC_NETWORK:-public}
+        - traefik.http.routers.opensearch-dashboards.rule=Host(`${OPENSEARCH_DASHBOARDS_HOST:?OPENSEARCH_DASHBOARDS_HOST is required}`)
+        - traefik.http.routers.opensearch-dashboards.entrypoints=websecure
+        - traefik.http.routers.opensearch-dashboards.tls.certresolver=letsencrypt
+        - traefik.http.services.opensearch-dashboards.loadbalancer.server.port=5601
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 60s
+
+networks:
+  public:
+    name: ${PUBLIC_NETWORK:-public}
+    external: true
+  backend:
+    name: ${BACKEND_NETWORK:-backend}
+    external: true
+  monitoring:
+    name: ${MONITORING_NETWORK:-monitoring}
+    external: true
+
+configs:
+  prometheus_config:
+    external: true
+    name: ${PROMETHEUS_CONFIG:?PROMETHEUS_CONFIG is required}
+
+volumes:
+  grafana_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_grafana_data
+    external: true
+  loki_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_loki_data
+    external: true

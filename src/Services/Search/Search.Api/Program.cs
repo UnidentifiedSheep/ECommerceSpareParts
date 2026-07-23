@@ -8,6 +8,7 @@ using Carter;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
+using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using Search.Abstractions.Options;
 using Search.Application;
@@ -73,10 +74,21 @@ builder.Services.AddCarter(
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddProcessInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddPrometheusExporter();
+    });
+
 var app = builder.Build();
 
 app.UseCommonApiPipeline();
 
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 await app.RunAsync();
 return;
 

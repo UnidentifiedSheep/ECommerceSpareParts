@@ -147,8 +147,6 @@ builder.Services.AddMassTransit(x =>
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
-
 MapDocs(app);
 
 app.UseCors();
@@ -163,6 +161,7 @@ app.UseMiddleware<ScopedLocalizationMiddleware>();
 
 app.UseExceptionHandler(_ => { });
 
+app.MapGet("/health", () => Results.Ok());
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 await app.RunAsync();
 

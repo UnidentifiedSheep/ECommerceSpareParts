@@ -94,8 +94,7 @@ environments.
 - `compose.yaml` — local stack built from source;
 - `migrator-compose.yaml` — local database migrators;
 - `compose.registry.yaml` — registry image builds;
-- `compose.stack.yaml` — registry deployment with Traefik;
-- `compose.stack.database.yaml` — standalone PostgreSQL deployment.
+- [`deploy/`](docs/SWARM_DEPLOYMENT.md) — split Docker Swarm stacks for secrets sync, gateway, applications, workers, infrastructure, and monitoring.
 
 ## Documentation
 
@@ -106,6 +105,8 @@ environments.
 - [Analytics service](docs/ANALYTICS.md)
 - [Development guidelines](docs/DEVELOPMENT.md)
 - [Testing guidelines](docs/TESTING.md)
+- [Docker Swarm deployment](docs/SWARM_DEPLOYMENT.md)
+- [PostgreSQL backup and recovery](docs/POSTGRES_BACKUP.md)
 - [Roadmap](docs/TODO.md)
 
 ## License

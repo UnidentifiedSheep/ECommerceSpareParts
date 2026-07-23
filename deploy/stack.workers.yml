@@ -1,0 +1,70 @@
+x-worker-service: &worker-service
+  volumes:
+    - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+  environment:
+    - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+    - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+    - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
+  networks:
+    - backend
+  deploy:
+    placement:
+      constraints:
+        - node.labels.workload.worker == true
+    update_config:
+      parallelism: 1
+      order: stop-first
+    restart_policy:
+      condition: any
+      delay: 5s
+
+services:
+  main-worker:
+    <<: *worker-service
+    image: ${ARTIFACT_REGISTRY_HOST}/main-worker:${IMAGE_TAG}
+    deploy:
+      replicas: ${MAIN_WORKER_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.workload.worker == true
+      update_config:
+        parallelism: 1
+        order: stop-first
+      restart_policy:
+        condition: any
+        delay: 5s
+
+  analytics-worker:
+    <<: *worker-service
+    image: ${ARTIFACT_REGISTRY_HOST}/analytics-worker:${IMAGE_TAG}
+    deploy:
+      replicas: ${ANALYTICS_WORKER_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.workload.worker == true
+      update_config:
+        parallelism: 1
+        order: stop-first
+      restart_policy:
+        condition: any
+        delay: 5s
+
+  pricing-worker:
+    <<: *worker-service
+    image: ${ARTIFACT_REGISTRY_HOST}/pricing-worker:${IMAGE_TAG}
+    deploy:
+      replicas: ${PRICING_WORKER_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.workload.worker == true
+      update_config:
+        parallelism: 1
+        order: stop-first
+      restart_policy:
+        condition: any
+        delay: 5s
+
+networks:
+  backend:
+    name: ${BACKEND_NETWORK:-backend}
+    external: true
