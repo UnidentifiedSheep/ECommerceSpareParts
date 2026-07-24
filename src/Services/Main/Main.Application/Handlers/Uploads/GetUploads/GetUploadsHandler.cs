@@ -2,10 +2,12 @@
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
+using Application.Common.Models.Options.S3;
 using Exceptions;
 using Main.Application.Dtos.Uploads;
 using Main.Application.Static;
 using Main.Entities.Settings;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Uploads.GetUploads;
 
@@ -19,24 +21,21 @@ public record GetUploadsResult(
 
 public class GetUploadsHandler(
     IS3StorageService s3StorageService,
-    ISettingsService settingsService
+    IOptions<S3BucketsOptions> bucketsOptions
 ) : IQueryHandler<GetUploadsQuery, GetUploadsResult>
 {
     public async Task<GetUploadsResult> Handle(GetUploadsQuery request, CancellationToken cancellationToken)
     {
-        var s3ServiceUrl = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
-            .Data
-            .S3ServiceUrl
-            ?? throw new InvalidInputException(
-                "global.application.setting.s3.service.url.not.configured");
-        var s3Url = s3ServiceUrl.TrimEnd('/') + $"/{BucketNames.Uploads}/";
-
+        var opt = bucketsOptions.Value.Uploads;
         var result = await s3StorageService.ListFilesAsync(
-            BucketNames.Uploads,
+            opt.Name,
             request.Cursor.CursorValue,
             request.Cursor.Size,
             cancellationToken);
 
+        var baseUrl = opt.PublicBaseUrl.EndsWith('/')
+            ? opt.PublicBaseUrl
+            : opt.PublicBaseUrl + "/";
         var files = result
             .Files
             .Select(x => new FileDto
@@ -44,7 +43,7 @@ public class GetUploadsHandler(
                 Key = x.Key,
                 LastModified = x.LastModified,
                 Size = x.Size,
-                FullPath = s3Url + x.Key
+                FullPath = baseUrl + x.Key
             })
             .ToList();
 

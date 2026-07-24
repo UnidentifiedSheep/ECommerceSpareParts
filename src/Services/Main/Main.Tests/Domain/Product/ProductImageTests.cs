@@ -1,122 +1,55 @@
-﻿using Exceptions;
+﻿using System.Text.RegularExpressions;
+using Exceptions;
 using FluentAssertions;
 using Main.Entities.Product;
 
 namespace Tests.Domain.Product;
 
-public class ProductImageTests
+public partial class ProductImageTests
 {
     [Theory]
-    [InlineData(
-        1,
-        "image.png",
-        "desc")]
-    [InlineData(
-        1,
-        "image.jpg",
-        null)]
-    [InlineData(
-        1,
-        "image.webp",
-        "   ")]
-    public void Create_ValidData_Succeeds(
-        int productId,
-        string path,
-        string? description)
+    [InlineData(".png", ".png")]
+    [InlineData("jpg", ".jpg")]
+    [InlineData(" .JPEG ", ".jpeg")]
+    [InlineData(" WEBP ", ".webp")]
+    public void Create_ValidExtension_GeneratesPath(
+        string extension,
+        string expectedExtension)
     {
-        var act = () => ProductImage.Create(
-            productId,
-            path,
-            description);
+        var image = ProductImage.Create(
+            42,
+            extension);
 
-        var model = act.Should().NotThrow().Subject;
-
-        Validate(
-            model,
-            productId,
-            path,
-            description);
-    }
-
-    [Theory]
-    [InlineData("image.exe")]
-    [InlineData("image.txt")]
-    [InlineData("image")]
-    public void Create_InvalidExtension_Throws(string path)
-    {
-        var act = () => ProductImage.Create(
-            1,
-            path,
-            "desc");
-
-        act.Should().Throw<InvalidInputException>();
+        image.ProductId.Should().Be(42);
+        image.StorageKey.Should().MatchRegex(
+            $@"^products/42_[0-9a-f]{{32}}{Regex.Escape(expectedExtension)}$");
     }
 
     [Theory]
     [InlineData("image.png")]
-    [InlineData("IMAGE.JPG")]
-    [InlineData("  image.webp  ")]
-    public void SetPath_Valid_Succeeds(string path)
-    {
-        var model = ProductImage.Create(
-            1,
-            "image.png",
-            null);
-
-        var act = () => model.SetPath(path);
-
-        act.Should().NotThrow();
-
-        model.Path.Should().Be(path.Trim());
-    }
-
-    [Theory]
-    [InlineData("image.exe")]
+    [InlineData(".exe")]
+    [InlineData("txt")]
     [InlineData("")]
     [InlineData("   ")]
-    public void SetPath_Invalid_Throws(string path)
+    [InlineData(".")]
+    public void Create_InvalidExtension_ThrowsExpectedError(string extension)
     {
-        var model = ProductImage.Create(
+        var act = () => ProductImage.Create(
             1,
-            "image.png",
-            null);
+            extension);
 
-        var act = () => model.SetPath(path);
-
-        act.Should().Throw<InvalidInputException>();
+        act.Should()
+            .Throw<InvalidInputException>()
+            .Which.MessageKey.Should()
+            .Be("article.image.invalid.extension");
     }
 
-    [Theory]
-    [InlineData(" desc ")]
-    [InlineData(null)]
-    [InlineData("   ")]
-    public void SetDescription_Normalization_Works(string? description)
+    [Fact]
+    public void Create_CalledTwice_GeneratesUniquePaths()
     {
-        var model = ProductImage.Create(
-            1,
-            "image.png",
-            "old");
+        var first = ProductImage.Create(1, ".png");
+        var second = ProductImage.Create(1, ".png");
 
-        model.SetDescription(description);
-
-        if (string.IsNullOrWhiteSpace(description))
-            model.Description.Should().BeNull();
-        else
-            model.Description.Should().Be(description.Trim());
-    }
-
-    private static void Validate(
-        ProductImage model,
-        int productId,
-        string path,
-        string? description)
-    {
-        model.ProductId.Should().Be(productId);
-        model.Path.Should().Be(path.Trim());
-
-        if (string.IsNullOrWhiteSpace(description))
-            model.Description.Should().BeNull();
-        else
-            model.Description.Should().Be(description.Trim());
+        second.StorageKey.Should().NotBe(first.StorageKey);
     }
 }

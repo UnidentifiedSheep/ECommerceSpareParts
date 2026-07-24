@@ -3,6 +3,7 @@ using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Models.Options.S3;
 using Application.Common.NamedObject;
 using CsvHelper;
 using CsvHelper.TypeConversion;
@@ -18,6 +19,7 @@ namespace Main.Application.Lrts.Base;
 
 public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     IRepository<Job, Guid> jobRepository,
+    IOptions<S3BucketsOptions> bucketsOptions,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger logger,
@@ -45,7 +47,7 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
         await BeforeRead(state);
 
         await using var stream = await s3Service.DownloadFileAsync(
-            BucketNames.Uploads,
+            bucketsOptions.Value.Uploads.Name,
             GetFileName(state),
             CancellationToken);
 

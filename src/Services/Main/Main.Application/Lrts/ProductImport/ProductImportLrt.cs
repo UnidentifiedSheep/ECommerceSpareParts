@@ -2,6 +2,7 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Localization.Abstractions.Interfaces;
@@ -30,6 +31,7 @@ public class ProductImportLrt(
     IS3StorageService s3Service,
     ISender sender,
     IPublishEndpoint publisher,
+    IOptions<S3BucketsOptions> bucketsOptions,
     ILogger<ProductImportLrt> logger,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
@@ -37,6 +39,7 @@ public class ProductImportLrt(
     : CsvImportLrtBase<ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto,
         CreateProductDto>(
         jobRepository,
+        bucketsOptions,
         unitOfWork,
         publisher,
         logger,

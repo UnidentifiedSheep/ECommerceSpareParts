@@ -1,6 +1,8 @@
 ﻿using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Models.Options.S3;
 using Main.Application.Static;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Uploads;
 
@@ -10,7 +12,8 @@ public record CreateUploadRequestCommand(string FileName, string ContentType)
 public record CreateUploadRequestResult(string UploadUrl);
 
 public class CreateUploadRequestHandler(
-    IS3StorageService storageService
+    IS3StorageService storageService,
+    IOptions<S3BucketsOptions> bucketsOptions
 ) : ICommandHandler<CreateUploadRequestCommand, CreateUploadRequestResult>
 {
     public async Task<CreateUploadRequestResult> Handle(
@@ -18,7 +21,7 @@ public class CreateUploadRequestHandler(
         CancellationToken cancellationToken)
     {
         var uri = await storageService.CreatePresignedUploadUrl(
-            BucketNames.Uploads,
+            bucketsOptions.Value.Uploads.Name,
             request.FileName,
             request.ContentType,
             TimeSpan.FromMinutes(15));

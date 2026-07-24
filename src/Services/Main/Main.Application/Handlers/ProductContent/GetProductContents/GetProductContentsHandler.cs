@@ -33,7 +33,7 @@ public class GetProductContentsHandler(
                     Sku = x.ChildProduct.Sku,
                     ProducerId = x.ChildProduct.ProducerId,
                     ProducerName = x.ChildProduct.Producer.Name,
-                    Images = x.ChildProduct.Images.Select(z => z.Path).ToList()
+                    Images = x.ChildProduct.Images.Select(z => z.StorageKey).ToList()
                 }
             })
             .ToListAsync(cancellationToken);

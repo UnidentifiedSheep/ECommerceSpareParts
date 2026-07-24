@@ -2,12 +2,14 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
+using Application.Common.Models.Options.S3;
 using Attributes;
 using Exceptions;
 using Main.Application.Static;
 using Main.Entities.Product;
 using Main.Entities.Settings;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Products.MapImgsToProduct;
 
@@ -18,35 +20,29 @@ public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) 
 public class MapImgsToProductHandler(
     IS3StorageService s3Storage,
     IUnitOfWork unitOfWork,
-    ISettingsService settingsService 
+    IOptions<S3BucketsOptions> bucketsOptions
     ) : ICommandHandler<MapImgsToProductCommand, Unit>
 {
     public async Task<Unit> Handle(MapImgsToProductCommand request, CancellationToken cancellationToken)
     {
         var keys = new HashSet<string>();
         var toAdd = new List<ProductImage>();
-        var applicationSettings =
-            (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
-        var s3ServiceUrl = applicationSettings.S3ServiceUrl
-                           ?? throw new InvalidInputException(
-                               "global.application.setting.s3.service.url.not.configured");
+        var opt = bucketsOptions.Value.Images;
         try
         {
             foreach (var img in request.Images)
             {
+                var model = ProductImage.Create(
+                    request.ProductId,
+                    img.Extension);
                 await using var stream = img.OpenReadStream();
-                var path = $"imgs/articles/{request.ProductId}_{Guid.NewGuid()}{img.Extension}";
                 var key = await s3Storage.UploadFileAsync(
-                    BucketNames.Images,
+                    opt.Name,
                     stream,
-                    path,
+                    model.StorageKey,
                     "image/webp");
                 keys.Add(key);
-                toAdd.Add(
-                    ProductImage.Create(
-                        request.ProductId,
-                        $"{s3ServiceUrl.TrimEnd('/')}/{BucketNames.Images}/{path}",
-                        key));
+                toAdd.Add(model);
             }
 
             await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
@@ -54,7 +50,8 @@ public class MapImgsToProductHandler(
         }
         catch (Exception)
         {
-            foreach (var key in keys) await s3Storage.DeleteFileAsync(BucketNames.Images, key);
+            foreach (var key in keys) 
+                await s3Storage.DeleteFileAsync(opt.Name, key);
             throw;
         }
         

@@ -20,7 +20,7 @@ public static class ProductProjections
             ProducerId = x.ProducerId,
             ProducerName = x.Producer.Name,
             Indicator = x.Indicator,
-            Images = x.Images.Select(z => z.Path).ToList()
+            Images = x.Images.Select(z => z.StorageKey).ToList()
         };
 
     public static readonly Expression<Func<Product, FullProductDto>> ToFullDto =
@@ -34,7 +34,7 @@ public static class ProductProjections
             ProducerId = x.ProducerId,
             ProducerName = x.Producer.Name,
             Indicator = x.Indicator,
-            Images = x.Images.Select(z => z.Path).ToList(),
+            Images = x.Images.Select(z => z.StorageKey).ToList(),
             ProductWeight = ToProductWeightDto.Invoke(x.ProductWeight),
             ProductSize = ToProductSizeDto.Invoke(x.ProductSize)
         };

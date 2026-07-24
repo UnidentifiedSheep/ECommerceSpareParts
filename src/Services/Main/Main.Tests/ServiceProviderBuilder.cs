@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common;
+using Application.Common.Models.Options.S3;
 using Cache;
 using Localization.Domain.Extensions;
 using Main.Application.Configs;
@@ -61,6 +62,22 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
                 {
                     Url = args.CacheConnectionString,
                     Password = null
+                }));
+        
+        services.AddSingleton(
+            Options.Create(
+                new S3BucketsOptions
+                {
+                    Images = new BucketOptions
+                    {
+                        Name = "images",
+                        PublicBaseUrl = "https://images.example.com"
+                    },
+                    Uploads = new BucketOptions
+                    {
+                        Name = "uploads",
+                        PublicBaseUrl = "https://images.example.com"
+                    },
                 }));
 
         var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);

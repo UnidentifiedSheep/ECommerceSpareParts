@@ -1,14 +1,13 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Models.Options.S3;
 using Attributes;
-using Contracts.Products;
-using Main.Application.Static;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Products;
 
@@ -19,27 +18,48 @@ public record RemoveProductImageCommand(int ProductId, string ImagePath) : IComm
 public class RemoveProductImageHandler(
     IS3StorageService s3Storage,
     IUnitOfWork unitOfWork,
+    IOptions<S3BucketsOptions> bucketsOptions,
     IRepository<ProductImage, (int, string)> repository
 ) : ICommandHandler<RemoveProductImageCommand>
 {
     public async Task<Unit> Handle(RemoveProductImageCommand request, CancellationToken cancellationToken)
     {
-        var imagePath = NormalizeImagePath(request.ImagePath);
+        var bucket = bucketsOptions.Value.Images;
+        var storageKey = GetStorageKey(request.ImagePath, bucket);
 
-        var imageEntity = await repository.GetById((request.ProductId, imagePath), cancellationToken)
-                          ?? throw new ProductImageNotFoundException(request.ProductId, imagePath);
+        var imageEntity = await repository.GetById((request.ProductId, storageKey), cancellationToken)
+                          ?? throw new ProductImageNotFoundException(request.ProductId, storageKey);
 
         unitOfWork.Remove(imageEntity);
 
-        var objectKey = GetObjectKey(imageEntity);
-        await s3Storage.DeleteFileAsync(BucketNames.Images, objectKey);
+        await s3Storage.DeleteFileAsync(bucket.Name, storageKey);
 
         return Unit.Value;
     }
 
+    private static string GetStorageKey(
+        string imagePath,
+        BucketOptions bucket)
+    {
+        var normalized = NormalizeImagePath(imagePath);
+        var path = Uri.TryCreate(normalized, UriKind.Absolute, out var imageUri)
+            ? imageUri.AbsolutePath
+            : RemoveQueryAndFragment(normalized);
+
+        path = Uri.UnescapeDataString(path).Trim('/');
+
+        if (Uri.TryCreate(bucket.PublicBaseUrl, UriKind.Absolute, out var publicBaseUri))
+        {
+            var publicBasePath = Uri.UnescapeDataString(publicBaseUri.AbsolutePath).Trim('/');
+            path = RemovePrefix(path, publicBasePath);
+        }
+
+        return RemovePrefix(path, bucket.Name.Trim('/'));
+    }
+
     private static string NormalizeImagePath(string imagePath)
     {
-        var normalized = Uri.UnescapeDataString(imagePath).Trim();
+        var normalized = imagePath.Trim();
         return normalized.Replace(
                 "http//",
                 "http://",
@@ -50,22 +70,20 @@ public class RemoveProductImageHandler(
                 StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string GetObjectKey(ProductImage image)
+    private static string RemoveQueryAndFragment(string path)
     {
-        if (!string.IsNullOrWhiteSpace(image.Description)) return image.Description;
+        var separatorIndex = path.IndexOfAny(['?', '#']);
+        return separatorIndex >= 0 ? path[..separatorIndex] : path;
+    }
 
-        if (!Uri.TryCreate(
-                image.Path,
-                UriKind.Absolute,
-                out var uri))
-            return image.Path.TrimStart('/');
+    private static string RemovePrefix(string path, string prefix)
+    {
+        if (string.IsNullOrEmpty(prefix)) return path;
+        if (path.Equals(prefix, StringComparison.OrdinalIgnoreCase)) return string.Empty;
 
-        var bucketPrefix = $"/{BucketNames.Images}/";
-        var path = uri.AbsolutePath;
-        var bucketIndex = path.IndexOf(bucketPrefix, StringComparison.OrdinalIgnoreCase);
-
-        return bucketIndex >= 0
-            ? path[(bucketIndex + bucketPrefix.Length)..]
-            : path.TrimStart('/');
+        var prefixWithSeparator = prefix + "/";
+        return path.StartsWith(prefixWithSeparator, StringComparison.OrdinalIgnoreCase)
+            ? path[prefixWithSeparator.Length..]
+            : path;
     }
 }
