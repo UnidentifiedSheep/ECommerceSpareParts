@@ -1,12 +1,12 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cache;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Cache;
 using Cache.Extensions;
 using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Projections;
 using Main.Application.Static;
 using Main.Entities.User;
 
@@ -14,7 +14,8 @@ namespace Main.Cache;
 
 public class UserCacheRepository(
     ICache rawCache,
-    IUserRepository userRepository
+    IUserRepository userRepository,
+    IProjectionProvider<User, UserDto> userProjection
 ) : IUserCacheRepository
 {
     public async Task<UserDto?> TryGetUserAsync(
@@ -126,6 +127,6 @@ public class UserCacheRepository(
         var user = await userRepository.FirstOrDefaultAsync(criteria, token);
         return user == null
             ? null
-            : UserProjections.UserProjection.AsFunc()(user);
+            : userProjection.Projection.AsFunc()(user);
     }
 }

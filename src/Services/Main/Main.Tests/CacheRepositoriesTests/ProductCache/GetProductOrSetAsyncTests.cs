@@ -5,6 +5,8 @@ using Main.Application.Interfaces.Cache;
 using Main.Application.Static;
 using Main.Entities.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
+using Tests.DataBuilders;
+using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -59,6 +61,24 @@ public class GetProductOrSetAsyncTests : IntegrationTest
 
         result.Should().BeEquivalentTo(cached);
         result.Name.Should().NotBe("Updated product name");
+    }
+
+    [Fact]
+    public async Task GetProductOrSetAsync_WhenProductHasImage_ReturnsPublicImageUrl()
+    {
+        var product = TestContext.Products[0];
+        var image = await new ProductImageBuilder(Faker)
+            .WithProductId(product.Id)
+            .WithExtension(".png")
+            .BuildAndAddToDb(Context);
+        var repository = GetRepository();
+
+        await RemoveCachedProduct(product.Id);
+
+        var result = await repository.GetProductOrSetAsync(product.Id);
+
+        result.Images.Should().ContainSingle()
+            .Which.Should().Be($"https://images.example.com/{image.StorageKey}");
     }
 
     [Fact]

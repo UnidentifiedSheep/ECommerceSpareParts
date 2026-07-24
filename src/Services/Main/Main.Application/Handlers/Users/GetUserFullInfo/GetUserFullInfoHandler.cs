@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Cache;
-using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,10 @@ public record GetUserFullInfoResult(
 
 public class GetUserFullInfoHandler(
     IReadRepository<User, Guid> repository,
-    IUserCacheRepository userCache
+    IUserCacheRepository userCache,
+    IProjectionProvider<User, UserDto> userProjection,
+    IProjectionProvider<UserEmail, UserEmailDto> emailProjection,
+    IProjectionProvider<UserPhone, UserPhoneDto> phoneProjection
 )
     : IQueryHandler<GetUserFullInfoQuery, GetUserFullInfoResult>
 {
@@ -30,14 +33,18 @@ public class GetUserFullInfoHandler(
         GetUserFullInfoQuery request,
         CancellationToken cancellationToken)
     {
+        var userToDto = userProjection.Projection;
+        var emailToDto = emailProjection.Projection;
+        var phoneToDto = phoneProjection.Projection;
+
         var user = await repository.Query
                        .Where(x => x.Id == request.UserId)
                        .AsExpandable()
                        .Select(x => new
                        {
-                           User = UserProjections.UserProjection.Invoke(x),
-                           Emails = x.Emails.Select(z => UserProjections.UserEmailProjection.Invoke(z)),
-                           Phones = x.Phones.Select(z => UserProjections.UserPhoneProjection.Invoke(z))
+                           User = userToDto.Invoke(x),
+                           Emails = x.Emails.Select(z => emailToDto.Invoke(z)),
+                           Phones = x.Phones.Select(z => phoneToDto.Invoke(z))
                        })
                        .FirstOrDefaultAsync(cancellationToken)
                    ?? throw new UserNotFoundException(request.UserId);

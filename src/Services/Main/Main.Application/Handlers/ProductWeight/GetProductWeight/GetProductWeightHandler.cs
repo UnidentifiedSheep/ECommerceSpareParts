@@ -1,9 +1,11 @@
 ﻿using Application.Common.Interfaces.Cqrs;
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
-using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using ProductWeightEntity = Main.Entities.Product.ProductWeight;
 
 namespace Main.Application.Handlers.ProductWeight.GetProductWeight;
 
@@ -11,7 +13,9 @@ public record GetProductWeightQuery(int ProductId) : IQuery<GetProductWeightResu
 
 public record GetProductWeightResult(ProductWeightDto ProductWeight);
 
-public class GetProductWeightHandler(IReadRepository<Entities.Product.ProductWeight, int> context)
+public class GetProductWeightHandler(
+    IReadRepository<ProductWeightEntity, int> context,
+    IProjectionProvider<ProductWeightEntity, ProductWeightDto> projection)
     : IQueryHandler<GetProductWeightQuery, GetProductWeightResult>
 {
     public async Task<GetProductWeightResult> Handle(
@@ -20,7 +24,7 @@ public class GetProductWeightHandler(IReadRepository<Entities.Product.ProductWei
     {
         var productWeight = await context.Query
                                 .Where(x => x.ProductId == request.ProductId)
-                                .Select(ProductProjections.ToProductWeightDto)
+                                .Project(projection)
                                 .FirstOrDefaultAsync(cancellationToken)
                             ?? throw new ProductWeightNotFoundException(request.ProductId);
 

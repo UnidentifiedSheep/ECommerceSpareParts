@@ -1,14 +1,22 @@
 ﻿using System.Linq.Expressions;
+using Application.Common.Interfaces.Projections;
 using LinqKit;
+using Main.Application.Dtos.Currencies;
 using Main.Application.Dtos.Storage;
+using Main.Entities.Currency;
 using Main.Entities.Storage;
 
 namespace Main.Application.Projections;
 
-public static class StorageContentProjections
+public sealed class StorageContentDtoProjectionProvider
+    : ISingletonProjectionProvider<StorageContent, StorageContentDto>
 {
-    public static readonly Expression<Func<StorageContent, StorageContentDto>> ToStorageContentDto =
-        x => new StorageContentDto
+    public StorageContentDtoProjectionProvider(
+        IProjectionProvider<Currency, CurrencyDto> currencyProjection)
+    {
+        var currencyToDto = currencyProjection.Projection;
+
+        Projection = x => new StorageContentDto
         {
             Id = x.Id,
             StorageName = x.StorageName,
@@ -17,6 +25,9 @@ public static class StorageContentProjections
             BuyPrice = x.BuyPrice,
             PurchaseDatetime = x.PurchaseDatetime,
             RowVersion = x.RowVersion,
-            Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
+            Currency = currencyToDto.Invoke(x.Currency)
         };
+    }
+
+    public Expression<Func<StorageContent, StorageContentDto>> Projection { get; }
 }

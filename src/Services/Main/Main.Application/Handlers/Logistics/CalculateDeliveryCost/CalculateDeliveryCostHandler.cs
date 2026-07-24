@@ -1,6 +1,7 @@
 ﻿using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Enums;
 using Enums.Units;
@@ -9,7 +10,6 @@ using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Logistics;
-using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Storage;
@@ -31,7 +31,8 @@ public class CalculateDeliveryCostHandler(
     IRepository<ProductSize, int> sizesRepository,
     IStorageRouteRepository storageRoutesRepository,
     IRepository<Entities.Product.ProductWeight, int> weightRepository,
-    ICurrencyConverter currencyConverter
+    ICurrencyConverter currencyConverter,
+    IProjectionProvider<StorageRoute, StorageRouteDto> routeProjection
 )
     : IQueryHandler<CalculateDeliveryCostQuery, CalculateDeliveryCostResult>
 {
@@ -87,7 +88,7 @@ public class CalculateDeliveryCostHandler(
         };
 
         return new CalculateDeliveryCostResult(
-            StorageProjections.StorageRouteProjection.AsFunc()(route),
+            routeProjection.Projection.AsFunc()(route),
             deliveryCost);
     }
 

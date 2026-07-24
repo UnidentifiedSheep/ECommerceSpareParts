@@ -1,12 +1,13 @@
 using Abstractions.Interfaces.Validators;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
-using Main.Application.Projections;
+using Main.Application.Dtos.Users;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
@@ -23,7 +24,8 @@ public class InternalServiceLoginHandler(
     IPasswordManager passwordManager,
     IUserRepository userRepository,
     IJwtGenerator tokenGenerator,
-    IUserCacheRepository userCache
+    IUserCacheRepository userCache,
+    IProjectionProvider<User, UserDto> userProjection
 ) : ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
 {
     private static readonly TimeSpan AdditionalValidDuration = TimeSpan.FromHours(1);
@@ -46,7 +48,7 @@ public class InternalServiceLoginHandler(
             await userCache.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken)
             ?? throw new UserNotFoundException(user.Id);
 
-        var userDto = UserProjections.UserProjection.AsFunc()(user);
+        var userDto = userProjection.Projection.AsFunc()(user);
         var token = tokenGenerator.CreateToken(
             userDto,
             request.Service,

@@ -1,10 +1,9 @@
 ﻿using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Storage;
-using Main.Application.Projections;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +13,9 @@ public record GetUserStoragesQuery(Guid UserId, Pagination Pagination) : IQuery<
 
 public record GetUserStoragesResult(List<StorageDto> Storages);
 
-public class GetUserStoragesHandler(IReadRepository<StorageOwner, (string, Guid)> storageOwnersRepository)
+public class GetUserStoragesHandler(
+    IReadRepository<StorageOwner, (string, Guid)> storageOwnersRepository,
+    IProjectionProvider<Storage, StorageDto> projection)
     : IQueryHandler<GetUserStoragesQuery, GetUserStoragesResult>
 {
     public async Task<GetUserStoragesResult> Handle(
@@ -24,8 +25,7 @@ public class GetUserStoragesHandler(IReadRepository<StorageOwner, (string, Guid)
         var storages = await storageOwnersRepository.Query
             .Where(x => x.UserId == request.UserId)
             .Select(x => x.Storage)
-            .AsExpandable()
-            .Select(StorageProjections.StorageProjection)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

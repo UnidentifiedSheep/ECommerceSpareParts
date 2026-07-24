@@ -1,10 +1,9 @@
 ﻿using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Storage;
-using Main.Application.Projections;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +19,8 @@ public record GetStorageRoutesQuery(
 public record GetStorageRoutesResult(List<StorageRouteDto> StorageRoutes);
 
 public class GetStorageRoutesHandler(
-    IReadRepository<StorageRoute, Guid> repository
+    IReadRepository<StorageRoute, Guid> repository,
+    IProjectionProvider<StorageRoute, StorageRouteDto> projection
 )
     : IQueryHandler<GetStorageRoutesQuery, GetStorageRoutesResult>
 {
@@ -39,8 +39,7 @@ public class GetStorageRoutesHandler(
         query = query.ApplyPagination(request.Pagination);
 
         var routes = await query
-            .AsExpandable()
-            .Select(StorageProjections.StorageRouteProjection)
+            .Project(projection)
             .ToListAsync(cancellationToken);
 
         return new GetStorageRoutesResult(routes);

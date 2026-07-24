@@ -1,10 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Purchase;
-using Main.Application.Projections;
 using Main.Entities.Purchase;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +22,8 @@ public record GetPurchasesQuery(
 public record GetPurchasesResult(IEnumerable<PurchaseDto> Purchases);
 
 public class GetPurchasesHandler(
-    IReadRepository<Purchase, Guid> repository
+    IReadRepository<Purchase, Guid> repository,
+    IProjectionProvider<Purchase, PurchaseDto> projection
 ) : IQueryHandler<GetPurchasesQuery, GetPurchasesResult>
 {
     public async Task<GetPurchasesResult> Handle(
@@ -52,8 +52,7 @@ public class GetPurchasesHandler(
 
         var purchases = await query
             .SortBy(request.SortBy)
-            .AsExpandable()
-            .Select(PurchaseProjections.ToPurchaseDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

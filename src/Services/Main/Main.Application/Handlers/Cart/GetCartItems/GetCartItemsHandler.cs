@@ -1,10 +1,10 @@
 ﻿using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Cart;
-using Main.Application.Projections;
+using Main.Entities.Cart;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Cart.GetCartItems;
@@ -14,7 +14,8 @@ public record GetCartItemsQuery(Guid UserId, Pagination Pagination) : IQuery<Get
 public record GetCartItemsResult(List<CartItemDto> CartItems);
 
 public class GetCartItemsHandler(
-    IReadRepository<Entities.Cart.Cart, (Guid, int)> repository
+    IReadRepository<Entities.Cart.Cart, (Guid, int)> repository,
+    IProjectionProvider<Entities.Cart.Cart, CartItemDto> cartProjection
 )
     : IQueryHandler<GetCartItemsQuery, GetCartItemsResult>
 {
@@ -25,8 +26,7 @@ public class GetCartItemsHandler(
         var result = await repository
             .Query
             .Where(x => x.UserId == request.UserId)
-            .AsExpandable()
-            .Select(CartProjections.ToCartItemDto)
+            .Project(cartProjection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

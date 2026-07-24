@@ -1,11 +1,13 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using LinqKit;
 using Main.Application.Dtos.Balances;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Projections;
+using Main.Entities.Balance;
 using Main.Entities.Currency;
 using Main.Entities.Organization;
 using Main.Entities.Settings;
@@ -28,7 +30,9 @@ public class GetOrganizationFinancialInfoHandler(
     ISettingsService settingsService,
     IReadRepository<Organization, Guid> readRepository,
     IReadRepository<Currency, int> currencyReadRepository,
-    IBalanceService balanceService
+    IBalanceService balanceService,
+    IProjectionProvider<Currency, CurrencyDto> currencyProjection,
+    IProjectionProvider<OrganizationBalance, OrganizationBalanceDto> balanceProjection
 ) : IQueryHandler<GetOrganizationFinancialInfoQuery, GetOrganizationFinancialInfoResult>
 {
     public async Task<GetOrganizationFinancialInfoResult> Handle(
@@ -39,8 +43,7 @@ public class GetOrganizationFinancialInfoHandler(
             .Data.BaseCurrencyId;
 
         var baseCurrency = await currencyReadRepository.Query
-            .AsExpandable()
-            .Select(CurrencyProjections.ToDto)
+            .Project(currencyProjection)
             .FirstAsync(x => x.Id == baseCurrencyId, cancellationToken);
         //we need to cache it.
 
@@ -58,11 +61,11 @@ public class GetOrganizationFinancialInfoHandler(
         {
             FinancialProfile = organization.FinancialProfile is null
                 ? null
-                : BalanceProjections.ToOrganizationFinancialProfileDto(
+                : OrganizationFinancialProfileDtoFactory.Create(
                     organization.FinancialProfile,
                     netPosition),
             Balances = organization.Balances.Select(
-                BalanceProjections.ToOrganizationBalanceDto.AsFunc()),
+                balanceProjection.Projection.AsFunc()),
             BaseCurrency = baseCurrency
         };
     }

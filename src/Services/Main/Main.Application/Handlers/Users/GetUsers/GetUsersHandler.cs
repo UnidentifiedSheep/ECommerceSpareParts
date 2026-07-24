@@ -1,12 +1,11 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Enums;
-using LinqKit;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
-using Main.Application.Projections;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
@@ -33,7 +32,9 @@ public record GetUsersQuery(
 
 public record GetUsersResult(IReadOnlyList<UserDto> Users);
 
-public class GetUsersHandler(IReadRepository<User, Guid> readRepository)
+public class GetUsersHandler(
+    IReadRepository<User, Guid> readRepository,
+    IProjectionProvider<User, UserDto> projection)
     : IQueryHandler<GetUsersQuery, GetUsersResult>
 {
     public async Task<GetUsersResult> Handle(GetUsersQuery request, CancellationToken cancellationToken)
@@ -168,8 +169,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository)
 
         return await queryWithScore
             .Select(x => x.User)
-            .AsExpandable()
-            .Select(UserProjections.UserProjection)
+            .Project(projection)
             .ToListAsync(cancellationToken);
     }
 
@@ -185,8 +185,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository)
         if (string.IsNullOrWhiteSpace(request.SearchColumn))
             return await query
                 .OrderBy(x => x.Id)
-                .AsExpandable()
-                .Select(UserProjections.UserProjection)
+                .Project(projection)
                 .ApplyPagination(request.Pagination)
                 .ToListAsync(cancellationToken);
 
@@ -202,8 +201,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository)
             .Where(x => x.Rank >= 0.3)
             .OrderByDescending(x => x.Rank)
             .Select(x => x.User)
-            .AsExpandable()
-            .Select(UserProjections.UserProjection)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
     }

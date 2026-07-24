@@ -3,13 +3,14 @@ using System.Security.Cryptography;
 using Abstractions.Interfaces.Validators;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions.Base;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
-using Main.Application.Projections;
+using Main.Application.Dtos.Users;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Enums;
@@ -38,7 +39,8 @@ public class LoginHandler(
     IUserRepository userRepository,
     IUserTokenService userTokenService,
     IJwtGenerator tokenGenerator,
-    IUserCacheRepository userCache
+    IUserCacheRepository userCache,
+    IProjectionProvider<User, UserDto> userProjection
 ) : ICommandHandler<LoginCommand, LoginResult>
 {
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -68,7 +70,7 @@ public class LoginHandler(
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        var userDto = UserProjections.UserProjection.AsFunc()(user);
+        var userDto = userProjection.Projection.AsFunc()(user);
         var token = tokenGenerator.CreateToken(
             userDto,
             deviceId,

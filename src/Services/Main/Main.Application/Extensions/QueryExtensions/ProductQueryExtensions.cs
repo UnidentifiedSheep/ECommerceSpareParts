@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using LinqKit;
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Projections;
 using Main.Application.Dtos.Product;
-using Main.Application.Projections;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,32 +10,33 @@ namespace Main.Application.Extensions.QueryExtensions;
 public static class ProductQueryExtensions
 {
     public static IQueryable<ProductDto> SelectProductDto(
-        this IQueryable<Product> query)
+        this IQueryable<Product> query,
+        IProjectionProvider<Product, ProductDto> projection)
     {
-        return query
-            .AsExpandable()
-            .Select(ProductProjections.ToDto);
+        return query.Project(projection);
     }
 
     public static Task<ProductDto?> FirstProductDtoAsync(
         this IQueryable<Product> query,
+        IProjectionProvider<Product, ProductDto> projection,
         Expression<Func<Product, bool>>? predicate = null,
         CancellationToken cancellationToken = default)
     {
         return query
             .WithPredicate(predicate)
-            .SelectProductDto()
+            .SelectProductDto(projection)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
     public static Task<Dictionary<int, ProductDto>> DictionaryProductDto(
         this IQueryable<Product> query,
+        IProjectionProvider<Product, ProductDto> projection,
         Expression<Func<Product, bool>>? predicate = null,
         CancellationToken cancellationToken = default)
     {
         return query
             .WithPredicate(predicate)
-            .SelectProductDto()
+            .SelectProductDto(projection)
             .ToDictionaryAsync(x => x.Id, cancellationToken);
     }
 

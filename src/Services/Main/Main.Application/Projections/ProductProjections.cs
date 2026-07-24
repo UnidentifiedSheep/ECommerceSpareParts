@@ -1,16 +1,25 @@
 ﻿using System.Linq.Expressions;
+using Application.Common.Interfaces.Projections;
+using Application.Common.Models.Options.S3;
 using LinqKit;
 using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Product.Reservation;
+using Main.Application.Dtos.Organizations;
+using Main.Entities.Organization;
 using Main.Entities.Product;
 using Main.Entities.Storage;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Projections;
 
-public static class ProductProjections
+public sealed class ProductDtoProjectionProvider
+    : ISingletonProjectionProvider<Product, ProductDto>
 {
-    public static readonly Expression<Func<Product, ProductDto>> ToDto =
-        x => new ProductDto
+    public ProductDtoProjectionProvider(IOptions<S3BucketsOptions> bucketsOptions)
+    {
+        var imagesBaseUrl = bucketsOptions.Value.Images.PublicBaseUrl.TrimEnd('/') + "/";
+
+        Projection = x => new ProductDto
         {
             Id = x.Id,
             Name = x.Name,
@@ -20,11 +29,26 @@ public static class ProductProjections
             ProducerId = x.ProducerId,
             ProducerName = x.Producer.Name,
             Indicator = x.Indicator,
-            Images = x.Images.Select(z => z.StorageKey).ToList()
+            Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList()
         };
+    }
 
-    public static readonly Expression<Func<Product, FullProductDto>> ToFullDto =
-        x => new FullProductDto
+    public Expression<Func<Product, ProductDto>> Projection { get; }
+}
+
+public sealed class FullProductDtoProjectionProvider
+    : ISingletonProjectionProvider<Product, FullProductDto>
+{
+    public FullProductDtoProjectionProvider(
+        IOptions<S3BucketsOptions> bucketsOptions,
+        IProjectionProvider<ProductWeight, ProductWeightDto> productWeightProjection,
+        IProjectionProvider<ProductSize, ProductSizeDto> productSizeProjection)
+    {
+        var imagesBaseUrl = bucketsOptions.Value.Images.PublicBaseUrl.TrimEnd('/') + "/";
+        var weightToDto = productWeightProjection.Projection;
+        var sizeToDto = productSizeProjection.Projection;
+
+        Projection = x => new FullProductDto
         {
             Id = x.Id,
             Name = x.Name,
@@ -34,49 +58,68 @@ public static class ProductProjections
             ProducerId = x.ProducerId,
             ProducerName = x.Producer.Name,
             Indicator = x.Indicator,
-            Images = x.Images.Select(z => z.StorageKey).ToList(),
-            ProductWeight = ToProductWeightDto.Invoke(x.ProductWeight),
-            ProductSize = ToProductSizeDto.Invoke(x.ProductSize)
+            Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList(),
+            ProductWeight = x.ProductWeight == null
+                ? null
+                : weightToDto.Invoke(x.ProductWeight),
+            ProductSize = x.ProductSize == null
+                ? null
+                : sizeToDto.Invoke(x.ProductSize)
         };
+    }
 
-    public static readonly Expression<Func<ProductWeight?, ProductWeightDto?>>
-        ToProductWeightDto =
-            x => x == null
-                ? null
-                : new ProductWeightDto
-                {
-                    ProductId = x.ProductId,
-                    Weight = x.Weight,
-                    Unit = x.Unit
-                };
+    public Expression<Func<Product, FullProductDto>> Projection { get; }
+}
 
-    public static readonly Expression<Func<ProductSize?, ProductSizeDto?>>
-        ToProductSizeDto =
-            x => x == null
-                ? null
-                : new ProductSizeDto
-                {
-                    ProductId = x.ProductId,
-                    Unit = x.Unit,
-                    Length = x.Length,
-                    Height = x.Height,
-                    Width = x.Width,
-                    VolumeM3 = x.VolumeM3
-                };
+public sealed class ProductWeightDtoProjectionProvider
+    : ISingletonProjectionProvider<ProductWeight, ProductWeightDto>
+{
+    public Expression<Func<ProductWeight, ProductWeightDto>> Projection { get; } =
+        x => new ProductWeightDto
+        {
+            ProductId = x.ProductId,
+            Weight = x.Weight,
+            Unit = x.Unit
+        };
+}
 
-    public static readonly Expression<Func<ProductReservation, ProductReservationDto>>
-        ToReservationDto =
-            x => new ProductReservationDto
-            {
-                Id = x.Id,
-                WhoUpdated = x.WhoUpdated,
-                Comment = x.Comment,
-                CurrentCount = x.CurrentCount,
-                ProposedCurrencyId = x.ProposedCurrencyId,
-                ProposedPrice = x.ProposedPrice,
-                ReservedCount = x.ReservedCount,
-                Status = x.Status,
-                UpdatedAt = x.UpdatedAt,
-                Organization = OrganizationProjections.ToDto.Invoke(x.Organization)
-            };
+public sealed class ProductSizeDtoProjectionProvider
+    : ISingletonProjectionProvider<ProductSize, ProductSizeDto>
+{
+    public Expression<Func<ProductSize, ProductSizeDto>> Projection { get; } =
+        x => new ProductSizeDto
+        {
+            ProductId = x.ProductId,
+            Unit = x.Unit,
+            Length = x.Length,
+            Height = x.Height,
+            Width = x.Width,
+            VolumeM3 = x.VolumeM3
+        };
+}
+
+public sealed class ProductReservationDtoProjectionProvider
+    : ISingletonProjectionProvider<ProductReservation, ProductReservationDto>
+{
+    public ProductReservationDtoProjectionProvider(
+        IProjectionProvider<Organization, OrganizationDto> organizationProjection)
+    {
+        var organizationToDto = organizationProjection.Projection;
+
+        Projection = x => new ProductReservationDto
+        {
+            Id = x.Id,
+            WhoUpdated = x.WhoUpdated,
+            Comment = x.Comment,
+            CurrentCount = x.CurrentCount,
+            ProposedCurrencyId = x.ProposedCurrencyId,
+            ProposedPrice = x.ProposedPrice,
+            ReservedCount = x.ReservedCount,
+            Status = x.Status,
+            UpdatedAt = x.UpdatedAt,
+            Organization = organizationToDto.Invoke(x.Organization)
+        };
+    }
+
+    public Expression<Func<ProductReservation, ProductReservationDto>> Projection { get; }
 }

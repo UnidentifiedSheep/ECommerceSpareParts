@@ -1,11 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
-using Localization.Abstractions.Interfaces;
 using Main.Application.Dtos.Auth;
-using Main.Application.Projections;
 using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +15,7 @@ public record GetRolesResult(IReadOnlyList<RoleDto> Roles);
 
 public class GetRolesHandler(
     IReadRepository<Role, string> repository,
-    IScopedStringLocalizer localizer
+    IProjectionProvider<Role, RoleDto> projection
 ) : IQueryHandler<GetRolesQuery, GetRolesResult>
 {
     public async Task<GetRolesResult> Handle(GetRolesQuery request, CancellationToken cancellationToken)
@@ -36,8 +34,7 @@ public class GetRolesHandler(
             query = query.OrderBy(x => x.Name);
 
         var roles = await query
-            .AsExpandable()
-            .Select(AuthProjections.ToRoleDto(localizer))
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

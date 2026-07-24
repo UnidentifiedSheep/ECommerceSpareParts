@@ -1,9 +1,9 @@
-﻿using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using LinqKit;
 using Main.Application.Dtos.Purchase;
-using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +19,8 @@ public record GetPurchaseQuery(
 public record GetPurchaseResult(PurchaseDto Purchase);
 
 public class GetPurchaseHandler(
-    IReadRepository<Purchase, Guid> repository
+    IReadRepository<Purchase, Guid> repository,
+    IProjectionProvider<Purchase, PurchaseDto> projection
 ) : IQueryHandler<GetPurchaseQuery, GetPurchaseResult>
 {
     public async Task<GetPurchaseResult> Handle(
@@ -34,8 +35,7 @@ public class GetPurchaseHandler(
                 purchaseId.HasValue && x.Id == purchaseId.Value ||
                 transactionId.HasValue && x.TransactionId == transactionId.Value)
             .OrderByDescending(x => purchaseId.HasValue && x.Id == purchaseId.Value)
-            .AsExpandable()
-            .Select(PurchaseProjections.ToPurchaseDto)
+            .Project(projection)
             .FirstOrDefaultAsync(cancellationToken);
 
         return dto == null

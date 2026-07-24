@@ -1,10 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Producer;
-using Main.Application.Projections;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +13,9 @@ public record GetProducersQuery(string? SearchTerm, Pagination Pagination) : IQu
 
 public record GetProducersResult(IEnumerable<ProducerDto> Producers);
 
-public class GetProducersHandler(IReadRepository<Producer, int> repository)
+public class GetProducersHandler(
+    IReadRepository<Producer, int> repository,
+    IProjectionProvider<Producer, ProducerDto> projection)
     : IQueryHandler<GetProducersQuery, GetProducersResult>
 {
     public async Task<GetProducersResult> Handle(
@@ -33,8 +34,7 @@ public class GetProducersHandler(IReadRepository<Producer, int> repository)
 
 
         var result = await query
-            .AsExpandable()
-            .Select(ProducerProjections.ToDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

@@ -1,12 +1,12 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cache;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Cache;
 using Cache.Extensions;
-using LinqKit;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Interfaces.Cache;
-using Main.Application.Projections;
 using Main.Application.Static;
 using Main.Entities.Currency;
 using Main.Entities.Settings;
@@ -18,7 +18,8 @@ public class CurrencyCacheRepository(
     ICache rawCache,
     ISettingsService settingsService,
     IRepository<CurrencyRate, (int, int)> rateRepository,
-    IReadRepository<Currency, int> repository
+    IReadRepository<Currency, int> repository,
+    IProjectionProvider<Currency, CurrencyDto> projection
 ) : ICurrencyCacheRepository
 {
     public async Task<CurrencyDto?> GetCurrency(
@@ -49,8 +50,7 @@ public class CurrencyCacheRepository(
                 .ToList();
 
         var currencies = await repository.Query
-            .AsExpandable()
-            .Select(CurrencyProjections.ToDto)
+            .Project(projection)
             .ToListAsync(cancellationToken);
 
         await rawCache.AddToSetAsync(currenciesKey, currencies.Select(x => x.Id.ToString()));
@@ -91,8 +91,7 @@ public class CurrencyCacheRepository(
     private Task<CurrencyDto?> GetCurrencyFromDb(int id)
     {
         return repository.Query.Where(x => x.Id == id)
-            .AsExpandable()
-            .Select(CurrencyProjections.ToDto)
+            .Project(projection)
             .FirstOrDefaultAsync();
     }
 
@@ -100,8 +99,7 @@ public class CurrencyCacheRepository(
     {
         return repository.Query
             .Where(x => ids.Contains(x.Id))
-            .AsExpandable()
-            .Select(CurrencyProjections.ToDto)
+            .Project(projection)
             .ToDictionaryAsync(x => x.Id);
     }
 

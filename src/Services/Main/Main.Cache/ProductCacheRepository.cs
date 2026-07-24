@@ -1,5 +1,6 @@
 ﻿using Application.Common.Extensions;
 using Application.Common.Interfaces.Cache;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Cache.Extensions;
 using Main.Application.Dtos.Product;
@@ -15,7 +16,8 @@ namespace Main.Cache;
 public class ProductCacheRepository(
     ICache rawCache,
     IReadRepository<ProductCross, (int, int)> crossesReadRepository,
-    IReadRepository<Product, int> productReadRepository
+    IReadRepository<Product, int> productReadRepository,
+    IProjectionProvider<Product, ProductDto> productProjection
 ) : IProductCacheRepository
 {
     public async Task<ProductDto> GetProductOrSetAsync(
@@ -53,7 +55,10 @@ public class ProductCacheRepository(
             product => product.Id,
             missingIds => productReadRepository
                 .Query
-                .DictionaryProductDto(x => missingIds.Contains(x.Id), cancellationToken),
+                .DictionaryProductDto(
+                    productProjection,
+                    x => missingIds.Contains(x.Id),
+                    cancellationToken),
             CacheKeys.ProductCache.Ttl);
     }
 
@@ -133,7 +138,10 @@ public class ProductCacheRepository(
     {
         return await productReadRepository
                    .Query
-                   .FirstProductDtoAsync(x => x.Id == id, cancellationToken)
+                   .FirstProductDtoAsync(
+                       productProjection,
+                       x => x.Id == id,
+                       cancellationToken)
                ?? throw new ProductNotFoundException(id);
     }
 }

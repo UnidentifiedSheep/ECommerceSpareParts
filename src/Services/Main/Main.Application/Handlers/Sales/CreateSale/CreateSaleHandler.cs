@@ -1,15 +1,15 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using LinqKit;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Event;
-using Main.Application.Projections;
 using Main.Entities.Sale;
 using Main.Enums;
 using Main.Enums.Balances;
@@ -45,7 +45,8 @@ public class CreateSaleHandler(
     IReadRepository<Sale, Guid> readRepository,
     ISaleEventService saleEventService,
     IUnitOfWork unitOfWork,
-    ISaleService saleService
+    ISaleService saleService,
+    IProjectionProvider<Sale, SaleDto> saleProjection
 ) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
@@ -129,8 +130,7 @@ public class CreateSaleHandler(
         CancellationToken token)
     {
         var fromDb = await readRepository.Query
-            .AsExpandable()
-            .Select(SaleProjections.ToSaleDto)
+            .Project(saleProjection)
             .FirstAsync(x => x.Id == id, token);
 
         return new CreateSaleResult(fromDb);
