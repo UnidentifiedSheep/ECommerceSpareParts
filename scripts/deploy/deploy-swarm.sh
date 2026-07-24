@@ -79,6 +79,7 @@ REQUIRED_NODE_LABELS=(
 ACTIVE_MIGRATOR_SERVICE=""
 ACTIVE_DIRECTORY_SERVICE=""
 ACTIVE_WALG_PREFLIGHT_SERVICE=""
+ACTIVE_PORTAINER_PREFLIGHT_SERVICE=""
 
 log() {
   echo
@@ -109,6 +110,10 @@ cleanup_temporary_services() {
 
   if [ -n "$ACTIVE_WALG_PREFLIGHT_SERVICE" ]; then
     sudo docker service rm "$ACTIVE_WALG_PREFLIGHT_SERVICE" >/dev/null 2>&1 || true
+  fi
+
+  if [ -n "$ACTIVE_PORTAINER_PREFLIGHT_SERVICE" ]; then
+    sudo docker service rm "$ACTIVE_PORTAINER_PREFLIGHT_SERVICE" >/dev/null 2>&1 || true
   fi
 }
 
@@ -676,6 +681,147 @@ wait_for_services_running() {
   done
 }
 
+validate_portainer_agents() {
+  log "Validate connectivity to every Portainer Agent task"
+
+  local agent_service
+  local expected_agents
+  local service
+  agent_service="$(service_name gateway portainer-agent)"
+  expected_agents="$(sudo docker service ps "$agent_service" \
+    --filter desired-state=running \
+    --format '{{.ID}}' |
+    wc -l)"
+  service="${STACK_NAME}-portainer-agent-preflight-${DEPLOY_RUN_ID}"
+
+  if [ "$expected_agents" -eq 0 ]; then
+    echo "No running Portainer Agent tasks were found."
+    return 1
+  fi
+
+  sudo docker service rm "$service" >/dev/null 2>&1 || true
+  ACTIVE_PORTAINER_PREFLIGHT_SERVICE="$service"
+
+  sudo docker service create \
+    --name "$service" \
+    --detach=true \
+    --restart-condition none \
+    --constraint "node.labels.management.portainer == true" \
+    --network "$PORTAINER_AGENT_NETWORK" \
+    --env EXPECTED_AGENTS="$expected_agents" \
+    --entrypoint python \
+    "$CONFIGS_PATH_INIT_IMAGE" \
+    -c \
+    'import http.client
+import os
+import socket
+import ssl
+import sys
+import time
+
+host = "tasks.portainer-agent"
+port = 9001
+expected = int(os.environ["EXPECTED_AGENTS"])
+context = ssl._create_unverified_context()
+deadline = time.monotonic() + 60
+
+while True:
+    addresses = sorted({
+        item[4][0]
+        for item in socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    })
+    failed = []
+
+    if len(addresses) != expected:
+        failed.append(
+            f"expected {expected} address(es), resolved {len(addresses)}: "
+            + ", ".join(addresses)
+        )
+    else:
+        for address in addresses:
+            try:
+                connection = http.client.HTTPSConnection(
+                    address,
+                    port,
+                    timeout=5,
+                    context=context,
+                )
+                connection.request("GET", "/ping", headers={"Host": host})
+                response = connection.getresponse()
+                response.read()
+                connection.close()
+                if response.status != 204:
+                    failed.append(f"{address}: HTTP {response.status}")
+            except Exception as error:
+                failed.append(f"{address}: {error}")
+
+    if not failed:
+        print(f"All {len(addresses)} Portainer Agent task(s) are reachable.")
+        sys.exit(0)
+
+    if time.monotonic() >= deadline:
+        print(
+            "Unreachable Portainer Agent task(s): " + "; ".join(failed),
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    time.sleep(2)' >/dev/null
+
+  for _ in $(seq 1 60); do
+    local state
+    state="$(sudo docker service ps "$service" \
+      --no-trunc \
+      --format '{{.CurrentState}}|{{.Error}}' |
+      head -n 1)"
+
+    case "$state" in
+      Complete*)
+        sudo docker service logs "$service" --raw --tail 20 || true
+        sudo docker service rm "$service" >/dev/null
+        ACTIVE_PORTAINER_PREFLIGHT_SERVICE=""
+        return 0
+        ;;
+      Failed*|Rejected*|Shutdown*non-zero\ exit*|*non-zero\ exit*|*exit\ \(*)
+        echo "$state"
+        print_service_diagnostics "$service"
+        return 1
+        ;;
+    esac
+
+    sleep 2
+  done
+
+  echo "Portainer Agent connectivity preflight did not complete in time."
+  print_service_diagnostics "$service"
+  return 1
+}
+
+cleanup_legacy_portainer_network() {
+  local legacy_network="${STACK_NAME}-gateway-portainer-agent"
+  local gateway_stack
+  local owner
+  gateway_stack="$(stack_name gateway)"
+
+  if [ "$legacy_network" = "$PORTAINER_AGENT_NETWORK" ] ||
+    ! sudo docker network inspect "$legacy_network" >/dev/null 2>&1; then
+    return
+  fi
+
+  owner="$(sudo docker network inspect "$legacy_network" \
+    --format '{{index .Labels "com.docker.stack.namespace"}}')"
+  if [ "$owner" != "$gateway_stack" ]; then
+    echo "Legacy network ${legacy_network} was not removed because it is not owned by stack ${gateway_stack}."
+    return
+  fi
+
+  if sudo docker network rm "$legacy_network" >/dev/null 2>&1; then
+    echo "Removed unused legacy Portainer network ${legacy_network}."
+  else
+    echo "Legacy network ${legacy_network} is still in use and was left unchanged."
+  fi
+}
+
 wait_for_http() {
   local display_name="$1"
   local network="$2"
@@ -954,6 +1100,7 @@ require_env CLOUD_RU_SECRET_PROJECT_ID
 PUBLIC_NETWORK="${PUBLIC_NETWORK:-public}"
 BACKEND_NETWORK="${BACKEND_NETWORK:-backend}"
 MONITORING_NETWORK="${MONITORING_NETWORK:-monitoring}"
+PORTAINER_AGENT_NETWORK="${PORTAINER_AGENT_NETWORK:-portainer_agent_network}"
 VOLUME_PREFIX="${VOLUME_PREFIX:-$STACK_NAME}"
 MIGRATOR_NODE_CONSTRAINT="${MIGRATOR_NODE_CONSTRAINT:-node.labels.infra.postgres == true}"
 MIGRATE_LEGACY_STACK="${MIGRATE_LEGACY_STACK:-false}"
@@ -965,7 +1112,8 @@ CLOUD_RU_SECRET_VERSION="${CLOUD_RU_SECRET_VERSION:-}"
 CONFIGS_PATH_INIT_IMAGE="${CONFIGS_PATH_INIT_IMAGE:-python:3.13-slim}"
 POSTGRES_WALG_SECRET="${POSTGRES_WALG_SECRET:-postgres_walg_config}"
 
-export PUBLIC_NETWORK BACKEND_NETWORK MONITORING_NETWORK VOLUME_PREFIX
+export PUBLIC_NETWORK BACKEND_NETWORK MONITORING_NETWORK
+export PORTAINER_AGENT_NETWORK VOLUME_PREFIX
 export CLOUD_RU_SECRET_PREFIX CLOUD_RU_SECRET_DEPTH
 export CLOUD_RU_SECRET_NAMES CLOUD_RU_SECRET_VERSION
 export POSTGRES_WALG_SECRET
@@ -1015,9 +1163,11 @@ deploy_stack monitoring
 wait_for_services_running "${GATEWAY_SERVICES[@]}"
 wait_for_services_running "${APP_SERVICES[@]}"
 wait_for_services_running "${MONITORING_SERVICES[@]}"
+validate_portainer_agents
 wait_for_application_endpoints
 wait_for_monitoring_endpoints
 
 log "[8/8] Cleanup obsolete Docker configs"
+cleanup_legacy_portainer_network
 cleanup_unused_versioned_configs
 show_stack_services

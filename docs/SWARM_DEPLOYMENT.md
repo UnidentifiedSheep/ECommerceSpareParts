@@ -205,7 +205,9 @@ Exactly one active ready node must carry `infra.postgres=true`. PostgreSQL and i
 
 ## Portainer CE
 
-`portainer-agent` runs in global mode on every Linux Swarm node and connects to Portainer Server through a dedicated encrypted overlay network. Portainer Server runs as one replica on the manager labeled `management.portainer=true`.
+`portainer-agent` runs in global mode on every Linux Swarm node and connects to Portainer Server through the dedicated overlay network `portainer_agent_network`. Portainer Server runs as one replica on the manager labeled `management.portainer=true`.
+
+The Portainer network intentionally does not enable Docker overlay IPsec encryption. Physical Swarm-node traffic already travels through Tailscale, while another encryption layer can make task addresses unreachable on only part of the cluster. The network name can be overridden with `PORTAINER_AGENT_NETWORK`, but the production default should normally be retained.
 
 The Portainer UI is available only through Traefik at `https://${PORTAINER_HOST}`. The stack does not publish Portainer ports `9000`, `9443`, `9001`, or `8000` on host nodes. Edge Agent features that require port `8000` are therefore not enabled.
 
@@ -216,6 +218,8 @@ docker service update --force ecommerce-gateway_portainer
 ```
 
 The global agents mount the Docker socket and Docker volume directory, which gives Portainer administrative access to every Swarm node. Protect the public hostname and administrator account accordingly.
+
+After deploying the gateway stack, the deployment script resolves every `tasks.portainer-agent` address and calls its HTTPS `/ping` endpoint from the node hosting Portainer Server. Deployment fails and reports the unreachable task IPs if even one Agent cannot be reached. After a successful transition, the old `${STACK_NAME}-gateway-portainer-agent` network is removed only when it belongs to the gateway stack and is no longer used.
 
 See the official [Portainer CE Swarm installation](https://docs.portainer.io/2.33-lts/start/install-ce/server/swarm/linux) and [Traefik reverse proxy](https://docs.portainer.io/2.33-lts/advanced/reverse-proxy/traefik) documentation.
 
