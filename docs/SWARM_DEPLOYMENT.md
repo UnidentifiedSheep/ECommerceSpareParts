@@ -137,6 +137,7 @@ Required GitHub Variable:
 
 Optional GitHub Variables:
 
+- `DEPLOY_ENVIRONMENT`, default `Production`
 - `CLOUD_RU_SECRET_PREFIX`, default `/appsettings`
 - `CLOUD_RU_SECRET_DEPTH`, default `-1`
 - `CLOUD_RU_SECRET_NAMES`

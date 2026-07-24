@@ -10,6 +10,7 @@ jobs:
     env:
       SWARM_PATH: ${{ secrets.SWARM_PATH || '/opt/ecommerce' }}
       STACK_NAME: ${{ secrets.SWARM_STACK_NAME || 'ecommerce' }}
+      DEPLOY_ENVIRONMENT: ${{ vars.DEPLOY_ENVIRONMENT || 'Production' }}
 
     steps:
       - name: Checkout
@@ -120,8 +121,8 @@ jobs:
             export CLOUD_RU_SECRET_DEPTH='${{ vars.CLOUD_RU_SECRET_DEPTH || '-1' }}'
             export CLOUD_RU_SECRET_NAMES='${{ vars.CLOUD_RU_SECRET_NAMES }}'
             export CLOUD_RU_SECRET_VERSION='${{ vars.CLOUD_RU_SECRET_VERSION }}'
-            export DOTNET_ENVIRONMENT='Staging'
-            export ASPNETCORE_ENVIRONMENT='Staging'
+            export DOTNET_ENVIRONMENT='${{ env.DEPLOY_ENVIRONMENT }}'
+            export ASPNETCORE_ENVIRONMENT='${{ env.DEPLOY_ENVIRONMENT }}'
             export CONFIGS_PATH="${CONFIGS_PATH:-${{ env.SWARM_PATH }}/configs}"
             export PUBLIC_NETWORK="${PUBLIC_NETWORK:-public}"
             export BACKEND_NETWORK="${BACKEND_NETWORK:-backend}"
