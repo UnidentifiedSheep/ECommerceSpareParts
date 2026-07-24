@@ -72,18 +72,37 @@ jobs:
             mv release/scripts scripts
             rm -rf release
 
+      - name: Encode Swarm environment
+        shell: bash
+        env:
+          SWARM_ENV_CONTENT: ${{ secrets.SWARM_ENV }}
+        run: |
+          set -euo pipefail
+
+          SWARM_ENV_BASE64="$(printf '%s' "$SWARM_ENV_CONTENT" | base64 --wrap=0)"
+          echo "::add-mask::$SWARM_ENV_BASE64"
+          printf 'SWARM_ENV_BASE64=%s\n' "$SWARM_ENV_BASE64" >> "$GITHUB_ENV"
+
       - name: Deploy stack
         uses: appleboy/ssh-action@v1.2.5
+        env:
+          SWARM_ENV_BASE64: ${{ env.SWARM_ENV_BASE64 }}
         with:
           host: ${{ secrets.SWARM_LEADER_HOST }}
           username: ${{ secrets.SWARM_SSH_USER }}
           key: ${{ secrets.SWARM_SSH_KEY }}
+          envs: SWARM_ENV_BASE64
           script: |
-            set -e
+            set -euo pipefail
 
             cd '${{ env.SWARM_PATH }}'
 
-            printf '%s\n' '${{ secrets.SWARM_ENV }}' > .env
+            if [ -z "${SWARM_ENV_BASE64:-}" ]; then
+              echo "SWARM_ENV is empty."
+              exit 1
+            fi
+
+            printf '%s' "$SWARM_ENV_BASE64" | base64 --decode > .env
             chmod 600 .env
 
             set -a
