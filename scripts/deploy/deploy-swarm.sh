@@ -39,6 +39,8 @@ MONITORING_SERVICES=(
 GATEWAY_SERVICES=(
   "gateway:traefik"
   "gateway:gateway"
+  "gateway:portainer-agent"
+  "gateway:portainer"
 )
 
 MIGRATORS=(
@@ -49,6 +51,7 @@ MIGRATORS=(
 
 PERSISTENT_VOLUMES=(
   traefik_letsencrypt
+  portainer_data
   pg_data
   redis_data
   rabbitmq_data
@@ -60,6 +63,7 @@ PERSISTENT_VOLUMES=(
 REQUIRED_NODE_LABELS=(
   workload.traefik=true
   workload.gateway=true
+  management.portainer=true
   workload.api=true
   workload.worker=true
   infra.postgres=true
@@ -283,6 +287,22 @@ validate_node_labels() {
 
   if [ "$traefik_manager_found" != "true" ]; then
     echo "No ready Swarm manager has label workload.traefik=true."
+    exit 1
+  fi
+
+  local portainer_manager_count=0
+  for node_id in $(sudo docker node ls \
+    --filter "node.label=management.portainer=true" \
+    --format '{{.ID}}'); do
+    if [ "$(sudo docker node inspect "$node_id" --format '{{.Spec.Role}}')" = "manager" ] &&
+      [ "$(sudo docker node inspect "$node_id" --format '{{.Status.State}}')" = "ready" ] &&
+      [ "$(sudo docker node inspect "$node_id" --format '{{.Spec.Availability}}')" = "active" ]; then
+      portainer_manager_count=$((portainer_manager_count + 1))
+    fi
+  done
+
+  if [ "$portainer_manager_count" -ne 1 ]; then
+    echo "Exactly one active ready Swarm manager must have label management.portainer=true."
     exit 1
   fi
 
@@ -748,6 +768,7 @@ wait_for_infrastructure() {
 wait_for_application_endpoints() {
   log "Wait for application health endpoints"
   wait_for_http Traefik "$PUBLIC_NETWORK" "http://traefik:8080/ping"
+  wait_for_http Portainer "$PUBLIC_NETWORK" "http://portainer:9000/api/status"
   wait_for_http Gateway "$BACKEND_NETWORK" "http://gateway:8080/health"
   wait_for_http "Main API" "$BACKEND_NETWORK" "http://main-api:8080/health"
   wait_for_http "Analytics API" "$BACKEND_NETWORK" "http://analytics-api:8080/health"

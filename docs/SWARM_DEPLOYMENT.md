@@ -9,7 +9,7 @@ Production uses one Docker Swarm cluster and six independently deployed stacks:
 | `${STACK_NAME}-apps` | Main, Analytics, Pricing and Search APIs |
 | `${STACK_NAME}-workers` | Main, Analytics and Pricing workers |
 | `${STACK_NAME}-monitoring` | Prometheus, Grafana, Loki and OpenSearch Dashboards |
-| `${STACK_NAME}-gateway` | Traefik and Gateway/YARP |
+| `${STACK_NAME}-gateway` | Traefik, Gateway/YARP, Portainer CE and global Portainer agents |
 
 MinIO is intentionally not deployed. Applications must use the configured external S3-compatible storage.
 
@@ -63,6 +63,7 @@ docker node update --label-add workload.traefik=true <manager-node>
 docker node update --label-add workload.gateway=true <gateway-node>
 docker node update --label-add workload.api=true <api-node>
 docker node update --label-add workload.worker=true <worker-node>
+docker node update --label-add management.portainer=true <portainer-manager-node>
 
 docker node update --label-add infra.postgres=true <postgres-node>
 docker node update --label-add infra.redis=true <redis-node>
@@ -76,6 +77,8 @@ docker node update --label-add monitoring.opensearch-dashboards=true <dashboards
 ```
 
 `workload.traefik=true` must be assigned to a manager because Traefik reads the local Docker socket to discover Swarm services. `workload.gateway=true` belongs to Gateway/YARP and may be assigned to a worker node.
+
+Exactly one active, ready manager must carry `management.portainer=true`. Portainer Server keeps its state in a node-local external volume, so the label gives it a stable placement. Portainer Agent does not need a label: its global service runs on every Linux Swarm node.
 
 Generic workload labels are kept only for services that can be freely distributed within a class of nodes. Infrastructure and monitoring use specialized labels because their services are stateful or comparatively heavy. Migrators run on the node labeled `infra.postgres=true`.
 
@@ -139,7 +142,11 @@ Optional GitHub Variables:
 - `CLOUD_RU_SECRET_NAMES`
 - `CLOUD_RU_SECRET_VERSION`
 
-`SWARM_ENV` keeps the existing non-Cloud.ru stack values, including database/cache/broker credentials, public host names, Traefik ACME email, and optional replica/network/volume settings.
+`SWARM_ENV` keeps the existing non-Cloud.ru stack values, including database/cache/broker credentials, public host names, Traefik ACME email, and optional replica/network/volume settings. It must include the public Portainer host:
+
+```dotenv
+PORTAINER_HOST=portainer.example.com
+```
 
 WAL-G scheduling values may also be placed in `SWARM_ENV`:
 
@@ -183,6 +190,7 @@ Stateful data uses external volumes named with `VOLUME_PREFIX`, which defaults t
 
 ```text
 ecommerce_traefik_letsencrypt
+ecommerce_portainer_data
 ecommerce_pg_data
 ecommerce_redis_data
 ecommerce_rabbitmq_data
@@ -193,7 +201,23 @@ ecommerce_loki_data
 
 The default `local` volume driver stores data on one node. Before moving a stateful placement label, migrate its volume data or configure shared storage. Stack removal does not delete these external volumes.
 
-Exactly one active ready node must carry `infra.postgres=true`. PostgreSQL and its backup service share the node-local `pg_data` volume, so allowing multiple eligible PostgreSQL nodes could place them over different local volumes.
+Exactly one active ready node must carry `infra.postgres=true`. PostgreSQL and its backup service share the node-local `pg_data` volume, so allowing multiple eligible PostgreSQL nodes could place them over different local volumes. Portainer has the same node-local storage consideration: migrate `portainer_data` before moving `management.portainer=true` to another manager.
+
+## Portainer CE
+
+`portainer-agent` runs in global mode on every Linux Swarm node and connects to Portainer Server through a dedicated encrypted overlay network. Portainer Server runs as one replica on the manager labeled `management.portainer=true`.
+
+The Portainer UI is available only through Traefik at `https://${PORTAINER_HOST}`. The stack does not publish Portainer ports `9000`, `9443`, `9001`, or `8000` on host nodes. Edge Agent features that require port `8000` are therefore not enabled.
+
+On the first launch, open the UI and create the initial administrator promptly. If Portainer expires the initial setup session, restart only its service:
+
+```bash
+docker service update --force ecommerce-gateway_portainer
+```
+
+The global agents mount the Docker socket and Docker volume directory, which gives Portainer administrative access to every Swarm node. Protect the public hostname and administrator account accordingly.
+
+See the official [Portainer CE Swarm installation](https://docs.portainer.io/2.33-lts/start/install-ce/server/swarm/linux) and [Traefik reverse proxy](https://docs.portainer.io/2.33-lts/advanced/reverse-proxy/traefik) documentation.
 
 ## PostgreSQL backups
 
@@ -253,4 +277,4 @@ The deploy script uses `set -euo pipefail`, checks real task states rather than 
 - Node-local persistent volumes do not follow a label to another physical node.
 - A completed one-shot `secrets-sync` service showing zero running tasks is expected.
 - A credentials-related sync failure intentionally suppresses raw Python output; inspect Cloud.ru credentials by rotating the Swarm secrets rather than printing them.
-- Traefik is the only service publishing ports `80` and `443`. PostgreSQL, Redis, RabbitMQ internal ports, OpenSearch API, Prometheus, and Loki remain private.
+- Traefik is the only service publishing ports `80` and `443`. Portainer agents, Portainer Server, PostgreSQL, Redis, RabbitMQ internal ports, OpenSearch API, Prometheus, and Loki remain private behind overlay networks.
