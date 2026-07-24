@@ -33,6 +33,10 @@ fi
 : "${PGDATA:?PGDATA is required}"
 : "${WALG_CONFIG_PATH:?WALG_CONFIG_PATH is required}"
 
+walg() {
+    wal-g --config "$WALG_CONFIG_PATH" "$@"
+}
+
 seconds_until_next_backup() {
     local now
     local target
@@ -57,21 +61,21 @@ run_backup() {
 
     echo "Starting WAL-G full backup."
 
-    while ! wal-g backup-push "$PGDATA"; do
+    while ! walg backup-push "$PGDATA"; do
         echo "WAL-G backup failed; retrying in ${retry_seconds} seconds." >&2
         sleep "$retry_seconds"
     done
 
     echo "WAL-G full backup completed."
 
-    if ! wal-g delete retain FULL "$retention_count" --confirm; then
+    if ! walg delete retain FULL "$retention_count" --confirm; then
         echo "WAL-G retention cleanup failed; the completed backup is preserved." >&2
     fi
 }
 
 echo "Checking WAL-G storage access."
 backup_list="$(
-    wal-g backup-list --json |
+    walg backup-list --json |
         tr -d '[:space:]'
 )"
 

@@ -68,7 +68,7 @@ PostgreSQL itself runs with:
 
 ```text
 archive_mode=on
-archive_command=/usr/local/bin/wal-g wal-push "%p"
+archive_command=/usr/local/bin/wal-g --config /run/secrets/postgres-walg.json wal-push "%p"
 archive_timeout=60s
 ```
 

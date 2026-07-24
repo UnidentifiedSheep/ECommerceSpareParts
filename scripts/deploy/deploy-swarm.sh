@@ -465,10 +465,20 @@ validate_walg_storage() {
     --network "$BACKEND_NETWORK" \
     --env WALG_CONFIG_PATH=/run/secrets/postgres-walg.json \
     --secret source="$POSTGRES_WALG_SECRET",target=postgres-walg.json,mode=0444 \
-    --entrypoint /usr/local/bin/wal-g \
+    --entrypoint /bin/sh \
     --with-registry-auth \
     "$image" \
-    backup-list >/dev/null
+    -ec \
+    'config=/run/secrets/postgres-walg.json
+    if [ ! -s "$config" ]; then
+      echo "WAL-G config secret is missing or empty." >&2
+      exit 1
+    fi
+    if ! grep -Eq '"'"'"WALG_S3_PREFIX"[[:space:]]*:'"'"' "$config"; then
+      echo "WAL-G config does not contain WALG_S3_PREFIX." >&2
+      exit 1
+    fi
+    exec /usr/local/bin/wal-g --config "$config" backup-list' >/dev/null
 
   for _ in $(seq 1 60); do
     local state
