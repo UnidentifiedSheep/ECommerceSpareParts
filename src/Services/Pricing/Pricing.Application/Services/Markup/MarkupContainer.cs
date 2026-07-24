@@ -1,7 +1,4 @@
 using Application.Common.Services;
-using IntervalMap.Core.Abstractions;
-using IntervalMap.Core.Models;
-using IntervalMap.Variations;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
 using System.Text.Json;
@@ -11,24 +8,24 @@ namespace Pricing.Application.Services.Markup;
 public class MarkupContainer : IMarkupContainer
 {
     private readonly Lock _lock = new();
-    private IntervalMapBase<Interval<Models.Markup>> _defaultMarkupMap = null!;
-    private Dictionary<int, IntervalMapBase<Interval<Models.Markup>>> _markupMaps = new();
+    private MarkupRangeIndex _defaultMarkupMap = null!;
+    private Dictionary<int, MarkupRangeIndex> _markupMaps = new();
     public bool Initialized { get; private set; }
     public Models.Markup DefaultMarkup { get; private set; } = null!;
     public int DefaultCurrencyId { get; private set; }
     public string CurrentVersion { get; private set; } = string.Empty;
 
-    public Models.Markup? GetForDefaultOrNull(double value)
+    public Models.Markup? GetForDefaultOrNull(decimal value)
     {
         EnsureInitialized();
-        return _defaultMarkupMap.GetInterval(value)?.Value;
+        return _defaultMarkupMap.Get(value);
     }
 
-    public Models.Markup? GetForCurrencyOrNull(int currencyId, double value)
+    public Models.Markup? GetForCurrencyOrNull(int currencyId, decimal value)
     {
         EnsureInitialized();
         return _markupMaps.TryGetValue(currencyId, out var map)
-            ? map.GetInterval(value)?.Value
+            ? map.Get(value)
             : null;
     }
 
@@ -54,18 +51,17 @@ public class MarkupContainer : IMarkupContainer
         }
     }
 
-    private static IntervalMapBase<Interval<Models.Markup>> GenMap(IEnumerable<MarkupRange> markupRanges)
+    private static MarkupRangeIndex GenMap(IEnumerable<MarkupRange> markupRanges)
     {
-        var map = new AdaptiveIntervalMap<Models.Markup>(intersectionAllowed: true);
-
-        foreach (var range in markupRanges)
-            map.AddInterval(
-                new Interval<Models.Markup>(
-                    (double)range.RangeStart,
-                    (double)range.RangeEnd,
-                    new Models.Markup(range.Markup)));
-
-        return map;
+        return new MarkupRangeIndex(
+            markupRanges
+                .OrderBy(x => x.RangeStart)
+                .ThenBy(x => x.RangeEnd)
+                .Select(x => new IndexedMarkupRange(
+                    x.RangeStart,
+                    x.RangeEnd,
+                    new Models.Markup(x.Markup)))
+                .ToArray());
     }
 
     private void GenMarkupHash(
@@ -122,4 +118,38 @@ public class MarkupContainer : IMarkupContainer
     {
         if (!Initialized) throw new InvalidOperationException("Markup map container is not initialized");
     }
+
+    private sealed class MarkupRangeIndex(IndexedMarkupRange[] ranges)
+    {
+        public Models.Markup? Get(decimal value)
+        {
+            var left = 0;
+            var right = ranges.Length - 1;
+            var candidate = -1;
+
+            while (left <= right)
+            {
+                var middle = left + ((right - left) >> 1);
+
+                if (ranges[middle].Start <= value)
+                {
+                    candidate = middle;
+                    left = middle + 1;
+                }
+                else
+                {
+                    right = middle - 1;
+                }
+            }
+
+            return candidate >= 0 && value <= ranges[candidate].End
+                ? ranges[candidate].Markup
+                : null;
+        }
+    }
+
+    private readonly record struct IndexedMarkupRange(
+        decimal Start,
+        decimal End,
+        Models.Markup Markup);
 }

@@ -16,10 +16,8 @@ public sealed class MarkupCalculator(
 
     private decimal GetMarkupProportion(decimal basePrice, int currencyId)
     {
-        var basePriceValue = (double)basePrice;
-
         return currencyId == markupContainer.DefaultCurrencyId
-            ? markupContainer.GetForDefaultOrNull(basePriceValue)?.Value ?? markupContainer.DefaultMarkup.Value
-            : markupContainer.GetForCurrencyOrNull(currencyId, basePriceValue)?.Value ?? markupContainer.DefaultMarkup.Value;
+            ? markupContainer.GetForDefaultOrNull(basePrice)?.Value ?? markupContainer.DefaultMarkup.Value
+            : markupContainer.GetForCurrencyOrNull(currencyId, basePrice)?.Value ?? markupContainer.DefaultMarkup.Value;
     }
 }

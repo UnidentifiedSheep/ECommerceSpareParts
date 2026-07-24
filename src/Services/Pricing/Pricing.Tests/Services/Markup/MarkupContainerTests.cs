@@ -7,6 +7,66 @@ namespace Pricing.Integration.Tests.Services.Markup;
 
 public class MarkupContainerTests
 {
+    [Theory]
+    [InlineData(0, 20)]
+    [InlineData(9_999, 20)]
+    [InlineData(10_000, 10)]
+    [InlineData(20_000, 10)]
+    public void GetForDefaultOrNull_WithMatchingRange_ReturnsMarkup(
+        int valueInCents,
+        int expectedPercent)
+    {
+        var container = CreateContainer(DefaultRanges().Reverse());
+        var value = valueInCents / 100m;
+        var expected = expectedPercent / 100m;
+
+        var result = container.GetForDefaultOrNull(value);
+
+        result.Should().NotBeNull();
+        result!.Value.Should().Be(expected);
+    }
+
+    [Fact]
+    public void GetForCurrencyOrNull_WithMatchingRange_ReturnsCurrencyMarkup()
+    {
+        var container = CreateContainer(
+            DefaultRanges(),
+            new Dictionary<int, IEnumerable<MarkupRange>>
+            {
+                [2] = CurrencyRanges(2).Reverse()
+            });
+
+        var result = container.GetForCurrencyOrNull(2, 250);
+
+        result.Should().NotBeNull();
+        result!.Value.Should().Be(0.1m);
+    }
+
+    [Fact]
+    public void GetForDefaultOrNull_WithGapBetweenRanges_ReturnsNull()
+    {
+        var container = CreateContainer(
+        [
+            Range(0m, 100m, 0.2m),
+            Range(200m, 300m, 0.1m)
+        ]);
+
+        container.GetForDefaultOrNull(150).Should().BeNull();
+    }
+
+    [Fact]
+    public void Initialize_WithLargeRange_DoesNotDependOnRangeCardinality()
+    {
+        var container = CreateContainer(
+        [
+            Range(0m, 5_000_000m, 0.2m)
+        ]);
+
+        container.GetForDefaultOrNull(4_999_999.99m)
+            .Should()
+            .Be(new MarkupModel(0.2m));
+    }
+
     [Fact]
     public void Initialize_WithRangesInDifferentOrder_GeneratesSameVersion()
     {

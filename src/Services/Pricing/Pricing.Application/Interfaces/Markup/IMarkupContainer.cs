@@ -8,8 +8,8 @@ public interface IMarkupContainer
 
     Models.Markup DefaultMarkup { get; }
     int DefaultCurrencyId { get; }
-    Models.Markup? GetForDefaultOrNull(double value);
-    Models.Markup? GetForCurrencyOrNull(int currencyId, double value);
+    Models.Markup? GetForDefaultOrNull(decimal value);
+    Models.Markup? GetForCurrencyOrNull(int currencyId, decimal value);
     string CurrentVersion { get; }
 
     void Initialize(
