@@ -3,6 +3,7 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
 using Attributes;
+using Exceptions;
 using Main.Application.Static;
 using Main.Entities.Product;
 using Main.Entities.Settings;
@@ -26,6 +27,9 @@ public class MapImgsToProductHandler(
         var toAdd = new List<ProductImage>();
         var applicationSettings =
             (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
+        var s3ServiceUrl = applicationSettings.S3ServiceUrl
+                           ?? throw new InvalidInputException(
+                               "global.application.setting.s3.service.url.not.configured");
         try
         {
             foreach (var img in request.Images)
@@ -41,7 +45,7 @@ public class MapImgsToProductHandler(
                 toAdd.Add(
                     ProductImage.Create(
                         request.ProductId,
-                        $"{applicationSettings.S3ServiceUrl}/{BucketNames.Images}/{path}",
+                        $"{s3ServiceUrl.TrimEnd('/')}/{BucketNames.Images}/{path}",
                         key));
             }
 

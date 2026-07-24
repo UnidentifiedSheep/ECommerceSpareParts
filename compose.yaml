@@ -45,7 +45,6 @@
     expose:
       - "8080"
     volumes:
-      - ./search_api_data:/app/data
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}

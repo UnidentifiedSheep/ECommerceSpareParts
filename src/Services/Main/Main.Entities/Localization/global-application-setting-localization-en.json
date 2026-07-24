@@ -1,0 +1,16 @@
+{
+  "locale": "en",
+  "keyValues": {
+    "global.application.setting.name": "Global application settings",
+    "global.application.setting.description": "Controls the public URLs used by application services.",
+    "global.application.setting.input.invalid": "Invalid global application settings data was provided.",
+    "global.application.setting.s3.service.url.name": "S3 service URL",
+    "global.application.setting.s3.service.url.description": "Public base URL used to access files stored in S3.",
+    "global.application.setting.s3.service.url.not.configured": "The S3 service URL is not configured. Configure it in the global application settings.",
+    "global.application.setting.api.service.url.name": "API service URL",
+    "global.application.setting.api.service.url.description": "Public base URL of the application API.",
+    "global.application.setting.app.service.url.name": "Application URL",
+    "global.application.setting.app.service.url.description": "Public base URL of the client application.",
+    "global.application.setting.app.service.url.not.configured": "The application URL is not configured. Configure it in the global application settings."
+  }
+}

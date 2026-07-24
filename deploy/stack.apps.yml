@@ -1,0 +1,101 @@
+x-api-service: &api-service
+  volumes:
+    - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+  environment:
+    - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+    - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+    - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
+  networks:
+    - backend
+  deploy:
+    placement:
+      constraints:
+        - node.labels.workload.api == true
+    update_config:
+      parallelism: 1
+      order: start-first
+    restart_policy:
+      condition: any
+      delay: 5s
+
+services:
+  main-api:
+    <<: *api-service
+    image: ${ARTIFACT_REGISTRY_HOST}/main-api:${IMAGE_TAG}
+    networks:
+      backend:
+        aliases:
+          - main-api
+    deploy:
+      replicas: ${MAIN_API_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.workload.api == true
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 5s
+
+  analytics-api:
+    <<: *api-service
+    image: ${ARTIFACT_REGISTRY_HOST}/analytics-api:${IMAGE_TAG}
+    networks:
+      backend:
+        aliases:
+          - analytics-api
+    deploy:
+      replicas: ${ANALYTICS_API_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.workload.api == true
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 5s
+
+  pricing-api:
+    <<: *api-service
+    image: ${ARTIFACT_REGISTRY_HOST}/pricing-api:${IMAGE_TAG}
+    networks:
+      backend:
+        aliases:
+          - pricing-api
+    deploy:
+      replicas: ${PRICING_API_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.workload.api == true
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 5s
+
+  search-api:
+    <<: *api-service
+    image: ${ARTIFACT_REGISTRY_HOST}/search-api:${IMAGE_TAG}
+    networks:
+      backend:
+        aliases:
+          - search-api
+    deploy:
+      replicas: ${SEARCH_API_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.workload.api == true
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 5s
+
+networks:
+  backend:
+    name: ${BACKEND_NETWORK:-backend}
+    external: true

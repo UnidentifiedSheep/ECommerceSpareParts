@@ -1,0 +1,190 @@
+services:
+  postgres:
+    image: ${ARTIFACT_REGISTRY_HOST}/postgres-cron:${IMAGE_TAG}
+    environment:
+      POSTGRES_USER: ${PGQL_USER}
+      POSTGRES_PASSWORD: ${PGQL_PASSWORD}
+      POSTGRES_MULTIPLE_DATABASES: main,analytics,pricing
+      PGDATA: ${POSTGRES_DATA_PATH:-/var/lib/postgresql/18/docker}
+      WALG_CONFIG_PATH: /run/secrets/postgres_walg_config
+    volumes:
+      - pg_data:/var/lib/postgresql
+    secrets:
+      - source: postgres_walg_config
+        target: postgres_walg_config
+        mode: 0444
+    configs:
+      - source: postgres_init_sql
+        target: /docker-entrypoint-initdb.d/clear-expired-coef.sql
+        mode: 0444
+      - source: postgres_init_script
+        target: /docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
+        mode: 0555
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=pg_cron
+      - -c
+      - cron.database_name=postgres
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=/usr/local/bin/wal-g wal-push "%p"
+      - -c
+      - archive_timeout=60s
+    networks:
+      backend:
+        aliases:
+          - postgres
+          - pgql
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.infra.postgres == true
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 60s
+
+  postgres-backup:
+    image: ${ARTIFACT_REGISTRY_HOST}/postgres-cron:${IMAGE_TAG}
+    user: postgres
+    entrypoint:
+      - /usr/local/bin/run-walg-backups
+    environment:
+      PGDATA: ${POSTGRES_DATA_PATH:-/var/lib/postgresql/18/docker}
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: postgres
+      PGUSER: ${PGQL_USER}
+      PGPASSWORD: ${PGQL_PASSWORD}
+      WALG_CONFIG_PATH: /run/secrets/postgres_walg_config
+      WALG_BACKUP_HOUR_UTC: ${WALG_BACKUP_HOUR_UTC:-2}
+      WALG_RETENTION_FULL_BACKUPS: ${WALG_RETENTION_FULL_BACKUPS:-7}
+      WALG_BACKUP_RETRY_SECONDS: ${WALG_BACKUP_RETRY_SECONDS:-900}
+      WALG_CREATE_INITIAL_BACKUP: ${WALG_CREATE_INITIAL_BACKUP:-true}
+    volumes:
+      - type: volume
+        source: pg_data
+        target: /var/lib/postgresql
+        read_only: true
+    secrets:
+      - source: postgres_walg_config
+        target: postgres_walg_config
+        mode: 0444
+    networks:
+      - backend
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.infra.postgres == true
+      update_config:
+        parallelism: 1
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        window: 120s
+
+  redis:
+    image: redis/redis-stack:latest
+    command:
+      - redis-stack-server
+      - --maxmemory-policy
+      - allkeys-lru
+      - --active-expire-effort
+      - "10"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      backend:
+        aliases:
+          - redis
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.infra.redis == true
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 60s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      backend:
+        aliases:
+          - rabbitmq
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.infra.rabbitmq == true
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 60s
+
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD}
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    networks:
+      backend:
+        aliases:
+          - opensearch
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.infra.opensearch == true
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        window: 120s
+
+networks:
+  backend:
+    name: ${BACKEND_NETWORK:-backend}
+    external: true
+
+configs:
+  postgres_init_sql:
+    external: true
+    name: ${POSTGRES_INIT_SQL_CONFIG:?POSTGRES_INIT_SQL_CONFIG is required}
+  postgres_init_script:
+    external: true
+    name: ${POSTGRES_INIT_SCRIPT_CONFIG:?POSTGRES_INIT_SCRIPT_CONFIG is required}
+
+secrets:
+  postgres_walg_config:
+    external: true
+    name: ${POSTGRES_WALG_SECRET:-postgres_walg_config}
+
+volumes:
+  pg_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_pg_data
+    external: true
+  redis_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_redis_data
+    external: true
+  rabbitmq_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_rabbitmq_data
+    external: true
+  opensearch_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_opensearch_data
+    external: true

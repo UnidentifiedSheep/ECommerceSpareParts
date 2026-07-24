@@ -12,10 +12,17 @@ scrape_configs:
     static_configs:
       - targets: [ "pricing-api:8080" ]
 
+  - job_name: "analytics-api"
+    metrics_path: /metrics
+    static_configs:
+      - targets: [ "analytics-api:8080" ]
+
+  - job_name: "search-api"
+    metrics_path: /metrics
+    static_configs:
+      - targets: [ "search-api:8080" ]
+
   - job_name: "gateway"
     metrics_path: /metrics
-    scheme: https
-    tls_config:
-      insecure_skip_verify: true
     static_configs:
       - targets: [ "gateway:8080" ]

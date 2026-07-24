@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
+using Exceptions;
 using Localization.Abstractions.Interfaces;
 using Mailing.Core;
 using Mailing.Core.Models;
@@ -44,6 +45,9 @@ public class SendEmailRecoveryHandler(
         var setting = (await settingsService
                 .GetOrDefault<GlobalApplicationSetting>(cancellationToken))
             .Data;
+        var appServiceUrl = setting.AppServiceUrl
+                            ?? throw new InvalidInputException(
+                                "global.application.setting.app.service.url.not.configured");
 
         var signed = jsonSigner.Sign(
             new ResetPayload
@@ -53,7 +57,7 @@ public class SendEmailRecoveryHandler(
                 Expires = DateTime.UtcNow + TimeSpan.FromMinutes(30)
             });
 
-        var baseUri = new Uri(setting.AppServiceUrl.TrimEnd('/') + "/");
+        var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
         var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
 
         var email = await emailRenderer.RenderAsync(

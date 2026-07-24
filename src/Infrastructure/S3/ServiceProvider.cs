@@ -12,7 +12,10 @@ public static class ServiceProvider
         collection.AddSingleton<IAmazonS3>(sp =>
         {
             var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
-            var config = CreateConfig(options.InternalUrl, options.ForcePathStyle);
+            var config = CreateConfig(
+                options.InternalUrl, 
+                options.Region,
+                options.ForcePathStyle);
             return new AmazonS3Client(
                 options.Login,
                 options.Password,
@@ -22,7 +25,10 @@ public static class ServiceProvider
         collection.AddSingleton<IPresignedS3Client, PresignedS3Client>(sp =>
         {
             var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
-            var config = CreateConfig(options.ExternalUrl, options.ForcePathStyle);
+            var config = CreateConfig(
+                options.ExternalUrl, 
+                options.Region,
+                options.ForcePathStyle);
             var protocol = GetProtocol(options.ExternalUrl);
             return new PresignedS3Client(
                 new AmazonS3Client(
@@ -38,6 +44,7 @@ public static class ServiceProvider
 
     private static AmazonS3Config CreateConfig(
         string serviceUrl,
+        string region,
         bool forcePathStyle)
     {
         var uri = new Uri(serviceUrl);
@@ -46,6 +53,7 @@ public static class ServiceProvider
         {
             ServiceURL = serviceUrl,
             ForcePathStyle = forcePathStyle,
+            AuthenticationRegion = region,
             UseHttp = uri.Scheme == Uri.UriSchemeHttp
         };
     }
