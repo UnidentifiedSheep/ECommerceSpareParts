@@ -6,12 +6,12 @@ services:
       POSTGRES_PASSWORD: ${PGQL_PASSWORD}
       POSTGRES_MULTIPLE_DATABASES: main,analytics,pricing
       PGDATA: ${POSTGRES_DATA_PATH:-/var/lib/postgresql/18/docker}
-      WALG_CONFIG_PATH: /run/secrets/postgres_walg_config
+      WALG_CONFIG_PATH: /run/secrets/postgres-walg.json
     volumes:
       - pg_data:/var/lib/postgresql
     secrets:
       - source: postgres_walg_config
-        target: postgres_walg_config
+        target: postgres-walg.json
         mode: 0444
     configs:
       - source: postgres_init_sql
@@ -59,7 +59,7 @@ services:
       PGDATABASE: postgres
       PGUSER: ${PGQL_USER}
       PGPASSWORD: ${PGQL_PASSWORD}
-      WALG_CONFIG_PATH: /run/secrets/postgres_walg_config
+      WALG_CONFIG_PATH: /run/secrets/postgres-walg.json
       WALG_BACKUP_HOUR_UTC: ${WALG_BACKUP_HOUR_UTC:-2}
       WALG_RETENTION_FULL_BACKUPS: ${WALG_RETENTION_FULL_BACKUPS:-7}
       WALG_BACKUP_RETRY_SECONDS: ${WALG_BACKUP_RETRY_SECONDS:-900}
@@ -71,7 +71,7 @@ services:
         read_only: true
     secrets:
       - source: postgres_walg_config
-        target: postgres_walg_config
+        target: postgres-walg.json
         mode: 0444
     networks:
       - backend

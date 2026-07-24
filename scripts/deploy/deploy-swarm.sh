@@ -463,8 +463,8 @@ validate_walg_storage() {
     --restart-condition none \
     --constraint "node.labels.infra.postgres == true" \
     --network "$BACKEND_NETWORK" \
-    --env WALG_CONFIG_PATH=/run/secrets/postgres_walg_config \
-    --secret source="$POSTGRES_WALG_SECRET",target=postgres_walg_config,mode=0444 \
+    --env WALG_CONFIG_PATH=/run/secrets/postgres-walg.json \
+    --secret source="$POSTGRES_WALG_SECRET",target=postgres-walg.json,mode=0444 \
     --entrypoint /usr/local/bin/wal-g \
     --with-registry-auth \
     "$image" \
