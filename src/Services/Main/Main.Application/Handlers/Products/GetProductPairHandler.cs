@@ -1,4 +1,5 @@
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
 using Main.Application.Extensions.QueryExtensions;
@@ -11,7 +12,9 @@ public record GetProductPairQuery(int ProductId) : IQuery<GetProductPairResult>;
 
 public record GetProductPairResult(ProductDto? Pair);
 
-public class GetProductPairHandler(IReadRepository<Product, int> context)
+public class GetProductPairHandler(
+    IReadRepository<Product, int> context,
+    IProjectionProvider<Product, ProductDto> productProjection)
     : IQueryHandler<GetProductPairQuery, GetProductPairResult>
 {
     public async Task<GetProductPairResult> Handle(
@@ -21,7 +24,9 @@ public class GetProductPairHandler(IReadRepository<Product, int> context)
         var product = await context.Query
             .Where(x => x.Id == request.ProductId && x.PairId != null)
             .Select(x => x.Pair!)
-            .FirstProductDtoAsync(cancellationToken: cancellationToken);
+            .FirstProductDtoAsync(
+                productProjection,
+                cancellationToken: cancellationToken);
 
         return new GetProductPairResult(product);
     }

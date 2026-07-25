@@ -1,11 +1,13 @@
 using Abstractions.Models;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Enums;
 using Enums.Units;
 using Extensions;
 using Search.Application.Dtos.Products;
 using Search.Application.Interfaces.Product;
-using Search.Application.Mapping;
+using Search.Entities;
 
 namespace Search.Application.Handlers.Products.SearchProductsByAll;
 
@@ -22,7 +24,9 @@ public record SearchProductsByAllQuery(
 
 public record SearchProductsByAllResult(IEnumerable<ProductDto> Products);
 
-public class SearchProductsByAllHandler(IProductRepository productRepository)
+public class SearchProductsByAllHandler(
+    IProductRepository productRepository,
+    IProjectionProvider<Product, ProductDto> projection)
     : IQueryHandler<SearchProductsByAllQuery, SearchProductsByAllResult>
 {
     public async Task<SearchProductsByAllResult> Handle(
@@ -40,7 +44,7 @@ public class SearchProductsByAllHandler(IProductRepository productRepository)
             cancellationToken);
 
         return new SearchProductsByAllResult(
-            products.Select(x => x.ToProductDto()));
+            products.Select(projection.Projection.AsFunc()));
     }
 
     private static RangeModel<decimal>? ConvertDimensionRangeToMeters(

@@ -27,7 +27,6 @@ public class GlobalApplicationSettingDefinition(
 
         var data = new GlobalApplicationSettingData
         {
-            S3ServiceUrl = NormalizeUrl(input.S3ServiceUrl),
             ApiServiceUrl = NormalizeUrl(input.ApiServiceUrl),
             AppServiceUrl = NormalizeUrl(input.AppServiceUrl)
         };

@@ -1,10 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Sale;
-using Main.Application.Projections;
 using Main.Entities.Sale;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +24,8 @@ public record GetSalesQuery(
 public record GetSalesResult(IReadOnlyList<SaleDto> Sales);
 
 public class GetSalesHandler(
-    IReadRepository<Sale, Guid> repository
+    IReadRepository<Sale, Guid> repository,
+    IProjectionProvider<Sale, SaleDto> projection
 ) : IQueryHandler<GetSalesQuery, GetSalesResult>
 {
     public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
@@ -52,8 +52,7 @@ public class GetSalesHandler(
 
         var result = await query
             .SortBy(request.SortBy)
-            .AsExpandable()
-            .Select(SaleProjections.ToSaleDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

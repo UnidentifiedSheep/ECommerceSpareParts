@@ -31,7 +31,6 @@ public abstract class GlobalApplicationSettingTestContext(
         var setting = new GlobalApplicationSetting(
             new GlobalApplicationSettingData
             {
-                S3ServiceUrl = "https://www.somewebsite.com",
                 ApiServiceUrl = "https://www.somewebsite.com",
                 AppServiceUrl = "https://www.somewebsite.com"
             });

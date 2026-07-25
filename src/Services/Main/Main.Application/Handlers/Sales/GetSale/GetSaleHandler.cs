@@ -1,9 +1,9 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using LinqKit;
 using Main.Application.Dtos.Sale;
-using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +19,8 @@ public record GetSaleQuery(
 public record GetSaleResult(SaleDto Sale);
 
 public class GetSaleHandler(
-    IReadRepository<Sale, Guid> repository
+    IReadRepository<Sale, Guid> repository,
+    IProjectionProvider<Sale, SaleDto> projection
 )
     : IQueryHandler<GetSaleQuery, GetSaleResult>
 {
@@ -35,8 +36,7 @@ public class GetSaleHandler(
                 saleId.HasValue && x.Id == saleId.Value ||
                 transactionId.HasValue && x.TransactionId == transactionId.Value)
             .OrderByDescending(x => saleId.HasValue && x.Id == saleId.Value)
-            .AsExpandable()
-            .Select(SaleProjections.ToSaleDto)
+            .Project(projection)
             .FirstOrDefaultAsync(cancellationToken);
 
         return dto == null

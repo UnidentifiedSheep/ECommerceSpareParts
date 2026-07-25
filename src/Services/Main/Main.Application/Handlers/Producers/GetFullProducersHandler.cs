@@ -1,8 +1,8 @@
-﻿using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Producer;
-using Main.Application.Projections;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +22,8 @@ public record GetFullProducersQuery : IQuery<GetFullProducersResult>
 public record GetFullProducersResult(IReadOnlyList<ProducerFullDto> Producers);
 
 public class GetFullProducersHandler(
-    IReadRepository<Producer, int> repository
+    IReadRepository<Producer, int> repository,
+    IProjectionProvider<Producer, ProducerFullDto> projection
 ) : IQueryHandler<GetFullProducersQuery, GetFullProducersResult>
 {
     public async Task<GetFullProducersResult> Handle(
@@ -34,8 +35,7 @@ public class GetFullProducersHandler(
         var result = await repository
             .Query
             .Where(x => request.Ids.Contains(x.Id))
-            .AsExpandable()
-            .Select(ProducerProjections.ToFullDto)
+            .Project(projection)
             .ToListAsync(cancellationToken);
 
         return new GetFullProducersResult(result);

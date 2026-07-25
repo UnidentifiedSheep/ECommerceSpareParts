@@ -2,10 +2,10 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Projections;
 using Attributes;
 using Contracts.Producer;
 using Main.Application.Dtos.Producer;
-using Main.Application.Projections;
 using Main.Entities.Producer;
 
 namespace Main.Application.Handlers.Producers.CreateProducer;
@@ -16,7 +16,9 @@ public record CreateProducerCommand(NewProducerDto NewProducer) : ICommand<Creat
 
 public record CreateProducerResult(ProducerDto Producer);
 
-public class CreateProducerHandler(IUnitOfWork unitOfWork )
+public class CreateProducerHandler(
+    IUnitOfWork unitOfWork,
+    IProjectionProvider<Producer, ProducerDto> projection)
     : ICommandHandler<CreateProducerCommand, CreateProducerResult>
 {
     public async Task<CreateProducerResult> Handle(
@@ -28,6 +30,6 @@ public class CreateProducerHandler(IUnitOfWork unitOfWork )
         await unitOfWork.AddAsync(producer, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new CreateProducerResult(ProducerProjections.ToDto.AsFunc()(producer));
+        return new CreateProducerResult(projection.Projection.AsFunc()(producer));
     }
 }

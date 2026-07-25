@@ -1,6 +1,9 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Projections;
+using LinqKit;
 using Main.Application.Dtos.Product;
+using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductContent.GetProductContents;
@@ -10,7 +13,8 @@ public record GetProductContentsQuery(int ProductId) : IQuery<GetProductContents
 public record GetProductContentsResult(IReadOnlyList<ProductContentDto> Contents);
 
 public class GetProductContentsHandler(
-    IReadRepository<Entities.Product.ProductContent, (int, int)> repository
+    IReadRepository<Entities.Product.ProductContent, (int, int)> repository,
+    IProjectionProvider<Product, ProductDto> productProjection
 )
     : IQueryHandler<GetProductContentsQuery, GetProductContentsResult>
 {
@@ -18,23 +22,15 @@ public class GetProductContentsHandler(
         GetProductContentsQuery request,
         CancellationToken cancellationToken)
     {
+        var productToDto = productProjection.Projection;
+
         var result = await repository.Query
             .Where(x => x.ParentProductId == request.ProductId)
+            .AsExpandable()
             .Select(x => new ProductContentDto
             {
                 Quantity = x.Quantity,
-                Product = new ProductDto
-                {
-                    Id = x.ChildProductId,
-                    Description = x.ChildProduct.Description,
-                    Indicator = x.ChildProduct.Indicator,
-                    Name = x.ChildProduct.Name,
-                    Stock = x.ChildProduct.Stock,
-                    Sku = x.ChildProduct.Sku,
-                    ProducerId = x.ChildProduct.ProducerId,
-                    ProducerName = x.ChildProduct.Producer.Name,
-                    Images = x.ChildProduct.Images.Select(z => z.Path).ToList()
-                }
+                Product = productToDto.Invoke(x.ChildProduct)
             })
             .ToListAsync(cancellationToken);
         return new GetProductContentsResult(result);

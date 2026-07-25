@@ -1,10 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Storage;
-using Main.Application.Projections;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +19,8 @@ public record GetStorageContentQuery(
 public record GetStorageContentResult(IEnumerable<StorageContentDto> Content);
 
 public class GetStorageContentHandler(
-    IReadRepository<StorageContent, int> repository
+    IReadRepository<StorageContent, int> repository,
+    IProjectionProvider<StorageContent, StorageContentDto> projection
 )
     : IQueryHandler<GetStorageContentQuery, GetStorageContentResult>
 {
@@ -38,8 +38,7 @@ public class GetStorageContentHandler(
         if (!request.ShowZeroCount) query = query.Where(x => x.Count > 0);
 
         var result = await query
-            .AsExpandable()
-            .Select(StorageContentProjections.ToStorageContentDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

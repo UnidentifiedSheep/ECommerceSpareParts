@@ -12,6 +12,7 @@ using Application.Common.Handlers.JobSchedules.UpdateSchedule;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
+using Application.Common.Projections;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -89,7 +90,8 @@ public static class ServiceProvider
     {
         assembly ??= Assembly.GetExecutingAssembly();
         services.RegisterNamedObject<LrtNamedObjectBase>(assembly)
-            .RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly);
+            .RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly)
+            .RegisterProjectionProviders<JobDtoProjectionProvider>();
 
         services.AddScoped<IJobLeaseService, JobLeaseService>();
         services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();

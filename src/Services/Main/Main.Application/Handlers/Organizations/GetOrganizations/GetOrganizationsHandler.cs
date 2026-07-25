@@ -1,10 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Organizations;
-using Main.Application.Projections;
 using Main.Entities.Organization;
 using Main.Enums.Organization;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +21,9 @@ public record GetOrganizationsQuery(
 
 public record GetOrganizationsResult(IReadOnlyList<OrganizationDto> Organizations);
 
-public class GetOrganizationsHandler(IReadRepository<Organization, Guid> repository)
+public class GetOrganizationsHandler(
+    IReadRepository<Organization, Guid> repository,
+    IProjectionProvider<Organization, OrganizationDto> projection)
     : IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
 {
     public async Task<GetOrganizationsResult> Handle(
@@ -76,8 +77,7 @@ public class GetOrganizationsHandler(IReadRepository<Organization, Guid> reposit
 
         var organizations = await query
             .SortBy(request.SortBy)
-            .AsExpandable()
-            .Select(OrganizationProjections.ToDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

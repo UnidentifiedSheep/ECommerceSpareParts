@@ -1,18 +1,18 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Purchase;
-using LinqKit;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Interfaces.Services;
-using Main.Application.Projections;
 using Main.Entities.Purchase;
 using Main.Entities.Storage;
 using Main.Enums;
@@ -50,7 +50,8 @@ public class CreatePurchaseHandler(
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
     IReadRepository<Purchase, Guid> readRepository,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    IProjectionProvider<Purchase, PurchaseDto> purchaseProjection
 ) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
     public async Task<CreatePurchaseResult> Handle(
@@ -111,8 +112,7 @@ public class CreatePurchaseHandler(
             });
 
         var fromDb = await readRepository.Query
-            .AsExpandable()
-            .Select(PurchaseProjections.ToPurchaseDto)
+            .Project(purchaseProjection)
             .FirstAsync(x => x.Id == purchase.Id, cancellationToken);
         return new CreatePurchaseResult(fromDb);
     }

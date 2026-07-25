@@ -2,6 +2,7 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions;
@@ -9,7 +10,6 @@ using Localization.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
-using Pricing.Application.Projections;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Entities.Pricing;
 using Pricing.Enums;
@@ -31,7 +31,9 @@ public class UpsertPriceApplierHandler(
     IRepository<Entities.Pricing.PriceApplier, string> repository,
     IReadRepository<PriceApplierState, PriceApplierStateKey> stateRepository,
     IScopedStringLocalizer localizer,
-    IUnitOfWork unitOfWork) : ICommandHandler<UpsertPriceApplierCommand, UpsertPriceApplierResult>
+    IUnitOfWork unitOfWork,
+    IProjectionProvider<Entities.Pricing.PriceApplier, PriceApplierDto> projection
+) : ICommandHandler<UpsertPriceApplierCommand, UpsertPriceApplierResult>
 {
     public async Task<UpsertPriceApplierResult> Handle(
         UpsertPriceApplierCommand request, 
@@ -92,7 +94,7 @@ public class UpsertPriceApplierHandler(
 
         model.RemoveStatesExcept(request.States.Select(x => x.Usage));
         
-        var result = PriceApplierProjections.ToApplierDto.AsFunc()(model);
+        var result = projection.Projection.AsFunc()(model);
         if (local is not null)
             result = result with { Name = local.GetLocalizedName(localizer) };
 

@@ -10,19 +10,15 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
     {
         builder.ToTable("product_images", "public");
 
-        builder.HasKey(e => new { e.ProductId, e.Path })
+        builder.HasKey(e => new { e.ProductId, e.StorageKey })
             .HasName("product_images_pk");
 
         builder.Property(e => e.ProductId)
             .HasColumnName("product_id");
 
-        builder.Property(e => e.Path)
-            .HasColumnName("path")
+        builder.Property(e => e.StorageKey)
+            .HasColumnName("storage_key")
             .HasMaxLength(255);
-
-        builder.Property(e => e.Description)
-            .HasColumnName("description")
-            .HasMaxLength(512);
 
         builder.HasOne<Entities.Product.Product>()
             .WithMany(p => p.Images)

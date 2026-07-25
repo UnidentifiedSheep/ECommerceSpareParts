@@ -48,6 +48,6 @@ public class UpdateOrganizationFinancialProfileHandler(
             request.OrganizationId,
             cancellationToken);
         return new UpdateOrganizationFinancialProfileResult(
-            BalanceProjections.ToOrganizationFinancialProfileDto(profile, netPosition));
+            OrganizationFinancialProfileDtoFactory.Create(profile, netPosition));
     }
 }

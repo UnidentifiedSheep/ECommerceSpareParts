@@ -2,6 +2,7 @@ using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Enums;
@@ -30,6 +31,7 @@ public class ProducerSupplierMappingImportLrt(
     ISender sender,
     IProducerLookupService producerLookupService,
     ILogger<ProducerSupplierMappingImportLrt> logger,
+    IOptions<S3BucketsOptions> bucketsOptions,
     IPublishEndpoint publisher,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
@@ -39,6 +41,7 @@ public class ProducerSupplierMappingImportLrt(
         ProducerSupplierMappingImportLrt.ProducerSupplierMappingCsvDto,
         ProducerSupplierMappingImportLrt.ProducerSupplierMappingBatchItem>(
         jobRepository,
+        bucketsOptions,
         unitOfWork,
         publisher,
         logger,

@@ -38,6 +38,7 @@ public static class ServiceProvider
             .WithSystemTextJsonSerializer();
 
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
+        collection.RegisterProjectionProviders<SettingFactory>();
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 

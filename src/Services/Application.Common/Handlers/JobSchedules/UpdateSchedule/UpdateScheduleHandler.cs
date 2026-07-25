@@ -4,13 +4,12 @@ using Application.Common.Exceptions;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.NamedObject;
-using Application.Common.Projections;
 using Attributes;
 using Cronos;
 using Domain.CommonEntities;
-using Localization.Abstractions.Interfaces;
 
 namespace Application.Common.Handlers.JobSchedules.UpdateSchedule;
 
@@ -25,8 +24,8 @@ public record UpdateScheduleResult(JobScheduleDto Schedule);
 public class UpdateScheduleHandler(
     IRepository<JobSchedule, Guid> repository,
     INamedObjectRegistry<LrtNamedObjectBase> registry,
-    IScopedStringLocalizer localizer,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    IProjectionProvider<JobSchedule, JobScheduleDto> projection
 ) : ICommandHandler<UpdateScheduleCommand, UpdateScheduleResult>
 {
     public async Task<UpdateScheduleResult> Handle(
@@ -79,6 +78,6 @@ public class UpdateScheduleHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new UpdateScheduleResult(JobProjections.JobScheduleProjection(localizer).AsFunc()(schedule));
+        return new UpdateScheduleResult(projection.Projection.AsFunc()(schedule));
     }
 }

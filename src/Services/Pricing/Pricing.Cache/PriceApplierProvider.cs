@@ -1,10 +1,11 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Models.Pricing;
-using Pricing.Application.Projections;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Application.Static;
 using Pricing.Entities.Pricing;
@@ -15,7 +16,9 @@ namespace Pricing.Cache;
 public class PriceApplierProvider(
     IFusionCache cache,
     IReadRepository<PriceApplier, string> repository,
-    INamedObjectRegistry<ApplierNamedObjectBase> registry) : IPriceApplierProvider
+    INamedObjectRegistry<ApplierNamedObjectBase> registry,
+    IProjectionProvider<PriceApplier, PriceApplierDto> projection
+) : IPriceApplierProvider
 {
     public async Task<PriceApplierConfigurationSnapshot> GetConfigurationAsync(
         CancellationToken ct = default)
@@ -39,8 +42,7 @@ public class PriceApplierProvider(
         CancellationToken ct = default)
     {
         var appliers = await repository.Query
-            .AsExpandable()
-            .Select(PriceApplierProjections.ToApplierDto)
+            .Project(projection)
             .ToListAsync(ct);
 
         return PriceApplierConfigurationSnapshot.Create(

@@ -44,6 +44,7 @@ builder.Services
     .AddPhoneOptions()
     .AddJwtOptions()
     .AddS3Options()
+    .AddS3BucketOptions()
     .AddLrtOptions()
     .AddScheduledJobEnqueuerOptions()
     .AddSystemOptions()

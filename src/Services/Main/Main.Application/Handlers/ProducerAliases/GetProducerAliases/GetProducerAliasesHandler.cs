@@ -1,11 +1,10 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Producer;
 using Main.Application.Dtos.Producer.Aliases;
-using Main.Application.Projections;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +15,9 @@ public record GetProducerAliasesQuery(int ProducerId, Pagination Pagination)
 
 public record GetProducerAliasesResult(IReadOnlyList<ProducerAliasDto> Aliases);
 
-public class GetProducerAliasesHandler(IReadRepository<ProducerAlias, string> repository)
+public class GetProducerAliasesHandler(
+    IReadRepository<ProducerAlias, string> repository,
+    IProjectionProvider<ProducerAlias, ProducerAliasDto> projection)
     : IQueryHandler<GetProducerAliasesQuery, GetProducerAliasesResult>
 {
     public async Task<GetProducerAliasesResult> Handle(
@@ -25,8 +26,7 @@ public class GetProducerAliasesHandler(IReadRepository<ProducerAlias, string> re
     {
         var result = await repository.Query
             .Where(x => x.ProducerId == request.ProducerId)
-            .AsExpandable()
-            .Select(ProducerProjections.ToAliasDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
         return new GetProducerAliasesResult(result);

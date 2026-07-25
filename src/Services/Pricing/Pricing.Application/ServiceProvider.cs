@@ -42,6 +42,7 @@ public static class ServiceProvider
             .WithSystemTextJsonSerializer();
 
         collection.RegisterSettingsService<SettingFactory>();
+        collection.RegisterProjectionProviders<SettingFactory>();
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();

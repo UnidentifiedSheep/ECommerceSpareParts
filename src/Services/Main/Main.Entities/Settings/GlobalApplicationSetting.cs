@@ -20,12 +20,6 @@ public class GlobalApplicationSetting : Setting<GlobalApplicationSettingData>,
 
 public record GlobalApplicationSettingData
 {
-    [JsonPropertyName("s3ServiceUrl")]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("global.application.setting.s3.service.url.name")]
-    [LocalizedJsonFieldDescription("global.application.setting.s3.service.url.description")]
-    public string? S3ServiceUrl { get; init; }
-
     [JsonPropertyName("apiServiceUrl")]
     [InputControl(InputControlType.TextField)]
     [LocalizedJsonFieldName("global.application.setting.api.service.url.name")]

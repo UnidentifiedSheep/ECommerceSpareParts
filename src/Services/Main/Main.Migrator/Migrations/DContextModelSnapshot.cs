@@ -1655,17 +1655,12 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("product_id");
 
-                    b.Property<string>("Path")
+                    b.Property<string>("StorageKey")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("path");
+                        .HasColumnName("storage_key");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
-                        .HasColumnName("description");
-
-                    b.HasKey("ProductId", "Path")
+                    b.HasKey("ProductId", "StorageKey")
                         .HasName("product_images_pk");
 
                     b.ToTable("product_images", "public");

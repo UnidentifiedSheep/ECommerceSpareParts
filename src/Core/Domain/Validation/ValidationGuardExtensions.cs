@@ -63,6 +63,11 @@ public static class ValidationGuardExtensions
             : value;
     }
 
+    public static bool EnsureTrue(this bool value, string errorKey)
+    {
+        return !value.IsTrue() ? throw new InvalidInputException(errorKey) : value;
+    }
+
     public static T EnsureNotEqual<T>(
         this T value,
         T next,
@@ -198,6 +203,11 @@ public static class ValidationGuardExtensions
         return !value.IsValid(predicate)
             ? throw exceptionFactory()
             : value;
+    }
+
+    public static bool EnsureTrue(this bool value, Func<Exception> exceptionFactory)
+    {
+        return !value.IsTrue() ? throw exceptionFactory() : value;
     }
 
     public static T EnsureNotEqual<T>(

@@ -1,7 +1,9 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Search.Application.Dtos.Producers;
 using Search.Application.Interfaces.Producer;
-using Search.Application.Mapping;
+using ProducerAliasEntity = Search.Entities.ProducerAlias;
 
 namespace Search.Application.Handlers.Producers;
 
@@ -10,7 +12,8 @@ public record GetProducerAliasesQuery(int ProducerId) : IQuery<GetProducerAliase
 public record GetProducerAliasesResult(IEnumerable<ProducerAlias> Aliases);
 
 public class GetProducerAliasesHandler(
-    IProducerRepository producerRepository
+    IProducerRepository producerRepository,
+    IProjectionProvider<ProducerAliasEntity, ProducerAlias> projection
 ) : IQueryHandler<GetProducerAliasesQuery, GetProducerAliasesResult>
 {
     public async Task<GetProducerAliasesResult> Handle(
@@ -22,6 +25,6 @@ public class GetProducerAliasesHandler(
             cancellationToken);
 
         return new GetProducerAliasesResult(
-            producer?.Aliases.Select(x => x.ToProducerAliasDto()) ?? []);
+            producer?.Aliases.Select(projection.Projection.AsFunc()) ?? []);
     }
 }

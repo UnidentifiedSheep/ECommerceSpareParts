@@ -1,14 +1,18 @@
 using System.Linq.Expressions;
 using Application.Common.Dtos;
+using Application.Common.Interfaces.Projections;
+using Attributes;
 using CronExpressionDescriptor;
 using Domain.CommonEntities;
 using Localization.Abstractions.Interfaces;
 
 namespace Application.Common.Projections;
 
-public static class JobProjections
+[Lifetime(Lifetime.Singleton)]
+public sealed class JobDtoProjectionProvider
+    : IProjectionProvider<Job, JobDto>
 {
-    public static readonly Expression<Func<Job, JobDto>> JobProjection =
+    public Expression<Func<Job, JobDto>> Projection { get; } =
         job => new JobDto
         {
             Attempts = job.Attempts,
@@ -22,11 +26,15 @@ public static class JobProjections
             Status = job.Status,
             UpdatedAt = job.UpdatedAt
         };
+}
 
-    public static Expression<Func<JobSchedule, JobScheduleDto>> JobScheduleProjection(
-        IScopedStringLocalizer localizer)
-    {
-        return schedule => new JobScheduleDto
+[Lifetime(Lifetime.Scoped)]
+public sealed class JobScheduleDtoProjectionProvider(
+    IScopedStringLocalizer localizer)
+    : IProjectionProvider<JobSchedule, JobScheduleDto>
+{
+    public Expression<Func<JobSchedule, JobScheduleDto>> Projection { get; } =
+        schedule => new JobScheduleDto
         {
             Id = schedule.Id,
             Name = schedule.Name,
@@ -47,5 +55,4 @@ public static class JobProjections
             JobSystemName = schedule.JobSystemName,
             Enabled = schedule.Enabled
         };
-    }
 }

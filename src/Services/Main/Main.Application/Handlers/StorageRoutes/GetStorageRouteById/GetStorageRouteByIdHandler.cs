@@ -1,8 +1,8 @@
-﻿using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Storage;
-using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,8 @@ public record GetStorageRouteByIdQuery(Guid Id) : IQuery<GetStorageRouteByIdResu
 public record GetStorageRouteByIdResult(StorageRouteDto StorageRoute);
 
 public class GetStorageRouteByIdHandler(
-    IReadRepository<StorageRoute, Guid> repository
+    IReadRepository<StorageRoute, Guid> repository,
+    IProjectionProvider<StorageRoute, StorageRouteDto> projection
 )
     : IQueryHandler<GetStorageRouteByIdQuery, GetStorageRouteByIdResult>
 {
@@ -23,8 +24,7 @@ public class GetStorageRouteByIdHandler(
         CancellationToken cancellationToken)
     {
         var route = await repository.Query
-            .AsExpandable()
-            .Select(StorageProjections.StorageRouteProjection)
+            .Project(projection)
             .FirstOrDefaultAsync(cancellationToken) ?? throw new StorageRouteNotFound(request.Id);
         return new GetStorageRouteByIdResult(route);
     }

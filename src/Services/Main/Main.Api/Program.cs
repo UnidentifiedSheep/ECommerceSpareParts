@@ -54,6 +54,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddEmailOptions()
     .AddPhoneOptions()
     .AddJwtOptions()
+    .AddS3BucketOptions()
     .AddSystemOptions()
     .AddSecretEncryptionOptions();
 

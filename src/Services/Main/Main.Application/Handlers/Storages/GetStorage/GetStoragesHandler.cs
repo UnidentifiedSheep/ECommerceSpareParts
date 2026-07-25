@@ -1,10 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Storage;
-using Main.Application.Projections;
 using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +20,8 @@ public record GetStoragesQuery(
 public record GetStoragesResult(IReadOnlyList<StorageDto> Storages);
 
 public class GetStoragesHandler(
-    IReadRepository<Storage, string> repository
+    IReadRepository<Storage, string> repository,
+    IProjectionProvider<Storage, StorageDto> projection
 ) : IQueryHandler<GetStoragesQuery, GetStoragesResult>
 {
     public async Task<GetStoragesResult> Handle(GetStoragesQuery request, CancellationToken cancellationToken)
@@ -48,8 +48,7 @@ public class GetStoragesHandler(
 
         var result = await query
             .Where(x => request.Type == null || x.Type == request.Type)
-            .AsExpandable()
-            .Select(StorageProjections.StorageProjection)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

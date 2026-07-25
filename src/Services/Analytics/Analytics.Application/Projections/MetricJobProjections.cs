@@ -1,13 +1,16 @@
 using System.Linq.Expressions;
 using Analytics.Application.Dtos.Metric;
 using Analytics.Entities.Metrics;
-using LinqKit;
+using Application.Common.Interfaces.Projections;
+using Attributes;
 
-namespace Analytics.Application.Handlers.Projections;
+namespace Analytics.Application.Projections;
 
-public static class MetricJobProjection
+[Lifetime(Lifetime.Singleton)]
+public sealed class MetricJobDtoProjectionProvider
+    : IProjectionProvider<MetricJob, MetricJobDto>
 {
-    public static readonly Expression<Func<MetricJob, MetricJobDto>> ToDto =
+    public Expression<Func<MetricJob, MetricJobDto>> Projection { get; } =
         x => new MetricJobDto
         {
             JobId = x.JobId,
@@ -19,9 +22,4 @@ public static class MetricJobProjection
             Attempts = x.Job.Attempts,
             MaxAttempts = x.Job.MaxAttempts
         };
-
-    public static readonly Expression<Func<MetricJob?, MetricJobDto?>> ToDtoOrDefault =
-        x => x == null
-            ? null
-            : ToDto.Invoke(x);
 }

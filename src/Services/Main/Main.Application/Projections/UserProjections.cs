@@ -1,4 +1,6 @@
 ﻿using System.Linq.Expressions;
+using Application.Common.Interfaces.Projections;
+using Attributes;
 using Enums;
 using LinqKit;
 using Main.Application.Dtos.Auth;
@@ -9,12 +11,16 @@ using Main.Enums.Auth;
 
 namespace Main.Application.Projections;
 
-public static class UserProjections
+[Lifetime(Lifetime.Singleton)]
+public sealed class UserDtoProjectionProvider
+    : IProjectionProvider<User, UserDto>
 {
-    private static readonly string SystemRole = Role.System.ToNormalizedRole();
+    public UserDtoProjectionProvider(
+        IProjectionProvider<UserInfo, UserInfoDto> userInfoProjection)
+    {
+        var userInfoToDto = userInfoProjection.Projection;
 
-    public static readonly Expression<Func<User, UserDto>> UserProjection =
-        x => new UserDto
+        Projection = x => new UserDto
         {
             Id = x.Id,
             UserName = x.UserName.Value,
@@ -27,27 +33,55 @@ public static class UserProjections
             LastLoginAt = x.LastLoginAt,
             UserInfo = x.UserInfo == null
                 ? null
-                : UserInfoProjection.Invoke(x.UserInfo)
+                : userInfoToDto.Invoke(x.UserInfo)
         };
+    }
 
-    public static readonly Expression<Func<User, UserPartyDto>> UserPartyProjection =
-        x => new UserPartyDto
+    public Expression<Func<User, UserDto>> Projection { get; }
+}
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class UserPartyDtoProjectionProvider
+    : IProjectionProvider<User, UserPartyDto>
+{
+    public UserPartyDtoProjectionProvider(
+        IProjectionProvider<User, UserDto> userProjection,
+        IProjectionProvider<User, UserPartyType> partyTypeProjection)
+    {
+        var userToDto = userProjection.Projection;
+        var userToPartyType = partyTypeProjection.Projection;
+        var systemRole = Role.System.ToNormalizedRole();
+
+        Projection = x => new UserPartyDto
         {
-            PartyType = TransactionPartyTypeProjection.Invoke(x),
-            User = x.Roles.Any(role => role.RoleName == SystemRole)
+            PartyType = userToPartyType.Invoke(x),
+            User = x.Roles.Any(role => role.RoleName == systemRole)
                 ? null
-                : UserProjection.Invoke(x)
+                : userToDto.Invoke(x)
         };
+    }
 
-    public static readonly Expression<Func<UserInfo, UserInfoDto>> UserInfoProjection =
+    public Expression<Func<User, UserPartyDto>> Projection { get; }
+}
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class UserInfoDtoProjectionProvider
+    : IProjectionProvider<UserInfo, UserInfoDto>
+{
+    public Expression<Func<UserInfo, UserInfoDto>> Projection { get; } =
         x => new UserInfoDto
         {
             Description = x.Description,
             Name = x.Name,
             Surname = x.Surname
         };
+}
 
-    public static readonly Expression<Func<UserEmail, UserEmailDto>> UserEmailProjection =
+[Lifetime(Lifetime.Singleton)]
+public sealed class UserEmailDtoProjectionProvider
+    : IProjectionProvider<UserEmail, UserEmailDto>
+{
+    public Expression<Func<UserEmail, UserEmailDto>> Projection { get; } =
         x => new UserEmailDto
         {
             Email = x.Email.Value,
@@ -58,8 +92,13 @@ public static class UserProjections
             EmailType = x.EmailType,
             IsPrimary = x.IsPrimary
         };
+}
 
-    public static readonly Expression<Func<UserPhone, UserPhoneDto>> UserPhoneProjection =
+[Lifetime(Lifetime.Singleton)]
+public sealed class UserPhoneDtoProjectionProvider
+    : IProjectionProvider<UserPhone, UserPhoneDto>
+{
+    public Expression<Func<UserPhone, UserPhoneDto>> Projection { get; } =
         x => new UserPhoneDto
         {
             IsConfirmed = x.Confirmed,
@@ -67,8 +106,15 @@ public static class UserProjections
             Number = x.PhoneNumber,
             Type = x.PhoneType
         };
+}
 
-    public static readonly Expression<Func<User, UserPartyType>> TransactionPartyTypeProjection =
+[Lifetime(Lifetime.Singleton)]
+public sealed class UserPartyTypeProjectionProvider
+    : IProjectionProvider<User, UserPartyType>
+{
+    private static readonly string SystemRole = Role.System.ToNormalizedRole();
+
+    public Expression<Func<User, UserPartyType>> Projection { get; } =
         x => x.Roles.Any(role => role.RoleName == SystemRole)
             ? UserPartyType.System
             : UserPartyType.User;

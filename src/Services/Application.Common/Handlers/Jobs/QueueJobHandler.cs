@@ -3,8 +3,8 @@ using Application.Common.Dtos;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Projections;
 using Application.Common.NamedObject;
-using Application.Common.Projections;
 using Attributes;
 using Domain.CommonEntities;
 
@@ -42,7 +42,8 @@ public sealed record QueueJobResult(IReadOnlyList<JobDto> Jobs);
 
 public sealed class QueueJobHandler(
     INamedObjectRegistry<LrtNamedObjectBase> registry,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    IProjectionProvider<Job, JobDto> projection
 ) : ICommandHandler<QueueJobCommand, QueueJobResult>
 {
     public async Task<QueueJobResult> Handle(
@@ -63,6 +64,7 @@ public sealed class QueueJobHandler(
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new QueueJobResult(toAdd.Select(job => JobProjections.JobProjection.AsFunc()(job)).ToList());
+        var toDto = projection.Projection.AsFunc();
+        return new QueueJobResult(toAdd.Select(toDto).ToList());
     }
 }

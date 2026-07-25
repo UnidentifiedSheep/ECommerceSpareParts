@@ -1,8 +1,10 @@
 ﻿using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Projections;
 using Search.Application.Dtos.Products;
 using Search.Application.Interfaces.Product;
-using Search.Application.Mapping;
+using Search.Entities;
 
 namespace Search.Application.Handlers.Products.SearchProductsBySku;
 
@@ -16,7 +18,8 @@ public record SearchProductsBySkuQuery(
 public record SearchProductsBySkuResult(IEnumerable<ProductDto> Products);
 
 public class SearchProductsBySkuHandler(
-    IProductRepository productRepository
+    IProductRepository productRepository,
+    IProjectionProvider<Product, ProductDto> projection
 ) : IQueryHandler<SearchProductsBySkuQuery, SearchProductsBySkuResult>
 {
     public async Task<SearchProductsBySkuResult> Handle(
@@ -31,6 +34,6 @@ public class SearchProductsBySkuHandler(
             cancellationToken);
 
         return new SearchProductsBySkuResult(
-            result.Select(x => x.ToProductDto()));
+            result.Select(projection.Projection.AsFunc()));
     }
 }

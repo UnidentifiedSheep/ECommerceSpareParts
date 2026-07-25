@@ -3,12 +3,11 @@ using Application.Common.Dtos;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Projections;
 using Application.Common.NamedObject;
-using Application.Common.Projections;
 using Attributes;
 using Cronos;
 using Domain.CommonEntities;
-using Localization.Abstractions.Interfaces;
 
 namespace Application.Common.Handlers.JobSchedules.CreateSchedule;
 
@@ -18,9 +17,9 @@ public record CreateScheduleCommand(NewJobScheduleDto NewSchedule) : IQuery<Crea
 public record CreateScheduleResult(JobScheduleDto Schedule);
 
 public class CreateScheduleHandler(
-    IScopedStringLocalizer localizer,
     INamedObjectRegistry<LrtNamedObjectBase> registry,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    IProjectionProvider<JobSchedule, JobScheduleDto> projection
 ) : IQueryHandler<CreateScheduleCommand, CreateScheduleResult>
 {
     public async Task<CreateScheduleResult> Handle(
@@ -50,6 +49,6 @@ public class CreateScheduleHandler(
         await unitOfWork.AddAsync(schedule, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new CreateScheduleResult(JobProjections.JobScheduleProjection(localizer).AsFunc()(schedule));
+        return new CreateScheduleResult(projection.Projection.AsFunc()(schedule));
     }
 }

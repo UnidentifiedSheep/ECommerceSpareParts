@@ -1,10 +1,10 @@
 using Abstractions.Models;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Enums;
-using LinqKit;
 using Main.Application.Dtos.Balances;
-using Main.Application.Projections;
 using Main.Entities.Balance;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +25,8 @@ public record GetTransactionsQuery(
 public record GetTransactionsResult(IReadOnlyList<TransactionDto> Transactions);
 
 public class GetTransactionsHandler(
-    IReadRepository<Transaction, Guid> repository
+    IReadRepository<Transaction, Guid> repository,
+    IProjectionProvider<Transaction, TransactionDto> projection
 )
     : IQueryHandler<GetTransactionsQuery, GetTransactionsResult>
 {
@@ -68,8 +69,7 @@ public class GetTransactionsHandler(
             .OrderByDescending(x => x.TransactionDatetime)
             .ThenByDescending(x => x.Id)
             .Take(cursor.Size)
-            .AsExpandable()
-            .Select(BalanceProjections.ToTransactionDto)
+            .Project(projection)
             .ToListAsync(cancellationToken);
 
         return new GetTransactionsResult(res);

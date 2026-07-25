@@ -4,6 +4,7 @@ using Api.Common.HostedServices;
 using Api.Common.Models.Options;
 using Application.Common.Models;
 using Application.Common.Models.Options;
+using Application.Common.Models.Options.S3;
 using Cache;
 using Persistence;
 using RabbitMq;
@@ -134,6 +135,16 @@ public static class ServiceProvider
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        return collection;
+    }
+
+    public static IServiceCollection AddS3BucketOptions(this IServiceCollection collection)
+    {
+        collection.AddOptions<S3BucketsOptions>()
+            .BindConfiguration(S3BucketsOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
         return collection;
     }
 }

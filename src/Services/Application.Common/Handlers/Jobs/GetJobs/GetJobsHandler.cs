@@ -2,8 +2,8 @@ using Abstractions.Models;
 using Application.Common.Dtos;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Projections;
 using Domain.CommonEntities;
 using Domain.CommonEnums;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +20,8 @@ public record GetJobsQuery(
 public record GetJobsResult(IReadOnlyList<JobDto> Jobs);
 
 public class GetJobsHandler(
-    IReadRepository<Job, Guid> repository
+    IReadRepository<Job, Guid> repository,
+    IProjectionProvider<Job, JobDto> projection
 ) : IQueryHandler<GetJobsQuery, GetJobsResult>
 {
     public async Task<GetJobsResult> Handle(GetJobsQuery request, CancellationToken cancellationToken)
@@ -33,7 +34,7 @@ public class GetJobsHandler(
 
         var result = await query
             .SortBy(request.SortBy)
-            .Select(JobProjections.JobProjection)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

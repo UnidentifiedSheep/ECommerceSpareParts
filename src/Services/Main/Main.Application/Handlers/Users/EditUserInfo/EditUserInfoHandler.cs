@@ -1,13 +1,13 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.User;
 using Enums;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
-using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 
@@ -21,7 +21,8 @@ public record EditUserInfoResult(UserInfoDto UserInfo);
 
 public class EditUserInfoHandler(
     IIntegrationEventScope integrationEventScope,
-    IRepository<User, Guid> repository
+    IRepository<User, Guid> repository,
+    IProjectionProvider<UserInfo, UserInfoDto> userInfoProjection
 ) : ICommandHandler<EditUserInfoCommand, EditUserInfoResult>
 {
     public async Task<EditUserInfoResult> Handle(
@@ -49,6 +50,6 @@ public class EditUserInfoHandler(
                 UserId = request.UserId
             });
 
-        return new EditUserInfoResult(UserProjections.UserInfoProjection.AsFunc()(user.UserInfo!));
+        return new EditUserInfoResult(userInfoProjection.Projection.AsFunc()(user.UserInfo!));
     }
 }

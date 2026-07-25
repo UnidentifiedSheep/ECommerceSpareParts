@@ -1,10 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Organizations;
-using Main.Application.Projections;
 using Main.Entities.Organization;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +17,8 @@ public record GetOrganizationMembersQuery(
 public record GetOrganizationMembersResult(IReadOnlyList<OrganizationMemberDto> Members);
 
 public class GetOrganizationMembersHandler(
-    IReadRepository<OrganizationMember, OrganizationMemberKey> repository)
+    IReadRepository<OrganizationMember, OrganizationMemberKey> repository,
+    IProjectionProvider<OrganizationMember, OrganizationMemberDto> projection)
     : IQueryHandler<GetOrganizationMembersQuery, GetOrganizationMembersResult>
 {
     public async Task<GetOrganizationMembersResult> Handle(
@@ -29,8 +29,7 @@ public class GetOrganizationMembersHandler(
             .Where(x => x.OrganizationId == request.OrganizationId)
             .OrderBy(x => x.Role)
             .ThenBy(x => x.UserId)
-            .AsExpandable()
-            .Select(OrganizationProjections.MemberToDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

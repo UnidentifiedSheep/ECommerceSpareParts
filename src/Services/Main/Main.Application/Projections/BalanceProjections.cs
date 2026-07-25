@@ -1,35 +1,64 @@
 using System.Linq.Expressions;
+using Application.Common.Interfaces.Projections;
+using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Balances;
+using Main.Application.Dtos.Currencies;
+using Main.Application.Dtos.Organizations;
 using Main.Entities.Balance;
+using Main.Entities.Currency;
 using Main.Entities.Organization;
 
 namespace Main.Application.Projections;
 
-public static class BalanceProjections
+[Lifetime(Lifetime.Singleton)]
+public sealed class TransactionDtoProjectionProvider
+    : IProjectionProvider<Transaction, TransactionDto>
 {
-    public static readonly Expression<Func<Transaction, TransactionDto>> ToTransactionDto =
-        x => new TransactionDto
+    public TransactionDtoProjectionProvider(
+        IProjectionProvider<Organization, OrganizationDto> organizationProjection)
+    {
+        var organizationToDto = organizationProjection.Projection;
+
+        Projection = x => new TransactionDto
         {
             Amount = x.Amount,
             Id = x.Id,
             CurrencyId = x.CurrencyId,
-            Receiver = OrganizationProjections.ToDto.Invoke(x.Receiver),
-            Sender = OrganizationProjections.ToDto.Invoke(x.Sender),
+            Receiver = organizationToDto.Invoke(x.Receiver),
+            Sender = organizationToDto.Invoke(x.Sender),
             Status = x.Status,
             Type = x.Type,
             TransactionDate = x.TransactionDatetime,
             SourceType = x.SourceType
         };
+    }
 
-    public static readonly Expression<Func<OrganizationBalance, OrganizationBalanceDto>> ToOrganizationBalanceDto =
-        x => new OrganizationBalanceDto
+    public Expression<Func<Transaction, TransactionDto>> Projection { get; }
+}
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class OrganizationBalanceDtoProjectionProvider
+    : IProjectionProvider<OrganizationBalance, OrganizationBalanceDto>
+{
+    public OrganizationBalanceDtoProjectionProvider(
+        IProjectionProvider<Currency, CurrencyDto> currencyProjection)
+    {
+        var currencyToDto = currencyProjection.Projection;
+
+        Projection = x => new OrganizationBalanceDto
         {
             Balance = x.Balance,
-            Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
+            Currency = currencyToDto.Invoke(x.Currency)
         };
+    }
 
-    public static OrganizationFinancialProfileDto ToOrganizationFinancialProfileDto(
+    public Expression<Func<OrganizationBalance, OrganizationBalanceDto>> Projection { get; }
+}
+
+public static class OrganizationFinancialProfileDtoFactory
+{
+    public static OrganizationFinancialProfileDto Create(
         OrganizationFinancialProfile profile,
         decimal netPositionInBaseCurrency)
     {

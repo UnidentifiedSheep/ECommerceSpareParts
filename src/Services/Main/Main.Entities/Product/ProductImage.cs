@@ -1,14 +1,14 @@
 using System.Linq.Expressions;
 using Domain;
+using Domain.Extensions;
 using Domain.Interfaces;
-using Exceptions;
 using Main.Entities.DomainEvents.Product;
 
 namespace Main.Entities.Product;
 
 public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<ProductImage, (int, string)>
 {
-    private static readonly string[] SupportedExtensions =
+    private static readonly HashSet<string> SupportedExtensions =
     [
         ".png",
         ".jpeg",
@@ -21,70 +21,56 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 
     private ProductImage(
         int productId,
-        string path,
-        string? description)
+        string extension)
     {
         ProductId = productId;
-        SetPath(path);
-        SetDescription(description);
+        SetPath(extension);
     }
 
     public int ProductId { get; }
 
-    public string Path { get; private set; } = null!;
-
-    public string? Description { get; private set; }
+    public string StorageKey { get; private set; } = null!;
 
     public static Expression<Func<ProductImage, (int, string)>> GetKeySelector()
     {
-        return x => ValueTuple.Create(x.ProductId, x.Path);
+        return x => ValueTuple.Create(x.ProductId, x.StorageKey);
     }
 
     public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key)
     {
-        return x => x.ProductId == key.Item1 && x.Path == key.Item2;
+        return x => x.ProductId == key.Item1 && x.StorageKey == key.Item2;
     }
 
     public static ProductImage Create(
         int productId,
-        string path,
-        string? description)
+        string extension)
     {
         return new ProductImage(
             productId,
-            path,
-            description);
+            extension);
     }
 
-    public void SetPath(string path)
+    private void SetPath(string extension)
     {
-        if (string.IsNullOrWhiteSpace(path)) throw new InvalidInputException("article.image.path.empty");
+        IsSupportedExtension(extension, out var normalizedExtension)
+            .EnsureTrue("article.image.invalid.extension");
 
-        path = path.Trim();
-
-        if (!IsSupportedExtension(path)) throw new InvalidInputException("article.image.invalid.extension");
-
-        Path = path;
-    }
-
-    public void SetDescription(string? description)
-    {
-        description = description?.Trim();
-
-        Description = string.IsNullOrWhiteSpace(description)
-            ? null
-            : description;
+        StorageKey = $"products/{ProductId}_{Guid.NewGuid():N}{normalizedExtension}";
     }
 
     public override void OnCreated() => AddDomainEvent(new ProductImageUpdatedDomainEvent(ProductId));
     public override void OnUpdated() => OnCreated();
     public override void OnDeleted() => OnCreated();
 
-    public override (int, string) GetId() { return (ProductId, Path); }
+    public override (int, string) GetId() { return (ProductId, StorageKey); }
 
-    private static bool IsSupportedExtension(string path)
+    private static bool IsSupportedExtension(string extension, out string normalizedExtension)
     {
-        var lower = path.ToLowerInvariant();
-        return SupportedExtensions.Any(lower.EndsWith);
+        var normalized = extension.Trim().ToLowerInvariant();
+        normalizedExtension = normalized.StartsWith('.')
+            ? normalized
+            : "." + normalized;
+
+        return SupportedExtensions.Contains(normalizedExtension);
     }
 }

@@ -1,11 +1,10 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Enums;
-using LinqKit;
 using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Application.Projections;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +19,8 @@ public record GetProducerSupplierMappingsResult(
     IReadOnlyList<ProducerSupplierMappingDto> Mappings);
 
 public class GetProducerSupplierMappingsHandler(
-    IReadRepository<ProducerSupplierMapping, int> repository
+    IReadRepository<ProducerSupplierMapping, int> repository,
+    IProjectionProvider<ProducerSupplierMapping, ProducerSupplierMappingDto> projection
     ) : IQueryHandler<GetProducerSupplierMappingsQuery, GetProducerSupplierMappingsResult>
 {
     public async Task<GetProducerSupplierMappingsResult> Handle(
@@ -34,8 +34,7 @@ public class GetProducerSupplierMappingsHandler(
             query = query.Where(x => request.Suppliers.Contains(x.Supplier));
 
         var result = await query
-            .AsExpandable()
-            .Select(ProducerProjections.ToSupplierMappingDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
         

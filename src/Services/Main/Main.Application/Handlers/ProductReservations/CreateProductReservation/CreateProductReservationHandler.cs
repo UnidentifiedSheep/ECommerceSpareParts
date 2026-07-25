@@ -1,10 +1,10 @@
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using LinqKit;
 using Main.Application.Dtos.Product.Reservation;
-using Main.Application.Projections;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +19,8 @@ public record CreateProductReservationResult(ProductReservationDto Reservation);
 
 public class CreateProductReservationHandler(
     IUnitOfWork unitOfWork,
-    IReadRepository<ProductReservation, int> repository
+    IReadRepository<ProductReservation, int> repository,
+    IProjectionProvider<ProductReservation, ProductReservationDto> projection
 ) : ICommandHandler<CreateProductReservationCommand, CreateProductReservationResult>
 {
     public async Task<CreateProductReservationResult> Handle(
@@ -41,8 +42,7 @@ public class CreateProductReservationHandler(
 
         var result = await repository.Query
             .Where(x => x.Id == reservation.Id)
-            .AsExpandable()
-            .Select(ProductProjections.ToReservationDto)
+            .Project(projection)
             .SingleAsync(cancellationToken);
 
         return new CreateProductReservationResult(result);

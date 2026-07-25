@@ -1,10 +1,9 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Product.Reservation;
-using Main.Application.Projections;
 using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +21,8 @@ public record GetProductReservationsQuery(
 public record GetProductReservationsResult(IReadOnlyList<ProductReservationDto> Reservations);
 
 public class GetProductReservationsHandler(
-    IReadRepository<ProductReservation, int> repository
+    IReadRepository<ProductReservation, int> repository,
+    IProjectionProvider<ProductReservation, ProductReservationDto> projection
 ) : IQueryHandler<GetProductReservationsQuery, GetProductReservationsResult>
 {
     public async Task<GetProductReservationsResult> Handle(
@@ -36,8 +36,7 @@ public class GetProductReservationsHandler(
                         x.OrganizationId == request.OrganizationId.Value)
             .Where(x => request.ShowDeleted || x.Status != ProductReservationStatus.Canceled)
             .SortBy(request.SortBy)
-            .AsExpandable()
-            .Select(ProductProjections.ToReservationDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

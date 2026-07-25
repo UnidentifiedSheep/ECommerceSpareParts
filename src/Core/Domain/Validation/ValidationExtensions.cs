@@ -60,6 +60,11 @@ public static class ValidationExtensions
         return predicate(value);
     }
 
+    public static bool IsTrue(this bool value)
+    {
+        return value;
+    }
+
     public static bool IsNotEqual<T>(this T value, T next)
         where T : IComparable<T>
     {

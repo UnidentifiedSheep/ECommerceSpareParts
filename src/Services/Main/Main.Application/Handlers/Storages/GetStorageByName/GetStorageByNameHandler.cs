@@ -1,8 +1,8 @@
-﻿using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Storage;
-using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,8 @@ public record GetStorageByNameQuery(string StorageName) : IQuery<GetStorageByNam
 public record GetStorageByNameResult(StorageDto Storage);
 
 public class GetStorageByNameHandler(
-    IReadRepository<Storage, string> repository
+    IReadRepository<Storage, string> repository,
+    IProjectionProvider<Storage, StorageDto> projection
 )
     : IQueryHandler<GetStorageByNameQuery, GetStorageByNameResult>
 {
@@ -23,8 +24,7 @@ public class GetStorageByNameHandler(
         CancellationToken cancellationToken)
     {
         var storage = await repository.Query
-                          .AsExpandable()
-                          .Select(StorageProjections.StorageProjection)
+                          .Project(projection)
                           .FirstOrDefaultAsync(x => x.Name == request.StorageName.Trim(), cancellationToken)
                       ?? throw new StorageNotFoundException(request.StorageName);
 
