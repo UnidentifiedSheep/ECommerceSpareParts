@@ -1,9 +1,9 @@
 using Abstractions.Models;
 using Analytics.Application.Dtos.Metric;
-using Analytics.Application.Handlers.Projections;
 using Analytics.Entities.Metrics;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +20,8 @@ public record GetMetricJobsQuery(
 public record GetMetricJobsResult(IReadOnlyList<MetricJobDto> Jobs);
 
 public class GetMetricJobsHandler(
-    IReadRepository<MetricJob, (Guid, Guid)> repository
+    IReadRepository<MetricJob, (Guid, Guid)> repository,
+    IProjectionProvider<MetricJob, MetricJobDto> projection
 )
     : IQueryHandler<GetMetricJobsQuery, GetMetricJobsResult>
 {
@@ -31,7 +32,7 @@ public class GetMetricJobsHandler(
         var jobs = await repository.Query
             .Where(x => x.MetricId == request.MetricId)
             .SortBy(request.SortBy)
-            .Select(MetricJobProjection.ToDto)
+            .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

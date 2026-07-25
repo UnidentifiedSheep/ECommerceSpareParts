@@ -1,7 +1,5 @@
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Dtos.Metric;
-using Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
-using Analytics.Application.Handlers.Projections;
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.NamedObjects.Metrics;
 using Analytics.Entities.Exceptions;
@@ -9,10 +7,9 @@ using Analytics.Entities.Metrics;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Localization.Abstractions.Interfaces;
-using MediatR;
 
 namespace Analytics.Application.Handlers.Metrics;
 
@@ -28,10 +25,9 @@ public record UpsertMetricResult(MetricDto Metric);
 
 public class UpsertMetricHandler(
     IMetricRepository metricRepository,
-    ISender sender,
     IUnitOfWork unitOfWork,
     INamedObjectRegistry<MetricDefinitionNamedObjectBase> registry,
-    IScopedLocalizedJsonSerializer serializer
+    IProjectionProvider<Metric, MetricDto> projection
 )
     : ICommandHandler<UpsertMetricCommand, UpsertMetricResult>
 {
@@ -39,6 +35,7 @@ public class UpsertMetricHandler(
         UpsertMetricCommand request,
         CancellationToken cancellationToken)
     {
+        var toDto = projection.Projection.AsFunc();
         var metricDefinition = registry.TryGetBySystemName(request.MetricSystemName)
                                ?? throw new MetricNotFoundException();
         var metric = metricDefinition.CreateMetricUntyped(request.InputPayload);
@@ -51,24 +48,12 @@ public class UpsertMetricHandler(
         var existingMetric = await metricRepository
             .FirstOrDefaultAsync(criteria, cancellationToken);
         if (existingMetric is not null)
-            return new UpsertMetricResult(
-                MetricProjection.ToDto(await GetMetricInfos(cancellationToken), serializer)
-                    .AsFunc()(existingMetric));
+            return new UpsertMetricResult(toDto(existingMetric));
 
         metric.MarkDirty();
         await unitOfWork.AddAsync(metric, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new UpsertMetricResult(
-            MetricProjection.ToDto(await GetMetricInfos(cancellationToken), serializer)
-                .AsFunc()(metric));
-    }
-
-    private async Task<IReadOnlyDictionary<string, MetricInfoDto>> GetMetricInfos(
-        CancellationToken cancellationToken)
-    {
-        return (await sender.Send(new ListAvailableMetricsQuery(), cancellationToken))
-            .Metrics
-            .ToDictionary(x => x.SystemName);
+        return new UpsertMetricResult(toDto(metric));
     }
 }

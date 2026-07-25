@@ -7,6 +7,12 @@ namespace Application.Common.Extensions;
 
 public static class ProjectionServiceCollectionExtensions
 {
+    public static IServiceCollection RegisterProjectionProviders<TAssemblyMarker>(
+        this IServiceCollection services)
+    {
+        return services.RegisterProjectionProviders(typeof(TAssemblyMarker).Assembly);
+    }
+
     public static IServiceCollection RegisterProjectionProviders(
         this IServiceCollection services,
         params Assembly[] assemblies)

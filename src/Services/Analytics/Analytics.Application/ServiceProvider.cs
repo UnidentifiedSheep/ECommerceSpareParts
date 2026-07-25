@@ -41,6 +41,7 @@ public static class ServiceProvider
             .WithSystemTextJsonSerializer();
 
         collection.RegisterSettingsService<SettingFactory>();
+        collection.RegisterProjectionProviders<TagsService>();
 
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
