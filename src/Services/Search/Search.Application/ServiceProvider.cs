@@ -1,6 +1,7 @@
 using Abstractions;
 using Application.Common;
 using Application.Common.Behaviors;
+using Application.Common.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Search.Application.Configs;
@@ -29,6 +30,7 @@ public static class ServiceProvider
                 typeof(DbValidationBehavior<,>),
                 typeof(CacheBehavior<,>));
 
+        services.RegisterProjectionProviders<ProductIndexSynchronizer>();
         services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
         services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
 

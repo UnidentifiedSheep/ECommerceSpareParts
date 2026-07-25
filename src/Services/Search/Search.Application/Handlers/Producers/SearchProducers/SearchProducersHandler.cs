@@ -1,8 +1,10 @@
 using Abstractions.Models;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Search.Application.Dtos.Producers;
 using Search.Application.Interfaces.Producer;
-using Search.Application.Mapping;
+using Search.Entities;
 
 namespace Search.Application.Handlers.Producers.SearchProducers;
 
@@ -14,7 +16,8 @@ public record SearchProducersQuery(
 public record SearchProducersResult(IEnumerable<ProducerSearchDto> Producers);
 
 public class SearchProducersHandler(
-    IProducerRepository producerRepository
+    IProducerRepository producerRepository,
+    IProjectionProvider<Producer, ProducerSearchDto> projection
 ) : IQueryHandler<SearchProducersQuery, SearchProducersResult>
 {
     public async Task<SearchProducersResult> Handle(
@@ -26,6 +29,7 @@ public class SearchProducersHandler(
             request.Pagination,
             cancellationToken);
 
-        return new SearchProducersResult(producers.Select(x => x.ToProducerSearchDto()));
+        return new SearchProducersResult(
+            producers.Select(projection.Projection.AsFunc()));
     }
 }
