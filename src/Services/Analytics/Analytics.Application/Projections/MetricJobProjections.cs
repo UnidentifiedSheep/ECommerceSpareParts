@@ -6,7 +6,7 @@ using Attributes;
 
 namespace Analytics.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class MetricJobDtoProjectionProvider
     : IProjectionProvider<MetricJob, MetricJobDto>
 {

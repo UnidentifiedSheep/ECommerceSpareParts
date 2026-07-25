@@ -10,7 +10,7 @@ using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Scoped)]
+[Lifetime(Lifetime.Scoped)]
 public sealed class MetricDtoProjectionProvider
     : IProjectionProvider<Metric, MetricDto>
 {

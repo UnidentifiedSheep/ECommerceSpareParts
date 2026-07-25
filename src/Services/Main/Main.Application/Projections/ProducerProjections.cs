@@ -8,7 +8,7 @@ using Main.Entities.Producer;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProducerDtoProjectionProvider
     : IProjectionProvider<Producer, ProducerDto>
 {
@@ -21,7 +21,7 @@ public sealed class ProducerDtoProjectionProvider
         };
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProducerFullDtoProjectionProvider
     : IProjectionProvider<Producer, ProducerFullDto>
 {
@@ -35,7 +35,7 @@ public sealed class ProducerFullDtoProjectionProvider
         };
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProducerAliasDtoProjectionProvider
     : IProjectionProvider<ProducerAlias, ProducerAliasDto>
 {
@@ -47,7 +47,7 @@ public sealed class ProducerAliasDtoProjectionProvider
         };
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProducerSupplierMappingDtoProjectionProvider
     : IProjectionProvider<ProducerSupplierMapping, ProducerSupplierMappingDto>
 {

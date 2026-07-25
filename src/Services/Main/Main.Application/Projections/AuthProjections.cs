@@ -7,7 +7,7 @@ using Main.Entities.Auth;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Scoped)]
+[Lifetime(Lifetime.Scoped)]
 public sealed class RoleDtoProjectionProvider(
     IScopedStringLocalizer localizer)
     : IProjectionProvider<Role, RoleDto>

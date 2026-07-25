@@ -10,7 +10,7 @@ using Main.Enums.Organization;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class OrganizationMemberDtoProjectionProvider
     : IProjectionProvider<OrganizationMember, OrganizationMemberDto>
 {
@@ -30,7 +30,7 @@ public sealed class OrganizationMemberDtoProjectionProvider
     public Expression<Func<OrganizationMember, OrganizationMemberDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class OrganizationDtoProjectionProvider
     : IProjectionProvider<Organization, OrganizationDto>
 {

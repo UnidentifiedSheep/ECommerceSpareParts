@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProductDtoProjectionProvider
     : IProjectionProvider<Product, ProductDto>
 {
@@ -38,7 +38,7 @@ public sealed class ProductDtoProjectionProvider
     public Expression<Func<Product, ProductDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class FullProductDtoProjectionProvider
     : IProjectionProvider<Product, FullProductDto>
 {
@@ -74,7 +74,7 @@ public sealed class FullProductDtoProjectionProvider
     public Expression<Func<Product, FullProductDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProductWeightDtoProjectionProvider
     : IProjectionProvider<ProductWeight, ProductWeightDto>
 {
@@ -87,7 +87,7 @@ public sealed class ProductWeightDtoProjectionProvider
         };
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProductSizeDtoProjectionProvider
     : IProjectionProvider<ProductSize, ProductSizeDto>
 {
@@ -103,7 +103,7 @@ public sealed class ProductSizeDtoProjectionProvider
         };
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProductReservationDtoProjectionProvider
     : IProjectionProvider<ProductReservation, ProductReservationDto>
 {

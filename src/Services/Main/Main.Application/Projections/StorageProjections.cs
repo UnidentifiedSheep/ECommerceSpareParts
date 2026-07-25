@@ -9,7 +9,7 @@ using Main.Entities.Storage;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class StorageRouteDtoProjectionProvider
     : IProjectionProvider<StorageRoute, StorageRouteDto>
 {
@@ -40,7 +40,7 @@ public sealed class StorageRouteDtoProjectionProvider
     public Expression<Func<StorageRoute, StorageRouteDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class StorageDtoProjectionProvider
     : IProjectionProvider<Storage, StorageDto>
 {

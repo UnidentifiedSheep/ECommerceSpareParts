@@ -15,7 +15,7 @@ using Main.Entities.User;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class SaleDtoProjectionProvider
     : IProjectionProvider<Sale, SaleDto>
 {
@@ -47,7 +47,7 @@ public sealed class SaleDtoProjectionProvider
     public Expression<Func<Sale, SaleDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class SaleContentDtoProjectionProvider
     : IProjectionProvider<SaleContent, SaleContentDto>
 {
@@ -74,7 +74,7 @@ public sealed class SaleContentDtoProjectionProvider
     public Expression<Func<SaleContent, SaleContentDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class SaleContentDetailDtoProjectionProvider
     : IProjectionProvider<SaleContentDetail, SaleContentDetailDto>
 {

@@ -9,7 +9,7 @@ using Main.Entities.Storage;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class StorageContentDtoProjectionProvider
     : IProjectionProvider<StorageContent, StorageContentDto>
 {

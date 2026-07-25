@@ -9,7 +9,7 @@ using Main.Entities.Product;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class CartItemDtoProjectionProvider
     : IProjectionProvider<Cart, CartItemDto>
 {

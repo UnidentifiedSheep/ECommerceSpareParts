@@ -15,7 +15,7 @@ using Main.Entities.User;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class PurchaseDtoProjectionProvider
     : IProjectionProvider<Purchase, PurchaseDto>
 {
@@ -51,7 +51,7 @@ public sealed class PurchaseDtoProjectionProvider
     public Expression<Func<Purchase, PurchaseDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class PurchaseLogisticDtoProjectionProvider
     : IProjectionProvider<PurchaseLogistic, PurchaseLogisticDto>
 {
@@ -78,7 +78,7 @@ public sealed class PurchaseLogisticDtoProjectionProvider
     public Expression<Func<PurchaseLogistic, PurchaseLogisticDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class PurchaseContentDtoProjectionProvider
     : IProjectionProvider<PurchaseContent, PurchaseContentDto>
 {
@@ -107,7 +107,7 @@ public sealed class PurchaseContentDtoProjectionProvider
     public Expression<Func<PurchaseContent, PurchaseContentDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class PurchaseContentLogisticDtoProjectionProvider
     : IProjectionProvider<PurchaseContentLogistic, PurchaseContentLogisticDto>
 {

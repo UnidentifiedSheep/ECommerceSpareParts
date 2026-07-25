@@ -6,7 +6,7 @@ using Main.Entities.Currency;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class CurrencyDtoProjectionProvider
     : IProjectionProvider<Currency, CurrencyDto>
 {

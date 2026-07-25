@@ -11,7 +11,7 @@ using Main.Enums.Auth;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class UserDtoProjectionProvider
     : IProjectionProvider<User, UserDto>
 {
@@ -40,7 +40,7 @@ public sealed class UserDtoProjectionProvider
     public Expression<Func<User, UserDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class UserPartyDtoProjectionProvider
     : IProjectionProvider<User, UserPartyDto>
 {
@@ -64,7 +64,7 @@ public sealed class UserPartyDtoProjectionProvider
     public Expression<Func<User, UserPartyDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class UserInfoDtoProjectionProvider
     : IProjectionProvider<UserInfo, UserInfoDto>
 {
@@ -77,7 +77,7 @@ public sealed class UserInfoDtoProjectionProvider
         };
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class UserEmailDtoProjectionProvider
     : IProjectionProvider<UserEmail, UserEmailDto>
 {
@@ -94,7 +94,7 @@ public sealed class UserEmailDtoProjectionProvider
         };
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class UserPhoneDtoProjectionProvider
     : IProjectionProvider<UserPhone, UserPhoneDto>
 {
@@ -108,7 +108,7 @@ public sealed class UserPhoneDtoProjectionProvider
         };
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class UserPartyTypeProjectionProvider
     : IProjectionProvider<User, UserPartyType>
 {

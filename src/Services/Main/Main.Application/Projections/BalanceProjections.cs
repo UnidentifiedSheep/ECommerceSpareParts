@@ -11,7 +11,7 @@ using Main.Entities.Organization;
 
 namespace Main.Application.Projections;
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class TransactionDtoProjectionProvider
     : IProjectionProvider<Transaction, TransactionDto>
 {
@@ -37,7 +37,7 @@ public sealed class TransactionDtoProjectionProvider
     public Expression<Func<Transaction, TransactionDto>> Projection { get; }
 }
 
-[LifetimeAttribute(Lifetime.Singleton)]
+[Lifetime(Lifetime.Singleton)]
 public sealed class OrganizationBalanceDtoProjectionProvider
     : IProjectionProvider<OrganizationBalance, OrganizationBalanceDto>
 {
