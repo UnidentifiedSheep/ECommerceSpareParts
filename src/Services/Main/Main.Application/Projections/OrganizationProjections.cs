@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Organizations;
 using Main.Application.Dtos.Users;
@@ -9,8 +10,9 @@ using Main.Enums.Organization;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class OrganizationMemberDtoProjectionProvider
-    : ISingletonProjectionProvider<OrganizationMember, OrganizationMemberDto>
+    : IProjectionProvider<OrganizationMember, OrganizationMemberDto>
 {
     public OrganizationMemberDtoProjectionProvider(
         IProjectionProvider<User, UserDto> userProjection)
@@ -28,8 +30,9 @@ public sealed class OrganizationMemberDtoProjectionProvider
     public Expression<Func<OrganizationMember, OrganizationMemberDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class OrganizationDtoProjectionProvider
-    : ISingletonProjectionProvider<Organization, OrganizationDto>
+    : IProjectionProvider<Organization, OrganizationDto>
 {
     public OrganizationDtoProjectionProvider(
         IProjectionProvider<OrganizationMember, OrganizationMemberDto> memberProjection)

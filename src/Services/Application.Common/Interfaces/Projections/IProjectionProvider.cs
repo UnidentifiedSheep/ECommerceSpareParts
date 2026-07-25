@@ -6,9 +6,3 @@ public interface IProjectionProvider<TIn, TOut>
 {
     Expression<Func<TIn, TOut>> Projection { get; }
 }
-
-public interface ISingletonProjectionProvider<TIn, TOut>
-    : IProjectionProvider<TIn, TOut>;
-
-public interface IScopedProjectionProvider<TIn, TOut>
-    : IProjectionProvider<TIn, TOut>;

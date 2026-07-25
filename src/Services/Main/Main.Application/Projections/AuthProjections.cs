@@ -1,14 +1,16 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using Localization.Abstractions.Interfaces;
 using Main.Application.Dtos.Auth;
 using Main.Entities.Auth;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Scoped)]
 public sealed class RoleDtoProjectionProvider(
     IScopedStringLocalizer localizer)
-    : IScopedProjectionProvider<Role, RoleDto>
+    : IProjectionProvider<Role, RoleDto>
 {
     public Expression<Func<Role, RoleDto>> Projection { get; } =
         x => new RoleDto

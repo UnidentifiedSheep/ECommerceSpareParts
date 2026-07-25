@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Models.Options.S3;
+using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Product.Reservation;
@@ -12,8 +13,9 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class ProductDtoProjectionProvider
-    : ISingletonProjectionProvider<Product, ProductDto>
+    : IProjectionProvider<Product, ProductDto>
 {
     public ProductDtoProjectionProvider(IOptions<S3BucketsOptions> bucketsOptions)
     {
@@ -36,8 +38,9 @@ public sealed class ProductDtoProjectionProvider
     public Expression<Func<Product, ProductDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class FullProductDtoProjectionProvider
-    : ISingletonProjectionProvider<Product, FullProductDto>
+    : IProjectionProvider<Product, FullProductDto>
 {
     public FullProductDtoProjectionProvider(
         IOptions<S3BucketsOptions> bucketsOptions,
@@ -71,8 +74,9 @@ public sealed class FullProductDtoProjectionProvider
     public Expression<Func<Product, FullProductDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class ProductWeightDtoProjectionProvider
-    : ISingletonProjectionProvider<ProductWeight, ProductWeightDto>
+    : IProjectionProvider<ProductWeight, ProductWeightDto>
 {
     public Expression<Func<ProductWeight, ProductWeightDto>> Projection { get; } =
         x => new ProductWeightDto
@@ -83,8 +87,9 @@ public sealed class ProductWeightDtoProjectionProvider
         };
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class ProductSizeDtoProjectionProvider
-    : ISingletonProjectionProvider<ProductSize, ProductSizeDto>
+    : IProjectionProvider<ProductSize, ProductSizeDto>
 {
     public Expression<Func<ProductSize, ProductSizeDto>> Projection { get; } =
         x => new ProductSizeDto
@@ -98,8 +103,9 @@ public sealed class ProductSizeDtoProjectionProvider
         };
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class ProductReservationDtoProjectionProvider
-    : ISingletonProjectionProvider<ProductReservation, ProductReservationDto>
+    : IProjectionProvider<ProductReservation, ProductReservationDto>
 {
     public ProductReservationDtoProjectionProvider(
         IProjectionProvider<Organization, OrganizationDto> organizationProjection)

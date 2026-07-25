@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using Main.Application.Dtos.Producer;
 using Main.Application.Dtos.Producer.Aliases;
 using Main.Application.Dtos.Producer.SupplierMappings;
@@ -7,8 +8,9 @@ using Main.Entities.Producer;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class ProducerDtoProjectionProvider
-    : ISingletonProjectionProvider<Producer, ProducerDto>
+    : IProjectionProvider<Producer, ProducerDto>
 {
     public Expression<Func<Producer, ProducerDto>> Projection { get; } =
         x => new ProducerDto
@@ -19,8 +21,9 @@ public sealed class ProducerDtoProjectionProvider
         };
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class ProducerFullDtoProjectionProvider
-    : ISingletonProjectionProvider<Producer, ProducerFullDto>
+    : IProjectionProvider<Producer, ProducerFullDto>
 {
     public Expression<Func<Producer, ProducerFullDto>> Projection { get; } =
         x => new ProducerFullDto
@@ -32,8 +35,9 @@ public sealed class ProducerFullDtoProjectionProvider
         };
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class ProducerAliasDtoProjectionProvider
-    : ISingletonProjectionProvider<ProducerAlias, ProducerAliasDto>
+    : IProjectionProvider<ProducerAlias, ProducerAliasDto>
 {
     public Expression<Func<ProducerAlias, ProducerAliasDto>> Projection { get; } =
         x => new ProducerAliasDto
@@ -43,8 +47,9 @@ public sealed class ProducerAliasDtoProjectionProvider
         };
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class ProducerSupplierMappingDtoProjectionProvider
-    : ISingletonProjectionProvider<ProducerSupplierMapping, ProducerSupplierMappingDto>
+    : IProjectionProvider<ProducerSupplierMapping, ProducerSupplierMappingDto>
 {
     public Expression<Func<ProducerSupplierMapping, ProducerSupplierMappingDto>> Projection { get; } =
         x => new ProducerSupplierMappingDto

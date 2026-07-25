@@ -1,12 +1,14 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using Main.Application.Dtos.Currencies;
 using Main.Entities.Currency;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class CurrencyDtoProjectionProvider
-    : ISingletonProjectionProvider<Currency, CurrencyDto>
+    : IProjectionProvider<Currency, CurrencyDto>
 {
     public Expression<Func<Currency, CurrencyDto>> Projection { get; } =
         x => new CurrencyDto

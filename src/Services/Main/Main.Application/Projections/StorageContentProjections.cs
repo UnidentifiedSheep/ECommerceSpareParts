@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Dtos.Storage;
@@ -8,8 +9,9 @@ using Main.Entities.Storage;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class StorageContentDtoProjectionProvider
-    : ISingletonProjectionProvider<StorageContent, StorageContentDto>
+    : IProjectionProvider<StorageContent, StorageContentDto>
 {
     public StorageContentDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)

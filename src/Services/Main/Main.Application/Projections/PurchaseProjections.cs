@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Dtos.Organizations;
@@ -14,8 +15,9 @@ using Main.Entities.User;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class PurchaseDtoProjectionProvider
-    : ISingletonProjectionProvider<Purchase, PurchaseDto>
+    : IProjectionProvider<Purchase, PurchaseDto>
 {
     public PurchaseDtoProjectionProvider(
         IProjectionProvider<PurchaseLogistic, PurchaseLogisticDto> logisticProjection,
@@ -49,8 +51,9 @@ public sealed class PurchaseDtoProjectionProvider
     public Expression<Func<Purchase, PurchaseDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class PurchaseLogisticDtoProjectionProvider
-    : ISingletonProjectionProvider<PurchaseLogistic, PurchaseLogisticDto>
+    : IProjectionProvider<PurchaseLogistic, PurchaseLogisticDto>
 {
     public PurchaseLogisticDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)
@@ -75,8 +78,9 @@ public sealed class PurchaseLogisticDtoProjectionProvider
     public Expression<Func<PurchaseLogistic, PurchaseLogisticDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class PurchaseContentDtoProjectionProvider
-    : ISingletonProjectionProvider<PurchaseContent, PurchaseContentDto>
+    : IProjectionProvider<PurchaseContent, PurchaseContentDto>
 {
     public PurchaseContentDtoProjectionProvider(
         IProjectionProvider<Product, ProductDto> productProjection,
@@ -103,8 +107,9 @@ public sealed class PurchaseContentDtoProjectionProvider
     public Expression<Func<PurchaseContent, PurchaseContentDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class PurchaseContentLogisticDtoProjectionProvider
-    : ISingletonProjectionProvider<PurchaseContentLogistic, PurchaseContentLogisticDto>
+    : IProjectionProvider<PurchaseContentLogistic, PurchaseContentLogisticDto>
 {
     public Expression<Func<PurchaseContentLogistic, PurchaseContentLogisticDto>> Projection { get; } =
         x => new PurchaseContentLogisticDto

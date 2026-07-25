@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Dtos.Storage;
@@ -8,8 +9,9 @@ using Main.Entities.Storage;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class StorageRouteDtoProjectionProvider
-    : ISingletonProjectionProvider<StorageRoute, StorageRouteDto>
+    : IProjectionProvider<StorageRoute, StorageRouteDto>
 {
     public StorageRouteDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)
@@ -38,8 +40,9 @@ public sealed class StorageRouteDtoProjectionProvider
     public Expression<Func<StorageRoute, StorageRouteDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class StorageDtoProjectionProvider
-    : ISingletonProjectionProvider<Storage, StorageDto>
+    : IProjectionProvider<Storage, StorageDto>
 {
     public Expression<Func<Storage, StorageDto>> Projection { get; } =
         x => new StorageDto

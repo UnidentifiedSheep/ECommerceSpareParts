@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using Enums;
 using LinqKit;
 using Main.Application.Dtos.Auth;
@@ -10,8 +11,9 @@ using Main.Enums.Auth;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class UserDtoProjectionProvider
-    : ISingletonProjectionProvider<User, UserDto>
+    : IProjectionProvider<User, UserDto>
 {
     public UserDtoProjectionProvider(
         IProjectionProvider<UserInfo, UserInfoDto> userInfoProjection)
@@ -38,8 +40,9 @@ public sealed class UserDtoProjectionProvider
     public Expression<Func<User, UserDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class UserPartyDtoProjectionProvider
-    : ISingletonProjectionProvider<User, UserPartyDto>
+    : IProjectionProvider<User, UserPartyDto>
 {
     public UserPartyDtoProjectionProvider(
         IProjectionProvider<User, UserDto> userProjection,
@@ -61,8 +64,9 @@ public sealed class UserPartyDtoProjectionProvider
     public Expression<Func<User, UserPartyDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class UserInfoDtoProjectionProvider
-    : ISingletonProjectionProvider<UserInfo, UserInfoDto>
+    : IProjectionProvider<UserInfo, UserInfoDto>
 {
     public Expression<Func<UserInfo, UserInfoDto>> Projection { get; } =
         x => new UserInfoDto
@@ -73,8 +77,9 @@ public sealed class UserInfoDtoProjectionProvider
         };
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class UserEmailDtoProjectionProvider
-    : ISingletonProjectionProvider<UserEmail, UserEmailDto>
+    : IProjectionProvider<UserEmail, UserEmailDto>
 {
     public Expression<Func<UserEmail, UserEmailDto>> Projection { get; } =
         x => new UserEmailDto
@@ -89,8 +94,9 @@ public sealed class UserEmailDtoProjectionProvider
         };
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class UserPhoneDtoProjectionProvider
-    : ISingletonProjectionProvider<UserPhone, UserPhoneDto>
+    : IProjectionProvider<UserPhone, UserPhoneDto>
 {
     public Expression<Func<UserPhone, UserPhoneDto>> Projection { get; } =
         x => new UserPhoneDto
@@ -102,8 +108,9 @@ public sealed class UserPhoneDtoProjectionProvider
         };
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class UserPartyTypeProjectionProvider
-    : ISingletonProjectionProvider<User, UserPartyType>
+    : IProjectionProvider<User, UserPartyType>
 {
     private static readonly string SystemRole = Role.System.ToNormalizedRole();
 

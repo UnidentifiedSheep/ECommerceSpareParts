@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
+using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Balances;
 using Main.Application.Dtos.Currencies;
@@ -10,8 +11,9 @@ using Main.Entities.Organization;
 
 namespace Main.Application.Projections;
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class TransactionDtoProjectionProvider
-    : ISingletonProjectionProvider<Transaction, TransactionDto>
+    : IProjectionProvider<Transaction, TransactionDto>
 {
     public TransactionDtoProjectionProvider(
         IProjectionProvider<Organization, OrganizationDto> organizationProjection)
@@ -35,8 +37,9 @@ public sealed class TransactionDtoProjectionProvider
     public Expression<Func<Transaction, TransactionDto>> Projection { get; }
 }
 
+[LifetimeAttribute(Lifetime.Singleton)]
 public sealed class OrganizationBalanceDtoProjectionProvider
-    : ISingletonProjectionProvider<OrganizationBalance, OrganizationBalanceDto>
+    : IProjectionProvider<OrganizationBalance, OrganizationBalanceDto>
 {
     public OrganizationBalanceDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)
