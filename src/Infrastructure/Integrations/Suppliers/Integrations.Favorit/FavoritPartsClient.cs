@@ -1,6 +1,5 @@
 using Integrations.Client.Core;
 using Integrations.Common;
-using Integrations.Favorit.Interfaces;
 using Integrations.Favorit.Requests;
 using Integrations.Favorit.Responses;
 using Integrations.Supplier.Connections;
@@ -8,6 +7,13 @@ using Integrations.Supplier.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace Integrations.Favorit;
+
+public interface IFavoritPartsClient
+{
+    Task<Response<GetPricesResponse>> GetPricesAsync(
+        GetPricesRequest request,
+        CancellationToken token = default);
+}
 
 public class FavoritPartsClient(
     HttpClient client,
@@ -37,8 +43,7 @@ public class FavoritPartsClient(
         if (request.ShowAnalogues) @params.Add("analogues", "on");
         if (request.ShowIsRefundable) @params.Add("info", "on");
 
-        httpRequest.RequestUri =
-            new Uri(QueryHelpers.AddQueryString(httpRequest.RequestUri!.ToString(), @params));
+        AddQueryParameters(httpRequest, @params);
         var response = await client.SendAsync(httpRequest, token);
         return await ReadResponse<GetPricesResponse>(response, token);
     }

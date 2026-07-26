@@ -1,6 +1,5 @@
 using System.Net;
 using Integrations.Common;
-using Integrations.Favorit.Interfaces;
 using Integrations.Favorit.Models;
 using Integrations.Favorit.Requests;
 using Integrations.Favorit.Responses;

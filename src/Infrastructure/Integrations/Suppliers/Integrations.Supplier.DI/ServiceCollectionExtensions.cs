@@ -1,9 +1,9 @@
 using Integrations.Common;
 using Integrations.Favorit;
-using Integrations.Favorit.Interfaces;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Settings;
+using Integrations.Tmtr;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -25,6 +25,24 @@ public static class ServiceCollectionExtensions
             .AddDefaultResilenceHandler();
 
         services.AddScoped<ISupplier, FavoritPartsSupplier>();
+
+        return services;
+    }
+    
+    public static IServiceCollection AddTmtrIntegration<TConnectionProvider, TSettingsProvider>(
+        this IServiceCollection services)
+        where TConnectionProvider : class, IConnectionProvider<TmtrConnection>
+        where TSettingsProvider : class, ISupplierSettingsProvider<TmtrSettings>
+    {
+        services.AddSupplierBase();
+
+        services.AddScoped<IConnectionProvider<TmtrConnection>, TConnectionProvider>();
+        services.AddScoped<ISupplierSettingsProvider<TmtrSettings>, TSettingsProvider>();
+
+        services.AddHttpClient<ITmtrClient, TmtrClient>()
+            .AddDefaultResilenceHandler();
+
+        services.AddScoped<ISupplier, TmtrSupplier>();
 
         return services;
     }
