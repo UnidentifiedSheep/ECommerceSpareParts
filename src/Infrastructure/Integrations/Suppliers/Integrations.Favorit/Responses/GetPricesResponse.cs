@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Favorit.Integrations.Core.Models;
+using Integrations.Favorit.Models;
 
-namespace Favorit.Integrations.Core.Responses;
+namespace Integrations.Favorit.Responses;
 
 public record GetPricesResponse
 {

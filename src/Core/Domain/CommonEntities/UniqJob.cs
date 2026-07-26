@@ -1,4 +1,5 @@
 using Domain.Extensions;
+using Domain.Validation;
 
 namespace Domain.CommonEntities;
 

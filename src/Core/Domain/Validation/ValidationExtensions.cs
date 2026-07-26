@@ -1,7 +1,6 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
-namespace Domain.Extensions;
+namespace Domain.Validation;
 
 public static class ValidationExtensions
 {

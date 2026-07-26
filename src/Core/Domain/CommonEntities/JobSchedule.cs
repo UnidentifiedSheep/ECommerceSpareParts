@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Domain.Validation;
 
 namespace Domain.CommonEntities;
 

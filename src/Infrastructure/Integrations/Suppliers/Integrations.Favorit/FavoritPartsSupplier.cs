@@ -1,17 +1,16 @@
 using System.Net;
-using Enums;
-using Favorit.Integrations.Core.Interfaces;
-using Favorit.Integrations.Core.Models;
-using Favorit.Integrations.Core.Requests;
-using Favorit.Integrations.Core.Responses;
 using Integrations.Common;
+using Integrations.Favorit.Interfaces;
+using Integrations.Favorit.Models;
+using Integrations.Favorit.Requests;
+using Integrations.Favorit.Responses;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Models;
 using Integrations.Supplier.Models.Requests;
 using Integrations.Supplier.Settings;
 
-namespace Favorit.Integrations.Client;
+namespace Integrations.Favorit;
 
 public class FavoritPartsSupplier(
     IFavoritPartsClient client,
@@ -19,7 +18,7 @@ public class FavoritPartsSupplier(
     IConnectionProvider<FavoritConnection> connectionProvider
 ) : ISupplier
 {
-    public Supplier Supplier => Supplier.FavoritParts;
+    public Enums.Supplier Supplier => Enums.Supplier.FavoritParts;
 
     public async Task<Response<IReadOnlyList<SupplierProduct>>> GetProductsAsync(
         GetProductsRequest request,

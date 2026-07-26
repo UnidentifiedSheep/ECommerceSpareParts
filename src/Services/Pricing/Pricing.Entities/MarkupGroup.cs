@@ -1,6 +1,7 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
+using Domain.Validation;
 using Pricing.Entities.DomainEvents;
 
 namespace Pricing.Entities;

@@ -7,12 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9"/>
-        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Integrations.Favorit\Integrations.Favorit.csproj" />
+      <ProjectReference Include="..\..\..\..\Core\Enums\Enums.csproj" />
+      <ProjectReference Include="..\..\Integrations.Client.Core\Integrations.Client.Core.csproj" />
+      <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj" />
       <ProjectReference Include="..\Integrations.Supplier\Integrations.Supplier.csproj" />
     </ItemGroup>
 

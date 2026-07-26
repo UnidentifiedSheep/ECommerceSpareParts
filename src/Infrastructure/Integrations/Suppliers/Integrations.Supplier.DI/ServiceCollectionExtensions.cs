@@ -1,6 +1,6 @@
-using Favorit.Integrations.Client;
-using Favorit.Integrations.Core.Interfaces;
 using Integrations.Common;
+using Integrations.Favorit;
+using Integrations.Favorit.Interfaces;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Settings;

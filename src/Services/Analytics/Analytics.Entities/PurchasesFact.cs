@@ -3,6 +3,7 @@ using Analytics.Enums;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
+using Domain.Validation;
 using Exceptions;
 
 namespace Analytics.Entities;

@@ -1,8 +1,8 @@
-using Favorit.Integrations.Core.Requests;
-using Favorit.Integrations.Core.Responses;
 using Integrations.Common;
+using Integrations.Favorit.Requests;
+using Integrations.Favorit.Responses;
 
-namespace Favorit.Integrations.Core.Interfaces;
+namespace Integrations.Favorit.Interfaces;
 
 public interface IFavoritPartsClient
 {

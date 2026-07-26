@@ -3,6 +3,7 @@ using Domain.CommonEnums;
 using Domain.Exceptions;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Domain.Validation;
 
 namespace Domain.CommonEntities;
 

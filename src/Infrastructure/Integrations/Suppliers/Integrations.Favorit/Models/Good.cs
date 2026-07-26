@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Favorit.Integrations.Core.Models;
+namespace Integrations.Favorit.Models;
 
 public record Good
 {

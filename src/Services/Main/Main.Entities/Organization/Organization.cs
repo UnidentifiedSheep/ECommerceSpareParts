@@ -3,6 +3,7 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Domain.Validation;
 using Exceptions;
 using Main.Entities.Balance;
 using Main.Enums.Organization;

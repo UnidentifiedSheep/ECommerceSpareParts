@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Domain.Validation;
 using Pricing.Enums;
 
 namespace Pricing.Entities.Offers;

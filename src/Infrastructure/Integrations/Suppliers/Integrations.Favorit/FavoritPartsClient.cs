@@ -1,13 +1,13 @@
-using Favorit.Integrations.Core.Interfaces;
-using Favorit.Integrations.Core.Requests;
-using Favorit.Integrations.Core.Responses;
 using Integrations.Client.Core;
 using Integrations.Common;
+using Integrations.Favorit.Interfaces;
+using Integrations.Favorit.Requests;
+using Integrations.Favorit.Responses;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Favorit.Integrations.Client;
+namespace Integrations.Favorit;
 
 public class FavoritPartsClient(
     HttpClient client,

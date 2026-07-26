@@ -1,4 +1,4 @@
-namespace Favorit.Integrations.Core.Requests;
+namespace Integrations.Favorit.Requests;
 
 public record GetPricesRequest
 {
