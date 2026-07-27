@@ -6,7 +6,7 @@ using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;
 using Internal.Integration.Core.Interfaces.Common;
 
-namespace Application.Common.Services.Supplier;
+namespace Application.Common.Services.Supplier.Favorite;
 
 public class FavoriteConnectionProvider(
     ICommonClient commonClient,

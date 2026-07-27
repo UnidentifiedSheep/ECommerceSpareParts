@@ -4,7 +4,7 @@ using Integrations.Supplier.Connections;
 using Internal.Integration.Core.Interfaces.Common;
 using ZiggyCreatures.Caching.Fusion;
 
-namespace Application.Common.Services.Supplier;
+namespace Application.Common.Services.Supplier.Favorite;
 
 public class FavoriteCacheableConnectionProvider(
     IFusionCache cache,

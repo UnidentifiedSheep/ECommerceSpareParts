@@ -10,6 +10,7 @@ using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Application.Common.Interfaces;
 using Application.Common.Services.Supplier;
+using Application.Common.Services.Supplier.Favorite;
 using Cache;
 using Carter;
 using Contracts.Analytics;
