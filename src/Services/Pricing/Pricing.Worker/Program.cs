@@ -9,6 +9,7 @@ using Application.Common.Consumer;
 using Application.Common.Interfaces;
 using Application.Common.Services.Supplier;
 using Application.Common.Services.Supplier.Favorite;
+using Application.Common.Services.Supplier.Tmtr;
 using Cache;
 using Contracts.Analytics;
 using Contracts.Job;
@@ -59,6 +60,7 @@ builder.Services
     .AddCommonLayer()
     .AddWorkerSecurityLayer()
     .AddFavoriteIntegration<FavoriteCacheableConnectionProvider, FavoriteSettingsProvider>()
+    .AddTmtrIntegration<TmtrCacheableConnectionProvider, TmtrSettingsProvider>()
     .AddJsonSigner()
     .AddSecretEncryptor();
 
