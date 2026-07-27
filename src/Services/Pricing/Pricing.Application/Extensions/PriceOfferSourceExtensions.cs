@@ -7,9 +7,13 @@ public static class PriceOfferSourceExtensions
 {
     public static PriceOfferSource ToSource(this Supplier supplier)
     {
-        return supplier == Supplier.Armtek
-            ? PriceOfferSource.Armtek
-            : PriceOfferSource.FavoriteParts;
+        return supplier switch
+        {
+            Supplier.Armtek => PriceOfferSource.Armtek,
+            Supplier.FavoritParts => PriceOfferSource.FavoriteParts,
+            Supplier.Tmtr => PriceOfferSource.Tmtr,
+            _ => throw new ArgumentOutOfRangeException(nameof(supplier), supplier, null)
+        };
     }
 
     public static PriceOfferSourceType GetSourceType(this PriceOfferSource source)
