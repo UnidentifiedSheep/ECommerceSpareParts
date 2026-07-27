@@ -11,6 +11,21 @@
     "supplier.favorit.setting.api.key.name": "API key",
     "supplier.favorit.setting.api.key.description": "API key used to authorize requests to the Favorit supplier API.",
     "supplier.favorit.setting.has.api.key.name": "API key configured",
-    "supplier.favorit.setting.has.api.key.description": "Shows whether an API key is stored for the Favorit supplier integration."
+    "supplier.favorit.setting.has.api.key.description": "Shows whether an API key is stored for the Favorit supplier integration.",
+    "supplier.tmtr.setting.name": "TMTR supplier settings",
+    "supplier.tmtr.setting.description": "Controls connection and delivery settings for the TMTR supplier integration.",
+    "supplier.tmtr.setting.input.invalid": "Invalid TMTR supplier settings data was provided.",
+    "supplier.tmtr.setting.is.enabled.name": "Integration enabled",
+    "supplier.tmtr.setting.is.enabled.description": "Enables or disables the TMTR supplier integration.",
+    "supplier.tmtr.setting.base.url.name": "Base URL",
+    "supplier.tmtr.setting.base.url.description": "Base URL used to send requests to the TMTR supplier API.",
+    "supplier.tmtr.setting.delivery.offset.name": "Guaranteed delivery offset",
+    "supplier.tmtr.setting.delivery.offset.description": "Number of days added to the guaranteed delivery date.",
+    "supplier.tmtr.setting.login.name": "Login",
+    "supplier.tmtr.setting.login.description": "Login used to authorize requests to the TMTR supplier API.",
+    "supplier.tmtr.setting.password.name": "Password",
+    "supplier.tmtr.setting.password.description": "Password used to authorize requests to the TMTR supplier API.",
+    "supplier.tmtr.setting.has.password.name": "Password configured",
+    "supplier.tmtr.setting.has.password.description": "Shows whether a password is stored for the TMTR supplier integration."
   }
 }

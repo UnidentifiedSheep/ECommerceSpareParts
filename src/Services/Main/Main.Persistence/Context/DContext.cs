@@ -179,7 +179,8 @@ public partial class DContext : DbContext
             .HasValue<CurrencySetting>(CurrencySetting.SettingName)
             .HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName)
             .HasValue<StorageContentSetting>(StorageContentSetting.SettingName)
-            .HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName);
+            .HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)
+            .HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
 
         modelBuilder.AddFieldsForAuditableEntities();
 

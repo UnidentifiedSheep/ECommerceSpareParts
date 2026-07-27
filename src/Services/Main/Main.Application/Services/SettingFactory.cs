@@ -12,5 +12,6 @@ public class SettingFactory : SettingFactoryBase
         Register(json => new GlobalApplicationSetting(json));
         Register(json => new StorageContentSetting(json));
         Register(json => new FavoritSupplierSetting(json));
+        Register(json => new TmtrSupplierSetting(json));
     }
 }
