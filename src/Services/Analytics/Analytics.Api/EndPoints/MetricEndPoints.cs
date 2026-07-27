@@ -57,7 +57,7 @@ public class MetricEndPoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var metrics = app.MapGroup("/metrics")
+        var metrics = app.MapGroup("/business-metrics")
             .WithTags("Metrics");
 
         metrics.MapGet(

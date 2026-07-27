@@ -41,7 +41,6 @@ public record SubtractStorageContentsResult(IReadOnlyList<StorageLot> Contents);
 
 public class SubtractStorageContentsHandler(
     IStorageContentRepository storageContentRepository,
-    IUnitOfWork unitOfWork,
     ISettingsService settingsService,
     INamedObjectRegistry<StorageContentExtractPolicyBase> policyRegistry
 )
