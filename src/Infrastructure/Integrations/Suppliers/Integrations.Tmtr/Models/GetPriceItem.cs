@@ -16,14 +16,24 @@ public sealed record GetPriceItem
     public DateTimeOffset? AvailabilityDeadline =>
         ParseDate(AvailabilityDeadlineRaw);
 
+    [JsonIgnore]
+    public int? AvailabilityPeriodDays =>
+        int.TryParse(
+            AvailabilityDeadlineRaw,
+            NumberStyles.Integer,
+            CultureInfo.InvariantCulture,
+            out var days)
+            ? days
+            : null;
+
     [JsonPropertyName("OS")]
     public OfferLocationType LocationType { get; init; }
 
     [JsonPropertyName("ShowedQuantity")]
-    public string DisplayedQuantity { get; init; } = null!;
+    public string? AvailableQuantityRaw { get; init; }
     
     [JsonIgnore]
-    public int DisplayedQuantityInt => ParseDisplayedQuantity(DisplayedQuantity);
+    public int AvailableQuantity => ParseDisplayedQuantity(AvailableQuantityRaw);
 
     [JsonPropertyName("DeliveryDate")]
     public string? ExpectedDeliveryDateRaw { get; init; }
@@ -84,11 +94,10 @@ public sealed record GetPriceItem
     public int PriceListId { get; init; }
 
     [JsonPropertyName("PriceDetailId")]
-    public int PriceListItemId { get; init; }
+    public long PriceListItemId { get; init; }
 
     [JsonPropertyName("StorageCode")]
-    public string StorageLocationCode { get; init; } = null!;
-
+    public string? StorageLocationCode { get; init; }
     [JsonPropertyName("DeliveryPeriod")]
     public int DeliveryDays { get; init; }
 
@@ -115,9 +124,13 @@ public sealed record GetPriceItem
         if (string.IsNullOrWhiteSpace(value))
             return 0;
 
-        var digits = value.Where(char.IsDigit).ToArray();
+        var numericPart = value.TrimStart('>', ' ');
 
-        return digits.Length > 0 && int.TryParse(digits, out var quantity)
+        return int.TryParse(
+            numericPart,
+            NumberStyles.Integer,
+            CultureInfo.InvariantCulture,
+            out var quantity)
             ? quantity
             : 0;
     }

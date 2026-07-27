@@ -1,6 +1,4 @@
 using Application.Common.Interfaces.Cache;
-using Application.Common.Interfaces.Settings;
-using Enums;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Models.Requests;
 using Internal.Integration.Core.Interfaces.Main;
@@ -8,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models;
 using Pricing.Application.Static;
-using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Services.Pricing;
 
@@ -50,7 +47,7 @@ public class SupplierOfferExtractorService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(
+            logger.LogError(
                 exception: ex, 
                 message: "Supplier offer extraction failed. Supplier: {Supplier}, ProductId: {ProductId}, Storage: {StorageName}", 
                 supplier.Supplier, 

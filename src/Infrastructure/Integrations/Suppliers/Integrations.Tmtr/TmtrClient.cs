@@ -32,7 +32,7 @@ public class TmtrClient(
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Brand);
         
         var connection = await connectionProvider.GetConnectionAsync(token);
-        var httpRequest = CreateRequest(connection, "/API.asmx/Proboy");
+        using var httpRequest = CreateRequest(connection, "/API.asmx/Proboy");
         
         httpRequest.Content = JsonContent.Create(new
         {
@@ -40,7 +40,7 @@ public class TmtrClient(
             brand = request.Brand
         });
         
-        var response = await client.SendAsync(httpRequest, token);
+        using var response = await client.SendAsync(httpRequest, token);
         return await ReadResponse<GetPricesResponse>(response, token);
     }
     public async Task<Response<GetProductsResponse>> GetProductsAsync(
@@ -50,14 +50,14 @@ public class TmtrClient(
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Number);
         
         var connection = await connectionProvider.GetConnectionAsync(token);
-        var httpRequest = CreateRequest(connection, "/API.asmx/PreProboy");
+        using var httpRequest = CreateRequest(connection, "/API.asmx/PreProboy");
 
         httpRequest.Content = JsonContent.Create(new
         {
             article = request.Number
         });
         
-        var response = await client.SendAsync(httpRequest, token);
+        using var response = await client.SendAsync(httpRequest, token);
         return await ReadResponse<GetProductsResponse>(response, token);
     }
 
@@ -81,6 +81,5 @@ public class TmtrClient(
     {
         request.Headers.Add("login", connection.Login);
         request.Headers.Add("password", connection.Password);
-        request.Headers.Add("Content-Type", "application/json");
     }
 }

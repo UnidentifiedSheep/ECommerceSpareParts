@@ -87,7 +87,13 @@ public class TmtrSupplier(
             }
 
             var key = (item.Brand, item.Number);
-            analogues[key] = analogues.GetValueOrDefault(key, [item]);
+            if (!analogues.TryGetValue(key, out var positions))
+            {
+                positions = [];
+                analogues[key] = positions;
+            }
+
+            positions.Add(item);
         }
         
         var firstPositionOrDefault = requestedPositions.FirstOrDefault();
@@ -143,7 +149,7 @@ public class TmtrSupplier(
                 : null,
             PurchaseInfo = new PurchaseInfo
             {
-                AvailableQuantity = item.DisplayedQuantityInt,
+                AvailableQuantity = item.AvailableQuantity,
                 MinimumPurchaseQuantity = item.MinimumOrderQuantity,
                 QuantityCoefficient = item.MinimumPackQuantity,
                 PartnerWarehouse = item.LocationType == OfferLocationType.PartnerNetworkWarehouse,
