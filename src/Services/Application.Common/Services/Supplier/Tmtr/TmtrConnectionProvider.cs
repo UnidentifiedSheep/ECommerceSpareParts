@@ -1,20 +1,16 @@
-using Abstractions;
 using Abstractions.Interfaces.Services;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;
-using Internal.Integration.Core.Interfaces.Common;
 
 namespace Application.Common.Services.Supplier.Tmtr;
 
 public class TmtrConnectionProvider(
-    ICommonClient commonClient,
+    TmtrMainSettingProvider settingsProvider,
     ISecretEncryptor secretEncryptor
 ) : IConnectionProvider<TmtrConnection>
 {
-    private const string SettingSystemName = "TmtrSupplierSetting";
-
-    public virtual async Task<TmtrConnection> GetConnectionAsync(
+    public async Task<TmtrConnection> GetConnectionAsync(
         CancellationToken cancellationToken = default)
     {
         var check = await CheckConnectionAsync(cancellationToken);
@@ -31,27 +27,16 @@ public class TmtrConnectionProvider(
         return await CheckConnectionAsync(cancellationToken);
     }
 
-    public virtual async Task<ConnectionCheck<TmtrConnection>> CheckConnectionAsync(
+    public async Task<ConnectionCheck<TmtrConnection>> CheckConnectionAsync(
         CancellationToken cancellationToken = default)
     {
-        var response = await commonClient.SettingNode.GetSetting(
-            ServicesDefinitions.Main,
-            SettingSystemName,
-            cancellationToken);
-
-        if (!response.Success)
+        var result = await settingsProvider.GetAsync(cancellationToken);
+        if (!result.IsSuccess)
             return Unavailable(
-                SupplierUnavailableReason.SettingsUnavailable,
-                "Unable to get TMTR settings");
+                result.Reason ?? SupplierUnavailableReason.SettingsUnavailable,
+                result.Message ?? "Unable to get TMTR settings");
 
-        var settings = System.Text.Json.JsonSerializer.Deserialize<TmtrMainSettings>(
-            response.ValueOrThrow);
-
-        if (settings is null)
-            return Unavailable(
-                SupplierUnavailableReason.InvalidConfiguration,
-                "Invalid TMTR settings JSON");
-
+        var settings = result.Setting!;
         if (!settings.IsEnabled)
             return Unavailable(
                 SupplierUnavailableReason.Disabled,

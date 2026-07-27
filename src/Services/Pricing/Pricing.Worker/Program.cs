@@ -59,8 +59,9 @@ builder.Services
     .AddApplicationLayer(builder.Configuration)
     .AddCommonLayer()
     .AddWorkerSecurityLayer()
-    .AddFavoriteIntegration<FavoriteCacheableConnectionProvider, FavoriteSettingsProvider>()
-    .AddTmtrIntegration<TmtrCacheableConnectionProvider, TmtrSettingsProvider>()
+    .AddMainSupplierSettingProviders()
+    .AddFavoriteIntegration<FavoriteConnectionProvider, FavoriteSettingsProvider>()
+    .AddTmtrIntegration<TmtrConnectionProvider, TmtrSettingsProvider>()
     .AddJsonSigner()
     .AddSecretEncryptor();
 

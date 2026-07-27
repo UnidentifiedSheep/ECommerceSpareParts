@@ -1,27 +1,22 @@
-using System.Text.Json.Serialization;
-using Abstractions;
 using Abstractions.Interfaces.Services;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;
-using Internal.Integration.Core.Interfaces.Common;
 
 namespace Application.Common.Services.Supplier.Favorite;
 
 public class FavoriteConnectionProvider(
-    ICommonClient commonClient,
-    ISecretEncryptor encryptor
+    FavoriteMainSettingProvider settingsProvider,
+    ISecretEncryptor secretEncryptor
 ) : IConnectionProvider<FavoritConnection>
 {
-    private const string SettingSystemName = "FavoritSupplierSetting";
-
-    public virtual async Task<FavoritConnection> GetConnectionAsync(
+    public async Task<FavoritConnection> GetConnectionAsync(
         CancellationToken cancellationToken = default)
     {
         var check = await CheckConnectionAsync(cancellationToken);
         if (!check.CanUse || check.Connection is null)
             throw new InvalidOperationException(
-                $"Supplier cannot be user. Reason: {check.Reason.ToString()}. Message: {check.Message}");
+                $"Supplier cannot be used. Reason: {check.Reason}. Message: {check.Message}");
 
         return check.Connection;
     }
@@ -32,49 +27,28 @@ public class FavoriteConnectionProvider(
         return await CheckConnectionAsync(cancellationToken);
     }
 
-    public virtual async Task<ConnectionCheck<FavoritConnection>> CheckConnectionAsync(
+    public async Task<ConnectionCheck<FavoritConnection>> CheckConnectionAsync(
         CancellationToken cancellationToken = default)
     {
-        var response = await commonClient.SettingNode.GetSetting(
-            ServicesDefinitions.Main,
-            SettingSystemName,
-            cancellationToken);
+        var result = await settingsProvider.GetAsync(cancellationToken);
+        if (!result.IsSuccess)
+            return Unavailable(
+                result.Reason ?? SupplierUnavailableReason.SettingsUnavailable,
+                result.Message ?? "Unable to get Favorit settings");
 
-        if (!response.Success)
-            return new ConnectionCheck<FavoritConnection>(
-                false,
-                null,
-                SupplierUnavailableReason.SettingsUnavailable,
-                "Unable to get Favorit settings");
-
-        var settings = System.Text.Json.JsonSerializer.Deserialize<FavoritMainSettings>(
-            response.ValueOrThrow);
-
-        if (settings is null)
-            return new ConnectionCheck<FavoritConnection>(
-                false,
-                null,
-                SupplierUnavailableReason.InvalidConfiguration,
-                "Invalid Favorit settings JSON");
-
+        var settings = result.Setting!;
         if (!settings.IsEnabled)
-            return new ConnectionCheck<FavoritConnection>(
-                false,
-                null,
+            return Unavailable(
                 SupplierUnavailableReason.Disabled,
                 "Favorit integration is disabled");
 
         if (string.IsNullOrWhiteSpace(settings.BaseUrl))
-            return new ConnectionCheck<FavoritConnection>(
-                false,
-                null,
+            return Unavailable(
                 SupplierUnavailableReason.InvalidConfiguration,
                 "Favorit BaseUrl is empty");
 
         if (string.IsNullOrWhiteSpace(settings.EncryptedApiKey))
-            return new ConnectionCheck<FavoritConnection>(
-                false,
-                null,
+            return Unavailable(
                 SupplierUnavailableReason.InvalidConfiguration,
                 "Favorit ApiKey is empty");
 
@@ -83,19 +57,18 @@ public class FavoriteConnectionProvider(
             new FavoritConnection
             {
                 BaseUrl = settings.BaseUrl,
-                ApiKey = encryptor.Decrypt(settings.EncryptedApiKey)
+                ApiKey = secretEncryptor.Decrypt(settings.EncryptedApiKey)
             });
     }
 
-    protected record FavoritMainSettings
+    private static ConnectionCheck<FavoritConnection> Unavailable(
+        SupplierUnavailableReason reason,
+        string message)
     {
-        [JsonPropertyName("isEnabled")]
-        public bool IsEnabled { get; init; }
-
-        [JsonPropertyName("baseUrl")]
-        public string? BaseUrl { get; init; }
-
-        [JsonPropertyName("encryptedApiKey")]
-        public string? EncryptedApiKey { get; init; }
+        return new ConnectionCheck<FavoritConnection>(
+            false,
+            null,
+            reason,
+            message);
     }
 }
