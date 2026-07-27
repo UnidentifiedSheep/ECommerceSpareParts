@@ -57,13 +57,18 @@ public class TmtrConnectionProvider(
                 SupplierUnavailableReason.InvalidConfiguration,
                 "TMTR password is empty");
 
+        if (!secretEncryptor.TryDecrypt(settings.AuthData.EncryptedPassword, out var password))
+            return Unavailable(
+                SupplierUnavailableReason.InvalidConfiguration,
+                "TMTR password cannot be decrypted");
+
         return new ConnectionCheck<TmtrConnection>(
             true,
             new TmtrConnection
             {
                 BaseUrl = settings.BaseUrl,
                 Login = settings.AuthData.Login,
-                Password = secretEncryptor.Decrypt(settings.AuthData.EncryptedPassword)
+                Password = password!
             });
     }
 

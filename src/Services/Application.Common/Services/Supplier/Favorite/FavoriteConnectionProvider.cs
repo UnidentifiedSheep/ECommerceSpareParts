@@ -52,12 +52,17 @@ public class FavoriteConnectionProvider(
                 SupplierUnavailableReason.InvalidConfiguration,
                 "Favorit ApiKey is empty");
 
+        if (!secretEncryptor.TryDecrypt(settings.EncryptedApiKey, out var apiKey))
+            return Unavailable(
+                SupplierUnavailableReason.InvalidConfiguration,
+                "Favorit ApiKey cannot be decrypted");
+
         return new ConnectionCheck<FavoritConnection>(
             true,
             new FavoritConnection
             {
                 BaseUrl = settings.BaseUrl,
-                ApiKey = secretEncryptor.Decrypt(settings.EncryptedApiKey)
+                ApiKey = apiKey!
             });
     }
 
