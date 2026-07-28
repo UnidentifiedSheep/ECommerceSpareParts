@@ -42,6 +42,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <EmailTemplate Include="..\..\..\Infrastructure\Mailing\EmailTemplates\**\*.cshtml"/>
         <Content Include="..\..\..\..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
@@ -62,9 +63,15 @@
         </Content>
     </ItemGroup>
 
+    <Target Name="CopyEmailTemplatesToOutput" AfterTargets="CopyFilesToOutputDirectory">
+        <Copy
+            SourceFiles="@(EmailTemplate)"
+            DestinationFiles="@(EmailTemplate->'$(OutDir)Templates\Emails\%(RecursiveDir)%(Filename)%(Extension)')"
+            SkipUnchangedFiles="true"/>
+    </Target>
+
     <Target Name="AddEmailTemplatesToPublish" BeforeTargets="ComputeFilesToPublish">
         <ItemGroup>
-            <EmailTemplate Include="..\..\..\Infrastructure\Mailing\EmailTemplates\**\*.cshtml"/>
             <ResolvedFileToPublish Include="@(EmailTemplate)">
                 <RelativePath>Templates\Emails\%(EmailTemplate.RecursiveDir)%(EmailTemplate.Filename)%(EmailTemplate.Extension)</RelativePath>
                 <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
