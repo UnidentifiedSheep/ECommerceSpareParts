@@ -49,4 +49,6 @@ public interface ICache
     Task AddToSetAsync(
         Dictionary<string, List<string>> keyValues,
         TimeSpan? ttl = null);
+
+    Task<T?> GetDeleteAsync<T>(string key);
 }

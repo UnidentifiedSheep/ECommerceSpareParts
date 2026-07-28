@@ -13,6 +13,7 @@ public class RedisCache(
 {
     public Task<T?> GetAsync<T>(string key)
         => redis.JSON().GetAsync<T>(GetWithPrefix(key));
+    
     public async Task<IReadOnlyList<T?>> GetAsync<T>(IEnumerable<string> keys)
     {
         var redisResults = await redis.JSON()
@@ -189,6 +190,12 @@ public class RedisCache(
         await Task.WhenAll(tasks);
 
         if (ttl.HasValue) await SetExpireAsync(keyValues.Keys, ttl);
+    }
+
+    public async Task<T?> GetDeleteAsync<T>(string key)
+    {
+        var res = await redis.StringGetDeleteAsync(GetWithPrefix(key));
+        return res.Deserialize<T>();
     }
 
     private Task AddToSetCore(

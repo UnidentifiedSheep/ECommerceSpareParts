@@ -9,6 +9,7 @@ using Mailing.Core;
 using Mailing.Core.Models;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.Models.Auth;
 using Main.Entities.Settings;
 using Main.Entities.User;
@@ -27,7 +28,8 @@ public class SendEmailRecoveryHandler(
     IMailingService mailingService,
     IScopedStringLocalizer localizer,
     IEmailMessageRenderer emailRenderer,
-    ISettingsService settingsService
+    ISettingsService settingsService,
+    IResetPayloadProvider payloadProvider
 ) : ICommandHandler<SendEmailRecoveryCommand>
 {
     public async Task<Unit> Handle(
@@ -50,12 +52,8 @@ public class SendEmailRecoveryHandler(
                                 "global.application.setting.app.service.url.not.configured");
 
         var signed = jsonSigner.Sign(
-            new ResetPayload
-            {
-                UserId = user.Id,
-                Type = ResetType.PasswordReset,
-                Expires = DateTime.UtcNow + TimeSpan.FromMinutes(30)
-            });
+            await payloadProvider
+                .GetPayload(user.Id, ResetType.PasswordReset));
 
         var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
         var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");

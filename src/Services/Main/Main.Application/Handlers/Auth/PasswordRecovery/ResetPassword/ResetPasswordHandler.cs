@@ -3,6 +3,7 @@ using Abstractions.Interfaces.Validators;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.Models.Auth;
 using Main.Entities.Exceptions;
 using Main.Enums.Auth;
@@ -20,6 +21,7 @@ public record ResetPasswordCommand(
 public class ResetPasswordHandler(
     IUserRepository userRepository,
     IPasswordManager pwdManager,
+    IResetPayloadProvider resetPayloadProvider,
     IJsonSigner jsonSigner
 ) : ICommandHandler<ResetPasswordCommand>
 {
@@ -30,7 +32,7 @@ public class ResetPasswordHandler(
         var token = Uri.UnescapeDataString(request.Token);
         if (!jsonSigner.VerifyJson<ResetPayload>(token, out var payload) ||
             payload == null ||
-            payload.Expires <= DateTime.UtcNow ||
+            !(await resetPayloadProvider.IsResetTokenValid(payload.Id)) ||
             payload.Type != ResetType.PasswordReset)
             throw new ResetTokenExpiredException();
 

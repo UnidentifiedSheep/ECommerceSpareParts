@@ -5,12 +5,12 @@ namespace Main.Application.Models.Auth;
 
 public record ResetPayload
 {
+    [JsonPropertyName("id")]
+    public Guid Id { get; } = Guid.NewGuid();
+    
     [JsonPropertyName("type")]
     public required ResetType Type { get; init; }
 
     [JsonPropertyName("userId")]
     public required Guid UserId { get; init; }
-
-    [JsonPropertyName("expires")]
-    public required DateTime Expires { get; init; }
 }
