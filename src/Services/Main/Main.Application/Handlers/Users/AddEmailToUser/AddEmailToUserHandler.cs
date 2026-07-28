@@ -1,8 +1,12 @@
 using Abstractions.Models.Options;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
+using Main.Application.Dtos.Emails;
+using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
@@ -21,15 +25,19 @@ namespace Main.Application.Handlers.Users.AddEmailToUser;
 public record AddEmailToUserCommand(
     Guid UserId,
     string Email,
-    EmailType EmailType) : ICommand;
+    EmailType EmailType) : ICommand<AddEmailToUserResult>;
+
+public record AddEmailToUserResult(
+    UserEmailDto Email);
 
 public class AddEmailToUserHandler(
     IOptions<UserEmailOptions> options,
+    IProjectionProvider<UserEmail, UserEmailDto> projectionProvider,
     IUserRepository userRepository,
     IReadRepository<UserEmail, string> emailRepository)
-    : ICommandHandler<AddEmailToUserCommand>
+    : ICommandHandler<AddEmailToUserCommand, AddEmailToUserResult>
 {
-    public async Task<Unit> Handle(
+    public async Task<AddEmailToUserResult> Handle(
         AddEmailToUserCommand request,
         CancellationToken cancellationToken)
     {
@@ -61,6 +69,9 @@ public class AddEmailToUserHandler(
             request.EmailType,
             options.Value.MaxEmailCount);
 
-        return Unit.Value;
+        return new AddEmailToUserResult(projectionProvider
+            .Projection
+            .AsFunc()
+            (user.Emails.First(x => x.Email == email)));
     }
 }

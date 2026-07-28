@@ -1,5 +1,6 @@
 using Api.Common.Extensions;
 using Enums;
+using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users.AddEmailToUser;
 using Main.Application.Handlers.Users.RemoveEmailFromUser;
 using Main.Enums;
@@ -10,6 +11,8 @@ namespace Main.Api.EndPoints.Users;
 public record AddUserEmailRequest(
     string Email,
     EmailType EmailType);
+
+public record AddUserEmailResponse(UserEmailDto Email);
 
 public static class UserEmailEndPoints
 {
@@ -23,7 +26,7 @@ public static class UserEmailEndPoints
                     AddUserEmailRequest request,
                     CancellationToken cancellationToken) =>
                 {
-                    await sender.Send(
+                    var result = await sender.Send(
                         new AddEmailToUserCommand(
                             userId,
                             request.Email,
@@ -32,14 +35,14 @@ public static class UserEmailEndPoints
 
                     return Results.Created(
                         $"/users/{userId}/emails/{Uri.EscapeDataString(request.Email)}",
-                        value: null);
+                        value: new AddUserEmailResponse(result.Email));
                 })
             .WithName("AddUserEmail")
             .WithSummary("Добавить почту пользователю")
             .WithDescription("Добавляет пользователю неподтверждённый дополнительный email")
             .WithDisplayName("Добавить почту")
             .Accepts<AddUserEmailRequest>(false, "application/json")
-            .Produces(StatusCodes.Status201Created)
+            .Produces<AddUserEmailResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict)
