@@ -1,0 +1,21 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "mail.password.reset.subject": "Şifre sıfırlama",
+    "mail.password.reset.title": "Şifrenizi sıfırlayın",
+    "mail.password.reset.intro": "Hesabınızın şifresini sıfırlamak için bir istek aldık.",
+    "mail.password.reset.description": "Yeni bir şifre belirlemek için aşağıdaki düğmeyi kullanın. Bu bağlantı sınırlı bir süre için geçerlidir.",
+    "mail.password.reset.button": "Şifreyi sıfırla",
+    "mail.password.reset.fallback": "Düğme çalışmazsa bu bağlantıyı kopyalayıp tarayıcınıza yapıştırın:",
+    "mail.password.reset.ignore": "Şifre sıfırlama isteğinde bulunmadıysanız bu e-postayı güvenle yok sayabilirsiniz.",
+    "mail.login.notification.subject": "Hesabınızda oturum açıldı",
+    "mail.login.notification.title": "Yeni hesap girişi",
+    "mail.login.notification.intro": "Hesabınızda bir oturum açma işlemi tespit ettik.",
+    "mail.login.notification.date.time.label": "Tarih ve saat",
+    "mail.login.notification.ip.address.label": "IP adresi",
+    "mail.login.notification.device.label": "Cihaz",
+    "mail.login.notification.was.you": "Bu sizseniz herhangi bir işlem yapmanız gerekmez.",
+    "mail.login.notification.not.you": "Bu girişi tanımıyorsanız şifrenizi hemen değiştirin ve etkin oturumları sonlandırın.",
+    "mail.login.notification.unknown": "Bilinmiyor"
+  }
+}

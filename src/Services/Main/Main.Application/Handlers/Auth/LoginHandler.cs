@@ -25,8 +25,7 @@ public record LoginCommand(
     string Password,
     IPAddress? IpAddress,
     string? UserAgent
-)
-    : ICommand<LoginResult>;
+) : ICommand<LoginResult>;
 
 public record LoginResult(
     string Token,
@@ -89,7 +88,9 @@ public class LoginHandler(
             [],
             cancellationToken);
 
-        user.Login();
+        user.Login(
+            ip?.ToString(),
+            userAgent);
 
         return new LoginResult(
             token,

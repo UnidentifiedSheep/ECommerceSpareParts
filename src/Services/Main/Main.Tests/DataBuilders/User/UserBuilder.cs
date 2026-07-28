@@ -1,4 +1,5 @@
 using Bogus;
+using Main.Enums;
 using Main.Entities.User.ValueObjects;
 using Tests.Abstractions;
 
@@ -7,6 +8,7 @@ namespace Tests.DataBuilders.User;
 public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(faker)
 {
     private readonly List<string> _roles = [];
+    private readonly List<UserEmailData> _emails = [];
     public UserName? UserName { get; private set; }
     public string? PasswordHash { get; private set; }
 
@@ -31,6 +33,20 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
     public UserBuilder WithRole(string role)
     {
         _roles.Add(role);
+        return this;
+    }
+
+    public UserBuilder WithEmail(
+        string email,
+        EmailType type = EmailType.Unknown,
+        bool isPrimary = false,
+        bool isConfirmed = true)
+    {
+        _emails.Add(new UserEmailData(
+            email,
+            type,
+            isPrimary,
+            isConfirmed));
         return this;
     }
 
@@ -65,7 +81,19 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
                 Description ?? Faker.Lorem.Sentence());
 
         foreach (var role in Roles) user.AddRole(role);
+        foreach (var email in _emails)
+            user.AddUserEmail(
+                email.Value,
+                email.Type,
+                email.IsPrimary,
+                email.IsConfirmed);
 
         return user;
     }
+
+    private sealed record UserEmailData(
+        string Value,
+        EmailType Type,
+        bool IsPrimary,
+        bool IsConfirmed);
 }

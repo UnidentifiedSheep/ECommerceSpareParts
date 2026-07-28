@@ -7,6 +7,7 @@ using Domain.Validation;
 using Exceptions;
 using Main.Entities.Auth;
 using Main.Entities.Balance;
+using Main.Entities.DomainEvents.User;
 using Main.Entities.Organization;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
@@ -179,7 +180,18 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
                 new InvalidOperationException("Password hash must not be null or empty."));
     }
 
-    public void Login() { LastLoginAt = DateTime.UtcNow; }
+    public void Login(
+        string? ipAddress,
+        string? userAgent)
+    {
+        LastLoginAt = DateTime.UtcNow;
+        AddDomainEvent(
+            new UserLoggedInDomainEvent(
+                Id,
+                LastLoginAt.Value,
+                ipAddress,
+                userAgent));
+    }
 
     public override Guid GetId() { return Id; }
 }

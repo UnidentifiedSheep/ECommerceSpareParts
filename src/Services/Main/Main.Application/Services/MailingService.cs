@@ -13,11 +13,21 @@ public class MailingService(
         IEmailMessage email,
         CancellationToken ct = default)
     {
-        var model = EmailOutBox.Create(
-            email.Subject,
-            email.To,
-            email.GetHtmlBody());
+        await QueueToOutbox([email], ct);
+    }
 
-        await unitOfWork.AddAsync(model, ct);
+    public async Task QueueToOutbox(
+        IEnumerable<IEmailMessage> emails,
+        CancellationToken ct = default)
+    {
+        var models = emails
+            .Select(email => EmailOutBox.Create(
+                email.Subject,
+                email.To,
+                email.GetHtmlBody()))
+            .ToList();
+
+        if (models.Count > 0)
+            await unitOfWork.AddRangeAsync(models, ct);
     }
 }

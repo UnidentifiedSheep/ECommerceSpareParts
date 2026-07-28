@@ -62,7 +62,7 @@ public class SendEmailRecoveryHandler(
 
         var email = await emailRenderer.RenderAsync(
             new ResetPasswordData(
-                localizer.Locale,
+                localizer,
                 resetUrl.ToString(),
                 request.Email),
             cancellationToken);

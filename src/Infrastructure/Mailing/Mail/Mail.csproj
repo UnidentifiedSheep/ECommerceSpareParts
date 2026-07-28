@@ -31,8 +31,4 @@
         <ProjectReference Include="..\EmailTemplates\EmailTemplates.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Interface\"/>
-    </ItemGroup>
-
 </Project>

@@ -11,4 +11,12 @@
         <ProjectReference Include="..\..\Localization\Localization.Abstractions\Localization.Abstractions.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="Localization\**\*.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <TargetPath>Localization\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+        </Content>
+    </ItemGroup>
+
 </Project>
