@@ -18,6 +18,7 @@ using MediatR;
 namespace Main.Application.Handlers.Auth.EmailVerification;
 
 [Diagnostics(maxExecutionTimeMs: 300)]
+[Transactional, AutoSave]
 public record RequestEmailVerificationCommand(
     Guid UserId,
     string Email) : ICommand;
