@@ -35,6 +35,7 @@
     "article.reservation.needed.count.must.be.positive": "İstenen miktar 0'dan büyük olmalıdır.",
     "article.create.articles.must.have.at.least.one": "En az bir ürün sağlanmalıdır.",
     "article.create.articles.max.100.at.once": "Tek seferde en fazla 100 ürün oluşturulabilir.",
+    "article.create.articles.max.5000.at.once": "Tek bir içe aktarma paketinde en fazla 5000 ürün oluşturulabilir.",
     "article.articleNumber.must.not.be.empty": "Ürün numarası boş olmamalıdır.",
     "article.articleNumber.min.length.3": "Ürün numarası en az 3 karakter uzunluğunda olmalıdır.",
     "article.articleNumber.max.length.128": "Ürün numarası 128 karakteri aşmamalıdır.",
@@ -56,6 +57,7 @@
     "article.reservation.similarity.range": "Benzerlik seviyesi 0 ile 1 arasında olmalıdır.",
     "article.image.not.found": "Belirtilen ürün resmi bulunamadı.",
     "article.import.too.many.errors.while.processing.batch": "Ürün içe aktarma paketi işlenirken çok fazla hata oluştu.",
-    "article.import.producer.not.found": "Üretici veya üretici takma adı '{0}' bulunamadı."
+    "article.import.producer.not.found": "Üretici veya üretici takma adı '{0}' bulunamadı.",
+    "article.cross.import.product.not.found": "'{0}' SKU ve '{1}' üreticisine sahip ürün bulunamadı."
   }
 }

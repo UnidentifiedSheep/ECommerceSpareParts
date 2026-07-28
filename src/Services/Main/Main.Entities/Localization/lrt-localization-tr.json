@@ -9,6 +9,8 @@
     "lrt.producer.supplier.mapping.import.description": "Tedarikçiye özgü üretici adlarını yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut üreticilerle ilişkilendirir.",
     "lrt.product.import.name": "Ürün içe aktarma",
     "lrt.product.import.description": "Ürünleri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler.",
+    "lrt.product.crosses.import.name": "Ürün çaprazları içe aktarma",
+    "lrt.product.crosses.import.description": "Ürün çaprazlarını CSV dosyasından içe aktarır, ürünleri SKU ve üreticiye göre bulur ve aralarında bağlantılar oluşturur.",
     "lrt.producer.synchronization.name": "Üretici senkronizasyonu",
     "lrt.producer.synchronization.description": "İlgili servislerin üretici verilerini yenileyebilmesi için tüm üreticiler için güncelleme olayları yayınlar.",
     "lrt.product.synchronization.name": "Ürün senkronizasyonu",

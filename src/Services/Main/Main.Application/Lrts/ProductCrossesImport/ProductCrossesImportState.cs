@@ -20,6 +20,7 @@ public record ProductCrossesImportState
     public List<ProductCrossesImportError> Errors { get; init; } = [];
 }
 
+[CsvSchema(typeof(ProductCrossesImportLrt.ProductCrossCsvDto))]
 public record ProductCrossesImportInputState : IInputState
 {
     [Accepts(".csv")]

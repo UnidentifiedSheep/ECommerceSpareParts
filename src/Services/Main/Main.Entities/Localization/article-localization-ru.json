@@ -35,6 +35,7 @@
     "article.reservation.needed.count.must.be.positive": "Запрашиваемое количество должно быть больше 0.",
     "article.create.articles.must.have.at.least.one": "Список артикулов не может быть пустым.",
     "article.create.articles.max.100.at.once": "Нельзя добавить более 100 артикулов за раз.",
+    "article.create.articles.max.5000.at.once": "При массовом импорте нельзя добавить более 5000 артикулов за раз.",
     "article.articleNumber.must.not.be.empty": "Артикул не может быть пустым.",
     "article.articleNumber.min.length.3": "Артикул должен содержать минимум 3 символа.",
     "article.articleNumber.max.length.128": "Артикул не должен превышать 128 символов.",
@@ -56,6 +57,7 @@
     "article.reservation.similarity.range": "Уровень схожести должен быть от 0 до 1.",
     "article.image.not.found": "Не удалось найти указанное изображение продукта.",
     "article.import.too.many.errors.while.processing.batch": "Произошло слишком много ошибок при обработке товаров.",
-    "article.import.producer.not.found": "Производитель или алиас производителя '{0}' не найден."
+    "article.import.producer.not.found": "Производитель или алиас производителя '{0}' не найден.",
+    "article.cross.import.product.not.found": "Товар с артикулом '{0}' и производителем '{1}' не найден."
   }
 }
