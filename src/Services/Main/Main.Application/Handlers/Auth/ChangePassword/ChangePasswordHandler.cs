@@ -1,8 +1,6 @@
 ﻿using Abstractions.Interfaces.Validators;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Attributes;
-using Contracts.User;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
 using MediatR;
@@ -19,8 +17,7 @@ public record ChangePasswordCommand(
 
 public class ChangePasswordHandler(
     IUserRepository userRepository,
-    IPasswordManager passwordManager,
-    IIntegrationEventScope integrationEventScope
+    IPasswordManager passwordManager
 ) : ICommandHandler<ChangePasswordCommand>
 {
     public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
@@ -32,11 +29,6 @@ public class ChangePasswordHandler(
             throw new WrongCredentialsException(null, request.PreviousPassword);
 
         user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
-        integrationEventScope.Add(
-            new UserUpdatedEvent
-            {
-                UserId = request.UserId
-            });
 
         return Unit.Value;
     }

@@ -59,13 +59,13 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
     }
 
     public override void OnUpdated()
-        => AddDomainEvent(new UserEmailsUpdatedDomainEvent(UserId));
-    
+        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
     public override void OnDeleted()
-        => AddDomainEvent(new UserEmailsUpdatedDomainEvent(UserId));
-    
+        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
     public override void OnCreated()
-        => AddDomainEvent(new UserEmailsUpdatedDomainEvent(UserId));
+        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
     public void ChangeType(EmailType emailType) { EmailType = emailType; }
 

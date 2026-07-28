@@ -1,9 +1,7 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.User;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using MediatR;
@@ -17,8 +15,7 @@ public record RemovePermissionFromUserCommand(Guid UserId, string PermissionName
 
 public class RemovePermissionFromUserHandler(
     IRepository<UserPermission, (Guid, string)> repository,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope interfaceScope
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<RemovePermissionFromUserCommand>
 {
     public async Task<Unit> Handle(
@@ -30,12 +27,6 @@ public class RemovePermissionFromUserHandler(
                                  cancellationToken)
                              ?? throw new UserPermissionNotFound(request.UserId, request.PermissionName);
         unitOfWork.Remove(userPermission);
-
-        interfaceScope.Add(
-            new UserUpdatedEvent
-            {
-                UserId = request.UserId
-            });
 
         return Unit.Value;
     }

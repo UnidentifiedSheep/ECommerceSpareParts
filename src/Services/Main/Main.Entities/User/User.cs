@@ -224,5 +224,11 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
                 userAgent));
     }
 
+    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(Id));
+
+    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(Id));
+
+    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(Id));
+
     public override Guid GetId() { return Id; }
 }

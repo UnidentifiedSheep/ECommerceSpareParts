@@ -1,10 +1,8 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.User;
 using Enums;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
@@ -20,7 +18,6 @@ public record EditUserInfoCommand(Guid UserId, UserInfoDto UserInfo) : ICommand<
 public record EditUserInfoResult(UserInfoDto UserInfo);
 
 public class EditUserInfoHandler(
-    IIntegrationEventScope integrationEventScope,
     IRepository<User, Guid> repository,
     IProjectionProvider<UserInfo, UserInfoDto> userInfoProjection
 ) : ICommandHandler<EditUserInfoCommand, EditUserInfoResult>
@@ -43,12 +40,6 @@ public class EditUserInfoHandler(
             request.UserInfo.Name,
             request.UserInfo.Surname,
             request.UserInfo.Description);
-
-        integrationEventScope.Add(
-            new UserUpdatedEvent
-            {
-                UserId = request.UserId
-            });
 
         return new EditUserInfoResult(userInfoProjection.Projection.AsFunc()(user.UserInfo!));
     }

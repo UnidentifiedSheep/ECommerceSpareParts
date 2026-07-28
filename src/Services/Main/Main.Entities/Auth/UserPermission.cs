@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.User;
 
 namespace Main.Entities.Auth;
 
@@ -33,6 +34,12 @@ public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>,
     {
         return new UserPermission(userId, permission);
     }
+
+    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
     public override (Guid, string) GetId() { return (UserId, Permission); }
 }

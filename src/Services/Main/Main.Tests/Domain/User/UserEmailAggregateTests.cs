@@ -1,5 +1,6 @@
 using Exceptions;
 using FluentAssertions;
+using Main.Entities.DomainEvents.User;
 using Main.Entities.Exceptions;
 using Main.Enums;
 
@@ -128,6 +129,29 @@ public class UserEmailAggregateTests
             .Which;
         exception.MessageKey.Should().Be("user.min.email.count");
         user.Emails.Should().ContainSingle();
+    }
+
+    [Fact]
+    public void EmailLifecycle_PublishesUserUpdatedEvent()
+    {
+        var user = CreateUser();
+        user.AddEmail(
+            "email@example.com",
+            EmailType.Personal,
+            false,
+            false);
+        var email = user.Emails.Single();
+
+        email.OnCreated();
+
+        var @event = email.FlushDomainEvents()
+            .Should()
+            .ContainSingle()
+            .Which
+            .Should()
+            .BeOfType<UserUpdatedDomainEvent>()
+            .Which;
+        @event.UserId.Should().Be(user.Id);
     }
 
     private static Main.Entities.User.User CreateUser()

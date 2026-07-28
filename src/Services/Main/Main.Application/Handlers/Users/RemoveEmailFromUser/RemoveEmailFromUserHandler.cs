@@ -1,9 +1,7 @@
 using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.User;
 using Enums;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
@@ -21,7 +19,6 @@ public record RemoveEmailFromUserCommand(Guid UserId, string Email) : ICommand;
 
 public class RemoveEmailFromUserHandler(
     IOptions<UserEmailOptions> options,
-    IIntegrationEventScope integrationEventScope,
     IUserRepository repository
 ) : ICommandHandler<RemoveEmailFromUserCommand>
 {
@@ -42,12 +39,6 @@ public class RemoveEmailFromUserHandler(
         user.RemoveEmail(
             request.Email,
             options.Value.MinEmailCount);
-
-        integrationEventScope.Add(
-            new UserUpdatedEvent
-            {
-                UserId = request.UserId
-            });
 
         return Unit.Value;
     }

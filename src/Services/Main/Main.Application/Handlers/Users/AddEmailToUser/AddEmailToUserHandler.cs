@@ -1,9 +1,7 @@
 using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.User;
 using Enums;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
@@ -28,8 +26,7 @@ public record AddEmailToUserCommand(
 public class AddEmailToUserHandler(
     IOptions<UserEmailOptions> options,
     IUserRepository userRepository,
-    IReadRepository<UserEmail, string> emailRepository,
-    IIntegrationEventScope integrationEventScope)
+    IReadRepository<UserEmail, string> emailRepository)
     : ICommandHandler<AddEmailToUserCommand>
 {
     public async Task<Unit> Handle(
@@ -63,12 +60,6 @@ public class AddEmailToUserHandler(
             email,
             request.EmailType,
             options.Value.MaxEmailCount);
-
-        integrationEventScope.Add(
-            new UserUpdatedEvent
-            {
-                UserId = request.UserId
-            });
 
         return Unit.Value;
     }

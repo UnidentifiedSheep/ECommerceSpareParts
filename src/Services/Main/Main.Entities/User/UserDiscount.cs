@@ -3,6 +3,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
+using Main.Entities.DomainEvents.User;
 
 namespace Main.Entities.User;
 
@@ -39,6 +40,12 @@ public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount
             0.99m,
             "user.discount.range");
     }
+
+    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
     public override Guid GetId() { return UserId; }
 }
