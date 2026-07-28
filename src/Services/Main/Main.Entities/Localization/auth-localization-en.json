@@ -37,6 +37,7 @@
     "user.vehicle.plate.number.already.taken": "Plate number '{0}' is already in use.",
     "user.vehicle.vin.code.already.taken": "VIN code '{0}' is already in use.",
     "user.email.primary.count": "User can have only one primary email.",
+    "user.email.primary.cannot.delete": "The primary email cannot be deleted. Assign another confirmed email as primary first.",
     "user.have.duplicate.email": "User must not have duplicate emails.",
     "user.phone.primary.count": "User can have only one primary phone.",
     "user.have.duplicate.phone": "User must not have duplicate phones.",

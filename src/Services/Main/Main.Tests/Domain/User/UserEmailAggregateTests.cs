@@ -111,13 +111,40 @@ public class UserEmailAggregateTests
     }
 
     [Fact]
+    public void RemoveEmail_PrimaryEmail_Throws()
+    {
+        var user = CreateUser();
+        user.AddEmail(
+            "primary@example.com",
+            EmailType.Personal,
+            true,
+            true);
+        user.AddEmail(
+            "secondary@example.com",
+            EmailType.Work,
+            false,
+            true);
+
+        var action = () => user.RemoveEmail(
+            "primary@example.com",
+            minEmailCount: 1);
+
+        var exception = action.Should()
+            .Throw<InvalidInputException>()
+            .Which;
+        exception.MessageKey.Should().Be("user.email.primary.cannot.delete");
+        user.Emails.Should().HaveCount(2);
+        user.Emails.Single(x => x.IsPrimary).Email.Value.Should().Be("primary@example.com");
+    }
+
+    [Fact]
     public void RemoveEmail_MinimumEmailCountReached_Throws()
     {
         var user = CreateUser();
         user.AddEmail(
             "email@example.com",
             EmailType.Personal,
-            true,
+            false,
             true);
 
         var action = () => user.RemoveEmail(

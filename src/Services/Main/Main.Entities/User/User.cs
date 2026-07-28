@@ -188,6 +188,9 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         var userEmail = _emails.SingleOrDefault(x => x.Email.Value == email.Value)
                         ?? throw new UserEmailNotFoundException(email.Value);
 
+        if (userEmail.IsPrimary)
+            throw new InvalidInputException("user.email.primary.cannot.delete");
+
         if (_emails.Count - 1 < minEmailCount)
             throw new InvalidInputException(
                 "user.min.email.count",
