@@ -88,10 +88,7 @@ public class TmtrSupplier(
 
             var key = (item.Brand, item.Number);
             if (!analogues.TryGetValue(key, out var positions))
-            {
-                positions = [];
-                analogues[key] = positions;
-            }
+                analogues[key] = positions = [];
 
             positions.Add(item);
         }
@@ -144,7 +141,7 @@ public class TmtrSupplier(
                                              ?? item.ExpectedDeliveryDate.Value
                                                  .AddDays(settings.GuaranteedDeliveryOffsetDays)
                                                  .UtcDateTime,
-                    OrderTill = DateTime.UtcNow //TODO: Should be changed.
+                    OrderTill = DateTime.UtcNow.Date.AddHours(14) //The order can be placed till 14 utc.
                 }
                 : null,
             PurchaseInfo = new PurchaseInfo
