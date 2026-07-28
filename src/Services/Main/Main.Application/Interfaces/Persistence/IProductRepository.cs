@@ -14,6 +14,10 @@ public interface IProductRepository : IRepository<Product, int>
         IEnumerable<(string NormalizedSku, int ProducerId)> keys,
         CancellationToken cancellationToken = default);
 
+    Task<Dictionary<(string NormalizedSku, int ProducerId), int>> GetProductIdsByKeys(
+        IEnumerable<(string NormalizedSku, int ProducerId)> keys,
+        CancellationToken cancellationToken = default);
+
     Task UpsertProductCrosses(
         IEnumerable<ProductCross> crosses,
         CancellationToken cancellationToken = default);

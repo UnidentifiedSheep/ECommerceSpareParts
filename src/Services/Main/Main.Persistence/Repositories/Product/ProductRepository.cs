@@ -66,12 +66,59 @@ public class ProductRepository(DContext context, QueryExtensions extensions)
             .ToHashSet();
     }
 
+    public async Task<Dictionary<(string NormalizedSku, int ProducerId), int>> GetProductIdsByKeys(
+        IEnumerable<(string NormalizedSku, int ProducerId)> keys,
+        CancellationToken cancellationToken = default)
+    {
+        var requestedKeys = keys
+            .Distinct()
+            .ToHashSet();
+
+        if (requestedKeys.Count == 0) return [];
+
+        var normalizedSkus = requestedKeys
+            .Select(x => x.NormalizedSku)
+            .Distinct()
+            .ToList();
+
+        var producerIds = requestedKeys
+            .Select(x => x.ProducerId)
+            .Distinct()
+            .ToList();
+
+        var products = await Context.Products
+            .AsNoTracking()
+            .Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))
+            .Where(x => producerIds.Contains(x.ProducerId))
+            .Select(x => new
+            {
+                x.Id,
+                x.Sku.NormalizedValue,
+                x.ProducerId
+            })
+            .ToListAsync(cancellationToken);
+
+        return products
+            .Where(x => requestedKeys.Contains((x.NormalizedValue, x.ProducerId)))
+            .ToDictionary(
+                x => (x.NormalizedValue, x.ProducerId),
+                x => x.Id);
+    }
+
     public Task UpsertProductCrosses(
         IEnumerable<ProductCross> crosses,
         CancellationToken cancellationToken = default)
     {
         return Context.BulkInsertOrUpdateAsync(
             crosses,
+            new BulkConfig
+            {
+                UpdateByProperties =
+                [
+                    nameof(ProductCross.LeftProductId),
+                    nameof(ProductCross.RightProductId)
+                ]
+            },
             cancellationToken: cancellationToken);
     }
 }

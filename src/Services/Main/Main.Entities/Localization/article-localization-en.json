@@ -35,6 +35,7 @@
     "article.reservation.needed.count.must.be.positive": "Requested quantity must be greater than 0.",
     "article.create.articles.must.have.at.least.one": "At least one article must be provided.",
     "article.create.articles.max.100.at.once": "Maximum 100 articles can be created at once.",
+    "article.create.articles.max.5000.at.once": "Maximum 5000 articles can be created in a single import batch.",
     "article.articleNumber.must.not.be.empty": "Article number must not be empty.",
     "article.articleNumber.min.length.3": "Article number must be at least 3 characters long.",
     "article.articleNumber.max.length.128": "Article number must not exceed 128 characters.",
@@ -56,6 +57,7 @@
     "article.reservation.similarity.range": "Similarity level must be between 0 and 1.",
     "article.image.not.found": "Unable to find specified image of product.",
     "article.import.too.many.errors.while.processing.batch": "Too many errors happened while product import batch was processing.",
-    "article.import.producer.not.found": "Producer or producer alias '{0}' was not found."
+    "article.import.producer.not.found": "Producer or producer alias '{0}' was not found.",
+    "article.cross.import.product.not.found": "Product with SKU '{0}' and producer '{1}' was not found."
   }
 }

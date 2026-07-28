@@ -66,6 +66,34 @@ public class CreateProductTests : IntegrationTest
     }
 
     [Fact]
+    public void CreateProducts_WithSkipExisting_AllowsMoreThanRegularLimit()
+    {
+        var command = new CreateProductsCommand(
+            CreateDtos(CreateProductsValidation.MaxProductsPerRequest + 1),
+            CreateProductsConflictPolicy.SkipExisting);
+
+        var result = new CreateProductsValidation().Validate(command);
+
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateProducts_WithSkipExisting_ExceedingImportLimit_FailsValidation()
+    {
+        var command = new CreateProductsCommand(
+            CreateDtos(CreateProductsValidation.MaxProductsPerImportBatch + 1),
+            CreateProductsConflictPolicy.SkipExisting);
+
+        var result = new CreateProductsValidation().Validate(command);
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should()
+            .ContainSingle(x =>
+                x.PropertyName == nameof(CreateProductsCommand.NewProducts) &&
+                x.ErrorCode == "article.create.articles.max.5000.at.once");
+    }
+
+    [Fact]
     public async Task CreateArticle_WithInvalidProducer_ThrowsProducerNotFoundException()
     {
         var dto = CreateDtos(1)[0] with

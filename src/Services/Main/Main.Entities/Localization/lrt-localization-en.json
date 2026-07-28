@@ -9,6 +9,8 @@
     "lrt.producer.supplier.mapping.import.description": "Imports supplier-specific producer names from an uploaded file, validates the data, and links them to existing producers.",
     "lrt.product.import.name": "Product import",
     "lrt.product.import.description": "Imports products from an uploaded file, validates the data, and adds new records while skipping existing ones.",
+    "lrt.product.crosses.import.name": "Product crosses import",
+    "lrt.product.crosses.import.description": "Imports product crosses from a CSV file, resolves products by SKU and producer, and creates links between them.",
     "lrt.producer.synchronization.name": "Producer synchronization",
     "lrt.producer.synchronization.description": "Publishes update events for all producers so related services can refresh their producer data.",
     "lrt.product.synchronization.name": "Product synchronization",
