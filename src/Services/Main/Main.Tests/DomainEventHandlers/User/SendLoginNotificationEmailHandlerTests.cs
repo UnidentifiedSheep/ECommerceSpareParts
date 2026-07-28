@@ -54,7 +54,7 @@ public class SendLoginNotificationEmailHandlerTests(
         IReadOnlyList<IEmailMessage>? queuedEmails = null;
         var mailingService = new Mock<IMailingService>();
         mailingService
-            .Setup(x => x.QueueToOutbox(
+            .Setup(x => x.QueueEmailAsync(
                 It.IsAny<IEnumerable<IEmailMessage>>(),
                 It.IsAny<CancellationToken>()))
             .Callback((
@@ -90,7 +90,7 @@ public class SendLoginNotificationEmailHandlerTests(
             "first-primary@example.com",
             "second-primary@example.com");
         mailingService.Verify(
-            x => x.QueueToOutbox(
+            x => x.QueueEmailAsync(
                 It.IsAny<IEnumerable<IEmailMessage>>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);

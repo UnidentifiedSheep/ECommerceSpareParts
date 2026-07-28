@@ -57,6 +57,7 @@ public static class ServiceProvider
         collection.AddScoped<ISaleEventService, SaleEventService>();
 
         collection.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();
+        collection.AddScoped<IVerificationPayloadProvider, VerificationPayloadProvider>();
 
         collection.AddScoped<IMailingService, MailingService>();
         collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();

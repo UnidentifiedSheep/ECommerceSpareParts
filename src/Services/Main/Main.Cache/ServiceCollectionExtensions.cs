@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IProductCacheRepository, ProductCacheRepository>();
         services.AddScoped<IUserCacheRepository, UserCacheRepository>();
         services.AddScoped<ICurrencyCacheRepository, CurrencyCacheRepository>();
-        services.AddScoped<IOneTokenStore, OneTokenStore>();
+        services.AddScoped<IOneTimeTokenStore, OneTimeTokenStore>();
         
         return services;
     }

@@ -74,6 +74,9 @@ public class CantCreateSystemUserException()
 public class ResetTokenExpiredException()
     : LocalizedBadRequestException("reset.token.expired");
 
+public class EmailVerificationTokenExpiredException()
+    : LocalizedBadRequestException("email.verification.token.expired");
+
 public class UserPermissionNotFound(Guid id, string permission)
     : LocalizedNotFoundException(
         "user.permission.not.found",

@@ -58,6 +58,7 @@
     "cant.add.system.role.to.user": "System role can not be assigned to a user.",
     "cant.remove.system.role.from.user": "System role can not be removed from a user.",
     "user.permission.not.found": "User permission was not found.",
-    "reset.token.expired": "Reset token is expired, you need to verify your identity one more time."
+    "reset.token.expired": "Reset token is expired, you need to verify your identity one more time.",
+    "email.verification.token.expired": "The email verification link is invalid or has expired. Request a new verification email."
   }
 }

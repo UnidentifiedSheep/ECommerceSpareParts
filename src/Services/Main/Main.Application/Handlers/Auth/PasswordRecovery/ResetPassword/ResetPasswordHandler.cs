@@ -31,8 +31,7 @@ public class ResetPasswordHandler(
     {
         var token = Uri.UnescapeDataString(request.Token);
         if (!jsonSigner.VerifyJson<ResetPayload>(token, out var payload) ||
-            payload == null ||
-            !(await resetPayloadProvider.IsResetTokenValid(payload.Id)) ||
+            !(await resetPayloadProvider.IsTokenValid(payload.Id)) ||
             payload.Type != ResetType.PasswordReset)
             throw new ResetTokenExpiredException();
 

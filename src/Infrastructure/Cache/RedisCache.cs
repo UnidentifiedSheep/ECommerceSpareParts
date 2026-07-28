@@ -194,7 +194,17 @@ public class RedisCache(
 
     public async Task<T?> GetDeleteAsync<T>(string key)
     {
-        var res = await redis.StringGetDeleteAsync(GetWithPrefix(key));
+        const string script =
+            """
+            local value = redis.call('JSON.GET', KEYS[1])
+            if value then
+                redis.call('DEL', KEYS[1])
+            end
+            return value
+            """;
+        var res = await redis.ScriptEvaluateAsync(
+            script,
+            [GetWithPrefix(key)]);
         return res.Deserialize<T>();
     }
 

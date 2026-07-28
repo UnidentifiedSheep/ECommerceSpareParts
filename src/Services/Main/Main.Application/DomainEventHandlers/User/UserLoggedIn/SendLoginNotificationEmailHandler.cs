@@ -69,7 +69,7 @@ public class SendLoginNotificationEmailHandler(
                     cancellationToken));
         }
 
-        await mailingService.QueueToOutbox(
+        await mailingService.QueueEmailAsync(
             emails,
             cancellationToken);
     }

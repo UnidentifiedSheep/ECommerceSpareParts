@@ -27,7 +27,6 @@ public class SendEmailRecoveryHandler(
     IUserRepository userRepository,
     IMailingService mailingService,
     IScopedStringLocalizer localizer,
-    IEmailMessageRenderer emailRenderer,
     ISettingsService settingsService,
     IResetPayloadProvider payloadProvider
 ) : ICommandHandler<SendEmailRecoveryCommand>
@@ -58,15 +57,11 @@ public class SendEmailRecoveryHandler(
         var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
         var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
 
-        var email = await emailRenderer.RenderAsync(
+        await mailingService.QueueEmailAsync(
             new ResetPasswordData(
                 localizer,
                 resetUrl.ToString(),
                 request.Email),
-            cancellationToken);
-
-        await mailingService.QueueToOutbox(
-            email,
             cancellationToken);
 
         return Unit.Value;
