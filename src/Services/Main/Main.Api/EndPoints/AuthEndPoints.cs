@@ -124,7 +124,7 @@ public class AuthEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
         auth.MapGet(
-                "/username/availability",
+                "/usernames/{userName}/availability",
                 async (
                     ISender sender,
                     string userName,
