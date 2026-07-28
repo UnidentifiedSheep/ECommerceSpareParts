@@ -67,12 +67,31 @@ public class UserRepository(DContext context, IQueryableExtensions extensions)
         Criteria<Entities.User.User>? criteria = null,
         CancellationToken cancellationToken = default)
     {
-        Email norm = email;
-        var query =
-            from user in Context.Users
-            join userEmail in Context.UserEmails on user.Id equals userEmail.UserId
-            where userEmail.Email == norm && userEmail.IsPrimary
-            select user;
+        Email normalizedEmail = email;
+        var query = Context.Users.Where(
+            x => x.Emails.Any(
+                z => z.Email == normalizedEmail && z.IsPrimary));
+
+        if (criteria != null) query = QueryableExtensions.Apply(query, criteria);
+
+        return query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<Entities.User.User?> GetUserByLoginAsync(
+        string login,
+        bool isEmail,
+        Criteria<Entities.User.User>? criteria = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (isEmail)
+            return GetUserByPrimaryEmailAsync(
+                login,
+                criteria,
+                cancellationToken);
+
+        var normalizedUserName = UserName.ToNormalized(login);
+        var query = Context.Users.Where(
+            x => x.UserName.NormalizedValue == normalizedUserName);
 
         if (criteria != null) query = QueryableExtensions.Apply(query, criteria);
 

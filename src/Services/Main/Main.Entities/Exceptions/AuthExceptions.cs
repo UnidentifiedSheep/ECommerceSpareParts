@@ -55,8 +55,8 @@ public class UserIsNotInNeededRole(Role role)
 public class UserNotFoundException(Guid id)
     : LocalizedNotFoundException("user.not.found", new { Id = id });
 
-public class WrongCredentialsException(string? email, string? password)
-    : LocalizedBadRequestException("wrong.credentials", new { Email = email, Password = password });
+public class WrongCredentialsException(string? login, string? password)
+    : LocalizedBadRequestException("wrong.credentials", new { Login = login, Password = password });
 
 public class CantCreateSystemUserException()
     : LocalizedBadRequestException("cant.create.system.user");

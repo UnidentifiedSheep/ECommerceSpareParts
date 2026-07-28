@@ -4,8 +4,10 @@ using Api.Common;
 using Application.Common.Models.Options.S3;
 using Cache;
 using Localization.Domain.Extensions;
+using Mailing.Core;
 using Main.Application.Configs;
 using Main.Cache;
+using Main.Application.Models;
 using Main.Persistence;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -99,6 +101,15 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
                 {
                     Secret = "some secret"
                 }));
+        services.AddSingleton(
+            Options.Create(
+                new JwtOptions
+                {
+                    ValidDuration = TimeSpan.FromMinutes(15),
+                    ValidIssuer = "main-tests",
+                    IssuerSigningKey = "main-tests-signing-key-at-least-32-characters"
+                }));
+        services.AddSingleton<IEmailMessageRenderer, EmailMessageRendererStub>();
         services.AddProjectJsonSerialization();
 
         services.AddJsonSigner()

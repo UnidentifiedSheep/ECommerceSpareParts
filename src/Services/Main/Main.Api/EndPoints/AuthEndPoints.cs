@@ -15,7 +15,7 @@ public record SendEmailRecoveryRequest(string Email);
 
 public record ResetPasswordRequest(string Token, string NewPassword);
 
-public record LoginRequest(string Email, string Password);
+public record LoginRequest(string Login, string Password);
 
 public record IsUserNameAvailableResponse(bool IsAvailable);
 
@@ -155,7 +155,7 @@ public class AuthEndPoints : ICarterModule
                     var ipAddress = context.Connection.RemoteIpAddress;
                     var result = await sender.Send(
                         new LoginCommand(
-                            request.Email,
+                            request.Login,
                             request.Password,
                             ipAddress,
                             userAgent),

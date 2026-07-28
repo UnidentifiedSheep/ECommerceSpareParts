@@ -16,4 +16,10 @@ public interface IUserRepository : IRepository<User, Guid>
         string email,
         Criteria<User>? criteria = null,
         CancellationToken cancellationToken = default);
+
+    Task<User?> GetUserByLoginAsync(
+        string login,
+        bool isEmail,
+        Criteria<User>? criteria = null,
+        CancellationToken cancellationToken = default);
 }
