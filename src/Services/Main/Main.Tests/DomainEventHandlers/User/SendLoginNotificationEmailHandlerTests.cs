@@ -7,6 +7,7 @@ using Localization.Abstractions.Interfaces;
 using Mailing.Core;
 using Mailing.Core.Models;
 using Main.Application.DomainEventHandlers.User;
+using Main.Application.DomainEventHandlers.User.UserLoggedIn;
 using Main.Application.Interfaces.Services;
 using Main.Entities.DomainEvents.User;
 using Main.Entities.User;

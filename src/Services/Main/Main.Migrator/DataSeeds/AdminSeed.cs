@@ -32,7 +32,7 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
                 AdministratorName,
                 AdministratorName,
                 null);
-            user.AddUserEmail(
+            user.AddEmail(
                 email,
                 EmailType.Personal,
                 true,

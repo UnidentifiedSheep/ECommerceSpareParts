@@ -58,6 +58,16 @@ public class UserNotFoundException(Guid id)
 public class WrongCredentialsException(string? login, string? password)
     : LocalizedBadRequestException("wrong.credentials", new { Login = login, Password = password });
 
+public class UserEmailAlreadyInUseException(string email)
+    : LocalizedConflictException(
+        "user.email.already.in.use",
+        new { Email = email });
+
+public class UserEmailNotFoundException(string email)
+    : LocalizedNotFoundException(
+        "user.email.not.found",
+        new { Email = email });
+
 public class CantCreateSystemUserException()
     : LocalizedBadRequestException("cant.create.system.user");
 

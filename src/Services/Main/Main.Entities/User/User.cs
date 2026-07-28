@@ -8,6 +8,7 @@ using Exceptions;
 using Main.Entities.Auth;
 using Main.Entities.Balance;
 using Main.Entities.DomainEvents.User;
+using Main.Entities.Exceptions;
 using Main.Entities.Organization;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
@@ -91,7 +92,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         _roles.Add(UserRole.Create(Id, roleName));
     }
 
-    public void AddUserEmail(
+    public void AddEmail(
         Email email,
         EmailType emailType,
         bool isPrimary,
@@ -109,6 +110,23 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         userEmail.MakePrimary(isPrimary);
         userEmail.Confirm(isConfirmed);
         _emails.Add(userEmail);
+    }
+
+    public void AddEmail(
+        Email email,
+        EmailType emailType,
+        int maxEmailCount)
+    {
+        if (_emails.Count >= maxEmailCount)
+            throw new InvalidInputException(
+                "user.max.email.count",
+                [maxEmailCount]);
+
+        AddEmail(
+            email,
+            emailType,
+            false,
+            false);
     }
 
     public void AddUserPhone(
@@ -163,7 +181,20 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 
     public void RemoveUserVehicle(Guid vehicleId) { _vehicles.RemoveAll(x => x.VehicleId == vehicleId); }
 
-    public void RemoveUserEmail(Email email) { _emails.RemoveAll(x => x.Email.Value == email.Value); }
+    public void RemoveEmail(
+        Email email,
+        int minEmailCount)
+    {
+        var userEmail = _emails.SingleOrDefault(x => x.Email.Value == email.Value)
+                        ?? throw new UserEmailNotFoundException(email.Value);
+
+        if (_emails.Count - 1 < minEmailCount)
+            throw new InvalidInputException(
+                "user.min.email.count",
+                [minEmailCount]);
+
+        _emails.Remove(userEmail);
+    }
 
     public void SetDiscount(decimal discount)
     {

@@ -82,7 +82,7 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
 
         foreach (var role in Roles) user.AddRole(role);
         foreach (var email in _emails)
-            user.AddUserEmail(
+            user.AddEmail(
                 email.Value,
                 email.Type,
                 email.IsPrimary,

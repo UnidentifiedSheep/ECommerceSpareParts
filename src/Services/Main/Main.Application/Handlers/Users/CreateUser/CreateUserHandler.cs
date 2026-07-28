@@ -49,7 +49,7 @@ public class CreateUserHandler(
         }
 
         foreach (var email in request.Emails)
-            user.AddUserEmail(
+            user.AddEmail(
                 email.Email,
                 email.Type,
                 email.IsPrimary,

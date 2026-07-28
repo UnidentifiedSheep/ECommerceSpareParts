@@ -1,14 +1,50 @@
 using Api.Common.Extensions;
 using Enums;
+using Main.Application.Handlers.Users.AddEmailToUser;
 using Main.Application.Handlers.Users.RemoveEmailFromUser;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
+
+public record AddUserEmailRequest(
+    string Email,
+    EmailType EmailType);
 
 public static class UserEmailEndPoints
 {
     public static RouteGroupBuilder MapUserEmailEndPoints(this RouteGroupBuilder users)
     {
+        users.MapPost(
+                "/{userId:guid}/emails",
+                async (
+                    ISender sender,
+                    Guid userId,
+                    AddUserEmailRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new AddEmailToUserCommand(
+                            userId,
+                            request.Email,
+                            request.EmailType),
+                        cancellationToken);
+
+                    return Results.Created(
+                        $"/users/{userId}/emails/{Uri.EscapeDataString(request.Email)}",
+                        value: null);
+                })
+            .WithName("AddUserEmail")
+            .WithSummary("Добавить почту пользователю")
+            .WithDescription("Добавляет пользователю неподтверждённый дополнительный email")
+            .WithDisplayName("Добавить почту")
+            .Accepts<AddUserEmailRequest>(false, "application/json")
+            .Produces(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .RequireAnyPermission(PermissionCodes.USERS_MAILS_CREATE);
+
         users.MapDelete(
                 "/{userId:guid}/emails/{email}",
                 async (
