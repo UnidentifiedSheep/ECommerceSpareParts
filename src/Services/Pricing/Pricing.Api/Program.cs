@@ -10,6 +10,8 @@ using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Application.Common.Interfaces;
 using Application.Common.Services.Supplier;
+using Application.Common.Services.Supplier.Favorite;
+using Application.Common.Services.Supplier.Tmtr;
 using Cache;
 using Carter;
 using Contracts.Analytics;
@@ -105,7 +107,9 @@ builder.Services
     .AddEComAuth(builder.Configuration)
     .AddPersistenceLayer()
     .AddApplicationCache()
-    .AddFavoriteIntegration<FavoriteCacheableConnectionProvider, FavoriteSettingsProvider>()
+    .AddMainSupplierSettingProviders()
+    .AddFavoriteIntegration<FavoriteConnectionProvider, FavoriteSettingsProvider>()
+    .AddTmtrIntegration<TmtrConnectionProvider, TmtrSettingsProvider>()
     .AddCacheLayer("pricing")
     .AddJsonSigner()
     .AddSecretEncryptor()

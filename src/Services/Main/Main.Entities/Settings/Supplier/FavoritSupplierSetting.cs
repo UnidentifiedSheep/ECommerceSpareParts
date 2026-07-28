@@ -17,7 +17,7 @@ public class FavoritSupplierSetting : Setting<FavoritSupplierSettingData>, ISett
 public record FavoritSupplierSettingData
 {
     [JsonPropertyName("isEnabled")]
-    public bool IsEnabled { get; init; } = false;
+    public bool IsEnabled { get; init; }
 
     [JsonPropertyName("baseUrl")]
     public string? BaseUrl { get; init; }

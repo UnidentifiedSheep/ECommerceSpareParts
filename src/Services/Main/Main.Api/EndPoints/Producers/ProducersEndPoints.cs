@@ -28,6 +28,9 @@ public record GetProducersRequest : PaginationQueryModel
 {
     [FromQuery(Name = "searchTerm")]
     public string? SearchTerm { get; init; }
+
+    [FromQuery(Name = "ids")]
+    public int[] Ids { get; init; } = [];
 }
 
 public class ProducersEndPoints : ICarterModule
@@ -106,7 +109,12 @@ public class ProducersEndPoints : ICarterModule
                     [AsParameters] GetProducersRequest request,
                     CancellationToken ct) =>
                 {
-                    var result = await sender.Send(new GetProducersQuery(request.SearchTerm, request), ct);
+                    var result = await sender.Send(
+                        new GetProducersQuery(
+                            request.SearchTerm,
+                            request.Ids,
+                            request),
+                        ct);
                     return Results.Ok(new GetProducersResponse(result.Producers));
                 })
             .WithName("GetProducers")

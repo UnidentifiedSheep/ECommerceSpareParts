@@ -1,5 +1,6 @@
 using Domain;
 using Domain.Extensions;
+using Domain.Validation;
 using Exceptions;
 
 namespace Analytics.Entities;

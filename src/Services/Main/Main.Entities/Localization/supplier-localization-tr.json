@@ -11,6 +11,21 @@
     "supplier.favorit.setting.api.key.name": "API anahtarı",
     "supplier.favorit.setting.api.key.description": "Favorit tedarikçi API'sine yapılan istekleri yetkilendirmek için kullanılan API anahtarı.",
     "supplier.favorit.setting.has.api.key.name": "API anahtarı tanımlı",
-    "supplier.favorit.setting.has.api.key.description": "Favorit tedarikçi entegrasyonu için API anahtarının kaydedilip kaydedilmediğini gösterir."
+    "supplier.favorit.setting.has.api.key.description": "Favorit tedarikçi entegrasyonu için API anahtarının kaydedilip kaydedilmediğini gösterir.",
+    "supplier.tmtr.setting.name": "TMTR tedarikçi ayarları",
+    "supplier.tmtr.setting.description": "TMTR tedarikçi entegrasyonu için bağlantı ve teslimat ayarlarını yönetir.",
+    "supplier.tmtr.setting.input.invalid": "Geçersiz TMTR tedarikçi ayarları verisi sağlandı.",
+    "supplier.tmtr.setting.is.enabled.name": "Entegrasyon etkin",
+    "supplier.tmtr.setting.is.enabled.description": "TMTR tedarikçi entegrasyonunu etkinleştirir veya devre dışı bırakır.",
+    "supplier.tmtr.setting.base.url.name": "Temel URL",
+    "supplier.tmtr.setting.base.url.description": "TMTR tedarikçi API'sine istek göndermek için kullanılan temel URL.",
+    "supplier.tmtr.setting.delivery.offset.name": "Garantili teslimat farkı",
+    "supplier.tmtr.setting.delivery.offset.description": "Garantili teslimat tarihine eklenen gün sayısı.",
+    "supplier.tmtr.setting.login.name": "Kullanıcı adı",
+    "supplier.tmtr.setting.login.description": "TMTR tedarikçi API'sine yapılan istekleri yetkilendirmek için kullanılan kullanıcı adı.",
+    "supplier.tmtr.setting.password.name": "Parola",
+    "supplier.tmtr.setting.password.description": "TMTR tedarikçi API'sine yapılan istekleri yetkilendirmek için kullanılan parola.",
+    "supplier.tmtr.setting.has.password.name": "Parola tanımlı",
+    "supplier.tmtr.setting.has.password.description": "TMTR tedarikçi entegrasyonu için bir parolanın kaydedilip kaydedilmediğini gösterir."
   }
 }

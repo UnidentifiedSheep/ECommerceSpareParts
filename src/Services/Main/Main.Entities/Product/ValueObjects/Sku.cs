@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Domain.Extensions;
+using Domain.Validation;
 using Exceptions;
 
 namespace Main.Entities.Product.ValueObjects;

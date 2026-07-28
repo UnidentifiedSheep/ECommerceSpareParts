@@ -1,5 +1,7 @@
+using System.Net.Http.Json;
 using System.Text.Json;
 using Integrations.Common;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Integrations.Client.Core;
 
@@ -58,5 +60,13 @@ public abstract class ClientBase
         return string.IsNullOrWhiteSpace(body)
             ? response.ReasonPhrase
             : body;
+    }
+
+    protected static void AddQueryParameters(
+        HttpRequestMessage request,
+        Dictionary<string, string?> @params)
+    {
+        request.RequestUri =
+            new Uri(QueryHelpers.AddQueryString(request.RequestUri!.ToString(), @params));
     }
 }

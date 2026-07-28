@@ -4,6 +4,7 @@ using Analytics.Enums;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Domain.Validation;
 using Exceptions;
 
 namespace Analytics.Entities;

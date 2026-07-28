@@ -11,6 +11,21 @@
     "supplier.favorit.setting.api.key.name": "API-ключ",
     "supplier.favorit.setting.api.key.description": "API-ключ, используемый для авторизации запросов в API поставщика Favorit.",
     "supplier.favorit.setting.has.api.key.name": "API-ключ задан",
-    "supplier.favorit.setting.has.api.key.description": "Показывает, сохранен ли API-ключ для интеграции с поставщиком Favorit."
+    "supplier.favorit.setting.has.api.key.description": "Показывает, сохранен ли API-ключ для интеграции с поставщиком Favorit.",
+    "supplier.tmtr.setting.name": "Настройки поставщика TMTR",
+    "supplier.tmtr.setting.description": "Управляет настройками подключения и доставки для интеграции с поставщиком TMTR.",
+    "supplier.tmtr.setting.input.invalid": "Переданы некорректные данные настроек поставщика TMTR.",
+    "supplier.tmtr.setting.is.enabled.name": "Интеграция включена",
+    "supplier.tmtr.setting.is.enabled.description": "Включает или отключает интеграцию с поставщиком TMTR.",
+    "supplier.tmtr.setting.base.url.name": "Базовый URL",
+    "supplier.tmtr.setting.base.url.description": "Базовый URL, используемый для отправки запросов в API поставщика TMTR.",
+    "supplier.tmtr.setting.delivery.offset.name": "Смещение гарантированной доставки",
+    "supplier.tmtr.setting.delivery.offset.description": "Количество дней, добавляемое к дате гарантированной доставки.",
+    "supplier.tmtr.setting.login.name": "Логин",
+    "supplier.tmtr.setting.login.description": "Логин, используемый для авторизации запросов в API поставщика TMTR.",
+    "supplier.tmtr.setting.password.name": "Пароль",
+    "supplier.tmtr.setting.password.description": "Пароль, используемый для авторизации запросов в API поставщика TMTR.",
+    "supplier.tmtr.setting.has.password.name": "Пароль задан",
+    "supplier.tmtr.setting.has.password.description": "Показывает, сохранен ли пароль для интеграции с поставщиком TMTR."
   }
 }

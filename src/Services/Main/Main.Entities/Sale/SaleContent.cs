@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Domain.Validation;
 
 namespace Main.Entities.Sale;
 

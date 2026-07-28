@@ -9,6 +9,7 @@ public record NewProducerSupplierMapping
     public required int ProducerId { get; init; }
     
     [JsonPropertyName("supplier")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public required Supplier Supplier { get; init; }
     
     [JsonPropertyName("supplierProducerName")]

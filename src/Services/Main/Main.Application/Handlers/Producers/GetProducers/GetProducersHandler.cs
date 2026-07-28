@@ -9,7 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Producers.GetProducers;
 
-public record GetProducersQuery(string? SearchTerm, Pagination Pagination) : IQuery<GetProducersResult>;
+public record GetProducersQuery(
+    string? SearchTerm,
+    IEnumerable<int> Ids,
+    Pagination Pagination
+) : IQuery<GetProducersResult>;
 
 public record GetProducersResult(IEnumerable<ProducerDto> Producers);
 
@@ -24,6 +28,12 @@ public class GetProducersHandler(
     {
         var query = repository.Query;
         var searchTerm = request.SearchTerm;
+        var ids = request.Ids
+            .Distinct()
+            .ToList();
+
+        if (ids.Count != 0)
+            query = query.Where(x => ids.Contains(x.Id));
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
             query = query

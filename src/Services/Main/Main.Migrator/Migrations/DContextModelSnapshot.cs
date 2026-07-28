@@ -269,10 +269,10 @@ namespace Main.Migrator.Migrations
                         .HasName("settings_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.settings.supplier.favoritsuppliersetting_who_created_idx");
+                        .HasDatabaseName("main.entities.settings.supplier.tmtrsuppliersetting_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.settings.supplier.favoritsuppliersetting_who_updated_idx");
+                        .HasDatabaseName("main.entities.settings.supplier.tmtrsuppliersetting_who_updated_idx");
 
                     b.ToTable("settings", "public");
 
@@ -3345,6 +3345,13 @@ namespace Main.Migrator.Migrations
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("FavoritSupplierSetting");
+                });
+
+            modelBuilder.Entity("Main.Entities.Settings.Supplier.TmtrSupplierSetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("TmtrSupplierSetting");
                 });
 
             modelBuilder.Entity("Main.Entities.Event.ReservationManualChangeEvent", b =>

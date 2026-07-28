@@ -2,6 +2,7 @@
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Domain.Validation;
 using Main.Enums;
 
 namespace Main.Entities.Mailing;

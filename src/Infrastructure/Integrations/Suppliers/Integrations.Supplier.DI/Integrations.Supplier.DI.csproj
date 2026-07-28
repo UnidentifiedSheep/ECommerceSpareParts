@@ -12,8 +12,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Favorit\Favorit.Integrations.Client\Favorit.Integrations.Client.csproj"/>
-        <ProjectReference Include="..\Favorit\Favorit.Integrations.Core\Favorit.Integrations.Core.csproj"/>
+      <ProjectReference Include="..\Integrations.Favorit\Integrations.Favorit.csproj" />
+      <ProjectReference Include="..\Integrations.Supplier\Integrations.Supplier.csproj" />
+      <ProjectReference Include="..\Integrations.Tmtr\Integrations.Tmtr.csproj" />
     </ItemGroup>
 
 </Project>

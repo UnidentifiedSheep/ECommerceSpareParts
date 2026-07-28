@@ -3,6 +3,7 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Domain.Validation;
 using Main.Entities.DomainEvents.Producer;
 
 namespace Main.Entities.Producer;

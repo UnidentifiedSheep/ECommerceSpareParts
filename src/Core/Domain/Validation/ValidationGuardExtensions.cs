@@ -1,6 +1,6 @@
 ﻿using Exceptions;
 
-namespace Domain.Extensions;
+namespace Domain.Validation;
 
 public static class ValidationGuardExtensions
 {

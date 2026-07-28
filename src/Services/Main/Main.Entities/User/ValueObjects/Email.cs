@@ -1,5 +1,6 @@
 ﻿using System.Net.Mail;
 using Domain.Extensions;
+using Domain.Validation;
 
 namespace Main.Entities.User.ValueObjects;
 
