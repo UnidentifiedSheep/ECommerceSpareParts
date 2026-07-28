@@ -1,7 +1,7 @@
 namespace Main.Application.Interfaces.Cache;
 
-public interface IResetCache
+public interface IOneTokenStore
 {
     Task StoreAsync(Guid tokenId, TimeSpan ttl);
-    Task<Guid?> ConsumeAsync(Guid tokenId);
+    Task<bool> ConsumeAsync(Guid tokenId);
 }

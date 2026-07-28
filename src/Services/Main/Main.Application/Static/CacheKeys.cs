@@ -47,8 +47,8 @@ public static class CacheKeys
         public static string CurrencyRate(int currencyId) { return $"currency:{currencyId}:rate"; }
     }
     
-    public static class PasswordResetCache
+    public static class OneTimeTokenCache
     {
-        public static string PasswordReset(Guid tokenId) => $"password-reset:{tokenId}";
+        public static string OneTimeToken(Guid tokenId) => $"password-reset:{tokenId}";
     }
 }

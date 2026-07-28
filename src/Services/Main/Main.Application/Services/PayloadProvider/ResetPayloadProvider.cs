@@ -6,7 +6,7 @@ using Main.Enums.Auth;
 namespace Main.Application.Services.PayloadProvider;
 
 public class ResetPayloadProvider(
-    IResetCache resetCache) : IResetPayloadProvider
+    IOneTokenStore oneTokenStore) : IResetPayloadProvider
 {
     public async Task<ResetPayload> GetPayload(Guid userId, ResetType type)
     {
@@ -16,15 +16,10 @@ public class ResetPayloadProvider(
             Type = type
         };
 
-        await resetCache.StoreAsync(payload.Id, TimeSpan.FromMinutes(15));
+        await oneTokenStore.StoreAsync(payload.Id, TimeSpan.FromMinutes(15));
         return payload;
     }
     
-    public async Task<bool> IsResetTokenValid(Guid tokenId)
-    {
-        var storedToken = await resetCache
-            .ConsumeAsync(tokenId);
-        
-        return storedToken.HasValue && storedToken.Value == tokenId;
-    }
+    public Task<bool> IsResetTokenValid(Guid tokenId)
+        => oneTokenStore.ConsumeAsync(tokenId);
 }
