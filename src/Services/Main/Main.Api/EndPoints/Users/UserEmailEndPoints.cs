@@ -1,6 +1,8 @@
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Dtos.Users;
+using Main.Application.Handlers.Auth.EmailVerification;
 using Main.Application.Handlers.Users.AddEmailToUser;
 using Main.Application.Handlers.Users.RemoveEmailFromUser;
 using Main.Enums;
@@ -67,6 +69,57 @@ public static class UserEmailEndPoints
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.USERS_MAILS_CREATE);
+
+        users.MapPost(
+                "/{userId:guid}/emails/{email}/verification/request",
+                async (
+                    ISender sender,
+                    Guid userId,
+                    string email,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new RequestEmailVerificationCommand(
+                            userId,
+                            email),
+                        cancellationToken);
+
+                    return Results.Accepted();
+                })
+            .WithName("RequestUserEmailVerification")
+            .WithSummary("Запросить подтверждение почты")
+            .WithDescription("Отправляет пользователю письмо для подтверждения указанной почты")
+            .WithDisplayName("Запрос подтверждения почты")
+            .Produces(StatusCodes.Status202Accepted)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.USERS_MAILS_CREATE);
+
+        users.MapPost(
+                "/me/emails/{email}/verification/request",
+                async (
+                    ISender sender,
+                    IUserContext userContext,
+                    string email,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new RequestEmailVerificationCommand(
+                            userContext.UserId,
+                            email),
+                        cancellationToken);
+
+                    return Results.Accepted();
+                })
+            .WithName("RequestUserEmailVerificationForMe")
+            .WithSummary("Запросить подтверждение почты для текущего юзера")
+            .WithDescription("Отправляет пользователю письмо для подтверждения указанной почты")
+            .WithDisplayName("Запрос подтверждения почты")
+            .Produces(StatusCodes.Status202Accepted)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
 
         return users;
     }

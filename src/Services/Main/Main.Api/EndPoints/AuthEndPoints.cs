@@ -107,23 +107,6 @@ public class AuthEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
         auth.MapGet(
-                "/verify/mail",
-                async (
-                    ISender sender,
-                    string userId,
-                    string confirmationToken) =>
-                {
-                    await sender.Send(new ConfirmMailCommand(userId, confirmationToken));
-                    return Results.Ok();
-                })
-            .WithName("ConfirmMail")
-            .WithSummary("Подтвердить почту")
-            .WithDescription("Подтверждение почты пользователя")
-            .WithDisplayName("Подтверждение почты")
-            .Produces(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest);
-
-        auth.MapGet(
                 "/usernames/{userName}/availability",
                 async (
                     ISender sender,
