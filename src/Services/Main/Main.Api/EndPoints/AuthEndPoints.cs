@@ -17,6 +17,8 @@ public record ResetPasswordRequest(string Token, string NewPassword);
 
 public record LoginRequest(string Email, string Password);
 
+public record IsUserNameAvailableResponse(bool IsAvailable);
+
 public record LoginResponse(
     string Token,
     string RefreshToken,
@@ -119,6 +121,26 @@ public class AuthEndPoints : ICarterModule
             .WithDescription("Подтверждение почты пользователя")
             .WithDisplayName("Подтверждение почты")
             .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
+
+        auth.MapGet(
+                "/username/availability",
+                async (
+                    ISender sender,
+                    string userName,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new IsUserNameAvailableQuery(userName),
+                        cancellationToken);
+
+                    return Results.Ok(new IsUserNameAvailableResponse(result.IsAvailable));
+                })
+            .WithName("IsUserNameAvailable")
+            .WithSummary("Проверить доступность имени пользователя")
+            .WithDescription("Проверяет, не занято ли имя другим пользователем")
+            .WithDisplayName("Проверка доступности имени пользователя")
+            .Produces<IsUserNameAvailableResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
         auth.MapPost(
