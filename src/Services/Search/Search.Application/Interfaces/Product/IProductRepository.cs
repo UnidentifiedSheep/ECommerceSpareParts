@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Search.Enums;
 
 namespace Search.Application.Interfaces.Product;
 
@@ -21,6 +22,7 @@ public interface IProductRepository
     Task<IReadOnlyCollection<Entities.Product>> SearchBySku(
         string sku,
         int? producerId,
+        SkuSearchMode searchMode,
         Pagination? pagination = null,
         string[]? sortBy = null,
         CancellationToken token = default);

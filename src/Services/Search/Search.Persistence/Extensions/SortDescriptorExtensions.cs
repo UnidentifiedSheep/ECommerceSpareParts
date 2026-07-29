@@ -8,8 +8,12 @@ public static class SortDescriptorExtensions
 {
     public static SearchDescriptor<TEntity> SortBy<TEntity>(
         this SearchDescriptor<TEntity> search,
-        string[]? sortBy) where TEntity : class
+        string[]? sortBy,
+        bool useDefault = true) where TEntity : class
     {
+        if (!useDefault && (sortBy is null || sortBy.All(string.IsNullOrWhiteSpace)))
+            return search;
+
         return search.Sort(sort => sort.SortBy(sortBy));
     }
 

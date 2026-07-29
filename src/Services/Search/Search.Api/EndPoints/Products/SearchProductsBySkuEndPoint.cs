@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Search.Application.Dtos.Products;
 using Search.Application.Handlers.Products.SearchProductsBySku;
+using Search.Enums;
 
 namespace Search.Api.EndPoints.Products;
 
@@ -16,6 +17,9 @@ public record SearchProductsBySkuRequest : SortablePaginationQueryModel
 
     [FromQuery(Name = "producerId")]
     public int? ProducerId { get; init; }
+
+    [FromQuery(Name = "searchMode")]
+    public SkuSearchMode SearchMode { get; init; } = SkuSearchMode.Full;
 }
 
 public record SearchProductsBySkuResult
@@ -39,6 +43,7 @@ public static class SearchProductsBySkuEndPoint
                         new SearchProductsBySkuQuery(
                             request.Sku,
                             request.ProducerId,
+                            request.SearchMode,
                             request,
                             request.SortBy),
                         cancellationToken);

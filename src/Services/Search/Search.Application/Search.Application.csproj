@@ -12,6 +12,7 @@
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj"/>
+        <ProjectReference Include="..\Search.Enums\Search.Enums.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -5,12 +5,14 @@ using Application.Common.Interfaces.Projections;
 using Search.Application.Dtos.Products;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
+using Search.Enums;
 
 namespace Search.Application.Handlers.Products.SearchProductsBySku;
 
 public record SearchProductsBySkuQuery(
     string Sku,
     int? ProducerId,
+    SkuSearchMode SearchMode,
     Pagination Pagination,
     string[] SortBy
 ) : IQuery<SearchProductsBySkuResult>;
@@ -29,6 +31,7 @@ public class SearchProductsBySkuHandler(
         var result = await productRepository.SearchBySku(
             request.Sku,
             request.ProducerId,
+            request.SearchMode,
             request.Pagination,
             request.SortBy,
             cancellationToken);
