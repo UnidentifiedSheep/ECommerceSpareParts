@@ -159,6 +159,68 @@ public class UserEmailAggregateTests
     }
 
     [Fact]
+    public void MakeEmailPrimary_ConfirmedEmail_ReplacesCurrentPrimary()
+    {
+        var user = CreateUser();
+        user.AddEmail(
+            "current@example.com",
+            EmailType.Personal,
+            true,
+            true);
+        user.AddEmail(
+            "new@example.com",
+            EmailType.Work,
+            false,
+            true);
+
+        user.MakeEmailPrimary("new@example.com");
+
+        user.Emails.Should().ContainSingle(x => x.IsPrimary);
+        user.Emails.Single(x => x.IsPrimary)
+            .Email.Value.Should().Be("new@example.com");
+        user.Emails.Single(x => x.Email == "current@example.com")
+            .IsPrimary.Should().BeFalse();
+    }
+
+    [Fact]
+    public void MakeEmailPrimary_UnconfirmedEmail_ThrowsAndKeepsCurrentPrimary()
+    {
+        var user = CreateUser();
+        user.AddEmail(
+            "current@example.com",
+            EmailType.Personal,
+            true,
+            true);
+        user.AddEmail(
+            "unconfirmed@example.com",
+            EmailType.Work,
+            false,
+            false);
+
+        var action = () => user.MakeEmailPrimary(
+            "unconfirmed@example.com");
+
+        var exception = action.Should()
+            .Throw<InvalidInputException>()
+            .Which;
+        exception.MessageKey.Should().Be(
+            "user.email.primary.must.be.confirmed");
+        user.Emails.Single(x => x.IsPrimary)
+            .Email.Value.Should().Be("current@example.com");
+    }
+
+    [Fact]
+    public void MakeEmailPrimary_EmailDoesNotExist_Throws()
+    {
+        var user = CreateUser();
+
+        var action = () => user.MakeEmailPrimary(
+            "missing@example.com");
+
+        action.Should().Throw<UserEmailNotFoundException>();
+    }
+
+    [Fact]
     public void EmailLifecycle_PublishesUserUpdatedEvent()
     {
         var user = CreateUser();
