@@ -1,4 +1,6 @@
-﻿namespace Main.Application.Static;
+﻿using Main.Enums;
+
+namespace Main.Application.Static;
 
 public static class CacheKeys
 {
@@ -45,5 +47,11 @@ public static class CacheKeys
         public static string AllCurrencies() { return "currencies"; }
 
         public static string CurrencyRate(int currencyId) { return $"currency:{currencyId}:rate"; }
+    }
+    
+    public static class OneTimeTokenCache
+    {
+        public static string OneTimeToken(OneTimeTokenPurpose purpose, Guid tokenId) 
+            => $"ont-time-token:{purpose}:{tokenId}";
     }
 }

@@ -1,9 +1,7 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.User;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using MediatR;
@@ -17,8 +15,7 @@ public record RemoveRoleFromUserCommand(Guid UserId, string RoleName) : ICommand
 
 public class RemoveRoleFromUserHandler(
     IRepository<UserRole, (Guid, string)> repository,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<RemoveRoleFromUserCommand>
 {
     public async Task<Unit> Handle(
@@ -29,12 +26,6 @@ public class RemoveRoleFromUserHandler(
                        ?? throw new UserRoleNotFoundException(request.UserId, request.RoleName);
 
         unitOfWork.Remove(userRole);
-
-        integrationEventScope.Add(
-            new UserUpdatedEvent
-            {
-                UserId = request.UserId
-            });
 
         return Unit.Value;
     }

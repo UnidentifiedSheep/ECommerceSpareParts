@@ -3,6 +3,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
+using Main.Entities.DomainEvents.User;
 
 namespace Main.Entities.User;
 
@@ -98,6 +99,12 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
             .EnsureMaxLength(MaxVinLength, "user.vehicle.vin.code.max.length")
             .ToUpperInvariant();
     }
+
+    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
     public override Guid GetId() { return Id; }
 }

@@ -1,0 +1,28 @@
+{
+  "locale": "ru",
+  "keyValues": {
+    "mail.password.reset.subject": "Восстановление пароля",
+    "mail.password.reset.title": "Восстановление пароля",
+    "mail.password.reset.intro": "Мы получили запрос на восстановление пароля для вашей учетной записи.",
+    "mail.password.reset.description": "Нажмите на кнопку ниже, чтобы задать новый пароль. Ссылка действительна ограниченное время.",
+    "mail.password.reset.button": "Восстановить пароль",
+    "mail.password.reset.fallback": "Если кнопка не работает, скопируйте и вставьте эту ссылку в браузер:",
+    "mail.password.reset.ignore": "Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.",
+    "mail.email.verification.subject": "Подтверждение email",
+    "mail.email.verification.title": "Подтвердите ваш email",
+    "mail.email.verification.intro": "Для вашей учётной записи был добавлен этот email.",
+    "mail.email.verification.description": "Нажмите на кнопку ниже, чтобы подтвердить, что адрес принадлежит вам. Ссылка действительна ограниченное время.",
+    "mail.email.verification.button": "Подтвердить email",
+    "mail.email.verification.fallback": "Если кнопка не работает, скопируйте и вставьте эту ссылку в браузер:",
+    "mail.email.verification.ignore": "Если вы не добавляли этот email, просто проигнорируйте письмо.",
+    "mail.login.notification.subject": "Выполнен вход в вашу учётную запись",
+    "mail.login.notification.title": "Новый вход в аккаунт",
+    "mail.login.notification.intro": "Мы зафиксировали вход в вашу учётную запись.",
+    "mail.login.notification.date.time.label": "Дата и время",
+    "mail.login.notification.ip.address.label": "IP-адрес",
+    "mail.login.notification.device.label": "Устройство",
+    "mail.login.notification.was.you": "Если это были вы, ничего делать не нужно.",
+    "mail.login.notification.not.you": "Если вы не узнаёте этот вход, немедленно смените пароль и завершите активные сессии.",
+    "mail.login.notification.unknown": "Неизвестно"
+  }
+}

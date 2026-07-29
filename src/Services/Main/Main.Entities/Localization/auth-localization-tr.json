@@ -37,6 +37,7 @@
     "user.vehicle.plate.number.already.taken": "Plaka numarası '{0}' zaten kullanımda.",
     "user.vehicle.vin.code.already.taken": "VIN kodu '{0}' zaten kullanımda.",
     "user.email.primary.count": "Kullanıcının yalnızca bir birincil e-postası olabilir.",
+    "user.email.primary.cannot.delete": "Birincil e-posta silinemez. Önce doğrulanmış başka bir e-postayı birincil olarak ayarlayın.",
     "user.have.duplicate.email": "Kullanıcının yinelenen e-postaları olmamalıdır.",
     "user.phone.primary.count": "Kullanıcının yalnızca bir birincil telefonu olabilir.",
     "user.have.duplicate.phone": "Kullanıcının yinelenen telefonları olmamalıdır.",
@@ -57,6 +58,7 @@
     "cant.add.system.role.to.user": "Sistem rolü bir kullanıcıya atanamaz.",
     "cant.remove.system.role.from.user": "Sistem rolü bir kullanıcıdan kaldırılamaz.",
     "user.permission.not.found": "Kullanıcı izni bulunamadı.",
-    "reset.token.expired": "Sıfırlama token'ının süresi doldu; kimliğinizi bir kez daha doğrulamanız gerekiyor."
+    "reset.token.expired": "Sıfırlama token'ının süresi doldu; kimliğinizi bir kez daha doğrulamanız gerekiyor.",
+    "email.verification.token.expired": "E-posta doğrulama bağlantısı geçersiz veya süresi dolmuş. Yeni bir doğrulama e-postası isteyin."
   }
 }

@@ -5,6 +5,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Extensions;
+using Main.Entities.DomainEvents.User;
 using Main.Enums;
 
 namespace Main.Entities.User;
@@ -110,6 +111,12 @@ public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity
 
     [GeneratedRegex(@"^\+?[0-9\s\-\(\)]{7,20}$")]
     private static partial Regex PhoneRegex();
+
+    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
     public override string GetId() { return NormalizedPhone; }
 }

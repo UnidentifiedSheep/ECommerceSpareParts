@@ -15,6 +15,8 @@ public class LoginValidator : AbstractValidator<string>
             .Must(x => x.Trim().Length <= 36)
             .WithLocalizationKey("login.max.length.36")
             .Must(x => !x.Contains(' '))
-            .WithLocalizationKey("login.cannot.contain.spaces");
+            .WithLocalizationKey("login.cannot.contain.spaces")
+            .Must(x => !x.Contains('@'))
+            .WithLocalizationKey("login.cannot.contain.at.sign");
     }
 }

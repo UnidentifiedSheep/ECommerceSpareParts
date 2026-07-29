@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.User;
 
 namespace Main.Entities.Auth;
 
@@ -30,6 +31,12 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>, ILinqEntity<U
     }
 
     public static UserRole Create(Guid userId, string roleName) { return new UserRole(userId, roleName); }
+
+    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
     public override (Guid, string) GetId() { return (UserId, RoleName); }
 }

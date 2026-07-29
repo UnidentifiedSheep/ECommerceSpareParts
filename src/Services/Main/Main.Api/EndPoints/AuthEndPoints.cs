@@ -15,7 +15,9 @@ public record SendEmailRecoveryRequest(string Email);
 
 public record ResetPasswordRequest(string Token, string NewPassword);
 
-public record LoginRequest(string Email, string Password);
+public record LoginRequest(string Login, string Password);
+
+public record IsUserNameAvailableResponse(bool IsAvailable);
 
 public record LoginResponse(
     string Token,
@@ -105,20 +107,23 @@ public class AuthEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
         auth.MapGet(
-                "/verify/mail",
+                "/usernames/{userName}/availability",
                 async (
                     ISender sender,
-                    string userId,
-                    string confirmationToken) =>
+                    string userName,
+                    CancellationToken cancellationToken) =>
                 {
-                    await sender.Send(new ConfirmMailCommand(userId, confirmationToken));
-                    return Results.Ok();
+                    var result = await sender.Send(
+                        new IsUserNameAvailableQuery(userName),
+                        cancellationToken);
+
+                    return Results.Ok(new IsUserNameAvailableResponse(result.IsAvailable));
                 })
-            .WithName("ConfirmMail")
-            .WithSummary("Подтвердить почту")
-            .WithDescription("Подтверждение почты пользователя")
-            .WithDisplayName("Подтверждение почты")
-            .Produces(StatusCodes.Status200OK)
+            .WithName("IsUserNameAvailable")
+            .WithSummary("Проверить доступность имени пользователя")
+            .WithDescription("Проверяет, не занято ли имя другим пользователем")
+            .WithDisplayName("Проверка доступности имени пользователя")
+            .Produces<IsUserNameAvailableResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
         auth.MapPost(
@@ -133,7 +138,7 @@ public class AuthEndPoints : ICarterModule
                     var ipAddress = context.Connection.RemoteIpAddress;
                     var result = await sender.Send(
                         new LoginCommand(
-                            request.Email,
+                            request.Login,
                             request.Password,
                             ipAddress,
                             userAgent),

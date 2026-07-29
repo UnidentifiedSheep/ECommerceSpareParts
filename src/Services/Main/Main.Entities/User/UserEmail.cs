@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.User;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 
@@ -56,6 +57,15 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
         Confirmed = confirmed;
         ConfirmedAt = confirmed ? DateTime.UtcNow : null;
     }
+
+    public override void OnUpdated()
+        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnDeleted()
+        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+    public override void OnCreated()
+        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
     public void ChangeType(EmailType emailType) { EmailType = emailType; }
 

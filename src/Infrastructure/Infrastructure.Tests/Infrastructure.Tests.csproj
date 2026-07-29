@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
+        <PreserveCompilationContext>true</PreserveCompilationContext>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,6 +23,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Mailing\EmailTemplates\EmailTemplates.csproj"/>
+        <ProjectReference Include="..\Mailing\Mailing.Core\Mailing.Core.csproj"/>
         <ProjectReference Include="..\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\Security\Security.csproj"/>
     </ItemGroup>

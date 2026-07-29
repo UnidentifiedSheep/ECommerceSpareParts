@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Abstractions.Interfaces.Services;
@@ -50,7 +51,15 @@ public class JsonSigner : IJsonSigner
         var payload = parts[0];
         var signature = parts[1];
 
-        var jsonBytes = EncodingUtils.Base64UrlDecode(payload);
+        byte[] jsonBytes;
+        try
+        {
+            jsonBytes = EncodingUtils.Base64UrlDecode(payload);
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
 
         using var hmac = new HMACSHA256(_secretBytes);
         var expectedHash = hmac.ComputeHash(jsonBytes);
@@ -67,13 +76,20 @@ public class JsonSigner : IJsonSigner
         return valid;
     }
 
-    public bool VerifyJson<T>(string signed, out T? obj)
+    public bool VerifyJson<T>(string signed, [NotNullWhen(true)] out T? obj)
     {
         obj = default;
-        var valid = VerifyJson(signed, out var jsonString);
+        if (!VerifyJson(signed, out var jsonString) || jsonString is null)
+            return false;
 
-        if (valid && jsonString != null) obj = JsonSerializer.Deserialize<T>(jsonString, _options);
-
-        return valid;
+        try
+        {
+            obj = JsonSerializer.Deserialize<T>(jsonString, _options);
+            return obj is not null;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
     }
 }

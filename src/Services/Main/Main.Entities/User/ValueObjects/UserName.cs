@@ -9,12 +9,13 @@ public record UserName
 
     public UserName(string value)
     {
+        value.EnsureNotNullOrWhiteSpace("login.must.not.be.empty");
         value = value.Trim();
 
-        value.EnsureNotNullOrEmpty("login.must.not.be.empty")
-            .EnsureMinLength(5, "login.min.length.5")
+        value.EnsureMinLength(5, "login.min.length.5")
             .EnsureMaxLength(36, "login.max.length.36")
-            .EnsureNoSpaces("login.cannot.contain.spaces");
+            .EnsureNoSpaces("login.cannot.contain.spaces")
+            .Ensure(x => !x.Contains('@'), "login.cannot.contain.at.sign");
 
         Value = value;
         NormalizedValue = ToNormalized(Value);

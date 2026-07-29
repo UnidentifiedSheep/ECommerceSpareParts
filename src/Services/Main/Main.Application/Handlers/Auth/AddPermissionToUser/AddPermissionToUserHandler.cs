@@ -1,8 +1,6 @@
 ﻿using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Attributes;
-using Contracts.User;
 using Main.Entities.Auth;
 using MediatR;
 
@@ -13,8 +11,7 @@ namespace Main.Application.Handlers.Auth.AddPermissionToUser;
 public record AddPermissionToUserCommand(Guid UserId, string PermissionName) : ICommand;
 
 public class AddPermissionToUserHandler(
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope interfaceScope
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<AddPermissionToUserCommand>
 {
     public async Task<Unit> Handle(AddPermissionToUserCommand request, CancellationToken cancellationToken)
@@ -22,11 +19,6 @@ public class AddPermissionToUserHandler(
         var model = UserPermission.Create(request.UserId, request.PermissionName);
 
         await unitOfWork.AddAsync(model, cancellationToken);
-        interfaceScope.Add(
-            new UserUpdatedEvent
-            {
-                UserId = request.UserId
-            });
         return Unit.Value;
     }
 }

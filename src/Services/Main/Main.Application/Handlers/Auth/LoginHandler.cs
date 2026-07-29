@@ -21,12 +21,11 @@ namespace Main.Application.Handlers.Auth;
 [Transactional]
 [AutoSave]
 public record LoginCommand(
-    string Email,
+    string Login,
     string Password,
     IPAddress? IpAddress,
     string? UserAgent
-)
-    : ICommand<LoginResult>;
+) : ICommand<LoginResult>;
 
 public record LoginResult(
     string Token,
@@ -35,6 +34,7 @@ public record LoginResult(
 );
 
 public class LoginHandler(
+    IEmailValidator emailValidator,
     IPasswordManager passwordManager,
     IUserRepository userRepository,
     IUserTokenService userTokenService,
@@ -51,16 +51,17 @@ public class LoginHandler(
             .Track()
             .Build();
 
-        var user = await userRepository.GetUserByPrimaryEmailAsync(
-                       request.Email,
+        var user = await userRepository.GetUserByLoginAsync(
+                       request.Login,
+                       emailValidator.IsValidEmail(request.Login),
                        criteria,
                        cancellationToken)
-                   ?? throw new WrongCredentialsException(request.Email, null);
+                   ?? throw new WrongCredentialsException(request.Login, null);
 
         if (user.UserInfo == null)
             throw new InternalServerException("User exists, but unable to get user info.");
         if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.Password))
-            throw new WrongCredentialsException(request.Email, request.Password);
+            throw new WrongCredentialsException(request.Login, request.Password);
 
         var (roles, permissions) =
             await userCache.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken)
@@ -89,7 +90,9 @@ public class LoginHandler(
             [],
             cancellationToken);
 
-        user.Login();
+        user.Login(
+            ip?.ToString(),
+            userAgent);
 
         return new LoginResult(
             token,

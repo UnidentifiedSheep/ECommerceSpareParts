@@ -55,14 +55,27 @@ public class UserIsNotInNeededRole(Role role)
 public class UserNotFoundException(Guid id)
     : LocalizedNotFoundException("user.not.found", new { Id = id });
 
-public class WrongCredentialsException(string? email, string? password)
-    : LocalizedBadRequestException("wrong.credentials", new { Email = email, Password = password });
+public class WrongCredentialsException(string? login, string? password)
+    : LocalizedBadRequestException("wrong.credentials", new { Login = login, Password = password });
+
+public class UserEmailAlreadyInUseException(string email)
+    : LocalizedConflictException(
+        "user.email.already.in.use",
+        new { Email = email });
+
+public class UserEmailNotFoundException(string email)
+    : LocalizedNotFoundException(
+        "user.email.not.found",
+        new { Email = email });
 
 public class CantCreateSystemUserException()
     : LocalizedBadRequestException("cant.create.system.user");
 
 public class ResetTokenExpiredException()
     : LocalizedBadRequestException("reset.token.expired");
+
+public class EmailVerificationTokenExpiredException()
+    : LocalizedBadRequestException("email.verification.token.expired");
 
 public class UserPermissionNotFound(Guid id, string permission)
     : LocalizedNotFoundException(
