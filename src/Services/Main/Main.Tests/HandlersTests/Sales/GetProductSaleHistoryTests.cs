@@ -83,7 +83,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
                 organizationId: sale.OrganizationId,
                 preferredOrganizationId: sale.OrganizationId,
                 currencyId: sale.CurrencyId,
-                sortBy: "averageBuyPrice_desc"));
+                sortBy: ["averageBuyPrice_desc"]));
 
         result.History.Should().ContainSingle();
     }
@@ -128,7 +128,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
         var result = await Mediator.Send(
             CreateQuery(
                 preferredOrganizationId: preferredSale.OrganizationId,
-                sortBy: "saleDate_desc"));
+                sortBy: ["saleDate_desc"]));
 
         result.History.Select(x => x.OrganizationId).Should().Equal(
             preferredSale.OrganizationId,
@@ -140,7 +140,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
         Guid? organizationId = null,
         Guid? preferredOrganizationId = null,
         int? currencyId = null,
-        string? sortBy = null)
+        string[]? sortBy = null)
     {
         return new GetProductSaleHistoryQuery(
             SaleContext.Product.Id,
@@ -149,6 +149,6 @@ public class GetProductSaleHistoryTests : IntegrationTest
             organizationId,
             preferredOrganizationId,
             currencyId,
-            sortBy);
+            sortBy ?? []);
     }
 }

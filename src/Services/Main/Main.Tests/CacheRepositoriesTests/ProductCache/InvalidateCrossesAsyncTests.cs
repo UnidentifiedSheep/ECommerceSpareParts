@@ -56,10 +56,11 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
         var repository = GetRepository();
 
         await RemoveCrossesCache(productId, null);
-        await RemoveCrossesCache(productId, "id_desc");
+        var sortBy = new[] { "id_desc", "name" };
+        await RemoveCrossesCache(productId, sortBy);
 
         await repository.GetProductCrossesAsync(productId, null);
-        await repository.GetProductCrossesAsync(productId, "id_desc");
+        await repository.GetProductCrossesAsync(productId, sortBy);
 
         await repository.InvalidateCrossesAsync(productId);
 
@@ -67,7 +68,7 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
         defaultCacheExists.Should().BeFalse();
 
         var sortedCacheExists =
-            await CacheKeyExists(CacheKeys.ProductCache.ProductCrosses(productId, "id_desc"));
+            await CacheKeyExists(CacheKeys.ProductCache.ProductCrosses(productId, sortBy));
         sortedCacheExists.Should().BeFalse();
 
         var relations = await GetRelations(productId);
@@ -110,7 +111,7 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
             .First();
     }
 
-    private async Task RemoveCrossesCache(int productId, string? sortBy)
+    private async Task RemoveCrossesCache(int productId, string[]? sortBy)
     {
         await Scope.ServiceProvider
             .GetRequiredService<ICache>()

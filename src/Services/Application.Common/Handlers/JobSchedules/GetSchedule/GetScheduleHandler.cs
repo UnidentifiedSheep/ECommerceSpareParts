@@ -12,7 +12,7 @@ namespace Application.Common.Handlers.JobSchedules.GetSchedule;
 public record GetScheduleQuery(
     IEnumerable<string> JobSystemNames,
     RangeModel<DateTime>? NextRunRange,
-    string? SortBy,
+    string[] SortBy,
     Pagination Pagination
 ) : IQuery<GetScheduleResult>;
 

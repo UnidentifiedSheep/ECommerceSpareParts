@@ -15,7 +15,7 @@ public record SearchProductsByAllQuery(
     string? Query,
     int? ProducerId,
     Pagination Pagination,
-    string? SortBy,
+    string[] SortBy,
     RangeModel<decimal>? Length = null,
     RangeModel<decimal>? Width = null,
     RangeModel<decimal>? Height = null,

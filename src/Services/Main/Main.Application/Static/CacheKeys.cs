@@ -10,9 +10,9 @@ public static class CacheKeys
 
         public static string Product(int id) { return $"product:{id}"; }
 
-        public static string ProductCrosses(int id, string? sortBy)
+        public static string ProductCrosses(int id, string[]? sortBy)
         {
-            return $"product:{id}:crosses:{sortBy}";
+            return $"product:{id}:crosses:{string.Join(',', sortBy ?? [])}";
         }
 
         public static string ProductCrossRelations(int id) { return $"product:{id}:crosses:relations"; }

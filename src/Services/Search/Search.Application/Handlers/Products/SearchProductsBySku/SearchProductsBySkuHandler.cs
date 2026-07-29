@@ -12,7 +12,7 @@ public record SearchProductsBySkuQuery(
     string Sku,
     int? ProducerId,
     Pagination Pagination,
-    string? SortBy
+    string[] SortBy
 ) : IQuery<SearchProductsBySkuResult>;
 
 public record SearchProductsBySkuResult(IEnumerable<ProductDto> Products);

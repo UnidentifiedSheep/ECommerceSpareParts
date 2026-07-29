@@ -13,7 +13,7 @@ namespace Analytics.Application.Handlers.Metrics.GetMetrics;
 [Diagnostics(maxExecutionTimeMs: 200)]
 public record GetMetricsQuery(
     string? MetricSystemName,
-    string? SortBy,
+    string[] SortBy,
     Pagination Pagination
 ) : IQuery<GetMetricsResult>;
 

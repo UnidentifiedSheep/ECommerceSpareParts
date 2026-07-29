@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.ProductReservations.GetProductReservations;
 public record GetProductReservationsQuery(
     int? ProductId,
     Guid? OrganizationId,
-    string? SortBy,
+    string[] SortBy,
     bool ShowDeleted,
     Pagination Pagination
 ) : IQuery<GetProductReservationsResult>;

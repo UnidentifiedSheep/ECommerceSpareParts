@@ -9,7 +9,7 @@ namespace Main.Application.Handlers.Products.GetProductCrosses;
 public record GetProductCrossesQuery(
     int ProductId,
     Pagination Pagination,
-    string? SortBy,
+    string[] SortBy,
     Guid? UserId
 ) : IQuery<GetProductCrossesResult>;
 
@@ -38,7 +38,7 @@ public class GetProductCrossesHandler(
     private async Task<IReadOnlyList<ProductDto>> GetCrosses(
         int productId,
         Pagination pagination,
-        string? sortBy,
+        string[] sortBy,
         CancellationToken token)
     {
         var crosseIds = (await productCache.GetProductCrossesAsync(
