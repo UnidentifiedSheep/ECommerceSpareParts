@@ -46,21 +46,22 @@ public static class HostBuilderExtensions
         string environment,
         string? lokiUrl)
     {
-        return new LoggerConfiguration()
+        var loggerConfiguration = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .WriteTo.Conditional(
-                _ => !string.IsNullOrWhiteSpace(lokiUrl),
-                wt => wt.LokiHttp(() => new LokiSinkConfiguration
+            .Enrich.FromLogContext();
+
+        if (!string.IsNullOrWhiteSpace(lokiUrl))
+            loggerConfiguration.WriteTo.LokiHttp(
+                () => new LokiSinkConfiguration
                 {
-                    LokiUrl = lokiUrl!,
+                    LokiUrl = lokiUrl,
                     LogLabelProvider = new CustomLogLabelProvider(
                     [
                         new LokiLabel("service", serviceName),
                         new LokiLabel("env", environment)
                     ])
-                })
-            );
+                });
+
+        return loggerConfiguration;
     }
 }
