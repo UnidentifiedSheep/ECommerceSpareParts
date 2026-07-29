@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Contracts.Models.Supplier;
 using Enums;
-using Main.Entities.Product.Supplier;
+using Main.Entities.Product.Enrichment;
 using Main.Entities.Product.ValueObjects;
 using MediatR;
 
