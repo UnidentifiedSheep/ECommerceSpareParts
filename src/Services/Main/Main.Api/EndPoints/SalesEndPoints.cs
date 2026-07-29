@@ -123,6 +123,9 @@ public record GetProductSaleHistoryRequest : SortablePaginationQueryModel
     [FromQuery(Name = "organizationId")]
     public Guid? OrganizationId { get; init; }
 
+    [FromQuery(Name = "preferredOrganizationId")]
+    public Guid? PreferredOrganizationId { get; init; }
+
     [FromQuery(Name = "currencyId")]
     public int? CurrencyId { get; init; }
 }
@@ -285,6 +288,7 @@ public class SalesEndPoints : ICarterModule
                             request,
                             request.StorageName,
                             request.OrganizationId,
+                            request.PreferredOrganizationId,
                             request.CurrencyId,
                             request.SortBy),
                         cancellationToken);

@@ -15,6 +15,7 @@ public record GetProductSaleHistoryQuery(
     Pagination Pagination,
     string? StorageName,
     Guid? OrganizationId,
+    Guid? PreferredOrganizationId,
     int? CurrencyId,
     string? SortBy) : IQuery<GetProductSaleHistoryResult>;
 
@@ -43,8 +44,14 @@ public class GetProductSaleHistoryHandler(
         if (request.CurrencyId.HasValue)
             query = query.Where(x => x.Sale.CurrencyId == request.CurrencyId);
 
-        var result = await query
-            .SortBy(request.SortBy)
+        var sortedQuery = request.PreferredOrganizationId.HasValue && !request.OrganizationId.HasValue
+            ? query
+                .OrderByDescending(x => x.Sale.OrganizationId == request.PreferredOrganizationId)
+                .ThenSortBy(request.SortBy)
+            : query.SortBy(request.SortBy);
+
+        var result = await sortedQuery
+            .ThenByDescending(x => x.Id)
             .Project(projectionProvider)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);

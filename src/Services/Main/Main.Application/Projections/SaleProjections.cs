@@ -106,6 +106,7 @@ public sealed class ProductSaleHistoryDtoProjectionProvider
         x => new ProductSaleHistoryDto
         {
             SaleContentId = x.Id,
+            OrganizationId = x.Sale.OrganizationId,
             CurrencyId = x.Sale.CurrencyId,
             ProductId = x.ProductId,
             StorageName = x.Sale.StorageName,

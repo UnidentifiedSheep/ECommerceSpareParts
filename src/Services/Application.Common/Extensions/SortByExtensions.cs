@@ -5,7 +5,7 @@ namespace Application.Common.Extensions;
 
 public static class SortByExtensions
 {
-    public static IQueryable<TEntity> SortBy<TEntity>(
+    public static IOrderedQueryable<TEntity> SortBy<TEntity>(
         this IQueryable<TEntity> query,
         string? sortParam)
     {
@@ -14,6 +14,17 @@ public static class SortByExtensions
         return sort.Desc
             ? query.OrderByDescending(sort.KeySelector)
             : query.OrderBy(sort.KeySelector);
+    }
+
+    public static IOrderedQueryable<TEntity> ThenSortBy<TEntity>(
+        this IOrderedQueryable<TEntity> query,
+        string? sortParam)
+    {
+        var sort = QueryableSortBy.ParseToKeySelector<TEntity>(sortParam);
+
+        return sort.Desc
+            ? query.ThenByDescending(sort.KeySelector)
+            : query.ThenBy(sort.KeySelector);
     }
 
     public static CriteriaBuilder<TEntity> WithSorting<TEntity>(

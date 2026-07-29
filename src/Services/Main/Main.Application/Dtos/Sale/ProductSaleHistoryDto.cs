@@ -9,6 +9,9 @@ public record ProductSaleHistoryDto
 
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }
+    
+    [JsonPropertyName("organizationId")]
+    public required Guid OrganizationId { get; init; }
 
     [JsonPropertyName("storageName")]
     public required string StorageName { get; init; }
