@@ -42,6 +42,8 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
     public decimal Discount { get; private set; }
 
     public Product.Product Product { get; private set; } = null!;
+    public Sale Sale { get; private set; } = null!;
+    
     public IReadOnlyList<SaleContentDetail> Details => _details;
 
     public static Expression<Func<SaleContent, int>> GetKeySelector() { return x => x.Id; }

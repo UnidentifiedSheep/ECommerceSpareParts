@@ -97,3 +97,23 @@ public sealed class SaleContentDetailDtoProjectionProvider
 
     public Expression<Func<SaleContentDetail, SaleContentDetailDto>> Projection { get; }
 }
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class ProductSaleHistoryDtoProjectionProvider
+    : IProjectionProvider<SaleContent, ProductSaleHistoryDto>
+{
+    public Expression<Func<SaleContent, ProductSaleHistoryDto>> Projection { get; } =
+        x => new ProductSaleHistoryDto
+        {
+            SaleContentId = x.Id,
+            CurrencyId = x.Sale.CurrencyId,
+            ProductId = x.ProductId,
+            StorageName = x.Sale.StorageName,
+            Quantity = x.Count,
+            Discount = x.Discount,
+            Price = x.Price,
+            AverageBuyPrice = x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count,
+            SaleDate = x.Sale.SaleDatetime,
+            WhoCreated = x.Sale.WhoCreated
+        };
+}

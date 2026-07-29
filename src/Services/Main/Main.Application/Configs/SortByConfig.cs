@@ -50,6 +50,18 @@ public static class SortByConfig
             .Map<Sale, Guid>("id", x => x.Id);
 
         QueryableSortBy.Value
+            .MapDefault<SaleContent, DateTime>(x => x.Sale.SaleDatetime, true)
+            .Map<SaleContent, int>("saleContentId", x => x.Id)
+            .Map<SaleContent, string>("storageName", x => x.Sale.StorageName)
+            .Map<SaleContent, int>("quantity", x => x.Count)
+            .Map<SaleContent, decimal>("discount", x => x.Discount)
+            .Map<SaleContent, decimal>("price", x => x.Price)
+            .Map<SaleContent, decimal>(
+                "averageBuyPrice",
+                x => x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count)
+            .Map<SaleContent, DateTime>("saleDate", x => x.Sale.SaleDatetime);
+
+        QueryableSortBy.Value
             .MapDefault<ProductReservation, DateTime>(x => x.CreatedAt)
             .Map<ProductReservation, int>("id", x => x.Id)
             .Map<ProductReservation, DateTime>("createAt", x => x.CreatedAt)
