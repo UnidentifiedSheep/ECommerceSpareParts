@@ -22,15 +22,17 @@ public record EditStorageContentRequest(
     Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields
 );
 
-public record GetStorageContentRequest(
+public record GetStorageContentRequest : PaginationQueryModel
+{
     [FromQuery(Name = "storageName")]
-    string? StorageName,
+    public string? StorageName { get; init; }
+
     [FromQuery(Name = "productId")]
-    int? ArticleId,
+    public int? ArticleId { get; init; }
+
     [FromQuery(Name = "showZeroContent")]
-    bool ShowZeroCount = true
-)
-    : PaginationQueryModel;
+    public bool ShowZeroCount { get; init; } = true;
+}
 
 public record GetStorageContentResponse(IEnumerable<StorageContentDto> Content);
 
