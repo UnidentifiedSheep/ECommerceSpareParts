@@ -207,12 +207,31 @@ validate_swarm_manager() {
 validate_required_swarm_secrets() {
   local secret
 
-  for secret in cloudru_key_id cloudru_key_secret "$POSTGRES_WALG_SECRET"; do
+  for secret in "$POSTGRES_WALG_SECRET"; do
     if ! sudo docker secret inspect "$secret" >/dev/null 2>&1; then
       echo "Required Docker Swarm secret ${secret} is missing"
       exit 1
     fi
   done
+}
+
+cloudru_sync_is_configured() {
+  local is_configured=true
+  local secret
+
+  if [ -z "${CLOUD_RU_SECRET_PROJECT_ID:-}" ]; then
+    echo "WARNING: CLOUD_RU_SECRET_PROJECT_ID is not configured; application config synchronization will be skipped." >&2
+    is_configured=false
+  fi
+
+  for secret in cloudru_key_id cloudru_key_secret; do
+    if ! sudo docker secret inspect "$secret" >/dev/null 2>&1; then
+      echo "WARNING: Docker Swarm secret ${secret} is missing; application config synchronization will be skipped." >&2
+      is_configured=false
+    fi
+  done
+
+  [ "$is_configured" = true ]
 }
 
 ensure_versioned_config() {
@@ -473,6 +492,25 @@ wait_for_secrets_sync() {
   wait_for_global_job \
     "$(service_name secrets secrets-sync)" \
     "Application config synchronization"
+}
+
+sync_application_configs() {
+  if ! cloudru_sync_is_configured; then
+    echo "WARNING: Continuing deployment with the existing files in ${CONFIGS_PATH}." >&2
+    return 0
+  fi
+
+  if ! deploy_stack secrets; then
+    echo "WARNING: Unable to deploy the secrets-sync service." >&2
+    echo "WARNING: Continuing deployment with the existing files in ${CONFIGS_PATH}." >&2
+    return 0
+  fi
+
+  if ! wait_for_secrets_sync; then
+    echo "WARNING: Cloud.ru application config synchronization failed." >&2
+    echo "WARNING: Continuing deployment with the existing files in ${CONFIGS_PATH}." >&2
+    return 0
+  fi
 }
 
 validate_walg_storage() {
@@ -1095,7 +1133,6 @@ require_env RABBITMQ_DEFAULT_PASS
 require_env OPENSEARCH_PASSWORD
 require_env CONFIGS_PATH
 require_env DOCKER_CONFIG
-require_env CLOUD_RU_SECRET_PROJECT_ID
 
 PUBLIC_NETWORK="${PUBLIC_NETWORK:-public}"
 BACKEND_NETWORK="${BACKEND_NETWORK:-backend}"
@@ -1163,8 +1200,7 @@ prepare_versioned_configs
 render_stack_files
 
 log "[4/8] Synchronize application configs"
-deploy_stack secrets
-wait_for_secrets_sync
+sync_application_configs
 
 log "[5/8] Validate Swarm placement"
 validate_node_labels

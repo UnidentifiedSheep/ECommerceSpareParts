@@ -104,7 +104,7 @@ printf '%s' '<cloudru-key-secret>' |
   docker secret create cloudru_key_secret -
 ```
 
-Do not place these values in GitHub Actions. A deployment fails before changing application services when either secret is absent.
+Do not place these values in GitHub Actions. When either Cloud.ru secret is absent, the deployment skips synchronization and continues with the existing files in `CONFIGS_PATH`.
 
 PostgreSQL backups require one additional external secret. Create a local JSON file as described in [PostgreSQL backup and recovery](POSTGRES_BACKUP.md), then create the secret:
 
@@ -188,10 +188,12 @@ The existing `scripts/deploy/load-secrets.py` remains the Cloud.ru client and JS
 3. passes its exact name to `stack.secrets.yml`;
 4. deploys or updates the global `secrets-sync` service;
 5. waits for the current task on every eligible active node to reach `Complete`;
-6. stops immediately on `Failed` or `Rejected`;
-7. deploys application services only after all nodes succeed.
+6. prints task and service diagnostics on `Failed` or `Rejected`;
+7. continues the deployment with the existing files in `CONFIGS_PATH` when Cloud.ru is unavailable or synchronization fails.
 
 The sync task writes into `${CONFIGS_PATH}/.next`. It also requires at least one generated JSON file. Only a successful, non-empty Cloud.ru fetch replaces the files in `${CONFIGS_PATH}`, so a failed fetch does not erase the previous working configuration.
+
+`CLOUD_RU_SECRET_PROJECT_ID`, `cloudru_key_id`, and `cloudru_key_secret` are optional for an individual deployment run. If any of them is missing, synchronization is skipped with a warning. This fallback assumes that valid JSON files already exist on the target nodes; on a new node or first deployment, applications can still fail to start if `CONFIGS_PATH` is empty.
 
 The Python process is one-shot and exits after writing JSON. Therefore the completed global service normally shows `0/N` running replicas; task state `Complete` is the success criterion. Raw loader output is suppressed inside the task because the current Python client can include credentials in an authentication error URL. Docker logs contain only a safe generic failure message, so deployment diagnostics can print task status and service logs without exposing credentials.
 
@@ -256,7 +258,7 @@ See [PostgreSQL backup and recovery](POSTGRES_BACKUP.md) for S3 configuration, c
 
 1. Initialize the Swarm and join workers.
 2. Apply all workload and specialized labels.
-3. Create `cloudru_key_id`, `cloudru_key_secret`, and `postgres_walg_config`.
+3. Create the required `postgres_walg_config` secret. Create `cloudru_key_id` and `cloudru_key_secret` when Cloud.ru synchronization is enabled.
 4. Create the three overlay networks, or let the deploy script create them.
 5. Create/verify the external persistent volumes, or let the deploy script create missing volumes.
 6. Configure the GitHub Secrets and Variables above.
@@ -286,7 +288,7 @@ manager -> primary registry login
 manager -> validate Swarm, secrets, networks and versioned configs
 Swarm global initializer -> mkdir -p CONFIGS_PATH on each eligible node
 Swarm global secrets-sync -> Cloud.ru -> each eligible node CONFIGS_PATH
-manager -> wait for every sync task to complete
+manager -> wait for every sync task; on failure keep the previous CONFIGS_PATH
 manager -> deploy infra -> migrators -> apps/workers/gateway/monitoring
 manager -> cleanup only unused old versioned configs
 ```
