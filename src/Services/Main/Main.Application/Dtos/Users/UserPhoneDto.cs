@@ -9,6 +9,7 @@ public record UserPhoneDto
     public required string Number { get; init; }
 
     [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public required PhoneType Type { get; init; }
 
     [JsonPropertyName("isConfirmed")]

@@ -3,6 +3,7 @@ using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Organizations;
+using Main.Application.Handlers.Organizations;
 using Main.Application.Handlers.Organizations.GetOrganizations;
 using Main.Enums.Organization;
 using MediatR;
@@ -23,6 +24,7 @@ public record GetOrganizationsRequest : SortablePaginationQueryModel
 }
 
 public record GetOrganizationsResponse(IReadOnlyList<OrganizationDto> Organizations);
+public record IsOrganizationSystemNameAvailableResponse(bool IsAvailable);
 
 public class OrganizationEndPoints : ICarterModule
 {
@@ -32,6 +34,29 @@ public class OrganizationEndPoints : ICarterModule
             .WithTags("Organizations");
 
         organizations.MapOrganizationMemberEndPoints();
+
+        organizations.MapGet(
+                "/system-names/{systemName}/availability",
+                async (
+                    ISender sender,
+                    string systemName,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new IsOrganizationSystemNameAvailableQuery(systemName),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new IsOrganizationSystemNameAvailableResponse(
+                            result.IsAvailable));
+                })
+            .WithName("IsOrganizationSystemNameAvailable")
+            .WithSummary("Проверить доступность системного имени организации")
+            .WithDescription("Проверяет, не занято ли системное имя другой организацией")
+            .WithDisplayName("Проверка доступности системного имени организации")
+            .Produces<IsOrganizationSystemNameAvailableResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.ORGANIZATIONS_CREATE);
 
         organizations.MapGet(
                 "",
