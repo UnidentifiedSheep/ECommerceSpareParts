@@ -4,6 +4,7 @@ using Enums;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Auth.EmailVerification;
 using Main.Application.Handlers.Users.AddEmailToUser;
+using Main.Application.Handlers.Users.MakeEmailPrimary;
 using Main.Application.Handlers.Users.RemoveEmailFromUser;
 using Main.Enums;
 using MediatR;
@@ -116,6 +117,57 @@ public static class UserEmailEndPoints
             .WithDescription("Отправляет пользователю письмо для подтверждения указанной почты")
             .WithDisplayName("Запрос подтверждения почты")
             .Produces(StatusCodes.Status202Accepted)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
+
+        users.MapPut(
+                "/{userId:guid}/emails/{email}/primary",
+                async (
+                    ISender sender,
+                    Guid userId,
+                    string email,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new MakeEmailPrimaryCommand(
+                            userId,
+                            email),
+                        cancellationToken);
+
+                    return Results.NoContent();
+                })
+            .WithName("MakeUserEmailPrimary")
+            .WithSummary("Назначить почту основной")
+            .WithDescription("Назначает подтверждённую почту пользователя основной")
+            .WithDisplayName("Назначение основной почты")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.USERS_MAILS_CREATE);
+
+        users.MapPut(
+                "/me/emails/{email}/primary",
+                async (
+                    ISender sender,
+                    IUserContext userContext,
+                    string email,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new MakeEmailPrimaryCommand(
+                            userContext.UserId,
+                            email),
+                        cancellationToken);
+
+                    return Results.NoContent();
+                })
+            .WithName("MakeCurrentUserEmailPrimary")
+            .WithSummary("Назначить свою почту основной")
+            .WithDescription("Назначает подтверждённую почту текущего пользователя основной")
+            .WithDisplayName("Назначение своей основной почты")
+            .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)

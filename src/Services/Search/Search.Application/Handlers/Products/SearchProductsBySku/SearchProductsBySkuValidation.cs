@@ -7,6 +7,9 @@ public class SearchProductsBySkuValidation : AbstractValidator<SearchProductsByS
 {
     public SearchProductsBySkuValidation()
     {
+        RuleFor(s => s.SearchMode)
+            .IsInEnum();
+
         RuleFor(s => s.Pagination)
             .SetValidator(new PaginationValidator());
     }

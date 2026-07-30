@@ -14,6 +14,7 @@
     "job.schedule.input.state.required": "Входное состояние задачи обязательно.",
     "job.schedule.cron.required": "Cron-выражение расписания задачи обязательно.",
     "job.schedule.cron.invalid": "Cron-выражение расписания задачи должно быть валидным.",
-    "setting.not.found": "Не удалось найти настройку {0}."
+    "setting.not.found": "Не удалось найти настройку {0}.",
+    "sorting.invalid": "Некорректная сортировка: {0}"
   }
 }

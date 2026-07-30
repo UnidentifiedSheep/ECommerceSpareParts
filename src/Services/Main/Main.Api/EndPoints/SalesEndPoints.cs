@@ -8,6 +8,7 @@ using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.Sales.EditSale;
+using Main.Application.Handlers.Sales.GetProductSaleHistory;
 using Main.Application.Handlers.Sales.GetSale;
 using Main.Application.Handlers.Sales.GetSales;
 using Main.Enums;
@@ -113,6 +114,24 @@ public record EditSaleRequest
 }
 
 public record GetSaleContentResponse(IReadOnlyList<SaleContentDto> Content);
+
+public record GetProductSaleHistoryRequest : SortablePaginationQueryModel
+{
+    [FromQuery(Name = "storageName")]
+    public string? StorageName { get; init; }
+
+    [FromQuery(Name = "organizationId")]
+    public Guid? OrganizationId { get; init; }
+
+    [FromQuery(Name = "preferredOrganizationId")]
+    public Guid? PreferredOrganizationId { get; init; }
+
+    [FromQuery(Name = "currencyId")]
+    public int? CurrencyId { get; init; }
+}
+
+public record GetProductSaleHistoryResponse(
+    IReadOnlyList<ProductSaleHistoryDto> History);
 
 public class SalesEndPoints : ICarterModule
 {
@@ -253,6 +272,36 @@ public class SalesEndPoints : ICarterModule
             .WithDisplayName("Получение содержания продажи")
             .Produces<GetSaleContentResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.SALES_GET);
+
+        sales.MapGet(
+                "/products/{productId:int}/history",
+                async (
+                    ISender sender,
+                    int productId,
+                    [AsParameters] GetProductSaleHistoryRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetProductSaleHistoryQuery(
+                            productId,
+                            request,
+                            request.StorageName,
+                            request.OrganizationId,
+                            request.PreferredOrganizationId,
+                            request.CurrencyId,
+                            request.SortBy),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new GetProductSaleHistoryResponse(result.History));
+                })
+            .WithDescription("Получение истории продаж продукта")
+            .WithName("GetProductSaleHistory")
+            .WithSummary("Получить историю продаж продукта")
+            .WithDisplayName("Получение истории продаж продукта")
+            .Produces<GetProductSaleHistoryResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
 
         sales.MapGet(

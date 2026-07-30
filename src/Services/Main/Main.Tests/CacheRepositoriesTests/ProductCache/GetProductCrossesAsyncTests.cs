@@ -104,10 +104,11 @@ public class GetProductCrossesAsyncTests : IntegrationTest
         var repository = GetRepository();
 
         await RemoveCachedCrosses(productId, null);
-        await RemoveCachedCrosses(productId, "id_desc");
+        var sortBy = new[] { "id_desc", "name" };
+        await RemoveCachedCrosses(productId, sortBy);
 
         var asc = (await repository.GetProductCrossesAsync(productId, null)).ToList();
-        var desc = (await repository.GetProductCrossesAsync(productId, "id_desc")).ToList();
+        var desc = (await repository.GetProductCrossesAsync(productId, sortBy)).ToList();
 
         asc.Should().BeInAscendingOrder();
         desc.Should().BeInDescendingOrder();
@@ -168,7 +169,7 @@ public class GetProductCrossesAsyncTests : IntegrationTest
             .First();
     }
 
-    private async Task RemoveCachedCrosses(int productId, string? sortBy)
+    private async Task RemoveCachedCrosses(int productId, string[]? sortBy)
     {
         var cache = Scope.ServiceProvider.GetRequiredService<ICache>();
         var cacheKey = CacheKeys.ProductCache.ProductCrosses(productId, sortBy);

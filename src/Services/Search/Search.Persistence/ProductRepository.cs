@@ -6,6 +6,7 @@ using OpenSearch.Client;
 using Search.Abstractions.Options;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
+using Search.Enums;
 using Search.Persistence.Extensions;
 using Search.Persistence.Interfaces;
 
@@ -63,7 +64,7 @@ public class ProductRepository(
         string query,
         int? producerId = null,
         Pagination? pagination = null,
-        string? sortBy = null,
+        string[]? sortBy = null,
         RangeModel<decimal>? lengthM = null,
         RangeModel<decimal>? widthM = null,
         RangeModel<decimal>? heightM = null,
@@ -126,8 +127,9 @@ public class ProductRepository(
     public async Task<IReadOnlyCollection<Product>> SearchBySku(
         string sku,
         int? producerId,
+        SkuSearchMode searchMode,
         Pagination? pagination = null,
-        string? sortBy = null,
+        string[]? sortBy = null,
         CancellationToken token = default)
     {
         var page = pagination ?? DefaultPagination;
@@ -136,7 +138,7 @@ public class ProductRepository(
 
         var should = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
         var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
-        AddSkuQueries(should, normalizedSku);
+        AddSkuQueries(should, normalizedSku, searchMode);
         AddProducerFilter(filters, producerId);
 
         var response = await client.SearchAsync<Product>(
@@ -144,7 +146,7 @@ public class ProductRepository(
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
-                .SortBy(sortBy)
+                .SortBy(sortBy, useDefault: false)
                 .Query(q =>
                 {
                     if (should.Count == 0 && filters.Count == 0) return q.MatchAll();
@@ -168,7 +170,7 @@ public class ProductRepository(
     public Task<IReadOnlyCollection<Product>> GetByWeightKgRange(
         RangeModel<decimal>? weightKg = null,
         Pagination? pagination = null,
-        string? sortBy = null,
+        string[]? sortBy = null,
         CancellationToken token = default)
     {
         return SearchByRange(
@@ -182,7 +184,7 @@ public class ProductRepository(
     public Task<IReadOnlyCollection<Product>> GetByVolumeM3Range(
         RangeModel<decimal>? volumeM3 = null,
         Pagination? pagination = null,
-        string? sortBy = null,
+        string[]? sortBy = null,
         CancellationToken token = default)
     {
         return SearchByRange(
@@ -230,7 +232,7 @@ public class ProductRepository(
         RangeModel<decimal>? width = null,
         RangeModel<decimal>? height = null,
         Pagination? pagination = null,
-        string? sortBy = null,
+        string[]? sortBy = null,
         CancellationToken token = default)
     {
         var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
@@ -273,7 +275,7 @@ public class ProductRepository(
         Expression<Func<Product, object>> field,
         RangeModel<decimal>? range,
         Pagination? pagination,
-        string? sortBy,
+        string[]? sortBy,
         CancellationToken token)
     {
         var page = pagination ?? DefaultPagination;
@@ -328,29 +330,34 @@ public class ProductRepository(
 
     private static void AddSkuQueries(
         List<Func<QueryContainerDescriptor<Product>, QueryContainer>> queries,
-        string normalizedSku)
+        string normalizedSku,
+        SkuSearchMode searchMode = SkuSearchMode.Full)
     {
         if (string.IsNullOrEmpty(normalizedSku)) return;
 
-        queries.Add(q => q.Term(t => t
-            .Field(p => p.NormalizedSku)
-            .Value(normalizedSku)
-            .Boost(10)));
+        if (searchMode is SkuSearchMode.Full or SkuSearchMode.Exact)
+            queries.Add(q => q.Term(t => t
+                .Field(p => p.NormalizedSku)
+                .Value(normalizedSku)
+                .Boost(10)));
 
-        queries.Add(q => q.Prefix(p => p
-            .Field(k => k.NormalizedSku)
-            .Value(normalizedSku)
-            .Boost(6)));
+        if (searchMode is SkuSearchMode.Full or SkuSearchMode.StartsWith)
+            queries.Add(q => q.Prefix(p => p
+                .Field(k => k.NormalizedSku)
+                .Value(normalizedSku)
+                .Boost(6)));
 
-        queries.Add(q => q.Wildcard(w => w
-            .Field(p => p.NormalizedSku)
-            .Value($"*{normalizedSku}*")
-            .Boost(3)));
+        if (searchMode is SkuSearchMode.Full or SkuSearchMode.Contains)
+            queries.Add(q => q.Wildcard(w => w
+                .Field(p => p.NormalizedSku)
+                .Value($"*{normalizedSku}*")
+                .Boost(3)));
 
-        queries.Add(q => q.Fuzzy(f => f
-            .Field(p => p.NormalizedSku)
-            .Value(normalizedSku)
-            .Fuzziness(Fuzziness.Auto)
-            .Boost(1)));
+        if (searchMode is SkuSearchMode.Full or SkuSearchMode.Fuzzy)
+            queries.Add(q => q.Fuzzy(f => f
+                .Field(p => p.NormalizedSku)
+                .Value(normalizedSku)
+                .Fuzziness(Fuzziness.Auto)
+                .Boost(1)));
     }
 }

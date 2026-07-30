@@ -14,7 +14,7 @@ namespace Analytics.Application.Handlers.Metrics;
 public record GetMetricJobsQuery(
     Guid MetricId,
     Pagination Pagination,
-    string? SortBy
+    string[] SortBy
 ) : IQuery<GetMetricJobsResult>;
 
 public record GetMetricJobsResult(IReadOnlyList<MetricJobDto> Jobs);

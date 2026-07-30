@@ -17,7 +17,7 @@ public interface IProductCacheRepository
 
     Task<IEnumerable<int>> GetProductCrossesAsync(
         int productId,
-        string? sortBy,
+        string[]? sortBy,
         CancellationToken cancellationToken = default);
 
     Task<Dictionary<int, ProductDto>> GetProductsOrSetAsync(

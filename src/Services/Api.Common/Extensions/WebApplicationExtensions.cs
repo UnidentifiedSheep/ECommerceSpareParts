@@ -20,6 +20,8 @@ public static class WebApplicationExtensions
         app.UseExceptionHandler(_ => { });
         app.UseRouting();
         app.UseCors();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapCarter();
         app.UseSwagger();
         app.MapHealthChecks("/health");

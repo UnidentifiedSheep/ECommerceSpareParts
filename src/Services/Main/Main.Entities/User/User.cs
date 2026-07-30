@@ -199,6 +199,23 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         _emails.Remove(userEmail);
     }
 
+    public void MakeEmailPrimary(Email email)
+    {
+        var userEmail = _emails.SingleOrDefault(x => x.Email.Value == email.Value)
+                        ?? throw new UserEmailNotFoundException(email.Value);
+
+        if (!userEmail.Confirmed)
+            throw new InvalidInputException(
+                "user.email.primary.must.be.confirmed");
+
+        if (userEmail.IsPrimary) return;
+
+        foreach (var currentPrimary in _emails.Where(x => x.IsPrimary))
+            currentPrimary.MakePrimary(false);
+
+        userEmail.MakePrimary();
+    }
+
     public void SetDiscount(decimal discount)
     {
         if (Discount == null)

@@ -136,9 +136,33 @@ public class GetOrganizationsTests : IntegrationTest
         var result = await Mediator.Send(
             CreateQuery(
                 ids: [first.Id, second.Id],
-                sortBy: "name_desc"));
+                sortBy: ["name_desc"]));
 
         result.Organizations.Select(x => x.Id).Should().Equal(second.Id, first.Id);
+    }
+
+    [Fact]
+    public async Task GetOrganizations_WithMultipleSortFields_AppliesThemInOrder()
+    {
+        var first = await CreateOrganization("Same organization", "zulu-organization");
+        var second = await CreateOrganization("Same organization", "alpha-organization");
+
+        var result = await Mediator.Send(
+            CreateQuery(
+                ids: [first.Id, second.Id],
+                sortBy: ["name", "systemName_desc"]));
+
+        result.Organizations.Select(x => x.Id).Should().Equal(first.Id, second.Id);
+    }
+
+    [Theory]
+    [InlineData("unknown_desc")]
+    [InlineData("name_down")]
+    public async Task GetOrganizations_WithInvalidSort_ThrowsInvalidInputException(string sortBy)
+    {
+        var query = CreateQuery(sortBy: [sortBy]);
+
+        await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(query));
     }
 
     [Fact]
@@ -154,13 +178,13 @@ public class GetOrganizationsTests : IntegrationTest
         Guid? userId = null,
         IReadOnlyCollection<Guid>? ids = null,
         IReadOnlyCollection<OrganizationType>? types = null,
-        string? sortBy = null,
+        string[]? sortBy = null,
         int page = 0,
         int size = 20)
     {
         return new GetOrganizationsQuery(
             new Pagination(page, size),
-            sortBy,
+            sortBy ?? [],
             searchTerm,
             userId,
             ids ?? [],

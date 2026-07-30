@@ -64,7 +64,7 @@ public class ProductCacheRepository(
 
     public async Task<IEnumerable<int>> GetProductCrossesAsync(
         int productId,
-        string? sortBy,
+        string[]? sortBy,
         CancellationToken cancellationToken = default)
     {
         var key = CacheKeys.ProductCache.ProductCrosses(productId, sortBy);
@@ -124,7 +124,7 @@ public class ProductCacheRepository(
 
     private Task<List<int>> GetCrossesFromDb(
         int productId,
-        string? sortBy,
+        string[]? sortBy,
         CancellationToken cancellationToken = default)
     {
         return crossesReadRepository.Query

@@ -60,12 +60,14 @@ public class QueryableSortBy
         if (!_mapDictionary.TryGetValue(type, out var primary))
             throw new ArgumentException($"{type} mapping not exists");
 
-        if (primary.TryGetValue(source, out var value)) return (Expression<Func<TEntity, object?>>)value;
+        if (primary.TryGetValue(source, out var value))
+            return (Expression<Func<TEntity, object?>>)value;
 
-        if (primary.TryGetValue(DefaultKey, out var defaultValue))
+        if (string.IsNullOrEmpty(source) &&
+            primary.TryGetValue(DefaultKey, out var defaultValue))
             return (Expression<Func<TEntity, object?>>)defaultValue;
 
-        throw new ArgumentException($"Mapping '{source}' for {type} not exists and no default provided");
+        throw new ArgumentException($"Sort mapping '{source}' for {type} does not exist.");
     }
 
     public bool GetDefaultDesc<TEntity>()
@@ -84,6 +86,21 @@ public class QueryableSortBy
         return new KeySelectorSortDefinition<TEntity>(map, desc);
     }
 
+    public static IReadOnlyList<KeySelectorSortDefinition<TEntity>> ParseToKeySelectors<TEntity>(
+        IEnumerable<string>? sortParams)
+    {
+        var values = sortParams?
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .ToArray() ?? [];
+
+        if (values.Length == 0)
+            return [ParseToKeySelector<TEntity>(null)];
+
+        return values
+            .Select(ParseToKeySelector<TEntity>)
+            .ToArray();
+    }
+
     public static TextSortDefinition ParseToText(string? sortParam)
     {
         if (string.IsNullOrWhiteSpace(sortParam)) return new TextSortDefinition(string.Empty, false);
@@ -97,6 +114,8 @@ public class QueryableSortBy
 
         var field = span[..idx];
         var dir = span[(idx + 1)..];
+        if (dir is not ("asc" or "desc"))
+            throw new ArgumentException($"Unknown sort direction '{dir}'.");
 
         return new TextSortDefinition(field, IsDesc(dir));
     }

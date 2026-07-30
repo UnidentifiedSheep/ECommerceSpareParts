@@ -38,6 +38,7 @@
     "user.vehicle.vin.code.already.taken": "VIN-код '{0}' уже используется.",
     "user.email.primary.count": "Пользователь может иметь только один основной email.",
     "user.email.primary.cannot.delete": "Нельзя удалить основной email. Сначала назначьте другой подтверждённый email основным.",
+    "user.email.primary.must.be.confirmed": "Основным можно назначить только подтверждённый email.",
     "user.have.duplicate.email": "У пользователя не должно быть повторяющихся email.",
     "user.phone.primary.count": "Пользователь может иметь только один основной телефон.",
     "user.have.duplicate.phone": "У пользователя не должно быть повторяющихся телефонов.",

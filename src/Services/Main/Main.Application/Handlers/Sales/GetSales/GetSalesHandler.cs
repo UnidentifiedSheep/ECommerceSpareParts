@@ -17,7 +17,7 @@ public record GetSalesQuery(
     IEnumerable<int> CurrencyIds,
     IEnumerable<int> ProductIds,
     IEnumerable<SaleState> States,
-    string? SortBy,
+    string[] SortBy,
     string? SearchTerm
 ) : IQuery<GetSalesResult>;
 

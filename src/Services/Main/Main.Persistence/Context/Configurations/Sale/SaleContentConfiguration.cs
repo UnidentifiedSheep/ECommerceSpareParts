@@ -12,7 +12,9 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
 
         builder.HasKey(e => e.Id).HasName("sale_content_pk");
 
-        builder.HasIndex(e => e.ProductId, "sale_content_product_id_index");
+        builder.HasIndex(
+            e => new { e.ProductId, e.SaleId },
+            "sale_content_product_id_sale_id_index");
 
         builder.HasIndex(e => e.Comment, "sale_content_comment_index")
             .HasMethod("gin")
@@ -51,7 +53,7 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_content_products_id_fk");
 
-        builder.HasOne<Entities.Sale.Sale>()
+        builder.HasOne<Entities.Sale.Sale>(e => e.Sale)
             .WithMany(p => p.Contents)
             .HasForeignKey(d => d.SaleId)
             .HasConstraintName("sale_content_sale_id_fk");
