@@ -39,12 +39,15 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
     {
         Id = id ?? Guid.NewGuid();
         Type = type;
-        SystemName = systemName.TrimSafe()
+        SystemName = NormalizeSystemName(systemName)
             .EnsureNotNullOrWhiteSpace("organization.system.name.required")
             .EnsureMaxLength(128, "organization.system.name.max.length");
         SetName(name);
         AddMember(ownerId, OrganizationRole.Owner);
     }
+    
+    public static string NormalizeSystemName(string systemName)
+        => systemName.ToLowerInvariant().TrimSafe();
 
     public static Organization CreateIndividual(
         string name,
