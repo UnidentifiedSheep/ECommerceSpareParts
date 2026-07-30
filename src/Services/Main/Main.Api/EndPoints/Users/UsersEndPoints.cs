@@ -37,32 +37,44 @@ public record CreateUserRequest
 
 public record CreateUserResponse(UserDto User);
 
-public record GetUsersRequest(
+public record GetUsersRequest : PaginationQueryModel
+{
     [FromQuery(Name = "searchTerm")]
-    string? SearchTerm,
+    public string? SearchTerm { get; init; }
+
     [FromQuery(Name = "id")]
-    Guid? Id,
+    public Guid? Id { get; init; }
+
     [FromQuery(Name = "name")]
-    string? Name,
+    public string? Name { get; init; }
+
     [FromQuery(Name = "surname")]
-    string? Surname,
+    public string? Surname { get; init; }
+
     [FromQuery(Name = "email")]
-    string? Email,
+    public string? Email { get; init; }
+
     [FromQuery(Name = "phone")]
-    string? Phone,
+    public string? Phone { get; init; }
+
     [FromQuery(Name = "userName")]
-    string? UserName,
+    public string? UserName { get; init; }
+
     [FromQuery(Name = "isSupplier")]
-    bool? IsSupplier,
+    public bool? IsSupplier { get; init; }
+
     [FromQuery(Name = "description")]
-    string? Description,
+    public string? Description { get; init; }
+
     [FromQuery(Name = "similarityLevel")]
-    double? SimilarityLevel,
+    public double? SimilarityLevel { get; init; }
+
     [FromQuery(Name = "roles")]
-    string[]? Roles,
+    public string[]? Roles { get; init; }
+
     [FromQuery(Name = "searchMethod")]
-    GeneralSearchStrategy SearchMethod
-) : PaginationQueryModel;
+    public GeneralSearchStrategy SearchMethod { get; init; }
+}
 
 public record GetUsersResponse(IReadOnlyList<UserDto> Users);
 

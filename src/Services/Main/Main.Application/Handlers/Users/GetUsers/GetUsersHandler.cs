@@ -180,7 +180,8 @@ public class GetUsersHandler(
         var query = readRepository.Query
             .Where(x => x.UserInfo != null)
             .ExcludeUsersWithRole(Role.System);
-        if (request.Roles != null && request.Roles.Any()) query = query.IncludeUsersWithRoles(request.Roles);
+        if (request.Roles != null && request.Roles.Any()) 
+            query = query.IncludeUsersWithRoles(request.Roles);
 
         if (string.IsNullOrWhiteSpace(request.SearchColumn))
             return await query
