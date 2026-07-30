@@ -191,7 +191,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.DropIndex(
                 name: "supplier_products_normalized_sku_producer_uidx",
-                schema: "product_enrichment",
+                schema: "catalogue_enrichment",
                 table: "supplier_products");
 
             migrationBuilder.CreateIndex(
@@ -426,12 +426,12 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.DropIndex(
                 name: "supplier_products_normalized_sku_idx",
-                schema: "catalogue_enrichment",
+                schema: "product_enrichment",
                 table: "supplier_products");
 
             migrationBuilder.DropIndex(
                 name: "supplier_products_supplier_producer_sku_uidx",
-                schema: "catalogue_enrichment",
+                schema: "product_enrichment",
                 table: "supplier_products");
 
             migrationBuilder.CreateIndex(
