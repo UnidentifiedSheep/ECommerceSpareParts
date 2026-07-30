@@ -2,6 +2,15 @@ name: Deploy
 
 on:
   workflow_call:
+    inputs:
+      registry_kind:
+        description: Artifact Registry selected by the publish workflow
+        required: true
+        type: string
+      backup_registry_available:
+        description: Whether the release was mirrored to the backup registry
+        required: true
+        type: boolean
 
 jobs:
   deploy:
@@ -111,9 +120,13 @@ jobs:
             set +a
 
             export STACK_NAME='${{ env.STACK_NAME }}'
-            export ARTIFACT_REGISTRY_HOST='${{ secrets.ARTIFACT_REGISTRY_HOST }}'
-            export ARTIFACT_REGISTRY_USERNAME='${{ secrets.ARTIFACT_REGISTRY_USERNAME }}'
-            export ARTIFACT_REGISTRY_PASSWORD='${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}'
+            export ARTIFACT_REGISTRY_HOST='${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_HOST || secrets.ARTIFACT_REGISTRY_HOST }}'
+            export ARTIFACT_REGISTRY_USERNAME='${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME || secrets.ARTIFACT_REGISTRY_USERNAME }}'
+            export ARTIFACT_REGISTRY_PASSWORD='${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}'
+            export BACKUP_ARTIFACT_REGISTRY_HOST='${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}'
+            export BACKUP_ARTIFACT_REGISTRY_USERNAME='${{ secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME }}'
+            export BACKUP_ARTIFACT_REGISTRY_PASSWORD='${{ secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}'
+            export ARTIFACT_REGISTRY_FALLBACK_ENABLED='${{ inputs.registry_kind == 'primary' && inputs.backup_registry_available }}'
             export IMAGE_TAG='${{ github.sha }}'
             export DEPLOY_RUN_ID='${{ github.run_id }}-${{ github.run_attempt }}'
             export CLOUD_RU_SECRET_PROJECT_ID='${{ vars.CLOUD_RU_SECRET_PROJECT_ID }}'

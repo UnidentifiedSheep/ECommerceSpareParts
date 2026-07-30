@@ -2,6 +2,13 @@ name: Publish Images
 
 on:
   workflow_call:
+    outputs:
+      registry_kind:
+        description: Registry selected for publishing and deployment
+        value: ${{ jobs.select-registry.outputs.registry_kind }}
+      backup_registry_available:
+        description: Whether every image was also published to the backup registry
+        value: ${{ jobs.select-registry.outputs.backup_registry_available }}
     secrets:
       ARTIFACT_REGISTRY_HOST:
         required: true
@@ -9,8 +16,77 @@ on:
         required: true
       ARTIFACT_REGISTRY_PASSWORD:
         required: true
+      BACKUP_ARTIFACT_REGISTRY_HOST:
+        required: true
+      BACKUP_ARTIFACT_REGISTRY_USERNAME:
+        required: true
+      BACKUP_ARTIFACT_REGISTRY_PASSWORD:
+        required: true
 
 jobs:
+  select-registry:
+    runs-on: ubuntu-latest
+
+    outputs:
+      registry_kind: ${{ steps.select.outputs.registry_kind }}
+      primary_registry_available: ${{ steps.select.outputs.primary_registry_available }}
+      backup_registry_available: ${{ steps.select.outputs.backup_registry_available }}
+
+    steps:
+      - name: Login to primary Artifact Registry
+        id: primary_login
+        continue-on-error: true
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
+          username: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
+          password: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
+
+      - name: Login to backup Artifact Registry
+        id: backup_login
+        continue-on-error: true
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}
+          username: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME }}
+          password: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}
+
+      - name: Select Artifact Registry
+        id: select
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          primary_available=false
+          backup_available=false
+
+          if [ '${{ steps.primary_login.outcome }}' = 'success' ]; then
+            primary_available=true
+          fi
+
+          if [ '${{ steps.backup_login.outcome }}' = 'success' ]; then
+            backup_available=true
+          fi
+
+          echo "primary_registry_available=$primary_available" >> "$GITHUB_OUTPUT"
+          echo "backup_registry_available=$backup_available" >> "$GITHUB_OUTPUT"
+
+          if [ "$primary_available" = true ]; then
+            echo 'registry_kind=primary' >> "$GITHUB_OUTPUT"
+            echo 'Primary Artifact Registry selected.'
+            exit 0
+          fi
+
+          if [ "$backup_available" = true ]; then
+            echo 'registry_kind=backup' >> "$GITHUB_OUTPUT"
+            echo 'Primary Artifact Registry login failed; backup registry selected.'
+            exit 0
+          fi
+
+          echo 'Unable to log in to either primary or backup Artifact Registry.' >&2
+          exit 1
+
   discover-images:
     runs-on: ubuntu-latest
 
@@ -77,7 +153,7 @@ jobs:
 
   publish-images:
     runs-on: ubuntu-latest
-    needs: discover-images
+    needs: [select-registry, discover-images]
     strategy:
       fail-fast: false
       max-parallel: 6
@@ -85,7 +161,13 @@ jobs:
     timeout-minutes: 15
 
     env:
-      ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
+      ARTIFACT_REGISTRY_HOST: ${{ needs.select-registry.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_HOST || secrets.ARTIFACT_REGISTRY_HOST }}
+      PRIMARY_ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
+      PRIMARY_ARTIFACT_REGISTRY_USERNAME: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
+      PRIMARY_ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
+      BACKUP_ARTIFACT_REGISTRY_HOST: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}
+      BACKUP_ARTIFACT_REGISTRY_USERNAME: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME }}
+      BACKUP_ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
@@ -95,12 +177,46 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Artifact Registry
+      - name: Login to primary Artifact Registry
+        if: needs.select-registry.outputs.primary_registry_available == 'true'
         uses: docker/login-action@v3
         with:
-          registry: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
-          username: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
-          password: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
+          registry: ${{ env.PRIMARY_ARTIFACT_REGISTRY_HOST }}
+          username: ${{ env.PRIMARY_ARTIFACT_REGISTRY_USERNAME }}
+          password: ${{ env.PRIMARY_ARTIFACT_REGISTRY_PASSWORD }}
+
+      - name: Login to backup Artifact Registry
+        if: needs.select-registry.outputs.backup_registry_available == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.BACKUP_ARTIFACT_REGISTRY_HOST }}
+          username: ${{ env.BACKUP_ARTIFACT_REGISTRY_USERNAME }}
+          password: ${{ env.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}
+
+      - name: Prepare image tags
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          {
+            echo 'PUBLISH_IMAGE_TAGS<<EOF'
+
+            if [ '${{ needs.select-registry.outputs.primary_registry_available }}' = 'true' ]; then
+              printf '%s/%s:%s\n' \
+                "$PRIMARY_ARTIFACT_REGISTRY_HOST" \
+                '${{ matrix.image }}' \
+                "$IMAGE_TAG"
+            fi
+
+            if [ '${{ needs.select-registry.outputs.backup_registry_available }}' = 'true' ]; then
+              printf '%s/%s:%s\n' \
+                "$BACKUP_ARTIFACT_REGISTRY_HOST" \
+                '${{ matrix.image }}' \
+                "$IMAGE_TAG"
+            fi
+
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
 
       - name: Build and push ${{ matrix.service }}
         id: build_push
@@ -113,9 +229,9 @@ jobs:
           push: true
           provenance: false
           sbom: false
-          tags: ${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache
-          cache-to: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache,mode=min,ignore-error=true
+          tags: ${{ env.PUBLISH_IMAGE_TAGS }}
+          cache-from: type=registry,ref=${{ env.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache
+          cache-to: type=registry,ref=${{ env.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache,mode=min,ignore-error=true
 
       - name: Retry build and push ${{ matrix.service }}
         if: steps.build_push.outcome == 'failure'
@@ -127,6 +243,6 @@ jobs:
           push: true
           provenance: false
           sbom: false
-          tags: ${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache
-          cache-to: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache,mode=min,ignore-error=true
+          tags: ${{ env.PUBLISH_IMAGE_TAGS }}
+          cache-from: type=registry,ref=${{ env.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache
+          cache-to: type=registry,ref=${{ env.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache,mode=min,ignore-error=true

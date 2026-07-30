@@ -1123,10 +1123,34 @@ sudo chown -R "$(id -u):$(id -g)" "$DOCKER_CONFIG"
 
 log "[1/8] Validate Swarm manager and Docker registry"
 validate_swarm_manager
-echo "$ARTIFACT_REGISTRY_PASSWORD" | docker login \
+
+if ! printf '%s' "$ARTIFACT_REGISTRY_PASSWORD" | docker login \
   "$ARTIFACT_REGISTRY_HOST" \
   --username "$ARTIFACT_REGISTRY_USERNAME" \
-  --password-stdin >/dev/null
+  --password-stdin >/dev/null; then
+  if [ "${ARTIFACT_REGISTRY_FALLBACK_ENABLED:-false}" != "true" ]; then
+    echo "Unable to log in to Artifact Registry ${ARTIFACT_REGISTRY_HOST}." >&2
+    exit 1
+  fi
+
+  require_env BACKUP_ARTIFACT_REGISTRY_HOST
+  require_env BACKUP_ARTIFACT_REGISTRY_USERNAME
+  require_env BACKUP_ARTIFACT_REGISTRY_PASSWORD
+
+  echo "Primary Artifact Registry login failed; trying backup registry."
+
+  printf '%s' "$BACKUP_ARTIFACT_REGISTRY_PASSWORD" | docker login \
+    "$BACKUP_ARTIFACT_REGISTRY_HOST" \
+    --username "$BACKUP_ARTIFACT_REGISTRY_USERNAME" \
+    --password-stdin >/dev/null
+
+  ARTIFACT_REGISTRY_HOST="$BACKUP_ARTIFACT_REGISTRY_HOST"
+  ARTIFACT_REGISTRY_USERNAME="$BACKUP_ARTIFACT_REGISTRY_USERNAME"
+  ARTIFACT_REGISTRY_PASSWORD="$BACKUP_ARTIFACT_REGISTRY_PASSWORD"
+  export ARTIFACT_REGISTRY_HOST
+  export ARTIFACT_REGISTRY_USERNAME
+  export ARTIFACT_REGISTRY_PASSWORD
+fi
 
 log "[2/8] Validate required Docker Swarm secrets"
 validate_required_swarm_secrets

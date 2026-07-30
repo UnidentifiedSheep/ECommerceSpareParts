@@ -124,6 +124,9 @@ Required GitHub Secrets:
 - `ARTIFACT_REGISTRY_HOST`
 - `ARTIFACT_REGISTRY_USERNAME`
 - `ARTIFACT_REGISTRY_PASSWORD`
+- `BACKUP_ARTIFACT_REGISTRY_HOST`
+- `BACKUP_ARTIFACT_REGISTRY_USERNAME`
+- `BACKUP_ARTIFACT_REGISTRY_PASSWORD`
 - `SWARM_ENV`
 
 Existing optional Secrets:
@@ -164,6 +167,17 @@ The following old GitHub Secrets are no longer needed:
 - `CLOUD_RU_SECRET_PROJECT_ID`, `CLOUD_RU_SECRET_PREFIX`, `CLOUD_RU_SECRET_DEPTH`, `CLOUD_RU_SECRET_NAMES`, and `CLOUD_RU_SECRET_VERSION` after the non-secret values are moved to GitHub Variables.
 
 Per-worker SSH credentials are no longer used. Cloud.ru credentials are no longer passed through GitHub Actions.
+
+Before building images, the publish workflow checks both Artifact Registries:
+
+- when primary and backup are available, every image tag is pushed to both and deployment prefers primary;
+- when primary is unavailable, all images are pushed to and deployed from backup;
+- when backup is unavailable but primary works, deployment continues through primary without runtime registry fallback;
+- when neither registry accepts login, publishing stops.
+
+The selected registry kind and backup availability are passed as non-secret reusable-workflow outputs to the deploy workflow; registry credentials are never placed in workflow outputs. If the release was mirrored and primary login fails on the Swarm manager, the deploy script switches `${ARTIFACT_REGISTRY_HOST}` to backup before rendering stack files and running migrators.
+
+Compose and Swarm files continue to use `${ARTIFACT_REGISTRY_HOST}`. The workflow assigns that variable to the selected primary or backup host, so separate copies of stack and migrator compose files are not required.
 
 ## Configuration synchronization
 
@@ -264,7 +278,11 @@ manager -> deploy stacks
 New flow:
 
 ```text
+GitHub runner -> check primary and backup registry login
+GitHub runner -> build/push all images to every available registry
 GitHub runner -> SSH/SCP manager (stack, script and static deployment files)
+manager -> primary registry login
+           └─ on failure, if release was mirrored -> backup registry login
 manager -> validate Swarm, secrets, networks and versioned configs
 Swarm global initializer -> mkdir -p CONFIGS_PATH on each eligible node
 Swarm global secrets-sync -> Cloud.ru -> each eligible node CONFIGS_PATH
