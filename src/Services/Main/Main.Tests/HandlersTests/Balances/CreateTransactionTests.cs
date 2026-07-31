@@ -1,3 +1,5 @@
+using Enums;
+using Extensions;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Static;
@@ -7,6 +9,7 @@ using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
+using Tests.Stubs;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 
@@ -82,8 +85,11 @@ public class CreateTransactionTests : IntegrationTest
     {
         var command = GetValidCommand();
 
-        await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(command with { TransactionDateTime = DateTime.UtcNow.AddMonths(-3) }));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
+            Mediator.Send(command with { TransactionDateTime = DateTime.UtcNow.AddDays(-31) }));
+
+        exception.Errors.Should().ContainSingle()
+            .Which.ErrorCode.Should().Be("operation.date.too.old");
     }
 
     [Fact]
@@ -91,8 +97,48 @@ public class CreateTransactionTests : IntegrationTest
     {
         var command = GetValidCommand();
 
-        await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(command with { TransactionDateTime = DateTime.UtcNow.AddHours(2) }));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
+            Mediator.Send(command with { TransactionDateTime = DateTime.UtcNow.AddMinutes(6) }));
+
+        exception.Errors.Should().ContainSingle()
+            .Which.ErrorCode.Should().Be("operation.date.cannot.be.in.future");
+    }
+
+    [Fact]
+    public async Task CreateTransaction_DateWithinBackdatePeriod_Succeeds()
+    {
+        var command = GetValidCommand() with
+        {
+            TransactionDateTime = DateTime.UtcNow.AddDays(-29),
+            ForcePayment = true
+        };
+
+        var result = await Mediator.Send(command);
+
+        result.Transaction.TransactionDatetime.Should().BeCloseTo(
+            command.TransactionDateTime,
+            TimeSpan.FromMilliseconds(1));
+    }
+
+    [Fact]
+    public async Task CreateTransaction_OldDateWithHistoricalRecordsPermission_Succeeds()
+    {
+        var userContext = (UserContextMock)GetContext<UserContextTestContext>().UserContext;
+        userContext.SetPermissions(
+        [
+            nameof(PermissionCodes.CREATE_HISTORICAL_RECORDS).ToNormalizedPermission()
+        ]);
+        var command = GetValidCommand() with
+        {
+            TransactionDateTime = DateTime.UtcNow.AddDays(-31),
+            ForcePayment = true
+        };
+
+        var result = await Mediator.Send(command);
+
+        result.Transaction.TransactionDatetime.Should().BeCloseTo(
+            command.TransactionDateTime,
+            TimeSpan.FromMilliseconds(1));
     }
 
     [Fact]
@@ -159,7 +205,7 @@ public class CreateTransactionTests : IntegrationTest
             .FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
 
         transaction.Should().NotBeNull();
-        transaction!.ReceiverId.Should().Be(command.ReceiverId);
+        transaction.ReceiverId.Should().Be(command.ReceiverId);
     }
 
     private CreateTransactionCommand GetValidCommand()

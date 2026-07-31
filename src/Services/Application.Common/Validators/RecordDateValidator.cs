@@ -2,7 +2,7 @@ using Application.Common.Services;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace Main.Application.Handlers.BaseValidators;
+namespace Application.Common.Validators;
 
 public class RecordDateValidator : AbstractValidator<DateTime>
 {

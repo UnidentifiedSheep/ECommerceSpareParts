@@ -1,6 +1,6 @@
 namespace Abstractions.Models;
 
-public sealed record RangeModel<T>(T? Min, T? Max)
+public sealed record RangeModel<T>(T? Min = null, T? Max = null)
     where T : struct, IComparable<T>
 {
     public bool HasBounds => Min.HasValue || Max.HasValue;
