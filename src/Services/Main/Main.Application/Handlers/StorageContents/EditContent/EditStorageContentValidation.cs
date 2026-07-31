@@ -1,3 +1,4 @@
+using Application.Common.Services;
 using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Application.Handlers.BaseValidators;
@@ -6,7 +7,7 @@ namespace Main.Application.Handlers.StorageContents.EditContent;
 
 public class EditStorageContentValidation : AbstractValidator<EditStorageContentCommand>
 {
-    public EditStorageContentValidation()
+    public EditStorageContentValidation(IOperationDatePolicy datePolicy)
     {
         RuleFor(x => x.EditedFields)
             .NotEmpty()
@@ -28,10 +29,9 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
                     .When(x => x.Model.Count.IsSet)
                     .WithLocalizationKey("storage.content.count.min.zero");
 
-                z.RuleFor(x => x.Model.PurchaseDatetime.Value.ToUniversalTime())
-                    .InclusiveBetween(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddMinutes(10))
-                    .When(x => x.Model.PurchaseDatetime.IsSet)
-                    .WithLocalizationKey("storage.content.purchase.date.range");
+                z.RuleFor(x => x.Model.PurchaseDatetime.Value)
+                    .SetValidator(new RecordDateValidator(datePolicy))
+                    .When(x => x.Model.PurchaseDatetime.IsSet);
             });
     }
 }

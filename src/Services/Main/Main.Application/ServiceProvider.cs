@@ -70,6 +70,7 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
         
+        collection.AddSingleton(TimeProvider.System);
         collection.AddScoped<IOperationDatePolicy, OperationDatePolicy>();
 
         collection.AddApplicationBase(

@@ -1,12 +1,14 @@
+using Application.Common.Services;
 using FluentValidation;
 using Localization.Domain.Extensions;
+using Main.Application.Handlers.BaseValidators;
 using Main.Application.Handlers.Purchases.BaseValidators;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
 {
-    public CreatePurchaseValidation()
+    public CreatePurchaseValidation(IOperationDatePolicy datePolicy)
     {
         RuleFor(x => x.PurchaseContent)
             .NotEmpty()
@@ -24,7 +26,7 @@ public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
             .SetValidator(new NewPurchaseContentValidation());
 
         RuleFor(x => x.PurchaseDate)
-            .SetValidator(new PurchaseDateTimeValidator());
+            .SetValidator(new RecordDateValidator(datePolicy));
 
         RuleFor(x => x.StorageFrom)
             .Must(x => x != null)

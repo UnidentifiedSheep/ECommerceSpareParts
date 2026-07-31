@@ -12,8 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.Balance.GetTransactions;
 
 public record GetTransactionsQuery(
-    DateTime RangeStart,
-    DateTime RangeEnd,
+    RangeModel<DateTime> DateRange,
     int? CurrencyId,
     Guid? SenderId,
     Guid? ReceiverId,
@@ -55,17 +54,21 @@ public class GetTransactionsHandler(
                 request.ReceiverId)
         };
 
-        var fixedStart = request.RangeStart.Date;
-        var fixedEnd = request.RangeEnd.Date.AddDays(1);
-        query = query.Where(x => x.TransactionDatetime >= fixedStart &&
-                                 x.TransactionDatetime <= fixedEnd);
+        if (request.DateRange.Min.HasValue)
+            query = query.Where(x => x.TransactionDatetime >= request.DateRange.Min.Value);
 
-        if (request.SkipReversed) query = query.Where(x => !ReversedStatuses.Contains(x.Status));
+        if (request.DateRange.Max.HasValue)
+            query = query.Where(x => x.TransactionDatetime <= request.DateRange.Max.Value);
+
+        if (request.SkipReversed) 
+            query = query.Where(x => !ReversedStatuses.Contains(x.Status));
+
+        if (cursor.CursorValue != (Guid.Empty, DateTime.MinValue))
+            query = query.Where(x =>
+                x.TransactionDatetime < cursor.CursorValue.dt ||
+                x.TransactionDatetime == cursor.CursorValue.dt && x.Id < cursor.CursorValue.id);
 
         var res = await query
-            .Where(x =>
-                x.TransactionDatetime > cursor.CursorValue.dt ||
-                x.TransactionDatetime == cursor.CursorValue.dt && x.Id > cursor.CursorValue.id)
             .OrderByDescending(x => x.TransactionDatetime)
             .ThenByDescending(x => x.Id)
             .Take(cursor.Size)

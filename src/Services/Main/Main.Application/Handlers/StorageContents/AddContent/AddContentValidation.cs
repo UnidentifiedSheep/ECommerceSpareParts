@@ -1,3 +1,4 @@
+using Application.Common.Services;
 using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Application.Handlers.BaseValidators;
@@ -6,7 +7,7 @@ namespace Main.Application.Handlers.StorageContents.AddContent;
 
 public class AddContentValidation : AbstractValidator<AddContentCommand>
 {
-    public AddContentValidation()
+    public AddContentValidation(IOperationDatePolicy datePolicy)
     {
         RuleForEach(x => x.StorageContent)
             .ChildRules(content =>
@@ -17,9 +18,8 @@ public class AddContentValidation : AbstractValidator<AddContentCommand>
                 content.RuleFor(x => x.Count)
                     .SetValidator(new CountValidator());
 
-                content.RuleFor(x => x.PurchaseDate.ToUniversalTime())
-                    .InclusiveBetween(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddMinutes(10))
-                    .WithLocalizationKey("storage.content.purchase.date.range");
+                content.RuleFor(x => x.PurchaseDate)
+                    .SetValidator(new RecordDateValidator(datePolicy));
             });
 
         RuleFor(x => x.StorageContent)

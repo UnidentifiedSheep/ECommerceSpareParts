@@ -156,8 +156,7 @@ public class GetTransactionsTests : IntegrationTest
         bool skipReversed = false)
     {
         return new GetTransactionsQuery(
-            rangeStart ?? DateTime.UtcNow.AddDays(-10),
-            rangeEnd ?? DateTime.UtcNow.AddDays(1),
+            new RangeModel<DateTime>(rangeStart, rangeEnd),
             currencyId,
             senderId,
             receiverId,

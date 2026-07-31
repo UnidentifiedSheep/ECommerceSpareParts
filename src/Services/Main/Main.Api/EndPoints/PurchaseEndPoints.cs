@@ -81,10 +81,10 @@ public record GetPurchasesResponse(IEnumerable<PurchaseDto> Purchases);
 public record GetPurchasesRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "rangeStartDate")]
-    public DateTime RangeStartDate { get; init; }
+    public DateTime? RangeStartDate { get; init; }
 
     [FromQuery(Name = "rangeEndDate")]
-    public DateTime RangeEndDate { get; init; }
+    public DateTime? RangeEndDate { get; init; }
 
     [FromQuery(Name = "supplierOrganizationIds")]
     public Guid[] SupplierOrganizationIds { get; init; } = [];

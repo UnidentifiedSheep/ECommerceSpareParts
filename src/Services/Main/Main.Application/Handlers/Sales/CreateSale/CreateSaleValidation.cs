@@ -1,15 +1,17 @@
+using Application.Common.Services;
 using FluentValidation;
 using Localization.Domain.Extensions;
+using Main.Application.Handlers.BaseValidators;
 using Main.Application.Handlers.Sales.BaseValidators;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
 public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
 {
-    public CreateSaleValidation()
+    public CreateSaleValidation(IOperationDatePolicy datePolicy)
     {
         RuleFor(x => x.SaleDateTime)
-            .SetValidator(new SaleDateTimeValidator());
+            .SetValidator(new RecordDateValidator(datePolicy));
 
         RuleFor(x => x.Contents)
             .SetValidator(new NewSaleContentValidator());
