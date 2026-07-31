@@ -25,8 +25,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Core\Abstractions\Abstractions.csproj"/>
         <ProjectReference Include="..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\Core\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\..\Core\Enums\Enums.csproj"/>
         <ProjectReference Include="..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\..\Core\Extensions\Extensions.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>

@@ -61,6 +61,7 @@ public class RolePermissionSeed : ISeed<DContext>
         {
             [Role.Admin] =
             [
+                PermissionCodes.CREATE_HISTORICAL_RECORDS,
                 PermissionCodes.STORAGES_CONTENT_GET_ALL,
                 PermissionCodes.STORAGES_GET,
                 PermissionCodes.USERS_PERMISSIONS_CREATE,
@@ -261,6 +262,7 @@ public class RolePermissionSeed : ISeed<DContext>
 
             [Role.System] =
             [
+                PermissionCodes.CREATE_HISTORICAL_RECORDS,
                 PermissionCodes.STORAGES_CONTENT_GET_ALL,
                 PermissionCodes.STORAGES_GET,
                 PermissionCodes.USERS_PERMISSIONS_CREATE,

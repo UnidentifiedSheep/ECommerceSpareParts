@@ -1,6 +1,8 @@
 {
   "locale": "tr",
   "keyValues": {
+    "permissions.create.historical.records.name": "Geçmiş tarihli kayıt oluşturma",
+    "permissions.create.historical.records.description": "Geçmiş tarihli kayıt oluşturma izni.",
     "permissions.articles.create.name": "Parça oluşturma",
     "permissions.articles.create.description": "Parça oluşturma izni.",
     "permissions.articles.edit.name": "Parça düzenleme",

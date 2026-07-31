@@ -4,6 +4,9 @@ namespace Enums;
 
 public enum PermissionCodes
 {
+    // ===== HISTORY =====
+    CREATE_HISTORICAL_RECORDS,
+    
     // ===== ARTICLES =====
     ARTICLES_CREATE,
     ARTICLES_EDIT,

@@ -1,6 +1,8 @@
 ﻿{
   "locale": "en",
   "keyValues": {
+    "permissions.create.historical.records.name": "Create historical records",
+    "permissions.create.historical.records.description": "Permission to create historical records.",
     "permissions.articles.create.name": "Create article",
     "permissions.articles.create.description": "Permission to create articles.",
     "permissions.articles.edit.name": "Edit article",
