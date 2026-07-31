@@ -1,6 +1,8 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
+    "permissions.create.historical.records.name": "Создание исторических записей",
+    "permissions.create.historical.records.description": "Право на создание исторических записей.",
     "permissions.articles.create.name": "Создание артикула",
     "permissions.articles.create.description": "Право на создание артикула.",
     "permissions.articles.edit.name": "Редактирование артикула",

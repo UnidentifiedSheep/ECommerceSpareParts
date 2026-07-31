@@ -3,6 +3,7 @@ using Abstractions.Interfaces.Validators;
 using Application.Common;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Services;
 using Application.Common.Services.Currency;
 using Application.Common.Validators;
 using Main.Application.Configs;
@@ -68,6 +69,9 @@ public static class ServiceProvider
         collection.AddScoped<IProducerLookupService, ProducerLookupService>();
         collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
+        
+        collection.AddSingleton(TimeProvider.System);
+        collection.AddScoped<IOperationDatePolicy, OperationDatePolicy>();
 
         collection.AddApplicationBase(
             ServicesDefinitions.Main,

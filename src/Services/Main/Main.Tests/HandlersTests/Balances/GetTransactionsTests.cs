@@ -64,6 +64,64 @@ public class GetTransactionsTests : IntegrationTest
     }
 
     [Fact]
+    public async Task GetTransactions_WithCursor_ReturnsTransactionsByDateDescendingWithoutDuplicates()
+    {
+        var baseDate = DateTime.UtcNow.Date.AddHours(12);
+        var transactions = await AddTransactions(
+            baseDate.AddHours(-2),
+            baseDate.AddHours(-1),
+            baseDate);
+        var senderId = transactions[0].SenderId;
+        var rangeStart = baseDate.AddHours(-3);
+        var rangeEnd = baseDate.AddHours(1);
+
+        var firstPage = await Mediator.Send(
+            GetQuery(
+                senderId,
+                size: 2,
+                rangeStart: rangeStart,
+                rangeEnd: rangeEnd));
+
+        firstPage.Transactions.Select(x => x.Id)
+            .Should().Equal(transactions[2].Id, transactions[1].Id);
+
+        var cursor = firstPage.Transactions[^1];
+        var secondPage = await Mediator.Send(
+            GetQuery(
+                senderId,
+                size: 2,
+                rangeStart: rangeStart,
+                rangeEnd: rangeEnd,
+                cursorId: cursor.Id,
+                cursorDate: cursor.TransactionDate));
+
+        secondPage.Transactions.Should().ContainSingle()
+            .Which.Id.Should().Be(transactions[0].Id);
+        secondPage.Transactions.Select(x => x.Id)
+            .Should().NotIntersectWith(firstPage.Transactions.Select(x => x.Id));
+    }
+
+    [Fact]
+    public async Task GetTransactions_AtRangeEnd_IncludesBoundaryAndExcludesLaterTransaction()
+    {
+        var boundary = DateTime.UtcNow.Date;
+        var transactions = await AddTransactions(
+            boundary.AddMilliseconds(-1),
+            boundary,
+            boundary.AddMilliseconds(1));
+
+        var result = await Mediator.Send(
+            GetQuery(
+                transactions[0].SenderId,
+                rangeStart: boundary.AddHours(-1),
+                rangeEnd: boundary));
+
+        result.Transactions.Select(x => x.Id)
+            .Should().Equal(transactions[1].Id, transactions[0].Id);
+        result.Transactions.Should().NotContain(x => x.Id == transactions[2].Id);
+    }
+
+    [Fact]
     public async Task GetTransactions_WithOr_ReturnsTransactionsWhereUserIsSenderOrReceiver()
     {
         var userId = TestContext.Users[0].Id;
@@ -153,17 +211,41 @@ public class GetTransactionsTests : IntegrationTest
         DateTime? rangeStart = null,
         DateTime? rangeEnd = null,
         LogicalOperation logicalOperation = LogicalOperation.And,
-        bool skipReversed = false)
+        bool skipReversed = false,
+        Guid? cursorId = null,
+        DateTime? cursorDate = null)
     {
         return new GetTransactionsQuery(
-            rangeStart ?? DateTime.UtcNow.AddDays(-10),
-            rangeEnd ?? DateTime.UtcNow.AddDays(1),
+            new RangeModel<DateTime>(rangeStart, rangeEnd),
             currencyId,
             senderId,
             receiverId,
             logicalOperation,
-            new Cursor<(Guid id, DateTime dt)>((Guid.Empty, DateTime.MinValue), size),
+            new Cursor<(Guid id, DateTime dt)>(
+                (cursorId ?? Guid.Empty, cursorDate ?? DateTime.MinValue),
+                size),
             skipReversed);
+    }
+
+    private async Task<IReadOnlyList<Transaction>> AddTransactions(params DateTime[] dates)
+    {
+        var sender = TestContext.Users[0];
+        var receiver = TestContext.Users[1];
+        var currency = TestContext.Currencies[0];
+        var transactions = dates
+            .Select(date => Transaction.Create(
+                sender.Id,
+                receiver.Id,
+                currency.Id,
+                TransactionType.Transfer,
+                100m,
+                date,
+                TransactionSourceType.Manual))
+            .ToList();
+
+        await Context.AddRangeAsync(transactions);
+        await Context.SaveChangesAsync();
+        return transactions;
     }
 
     private async Task<Transaction> ReverseSeedTransaction()
@@ -214,8 +296,7 @@ public class GetTransactionsTests : IntegrationTest
             receiverProfile,
             0m,
             100m,
-            100m,
-            false);
+            100m);
 
         await Context.AddAsync(transaction);
         await Context.SaveChangesAsync();

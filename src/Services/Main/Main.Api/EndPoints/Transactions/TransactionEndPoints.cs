@@ -37,9 +37,9 @@ public record GetTransactionsResponse(IReadOnlyList<TransactionDto> Transactions
 
 public record GetTransactionsRequest(
     [FromQuery(Name = "rangeStart")]
-    DateTime RangeStart,
+    DateTime? RangeStart,
     [FromQuery(Name = "rangeEnd")]
-    DateTime RangeEnd,
+    DateTime? RangeEnd,
     [FromQuery(Name = "currencyId")]
     int? CurrencyId,
     [FromQuery(Name = "senderId")]
@@ -122,8 +122,7 @@ public static class TransactionEndPoints
                     CancellationToken token) =>
                 {
                     var query = new GetTransactionsQuery(
-                        request.RangeStart,
-                        request.RangeEnd,
+                        new RangeModel<DateTime>(request.RangeStart, request.RangeEnd),
                         request.CurrencyId,
                         request.SenderId,
                         request.ReceiverId,

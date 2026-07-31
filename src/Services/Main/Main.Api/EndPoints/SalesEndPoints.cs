@@ -59,10 +59,10 @@ public record CreateSaleResponse
 public record GetSalesRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "rangeStartDate")]
-    public DateTime RangeStartDate { get; init; }
+    public DateTime? RangeStartDate { get; init; }
 
     [FromQuery(Name = "rangeEndDate")]
-    public DateTime RangeEndDate { get; init; }
+    public DateTime? RangeEndDate { get; init; }
 
     [FromQuery(Name = "buyerIds")]
     public Guid[] BuyerIds { get; init; } = [];
