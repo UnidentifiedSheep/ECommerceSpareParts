@@ -33,5 +33,4 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       registry_kind: ${{ needs.publish-images.outputs.registry_kind }}
-      backup_registry_available: ${{ needs.publish-images.outputs.backup_registry_available == 'true' }}
     secrets: inherit
