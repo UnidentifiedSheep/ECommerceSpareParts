@@ -11,18 +11,20 @@ namespace Application.Common.Handlers.JobSchedules;
 [Diagnostics]
 [Transactional]
 [AutoSave]
-public record QueueScheduledJobsCommand(int BatchSize) : ICommand;
+public record QueueScheduledJobsCommand(int BatchSize) : ICommand<QueueScheduledJobsResult>;
+
+public record QueueScheduledJobsResult(int Queued);
 
 public class QueueScheduledJobsHandler(
     IRepository<JobSchedule, Guid> repository,
     ISender sender
-) : ICommandHandler<QueueScheduledJobsCommand>
+) : ICommandHandler<QueueScheduledJobsCommand, QueueScheduledJobsResult>
 {
-    public async Task<Unit> Handle(
+    public async Task<QueueScheduledJobsResult> Handle(
         QueueScheduledJobsCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.BatchSize <= 0) return Unit.Value;
+        if (request.BatchSize <= 0) return new QueueScheduledJobsResult(0);
 
         var uncorrectedTime = DateTime.UtcNow;
 
@@ -36,7 +38,7 @@ public class QueueScheduledJobsHandler(
             .Build();
 
         var schedules = await repository.ListAsync(criteria, cancellationToken);
-        if (schedules.Count == 0) return Unit.Value;
+        if (schedules.Count == 0) return new QueueScheduledJobsResult(0);
 
         var jobs = (await sender.Send(
             new QueueJobCommand(
@@ -67,6 +69,6 @@ public class QueueScheduledJobsHandler(
                 uncorrectedTime);
         }
 
-        return Unit.Value;
+        return new QueueScheduledJobsResult(schedules.Count);
     }
 }

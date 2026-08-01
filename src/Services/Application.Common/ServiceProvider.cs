@@ -134,7 +134,7 @@ public static class ServiceProvider
             UpdateScheduleHandler>();
 
         services.AddScoped<
-            IRequestHandler<QueueScheduledJobsCommand, Unit>,
+            IRequestHandler<QueueScheduledJobsCommand, QueueScheduledJobsResult>,
             QueueScheduledJobsHandler>();
         
         services.AddScoped<
