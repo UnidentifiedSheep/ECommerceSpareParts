@@ -9,6 +9,9 @@ public interface ILrtQuotaManager
     int MaxQuota { get; }
     
     ILrtQuota UseQuota(Guid holderId);
+    ValueTask<ILrtQuota> UseQuotaAsync(
+        Guid holderId,
+        CancellationToken cancellationToken = default);
     bool TryUseQuota(
         Guid holderId, 
         [NotNullWhen(true)]

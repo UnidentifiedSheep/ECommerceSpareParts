@@ -1,21 +1,25 @@
 using System.Diagnostics.CodeAnalysis;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Models;
 using Application.Common.Models.Options;
 using Microsoft.Extensions.Options;
 
 namespace Application.Common.LRT;
 
-public sealed class LrtQuotaManager(
-    IOptionsMonitor<LrtExecutorOptions> options
-) : ILrtQuotaManager, IDisposable
+public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 {
     private readonly Lock _sync = new();
     private readonly HashSet<Guid> _holders = [];
+    private readonly SemaphoreSlim _semaphore;
 
     private bool _disposed;
 
-    public int MaxQuota => Math.Max(0, options.CurrentValue.MaxParallelPerWorker);
+    public LrtQuotaManager(IOptions<LrtExecutorOptions> options)
+    {
+        MaxQuota = Math.Max(0, options.Value.MaxParallelPerWorker);
+        _semaphore = new SemaphoreSlim(MaxQuota, Math.Max(1, MaxQuota));
+    }
+
+    public int MaxQuota { get; }
 
     public int AvailableQuota
     {
@@ -24,59 +28,90 @@ public sealed class LrtQuotaManager(
             lock (_sync)
             {
                 ThrowIfDisposed();
-                return Math.Max(0, MaxQuota - _holders.Count);
+                return _semaphore.CurrentCount;
             }
         }
     }
-    public bool IsQuotaAvailable => AvailableQuota > 0;
 
+    public bool IsQuotaAvailable => AvailableQuota > 0;
 
     public ILrtQuota UseQuota(Guid holderId)
     {
+        return TryUseQuota(holderId, out var quota)
+            ? quota
+            : throw new InvalidOperationException("No available quota.");
+    }
+
+    public async ValueTask<ILrtQuota> UseQuotaAsync(
+        Guid holderId,
+        CancellationToken cancellationToken = default)
+    {
+        ValidateHolderBeforeWait(holderId);
+        await _semaphore.WaitAsync(cancellationToken);
+
         lock (_sync)
         {
-            ThrowIfDisposed();
+            try
+            {
+                ThrowIfDisposed();
+                AddHolder(holderId);
+                return new LrtQuota(this, holderId);
+            }
+            catch
+            {
+                if (!_disposed)
+                    _semaphore.Release();
 
-            if (holderId == Guid.Empty)
-                throw new ArgumentException("Holder id cannot be empty.", nameof(holderId));
-
-            if (_holders.Contains(holderId))
-                throw new InvalidOperationException($"Quota is already acquired by holder '{holderId}'.");
-
-            if (_holders.Count >= MaxQuota)
-                throw new InvalidOperationException("No available quota.");
-
-            _holders.Add(holderId);
-
-            return new LrtQuota(this, holderId);
+                throw;
+            }
         }
     }
-    
+
     public bool TryUseQuota(
-        Guid holderId, 
-        [NotNullWhen(true)] 
+        Guid holderId,
+        [NotNullWhen(true)]
         out ILrtQuota? quota)
     {
         lock (_sync)
         {
             ThrowIfDisposed();
+            ValidateHolder(holderId);
 
             quota = null;
 
-            if (holderId == Guid.Empty)
-                throw new ArgumentException("Holder id cannot be empty.", nameof(holderId));
-
-            if (_holders.Contains(holderId))
-                throw new InvalidOperationException(
-                    $"Quota is already acquired for holder '{holderId}'.");
-
-            if (_holders.Count >= MaxQuota)
+            if (!_semaphore.Wait(0))
                 return false;
 
-            _holders.Add(holderId);
+            AddHolder(holderId);
             quota = new LrtQuota(this, holderId);
             return true;
         }
+    }
+
+    private void ValidateHolderBeforeWait(Guid holderId)
+    {
+        lock (_sync)
+        {
+            ThrowIfDisposed();
+            ValidateHolder(holderId);
+        }
+    }
+
+    private void ValidateHolder(Guid holderId)
+    {
+        if (holderId == Guid.Empty)
+            throw new ArgumentException("Holder id cannot be empty.", nameof(holderId));
+
+        if (_holders.Contains(holderId))
+            throw new InvalidOperationException(
+                $"Quota is already acquired for holder '{holderId}'.");
+    }
+
+    private void AddHolder(Guid holderId)
+    {
+        if (!_holders.Add(holderId))
+            throw new InvalidOperationException(
+                $"Quota is already acquired for holder '{holderId}'.");
     }
 
     private void ReleaseQuota(Guid holderId)
@@ -86,7 +121,8 @@ public sealed class LrtQuotaManager(
             if (_disposed)
                 return;
 
-            _holders.Remove(holderId);
+            if (_holders.Remove(holderId))
+                _semaphore.Release();
         }
     }
 
@@ -99,8 +135,12 @@ public sealed class LrtQuotaManager(
     {
         lock (_sync)
         {
+            if (_disposed)
+                return;
+
             _disposed = true;
             _holders.Clear();
+            _semaphore.Dispose();
         }
     }
 
