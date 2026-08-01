@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Sales.GetSales;
 public record GetSalesQuery(
     RangeModel<DateTime> DateRange,
     Pagination Pagination,
-    IEnumerable<Guid> BuyerIds,
+    IEnumerable<Guid> OrganizationIds,
     IEnumerable<int> CurrencyIds,
     IEnumerable<int> ProductIds,
     IEnumerable<SaleState> States,
@@ -42,7 +42,7 @@ public class GetSalesHandler(
 
         if (request.CurrencyIds.Any()) query = query.Where(x => request.CurrencyIds.Contains(x.CurrencyId));
 
-        if (request.BuyerIds.Any()) query = query.Where(x => request.BuyerIds.Contains(x.UserId));
+        if (request.OrganizationIds.Any()) query = query.Where(x => request.OrganizationIds.Contains(x.OrganizationId));
 
         if (request.ProductIds.Any())
             query = query.Where(x => x.Contents.Any(z => request.ProductIds.Contains(z.ProductId)));
