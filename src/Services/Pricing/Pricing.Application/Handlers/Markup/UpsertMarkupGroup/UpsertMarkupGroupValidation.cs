@@ -54,8 +54,8 @@ public class UpsertMarkupRangeDtoValidation : AbstractValidator<UpsertMarkupRang
             .WithLocalizationKey("markup.range.end.must.not.be.negative");
 
         RuleFor(x => x.RangeEnd)
-            .GreaterThan(x => x.RangeStart)
-            .WithLocalizationKey("markup.range.end.must.be.greater.than.start");
+            .GreaterThanOrEqualTo(x => x.RangeStart)
+            .WithLocalizationKey("markup.range.end.must.not.be.less.than.start");
 
         RuleFor(x => x.Markup)
             .GreaterThanOrEqualTo(0)

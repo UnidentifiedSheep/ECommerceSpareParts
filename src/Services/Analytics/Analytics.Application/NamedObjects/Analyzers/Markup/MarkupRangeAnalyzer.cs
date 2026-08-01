@@ -10,6 +10,7 @@ public class MarkupRangeAnalyzer(
 {
     private const int BatchSize = 1000;
     private const int DecimalScale = 10;
+    private const int MinBucketSampleSize = 20;
     private const double MaxStdDev = 0.08;
     private const decimal MaxCostRatio = 1.5m;
     private const decimal MinAllowedMarkup = 0.01m;
@@ -142,11 +143,15 @@ public class MarkupRangeAnalyzer(
         MarkupBucketBuilder currentBucket,
         MarkupBucketBuilder testBucket)
     {
+        if (row.AvgBuyPriceBase == currentBucket.ToCost)
+            return false;
+
         var costRatioExceeded =
             currentBucket.FromCost > 0 &&
             row.AvgBuyPriceBase / currentBucket.FromCost > MaxCostRatio;
 
         var stdDevExceeded =
+            currentBucket.Count >= MinBucketSampleSize &&
             testBucket is { Count: > 1, StdDev: > MaxStdDev };
 
         return stdDevExceeded || costRatioExceeded;

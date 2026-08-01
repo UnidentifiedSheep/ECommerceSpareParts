@@ -10,7 +10,7 @@
     "markup.group.ranges.required": "Группа наценок должна содержать хотя бы один диапазон.",
     "markup.range.start.must.not.be.negative": "Начало диапазона наценки не должно быть отрицательным.",
     "markup.range.end.must.not.be.negative": "Конец диапазона наценки не должен быть отрицательным.",
-    "markup.range.end.must.be.greater.than.start": "Конец диапазона наценки должен быть больше его начала.",
+    "markup.range.end.must.not.be.less.than.start": "Конец диапазона наценки не должен быть меньше его начала.",
     "markup.range.markup.must.not.be.negative": "Значение наценки не должно быть отрицательным."
   }
 }

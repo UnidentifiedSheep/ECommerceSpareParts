@@ -10,7 +10,7 @@
     "markup.group.ranges.required": "Markup group must contain at least one range.",
     "markup.range.start.must.not.be.negative": "Markup range start must not be negative.",
     "markup.range.end.must.not.be.negative": "Markup range end must not be negative.",
-    "markup.range.end.must.be.greater.than.start": "Markup range end must be greater than range start.",
+    "markup.range.end.must.not.be.less.than.start": "Markup range end must not be less than range start.",
     "markup.range.markup.must.not.be.negative": "Markup value must not be negative."
   }
 }

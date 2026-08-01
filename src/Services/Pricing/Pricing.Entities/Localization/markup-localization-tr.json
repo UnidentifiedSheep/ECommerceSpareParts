@@ -10,7 +10,7 @@
     "markup.group.ranges.required": "Kâr marjı grubu en az bir aralık içermelidir.",
     "markup.range.start.must.not.be.negative": "Kâr marjı aralığı başlangıcı negatif olmamalıdır.",
     "markup.range.end.must.not.be.negative": "Kâr marjı aralığı sonu negatif olmamalıdır.",
-    "markup.range.end.must.be.greater.than.start": "Kâr marjı aralığı sonu başlangıcından büyük olmalıdır.",
+    "markup.range.end.must.not.be.less.than.start": "Kâr marjı aralığı sonu başlangıcından küçük olmamalıdır.",
     "markup.range.markup.must.not.be.negative": "Kâr marjı değeri negatif olmamalıdır."
   }
 }
