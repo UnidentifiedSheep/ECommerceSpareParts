@@ -22,48 +22,51 @@ public class LrtExecutorHostedService(
         while (!stoppingToken.IsCancellationRequested)
         {
             var currentValue = options.CurrentValue;
-            await Iteration(currentValue, stoppingToken);
+            var jobStarted = await Iteration(stoppingToken);
+
+            if (!jobStarted)
+                await Task.Delay(currentValue.Delay, stoppingToken);
         }
     }
 
-    private async Task Iteration(
-        LrtExecutorOptions opt,
-        CancellationToken ct)
+    private async Task<bool> Iteration(CancellationToken ct)
     {
         try
         {
             await using var scope = scopeFactory.CreateAsyncScope();
             var leaseService = scope.ServiceProvider.GetRequiredService<IJobLeaseService>();
 
-            while (lrtQuotaManager.TryUseQuota(Guid.NewGuid(), out var quota))
+            var quota = await lrtQuotaManager.UseQuotaAsync(Guid.NewGuid(), ct);
+            Job? job;
+
+            try
             {
-                Job? job;
-
-                try
-                {
-                    job = await leaseService.TryAcquireJobAsync(
-                        quota.HolderId,
-                        InitialLeaseDuration,
-                        ct);
-                }
-                catch
-                {
-                    quota.Dispose();
-                    throw;
-                }
-
-                if (job == null)
-                {
-                    quota.Dispose();
-                    break;
-                }
-                
-                _ = RunJobAndReleaseQuota(job.Id, job.SystemName, quota, ct);
+                job = await leaseService.TryAcquireJobAsync(
+                    quota.HolderId,
+                    InitialLeaseDuration,
+                    ct);
             }
+            catch
+            {
+                quota.Dispose();
+                throw;
+            }
+
+            if (job == null)
+            {
+                quota.Dispose();
+                return false;
+            }
+
+            _ = RunJobAndReleaseQuota(job.Id, job.SystemName, quota, ct);
+            return true;
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-        catch (Exception ex) { logger.LogError(ex, "Job execution failed."); }
-        finally { await Task.Delay(opt.Delay, ct); }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Job execution failed.");
+            return false;
+        }
     }
 
     private async Task RunJobAndReleaseQuota(

@@ -64,8 +64,8 @@ public record GetSalesRequest : SortablePaginationQueryModel
     [FromQuery(Name = "rangeEndDate")]
     public DateTime? RangeEndDate { get; init; }
 
-    [FromQuery(Name = "buyerIds")]
-    public Guid[] BuyerIds { get; init; } = [];
+    [FromQuery(Name = "organizationIds")]
+    public Guid[] OrganizationIds { get; init; } = [];
 
     [FromQuery(Name = "currencyIds")]
     public int[] CurrencyIds { get; init; } = [];
@@ -315,7 +315,7 @@ public class SalesEndPoints : ICarterModule
                         new GetSalesQuery(
                             new RangeModel<DateTime>(request.RangeStartDate, request.RangeEndDate),
                             request,
-                            request.BuyerIds,
+                            request.OrganizationIds,
                             request.CurrencyIds,
                             request.ProductIds,
                             request.States,

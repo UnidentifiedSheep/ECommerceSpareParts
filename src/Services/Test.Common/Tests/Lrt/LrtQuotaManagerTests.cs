@@ -5,7 +5,6 @@ using Application.Common.Models;
 using Application.Common.Models.Options;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
-using Moq;
 
 namespace Tests.Tests.Lrt;
 
@@ -135,6 +134,36 @@ public class LrtQuotaManagerTests
     }
 
     [Fact]
+    public async Task UseQuotaAsync_WhenNoQuotaAvailable_WaitsUntilReleased()
+    {
+        var manager = CreateManager(1);
+        var acquiredQuota = manager.UseQuota(Guid.NewGuid());
+        var waitingHolderId = Guid.NewGuid();
+
+        var waitingTask = manager.UseQuotaAsync(waitingHolderId).AsTask();
+
+        waitingTask.IsCompleted.Should().BeFalse();
+        acquiredQuota.Dispose();
+
+        using var quota = await waitingTask.WaitAsync(TimeSpan.FromSeconds(1));
+        quota.HolderId.Should().Be(waitingHolderId);
+    }
+
+    [Fact]
+    public async Task UseQuotaAsync_WhenCancelled_Throws()
+    {
+        var manager = CreateManager(1);
+        using var quota = manager.UseQuota(Guid.NewGuid());
+        using var cts = new CancellationTokenSource();
+
+        var waitingTask = manager.UseQuotaAsync(Guid.NewGuid(), cts.Token).AsTask();
+        cts.Cancel();
+
+        var act = async () => await waitingTask;
+        await act.Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    [Fact]
     public void QuotaDispose_ReleasesQuota()
     {
         var manager = CreateManager(1);
@@ -174,7 +203,7 @@ public class LrtQuotaManagerTests
     }
 
     [Fact]
-    public void AvailableQuota_WhenOptionsDecreaseBelowUsedQuota_ReturnsZero()
+    public void MaxQuota_WhenOptionsDecrease_RemainsUnchanged()
     {
         var maxParallelPerWorker = 2;
         var manager = CreateManager(() => maxParallelPerWorker);
@@ -183,13 +212,13 @@ public class LrtQuotaManagerTests
 
         maxParallelPerWorker = 1;
 
-        manager.MaxQuota.Should().Be(1);
+        manager.MaxQuota.Should().Be(2);
         manager.AvailableQuota.Should().Be(0);
         manager.IsQuotaAvailable.Should().BeFalse();
     }
 
     [Fact]
-    public void AvailableQuota_WhenOptionsIncrease_ReturnsAdditionalQuota()
+    public void MaxQuota_WhenOptionsIncrease_RemainsUnchanged()
     {
         var maxParallelPerWorker = 1;
         var manager = CreateManager(() => maxParallelPerWorker);
@@ -197,9 +226,9 @@ public class LrtQuotaManagerTests
 
         maxParallelPerWorker = 3;
 
-        manager.MaxQuota.Should().Be(3);
-        manager.AvailableQuota.Should().Be(2);
-        manager.IsQuotaAvailable.Should().BeTrue();
+        manager.MaxQuota.Should().Be(1);
+        manager.AvailableQuota.Should().Be(0);
+        manager.IsQuotaAvailable.Should().BeFalse();
     }
 
     [Fact]
@@ -355,14 +384,11 @@ public class LrtQuotaManagerTests
 
     private static LrtQuotaManager CreateManager(Func<int> maxParallelPerWorker)
     {
-        var options = new Mock<IOptionsMonitor<LrtExecutorOptions>>();
-        options
-            .SetupGet(x => x.CurrentValue)
-            .Returns(() => new LrtExecutorOptions
-            {
-                MaxParallelPerWorker = maxParallelPerWorker()
-            });
+        var options = Options.Create(new LrtExecutorOptions
+        {
+            MaxParallelPerWorker = maxParallelPerWorker()
+        });
 
-        return new LrtQuotaManager(options.Object);
+        return new LrtQuotaManager(options);
     }
 }

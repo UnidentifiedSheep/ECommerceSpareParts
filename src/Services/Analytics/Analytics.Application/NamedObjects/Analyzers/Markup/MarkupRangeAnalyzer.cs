@@ -9,6 +9,7 @@ public class MarkupRangeAnalyzer(
 ) : MarkupAnalyzerNamedObjectBase
 {
     private const int BatchSize = 1000;
+    private const int DecimalScale = 10;
     private const double MaxStdDev = 0.08;
     private const decimal MaxCostRatio = 1.5m;
     private const decimal MinAllowedMarkup = 0.01m;
@@ -83,10 +84,13 @@ public class MarkupRangeAnalyzer(
         return query.Select(x => new SaleContentMarkupRow
         {
             Id = x.Id,
-            SaleUnitPriceBase = x.PriceInBaseCurrency / (1 - x.Discount),
-            AvgBuyPriceBase =
+            SaleUnitPriceBase = Math.Round(
+                x.PriceInBaseCurrency / (1 - x.Discount),
+                DecimalScale),
+            AvgBuyPriceBase = Math.Round(
                 x.Details.Sum(d => d.BuyPriceInBaseCurrency * d.Count) /
-                x.Details.Sum(d => d.Count)
+                x.Details.Sum(d => d.Count),
+                DecimalScale)
         });
     }
 
