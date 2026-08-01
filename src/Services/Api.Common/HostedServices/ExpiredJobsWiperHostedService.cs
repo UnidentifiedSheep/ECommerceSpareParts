@@ -15,11 +15,14 @@ public class ExpiredJobsWiperHostedService(
         while (!stoppingToken.IsCancellationRequested)
         {
             var currentValue = options.CurrentValue;
-            await Iteration(currentValue, stoppingToken);
+            var batchIsFull = await Iteration(currentValue, stoppingToken);
+
+            if (!batchIsFull)
+                await Task.Delay(currentValue.Delay, stoppingToken);
         }
     }
 
-    private async Task Iteration(
+    private async Task<bool> Iteration(
         LrtExecutorOptions opt,
         CancellationToken ct)
     {
@@ -36,9 +39,14 @@ public class ExpiredJobsWiperHostedService(
                 logger.LogInformation(
                     "Jobs with expired leases are made 'Failed'. Count: {Count}",
                     jobs.Count);
+
+            return jobs.Count == opt.MaxExpiredLeaseFailBatchSize;
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-        catch (Exception ex) { logger.LogError(ex, "Expired job wipe failed."); }
-        finally { await Task.Delay(opt.Delay, ct); }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Expired job wipe failed.");
+            return false;
+        }
     }
 }

@@ -10,7 +10,7 @@ using Search.Enums;
 namespace Search.Application.Handlers.Products.SearchProductsBySku;
 
 public record SearchProductsBySkuQuery(
-    string Sku,
+    string? Sku,
     int? ProducerId,
     SkuSearchMode SearchMode,
     Pagination Pagination,

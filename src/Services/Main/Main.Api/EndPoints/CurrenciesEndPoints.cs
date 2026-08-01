@@ -24,6 +24,8 @@ public record GetCurrenciesResponse(IReadOnlyList<CurrencyDto> Currencies);
 
 public record GetCurrencyByIdResponse(CurrencyDto Currency);
 
+public record GetBaseCurrencyResponse(CurrencyDto Currency);
+
 public record GetCurrencyHistoryResponse(IReadOnlyList<CurrencyRateHistoryDto> History);
 
 public class CurrenciesEndPoints : ICarterModule
@@ -73,6 +75,27 @@ public class CurrenciesEndPoints : ICarterModule
             .WithDisplayName("Получение списка валют")
             .Produces<GetCurrenciesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
+
+        currencies.MapGet(
+                "/base",
+                async (
+                    ISender sender,
+                    CancellationToken cancellation) =>
+                {
+                    var result = await sender.Send(
+                        new GetBaseCurrencyQuery(),
+                        cancellation);
+
+                    return Results.Ok(
+                        new GetBaseCurrencyResponse(result.Currency));
+                })
+            .WithName("GetBaseCurrency")
+            .WithSummary("Получить базовую валюту")
+            .WithDescription("Получение базовой валюты системы")
+            .WithDisplayName("Получение базовой валюты")
+            .Produces<GetBaseCurrencyResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
 
         currencies.MapGet(

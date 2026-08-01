@@ -15,5 +15,6 @@ public class EmailWorkOptions
     [Required]
     public required TimeSpan Delay { get; set; }
 
+    [Range(1, int.MaxValue)]
     public required int ScheduleAtOnce { get; set; } = 100;
 }

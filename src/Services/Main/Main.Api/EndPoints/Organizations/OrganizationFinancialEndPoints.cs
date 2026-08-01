@@ -3,7 +3,6 @@ using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Balances;
-using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
 using Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 using MediatR;
@@ -14,9 +13,6 @@ public record GetOrganizationFinancialInfoResponse
 {
     [JsonPropertyName("financialProfile")]
     public required OrganizationFinancialProfileDto? FinancialProfile { get; init; }
-
-    [JsonPropertyName("baseCurrency")]
-    public required CurrencyDto BaseCurrency { get; init; }
 
     [JsonPropertyName("balances")]
     public required IEnumerable<OrganizationBalanceDto> Balances { get; init; }
@@ -56,7 +52,6 @@ public class OrganizationFinancialEndPoints : ICarterModule
                         new GetOrganizationFinancialInfoResponse
                         {
                             Balances = result.Balances,
-                            BaseCurrency = result.BaseCurrency,
                             FinancialProfile = result.FinancialProfile
                         });
                 })

@@ -8,6 +8,10 @@ public interface IBalanceService
         Guid organizationId,
         CancellationToken cancellationToken = default);
 
+    Task RecalculateApproximateBalancesAsync(
+        IReadOnlyCollection<Guid> organizationIds,
+        CancellationToken cancellationToken = default);
+
     Task ChangeSenderReceiverBalancesAsync(
         Transaction transaction,
         bool forceFinancialProfileDebit = false,

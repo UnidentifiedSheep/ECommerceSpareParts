@@ -22,7 +22,7 @@ public record GetUserOrganizationsRequest : SortablePaginationQueryModel
     public OrganizationType[] Types { get; init; } = [];
 }
 
-public record GetUserOrganizationsResponse(IReadOnlyList<OrganizationDto> Organizations);
+public record GetUserOrganizationsResponse(IReadOnlyList<OrganizationListItemDto> Organizations);
 public record CreateOrganizationRequest(string Name, string SystemName);
 public record CreateOrganizationResponse(OrganizationDto Organization);
 

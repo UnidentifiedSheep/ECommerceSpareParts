@@ -13,9 +13,11 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Application.Common.Projections;
+using Application.Common.Services;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
 namespace Application.Common;
@@ -93,6 +95,9 @@ public static class ServiceProvider
             .RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly)
             .RegisterProjectionProviders<JobDtoProjectionProvider>();
 
+        services.TryAddSingleton(TimeProvider.System);
+        services.TryAddScoped<IOperationDatePolicy, OperationDatePolicy>();
+
         services.AddScoped<IJobLeaseService, JobLeaseService>();
         services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();
         
@@ -129,7 +134,7 @@ public static class ServiceProvider
             UpdateScheduleHandler>();
 
         services.AddScoped<
-            IRequestHandler<QueueScheduledJobsCommand, Unit>,
+            IRequestHandler<QueueScheduledJobsCommand, QueueScheduledJobsResult>,
             QueueScheduledJobsHandler>();
         
         services.AddScoped<

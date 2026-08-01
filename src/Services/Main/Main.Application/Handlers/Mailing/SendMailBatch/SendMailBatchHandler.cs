@@ -5,7 +5,6 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Entities.Mailing;
 using Main.Enums;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Handlers.Mailing.SendMailBatch;
@@ -13,15 +12,17 @@ namespace Main.Application.Handlers.Mailing.SendMailBatch;
 [Diagnostics]
 [Transactional]
 [AutoSave]
-public record SendMailBatchCommand(int Batch = 100) : ICommand;
+public record SendMailBatchCommand(int Batch = 100) : ICommand<SendMailBatchResult>;
+
+public record SendMailBatchResult(int Sent);
 
 public class SendMailBatchHandler(
     IRepository<EmailOutBox, Guid> repository,
     ILogger<SendMailBatchCommand> logger,
     IEmailSender sender
-) : ICommandHandler<SendMailBatchCommand>
+) : ICommandHandler<SendMailBatchCommand, SendMailBatchResult>
 {
-    public async Task<Unit> Handle(
+    public async Task<SendMailBatchResult> Handle(
         SendMailBatchCommand request,
         CancellationToken cancellationToken)
     {
@@ -36,7 +37,7 @@ public class SendMailBatchHandler(
                 .Build(),
             cancellationToken);
 
-        if (batch.Count == 0) return Unit.Value;
+        if (batch.Count == 0) return new SendMailBatchResult(0);
 
         var messages = new List<EmailMessage>();
 
@@ -54,6 +55,6 @@ public class SendMailBatchHandler(
 
         await sender.SendBatchAsync(messages, cancellationToken);
 
-        return Unit.Value;
+        return new SendMailBatchResult(batch.Count);
     }
 }

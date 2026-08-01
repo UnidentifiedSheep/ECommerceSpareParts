@@ -23,7 +23,7 @@ public record GetOrganizationsRequest : SortablePaginationQueryModel
     public OrganizationType[] Types { get; init; } = [];
 }
 
-public record GetOrganizationsResponse(IReadOnlyList<OrganizationDto> Organizations);
+public record GetOrganizationsResponse(IReadOnlyList<OrganizationListItemDto> Organizations);
 public record IsOrganizationSystemNameAvailableResponse(bool IsAvailable);
 
 public class OrganizationEndPoints : ICarterModule

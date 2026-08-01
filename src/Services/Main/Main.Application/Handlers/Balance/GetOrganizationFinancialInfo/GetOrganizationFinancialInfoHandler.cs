@@ -2,16 +2,12 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Settings;
 using LinqKit;
 using Main.Application.Dtos.Balances;
-using Main.Application.Dtos.Currencies;
+using Main.Application.Interfaces.Services;
 using Main.Application.Projections;
 using Main.Entities.Balance;
-using Main.Entities.Currency;
 using Main.Entities.Organization;
-using Main.Entities.Settings;
-using Main.Application.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
@@ -22,16 +18,12 @@ public record GetOrganizationFinancialInfoQuery(Guid OrganizationId)
 public record GetOrganizationFinancialInfoResult
 {
     public required OrganizationFinancialProfileDto? FinancialProfile { get; init; }
-    public required CurrencyDto BaseCurrency { get; init; }
     public required IEnumerable<OrganizationBalanceDto> Balances { get; init; }
 }
 
 public class GetOrganizationFinancialInfoHandler(
-    ISettingsService settingsService,
     IReadRepository<Organization, Guid> readRepository,
-    IReadRepository<Currency, int> currencyReadRepository,
     IBalanceService balanceService,
-    IProjectionProvider<Currency, CurrencyDto> currencyProjection,
     IProjectionProvider<OrganizationBalance, OrganizationBalanceDto> balanceProjection
 ) : IQueryHandler<GetOrganizationFinancialInfoQuery, GetOrganizationFinancialInfoResult>
 {
@@ -39,14 +31,6 @@ public class GetOrganizationFinancialInfoHandler(
         GetOrganizationFinancialInfoQuery request,
         CancellationToken cancellationToken)
     {
-        var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
-            .Data.BaseCurrencyId;
-
-        var baseCurrency = await currencyReadRepository.Query
-            .Project(currencyProjection)
-            .FirstAsync(x => x.Id == baseCurrencyId, cancellationToken);
-        //we need to cache it.
-
         var organization = await readRepository.Query
             .Where(x => x.Id == request.OrganizationId)
             .Include(x => x.FinancialProfile)
@@ -65,8 +49,7 @@ public class GetOrganizationFinancialInfoHandler(
                     organization.FinancialProfile,
                     netPosition),
             Balances = organization.Balances.Select(
-                balanceProjection.Projection.AsFunc()),
-            BaseCurrency = baseCurrency
+                balanceProjection.Projection.AsFunc())
         };
     }
 }

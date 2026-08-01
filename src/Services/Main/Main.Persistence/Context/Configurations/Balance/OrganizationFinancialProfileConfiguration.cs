@@ -23,6 +23,9 @@ public class OrganizationFinancialProfileConfiguration : IEntityTypeConfiguratio
 
         builder.Property(e => e.MinAllowedBalance)
             .HasColumnName("min_allowed_balance");
+        
+        builder.Property(e => e.ApproximateBalance)
+            .HasColumnName("approximate_balance");
 
         builder.HasOne<Entities.Organization.Organization>()
             .WithOne(e => e.FinancialProfile)

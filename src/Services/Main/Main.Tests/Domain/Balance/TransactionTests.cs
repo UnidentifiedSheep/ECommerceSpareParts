@@ -122,6 +122,30 @@ public class TransactionTests
     }
 
     [Fact]
+    public void ApplyProfile_Completion_UpdatesApproximateBalancesInBaseCurrency()
+    {
+        var tx = Create();
+        var senderBalance = OrganizationBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = OrganizationBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = OrganizationFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = OrganizationFinancialProfile.Create(tx.ReceiverId);
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            10.123m,
+            20.456m,
+            5.111m,
+            true);
+
+        senderProfile.ApproximateBalance.Should().Be(15.23m);
+        receiverProfile.ApproximateBalance.Should().Be(15.35m);
+    }
+
+    [Fact]
     public void ApplyProfile_ReversalBelowLimit_IsAllowed()
     {
         var tx = Create();
@@ -145,11 +169,13 @@ public class TransactionTests
             tx,
             senderProfile,
             receiverProfile,
-            decimal.MinValue,
-            decimal.MinValue,
+            320m,
+            0m,
             120m);
 
         tx.IsReversalProfileApplied.Should().BeTrue();
+        senderProfile.ApproximateBalance.Should().Be(200m);
+        receiverProfile.ApproximateBalance.Should().Be(120m);
     }
 
     [Fact]
@@ -257,11 +283,12 @@ public class TransactionTests
             receiverProfile,
             0m,
             50m,
-            100m,
-            false);
+            100m);
 
         act.Should().Throw<InvalidInputException>();
         tx.IsCompletionProfileApplied.Should().BeFalse();
+        senderProfile.ApproximateBalance.Should().Be(0m);
+        receiverProfile.ApproximateBalance.Should().Be(0m);
     }
 
     [Fact]
@@ -305,8 +332,7 @@ public class TransactionTests
             receiverProfile,
             -1_000m,
             100m,
-            100m,
-            false);
+            100m);
 
         tx.IsCompletionProfileApplied.Should().BeTrue();
     }

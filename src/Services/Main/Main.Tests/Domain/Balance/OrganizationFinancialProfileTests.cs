@@ -61,6 +61,31 @@ public class OrganizationFinancialProfileTests
         profile.MinAllowedBalance.Should().Be(-10m);
     }
 
+    [Theory]
+    [InlineData(125.25)]
+    [InlineData(0)]
+    [InlineData(-125.25)]
+    public void SetApproximateBalance_ValidValue_UpdatesBalance(decimal balance)
+    {
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
+
+        profile.SetApproximateBalance(balance);
+
+        profile.ApproximateBalance.Should().Be(balance);
+    }
+
+    [Fact]
+    public void SetApproximateBalance_MoreThanTwoDecimals_ThrowsAndKeepsPreviousBalance()
+    {
+        var profile = OrganizationFinancialProfile.Create(Guid.NewGuid());
+        profile.SetApproximateBalance(10.25m);
+
+        var act = () => profile.SetApproximateBalance(10.251m);
+
+        act.Should().Throw<InvalidOperationException>();
+        profile.ApproximateBalance.Should().Be(10.25m);
+    }
+
     [Fact]
     public void Create_PositiveMinAllowedBalance_Throws()
     {

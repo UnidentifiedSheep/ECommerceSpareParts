@@ -15,11 +15,14 @@ public class EmailWorkHostedService(
         while (!stoppingToken.IsCancellationRequested)
         {
             var currentValue = options.CurrentValue.EmailWork;
-            await Iteration(currentValue, stoppingToken);
+            var batchIsFull = await Iteration(currentValue, stoppingToken);
+
+            if (!batchIsFull)
+                await Task.Delay(currentValue.Delay, stoppingToken);
         }
     }
 
-    private async Task Iteration(
+    private async Task<bool> Iteration(
         EmailWorkOptions opt,
         CancellationToken ct)
     {
@@ -28,13 +31,17 @@ public class EmailWorkHostedService(
             await using var scope = scopeFactory.CreateAsyncScope();
             var sender = scope.ServiceProvider.GetRequiredService<ISender>();
 
-            await sender.Send(
+            var result = await sender.Send(
                 new SendMailBatchCommand(opt.ScheduleAtOnce),
                 ct);
 
-            await Task.Delay(opt.Delay, ct);
+            return result.Sent == opt.ScheduleAtOnce;
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-        catch (Exception ex) { logger.LogError(ex, "Email batch sending failed."); }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Email batch sending failed.");
+            return false;
+        }
     }
 }

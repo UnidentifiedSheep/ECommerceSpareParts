@@ -18,6 +18,12 @@ public class TransactionFinancialProfileService : ITransactionFinancialProfileSe
 
         if (transaction.IsReversalApplied)
         {
+            SetApproximateBalances(
+                senderProfile,
+                receiverProfile,
+                senderBalanceInBaseCurrency,
+                receiverBalanceInBaseCurrency,
+                -amountInBaseCurrency);
             transaction.MarkReversalProfileApplied();
             return;
         }
@@ -33,7 +39,30 @@ public class TransactionFinancialProfileService : ITransactionFinancialProfileSe
             -amountInBaseCurrency,
             forceDebit);
 
+        SetApproximateBalances(
+            senderProfile,
+            receiverProfile,
+            senderBalanceInBaseCurrency,
+            receiverBalanceInBaseCurrency,
+            amountInBaseCurrency);
         transaction.MarkCompletionProfileApplied();
+    }
+
+    private static void SetApproximateBalances(
+        OrganizationFinancialProfile senderProfile,
+        OrganizationFinancialProfile receiverProfile,
+        decimal senderBalanceInBaseCurrency,
+        decimal receiverBalanceInBaseCurrency,
+        decimal amountInBaseCurrency)
+    {
+        senderProfile.SetApproximateBalance(Math.Round(
+            senderBalanceInBaseCurrency + amountInBaseCurrency,
+            2,
+            MidpointRounding.AwayFromZero));
+        receiverProfile.SetApproximateBalance(Math.Round(
+            receiverBalanceInBaseCurrency - amountInBaseCurrency,
+            2,
+            MidpointRounding.AwayFromZero));
     }
 
     private static void EnsureBalanceIsAllowed(

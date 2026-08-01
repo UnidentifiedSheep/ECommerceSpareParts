@@ -20,7 +20,7 @@ public interface IProductRepository
         CancellationToken token = default);
 
     Task<IReadOnlyCollection<Entities.Product>> SearchBySku(
-        string sku,
+        string? sku,
         int? producerId,
         SkuSearchMode searchMode,
         Pagination? pagination = null,

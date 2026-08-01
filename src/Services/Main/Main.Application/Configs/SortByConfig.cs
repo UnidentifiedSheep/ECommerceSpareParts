@@ -35,7 +35,12 @@ public static class SortByConfig
             .Map<Organization, Guid>("id", x => x.Id)
             .Map<Organization, string>("name", x => x.Name)
             .Map<Organization, string>("systemName", x => x.SystemName)
-            .Map<Organization, OrganizationType>("type", x => x.Type);
+            .Map<Organization, OrganizationType>("type", x => x.Type)
+            .Map<Organization, decimal>(
+                source: "approximateBalance",
+                keySelector: x => x.FinancialProfile == null
+                    ? 0
+                    : x.FinancialProfile.ApproximateBalance);
 
         QueryableSortBy.Value
             .MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime, true)
