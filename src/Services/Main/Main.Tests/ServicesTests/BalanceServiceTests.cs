@@ -57,6 +57,33 @@ public class BalanceServiceTests : IntegrationTest
     }
 
     [Fact]
+    public async Task RecalculateApproximateBalancesAsync_UpdatesProfilesForBatch()
+    {
+        var organizationId = UsersContext.Users.First().Id;
+        var baseCurrency = CurrencyContext.Currencies[0];
+        var foreignCurrency = CurrencyContext.Currencies[1];
+        var foreignRate = GetContext<CurrencyRatesTestContext>().Rates
+            .Single(x => x.FromCurrencyId == foreignCurrency.Id)
+            .Rate;
+        var profile = OrganizationFinancialProfile.Create(organizationId);
+        var baseBalance = OrganizationBalance.Create(organizationId, baseCurrency.Id);
+        var foreignBalance = OrganizationBalance.Create(organizationId, foreignCurrency.Id);
+        baseBalance.IncrementBalance(25m);
+        foreignBalance.IncrementBalance(100m * foreignRate);
+        await Context.AddRangeAsync(profile, baseBalance, foreignBalance);
+        await Context.SaveChangesAsync();
+        Context.ChangeTracker.Clear();
+
+        await _service.RecalculateApproximateBalancesAsync([organizationId]);
+        await Context.SaveChangesAsync();
+        Context.ChangeTracker.Clear();
+
+        var updatedProfile = await Context.Set<OrganizationFinancialProfile>()
+            .SingleAsync(x => x.OrganizationId == organizationId);
+        updatedProfile.ApproximateBalance.Should().Be(125m);
+    }
+
+    [Fact]
     public async Task ChangeSenderReceiverBalancesAsync_AllCurrencyBalanceWouldFallBelowMinimum_Throws()
     {
         var sender = UsersContext.Users.ElementAt(0);

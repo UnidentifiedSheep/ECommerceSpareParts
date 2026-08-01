@@ -31,6 +31,33 @@ public class BalanceService(
         return await SumBalanceInBaseCurrencyAsync(balances, cancellationToken);
     }
 
+    public async Task RecalculateApproximateBalancesAsync(
+        IReadOnlyCollection<Guid> organizationIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (organizationIds.Count == 0) return;
+
+        var organizationCriteria = Criteria<Organization>.New()
+            .Where(x => organizationIds.Contains(x.Id) && x.FinancialProfile != null)
+            .Include(x => x.FinancialProfile)
+            .Include(x => x.Balances)
+            .Track()
+            .ForUpdate()
+            .Build();
+        var organizations = await organizationRepository.ListAsync(
+            organizationCriteria,
+            cancellationToken);
+
+        foreach (var organization in organizations)
+        {
+            var balance = await SumBalanceInBaseCurrencyAsync(
+                organization.Balances,
+                cancellationToken);
+            organization.FinancialProfile!.SetApproximateBalance(
+                Math.Round(balance, 2, MidpointRounding.AwayFromZero));
+        }
+    }
+
     public async Task ChangeSenderReceiverBalancesAsync(
         Transaction transaction,
         bool forceFinancialProfileDebit = false,
