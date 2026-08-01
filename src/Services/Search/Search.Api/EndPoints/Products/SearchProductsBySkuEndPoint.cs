@@ -13,7 +13,7 @@ namespace Search.Api.EndPoints.Products;
 public record SearchProductsBySkuRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "sku")]
-    public required string Sku { get; init; }
+    public string? Sku { get; init; }
 
     [FromQuery(Name = "producerId")]
     public int? ProducerId { get; init; }

@@ -125,7 +125,7 @@ public class ProductRepository(
     }
 
     public async Task<IReadOnlyCollection<Product>> SearchBySku(
-        string sku,
+        string? sku,
         int? producerId,
         SkuSearchMode searchMode,
         Pagination? pagination = null,
@@ -134,7 +134,7 @@ public class ProductRepository(
     {
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
-        var normalizedSku = sku.OnlyCharacterToLower();
+        var normalizedSku = sku?.OnlyCharacterToLower() ?? string.Empty;
 
         var should = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
         var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
