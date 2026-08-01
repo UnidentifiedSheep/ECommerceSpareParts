@@ -19,11 +19,11 @@ public record GetOrganizationsQuery(
     IReadOnlyCollection<OrganizationType> Types
 ) : IQuery<GetOrganizationsResult>;
 
-public record GetOrganizationsResult(IReadOnlyList<OrganizationDto> Organizations);
+public record GetOrganizationsResult(IReadOnlyList<OrganizationListItemDto> Organizations);
 
 public class GetOrganizationsHandler(
     IReadRepository<Organization, Guid> repository,
-    IProjectionProvider<Organization, OrganizationDto> projection)
+    IProjectionProvider<Organization, OrganizationListItemDto> projection)
     : IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
 {
     public async Task<GetOrganizationsResult> Handle(

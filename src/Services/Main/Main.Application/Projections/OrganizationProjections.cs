@@ -53,3 +53,30 @@ public sealed class OrganizationDtoProjectionProvider
 
     public Expression<Func<Organization, OrganizationDto>> Projection { get; }
 }
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class OrganizationListItemProjectionProvider
+    : IProjectionProvider<Organization, OrganizationListItemDto>
+{
+    public OrganizationListItemProjectionProvider(
+        IProjectionProvider<OrganizationMember, OrganizationMemberDto> memberProjection)
+    {
+        var memberToDto = memberProjection.Projection;
+
+        Projection = organization => new OrganizationListItemDto
+        {
+            Id = organization.Id,
+            Type = organization.Type,
+            Name = organization.Name,
+            SystemName = organization.SystemName,
+            Owner = memberToDto.Invoke(
+                organization.Members.Single(member =>
+                    member.Role == OrganizationRole.Owner)),
+            ApproximateBalanceInBaseCurrency = organization.FinancialProfile == null
+                ? null
+                : organization.FinancialProfile.ApproximateBalance
+        };
+    }
+
+    public Expression<Func<Organization, OrganizationListItemDto>> Projection { get; }
+}
