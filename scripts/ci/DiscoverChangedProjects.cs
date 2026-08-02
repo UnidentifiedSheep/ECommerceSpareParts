@@ -1,55 +1,64 @@
 ﻿#!/usr/bin/env dotnet
 
-using System.Diagnostics;
+using System.Xml.Linq;
 
-var output = await GitCommand.RunAsync(
-    Directory.GetCurrentDirectory(),
-    [
-        "diff",
-        "--name-only",
-        "origin/master...HEAD"
-    ]);
-
-Console.WriteLine(output);
-
-public static class GitCommand
+if (args.Length != 1)
 {
-    public static async Task<string> RunAsync(
-        string workingDirectory,
-        IEnumerable<string> arguments,
-        CancellationToken cancellationToken = default)
+    Console.Error.WriteLine("Usage: FilterDeployableProjects.cs <affected.txt>");
+    return 2;
+}
+
+var affectedFilePath = Path.GetFullPath(args[0]);
+
+if (!File.Exists(affectedFilePath))
+{
+    Console.Error.WriteLine($"Affected projects file not found: {affectedFilePath}");
+    return 1;
+}
+
+foreach (var projectPath in File
+             .ReadLines(affectedFilePath)
+             .Where(path => !string.IsNullOrWhiteSpace(path))
+             .Select(path => Path.GetFullPath(path.Trim()))
+             .Distinct(StringComparer.Ordinal)
+             .OrderBy(path => path, StringComparer.Ordinal))
+{
+    var projectType = GetProjectType(projectPath);
+
+    if (projectType is ProjectType.Api or ProjectType.Worker)
+        Console.WriteLine(projectPath);
+}
+
+return 0;
+
+static ProjectType GetProjectType(string projectPath)
+{
+    var document = XDocument.Load(projectPath);
+
+    var sdk = document.Root?
+        .Attribute("Sdk")?
+        .Value;
+
+    var outputType = document
+        .Descendants("OutputType")
+        .Select(element => element.Value.Trim())
+        .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
+
+    if (string.Equals(outputType, "Library", StringComparison.OrdinalIgnoreCase))
+        return ProjectType.Library;
+
+    return sdk switch
     {
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = "git",
-            WorkingDirectory = workingDirectory,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false
-        };
+        "Microsoft.NET.Sdk.Web" => ProjectType.Api,
+        "Microsoft.NET.Sdk.Worker" => ProjectType.Worker,
+        _ => ProjectType.Unknown
+    };
+}
 
-        foreach (var argument in arguments)
-        {
-            startInfo.ArgumentList.Add(argument);
-        }
-
-        using var process = Process.Start(startInfo)
-                            ?? throw new InvalidOperationException("Не удалось запустить git.");
-
-        var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
-        var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
-
-        await process.WaitForExitAsync(cancellationToken);
-
-        var output = await outputTask;
-        var error = await errorTask;
-
-        if (process.ExitCode != 0)
-        {
-            throw new InvalidOperationException(
-                $"Git завершился с кодом {process.ExitCode}:{Environment.NewLine}{error}");
-        }
-
-        return output;
-    }
+enum ProjectType
+{
+    Unknown,
+    Api,
+    Worker,
+    Library
 }

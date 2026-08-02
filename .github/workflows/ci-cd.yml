@@ -5,12 +5,187 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:
 
 concurrency:
   group: ci-cd-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  discover-affected:
+    runs-on: ubuntu-latest
+
+    outputs:
+      has_changes: ${{ steps.discover.outputs.has_changes }}
+      matrix: ${{ steps.discover.outputs.matrix }}
+      services: ${{ steps.discover.outputs.services }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore local .NET tools
+        run: dotnet tool restore
+
+      - name: Resolve comparison commits
+        id: refs
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+          BASE_REF: ${{ github.base_ref || github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "$BASE_REF" ]; then
+            git fetch --no-tags origin \
+              "+refs/heads/${BASE_REF}:refs/remotes/origin/${BASE_REF}"
+          fi
+
+          case "$EVENT_NAME" in
+            pull_request)
+              BASE_SHA="$PR_BASE_SHA"
+              HEAD_SHA="$PR_HEAD_SHA"
+              ;;
+            push)
+              BASE_SHA="$PUSH_BEFORE_SHA"
+              HEAD_SHA="$CURRENT_SHA"
+              ;;
+            *)
+              HEAD_SHA="$CURRENT_SHA"
+              if git rev-parse --verify "${HEAD_SHA}^" >/dev/null 2>&1; then
+                BASE_SHA="$(git rev-parse "${HEAD_SHA}^")"
+              else
+                BASE_SHA="$(git hash-object -t tree -w --stdin < /dev/null)"
+              fi
+              ;;
+          esac
+
+          if [ -z "$BASE_SHA" ] || [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            if git rev-parse --verify "${HEAD_SHA}^" >/dev/null 2>&1; then
+              BASE_SHA="$(git rev-parse "${HEAD_SHA}^")"
+            else
+              BASE_SHA="$(git hash-object -t tree -w --stdin < /dev/null)"
+            fi
+          fi
+
+          git cat-file -e "$BASE_SHA" 2>/dev/null ||
+            git fetch --no-tags origin "$BASE_SHA"
+          git cat-file -e "${HEAD_SHA}^{commit}" 2>/dev/null ||
+            git fetch --no-tags origin "$HEAD_SHA"
+
+          echo "base=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "Comparing $BASE_SHA with $HEAD_SHA"
+
+      - name: Discover affected Docker services
+        id: discover
+        shell: bash
+        env:
+          BASE_SHA: ${{ steps.refs.outputs.base }}
+          HEAD_SHA: ${{ steps.refs.outputs.head }}
+          ARTIFACT_REGISTRY_HOST: affected.invalid
+          IMAGE_TAG: affected
+        run: |
+          set -euo pipefail
+
+          AFFECTED_DIR="$RUNNER_TEMP/dotnet-affected"
+          AFFECTED_FILE="$AFFECTED_DIR/affected.txt"
+          DEPLOYABLE_FILE="$AFFECTED_DIR/deployable.txt"
+          mkdir -p "$AFFECTED_DIR"
+
+          dotnet affected \
+            --repository-path "$GITHUB_WORKSPACE" \
+            --solution-path "$GITHUB_WORKSPACE/ECommerceSpareParts.sln" \
+            --from "$BASE_SHA" \
+            --to "$HEAD_SHA" \
+            --format text \
+            --output-dir "$AFFECTED_DIR" \
+            --output-name affected
+
+          # Build the file-based app before capturing stdout so compiler/restore
+          # diagnostics cannot be mixed with the project-path stream.
+          dotnet run --file scripts/ci/DiscoverChangedProjects.cs -- \
+            "$AFFECTED_FILE" > /dev/null
+          dotnet run --file scripts/ci/DiscoverChangedProjects.cs \
+            --no-build -- "$AFFECTED_FILE" > "$DEPLOYABLE_FILE"
+
+          docker compose \
+            -f compose.yaml \
+            -f compose.registry.yaml \
+            --env-file .env.example \
+            config --format json > "$AFFECTED_DIR/compose.json"
+
+          python3 - "$DEPLOYABLE_FILE" "$AFFECTED_DIR/compose.json" "$GITHUB_OUTPUT" <<'PY'
+          import json
+          import os
+          import sys
+
+          projects_file, compose_file, output_file = sys.argv[1:]
+          workspace = os.getcwd()
+
+          with open(projects_file, encoding="utf-8-sig") as stream:
+              project_paths = [line.strip() for line in stream if line.strip()]
+
+          affected_dockerfiles = {
+              os.path.normpath(os.path.relpath(
+                  os.path.join(os.path.dirname(project), "Dockerfile"),
+                  workspace,
+              ))
+              for project in project_paths
+          }
+
+          with open(compose_file, encoding="utf-8-sig") as stream:
+              compose = json.load(stream)
+
+          services = []
+          for name, service in compose["services"].items():
+              build = service.get("build")
+              if not build:
+                  continue
+
+              dockerfile = build.get("dockerfile") or "Dockerfile"
+              if os.path.isabs(dockerfile):
+                  dockerfile = os.path.relpath(dockerfile, workspace)
+              dockerfile = os.path.normpath(dockerfile)
+
+              if dockerfile not in affected_dockerfiles:
+                  continue
+
+              image = service.get("image") or (build.get("tags") or [""])[0]
+              services.append({
+                  "service": name,
+                  "image": image.split("/")[-1].split(":")[0],
+                  "context": os.path.relpath(
+                      build.get("context") or ".", workspace
+                  ) if os.path.isabs(build.get("context") or ".") else (
+                      build.get("context") or "."
+                  ),
+                  "dockerfile": dockerfile.replace(os.sep, "/"),
+              })
+
+          services.sort(key=lambda item: item["service"])
+          matrix = json.dumps({"include": services}, separators=(",", ":"))
+          names = ",".join(item["service"] for item in services)
+
+          with open(output_file, "a", encoding="utf-8") as stream:
+              stream.write(f"has_changes={'true' if services else 'false'}\n")
+              stream.write(f"matrix={matrix}\n")
+              stream.write(f"services={names}\n")
+
+          print(f"Affected deployable services: {names or 'none'}")
+          PY
+
   build:
     uses: ./.github/workflows/build.yml
 
@@ -22,15 +197,25 @@ jobs:
     uses: ./.github/workflows/coverage.yml
 
   publish-images:
-    needs: [build, test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [build, test, discover-affected]
+    if: >-
+      needs.discover-affected.outputs.has_changes == 'true' &&
+      ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+       github.event_name == 'workflow_dispatch')
     uses: ./.github/workflows/publish-images.yml
+    with:
+      matrix: ${{ needs.discover-affected.outputs.matrix }}
     secrets: inherit
 
   deploy:
-    needs: publish-images
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [publish-images, discover-affected]
+    if: >-
+      needs.publish-images.result == 'success' &&
+      needs.discover-affected.outputs.has_changes == 'true' &&
+      ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+       github.event_name == 'workflow_dispatch')
     uses: ./.github/workflows/deploy.yml
     with:
       registry_kind: ${{ needs.publish-images.outputs.registry_kind }}
+      services: ${{ needs.discover-affected.outputs.services }}
     secrets: inherit
