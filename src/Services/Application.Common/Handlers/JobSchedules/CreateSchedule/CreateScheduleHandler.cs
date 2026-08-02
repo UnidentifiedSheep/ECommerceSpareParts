@@ -37,7 +37,6 @@ public class CreateScheduleHandler(
             request.NewSchedule.MaxAttempts,
             request.NewSchedule.Cron);
 
-        //Some change.
         if (request.NewSchedule.Enabled) schedule.Enable();
 
         var nextRunAt = CronExpression.Parse(schedule.Cron)
