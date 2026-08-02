@@ -7,6 +7,10 @@ on:
         description: Artifact Registry selected by the publish workflow
         required: true
         type: string
+      services:
+        description: Comma-separated affected API and Worker service names
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -121,6 +125,7 @@ jobs:
             export ARTIFACT_REGISTRY_PASSWORD='${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}'
             export ARTIFACT_REGISTRY_FALLBACK_ENABLED=false
             export IMAGE_TAG='${{ github.sha }}'
+            export DEPLOY_SERVICES='${{ inputs.services }}'
             export DEPLOY_RUN_ID='${{ github.run_id }}-${{ github.run_attempt }}'
             export CLOUD_RU_SECRET_PROJECT_ID='${{ vars.CLOUD_RU_SECRET_PROJECT_ID }}'
             export CLOUD_RU_SECRET_PREFIX='${{ vars.CLOUD_RU_SECRET_PREFIX || '/appsettings' }}'

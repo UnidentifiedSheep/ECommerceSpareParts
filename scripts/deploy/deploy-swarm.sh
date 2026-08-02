@@ -1053,6 +1053,47 @@ deploy_stack() {
     --with-registry-auth
 }
 
+deploy_selected_services() {
+  local selected_services
+  local service
+  local stack
+  local swarm_service
+  IFS=',' read -r -a selected_services <<< "$DEPLOY_SERVICES"
+
+  log "Deploy affected application services"
+
+  for service in "${selected_services[@]}"; do
+    case "$service" in
+      gateway)
+        stack=gateway
+        ;;
+      *-api)
+        stack=apps
+        ;;
+      *-worker)
+        stack=workers
+        ;;
+      *)
+        echo "Unsupported affected service: ${service}" >&2
+        return 1
+        ;;
+    esac
+
+    swarm_service="$(service_name "$stack" "$service")"
+    if ! sudo docker service inspect "$swarm_service" >/dev/null 2>&1; then
+      echo "Swarm service ${swarm_service} does not exist." >&2
+      return 1
+    fi
+
+    docker_sudo service update \
+      --detach=true \
+      --image "${ARTIFACT_REGISTRY_HOST}/${service}:${IMAGE_TAG}" \
+      --with-registry-auth \
+      "$swarm_service"
+    wait_for_service_running "$swarm_service" 60
+  done
+}
+
 show_stack_services() {
   log "Stack services"
 
@@ -1187,6 +1228,13 @@ if ! printf '%s' "$ARTIFACT_REGISTRY_PASSWORD" | docker login \
   export ARTIFACT_REGISTRY_HOST
   export ARTIFACT_REGISTRY_USERNAME
   export ARTIFACT_REGISTRY_PASSWORD
+fi
+
+if [ -n "${DEPLOY_SERVICES:-}" ]; then
+  log "Validate Swarm manager"
+  validate_swarm_manager
+  deploy_selected_services
+  exit 0
 fi
 
 log "[2/8] Validate required Docker Swarm secrets"

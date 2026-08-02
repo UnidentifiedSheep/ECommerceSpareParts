@@ -2,6 +2,11 @@ name: Publish Images
 
 on:
   workflow_call:
+    inputs:
+      matrix:
+        description: Affected API and Worker Docker build matrix
+        required: true
+        type: string
     outputs:
       registry_kind:
         description: Registry selected for publishing and deployment
@@ -69,77 +74,13 @@ jobs:
           echo 'Unable to log in to either primary or backup Artifact Registry.' >&2
           exit 1
 
-  discover-images:
-    runs-on: ubuntu-latest
-
-    env:
-      ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
-      IMAGE_TAG: ${{ github.sha }}
-
-    outputs:
-      matrix: ${{ steps.discover.outputs.matrix }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Discover Docker services
-        id: discover
-        run: |
-          discover_services() {
-            docker compose "$@" --env-file .env.example config --format json \
-              | python3 -c '
-          import json
-          import os
-          import sys
-
-          data = json.load(sys.stdin)
-          workspace = os.getcwd()
-          result = []
-
-          def normalize_path(value):
-              if not value:
-                  return value
-              if os.path.isabs(value):
-                  return os.path.relpath(value, workspace)
-              return value
-
-          for name, service in data["services"].items():
-              build = service.get("build")
-              if build is None:
-                  continue
-
-              image = service.get("image") or (build.get("tags") or [""])[0]
-              image_name = image.split("/")[-1].split(":")[0]
-
-              result.append({
-                  "service": name,
-                  "image": image_name,
-                  "context": normalize_path(build.get("context") or "."),
-                  "dockerfile": normalize_path(build.get("dockerfile") or "Dockerfile")
-              })
-
-          print(json.dumps(result))
-          '
-          }
-
-          APP_SERVICES=$(discover_services -f compose.yaml -f compose.registry.yaml)
-          MIGRATOR_SERVICES=$(discover_services -f migrator-compose.yaml -f migrator-compose.registry.yaml)
-
-          MATRIX=$(APP_SERVICES="$APP_SERVICES" MIGRATOR_SERVICES="$MIGRATOR_SERVICES" python3 -c 'import json, os; print(json.dumps({
-              "include": json.loads(os.environ["APP_SERVICES"]) + json.loads(os.environ["MIGRATOR_SERVICES"])
-            }))')
-
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
-          echo "$MATRIX"
-
   publish-images:
     runs-on: ubuntu-latest
-    needs: [select-registry, discover-images]
+    needs: select-registry
     strategy:
       fail-fast: false
       max-parallel: 6
-      matrix: ${{ fromJson(needs.discover-images.outputs.matrix) }}
+      matrix: ${{ fromJson(inputs.matrix) }}
     timeout-minutes: 15
 
     env:
