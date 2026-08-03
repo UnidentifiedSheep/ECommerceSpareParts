@@ -38,6 +38,7 @@ public static class ServiceProvider
         });
 
         collection.AddScoped<IProductRepository, ProductRepository>();
+        collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();
         collection.AddScoped<IProducerRepository, ProducerRepository>();
         collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
         collection.AddScoped<IStorageContentRepository, StorageContentRepository>();

@@ -56,6 +56,8 @@ public partial class DContext : DbContext
 
     public virtual DbSet<SupplierProductName> SupplierProductNames { get; set; }
 
+    public virtual DbSet<SupplierProductCross> SupplierProductCrosses { get; set; }
+
     public virtual DbSet<CatalogueCandidate> CatalogueCandidates { get; set; }
 
     public virtual DbSet<Event> Events { get; set; }

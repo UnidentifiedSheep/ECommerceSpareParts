@@ -72,6 +72,67 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture)
         (await GetProducts()).Should().BeEmpty();
     }
 
+    [Fact]
+    public async Task Import_Analogues_ImportsProductsNamesAndCrosses()
+    {
+        var analogue = CreateProduct("ANALOGUE-1", "MANN", ["Analogue name"]);
+        var product = CreateProduct(
+            "PRODUCT-1",
+            "Bosch",
+            ["Product name"],
+            [analogue]);
+
+        await Mediator.Send(new ImportSupplierProductCommand(
+            Supplier.Armtek,
+            [product]));
+
+        var products = await GetProducts();
+        products.Should().HaveCount(2);
+        products.Single(x => x.Producer == "Bosch").Names
+            .Select(x => x.Name)
+            .Should().ContainSingle("Product name");
+        products.Single(x => x.Producer == "MANN").Names
+            .Select(x => x.Name)
+            .Should().ContainSingle("Analogue name");
+
+        var cross = await Context.SupplierProductCrosses
+            .AsNoTracking()
+            .SingleAsync();
+        cross.LeftId.Should().Be(Math.Min(products[0].Id, products[1].Id));
+        cross.RightId.Should().Be(Math.Max(products[0].Id, products[1].Id));
+    }
+
+    [Fact]
+    public async Task Import_ExistingAnalogue_AddsNamesWithoutDuplicatingCross()
+    {
+        await Mediator.Send(new ImportSupplierProductCommand(
+            Supplier.Armtek,
+            [CreateProduct(
+                "PRODUCT-1",
+                "Bosch",
+                ["Product name"],
+                [CreateProduct("ANALOGUE-1", "MANN", ["First analogue name"])])]));
+
+        await Mediator.Send(new ImportSupplierProductCommand(
+            Supplier.Armtek,
+            [CreateProduct(
+                "PRODUCT1",
+                "Bosch",
+                ["Product name"],
+                [CreateProduct("ANALOGUE1", "MANN", ["Second analogue name"])])]));
+
+        var products = await GetProducts();
+        products.Should().HaveCount(2);
+        products.Single(x => x.Producer == "MANN").Names
+            .Select(x => x.Name)
+            .Should().BeEquivalentTo("First analogue name", "Second analogue name");
+
+        var crossesCount = await Context.SupplierProductCrosses
+            .AsNoTracking()
+            .CountAsync();
+        crossesCount.Should().Be(1);
+    }
+
     private async Task<List<Main.Entities.Product.Enrichment.SupplierProduct>> GetProducts()
     {
         return await Context.SupplierProducts
@@ -84,7 +145,8 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture)
     private static ContractSupplierProductDto CreateProduct(
         string number,
         string brand,
-        IReadOnlyList<string> names)
+        IReadOnlyList<string> names,
+        IReadOnlyList<ContractSupplierProductDto>? analogues = null)
     {
         return new ContractSupplierProductDto
         {
@@ -92,7 +154,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture)
             Number = number,
             Brand = brand,
             Names = names,
-            Analogues = [],
+            Analogues = analogues ?? [],
             Positions = []
         };
     }

@@ -1,10 +1,10 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Models.Supplier;
 using Enums;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product.Enrichment;
 using Main.Entities.Product.ValueObjects;
 using MediatR;
@@ -20,7 +20,7 @@ public record ImportSupplierProductCommand(
 ) : ICommand;
 
 public class ImportSupplierProductHandler(
-    IRepository<SupplierProduct, int> repository,
+    ISupplierProductRepository repository,
     IUnitOfWork unitOfWork,
     ILogger<ImportSupplierProductHandler> logger
     ) : ICommandHandler<ImportSupplierProductCommand>
@@ -29,19 +29,16 @@ public class ImportSupplierProductHandler(
         ImportSupplierProductCommand request,
         CancellationToken cancellationToken)
     {
-        var products = request.Products
-            .Select(x => TryCreateImportProduct(x, out var product) ? product : null)
-            .OfType<ImportProduct>()
-            .ToList();
+        var graph = BuildImportGraph(request.Products);
 
         var existingProducts = await GetExistingProducts(
             request.Supplier,
-            products.Select(x => x.Key).ToHashSet(),
+            graph.Products.Select(x => x.Key).ToHashSet(),
             cancellationToken);
 
         var toAdd = new List<SupplierProduct>();
 
-        foreach (var product in products)
+        foreach (var product in graph.Products)
         {
             var requestProduct = product.Product;
             if (!existingProducts.TryGetValue(product.Key, out var existingProduct))
@@ -60,6 +57,16 @@ public class ImportSupplierProductHandler(
         }
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var crosses = graph.Crosses
+            .Select(x => SupplierProductCross.Create(
+                existingProducts[x.Product].Id,
+                existingProducts[x.Analogue].Id))
+            .DistinctBy(x => x.GetId())
+            .ToList();
+
+        await repository.UpsertCrossesAsync(crosses, cancellationToken);
         return Unit.Value;
     }
 
@@ -70,19 +77,50 @@ public class ImportSupplierProductHandler(
     {
         if (keys.Count == 0) return [];
 
-        var producers = keys.Select(x => x.Producer).Distinct().ToList();
-        var numbers = keys.Select(x => x.Sku).Distinct().ToList();
-
-        return (await repository.ListAsync(
-                Criteria<SupplierProduct>.New()
-                    .Include(x => x.Names)
-                    .Where(x => x.Supplier == supplier)
-                    .Where(x => producers.Contains(x.Producer))
-                    .Where(x => numbers.Contains(x.Sku.NormalizedValue))
-                    .Track()
-                    .Build(),
+        return (await repository.GetBySupplierKeysAsync(
+                supplier,
+                keys.Select(x => (x.Sku, x.Producer)),
                 cancellationToken))
             .ToDictionary(x => new SupplierProductKey(x.Sku.NormalizedValue, x.Producer));
+    }
+
+    private ImportGraph BuildImportGraph(
+        IEnumerable<ContractSupplierProductDto> rootProducts)
+    {
+        var products = new List<ImportProduct>();
+        var crosses = new List<RequestedCross>();
+        var processed = new Dictionary<ContractSupplierProductDto, ImportProduct?>(
+            ReferenceEqualityComparer.Instance);
+        var expanded = new HashSet<ContractSupplierProductDto>(
+            ReferenceEqualityComparer.Instance);
+        var pending = new Queue<(ContractSupplierProductDto Product, SupplierProductKey? Parent)>();
+
+        foreach (var product in rootProducts)
+            pending.Enqueue((product, null));
+
+        while (pending.TryDequeue(out var item))
+        {
+            if (!processed.TryGetValue(item.Product, out var product))
+            {
+                TryCreateImportProduct(item.Product, out product);
+                processed.Add(item.Product, product);
+            }
+
+            if (product is not null)
+            {
+                products.Add(product);
+
+                if (item.Parent is { } parent && parent != product.Key)
+                    crosses.Add(new RequestedCross(parent, product.Key));
+            }
+
+            if (!expanded.Add(item.Product)) continue;
+
+            foreach (var analogue in item.Product.Analogues)
+                pending.Enqueue((analogue, product?.Key));
+        }
+
+        return new ImportGraph(products, crosses);
     }
 
     private bool TryCreateImportProduct(
@@ -107,7 +145,7 @@ public class ImportSupplierProductHandler(
                 product.Number);
             return false;
         }
-        
+
         var key = new SupplierProductKey(
             Sku.ToNormalized(product.Number),
             product.Brand.Trim());
@@ -117,7 +155,13 @@ public class ImportSupplierProductHandler(
     }
 
     private record struct SupplierProductKey(string Sku, string Producer);
+    private record struct RequestedCross(
+        SupplierProductKey Product,
+        SupplierProductKey Analogue);
     private sealed record ImportProduct(
         SupplierProductKey Key,
         ContractSupplierProductDto Product);
+    private sealed record ImportGraph(
+        IReadOnlyList<ImportProduct> Products,
+        IReadOnlyList<RequestedCross> Crosses);
 }
