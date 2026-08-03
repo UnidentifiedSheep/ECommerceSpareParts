@@ -1,4 +1,5 @@
 ﻿using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,4 +1,5 @@
 ﻿using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using FluentAssertions;
 
 namespace Tests.Tests.CommonEntities;

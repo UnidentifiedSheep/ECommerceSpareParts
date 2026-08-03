@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Main.Entities;
 using Main.Entities.Auth;
 using Main.Entities.Balance;

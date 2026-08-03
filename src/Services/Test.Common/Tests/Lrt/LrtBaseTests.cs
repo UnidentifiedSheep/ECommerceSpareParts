@@ -6,6 +6,7 @@ using Application.Common.LRT;
 using Attributes;
 using Contracts.Job;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using Domain.Exceptions;
 using FluentAssertions;

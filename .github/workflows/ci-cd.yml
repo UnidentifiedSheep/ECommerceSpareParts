@@ -104,6 +104,7 @@ jobs:
           DEPLOYABLE_FILE="$AFFECTED_DIR/deployable.txt"
           mkdir -p "$AFFECTED_DIR"
 
+          set +e
           dotnet affected \
             --repository-path "$GITHUB_WORKSPACE" \
             --solution-path "$GITHUB_WORKSPACE/ECommerceSpareParts.sln" \
@@ -112,6 +113,21 @@ jobs:
             --format text \
             --output-dir "$AFFECTED_DIR" \
             --output-name affected
+          AFFECTED_EXIT_CODE=$?
+          set -e
+
+          if [ "$AFFECTED_EXIT_CODE" -eq 166 ]; then
+            echo "No affected projects were found."
+            {
+              echo 'has_changes=false'
+              echo 'matrix={"include":[]}'
+              echo 'services='
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          elif [ "$AFFECTED_EXIT_CODE" -ne 0 ]; then
+            echo "dotnet-affected failed with exit code ${AFFECTED_EXIT_CODE}." >&2
+            exit "$AFFECTED_EXIT_CODE"
+          fi
 
           # Build the file-based app before capturing stdout so compiler/restore
           # diagnostics cannot be mixed with the project-path stream.

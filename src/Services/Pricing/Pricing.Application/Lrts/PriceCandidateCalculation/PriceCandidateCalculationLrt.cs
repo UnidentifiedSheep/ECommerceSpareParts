@@ -2,6 +2,7 @@ using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.LRT;
 using Application.Common.NamedObject;
 using MassTransit;
 using MediatR;

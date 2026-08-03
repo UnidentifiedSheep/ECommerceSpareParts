@@ -1,13 +1,12 @@
-﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Persistence;
+﻿using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.LRT;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Common.NamedObject;
+namespace Application.Common.LRT;
 
 public abstract class LrtNamedObjectBase(
     IRepository<Job, Guid> jobRepository,

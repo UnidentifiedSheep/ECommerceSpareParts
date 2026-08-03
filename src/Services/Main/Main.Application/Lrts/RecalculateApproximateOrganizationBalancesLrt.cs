@@ -6,6 +6,7 @@ using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Attributes;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Organization;
 using MassTransit;

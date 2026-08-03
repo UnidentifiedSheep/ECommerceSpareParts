@@ -5,6 +5,7 @@ using Application.Common.Models;
 using Application.Common.Models.Options;
 using Application.Common.NamedObject;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Microsoft.Extensions.Options;
 
 namespace Api.Common.HostedServices;

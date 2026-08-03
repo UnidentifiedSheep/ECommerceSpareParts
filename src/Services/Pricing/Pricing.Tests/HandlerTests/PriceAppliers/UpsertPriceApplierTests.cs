@@ -4,6 +4,7 @@ using Domain.CommonEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Nodes;
+using Domain.CommonEntities.Job;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Handlers.PriceApplier;
 using Pricing.Application.Interfaces.Cache;

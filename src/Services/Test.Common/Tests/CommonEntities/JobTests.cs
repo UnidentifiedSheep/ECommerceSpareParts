@@ -1,7 +1,7 @@
 ﻿using Domain.CommonEnums;
 using Domain.Exceptions;
 using FluentAssertions;
-using JobDomain = Domain.CommonEntities.Job;
+using JobDomain = Domain.CommonEntities.Job.Job;
 
 namespace Tests.Tests.CommonEntities;
 

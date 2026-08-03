@@ -2,6 +2,7 @@ using Abstractions.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Dapper;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;

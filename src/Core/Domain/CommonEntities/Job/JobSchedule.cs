@@ -3,7 +3,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Domain.CommonEntities;
+namespace Domain.CommonEntities.Job;
 
 public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSchedule, Guid>
 {

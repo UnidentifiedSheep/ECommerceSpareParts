@@ -7,6 +7,7 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Job;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Domain.Exceptions;
 using MassTransit;
 using Microsoft.Extensions.Logging;

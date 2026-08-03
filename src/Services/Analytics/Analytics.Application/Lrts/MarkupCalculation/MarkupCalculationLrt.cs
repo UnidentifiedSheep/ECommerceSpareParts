@@ -5,10 +5,12 @@ using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Attributes;
 using Contracts.Analytics;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 

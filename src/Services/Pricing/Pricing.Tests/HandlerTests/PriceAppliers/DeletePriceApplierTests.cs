@@ -1,4 +1,5 @@
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Exceptions;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;

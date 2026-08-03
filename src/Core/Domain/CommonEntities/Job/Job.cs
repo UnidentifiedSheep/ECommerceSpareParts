@@ -5,7 +5,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Domain.CommonEntities;
+namespace Domain.CommonEntities.Job;
 
 public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 {

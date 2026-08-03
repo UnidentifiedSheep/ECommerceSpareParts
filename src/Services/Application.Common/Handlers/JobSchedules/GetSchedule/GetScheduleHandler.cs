@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Common.Handlers.JobSchedules.GetSchedule;

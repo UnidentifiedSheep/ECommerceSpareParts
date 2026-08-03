@@ -2,6 +2,7 @@
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
