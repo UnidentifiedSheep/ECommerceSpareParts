@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       services:
-        description: Comma-separated affected API and Worker service names
+        description: Comma-separated affected API, Worker and Migrator service names
         required: true
         type: string
 

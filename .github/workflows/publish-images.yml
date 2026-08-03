@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       matrix:
-        description: Affected API and Worker Docker build matrix
+        description: Affected API, Worker and Migrator Docker build matrix
         required: true
         type: string
     outputs:

@@ -123,6 +123,8 @@ jobs:
           docker compose \
             -f compose.yaml \
             -f compose.registry.yaml \
+            -f migrator-compose.yaml \
+            -f migrator-compose.registry.yaml \
             --env-file .env.example \
             config --format json > "$AFFECTED_DIR/compose.json"
 
@@ -163,8 +165,13 @@ jobs:
                   continue
 
               image = service.get("image") or (build.get("tags") or [""])[0]
+              deploy_name = (
+                  name.removesuffix(".migrator") + "-migrator"
+                  if name.endswith(".migrator")
+                  else name
+              )
               services.append({
-                  "service": name,
+                  "service": deploy_name,
                   "image": image.split("/")[-1].split(":")[0],
                   "context": os.path.relpath(
                       build.get("context") or ".", workspace

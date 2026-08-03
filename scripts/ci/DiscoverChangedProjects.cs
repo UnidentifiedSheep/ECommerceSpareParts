@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 if (args.Length != 1)
 {
-    Console.Error.WriteLine("Usage: FilterDeployableProjects.cs <affected.txt>");
+    Console.Error.WriteLine("Usage: DiscoverChangedProjects.cs <affected.txt>");
     return 2;
 }
 
@@ -25,7 +25,7 @@ foreach (var projectPath in File
 {
     var projectType = GetProjectType(projectPath);
 
-    if (projectType is ProjectType.Api or ProjectType.Worker)
+    if (projectType is ProjectType.Api or ProjectType.Worker or ProjectType.Migrator)
         Console.WriteLine(projectPath);
 }
 
@@ -47,6 +47,11 @@ static ProjectType GetProjectType(string projectPath)
     if (string.Equals(outputType, "Library", StringComparison.OrdinalIgnoreCase))
         return ProjectType.Library;
 
+    if (string.Equals(outputType, "Exe", StringComparison.OrdinalIgnoreCase) &&
+        Path.GetFileNameWithoutExtension(projectPath)
+            .EndsWith(".Migrator", StringComparison.OrdinalIgnoreCase))
+        return ProjectType.Migrator;
+
     return sdk switch
     {
         "Microsoft.NET.Sdk.Web" => ProjectType.Api,
@@ -60,5 +65,6 @@ enum ProjectType
     Unknown,
     Api,
     Worker,
+    Migrator,
     Library
 }

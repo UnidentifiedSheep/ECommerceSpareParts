@@ -1056,14 +1056,43 @@ deploy_stack() {
 deploy_selected_services() {
   local selected_services
   local service
+  local migrator
   local stack
   local swarm_service
+  local migrator_found
   IFS=',' read -r -a selected_services <<< "$DEPLOY_SERVICES"
+
+  log "Run affected database migrations"
+
+  for service in "${selected_services[@]}"; do
+    case "$service" in
+      *-migrator)
+        migrator_found=false
+        for migrator in "${MIGRATORS[@]}"; do
+          if [ "${migrator%%:*}" != "$service" ]; then
+            continue
+          fi
+
+          run_migrator "${migrator%%:*}" "${migrator##*:}"
+          migrator_found=true
+          break
+        done
+
+        if [ "$migrator_found" != "true" ]; then
+          echo "Unsupported affected migrator: ${service}" >&2
+          return 1
+        fi
+        ;;
+    esac
+  done
 
   log "Deploy affected application services"
 
   for service in "${selected_services[@]}"; do
     case "$service" in
+      *-migrator)
+        continue
+        ;;
       gateway)
         stack=gateway
         ;;
