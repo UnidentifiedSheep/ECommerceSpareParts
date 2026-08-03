@@ -69,7 +69,7 @@ public class FavoritPartsSupplier(
         {
             Brand = good.Brand,
             Id = good.Id,
-            Name = good.Name,
+            Names = [good.Name],
             Number = good.Number,
             Analogues = good.Analogues.Select(x => AdaptGood(x, settings)).ToList(),
             Positions = good.Warehouses.Select(x => new SupplierPosition

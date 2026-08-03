@@ -14,12 +14,11 @@ public class SupplierProduct :
     private SupplierProduct() { }
 
     private SupplierProduct(
-        string sku,
+        Sku sku,
         string producer,
         global::Enums.Supplier supplier)
     {
-        Sku = new Sku(sku);
-
+        Sku = sku;
         Producer = producer
             .TrimSafe()
             .EnsureNotNullOrWhiteSpace(() =>
@@ -45,7 +44,7 @@ public class SupplierProduct :
     public IReadOnlyList<SupplierProductName> Names => _names;
 
     public static SupplierProduct Create(
-        string sku,
+        Sku sku,
         string producer,
         global::Enums.Supplier supplier)
     {

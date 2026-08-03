@@ -49,7 +49,7 @@ public class TmtrSupplier(
                     Brand = x.Brand,
                     Id = string.Empty,
                     Number = x.Number,
-                    Name = x.Name ?? string.Empty,
+                    Names = [x.Name ?? string.Empty],
                     Positions = []
                 })
                 .ToList());
@@ -102,7 +102,7 @@ public class TmtrSupplier(
                 Id = firstPositionOrDefault?.ProductId.ToString() ?? string.Empty,
                 Brand = request.Brand,
                 Number = request.Number,
-                Name = firstPositionOrDefault?.ProductName ?? string.Empty,
+                Names = requestedPositions.Select(x => x.ProductName).ToList(), 
                 Positions = requestedPositions.Select(x => AdaptToPosition(x, setting)).ToList(),
                 Analogues = analogues
                     .Select(x => 
@@ -111,7 +111,7 @@ public class TmtrSupplier(
                             Id = x.Value.First().ProductId.ToString(),
                             Brand = x.Key.brand,
                             Number = x.Key.number,
-                            Name = x.Value.First().ProductName,
+                            Names = x.Value.Select(z => z.ProductName).ToList(),
                             Analogues = [],
                             Positions = x.Value.Select(z => AdaptToPosition(z, setting)).ToList()
                         })

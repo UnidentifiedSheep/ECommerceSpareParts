@@ -9,7 +9,7 @@ public static class SupplierProductExtensions
         => new()
         {
             Id = product.Id,
-            Name = product.Name,
+            Names = product.Names,
             Number = product.Number,
             Brand = product.Brand,
             
@@ -50,7 +50,7 @@ public static class SupplierProductExtensions
         => new()
         {
             Id = product.Id,
-            Name = product.Name,
+            Names = product.Names,
             Number = product.Number,
             Brand = product.Brand,
             
@@ -86,4 +86,10 @@ public static class SupplierProductExtensions
                 })
                 .ToList()
         };
+    
+    public static IReadOnlyList<SupplierProduct> FromContract(this IEnumerable<ContractSupplierProductDto> products)
+        => products.Select(FromContract).ToList();
+    
+    public static IReadOnlyList<ContractSupplierProductDto> ToContract(this IEnumerable<SupplierProduct> products)
+        => products.Select(ToContract).ToList();
 }

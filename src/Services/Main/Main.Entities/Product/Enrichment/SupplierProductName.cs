@@ -31,8 +31,7 @@ public class SupplierProductName :
 
     public string Name { get; private set; } = null!;
 
-    public SupplierProduct SupplierProduct
-    { get; private set; } = null!;
+    public SupplierProduct SupplierProduct { get; private set; } = null!;
 
     public static SupplierProductName Create(
         int supplierProductId,
