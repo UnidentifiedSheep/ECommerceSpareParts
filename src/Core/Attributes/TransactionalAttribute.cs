@@ -15,12 +15,14 @@ public class TransactionalAttribute : Attribute
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
         int retryDelayMs = 0,
         int retryCount = 0,
-        string[]? retryErrors = null)
+        params string[] retryErrors)
     {
         IsolationLevel = isolationLevel;
         RetryDelayMs = retryDelayMs;
         RetryCount = retryCount;
-        RetryErrors = retryErrors?.Union(DefaultPgqlErrors) ?? DefaultPgqlErrors;
+        RetryErrors = retryErrors.Length == 0 
+                ? DefaultPgqlErrors 
+                : retryErrors.Union(DefaultPgqlErrors);
     }
 
     public IsolationLevel IsolationLevel { get; }

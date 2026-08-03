@@ -1,12 +1,18 @@
 using Contracts.Supplier;
+using Main.Application.Handlers.ProductEnrichment;
 using MassTransit;
+using MediatR;
 
 namespace Main.Application.Consumers;
 
-public class SupplierProductsRequestedConsumer : IConsumer<SupplierProductsRequestedEvent>
+public class SupplierProductsRequestedConsumer(
+    ISender sender) : IConsumer<SupplierProductsRequestedEvent>
 {
-    public Task Consume(ConsumeContext<SupplierProductsRequestedEvent> context)
+    public async Task Consume(ConsumeContext<SupplierProductsRequestedEvent> context)
     {
-        throw new NotImplementedException();
+        await sender.Send(new ImportSupplierProductCommand(
+            context.Message.Supplier,
+            context.Message.Products),
+            context.CancellationToken);
     }
 }

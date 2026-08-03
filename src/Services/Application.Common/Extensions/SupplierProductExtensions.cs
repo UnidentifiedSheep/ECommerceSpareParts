@@ -86,4 +86,10 @@ public static class SupplierProductExtensions
                 })
                 .ToList()
         };
+    
+    public static IReadOnlyList<SupplierProduct> FromContract(this IEnumerable<ContractSupplierProductDto> products)
+        => products.Select(FromContract).ToList();
+    
+    public static IReadOnlyList<ContractSupplierProductDto> ToContract(this IEnumerable<SupplierProduct> products)
+        => products.Select(ToContract).ToList();
 }
