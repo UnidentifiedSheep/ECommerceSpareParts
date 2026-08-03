@@ -1,4 +1,5 @@
 using Domain.CommonEnums;
+using Domain.Exceptions;
 
 namespace Domain.CommonEntities.Job;
 
@@ -75,9 +76,28 @@ public sealed class MultiStepJob : Job
         step.AddDependency(dependsOn);
     }
 
+    public void Wait(Guid leaseHolderId)
+    {
+        EnsureActiveLease(leaseHolderId);
+
+        if (IsCancellationRequested)
+            throw new JobCancellationRequestedException(Id);
+
+        EnsureStatus(JobStatus.Processing);
+
+        Status = JobStatus.Waiting;
+        ClearLease();
+    }
+
+    public void Resume()
+    {
+        EnsureStatus(JobStatus.Waiting);
+        Status = JobStatus.Pending;
+    }
+
     private void EnsureTopologyMutable()
     {
-        if (Status != JobStatus.Pending)
+        if (Status != JobStatus.Pending || LockedAt is not null)
             throw new InvalidOperationException(
                 "Multi-step job topology cannot be " +
                 "changed after execution has started.");

@@ -8,5 +8,6 @@ public enum JobStatus
     Failed,
     Succeeded,
     CancellationRequested,
-    Cancelled
+    Cancelled,
+    Waiting
 }

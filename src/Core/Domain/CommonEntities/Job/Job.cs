@@ -219,7 +219,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
             throw new JobLeaseLostException(Id);
     }
     
-    private void ClearLease()
+    protected void ClearLease()
     {
         LeaseHolderId = null;
         LeaseExpiresAt = null;
