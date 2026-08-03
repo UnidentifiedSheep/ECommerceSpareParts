@@ -57,7 +57,7 @@ public sealed class QueueJobHandler(
         {
             var lrt = registry.GetBySystemName(item.SystemName);
 
-            var job = Job.Create(
+            var job = SingleRunJob.Create(
                 lrt.SystemName,
                 lrt.ValidateState(item.InputState), 
                 item.MaxAttempts);

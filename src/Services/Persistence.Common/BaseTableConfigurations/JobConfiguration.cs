@@ -53,7 +53,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         
         builder
             .HasDiscriminator<string>("job_type")
-            .HasValue<Job>("job")
+            .HasValue<SingleRunJob>("job")
             .HasValue<UniqJob>("uniq_job");
     }
 }

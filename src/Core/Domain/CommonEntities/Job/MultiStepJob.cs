@@ -23,7 +23,7 @@ public sealed class MultiStepJob : Job
 
     public IReadOnlyList<JobStep> Steps => _steps;
 
-    public new static MultiStepJob Create(
+    public static MultiStepJob Create(
         string systemName,
         string initialState,
         int maxAttempts = 3)

@@ -1,4 +1,5 @@
 ﻿using Domain.CommonEnums;
+using Domain.CommonEntities.Job;
 using Domain.Exceptions;
 using FluentAssertions;
 using JobDomain = Domain.CommonEntities.Job.Job;
@@ -10,7 +11,7 @@ public class JobTests
     [Fact]
     public void Create_ValidData_Succeeds()
     {
-        var job = JobDomain.Create("import-products", "{\"page\":1}", 5);
+        var job = SingleRunJob.Create("import-products", "{\"page\":1}", 5);
 
         job.SystemName.Should().Be("import-products");
         job.State.Should().Be("{\"page\":1}");
@@ -28,7 +29,7 @@ public class JobTests
     [Fact]
     public void Create_InvalidMaxAttempts_Throws()
     {
-        var act = () => JobDomain.Create(
+        var act = () => SingleRunJob.Create(
             "import-products",
             "{}",
             0);
@@ -144,7 +145,7 @@ public class JobTests
     [Fact]
     public void AcquireLease_ExpiredLockedJobWithoutRetryAttempts_Throws()
     {
-        var job = JobDomain.Create("import-products", "{}", 1);
+        var job = SingleRunJob.Create("import-products", "{}", 1);
         job.AcquireLease(Guid.NewGuid(), TimeSpan.FromMilliseconds(-1));
 
         var act = () => job.AcquireLease(Guid.NewGuid(), TimeSpan.FromMinutes(5));
@@ -248,7 +249,7 @@ public class JobTests
     public void RegisterAttempt_MaxAttemptsExceeded_Throws()
     {
         var leaseHolderId = Guid.NewGuid();
-        var job = JobDomain.Create("import-products", "{}", 1);
+        var job = SingleRunJob.Create("import-products", "{}", 1);
         job.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
 
         var act = () => job.RegisterAttempt(leaseHolderId);
@@ -269,7 +270,7 @@ public class JobTests
     [Fact]
     public void CanRetry_WhenAttemptsExhausted_ReturnsFalse()
     {
-        var job = JobDomain.Create("import-products", "{}", 1);
+        var job = SingleRunJob.Create("import-products", "{}", 1);
 
         var result = job.CanRetry();
 
@@ -531,7 +532,7 @@ public class JobTests
     [Fact]
     public void CanBeFailedByExpiredLease_ExpiredAndAttemptsExhausted_ReturnsTrue()
     {
-        var job = JobDomain.Create("import-products", "{}", 1);
+        var job = SingleRunJob.Create("import-products", "{}", 1);
         job.AcquireLease(Guid.NewGuid(), TimeSpan.FromMilliseconds(-1));
 
         var result = job.CanBeFailedByExpiredLease(DateTime.UtcNow);
@@ -585,7 +586,7 @@ public class JobTests
     [Fact]
     public void FailByExpiredLease_ExpiredAndAttemptsExhausted_FailsAndClearsLease()
     {
-        var job = JobDomain.Create("import-products", "{}", 1);
+        var job = SingleRunJob.Create("import-products", "{}", 1);
         job.AcquireLease(Guid.NewGuid(), TimeSpan.FromMilliseconds(-1));
 
         job.FailByExpiredLease(DateTime.UtcNow, "  lease expired  ");
@@ -599,7 +600,7 @@ public class JobTests
     [Fact]
     public void FailByExpiredLease_WithoutError_UsesDefaultErrorMessage()
     {
-        var job = JobDomain.Create("import-products", "{}", 1);
+        var job = SingleRunJob.Create("import-products", "{}", 1);
         job.AcquireLease(Guid.NewGuid(), TimeSpan.FromMilliseconds(-1));
 
         job.FailByExpiredLease(DateTime.UtcNow);
@@ -639,7 +640,7 @@ public class JobTests
 
     private static JobDomain Create()
     {
-        return JobDomain.Create("import-products", "{}");
+        return SingleRunJob.Create("import-products", "{}");
     }
 
     private static JobDomain CreateLockedJob(Guid leaseHolderId)

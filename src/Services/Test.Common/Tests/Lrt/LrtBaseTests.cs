@@ -263,7 +263,7 @@ public class LrtBaseTests
         {
             JobId = Guid.NewGuid();
             LeaseHolderId = Guid.NewGuid();
-            Job = Job.Create("test-lrt", initialState, maxAttempts);
+            Job = SingleRunJob.Create("test-lrt", initialState, maxAttempts);
             SetJobId(Job, JobId);
             Job.AcquireLease(LeaseHolderId, TimeSpan.FromMinutes(5));
 

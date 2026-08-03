@@ -7,7 +7,7 @@ using Domain.Validation;
 
 namespace Domain.CommonEntities.Job;
 
-public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
+public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 {
     protected Job() { }
     protected Job(
@@ -43,15 +43,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
     public override Guid GetId() { return Id; }
 
-    public static Job Create(
-        string systemName,
-        string initialState,
-        int maxAttempts = 3)
-    {
-        return new Job(systemName, initialState, maxAttempts);
-    }
-
-    public bool CanRetry()
+    public virtual bool CanRetry()
     {
         if (IsTerminal) return false;
         return Attempts < MaxAttempts;
@@ -89,7 +81,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
             () => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
     }
 
-    public void Start(Guid leaseHolderId)
+    public virtual void Start(Guid leaseHolderId)
     {
         EnsureActiveLease(leaseHolderId);
         
@@ -101,7 +93,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         Status = JobStatus.Processing;
     }
 
-    public void Succeed(Guid leaseHolderId)
+    public virtual void Succeed(Guid leaseHolderId)
     {
         EnsureActiveLease(leaseHolderId);
         
@@ -114,7 +106,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         ClearLease();
     }
 
-    public void Fail(Guid leaseHolderId, string? errorMessage)
+    public virtual void Fail(Guid leaseHolderId, string? errorMessage)
     {
         EnsureActiveLease(leaseHolderId);
         if (IsTerminal) throw new InvalidOperationException("Terminal job cannot be failed.");
@@ -124,7 +116,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         ClearLease();
     }
 
-    public void Cancel(Guid leaseHolderId, string? errorMessage = null)
+    public virtual void Cancel(Guid leaseHolderId, string? errorMessage = null)
     {
         EnsureActiveLease(leaseHolderId);
 
@@ -139,7 +131,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         ClearLease();
     }
     
-    public void RequestCancellation(string? reason = null)
+    public virtual void RequestCancellation(string? reason = null)
     {
         if (IsTerminal)
             throw new InvalidOperationException("Terminal job cannot be cancelled.");
@@ -192,7 +184,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         LeaseExpiresAt = DateTime.UtcNow.Add(leaseDuration);
     }
     
-    public bool CanBeFailedByExpiredLease(DateTime now)
+    public virtual bool CanBeFailedByExpiredLease(DateTime now)
     {
         if (IsTerminal)
             return false;
@@ -206,7 +198,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         return Attempts >= MaxAttempts;
     }
 
-    public void FailByExpiredLease(DateTime now, string? errorMessage = null)
+    public virtual void FailByExpiredLease(DateTime now, string? errorMessage = null)
     {
         if (!CanBeFailedByExpiredLease(now))
             throw new InvalidOperationException("Job cannot be failed by expired lease.");
