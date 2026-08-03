@@ -1,3 +1,5 @@
+using Domain.CommonEntities.Job.Events;
+
 namespace Domain.CommonEntities.Job;
 
 public sealed class JobStep : Job
@@ -51,5 +53,26 @@ public sealed class JobStep : Job
             return;
 
         _dependencies.Add(JobStepDependency.Create(Id, dependsOn.Id));
+    }
+
+    public override void OnCreated()
+    {
+        RaiseFinishedEventIfTerminal();
+    }
+
+    public override void OnUpdated()
+    {
+        RaiseFinishedEventIfTerminal();
+    }
+
+    private void RaiseFinishedEventIfTerminal()
+    {
+        if (!IsTerminal) return;
+
+        AddDomainEvent(
+            new JobStepFinishedDomainEvent(
+                Id,
+                MultiStepJobId,
+                Status));
     }
 }

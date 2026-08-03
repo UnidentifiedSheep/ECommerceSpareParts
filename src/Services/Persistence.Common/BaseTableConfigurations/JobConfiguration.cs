@@ -54,6 +54,8 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder
             .HasDiscriminator<string>("job_type")
             .HasValue<SingleRunJob>("job")
-            .HasValue<UniqJob>("uniq_job");
+            .HasValue<UniqJob>("uniq_job")
+            .HasValue<MultiStepJob>("multi_step_job")
+            .HasValue<JobStep>("job_step");
     }
 }

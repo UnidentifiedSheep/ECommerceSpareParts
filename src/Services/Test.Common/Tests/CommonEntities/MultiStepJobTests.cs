@@ -1,4 +1,5 @@
 using Domain.CommonEntities.Job;
+using Domain.CommonEntities.Job.Events;
 using Domain.CommonEnums;
 using Domain.Exceptions;
 using FluentAssertions;
@@ -101,6 +102,70 @@ public class MultiStepJobTests
         var act = () => job.AddStep("another-step", "{}");
 
         act.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void StepSucceeded_RaisesFinishedEvent()
+    {
+        var leaseHolderId = Guid.NewGuid();
+        var job = Create();
+        var step = job.AddStep("step", "{}");
+        step.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
+        step.Start(leaseHolderId);
+
+        step.Succeed(leaseHolderId);
+        step.OnUpdated();
+
+        var @event = step.FlushDomainEvents()
+            .Should().ContainSingle()
+            .Which.Should().BeOfType<JobStepFinishedDomainEvent>()
+            .Subject;
+        @event.JobStepId.Should().Be(step.Id);
+        @event.MultiStepJobId.Should().Be(job.Id);
+        @event.Status.Should().Be(JobStatus.Succeeded);
+    }
+
+    [Fact]
+    public void StepFailed_RaisesFinishedEvent()
+    {
+        var leaseHolderId = Guid.NewGuid();
+        var job = Create();
+        var step = job.AddStep("step", "{}");
+        step.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
+
+        step.Fail(leaseHolderId, "failed");
+        step.OnUpdated();
+
+        step.FlushDomainEvents()
+            .Should().ContainSingle()
+            .Which.Should().BeOfType<JobStepFinishedDomainEvent>()
+            .Which.Status.Should().Be(JobStatus.Failed);
+    }
+
+    [Fact]
+    public void PendingStepCancellation_RaisesFinishedEvent()
+    {
+        var job = Create();
+        var step = job.AddStep("step", "{}");
+
+        step.RequestCancellation();
+        step.OnCreated();
+
+        step.FlushDomainEvents()
+            .Should().ContainSingle()
+            .Which.Should().BeOfType<JobStepFinishedDomainEvent>()
+            .Which.Status.Should().Be(JobStatus.Cancelled);
+    }
+
+    [Fact]
+    public void NonTerminalStepUpdate_DoesNotRaiseFinishedEvent()
+    {
+        var job = Create();
+        var step = job.AddStep("step", "{}");
+
+        step.OnUpdated();
+
+        step.FlushDomainEvents().Should().BeEmpty();
     }
 
     private static MultiStepJob Create()

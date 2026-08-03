@@ -2,6 +2,7 @@
 using Abstractions.Interfaces;
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
+using Application.Common.DomainEventHandlers.Jobs;
 using Application.Common.Extensions;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
@@ -14,6 +15,8 @@ using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Application.Common.Projections;
 using Application.Common.Services;
+using Application.Common.Services.Events;
+using Domain.CommonEntities.Job.Events;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -100,6 +103,9 @@ public static class ServiceProvider
 
         services.AddScoped<IJobLeaseService, JobLeaseService>();
         services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();
+        services.AddScoped<
+            INotificationHandler<Batch<JobStepFinishedDomainEvent>>,
+            ResumeMultiStepJobHandler>();
         
         services.AddScoped<
             IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,
