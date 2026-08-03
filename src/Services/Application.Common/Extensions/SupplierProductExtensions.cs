@@ -9,7 +9,7 @@ public static class SupplierProductExtensions
         => new()
         {
             Id = product.Id,
-            Name = product.Name,
+            Names = product.Names,
             Number = product.Number,
             Brand = product.Brand,
             
@@ -50,7 +50,7 @@ public static class SupplierProductExtensions
         => new()
         {
             Id = product.Id,
-            Name = product.Name,
+            Names = product.Names,
             Number = product.Number,
             Brand = product.Brand,
             
