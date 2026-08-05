@@ -19,7 +19,7 @@ public class UpdateCurrencyRatesLrt(
     IPublishEndpoint publisher,
     ILogger<UpdateCurrencyRatesLrt> logger,
     ISender sender
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

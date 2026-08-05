@@ -8,7 +8,7 @@ namespace Application.Common.Extensions;
 public static class InputStateExtensions
 {
     public static string ValidateState(
-        this LrtNamedObjectBase lrt,
+        this ILrtNamedObject lrt,
         string state)
     {
         if (JsonSerializer.Deserialize(state, lrt.InputType) is not IInputState inputState)

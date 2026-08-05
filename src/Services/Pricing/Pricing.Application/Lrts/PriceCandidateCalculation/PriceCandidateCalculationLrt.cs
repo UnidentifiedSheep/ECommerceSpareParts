@@ -17,7 +17,7 @@ public class PriceCandidateCalculationLrt(
     IPublishEndpoint publisher,
     ILogger<PriceCandidateCalculationLrt> logger,
     ISender sender
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

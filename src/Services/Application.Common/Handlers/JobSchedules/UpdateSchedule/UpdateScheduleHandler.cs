@@ -3,6 +3,7 @@ using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
@@ -25,7 +26,7 @@ public record UpdateScheduleResult(JobScheduleDto Schedule);
 
 public class UpdateScheduleHandler(
     IRepository<JobSchedule, Guid> repository,
-    INamedObjectRegistry<LrtNamedObjectBase> registry,
+    INamedObjectRegistry<ILrtNamedObject> registry,
     IUnitOfWork unitOfWork,
     IProjectionProvider<JobSchedule, JobScheduleDto> projection
 ) : ICommandHandler<UpdateScheduleCommand, UpdateScheduleResult>

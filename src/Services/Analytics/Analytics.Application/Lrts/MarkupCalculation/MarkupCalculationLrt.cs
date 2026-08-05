@@ -22,7 +22,7 @@ public class MarkupCalculationLrt(
     INamedObjectRegistry<MarkupAnalyzerNamedObjectBase> registry,
     IPublishEndpoint publisher,
     ILogger<MarkupCalculationLrt> logger
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

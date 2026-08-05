@@ -28,7 +28,7 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     IS3StorageService s3Service,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
-) : LrtNamedObjectBase(
+) : LrtBase(
         jobRepository,
         unitOfWork,
         publisher,

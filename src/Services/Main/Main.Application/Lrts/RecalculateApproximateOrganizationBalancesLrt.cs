@@ -22,7 +22,7 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<RecalculateApproximateOrganizationBalancesLrt> logger
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

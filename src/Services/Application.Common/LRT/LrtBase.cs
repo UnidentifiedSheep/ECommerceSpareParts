@@ -19,7 +19,7 @@ public abstract class LrtBase(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger logger
-) : ILrt, ILrtDescriptor
+) : ILrtNamedObject
 {
     protected IUnitOfWork UnitOfWork => unitOfWork;
     protected IRepository<Job, Guid> JobRepository => jobRepository;
@@ -33,6 +33,9 @@ public abstract class LrtBase(
     protected bool Initialized { get; private set; }
     protected virtual TimeSpan LeaseDuration => TimeSpan.FromMinutes(5);
     public abstract IServiceDefinition ServiceDefinition { get; }
+    public abstract string SystemName { get; }
+    public abstract string NameLocalizationKey { get; }
+    public abstract string DescriptionLocalizationKey { get; }
 
     public async Task ExecuteAsync(
         Guid jobId,

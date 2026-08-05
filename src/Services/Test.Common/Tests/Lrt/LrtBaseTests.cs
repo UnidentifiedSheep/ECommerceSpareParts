@@ -339,6 +339,9 @@ public class LrtBaseTests
         public bool CurrentInitialized => Initialized;
         public DateTime? CurrentLeaseExpiresAt => Job.LeaseExpiresAt;
         public override IServiceDefinition ServiceDefinition { get; } = new TestServiceDefinition();
+        public override string SystemName => nameof(TestLrt);
+        public override string NameLocalizationKey => "test-lrt-name";
+        public override string DescriptionLocalizationKey => "test-lrt-description";
         public override Type InputType => typeof(TestInput);
         public override Type StateType => typeof(TestState);
 

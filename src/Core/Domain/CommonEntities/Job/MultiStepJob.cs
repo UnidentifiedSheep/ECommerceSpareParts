@@ -20,9 +20,11 @@ public sealed class MultiStepJob : Job
     {
     }
 
-    private readonly List<JobStep> _steps = [];
+    private readonly List<Job> _steps = [];
+    private readonly List<JobStepDependency> _dependencies = [];
 
-    public IReadOnlyList<JobStep> Steps => _steps;
+    public IReadOnlyList<Job> Steps => _steps;
+    public IReadOnlyList<JobStepDependency> Dependencies => _dependencies;
 
     public static MultiStepJob Create(
         string systemName,
@@ -35,27 +37,21 @@ public sealed class MultiStepJob : Job
             maxAttempts);
     }
 
-    public JobStep AddStep(
-        string systemName,
-        string initialState,
-        int maxAttempts = 3)
+    public void AddStep(Job step)
     {
+        ArgumentNullException.ThrowIfNull(step);
         EnsureTopologyMutable();
 
-        var step = JobStep.Create(
-            Id,
-            systemName,
-            initialState,
-            maxAttempts);
+        if (_steps.Any(x => x.Id == step.Id))
+            return;
 
+        step.AttachTo(this);
         _steps.Add(step);
-
-        return step;
     }
 
     public void AddDependency(
-        JobStep step,
-        JobStep dependsOn)
+        Job step,
+        Job dependsOn)
     {
         ArgumentNullException.ThrowIfNull(step);
         ArgumentNullException.ThrowIfNull(dependsOn);
@@ -67,13 +63,27 @@ public sealed class MultiStepJob : Job
         if (step.Id == dependsOn.Id)
             throw new InvalidOperationException(
                 "Job step cannot depend on itself.");
-        
-        
+
         if (HasDependencyPath(dependsOn.Id, step.Id))
             throw new InvalidOperationException(
                 "Dependency would create a cycle.");
 
-        step.AddDependency(dependsOn);
+        if (_dependencies.Any(x =>
+                x.StepId == step.Id &&
+                x.DependsOnStepId == dependsOn.Id))
+            return;
+
+        _dependencies.Add(JobStepDependency.Create(
+            this,
+            step,
+            dependsOn));
+    }
+
+    public void ActivateStep(Job step)
+    {
+        ArgumentNullException.ThrowIfNull(step);
+        EnsureOwnStep(step);
+        step.Activate(Id);
     }
 
     public void Wait(Guid leaseHolderId)
@@ -97,13 +107,17 @@ public sealed class MultiStepJob : Job
 
     private void EnsureTopologyMutable()
     {
+        if (IsStep)
+            throw new InvalidOperationException(
+                "Nested multi-step job topology cannot be changed.");
+
         if (Status != JobStatus.Pending || LockedAt is not null)
             throw new InvalidOperationException(
                 "Multi-step job topology cannot be " +
                 "changed after execution has started.");
     }
 
-    private void EnsureOwnStep(JobStep step)
+    private void EnsureOwnStep(Job step)
     {
         if (step.MultiStepJobId != Id || _steps.All(x => x.Id != step.Id))
             throw new InvalidOperationException(
@@ -127,11 +141,12 @@ public sealed class MultiStepJob : Job
             if (currentStepId == targetStepId)
                 return true;
 
-            if (!stepsById.TryGetValue(currentStepId, out var currentStep))
+            if (!stepsById.ContainsKey(currentStepId))
                 throw new InvalidOperationException(
                     "Workflow contains a dependency on an unknown job step.");
 
-            foreach (var dependency in currentStep.Dependencies)
+            foreach (var dependency in _dependencies.Where(x =>
+                         x.StepId == currentStepId))
                 stack.Push(dependency.DependsOnStepId);
         }
 

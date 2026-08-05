@@ -21,7 +21,7 @@ public class ProducerSynchronizationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<ProducerSynchronizationLrt> logger
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

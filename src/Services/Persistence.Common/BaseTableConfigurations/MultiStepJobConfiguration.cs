@@ -9,14 +9,18 @@ public sealed class MultiStepJobConfiguration :
 {
     public void Configure(EntityTypeBuilder<MultiStepJob> builder)
     {
-        builder.HasMany(x => x.Steps)
+        builder.Navigation(x => x.Steps)
+            .HasField("_steps")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(x => x.Dependencies)
             .WithOne(x => x.MultiStepJob)
             .HasForeignKey(x => x.MultiStepJobId)
             .OnDelete(DeleteBehavior.Cascade)
-            .HasConstraintName("jobs_multi_step_job_id_fk");
+            .HasConstraintName("job_step_dependencies_multi_step_job_id_fk");
 
-        builder.Navigation(x => x.Steps)
-            .HasField("_steps")
+        builder.Navigation(x => x.Dependencies)
+            .HasField("_dependencies")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

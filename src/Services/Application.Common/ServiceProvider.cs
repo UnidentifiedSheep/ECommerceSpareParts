@@ -94,7 +94,7 @@ public static class ServiceProvider
         Assembly? assembly = null)
     {
         assembly ??= Assembly.GetExecutingAssembly();
-        services.RegisterNamedObject<LrtNamedObjectBase>(assembly)
+        services.RegisterNamedObject<ILrtNamedObject>(assembly)
             .RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly)
             .RegisterProjectionProviders<JobDtoProjectionProvider>();
 
@@ -102,6 +102,7 @@ public static class ServiceProvider
         services.TryAddScoped<IOperationDatePolicy, OperationDatePolicy>();
 
         services.AddScoped<IJobLeaseService, JobLeaseService>();
+        services.AddScoped<IJobCreationDispatcher, JobCreationDispatcher>();
         services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();
         services.AddScoped<
             INotificationHandler<Batch<JobStepFinishedDomainEvent>>,

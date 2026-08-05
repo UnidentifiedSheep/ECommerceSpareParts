@@ -21,7 +21,7 @@ public sealed class ProductSynchronizationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<ProductSynchronizationLrt> logger
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

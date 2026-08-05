@@ -1,6 +1,7 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -35,7 +36,7 @@ public record TryEnqueueUniqJobItem(
     int MaxAttempts);
 
 public class TryEnqueueUniqJobHandler(
-    INamedObjectRegistry<LrtNamedObjectBase> registry,
+    INamedObjectRegistry<ILrtNamedObject> registry,
     IJobRepository jobRepository
     ) : ICommandHandler<TryEnqueueUniqJobCommand>
 {
@@ -45,6 +46,10 @@ public class TryEnqueueUniqJobHandler(
         foreach (var item in request.Items)
         {
             var lrt = registry.GetBySystemName(item.SystemName);
+
+            if (lrt is MultiStepLrtBase)
+                throw new InvalidOperationException(
+                    "Multi-step LRT cannot be queued as a unique job.");
 
             var job = UniqJob.Create(
                 item.NaturalKey,

@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -21,7 +22,7 @@ public class CancelJobHandler(
     IRepository<Job, Guid> repository,
     IPublishEndpoint publisher,
     IUnitOfWork unitOfWork,
-    INamedObjectRegistry<LrtNamedObjectBase> registry) : ICommandHandler<CancelJobCommand>
+    INamedObjectRegistry<ILrtNamedObject> registry) : ICommandHandler<CancelJobCommand>
 {
     public async Task<Unit> Handle(CancelJobCommand request, CancellationToken cancellationToken)
     {

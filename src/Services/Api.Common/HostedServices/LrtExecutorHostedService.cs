@@ -83,7 +83,7 @@ public class LrtExecutorHostedService(
                 await using var scope = scopeFactory.CreateAsyncScope();
 
                 var registry = scope.ServiceProvider
-                    .GetRequiredService<INamedObjectRegistry<LrtNamedObjectBase>>();
+                    .GetRequiredService<INamedObjectRegistry<ILrtNamedObject>>();
 
                 await registry
                     .GetBySystemName(systemName)

@@ -1,0 +1,6 @@
+{
+  "locale": "en",
+  "keyValues": {
+    "job.step.cannot.be.cancelled.directly": "A job step cannot be cancelled directly. Cancel its multi-step job instead."
+  }
+}

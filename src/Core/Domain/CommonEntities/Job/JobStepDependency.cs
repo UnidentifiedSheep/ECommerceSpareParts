@@ -12,47 +12,55 @@ public sealed class JobStepDependency :
     }
 
     private JobStepDependency(
-        Guid stepId,
-        Guid dependsOnStepId)
+        MultiStepJob multiStepJob,
+        Job step,
+        Job dependsOnStep)
     {
-        StepId = stepId;
-        DependsOnStepId = dependsOnStepId;
+        MultiStepJobId = multiStepJob.Id;
+        MultiStepJob = multiStepJob;
+        StepId = step.Id;
+        Step = step;
+        DependsOnStepId = dependsOnStep.Id;
+        DependsOnStep = dependsOnStep;
     }
 
+    public Guid MultiStepJobId { get; private set; }
+    public MultiStepJob MultiStepJob { get; private set; } = null!;
+
     public Guid StepId { get; private set; }
-    public JobStep Step { get; private set; } = null!;
+    public Job Step { get; private set; } = null!;
 
     public Guid DependsOnStepId { get; private set; }
-    public JobStep DependsOnStep { get; private set; } = null!;
+    public Job DependsOnStep { get; private set; } = null!;
 
     internal static JobStepDependency Create(
-        Guid stepId,
-        Guid dependsOnStepId)
+        MultiStepJob multiStepJob,
+        Job step,
+        Job dependsOnStep)
     {
-        if (stepId == dependsOnStepId)
-        {
+        ArgumentNullException.ThrowIfNull(multiStepJob);
+        ArgumentNullException.ThrowIfNull(step);
+        ArgumentNullException.ThrowIfNull(dependsOnStep);
+
+        if (step.Id == dependsOnStep.Id)
             throw new InvalidOperationException(
                 "Job step cannot depend on itself.");
-        }
 
         return new JobStepDependency(
-            stepId,
-            dependsOnStepId);
+            multiStepJob,
+            step,
+            dependsOnStep);
     }
 
     public override JobStepDependencyKey GetId()
     {
-        return new JobStepDependencyKey(
-            StepId,
-            DependsOnStepId);
+        return new JobStepDependencyKey(StepId, DependsOnStepId);
     }
 
     public static Expression<Func<JobStepDependency, JobStepDependencyKey>>
         GetKeySelector()
     {
-        return x => new JobStepDependencyKey(
-            x.StepId,
-            x.DependsOnStepId);
+        return x => new JobStepDependencyKey(x.StepId, x.DependsOnStepId);
     }
 
     public static Expression<Func<JobStepDependency, bool>>

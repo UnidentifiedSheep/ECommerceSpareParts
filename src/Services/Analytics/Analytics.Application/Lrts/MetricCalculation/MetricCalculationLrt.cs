@@ -20,7 +20,7 @@ public class MetricCalculationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<MetricCalculationLrt> logger
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

@@ -31,7 +31,7 @@ public class InvalidateStalePriceOptionsLrt(
     IMarkupContainer markupContainer,
     IPriceApplierService priceApplierService,
     ISettingsService settingsService
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

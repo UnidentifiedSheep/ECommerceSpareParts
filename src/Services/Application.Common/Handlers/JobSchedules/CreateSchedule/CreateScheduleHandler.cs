@@ -2,6 +2,7 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Dtos;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Projections;
 using Application.Common.LRT;
@@ -19,7 +20,7 @@ public record CreateScheduleCommand(NewJobScheduleDto NewSchedule) : IQuery<Crea
 public record CreateScheduleResult(JobScheduleDto Schedule);
 
 public class CreateScheduleHandler(
-    INamedObjectRegistry<LrtNamedObjectBase> registry,
+    INamedObjectRegistry<ILrtNamedObject> registry,
     IUnitOfWork unitOfWork,
     IProjectionProvider<JobSchedule, JobScheduleDto> projection
 ) : IQueryHandler<CreateScheduleCommand, CreateScheduleResult>
