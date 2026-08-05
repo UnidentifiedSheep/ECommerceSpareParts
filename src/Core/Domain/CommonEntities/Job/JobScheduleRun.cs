@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain.Interfaces;
 
-namespace Domain.CommonEntities;
+namespace Domain.CommonEntities.Job;
 
 public class JobScheduleRun : Entity<JobScheduleRun, Guid>, ILinqEntity<JobScheduleRun, Guid>
 {

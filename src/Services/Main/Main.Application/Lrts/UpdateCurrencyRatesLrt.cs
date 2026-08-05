@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using MassTransit;
 using MediatR;
@@ -18,7 +19,7 @@ public class UpdateCurrencyRatesLrt(
     IPublishEndpoint publisher,
     ILogger<UpdateCurrencyRatesLrt> logger,
     ISender sender
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

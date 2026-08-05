@@ -1,6 +1,8 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Localization.Abstractions.Interfaces;
 
@@ -12,7 +14,7 @@ public sealed record GetAllAvailableJobsResult(IReadOnlyList<JobInfoDto> Jobs);
 
 public sealed class GetAllAvailableJobsHandler(
     IScopedStringLocalizer localizer,
-    INamedObjectRegistry<LrtNamedObjectBase> registry,
+    INamedObjectRegistry<ILrtNamedObject> registry,
     IScopedLocalizedJsonSerializer jsonSerializer
 ) : IQueryHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>
 {

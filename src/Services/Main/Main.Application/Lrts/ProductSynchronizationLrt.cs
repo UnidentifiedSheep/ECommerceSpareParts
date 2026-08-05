@@ -7,6 +7,7 @@ using Application.Common.NamedObject;
 using Attributes;
 using Contracts.Products;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Main.Entities.Product;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ public sealed class ProductSynchronizationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<ProductSynchronizationLrt> logger
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

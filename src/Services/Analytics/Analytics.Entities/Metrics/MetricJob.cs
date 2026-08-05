@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Domain.Interfaces;
 
 namespace Analytics.Entities.Metrics;

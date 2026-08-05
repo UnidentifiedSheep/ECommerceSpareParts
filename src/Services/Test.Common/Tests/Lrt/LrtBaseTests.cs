@@ -6,6 +6,7 @@ using Application.Common.LRT;
 using Attributes;
 using Contracts.Job;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using Domain.Exceptions;
 using FluentAssertions;
@@ -262,7 +263,7 @@ public class LrtBaseTests
         {
             JobId = Guid.NewGuid();
             LeaseHolderId = Guid.NewGuid();
-            Job = Job.Create("test-lrt", initialState, maxAttempts);
+            Job = SingleRunJob.Create("test-lrt", initialState, maxAttempts);
             SetJobId(Job, JobId);
             Job.AcquireLease(LeaseHolderId, TimeSpan.FromMinutes(5));
 
@@ -338,6 +339,9 @@ public class LrtBaseTests
         public bool CurrentInitialized => Initialized;
         public DateTime? CurrentLeaseExpiresAt => Job.LeaseExpiresAt;
         public override IServiceDefinition ServiceDefinition { get; } = new TestServiceDefinition();
+        public override string SystemName => nameof(TestLrt);
+        public override string NameLocalizationKey => "test-lrt-name";
+        public override string DescriptionLocalizationKey => "test-lrt-description";
         public override Type InputType => typeof(TestInput);
         public override Type StateType => typeof(TestState);
 

@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 
 namespace Application.Common.LRT;

@@ -1,4 +1,5 @@
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 
 namespace Application.Common.Interfaces.Repositories;
 

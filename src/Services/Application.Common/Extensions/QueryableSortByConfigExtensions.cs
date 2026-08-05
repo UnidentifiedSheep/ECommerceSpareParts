@@ -1,5 +1,6 @@
 using Abstractions;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 
 namespace Application.Common.Extensions;

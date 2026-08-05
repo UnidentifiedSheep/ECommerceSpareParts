@@ -1,4 +1,5 @@
 ﻿using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -46,13 +47,24 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(e => e.State)
             .HasColumnName("state");
 
+        builder.Property(e => e.MultiStepJobId)
+            .HasColumnName("multi_step_job_id");
+
         builder.HasIndex(e => e.SystemName, "jobs_system_name_idx");
         builder.HasIndex(e => new { e.Status, e.Id }, "jobs_status_id_idx");
         builder.HasIndex(e => e.LockedAt, "jobs_locked_at_idx");
-        
+        builder.HasIndex(e => e.MultiStepJobId, "jobs_multi_step_job_id_idx");
+
+        builder.HasOne(e => e.MultiStepJob)
+            .WithMany(e => e.Steps)
+            .HasForeignKey(e => e.MultiStepJobId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("jobs_multi_step_job_id_fk");
+
         builder
             .HasDiscriminator<string>("job_type")
-            .HasValue<Job>("job")
-            .HasValue<UniqJob>("uniq_job");
+            .HasValue<SingleRunJob>("job")
+            .HasValue<UniqJob>("uniq_job")
+            .HasValue<MultiStepJob>("multi_step_job");
     }
 }

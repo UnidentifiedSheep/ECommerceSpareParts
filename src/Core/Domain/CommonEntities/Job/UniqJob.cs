@@ -1,7 +1,7 @@
 using Domain.Extensions;
 using Domain.Validation;
 
-namespace Domain.CommonEntities;
+namespace Domain.CommonEntities.Job;
 
 public class UniqJob : Job
 {

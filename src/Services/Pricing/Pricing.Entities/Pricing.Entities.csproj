@@ -37,6 +37,11 @@
         <Content Include="..\..\Application.Common\Localization\json-property-names-localization-tr.json">
             <Link>Localization\json-property-names-localization-tr.json</Link>
         </Content>
+        <Content Include="..\..\..\Core\Domain\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>

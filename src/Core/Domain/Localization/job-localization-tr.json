@@ -1,0 +1,6 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "job.step.cannot.be.cancelled.directly": "Bir iş adımı doğrudan iptal edilemez. Bunun yerine üst çok adımlı işi iptal edin."
+  }
+}

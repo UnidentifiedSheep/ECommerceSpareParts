@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Handlers.Products.UpsertProductCrosses;

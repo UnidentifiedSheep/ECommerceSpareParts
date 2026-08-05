@@ -1,5 +1,6 @@
 using Cronos;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using FluentValidation;
 using Localization.Domain.Extensions;
 

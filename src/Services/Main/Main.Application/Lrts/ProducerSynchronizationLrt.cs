@@ -7,6 +7,7 @@ using Application.Common.NamedObject;
 using Attributes;
 using Contracts.Producer;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Main.Entities.Producer;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ public class ProducerSynchronizationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<ProducerSynchronizationLrt> logger
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

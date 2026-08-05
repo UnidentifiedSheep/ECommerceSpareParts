@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Projections;
 using Attributes;
 using CronExpressionDescriptor;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
 
 namespace Application.Common.Projections;

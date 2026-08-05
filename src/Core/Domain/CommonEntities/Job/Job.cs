@@ -1,13 +1,15 @@
 ﻿using System.Linq.Expressions;
+using Domain.CommonEntities.Job.Events;
 using Domain.CommonEnums;
 using Domain.Exceptions;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
+using Exceptions;
 
-namespace Domain.CommonEntities;
+namespace Domain.CommonEntities.Job;
 
-public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
+public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 {
     protected Job() { }
     protected Job(
@@ -33,9 +35,12 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     public DateTime? LockedAt { get; private set; }
     public DateTime? LeaseExpiresAt { get; private set; }
     public Guid? LeaseHolderId { get; private set; }
+    public Guid? MultiStepJobId { get; private set; }
+    public MultiStepJob? MultiStepJob { get; private set; }
 
     public bool IsTerminal => Status is JobStatus.Succeeded or JobStatus.Failed or JobStatus.Cancelled;
     public bool IsCancellationRequested => Status == JobStatus.CancellationRequested;
+    public bool IsStep => MultiStepJobId.HasValue;
 
     public static Expression<Func<Job, Guid>> GetKeySelector() { return x => x.Id; }
 
@@ -43,15 +48,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
     public override Guid GetId() { return Id; }
 
-    public static Job Create(
-        string systemName,
-        string initialState,
-        int maxAttempts = 3)
-    {
-        return new Job(systemName, initialState, maxAttempts);
-    }
-
-    public bool CanRetry()
+    public virtual bool CanRetry()
     {
         if (IsTerminal) return false;
         return Attempts < MaxAttempts;
@@ -89,32 +86,32 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
             () => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
     }
 
-    public void Start(Guid leaseHolderId)
+    public virtual void Start(Guid leaseHolderId)
     {
         EnsureActiveLease(leaseHolderId);
-        
+
         if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
-        
+
         EnsureStatus(JobStatus.Locked);
-        
+
         ErrorMessage = null;
         Status = JobStatus.Processing;
     }
 
-    public void Succeed(Guid leaseHolderId)
+    public virtual void Succeed(Guid leaseHolderId)
     {
         EnsureActiveLease(leaseHolderId);
-        
+
         if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
-        
+
         EnsureStatus(JobStatus.Processing);
-        
+
         ErrorMessage = null;
         Status = JobStatus.Succeeded;
         ClearLease();
     }
 
-    public void Fail(Guid leaseHolderId, string? errorMessage)
+    public virtual void Fail(Guid leaseHolderId, string? errorMessage)
     {
         EnsureActiveLease(leaseHolderId);
         if (IsTerminal) throw new InvalidOperationException("Terminal job cannot be failed.");
@@ -124,7 +121,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         ClearLease();
     }
 
-    public void Cancel(Guid leaseHolderId, string? errorMessage = null)
+    public virtual void Cancel(Guid leaseHolderId, string? errorMessage = null)
     {
         EnsureActiveLease(leaseHolderId);
 
@@ -138,15 +135,19 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         Status = JobStatus.Cancelled;
         ClearLease();
     }
-    
-    public void RequestCancellation(string? reason = null)
+
+    public virtual void RequestCancellation(string? reason = null)
     {
+        if (IsStep)
+            throw new InvalidInputException(
+                "job.step.cannot.be.cancelled.directly");
+
         if (IsTerminal)
             throw new InvalidOperationException("Terminal job cannot be cancelled.");
 
         ErrorMessage = reason?.TrimOrNull();
 
-        if (Status == JobStatus.Pending)
+        if (Status is JobStatus.Pending or JobStatus.Waiting or JobStatus.Blocked)
         {
             Status = JobStatus.Cancelled;
             ClearLease();
@@ -155,7 +156,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
         Status = JobStatus.CancellationRequested;
     }
-    
+
     public void AcquireLease(Guid leaseHolderId, TimeSpan leaseDuration)
     {
         if (IsTerminal)
@@ -163,6 +164,12 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
         if (Status == JobStatus.CancellationRequested)
             throw new InvalidOperationException("Cancellation requested job cannot be acquired.");
+
+        if (Status is not JobStatus.Pending and
+            not JobStatus.Locked and
+            not JobStatus.Processing)
+            throw new InvalidOperationException(
+                $"Job in {Status} status cannot be acquired.");
 
         var now = DateTime.UtcNow;
 
@@ -191,8 +198,8 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
         LeaseExpiresAt = DateTime.UtcNow.Add(leaseDuration);
     }
-    
-    public bool CanBeFailedByExpiredLease(DateTime now)
+
+    public virtual bool CanBeFailedByExpiredLease(DateTime now)
     {
         if (IsTerminal)
             return false;
@@ -206,7 +213,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         return Attempts >= MaxAttempts;
     }
 
-    public void FailByExpiredLease(DateTime now, string? errorMessage = null)
+    public virtual void FailByExpiredLease(DateTime now, string? errorMessage = null)
     {
         if (!CanBeFailedByExpiredLease(now))
             throw new InvalidOperationException("Job cannot be failed by expired lease.");
@@ -217,7 +224,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         Status = JobStatus.Failed;
         ClearLease();
     }
-    
+
     public void EnsureActiveLease(Guid leaseHolderId)
     {
         if (LeaseHolderId != leaseHolderId)
@@ -227,9 +234,51 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
             throw new JobLeaseLostException(Id);
     }
     
-    private void ClearLease()
+    protected void ClearLease()
     {
         LeaseHolderId = null;
         LeaseExpiresAt = null;
+    }
+
+    internal void AttachTo(MultiStepJob parent)
+    {
+        ArgumentNullException.ThrowIfNull(parent);
+        EnsureStatus(JobStatus.Pending);
+
+        if (IsStep)
+            throw new InvalidOperationException(
+                "Job already belongs to a multi-step job.");
+
+        MultiStepJobId = parent.Id;
+        MultiStepJob = parent;
+        Status = JobStatus.Blocked;
+    }
+
+    internal void Activate(Guid multiStepJobId)
+    {
+        if (MultiStepJobId != multiStepJobId)
+            throw new InvalidOperationException(
+                "Job does not belong to the specified multi-step job.");
+
+        EnsureStatus(JobStatus.Blocked);
+        Status = JobStatus.Pending;
+    }
+
+    public override void OnCreated()
+    {
+        RaiseFinishedEventIfStepIsTerminal();
+    }
+
+    public override void OnUpdated()
+    {
+        RaiseFinishedEventIfStepIsTerminal();
+    }
+
+    private void RaiseFinishedEventIfStepIsTerminal()
+    {
+        if (!IsTerminal || !MultiStepJobId.HasValue)
+            return;
+
+        AddDomainEvent(new JobStepFinishedDomainEvent(Id, MultiStepJobId.Value, Status));
     }
 }

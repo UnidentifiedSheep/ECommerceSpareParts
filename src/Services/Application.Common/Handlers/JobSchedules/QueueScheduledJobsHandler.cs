@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Cronos;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using MediatR;
 
 namespace Application.Common.Handlers.JobSchedules;

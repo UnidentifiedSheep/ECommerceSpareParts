@@ -3,11 +3,13 @@ using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.LRT;
 using Application.Common.Models.Options.S3;
 using Application.Common.NamedObject;
 using CsvHelper;
 using CsvHelper.TypeConversion;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Static;
@@ -26,7 +28,7 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     IS3StorageService s3Service,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
-) : LrtNamedObjectBase(
+) : LrtBase(
         jobRepository,
         unitOfWork,
         publisher,

@@ -2,6 +2,7 @@ using Application.Common.Exceptions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Common.Handlers.Jobs;

@@ -3,9 +3,11 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Handlers.Metrics;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Contracts.Analytics;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -18,7 +20,7 @@ public class MetricCalculationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<MetricCalculationLrt> logger
-) : LrtNamedObjectBase(
+) : LrtBase(
     jobRepository,
     unitOfWork,
     publisher,

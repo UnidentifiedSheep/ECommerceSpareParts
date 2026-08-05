@@ -2,11 +2,11 @@
 using Application.Common.Dtos;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Projections;
-using Application.Common.NamedObject;
 using Attributes;
 using Domain.CommonEntities;
+using Domain.CommonEntities.Job;
 
 namespace Application.Common.Handlers.Jobs;
 
@@ -41,7 +41,7 @@ public sealed record QueueJobItem(
 public sealed record QueueJobResult(IReadOnlyList<JobDto> Jobs);
 
 public sealed class QueueJobHandler(
-    INamedObjectRegistry<LrtNamedObjectBase> registry,
+    IJobCreationDispatcher jobCreationDispatcher,
     IUnitOfWork unitOfWork,
     IProjectionProvider<Job, JobDto> projection
 ) : ICommandHandler<QueueJobCommand, QueueJobResult>
@@ -52,15 +52,10 @@ public sealed class QueueJobHandler(
     {
         var toAdd = new List<Job>();
         foreach (var item in request.Jobs)
-        {
-            var lrt = registry.GetBySystemName(item.SystemName);
-
-            var job = Job.Create(
-                lrt.SystemName,
-                lrt.ValidateState(item.InputState), 
-                item.MaxAttempts);
-            toAdd.Add(job);
-        }
+            toAdd.Add(jobCreationDispatcher.Create(
+                item.SystemName,
+                item.InputState,
+                item.MaxAttempts));
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
