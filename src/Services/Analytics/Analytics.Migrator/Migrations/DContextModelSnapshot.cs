@@ -336,7 +336,7 @@ namespace Analytics.Migrator.Migrations
                     b.ToTable("sales_fact", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.CommonEntities.Job", b =>
+            modelBuilder.Entity("Domain.CommonEntities.Job.Job", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -371,6 +371,10 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("max_attempts");
 
+                    b.Property<Guid?>("MultiStepJobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("multi_step_job_id");
+
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("text")
@@ -401,19 +405,21 @@ namespace Analytics.Migrator.Migrations
 
                     b.Property<string>("job_type")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)");
+                        .HasMaxLength(21)
+                        .HasColumnType("character varying(21)");
 
                     b.HasKey("Id")
                         .HasName("jobs_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.uniqjob_who_created_idx");
+                        .HasDatabaseName("domain.commonentities.job.uniqjob_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.uniqjob_who_updated_idx");
+                        .HasDatabaseName("domain.commonentities.job.uniqjob_who_updated_idx");
 
                     b.HasIndex(new[] { "LockedAt" }, "jobs_locked_at_idx");
+
+                    b.HasIndex(new[] { "MultiStepJobId" }, "jobs_multi_step_job_id_idx");
 
                     b.HasIndex(new[] { "Status", "Id" }, "jobs_status_id_idx");
 
@@ -421,12 +427,12 @@ namespace Analytics.Migrator.Migrations
 
                     b.ToTable("jobs", "job");
 
-                    b.HasDiscriminator<string>("job_type").HasValue("job");
+                    b.HasDiscriminator<string>("job_type").HasValue("Job");
 
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Domain.CommonEntities.JobSchedule", b =>
+            modelBuilder.Entity("Domain.CommonEntities.Job.JobSchedule", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -497,10 +503,10 @@ namespace Analytics.Migrator.Migrations
                         .HasName("job_schedules_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.jobschedule_who_created_idx");
+                        .HasDatabaseName("domain.commonentities.job.jobschedule_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.jobschedule_who_updated_idx");
+                        .HasDatabaseName("domain.commonentities.job.jobschedule_who_updated_idx");
 
                     b.HasIndex(new[] { "Enabled", "NextRunAt", "Id" }, "job_schedules_enabled_next_run_at_id_idx");
 
@@ -511,7 +517,7 @@ namespace Analytics.Migrator.Migrations
                     b.ToTable("job_schedules", "job");
                 });
 
-            modelBuilder.Entity("Domain.CommonEntities.JobScheduleRun", b =>
+            modelBuilder.Entity("Domain.CommonEntities.Job.JobScheduleRun", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -544,6 +550,32 @@ namespace Analytics.Migrator.Migrations
                         .IsUnique();
 
                     b.ToTable("job_schedule_runs", "job");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.Job.JobStepDependency", b =>
+                {
+                    b.Property<Guid>("StepId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("step_id");
+
+                    b.Property<Guid>("DependsOnStepId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("depends_on_step_id");
+
+                    b.Property<Guid>("MultiStepJobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("multi_step_job_id");
+
+                    b.HasKey("StepId", "DependsOnStepId")
+                        .HasName("job_step_dependencies_pk");
+
+                    b.HasIndex("DependsOnStepId")
+                        .HasDatabaseName("job_step_dependencies_depends_on_step_id_idx");
+
+                    b.HasIndex("MultiStepJobId")
+                        .HasDatabaseName("job_step_dependencies_multi_step_job_id_idx");
+
+                    b.ToTable("job_step_dependencies", "job");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Setting", b =>
@@ -783,9 +815,23 @@ namespace Analytics.Migrator.Migrations
                     b.HasDiscriminator().HasValue("ProductSalesMetric");
                 });
 
-            modelBuilder.Entity("Domain.CommonEntities.UniqJob", b =>
+            modelBuilder.Entity("Domain.CommonEntities.Job.MultiStepJob", b =>
                 {
-                    b.HasBaseType("Domain.CommonEntities.Job");
+                    b.HasBaseType("Domain.CommonEntities.Job.Job");
+
+                    b.HasDiscriminator().HasValue("multi_step_job");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.Job.SingleRunJob", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Job.Job");
+
+                    b.HasDiscriminator().HasValue("job");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.Job.UniqJob", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Job.Job");
 
                     b.Property<string>("NaturalKey")
                         .IsRequired()
@@ -802,7 +848,7 @@ namespace Analytics.Migrator.Migrations
 
             modelBuilder.Entity("Analytics.Entities.Metrics.MetricJob", b =>
                 {
-                    b.HasOne("Domain.CommonEntities.Job", "Job")
+                    b.HasOne("Domain.CommonEntities.Job.Job", "Job")
                         .WithMany()
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -857,21 +903,62 @@ namespace Analytics.Migrator.Migrations
                     b.Navigation("SaleContent");
                 });
 
-            modelBuilder.Entity("Domain.CommonEntities.JobScheduleRun", b =>
+            modelBuilder.Entity("Domain.CommonEntities.Job.Job", b =>
                 {
-                    b.HasOne("Domain.CommonEntities.Job", null)
+                    b.HasOne("Domain.CommonEntities.Job.MultiStepJob", "MultiStepJob")
+                        .WithMany("Steps")
+                        .HasForeignKey("MultiStepJobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("jobs_multi_step_job_id_fk");
+
+                    b.Navigation("MultiStepJob");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.Job.JobScheduleRun", b =>
+                {
+                    b.HasOne("Domain.CommonEntities.Job.Job", null)
                         .WithMany()
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("job_schedule_runs_job_id_fk");
 
-                    b.HasOne("Domain.CommonEntities.JobSchedule", null)
+                    b.HasOne("Domain.CommonEntities.Job.JobSchedule", null)
                         .WithMany("Runs")
                         .HasForeignKey("JobScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("job_schedule_runs_job_schedule_id_fk");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.Job.JobStepDependency", b =>
+                {
+                    b.HasOne("Domain.CommonEntities.Job.Job", "DependsOnStep")
+                        .WithMany()
+                        .HasForeignKey("DependsOnStepId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("job_step_dependencies_depends_on_step_id_fk");
+
+                    b.HasOne("Domain.CommonEntities.Job.MultiStepJob", "MultiStepJob")
+                        .WithMany("Dependencies")
+                        .HasForeignKey("MultiStepJobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("job_step_dependencies_multi_step_job_id_fk");
+
+                    b.HasOne("Domain.CommonEntities.Job.Job", "Step")
+                        .WithMany()
+                        .HasForeignKey("StepId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("job_step_dependencies_step_id_fk");
+
+                    b.Navigation("DependsOnStep");
+
+                    b.Navigation("MultiStepJob");
+
+                    b.Navigation("Step");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
@@ -906,9 +993,16 @@ namespace Analytics.Migrator.Migrations
                     b.Navigation("SaleContents");
                 });
 
-            modelBuilder.Entity("Domain.CommonEntities.JobSchedule", b =>
+            modelBuilder.Entity("Domain.CommonEntities.Job.JobSchedule", b =>
                 {
                     b.Navigation("Runs");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.Job.MultiStepJob", b =>
+                {
+                    b.Navigation("Dependencies");
+
+                    b.Navigation("Steps");
                 });
 #pragma warning restore 612, 618
         }
