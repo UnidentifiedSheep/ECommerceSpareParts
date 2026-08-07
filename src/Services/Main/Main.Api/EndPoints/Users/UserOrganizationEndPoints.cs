@@ -2,6 +2,7 @@ using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Enums;
 using Main.Application.Dtos.Organizations;
+using Main.Application.Handlers.Organizations;
 using Main.Application.Handlers.Organizations.CreateOrganization;
 using Main.Application.Handlers.Organizations.GetOrganizations;
 using Main.Enums.Organization;
@@ -38,15 +39,19 @@ public static class UserOrganizationEndPoints
                     CreateOrganizationRequest request,
                     CancellationToken cancellationToken) =>
                 {
-                    var result = await sender.Send(
+                    var orgId = (await sender.Send(
                         new CreateOrganizationCommand(
                             userId,
                             request.Name,
                             request.SystemName),
+                        cancellationToken)).OrganizationId;
+
+                    var result = await sender.Send(
+                        new GetOrganizationQuery(orgId),
                         cancellationToken);
 
                     return Results.Created(
-                        $"/organizations/{result.Organization.Id}",
+                        $"/organizations/{orgId}",
                         new CreateOrganizationResponse(result.Organization));
                 })
             .WithName("CreateOrganization")

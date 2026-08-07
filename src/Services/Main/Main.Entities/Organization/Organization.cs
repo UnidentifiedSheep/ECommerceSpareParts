@@ -19,13 +19,13 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 
     [Validate]
     public string SystemName { get; private set; } = null!;
-    
+
     private readonly List<OrganizationMember> _members = [];
     public IReadOnlyList<OrganizationMember> Members => _members;
-    
+
     private readonly List<OrganizationBalance> _balances = [];
     public IReadOnlyList<OrganizationBalance> Balances => _balances;
-    
+
     public OrganizationFinancialProfile? FinancialProfile { get; private set; }
     
     private Organization() { }
@@ -39,9 +39,7 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
     {
         Id = id ?? Guid.NewGuid();
         Type = type;
-        SystemName = NormalizeSystemName(systemName)
-            .EnsureNotNullOrWhiteSpace("organization.system.name.required")
-            .EnsureMaxLength(128, "organization.system.name.max.length");
+        SetSystemName(systemName);
         SetName(name);
         AddMember(ownerId, OrganizationRole.Owner);
     }
@@ -64,7 +62,7 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
         string name,
         string systemName,
         Guid ownerId)
-        => new Organization(
+        => new(
             systemName,
             name,
             OrganizationType.Business,
@@ -123,7 +121,12 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
             .EnsureNotNullOrWhiteSpace("organization.name.required")
             .EnsureMaxLength(128, "organization.name.max.length")
             .EnsureMinLength(3, "organization.name.min.length");
-    
+
+    private void SetSystemName(string systemName)
+        => SystemName = NormalizeSystemName(systemName)
+            .EnsureNotNullOrWhiteSpace("organization.system.name.required")
+            .EnsureMaxLength(128, "organization.system.name.max.length");
+
     public override Guid GetId() => Id;
     public static Expression<Func<Organization, Guid>> GetKeySelector()
         => x => x.Id;
