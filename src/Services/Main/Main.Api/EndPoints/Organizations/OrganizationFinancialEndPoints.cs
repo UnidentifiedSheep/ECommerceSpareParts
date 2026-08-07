@@ -75,11 +75,14 @@ public class OrganizationFinancialEndPoints : ICarterModule
                             organizationId,
                             request.FinancialProfile),
                         cancellationToken);
+                    var financialInfo = await sender.Send(
+                        new GetOrganizationFinancialInfoQuery(result.OrganizationId),
+                        cancellationToken);
 
                     return Results.Ok(
                         new UpdateOrganizationFinancialInfoResponse
                         {
-                            FinancialProfile = result.Profile
+                            FinancialProfile = financialInfo.FinancialProfile!
                         });
                 })
             .WithName("UpdateOrganizationFinancialInfo")

@@ -4,6 +4,7 @@ using Pricing.Application.Handlers.PriceApplier;
 using Pricing.Application.Handlers.PriceApplier.GetPriceAppliers;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
+using Pricing.Entities.Exceptions;
 using Pricing.Enums;
 using Pricing.Integration.Tests.DataBuilders.PriceAppliers;
 using Tests.Extensions;
@@ -33,6 +34,76 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
                 PriceOfferSourceType.OurWarehouse
             ]);
         configuration.Version.Should().HaveLength(64);
+    }
+
+    [Fact]
+    public async Task BySystemName_ReturnsRegistryOnlyLocalApplier()
+    {
+        var result = await Mediator.Send(
+            new GetPriceApplierQuery(nameof(PriceRoundingApplier)));
+
+        result.Applier.SystemName.Should().Be(nameof(PriceRoundingApplier));
+        result.Applier.Name.Should().NotBe(result.Applier.SystemName);
+        result.Applier.IsDynamic.Should().BeFalse();
+        result.Applier.States.Select(x => x.Usage).Should().BeEquivalentTo(
+            [
+                PriceOfferSourceType.Supplier,
+                PriceOfferSourceType.OurWarehouse
+            ]);
+    }
+
+    [Fact]
+    public async Task BySystemName_ReturnsPersistedDynamicApplier()
+    {
+        var applier = await new PriceApplierDataBuilder(Faker)
+            .WithName("Requested dynamic applier")
+            .WithState(PriceOfferSourceType.Supplier, 50, false)
+            .BuildAndAddToDb(Context);
+
+        var result = await Mediator.Send(
+            new GetPriceApplierQuery(applier.SystemName));
+
+        result.Applier.SystemName.Should().Be(applier.SystemName);
+        result.Applier.Name.Should().Be("Requested dynamic applier");
+        result.Applier.IsDynamic.Should().BeTrue();
+        result.Applier.States.Should().ContainSingle(x =>
+            x.Usage == PriceOfferSourceType.Supplier
+            && x.Order == 50
+            && !x.Enabled);
+    }
+
+    [Fact]
+    public async Task BySystemName_ReturnsPersistedStateForLocalApplier()
+    {
+        await new PriceApplierDataBuilder(Faker)
+            .WithSystemName(nameof(MarkupApplier))
+            .AsLocal()
+            .WithState(PriceOfferSourceType.Supplier, 999, false)
+            .BuildAndAddToDb(Context);
+
+        var result = await Mediator.Send(
+            new GetPriceApplierQuery(nameof(MarkupApplier)));
+
+        result.Applier.IsDynamic.Should().BeFalse();
+        result.Applier.Name.Should().NotBe(result.Applier.SystemName);
+        result.Applier.States.Should().Contain(x =>
+            x.Usage == PriceOfferSourceType.Supplier
+            && x.Order == 0
+            && !x.Enabled);
+        result.Applier.States.Should().Contain(x =>
+            x.Usage == PriceOfferSourceType.OurWarehouse
+            && x.Order == 0
+            && !x.Enabled);
+    }
+
+    [Fact]
+    public async Task BySystemName_MissingApplier_ThrowsNotFoundException()
+    {
+        var query = new GetPriceApplierQuery(
+            $"missing-{Faker.Random.Guid():N}");
+
+        await Assert.ThrowsAsync<PriceApplierNotFoundException>(() =>
+            Mediator.Send(query));
     }
 
     [Fact]

@@ -7,6 +7,7 @@ using Enums;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;
+using Main.Application.Handlers.Users.GetUserFullInfo;
 using Main.Application.Handlers.Users.GetUsers;
 using Main.Enums;
 using MediatR;
@@ -109,7 +110,13 @@ public class UsersEndPoints : ICarterModule
                             request.Phones,
                             request.Roles),
                         cancellationToken);
-                    return Results.Created($"users/{result.User.Id}", new CreateUserResponse(result.User));
+                    var user = await sender.Send(
+                        new GetUserFullInfoQuery(result.UserId),
+                        cancellationToken);
+
+                    return Results.Created(
+                        $"/users/{result.UserId}",
+                        new CreateUserResponse(user.User));
                 })
             .WithName("CreateUser")
             .WithSummary("Создать пользователя")

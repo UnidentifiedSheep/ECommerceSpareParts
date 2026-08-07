@@ -1,10 +1,7 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Projections;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -14,7 +11,6 @@ using Main.Entities.Sale;
 using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
@@ -37,16 +33,14 @@ public record CreateSaleCommand(
     bool ForcePayment = false
 ) : ICommand<CreateSaleResult>;
 
-public record CreateSaleResult(SaleDto Sale);
+public record CreateSaleResult(Guid SaleId);
 
 public class CreateSaleHandler(
     ISender sender,
     IOptions<SystemOptions> systemOptions,
-    IReadRepository<Sale, Guid> readRepository,
     ISaleEventService saleEventService,
     IUnitOfWork unitOfWork,
-    ISaleService saleService,
-    IProjectionProvider<Sale, SaleDto> saleProjection
+    ISaleService saleService
 ) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
@@ -122,17 +116,6 @@ public class CreateSaleHandler(
 
         await saleEventService.NotifyUpdated(sale.Id, cancellationToken);
 
-        return await ReturnAsync(sale.GetId(), cancellationToken);
-    }
-
-    private async Task<CreateSaleResult> ReturnAsync(
-        Guid id,
-        CancellationToken token)
-    {
-        var fromDb = await readRepository.Query
-            .Project(saleProjection)
-            .FirstAsync(x => x.Id == id, token);
-
-        return new CreateSaleResult(fromDb);
+        return new CreateSaleResult(sale.Id);
     }
 }

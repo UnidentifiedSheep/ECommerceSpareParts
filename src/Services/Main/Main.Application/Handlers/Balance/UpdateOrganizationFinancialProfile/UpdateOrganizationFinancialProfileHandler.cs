@@ -5,8 +5,6 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Balances;
-using Main.Application.Interfaces.Services;
-using Main.Application.Projections;
 using Main.Entities.Balance;
 using Main.Entities.Organization;
 
@@ -23,11 +21,10 @@ public record UpdateOrganizationFinancialProfileCommand(
     PatchOrganizationFinancialProfileDto Patch
 ) : ICommand<UpdateOrganizationFinancialProfileResult>;
 
-public record UpdateOrganizationFinancialProfileResult(OrganizationFinancialProfileDto Profile);
+public record UpdateOrganizationFinancialProfileResult(Guid OrganizationId);
 
 public class UpdateOrganizationFinancialProfileHandler(
     IRepository<OrganizationFinancialProfile, Guid> repository,
-    IBalanceService balanceService,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<UpdateOrganizationFinancialProfileCommand, UpdateOrganizationFinancialProfileResult>
 {
@@ -44,10 +41,6 @@ public class UpdateOrganizationFinancialProfileHandler(
         }
 
         request.Patch.MinimalAllowedBalance.Apply(x => profile.SetMinAllowedBalance(x));
-        var netPosition = await balanceService.GetBalanceInBaseCurrencyAsync(
-            request.OrganizationId,
-            cancellationToken);
-        return new UpdateOrganizationFinancialProfileResult(
-            OrganizationFinancialProfileDtoFactory.Create(profile, netPosition));
+        return new UpdateOrganizationFinancialProfileResult(request.OrganizationId);
     }
 }

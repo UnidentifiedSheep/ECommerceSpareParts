@@ -49,7 +49,7 @@ public class QueueScheduledJobsHandler(
                         x.InputState,
                         x.MaxAttempts))
                     .ToList()),
-            cancellationToken)).Jobs;
+            cancellationToken)).JobIds;
 
         for (var i = 0; i < schedules.Count; i++)
         {
@@ -65,7 +65,7 @@ public class QueueScheduledJobsHandler(
 
             schedule.MarkQueued(uncorrectedTime, nextRunAt);
             schedule.AddScheduleRun(
-                job.Id,
+                job,
                 scheduledAt,
                 uncorrectedTime);
         }

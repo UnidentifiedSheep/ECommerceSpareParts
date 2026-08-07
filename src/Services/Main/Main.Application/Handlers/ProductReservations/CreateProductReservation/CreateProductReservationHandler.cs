@@ -1,12 +1,8 @@
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Projections;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Product.Reservation;
 using Main.Entities.Storage;
-using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductReservations.CreateProductReservation;
 
@@ -15,12 +11,10 @@ public record CreateProductReservationCommand(
     NewProductReservationDto Reservation
 ) : ICommand<CreateProductReservationResult>;
 
-public record CreateProductReservationResult(ProductReservationDto Reservation);
+public record CreateProductReservationResult(int ReservationId);
 
 public class CreateProductReservationHandler(
-    IUnitOfWork unitOfWork,
-    IReadRepository<ProductReservation, int> repository,
-    IProjectionProvider<ProductReservation, ProductReservationDto> projection
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<CreateProductReservationCommand, CreateProductReservationResult>
 {
     public async Task<CreateProductReservationResult> Handle(
@@ -40,11 +34,6 @@ public class CreateProductReservationHandler(
         await unitOfWork.AddAsync(reservation, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var result = await repository.Query
-            .Where(x => x.Id == reservation.Id)
-            .Project(projection)
-            .SingleAsync(cancellationToken);
-
-        return new CreateProductReservationResult(result);
+        return new CreateProductReservationResult(reservation.Id);
     }
 }

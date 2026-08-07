@@ -69,6 +69,27 @@ public class PriceApplierService(
             .ToList();
     }
 
+    public async Task<PriceApplierDto?> FindPriceApplierInfoAsync(
+        string systemName,
+        CancellationToken ct = default)
+    {
+        var configuration = await priceApplierProvider
+            .GetConfigurationAsync(ct);
+        var applier = configuration
+            .Appliers
+            .FirstOrDefault(x => x.SystemName == systemName);
+
+        if (applier is null) return null;
+
+        var local = registry.TryGetBySystemName(applier.SystemName);
+        return local is null
+            ? applier
+            : applier with
+            {
+                Name = local.GetLocalizedName(localizer)
+            };
+    }
+
     public async Task<IReadOnlyList<IPriceApplier>> GetPriceAppliersAsync(
         PriceOfferSourceType usage,
         CancellationToken ct = default)

@@ -161,10 +161,14 @@ public class SalesEndPoints : ICarterModule
                             request.ForcePayment),
                         token);
 
+                    var sale = await sender.Send(
+                        new GetSaleQuery(result.SaleId, null),
+                        token);
+
                     return Results.Ok(
                         new CreateSaleResponse
                         {
-                            Sale = result.Sale
+                            Sale = sale.Sale
                         });
                 })
             .WithDescription("Создание новой продажи")

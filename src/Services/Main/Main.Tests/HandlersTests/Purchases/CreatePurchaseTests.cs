@@ -111,12 +111,9 @@ public class CreatePurchaseTests : IntegrationTest
 
         var result = await Mediator.Send(command);
 
-        result.Purchase.Supplier.Id.Should().Be(_supplier.Id);
-        result.Purchase.SupplierOrganization.Id.Should().Be(organization.Id);
-
         var purchase = await Context.Purchases
             .AsNoTracking()
-            .SingleAsync(x => x.Id == result.Purchase.Id);
+            .SingleAsync(x => x.Id == result.PurchaseId);
         purchase.SupplierUserId.Should().Be(_supplier.Id);
         purchase.SupplierOrganizationId.Should().Be(organization.Id);
 
@@ -147,9 +144,12 @@ public class CreatePurchaseTests : IntegrationTest
             ]);
 
         var result = await Mediator.Send(command);
+        var purchase = await Context.Purchases
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == result.PurchaseId);
 
-        result.Purchase.Supplier.Id.Should().Be(member.Id);
-        result.Purchase.SupplierOrganization.Id.Should().Be(member.Id);
+        purchase.SupplierUserId.Should().Be(member.Id);
+        purchase.SupplierOrganizationId.Should().Be(member.Id);
     }
 
     [Fact]

@@ -4,7 +4,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
-using Application.Common.Interfaces.Projections;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Attributes;
@@ -15,15 +14,14 @@ using Domain.CommonEntities.Job;
 namespace Application.Common.Handlers.JobSchedules.CreateSchedule;
 
 [Transactional]
-public record CreateScheduleCommand(NewJobScheduleDto NewSchedule) : IQuery<CreateScheduleResult>;
+public record CreateScheduleCommand(NewJobScheduleDto NewSchedule) : ICommand<CreateScheduleResult>;
 
-public record CreateScheduleResult(JobScheduleDto Schedule);
+public record CreateScheduleResult(Guid ScheduleId);
 
 public class CreateScheduleHandler(
     INamedObjectRegistry<ILrtNamedObject> registry,
-    IUnitOfWork unitOfWork,
-    IProjectionProvider<JobSchedule, JobScheduleDto> projection
-) : IQueryHandler<CreateScheduleCommand, CreateScheduleResult>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<CreateScheduleCommand, CreateScheduleResult>
 {
     public async Task<CreateScheduleResult> Handle(
         CreateScheduleCommand request,
@@ -52,6 +50,6 @@ public class CreateScheduleHandler(
         await unitOfWork.AddAsync(schedule, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new CreateScheduleResult(projection.Projection.AsFunc()(schedule));
+        return new CreateScheduleResult(schedule.Id);
     }
 }

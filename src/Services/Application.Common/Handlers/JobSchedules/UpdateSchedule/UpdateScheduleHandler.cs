@@ -5,7 +5,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
-using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -22,13 +21,12 @@ public record UpdateScheduleCommand(
     PatchJobScheduleDto Patch
 ) : ICommand<UpdateScheduleResult>;
 
-public record UpdateScheduleResult(JobScheduleDto Schedule);
+public record UpdateScheduleResult(Guid ScheduleId);
 
 public class UpdateScheduleHandler(
     IRepository<JobSchedule, Guid> repository,
     INamedObjectRegistry<ILrtNamedObject> registry,
-    IUnitOfWork unitOfWork,
-    IProjectionProvider<JobSchedule, JobScheduleDto> projection
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<UpdateScheduleCommand, UpdateScheduleResult>
 {
     public async Task<UpdateScheduleResult> Handle(
@@ -81,6 +79,6 @@ public class UpdateScheduleHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new UpdateScheduleResult(projection.Projection.AsFunc()(schedule));
+        return new UpdateScheduleResult(schedule.Id);
     }
 }

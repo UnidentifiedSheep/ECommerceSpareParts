@@ -1,8 +1,6 @@
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Validators;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Projections;
 using Attributes;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
@@ -25,12 +23,11 @@ public record CreateUserCommand(
     IEnumerable<string> Roles
 ) : ICommand<CreateUserResult>;
 
-public record CreateUserResult(UserDto User);
+public record CreateUserResult(Guid UserId);
 
 public class CreateUserHandler(
     IUnitOfWork unitOfWork,
-    IPasswordManager passwordManager,
-    IProjectionProvider<User, UserDto> userProjection)
+    IPasswordManager passwordManager)
     : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
     public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -68,7 +65,6 @@ public class CreateUserHandler(
 
         await unitOfWork.AddAsync(user, cancellationToken);
         await unitOfWork.AddAsync(organization, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new CreateUserResult(userProjection.Projection.AsFunc()(user));
+        return new CreateUserResult(user.Id);
     }
 }

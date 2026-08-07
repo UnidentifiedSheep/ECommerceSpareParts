@@ -126,11 +126,15 @@ public class PurchaseEndPoints : ICarterModule
                         request.StorageFrom,
                         request.ForcePayment);
                     var result = await sender.Send(command, token);
+                    var purchase = await sender.Send(
+                        new GetPurchaseQuery(result.PurchaseId, null),
+                        token);
+
                     return Results.Created(
-                        new Uri($"/purchases/{result.Purchase.Id}"),
+                        new Uri($"/purchases/{result.PurchaseId}"),
                         new CreatePurchaseResponse
                         {
-                            Purchase = result.Purchase
+                            Purchase = purchase.Purchase
                         });
                 })
             .WithName("CreatePurchase")

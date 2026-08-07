@@ -125,6 +125,10 @@ public static class ServiceProvider
             GetJobsHandler>();
 
         services.AddScoped<
+            IRequestHandler<GetJobQuery, GetJobResult>,
+            GetJobHandler>();
+
+        services.AddScoped<
             IRequestHandler<GetJobStateQuery, GetJobStateResult>,
             GetJobStateHandler>();
 
@@ -135,6 +139,10 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<GetScheduleQuery, GetScheduleResult>,
             GetScheduleHandler>();
+
+        services.AddScoped<
+            IRequestHandler<GetScheduleByIdQuery, GetScheduleByIdResult>,
+            GetScheduleByIdHandler>();
 
         services.AddScoped<
             IRequestHandler<UpdateScheduleCommand, UpdateScheduleResult>,
