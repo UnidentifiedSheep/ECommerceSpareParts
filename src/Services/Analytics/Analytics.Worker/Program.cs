@@ -33,7 +33,7 @@ builder.Services
     .AddRedisOptions()
     .AddDatabaseOptions();
 
-builder.Services.AddCommonWorkerInfrastructure();
+builder.Services.AddCommonWorkerInfrastructure(ServicesDefinitions.Analytics);
 
 builder.AddLokiLogger(
     builder.Configuration,

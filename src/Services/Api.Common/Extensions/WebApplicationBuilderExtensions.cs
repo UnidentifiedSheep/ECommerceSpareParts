@@ -1,7 +1,11 @@
+using Abstractions.Interfaces;
 using Abstractions.Models.Options;
 using Api.Common.Middleware;
 using Api.Common.OperationFilters;
+using Application.Common.Models;
 using Common;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 
 namespace Api.Common.Extensions;
 
@@ -26,7 +30,8 @@ public static class WebApplicationBuilderExtensions
     }
 
     public static IServiceCollection AddCommonApiInfrastructure(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IServiceDefinition serviceDefinition)
     {
         services.AddProjectJsonSerialization();
         services.AddOpenApi();
@@ -48,16 +53,39 @@ public static class WebApplicationBuilderExtensions
                     .AllowAnyMethod();
             });
         });
+        services.AddOpenTelemetry(serviceDefinition);
+        
         services.AddTransient<HeaderSecretMiddleware>();
 
         return services;
     }
 
     public static IServiceCollection AddCommonWorkerInfrastructure(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IServiceDefinition serviceDefinition)
     {
         services.AddProjectJsonSerialization();
 
         return services;
+    }
+
+    private static IServiceCollection AddOpenTelemetry(
+        this IServiceCollection collection,
+        IServiceDefinition serviceDefinition)
+    {
+        collection.AddOpenTelemetry()
+            .ConfigureResource(x =>
+                x.AddService(serviceDefinition.ServiceName))
+            .WithMetrics(metrics =>
+            {
+                metrics
+                    .AddAspNetCoreInstrumentation()
+                    .AddProcessInstrumentation()
+                    .AddRuntimeInstrumentation()
+                    .AddPrometheusExporter();
+                metrics.AddMeter(CqrsMetrics.MeterName);
+            });
+
+        return collection;
     }
 }

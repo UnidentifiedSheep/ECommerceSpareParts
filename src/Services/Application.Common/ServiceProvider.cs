@@ -36,6 +36,7 @@ public static class ServiceProvider
     {
         assembly ??= Assembly.GetExecutingAssembly();
         services
+            .AddCqrsMetrics()
             .RegisterIdCollector()
             .RegisterIntegrationEventScope()
             .RegisterDomainEventScope()
@@ -55,6 +56,9 @@ public static class ServiceProvider
 
             config.RegisterServicesFromAssembly(assembly);
             config
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(MetricsBehavior<,>))
                 .RegisterIfNotExcluded(
                     hs,
                     typeof(DiagnosticsBehavior<,>))

@@ -6,6 +6,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Settings;
+using Application.Common.Models;
 using Application.Common.NamedObject;
 using Application.Common.Services;
 using Application.Common.Services.Events;
@@ -159,5 +160,12 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<INamedObjectGroupResolver, NamedObjectGroupResolver>();
 
         return services;
+    }
+
+    public static IServiceCollection AddCqrsMetrics(this IServiceCollection collection)
+    {
+        collection.AddMetrics();
+        collection.AddSingleton<CqrsMetrics>();
+        return collection;
     }
 }

@@ -42,7 +42,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddRedisOptions()
     .AddDatabaseOptions();
 
-builder.Services.AddCommonApiInfrastructure();
+builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Analytics);
 
 builder.Services
     .AddPersistenceLayer()
@@ -114,16 +114,6 @@ builder.Services.AddMassTransit(x =>
 
 builder.Services.AddSignalR();
 
-builder.Services.AddOpenTelemetry()
-    .WithMetrics(metrics =>
-    {
-        metrics
-            .AddAspNetCoreInstrumentation()
-            .AddProcessInstrumentation()
-            .AddRuntimeInstrumentation()
-            .AddPrometheusExporter();
-    });
-
 builder.Services.AddCarter(configurator: c => c.WithEmptyValidators());
 
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
@@ -133,7 +123,6 @@ var app = builder.Build();
 
 app.UseCommonApiPipeline();
 
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.MapHub<MetricCalculationHub>("/hubs/calculation-jobs");
 
 app.MapHub<JobHub>("/hubs/jobs");

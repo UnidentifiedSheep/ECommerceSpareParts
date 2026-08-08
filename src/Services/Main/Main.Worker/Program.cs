@@ -1,4 +1,5 @@
 using System.Reflection;
+using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
@@ -55,7 +56,7 @@ builder.AddLokiLogger(
     "main.worker",
     env);
 
-builder.Services.AddCommonWorkerInfrastructure();
+builder.Services.AddCommonWorkerInfrastructure(ServicesDefinitions.Main);
 
 AddMassTransit(builder);
 

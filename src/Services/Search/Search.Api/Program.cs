@@ -1,4 +1,5 @@
 using System.Reflection;
+using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
@@ -30,7 +31,7 @@ AddOpenSearchOptions(builder.Services)
     .AddHeaderSecretsOptions()
     .AddRedisOptions();
 
-builder.Services.AddCommonApiInfrastructure();
+builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Search);
 
 builder.Services.AddMassTransit(x =>
 {
@@ -74,21 +75,10 @@ builder.Services.AddCarter(
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
-builder.Services.AddOpenTelemetry()
-    .WithMetrics(metrics =>
-    {
-        metrics
-            .AddAspNetCoreInstrumentation()
-            .AddProcessInstrumentation()
-            .AddRuntimeInstrumentation()
-            .AddPrometheusExporter();
-    });
-
 var app = builder.Build();
 
 app.UseCommonApiPipeline();
 
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
 await app.RunAsync();
 return;
 
