@@ -18,6 +18,8 @@
     "lrt.currency.rates.update.name": "Currency rate update",
     "lrt.currency.rates.update.description": "Updates currency exchange rates using current data and saves the new values in the system.",
     "lrt.organization.approximate.balance.recalculate.name": "Organization approximate balance recalculation",
-    "lrt.organization.approximate.balance.recalculate.description": "Recalculates organization approximate balances in the base currency from their current balances."
+    "lrt.organization.approximate.balance.recalculate.description": "Recalculates organization approximate balances in the base currency from their current balances.",
+    "lrt.catalogue.candidates.build.name": "Build catalogue candidates",
+    "lrt.catalogue.candidates.build.description": "Creates catalogue candidates from supplier products and links each resolved supplier product to its candidate."
   }
 }

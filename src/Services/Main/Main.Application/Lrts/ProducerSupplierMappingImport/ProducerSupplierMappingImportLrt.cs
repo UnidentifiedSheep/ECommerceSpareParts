@@ -50,7 +50,7 @@ public class ProducerSupplierMappingImportLrt(
         stringLocalizer,
         localesOptions)
 {
-    private ProducerLookup _producerLookup = ProducerLookup.Empty;
+    private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
     public override string SystemName => nameof(ProducerSupplierMappingImportLrt);
     public override string NameLocalizationKey => "lrt.producer.supplier.mapping.import.name";

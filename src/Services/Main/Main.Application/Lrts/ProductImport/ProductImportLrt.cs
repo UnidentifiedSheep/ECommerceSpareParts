@@ -48,7 +48,7 @@ public class ProductImportLrt(
         stringLocalizer,
         localesOptions)
 {
-    private ProducerLookup _producerLookup = ProducerLookup.Empty;
+    private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
     protected override int BatchSize => 1000;
     public override Type InputType => typeof(ProductImportInputState);

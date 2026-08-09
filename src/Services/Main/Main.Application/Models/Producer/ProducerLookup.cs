@@ -1,3 +1,5 @@
+using Enums;
+using Main.Application.Interfaces.Services;
 using ProducerEntity = Main.Entities.Producer.Producer;
 
 namespace Main.Application.Models.Producer;
@@ -5,12 +7,15 @@ namespace Main.Application.Models.Producer;
 public class ProducerLookup(
     IReadOnlyDictionary<string, int> producerNamesToIds,
     IReadOnlyDictionary<string, int> aliasesToIds)
+    : IProducerLookup
 {
     public static ProducerLookup Empty { get; } = new(
         new Dictionary<string, int>(),
         new Dictionary<string, int>());
 
-    public int? ResolveId(string producer)
+    public int? ResolveId(
+        string producer,
+        Supplier? supplier = null)
     {
         if (string.IsNullOrWhiteSpace(producer)) return null;
 

@@ -47,7 +47,7 @@ public class ProductCrossesImportLrt(
         stringLocalizer,
         localesOptions)
 {
-    private ProducerLookup _producerLookup = ProducerLookup.Empty;
+    private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
     public override string SystemName => nameof(ProductCrossesImportLrt);
     public override string NameLocalizationKey => "lrt.product.crosses.import.name";

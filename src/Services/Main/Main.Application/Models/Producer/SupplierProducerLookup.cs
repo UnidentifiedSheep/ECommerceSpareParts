@@ -1,27 +1,35 @@
 using Enums;
+using Main.Application.Interfaces.Services;
 
 namespace Main.Application.Models.Producer;
 
 public sealed class SupplierProducerLookup(
-    ProducerLookup producerLookup,
-    IReadOnlyDictionary<SupplierProducerLookupKey, int> supplierMappings)
+    IProducerLookup inner,
+    IReadOnlyDictionary<ProducerSupplierLookupKey, int> supplierMappings)
+    : IProducerLookup
 {
     public int? ResolveId(
-        Supplier supplier,
-        string producer)
+        string producer,
+        Supplier? supplier = null)
     {
         if (string.IsNullOrWhiteSpace(producer)) return null;
 
-        var supplierKey = new SupplierProducerLookupKey(
-            supplier,
-            producer.Trim());
+        if (supplier.HasValue)
+        {
+            var supplierKey = new ProducerSupplierLookupKey(
+                supplier.Value,
+                producer.Trim());
 
-        return supplierMappings.TryGetValue(supplierKey, out var producerId)
-            ? producerId
-            : producerLookup.ResolveId(producer);
+            if (supplierMappings.TryGetValue(
+                    supplierKey,
+                    out var producerId))
+                return producerId;
+        }
+
+        return inner.ResolveId(producer);
     }
 }
 
-public readonly record struct SupplierProducerLookupKey(
+public readonly record struct ProducerSupplierLookupKey(
     Supplier Supplier,
     string SupplierProducerName);
