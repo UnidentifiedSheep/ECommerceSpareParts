@@ -27,7 +27,7 @@ public class ProducerImportLrt(
     IPublishEndpoint publisher,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
-) : CsvImportLrtBase<ProducerImportState, ProducerImportError, ProducerImportLrt.NewProducerCsvDto,
+) : CsvImportLrtBase<ProducerImportInputState, ProducerImportState, ProducerImportError, ProducerImportLrt.NewProducerCsvDto,
     NewProducerDto>(
     jobRepository,
     bucketsOptions,
@@ -41,8 +41,6 @@ public class ProducerImportLrt(
     public override string SystemName => nameof(ProducerImportLrt);
     public override string NameLocalizationKey => "lrt.producer.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.import.description";
-    public override Type InputType => typeof(ProducerImportInputState);
-    public override Type StateType => typeof(ProducerImportState);
 
     protected override string GetFileName(ProducerImportState state) { return state.FileName; }
 

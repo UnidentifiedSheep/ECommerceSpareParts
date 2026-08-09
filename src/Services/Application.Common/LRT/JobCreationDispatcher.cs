@@ -17,7 +17,7 @@ public sealed class JobCreationDispatcher(
         var lrt = registry.GetBySystemName(systemName);
         var state = lrt.ValidateState(inputState);
 
-        if (lrt is not MultiStepLrtBase multiStepLrt)
+        if (lrt is not IMultiStepLrt multiStepLrt)
             return SingleRunJob.Create(
                 lrt.SystemName,
                 state,
@@ -31,7 +31,7 @@ public sealed class JobCreationDispatcher(
     }
 
     private MultiStepJob CreateMultiStepJob(
-        MultiStepLrtBase lrt,
+        IMultiStepLrt lrt,
         string state,
         int maxAttempts,
         HashSet<string> compositionPath)
@@ -79,7 +79,7 @@ public sealed class JobCreationDispatcher(
         var state = lrt.ValidateState(inputState);
 
         Job step;
-        if (lrt is not MultiStepLrtBase multiStepLrt)
+        if (lrt is not IMultiStepLrt multiStepLrt)
             step = SingleRunJob.Create(
                 lrt.SystemName,
                 state,

@@ -21,7 +21,7 @@ public class ProducerSynchronizationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<ProducerSynchronizationLrt> logger
-) : LrtBase(
+) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository,
     unitOfWork,
     publisher,
@@ -29,8 +29,6 @@ public class ProducerSynchronizationLrt(
 {
 
     public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
-    public override Type InputType => typeof(NoneInputState);
-    public override Type StateType => typeof(NoneInputState);
     public override string SystemName => nameof(ProducerSynchronizationLrt);
     public override string NameLocalizationKey => "lrt.producer.synchronization.name";
     public override string DescriptionLocalizationKey => "lrt.producer.synchronization.description";

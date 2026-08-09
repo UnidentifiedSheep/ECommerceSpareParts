@@ -2,6 +2,7 @@ using System.Globalization;
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.Models.Options.S3;
@@ -19,7 +20,7 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Application.Lrts.Base;
 
-public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
+public abstract class CsvImportLrtBase<TInputState, TState, TError, TCsvRow, TBatchItem>(
     IRepository<Job, Guid> jobRepository,
     IOptions<S3BucketsOptions> bucketsOptions,
     IUnitOfWork unitOfWork,
@@ -28,11 +29,13 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     IS3StorageService s3Service,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
-) : LrtBase(
+) : LrtBase<TInputState, TState>(
         jobRepository,
         unitOfWork,
         publisher,
         logger)
+    where TInputState : class, IInputState
+    where TState : class, TInputState
 {
     protected virtual int BatchSize => 1000;
     protected virtual int MaxErrors => 10_000;
@@ -43,8 +46,7 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     protected sealed override async Task DoWork()
     {
         stringLocalizer.SetLocale(localesOptions.Value.Default);
-        var state = await GetStateAsync<TState>()
-                    ?? throw new InvalidOperationException($"{GetType().Name} state is empty.");
+        var state = State;
 
         await BeforeRead(state);
 
@@ -73,7 +75,7 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
 
             if (errors.Count >= MaxErrors)
             {
-                await UpdateState(
+                await SaveStateAsync(
                     WithUpdatedState(
                         state,
                         rowIdx,
@@ -104,11 +106,12 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
                     rowsToAdd,
                     state,
                     errors);
-                await UpdateState(
-                    WithUpdatedState(
-                        state,
-                        rowIdx,
-                        errors));
+                state = WithUpdatedState(
+                    state,
+                    rowIdx,
+                    errors);
+                await SaveStateAsync(
+                    state);
             }
 
             rowIdx++;
@@ -120,7 +123,7 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
                 state,
                 errors);
 
-        await UpdateState(
+        await SaveStateAsync(
             WithUpdatedState(
                 state,
                 rowIdx - 1,

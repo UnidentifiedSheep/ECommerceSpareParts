@@ -11,20 +11,29 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Common.LRT;
 
-public abstract class MultiStepLrtBase(
+public abstract class MultiStepLrtBase<TInputState, TState>(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger logger
-) : LrtBase(
+) : LrtBase<TInputState, TState>(
     jobRepository,
     unitOfWork,
     publisher,
-    logger)
+    logger), IMultiStepLrt
+    where TInputState : class, IInputState
+    where TState : class, TInputState
 {
     protected internal abstract void ConfigureSteps(
         IMultiStepJobBuilder builder,
         string initialState);
+
+    void IMultiStepLrt.ConfigureSteps(
+        IMultiStepJobBuilder builder,
+        string initialState)
+    {
+        ConfigureSteps(builder, initialState);
+    }
 
     protected override Task DoWork()
     {

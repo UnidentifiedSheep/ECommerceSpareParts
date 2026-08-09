@@ -22,30 +22,25 @@ public class MarkupCalculationLrt(
     INamedObjectRegistry<MarkupAnalyzerNamedObjectBase> registry,
     IPublishEndpoint publisher,
     ILogger<MarkupCalculationLrt> logger
-) : LrtBase(
+) : LrtBase<MarkupCalculationInputState, MarkupCalculationState>(
     jobRepository,
     unitOfWork,
     publisher,
     logger)
 {
     public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Analytics;
-    public override Type InputType => typeof(MarkupCalculationInputState);
-    public override Type StateType => typeof(MarkupCalculationState);
     public override string SystemName => nameof(MarkupCalculationLrt);
     public override string NameLocalizationKey => "markup_calculation_lrt_name";
     public override string DescriptionLocalizationKey => "markup_calculation_lrt_description";
 
     protected override async Task DoWork()
     {
-        var state = await GetStateAsync<MarkupCalculationState>()
-                    ?? throw new InvalidOperationException($"'{InputType.Name}' state is null");
-
         var analyzer = registry.GetBySystemName(MarkupRangeAnalyzer.AnalyzerSystemName);
         var result = await analyzer.AnalyzeAsync(
             new MarkupAnalyzerInput
             {
-                StartDate = state.RangeStart,
-                EndDate = state.RangeEnd
+                StartDate = State.RangeStart,
+                EndDate = State.RangeEnd
             },
             CancellationToken);
 

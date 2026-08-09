@@ -14,12 +14,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Common.LRT;
 
-public abstract class LrtBase(
+public abstract class LrtBase<TInputState, TState>(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger logger
 ) : ILrtNamedObject
+    where TInputState : class, IInputState
+    where TState : class, TInputState
 {
     protected IUnitOfWork UnitOfWork => unitOfWork;
     protected IRepository<Job, Guid> JobRepository => jobRepository;
@@ -27,7 +29,10 @@ public abstract class LrtBase(
     protected IPublishEndpoint Publisher => publisher;
     protected CancellationToken CancellationToken { get; private set; }
     private Job? _job;
+    private TState? _state;
     protected Job Job => _job ?? throw new InvalidOperationException("Job is not initialized");
+    protected TState State => _state ??
+                              throw new InvalidOperationException("LRT state is not initialized");
     protected Guid JobId { get; private set; }
     protected Guid LeaseHolderId { get; private set; }
     protected bool Initialized { get; private set; }
@@ -36,6 +41,8 @@ public abstract class LrtBase(
     public abstract string SystemName { get; }
     public abstract string NameLocalizationKey { get; }
     public abstract string DescriptionLocalizationKey { get; }
+    public Type InputType => typeof(TInputState);
+    public Type StateType => typeof(TState);
 
     public async Task ExecuteAsync(
         Guid jobId,
@@ -46,6 +53,8 @@ public abstract class LrtBase(
         JobId = jobId;
         LeaseHolderId = leaseHolderId;
         Initialized = false;
+        _job = null;
+        _state = null;
 
         logger.LogInformation(
             "LRT execution started. JobId: {JobId}",
@@ -103,6 +112,7 @@ public abstract class LrtBase(
             {
                 if (await AttemptOrFailJobAsync(e))
                 {
+                    await ReloadStateAsync();
                     logger.LogWarning(
                         e,
                         "LRT execution attempt failed. JobId: {JobId}, Attempts: {Attempts}/{MaxAttempts}",
@@ -122,22 +132,22 @@ public abstract class LrtBase(
             }
     }
 
-    public abstract Type InputType { get; }
-    public abstract Type StateType { get; }
-
-    protected virtual Task InitJobAsync() { return GetJobAsync(); }
+    protected virtual Task InitJobAsync() { return ReloadStateAsync(); }
 
     protected void Interrupt(string reason) { throw new LrtInterruptedException(reason); }
 
-    protected async Task<T?> GetStateAsync<T>()
+    protected async Task ReloadStateAsync()
     {
         await GetJobAsync();
-        return string.IsNullOrWhiteSpace(Job.State)
-            ? default
-            : JsonSerializer.Deserialize<T>(Job.State);
+        _state = string.IsNullOrWhiteSpace(Job.State)
+            ? throw new InvalidOperationException(
+                $"LRT '{SystemName}' state is empty.")
+            : JsonSerializer.Deserialize<TState>(Job.State)
+              ?? throw new InvalidOperationException(
+                  $"LRT '{SystemName}' state could not be deserialized as '{StateType.Name}'.");
     }
 
-    protected async Task UpdateState<T>(T? state)
+    protected async Task SaveStateAsync(TState state)
     {
         var json = JsonSerializer.Serialize(state);
         await unitOfWork.ExecuteWithTransaction(
@@ -150,6 +160,8 @@ public abstract class LrtBase(
                 await unitOfWork.SaveChangesAsync(CancellationToken);
             },
             CancellationToken);
+
+        _state = state;
     }
 
     protected async Task GetJobAsync()

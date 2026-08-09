@@ -14,7 +14,7 @@ public class EnrichOurCatalogueLrt(
     IRepository<Job, Guid> jobRepository, 
     IUnitOfWork unitOfWork, 
     IPublishEndpoint publisher,
-    ILogger logger) : MultiStepLrtBase(
+    ILogger logger) : MultiStepLrtBase<NoneInputState, NoneInputState>(
     jobRepository, 
     unitOfWork,
     publisher, 
@@ -25,8 +25,6 @@ public class EnrichOurCatalogueLrt(
     public override string SystemName => nameof(EnrichOurCatalogueLrt);
     public override string NameLocalizationKey { get; }
     public override string DescriptionLocalizationKey { get; }
-    public override Type InputType => typeof(NoneInputState);
-    public override Type StateType => typeof(NoneInputState);
     protected override void ConfigureSteps(
         IMultiStepJobBuilder builder, 
         string initialState)

@@ -1,6 +1,7 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
@@ -160,12 +161,14 @@ public class LrtBaseTests
         lrt.Work = async x =>
         {
             await x.UpdateStateForTest(new TestState { Value = 42 });
+            await x.CaptureStateForTest();
             renewedLeaseExpiresAt = x.CurrentLeaseExpiresAt;
         };
 
         await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId);
 
         fixture.Job.State.Should().Be("""{"Value":42}""");
+        lrt.CapturedState!.Value.Should().Be(42);
         renewedLeaseExpiresAt.Should().NotBeNull();
         fixture.Job.Status.Should().Be(JobStatus.Succeeded);
         fixture.UnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Exactly(3));
@@ -323,7 +326,7 @@ public class LrtBaseTests
         IUnitOfWork unitOfWork,
         IPublishEndpoint publisher,
         ILogger logger
-    ) : LrtBase(jobRepository, unitOfWork, publisher, logger)
+    ) : LrtBase<TestInput, TestState>(jobRepository, unitOfWork, publisher, logger)
     {
         public Func<TestLrt, Task> Work { get; set; } = _ => Task.CompletedTask;
         public int DoWorkCalls { get; private set; }
@@ -342,8 +345,6 @@ public class LrtBaseTests
         public override string SystemName => nameof(TestLrt);
         public override string NameLocalizationKey => "test-lrt-name";
         public override string DescriptionLocalizationKey => "test-lrt-description";
-        public override Type InputType => typeof(TestInput);
-        public override Type StateType => typeof(TestState);
 
         protected override Task DoWork()
         {
@@ -361,14 +362,15 @@ public class LrtBaseTests
             Job.RequestCancellation(reason);
         }
 
-        public async Task CaptureStateForTest()
+        public Task CaptureStateForTest()
         {
-            CapturedState = await GetStateAsync<TestState>();
+            CapturedState = State;
+            return Task.CompletedTask;
         }
 
         public Task UpdateStateForTest(TestState state)
         {
-            return UpdateState(state);
+            return SaveStateAsync(state);
         }
 
         public Task RenewLeaseForTest(TimeSpan leaseDuration)
@@ -382,9 +384,12 @@ public class LrtBaseTests
         public string ServiceName => "test-service";
     }
 
-    private sealed class TestInput;
+    private class TestInput : IInputState
+    {
+        public void ValidateState() { }
+    }
 
-    private sealed class TestState
+    private sealed class TestState : TestInput
     {
         public int Value { get; set; }
     }

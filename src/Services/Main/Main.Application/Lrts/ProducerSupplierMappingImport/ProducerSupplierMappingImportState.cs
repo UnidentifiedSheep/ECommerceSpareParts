@@ -5,11 +5,8 @@ using Enums;
 
 namespace Main.Application.Lrts.ProducerSupplierMappingImport;
 
-public record ProducerSupplierMappingImportState
+public record ProducerSupplierMappingImportState : ProducerSupplierMappingImportInputState
 {
-    [JsonPropertyName("fileName")]
-    public required string FileName { get; init; }
-
     [JsonPropertyName("currentLine")]
     public int CurrentLine { get; init; }
 

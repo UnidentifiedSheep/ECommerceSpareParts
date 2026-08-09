@@ -21,7 +21,7 @@ public sealed class ProductSynchronizationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<ProductSynchronizationLrt> logger
-) : LrtBase(
+) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository,
     unitOfWork,
     publisher,
@@ -29,8 +29,6 @@ public sealed class ProductSynchronizationLrt(
 {
 
     public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
-    public override Type InputType => typeof(NoneInputState);
-    public override Type StateType => typeof(NoneInputState);
     public override string SystemName => nameof(ProductSynchronizationLrt);
     public override string NameLocalizationKey => "lrt.product.synchronization.name";
     public override string DescriptionLocalizationKey => "lrt.product.synchronization.description";

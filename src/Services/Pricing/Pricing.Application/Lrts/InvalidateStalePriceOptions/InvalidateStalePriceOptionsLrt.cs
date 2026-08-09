@@ -31,7 +31,7 @@ public class InvalidateStalePriceOptionsLrt(
     IMarkupContainer markupContainer,
     IPriceApplierService priceApplierService,
     ISettingsService settingsService
-) : LrtBase(
+) : LrtBase<NoneInputState, InvalidateStalePriceOptionsState>(
     jobRepository,
     unitOfWork,
     publisher,
@@ -39,8 +39,6 @@ public class InvalidateStalePriceOptionsLrt(
 {
     public const string LrtName = nameof(InvalidateStalePriceOptionsLrt); 
     public override string SystemName => LrtName;
-    public override Type InputType => typeof(NoneInputState);
-    public override Type StateType => typeof(InvalidateStalePriceOptionsState);
     public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Pricing;
     public override string NameLocalizationKey => "lrt.invalidate.stale.price.options.name";
     public override string DescriptionLocalizationKey => "lrt.invalidate.stale.price.options.description";
@@ -55,9 +53,6 @@ public class InvalidateStalePriceOptionsLrt(
                 TransactionalAttribute.ReadCommited(30, 3),
                 async () =>
                 {
-                    var currentState = await GetStateAsync<InvalidateStalePriceOptionsState>()
-                                       ?? new InvalidateStalePriceOptionsState();
-
                     var currentVersion = markupContainer.CurrentVersion;
                     var currentAppliersVersion = await priceApplierService
                         .GetCurrentConfigurationVersionAsync(CancellationToken);
@@ -94,9 +89,9 @@ public class InvalidateStalePriceOptionsLrt(
                         items.Select(x => x.PriceOfferId),
                         CancellationToken);
 
-                    await UpdateState(new InvalidateStalePriceOptionsState
+                    await SaveStateAsync(new InvalidateStalePriceOptionsState
                     {
-                        ProcessedRows = currentState.ProcessedRows + items.Count
+                        ProcessedRows = State.ProcessedRows + items.Count
                     });
 
                     return items.Count;

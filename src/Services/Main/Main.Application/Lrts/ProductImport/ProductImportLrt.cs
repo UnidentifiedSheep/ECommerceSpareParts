@@ -37,7 +37,7 @@ public class ProductImportLrt(
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
 )
-    : CsvImportLrtBase<ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto,
+    : CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto,
         CreateProductDto>(
         jobRepository,
         bucketsOptions,
@@ -51,8 +51,6 @@ public class ProductImportLrt(
     private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
     protected override int BatchSize => 1000;
-    public override Type InputType => typeof(ProductImportInputState);
-    public override Type StateType => typeof(ProductImportState);
     public override string SystemName => nameof(ProductImportLrt);
     public override string NameLocalizationKey => "lrt.product.import.name";
     public override string DescriptionLocalizationKey => "lrt.product.import.description";

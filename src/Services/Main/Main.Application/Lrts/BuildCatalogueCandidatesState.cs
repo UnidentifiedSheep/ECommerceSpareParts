@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
+using Application.Common.LRT;
 
 namespace Main.Application.Lrts;
 
-public sealed record BuildCatalogueCandidatesState
+public sealed record BuildCatalogueCandidatesState : NoneInputState
 {
     [JsonPropertyName("lastProcessedId")]
     public int LastProcessedId { get; init; }

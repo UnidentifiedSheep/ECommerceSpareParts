@@ -20,15 +20,13 @@ public class MetricCalculationLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger<MetricCalculationLrt> logger
-) : LrtBase(
+) : LrtBase<MetricCalculationInputState, MetricCalculationState>(
     jobRepository,
     unitOfWork,
     publisher,
     logger)
 {
     public const string LrtSystemName = nameof(MetricCalculationLrt);
-    public override Type InputType => typeof(MetricCalculationInputState);
-    public override Type StateType => typeof(MetricCalculationState);
     public override string SystemName => LrtSystemName;
     public override string NameLocalizationKey => "metric_calculation_lrt_name";
     public override string DescriptionLocalizationKey => "metric_calculation_lrt_description";
@@ -36,31 +34,25 @@ public class MetricCalculationLrt(
 
     protected override async Task DoWork()
     {
-        var state = await GetStateAsync<MetricCalculationInputState>()
-                    ?? throw new InvalidOperationException($"'{InputType.Name}' state is null");
-
         await Publisher.Publish(
             new MetricCalculationStatusUpdatedEvent
             {
-                MetricId = state.MetricId,
+                MetricId = State.MetricId,
                 JobStatus = Job.Status.ToString()
             });
 
         await UnitOfWork.SaveChangesAsync(CancellationToken);
 
-        await sender.Send(new CalculateMetricCommand(state.MetricId), CancellationToken);
+        await sender.Send(new CalculateMetricCommand(State.MetricId), CancellationToken);
     }
 
     protected override async Task SucceedJobAsync()
     {
         await base.SucceedJobAsync();
-        var state = await GetStateAsync<MetricCalculationState>()
-                    ?? throw new InvalidOperationException("State is null");
-
         await Publisher.Publish(
             new MetricCalculationStatusUpdatedEvent
             {
-                MetricId = state.MetricId,
+                MetricId = State.MetricId,
                 JobStatus = Job.Status.ToString()
             });
 

@@ -29,6 +29,7 @@ public class ProducerAliasImportLrt(
     IOptions<LocalesOptions> localesOptions
 )
     : CsvImportLrtBase<
+        ProducerAliasesImportInputState,
         ProducerAliasesImportState,
         ProducerAliasesImportError,
         ProducerAliasImportLrt.ProducerAliasCsvDto,
@@ -45,8 +46,6 @@ public class ProducerAliasImportLrt(
     public override string SystemName => nameof(ProducerAliasImportLrt);
     public override string NameLocalizationKey => "lrt.producer.other.names.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.other.names.import.description";
-    public override Type InputType => typeof(ProducerAliasesImportInputState);
-    public override Type StateType => typeof(ProducerAliasesImportState);
 
     protected override string GetFileName(ProducerAliasesImportState state) { return state.FileName; }
 

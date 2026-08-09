@@ -5,11 +5,8 @@ using Enums;
 
 namespace Main.Application.Lrts.ProductImport;
 
-public record ProductImportState
+public record ProductImportState : ProductImportInputState
 {
-    [JsonPropertyName("fileName")]
-    public required string FileName { get; init; }
-
     [JsonPropertyName("currentLine")]
     public int CurrentLine { get; init; }
 

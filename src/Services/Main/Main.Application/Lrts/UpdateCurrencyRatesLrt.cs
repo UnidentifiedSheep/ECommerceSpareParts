@@ -19,15 +19,13 @@ public class UpdateCurrencyRatesLrt(
     IPublishEndpoint publisher,
     ILogger<UpdateCurrencyRatesLrt> logger,
     ISender sender
-) : LrtBase(
+) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository,
     unitOfWork,
     publisher,
     logger)
 {
     public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
-    public override Type InputType => typeof(NoneInputState);
-    public override Type StateType => typeof(NoneInputState);
     public override string SystemName => nameof(UpdateCurrencyRatesLrt);
     public override string NameLocalizationKey => "lrt.currency.rates.update.name";
     public override string DescriptionLocalizationKey => "lrt.currency.rates.update.description";

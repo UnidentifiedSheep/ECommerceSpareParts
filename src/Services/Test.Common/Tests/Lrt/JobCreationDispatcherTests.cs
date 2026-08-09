@@ -106,7 +106,7 @@ public sealed class JobCreationDispatcherTests
         return lrt.Object;
     }
 
-    private sealed class TestMultiStepLrt : MultiStepLrtBase
+    private sealed class TestMultiStepLrt : MultiStepLrtBase<NoneInputState, NoneInputState>
     {
         public TestMultiStepLrt()
             : base(
@@ -121,9 +121,6 @@ public sealed class JobCreationDispatcherTests
         public override string SystemName => nameof(TestMultiStepLrt);
         public override string NameLocalizationKey => "test-name";
         public override string DescriptionLocalizationKey => "test-description";
-        public override Type InputType => typeof(NoneInputState);
-        public override Type StateType => typeof(NoneInputState);
-
         protected override void ConfigureSteps(
             IMultiStepJobBuilder builder,
             string initialState)
@@ -134,7 +131,7 @@ public sealed class JobCreationDispatcherTests
 
     private sealed class NestedMultiStepLrt(
         string systemName,
-        string childSystemName) : MultiStepLrtBase(
+        string childSystemName) : MultiStepLrtBase<NoneInputState, NoneInputState>(
         Mock.Of<IRepository<Job, Guid>>(),
         Mock.Of<IUnitOfWork>(),
         Mock.Of<IPublishEndpoint>(),
@@ -145,9 +142,6 @@ public sealed class JobCreationDispatcherTests
         public override string SystemName => systemName;
         public override string NameLocalizationKey => "test-name";
         public override string DescriptionLocalizationKey => "test-description";
-        public override Type InputType => typeof(NoneInputState);
-        public override Type StateType => typeof(NoneInputState);
-
         protected override void ConfigureSteps(
             IMultiStepJobBuilder builder,
             string initialState)

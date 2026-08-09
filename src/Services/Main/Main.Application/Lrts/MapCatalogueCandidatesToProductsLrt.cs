@@ -11,7 +11,7 @@ public class MapCatalogueCandidatesToProductsLrt(
     IRepository<Job, Guid> jobRepository, 
     IUnitOfWork unitOfWork, 
     IPublishEndpoint publisher,
-    ILogger logger) : LrtBase(
+    ILogger logger) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository, 
     unitOfWork,
     publisher, 

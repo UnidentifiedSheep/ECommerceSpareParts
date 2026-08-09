@@ -34,6 +34,7 @@ public class ProductCrossesImportLrt(
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions)
     : CsvImportLrtBase<
+        ProductCrossesImportInputState,
         ProductCrossesImportState,
         ProductCrossesImportError,
         ProductCrossesImportLrt.ProductCrossCsvDto,
@@ -52,8 +53,6 @@ public class ProductCrossesImportLrt(
     public override string SystemName => nameof(ProductCrossesImportLrt);
     public override string NameLocalizationKey => "lrt.product.crosses.import.name";
     public override string DescriptionLocalizationKey => "lrt.product.crosses.import.description";
-    public override Type InputType => typeof(ProductCrossesImportInputState);
-    public override Type StateType => typeof(ProductCrossesImportState);
 
     protected override async Task BeforeRead(ProductCrossesImportState state)
     {

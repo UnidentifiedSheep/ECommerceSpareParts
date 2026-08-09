@@ -190,7 +190,7 @@ public sealed class MultiStepLrtBaseTests
         IUnitOfWork unitOfWork,
         IPublishEndpoint publisher,
         ILogger logger)
-        : MultiStepLrtBase(
+        : MultiStepLrtBase<NoneInputState, NoneInputState>(
             jobRepository,
             unitOfWork,
             publisher,
@@ -202,9 +202,6 @@ public sealed class MultiStepLrtBaseTests
         public override string NameLocalizationKey => "test-multi-step-lrt-name";
         public override string DescriptionLocalizationKey =>
             "test-multi-step-lrt-description";
-        public override Type InputType => typeof(NoneInputState);
-        public override Type StateType => typeof(NoneInputState);
-
         protected override void ConfigureSteps(
             IMultiStepJobBuilder builder,
             string initialState)

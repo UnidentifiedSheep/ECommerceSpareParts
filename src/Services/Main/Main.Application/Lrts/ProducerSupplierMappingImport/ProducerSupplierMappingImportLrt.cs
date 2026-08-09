@@ -37,6 +37,7 @@ public class ProducerSupplierMappingImportLrt(
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
 ) : CsvImportLrtBase<
+        ProducerSupplierMappingImportInputState,
         ProducerSupplierMappingImportState,
         ProducerSupplierMappingImportError,
         ProducerSupplierMappingImportLrt.ProducerSupplierMappingCsvDto,
@@ -55,8 +56,6 @@ public class ProducerSupplierMappingImportLrt(
     public override string SystemName => nameof(ProducerSupplierMappingImportLrt);
     public override string NameLocalizationKey => "lrt.producer.supplier.mapping.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.supplier.mapping.import.description";
-    public override Type InputType => typeof(ProducerSupplierMappingImportInputState);
-    public override Type StateType => typeof(ProducerSupplierMappingImportState);
 
     protected override async Task BeforeRead(ProducerSupplierMappingImportState state)
     {

@@ -1,10 +1,8 @@
-using System.Data;
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
-using Attributes;
 using Domain.CommonEntities.Job;
 using MassTransit;
 using Main.Application.Handlers.ProductEnrichment.BuildCatalogueCandidatesBatch;
@@ -19,7 +17,7 @@ public class BuildCatalogueCandidatesLrt(
     IPublishEndpoint publisher,
     ISender sender,
     ILogger logger
-    ) : LrtBase(
+    ) : LrtBase<NoneInputState, BuildCatalogueCandidatesState>(
     jobRepository,
     unitOfWork,
     publisher,
@@ -32,31 +30,25 @@ public class BuildCatalogueCandidatesLrt(
         "lrt.catalogue.candidates.build.name";
     public override string DescriptionLocalizationKey =>
         "lrt.catalogue.candidates.build.description";
-    public override Type InputType => typeof(NoneInputState);
-    public override Type StateType => typeof(BuildCatalogueCandidatesState);
-
     protected override async Task DoWork()
     {
         const int batchSize = 1000;
         while (true)
         {
-            var state = await GetStateAsync<BuildCatalogueCandidatesState>()
-                        ?? new BuildCatalogueCandidatesState();
-            
             var result = await sender.Send(
                 new BuildCatalogueCandidatesBatchCommand(
-                    state.LastProcessedId,
+                    State.LastProcessedId,
                     batchSize),
                 CancellationToken);
 
             if (result.ReadRows == 0) return;
 
-            await UpdateState(new BuildCatalogueCandidatesState
+            await SaveStateAsync(new BuildCatalogueCandidatesState
             {
                 LastProcessedId = result.LastProcessedId,
-                ProcessedRows = state.ProcessedRows + result.ReadRows,
-                AssignedRows = state.AssignedRows + result.AssignedRows,
-                SkippedRows = state.SkippedRows + result.SkippedRows
+                ProcessedRows = State.ProcessedRows + result.ReadRows,
+                AssignedRows = State.AssignedRows + result.AssignedRows,
+                SkippedRows = State.SkippedRows + result.SkippedRows
             });
 
             if (!result.HasMore) break;
