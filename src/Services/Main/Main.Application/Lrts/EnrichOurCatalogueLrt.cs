@@ -23,8 +23,8 @@ public class EnrichOurCatalogueLrt(
 
     public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
     public override string SystemName => nameof(EnrichOurCatalogueLrt);
-    public override string NameLocalizationKey { get; }
-    public override string DescriptionLocalizationKey { get; }
+    public override string NameLocalizationKey => "lrt.catalogue.enrichment.name";
+    public override string DescriptionLocalizationKey => "lrt.catalogue.enrichment.description";
     protected override void ConfigureSteps(
         IMultiStepJobBuilder builder, 
         string initialState)

@@ -20,6 +20,10 @@
     "lrt.organization.approximate.balance.recalculate.name": "Organization approximate balance recalculation",
     "lrt.organization.approximate.balance.recalculate.description": "Recalculates organization approximate balances in the base currency from their current balances.",
     "lrt.catalogue.candidates.build.name": "Build catalogue candidates",
-    "lrt.catalogue.candidates.build.description": "Creates catalogue candidates from supplier products and links each resolved supplier product to its candidate."
+    "lrt.catalogue.candidates.build.description": "Creates catalogue candidates from supplier products and links each resolved supplier product to its candidate.",
+    "lrt.catalogue.candidates.map.to.products.name": "Map catalogue candidates to products",
+    "lrt.catalogue.candidates.map.to.products.description": "Maps catalogue candidates to products by normalized SKU and producer.",
+    "lrt.catalogue.enrichment.name": "Catalogue enrichment",
+    "lrt.catalogue.enrichment.description": "Builds candidates from supplier products and then maps them to catalogue products."
   }
 }

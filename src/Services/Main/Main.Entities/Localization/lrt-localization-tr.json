@@ -20,6 +20,10 @@
     "lrt.organization.approximate.balance.recalculate.name": "Kuruluş yaklaşık bakiye yeniden hesaplama",
     "lrt.organization.approximate.balance.recalculate.description": "Kuruluşların yaklaşık bakiyelerini mevcut bakiyelerine göre temel para biriminde yeniden hesaplar.",
     "lrt.catalogue.candidates.build.name": "Katalog adaylarını oluşturma",
-    "lrt.catalogue.candidates.build.description": "Tedarikçi ürünlerinden katalog adayları oluşturur ve çözümlenen her tedarikçi ürününü ilgili adaya bağlar."
+    "lrt.catalogue.candidates.build.description": "Tedarikçi ürünlerinden katalog adayları oluşturur ve çözümlenen her tedarikçi ürününü ilgili adaya bağlar.",
+    "lrt.catalogue.candidates.map.to.products.name": "Katalog adaylarını ürünlerle eşleştirme",
+    "lrt.catalogue.candidates.map.to.products.description": "Katalog adaylarını normalleştirilmiş SKU ve üreticiye göre ürünlerle eşleştirir.",
+    "lrt.catalogue.enrichment.name": "Katalog zenginleştirme",
+    "lrt.catalogue.enrichment.description": "Tedarikçi ürünlerinden adaylar oluşturur ve ardından bunları katalog ürünleriyle eşleştirir."
   }
 }

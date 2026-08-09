@@ -52,9 +52,10 @@ public sealed class BuildCatalogueCandidatesBatchTests : IntegrationTest
     public async Task ExistingCandidate_IsReused()
     {
         var producer = TestContext.Producers[0];
-        var candidate = CatalogueCandidate.Create("ABC-123", producer.Id);
-        await Context.AddAsync(candidate);
-        await Context.SaveChangesAsync();
+        var candidate = await new CatalogueCandidateBuilder(Faker)
+            .WithSku("ABC-123")
+            .WithProducerId(producer.Id)
+            .BuildAndAddToDb(Context);
         var supplierProduct = await AddSupplierProduct(
             "ABC123",
             producer.Name,
