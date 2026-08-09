@@ -2,6 +2,7 @@ using System.Globalization;
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -25,6 +26,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TError, TCsvRow, TBa
     IOptions<S3BucketsOptions> bucketsOptions,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger logger,
     IS3StorageService s3Service,
     IScopedStringLocalizer stringLocalizer,
@@ -33,6 +35,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TError, TCsvRow, TBa
         jobRepository,
         unitOfWork,
         publisher,
+        domainEventExecutor,
         logger)
     where TInputState : class, IInputState
     where TState : class, TInputState

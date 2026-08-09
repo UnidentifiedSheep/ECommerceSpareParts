@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
@@ -32,6 +33,7 @@ public class ProductImportLrt(
     IS3StorageService s3Service,
     ISender sender,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     IOptions<S3BucketsOptions> bucketsOptions,
     ILogger<ProductImportLrt> logger,
     IScopedStringLocalizer stringLocalizer,
@@ -43,6 +45,7 @@ public class ProductImportLrt(
         bucketsOptions,
         unitOfWork,
         publisher,
+        domainEventExecutor,
         logger,
         s3Service,
         stringLocalizer,

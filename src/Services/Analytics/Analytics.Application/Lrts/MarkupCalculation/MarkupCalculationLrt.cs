@@ -3,6 +3,7 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -21,11 +22,13 @@ public class MarkupCalculationLrt(
     IUnitOfWork unitOfWork,
     INamedObjectRegistry<MarkupAnalyzerNamedObjectBase> registry,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger<MarkupCalculationLrt> logger
 ) : LrtBase<MarkupCalculationInputState, MarkupCalculationState>(
     jobRepository,
     unitOfWork,
     publisher,
+    domainEventExecutor,
     logger)
 {
     public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Analytics;
@@ -54,7 +57,7 @@ public class MarkupCalculationLrt(
             })
             .ToList();
 
-        await UnitOfWork.ExecuteWithTransaction(
+        await ExecuteWithDomainEventsTransactionAsync(
             TransactionalAttribute.ReadCommited(20, 2),
             async () =>
             {
@@ -65,7 +68,6 @@ public class MarkupCalculationLrt(
                     });
 
                 await UnitOfWork.SaveChangesAsync(CancellationToken);
-            },
-            CancellationToken);
+            });
     }
 }

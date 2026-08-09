@@ -194,6 +194,7 @@ public sealed class MultiStepLrtBaseTests
             jobRepository,
             unitOfWork,
             publisher,
+            new DomainEventExecutorStub(),
             logger)
     {
         public override IServiceDefinition ServiceDefinition { get; } =

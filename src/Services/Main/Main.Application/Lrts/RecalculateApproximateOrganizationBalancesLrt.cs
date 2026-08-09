@@ -1,6 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -21,11 +22,13 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
     IBalanceService balanceService,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger<RecalculateApproximateOrganizationBalancesLrt> logger
 ) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository,
     unitOfWork,
     publisher,
+    domainEventExecutor,
     logger)
 {
     private const int BatchSize = 250;
@@ -51,7 +54,7 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 
             if (organizationIds.Count == 0) break;
 
-            await UnitOfWork.ExecuteWithTransaction(
+            await ExecuteWithDomainEventsTransactionAsync(
                 TransactionalAttribute.ReadCommited(20, 3),
                 async () =>
                 {
@@ -59,8 +62,7 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
                         organizationIds,
                         CancellationToken);
                     await UnitOfWork.SaveChangesAsync(CancellationToken);
-                },
-                CancellationToken);
+                });
 
             lastOrganizationId = organizationIds[^1];
             if (organizationIds.Count < BatchSize) break;

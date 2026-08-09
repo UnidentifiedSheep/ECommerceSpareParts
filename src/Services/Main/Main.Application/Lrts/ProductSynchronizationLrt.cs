@@ -1,6 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -20,11 +21,13 @@ public sealed class ProductSynchronizationLrt(
     IReadRepository<Product, int> productRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger<ProductSynchronizationLrt> logger
 ) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository,
     unitOfWork,
     publisher,
+    domainEventExecutor,
     logger)
 {
 
@@ -58,7 +61,7 @@ public sealed class ProductSynchronizationLrt(
             .ToListAsync(CancellationToken);
 
     private Task PublishEventsAsync(IReadOnlyList<int> ids)
-        => UnitOfWork.ExecuteWithTransaction(
+        => ExecuteWithDomainEventsTransactionAsync(
             settings: TransactionalAttribute.ReadCommited(20, 2),
             action: async () =>
             {
@@ -69,6 +72,5 @@ public sealed class ProductSynchronizationLrt(
                     });
                 
                 await UnitOfWork.SaveChangesAsync(CancellationToken);
-            },
-            cancellationToken: CancellationToken);
+            });
 }

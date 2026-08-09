@@ -11,6 +11,7 @@ using FluentAssertions;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Tests.Stubs;
 
 namespace Tests.Tests.Lrt;
 
@@ -113,6 +114,7 @@ public sealed class JobCreationDispatcherTests
                 Mock.Of<IRepository<Job, Guid>>(),
                 Mock.Of<IUnitOfWork>(),
                 Mock.Of<IPublishEndpoint>(),
+                new DomainEventExecutorStub(),
                 Mock.Of<ILogger>())
         {
         }
@@ -135,6 +137,7 @@ public sealed class JobCreationDispatcherTests
         Mock.Of<IRepository<Job, Guid>>(),
         Mock.Of<IUnitOfWork>(),
         Mock.Of<IPublishEndpoint>(),
+        new DomainEventExecutorStub(),
         Mock.Of<ILogger>())
     {
         public override IServiceDefinition ServiceDefinition { get; } =

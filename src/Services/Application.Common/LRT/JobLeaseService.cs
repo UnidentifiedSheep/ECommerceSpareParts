@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -10,7 +11,8 @@ namespace Application.Common.LRT;
 
 public class JobLeaseService(
     IRepository<Job, Guid> repository,
-    IUnitOfWork unitOfWork) : IJobLeaseService
+    IUnitOfWork unitOfWork,
+    IDomainEventExecutor domainEventExecutor) : IJobLeaseService
 {
     public async Task<Job?> TryAcquireJobAsync(
         Guid holderId,
@@ -18,7 +20,7 @@ public class JobLeaseService(
         CancellationToken ct)
         => await unitOfWork.ExecuteWithTransaction(
             TransactionalAttribute.ReadCommited(30, 3),
-            async () =>
+            () => domainEventExecutor.ExecuteAsync(async () =>
             {
                 var now = DateTime.UtcNow;
                 var criteria = GetCriteriaBase(1)
@@ -40,13 +42,13 @@ public class JobLeaseService(
                 
                 await unitOfWork.SaveChangesAsync(ct);
                 return job;
-            },
+            }, ct),
             ct);
     
     public async Task<List<Job>> FailExpiredJobsWithoutAttempts(int maxBatchSize, CancellationToken ct)
         => await unitOfWork.ExecuteWithTransaction(
             TransactionalAttribute.ReadCommited(30, 3),
-            async () =>
+            () => domainEventExecutor.ExecuteAsync(async () =>
             {
                 var now = DateTime.UtcNow;
                 var criteria = GetCriteriaBase(maxBatchSize)
@@ -65,7 +67,7 @@ public class JobLeaseService(
                 
                 await unitOfWork.SaveChangesAsync(ct);
                 return jobs;
-            },
+            }, ct),
             ct);
     
     private static CriteriaBuilder<Job> GetCriteriaBase(int maxBatchSize)

@@ -1,6 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -15,12 +16,14 @@ public class PriceCandidateCalculationLrt(
     IJobRepository jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger<PriceCandidateCalculationLrt> logger,
     ISender sender
 ) : LrtBase<PriceCandidateCalculationState, PriceCandidateCalculationState>(
     jobRepository,
     unitOfWork,
     publisher,
+    domainEventExecutor,
     logger)
 {
     public static string LrtName => nameof(PriceCandidateCalculationLrt);

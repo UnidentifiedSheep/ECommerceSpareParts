@@ -2,6 +2,7 @@ using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Handlers.Jobs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Application.Common.LRT;
@@ -24,6 +25,7 @@ public class InvalidateStalePriceOptionsLrt(
     IJobRepository jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger<InvalidateStalePriceOptionsLrt> logger,
     IReadRepository<ProductPriceOption, Guid> readRepository,
     IProductPriceOptionRepository productPriceOptionRepository,
@@ -35,6 +37,7 @@ public class InvalidateStalePriceOptionsLrt(
     jobRepository,
     unitOfWork,
     publisher,
+    domainEventExecutor,
     logger)
 {
     public const string LrtName = nameof(InvalidateStalePriceOptionsLrt); 
@@ -49,7 +52,7 @@ public class InvalidateStalePriceOptionsLrt(
 
         while (true)
         {
-            var processedCount = await UnitOfWork.ExecuteWithTransaction(
+            var processedCount = await ExecuteWithDomainEventsTransactionAsync(
                 TransactionalAttribute.ReadCommited(30, 3),
                 async () =>
                 {
@@ -95,8 +98,7 @@ public class InvalidateStalePriceOptionsLrt(
                     });
 
                     return items.Count;
-                },
-                CancellationToken);
+                });
 
             if (processedCount < batchSize) break;
         }

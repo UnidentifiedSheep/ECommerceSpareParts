@@ -1,6 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
@@ -15,12 +16,14 @@ public class MapCatalogueCandidatesToProductsLrt(
     IRepository<Job, Guid> jobRepository, 
     IUnitOfWork unitOfWork, 
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ISender sender,
     ILogger<MapCatalogueCandidatesToProductsLrt> logger)
     : LrtBase<NoneInputState, MapCatalogueCandidatesToProductsState>(
     jobRepository, 
     unitOfWork,
     publisher, 
+    domainEventExecutor,
     logger)
 {
     public const string LrtSystemName = nameof(MapCatalogueCandidatesToProductsLrt);

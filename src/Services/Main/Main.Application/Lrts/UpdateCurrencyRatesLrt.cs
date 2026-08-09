@@ -1,6 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -17,12 +18,14 @@ public class UpdateCurrencyRatesLrt(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger<UpdateCurrencyRatesLrt> logger,
     ISender sender
 ) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository,
     unitOfWork,
     publisher,
+    domainEventExecutor,
     logger)
 {
     public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;

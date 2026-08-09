@@ -1,6 +1,7 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -317,6 +318,7 @@ public class LrtBaseTests
                 JobRepository.Object,
                 UnitOfWork.Object,
                 Publisher,
+                new DomainEventExecutorStub(),
                 Logger.Object);
         }
     }
@@ -325,8 +327,14 @@ public class LrtBaseTests
         IRepository<Job, Guid> jobRepository,
         IUnitOfWork unitOfWork,
         IPublishEndpoint publisher,
+        IDomainEventExecutor domainEventExecutor,
         ILogger logger
-    ) : LrtBase<TestInput, TestState>(jobRepository, unitOfWork, publisher, logger)
+    ) : LrtBase<TestInput, TestState>(
+        jobRepository,
+        unitOfWork,
+        publisher,
+        domainEventExecutor,
+        logger)
     {
         public Func<TestLrt, Task> Work { get; set; } = _ => Task.CompletedTask;
         public int DoWorkCalls { get; private set; }

@@ -102,6 +102,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterDomainEventScope(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventScope, DomainEventScope>();
+        services.AddScoped<IDomainEventExecutor, DomainEventExecutor>();
         return services;
     }
 

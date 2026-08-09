@@ -2,6 +2,7 @@ using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Handlers.Metrics;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -19,11 +20,13 @@ public class MetricCalculationLrt(
     ISender sender,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger<MetricCalculationLrt> logger
 ) : LrtBase<MetricCalculationInputState, MetricCalculationState>(
     jobRepository,
     unitOfWork,
     publisher,
+    domainEventExecutor,
     logger)
 {
     public const string LrtSystemName = nameof(MetricCalculationLrt);

@@ -2,6 +2,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Exceptions;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -18,6 +19,7 @@ public abstract class LrtBase<TInputState, TState>(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger logger
 ) : ILrtNamedObject
     where TInputState : class, IInputState
@@ -150,7 +152,7 @@ public abstract class LrtBase<TInputState, TState>(
     protected async Task SaveStateAsync(TState state)
     {
         var json = JsonSerializer.Serialize(state);
-        await unitOfWork.ExecuteWithTransaction(
+        await ExecuteWithDomainEventsTransactionAsync(
             TransactionalAttribute.ReadCommited(30, 3),
             async () =>
             {
@@ -158,8 +160,7 @@ public abstract class LrtBase<TInputState, TState>(
                 Job.SetState(json, LeaseHolderId);
                 Job.RenewLease(LeaseHolderId, LeaseDuration);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
-            },
-            CancellationToken);
+            });
 
         _state = state;
     }
@@ -175,7 +176,7 @@ public abstract class LrtBase<TInputState, TState>(
 
     protected virtual async Task ProcessingJobAsync()
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await ExecuteWithDomainEventsTransactionAsync(
             TransactionalAttribute.ReadCommited(30, 3),
             async () =>
             {
@@ -187,15 +188,14 @@ public abstract class LrtBase<TInputState, TState>(
                 logger.LogInformation(
                     "LRT job processing started. JobId: {JobId}",
                     JobId);
-            },
-            CancellationToken);
+            });
     }
 
     protected virtual async Task<bool> AttemptOrFailJobAsync(
         Exception exception,
         bool forceFail = false)
     {
-        return await unitOfWork.ExecuteWithTransaction(
+        return await ExecuteWithDomainEventsTransactionAsync(
             TransactionalAttribute.ReadCommited(30, 3),
             async () =>
             {
@@ -213,13 +213,12 @@ public abstract class LrtBase<TInputState, TState>(
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
                 return false;
-            },
-            CancellationToken);
+            });
     }
 
     protected virtual async Task SucceedJobAsync()
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await ExecuteWithDomainEventsTransactionAsync(
             TransactionalAttribute.ReadCommited(30, 3),
             async () =>
             {
@@ -227,13 +226,12 @@ public abstract class LrtBase<TInputState, TState>(
                 Job.Succeed(LeaseHolderId);
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
-            },
-            CancellationToken);
+            });
     }
 
     protected virtual async Task CancelJobAsync()
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await ExecuteWithDomainEventsTransactionAsync(
             TransactionalAttribute.ReadCommited(30, 3),
             async () =>
             {
@@ -241,20 +239,42 @@ public abstract class LrtBase<TInputState, TState>(
                 Job.Cancel(LeaseHolderId);
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
-            },
-            CancellationToken);
+            });
     }
 
     protected async Task RenewLeaseAsync(TimeSpan leaseDuration)
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await ExecuteWithDomainEventsTransactionAsync(
             TransactionalAttribute.ReadCommited(30, 3),
             async () =>
             {
                 await GetJobAsync();
                 Job.RenewLease(LeaseHolderId, leaseDuration);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
-            },
+            });
+    }
+
+    protected Task ExecuteWithDomainEventsTransactionAsync(
+        TransactionalAttribute settings,
+        Func<Task> action)
+    {
+        return unitOfWork.ExecuteWithTransaction(
+            settings,
+            () => domainEventExecutor.ExecuteAsync(
+                action,
+                CancellationToken),
+            CancellationToken);
+    }
+
+    protected Task<T> ExecuteWithDomainEventsTransactionAsync<T>(
+        TransactionalAttribute settings,
+        Func<Task<T>> action)
+    {
+        return unitOfWork.ExecuteWithTransaction(
+            settings,
+            () => domainEventExecutor.ExecuteAsync(
+                action,
+                CancellationToken),
             CancellationToken);
     }
 

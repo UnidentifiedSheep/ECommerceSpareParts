@@ -1,6 +1,7 @@
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
@@ -34,6 +35,7 @@ public class ProducerSupplierMappingImportLrt(
     ILogger<ProducerSupplierMappingImportLrt> logger,
     IOptions<S3BucketsOptions> bucketsOptions,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
 ) : CsvImportLrtBase<
@@ -46,6 +48,7 @@ public class ProducerSupplierMappingImportLrt(
         bucketsOptions,
         unitOfWork,
         publisher,
+        domainEventExecutor,
         logger,
         s3Service,
         stringLocalizer,

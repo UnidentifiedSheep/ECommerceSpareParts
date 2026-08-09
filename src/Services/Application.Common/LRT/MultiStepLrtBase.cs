@@ -1,5 +1,6 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -15,11 +16,13 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger logger
 ) : LrtBase<TInputState, TState>(
     jobRepository,
     unitOfWork,
     publisher,
+    domainEventExecutor,
     logger), IMultiStepLrt
     where TInputState : class, IInputState
     where TState : class, TInputState
@@ -37,10 +40,9 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
 
     protected override Task DoWork()
     {
-        return UnitOfWork.ExecuteWithTransaction(
+        return ExecuteWithDomainEventsTransactionAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            ReconcileAsync,
-            CancellationToken);
+            ReconcileAsync);
     }
 
     protected override Task SucceedJobAsync()

@@ -1,6 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -14,10 +15,12 @@ public class EnrichOurCatalogueLrt(
     IRepository<Job, Guid> jobRepository, 
     IUnitOfWork unitOfWork, 
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     ILogger<EnrichOurCatalogueLrt> logger) : MultiStepLrtBase<NoneInputState, NoneInputState>(
     jobRepository, 
     unitOfWork,
     publisher, 
+    domainEventExecutor,
     logger)
 {
 

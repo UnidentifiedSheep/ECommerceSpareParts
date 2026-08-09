@@ -1,5 +1,6 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
@@ -24,6 +25,7 @@ public class ProducerAliasImportLrt(
     ISender sender,
     ILogger<ProducerAliasImportLrt> logger,
     IPublishEndpoint publisher,
+    IDomainEventExecutor domainEventExecutor,
     IOptions<S3BucketsOptions> bucketsOptions,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
@@ -38,6 +40,7 @@ public class ProducerAliasImportLrt(
         bucketsOptions,
         unitOfWork,
         publisher,
+        domainEventExecutor,
         logger,
         s3Service,
         stringLocalizer,
