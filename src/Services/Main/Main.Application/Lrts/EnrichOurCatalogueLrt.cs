@@ -14,7 +14,7 @@ public class EnrichOurCatalogueLrt(
     IRepository<Job, Guid> jobRepository, 
     IUnitOfWork unitOfWork, 
     IPublishEndpoint publisher,
-    ILogger logger) : MultiStepLrtBase<NoneInputState, NoneInputState>(
+    ILogger<EnrichOurCatalogueLrt> logger) : MultiStepLrtBase<NoneInputState, NoneInputState>(
     jobRepository, 
     unitOfWork,
     publisher, 

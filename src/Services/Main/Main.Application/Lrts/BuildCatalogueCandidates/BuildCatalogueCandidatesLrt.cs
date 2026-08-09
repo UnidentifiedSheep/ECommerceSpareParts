@@ -16,7 +16,7 @@ public class BuildCatalogueCandidatesLrt(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ISender sender,
-    ILogger logger
+    ILogger<BuildCatalogueCandidatesLrt> logger
     ) : LrtBase<NoneInputState, BuildCatalogueCandidatesState>(
     jobRepository,
     unitOfWork,
