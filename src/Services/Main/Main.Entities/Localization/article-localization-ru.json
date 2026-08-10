@@ -35,7 +35,7 @@
     "article.reservation.needed.count.must.be.positive": "Запрашиваемое количество должно быть больше 0.",
     "article.create.articles.must.have.at.least.one": "Список артикулов не может быть пустым.",
     "article.create.articles.max.100.at.once": "Нельзя добавить более 100 артикулов за раз.",
-    "article.create.articles.max.5000.at.once": "При массовом импорте нельзя добавить более 5000 артикулов за раз.",
+    "article.create.articles.duplicate": "Товар с таким артикулом и производителем уже существует.",
     "article.articleNumber.must.not.be.empty": "Артикул не может быть пустым.",
     "article.articleNumber.min.length.3": "Артикул должен содержать минимум 3 символа.",
     "article.articleNumber.max.length.128": "Артикул не должен превышать 128 символов.",

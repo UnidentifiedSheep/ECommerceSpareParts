@@ -1,17 +1,18 @@
+using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
+using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
-using Main.Application.Dtos.Producer;
-using Main.Application.Handlers.Producers;
+using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
+using Main.Entities.Producer;
 using MassTransit;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -21,14 +22,14 @@ public class ProducerImportLrt(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
-    ISender sender,
+    IProducerRepository producerRepository,
     ILogger<ProducerImportLrt> logger,
     IOptions<S3BucketsOptions> bucketsOptions,
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
     IScopedStringLocalizer stringLocalizer
 ) : CsvImportLrtBase<ProducerImportInputState, ProducerImportState, ProducerImportLrt.NewProducerCsvDto,
-    NewProducerDto>(
+    Producer>(
     jobRepository,
     bucketsOptions,
     unitOfWork,
@@ -52,40 +53,73 @@ public class ProducerImportLrt(
         NewProducerCsvDto row,
         ProducerImportState state,
         List<CsvImportError> errors,
-        out NewProducerDto item)
+        out Producer item)
     {
-        item = new NewProducerDto
+        item = null!;
+        try
         {
-            Name = row.Name,
-            Description = row.Description
-        };
+            item = Producer.Create(row.Name, row.Description);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            var message = ex is ILocalizableException localizableException
+                ? StringLocalizer.GetOrDefault(
+                    localizableException.MessageKey,
+                    localizableException.Arguments ?? []) ?? ex.Message
+                : ex.Message;
 
-        return true;
+            errors.Add(CreateError(rowIdx, message));
+            return false;
+        }
     }
 
     protected override async Task ProcessBatch(
-        IReadOnlyList<(int idx, NewProducerDto item)> producers,
+        IReadOnlyList<(int idx, Producer item)> producers,
         ProducerImportState state,
         List<CsvImportError> errors)
     {
         if (producers.Count == 0) return;
 
         var firstIdx = producers[0].idx;
+        var errorsBeforeBatch = errors.Count;
 
-        var result = await sender.Send(
-            new CreateProducerBatchCommand(
-                producers.Select(x => x.item)),
+        var uniqueNames = new HashSet<string>();
+        var uniqueProducers = new List<Producer>();
+        foreach (var (idx, producer) in producers)
+        {
+            if (uniqueNames.Add(producer.Name))
+            {
+                uniqueProducers.Add(producer);
+                continue;
+            }
+
+            errors.Add(CreateError(
+                idx,
+                StringLocalizer.Get("producer.duplicate.name.in.batch")));
+        }
+
+        var created = await TransactionService.ExecuteAsync(
+            TransactionalAttribute.RetryOnConflict(20, 2),
+            async (context, cancellationToken) =>
+            {
+                var existingNames = (await producerRepository.ListAsync(
+                        Criteria<Producer>.New()
+                            .Where(x => uniqueNames.Contains(x.Name))
+                            .Track(false)
+                            .Build(),
+                        cancellationToken))
+                    .Select(x => x.Name)
+                    .ToHashSet();
+                var toAdd = uniqueProducers
+                    .Where(x => !existingNames.Contains(x.Name))
+                    .ToList();
+
+                await context.UnitOfWork.AddRangeAsync(toAdd, cancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+                return toAdd.Count;
+            },
             CancellationToken);
-
-        foreach (var (idx, message) in result.Errors)
-            errors.Add(
-                new CsvImportError
-                {
-                    Message = message,
-                    RowIdx = idx >= 0 && idx < producers.Count
-                        ? producers[idx].idx
-                        : firstIdx + idx
-                });
 
         Logger.LogInformation(
             "Producer import batch processed. JobId: {JobId}, " +
@@ -94,9 +128,9 @@ public class ProducerImportLrt(
             JobId,
             firstIdx,
             producers.Count,
-            result.Created,
-            result.Skipped,
-            result.Errors.Count);
+            created,
+            uniqueProducers.Count - created,
+            errors.Count - errorsBeforeBatch);
     }
 
     public record NewProducerCsvDto

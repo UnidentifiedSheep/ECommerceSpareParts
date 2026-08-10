@@ -1,32 +1,20 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
-using Main.Enums.Products;
 
 namespace Main.Application.Handlers.Products.CreateProducts;
 
 public class CreateProductsValidation : AbstractValidator<CreateProductsCommand>
 {
     public const int MaxProductsPerRequest = 100;
-    public const int MaxProductsPerImportBatch = 5000;
-
     public CreateProductsValidation()
     {
-        RuleFor(x => x.Policy)
-            .IsInEnum();
-
         RuleFor(x => x.NewProducts)
             .NotEmpty()
             .WithLocalizationKey("article.create.articles.must.have.at.least.one");
 
         RuleFor(x => x.NewProducts)
             .Must(x => x.Count <= MaxProductsPerRequest)
-            .When(x => x.Policy != CreateProductsConflictPolicy.SkipExisting)
             .WithLocalizationKey("article.create.articles.max.100.at.once");
-
-        RuleFor(x => x.NewProducts)
-            .Must(x => x.Count <= MaxProductsPerImportBatch)
-            .When(x => x.Policy == CreateProductsConflictPolicy.SkipExisting)
-            .WithLocalizationKey("article.create.articles.max.5000.at.once");
 
         RuleForEach(x => x.NewProducts)
             .ChildRules(content =>

@@ -35,7 +35,7 @@
     "article.reservation.needed.count.must.be.positive": "Requested quantity must be greater than 0.",
     "article.create.articles.must.have.at.least.one": "At least one article must be provided.",
     "article.create.articles.max.100.at.once": "Maximum 100 articles can be created at once.",
-    "article.create.articles.max.5000.at.once": "Maximum 5000 articles can be created in a single import batch.",
+    "article.create.articles.duplicate": "A product with the same SKU and producer already exists.",
     "article.articleNumber.must.not.be.empty": "Article number must not be empty.",
     "article.articleNumber.min.length.3": "Article number must be at least 3 characters long.",
     "article.articleNumber.max.length.128": "Article number must not exceed 128 characters.",
