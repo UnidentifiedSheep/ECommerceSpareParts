@@ -2,20 +2,25 @@
 using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
 using Enums;
+using Main.Application.Lrts.Base;
 
 namespace Main.Application.Lrts.ProducerAliasesImport;
 
-public record ProducerAliasesImportState : ProducerAliasesImportInputState
+public record ProducerAliasesImportState : ProducerAliasesImportInputState,
+    ICsvImportState<ProducerAliasesImportState>
 {
     [JsonPropertyName("currentLine")]
     public int CurrentLine { get; init; }
 
     [JsonPropertyName("errors")]
-    public List<ProducerAliasesImportError> Errors { get; init; } = [];
+    public List<CsvImportError> Errors { get; init; } = [];
+
+    public ProducerAliasesImportState WithCurrentLine(int currentLine)
+        => this with { CurrentLine = currentLine };
 }
 
 [CsvSchema(typeof(ProducerAliasImportLrt.ProducerAliasCsvDto))]
-public record ProducerAliasesImportInputState : IInputState
+public record ProducerAliasesImportInputState : IInputState, ICsvImportInputState
 {
     [Accepts(".csv")]
     [InputControl(InputControlType.UploadFile)]
@@ -32,13 +37,4 @@ public record ProducerAliasesImportInputState : IInputState
                 "Producer other name import state error. " +
                 "File name should end with .csv");
     }
-}
-
-public record ProducerAliasesImportError
-{
-    [JsonPropertyName("rowIdx")]
-    public int RowIdx { get; init; }
-
-    [JsonPropertyName("message")]
-    public required string Message { get; init; }
 }

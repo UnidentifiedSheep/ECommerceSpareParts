@@ -56,23 +56,51 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateProducerSupplierMapping_WithSameProducerAndSupplier_ThrowsMappingAlreadyExists()
+    public async Task CreateProducerSupplierMapping_WithSameSupplierNameAndSupplier_ThrowsMappingAlreadyExists()
     {
+        const string supplierProducerName = "Bosch";
         var existing = await new ProducerSupplierMappingBuilder(Faker)
             .WithProducerId(TestContext.Producers[0].Id)
             .WithSupplier(Supplier.Armtek)
+            .WithSupplierProducerName($"  {supplierProducerName}  ")
             .BuildAndAddToDb(Context);
 
         var command = new CreateProducerSupplierMappingCommand(
             new NewProducerSupplierMapping
             {
-                ProducerId = existing.ProducerId,
+                ProducerId = TestContext.Producers[1].Id,
                 Supplier = existing.Supplier,
-                SupplierProducerName = Faker.Lorem.Letter(20)
+                SupplierProducerName = $" {supplierProducerName} "
             });
 
         await Assert.ThrowsAsync<ProducersSupplierMappingAlreadyExistsException>(async () =>
             await Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreateProducerSupplierMapping_WithSameProducerAndSupplierButDifferentName_Succeeds()
+    {
+        var producer = TestContext.Producers[0];
+        await new ProducerSupplierMappingBuilder(Faker)
+            .WithProducerId(producer.Id)
+            .WithSupplier(Supplier.Armtek)
+            .WithSupplierProducerName("Bosch")
+            .BuildAndAddToDb(Context);
+        var command = new CreateProducerSupplierMappingCommand(
+            new NewProducerSupplierMapping
+            {
+                ProducerId = producer.Id,
+                Supplier = Supplier.Armtek,
+                SupplierProducerName = "Bosch Automotive"
+            });
+
+        await Mediator.Send(command);
+
+        var mappings = await Context.ProducerSupplierMappings
+            .AsNoTracking()
+            .Where(x => x.ProducerId == producer.Id)
+            .ToListAsync();
+        mappings.Should().HaveCount(2);
     }
 
     [Fact]

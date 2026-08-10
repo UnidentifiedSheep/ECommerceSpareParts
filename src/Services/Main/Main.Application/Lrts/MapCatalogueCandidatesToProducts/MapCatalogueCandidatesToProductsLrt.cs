@@ -63,7 +63,7 @@ public class MapCatalogueCandidatesToProductsLrt(
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
 
         return TransactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30,3),
+            TransactionalAttribute.ReadCommitted(30,3),
             async (context, cancellationToken) =>
             {
                 var candidates = await catalogueCandidateRepository.ListAsync(

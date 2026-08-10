@@ -1,18 +1,18 @@
+using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
+using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
-using Localization.Domain;
-using Main.Application.Handlers.ProducerAliases;
-using Main.Application.Handlers.Producers;
+using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
+using Main.Entities.Producer;
 using MassTransit;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -22,20 +22,19 @@ public class ProducerAliasImportLrt(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
-    ISender sender,
+    IRepository<ProducerAlias, string> aliasRepository,
+    IProducerRepository producerRepository,
     ILogger<ProducerAliasImportLrt> logger,
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
     IOptions<S3BucketsOptions> bucketsOptions,
-    IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions
+    IScopedStringLocalizer stringLocalizer
 )
     : CsvImportLrtBase<
         ProducerAliasesImportInputState,
         ProducerAliasesImportState,
-        ProducerAliasesImportError,
         ProducerAliasImportLrt.ProducerAliasCsvDto,
-        CreateProducerAliasesBatchItem>(
+        ProducerAliasImportLrt.ProducerAliasBatchItem>(
         jobRepository,
         bucketsOptions,
         unitOfWork,
@@ -43,82 +42,125 @@ public class ProducerAliasImportLrt(
         transactionService,
         logger,
         s3Service,
-        stringLocalizer,
-        localesOptions)
+        stringLocalizer)
 {
     public override string SystemName => nameof(ProducerAliasImportLrt);
     public override string NameLocalizationKey => "lrt.producer.other.names.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.other.names.import.description";
-
-    protected override string GetFileName(ProducerAliasesImportState state) { return state.FileName; }
-
-    protected override int GetCurrentLine(ProducerAliasesImportState state) { return state.CurrentLine; }
-
-    protected override List<ProducerAliasesImportError> GetErrors(ProducerAliasesImportState state)
-    {
-        return state.Errors;
-    }
 
     protected override string GetTooManyErrorsLocalizationKey()
     {
         return "producer.too.many.errors.while.processing.batch";
     }
 
-    protected override ProducerAliasesImportError CreateError(int rowIdx, string message)
-    {
-        return new ProducerAliasesImportError
-        {
-            RowIdx = rowIdx,
-            Message = message
-        };
-    }
-
-    protected override ProducerAliasesImportState WithUpdatedState(
-        ProducerAliasesImportState state,
-        int currentLine,
-        List<ProducerAliasesImportError> errors)
-    {
-        return state with
-        {
-            CurrentLine = currentLine,
-            Errors = errors
-        };
-    }
-
     protected override bool TryProcessRow(
         int rowIdx,
         ProducerAliasCsvDto row,
         ProducerAliasesImportState state,
-        List<ProducerAliasesImportError> errors,
-        out CreateProducerAliasesBatchItem item)
+        List<CsvImportError> errors,
+        out ProducerAliasBatchItem item)
     {
-        item = new CreateProducerAliasesBatchItem(
-            row.Name,
-            row.Alias);
-        return true;
+        item = null!;
+        try
+        {
+            var alias = ProducerAlias.Create(0, row.Alias);
+            item = new ProducerAliasBatchItem(
+                Producer.ToNormalizedName(row.Name),
+                alias.Alias);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            var message = ex is ILocalizableException localizableException
+                ? StringLocalizer.GetOrDefault(
+                    localizableException.MessageKey,
+                    localizableException.Arguments ?? []) ?? ex.Message
+                : ex.Message;
+
+            errors.Add(CreateError(rowIdx, message));
+            return false;
+        }
     }
 
     protected override async Task ProcessBatch(
-        List<(int idx, CreateProducerAliasesBatchItem item)> otherNames,
+        IReadOnlyList<(int idx, ProducerAliasBatchItem item)> aliases,
         ProducerAliasesImportState state,
-        List<ProducerAliasesImportError> errors)
+        List<CsvImportError> errors)
     {
-        if (otherNames.Count == 0) return;
+        if (aliases.Count == 0) return;
 
-        var firstIdx = otherNames[0].idx;
-        var result = await sender.Send(
-            new CreateProducerAliasesBatchCommand(otherNames.Select(x => x.item)),
+        var firstIdx = aliases[0].idx;
+        var errorsBeforeBatch = errors.Count;
+        var uniqueAliases = new HashSet<string>();
+        var uniqueItems = new List<(int idx, ProducerAliasBatchItem item)>();
+        foreach (var item in aliases)
+        {
+            if (uniqueAliases.Add(item.item.Alias))
+            {
+                uniqueItems.Add(item);
+                continue;
+            }
+
+            errors.Add(CreateError(
+                item.idx,
+                StringLocalizer.Get("producer.other.name.duplicate.in.batch")));
+        }
+
+        var result = await TransactionService.ExecuteAsync(
+            TransactionalAttribute.RetryOnConflict(20, 2),
+            async (context, cancellationToken) =>
+            {
+                var existingAliases = (await aliasRepository.ListAsync(
+                        Criteria<ProducerAlias>.New()
+                            .Where(x => uniqueAliases.Contains(x.Alias))
+                            .Track(false)
+                            .Build(),
+                        cancellationToken))
+                    .Select(x => x.Alias)
+                    .ToHashSet();
+                var producerNames = uniqueItems
+                    .Select(x => x.item.OriginalName)
+                    .Distinct()
+                    .ToList();
+                var producers = (await producerRepository.ListAsync(
+                        Criteria<Producer>.New()
+                            .Where(x => producerNames.Contains(x.Name))
+                            .Track(false)
+                            .Build(),
+                        cancellationToken))
+                    .ToDictionary(x => x.Name);
+
+                var transactionErrors = new List<CsvImportError>();
+                var toAdd = new List<ProducerAlias>();
+                foreach (var (idx, item) in uniqueItems)
+                {
+                    if (existingAliases.Contains(item.Alias))
+                    {
+                        transactionErrors.Add(CreateError(
+                            idx,
+                            StringLocalizer.Get("producer.other.name.already.taken")));
+                        continue;
+                    }
+
+                    if (!producers.TryGetValue(item.OriginalName, out var producer))
+                    {
+                        transactionErrors.Add(CreateError(
+                            idx,
+                            StringLocalizer.Get(
+                                "producer.other.name.producer.not.found.in.batch")));
+                        continue;
+                    }
+
+                    toAdd.Add(ProducerAlias.Create(producer.Id, item.Alias));
+                }
+
+                await context.UnitOfWork.AddRangeAsync(toAdd, cancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+                return new ProducerAliasBatchResult(toAdd.Count, transactionErrors);
+            },
             CancellationToken);
 
-        foreach (var (idx, message) in result.Errors)
-            errors.Add(
-                new ProducerAliasesImportError
-                {
-                    Message = message,
-                    RowIdx = idx >= 0 && idx < otherNames.Count
-                        ? otherNames[idx].idx
-                        : firstIdx + idx
-                });
+        errors.AddRange(result.Errors);
 
         Logger.LogInformation(
             "Producer other names import batch processed. JobId: {JobId}, " +
@@ -126,13 +168,17 @@ public class ProducerAliasImportLrt(
             "Created: {Created}, Skipped: {Skipped}, Errors: {Errors}",
             JobId,
             firstIdx,
-            otherNames.Count,
+            aliases.Count,
             result.Created,
-            result.Skipped,
-            result.Errors.Count);
-
-        otherNames.Clear();
+            aliases.Count - result.Created,
+            errors.Count - errorsBeforeBatch);
     }
+
+    public sealed record ProducerAliasBatchItem(string OriginalName, string Alias);
+
+    private sealed record ProducerAliasBatchResult(
+        int Created,
+        IReadOnlyList<CsvImportError> Errors);
 
     public record ProducerAliasCsvDto
     {

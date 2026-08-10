@@ -3,22 +3,21 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Attributes;
 using Contracts.Products;
+using Exceptions;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
-using Main.Enums.Products;
 
 namespace Main.Application.Handlers.Products.CreateProducts;
 
 [AutoSave]
 [Transactional]
 public record CreateProductsCommand(
-    List<CreateProductDto> NewProducts,
-    CreateProductsConflictPolicy Policy = CreateProductsConflictPolicy.Fail
+    List<CreateProductDto> NewProducts
 ) : ICommand<CreateProductsResult>;
 
-public record CreateProductsResult(List<int> CreatedIds, int Skipped = 0);
+public record CreateProductsResult(List<int> CreatedIds);
 
 public class CreateProductsHandler(
     IProductRepository productRepository,
@@ -29,10 +28,21 @@ public class CreateProductsHandler(
         CreateProductsCommand request,
         CancellationToken cancellationToken)
     {
-        var newProducts = await GetProductsToCreate(request, cancellationToken);
+        var keys = request.NewProducts
+            .Select(GetProductKey)
+            .ToList();
+        if (keys.Distinct().Count() != keys.Count)
+            throw new InvalidInputException("article.create.articles.duplicate");
+
+        var existingKeys = await productRepository.GetExistingProductKeys(
+            keys,
+            cancellationToken);
+        if (existingKeys.Count > 0)
+            throw new InvalidInputException("article.create.articles.duplicate");
+
         var products = new List<Product>();
 
-        foreach (var @new in newProducts)
+        foreach (var @new in request.NewProducts)
         {
             var product = Product.Create(
                 @new.Sku,
@@ -47,44 +57,9 @@ public class CreateProductsHandler(
         await unitOfWork.AddRangeAsync(products, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new CreateProductsResult(
-            products.Select(x => x.Id).ToList(),
-            request.Policy == CreateProductsConflictPolicy.SkipExisting
-                ? request.NewProducts.Count - products.Count
-                : 0);
-    }
-
-    private async Task<List<CreateProductDto>> GetProductsToCreate(
-        CreateProductsCommand request,
-        CancellationToken cancellationToken)
-    {
-        if (request.Policy == CreateProductsConflictPolicy.Fail) return request.NewProducts;
-
-        var keys = request.NewProducts
-            .Select(GetProductKey)
-            .ToList();
-
-        var existingKeys = await productRepository
-            .GetExistingProductKeys(keys, cancellationToken);
-        var currentBatchKeys = new HashSet<(string NormalizedSku, int ProducerId)>();
-        var products = new List<CreateProductDto>();
-
-        foreach (var newProduct in request.NewProducts)
-        {
-            var key = GetProductKey(newProduct);
-
-            if (existingKeys.Contains(key)) continue;
-
-            if (!currentBatchKeys.Add(key)) continue;
-
-            products.Add(newProduct);
-        }
-
-        return products;
+        return new CreateProductsResult(products.Select(x => x.Id).ToList());
     }
 
     private static (string NormalizedSku, int ProducerId) GetProductKey(CreateProductDto product)
-    {
-        return (new Sku(product.Sku).NormalizedValue, product.ProducerId);
-    }
+        => (new Sku(product.Sku).NormalizedValue, product.ProducerId);
 }

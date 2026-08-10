@@ -27,7 +27,7 @@ public class SaleFactSynchronizer(
         CancellationToken cancellationToken = default)
     {
         return await unitOfWork.ExecuteWithTransaction(
-            TransactionalAttribute.ReadCommited(20, 2),
+            TransactionalAttribute.ReadCommitted(20, 2),
             async () => await ExecuteAsync(id, cancellationToken),
             cancellationToken);
     }
@@ -37,7 +37,7 @@ public class SaleFactSynchronizer(
         CancellationToken cancellationToken = default)
     {
         return await unitOfWork.ExecuteWithTransaction(
-            TransactionalAttribute.ReadCommited(20, 2),
+            TransactionalAttribute.ReadCommitted(20, 2),
             async () => await ExecuteAsync(saleUpdatedEvent, cancellationToken),
             cancellationToken);
     }

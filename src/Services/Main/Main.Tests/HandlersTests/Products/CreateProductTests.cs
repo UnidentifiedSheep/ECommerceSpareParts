@@ -1,9 +1,8 @@
 using FluentAssertions;
+using Exceptions;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Entities.Product;
-using Main.Entities.Product.ValueObjects;
-using Main.Enums.Products;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -66,34 +65,6 @@ public class CreateProductTests : IntegrationTest
     }
 
     [Fact]
-    public void CreateProducts_WithSkipExisting_AllowsMoreThanRegularLimit()
-    {
-        var command = new CreateProductsCommand(
-            CreateDtos(CreateProductsValidation.MaxProductsPerRequest + 1),
-            CreateProductsConflictPolicy.SkipExisting);
-
-        var result = new CreateProductsValidation().Validate(command);
-
-        result.IsValid.Should().BeTrue();
-    }
-
-    [Fact]
-    public void CreateProducts_WithSkipExisting_ExceedingImportLimit_FailsValidation()
-    {
-        var command = new CreateProductsCommand(
-            CreateDtos(CreateProductsValidation.MaxProductsPerImportBatch + 1),
-            CreateProductsConflictPolicy.SkipExisting);
-
-        var result = new CreateProductsValidation().Validate(command);
-
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should()
-            .ContainSingle(x =>
-                x.PropertyName == nameof(CreateProductsCommand.NewProducts) &&
-                x.ErrorCode == "article.create.articles.max.5000.at.once");
-    }
-
-    [Fact]
     public async Task CreateArticle_WithInvalidProducer_ThrowsProducerNotFoundException()
     {
         var dto = CreateDtos(1)[0] with
@@ -107,83 +78,29 @@ public class CreateProductTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateProducts_WithSkipExisting_SkipsExistingProducts()
+    public async Task CreateProducts_WithExistingProduct_Throws()
     {
-        var existing = CreateDtos(1)[0];
-        var newProduct = CreateDtos(1)[0];
+        var product = CreateDtos(1)[0];
+        await Mediator.Send(new CreateProductsCommand([product]));
 
-        await Mediator.Send(new CreateProductsCommand([existing]));
+        var act = () => Mediator.Send(new CreateProductsCommand([product]));
 
-        var result = await Mediator.Send(
-            new CreateProductsCommand(
-                [existing, newProduct],
-                CreateProductsConflictPolicy.SkipExisting));
-
-        result.CreatedIds.Should().HaveCount(1);
-        result.Skipped.Should().Be(1);
-
-        var products = await GetProducts();
-        products.Should().HaveCount(2);
-        products.Should()
-            .ContainSingle(x =>
-                x.Sku.NormalizedValue == new Sku(existing.Sku).NormalizedValue &&
-                x.ProducerId == existing.ProducerId);
-        products.Should()
-            .ContainSingle(x =>
-                x.Sku.NormalizedValue == new Sku(newProduct.Sku).NormalizedValue &&
-                x.ProducerId == newProduct.ProducerId);
+        await act.Should().ThrowAsync<InvalidInputException>();
     }
 
     [Fact]
-    public async Task CreateProducts_WithSkipExisting_SkipsDuplicateProductsInBatch()
+    public async Task CreateProducts_WithDuplicateInsideBatch_Throws()
     {
         var product = CreateDtos(1)[0];
 
-        var result = await Mediator.Send(
+        var act = () => Mediator.Send(
             new CreateProductsCommand(
-                [product, product with { Name = TestContext.Faker.Commerce.ProductName() }],
-                CreateProductsConflictPolicy.SkipExisting));
+            [
+                product,
+                product with { Name = TestContext.Faker.Commerce.ProductName() }
+            ]));
 
-        result.CreatedIds.Should().HaveCount(1);
-        result.Skipped.Should().Be(1);
-
-        var products = await GetProducts();
-        products.Should()
-            .ContainSingle(x =>
-                x.Sku.NormalizedValue == new Sku(product.Sku).NormalizedValue &&
-                x.ProducerId == product.ProducerId);
-    }
-
-    [Fact]
-    public async Task CreateProducts_WithSkipExisting_DoesNotSkipSameSkuForAnotherProducer()
-    {
-        var producerIds = TestContext.Producers
-            .Take(2)
-            .Select(x => x.Id)
-            .ToArray();
-
-        var first = CreateDtos(1)[0] with
-        {
-            ProducerId = producerIds[0]
-        };
-        var second = first with
-        {
-            ProducerId = producerIds[1]
-        };
-
-        await Mediator.Send(new CreateProductsCommand([first]));
-
-        var result = await Mediator.Send(
-            new CreateProductsCommand(
-                [second],
-                CreateProductsConflictPolicy.SkipExisting));
-
-        result.CreatedIds.Should().HaveCount(1);
-        result.Skipped.Should().Be(0);
-
-        var products = await GetProducts();
-        products.Should().HaveCount(2);
-        products.Should().OnlyContain(x => x.Sku.Value == first.Sku);
+        await act.Should().ThrowAsync<InvalidInputException>();
     }
 
     private void Validate(CreateProductDto product, Product dbProduct)

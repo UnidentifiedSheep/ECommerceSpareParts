@@ -20,7 +20,13 @@ public class ProducersSupplierMappingNotFoundException(int id)
         "producer.supplier.mapping.not.found",
         new { Id = id });
 
-public class ProducersSupplierMappingAlreadyExistsException(int producerId, Supplier supplier)
+public class ProducersSupplierMappingAlreadyExistsException(
+    string supplierProducerName,
+    Supplier supplier)
     : LocalizedConflictException(
         "producer.supplier.mapping.already.exists",
-        new { ProducerId = producerId, Supplier = supplier });
+        new
+        {
+            SupplierProducerName = supplierProducerName,
+            Supplier = supplier
+        });

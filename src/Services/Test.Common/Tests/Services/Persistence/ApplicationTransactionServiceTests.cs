@@ -34,7 +34,7 @@ public sealed class ApplicationTransactionServiceTests
             context);
 
         await service.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             (actualContext, actualCancellationToken) =>
             {
                 actualContext.Should().BeSameAs(context);
@@ -104,7 +104,7 @@ public sealed class ApplicationTransactionServiceTests
             Mock.Of<IApplicationTransactionContext>());
 
         var action = () => service.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             (_, _) =>
             {
                 integrationEventScope.Add("discard-me");

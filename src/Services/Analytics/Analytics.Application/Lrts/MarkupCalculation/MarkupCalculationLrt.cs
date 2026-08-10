@@ -57,7 +57,7 @@ public class MarkupCalculationLrt(
             .ToList();
 
         await TransactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(20, 2),
+            TransactionalAttribute.ReadCommitted(20, 2),
             async (context, cancellationToken) =>
             {
                 await Publisher.Publish(

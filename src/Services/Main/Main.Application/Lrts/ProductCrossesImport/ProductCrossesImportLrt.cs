@@ -1,22 +1,23 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
+using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
-using Localization.Domain;
-using Main.Application.Handlers.Products.UpsertProductCrosses;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
 using Main.Entities.Product.ValueObjects;
+using Main.Entities.DomainEvents.Product;
+using Main.Entities.Product;
 using MassTransit;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -28,17 +29,15 @@ public class ProductCrossesImportLrt(
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
-    ISender sender,
+    IDomainEventScope domainEventScope,
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
     IOptions<S3BucketsOptions> bucketsOptions,
     ILogger<ProductCrossesImportLrt> logger,
-    IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions)
+    IScopedStringLocalizer stringLocalizer)
     : CsvImportLrtBase<
         ProductCrossesImportInputState,
         ProductCrossesImportState,
-        ProductCrossesImportError,
         ProductCrossesImportLrt.ProductCrossCsvDto,
         ProductCrossesImportLrt.ProductCrossBatchItem>(
         jobRepository,
@@ -48,8 +47,7 @@ public class ProductCrossesImportLrt(
         transactionService,
         logger,
         s3Service,
-        stringLocalizer,
-        localesOptions)
+        stringLocalizer)
 {
     private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
@@ -62,42 +60,14 @@ public class ProductCrossesImportLrt(
         _producerLookup = await producerLookupService.Load(CancellationToken);
     }
 
-    protected override string GetFileName(ProductCrossesImportState state) => state.FileName;
-
-    protected override int GetCurrentLine(ProductCrossesImportState state) => state.CurrentLine;
-
-    protected override List<ProductCrossesImportError> GetErrors(ProductCrossesImportState state)
-        => state.Errors;
-
-    protected override ProductCrossesImportError CreateError(int rowIdx, string message)
-    {
-        return new ProductCrossesImportError
-        {
-            RowIdx = rowIdx,
-            Message = message
-        };
-    }
-
     protected override string GetTooManyErrorsLocalizationKey()
         => "article.import.too.many.errors.while.processing.batch";
-
-    protected override ProductCrossesImportState WithUpdatedState(
-        ProductCrossesImportState state,
-        int currentLine,
-        List<ProductCrossesImportError> errors)
-    {
-        return state with
-        {
-            CurrentLine = currentLine,
-            Errors = errors
-        };
-    }
 
     protected override bool TryProcessRow(
         int rowIdx,
         ProductCrossCsvDto row,
         ProductCrossesImportState state,
-        List<ProductCrossesImportError> errors,
+        List<CsvImportError> errors,
         out ProductCrossBatchItem item)
     {
         item = null!;
@@ -143,9 +113,9 @@ public class ProductCrossesImportLrt(
     }
 
     protected override async Task ProcessBatch(
-        List<(int idx, ProductCrossBatchItem item)> items,
+        IReadOnlyList<(int idx, ProductCrossBatchItem item)> items,
         ProductCrossesImportState state,
-        List<ProductCrossesImportError> errors)
+        List<CsvImportError> errors)
     {
         if (items.Count == 0) return;
 
@@ -205,8 +175,26 @@ public class ProductCrossesImportLrt(
         }
 
         if (crosses.Count > 0)
-            await sender.Send(
-                new UpsertProductCrossesCommand(crosses),
+            await TransactionService.ExecuteAsync(
+                TransactionalAttribute.ReadCommitted(20, 2),
+                async (_, cancellationToken) =>
+                {
+                    var entities = crosses
+                        .Select(x => ProductCross.Create(x.ProductId, x.CrossProductId))
+                        .ToList();
+                    await productRepository.UpsertProductCrosses(
+                        entities,
+                        cancellationToken);
+                    domainEventScope.AddRange(
+                        entities
+                            .SelectMany(x => new[]
+                            {
+                                x.LeftProductId,
+                                x.RightProductId
+                            })
+                            .Distinct()
+                            .Select(x => new ProductLinkageUpdatedDomainEvent(x)));
+                },
                 CancellationToken);
 
         Logger.LogInformation(
@@ -218,8 +206,6 @@ public class ProductCrossesImportLrt(
             items.Count,
             crosses.Count,
             errors.Count - errorsBeforeBatch);
-
-        items.Clear();
     }
 
     private string GetErrorMessage(Exception ex)

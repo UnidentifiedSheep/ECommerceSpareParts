@@ -41,7 +41,7 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
     protected override async Task DoWork()
     {
         var failure = await TransactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             (_, _) => ReconcileAsync(),
             CancellationToken);
 

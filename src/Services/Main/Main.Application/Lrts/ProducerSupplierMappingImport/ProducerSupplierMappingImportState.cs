@@ -2,20 +2,25 @@ using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
 using Enums;
+using Main.Application.Lrts.Base;
 
 namespace Main.Application.Lrts.ProducerSupplierMappingImport;
 
-public record ProducerSupplierMappingImportState : ProducerSupplierMappingImportInputState
+public record ProducerSupplierMappingImportState : ProducerSupplierMappingImportInputState,
+    ICsvImportState<ProducerSupplierMappingImportState>
 {
     [JsonPropertyName("currentLine")]
     public int CurrentLine { get; init; }
 
     [JsonPropertyName("errors")]
-    public List<ProducerSupplierMappingImportError> Errors { get; init; } = [];
+    public List<CsvImportError> Errors { get; init; } = [];
+
+    public ProducerSupplierMappingImportState WithCurrentLine(int currentLine)
+        => this with { CurrentLine = currentLine };
 }
 
 [CsvSchema(typeof(ProducerSupplierMappingImportLrt.ProducerSupplierMappingCsvDto))]
-public record ProducerSupplierMappingImportInputState : IInputState
+public record ProducerSupplierMappingImportInputState : IInputState, ICsvImportInputState
 {
     [Accepts(".csv")]
     [InputControl(InputControlType.UploadFile)]
@@ -32,13 +37,4 @@ public record ProducerSupplierMappingImportInputState : IInputState
                 "Supplier producer import state error. " +
                 "File name should end with .csv");
     }
-}
-
-public record ProducerSupplierMappingImportError
-{
-    [JsonPropertyName("rowIdx")]
-    public int RowIdx { get; init; }
-
-    [JsonPropertyName("message")]
-    public required string Message { get; init; }
 }

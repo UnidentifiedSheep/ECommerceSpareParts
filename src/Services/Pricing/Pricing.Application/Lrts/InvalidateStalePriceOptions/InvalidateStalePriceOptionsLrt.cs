@@ -52,7 +52,7 @@ public class InvalidateStalePriceOptionsLrt(
         while (true)
         {
             var processedCount = await TransactionService.ExecuteAsync(
-                TransactionalAttribute.ReadCommited(30, 3),
+                TransactionalAttribute.ReadCommitted(30, 3),
                 async (_, cancellationToken) =>
                 {
                     var currentVersion = markupContainer.CurrentVersion;

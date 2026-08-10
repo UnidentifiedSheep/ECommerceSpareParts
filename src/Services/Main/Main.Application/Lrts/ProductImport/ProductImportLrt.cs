@@ -4,22 +4,19 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
+using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
-using Localization.Domain;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
-using Main.Enums.Products;
 using MassTransit;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -31,15 +28,13 @@ public class ProductImportLrt(
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
-    ISender sender,
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
     IOptions<S3BucketsOptions> bucketsOptions,
     ILogger<ProductImportLrt> logger,
-    IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions
+    IScopedStringLocalizer stringLocalizer
 )
-    : CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto,
+    : CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportLrt.NewProductCsvDto,
         CreateProductDto>(
         jobRepository,
         bucketsOptions,
@@ -48,8 +43,7 @@ public class ProductImportLrt(
         transactionService,
         logger,
         s3Service,
-        stringLocalizer,
-        localesOptions)
+        stringLocalizer)
 {
     private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
@@ -63,44 +57,16 @@ public class ProductImportLrt(
         _producerLookup = await producerLookupService.Load(CancellationToken);
     }
 
-    protected override string GetFileName(ProductImportState state) { return state.FileName; }
-
-    protected override int GetCurrentLine(ProductImportState state) { return state.CurrentLine; }
-
-    protected override List<ProductImportError> GetErrors(ProductImportState state) { return state.Errors; }
-
     protected override string GetTooManyErrorsLocalizationKey()
     {
         return "article.import.too.many.errors.while.processing.batch";
-    }
-
-    protected override ProductImportError CreateError(int rowIdx, string message)
-    {
-        return new ProductImportError
-        {
-            RowIdx = rowIdx,
-            Message = message
-        };
-    }
-
-    protected override ProductImportState WithUpdatedState(
-        ProductImportState state,
-        int currentLine,
-        List<ProductImportError> errors)
-    {
-        return state with
-        {
-            CurrentLine = currentLine,
-            Errors = errors,
-            SkippedLines = state.SkippedLines
-        };
     }
 
     protected override bool TryProcessRow(
         int rowIdx,
         NewProductCsvDto row,
         ProductImportState state,
-        List<ProductImportError> errors,
+        List<CsvImportError> errors,
         out CreateProductDto item)
     {
         var product = ProcessDto(
@@ -114,7 +80,7 @@ public class ProductImportLrt(
     private CreateProductDto? ProcessDto(
         int idx,
         NewProductCsvDto row,
-        List<ProductImportError> errors)
+        List<CsvImportError> errors)
     {
         try
         {
@@ -122,7 +88,7 @@ public class ProductImportLrt(
             if (producerId == null)
             {
                 errors.Add(
-                    new ProductImportError
+                    new CsvImportError
                     {
                         RowIdx = idx,
                         Message = StringLocalizer.Get("article.import.producer.not.found", row.Producer)
@@ -152,7 +118,7 @@ public class ProductImportLrt(
         catch (Exception ex)
         {
             errors.Add(
-                new ProductImportError
+                new CsvImportError
                 {
                     RowIdx = idx,
                     Message = GetErrorMessage(ex)
@@ -163,16 +129,27 @@ public class ProductImportLrt(
     }
 
     protected override async Task ProcessBatch(
-        List<(int idx, CreateProductDto item)> products,
+        IReadOnlyList<(int idx, CreateProductDto item)> products,
         ProductImportState state,
-        List<ProductImportError> errors)
+        List<CsvImportError> errors)
     {
         if (products.Count == 0) return;
 
         var firstIdx = products[0].idx;
-        var toCreate = await FilterExistingAndDuplicateProducts(products, state.SkippedLines);
+        var uniqueKeys = new HashSet<(string NormalizedSku, int ProducerId)>();
+        var uniqueProducts = new List<(int idx, CreateProductDto item)>();
+        foreach (var product in products)
+        {
+            if (uniqueKeys.Add(GetProductKey(product.item)))
+            {
+                uniqueProducts.Add(product);
+                continue;
+            }
 
-        if (toCreate.Count == 0)
+            state.SkippedLines.Add(product.idx);
+        }
+
+        if (uniqueProducts.Count == 0)
         {
             Logger.LogInformation(
                 "Product import batch skipped. JobId: {JobId}, BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}",
@@ -180,15 +157,35 @@ public class ProductImportLrt(
                 firstIdx,
                 products.Count);
 
-            products.Clear();
             return;
         }
 
-        var result = await sender.Send(
-            new CreateProductsCommand(
-                toCreate.Select(x => x.item).ToList(),
-                CreateProductsConflictPolicy.SkipExisting),
+        var result = await TransactionService.ExecuteAsync(
+            TransactionalAttribute.RetryOnConflict(20, 2),
+            async (context, cancellationToken) =>
+            {
+                var existingKeys = await productRepository.GetExistingProductKeys(
+                    uniqueKeys,
+                    cancellationToken);
+                var toCreate = uniqueProducts
+                    .Where(x => !existingKeys.Contains(GetProductKey(x.item)))
+                    .ToList();
+                var entities = toCreate
+                    .Select(x => CreateProduct(x.item))
+                    .ToList();
+
+                await context.UnitOfWork.AddRangeAsync(entities, cancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+                return new ProductImportBatchResult(
+                    entities.Count,
+                    uniqueProducts
+                        .Where(x => existingKeys.Contains(GetProductKey(x.item)))
+                        .Select(x => x.idx)
+                        .ToList());
+            },
             CancellationToken);
+        state.SkippedLines.AddRange(result.SkippedLines);
 
         Logger.LogInformation(
             "Product import batch processed. JobId: {JobId}, " +
@@ -197,44 +194,30 @@ public class ProductImportLrt(
             JobId,
             firstIdx,
             products.Count,
-            result.CreatedIds.Count,
-            products.Count - toCreate.Count + result.Skipped);
-
-        products.Clear();
+            result.Created,
+            products.Count - result.Created);
     }
 
-    private async Task<List<(int idx, CreateProductDto item)>> FilterExistingAndDuplicateProducts(
-        List<(int idx, CreateProductDto item)> products,
-        List<int> skippedLines)
+    private static Product CreateProduct(CreateProductDto item)
     {
-        var keys = products
-            .Select(x => GetProductKey(x.item))
-            .ToList();
-
-        var existingKeys = await productRepository.GetExistingProductKeys(keys, CancellationToken);
-        var currentBatchKeys = new HashSet<(string NormalizedSku, int ProducerId)>();
-        var toCreate = new List<(int idx, CreateProductDto product)>();
-
-        foreach (var item in products)
-        {
-            var key = GetProductKey(item.item);
-
-            if (existingKeys.Contains(key) || !currentBatchKeys.Add(key))
-            {
-                skippedLines.Add(item.idx);
-                continue;
-            }
-
-            toCreate.Add(item);
-        }
-
-        return toCreate;
+        var product = Product.Create(
+            item.Sku,
+            item.Name,
+            item.ProducerId,
+            item.Description);
+        product.SetIndicator(item.Indicator);
+        product.SetCategory(item.CategoryId);
+        return product;
     }
 
     private static (string NormalizedSku, int ProducerId) GetProductKey(CreateProductDto product)
     {
         return (new Sku(product.Sku).NormalizedValue, product.ProducerId);
     }
+
+    private sealed record ProductImportBatchResult(
+        int Created,
+        IReadOnlyList<int> SkippedLines);
 
     private string GetErrorMessage(Exception ex)
     {

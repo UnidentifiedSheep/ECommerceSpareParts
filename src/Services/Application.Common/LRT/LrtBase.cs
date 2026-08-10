@@ -152,7 +152,7 @@ public abstract class LrtBase<TInputState, TState>(
     {
         var json = JsonSerializer.Serialize(state);
         await transactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             async (context, cancellationToken) =>
             {
                 await GetJobAsync();
@@ -177,7 +177,7 @@ public abstract class LrtBase<TInputState, TState>(
     protected virtual async Task ProcessingJobAsync()
     {
         await transactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             async (context, cancellationToken) =>
             {
                 await GetJobAsync();
@@ -196,7 +196,7 @@ public abstract class LrtBase<TInputState, TState>(
         bool forceFail = false)
     {
         return await transactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             async (context, cancellationToken) =>
             {
                 await GetJobAsync();
@@ -218,7 +218,7 @@ public abstract class LrtBase<TInputState, TState>(
     protected virtual async Task SucceedJobAsync()
     {
         await transactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             async (context, cancellationToken) =>
             {
                 await GetJobAsync();
@@ -231,7 +231,7 @@ public abstract class LrtBase<TInputState, TState>(
     protected virtual async Task CancelJobAsync()
     {
         await transactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             async (context, cancellationToken) =>
             {
                 await GetJobAsync();
@@ -244,7 +244,7 @@ public abstract class LrtBase<TInputState, TState>(
     protected async Task RenewLeaseAsync(TimeSpan leaseDuration)
     {
         await transactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             async (context, cancellationToken) =>
             {
                 await GetJobAsync();
