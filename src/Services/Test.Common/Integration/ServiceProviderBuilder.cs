@@ -44,7 +44,8 @@ internal sealed class ServiceProviderBuilder :
             .AddLocalization(
                 "ru-RU",
                 "ru-RU",
-                "en-EN");
+                "en-EN")
+            .RegisterSettingsService();
 
         services.AddScoped<AuditableEntitySaveChangesInterceptor>();
         services.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
@@ -61,7 +62,9 @@ internal sealed class ServiceProviderBuilder :
         services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
         services.AddUnitOfWork<DContext>();
         services.AddScoped<IUserContext, UserContextMock>();
-        services.AddScoped<IPublishEndpoint, MessageBrokerStub>();
+        services.AddScoped<MessageBrokerStub>();
+        services.AddScoped<IPublishEndpoint>(sp =>
+            sp.GetRequiredService<MessageBrokerStub>());
 
         return services.BuildServiceProvider();
     }

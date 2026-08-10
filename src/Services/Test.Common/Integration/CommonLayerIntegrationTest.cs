@@ -6,7 +6,6 @@ using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Localization.Domain.Extensions;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Abstractions.Test;
 using Tests.Extensions;

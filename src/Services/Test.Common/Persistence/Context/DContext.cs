@@ -3,8 +3,8 @@ using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Common;
 using Persistence.Common.BaseTableConfigurations;
-using Persistence.Extensions;
 using Persistence.Interceptors;
+using Tests.Persistence.Entities;
 
 namespace Tests.Persistence.Context;
 
@@ -32,6 +32,11 @@ internal sealed class DContext(DbContextOptions<DContext> options)
         modelBuilder
             .ApplyConfiguration(new SettingConfiguration())
             .ApplyJobConfigurations();
+
+        modelBuilder.Entity<Setting>()
+            .HasDiscriminator(e => e.Key)
+            .HasValue<Setting>(nameof(Setting))
+            .HasValue<TestSetting>(TestSetting.SettingName);
 
         modelBuilder.AddFieldsForAuditableEntities();
         modelBuilder

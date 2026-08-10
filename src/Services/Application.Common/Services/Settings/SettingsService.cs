@@ -11,8 +11,7 @@ namespace Application.Common.Services.Settings;
 public class SettingsService(
     IRepository<Setting, string> repository,
     IApplicationTransactionService transactionService,
-    ISettingsContainer settingsContainer,
-    ISettingFactory settingFactory
+    ISettingsContainer settingsContainer
 ) : ISettingsService
 {
     private static readonly TransactionalAttribute TransactionSettings
@@ -28,11 +27,7 @@ public class SettingsService(
             .Build();
 
         var dbSettings = await repository.ListAsync(criteria, cancellationToken);
-        foreach (var setting in dbSettings)
-        {
-            var typed = settingFactory.Create(setting.Key, setting.Json);
-            settingsContainer.Set(typed);
-        }
+        settingsContainer.Load(dbSettings);
     }
 
     public async Task SetSetting<T>(
@@ -72,12 +67,16 @@ public class SettingsService(
 
         if (dbSetting != null)
         {
-            var typed = (T)settingFactory.Create(dbSetting.Key, dbSetting.Json);
+            var typed = dbSetting as T
+                        ?? throw new InvalidOperationException(
+                            $"Setting '{dbSetting.Key}' was materialized as " +
+                            $"'{dbSetting.GetType().Name}' instead of '{typeof(T).Name}'.");
             settingsContainer.Set(typed);
             return typed;
         }
 
-        await SetSetting(T.Default, cancellationToken);
-        return T.Default;
+        var defaultSetting = T.Default;
+        await SetSetting(defaultSetting, cancellationToken);
+        return defaultSetting;
     }
 }

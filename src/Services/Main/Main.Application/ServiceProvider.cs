@@ -40,11 +40,11 @@ public static class ServiceProvider
             .WithSystemTextJsonSerializer();
 
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
-        collection.RegisterProjectionProviders<SettingFactory>();
+        collection.RegisterProjectionProviders<ProducerImportLrt>();
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 
-        collection.RegisterSettingsService<SettingFactory>();
+        collection.RegisterSettingsService();
 
         collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();
         collection.AddSingleton<ILogisticsPricingStrategy, PerAreaAndWeight>();

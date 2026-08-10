@@ -40,7 +40,7 @@ public static class ServiceProvider
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
 
-        collection.RegisterSettingsService<SettingFactory>();
+        collection.RegisterSettingsService();
         collection.RegisterProjectionProviders<TagsService>();
 
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();

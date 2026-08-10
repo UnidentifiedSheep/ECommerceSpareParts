@@ -31,13 +31,11 @@ public static class ServiceCollectionExtensions
         return collection;
     }
 
-    public static IServiceCollection RegisterSettingsService<TSettingFactory>(
+    public static IServiceCollection RegisterSettingsService(
         this IServiceCollection collection)
-        where TSettingFactory : class, ISettingFactory
     {
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddScoped<ISettingsService, SettingsService>();
-        collection.AddSingleton<ISettingFactory, TSettingFactory>();
         collection.AddScoped<
             INotificationHandler<Batch<SettingUpdatedDomainEvent>>,
             PublishSettingUpdatedEventHandler>();

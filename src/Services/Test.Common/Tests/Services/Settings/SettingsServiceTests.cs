@@ -45,8 +45,7 @@ public sealed class SettingsServiceTests
         var service = new SettingsService(
             repository.Object,
             transactionService.Object,
-            settingsContainer.Object,
-            Mock.Of<ISettingFactory>());
+            settingsContainer.Object);
 
         await service.SetSetting(replacement);
 
