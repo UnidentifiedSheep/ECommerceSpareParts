@@ -658,11 +658,13 @@ wait_for_postgres() {
 wait_for_service_running() {
   local name="$1"
   local attempts="${2:-60}"
+  local expected_image="${3:-}"
 
   for _ in $(seq 1 "$attempts"); do
     local desired_running
     local current_running
-    local failed_count
+    local expected_replicas
+    local configured_image
     local update_status
     local update_state
     local update_message
@@ -673,20 +675,11 @@ wait_for_service_running() {
     current_running="$(sudo docker service ps "$name" \
       --filter desired-state=running \
       --format '{{.CurrentState}}' | grep -c '^Running' || true)"
-    failed_count="$(sudo docker service ps "$name" \
-      --filter desired-state=running \
-      --format '{{.CurrentState}}|{{.Error}}' |
-      grep -Eci 'Failed|Rejected|non-zero exit|No such image' || true)"
     update_status="$(sudo docker service inspect "$name" \
       --format '{{if .UpdateStatus}}{{.UpdateStatus.State}}|{{.UpdateStatus.Message}}{{end}}' \
       2>/dev/null || true)"
     update_state="${update_status%%|*}"
     update_message="${update_status#*|}"
-
-    if [ "$desired_running" -gt 0 ] &&
-      [ "$desired_running" -eq "$current_running" ]; then
-      return 0
-    fi
 
     if [ "$update_state" = "paused" ] ||
       [ "$update_state" = "rollback_paused" ]; then
@@ -695,10 +688,53 @@ wait_for_service_running() {
       return 1
     fi
 
-    if [ "$failed_count" -gt 0 ]; then
-      echo "${name} has failed tasks."
-      print_service_diagnostics "$name"
-      return 1
+    if [ -n "$expected_image" ]; then
+      if [ "$update_state" = "rollback_started" ] ||
+        [ "$update_state" = "rollback_completed" ]; then
+        echo "${name} rolled back instead of deploying ${expected_image}: ${update_message}"
+        print_service_diagnostics "$name"
+        return 1
+      fi
+
+      # With start-first updates the old task remains running while the new
+      # task starts. Do not treat that old task as a successful deployment.
+      if [ "$update_state" != "completed" ]; then
+        sleep 5
+        continue
+      fi
+
+      configured_image="$(sudo docker service inspect "$name" \
+        --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')"
+      case "$configured_image" in
+        "$expected_image"|"${expected_image}@"*) ;;
+        *)
+          sleep 5
+          continue
+          ;;
+      esac
+
+      expected_replicas="$(sudo docker service inspect "$name" \
+        --format '{{if .Spec.Mode.Replicated}}{{.Spec.Mode.Replicated.Replicas}}{{end}}')"
+      desired_running="$(sudo docker service ps "$name" \
+        --filter desired-state=running \
+        --format '{{.Image}}' |
+        awk -v image="$expected_image" '$0 == image || index($0, image "@") == 1 { count++ } END { print count + 0 }')"
+      current_running="$(sudo docker service ps "$name" \
+        --filter desired-state=running \
+        --format '{{.Image}}|{{.CurrentState}}' |
+        awk -F '|' -v image="$expected_image" \
+          '($1 == image || index($1, image "@") == 1) && $2 ~ /^Running/ { count++ } END { print count + 0 }')"
+
+      if [ -n "$expected_replicas" ] &&
+        [ "$desired_running" -eq "$expected_replicas" ] &&
+        [ "$current_running" -eq "$expected_replicas" ]; then
+        return 0
+      fi
+    elif [ "$update_state" != "updating" ] &&
+      [ "$update_state" != "rollback_started" ] &&
+      [ "$desired_running" -gt 0 ] &&
+      [ "$desired_running" -eq "$current_running" ]; then
+      return 0
     fi
 
     sleep 5
@@ -707,6 +743,28 @@ wait_for_service_running() {
   echo "${name} did not become running in time."
   print_service_diagnostics "$name"
   return 1
+}
+
+wait_for_selected_service_health() {
+  local service="$1"
+  local swarm_service
+
+  case "$service" in
+    gateway)
+      swarm_service="$(service_name gateway gateway)"
+      if ! wait_for_http Gateway "$BACKEND_NETWORK" "http://gateway:8080/health"; then
+        print_service_diagnostics "$swarm_service"
+        return 1
+      fi
+      ;;
+    *-api)
+      swarm_service="$(service_name apps "$service")"
+      if ! wait_for_http "$service" "$BACKEND_NETWORK" "http://${service}:8080/health"; then
+        print_service_diagnostics "$swarm_service"
+        return 1
+      fi
+      ;;
+  esac
 }
 
 wait_for_services_running() {
@@ -1059,6 +1117,7 @@ deploy_selected_services() {
   local migrator
   local stack
   local swarm_service
+  local image
   local migrator_found
   IFS=',' read -r -a selected_services <<< "$DEPLOY_SERVICES"
 
@@ -1114,12 +1173,21 @@ deploy_selected_services() {
       return 1
     fi
 
+    image="${ARTIFACT_REGISTRY_HOST}/${service}:${IMAGE_TAG}"
     docker_sudo service update \
       --detach=true \
-      --image "${ARTIFACT_REGISTRY_HOST}/${service}:${IMAGE_TAG}" \
+      --image "$image" \
+      --env-add "DEPLOY_RUN_ID=${DEPLOY_RUN_ID}" \
+      --update-failure-action rollback \
+      --update-monitor 30s \
+      --update-max-failure-ratio 0 \
+      --rollback-failure-action pause \
+      --rollback-monitor 30s \
+      --rollback-max-failure-ratio 0 \
       --with-registry-auth \
       "$swarm_service"
-    wait_for_service_running "$swarm_service" 60
+    wait_for_service_running "$swarm_service" 60 "$image"
+    wait_for_selected_service_health "$service"
   done
 }
 
@@ -1260,9 +1328,14 @@ if ! printf '%s' "$ARTIFACT_REGISTRY_PASSWORD" | docker login \
 fi
 
 if [ -n "${DEPLOY_SERVICES:-}" ]; then
-  log "Validate Swarm manager"
-  validate_swarm_manager
+  log "Prepare and synchronize application configs"
+  ensure_external_networks
+  ensure_configs_path_on_nodes
+  prepare_versioned_configs
+  render_stack_files
+  sync_application_configs
   deploy_selected_services
+  cleanup_unused_versioned_configs
   exit 0
 fi
 
