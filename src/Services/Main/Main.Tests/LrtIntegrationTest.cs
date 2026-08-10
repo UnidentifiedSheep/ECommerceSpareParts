@@ -1,20 +1,27 @@
 using System.Reflection;
 using Abstractions.Interfaces.Persistence;
-using Analytics.Persistence.Context;
 using Api.Common.Extensions;
+using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Lrt;
 using Attributes;
 using Localization.Domain.Extensions;
+using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 
-namespace Analytics.Integration.Tests;
+namespace Tests;
 
 [Collection("Combined collection")]
-public abstract class IntegrationTest(CombinedContainerFixture fixture)
-    : IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
+public abstract class LrtIntegrationTest<TLrt>(CombinedContainerFixture fixture)
+    : LrtIntegrationTestBase<
+        TLrt,
+        ServiceProviderBuilder,
+        ServiceProviderArguments,
+        DContext>
+    where TLrt : class, ILrtNamedObject
 {
     protected IMediator Mediator { get; private set; } = null!;
 
@@ -40,6 +47,8 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
         await unitOfWork.ExecuteWithTransaction(
             new TransactionalAttribute(),
             () => base.InitializeBasicContexts());
+
+        Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
     }
 
     public override async Task DisposeAsync()

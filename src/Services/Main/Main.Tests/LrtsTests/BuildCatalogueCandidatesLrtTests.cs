@@ -1,12 +1,9 @@
-using System.Text.Json;
-using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using Enums;
 using FluentAssertions;
 using Main.Application.Lrts.BuildCatalogueCandidates;
 using Main.Entities.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -14,7 +11,8 @@ using Tests.TestContexts;
 
 namespace Tests.LrtsTests;
 
-public sealed class BuildCatalogueCandidatesLrtTests : IntegrationTest
+public sealed class BuildCatalogueCandidatesLrtTests
+    : LrtIntegrationTest<BuildCatalogueCandidatesLrt>
 {
     public BuildCatalogueCandidatesLrtTests(CombinedContainerFixture fixture)
         : base(fixture)
@@ -37,8 +35,10 @@ public sealed class BuildCatalogueCandidatesLrtTests : IntegrationTest
             producer.Name,
             Supplier.Tmtr);
 
-        var state = await ExecuteLrt();
+        var execution = await ExecuteLrt();
+        var state = execution.GetState<BuildCatalogueCandidatesState>();
 
+        execution.Job.Status.Should().Be(JobStatus.Succeeded);
         state.LastProcessedId.Should().Be(Math.Max(firstProduct.Id, secondProduct.Id));
         state.ProcessedRows.Should().Be(2);
         state.AssignedRows.Should().Be(2);
@@ -70,8 +70,10 @@ public sealed class BuildCatalogueCandidatesLrtTests : IntegrationTest
             producer.Name,
             Supplier.Armtek);
 
-        var state = await ExecuteLrt();
+        var execution = await ExecuteLrt();
+        var state = execution.GetState<BuildCatalogueCandidatesState>();
 
+        execution.Job.Status.Should().Be(JobStatus.Succeeded);
         state.AssignedRows.Should().Be(1);
         (await Context.CatalogueCandidates.CountAsync()).Should().Be(1);
 
@@ -90,8 +92,10 @@ public sealed class BuildCatalogueCandidatesLrtTests : IntegrationTest
             $"unknown-{Guid.NewGuid():N}",
             Supplier.Armtek);
 
-        var state = await ExecuteLrt();
+        var execution = await ExecuteLrt();
+        var state = execution.GetState<BuildCatalogueCandidatesState>();
 
+        execution.Job.Status.Should().Be(JobStatus.Succeeded);
         state.LastProcessedId.Should().Be(supplierProduct.Id);
         state.ProcessedRows.Should().Be(1);
         state.AssignedRows.Should().Be(0);
@@ -103,34 +107,6 @@ public sealed class BuildCatalogueCandidatesLrtTests : IntegrationTest
             .AsNoTracking()
             .SingleAsync(x => x.Id == supplierProduct.Id);
         persistedProduct.CatalogueCandidateId.Should().BeNull();
-    }
-
-    private async Task<BuildCatalogueCandidatesState> ExecuteLrt()
-    {
-        var leaseHolderId = Guid.NewGuid();
-        var job = SingleRunJob.Create(
-            BuildCatalogueCandidatesLrt.LrtSystemName,
-            JsonSerializer.Serialize(new BuildCatalogueCandidatesState()));
-        job.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
-
-        await Context.AddAsync(job);
-        await Context.SaveChangesAsync();
-
-        var lrt = ActivatorUtilities.CreateInstance<BuildCatalogueCandidatesLrt>(
-            Scope.ServiceProvider);
-
-        await lrt.ExecuteAsync(job.Id, leaseHolderId);
-
-        Context.ChangeTracker.Clear();
-        var persistedJob = await Context.Jobs
-            .AsNoTracking()
-            .SingleAsync(x => x.Id == job.Id);
-        persistedJob.Status.Should().Be(JobStatus.Succeeded);
-
-        return JsonSerializer.Deserialize<BuildCatalogueCandidatesState>(
-                   persistedJob.State)
-               ?? throw new InvalidOperationException(
-                   "Build catalogue candidates state could not be deserialized.");
     }
 
     private Task<SupplierProduct> AddSupplierProduct(

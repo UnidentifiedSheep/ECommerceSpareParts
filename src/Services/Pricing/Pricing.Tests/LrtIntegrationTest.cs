@@ -1,20 +1,25 @@
-using System.Reflection;
 using Abstractions.Interfaces.Persistence;
-using Analytics.Persistence.Context;
 using Api.Common.Extensions;
+using Application.Common.Interfaces.Lrt;
 using Attributes;
 using Localization.Domain.Extensions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
+using Pricing.Persistence.Contexts;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 
-namespace Analytics.Integration.Tests;
+namespace Pricing.Integration.Tests;
 
 [Collection("Combined collection")]
-public abstract class IntegrationTest(CombinedContainerFixture fixture)
-    : IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
+public abstract class LrtIntegrationTest<TLrt>(CombinedContainerFixture fixture)
+    : LrtIntegrationTestBase<
+        TLrt,
+        ServiceProviderBuilder,
+        ServiceProviderArguments,
+        DContext>
+    where TLrt : class, ILrtNamedObject
 {
     protected IMediator Mediator { get; private set; } = null!;
 
@@ -26,6 +31,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
                 PgsqlConnectionString = fixture.PostgresConnectionString,
                 CacheConnectionString = fixture.RedisConnectionString
             });
+
         Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
         await ResetDataStoresAsync();

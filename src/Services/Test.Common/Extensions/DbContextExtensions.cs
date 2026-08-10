@@ -4,7 +4,9 @@ namespace Tests.Extensions;
 
 public static class DbContextExtensions
 {
-    public static async Task ClearDatabase(this DbContext context)
+    public static async Task ClearDatabase(
+        this DbContext context,
+        CancellationToken cancellationToken = default)
     {
         var sql = """
                   DO $$
@@ -20,6 +22,8 @@ public static class DbContextExtensions
                       END LOOP;
                   END $$;
                   """;
-        await context.Database.ExecuteSqlRawAsync(sql);
+        await context.Database.ExecuteSqlRawAsync(
+            sql,
+            cancellationToken);
     }
 }

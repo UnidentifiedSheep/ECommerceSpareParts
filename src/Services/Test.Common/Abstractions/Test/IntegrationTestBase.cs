@@ -4,6 +4,8 @@ using Localization.Domain;
 using Localization.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
+using Tests.Extensions;
 using Tests.Interfaces.ServiceProvider;
 
 namespace Tests.Abstractions.Test;
@@ -33,5 +35,26 @@ public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
         var path = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
         var loader = new JsonLocalizerContainerLoader(path);
         await loader.LoadAsync(containers);
+    }
+
+    protected async Task ResetDataStoresAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await Context.ClearDatabase(cancellationToken);
+
+        var multiplexer = Scope.ServiceProvider
+            .GetService<IConnectionMultiplexer>();
+        if (multiplexer is null) return;
+
+        var database = multiplexer.GetDatabase();
+        foreach (var endpoint in multiplexer.GetEndPoints())
+        {
+            var server = multiplexer.GetServer(endpoint);
+            var keys = server.Keys(database.Database).ToArray();
+
+            if (keys.Length == 0) continue;
+
+            await database.KeyDeleteAsync(keys);
+        }
     }
 }
