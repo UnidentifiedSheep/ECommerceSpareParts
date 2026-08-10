@@ -24,7 +24,7 @@ public class PurchaseFactSynchronizer(
         CancellationToken cancellationToken = default)
     {
         return await unitOfWork.ExecuteWithTransaction(
-            TransactionalAttribute.ReadCommited(20, 2),
+            TransactionalAttribute.ReadCommitted(20, 2),
             async () => await ExecuteAsync(id, cancellationToken),
             cancellationToken);
     }

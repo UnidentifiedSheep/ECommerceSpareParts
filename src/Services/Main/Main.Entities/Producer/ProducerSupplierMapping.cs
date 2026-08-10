@@ -36,7 +36,7 @@ public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>, ILi
         {
             ProducerId = producerId,
             Supplier = supplier,
-            SupplierProducerName = supplierProducerName
+            SupplierProducerName = supplierProducerName.Trim()
         };
     }
 

@@ -3,7 +3,7 @@ using System.Data;
 namespace Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class TransactionalAttribute : Attribute
+public partial class TransactionalAttribute : Attribute
 {
     private static readonly string[] DefaultPgqlErrors = ["40001", "40P01", "55P03"];
 
@@ -30,7 +30,7 @@ public class TransactionalAttribute : Attribute
     public int RetryCount { get; }
     public IEnumerable<string> RetryErrors { get; }
 
-    public static TransactionalAttribute ReadCommited(int delay, int retryCount)
+    public static TransactionalAttribute ReadCommitted(int delay, int retryCount)
     {
         return new TransactionalAttribute(
             IsolationLevel.ReadCommitted,

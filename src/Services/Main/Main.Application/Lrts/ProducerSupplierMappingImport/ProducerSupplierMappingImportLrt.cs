@@ -4,23 +4,23 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
+using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
+using Domain.Extensions;
 using Enums;
 using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Dtos.Producer;
-using Main.Application.Dtos.Producer.SupplierMappings;
 using Main.Application.Handlers.Producers;
-using Main.Application.Handlers.ProducerSupplierMappings;
+using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
 using Main.Entities.Producer;
 using Main.Enums;
 using MassTransit;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -30,7 +30,7 @@ public class ProducerSupplierMappingImportLrt(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
-    ISender sender,
+    IProducerRepository producerRepository,
     IProducerLookupService producerLookupService,
     ILogger<ProducerSupplierMappingImportLrt> logger,
     IOptions<S3BucketsOptions> bucketsOptions,
@@ -134,7 +134,12 @@ public class ProducerSupplierMappingImportLrt(
         if (mappings.Count == 0) return;
 
         var firstIdx = mappings[0].idx;
-        var items = new List<(int idx, NewProducerSupplierMapping item)>();
+        var errorsBeforeBatch = errors.Count;
+        var toAdd = new List<ProducerSupplierMapping>();
+        var uniqueMappings = new HashSet<(
+            string SupplierProducerName,
+            Supplier Supplier)>();
+
         foreach (var (idx, item) in mappings)
         {
             var producerId = _producerLookup.ResolveId(item.ProducerName);
@@ -146,17 +151,33 @@ public class ProducerSupplierMappingImportLrt(
                 continue;
             }
 
-            items.Add((
-                idx,
-                new NewProducerSupplierMapping
-                {
-                    ProducerId = producerId.Value,
-                    Supplier = item.Supplier,
-                    SupplierProducerName = item.SupplierProducerName
-                }));
+            var supplierProducerName = item.SupplierProducerName.TrimSafe();
+            if (string.IsNullOrWhiteSpace(supplierProducerName))
+            {
+                errors.Add(CreateError(
+                    idx,
+                    StringLocalizer.Get(
+                        "producer.supplier.mapping.supplier.producer.name.required")));
+                continue;
+            }
+
+            if (!uniqueMappings.Add((supplierProducerName, item.Supplier)))
+            {
+                errors.Add(CreateError(
+                    idx,
+                    StringLocalizer.Get(
+                        "producer.supplier.mapping.duplicate.in.batch")));
+                continue;
+            }
+
+            toAdd.Add(
+                ProducerSupplierMapping.Create(
+                    producerId.Value,
+                    supplierProducerName,
+                    item.Supplier));
         }
 
-        if (items.Count == 0)
+        if (toAdd.Count == 0)
         {
             Logger.LogInformation(
                 "Producer supplier mapping import batch skipped. JobId: {JobId}, " +
@@ -169,19 +190,13 @@ public class ProducerSupplierMappingImportLrt(
             return;
         }
 
-        var result = await sender.Send(
-            new CreateProducerSupplierMappingBatchCommand(items.Select(x => x.item)),
+        await TransactionService.ExecuteAsync(
+            TransactionalAttribute.RetryOnConflict(20, 2),
+            (_, cancellationToken) =>
+                producerRepository.AddSupplierMappingsOnConflictDoNothingAsync(
+                    toAdd,
+                    cancellationToken),
             CancellationToken);
-
-        foreach (var (idx, message) in result.Errors)
-            errors.Add(
-                new ProducerSupplierMappingImportError
-                {
-                    Message = message,
-                    RowIdx = idx >= 0 && idx < items.Count
-                        ? items[idx].idx
-                        : firstIdx + idx
-                });
 
         Logger.LogInformation(
             "Producer supplier mapping import batch processed. JobId: {JobId}, " +
@@ -190,9 +205,9 @@ public class ProducerSupplierMappingImportLrt(
             JobId,
             firstIdx,
             mappings.Count,
-            result.Created,
-            result.Skipped,
-            result.Errors.Count);
+            toAdd.Count,
+            mappings.Count - toAdd.Count,
+            errors.Count - errorsBeforeBatch);
 
         mappings.Clear();
     }

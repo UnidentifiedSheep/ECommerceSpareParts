@@ -110,6 +110,9 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
                     IssuerSigningKey = "main-tests-signing-key-at-least-32-characters"
                 }));
         services.AddSingleton<IEmailMessageRenderer, EmailMessageRendererStub>();
+        services.AddScoped<S3StorageServiceStub>();
+        services.AddScoped<IS3StorageService>(sp =>
+            sp.GetRequiredService<S3StorageServiceStub>());
         services.AddProjectJsonSerialization();
 
         services.AddJsonSigner()

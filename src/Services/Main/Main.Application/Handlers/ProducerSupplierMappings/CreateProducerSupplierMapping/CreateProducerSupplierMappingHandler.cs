@@ -27,19 +27,23 @@ public class CreateProducerSupplierMappingHandler(
         CreateProducerSupplierMappingCommand request,
         CancellationToken cancellationToken)
     {
+        var supplierProducerName = request
+            .ProducerSupplierMapping
+            .SupplierProducerName
+            .Trim();
         var exists = await repository.Query
             .AnyAsync(
-                x => x.ProducerId == request.ProducerSupplierMapping.ProducerId
+                x => x.SupplierProducerName == supplierProducerName
                      && x.Supplier == request.ProducerSupplierMapping.Supplier,
                 cancellationToken);
         if (exists)
             throw new ProducersSupplierMappingAlreadyExistsException(
-                request.ProducerSupplierMapping.ProducerId,
+                supplierProducerName,
                 request.ProducerSupplierMapping.Supplier);
 
         var model = ProducerSupplierMapping.Create(
             request.ProducerSupplierMapping.ProducerId,
-            request.ProducerSupplierMapping.SupplierProducerName.Trim(),
+            supplierProducerName,
             request.ProducerSupplierMapping.Supplier);
 
         await unitOfWork.AddAsync(model, cancellationToken);

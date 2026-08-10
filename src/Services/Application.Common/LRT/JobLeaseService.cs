@@ -16,7 +16,7 @@ public class JobLeaseService(
         TimeSpan leaseDuration,
         CancellationToken ct)
         => await transactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             async (context, cancellationToken) =>
             {
                 var repository = context.Repositories.Get<Job, Guid>();
@@ -45,7 +45,7 @@ public class JobLeaseService(
     
     public async Task<List<Job>> FailExpiredJobsWithoutAttempts(int maxBatchSize, CancellationToken ct)
         => await transactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(30, 3),
+            TransactionalAttribute.ReadCommitted(30, 3),
             async (context, cancellationToken) =>
             {
                 var repository = context.Repositories.Get<Job, Guid>();

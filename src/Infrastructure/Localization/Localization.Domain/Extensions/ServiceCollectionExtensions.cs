@@ -4,6 +4,7 @@ using Localization.Domain.Middlewares;
 using Localization.Domain.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Localization.Domain.Extensions;
 
@@ -33,12 +34,28 @@ public static class ServiceCollectionExtensions
                       ?? throw new InvalidOperationException(
                           $"Missing {LocalesOptions.SectionName} configuration section");
 
-        return services.AddLocalization(
+        return services.RegisterLocalization(
             options.Default,
             options.Supported.Select(x => (Locale)x).ToArray());
     }
 
     public static IServiceCollection AddLocalization(
+        this IServiceCollection services,
+        Locale defaultLocale,
+        params Locale[] locales)
+    {
+        services.AddSingleton<IOptions<LocalesOptions>>(
+            Options.Create(
+                new LocalesOptions
+                {
+                    Default = defaultLocale,
+                    Supported = locales.Select(x => x.ToString()).ToArray()
+                }));
+
+        return services.RegisterLocalization(defaultLocale, locales);
+    }
+
+    private static IServiceCollection RegisterLocalization(
         this IServiceCollection services,
         Locale defaultLocale,
         params Locale[] locales)

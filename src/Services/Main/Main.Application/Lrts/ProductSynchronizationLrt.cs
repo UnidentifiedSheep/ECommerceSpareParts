@@ -61,7 +61,7 @@ public sealed class ProductSynchronizationLrt(
 
     private Task PublishEventsAsync(IReadOnlyList<int> ids)
         => TransactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommited(20, 2),
+            TransactionalAttribute.ReadCommitted(20, 2),
             async (context, cancellationToken) =>
             {
                 foreach (var id in ids)

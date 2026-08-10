@@ -54,7 +54,7 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
             if (organizationIds.Count == 0) break;
 
             await TransactionService.ExecuteAsync(
-                TransactionalAttribute.ReadCommited(20, 3),
+                TransactionalAttribute.ReadCommitted(20, 3),
                 async (context, cancellationToken) =>
                 {
                     await balanceService.RecalculateApproximateBalancesAsync(

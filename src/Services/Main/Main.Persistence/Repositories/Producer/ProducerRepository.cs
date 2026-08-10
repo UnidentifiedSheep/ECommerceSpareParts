@@ -1,4 +1,3 @@
-using Dapper;
 using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Producer;
@@ -18,6 +17,7 @@ public class ProducerRepository(DContext context, QueryExtensions extensions)
             .AsNoTracking()
             .AnyAsync(x => x.ProducerId == producerId, cancellationToken);
     }
+
     public async Task AddSupplierMappingsOnConflictDoNothingAsync(
         IEnumerable<ProducerSupplierMapping> mappings, 
         CancellationToken cancellationToken = default)
@@ -25,25 +25,17 @@ public class ProducerRepository(DContext context, QueryExtensions extensions)
         var items = mappings.ToList();
         if (items.Count == 0) return;
 
-        const string sql = """
-                           INSERT INTO producer_supplier_mappings
-                               (supplier, producer_id, producer_supplier_name)
-                           VALUES
-                               (@Supplier, @ProducerId, @SupplierProducerName)
-                           ON CONFLICT (producer_id, supplier) DO NOTHING;
-                           """;
-
-        var connection = Context.Database.GetDbConnection();
-        
-        await connection.ExecuteAsync(
-            new CommandDefinition(
-                sql,
-                items.Select(x => new
-                {
-                    Supplier = x.Supplier.ToString(),
-                    x.ProducerId,
-                    x.SupplierProducerName
-                }),
-                cancellationToken: cancellationToken));
+        await Context.BulkInsertOrUpdateAsync(
+            items,
+            new BulkConfig
+            {
+                UpdateByProperties =
+                [
+                    nameof(ProducerSupplierMapping.SupplierProducerName),
+                    nameof(ProducerSupplierMapping.Supplier)
+                ],
+                PropertiesToIncludeOnUpdate = [""]
+            },
+            cancellationToken: cancellationToken);
     }
 }
