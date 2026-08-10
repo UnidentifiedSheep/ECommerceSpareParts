@@ -30,7 +30,6 @@ using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
-using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using S3;
 using Security;
@@ -58,7 +57,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddSystemOptions()
     .AddSecretEncryptionOptions();
 
-builder.Services.AddCommonApiInfrastructure();
+builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Main);
 builder.Services.AddSignalR();
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
@@ -133,16 +132,6 @@ builder.Services
     .AddLocalization(builder.Configuration)
     .AddExchangeRates();
 
-builder.Services.AddOpenTelemetry()
-    .WithMetrics(metrics =>
-    {
-        metrics
-            .AddAspNetCoreInstrumentation()
-            .AddProcessInstrumentation()
-            .AddRuntimeInstrumentation()
-            .AddPrometheusExporter();
-    });
-
 builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(
         typeof(ProductsEndPoints).Assembly,
@@ -158,7 +147,6 @@ SortByConfig.Configure();
 
 app.UseCommonApiPipeline();
 
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.MapHub<JobHub>("/hubs/jobs");
 
 await app.RunAsync();

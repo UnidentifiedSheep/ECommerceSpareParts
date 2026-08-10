@@ -10,6 +10,11 @@ This document describes the solution-level testing approach.
 
 Integration tests use Testcontainers, so Docker must be running.
 
+Common application and persistence integration tests belong in `Test.Common` and inherit from
+`Tests.Integration.CommonLayerIntegrationTest`. Its test-only `DContext` contains only shared tables such as
+jobs, job dependencies, schedules, and settings. Service integration tests must continue to use
+their own service `DContext`.
+
 ## Test Data Pattern
 
 Use this split consistently:

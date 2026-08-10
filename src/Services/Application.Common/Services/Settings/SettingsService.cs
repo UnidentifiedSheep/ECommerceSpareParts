@@ -1,25 +1,18 @@
 ﻿using System.Data;
-using Abstractions.Interfaces;
-using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Settings;
 using Domain.CommonEntities;
 using Domain.Interfaces;
-using MassTransit;
 
 namespace Application.Common.Services.Settings;
 
 public class SettingsService(
     IRepository<Setting, string> repository,
-    IUnitOfWork unitOfWork,
-    ISettingsContainer settingsContainer,
-    IPublishEndpoint publishEndpoint,
-    IServiceDefinition serviceDefinition,
-    ISettingFactory settingFactory
-)
-    : ISettingsService
+    IApplicationTransactionService transactionService,
+    ISettingsContainer settingsContainer
+) : ISettingsService
 {
     private static readonly TransactionalAttribute TransactionSettings
         = new(
@@ -34,11 +27,7 @@ public class SettingsService(
             .Build();
 
         var dbSettings = await repository.ListAsync(criteria, cancellationToken);
-        foreach (var setting in dbSettings)
-        {
-            var typed = settingFactory.Create(setting.Key, setting.Json);
-            settingsContainer.Set(typed);
-        }
+        settingsContainer.Load(dbSettings);
     }
 
     public async Task SetSetting<T>(
@@ -46,9 +35,9 @@ public class SettingsService(
         CancellationToken cancellationToken = default
     ) where T : Setting
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await transactionService.ExecuteAsync(
             TransactionSettings,
-            async () =>
+            async (context, ct) =>
             {
                 var criteria = Criteria<Setting>.New()
                     .Where(x => x.Key == value.Key)
@@ -56,21 +45,13 @@ public class SettingsService(
                     .Track()
                     .Build();
 
-                var existing = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
+                var existing = await repository.FirstOrDefaultAsync(criteria, ct);
                 existing?.SetData(value.Json);
 
-                if (existing == null) await unitOfWork.AddAsync(value, cancellationToken);
+                if (existing == null)
+                    await context.UnitOfWork.AddAsync(value, ct);
 
-                await publishEndpoint.Publish(
-                    new SettingUpdatedEvent
-                    {
-                        Key = value.Key,
-                        Value = value.Json,
-                        ChangedAt = DateTime.UtcNow
-                    },
-                    conf => conf.SetRoutingKey(serviceDefinition.ServiceName),
-                    cancellationToken);
-                await unitOfWork.SaveChangesAsync(cancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(ct);
             },
             cancellationToken);
 
@@ -86,12 +67,16 @@ public class SettingsService(
 
         if (dbSetting != null)
         {
-            var typed = (T)settingFactory.Create(dbSetting.Key, dbSetting.Json);
+            var typed = dbSetting as T
+                        ?? throw new InvalidOperationException(
+                            $"Setting '{dbSetting.Key}' was materialized as " +
+                            $"'{dbSetting.GetType().Name}' instead of '{typeof(T).Name}'.");
             settingsContainer.Set(typed);
             return typed;
         }
 
-        await SetSetting(T.Default, cancellationToken);
-        return T.Default;
+        var defaultSetting = T.Default;
+        await SetSetting(defaultSetting, cancellationToken);
+        return defaultSetting;
     }
 }

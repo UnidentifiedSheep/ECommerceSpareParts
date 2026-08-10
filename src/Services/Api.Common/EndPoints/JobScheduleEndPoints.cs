@@ -43,6 +43,8 @@ public record UpdateJobScheduleResponse
     public required JobScheduleDto Schedule { get; init; }
 }
 
+public record GetJobScheduleResponse(JobScheduleDto Schedule);
+
 public static class JobScheduleEndPoints
 {
     public static RouteGroupBuilder AddScheduleEndPoints(this RouteGroupBuilder group)
@@ -76,6 +78,26 @@ public static class JobScheduleEndPoints
             .Produces<GetJobSchedulesResponse>()
             .RequireAllPermissions(PermissionCodes.JOBS_GET);
 
+        schedules.MapGet(
+                "{scheduleId:guid}",
+                async (
+                    ISender sender,
+                    Guid scheduleId,
+                    CancellationToken ct) =>
+                {
+                    var result = await sender.Send(
+                        new GetScheduleByIdQuery(scheduleId),
+                        ct);
+
+                    return Results.Ok(
+                        new GetJobScheduleResponse(result.Schedule));
+                })
+            .WithName("GetJobSchedule")
+            .WithDisplayName("Get job schedule by id")
+            .Produces<GetJobScheduleResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAllPermissions(PermissionCodes.JOBS_GET);
+
         schedules.MapPost(
                 "",
                 async (
@@ -84,12 +106,15 @@ public static class JobScheduleEndPoints
                     CancellationToken ct) =>
                 {
                     var result = await sender.Send(new CreateScheduleCommand(schedule), ct);
+                    var created = await sender.Send(
+                        new GetScheduleByIdQuery(result.ScheduleId),
+                        ct);
 
                     return Results.Created(
-                        $"/jobs/schedules/{result.Schedule.Id}",
+                        $"/jobs/schedules/{result.ScheduleId}",
                         new CreateJobScheduleResponse
                         {
-                            Schedule = result.Schedule
+                            Schedule = created.Schedule
                         });
                 })
             .WithName("CreateJobSchedule")
@@ -107,11 +132,14 @@ public static class JobScheduleEndPoints
                     CancellationToken ct) =>
                 {
                     var result = await sender.Send(new UpdateScheduleCommand(scheduleId, patch), ct);
+                    var updated = await sender.Send(
+                        new GetScheduleByIdQuery(result.ScheduleId),
+                        ct);
 
                     return Results.Ok(
                         new UpdateJobScheduleResponse
                         {
-                            Schedule = result.Schedule
+                            Schedule = updated.Schedule
                         });
                 })
             .WithName("UpdateJobSchedule")

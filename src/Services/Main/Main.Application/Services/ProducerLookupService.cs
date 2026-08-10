@@ -7,9 +7,25 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Services;
 
 public class ProducerLookupService(
-    IReadRepository<Producer, int> producerReadRepository) : IProducerLookupService
+    IReadRepository<Producer, int> producerReadRepository,
+    IReadRepository<ProducerSupplierMapping, int> mappingRepository)
+    : IProducerLookupService
 {
-    public async Task<ProducerLookup> Load(CancellationToken cancellationToken = default)
+    private readonly object _loadLock = new();
+    private Task<IProducerLookup>? _loadTask;
+
+    public Task<IProducerLookup> Load(
+        CancellationToken cancellationToken = default)
+    {
+        Task<IProducerLookup> loadTask;
+        lock (_loadLock)
+            loadTask = _loadTask ??= LoadCore(cancellationToken);
+
+        return AwaitAndResetOnFailure(loadTask);
+    }
+
+    private async Task<IProducerLookup> LoadCore(
+        CancellationToken cancellationToken)
     {
         var producerNamesToIds = new Dictionary<string, int>();
         var aliasesToIds = new Dictionary<string, int>();
@@ -48,6 +64,45 @@ public class ProducerLookupService(
             if (producers.Count != batchSize) break;
         }
 
-        return new ProducerLookup(producerNamesToIds, aliasesToIds);
+        var supplierMappingItems = await mappingRepository.Query
+            .Select(x => new
+            {
+                x.Supplier,
+                x.SupplierProducerName,
+                x.ProducerId
+            })
+            .ToListAsync(cancellationToken);
+
+        var supplierMappings = supplierMappingItems
+            .ToDictionary(
+                x => new ProducerSupplierLookupKey(
+                    x.Supplier,
+                    x.SupplierProducerName),
+                x => x.ProducerId);
+
+        IProducerLookup lookup = new ProducerLookup(
+            producerNamesToIds,
+            aliasesToIds);
+
+        return new SupplierProducerLookup(
+            lookup,
+            supplierMappings);
+    }
+
+    private async Task<IProducerLookup> AwaitAndResetOnFailure(
+        Task<IProducerLookup> loadTask)
+    {
+        try
+        {
+            return await loadTask;
+        }
+        catch
+        {
+            lock (_loadLock)
+                if (ReferenceEquals(_loadTask, loadTask))
+                    _loadTask = null;
+
+            throw;
+        }
     }
 }

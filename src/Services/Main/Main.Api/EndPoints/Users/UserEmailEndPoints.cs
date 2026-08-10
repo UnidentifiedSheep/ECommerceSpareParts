@@ -4,6 +4,7 @@ using Enums;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Auth.EmailVerification;
 using Main.Application.Handlers.Users.AddEmailToUser;
+using Main.Application.Handlers.Users.GetUserEmail;
 using Main.Application.Handlers.Users.MakeEmailPrimary;
 using Main.Application.Handlers.Users.RemoveEmailFromUser;
 using Main.Enums;
@@ -16,6 +17,7 @@ public record AddUserEmailRequest(
     EmailType EmailType);
 
 public record AddUserEmailResponse(UserEmailDto Email);
+public record GetUserEmailResponse(UserEmailDto Email);
 
 public static class UserEmailEndPoints
 {
@@ -36,9 +38,13 @@ public static class UserEmailEndPoints
                             request.EmailType),
                         cancellationToken);
 
+                    var email = await sender.Send(
+                        new GetUserEmailQuery(result.UserId, result.Email),
+                        cancellationToken);
+
                     return Results.Created(
                         $"/users/{userId}/emails/{Uri.EscapeDataString(request.Email)}",
-                        value: new AddUserEmailResponse(result.Email));
+                        value: new AddUserEmailResponse(email.Email));
                 })
             .WithName("AddUserEmail")
             .WithSummary("Добавить почту пользователю")
@@ -50,6 +56,26 @@ public static class UserEmailEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict)
             .RequireAnyPermission(PermissionCodes.USERS_MAILS_CREATE);
+
+        users.MapGet(
+                "/{userId:guid}/emails/{email}",
+                async (
+                    ISender sender,
+                    Guid userId,
+                    string email,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetUserEmailQuery(userId, email),
+                        cancellationToken);
+
+                    return Results.Ok(new GetUserEmailResponse(result.Email));
+                })
+            .WithName("GetUserEmail")
+            .WithSummary("Получить почту пользователя")
+            .Produces<GetUserEmailResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.USERS_INFO_GET);
 
         users.MapDelete(
                 "/{userId:guid}/emails/{email}",

@@ -6,14 +6,7 @@ using Exceptions;
 
 namespace Analytics.Application.Lrts.MarkupCalculation;
 
-public record MarkupCalculationState
-{
-    [JsonPropertyName("rangeStart")]
-    public DateTime? RangeStart { get; init; }
-
-    [JsonPropertyName("rangeEnd")]
-    public DateTime? RangeEnd { get; init; }
-}
+public record MarkupCalculationState : MarkupCalculationInputState;
 
 public record MarkupCalculationInputState : IInputState
 {

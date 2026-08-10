@@ -5,11 +5,8 @@ using Enums;
 
 namespace Main.Application.Lrts.ProducerAliasesImport;
 
-public record ProducerAliasesImportState
+public record ProducerAliasesImportState : ProducerAliasesImportInputState
 {
-    [JsonPropertyName("fileName")]
-    public required string FileName { get; init; }
-
     [JsonPropertyName("currentLine")]
     public int CurrentLine { get; init; }
 

@@ -67,10 +67,14 @@ public static class UserInfoEndPoints
                     CancellationToken token) =>
                 {
                     var result = await sender.Send(new EditUserInfoCommand(id, request.UserInfo), token);
+                    var user = await sender.Send(
+                        new GetUserFullInfoQuery(result.UserId),
+                        token);
+
                     return Results.Ok(
                         new EditUserInfoResponse
                         {
-                            UserInfo = result.UserInfo
+                            UserInfo = user.User.UserInfo!
                         });
                 })
             .WithName("EditUserInfo")

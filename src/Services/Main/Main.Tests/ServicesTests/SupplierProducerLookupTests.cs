@@ -1,29 +1,20 @@
 using Enums;
 using FluentAssertions;
+using Main.Application.Interfaces.Services;
 using Main.Application.Models.Producer;
 
 namespace Tests.ServicesTests;
 
-public class SupplierProducerLookupTests
+public class ProducerLookupSupplierResolutionTests
 {
-    private static readonly ProducerLookup ProducerLookup = new(
-        new Dictionary<string, int>
-        {
-            ["BOSCH"] = 1
-        },
-        new Dictionary<string, int>
-        {
-            ["ROBERT BOSCH"] = 1
-        });
-
     [Fact]
     public void ResolveId_PrefersExactSupplierMapping()
     {
         var lookup = CreateLookup(
-            new SupplierProducerLookupKey(Supplier.Armtek, "Bosch"),
+            new ProducerSupplierLookupKey(Supplier.Armtek, "Bosch"),
             2);
 
-        lookup.ResolveId(Supplier.Armtek, " Bosch ")
+        lookup.ResolveId(" Bosch ", Supplier.Armtek)
             .Should().Be(2);
     }
 
@@ -31,10 +22,10 @@ public class SupplierProducerLookupTests
     public void ResolveId_DoesNotUseMappingFromAnotherSupplier()
     {
         var lookup = CreateLookup(
-            new SupplierProducerLookupKey(Supplier.Armtek, "Bosch"),
+            new ProducerSupplierLookupKey(Supplier.Armtek, "Bosch"),
             2);
 
-        lookup.ResolveId(Supplier.Tmtr, "Bosch")
+        lookup.ResolveId("Bosch", Supplier.Tmtr)
             .Should().Be(1);
     }
 
@@ -45,7 +36,7 @@ public class SupplierProducerLookupTests
     {
         var lookup = CreateLookup();
 
-        lookup.ResolveId(Supplier.Armtek, producer)
+        lookup.ResolveId(producer, Supplier.Armtek)
             .Should().Be(1);
     }
 
@@ -54,21 +45,31 @@ public class SupplierProducerLookupTests
     {
         var lookup = CreateLookup();
 
-        lookup.ResolveId(Supplier.Armtek, "Unknown")
+        lookup.ResolveId("Unknown", Supplier.Armtek)
             .Should().BeNull();
     }
 
-    private static SupplierProducerLookup CreateLookup(
-        SupplierProducerLookupKey? key = null,
+    private static IProducerLookup CreateLookup(
+        ProducerSupplierLookupKey? key = null,
         int producerId = 0)
     {
-        IReadOnlyDictionary<SupplierProducerLookupKey, int> mappings = key is null
-            ? new Dictionary<SupplierProducerLookupKey, int>()
-            : new Dictionary<SupplierProducerLookupKey, int>
+        IReadOnlyDictionary<ProducerSupplierLookupKey, int> mappings = key is null
+            ? new Dictionary<ProducerSupplierLookupKey, int>()
+            : new Dictionary<ProducerSupplierLookupKey, int>
             {
                 [key.Value] = producerId
             };
 
-        return new SupplierProducerLookup(ProducerLookup, mappings);
+        IProducerLookup lookup = new ProducerLookup(
+            new Dictionary<string, int>
+            {
+                ["BOSCH"] = 1
+            },
+            new Dictionary<string, int>
+            {
+                ["ROBERT BOSCH"] = 1
+            });
+
+        return new SupplierProducerLookup(lookup, mappings);
     }
 }

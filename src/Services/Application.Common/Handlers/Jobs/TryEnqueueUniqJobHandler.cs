@@ -47,7 +47,7 @@ public class TryEnqueueUniqJobHandler(
         {
             var lrt = registry.GetBySystemName(item.SystemName);
 
-            if (lrt is MultiStepLrtBase)
+            if (lrt is IMultiStepLrt)
                 throw new InvalidOperationException(
                     "Multi-step LRT cannot be queued as a unique job.");
 

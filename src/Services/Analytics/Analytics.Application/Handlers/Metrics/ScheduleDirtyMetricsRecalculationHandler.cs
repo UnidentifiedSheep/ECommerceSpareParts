@@ -60,13 +60,13 @@ public class ScheduleDirtyMetricsRecalculationHandler(
         for (var i = 0; i < metrics.Count; i++)
         {
             var metric = metrics[i];
-            var job = jobResult.Jobs[i];
-            metric.AddJob(job.Id);
+            var jobId = jobResult.JobIds[i];
+            metric.AddJob(jobId);
             integrationEventScope.Add(
                 new MetricCalculationStatusUpdatedEvent
                 {
                     MetricId = metric.Id,
-                    JobStatus = job.Status.ToString()
+                    JobStatus = JobStatus.Pending.ToString()
                 });
         }
 

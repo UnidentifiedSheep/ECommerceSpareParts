@@ -1,6 +1,5 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
@@ -15,11 +14,10 @@ namespace Main.Application.Handlers.Users.EditUserInfo;
 [AutoSave]
 public record EditUserInfoCommand(Guid UserId, UserInfoDto UserInfo) : ICommand<EditUserInfoResult>;
 
-public record EditUserInfoResult(UserInfoDto UserInfo);
+public record EditUserInfoResult(Guid UserId);
 
 public class EditUserInfoHandler(
-    IRepository<User, Guid> repository,
-    IProjectionProvider<UserInfo, UserInfoDto> userInfoProjection
+    IRepository<User, Guid> repository
 ) : ICommandHandler<EditUserInfoCommand, EditUserInfoResult>
 {
     public async Task<EditUserInfoResult> Handle(
@@ -41,6 +39,6 @@ public class EditUserInfoHandler(
             request.UserInfo.Surname,
             request.UserInfo.Description);
 
-        return new EditUserInfoResult(userInfoProjection.Projection.AsFunc()(user.UserInfo!));
+        return new EditUserInfoResult(user.Id);
     }
 }

@@ -11,6 +11,10 @@ public interface IPriceApplierService
         PriceOfferSourceType usage,
         CancellationToken ct = default);
 
+    Task<PriceApplierDto?> FindPriceApplierInfoAsync(
+        string systemName,
+        CancellationToken ct = default);
+
     Task<IReadOnlyList<IPriceApplier>> GetPriceAppliersAsync(
         PriceOfferSourceType usage,
         CancellationToken ct = default);

@@ -1,5 +1,6 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
@@ -24,11 +25,13 @@ public class ProducerAliasImportLrt(
     ISender sender,
     ILogger<ProducerAliasImportLrt> logger,
     IPublishEndpoint publisher,
+    IApplicationTransactionService transactionService,
     IOptions<S3BucketsOptions> bucketsOptions,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
 )
     : CsvImportLrtBase<
+        ProducerAliasesImportInputState,
         ProducerAliasesImportState,
         ProducerAliasesImportError,
         ProducerAliasImportLrt.ProducerAliasCsvDto,
@@ -37,6 +40,7 @@ public class ProducerAliasImportLrt(
         bucketsOptions,
         unitOfWork,
         publisher,
+        transactionService,
         logger,
         s3Service,
         stringLocalizer,
@@ -45,8 +49,6 @@ public class ProducerAliasImportLrt(
     public override string SystemName => nameof(ProducerAliasImportLrt);
     public override string NameLocalizationKey => "lrt.producer.other.names.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.other.names.import.description";
-    public override Type InputType => typeof(ProducerAliasesImportInputState);
-    public override Type StateType => typeof(ProducerAliasesImportState);
 
     protected override string GetFileName(ProducerAliasesImportState state) { return state.FileName; }
 

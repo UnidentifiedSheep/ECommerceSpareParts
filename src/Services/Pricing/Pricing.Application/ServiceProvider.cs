@@ -41,8 +41,8 @@ public static class ServiceProvider
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
 
-        collection.RegisterSettingsService<SettingFactory>();
-        collection.RegisterProjectionProviders<SettingFactory>();
+        collection.RegisterSettingsService();
+        collection.RegisterProjectionProviders<PriceCandidateCalculationLrt>();
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();

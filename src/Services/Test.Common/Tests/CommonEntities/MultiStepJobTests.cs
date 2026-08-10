@@ -65,6 +65,55 @@ public class MultiStepJobTests
     }
 
     [Fact]
+    public void CancelUnfinishedSteps_CancelsEveryNonTerminalStep()
+    {
+        var job = Create();
+        var blocked = AddStep(job);
+        var pending = AddStep(job);
+        var processing = AddStep(job);
+        var succeeded = AddStep(job);
+        job.ActivateStep(pending);
+        job.ActivateStep(processing);
+        job.ActivateStep(succeeded);
+
+        var processingLeaseHolderId = Guid.NewGuid();
+        processing.AcquireLease(
+            processingLeaseHolderId,
+            TimeSpan.FromMinutes(5));
+        processing.Start(processingLeaseHolderId);
+
+        var succeededLeaseHolderId = Guid.NewGuid();
+        succeeded.AcquireLease(
+            succeededLeaseHolderId,
+            TimeSpan.FromMinutes(5));
+        succeeded.Start(succeededLeaseHolderId);
+        succeeded.Succeed(succeededLeaseHolderId);
+
+        job.CancelUnfinishedSteps(
+            job.Steps,
+            "workflow failed");
+
+        blocked.Status.Should().Be(JobStatus.Cancelled);
+        pending.Status.Should().Be(JobStatus.Cancelled);
+        processing.Status.Should().Be(JobStatus.Cancelled);
+        processing.LeaseHolderId.Should().BeNull();
+        processing.LeaseExpiresAt.Should().BeNull();
+        succeeded.Status.Should().Be(JobStatus.Succeeded);
+    }
+
+    [Fact]
+    public void CancelUnfinishedSteps_ForeignStep_Throws()
+    {
+        var job = Create();
+        var foreignStep = AddStep(Create());
+
+        var act = () => job.CancelUnfinishedSteps([foreignStep]);
+
+        act.Should().Throw<InvalidOperationException>();
+        foreignStep.Status.Should().Be(JobStatus.Blocked);
+    }
+
+    [Fact]
     public void AcquireLease_BlockedStep_Throws()
     {
         var step = AddStep(Create());
@@ -221,9 +270,9 @@ public class MultiStepJobTests
         step.OnUpdated();
 
         var @event = step.FlushDomainEvents()
+            .OfType<JobStepFinishedDomainEvent>()
             .Should().ContainSingle()
-            .Which.Should().BeOfType<JobStepFinishedDomainEvent>()
-            .Subject;
+            .Which;
         @event.JobStepId.Should().Be(step.Id);
         @event.MultiStepJobId.Should().Be(job.Id);
         @event.Status.Should().Be(JobStatus.Succeeded);
@@ -242,8 +291,8 @@ public class MultiStepJobTests
         step.OnUpdated();
 
         step.FlushDomainEvents()
+            .OfType<JobStepFinishedDomainEvent>()
             .Should().ContainSingle()
-            .Which.Should().BeOfType<JobStepFinishedDomainEvent>()
             .Which.Status.Should().Be(JobStatus.Failed);
     }
 
@@ -268,7 +317,9 @@ public class MultiStepJobTests
 
         step.OnUpdated();
 
-        step.FlushDomainEvents().Should().BeEmpty();
+        step.FlushDomainEvents()
+            .OfType<JobStepFinishedDomainEvent>()
+            .Should().BeEmpty();
     }
 
     private static MultiStepJob Create()

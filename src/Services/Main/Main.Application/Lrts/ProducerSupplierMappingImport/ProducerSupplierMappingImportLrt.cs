@@ -1,6 +1,7 @@
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
@@ -34,9 +35,11 @@ public class ProducerSupplierMappingImportLrt(
     ILogger<ProducerSupplierMappingImportLrt> logger,
     IOptions<S3BucketsOptions> bucketsOptions,
     IPublishEndpoint publisher,
+    IApplicationTransactionService transactionService,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
 ) : CsvImportLrtBase<
+        ProducerSupplierMappingImportInputState,
         ProducerSupplierMappingImportState,
         ProducerSupplierMappingImportError,
         ProducerSupplierMappingImportLrt.ProducerSupplierMappingCsvDto,
@@ -45,18 +48,17 @@ public class ProducerSupplierMappingImportLrt(
         bucketsOptions,
         unitOfWork,
         publisher,
+        transactionService,
         logger,
         s3Service,
         stringLocalizer,
         localesOptions)
 {
-    private ProducerLookup _producerLookup = ProducerLookup.Empty;
+    private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
     public override string SystemName => nameof(ProducerSupplierMappingImportLrt);
     public override string NameLocalizationKey => "lrt.producer.supplier.mapping.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.supplier.mapping.import.description";
-    public override Type InputType => typeof(ProducerSupplierMappingImportInputState);
-    public override Type StateType => typeof(ProducerSupplierMappingImportState);
 
     protected override async Task BeforeRead(ProducerSupplierMappingImportState state)
     {

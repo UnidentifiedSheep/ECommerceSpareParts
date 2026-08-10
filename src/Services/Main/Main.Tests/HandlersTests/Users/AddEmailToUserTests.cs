@@ -23,11 +23,14 @@ public class AddEmailToUserTests(
         var user = await CreateUser();
         const string email = "Additional.Email@example.com";
 
-        await Mediator.Send(
+        var created = await Mediator.Send(
             new AddEmailToUserCommand(
                 user.Id,
                 email,
                 EmailType.Work));
+
+        created.UserId.Should().Be(user.Id);
+        created.Email.Should().Be("additional.email@example.com");
 
         var addedEmail = await Context.UserEmails
             .AsNoTracking()

@@ -36,6 +36,7 @@ public static class ServiceProvider
     {
         assembly ??= Assembly.GetExecutingAssembly();
         services
+            .AddCqrsMetrics()
             .RegisterIdCollector()
             .RegisterIntegrationEventScope()
             .RegisterDomainEventScope()
@@ -57,6 +58,9 @@ public static class ServiceProvider
             config
                 .RegisterIfNotExcluded(
                     hs,
+                    typeof(MetricsBehavior<,>))
+                .RegisterIfNotExcluded(
+                    hs,
                     typeof(DiagnosticsBehavior<,>))
                 .RegisterIfNotExcluded(
                     hs,
@@ -70,19 +74,7 @@ public static class ServiceProvider
                     typeof(CacheBehavior<,>))
                 .RegisterIfNotExcluded(
                     hs,
-                    typeof(TransactionBehavior<,>),
-                    ServiceLifetime.Scoped)
-                .RegisterIfNotExcluded(
-                    hs,
-                    typeof(IntegrationEventPublisherBehavior<,>),
-                    ServiceLifetime.Scoped)
-                .RegisterIfNotExcluded(
-                    hs,
-                    typeof(DomainEventPublisherBehavior<,>),
-                    ServiceLifetime.Scoped)
-                .RegisterIfNotExcluded(
-                    hs,
-                    typeof(SaveChangesBehavior<,>),
+                    typeof(ApplicationTransactionBehavior<,>),
                     ServiceLifetime.Scoped);
         });
 
@@ -107,6 +99,9 @@ public static class ServiceProvider
         services.AddScoped<
             INotificationHandler<Batch<JobStepFinishedDomainEvent>>,
             ResumeMultiStepJobHandler>();
+        services.AddScoped<
+            INotificationHandler<Batch<JobStatusUpdatedDomainEvent>>,
+            PublishJobStatusUpdatedEventHandler>();
         
         services.AddScoped<
             IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,
@@ -125,6 +120,10 @@ public static class ServiceProvider
             GetJobsHandler>();
 
         services.AddScoped<
+            IRequestHandler<GetJobQuery, GetJobResult>,
+            GetJobHandler>();
+
+        services.AddScoped<
             IRequestHandler<GetJobStateQuery, GetJobStateResult>,
             GetJobStateHandler>();
 
@@ -135,6 +134,10 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<GetScheduleQuery, GetScheduleResult>,
             GetScheduleHandler>();
+
+        services.AddScoped<
+            IRequestHandler<GetScheduleByIdQuery, GetScheduleByIdResult>,
+            GetScheduleByIdHandler>();
 
         services.AddScoped<
             IRequestHandler<UpdateScheduleCommand, UpdateScheduleResult>,

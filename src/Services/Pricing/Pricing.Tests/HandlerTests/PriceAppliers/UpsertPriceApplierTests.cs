@@ -40,13 +40,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
         var result = await Mediator.Send(command);
 
-        result.Applier.SystemName.Should().Be(systemName);
-        result.Applier.Name.Should().Be(name);
-        result.Applier.IsDynamic.Should().BeTrue();
-        result.Applier.DslLogic.Should().Be(dslLogic);
-        result.Applier.States.Should().BeEquivalentTo(
-            command.States,
-            options => options.ExcludingMissingMembers());
+        result.SystemName.Should().Be(systemName);
 
         var applier = await Context.Set<PriceApplier>()
             .AsNoTracking()
@@ -136,17 +130,14 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
         var result = await Mediator.Send(command);
 
-        result.Applier.IsDynamic.Should().BeFalse();
-        result.Applier.Name.Should().NotBeNullOrWhiteSpace();
-        result.Applier.Name.Should().NotBe(result.Applier.SystemName);
-        result.Applier.DslLogic.Should().BeNull();
-        result.Applier.States.Should().OnlyContain(x => x.Order == 0);
+        result.SystemName.Should().Be(nameof(MarkupApplier));
 
         var applier = await Context.Set<PriceApplier>()
             .AsNoTracking()
             .Include(x => x.States)
             .SingleAsync(x => x.SystemName == nameof(MarkupApplier));
 
+        applier.Name.Should().BeNull();
         applier.DslLogic.Should().BeNull();
         applier.States.Should().OnlyContain(x => x.Order == 0);
     }

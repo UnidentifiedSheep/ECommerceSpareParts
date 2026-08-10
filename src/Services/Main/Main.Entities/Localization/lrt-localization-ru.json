@@ -18,6 +18,12 @@
     "lrt.currency.rates.update.name": "Обновление курсов валют",
     "lrt.currency.rates.update.description": "Обновляет курсы валют по актуальным данным и сохраняет новые значения в системе.",
     "lrt.organization.approximate.balance.recalculate.name": "Перерасчёт приблизительных балансов организаций",
-    "lrt.organization.approximate.balance.recalculate.description": "Пересчитывает приблизительные балансы организаций в базовой валюте по их текущим балансам."
+    "lrt.organization.approximate.balance.recalculate.description": "Пересчитывает приблизительные балансы организаций в базовой валюте по их текущим балансам.",
+    "lrt.catalogue.candidates.build.name": "Формирование кандидатов каталога",
+    "lrt.catalogue.candidates.build.description": "Создаёт кандидатов каталога из товаров поставщиков и связывает каждый распознанный товар с соответствующим кандидатом.",
+    "lrt.catalogue.candidates.map.to.products.name": "Сопоставление кандидатов с каталогом",
+    "lrt.catalogue.candidates.map.to.products.description": "Сопоставляет кандидатов каталога с товарами по нормализованному артикулу и производителю.",
+    "lrt.catalogue.enrichment.name": "Обогащение каталога",
+    "lrt.catalogue.enrichment.description": "Формирует кандидатов из товаров поставщиков и последовательно сопоставляет их с товарами каталога."
   }
 }

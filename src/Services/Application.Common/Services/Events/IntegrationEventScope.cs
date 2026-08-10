@@ -1,28 +1,34 @@
 ﻿using Abstractions.Interfaces.Events;
 using Application.Common.Interfaces.Events;
+using Application.Common.Models;
 
 namespace Application.Common.Services.Events;
 
 public class IntegrationEventScope : IIntegrationEventScope
 {
-    private readonly List<object> _events = [];
-    private readonly Dictionary<string, object> _keyedEvents = new();
+    private readonly List<IntegrationEventEnvelope> _events = [];
+    private readonly Dictionary<string, IntegrationEventEnvelope> _keyedEvents = new();
 
-    public void Add<T>(T @event)
+    public void Add<T>(T @event, string? routingKey = null)
     {
         ArgumentNullException.ThrowIfNull(@event);
+        var envelope = new IntegrationEventEnvelope(@event, routingKey);
+
         if (@event is IKeyedEvent ke)
-            _keyedEvents[ke.GetKey()] = @event;
+            _keyedEvents[ke.GetKey()] = envelope;
         else
-            _events.Add(@event);
+            _events.Add(envelope);
     }
 
-    public void AddRange<T>(IEnumerable<T> events)
+    public void AddRange<T>(
+        IEnumerable<T> events,
+        string? routingKey = null)
     {
-        foreach (var @event in events) Add(@event);
+        foreach (var @event in events)
+            Add(@event, routingKey);
     }
 
-    public IReadOnlyCollection<object> Flush()
+    public IReadOnlyCollection<IntegrationEventEnvelope> Flush()
     {
         var result = _keyedEvents.Values
             .Concat(_events)

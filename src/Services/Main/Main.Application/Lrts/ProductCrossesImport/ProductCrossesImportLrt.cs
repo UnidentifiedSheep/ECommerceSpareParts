@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
@@ -29,11 +30,13 @@ public class ProductCrossesImportLrt(
     IS3StorageService s3Service,
     ISender sender,
     IPublishEndpoint publisher,
+    IApplicationTransactionService transactionService,
     IOptions<S3BucketsOptions> bucketsOptions,
     ILogger<ProductCrossesImportLrt> logger,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions)
     : CsvImportLrtBase<
+        ProductCrossesImportInputState,
         ProductCrossesImportState,
         ProductCrossesImportError,
         ProductCrossesImportLrt.ProductCrossCsvDto,
@@ -42,18 +45,17 @@ public class ProductCrossesImportLrt(
         bucketsOptions,
         unitOfWork,
         publisher,
+        transactionService,
         logger,
         s3Service,
         stringLocalizer,
         localesOptions)
 {
-    private ProducerLookup _producerLookup = ProducerLookup.Empty;
+    private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
     public override string SystemName => nameof(ProductCrossesImportLrt);
     public override string NameLocalizationKey => "lrt.product.crosses.import.name";
     public override string DescriptionLocalizationKey => "lrt.product.crosses.import.description";
-    public override Type InputType => typeof(ProductCrossesImportInputState);
-    public override Type StateType => typeof(ProductCrossesImportState);
 
     protected override async Task BeforeRead(ProductCrossesImportState state)
     {

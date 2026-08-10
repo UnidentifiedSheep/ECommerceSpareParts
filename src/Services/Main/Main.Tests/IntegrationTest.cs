@@ -8,9 +8,7 @@ using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
-using StackExchange.Redis;
 using Tests.Abstractions.Test;
-using Tests.Extensions;
 using Tests.TestContainers.Combined;
 
 namespace Tests;
@@ -31,7 +29,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
             });
         Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        await ResetCache();
+        await ResetDataStoresAsync();
         await SeedDb();
         await LoadLocales();
         await InitializeBasicContexts();
@@ -49,8 +47,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 
     public override async Task DisposeAsync()
     {
-        await ResetDb();
-        await ResetCache();
+        await ResetDataStoresAsync();
         Scope.Dispose();
     }
 
@@ -60,21 +57,4 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
         await scope.SeedAsync<DContext>();
     }
 
-    protected Task ResetDb() { return Context.ClearDatabase(); }
-
-    protected async Task ResetCache()
-    {
-        var multiplexer = Scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>();
-        var database = multiplexer.GetDatabase();
-
-        foreach (var endpoint in multiplexer.GetEndPoints())
-        {
-            var server = multiplexer.GetServer(endpoint);
-            var keys = server.Keys(database.Database).ToArray();
-
-            if (keys.Length == 0) continue;
-
-            await database.KeyDeleteAsync(keys);
-        }
-    }
 }

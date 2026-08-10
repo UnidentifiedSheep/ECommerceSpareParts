@@ -1,4 +1,5 @@
-﻿using Domain.CommonEnums;
+﻿using Domain.CommonEntities.Job.Events;
+using Domain.CommonEnums;
 using Domain.CommonEntities.Job;
 using Domain.Exceptions;
 using FluentAssertions;
@@ -24,6 +25,57 @@ public class JobTests
         job.LeaseHolderId.Should().BeNull();
         job.IsTerminal.Should().BeFalse();
         job.IsCancellationRequested.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Create_RaisesPendingStatusUpdatedEvent()
+    {
+        var job = Create();
+
+        var @event = job.FlushDomainEvents()
+            .OfType<JobStatusUpdatedDomainEvent>()
+            .Should().ContainSingle()
+            .Which;
+
+        @event.JobId.Should().Be(job.Id);
+        @event.Status.Should().Be(JobStatus.Pending);
+        @event.CurrentAttempt.Should().Be(1);
+    }
+
+    [Fact]
+    public void StatusTransitions_BeforeFlush_KeepOnlyLatestStatusEvent()
+    {
+        var leaseHolderId = Guid.NewGuid();
+        var job = Create();
+
+        job.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
+        job.Start(leaseHolderId);
+
+        var @event = job.FlushDomainEvents()
+            .OfType<JobStatusUpdatedDomainEvent>()
+            .Should().ContainSingle()
+            .Which;
+
+        @event.Status.Should().Be(JobStatus.Processing);
+        @event.CurrentAttempt.Should().Be(1);
+    }
+
+    [Fact]
+    public void RegisterAttempt_RaisesStatusEventWithUpdatedAttempt()
+    {
+        var leaseHolderId = Guid.NewGuid();
+        var job = CreateLockedJob(leaseHolderId);
+        job.FlushDomainEvents();
+
+        job.RegisterAttempt(leaseHolderId);
+
+        var @event = job.FlushDomainEvents()
+            .OfType<JobStatusUpdatedDomainEvent>()
+            .Should().ContainSingle()
+            .Which;
+
+        @event.Status.Should().Be(JobStatus.Locked);
+        @event.CurrentAttempt.Should().Be(2);
     }
 
     [Fact]

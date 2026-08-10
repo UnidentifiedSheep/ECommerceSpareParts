@@ -4,7 +4,9 @@ namespace Tests.Extensions;
 
 public static class DbContextExtensions
 {
-    public static async Task ClearDatabase(this DbContext context)
+    public static async Task ClearDatabase(
+        this DbContext context,
+        CancellationToken cancellationToken = default)
     {
         var sql = """
                   DO $$
@@ -14,12 +16,14 @@ public static class DbContextExtensions
                       FOR r IN 
                           SELECT schemaname, tablename
                           FROM pg_tables
-                          WHERE schemaname IN ('auth', 'catalogue_enrichment', 'public')
+                          WHERE schemaname IN ('auth', 'catalogue_enrichment', 'job', 'public')
                       LOOP
                           EXECUTE format('TRUNCATE TABLE %I.%I RESTART IDENTITY CASCADE', r.schemaname, r.tablename);
                       END LOOP;
                   END $$;
                   """;
-        await context.Database.ExecuteSqlRawAsync(sql);
+        await context.Database.ExecuteSqlRawAsync(
+            sql,
+            cancellationToken);
     }
 }

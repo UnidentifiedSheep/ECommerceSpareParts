@@ -1,6 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -20,17 +21,16 @@ public class ProducerSynchronizationLrt(
     IReadRepository<Producer, int> producerRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IApplicationTransactionService transactionService,
     ILogger<ProducerSynchronizationLrt> logger
-) : LrtBase(
+) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository,
     unitOfWork,
     publisher,
+    transactionService,
     logger)
 {
 
-    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
-    public override Type InputType => typeof(NoneInputState);
-    public override Type StateType => typeof(NoneInputState);
     public override string SystemName => nameof(ProducerSynchronizationLrt);
     public override string NameLocalizationKey => "lrt.producer.synchronization.name";
     public override string DescriptionLocalizationKey => "lrt.producer.synchronization.description";
@@ -60,17 +60,17 @@ public class ProducerSynchronizationLrt(
             .ToListAsync(CancellationToken);
 
     private Task PublishEventsAsync(IReadOnlyList<int> ids)
-        => UnitOfWork.ExecuteWithTransaction(
-            settings: TransactionalAttribute.ReadCommited(20, 2),
-            action: async () =>
+        => TransactionService.ExecuteAsync(
+            TransactionalAttribute.ReadCommited(20, 2),
+            async (context, cancellationToken) =>
             {
                 foreach (var id in ids)
                     await Publisher.Publish(new ProducerUpdatedEvent
                     {
                         Id = id
-                    });
+                    }, cancellationToken);
                 
-                await UnitOfWork.SaveChangesAsync(CancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
             },
-            cancellationToken: CancellationToken);
+            CancellationToken);
 }

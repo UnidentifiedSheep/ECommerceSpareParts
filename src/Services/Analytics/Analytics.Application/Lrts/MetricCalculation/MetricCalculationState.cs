@@ -5,11 +5,7 @@ using Enums;
 
 namespace Analytics.Application.Lrts.MetricCalculation;
 
-public record MetricCalculationState
-{
-    [JsonPropertyName("metricId")]
-    public required Guid MetricId { get; init; }
-}
+public record MetricCalculationState : MetricCalculationInputState;
 
 public record MetricCalculationInputState : IInputState
 {

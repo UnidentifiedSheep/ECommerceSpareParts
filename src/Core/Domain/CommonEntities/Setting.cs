@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Text.Json;
+using Domain.CommonEntities.Events;
 using Domain.Interfaces;
 
 namespace Domain.CommonEntities;
@@ -22,7 +23,24 @@ public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, st
         return x => x.Key == key;
     }
 
-    public void SetData(string json) { Json = json; }
+    public void SetData(string json)
+    {
+        Json = json;
+        RaiseUpdatedEvent();
+    }
+
+    public override void OnCreated()
+    {
+        RaiseUpdatedEvent();
+    }
+
+    private void RaiseUpdatedEvent()
+    {
+        AddDomainEvent(new SettingUpdatedDomainEvent(
+            Key,
+            Json,
+            DateTime.UtcNow));
+    }
 
     public override string GetId() { return Key; }
 }
@@ -44,7 +62,7 @@ public abstract class Setting<T> : Setting
 
     public void SetData(T data)
     {
-        Json = Serialize(data);
+        base.SetData(Serialize(data));
         _data = data;
     }
 

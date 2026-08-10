@@ -42,7 +42,7 @@ builder.Services
     .AddSystemOptions()
     .AddSecretEncryptionOptions();
 
-builder.Services.AddCommonWorkerInfrastructure();
+builder.Services.AddCommonWorkerInfrastructure(ServicesDefinitions.Pricing);
 
 builder.AddLokiLogger(
     builder.Configuration,

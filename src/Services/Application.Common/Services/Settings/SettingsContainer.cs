@@ -33,13 +33,28 @@ public class SettingsContainer : ISettingsContainer
         return false;
     }
 
-    public void Set<T>(T setting) where T : Setting
+    public void Load(IEnumerable<Setting> settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+
+        foreach (var setting in settings)
+            SetCore(setting);
+
+        Loaded = true;
+    }
+
+    public void Set(Setting setting)
     {
         ArgumentNullException.ThrowIfNull(setting);
+        SetCore(setting);
+        Loaded = true;
+    }
+
+    private void SetCore(Setting setting)
+    {
         _settings.AddOrUpdate(
-            typeof(T),
+            setting.GetType(),
             setting,
             (_, _) => setting);
-        Loaded = true;
     }
 }

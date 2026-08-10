@@ -51,11 +51,9 @@ public class CatalogueCandidate :
 
     public override int GetId() => Id;
 
-    public static Expression<Func<CatalogueCandidate, int>>
-        GetKeySelector()
+    public static Expression<Func<CatalogueCandidate, int>> GetKeySelector() 
         => x => x.Id;
 
-    public static Expression<Func<CatalogueCandidate, bool>>
-        GetEqualityExpression(int key)
+    public static Expression<Func<CatalogueCandidate, bool>> GetEqualityExpression(int key) 
         => x => x.Id == key;
 }

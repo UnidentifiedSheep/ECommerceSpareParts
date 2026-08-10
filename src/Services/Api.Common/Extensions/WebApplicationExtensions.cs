@@ -25,6 +25,7 @@ public static class WebApplicationExtensions
         app.MapCarter();
         app.UseSwagger();
         app.MapHealthChecks("/health");
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
         return app;
     }

@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
@@ -32,27 +33,27 @@ public class ProductImportLrt(
     IS3StorageService s3Service,
     ISender sender,
     IPublishEndpoint publisher,
+    IApplicationTransactionService transactionService,
     IOptions<S3BucketsOptions> bucketsOptions,
     ILogger<ProductImportLrt> logger,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
 )
-    : CsvImportLrtBase<ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto,
+    : CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto,
         CreateProductDto>(
         jobRepository,
         bucketsOptions,
         unitOfWork,
         publisher,
+        transactionService,
         logger,
         s3Service,
         stringLocalizer,
         localesOptions)
 {
-    private ProducerLookup _producerLookup = ProducerLookup.Empty;
+    private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
     protected override int BatchSize => 1000;
-    public override Type InputType => typeof(ProductImportInputState);
-    public override Type StateType => typeof(ProductImportState);
     public override string SystemName => nameof(ProductImportLrt);
     public override string NameLocalizationKey => "lrt.product.import.name";
     public override string DescriptionLocalizationKey => "lrt.product.import.description";

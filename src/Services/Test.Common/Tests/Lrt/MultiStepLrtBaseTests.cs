@@ -3,6 +3,7 @@ using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
@@ -75,8 +76,8 @@ public sealed class MultiStepLrtBaseTests
         await fixture.ExecuteAsync();
 
         fixture.Parent.Status.Should().Be(JobStatus.Failed);
-        fixture.Child.Status.Should().Be(JobStatus.Blocked);
-        fixture.SecondRoot.Status.Should().Be(JobStatus.Pending);
+        fixture.Child.Status.Should().Be(JobStatus.Cancelled);
+        fixture.SecondRoot.Status.Should().Be(JobStatus.Cancelled);
     }
 
     private sealed class Fixture
@@ -114,6 +115,9 @@ public sealed class MultiStepLrtBaseTests
             Lrt = new TestMultiStepLrt(
                 JobRepository.Object,
                 UnitOfWork.Object,
+                new ApplicationTransactionServiceStub(
+                    UnitOfWork.Object,
+                    Mock.Of<IRepositoryProvider>()),
                 Publisher,
                 Logger.Object);
 
@@ -188,23 +192,20 @@ public sealed class MultiStepLrtBaseTests
     private sealed class TestMultiStepLrt(
         IRepository<Job, Guid> jobRepository,
         IUnitOfWork unitOfWork,
+        IApplicationTransactionService transactionService,
         IPublishEndpoint publisher,
         ILogger logger)
-        : MultiStepLrtBase(
+        : MultiStepLrtBase<NoneInputState, NoneInputState>(
             jobRepository,
             unitOfWork,
             publisher,
+            transactionService,
             logger)
     {
-        public override IServiceDefinition ServiceDefinition { get; } =
-            new TestServiceDefinition();
         public override string SystemName => nameof(TestMultiStepLrt);
         public override string NameLocalizationKey => "test-multi-step-lrt-name";
         public override string DescriptionLocalizationKey =>
             "test-multi-step-lrt-description";
-        public override Type InputType => typeof(NoneInputState);
-        public override Type StateType => typeof(NoneInputState);
-
         protected override void ConfigureSteps(
             IMultiStepJobBuilder builder,
             string initialState)
@@ -225,8 +226,4 @@ public sealed class MultiStepLrtBaseTests
         return lrt.Object;
     }
 
-    private sealed class TestServiceDefinition : IServiceDefinition
-    {
-        public string ServiceName => "test-service";
-    }
 }

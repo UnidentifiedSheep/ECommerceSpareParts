@@ -56,23 +56,18 @@ public class CreateSaleTests : IntegrationTest
 
         var result = await Mediator.Send(command);
 
-        result.Sale.Id.Should().NotBeEmpty();
-        result.Sale.Buyer.Id.Should().Be(buyer.Id);
-        result.Sale.Organization.Id.Should().Be(buyer.Id);
-        result.Sale.Currency.Id.Should().Be(storageContent.CurrencyId);
-        result.Sale.Storage.Should().Be(storageContent.StorageName);
-        result.Sale.Comment.Should().Be(command.Comment);
-        result.Sale.TotalSum.Should().Be(80m);
+        result.SaleId.Should().NotBeEmpty();
 
         var sale = await Context.Sales
             .Include(x => x.Contents)
             .ThenInclude(x => x.Details)
             .AsNoTracking()
-            .SingleAsync(x => x.Id == result.Sale.Id);
+            .SingleAsync(x => x.Id == result.SaleId);
         sale.UserId.Should().Be(buyer.Id);
         sale.OrganizationId.Should().Be(buyer.Id);
         sale.CurrencyId.Should().Be(storageContent.CurrencyId);
         sale.StorageName.Should().Be(storageContent.StorageName);
+        sale.Comment.Should().Be(command.Comment);
 
         var saleContent = sale.Contents.Should().ContainSingle().Subject;
         saleContent.ProductId.Should().Be(storageContent.ProductId);
@@ -315,13 +310,12 @@ public class CreateSaleTests : IntegrationTest
 
         var result = await Mediator.Send(command);
 
-        result.Sale.TotalSum.Should().Be(270m);
-
         var sale = await Context.Sales
             .Include(x => x.Contents)
             .ThenInclude(x => x.Details)
             .AsNoTracking()
-            .SingleAsync(x => x.Id == result.Sale.Id);
+            .SingleAsync(x => x.Id == result.SaleId);
+        sale.Contents.Sum(x => x.TotalSum).Should().Be(270m);
         sale.Contents.Should().HaveCount(2);
         sale.Contents.Sum(x => x.Count).Should().Be(2);
         sale.Contents.SelectMany(x => x.Details).Sum(x => x.Count).Should().Be(2);
@@ -406,7 +400,7 @@ public class CreateSaleTests : IntegrationTest
 
         var result = await Mediator.Send(command);
 
-        result.Sale.Id.Should().NotBeEmpty();
+        result.SaleId.Should().NotBeEmpty();
         var salesCount = await Context.Sales.AsNoTracking().CountAsync();
         salesCount.Should().Be(1);
     }

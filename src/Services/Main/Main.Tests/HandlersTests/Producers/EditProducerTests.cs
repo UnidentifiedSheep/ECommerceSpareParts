@@ -103,13 +103,12 @@ public class EditProducerTests : IntegrationTest
             }
         };
         var command = new EditProducerCommand(producer.Id, model);
-        var act = () => Mediator.Send(command);
-
-        await act.Should().NotThrowAsync();
+        var edited = await Mediator.Send(command);
 
         var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
         dbProducer.Should().NotBeNull();
 
+        edited.ProducerId.Should().Be(producer.Id);
         dbProducer.Name.Should().Be(Producer.ToNormalizedName(model.Name.Value));
         dbProducer.Description.Should().Be(model.Description.Value);
     }

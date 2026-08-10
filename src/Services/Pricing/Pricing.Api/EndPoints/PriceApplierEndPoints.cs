@@ -46,6 +46,8 @@ public record GetPriceAppliersResponse
     public required IReadOnlyList<PriceApplierDto> Appliers { get; init; }
 }
 
+public record GetPriceApplierResponse(PriceApplierDto Applier);
+
 public class PriceApplierEndPoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -77,6 +79,26 @@ public class PriceApplierEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.PRICE_APPLIERS_MANAGE);
 
+        priceAppliers.MapGet(
+                "/{systemName}",
+                async (
+                    ISender sender,
+                    string systemName,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetPriceApplierQuery(systemName),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new GetPriceApplierResponse(result.Applier));
+                })
+            .WithName("GetPriceApplier")
+            .WithSummary("Получить правило формирования цены")
+            .Produces<GetPriceApplierResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.PRICE_APPLIERS_MANAGE);
+
         priceAppliers.MapPost(
                 "",
                 async (
@@ -90,11 +112,14 @@ public class PriceApplierEndPoints : ICarterModule
                         request.DslLogic,
                         request.States);
                     var result = await sender.Send(command, cancellationToken);
+                    var applier = await sender.Send(
+                        new GetPriceApplierQuery(result.SystemName),
+                        cancellationToken);
 
                     return Results.Ok(
                         new UpsertPriceApplierResponse
                         {
-                            Applier = result.Applier
+                            Applier = applier.Applier
                         });
                 })
             .WithName("UpsertPriceApplier")

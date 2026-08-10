@@ -51,7 +51,13 @@ public class ProducersEndPoints : ICarterModule
                     CancellationToken token) =>
                 {
                     var result = await sender.Send(new CreateProducerCommand(request.NewProducer), token);
-                    return Results.Created("/producers", new CreateProducerResponse(result.Producer));
+                    var producer = await sender.Send(
+                        new GetProducerByIdQuery(result.ProducerId),
+                        token);
+
+                    return Results.Created(
+                        $"/producers/{result.ProducerId}",
+                        new CreateProducerResponse(producer.Producer));
                 })
             .WithName("CreateProducer")
             .WithSummary("Создать производителя")
@@ -72,7 +78,11 @@ public class ProducersEndPoints : ICarterModule
                 {
                     var result = await sender
                         .Send(new EditProducerCommand(producerId, request.EditProducer), cancellationToken);
-                    return Results.Ok(new PatchProducerResponse(result.Producer));
+                    var producer = await sender.Send(
+                        new GetProducerByIdQuery(result.ProducerId),
+                        cancellationToken);
+
+                    return Results.Ok(new PatchProducerResponse(producer.Producer));
                 })
             .WithName("EditProducer")
             .WithSummary("Редактировать производителя")

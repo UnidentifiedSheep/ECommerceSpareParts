@@ -4,10 +4,8 @@ using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.NamedObjects.Metrics;
 using Analytics.Entities.Exceptions;
 using Analytics.Entities.Metrics;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
-using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 
@@ -21,13 +19,12 @@ public record UpsertMetricCommand(
     string InputPayload
 ) : ICommand<UpsertMetricResult>;
 
-public record UpsertMetricResult(MetricDto Metric);
+public record UpsertMetricResult(Guid MetricId);
 
 public class UpsertMetricHandler(
     IMetricRepository metricRepository,
     IUnitOfWork unitOfWork,
-    INamedObjectRegistry<MetricDefinitionNamedObjectBase> registry,
-    IProjectionProvider<Metric, MetricDto> projection
+    INamedObjectRegistry<MetricDefinitionNamedObjectBase> registry
 )
     : ICommandHandler<UpsertMetricCommand, UpsertMetricResult>
 {
@@ -35,7 +32,6 @@ public class UpsertMetricHandler(
         UpsertMetricCommand request,
         CancellationToken cancellationToken)
     {
-        var toDto = projection.Projection.AsFunc();
         var metricDefinition = registry.TryGetBySystemName(request.MetricSystemName)
                                ?? throw new MetricNotFoundException();
         var metric = metricDefinition.CreateMetricUntyped(request.InputPayload);
@@ -48,12 +44,10 @@ public class UpsertMetricHandler(
         var existingMetric = await metricRepository
             .FirstOrDefaultAsync(criteria, cancellationToken);
         if (existingMetric is not null)
-            return new UpsertMetricResult(toDto(existingMetric));
+            return new UpsertMetricResult(existingMetric.Id);
 
         metric.MarkDirty();
         await unitOfWork.AddAsync(metric, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return new UpsertMetricResult(toDto(metric));
+        return new UpsertMetricResult(metric.Id);
     }
 }

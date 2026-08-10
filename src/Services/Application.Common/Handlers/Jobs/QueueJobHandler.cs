@@ -1,9 +1,7 @@
 ﻿using Abstractions.Interfaces.Persistence;
 using Application.Common.Dtos;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.Projections;
 using Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
@@ -38,12 +36,11 @@ public sealed record QueueJobItem(
     int MaxAttempts
 );
 
-public sealed record QueueJobResult(IReadOnlyList<JobDto> Jobs);
+public sealed record QueueJobResult(IReadOnlyList<Guid> JobIds);
 
 public sealed class QueueJobHandler(
     IJobCreationDispatcher jobCreationDispatcher,
-    IUnitOfWork unitOfWork,
-    IProjectionProvider<Job, JobDto> projection
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<QueueJobCommand, QueueJobResult>
 {
     public async Task<QueueJobResult> Handle(
@@ -59,7 +56,7 @@ public sealed class QueueJobHandler(
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        var toDto = projection.Projection.AsFunc();
-        return new QueueJobResult(toAdd.Select(toDto).ToList());
+
+        return new QueueJobResult(toAdd.Select(x => x.Id).ToList());
     }
 }

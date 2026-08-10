@@ -34,17 +34,11 @@ public class CreateProductReservationTests : IntegrationTest
 
         var result = await Mediator.Send(command);
 
-        result.Reservation.Id.Should().BeGreaterThan(0);
-        result.Reservation.Organization.Id.Should().Be(dto.OrganizationId);
-        result.Reservation.ReservedCount.Should().Be(dto.ReservedCount);
-        result.Reservation.CurrentCount.Should().Be(dto.CurrentCount);
-        result.Reservation.ProposedPrice.Should().Be(dto.ProposedPrice);
-        result.Reservation.ProposedCurrencyId.Should().Be(dto.GivenCurrencyId);
-        result.Reservation.Comment.Should().Be(dto.Comment);
+        result.ReservationId.Should().BeGreaterThan(0);
 
         var db = await Context.ProductReservations
             .AsNoTracking()
-            .SingleAsync(x => x.Id == result.Reservation.Id);
+            .SingleAsync(x => x.Id == result.ReservationId);
 
         db.Comment.Should().Be(dto.Comment);
         db.ProductId.Should().Be(dto.ProductId);
@@ -81,11 +75,9 @@ public class CreateProductReservationTests : IntegrationTest
 
         var result = await Mediator.Send(command);
 
-        result.Reservation.Status.Should().Be(ProductReservationStatus.Done);
-
         var db = await Context.ProductReservations
             .AsNoTracking()
-            .SingleAsync(x => x.Id == result.Reservation.Id);
+            .SingleAsync(x => x.Id == result.ReservationId);
         db.Status.Should().Be(ProductReservationStatus.Done);
     }
 
@@ -100,9 +92,12 @@ public class CreateProductReservationTests : IntegrationTest
         var command = new CreateProductReservationCommand(dto);
 
         var result = await Mediator.Send(command);
+        var reservation = await Context.ProductReservations
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == result.ReservationId);
 
-        result.Reservation.ProposedPrice.Should().BeNull();
-        result.Reservation.ProposedCurrencyId.Should().BeNull();
+        reservation.ProposedPrice.Should().BeNull();
+        reservation.ProposedCurrencyId.Should().BeNull();
     }
 
     [Theory]

@@ -5,6 +5,7 @@ using Enums;
 using Main.Application.Dtos.Organizations;
 using Main.Application.Handlers.Organizations;
 using Main.Application.Handlers.Organizations.GetOrganizations;
+using Main.Application.Handlers.Organizations.UpdateOrganization;
 using Main.Enums.Organization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,9 @@ public record GetOrganizationsRequest : SortablePaginationQueryModel
 }
 
 public record GetOrganizationsResponse(IReadOnlyList<OrganizationListItemDto> Organizations);
+public record GetOrganizationResponse(OrganizationDto Organization);
+public record UpdateOrganizationRequest(PatchOrganizationDto Organization);
+public record UpdateOrganizationResponse(OrganizationDto Organization);
 public record IsOrganizationSystemNameAvailableResponse(bool IsAvailable);
 
 public class OrganizationEndPoints : ICarterModule
@@ -34,6 +38,79 @@ public class OrganizationEndPoints : ICarterModule
             .WithTags("Organizations");
 
         organizations.MapOrganizationMemberEndPoints();
+
+        organizations.MapGet(
+                "/{organizationId:guid}",
+                async (
+                    ISender sender,
+                    Guid organizationId,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetOrganizationQuery(organizationId),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new GetOrganizationResponse(result.Organization));
+                })
+            .WithName("GetOrganizationById")
+            .WithSummary("Получить организацию по идентификатору")
+            .WithDescription("Получение организации по её идентификатору")
+            .Produces<GetOrganizationResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ORGANIZATIONS_GET);
+
+        organizations.MapGet(
+                "/system-names/{systemName}",
+                async (
+                    ISender sender,
+                    string systemName,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetOrganizationQuery(systemName),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new GetOrganizationResponse(result.Organization));
+                })
+            .WithName("GetOrganizationBySystemName")
+            .WithSummary("Получить организацию по системному имени")
+            .WithDescription("Получение организации по её системному имени")
+            .Produces<GetOrganizationResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ORGANIZATIONS_GET);
+
+        organizations.MapPatch(
+                "/{organizationId:guid}",
+                async (
+                    ISender sender,
+                    Guid organizationId,
+                    UpdateOrganizationRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var organizationIdResult = await sender.Send(
+                        new UpdateOrganizationCommand(
+                            organizationId,
+                            request.Organization),
+                        cancellationToken);
+
+                    var result = await sender.Send(
+                        new GetOrganizationQuery(
+                            organizationIdResult.OrganizationId),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new UpdateOrganizationResponse(result.Organization));
+                })
+            .WithName("UpdateOrganization")
+            .WithSummary("Обновить организацию")
+            .WithDescription("Обновление изменяемых полей организации")
+            .Accepts<UpdateOrganizationRequest>("application/json")
+            .Produces<UpdateOrganizationResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ORGANIZATIONS_EDIT);
 
         organizations.MapGet(
                 "/system-names/{systemName}/availability",

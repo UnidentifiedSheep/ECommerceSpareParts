@@ -6,11 +6,13 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Enums;
 using Exceptions.Base;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Dtos.Users;
+using Main.Application.Extensions;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Enums;
@@ -47,6 +49,7 @@ public class LoginHandler(
     {
         var criteria = Criteria<User>
             .New()
+            .WhereDoesNotHaveRole(Role.System)
             .Include(x => x.UserInfo)
             .Track()
             .Build();

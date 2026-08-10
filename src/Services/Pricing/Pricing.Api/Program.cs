@@ -21,7 +21,6 @@ using Integrations.Supplier.DI;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
-using OpenTelemetry.Metrics;
 using Pricing.Api;
 using Pricing.Api.Startup;
 using Pricing.Application;
@@ -49,7 +48,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddDatabaseOptions()
     .AddSecretEncryptionOptions();
 
-builder.Services.AddCommonApiInfrastructure();
+builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Pricing);
 
 var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 
@@ -124,15 +123,6 @@ builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
 builder.Services.AddSignalR();
-builder.Services.AddOpenTelemetry()
-    .WithMetrics(metrics =>
-    {
-        metrics
-            .AddAspNetCoreInstrumentation()
-            .AddProcessInstrumentation()
-            .AddRuntimeInstrumentation()
-            .AddPrometheusExporter();
-    });
 
 var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(
@@ -144,7 +134,6 @@ var app = builder.Build();
 
 app.UseCommonApiPipeline();
 
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.MapHub<JobHub>("/hubs/jobs");
 
 await app.RunAsync();

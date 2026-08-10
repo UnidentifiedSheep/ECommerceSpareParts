@@ -51,6 +51,8 @@ public record CreateJobResponse
     public required JobDto Job { get; init; }
 }
 
+public record GetJobResponse(JobDto Job);
+
 public record GetJobStateResponse
 {
     [JsonPropertyName("state")]
@@ -110,6 +112,22 @@ public class JobEndPoints : ICarterModule
             .Produces<GetJobsResponse>()
             .RequireAllPermissions(PermissionCodes.JOBS_GET);
 
+        jobs.MapGet(
+                "{id:guid}",
+                async (
+                    ISender sender,
+                    Guid id,
+                    CancellationToken ct) =>
+                {
+                    var result = await sender.Send(new GetJobQuery(id), ct);
+                    return Results.Ok(new GetJobResponse(result.Job));
+                })
+            .WithName("GetJob")
+            .WithDisplayName("Get job by id")
+            .Produces<GetJobResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAllPermissions(PermissionCodes.JOBS_GET);
+
         jobs.MapGet("{id:guid}/cancel",
                 async (
                     ISender sender,
@@ -157,12 +175,15 @@ public class JobEndPoints : ICarterModule
                             request.InputState,
                             request.MaxAttempts),
                         ct);
+                    var job = await sender.Send(
+                        new GetJobQuery(result.JobIds[0]),
+                        ct);
 
                     return Results.Created(
-                        $"/jobs/{result.Jobs[0].Id}",
+                        $"/jobs/{result.JobIds[0]}",
                         new CreateJobResponse
                         {
-                            Job = result.Jobs[0]
+                            Job = job.Job
                         });
                 })
             .WithName("CreateJob")

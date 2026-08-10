@@ -18,12 +18,10 @@ public record CreateOrganizationCommand(
     string SystemName
 ) : ICommand<CreateOrganizationResult>;
 
-public record CreateOrganizationResult(OrganizationDto Organization);
+public record CreateOrganizationResult(Guid OrganizationId);
 
 public class CreateOrganizationHandler(
-    IUnitOfWork unitOfWork,
-    IReadRepository<Organization, Guid> organizationRepository,
-    IProjectionProvider<Organization, OrganizationDto> projection)
+    IUnitOfWork unitOfWork)
     : ICommandHandler<CreateOrganizationCommand, CreateOrganizationResult>
 {
     public async Task<CreateOrganizationResult> Handle(
@@ -36,11 +34,7 @@ public class CreateOrganizationHandler(
             request.OwnerId);
 
         await unitOfWork.AddAsync(organization, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        var dbValue = await organizationRepository.Query
-            .Project(projection)
-            .FirstAsync(x => x.Id == organization.Id, cancellationToken);
-        return new CreateOrganizationResult(dbValue);
+        return new CreateOrganizationResult(organization.Id);
     }
 }

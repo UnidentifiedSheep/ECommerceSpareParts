@@ -1,15 +1,21 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
+using Application.Common.DomainEventHandlers.Settings;
 using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
+using Application.Common.Models;
 using Application.Common.NamedObject;
 using Application.Common.Services;
 using Application.Common.Services.Events;
+using Application.Common.Services.Persistence;
 using Application.Common.Services.Settings;
+using Domain.CommonEntities.Events;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,13 +31,14 @@ public static class ServiceCollectionExtensions
         return collection;
     }
 
-    public static IServiceCollection RegisterSettingsService<TSettingFactory>(
+    public static IServiceCollection RegisterSettingsService(
         this IServiceCollection collection)
-        where TSettingFactory : class, ISettingFactory
     {
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddScoped<ISettingsService, SettingsService>();
-        collection.AddSingleton<ISettingFactory, TSettingFactory>();
+        collection.AddScoped<
+            INotificationHandler<Batch<SettingUpdatedDomainEvent>>,
+            PublishSettingUpdatedEventHandler>();
 
         collection.TryAddScoped<
             IRequestHandler<UpdateSettingCommand, UpdateSettingResult>,
@@ -101,6 +108,20 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterDomainEventScope(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventScope, DomainEventScope>();
+        services.AddScoped<IDomainEventExecutor, DomainEventExecutor>();
+        return services;
+    }
+
+    public static IServiceCollection RegisterApplicationTransactions(
+        this IServiceCollection services)
+    {
+        services.AddScoped<IRepositoryProvider, RepositoryProvider>();
+        services.AddScoped<
+            IApplicationTransactionContext,
+            ApplicationTransactionContext>();
+        services.AddScoped<
+            IApplicationTransactionService,
+            ApplicationTransactionService>();
         return services;
     }
 
@@ -159,5 +180,12 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<INamedObjectGroupResolver, NamedObjectGroupResolver>();
 
         return services;
+    }
+
+    public static IServiceCollection AddCqrsMetrics(this IServiceCollection collection)
+    {
+        collection.AddMetrics();
+        collection.AddSingleton<CqrsMetrics>();
+        return collection;
     }
 }

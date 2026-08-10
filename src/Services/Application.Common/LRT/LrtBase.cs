@@ -3,9 +3,9 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Job;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Domain.Exceptions;
@@ -14,28 +14,36 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Common.LRT;
 
-public abstract class LrtBase(
+public abstract class LrtBase<TInputState, TState>(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
+    IApplicationTransactionService transactionService,
     ILogger logger
 ) : ILrtNamedObject
+    where TInputState : class, IInputState
+    where TState : class, TInputState
 {
     protected IUnitOfWork UnitOfWork => unitOfWork;
+    protected IApplicationTransactionService TransactionService => transactionService;
     protected IRepository<Job, Guid> JobRepository => jobRepository;
     protected ILogger Logger => logger;
     protected IPublishEndpoint Publisher => publisher;
     protected CancellationToken CancellationToken { get; private set; }
     private Job? _job;
+    private TState? _state;
     protected Job Job => _job ?? throw new InvalidOperationException("Job is not initialized");
+    protected TState State => _state ??
+                              throw new InvalidOperationException("LRT state is not initialized");
     protected Guid JobId { get; private set; }
     protected Guid LeaseHolderId { get; private set; }
     protected bool Initialized { get; private set; }
     protected virtual TimeSpan LeaseDuration => TimeSpan.FromMinutes(5);
-    public abstract IServiceDefinition ServiceDefinition { get; }
     public abstract string SystemName { get; }
     public abstract string NameLocalizationKey { get; }
     public abstract string DescriptionLocalizationKey { get; }
+    public Type InputType => typeof(TInputState);
+    public Type StateType => typeof(TState);
 
     public async Task ExecuteAsync(
         Guid jobId,
@@ -46,6 +54,8 @@ public abstract class LrtBase(
         JobId = jobId;
         LeaseHolderId = leaseHolderId;
         Initialized = false;
+        _job = null;
+        _state = null;
 
         logger.LogInformation(
             "LRT execution started. JobId: {JobId}",
@@ -103,6 +113,7 @@ public abstract class LrtBase(
             {
                 if (await AttemptOrFailJobAsync(e))
                 {
+                    await ReloadStateAsync();
                     logger.LogWarning(
                         e,
                         "LRT execution attempt failed. JobId: {JobId}, Attempts: {Attempts}/{MaxAttempts}",
@@ -122,34 +133,36 @@ public abstract class LrtBase(
             }
     }
 
-    public abstract Type InputType { get; }
-    public abstract Type StateType { get; }
-
-    protected virtual Task InitJobAsync() { return GetJobAsync(); }
+    protected virtual Task InitJobAsync() { return ReloadStateAsync(); }
 
     protected void Interrupt(string reason) { throw new LrtInterruptedException(reason); }
 
-    protected async Task<T?> GetStateAsync<T>()
+    protected async Task ReloadStateAsync()
     {
         await GetJobAsync();
-        return string.IsNullOrWhiteSpace(Job.State)
-            ? default
-            : JsonSerializer.Deserialize<T>(Job.State);
+        _state = string.IsNullOrWhiteSpace(Job.State)
+            ? throw new InvalidOperationException(
+                $"LRT '{SystemName}' state is empty.")
+            : JsonSerializer.Deserialize<TState>(Job.State)
+              ?? throw new InvalidOperationException(
+                  $"LRT '{SystemName}' state could not be deserialized as '{StateType.Name}'.");
     }
 
-    protected async Task UpdateState<T>(T? state)
+    protected async Task SaveStateAsync(TState state)
     {
         var json = JsonSerializer.Serialize(state);
-        await unitOfWork.ExecuteWithTransaction(
+        await transactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            async () =>
+            async (context, cancellationToken) =>
             {
                 await GetJobAsync();
                 Job.SetState(json, LeaseHolderId);
                 Job.RenewLease(LeaseHolderId, LeaseDuration);
-                await unitOfWork.SaveChangesAsync(CancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
             },
             CancellationToken);
+
+        _state = state;
     }
 
     protected async Task GetJobAsync()
@@ -163,15 +176,14 @@ public abstract class LrtBase(
 
     protected virtual async Task ProcessingJobAsync()
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await transactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            async () =>
+            async (context, cancellationToken) =>
             {
                 await GetJobAsync();
                 Job.Start(LeaseHolderId);
                 Job.RenewLease(LeaseHolderId, LeaseDuration);
-                await PublishStatusUpdatedEvent(Job);
-                await unitOfWork.SaveChangesAsync(CancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
                 logger.LogInformation(
                     "LRT job processing started. JobId: {JobId}",
                     JobId);
@@ -183,23 +195,21 @@ public abstract class LrtBase(
         Exception exception,
         bool forceFail = false)
     {
-        return await unitOfWork.ExecuteWithTransaction(
+        return await transactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            async () =>
+            async (context, cancellationToken) =>
             {
                 await GetJobAsync();
 
                 if (Job.CanRetry() && !forceFail)
                 {
                     Job.RegisterAttempt(LeaseHolderId);
-                    await PublishStatusUpdatedEvent(Job);
-                    await unitOfWork.SaveChangesAsync(CancellationToken);
+                    await context.UnitOfWork.SaveChangesAsync(cancellationToken);
                     return true;
                 }
 
                 Job.Fail(LeaseHolderId, exception.Message);
-                await PublishStatusUpdatedEvent(Job);
-                await unitOfWork.SaveChangesAsync(CancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return false;
             },
             CancellationToken);
@@ -207,55 +217,40 @@ public abstract class LrtBase(
 
     protected virtual async Task SucceedJobAsync()
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await transactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            async () =>
+            async (context, cancellationToken) =>
             {
                 await GetJobAsync();
                 Job.Succeed(LeaseHolderId);
-                await PublishStatusUpdatedEvent(Job);
-                await unitOfWork.SaveChangesAsync(CancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
             },
             CancellationToken);
     }
 
     protected virtual async Task CancelJobAsync()
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await transactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            async () =>
+            async (context, cancellationToken) =>
             {
                 await GetJobAsync();
                 Job.Cancel(LeaseHolderId);
-                await PublishStatusUpdatedEvent(Job);
-                await unitOfWork.SaveChangesAsync(CancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
             },
             CancellationToken);
     }
 
     protected async Task RenewLeaseAsync(TimeSpan leaseDuration)
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await transactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            async () =>
+            async (context, cancellationToken) =>
             {
                 await GetJobAsync();
                 Job.RenewLease(LeaseHolderId, leaseDuration);
-                await unitOfWork.SaveChangesAsync(CancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
             },
-            CancellationToken);
-    }
-
-    protected async Task PublishStatusUpdatedEvent(Job job)
-    {
-        await publisher.Publish(
-            new JobStatusUpdatedEvent
-            {
-                JobId = job.Id,
-                Status = job.Status.ToString(),
-                CurrentAttempt = job.Attempts
-            },
-            conf => conf.SetRoutingKey(ServiceDefinition.ServiceName),
             CancellationToken);
     }
 

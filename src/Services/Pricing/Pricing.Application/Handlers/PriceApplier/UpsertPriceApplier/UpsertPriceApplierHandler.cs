@@ -1,12 +1,9 @@
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
-using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions;
-using Localization.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
@@ -24,15 +21,13 @@ public record UpsertPriceApplierCommand(
     string? DslLogic,
     IReadOnlyList<UpsertPriceApplierStateDto> States
     ) : ICommand<UpsertPriceApplierResult>;
-public record UpsertPriceApplierResult(PriceApplierDto Applier);
+public record UpsertPriceApplierResult(string SystemName);
 
 public class UpsertPriceApplierHandler(
     INamedObjectRegistry<ApplierNamedObjectBase> registry,
     IRepository<Entities.Pricing.PriceApplier, string> repository,
     IReadRepository<PriceApplierState, PriceApplierStateKey> stateRepository,
-    IScopedStringLocalizer localizer,
-    IUnitOfWork unitOfWork,
-    IProjectionProvider<Entities.Pricing.PriceApplier, PriceApplierDto> projection
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<UpsertPriceApplierCommand, UpsertPriceApplierResult>
 {
     public async Task<UpsertPriceApplierResult> Handle(
@@ -94,11 +89,7 @@ public class UpsertPriceApplierHandler(
 
         model.RemoveStatesExcept(request.States.Select(x => x.Usage));
         
-        var result = projection.Projection.AsFunc()(model);
-        if (local is not null)
-            result = result with { Name = local.GetLocalizedName(localizer) };
-
-        return new UpsertPriceApplierResult(result);
+        return new UpsertPriceApplierResult(model.SystemName);
     }
 
     private static void UpdateState(

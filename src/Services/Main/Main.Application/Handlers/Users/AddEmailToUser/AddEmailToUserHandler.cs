@@ -1,7 +1,6 @@
 using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
@@ -28,11 +27,11 @@ public record AddEmailToUserCommand(
     EmailType EmailType) : ICommand<AddEmailToUserResult>;
 
 public record AddEmailToUserResult(
-    UserEmailDto Email);
+    Guid UserId,
+    string Email);
 
 public class AddEmailToUserHandler(
     IOptions<UserEmailOptions> options,
-    IProjectionProvider<UserEmail, UserEmailDto> projectionProvider,
     IUserRepository userRepository,
     IReadRepository<UserEmail, string> emailRepository)
     : ICommandHandler<AddEmailToUserCommand, AddEmailToUserResult>
@@ -69,9 +68,6 @@ public class AddEmailToUserHandler(
             request.EmailType,
             options.Value.MaxEmailCount);
 
-        return new AddEmailToUserResult(projectionProvider
-            .Projection
-            .AsFunc()
-            (user.Emails.First(x => x.Email == email)));
+        return new AddEmailToUserResult(user.Id, email.Value);
     }
 }

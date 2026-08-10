@@ -47,6 +47,8 @@ public sealed record UpsertMetricResponse
     public required MetricDto Metric { get; init; }
 }
 
+public sealed record GetMetricResponse(MetricDto Metric);
+
 public sealed record GetMetricJobsResponse
 {
     [JsonPropertyName("jobs")]
@@ -101,6 +103,25 @@ public class MetricEndPoints : ICarterModule
             .Produces<GetMetricsResponse>()
             .RequireAnyPermission(PermissionCodes.METRICS_GET);
 
+        metrics.MapGet(
+                "/{metricId:guid}",
+                async (
+                    ISender sender,
+                    Guid metricId,
+                    CancellationToken token) =>
+                {
+                    var result = await sender.Send(
+                        new GetMetricQuery(metricId),
+                        token);
+
+                    return Results.Ok(new GetMetricResponse(result.Metric));
+                })
+            .WithName("GetMetric")
+            .WithDescription("Возвращает метрику по идентификатору")
+            .Produces<GetMetricResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.METRICS_GET);
+
         metrics.MapPost(
                 "",
                 async (
@@ -113,11 +134,14 @@ public class MetricEndPoints : ICarterModule
                             request.MetricSystemName,
                             request.InputPayload),
                         token);
+                    var metric = await sender.Send(
+                        new GetMetricQuery(result.MetricId),
+                        token);
 
                     return Results.Ok(
                         new UpsertMetricResponse
                         {
-                            Metric = result.Metric
+                            Metric = metric.Metric
                         });
                 })
             .WithName("UpsertMetric")

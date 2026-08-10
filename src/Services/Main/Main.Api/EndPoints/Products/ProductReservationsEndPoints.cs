@@ -6,6 +6,7 @@ using Main.Application.Dtos.Product.Reservation;
 using Main.Application.Handlers.ProductReservations.CreateProductReservation;
 using Main.Application.Handlers.ProductReservations.DeleteProductReservation;
 using Main.Application.Handlers.ProductReservations.EditProductReservation;
+using Main.Application.Handlers.ProductReservations.GetProductReservation;
 using Main.Application.Handlers.ProductReservations.GetProductReservations;
 using Main.Application.Handlers.ProductReservations.GetReservationHistory;
 using Main.Entities.Event;
@@ -25,6 +26,9 @@ public record CreateProductReservationResponse
     [JsonPropertyName("reservation")]
     public required ProductReservationDto Reservation { get; init; }
 }
+
+public record GetProductReservationResponse(
+    ProductReservationDto Reservation);
 
 public record EditProductReservationRequest
 {
@@ -70,11 +74,16 @@ public static class ProductReservationsEndPoints
                     var result = await sender.Send(
                         new CreateProductReservationCommand(request.Reservation),
                         cancellationToken);
+
+                    var reservation = await sender.Send(
+                        new GetProductReservationQuery(result.ReservationId),
+                        cancellationToken);
+
                     return Results.Created(
-                        $"/products/reservations/{result.Reservation.Id}",
+                        $"/products/reservations/{result.ReservationId}",
                         new CreateProductReservationResponse
                         {
-                            Reservation = result.Reservation
+                            Reservation = reservation.Reservation
                         });
                 })
             .WithName("CreateProductReservations")
@@ -85,6 +94,26 @@ public static class ProductReservationsEndPoints
             .Produces<CreateProductReservationResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_CREATE);
+
+        products.MapGet(
+                "/reservations/{reservationId:int}",
+                async (
+                    ISender sender,
+                    int reservationId,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetProductReservationQuery(reservationId),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new GetProductReservationResponse(result.Reservation));
+                })
+            .WithName("GetProductReservation")
+            .WithSummary("Получить резервацию по идентификатору")
+            .Produces<GetProductReservationResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL);
 
         products.MapPut(
                 "/reservations/{reservationId:int}",

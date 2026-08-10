@@ -4,8 +4,6 @@ using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
-using Application.Common.Interfaces.Projections;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Purchase;
 using Main.Application.Dtos.Purchase;
@@ -18,7 +16,6 @@ using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
@@ -42,16 +39,14 @@ public record CreatePurchaseCommand(
     bool ForcePayment = false
 ) : ICommand<CreatePurchaseResult>;
 
-public record CreatePurchaseResult(PurchaseDto Purchase);
+public record CreatePurchaseResult(Guid PurchaseId);
 
 public class CreatePurchaseHandler(
     ISender sender,
     IOptions<SystemOptions> systemOptions,
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
-    IReadRepository<Purchase, Guid> readRepository,
-    IUnitOfWork unitOfWork,
-    IProjectionProvider<Purchase, PurchaseDto> purchaseProjection
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
     public async Task<CreatePurchaseResult> Handle(
@@ -111,10 +106,7 @@ public class CreatePurchaseHandler(
                 PurchaseId = purchase.Id
             });
 
-        var fromDb = await readRepository.Query
-            .Project(purchaseProjection)
-            .FirstAsync(x => x.Id == purchase.Id, cancellationToken);
-        return new CreatePurchaseResult(fromDb);
+        return new CreatePurchaseResult(purchase.Id);
     }
 
     private async Task<IReadOnlyList<StorageContent>> AddContentsToStorage(
