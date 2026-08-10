@@ -1,18 +1,22 @@
+using System.Text.Json;
+using Domain.CommonEntities.Job;
+using Domain.CommonEnums;
 using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.ProductEnrichment.BuildCatalogueCandidatesBatch;
+using Main.Application.Lrts.BuildCatalogueCandidates;
 using Main.Entities.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
-namespace Tests.HandlersTests.ProductEnrichment;
+namespace Tests.LrtsTests;
 
-public sealed class BuildCatalogueCandidatesBatchTests : IntegrationTest
+public sealed class BuildCatalogueCandidatesLrtTests : IntegrationTest
 {
-    public BuildCatalogueCandidatesBatchTests(CombinedContainerFixture fixture)
+    public BuildCatalogueCandidatesLrtTests(CombinedContainerFixture fixture)
         : base(fixture)
     {
         RegisterBasicContext<ProducerTestContext>();
@@ -24,16 +28,21 @@ public sealed class BuildCatalogueCandidatesBatchTests : IntegrationTest
     public async Task ProductsWithSameResolvedKey_CreateOneCandidateAndAssignAllProducts()
     {
         var producer = TestContext.Producers[0];
-        await AddSupplierProduct("ABC-123", producer.Name, Supplier.Armtek);
-        await AddSupplierProduct("ABC123", producer.Name, Supplier.Tmtr);
+        var firstProduct = await AddSupplierProduct(
+            "ABC-123",
+            producer.Name,
+            Supplier.Armtek);
+        var secondProduct = await AddSupplierProduct(
+            "ABC123",
+            producer.Name,
+            Supplier.Tmtr);
 
-        var result = await Mediator.Send(
-            new BuildCatalogueCandidatesBatchCommand(0, 100));
+        var state = await ExecuteLrt();
 
-        result.ReadRows.Should().Be(2);
-        result.AssignedRows.Should().Be(2);
-        result.SkippedRows.Should().Be(0);
-        result.HasMore.Should().BeFalse();
+        state.LastProcessedId.Should().Be(Math.Max(firstProduct.Id, secondProduct.Id));
+        state.ProcessedRows.Should().Be(2);
+        state.AssignedRows.Should().Be(2);
+        state.SkippedRows.Should().Be(0);
 
         var candidate = await Context.CatalogueCandidates
             .AsNoTracking()
@@ -61,10 +70,9 @@ public sealed class BuildCatalogueCandidatesBatchTests : IntegrationTest
             producer.Name,
             Supplier.Armtek);
 
-        var result = await Mediator.Send(
-            new BuildCatalogueCandidatesBatchCommand(0, 100));
+        var state = await ExecuteLrt();
 
-        result.AssignedRows.Should().Be(1);
+        state.AssignedRows.Should().Be(1);
         (await Context.CatalogueCandidates.CountAsync()).Should().Be(1);
 
         Context.ChangeTracker.Clear();
@@ -82,14 +90,12 @@ public sealed class BuildCatalogueCandidatesBatchTests : IntegrationTest
             $"unknown-{Guid.NewGuid():N}",
             Supplier.Armtek);
 
-        var result = await Mediator.Send(
-            new BuildCatalogueCandidatesBatchCommand(0, 1));
+        var state = await ExecuteLrt();
 
-        result.LastProcessedId.Should().Be(supplierProduct.Id);
-        result.ReadRows.Should().Be(1);
-        result.AssignedRows.Should().Be(0);
-        result.SkippedRows.Should().Be(1);
-        result.HasMore.Should().BeTrue();
+        state.LastProcessedId.Should().Be(supplierProduct.Id);
+        state.ProcessedRows.Should().Be(1);
+        state.AssignedRows.Should().Be(0);
+        state.SkippedRows.Should().Be(1);
         (await Context.CatalogueCandidates.CountAsync()).Should().Be(0);
 
         Context.ChangeTracker.Clear();
@@ -97,6 +103,34 @@ public sealed class BuildCatalogueCandidatesBatchTests : IntegrationTest
             .AsNoTracking()
             .SingleAsync(x => x.Id == supplierProduct.Id);
         persistedProduct.CatalogueCandidateId.Should().BeNull();
+    }
+
+    private async Task<BuildCatalogueCandidatesState> ExecuteLrt()
+    {
+        var leaseHolderId = Guid.NewGuid();
+        var job = SingleRunJob.Create(
+            BuildCatalogueCandidatesLrt.LrtSystemName,
+            JsonSerializer.Serialize(new BuildCatalogueCandidatesState()));
+        job.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
+
+        await Context.AddAsync(job);
+        await Context.SaveChangesAsync();
+
+        var lrt = ActivatorUtilities.CreateInstance<BuildCatalogueCandidatesLrt>(
+            Scope.ServiceProvider);
+
+        await lrt.ExecuteAsync(job.Id, leaseHolderId);
+
+        Context.ChangeTracker.Clear();
+        var persistedJob = await Context.Jobs
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == job.Id);
+        persistedJob.Status.Should().Be(JobStatus.Succeeded);
+
+        return JsonSerializer.Deserialize<BuildCatalogueCandidatesState>(
+                   persistedJob.State)
+               ?? throw new InvalidOperationException(
+                   "Build catalogue candidates state could not be deserialized.");
     }
 
     private Task<SupplierProduct> AddSupplierProduct(

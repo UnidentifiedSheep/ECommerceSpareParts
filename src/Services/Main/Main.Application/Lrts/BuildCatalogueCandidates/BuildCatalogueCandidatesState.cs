@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Application.Common.LRT;
 
-namespace Main.Application.Lrts;
+namespace Main.Application.Lrts.BuildCatalogueCandidates;
 
 public sealed record BuildCatalogueCandidatesState : NoneInputState
 {
