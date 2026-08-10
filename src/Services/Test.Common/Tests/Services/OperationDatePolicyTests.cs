@@ -5,7 +5,7 @@ using Extensions;
 using FluentAssertions;
 using Moq;
 
-namespace Tests.ServicesTests;
+namespace Tests.Tests.Services;
 
 public class OperationDatePolicyTests
 {

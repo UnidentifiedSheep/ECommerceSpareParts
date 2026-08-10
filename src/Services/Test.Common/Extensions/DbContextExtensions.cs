@@ -14,7 +14,7 @@ public static class DbContextExtensions
                       FOR r IN 
                           SELECT schemaname, tablename
                           FROM pg_tables
-                          WHERE schemaname IN ('auth', 'catalogue_enrichment', 'public')
+                          WHERE schemaname IN ('auth', 'catalogue_enrichment', 'job', 'public')
                       LOOP
                           EXECUTE format('TRUNCATE TABLE %I.%I RESTART IDENTITY CASCADE', r.schemaname, r.tablename);
                       END LOOP;

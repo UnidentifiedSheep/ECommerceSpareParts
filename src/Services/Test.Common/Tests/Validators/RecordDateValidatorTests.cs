@@ -3,7 +3,7 @@ using Application.Common.Validators;
 using FluentAssertions;
 using Moq;
 
-namespace Tests.Validators;
+namespace Tests.Tests.Validators;
 
 public class RecordDateValidatorTests
 {

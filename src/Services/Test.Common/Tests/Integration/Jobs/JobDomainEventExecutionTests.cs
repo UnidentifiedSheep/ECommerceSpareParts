@@ -13,13 +13,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Tests.Stubs;
+using Tests.Integration;
 using Tests.TestContainers.Combined;
 
-namespace Tests.ServicesTests; //TODO should be moved to Test.Common.
+namespace Tests.Tests.Integration.Jobs;
 
 public sealed class JobDomainEventExecutionTests(
     CombinedContainerFixture fixture)
-    : IntegrationTest(fixture)
+    : CommonLayerIntegrationTest(fixture)
 {
     [Fact]
     public async Task StepSucceeds_ExecutorResumesWaitingParent()
