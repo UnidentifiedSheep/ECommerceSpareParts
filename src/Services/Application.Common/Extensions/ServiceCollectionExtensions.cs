@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
+using Application.Common.DomainEventHandlers.Settings;
 using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
@@ -14,6 +15,7 @@ using Application.Common.Services;
 using Application.Common.Services.Events;
 using Application.Common.Services.Persistence;
 using Application.Common.Services.Settings;
+using Domain.CommonEntities.Events;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +38,9 @@ public static class ServiceCollectionExtensions
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddScoped<ISettingsService, SettingsService>();
         collection.AddSingleton<ISettingFactory, TSettingFactory>();
+        collection.AddScoped<
+            INotificationHandler<Batch<SettingUpdatedDomainEvent>>,
+            PublishSettingUpdatedEventHandler>();
 
         collection.TryAddScoped<
             IRequestHandler<UpdateSettingCommand, UpdateSettingResult>,

@@ -1,25 +1,19 @@
 ﻿using System.Data;
-using Abstractions.Interfaces;
-using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Settings;
 using Domain.CommonEntities;
 using Domain.Interfaces;
-using MassTransit;
 
 namespace Application.Common.Services.Settings;
 
 public class SettingsService(
     IRepository<Setting, string> repository,
-    IUnitOfWork unitOfWork,
+    IApplicationTransactionService transactionService,
     ISettingsContainer settingsContainer,
-    IPublishEndpoint publishEndpoint,
-    IServiceDefinition serviceDefinition,
     ISettingFactory settingFactory
-)
-    : ISettingsService
+) : ISettingsService
 {
     private static readonly TransactionalAttribute TransactionSettings
         = new(
@@ -46,9 +40,9 @@ public class SettingsService(
         CancellationToken cancellationToken = default
     ) where T : Setting
     {
-        await unitOfWork.ExecuteWithTransaction(
+        await transactionService.ExecuteAsync(
             TransactionSettings,
-            async () =>
+            async (context, ct) =>
             {
                 var criteria = Criteria<Setting>.New()
                     .Where(x => x.Key == value.Key)
@@ -56,21 +50,13 @@ public class SettingsService(
                     .Track()
                     .Build();
 
-                var existing = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
+                var existing = await repository.FirstOrDefaultAsync(criteria, ct);
                 existing?.SetData(value.Json);
 
-                if (existing == null) await unitOfWork.AddAsync(value, cancellationToken);
+                if (existing == null)
+                    await context.UnitOfWork.AddAsync(value, ct);
 
-                await publishEndpoint.Publish(
-                    new SettingUpdatedEvent
-                    {
-                        Key = value.Key,
-                        Value = value.Json,
-                        ChangedAt = DateTime.UtcNow
-                    },
-                    conf => conf.SetRoutingKey(serviceDefinition.ServiceName),
-                    cancellationToken);
-                await unitOfWork.SaveChangesAsync(cancellationToken);
+                await context.UnitOfWork.SaveChangesAsync(ct);
             },
             cancellationToken);
 
