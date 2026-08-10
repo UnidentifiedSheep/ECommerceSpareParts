@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
@@ -55,7 +55,7 @@ public sealed class JobDomainEventExecutionTests(
         var unitOfWork = Scope.ServiceProvider
             .GetRequiredService<IUnitOfWork>();
         var executor = Scope.ServiceProvider
-            .GetRequiredService<IDomainEventExecutor>();
+            .GetRequiredService<IApplicationTransactionService>();
         var lrt = new SucceedingTestLrt(
             repository,
             unitOfWork,
@@ -119,17 +119,15 @@ public sealed class JobDomainEventExecutionTests(
         IRepository<Job, Guid> jobRepository,
         IUnitOfWork unitOfWork,
         IPublishEndpoint publisher,
-        IDomainEventExecutor domainEventExecutor,
+        IApplicationTransactionService transactionService,
         ILogger logger)
         : LrtBase<NoneInputState, NoneInputState>(
             jobRepository,
             unitOfWork,
             publisher,
-            domainEventExecutor,
+            transactionService,
             logger)
     {
-        public override IServiceDefinition ServiceDefinition { get; } =
-            new TestServiceDefinition();
         public override string SystemName => "step";
         public override string NameLocalizationKey => "test-name";
         public override string DescriptionLocalizationKey =>
@@ -138,8 +136,4 @@ public sealed class JobDomainEventExecutionTests(
         protected override Task DoWork() => Task.CompletedTask;
     }
 
-    private sealed class TestServiceDefinition : IServiceDefinition
-    {
-        public string ServiceName => "test";
-    }
 }

@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.CommonEntities;
@@ -16,13 +16,13 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
-    IDomainEventExecutor domainEventExecutor,
+    IApplicationTransactionService transactionService,
     ILogger logger
 ) : LrtBase<TInputState, TState>(
     jobRepository,
     unitOfWork,
     publisher,
-    domainEventExecutor,
+    transactionService,
     logger), IMultiStepLrt
     where TInputState : class, IInputState
     where TState : class, TInputState
@@ -38,11 +38,15 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
         ConfigureSteps(builder, initialState);
     }
 
-    protected override Task DoWork()
+    protected override async Task DoWork()
     {
-        return ExecuteWithDomainEventsTransactionAsync(
+        var failure = await TransactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            ReconcileAsync);
+            (_, _) => ReconcileAsync(),
+            CancellationToken);
+
+        if (failure is not null)
+            Interrupt(failure);
     }
 
     protected override Task SucceedJobAsync()
@@ -52,7 +56,7 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
             : base.SucceedJobAsync();
     }
 
-    private async Task ReconcileAsync()
+    private async Task<string?> ReconcileAsync()
     {
         var parentCriteria = Criteria<Job>
             .New()
@@ -89,12 +93,21 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
             x.Status is JobStatus.Failed or JobStatus.Cancelled);
 
         if (failedStep is not null)
-            Interrupt(
+        {
+            var failure =
                 $"Step '{failedStep.SystemName}' finished with status " +
-                $"'{failedStep.Status}'.");
+                $"'{failedStep.Status}'.";
+
+            await CancelUnfinishedWorkflowAsync(
+                multiStepJob,
+                steps,
+                failure);
+            await UnitOfWork.SaveChangesAsync(CancellationToken);
+            return failure;
+        }
 
         if (steps.All(x => x.Status == JobStatus.Succeeded))
-            return;
+            return null;
 
         var stepsById = steps.ToDictionary(x => x.Id);
         var dependenciesByStepId = multiStepJob.Dependencies
@@ -121,7 +134,50 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
                 "Multi-step job cannot make progress because no step is runnable.");
 
         multiStepJob.Wait(LeaseHolderId);
-        await PublishStatusUpdatedEvent(multiStepJob);
         await UnitOfWork.SaveChangesAsync(CancellationToken);
+        return null;
+    }
+
+    private async Task CancelUnfinishedWorkflowAsync(
+        MultiStepJob root,
+        IReadOnlyCollection<Job> rootSteps,
+        string reason)
+    {
+        var parents = new[] { root };
+        var steps = rootSteps;
+
+        while (parents.Length != 0)
+        {
+            var parentsById = parents.ToDictionary(x => x.Id);
+
+            foreach (var group in steps.GroupBy(x => x.MultiStepJobId))
+            {
+                if (!group.Key.HasValue ||
+                    !parentsById.TryGetValue(group.Key.Value, out var parent))
+                    throw new InvalidOperationException(
+                        "Multi-step workflow contains a step with an unknown parent.");
+
+                parent.CancelUnfinishedSteps(group, reason);
+            }
+
+            parents = steps
+                .OfType<MultiStepJob>()
+                .ToArray();
+
+            if (parents.Length == 0)
+                break;
+
+            var parentIds = parents.Select(x => x.Id).ToList();
+            var criteria = Criteria<Job>.New()
+                .Where(x => x.MultiStepJobId.HasValue &&
+                            parentIds.Contains(x.MultiStepJobId.Value))
+                .Track()
+                .ForUpdate()
+                .Build();
+
+            steps = await JobRepository.ListAsync(
+                criteria,
+                CancellationToken);
+        }
     }
 }

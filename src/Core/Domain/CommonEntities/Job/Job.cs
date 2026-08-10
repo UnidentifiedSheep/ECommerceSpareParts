@@ -18,17 +18,17 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         int maxAttempts)
     {
         Id = Guid.NewGuid();
-        Status = JobStatus.Pending;
         SystemName = systemName;
         Attempts = 1;
         SetMaxAttempts(maxAttempts);
         State = initialState;
+        SetStatus(JobStatus.Pending);
     }
 
     public Guid Id { get; private set; }
     public string SystemName { get; private set; } = null!;
     public string State { get; protected set; } = string.Empty;
-    public JobStatus Status { get; protected set; }
+    public JobStatus Status { get; private set; }
     public int Attempts { get; private set; }
     public int MaxAttempts { get; private set; }
     public string? ErrorMessage { get; private set; }
@@ -62,6 +62,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
             throw new InvalidOperationException("Maximum number of attempts exceeded.");
 
         Attempts++;
+        RaiseStatusUpdatedEvent();
     }
 
     public void SetState(string state, Guid leaseHolderId)
@@ -95,7 +96,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         EnsureStatus(JobStatus.Locked);
 
         ErrorMessage = null;
-        Status = JobStatus.Processing;
+        SetStatus(JobStatus.Processing);
     }
 
     public virtual void Succeed(Guid leaseHolderId)
@@ -107,7 +108,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         EnsureStatus(JobStatus.Processing);
 
         ErrorMessage = null;
-        Status = JobStatus.Succeeded;
+        SetStatus(JobStatus.Succeeded);
         ClearLease();
     }
 
@@ -117,7 +118,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         if (IsTerminal) throw new InvalidOperationException("Terminal job cannot be failed.");
 
         ErrorMessage = errorMessage?.TrimOrNull();
-        Status = JobStatus.Failed;
+        SetStatus(JobStatus.Failed);
         ClearLease();
     }
 
@@ -132,7 +133,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
             throw new InvalidOperationException("Job cancellation was not requested.");
 
         ErrorMessage = errorMessage?.TrimOrNull() ?? ErrorMessage;
-        Status = JobStatus.Cancelled;
+        SetStatus(JobStatus.Cancelled);
         ClearLease();
     }
 
@@ -149,12 +150,12 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
         if (Status is JobStatus.Pending or JobStatus.Waiting or JobStatus.Blocked)
         {
-            Status = JobStatus.Cancelled;
+            SetStatus(JobStatus.Cancelled);
             ClearLease();
             return;
         }
 
-        Status = JobStatus.CancellationRequested;
+        SetStatus(JobStatus.CancellationRequested);
     }
 
     public void AcquireLease(Guid leaseHolderId, TimeSpan leaseDuration)
@@ -185,7 +186,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         }
 
         LockedAt = now;
-        Status = JobStatus.Locked;
+        SetStatus(JobStatus.Locked);
         ErrorMessage = null;
         LeaseExpiresAt = now.Add(leaseDuration);
         LeaseHolderId = leaseHolderId;
@@ -221,7 +222,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         ErrorMessage = errorMessage?.TrimOrNull()
                        ?? "Job lease expired and maximum number of attempts was exceeded.";
 
-        Status = JobStatus.Failed;
+        SetStatus(JobStatus.Failed);
         ClearLease();
     }
 
@@ -251,7 +252,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
         MultiStepJobId = parent.Id;
         MultiStepJob = parent;
-        Status = JobStatus.Blocked;
+        SetStatus(JobStatus.Blocked);
     }
 
     internal void Activate(Guid multiStepJobId)
@@ -261,7 +262,37 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
                 "Job does not belong to the specified multi-step job.");
 
         EnsureStatus(JobStatus.Blocked);
-        Status = JobStatus.Pending;
+        SetStatus(JobStatus.Pending);
+    }
+
+    internal void CancelBy(MultiStepJob parent, string? reason = null)
+    {
+        ArgumentNullException.ThrowIfNull(parent);
+
+        if (MultiStepJobId != parent.Id)
+            throw new InvalidOperationException(
+                "Job does not belong to the specified multi-step job.");
+
+        if (IsTerminal)
+            return;
+
+        ErrorMessage = reason?.TrimOrNull();
+        SetStatus(JobStatus.Cancelled);
+        ClearLease();
+    }
+
+    protected void SetStatus(JobStatus status)
+    {
+        Status = status;
+        RaiseStatusUpdatedEvent();
+    }
+
+    private void RaiseStatusUpdatedEvent()
+    {
+        AddDomainEvent(new JobStatusUpdatedDomainEvent(
+            Id,
+            Status,
+            Attempts));
     }
 
     public override void OnCreated()

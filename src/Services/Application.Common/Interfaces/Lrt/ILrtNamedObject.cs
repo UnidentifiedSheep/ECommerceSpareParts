@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.NamedObject;
 
 namespace Application.Common.Interfaces.Lrt;
@@ -8,5 +7,4 @@ public interface ILrtNamedObject :
     ILrtDescriptor,
     ILocalizableNamedObject
 {
-    IServiceDefinition ServiceDefinition { get; }
 }

@@ -2,6 +2,7 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities;
@@ -114,12 +115,11 @@ public sealed class JobCreationDispatcherTests
                 Mock.Of<IRepository<Job, Guid>>(),
                 Mock.Of<IUnitOfWork>(),
                 Mock.Of<IPublishEndpoint>(),
-                new DomainEventExecutorStub(),
+                Mock.Of<IApplicationTransactionService>(),
                 Mock.Of<ILogger>())
         {
         }
 
-        public override IServiceDefinition ServiceDefinition { get; } = new TestServiceDefinition();
         public override string SystemName => nameof(TestMultiStepLrt);
         public override string NameLocalizationKey => "test-name";
         public override string DescriptionLocalizationKey => "test-description";
@@ -137,11 +137,9 @@ public sealed class JobCreationDispatcherTests
         Mock.Of<IRepository<Job, Guid>>(),
         Mock.Of<IUnitOfWork>(),
         Mock.Of<IPublishEndpoint>(),
-        new DomainEventExecutorStub(),
+        Mock.Of<IApplicationTransactionService>(),
         Mock.Of<ILogger>())
     {
-        public override IServiceDefinition ServiceDefinition { get; } =
-            new TestServiceDefinition();
         public override string SystemName => systemName;
         public override string NameLocalizationKey => "test-name";
         public override string DescriptionLocalizationKey => "test-description";
@@ -153,8 +151,4 @@ public sealed class JobCreationDispatcherTests
         }
     }
 
-    private sealed class TestServiceDefinition : IServiceDefinition
-    {
-        public string ServiceName => "test";
-    }
 }

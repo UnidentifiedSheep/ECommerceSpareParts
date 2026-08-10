@@ -1,7 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -15,16 +15,15 @@ public class EnrichOurCatalogueLrt(
     IRepository<Job, Guid> jobRepository, 
     IUnitOfWork unitOfWork, 
     IPublishEndpoint publisher,
-    IDomainEventExecutor domainEventExecutor,
+    IApplicationTransactionService transactionService,
     ILogger<EnrichOurCatalogueLrt> logger) : MultiStepLrtBase<NoneInputState, NoneInputState>(
     jobRepository, 
     unitOfWork,
     publisher, 
-    domainEventExecutor,
+    transactionService,
     logger)
 {
 
-    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
     public override string SystemName => nameof(EnrichOurCatalogueLrt);
     public override string NameLocalizationKey => "lrt.catalogue.enrichment.name";
     public override string DescriptionLocalizationKey => "lrt.catalogue.enrichment.description";

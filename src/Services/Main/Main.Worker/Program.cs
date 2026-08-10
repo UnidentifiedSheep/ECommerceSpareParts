@@ -13,6 +13,7 @@ using Contracts.Currency;
 using Contracts.Job;
 using Contracts.Products;
 using Contracts.Settings;
+using Contracts.Supplier;
 using Contracts.User;
 using ExchangeRate;
 using Localization.Domain.Extensions;
@@ -145,8 +146,9 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
                     ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
                     ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
                     ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-
-
+                    ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
+                    
+                    ep.Bind<SupplierProductsRequestedEvent>();
                     ep.Bind<CurrencyCreatedEvent>();
                     ep.Bind<ProductUpdatedEvent>();
                     ep.Bind<RoleUpdatedEvent>();

@@ -1,7 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -22,17 +22,16 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
     IBalanceService balanceService,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
-    IDomainEventExecutor domainEventExecutor,
+    IApplicationTransactionService transactionService,
     ILogger<RecalculateApproximateOrganizationBalancesLrt> logger
 ) : LrtBase<NoneInputState, NoneInputState>(
     jobRepository,
     unitOfWork,
     publisher,
-    domainEventExecutor,
+    transactionService,
     logger)
 {
     private const int BatchSize = 250;
-    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
     public override string SystemName => nameof(RecalculateApproximateOrganizationBalancesLrt);
     public override string NameLocalizationKey => "lrt.organization.approximate.balance.recalculate.name";
     public override string DescriptionLocalizationKey =>
@@ -54,15 +53,16 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 
             if (organizationIds.Count == 0) break;
 
-            await ExecuteWithDomainEventsTransactionAsync(
+            await TransactionService.ExecuteAsync(
                 TransactionalAttribute.ReadCommited(20, 3),
-                async () =>
+                async (context, cancellationToken) =>
                 {
                     await balanceService.RecalculateApproximateBalancesAsync(
                         organizationIds,
-                        CancellationToken);
-                    await UnitOfWork.SaveChangesAsync(CancellationToken);
-                });
+                        cancellationToken);
+                    await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+                },
+                CancellationToken);
 
             lastOrganizationId = organizationIds[^1];
             if (organizationIds.Count < BatchSize) break;

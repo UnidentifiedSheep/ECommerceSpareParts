@@ -1,15 +1,9 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.LRT;
-using Application.Common.NamedObject;
 using Attributes;
-using Contracts.Job;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
-using MassTransit;
 using MediatR;
 using JobNotFoundException = Application.Common.Exceptions.JobNotFoundException;
 
@@ -20,9 +14,7 @@ public record CancelJobCommand(Guid JobId) : ICommand;
 
 public class CancelJobHandler(
     IRepository<Job, Guid> repository,
-    IPublishEndpoint publisher,
-    IUnitOfWork unitOfWork,
-    INamedObjectRegistry<ILrtNamedObject> registry) : ICommandHandler<CancelJobCommand>
+    IUnitOfWork unitOfWork) : ICommandHandler<CancelJobCommand>
 {
     public async Task<Unit> Handle(CancelJobCommand request, CancellationToken cancellationToken)
     {
@@ -35,19 +27,7 @@ public class CancelJobHandler(
         var job = await repository.FirstOrDefaultAsync(criteria, cancellationToken)
             ?? throw new JobNotFoundException(request.JobId);
 
-        var lrt = registry.GetBySystemName(job.SystemName);
-            
         job.RequestCancellation();
-        
-        await publisher.Publish(
-            new JobStatusUpdatedEvent
-            {
-                JobId = job.Id,
-                Status = job.Status.ToString(),
-                CurrentAttempt = job.Attempts
-            },
-            conf => conf.SetRoutingKey(lrt.ServiceDefinition.ServiceName),
-            cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

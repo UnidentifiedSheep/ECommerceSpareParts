@@ -14,6 +14,8 @@ public static class ServiceCollectionExtensions
         collection.AddScoped<IUnitOfWork, UnitOfWork<T>>();
         collection.AddScoped<IContextMetadata, ContextMetadata<T>>();
         collection.AddScoped<IQueryableExtensions, QueryableExtensions>();
+        Application.Common.Extensions.ServiceCollectionExtensions
+            .RegisterApplicationTransactions(collection);
 
         return collection;
     }

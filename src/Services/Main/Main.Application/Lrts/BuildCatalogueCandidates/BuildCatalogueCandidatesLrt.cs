@@ -1,7 +1,7 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
@@ -16,18 +16,17 @@ public class BuildCatalogueCandidatesLrt(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
-    IDomainEventExecutor domainEventExecutor,
+    IApplicationTransactionService transactionService,
     ISender sender,
     ILogger<BuildCatalogueCandidatesLrt> logger
     ) : LrtBase<NoneInputState, BuildCatalogueCandidatesState>(
     jobRepository,
     unitOfWork,
     publisher,
-    domainEventExecutor,
+    transactionService,
     logger)
 {
     public const string LrtSystemName = nameof(BuildCatalogueCandidatesLrt);
-    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
     public override string SystemName => LrtSystemName;
     public override string NameLocalizationKey =>
         "lrt.catalogue.candidates.build.name";

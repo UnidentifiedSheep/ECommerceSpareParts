@@ -2,7 +2,7 @@ using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Handlers.Metrics;
-using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
@@ -20,20 +20,19 @@ public class MetricCalculationLrt(
     ISender sender,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
-    IDomainEventExecutor domainEventExecutor,
+    IApplicationTransactionService transactionService,
     ILogger<MetricCalculationLrt> logger
 ) : LrtBase<MetricCalculationInputState, MetricCalculationState>(
     jobRepository,
     unitOfWork,
     publisher,
-    domainEventExecutor,
+    transactionService,
     logger)
 {
     public const string LrtSystemName = nameof(MetricCalculationLrt);
     public override string SystemName => LrtSystemName;
     public override string NameLocalizationKey => "metric_calculation_lrt_name";
     public override string DescriptionLocalizationKey => "metric_calculation_lrt_description";
-    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Analytics;
 
     protected override async Task DoWork()
     {

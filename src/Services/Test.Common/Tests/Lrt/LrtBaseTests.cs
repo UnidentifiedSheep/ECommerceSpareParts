@@ -1,8 +1,8 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
@@ -31,10 +31,6 @@ public class LrtBaseTests
 
         lrt.DoWorkCalls.Should().Be(1);
         fixture.Job.Status.Should().Be(JobStatus.Succeeded);
-        fixture.JobStatusEvents.Select(x => x.Status)
-            .Should().Equal(JobStatus.Processing.ToString(), JobStatus.Succeeded.ToString());
-        fixture.JobStatusEvents.Select(x => x.CurrentAttempt)
-            .Should().Equal(1, 1);
         fixture.UnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 
@@ -56,13 +52,6 @@ public class LrtBaseTests
         lrt.DoWorkCalls.Should().Be(2);
         fixture.Job.Status.Should().Be(JobStatus.Succeeded);
         fixture.Job.Attempts.Should().Be(2);
-        fixture.JobStatusEvents.Select(x => x.Status)
-            .Should().Equal(
-                JobStatus.Processing.ToString(),
-                JobStatus.Processing.ToString(),
-                JobStatus.Succeeded.ToString());
-        fixture.JobStatusEvents.Select(x => x.CurrentAttempt)
-            .Should().Equal(1, 2, 2);
     }
 
     [Fact]
@@ -77,8 +66,6 @@ public class LrtBaseTests
         lrt.DoWorkCalls.Should().Be(1);
         fixture.Job.Status.Should().Be(JobStatus.Failed);
         fixture.Job.ErrorMessage.Should().Be("permanent failure");
-        fixture.JobStatusEvents.Select(x => x.Status)
-            .Should().Equal(JobStatus.Processing.ToString(), JobStatus.Failed.ToString());
     }
 
     [Fact]
@@ -97,8 +84,6 @@ public class LrtBaseTests
         fixture.Job.Status.Should().Be(JobStatus.Failed);
         fixture.Job.Attempts.Should().Be(1);
         fixture.Job.ErrorMessage.Should().Be("manual stop");
-        fixture.JobStatusEvents.Select(x => x.Status)
-            .Should().Equal(JobStatus.Processing.ToString(), JobStatus.Failed.ToString());
     }
 
     [Fact]
@@ -116,8 +101,6 @@ public class LrtBaseTests
             cancellationTokenSource.Token);
 
         fixture.Job.Status.Should().Be(JobStatus.Processing);
-        fixture.JobStatusEvents.Select(x => x.Status)
-            .Should().Equal(JobStatus.Processing.ToString());
     }
 
     [Fact]
@@ -135,8 +118,6 @@ public class LrtBaseTests
 
         fixture.Job.Status.Should().Be(JobStatus.Cancelled);
         fixture.Job.ErrorMessage.Should().Be("cancel requested");
-        fixture.JobStatusEvents.Select(x => x.Status)
-            .Should().Equal(JobStatus.Processing.ToString(), JobStatus.Cancelled.ToString());
     }
 
     [Fact]
@@ -149,8 +130,6 @@ public class LrtBaseTests
         await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId);
 
         fixture.Job.Status.Should().Be(JobStatus.Processing);
-        fixture.JobStatusEvents.Select(x => x.Status)
-            .Should().Equal(JobStatus.Processing.ToString());
     }
 
     [Fact]
@@ -308,8 +287,6 @@ public class LrtBaseTests
         public Mock<IRepository<Job, Guid>> JobRepository { get; } = new();
         public Mock<IUnitOfWork> UnitOfWork { get; } = new();
         public MessageBrokerStub Publisher { get; } = new();
-        public IReadOnlyList<JobStatusUpdatedEvent> JobStatusEvents =>
-            Publisher.PublishedMessagesOfType<JobStatusUpdatedEvent>();
         public Mock<ILogger> Logger { get; } = new();
 
         public TestLrt CreateLrt()
@@ -318,7 +295,9 @@ public class LrtBaseTests
                 JobRepository.Object,
                 UnitOfWork.Object,
                 Publisher,
-                new DomainEventExecutorStub(),
+                new ApplicationTransactionServiceStub(
+                    UnitOfWork.Object,
+                    Mock.Of<IRepositoryProvider>()),
                 Logger.Object);
         }
     }
@@ -327,13 +306,13 @@ public class LrtBaseTests
         IRepository<Job, Guid> jobRepository,
         IUnitOfWork unitOfWork,
         IPublishEndpoint publisher,
-        IDomainEventExecutor domainEventExecutor,
+        IApplicationTransactionService transactionService,
         ILogger logger
     ) : LrtBase<TestInput, TestState>(
         jobRepository,
         unitOfWork,
         publisher,
-        domainEventExecutor,
+        transactionService,
         logger)
     {
         public Func<TestLrt, Task> Work { get; set; } = _ => Task.CompletedTask;
@@ -349,7 +328,6 @@ public class LrtBaseTests
         public CancellationToken CurrentCancellationToken => CancellationToken;
         public bool CurrentInitialized => Initialized;
         public DateTime? CurrentLeaseExpiresAt => Job.LeaseExpiresAt;
-        public override IServiceDefinition ServiceDefinition { get; } = new TestServiceDefinition();
         public override string SystemName => nameof(TestLrt);
         public override string NameLocalizationKey => "test-lrt-name";
         public override string DescriptionLocalizationKey => "test-lrt-description";
@@ -385,11 +363,6 @@ public class LrtBaseTests
         {
             return RenewLeaseAsync(leaseDuration);
         }
-    }
-
-    private sealed class TestServiceDefinition : IServiceDefinition
-    {
-        public string ServiceName => "test-service";
     }
 
     private class TestInput : IInputState

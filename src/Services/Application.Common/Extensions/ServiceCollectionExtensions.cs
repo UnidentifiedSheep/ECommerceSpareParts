@@ -5,11 +5,14 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Models;
 using Application.Common.NamedObject;
 using Application.Common.Services;
 using Application.Common.Services.Events;
+using Application.Common.Services.Persistence;
 using Application.Common.Services.Settings;
 using FluentValidation;
 using MediatR;
@@ -103,6 +106,19 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IDomainEventScope, DomainEventScope>();
         services.AddScoped<IDomainEventExecutor, DomainEventExecutor>();
+        return services;
+    }
+
+    public static IServiceCollection RegisterApplicationTransactions(
+        this IServiceCollection services)
+    {
+        services.AddScoped<IRepositoryProvider, RepositoryProvider>();
+        services.AddScoped<
+            IApplicationTransactionContext,
+            ApplicationTransactionContext>();
+        services.AddScoped<
+            IApplicationTransactionService,
+            ApplicationTransactionService>();
         return services;
     }
 

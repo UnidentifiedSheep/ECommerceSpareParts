@@ -24,9 +24,7 @@ public static class ServiceProvider
                 ServicesDefinitions.Search,
                 configuration,
                 typeof(ServiceProvider).Assembly,
-                typeof(TransactionBehavior<,>),
-                typeof(SaveChangesBehavior<,>),
-                typeof(IntegrationEventPublisherBehavior<,>),
+                typeof(ApplicationTransactionBehavior<,>),
                 typeof(DbValidationBehavior<,>),
                 typeof(CacheBehavior<,>));
 

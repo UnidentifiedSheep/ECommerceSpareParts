@@ -3,7 +3,7 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
-using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -22,16 +22,15 @@ public class MarkupCalculationLrt(
     IUnitOfWork unitOfWork,
     INamedObjectRegistry<MarkupAnalyzerNamedObjectBase> registry,
     IPublishEndpoint publisher,
-    IDomainEventExecutor domainEventExecutor,
+    IApplicationTransactionService transactionService,
     ILogger<MarkupCalculationLrt> logger
 ) : LrtBase<MarkupCalculationInputState, MarkupCalculationState>(
     jobRepository,
     unitOfWork,
     publisher,
-    domainEventExecutor,
+    transactionService,
     logger)
 {
-    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Analytics;
     public override string SystemName => nameof(MarkupCalculationLrt);
     public override string NameLocalizationKey => "markup_calculation_lrt_name";
     public override string DescriptionLocalizationKey => "markup_calculation_lrt_description";
@@ -57,17 +56,19 @@ public class MarkupCalculationLrt(
             })
             .ToList();
 
-        await ExecuteWithDomainEventsTransactionAsync(
+        await TransactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(20, 2),
-            async () =>
+            async (context, cancellationToken) =>
             {
                 await Publisher.Publish(
                     new MarkupAnalyzedEvent
                     {
                         Ranges = ranges
-                    });
+                    },
+                    cancellationToken);
 
-                await UnitOfWork.SaveChangesAsync(CancellationToken);
-            });
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+            },
+            CancellationToken);
     }
 }

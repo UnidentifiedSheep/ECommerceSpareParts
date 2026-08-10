@@ -74,19 +74,7 @@ public static class ServiceProvider
                     typeof(CacheBehavior<,>))
                 .RegisterIfNotExcluded(
                     hs,
-                    typeof(TransactionBehavior<,>),
-                    ServiceLifetime.Scoped)
-                .RegisterIfNotExcluded(
-                    hs,
-                    typeof(IntegrationEventPublisherBehavior<,>),
-                    ServiceLifetime.Scoped)
-                .RegisterIfNotExcluded(
-                    hs,
-                    typeof(DomainEventPublisherBehavior<,>),
-                    ServiceLifetime.Scoped)
-                .RegisterIfNotExcluded(
-                    hs,
-                    typeof(SaveChangesBehavior<,>),
+                    typeof(ApplicationTransactionBehavior<,>),
                     ServiceLifetime.Scoped);
         });
 
@@ -111,6 +99,9 @@ public static class ServiceProvider
         services.AddScoped<
             INotificationHandler<Batch<JobStepFinishedDomainEvent>>,
             ResumeMultiStepJobHandler>();
+        services.AddScoped<
+            INotificationHandler<Batch<JobStatusUpdatedDomainEvent>>,
+            PublishJobStatusUpdatedEventHandler>();
         
         services.AddScoped<
             IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,

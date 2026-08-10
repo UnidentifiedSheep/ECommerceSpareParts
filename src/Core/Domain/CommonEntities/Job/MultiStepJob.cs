@@ -86,6 +86,24 @@ public sealed class MultiStepJob : Job
         step.Activate(Id);
     }
 
+    public void CancelUnfinishedSteps(
+        IEnumerable<Job> steps,
+        string? reason = null)
+    {
+        ArgumentNullException.ThrowIfNull(steps);
+
+        foreach (var step in steps)
+        {
+            ArgumentNullException.ThrowIfNull(step);
+
+            if (step.MultiStepJobId != Id)
+                throw new InvalidOperationException(
+                    "Job step does not belong to this multi-step job.");
+
+            step.CancelBy(this, reason);
+        }
+    }
+
     public void Wait(Guid leaseHolderId)
     {
         EnsureActiveLease(leaseHolderId);
@@ -95,14 +113,14 @@ public sealed class MultiStepJob : Job
 
         EnsureStatus(JobStatus.Processing);
 
-        Status = JobStatus.Waiting;
+        SetStatus(JobStatus.Waiting);
         ClearLease();
     }
 
     public void Resume()
     {
         EnsureStatus(JobStatus.Waiting);
-        Status = JobStatus.Pending;
+        SetStatus(JobStatus.Pending);
     }
 
     private void EnsureTopologyMutable()

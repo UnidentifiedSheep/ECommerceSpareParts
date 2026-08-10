@@ -1,6 +1,5 @@
-using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.CommonEntities;
@@ -10,18 +9,17 @@ using Domain.CommonEnums;
 namespace Application.Common.LRT;
 
 public class JobLeaseService(
-    IRepository<Job, Guid> repository,
-    IUnitOfWork unitOfWork,
-    IDomainEventExecutor domainEventExecutor) : IJobLeaseService
+    IApplicationTransactionService transactionService) : IJobLeaseService
 {
     public async Task<Job?> TryAcquireJobAsync(
         Guid holderId,
         TimeSpan leaseDuration,
         CancellationToken ct)
-        => await unitOfWork.ExecuteWithTransaction(
+        => await transactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            () => domainEventExecutor.ExecuteAsync(async () =>
+            async (context, cancellationToken) =>
             {
+                var repository = context.Repositories.Get<Job, Guid>();
                 var now = DateTime.UtcNow;
                 var criteria = GetCriteriaBase(1)
                     .Where(x =>
@@ -34,22 +32,23 @@ public class JobLeaseService(
                         ))
                     .Build();
                 
-                var job = await repository.FirstOrDefaultAsync(criteria, ct);
+                var job = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
 
                 if (job == null) return null;
 
                 job.AcquireLease(holderId, leaseDuration);
                 
-                await unitOfWork.SaveChangesAsync(ct);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return job;
-            }, ct),
+            },
             ct);
     
     public async Task<List<Job>> FailExpiredJobsWithoutAttempts(int maxBatchSize, CancellationToken ct)
-        => await unitOfWork.ExecuteWithTransaction(
+        => await transactionService.ExecuteAsync(
             TransactionalAttribute.ReadCommited(30, 3),
-            () => domainEventExecutor.ExecuteAsync(async () =>
+            async (context, cancellationToken) =>
             {
+                var repository = context.Repositories.Get<Job, Guid>();
                 var now = DateTime.UtcNow;
                 var criteria = GetCriteriaBase(maxBatchSize)
                     .Where(x =>
@@ -58,16 +57,16 @@ public class JobLeaseService(
                         && x.LeaseExpiresAt <= now
                         && x.Attempts >= x.MaxAttempts)
                     .Build();
-                var jobs = await repository.ListAsync(criteria, ct);
+                var jobs = await repository.ListAsync(criteria, cancellationToken);
 
                 foreach (var job in jobs)
                     job.FailByExpiredLease(
                         now, //TODO: create localization message.
                         "Job lease expired and maximum number of attempts was exceeded.");
                 
-                await unitOfWork.SaveChangesAsync(ct);
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return jobs;
-            }, ct),
+            },
             ct);
     
     private static CriteriaBuilder<Job> GetCriteriaBase(int maxBatchSize)
