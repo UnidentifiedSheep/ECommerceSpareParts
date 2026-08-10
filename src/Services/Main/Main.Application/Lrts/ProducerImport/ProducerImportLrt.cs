@@ -7,7 +7,6 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
-using Localization.Domain;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers;
 using Main.Application.Lrts.Base;
@@ -27,9 +26,8 @@ public class ProducerImportLrt(
     IOptions<S3BucketsOptions> bucketsOptions,
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
-    IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions
-) : CsvImportLrtBase<ProducerImportInputState, ProducerImportState, ProducerImportError, ProducerImportLrt.NewProducerCsvDto,
+    IScopedStringLocalizer stringLocalizer
+) : CsvImportLrtBase<ProducerImportInputState, ProducerImportState, ProducerImportLrt.NewProducerCsvDto,
     NewProducerDto>(
     jobRepository,
     bucketsOptions,
@@ -38,50 +36,22 @@ public class ProducerImportLrt(
     transactionService,
     logger,
     s3Service,
-    stringLocalizer,
-    localesOptions)
+    stringLocalizer)
 {
     public override string SystemName => nameof(ProducerImportLrt);
     public override string NameLocalizationKey => "lrt.producer.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.import.description";
-
-    protected override string GetFileName(ProducerImportState state) { return state.FileName; }
-
-    protected override int GetCurrentLine(ProducerImportState state) { return state.CurrentLine; }
-
-    protected override List<ProducerImportError> GetErrors(ProducerImportState state) { return state.Errors; }
 
     protected override string GetTooManyErrorsLocalizationKey()
     {
         return "producer.too.many.errors.while.processing.batch";
     }
 
-    protected override ProducerImportError CreateError(int rowIdx, string message)
-    {
-        return new ProducerImportError
-        {
-            RowIdx = rowIdx,
-            Message = message
-        };
-    }
-
-    protected override ProducerImportState WithUpdatedState(
-        ProducerImportState state,
-        int currentLine,
-        List<ProducerImportError> errors)
-    {
-        return state with
-        {
-            CurrentLine = currentLine,
-            Errors = errors
-        };
-    }
-
     protected override bool TryProcessRow(
         int rowIdx,
         NewProducerCsvDto row,
         ProducerImportState state,
-        List<ProducerImportError> errors,
+        List<CsvImportError> errors,
         out NewProducerDto item)
     {
         item = new NewProducerDto
@@ -94,9 +64,9 @@ public class ProducerImportLrt(
     }
 
     protected override async Task ProcessBatch(
-        List<(int idx, NewProducerDto item)> producers,
+        IReadOnlyList<(int idx, NewProducerDto item)> producers,
         ProducerImportState state,
-        List<ProducerImportError> errors)
+        List<CsvImportError> errors)
     {
         if (producers.Count == 0) return;
 
@@ -109,7 +79,7 @@ public class ProducerImportLrt(
 
         foreach (var (idx, message) in result.Errors)
             errors.Add(
-                new ProducerImportError
+                new CsvImportError
                 {
                     Message = message,
                     RowIdx = idx >= 0 && idx < producers.Count
@@ -127,8 +97,6 @@ public class ProducerImportLrt(
             result.Created,
             result.Skipped,
             result.Errors.Count);
-
-        producers.Clear();
     }
 
     public record NewProducerCsvDto

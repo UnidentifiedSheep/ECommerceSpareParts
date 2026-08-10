@@ -11,7 +11,6 @@ using Domain.CommonEntities.Job;
 using Domain.Extensions;
 using Enums;
 using Localization.Abstractions.Interfaces;
-using Localization.Domain;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers;
 using Main.Application.Interfaces.Persistence;
@@ -36,12 +35,10 @@ public class ProducerSupplierMappingImportLrt(
     IOptions<S3BucketsOptions> bucketsOptions,
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
-    IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions
+    IScopedStringLocalizer stringLocalizer
 ) : CsvImportLrtBase<
         ProducerSupplierMappingImportInputState,
         ProducerSupplierMappingImportState,
-        ProducerSupplierMappingImportError,
         ProducerSupplierMappingImportLrt.ProducerSupplierMappingCsvDto,
         ProducerSupplierMappingImportLrt.ProducerSupplierMappingBatchItem>(
         jobRepository,
@@ -51,8 +48,7 @@ public class ProducerSupplierMappingImportLrt(
         transactionService,
         logger,
         s3Service,
-        stringLocalizer,
-        localesOptions)
+        stringLocalizer)
 {
     private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
@@ -65,42 +61,14 @@ public class ProducerSupplierMappingImportLrt(
         _producerLookup = await producerLookupService.Load(CancellationToken);
     }
 
-    protected override string GetFileName(ProducerSupplierMappingImportState state) => state.FileName;
-
-    protected override int GetCurrentLine(ProducerSupplierMappingImportState state) => state.CurrentLine;
-
-    protected override List<ProducerSupplierMappingImportError> GetErrors(
-        ProducerSupplierMappingImportState state) => state.Errors;
-
     protected override string GetTooManyErrorsLocalizationKey()
         => "producer.too.many.errors.while.processing.batch";
-
-    protected override ProducerSupplierMappingImportError CreateError(int rowIdx, string message)
-    {
-        return new ProducerSupplierMappingImportError
-        {
-            RowIdx = rowIdx,
-            Message = message
-        };
-    }
-
-    protected override ProducerSupplierMappingImportState WithUpdatedState(
-        ProducerSupplierMappingImportState state,
-        int currentLine,
-        List<ProducerSupplierMappingImportError> errors)
-    {
-        return state with
-        {
-            CurrentLine = currentLine,
-            Errors = errors
-        };
-    }
 
     protected override bool TryProcessRow(
         int rowIdx,
         ProducerSupplierMappingCsvDto row,
         ProducerSupplierMappingImportState state,
-        List<ProducerSupplierMappingImportError> errors,
+        List<CsvImportError> errors,
         out ProducerSupplierMappingBatchItem item)
     {
         item = null!;
@@ -127,9 +95,9 @@ public class ProducerSupplierMappingImportLrt(
     }
 
     protected override async Task ProcessBatch(
-        List<(int idx, ProducerSupplierMappingBatchItem item)> mappings,
+        IReadOnlyList<(int idx, ProducerSupplierMappingBatchItem item)> mappings,
         ProducerSupplierMappingImportState state,
-        List<ProducerSupplierMappingImportError> errors)
+        List<CsvImportError> errors)
     {
         if (mappings.Count == 0) return;
 
@@ -186,7 +154,6 @@ public class ProducerSupplierMappingImportLrt(
                 firstIdx,
                 mappings.Count);
 
-            mappings.Clear();
             return;
         }
 
@@ -208,8 +175,6 @@ public class ProducerSupplierMappingImportLrt(
             toAdd.Count,
             mappings.Count - toAdd.Count,
             errors.Count - errorsBeforeBatch);
-
-        mappings.Clear();
     }
 
     public record ProducerSupplierMappingBatchItem(

@@ -7,7 +7,6 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
-using Localization.Domain;
 using Main.Application.Handlers.ProducerAliases;
 using Main.Application.Handlers.Producers;
 using Main.Application.Lrts.Base;
@@ -27,13 +26,11 @@ public class ProducerAliasImportLrt(
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
     IOptions<S3BucketsOptions> bucketsOptions,
-    IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions
+    IScopedStringLocalizer stringLocalizer
 )
     : CsvImportLrtBase<
         ProducerAliasesImportInputState,
         ProducerAliasesImportState,
-        ProducerAliasesImportError,
         ProducerAliasImportLrt.ProducerAliasCsvDto,
         CreateProducerAliasesBatchItem>(
         jobRepository,
@@ -43,53 +40,22 @@ public class ProducerAliasImportLrt(
         transactionService,
         logger,
         s3Service,
-        stringLocalizer,
-        localesOptions)
+        stringLocalizer)
 {
     public override string SystemName => nameof(ProducerAliasImportLrt);
     public override string NameLocalizationKey => "lrt.producer.other.names.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.other.names.import.description";
-
-    protected override string GetFileName(ProducerAliasesImportState state) { return state.FileName; }
-
-    protected override int GetCurrentLine(ProducerAliasesImportState state) { return state.CurrentLine; }
-
-    protected override List<ProducerAliasesImportError> GetErrors(ProducerAliasesImportState state)
-    {
-        return state.Errors;
-    }
 
     protected override string GetTooManyErrorsLocalizationKey()
     {
         return "producer.too.many.errors.while.processing.batch";
     }
 
-    protected override ProducerAliasesImportError CreateError(int rowIdx, string message)
-    {
-        return new ProducerAliasesImportError
-        {
-            RowIdx = rowIdx,
-            Message = message
-        };
-    }
-
-    protected override ProducerAliasesImportState WithUpdatedState(
-        ProducerAliasesImportState state,
-        int currentLine,
-        List<ProducerAliasesImportError> errors)
-    {
-        return state with
-        {
-            CurrentLine = currentLine,
-            Errors = errors
-        };
-    }
-
     protected override bool TryProcessRow(
         int rowIdx,
         ProducerAliasCsvDto row,
         ProducerAliasesImportState state,
-        List<ProducerAliasesImportError> errors,
+        List<CsvImportError> errors,
         out CreateProducerAliasesBatchItem item)
     {
         item = new CreateProducerAliasesBatchItem(
@@ -99,9 +65,9 @@ public class ProducerAliasImportLrt(
     }
 
     protected override async Task ProcessBatch(
-        List<(int idx, CreateProducerAliasesBatchItem item)> otherNames,
+        IReadOnlyList<(int idx, CreateProducerAliasesBatchItem item)> otherNames,
         ProducerAliasesImportState state,
-        List<ProducerAliasesImportError> errors)
+        List<CsvImportError> errors)
     {
         if (otherNames.Count == 0) return;
 
@@ -112,7 +78,7 @@ public class ProducerAliasImportLrt(
 
         foreach (var (idx, message) in result.Errors)
             errors.Add(
-                new ProducerAliasesImportError
+                new CsvImportError
                 {
                     Message = message,
                     RowIdx = idx >= 0 && idx < otherNames.Count
@@ -130,8 +96,6 @@ public class ProducerAliasImportLrt(
             result.Created,
             result.Skipped,
             result.Errors.Count);
-
-        otherNames.Clear();
     }
 
     public record ProducerAliasCsvDto

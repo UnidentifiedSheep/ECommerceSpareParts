@@ -2,10 +2,11 @@ using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
 using Enums;
+using Main.Application.Lrts.Base;
 
 namespace Main.Application.Lrts.ProductImport;
 
-public record ProductImportState : ProductImportInputState
+public record ProductImportState : ProductImportInputState, ICsvImportState<ProductImportState>
 {
     [JsonPropertyName("currentLine")]
     public int CurrentLine { get; init; }
@@ -14,11 +15,14 @@ public record ProductImportState : ProductImportInputState
     public List<int> SkippedLines { get; init; } = [];
 
     [JsonPropertyName("errors")]
-    public List<ProductImportError> Errors { get; init; } = [];
+    public List<CsvImportError> Errors { get; init; } = [];
+
+    public ProductImportState WithCurrentLine(int currentLine)
+        => this with { CurrentLine = currentLine };
 }
 
 [CsvSchema(typeof(ProductImportLrt.NewProductCsvDto))]
-public record ProductImportInputState : IInputState
+public record ProductImportInputState : IInputState, ICsvImportInputState
 {
     [Accepts(".csv")]
     [InputControl(InputControlType.UploadFile)]
@@ -35,13 +39,4 @@ public record ProductImportInputState : IInputState
                 "Product import state error. " +
                 "File name should end with .csv");
     }
-}
-
-public record ProductImportError
-{
-    [JsonPropertyName("rowIdx")]
-    public int RowIdx { get; init; }
-
-    [JsonPropertyName("message")]
-    public required string Message { get; init; }
 }

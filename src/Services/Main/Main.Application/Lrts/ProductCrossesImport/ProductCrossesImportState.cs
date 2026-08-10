@@ -2,10 +2,12 @@ using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
 using Enums;
+using Main.Application.Lrts.Base;
 
 namespace Main.Application.Lrts.ProductCrossesImport;
 
-public record ProductCrossesImportState : ProductCrossesImportInputState
+public record ProductCrossesImportState : ProductCrossesImportInputState,
+    ICsvImportState<ProductCrossesImportState>
 {
     [JsonPropertyName("currentLine")]
     public int CurrentLine { get; init; }
@@ -14,11 +16,14 @@ public record ProductCrossesImportState : ProductCrossesImportInputState
     public List<int> SkippedLines { get; init; } = [];
 
     [JsonPropertyName("errors")]
-    public List<ProductCrossesImportError> Errors { get; init; } = [];
+    public List<CsvImportError> Errors { get; init; } = [];
+
+    public ProductCrossesImportState WithCurrentLine(int currentLine)
+        => this with { CurrentLine = currentLine };
 }
 
 [CsvSchema(typeof(ProductCrossesImportLrt.ProductCrossCsvDto))]
-public record ProductCrossesImportInputState : IInputState
+public record ProductCrossesImportInputState : IInputState, ICsvImportInputState
 {
     [Accepts(".csv")]
     [InputControl(InputControlType.UploadFile)]
@@ -35,13 +40,4 @@ public record ProductCrossesImportInputState : IInputState
                 "Product crosses import state error. " +
                 "File name should end with .csv");
     }
-}
-
-public record ProductCrossesImportError
-{
-    [JsonPropertyName("rowIdx")]
-    public int RowIdx { get; init; }
-
-    [JsonPropertyName("message")]
-    public required string Message { get; init; }
 }

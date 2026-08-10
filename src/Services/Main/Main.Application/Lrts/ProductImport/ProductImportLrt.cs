@@ -8,7 +8,6 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Localization.Abstractions.Interfaces;
-using Localization.Domain;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Interfaces.Persistence;
@@ -36,10 +35,9 @@ public class ProductImportLrt(
     IApplicationTransactionService transactionService,
     IOptions<S3BucketsOptions> bucketsOptions,
     ILogger<ProductImportLrt> logger,
-    IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions
+    IScopedStringLocalizer stringLocalizer
 )
-    : CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto,
+    : CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportLrt.NewProductCsvDto,
         CreateProductDto>(
         jobRepository,
         bucketsOptions,
@@ -48,8 +46,7 @@ public class ProductImportLrt(
         transactionService,
         logger,
         s3Service,
-        stringLocalizer,
-        localesOptions)
+        stringLocalizer)
 {
     private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
@@ -63,44 +60,16 @@ public class ProductImportLrt(
         _producerLookup = await producerLookupService.Load(CancellationToken);
     }
 
-    protected override string GetFileName(ProductImportState state) { return state.FileName; }
-
-    protected override int GetCurrentLine(ProductImportState state) { return state.CurrentLine; }
-
-    protected override List<ProductImportError> GetErrors(ProductImportState state) { return state.Errors; }
-
     protected override string GetTooManyErrorsLocalizationKey()
     {
         return "article.import.too.many.errors.while.processing.batch";
-    }
-
-    protected override ProductImportError CreateError(int rowIdx, string message)
-    {
-        return new ProductImportError
-        {
-            RowIdx = rowIdx,
-            Message = message
-        };
-    }
-
-    protected override ProductImportState WithUpdatedState(
-        ProductImportState state,
-        int currentLine,
-        List<ProductImportError> errors)
-    {
-        return state with
-        {
-            CurrentLine = currentLine,
-            Errors = errors,
-            SkippedLines = state.SkippedLines
-        };
     }
 
     protected override bool TryProcessRow(
         int rowIdx,
         NewProductCsvDto row,
         ProductImportState state,
-        List<ProductImportError> errors,
+        List<CsvImportError> errors,
         out CreateProductDto item)
     {
         var product = ProcessDto(
@@ -114,7 +83,7 @@ public class ProductImportLrt(
     private CreateProductDto? ProcessDto(
         int idx,
         NewProductCsvDto row,
-        List<ProductImportError> errors)
+        List<CsvImportError> errors)
     {
         try
         {
@@ -122,7 +91,7 @@ public class ProductImportLrt(
             if (producerId == null)
             {
                 errors.Add(
-                    new ProductImportError
+                    new CsvImportError
                     {
                         RowIdx = idx,
                         Message = StringLocalizer.Get("article.import.producer.not.found", row.Producer)
@@ -152,7 +121,7 @@ public class ProductImportLrt(
         catch (Exception ex)
         {
             errors.Add(
-                new ProductImportError
+                new CsvImportError
                 {
                     RowIdx = idx,
                     Message = GetErrorMessage(ex)
@@ -163,9 +132,9 @@ public class ProductImportLrt(
     }
 
     protected override async Task ProcessBatch(
-        List<(int idx, CreateProductDto item)> products,
+        IReadOnlyList<(int idx, CreateProductDto item)> products,
         ProductImportState state,
-        List<ProductImportError> errors)
+        List<CsvImportError> errors)
     {
         if (products.Count == 0) return;
 
@@ -180,7 +149,6 @@ public class ProductImportLrt(
                 firstIdx,
                 products.Count);
 
-            products.Clear();
             return;
         }
 
@@ -199,12 +167,10 @@ public class ProductImportLrt(
             products.Count,
             result.CreatedIds.Count,
             products.Count - toCreate.Count + result.Skipped);
-
-        products.Clear();
     }
 
     private async Task<List<(int idx, CreateProductDto item)>> FilterExistingAndDuplicateProducts(
-        List<(int idx, CreateProductDto item)> products,
+        IReadOnlyList<(int idx, CreateProductDto item)> products,
         List<int> skippedLines)
     {
         var keys = products
