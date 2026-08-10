@@ -15,12 +15,12 @@ using Tests.TestContainers.Combined;
 
 namespace Tests.Integration;
 
-[Collection("Combined collection")]
 /// <summary>
 /// Base class exclusively for common-layer integration tests declared in
 /// Test.Common. Service test projects must use their own integration-test
 /// base and DbContext and must not inherit from this class.
 /// </summary>
+[Collection("Combined collection")]
 public abstract class CommonLayerIntegrationTest : TestBase
 {
     private readonly CombinedContainerFixture _fixture;
