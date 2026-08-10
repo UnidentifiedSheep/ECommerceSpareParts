@@ -7,6 +7,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Main.Application.Lrts.BuildCatalogueCandidates;
+using Main.Application.Lrts.MapCatalogueCandidatesToProducts;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
