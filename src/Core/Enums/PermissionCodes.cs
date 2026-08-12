@@ -14,6 +14,9 @@ public enum PermissionCodes
     ARTICLES_GET_FULL,
     ARTICLES_GET_MAIN,
 
+    // ===== CATALOGUE ENRICHMENT =====
+    CATALOGUE_CANDIDATES_REVIEW,
+
     // ===== ARTICLE / SIZES =====
     ARTICLE_SIZES_GET,
     ARTICLE_SIZES_CREATE,

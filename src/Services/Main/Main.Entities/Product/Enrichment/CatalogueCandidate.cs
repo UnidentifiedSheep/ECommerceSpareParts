@@ -26,6 +26,8 @@ public class CatalogueCandidate :
     public int ProducerId { get; private set; }
 
     public int? ProductId { get; private set; }
+    public Product? Product { get; private set; }
+    public Producer.Producer Producer { get; private set; } = null!;
 
     private readonly List<SupplierProduct> _supplierProducts = [];
     public IReadOnlyList<SupplierProduct> SupplierProducts => _supplierProducts;

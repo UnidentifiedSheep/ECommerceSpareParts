@@ -13,6 +13,8 @@
     "permissions.articles.get.full.description": "Право на поиск артикулов по полной модели.",
     "permissions.articles.get.main.name": "Просмотр артикулов, минимальная модель",
     "permissions.articles.get.main.description": "Право на поиск артикулов по минимальной модели.",
+    "permissions.catalogue.candidates.review.name": "Проверка кандидатов каталога",
+    "permissions.catalogue.candidates.review.description": "Право на просмотр кандидатов каталога для проверки.",
     "permissions.article.sizes.create.name": "Установка размеров артикула",
     "permissions.article.sizes.create.description": "Право на установку размеров артикула.",
     "permissions.article.sizes.get.name": "Просмотр размеров артикула",

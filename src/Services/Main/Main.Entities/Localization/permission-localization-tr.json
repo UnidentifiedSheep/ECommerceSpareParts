@@ -13,6 +13,8 @@
     "permissions.articles.get.full.description": "Tam model ile parça arama izni.",
     "permissions.articles.get.main.name": "Parçaları görüntüleme, minimum model",
     "permissions.articles.get.main.description": "Minimum model ile parça arama izni.",
+    "permissions.catalogue.candidates.review.name": "Katalog adaylarını inceleme",
+    "permissions.catalogue.candidates.review.description": "Katalog adaylarını inceleme amacıyla görüntüleme izni.",
     "permissions.article.sizes.create.name": "Parça ölçülerini ayarlama",
     "permissions.article.sizes.create.description": "Parça ölçülerini ayarlama izni.",
     "permissions.article.sizes.get.name": "Parça ölçülerini görüntüleme",

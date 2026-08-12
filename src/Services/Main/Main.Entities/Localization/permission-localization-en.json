@@ -13,6 +13,8 @@
     "permissions.articles.get.full.description": "Permission to search articles using the full model.",
     "permissions.articles.get.main.name": "View articles, minimal model",
     "permissions.articles.get.main.description": "Permission to search articles using the minimal model.",
+    "permissions.catalogue.candidates.review.name": "Review catalogue candidates",
+    "permissions.catalogue.candidates.review.description": "Permission to view catalogue candidates for review.",
     "permissions.article.sizes.create.name": "Set article dimensions",
     "permissions.article.sizes.create.description": "Permission to set article dimensions.",
     "permissions.article.sizes.get.name": "View article dimensions",
