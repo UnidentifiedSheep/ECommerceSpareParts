@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
@@ -89,9 +90,9 @@ public class ImportSupplierProductHandler(
     {
         var products = new List<ImportProduct>();
         var crosses = new List<RequestedCross>();
-        var processed = new Dictionary<ContractSupplierProductDto, ImportProduct?>(
+        var processed = new Dictionary<ContractSupplierProductDto, ImportProduct>(
             ReferenceEqualityComparer.Instance);
-        var expanded = new HashSet<ContractSupplierProductDto>(
+        var visited = new HashSet<ContractSupplierProductDto>(
             ReferenceEqualityComparer.Instance);
         var pending = new Queue<(ContractSupplierProductDto Product, SupplierProductKey? Parent)>();
 
@@ -100,24 +101,27 @@ public class ImportSupplierProductHandler(
 
         while (pending.TryDequeue(out var item))
         {
-            if (!processed.TryGetValue(item.Product, out var product))
+            ImportProduct? product;
+
+            if (visited.Add(item.Product))
             {
-                TryCreateImportProduct(item.Product, out product);
-                processed.Add(item.Product, product);
+                if (TryCreateImportProduct(item.Product, out product))
+                {
+                    processed.Add(item.Product, product);
+                    products.Add(product);
+                }
+
+                foreach (var analogue in item.Product.Analogues)
+                    pending.Enqueue((analogue, product?.Key));
             }
+            else
+                processed.TryGetValue(item.Product, out product);
 
             if (product is not null)
             {
-                products.Add(product);
-
                 if (item.Parent is { } parent && parent != product.Key)
                     crosses.Add(new RequestedCross(parent, product.Key));
             }
-
-            if (!expanded.Add(item.Product)) continue;
-
-            foreach (var analogue in item.Product.Analogues)
-                pending.Enqueue((analogue, product?.Key));
         }
 
         return new ImportGraph(products, crosses);
@@ -125,7 +129,7 @@ public class ImportSupplierProductHandler(
 
     private bool TryCreateImportProduct(
         ContractSupplierProductDto product,
-        out ImportProduct? importProduct)
+        [NotNullWhen(true)] out ImportProduct? importProduct)
     {
         importProduct = null;
 
