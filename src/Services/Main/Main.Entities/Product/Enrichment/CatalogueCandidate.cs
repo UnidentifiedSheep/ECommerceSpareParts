@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.CatalogueCandidate;
 using Main.Entities.Product.ValueObjects;
 
 namespace Main.Entities.Product.Enrichment;
@@ -51,6 +52,35 @@ public class CatalogueCandidate :
     public void RemoveProductMapping()
     {
         ProductId = null;
+    }
+
+    public void AddSupplierProduct(SupplierProduct supplierProduct)
+    {
+        ArgumentNullException.ThrowIfNull(supplierProduct);
+
+        if (supplierProduct.CatalogueCandidateId.HasValue &&
+            supplierProduct.CatalogueCandidateId != Id)
+            throw new InvalidOperationException(
+                "Supplier product is already assigned to another catalogue candidate.");
+
+        if (_supplierProducts.Contains(supplierProduct)) return;
+
+        _supplierProducts.Add(supplierProduct);
+        AddContentChangedDomainEvent();
+    }
+
+    public void RemoveSupplierProduct(SupplierProduct supplierProduct)
+    {
+        ArgumentNullException.ThrowIfNull(supplierProduct);
+
+        if (!_supplierProducts.Remove(supplierProduct)) return;
+
+        AddContentChangedDomainEvent();
+    }
+
+    private void AddContentChangedDomainEvent()
+    {
+        AddDomainEvent(new CatalogueCandidateContentChangedDomainEvent(Id));
     }
 
     public override Guid GetId() => Id;

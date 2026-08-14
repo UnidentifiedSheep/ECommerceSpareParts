@@ -153,8 +153,8 @@ public class BuildCatalogueCandidatesLrt(
                     var key = (
                         resolved.Product.Sku.NormalizedValue,
                         resolved.ProducerId!.Value);
-                    resolved.Product.AssignToCatalogueCandidate(
-                        persistedCandidates[key].Id);
+                    persistedCandidates[key].AddSupplierProduct(
+                        resolved.Product);
                 }
 
                 await context.UnitOfWork.SaveChangesAsync(cancellationToken);

@@ -3,6 +3,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
+using Main.Entities.DomainEvents.CatalogueCandidate;
 using Main.Entities.Product.ValueObjects;
 
 namespace Main.Entities.Product.Enrichment;
@@ -54,17 +55,6 @@ public class SupplierProduct :
             supplier);
     }
 
-    public void AssignToCatalogueCandidate(
-        Guid catalogueCandidateId)
-    {
-        CatalogueCandidateId = catalogueCandidateId;
-    }
-
-    public void RemoveFromCatalogueCandidate()
-    {
-        CatalogueCandidateId = null;
-    }
-
     public void AddName(string name)
     {
         var normalizedName = name
@@ -81,6 +71,11 @@ public class SupplierProduct :
             return;
 
         _names.Add(SupplierProductName.Create(Id, normalizedName));
+
+        if (CatalogueCandidateId.HasValue)
+            AddDomainEvent(
+                new CatalogueCandidateContentChangedDomainEvent(
+                    CatalogueCandidateId.Value));
     }
 
     public override int GetId() => Id;

@@ -37,7 +37,7 @@ public sealed class CatalogueCandidateReviewTestContext(DContext context)
             .WithProducer("Supplier producer")
             .WithSupplier(Supplier.FavoritParts)
             .Build();
-        SupplierProduct.AssignToCatalogueCandidate(Candidate.Id);
+        Candidate.AddSupplierProduct(SupplierProduct);
         SupplierProduct.AddName("First supplier name");
         SupplierProduct.AddName("Second supplier name");
 
