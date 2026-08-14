@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces;
+﻿using Domain.Events;
+using Domain.Interfaces;
 using Domain.Interfaces.Events;
 
 namespace Domain;
@@ -36,7 +37,21 @@ public abstract class Entity<TModel, TKey>
             _domainEvents.Add(domainEvent);
     }
 
-    public virtual void OnDeleted() { }
-    public virtual void OnUpdated() { }
-    public virtual void OnCreated() { }
+    public virtual void OnDeleted()
+    {
+        if (this is IAutomaticDomainEvents)
+            AddDomainEvent(new EntityDeletedDomainEvent<TModel, TKey>(GetId()));
+    }
+
+    public virtual void OnUpdated()
+    {
+        if (this is IAutomaticDomainEvents)
+            AddDomainEvent(new EntityUpdatedDomainEvent<TModel, TKey>(GetId()));
+    }
+
+    public virtual void OnCreated()
+    {
+        if (this is IAutomaticDomainEvents)
+            AddDomainEvent(new EntityCreatedDomainEvent<TModel>((TModel)this));
+    }
 }
