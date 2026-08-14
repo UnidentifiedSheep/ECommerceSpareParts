@@ -9,10 +9,10 @@ namespace Main.Application.DomainEventHandlers.CatalogueCandidate.Deleted;
 
 public class PublishIntegrationEvents(
     IIntegrationEventScope integrationEventScope
-    ) : BatchableDomainEventHandler<EntityDeletedDomainEvent<Candidate, int>>
+    ) : BatchableDomainEventHandler<EntityDeletedDomainEvent<Candidate, Guid>>
 {
     public override Task Handle(
-        Batch<EntityDeletedDomainEvent<Candidate, int>> notification, 
+        Batch<EntityDeletedDomainEvent<Candidate, Guid>> notification, 
         CancellationToken cancellationToken)
     {
         var events = notification

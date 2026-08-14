@@ -6,8 +6,8 @@ using Main.Entities.Product.ValueObjects;
 namespace Main.Entities.Product.Enrichment;
 
 public class CatalogueCandidate :
-    AuditableEntity<CatalogueCandidate, int>,
-    ILinqEntity<CatalogueCandidate, int>,
+    AuditableEntity<CatalogueCandidate, Guid>,
+    ILinqEntity<CatalogueCandidate, Guid>,
     IGenerateAutomaticDomainEvents
 {
     private CatalogueCandidate() { }
@@ -16,11 +16,12 @@ public class CatalogueCandidate :
         string sku,
         int producerId)
     {
+        Id = Guid.CreateVersion7();
         Sku = new Sku(sku);
         ProducerId = producerId;
     }
 
-    public int Id { get; private set; }
+    public Guid Id { get; private set; }
 
     public Sku Sku { get; private set; } = null!;
 
@@ -52,11 +53,11 @@ public class CatalogueCandidate :
         ProductId = null;
     }
 
-    public override int GetId() => Id;
+    public override Guid GetId() => Id;
 
-    public static Expression<Func<CatalogueCandidate, int>> GetKeySelector() 
+    public static Expression<Func<CatalogueCandidate, Guid>> GetKeySelector() 
         => x => x.Id;
 
-    public static Expression<Func<CatalogueCandidate, bool>> GetEqualityExpression(int key) 
+    public static Expression<Func<CatalogueCandidate, bool>> GetEqualityExpression(Guid key) 
         => x => x.Id == key;
 }

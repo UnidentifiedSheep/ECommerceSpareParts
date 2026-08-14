@@ -6,7 +6,7 @@ namespace Main.Application.Lrts.MapCatalogueCandidatesToProducts;
 public sealed record MapCatalogueCandidatesToProductsState : NoneInputState
 {
     [JsonPropertyName("lastProcessedId")]
-    public int LastProcessedId { get; init; }
+    public Guid LastProcessedId { get; init; }
 
     [JsonPropertyName("processedRows")]
     public long ProcessedRows { get; init; }

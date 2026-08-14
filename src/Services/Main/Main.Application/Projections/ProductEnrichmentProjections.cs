@@ -96,7 +96,6 @@ public sealed class CatalogueCandidateContractDtoProjectionProvider
             Names = x.SupplierProducts
                 .SelectMany(z => z.Names
                     .Select(c => c.Name.Trim()))
-                .Distinct()
                 .ToList()
         };
     }

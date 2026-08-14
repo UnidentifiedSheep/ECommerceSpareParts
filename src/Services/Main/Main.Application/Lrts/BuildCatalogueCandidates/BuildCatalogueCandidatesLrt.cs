@@ -19,7 +19,7 @@ public class BuildCatalogueCandidatesLrt(
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
     ISupplierProductRepository supplierProductRepository,
-    IRepository<CatalogueCandidate, int> catalogueCandidateRepository,
+    IRepository<CatalogueCandidate, Guid> catalogueCandidateRepository,
     IProducerLookupService producerLookupService,
     ILogger<BuildCatalogueCandidatesLrt> logger
     ) : LrtBase<NoneInputState, BuildCatalogueCandidatesState>(

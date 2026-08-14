@@ -20,7 +20,7 @@ public record GetCatalogueCandidatesForReviewResult(
     IReadOnlyList<CatalogueCandidateReviewDto> Candidates);
 
 public sealed class GetCatalogueCandidatesForReviewHandler(
-    IReadRepository<CatalogueCandidate, int> repository,
+    IReadRepository<CatalogueCandidate, Guid> repository,
     IProjectionProvider<CatalogueCandidate, CatalogueCandidateReviewDto> projection)
     : IQueryHandler<GetCatalogueCandidatesForReviewQuery, GetCatalogueCandidatesForReviewResult>
 {

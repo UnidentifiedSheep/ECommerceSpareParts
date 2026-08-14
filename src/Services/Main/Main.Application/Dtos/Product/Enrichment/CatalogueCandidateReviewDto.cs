@@ -6,7 +6,7 @@ namespace Main.Application.Dtos.Product.Enrichment;
 public record CatalogueCandidateReviewDto
 {
     [JsonPropertyName("id")]
-    public required int Id { get; init; }
+    public required Guid Id { get; init; }
 
     [JsonPropertyName("producer")]
     public required ProducerDto Producer { get; init; }

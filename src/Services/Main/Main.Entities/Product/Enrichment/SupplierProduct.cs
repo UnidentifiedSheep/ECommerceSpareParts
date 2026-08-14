@@ -36,7 +36,7 @@ public class SupplierProduct :
 
     public global::Enums.Supplier Supplier { get; private set; }
 
-    public int? CatalogueCandidateId { get; private set; }
+    public Guid? CatalogueCandidateId { get; private set; }
 
     public CatalogueCandidate? CatalogueCandidate { get; private set; }
 
@@ -55,7 +55,7 @@ public class SupplierProduct :
     }
 
     public void AssignToCatalogueCandidate(
-        int catalogueCandidateId)
+        Guid catalogueCandidateId)
     {
         CatalogueCandidateId = catalogueCandidateId;
     }

@@ -16,7 +16,7 @@ public class MapCatalogueCandidatesToProductsLrt(
     IUnitOfWork unitOfWork, 
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
-    IRepository<CatalogueCandidate, int> catalogueCandidateRepository,
+    IRepository<CatalogueCandidate, Guid> catalogueCandidateRepository,
     IProductRepository productRepository,
     ILogger<MapCatalogueCandidatesToProductsLrt> logger)
     : LrtBase<NoneInputState, MapCatalogueCandidatesToProductsState>(
@@ -56,10 +56,9 @@ public class MapCatalogueCandidatesToProductsLrt(
     }
 
     private Task<BatchResult> ProcessBatchAsync(
-        int lastProcessedId,
+        Guid lastProcessedId,
         int batchSize)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(lastProcessedId);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
 
         return TransactionService.ExecuteAsync(
@@ -116,7 +115,7 @@ public class MapCatalogueCandidatesToProductsLrt(
     }
 
     private sealed record BatchResult(
-        int LastProcessedId,
+        Guid LastProcessedId,
         int ReadRows,
         int MappedRows,
         int SkippedRows,
