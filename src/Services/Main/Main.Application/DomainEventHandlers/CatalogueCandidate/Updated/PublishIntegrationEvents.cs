@@ -10,24 +10,22 @@ using Domain.Events;
 using Microsoft.EntityFrameworkCore;
 using Candidate = Main.Entities.Product.Enrichment.CatalogueCandidate;
 
-namespace Main.Application.DomainEventHandlers.CatalogueCandidate.Created;
+namespace Main.Application.DomainEventHandlers.CatalogueCandidate.Updated;
 
 public class PublishIntegrationEvents(
     IIntegrationEventScope integrationEventScope,
     IProjectionProvider<Candidate, CatalogueCandidateContractDto> projection,
     IReadRepository<Candidate, int> repository
-    ) : BatchableDomainEventHandler<EntityCreatedDomainEvent<Candidate>>
+    ) : BatchableDomainEventHandler<EntityUpdatedDomainEvent<Candidate, int>>
 {
     public override async Task Handle(
-        Batch<EntityCreatedDomainEvent<Candidate>> notification, 
+        Batch<EntityUpdatedDomainEvent<Candidate, int>> notification, 
         CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
-        if (notification.Items.Any(x => x.Entity.Id == 0))
-            throw new InvalidOperationException("Save Changes should be called before domain event handlers.");
         
         var chunkedIds = notification.Items
-            .Select(x => x.Entity.Id)
+            .Select(x => x.Id)
             .Distinct()
             .Chunk(1000)
             .Select(x => x.ToList());
@@ -35,9 +33,9 @@ public class PublishIntegrationEvents(
         foreach (var ids in chunkedIds)
         {
             var events = (await repository.Query
-                    .Where(x => ids.Contains(x.Id))
-                    .Project(projection)
-                    .ToListAsync(cancellationToken))
+                .Where(x => ids.Contains(x.Id))
+                .Project(projection)
+                .ToListAsync(cancellationToken))
                 .Select(x => new CatalogueCandidateUpdatedEvent
                 {
                     OccuredAt = now,
