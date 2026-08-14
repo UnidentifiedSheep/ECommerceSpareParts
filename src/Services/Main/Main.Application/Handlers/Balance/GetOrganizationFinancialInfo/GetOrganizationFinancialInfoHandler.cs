@@ -49,7 +49,7 @@ public class GetOrganizationFinancialInfoHandler(
                     organization.FinancialProfile,
                     netPosition),
             Balances = organization.Balances.Select(
-                balanceProjection.Projection.AsFunc())
+                balanceProjection.ProjectionFunc)
         };
     }
 }

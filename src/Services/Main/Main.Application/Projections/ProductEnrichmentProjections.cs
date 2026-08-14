@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
+using Contracts.Models.CatalogueCandidate;
 using LinqKit;
 using Main.Application.Dtos.Producer;
 using Main.Application.Dtos.Product;
@@ -13,9 +14,9 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class SupplierProductNameDtoProjectionProvider
-    : IProjectionProvider<SupplierProductName, SupplierProductNameDto>
+    : ProjectionProviderBase<SupplierProductName, SupplierProductNameDto>
 {
-    public Expression<Func<SupplierProductName, SupplierProductNameDto>> Projection { get; } =
+    public override Expression<Func<SupplierProductName, SupplierProductNameDto>> Projection { get; } =
         x => new SupplierProductNameDto
         {
             Id = x.Id,
@@ -26,7 +27,7 @@ public sealed class SupplierProductNameDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class SupplierProductDtoProjectionProvider
-    : IProjectionProvider<SupplierProduct, SupplierProductDto>
+    : ProjectionProviderBase<SupplierProduct, SupplierProductDto>
 {
     public SupplierProductDtoProjectionProvider(
         IProjectionProvider<SupplierProductName, SupplierProductNameDto> nameProjection)
@@ -46,12 +47,12 @@ public sealed class SupplierProductDtoProjectionProvider
         };
     }
 
-    public Expression<Func<SupplierProduct, SupplierProductDto>> Projection { get; }
+    public override Expression<Func<SupplierProduct, SupplierProductDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class CatalogueCandidateReviewDtoProjectionProvider
-    : IProjectionProvider<CatalogueCandidate, CatalogueCandidateReviewDto>
+    : ProjectionProviderBase<CatalogueCandidate, CatalogueCandidateReviewDto>
 {
     public CatalogueCandidateReviewDtoProjectionProvider(
         IProjectionProvider<ProducerEntity, ProducerDto> producerProjection,
@@ -77,5 +78,28 @@ public sealed class CatalogueCandidateReviewDtoProjectionProvider
         };
     }
 
-    public Expression<Func<CatalogueCandidate, CatalogueCandidateReviewDto>> Projection { get; }
+    public override Expression<Func<CatalogueCandidate, CatalogueCandidateReviewDto>> Projection { get; }
+}
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class CatalogueCandidateContractDtoProjectionProvider
+    : ProjectionProviderBase<CatalogueCandidate, CatalogueCandidateContractDto>
+{
+    public CatalogueCandidateContractDtoProjectionProvider()
+    {
+        Projection = x => new CatalogueCandidateContractDto
+        {
+            Id = x.Id,
+            Sku = x.Sku.Value,
+            MappedProductId = x.ProductId,
+            ProducerId = x.ProducerId,
+            Names = x.SupplierProducts
+                .SelectMany(z => z.Names
+                    .Select(c => c.Name.Trim()))
+                .Distinct()
+                .ToList()
+        };
+    }
+    
+    public override Expression<Func<CatalogueCandidate, CatalogueCandidateContractDto>> Projection { get; }
 }

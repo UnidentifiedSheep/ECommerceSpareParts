@@ -12,7 +12,7 @@ namespace Analytics.Application.Projections;
 
 [Lifetime(Lifetime.Scoped)]
 public sealed class MetricDtoProjectionProvider
-    : IProjectionProvider<Metric, MetricDto>
+    : ProjectionProviderBase<Metric, MetricDto>
 {
     public MetricDtoProjectionProvider(
         IScopedStringLocalizer localizer,
@@ -50,5 +50,5 @@ public sealed class MetricDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Metric, MetricDto>> Projection { get; }
+    public override Expression<Func<Metric, MetricDto>> Projection { get; }
 }

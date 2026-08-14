@@ -10,9 +10,9 @@ namespace Main.Application.Projections;
 [Lifetime(Lifetime.Scoped)]
 public sealed class RoleDtoProjectionProvider(
     IScopedStringLocalizer localizer)
-    : IProjectionProvider<Role, RoleDto>
+    : ProjectionProviderBase<Role, RoleDto>
 {
-    public Expression<Func<Role, RoleDto>> Projection { get; } =
+    public override Expression<Func<Role, RoleDto>> Projection { get; } =
         x => new RoleDto
         {
             SystemName = x.Name,

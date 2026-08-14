@@ -8,9 +8,9 @@ namespace Analytics.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class MetricJobDtoProjectionProvider
-    : IProjectionProvider<MetricJob, MetricJobDto>
+    : ProjectionProviderBase<MetricJob, MetricJobDto>
 {
-    public Expression<Func<MetricJob, MetricJobDto>> Projection { get; } =
+    public override Expression<Func<MetricJob, MetricJobDto>> Projection { get; } =
         x => new MetricJobDto
         {
             JobId = x.JobId,

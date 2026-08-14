@@ -13,7 +13,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class TransactionDtoProjectionProvider
-    : IProjectionProvider<Transaction, TransactionDto>
+    : ProjectionProviderBase<Transaction, TransactionDto>
 {
     public TransactionDtoProjectionProvider(
         IProjectionProvider<Organization, OrganizationDto> organizationProjection)
@@ -34,12 +34,12 @@ public sealed class TransactionDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Transaction, TransactionDto>> Projection { get; }
+    public override Expression<Func<Transaction, TransactionDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class OrganizationBalanceDtoProjectionProvider
-    : IProjectionProvider<OrganizationBalance, OrganizationBalanceDto>
+    : ProjectionProviderBase<OrganizationBalance, OrganizationBalanceDto>
 {
     public OrganizationBalanceDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)
@@ -53,7 +53,7 @@ public sealed class OrganizationBalanceDtoProjectionProvider
         };
     }
 
-    public Expression<Func<OrganizationBalance, OrganizationBalanceDto>> Projection { get; }
+    public override Expression<Func<OrganizationBalance, OrganizationBalanceDto>> Projection { get; }
 }
 
 public static class OrganizationFinancialProfileDtoFactory

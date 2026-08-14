@@ -12,7 +12,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class OrganizationMemberDtoProjectionProvider
-    : IProjectionProvider<OrganizationMember, OrganizationMemberDto>
+    : ProjectionProviderBase<OrganizationMember, OrganizationMemberDto>
 {
     public OrganizationMemberDtoProjectionProvider(
         IProjectionProvider<User, UserDto> userProjection)
@@ -27,12 +27,12 @@ public sealed class OrganizationMemberDtoProjectionProvider
         };
     }
 
-    public Expression<Func<OrganizationMember, OrganizationMemberDto>> Projection { get; }
+    public override Expression<Func<OrganizationMember, OrganizationMemberDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class OrganizationDtoProjectionProvider
-    : IProjectionProvider<Organization, OrganizationDto>
+    : ProjectionProviderBase<Organization, OrganizationDto>
 {
     public OrganizationDtoProjectionProvider(
         IProjectionProvider<OrganizationMember, OrganizationMemberDto> memberProjection)
@@ -51,12 +51,12 @@ public sealed class OrganizationDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Organization, OrganizationDto>> Projection { get; }
+    public override Expression<Func<Organization, OrganizationDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class OrganizationListItemProjectionProvider
-    : IProjectionProvider<Organization, OrganizationListItemDto>
+    : ProjectionProviderBase<Organization, OrganizationListItemDto>
 {
     public OrganizationListItemProjectionProvider(
         IProjectionProvider<OrganizationMember, OrganizationMemberDto> memberProjection)
@@ -78,5 +78,5 @@ public sealed class OrganizationListItemProjectionProvider
         };
     }
 
-    public Expression<Func<Organization, OrganizationListItemDto>> Projection { get; }
+    public override Expression<Func<Organization, OrganizationListItemDto>> Projection { get; }
 }

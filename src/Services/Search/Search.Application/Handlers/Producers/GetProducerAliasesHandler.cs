@@ -25,6 +25,6 @@ public class GetProducerAliasesHandler(
             cancellationToken);
 
         return new GetProducerAliasesResult(
-            producer?.Aliases.Select(projection.Projection.AsFunc()) ?? []);
+            producer?.Aliases.Select(projection.ProjectionFunc) ?? []);
     }
 }

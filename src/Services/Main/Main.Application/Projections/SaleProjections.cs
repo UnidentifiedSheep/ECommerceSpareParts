@@ -17,7 +17,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class SaleDtoProjectionProvider
-    : IProjectionProvider<Sale, SaleDto>
+    : ProjectionProviderBase<Sale, SaleDto>
 {
     public SaleDtoProjectionProvider(
         IProjectionProvider<User, UserDto> userProjection,
@@ -44,12 +44,12 @@ public sealed class SaleDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Sale, SaleDto>> Projection { get; }
+    public override Expression<Func<Sale, SaleDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class SaleContentDtoProjectionProvider
-    : IProjectionProvider<SaleContent, SaleContentDto>
+    : ProjectionProviderBase<SaleContent, SaleContentDto>
 {
     public SaleContentDtoProjectionProvider(
         IProjectionProvider<Product, ProductDto> productProjection,
@@ -71,12 +71,12 @@ public sealed class SaleContentDtoProjectionProvider
         };
     }
 
-    public Expression<Func<SaleContent, SaleContentDto>> Projection { get; }
+    public override Expression<Func<SaleContent, SaleContentDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class SaleContentDetailDtoProjectionProvider
-    : IProjectionProvider<SaleContentDetail, SaleContentDetailDto>
+    : ProjectionProviderBase<SaleContentDetail, SaleContentDetailDto>
 {
     public SaleContentDetailDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)
@@ -95,14 +95,14 @@ public sealed class SaleContentDetailDtoProjectionProvider
         };
     }
 
-    public Expression<Func<SaleContentDetail, SaleContentDetailDto>> Projection { get; }
+    public override Expression<Func<SaleContentDetail, SaleContentDetailDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductSaleHistoryDtoProjectionProvider
-    : IProjectionProvider<SaleContent, ProductSaleHistoryDto>
+    : ProjectionProviderBase<SaleContent, ProductSaleHistoryDto>
 {
-    public Expression<Func<SaleContent, ProductSaleHistoryDto>> Projection { get; } =
+    public override Expression<Func<SaleContent, ProductSaleHistoryDto>> Projection { get; } =
         x => new ProductSaleHistoryDto
         {
             SaleContentId = x.Id,

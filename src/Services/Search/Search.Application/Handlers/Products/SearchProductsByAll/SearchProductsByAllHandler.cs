@@ -44,7 +44,7 @@ public class SearchProductsByAllHandler(
             cancellationToken);
 
         return new SearchProductsByAllResult(
-            products.Select(projection.Projection.AsFunc()));
+            products.Select(projection.ProjectionFunc));
     }
 
     private static RangeModel<decimal>? ConvertDimensionRangeToMeters(

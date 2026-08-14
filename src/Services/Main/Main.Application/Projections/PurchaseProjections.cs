@@ -17,7 +17,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class PurchaseDtoProjectionProvider
-    : IProjectionProvider<Purchase, PurchaseDto>
+    : ProjectionProviderBase<Purchase, PurchaseDto>
 {
     public PurchaseDtoProjectionProvider(
         IProjectionProvider<PurchaseLogistic, PurchaseLogisticDto> logisticProjection,
@@ -48,12 +48,12 @@ public sealed class PurchaseDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Purchase, PurchaseDto>> Projection { get; }
+    public override Expression<Func<Purchase, PurchaseDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class PurchaseLogisticDtoProjectionProvider
-    : IProjectionProvider<PurchaseLogistic, PurchaseLogisticDto>
+    : ProjectionProviderBase<PurchaseLogistic, PurchaseLogisticDto>
 {
     public PurchaseLogisticDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)
@@ -75,12 +75,12 @@ public sealed class PurchaseLogisticDtoProjectionProvider
         };
     }
 
-    public Expression<Func<PurchaseLogistic, PurchaseLogisticDto>> Projection { get; }
+    public override Expression<Func<PurchaseLogistic, PurchaseLogisticDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class PurchaseContentDtoProjectionProvider
-    : IProjectionProvider<PurchaseContent, PurchaseContentDto>
+    : ProjectionProviderBase<PurchaseContent, PurchaseContentDto>
 {
     public PurchaseContentDtoProjectionProvider(
         IProjectionProvider<Product, ProductDto> productProjection,
@@ -104,14 +104,14 @@ public sealed class PurchaseContentDtoProjectionProvider
         };
     }
 
-    public Expression<Func<PurchaseContent, PurchaseContentDto>> Projection { get; }
+    public override Expression<Func<PurchaseContent, PurchaseContentDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class PurchaseContentLogisticDtoProjectionProvider
-    : IProjectionProvider<PurchaseContentLogistic, PurchaseContentLogisticDto>
+    : ProjectionProviderBase<PurchaseContentLogistic, PurchaseContentLogisticDto>
 {
-    public Expression<Func<PurchaseContentLogistic, PurchaseContentLogisticDto>> Projection { get; } =
+    public override Expression<Func<PurchaseContentLogistic, PurchaseContentLogisticDto>> Projection { get; } =
         x => new PurchaseContentLogisticDto
         {
             WeightKg = x.WeightKg,

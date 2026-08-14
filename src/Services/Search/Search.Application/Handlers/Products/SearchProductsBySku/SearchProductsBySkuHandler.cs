@@ -37,6 +37,6 @@ public class SearchProductsBySkuHandler(
             cancellationToken);
 
         return new SearchProductsBySkuResult(
-            result.Select(projection.Projection.AsFunc()));
+            result.Select(projection.ProjectionFunc));
     }
 }

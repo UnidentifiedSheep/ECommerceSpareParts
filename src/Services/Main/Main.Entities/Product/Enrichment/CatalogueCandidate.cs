@@ -8,7 +8,7 @@ namespace Main.Entities.Product.Enrichment;
 public class CatalogueCandidate :
     AuditableEntity<CatalogueCandidate, int>,
     ILinqEntity<CatalogueCandidate, int>,
-    IAutomaticDomainEvents
+    IGenerateAutomaticDomainEvents
 {
     private CatalogueCandidate() { }
 

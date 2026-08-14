@@ -10,9 +10,9 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProducerDtoProjectionProvider
-    : IProjectionProvider<Producer, ProducerDto>
+    : ProjectionProviderBase<Producer, ProducerDto>
 {
-    public Expression<Func<Producer, ProducerDto>> Projection { get; } =
+    public override Expression<Func<Producer, ProducerDto>> Projection { get; } =
         x => new ProducerDto
         {
             Id = x.Id,
@@ -23,9 +23,9 @@ public sealed class ProducerDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProducerFullDtoProjectionProvider
-    : IProjectionProvider<Producer, ProducerFullDto>
+    : ProjectionProviderBase<Producer, ProducerFullDto>
 {
-    public Expression<Func<Producer, ProducerFullDto>> Projection { get; } =
+    public override Expression<Func<Producer, ProducerFullDto>> Projection { get; } =
         x => new ProducerFullDto
         {
             Id = x.Id,
@@ -37,9 +37,9 @@ public sealed class ProducerFullDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProducerAliasDtoProjectionProvider
-    : IProjectionProvider<ProducerAlias, ProducerAliasDto>
+    : ProjectionProviderBase<ProducerAlias, ProducerAliasDto>
 {
-    public Expression<Func<ProducerAlias, ProducerAliasDto>> Projection { get; } =
+    public override Expression<Func<ProducerAlias, ProducerAliasDto>> Projection { get; } =
         x => new ProducerAliasDto
         {
             ProducerId = x.ProducerId,
@@ -49,9 +49,9 @@ public sealed class ProducerAliasDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProducerSupplierMappingDtoProjectionProvider
-    : IProjectionProvider<ProducerSupplierMapping, ProducerSupplierMappingDto>
+    : ProjectionProviderBase<ProducerSupplierMapping, ProducerSupplierMappingDto>
 {
-    public Expression<Func<ProducerSupplierMapping, ProducerSupplierMappingDto>> Projection { get; } =
+    public override Expression<Func<ProducerSupplierMapping, ProducerSupplierMappingDto>> Projection { get; } =
         x => new ProducerSupplierMappingDto
         {
             Id = x.Id,

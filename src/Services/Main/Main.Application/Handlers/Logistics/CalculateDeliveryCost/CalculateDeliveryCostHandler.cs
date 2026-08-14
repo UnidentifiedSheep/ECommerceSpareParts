@@ -88,7 +88,7 @@ public class CalculateDeliveryCostHandler(
         };
 
         return new CalculateDeliveryCostResult(
-            routeProjection.Projection.AsFunc()(route),
+            routeProjection.ProjectionFunc(route),
             deliveryCost);
     }
 

@@ -10,9 +10,9 @@ namespace Search.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProducerSearchDtoProjectionProvider
-    : IProjectionProvider<Producer, ProducerSearchDto>
+    : ProjectionProviderBase<Producer, ProducerSearchDto>
 {
-    public Expression<Func<Producer, ProducerSearchDto>> Projection { get; } =
+    public override Expression<Func<Producer, ProducerSearchDto>> Projection { get; } =
         producer => new ProducerSearchDto
         {
             Id = producer.Id,
@@ -23,9 +23,9 @@ public sealed class ProducerSearchDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProducerAliasDtoProjectionProvider
-    : IProjectionProvider<Entities.ProducerAlias, ProducerAliasDto>
+    : ProjectionProviderBase<Entities.ProducerAlias, ProducerAliasDto>
 {
-    public Expression<Func<Entities.ProducerAlias, ProducerAliasDto>> Projection { get; } =
+    public override Expression<Func<Entities.ProducerAlias, ProducerAliasDto>> Projection { get; } =
         alias => new ProducerAliasDto
         {
             Alias = alias.Alias
@@ -34,7 +34,7 @@ public sealed class ProducerAliasDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProducerDtoProjectionProvider
-    : IProjectionProvider<Producer, ProducerDto>
+    : ProjectionProviderBase<Producer, ProducerDto>
 {
     public ProducerDtoProjectionProvider(
         IProjectionProvider<Entities.ProducerAlias, ProducerAliasDto> aliasProjection)
@@ -50,5 +50,5 @@ public sealed class ProducerDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Producer, ProducerDto>> Projection { get; }
+    public override Expression<Func<Producer, ProducerDto>> Projection { get; }
 }

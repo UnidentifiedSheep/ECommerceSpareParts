@@ -11,7 +11,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class StorageContentDtoProjectionProvider
-    : IProjectionProvider<StorageContent, StorageContentDto>
+    : ProjectionProviderBase<StorageContent, StorageContentDto>
 {
     public StorageContentDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)
@@ -31,5 +31,5 @@ public sealed class StorageContentDtoProjectionProvider
         };
     }
 
-    public Expression<Func<StorageContent, StorageContentDto>> Projection { get; }
+    public override Expression<Func<StorageContent, StorageContentDto>> Projection { get; }
 }

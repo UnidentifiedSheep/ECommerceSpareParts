@@ -11,7 +11,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class CartItemDtoProjectionProvider
-    : IProjectionProvider<Cart, CartItemDto>
+    : ProjectionProviderBase<Cart, CartItemDto>
 {
     public CartItemDtoProjectionProvider(
         IProjectionProvider<Product, ProductDto> productProjection)
@@ -28,5 +28,5 @@ public sealed class CartItemDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Cart, CartItemDto>> Projection { get; }
+    public override Expression<Func<Cart, CartItemDto>> Projection { get; }
 }
