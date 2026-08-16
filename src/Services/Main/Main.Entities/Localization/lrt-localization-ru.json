@@ -15,6 +15,8 @@
     "lrt.producer.synchronization.description": "Публикует события обновления для всех производителей, чтобы связанные сервисы могли обновить данные о производителях.",
     "lrt.product.synchronization.name": "Синхронизация товаров",
     "lrt.product.synchronization.description": "Публикует события обновления для всех товаров, чтобы связанные сервисы могли обновить данные о товарах.",
+    "lrt.catalogue.candidates.synchronization.name": "Синхронизация кандидатов каталога",
+    "lrt.catalogue.candidates.synchronization.description": "Публикует события обновления для всех кандидатов, чтобы поисковый сервис мог полностью перестроить индекс кандидатов каталога.",
     "lrt.currency.rates.update.name": "Обновление курсов валют",
     "lrt.currency.rates.update.description": "Обновляет курсы валют по актуальным данным и сохраняет новые значения в системе.",
     "lrt.organization.approximate.balance.recalculate.name": "Перерасчёт приблизительных балансов организаций",

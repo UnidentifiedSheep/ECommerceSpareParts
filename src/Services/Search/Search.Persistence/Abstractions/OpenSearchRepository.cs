@@ -140,7 +140,7 @@ public abstract class OpenSearchRepository<TDocument, TKey>(
             $"Failed to {operation} OpenSearch index '{indexProvider()}'. {details}");
     }
 
-    private void EnsureResponseSucceeded(
+    protected void EnsureResponseSucceeded(
         IResponse response,
         string operation)
     {

@@ -22,12 +22,9 @@ public sealed class CatalogueCandidateIndexInitializer(
                 index,
                 descriptor => descriptor
                     .Settings(settings => settings
+                        .Setting("index.max_ngram_diff", 18)
                         .Analysis(analysis => analysis
-                            .Normalizers(normalizers => normalizers
-                                .Custom(
-                                    "lowercase_normalizer",
-                                    normalizer => normalizer
-                                        .Filters("lowercase")))))
+                            .ConfigureCatalogueSearch()))
                     .Map<CatalogueCandidate>(mapping => mapping
                         .Dynamic(false)
                         .Properties(properties => properties
@@ -38,7 +35,16 @@ public sealed class CatalogueCandidateIndexInitializer(
                                 .Normalizer("lowercase_normalizer"))
                             .Keyword(keyword => keyword
                                 .Name(x => x.NormalizedSku)
-                                .Normalizer("lowercase_normalizer"))
+                                .Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer)
+                                .Fields(fields => fields
+                                    .Text(prefix => prefix
+                                        .Name("prefix")
+                                        .Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
+                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
+                                    .Text(contains => contains
+                                        .Name("contains")
+                                        .Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
+                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))))
                             .Number(number => number
                                 .Name(x => x.ProducerId)
                                 .Type(NumberType.Integer))
@@ -47,11 +53,20 @@ public sealed class CatalogueCandidateIndexInitializer(
                                 .Type(NumberType.Integer))
                             .Text(text => text
                                 .Name(x => x.Names)
+                                .Analyzer(CatalogueSearchAnalysis.SearchAnalyzer)
                                 .Fields(fields => fields
                                     .Keyword(keyword => keyword
                                         .Name("keyword")
                                         .IgnoreAbove(256)
-                                        .Normalizer("lowercase_normalizer")))))),
+                                        .Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer))
+                                    .Text(prefix => prefix
+                                        .Name("prefix")
+                                        .Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
+                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
+                                    .Text(contains => contains
+                                        .Name("contains")
+                                        .Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
+                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer)))))),
                 ct),
             cancellationToken);
     }

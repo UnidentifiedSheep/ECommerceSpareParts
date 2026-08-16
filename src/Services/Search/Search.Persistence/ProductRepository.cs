@@ -5,11 +5,13 @@ using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using Search.Abstractions.Options;
 using Search.Application.Interfaces.Product;
+using Search.Application.Models.CatalogueSearch;
 using Search.Entities;
 using Search.Enums;
 using Search.Persistence.Abstractions;
 using Search.Persistence.Extensions;
 using Search.Persistence.Interfaces;
+using Search.Persistence.Queries;
 
 namespace Search.Persistence;
 
@@ -25,6 +27,32 @@ public class ProductRepository(
     IProductRepository
 {
     private static readonly Pagination DefaultPagination = new(0, 20);
+
+    public async Task<SearchResult<Product>> Search(
+        CatalogueSearchCriteria criteria,
+        CancellationToken cancellationToken = default)
+    {
+        var index = await GetIndex(cancellationToken);
+        var response = await Client.SearchAsync<Product>(
+            search => search
+                .Index(index)
+                .From(GetFrom(criteria.Pagination))
+                .Size(criteria.Pagination.Size)
+                .TrackTotalHits()
+                .SortBySearchRelevance(criteria.SortBy, product => product.Id)
+                .Query(query => CatalogueSearchQueryBuilder.Build(
+                    query,
+                    criteria,
+                    new Field("normalizedSku"),
+                    new Field("name"),
+                    new Field("producerId"))),
+            cancellationToken);
+
+        EnsureResponseSucceeded(response, "search in");
+        return new SearchResult<Product>(
+            response.Documents,
+            response.Total);
+    }
 
     public async Task<IReadOnlyCollection<Product>> Search(
         string query,

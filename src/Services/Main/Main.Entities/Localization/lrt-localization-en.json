@@ -15,6 +15,8 @@
     "lrt.producer.synchronization.description": "Publishes update events for all producers so related services can refresh their producer data.",
     "lrt.product.synchronization.name": "Product synchronization",
     "lrt.product.synchronization.description": "Publishes update events for all products so related services can refresh their product data.",
+    "lrt.catalogue.candidates.synchronization.name": "Catalogue candidate synchronization",
+    "lrt.catalogue.candidates.synchronization.description": "Publishes update events for all candidates so the search service can fully rebuild the catalogue candidate index.",
     "lrt.currency.rates.update.name": "Currency rate update",
     "lrt.currency.rates.update.description": "Updates currency exchange rates using current data and saves the new values in the system.",
     "lrt.organization.approximate.balance.recalculate.name": "Organization approximate balance recalculation",

@@ -27,6 +27,7 @@
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\Search.Application\Search.Application.csproj"/>
         <ProjectReference Include="..\Search.Entities\Search.Entities.csproj"/>
+        <ProjectReference Include="..\Search.Persistence\Search.Persistence.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -1,11 +1,26 @@
 using Abstractions;
 using Exceptions;
 using OpenSearch.Client;
+using System.Linq.Expressions;
 
 namespace Search.Persistence.Extensions;
 
 public static class SortDescriptorExtensions
 {
+    public static SearchDescriptor<TEntity> SortBySearchRelevance<TEntity, TKey>(
+        this SearchDescriptor<TEntity> search,
+        string[]? sortBy,
+        Expression<Func<TEntity, TKey>> idSelector)
+        where TEntity : class
+    {
+        if (sortBy is not null && sortBy.Any(x => !string.IsNullOrWhiteSpace(x)))
+            return search.SortBy(sortBy);
+
+        return search.Sort(sort => sort
+            .Descending(SortSpecialField.Score)
+            .Ascending(idSelector));
+    }
+
     public static SearchDescriptor<TEntity> SortBy<TEntity>(
         this SearchDescriptor<TEntity> search,
         string[]? sortBy,

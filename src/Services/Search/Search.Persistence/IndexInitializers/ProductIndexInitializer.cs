@@ -22,15 +22,9 @@ public class ProductIndexInitializer(
                 idx,
                 c => c
                     .Settings(s => s
+                        .Setting("index.max_ngram_diff", 18)
                         .Analysis(a => a
-                            .Normalizers(n => n
-                                .Custom(
-                                    "lowercase_normalizer",
-                                    cn => cn
-                                        .Filters("lowercase")
-                                )
-                            )
-                        ))
+                            .ConfigureCatalogueSearch()))
                     .Map<Product>(m => m
                         .Properties(p => p
                             .Keyword(k => k
@@ -38,11 +32,21 @@ public class ProductIndexInitializer(
                             )
                             .Text(t => t
                                 .Name(x => x.Name)
+                                .Analyzer(CatalogueSearchAnalysis.SearchAnalyzer)
                                 .Fields(f => f
                                     .Keyword(k => k
                                         .Name("keyword")
                                         .IgnoreAbove(256)
+                                        .Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer)
                                     )
+                                    .Text(prefix => prefix
+                                        .Name("prefix")
+                                        .Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
+                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
+                                    .Text(contains => contains
+                                        .Name("contains")
+                                        .Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
+                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
                                 )
                             )
                             .Keyword(k => k
@@ -51,7 +55,16 @@ public class ProductIndexInitializer(
                             )
                             .Keyword(k => k
                                 .Name(x => x.NormalizedSku)
-                                .Normalizer("lowercase_normalizer")
+                                .Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer)
+                                .Fields(fields => fields
+                                    .Text(prefix => prefix
+                                        .Name("prefix")
+                                        .Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
+                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
+                                    .Text(contains => contains
+                                        .Name("contains")
+                                        .Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
+                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer)))
                             )
                             .Number(n => n
                                 .Name(x => x.ProducerId)

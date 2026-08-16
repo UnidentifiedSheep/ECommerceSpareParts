@@ -15,6 +15,8 @@
     "lrt.producer.synchronization.description": "İlgili servislerin üretici verilerini yenileyebilmesi için tüm üreticiler için güncelleme olayları yayınlar.",
     "lrt.product.synchronization.name": "Ürün senkronizasyonu",
     "lrt.product.synchronization.description": "İlgili servislerin ürün verilerini yenileyebilmesi için tüm ürünler için güncelleme olayları yayınlar.",
+    "lrt.catalogue.candidates.synchronization.name": "Katalog adayı senkronizasyonu",
+    "lrt.catalogue.candidates.synchronization.description": "Arama servisinin katalog adayı dizinini tamamen yeniden oluşturabilmesi için tüm adaylara ait güncelleme olaylarını yayınlar.",
     "lrt.currency.rates.update.name": "Döviz kuru güncelleme",
     "lrt.currency.rates.update.description": "Döviz kurlarını güncel verilerle yeniler ve sistemdeki mevcut kur bilgilerini günceller.",
     "lrt.organization.approximate.balance.recalculate.name": "Kuruluş yaklaşık bakiye yeniden hesaplama",
