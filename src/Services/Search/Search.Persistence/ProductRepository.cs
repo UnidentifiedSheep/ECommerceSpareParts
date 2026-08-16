@@ -40,12 +40,22 @@ public class ProductRepository(
                     criteria,
                     new Field("normalizedSku"),
                     new Field("name"),
-                    new Field("producerId"))),
+                    new Field("producerId")))
+                .AddCatalogueHighlights(
+                    criteria.IncludeHighlights,
+                    criteria.Query,
+                    new Field("sku"),
+                    new Field("normalizedSku"),
+                    new Field("name")),
             cancellationToken);
 
         EnsureResponseSucceeded(response, "search in");
         return new SearchResult<Product>(
-            response.Documents,
+            response.Hits.Select(hit => new SearchHit<Product>(
+                hit.Source,
+                hit.Highlight.ToDictionary(
+                    pair => pair.Key,
+                    pair => (IReadOnlyCollection<string>)pair.Value))).ToArray(),
             response.Total);
     }
 

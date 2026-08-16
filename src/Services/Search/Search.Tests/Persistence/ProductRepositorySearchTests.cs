@@ -31,6 +31,7 @@ public sealed class ProductRepositorySearchTests
         requestBody().Should().Contain("\"normalizedSku\"");
         requestBody().Should().Contain("\"name.contains\"");
         requestBody().Should().NotContain("\"name.prefix\"");
+        requestBody().Should().NotContain("\"highlight\"");
     }
 
     [Fact]
@@ -48,6 +49,48 @@ public sealed class ProductRepositorySearchTests
         requestBody().Should().NotContain("\"fuzzy\"");
     }
 
+    [Fact]
+    public async Task Search_WhenHighlightsIncluded_ShouldRequestAndReturnHighlights()
+    {
+        const string response = """
+            {
+              "hits": {
+                "total": { "value": 1, "relation": "eq" },
+                "hits": [
+                  {
+                    "_index": "products-v2",
+                    "_id": "123",
+                    "_source": {
+                      "id": 123,
+                      "sku": "BOSCH-123",
+                      "normalizedSku": "bosch123",
+                      "name": "Bosch product",
+                      "producerId": 42,
+                      "stock": 0
+                    },
+                    "highlight": { "name": ["[[[Bosch]]] product"] }
+                  }
+                ]
+              }
+            }
+            """;
+        var (repository, requestBody) = CreateRepository(response);
+        var criteria = CreateCriteria(
+            "bosch",
+            new HashSet<SearchMatchType> { SearchMatchType.Exact },
+            new HashSet<SearchMatchType> { SearchMatchType.Contains }) with
+        {
+            IncludeHighlights = true
+        };
+
+        var result = await repository.Search(criteria);
+
+        requestBody().Should().Contain("\"highlight\"");
+        requestBody().Should().Contain("\"pre_tags\":[\"[[[\"]");
+        requestBody().Should().Contain("\"matched_fields\"");
+        result.Hits.Single().Highlights["name"].Should().Equal("[[[Bosch]]] product");
+    }
+
     private static CatalogueSearchCriteria CreateCriteria(
         string query,
         IReadOnlySet<SearchMatchType> skuModes,
@@ -63,10 +106,10 @@ public sealed class ProductRepositorySearchTests
         };
     }
 
-    private static (ProductRepository Repository, Func<string> RequestBody) CreateRepository()
+    private static (ProductRepository Repository, Func<string> RequestBody) CreateRepository(
+        string responseJson = "{\"hits\":{\"total\":{\"value\":0,\"relation\":\"eq\"},\"hits\":[]}}")
     {
-        var response = Encoding.UTF8.GetBytes(
-            "{\"hits\":{\"total\":{\"value\":0,\"relation\":\"eq\"},\"hits\":[]}}");
+        var response = Encoding.UTF8.GetBytes(responseJson);
         string requestBody = string.Empty;
         var connection = new InMemoryConnection(response, 200);
         var settings = new ConnectionSettings(

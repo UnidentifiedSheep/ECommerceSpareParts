@@ -44,6 +44,9 @@ public sealed record SearchCatalogueRequest
 
     [JsonPropertyName("sortBy")]
     public CatalogueSearchSortRequest? SortBy { get; init; }
+
+    [JsonPropertyName("includeHighlights")]
+    public bool IncludeHighlights { get; init; }
 }
 
 public sealed record CatalogueSearchSortRequest
@@ -84,7 +87,8 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
                             request.ProducerIds,
                             new Pagination(request.Page, request.Size),
                             request.SortBy?.Products ?? [],
-                            request.SortBy?.CatalogueCandidates ?? []),
+                            request.SortBy?.CatalogueCandidates ?? [],
+                            request.IncludeHighlights),
                         cancellationToken);
 
                     return Results.Ok(

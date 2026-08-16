@@ -29,12 +29,18 @@ public sealed class SearchCatalogueHandlerTests
                 It.IsAny<CancellationToken>()))
             .Callback<CatalogueSearchCriteria, CancellationToken>(
                 (criteria, _) => receivedCriteria = criteria)
-            .ReturnsAsync(new SearchResult<ProductDocument>([product], 11));
+            .ReturnsAsync(new SearchResult<ProductDocument>(
+                [new SearchHit<ProductDocument>(product, new Dictionary<string, IReadOnlyCollection<string>>())],
+                11));
         _candidateRepository
             .Setup(x => x.Search(
                 It.IsAny<CatalogueSearchCriteria>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new SearchResult<CatalogueCandidateDocument>([candidate], 7));
+            .ReturnsAsync(new SearchResult<CatalogueCandidateDocument>(
+                [new SearchHit<CatalogueCandidateDocument>(
+                    candidate,
+                    new Dictionary<string, IReadOnlyCollection<string>>())],
+                7));
         var handler = CreateHandler();
 
         var result = await handler.Handle(
@@ -55,6 +61,30 @@ public sealed class SearchCatalogueHandlerTests
         receivedCriteria.Should().NotBeNull();
         receivedCriteria!.Query.Should().Be("bosch 123");
         receivedCriteria.ProducerIds.Should().Equal(42);
+    }
+
+    [Fact]
+    public async Task Handle_WhenHighlightsIncluded_ShouldMapThemToItems()
+    {
+        var product = CreateProduct();
+        var highlights = new Dictionary<string, IReadOnlyCollection<string>>
+        {
+            ["name"] = ["Product [[[name]]]"]
+        };
+        _productRepository
+            .Setup(x => x.Search(
+                It.IsAny<CatalogueSearchCriteria>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SearchResult<ProductDocument>(
+                [new SearchHit<ProductDocument>(product, highlights)],
+                1));
+        var handler = CreateHandler();
+
+        var result = await handler.Handle(
+            CreateQuery(new HashSet<SearchTarget> { SearchTarget.Products }, true),
+            CancellationToken.None);
+
+        result.Products.Items.Single().Highlights.Should().BeEquivalentTo(highlights);
     }
 
     [Fact]
@@ -102,7 +132,8 @@ public sealed class SearchCatalogueHandlerTests
     }
 
     private static SearchCatalogueQuery CreateQuery(
-        IReadOnlySet<SearchTarget> targets)
+        IReadOnlySet<SearchTarget> targets,
+        bool includeHighlights = false)
     {
         return new SearchCatalogueQuery(
             "  bosch 123  ",
@@ -112,7 +143,8 @@ public sealed class SearchCatalogueHandlerTests
             [42, 42],
             new Pagination(0, 20),
             [],
-            []);
+            [],
+            includeHighlights);
     }
 
     private static ProductDocument CreateProduct()

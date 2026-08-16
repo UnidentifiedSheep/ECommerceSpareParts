@@ -37,8 +37,11 @@ when first used. Main also contains synchronization jobs for rebuilding product 
 
 Exact query parameters and permissions are available at <http://localhost:8080/docs>.
 
+Catalogue search accepts `includeHighlights` (default: `false`). When enabled for a non-empty text query, matching
+items include a `highlights` object for `sku` and `name`/`names`. Matched text is delimited with `[[[` and `]]]`
+markers so clients can render it without treating search data as HTML.
+
 ## Current Scope
 
 Dedicated suggestions, transliteration, and supplier-producer names awaiting confirmation are not yet included. See
 [TODO.md](TODO.md).
-

@@ -15,4 +15,8 @@ public sealed record CatalogueCandidateDto
 
     [JsonPropertyName("names")]
     public required IReadOnlyCollection<string> Names { get; init; }
+
+    [JsonPropertyName("highlights")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyDictionary<string, IReadOnlyCollection<string>>? Highlights { get; init; }
 }

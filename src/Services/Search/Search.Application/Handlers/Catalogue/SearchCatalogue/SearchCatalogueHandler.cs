@@ -20,7 +20,8 @@ public sealed record SearchCatalogueQuery(
     IReadOnlyCollection<int> ProducerIds,
     Pagination Pagination,
     string[] ProductSortBy,
-    string[] CatalogueCandidateSortBy)
+    string[] CatalogueCandidateSortBy,
+    bool IncludeHighlights = false)
     : IQuery<SearchCatalogueResult>;
 
 public sealed record SearchCatalogueSection<T>(
@@ -49,7 +50,8 @@ public sealed class SearchCatalogueHandler(
             NameModes = request.NameModes,
             ProducerIds = request.ProducerIds.Distinct().ToArray(),
             Pagination = request.Pagination,
-            SortBy = []
+            SortBy = [],
+            IncludeHighlights = request.IncludeHighlights
         };
 
         var productTask = request.Targets.Contains(SearchTarget.Products)
@@ -69,10 +71,22 @@ public sealed class SearchCatalogueHandler(
 
         return new SearchCatalogueResult(
             new SearchCatalogueSection<ProductDto>(
-                products.Items.Select(productProjection.ProjectionFunc).ToArray(),
+                products.Hits.Select(hit => productProjection.ProjectionFunc(hit.Document) with
+                {
+                    Highlights = ToHighlights(hit.Highlights)
+                }).ToArray(),
                 products.Total),
             new SearchCatalogueSection<CatalogueCandidateDto>(
-                candidates.Items.Select(candidateProjection.ProjectionFunc).ToArray(),
+                candidates.Hits.Select(hit => candidateProjection.ProjectionFunc(hit.Document) with
+                {
+                    Highlights = ToHighlights(hit.Highlights)
+                }).ToArray(),
                 candidates.Total));
+    }
+
+    private static IReadOnlyDictionary<string, IReadOnlyCollection<string>>? ToHighlights(
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlights)
+    {
+        return highlights.Count == 0 ? null : highlights;
     }
 }
