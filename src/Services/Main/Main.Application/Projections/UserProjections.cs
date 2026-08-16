@@ -13,7 +13,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserDtoProjectionProvider
-    : IProjectionProvider<User, UserDto>
+    : ProjectionProviderBase<User, UserDto>
 {
     public UserDtoProjectionProvider(
         IProjectionProvider<UserInfo, UserInfoDto> userInfoProjection)
@@ -37,12 +37,12 @@ public sealed class UserDtoProjectionProvider
         };
     }
 
-    public Expression<Func<User, UserDto>> Projection { get; }
+    public override Expression<Func<User, UserDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserPartyDtoProjectionProvider
-    : IProjectionProvider<User, UserPartyDto>
+    : ProjectionProviderBase<User, UserPartyDto>
 {
     public UserPartyDtoProjectionProvider(
         IProjectionProvider<User, UserDto> userProjection,
@@ -61,14 +61,14 @@ public sealed class UserPartyDtoProjectionProvider
         };
     }
 
-    public Expression<Func<User, UserPartyDto>> Projection { get; }
+    public override Expression<Func<User, UserPartyDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserInfoDtoProjectionProvider
-    : IProjectionProvider<UserInfo, UserInfoDto>
+    : ProjectionProviderBase<UserInfo, UserInfoDto>
 {
-    public Expression<Func<UserInfo, UserInfoDto>> Projection { get; } =
+    public override Expression<Func<UserInfo, UserInfoDto>> Projection { get; } =
         x => new UserInfoDto
         {
             Description = x.Description,
@@ -79,9 +79,9 @@ public sealed class UserInfoDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserEmailDtoProjectionProvider
-    : IProjectionProvider<UserEmail, UserEmailDto>
+    : ProjectionProviderBase<UserEmail, UserEmailDto>
 {
-    public Expression<Func<UserEmail, UserEmailDto>> Projection { get; } =
+    public override Expression<Func<UserEmail, UserEmailDto>> Projection { get; } =
         x => new UserEmailDto
         {
             Email = x.Email.Value,
@@ -96,9 +96,9 @@ public sealed class UserEmailDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserPhoneDtoProjectionProvider
-    : IProjectionProvider<UserPhone, UserPhoneDto>
+    : ProjectionProviderBase<UserPhone, UserPhoneDto>
 {
-    public Expression<Func<UserPhone, UserPhoneDto>> Projection { get; } =
+    public override Expression<Func<UserPhone, UserPhoneDto>> Projection { get; } =
         x => new UserPhoneDto
         {
             IsConfirmed = x.Confirmed,
@@ -110,11 +110,11 @@ public sealed class UserPhoneDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserPartyTypeProjectionProvider
-    : IProjectionProvider<User, UserPartyType>
+    : ProjectionProviderBase<User, UserPartyType>
 {
     private static readonly string SystemRole = Role.System.ToNormalizedRole();
 
-    public Expression<Func<User, UserPartyType>> Projection { get; } =
+    public override Expression<Func<User, UserPartyType>> Projection { get; } =
         x => x.Roles.Any(role => role.RoleName == SystemRole)
             ? UserPartyType.System
             : UserPartyType.User;

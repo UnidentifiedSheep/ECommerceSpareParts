@@ -6,6 +6,8 @@ Search provides product and producer discovery through OpenSearch. Main remains 
 
 - searches products by name and SKU;
 - supports exact, prefix, substring, and fuzzy SKU matching;
+- applies name matching to the whole value for exact, prefix, and substring modes; fuzzy name matching requires every
+  query token to match;
 - filters products by producer and dimensions;
 - supports pagination and configured sorting;
 - searches producers by primary name and aliases;
@@ -37,8 +39,11 @@ when first used. Main also contains synchronization jobs for rebuilding product 
 
 Exact query parameters and permissions are available at <http://localhost:8080/docs>.
 
+Catalogue search accepts `includeHighlights` (default: `false`). When enabled for a non-empty text query, matching
+items include a `highlights` object for `sku` and `name`/`names`. Matched text is delimited with `[[[` and `]]]`
+markers so clients can render it without treating search data as HTML.
+
 ## Current Scope
 
 Dedicated suggestions, transliteration, and supplier-producer names awaiting confirmation are not yet included. See
 [TODO.md](TODO.md).
-

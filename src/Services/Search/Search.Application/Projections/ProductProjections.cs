@@ -9,9 +9,9 @@ namespace Search.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductDimensionsDtoProjectionProvider
-    : IProjectionProvider<ProductDimensions, ProductDimensionsDto>
+    : ProjectionProviderBase<ProductDimensions, ProductDimensionsDto>
 {
-    public Expression<Func<ProductDimensions, ProductDimensionsDto>> Projection { get; } =
+    public override Expression<Func<ProductDimensions, ProductDimensionsDto>> Projection { get; } =
         dimensions => new ProductDimensionsDto
         {
             Length = dimensions.Length,
@@ -24,9 +24,9 @@ public sealed class ProductDimensionsDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductWeightDtoProjectionProvider
-    : IProjectionProvider<ProductWeight, ProductWeightDto>
+    : ProjectionProviderBase<ProductWeight, ProductWeightDto>
 {
-    public Expression<Func<ProductWeight, ProductWeightDto>> Projection { get; } =
+    public override Expression<Func<ProductWeight, ProductWeightDto>> Projection { get; } =
         weight => new ProductWeightDto
         {
             Value = weight.Value,
@@ -37,7 +37,7 @@ public sealed class ProductWeightDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductDtoProjectionProvider
-    : IProjectionProvider<Product, ProductDto>
+    : ProjectionProviderBase<Product, ProductDto>
 {
     public ProductDtoProjectionProvider(
         IProjectionProvider<ProductDimensions, ProductDimensionsDto> dimensionsProjection,
@@ -63,5 +63,5 @@ public sealed class ProductDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Product, ProductDto>> Projection { get; }
+    public override Expression<Func<Product, ProductDto>> Projection { get; }
 }

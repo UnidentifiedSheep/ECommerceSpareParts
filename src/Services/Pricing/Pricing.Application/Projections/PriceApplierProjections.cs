@@ -9,9 +9,9 @@ namespace Pricing.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class PriceApplierStateDtoProjectionProvider
-    : IProjectionProvider<PriceApplierState, PriceApplierStateDto>
+    : ProjectionProviderBase<PriceApplierState, PriceApplierStateDto>
 {
-    public Expression<Func<PriceApplierState, PriceApplierStateDto>> Projection { get; } =
+    public override Expression<Func<PriceApplierState, PriceApplierStateDto>> Projection { get; } =
         x => new PriceApplierStateDto
         {
             Enabled = x.Enabled,
@@ -23,7 +23,7 @@ public sealed class PriceApplierStateDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class PriceApplierDtoProjectionProvider
-    : IProjectionProvider<PriceApplier, PriceApplierDto>
+    : ProjectionProviderBase<PriceApplier, PriceApplierDto>
 {
     public PriceApplierDtoProjectionProvider(
         IProjectionProvider<PriceApplierState, PriceApplierStateDto> stateProjection)
@@ -40,5 +40,5 @@ public sealed class PriceApplierDtoProjectionProvider
         };
     }
 
-    public Expression<Func<PriceApplier, PriceApplierDto>> Projection { get; }
+    public override Expression<Func<PriceApplier, PriceApplierDto>> Projection { get; }
 }

@@ -9,4 +9,7 @@ public record OpenSearchIndexOptions
 
     [Required]
     public required string Producers { get; init; }
+
+    [Required]
+    public required string CatalogueCandidates { get; init; }
 }

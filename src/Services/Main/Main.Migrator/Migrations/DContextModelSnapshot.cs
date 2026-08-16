@@ -1484,12 +1484,10 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Product.Enrichment.CatalogueCandidate", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -1562,8 +1560,8 @@ namespace Main.Migrator.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CatalogueCandidateId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("CatalogueCandidateId")
+                        .HasColumnType("uuid")
                         .HasColumnName("catalogue_candidate_id");
 
                     b.Property<DateTime>("CreatedAt")
@@ -3755,18 +3753,22 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Product.Enrichment.CatalogueCandidate", b =>
                 {
-                    b.HasOne("Main.Entities.Producer.Producer", null)
+                    b.HasOne("Main.Entities.Producer.Producer", "Producer")
                         .WithMany()
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("catalogue_candidates_producer_id_fk");
 
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product", "Product")
                         .WithOne()
                         .HasForeignKey("Main.Entities.Product.Enrichment.CatalogueCandidate", "ProductId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("catalogue_candidates_product_id_fk");
+
+                    b.Navigation("Producer");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.Enrichment.SupplierProduct", b =>

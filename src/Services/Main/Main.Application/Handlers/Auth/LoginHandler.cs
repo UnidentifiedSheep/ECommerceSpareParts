@@ -74,7 +74,7 @@ public class LoginHandler(
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        var userDto = userProjection.Projection.AsFunc()(user);
+        var userDto = userProjection.ProjectionFunc(user);
         var token = tokenGenerator.CreateToken(
             userDto,
             deviceId,

@@ -11,7 +11,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class StorageRouteDtoProjectionProvider
-    : IProjectionProvider<StorageRoute, StorageRouteDto>
+    : ProjectionProviderBase<StorageRoute, StorageRouteDto>
 {
     public StorageRouteDtoProjectionProvider(
         IProjectionProvider<Currency, CurrencyDto> currencyProjection)
@@ -37,14 +37,14 @@ public sealed class StorageRouteDtoProjectionProvider
         };
     }
 
-    public Expression<Func<StorageRoute, StorageRouteDto>> Projection { get; }
+    public override Expression<Func<StorageRoute, StorageRouteDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class StorageDtoProjectionProvider
-    : IProjectionProvider<Storage, StorageDto>
+    : ProjectionProviderBase<Storage, StorageDto>
 {
-    public Expression<Func<Storage, StorageDto>> Projection { get; } =
+    public override Expression<Func<Storage, StorageDto>> Projection { get; } =
         x => new StorageDto
         {
             Name = x.Name,

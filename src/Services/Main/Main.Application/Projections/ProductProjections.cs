@@ -15,7 +15,7 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductDtoProjectionProvider
-    : IProjectionProvider<Product, ProductDto>
+    : ProjectionProviderBase<Product, ProductDto>
 {
     public ProductDtoProjectionProvider(IOptions<S3BucketsOptions> bucketsOptions)
     {
@@ -35,12 +35,12 @@ public sealed class ProductDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Product, ProductDto>> Projection { get; }
+    public override Expression<Func<Product, ProductDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class FullProductDtoProjectionProvider
-    : IProjectionProvider<Product, FullProductDto>
+    : ProjectionProviderBase<Product, FullProductDto>
 {
     public FullProductDtoProjectionProvider(
         IOptions<S3BucketsOptions> bucketsOptions,
@@ -71,14 +71,14 @@ public sealed class FullProductDtoProjectionProvider
         };
     }
 
-    public Expression<Func<Product, FullProductDto>> Projection { get; }
+    public override Expression<Func<Product, FullProductDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductWeightDtoProjectionProvider
-    : IProjectionProvider<ProductWeight, ProductWeightDto>
+    : ProjectionProviderBase<ProductWeight, ProductWeightDto>
 {
-    public Expression<Func<ProductWeight, ProductWeightDto>> Projection { get; } =
+    public override Expression<Func<ProductWeight, ProductWeightDto>> Projection { get; } =
         x => new ProductWeightDto
         {
             ProductId = x.ProductId,
@@ -89,9 +89,9 @@ public sealed class ProductWeightDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductSizeDtoProjectionProvider
-    : IProjectionProvider<ProductSize, ProductSizeDto>
+    : ProjectionProviderBase<ProductSize, ProductSizeDto>
 {
-    public Expression<Func<ProductSize, ProductSizeDto>> Projection { get; } =
+    public override Expression<Func<ProductSize, ProductSizeDto>> Projection { get; } =
         x => new ProductSizeDto
         {
             ProductId = x.ProductId,
@@ -105,7 +105,7 @@ public sealed class ProductSizeDtoProjectionProvider
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductReservationDtoProjectionProvider
-    : IProjectionProvider<ProductReservation, ProductReservationDto>
+    : ProjectionProviderBase<ProductReservation, ProductReservationDto>
 {
     public ProductReservationDtoProjectionProvider(
         IProjectionProvider<Organization, OrganizationDto> organizationProjection)
@@ -127,5 +127,5 @@ public sealed class ProductReservationDtoProjectionProvider
         };
     }
 
-    public Expression<Func<ProductReservation, ProductReservationDto>> Projection { get; }
+    public override Expression<Func<ProductReservation, ProductReservationDto>> Projection { get; }
 }

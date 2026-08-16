@@ -46,14 +46,14 @@ public class CatalogueCandidateConfiguration :
         builder.Property(x => x.ProductId)
             .HasColumnName("product_id");
 
-        builder.HasOne<ProducerEntity>()
+        builder.HasOne<ProducerEntity>(e => e.Producer)
             .WithMany()
             .HasForeignKey(x => x.ProducerId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName(
                 "catalogue_candidates_producer_id_fk");
 
-        builder.HasOne<ProductEntity>()
+        builder.HasOne<ProductEntity>(e => e.Product)
             .WithOne()
             .HasForeignKey<CatalogueCandidate>(x => x.ProductId)
             .OnDelete(DeleteBehavior.SetNull)

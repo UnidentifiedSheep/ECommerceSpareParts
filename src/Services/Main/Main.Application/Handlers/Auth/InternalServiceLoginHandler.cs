@@ -48,7 +48,7 @@ public class InternalServiceLoginHandler(
             await userCache.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken)
             ?? throw new UserNotFoundException(user.Id);
 
-        var userDto = userProjection.Projection.AsFunc()(user);
+        var userDto = userProjection.ProjectionFunc(user);
         var token = tokenGenerator.CreateToken(
             userDto,
             request.Service,

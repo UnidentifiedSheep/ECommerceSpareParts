@@ -28,4 +28,8 @@ public record ProductDto
 
     [JsonPropertyName("weight")]
     public ProductWeightDto? Weight { get; init; }
+
+    [JsonPropertyName("highlights")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyDictionary<string, IReadOnlyCollection<string>>? Highlights { get; init; }
 }

@@ -11,9 +11,9 @@ namespace Application.Common.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class JobDtoProjectionProvider
-    : IProjectionProvider<Job, JobDto>
+    : ProjectionProviderBase<Job, JobDto>
 {
-    public Expression<Func<Job, JobDto>> Projection { get; } =
+    public override Expression<Func<Job, JobDto>> Projection { get; } =
         job => new JobDto
         {
             Attempts = job.Attempts,
@@ -32,9 +32,9 @@ public sealed class JobDtoProjectionProvider
 [Lifetime(Lifetime.Scoped)]
 public sealed class JobScheduleDtoProjectionProvider(
     IScopedStringLocalizer localizer)
-    : IProjectionProvider<JobSchedule, JobScheduleDto>
+    : ProjectionProviderBase<JobSchedule, JobScheduleDto>
 {
-    public Expression<Func<JobSchedule, JobScheduleDto>> Projection { get; } =
+    public override Expression<Func<JobSchedule, JobScheduleDto>> Projection { get; } =
         schedule => new JobScheduleDto
         {
             Id = schedule.Id,

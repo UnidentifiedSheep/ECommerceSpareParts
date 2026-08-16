@@ -18,5 +18,11 @@ public static class SortByConfig
             .Map<Product, decimal?>("height", x => x.Dimensions!.HeightM)
             .Map<Product, decimal?>("volume", x => x.Dimensions!.VolumeM3)
             .Map<Product, decimal?>("weight", x => x.Weight!.WeightKg);
+
+        QueryableSortBy.Value
+            .MapDefault<CatalogueCandidate, Guid>(x => x.Id)
+            .Map<CatalogueCandidate, Guid>("id", x => x.Id)
+            .Map<CatalogueCandidate, string>("sku", x => x.NormalizedSku)
+            .Map<CatalogueCandidate, int>("producerId", x => x.ProducerId);
     }
 }

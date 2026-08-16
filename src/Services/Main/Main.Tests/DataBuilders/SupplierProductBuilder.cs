@@ -36,6 +36,6 @@ public sealed class SupplierProductBuilder(Faker faker)
         return SupplierProduct.Create(
             new Sku(Sku ?? Faker.Random.AlphaNumeric(12)),
             Producer ?? Faker.Company.CompanyName(),
-            Supplier ?? Faker.PickRandom<Enums.Supplier>());
+            Supplier ?? Faker.PickRandom<Supplier>());
     }
 }

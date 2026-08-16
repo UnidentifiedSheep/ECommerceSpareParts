@@ -127,6 +127,6 @@ public class UserCacheRepository(
         var user = await userRepository.FirstOrDefaultAsync(criteria, token);
         return user == null
             ? null
-            : userProjection.Projection.AsFunc()(user);
+            : userProjection.ProjectionFunc(user);
     }
 }

@@ -8,9 +8,9 @@ namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class CurrencyDtoProjectionProvider
-    : IProjectionProvider<Currency, CurrencyDto>
+    : ProjectionProviderBase<Currency, CurrencyDto>
 {
-    public Expression<Func<Currency, CurrencyDto>> Projection { get; } =
+    public override Expression<Func<Currency, CurrencyDto>> Projection { get; } =
         x => new CurrencyDto
         {
             Id = x.Id,

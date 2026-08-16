@@ -30,6 +30,6 @@ public class SearchProducersHandler(
             cancellationToken);
 
         return new SearchProducersResult(
-            producers.Select(projection.Projection.AsFunc()));
+            producers.Select(projection.ProjectionFunc));
     }
 }
