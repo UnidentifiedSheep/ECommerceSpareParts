@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using OpenSearch.Net;
 using Search.Abstractions.Options;
+using Search.Application.Interfaces.CatalogueCandidate;
 using Search.Application.Interfaces.Producer;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
@@ -36,12 +37,14 @@ public static class ServiceProvider
 
         services.AddSingleton<IProductRepository, ProductRepository>();
         services.AddSingleton<IProducerRepository, ProducerRepository>();
+        services.AddSingleton<ICatalogueCandidateRepository, CatalogueCandidateRepository>();
         services.AddSingleton<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();
         services.AddSingleton<IProducerSearchDocumentProvider, MainProducerSearchDocumentProvider>();
 
 
         services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();
         services.AddSingleton<IIndexInitializer<Producer>, ProducerIndexInitializer>();
+        services.AddSingleton<IIndexInitializer<CatalogueCandidate>, CatalogueCandidateIndexInitializer>();
 
         return services;
     }

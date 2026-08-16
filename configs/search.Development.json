@@ -6,7 +6,8 @@
     "AllowInvalidCertificate": true,
     "IndexOptions": {
       "Products": "products-v1",
-      "Producers": "producers-v1"
+      "Producers": "producers-v1",
+      "CatalogueCandidates": "catalogue-candidates-v1"
     }
   },
   "InternalServiceCredentials": {

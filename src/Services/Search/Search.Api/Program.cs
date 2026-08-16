@@ -13,6 +13,7 @@ using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using Search.Abstractions.Options;
 using Search.Application;
+using Search.Application.Consumers.CatalogueCandidate;
 using Search.Application.Consumers.Producer;
 using Search.Application.Consumers.Product;
 using Search.Persistence;
@@ -38,6 +39,8 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<ProducerUpdatedConsumer, ProducerUpdatedConsumerDefinition>();
     x.AddConsumer<ProductUpdatedConsumer, ProductUpdatedConsumerDefinition>();
     x.AddConsumer<ProductDeletedConsumer, ProductDeletedConsumerDefinition>();
+    x.AddConsumer<CatalogueCandidateUpdatedConsumer, CatalogueCandidateUpdatedConsumerDefinition>();
+    x.AddConsumer<CatalogueCandidateDeletedConsumer, CatalogueCandidateDeletedConsumerDefinition>();
 
     x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
 
@@ -53,6 +56,8 @@ builder.Services.AddMassTransit(x =>
 
                 ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
                 ep.ConfigureConsumer<ProductDeletedConsumer>(context);
+                ep.ConfigureConsumer<CatalogueCandidateUpdatedConsumer>(context);
+                ep.ConfigureConsumer<CatalogueCandidateDeletedConsumer>(context);
 
                 ep.ConfigureConsumer<ProducerUpdatedConsumer>(context);
             });
