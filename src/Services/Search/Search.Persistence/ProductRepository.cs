@@ -7,6 +7,7 @@ using Search.Abstractions.Options;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
 using Search.Enums;
+using Search.Persistence.Abstractions;
 using Search.Persistence.Extensions;
 using Search.Persistence.Interfaces;
 
@@ -16,49 +17,14 @@ public class ProductRepository(
     IOptionsMonitor<OpenSearchOptions> options,
     IOpenSearchClient client,
     IIndexInitializer<Product> idxInitializer
-) : IProductRepository
+) : OpenSearchRepository<Product, int>(
+        client,
+        idxInitializer,
+        () => options.CurrentValue.IndexOptions.Products,
+        product => product.Id),
+    IProductRepository
 {
     private static readonly Pagination DefaultPagination = new(0, 20);
-
-    public async Task Upsert(
-        Product product,
-        CancellationToken token = default)
-    {
-        var idx = await CheckInitAndGetIdx(token);
-        await client.IndexAsync(
-            product,
-            i => i
-                .Index(idx)
-                .Id(product.Id),
-            token);
-    }
-
-    public async Task UpsertMany(
-        IEnumerable<Product> products,
-        CancellationToken token = default)
-    {
-        var idx = await CheckInitAndGetIdx(token);
-        await client.BulkAsync(
-            b => b
-                .Index(idx)
-                .IndexMany(
-                    products,
-                    (d, product) => d.Id(product.Id)),
-            token);
-    }
-
-    public async Task<Product?> GetById(
-        int id,
-        CancellationToken token = default)
-    {
-        var idx = await CheckInitAndGetIdx(token);
-        var response = await client.GetAsync<Product>(
-            id,
-            g => g.Index(idx),
-            token);
-
-        return response.Found ? response.Source : null;
-    }
 
     public async Task<IReadOnlyCollection<Product>> Search(
         string query,
@@ -89,9 +55,9 @@ public class ProductRepository(
             heightM);
 
         var page = pagination ?? DefaultPagination;
-        var idx = await CheckInitAndGetIdx(token);
+        var idx = await GetIndex(token);
         var normalizedQuery = query.OnlyCharacterToLower();
-        var response = await client.SearchAsync<Product>(
+        var response = await Client.SearchAsync<Product>(
             s => s
                 .Index(idx)
                 .From(GetFrom(page))
@@ -133,7 +99,7 @@ public class ProductRepository(
         CancellationToken token = default)
     {
         var page = pagination ?? DefaultPagination;
-        var idx = await CheckInitAndGetIdx(token);
+        var idx = await GetIndex(token);
         var normalizedSku = sku?.OnlyCharacterToLower() ?? string.Empty;
 
         var should = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
@@ -141,7 +107,7 @@ public class ProductRepository(
         AddSkuQueries(should, normalizedSku, searchMode);
         AddProducerFilter(filters, producerId);
 
-        var response = await client.SearchAsync<Product>(
+        var response = await Client.SearchAsync<Product>(
             s => s
                 .Index(idx)
                 .From(GetFrom(page))
@@ -195,38 +161,6 @@ public class ProductRepository(
             token);
     }
 
-    public async Task Delete(
-        int id,
-        CancellationToken token = default)
-    {
-        var idx = await CheckInitAndGetIdx(token);
-        await client.DeleteAsync<Product>(
-            id,
-            d => d.Index(idx),
-            token);
-    }
-
-    public async Task DeleteMany(
-        IEnumerable<int> ids,
-        CancellationToken token = default)
-    {
-        var idList = ids.ToArray();
-        if (idList.Length == 0) return;
-
-
-        var idx = await CheckInitAndGetIdx(token);
-        await client.BulkAsync(
-            b =>
-            {
-                b.Index(idx);
-
-                foreach (var id in idList) b.Delete<Product>(d => d.Id(id));
-
-                return b;
-            },
-            token);
-    }
-
     public async Task<IReadOnlyCollection<Product>> GetByDimensionsRange(
         RangeModel<decimal>? length = null,
         RangeModel<decimal>? width = null,
@@ -250,8 +184,8 @@ public class ProductRepository(
             height);
 
         var page = pagination ?? DefaultPagination;
-        var idx = await CheckInitAndGetIdx(token);
-        var response = await client.SearchAsync<Product>(
+        var idx = await GetIndex(token);
+        var response = await Client.SearchAsync<Product>(
             s => s
                 .Index(idx)
                 .From(GetFrom(page))
@@ -265,12 +199,6 @@ public class ProductRepository(
         return response.Documents;
     }
 
-    private async Task<string> CheckInitAndGetIdx(CancellationToken token)
-    {
-        await idxInitializer.LazyInitialize(token);
-        return options.CurrentValue.IndexOptions.Products;
-    }
-
     private async Task<IReadOnlyCollection<Product>> SearchByRange(
         Expression<Func<Product, object>> field,
         RangeModel<decimal>? range,
@@ -279,8 +207,8 @@ public class ProductRepository(
         CancellationToken token)
     {
         var page = pagination ?? DefaultPagination;
-        var idx = await CheckInitAndGetIdx(token);
-        var response = await client.SearchAsync<Product>(
+        var idx = await GetIndex(token);
+        var response = await Client.SearchAsync<Product>(
             s => s
                 .Index(idx)
                 .From(GetFrom(page))

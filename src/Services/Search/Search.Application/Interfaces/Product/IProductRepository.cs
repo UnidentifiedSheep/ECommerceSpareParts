@@ -4,11 +4,8 @@ using Search.Enums;
 namespace Search.Application.Interfaces.Product;
 
 public interface IProductRepository
+    : ISearchRepository<Entities.Product, int>
 {
-    Task Upsert(Entities.Product product, CancellationToken token = default);
-    Task UpsertMany(IEnumerable<Entities.Product> products, CancellationToken token = default);
-    Task<Entities.Product?> GetById(int id, CancellationToken token = default);
-
     Task<IReadOnlyCollection<Entities.Product>> Search(
         string query,
         int? producerId = null,
@@ -39,6 +36,4 @@ public interface IProductRepository
         string[]? sortBy = null,
         CancellationToken token = default);
 
-    Task Delete(int id, CancellationToken token = default);
-    Task DeleteMany(IEnumerable<int> ids, CancellationToken token = default);
 }
