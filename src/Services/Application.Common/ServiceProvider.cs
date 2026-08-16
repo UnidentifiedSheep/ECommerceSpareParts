@@ -42,7 +42,7 @@ public static class ServiceProvider
             .RegisterDomainEventScope()
             .RegisterCachePolicies(assembly)
             .RegisterDbValidations(assembly)
-            .RegisterFluentValidations(assembly);
+            .RegisterFluentValidations(assembly); 
 
         services.AddSingleton<IBackplaneDispatcher, BackplaneDispatcher>();
         services.AddSingleton<IFusionCacheBackplane, MassTransitBackplane>();
