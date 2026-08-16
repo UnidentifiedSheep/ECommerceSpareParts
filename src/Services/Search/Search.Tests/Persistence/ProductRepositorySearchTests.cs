@@ -29,9 +29,58 @@ public sealed class ProductRepositorySearchTests
 
         result.Total.Should().Be(0);
         requestBody().Should().Contain("\"normalizedSku\"");
-        requestBody().Should().Contain("\"name.contains\"");
+        requestBody().Should().Contain("\"wildcard\"");
+        requestBody().Should().Contain("\"name.keyword\"");
         requestBody().Should().NotContain("\"name.prefix\"");
         requestBody().Should().NotContain("\"highlight\"");
+    }
+
+    [Fact]
+    public async Task Search_NameStartsWith_ShouldUseWholeValuePrefix()
+    {
+        var (repository, requestBody) = CreateRepository();
+        var criteria = CreateCriteria(
+            "EKO-01.213",
+            new HashSet<SearchMatchType>(),
+            new HashSet<SearchMatchType> { SearchMatchType.StartsWith });
+
+        await repository.Search(criteria);
+
+        requestBody().Should().Contain("\"prefix\"");
+        requestBody().Should().Contain("\"name.keyword\"");
+        requestBody().Should().Contain("\"value\":\"eko-01.213\"");
+        requestBody().Should().NotContain("\"name.prefix\"");
+    }
+
+    [Fact]
+    public async Task Search_NameContains_ShouldEscapeWildcardCharacters()
+    {
+        var (repository, requestBody) = CreateRepository();
+        var criteria = CreateCriteria(
+            "EKO*01?213",
+            new HashSet<SearchMatchType>(),
+            new HashSet<SearchMatchType> { SearchMatchType.Contains });
+
+        await repository.Search(criteria);
+
+        requestBody().Should().Contain("\"wildcard\"");
+        requestBody().Should().Contain("\"value\":\"*eko\\\\*01\\\\?213*\"");
+        requestBody().Should().NotContain("\"name.contains\"");
+    }
+
+    [Fact]
+    public async Task Search_NameFuzzy_ShouldRequireAllQueryTokens()
+    {
+        var (repository, requestBody) = CreateRepository();
+        var criteria = CreateCriteria(
+            "air fiter",
+            new HashSet<SearchMatchType>(),
+            new HashSet<SearchMatchType> { SearchMatchType.Fuzzy });
+
+        await repository.Search(criteria);
+
+        requestBody().Should().Contain("\"fuzziness\":\"AUTO\"");
+        requestBody().Should().Contain("\"operator\":\"and\"");
     }
 
     [Fact]

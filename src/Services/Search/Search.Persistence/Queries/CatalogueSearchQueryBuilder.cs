@@ -112,26 +112,35 @@ internal static class CatalogueSearchQueryBuilder
                 .Boost(30)));
 
         if (query.Length >= 2 && modes.Contains(SearchMatchType.StartsWith))
-            queries.Add(descriptor => descriptor.Match(match => match
-                .Field(new Field($"{field.Name}.prefix"))
-                .Query(query)
+            queries.Add(descriptor => descriptor.Prefix(prefix => prefix
+                .Field(new Field($"{field.Name}.keyword"))
+                .Value(query.ToLowerInvariant())
                 .Boost(15)));
 
         if (query.Length >= 2 && modes.Contains(SearchMatchType.Contains))
-            queries.Add(descriptor => descriptor.Match(match => match
-                .Field(new Field($"{field.Name}.contains"))
-                .Query(query)
+            queries.Add(descriptor => descriptor.Wildcard(wildcard => wildcard
+                .Field(new Field($"{field.Name}.keyword"))
+                .Value($"*{EscapeWildcard(query.ToLowerInvariant())}*")
                 .Boost(8)));
 
         if (query.Length >= 4 && modes.Contains(SearchMatchType.Fuzzy))
             queries.Add(descriptor => descriptor.Match(match => match
                 .Field(field)
                 .Query(query)
+                .Operator(Operator.And)
                 .Fuzziness(Fuzziness.Auto)
                 .PrefixLength(1)
                 .Boost(2)));
 
         return queries;
+    }
+
+    private static string EscapeWildcard(string value)
+    {
+        return value
+            .Replace("\\", "\\\\", StringComparison.Ordinal)
+            .Replace("*", "\\*", StringComparison.Ordinal)
+            .Replace("?", "\\?", StringComparison.Ordinal);
     }
 
     private static List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>> BuildFilters<TDocument>(

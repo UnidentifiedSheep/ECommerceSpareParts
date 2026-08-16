@@ -6,6 +6,8 @@ Search provides product and producer discovery through OpenSearch. Main remains 
 
 - searches products by name and SKU;
 - supports exact, prefix, substring, and fuzzy SKU matching;
+- applies name matching to the whole value for exact, prefix, and substring modes; fuzzy name matching requires every
+  query token to match;
 - filters products by producer and dimensions;
 - supports pagination and configured sorting;
 - searches producers by primary name and aliases;
