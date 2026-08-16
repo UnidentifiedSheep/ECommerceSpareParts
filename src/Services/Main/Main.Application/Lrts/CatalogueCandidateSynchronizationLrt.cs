@@ -6,6 +6,7 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
+using Attributes;
 using Contracts.Models.CatalogueCandidate;
 using Contracts.ProductEnrichment;
 using Domain.CommonEntities.Job;
@@ -44,31 +45,54 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 
         while (true)
         {
-            var candidates = await candidateRepository.Query
-                .Where(candidate => candidate.Id > lastId)
-                .OrderBy(candidate => candidate.Id)
-                .Take(batchSize)
-                .Project(projection)
-                .ToListAsync(CancellationToken);
-            if (candidates.Count == 0) return;
-
-            var occurredAt = DateTime.UtcNow;
-            foreach (var candidate in candidates)
-                await Publisher.Publish(
-                    new CatalogueCandidateUpdatedEvent
-                    {
-                        Candidate = candidate with
-                        {
-                            Names = candidate.Names
-                                .Distinct(StringComparer.OrdinalIgnoreCase)
-                                .ToList()
-                        },
-                        OccuredAt = occurredAt
-                    },
-                    CancellationToken);
+            var candidates = await GetCandidatesAsync(
+                lastId,
+                batchSize);
+            if (candidates.Count == 0) break;
 
             lastId = candidates[^1].Id;
-            if (candidates.Count < batchSize) return;
+            await PublishEventsAsync(candidates);
+
+            if (candidates.Count < batchSize) break;
         }
+    }
+
+    private async Task<IReadOnlyList<CatalogueCandidateContractDto>> GetCandidatesAsync(
+        Guid lastId,
+        int batchSize)
+    {
+        return await candidateRepository.Query
+            .Where(candidate => candidate.Id > lastId)
+            .OrderBy(candidate => candidate.Id)
+            .Take(batchSize)
+            .Project(projection)
+            .ToListAsync(CancellationToken);
+    }
+
+    private Task PublishEventsAsync(
+        IReadOnlyList<CatalogueCandidateContractDto> candidates)
+    {
+        return TransactionService.ExecuteAsync(
+            TransactionalAttribute.ReadCommitted(20, 2),
+            async (context, cancellationToken) =>
+            {
+                var occurredAt = DateTime.UtcNow;
+                foreach (var candidate in candidates)
+                    await Publisher.Publish(
+                        new CatalogueCandidateUpdatedEvent
+                        {
+                            Candidate = candidate with
+                            {
+                                Names = candidate.Names
+                                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                                    .ToList()
+                            },
+                            OccuredAt = occurredAt
+                        },
+                        cancellationToken);
+
+                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+            },
+            CancellationToken);
     }
 }
