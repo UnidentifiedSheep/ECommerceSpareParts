@@ -924,6 +924,7 @@ wait_for_http() {
   local url="$3"
   local credentials="${4:-}"
   local insecure="${5:-false}"
+  local curl_output
 
   for attempt in $(seq 1 60); do
     local args=(
@@ -942,14 +943,19 @@ wait_for_http() {
       args+=(--insecure)
     fi
 
-    if sudo docker run \
+    if curl_output="$(sudo docker run \
       --rm \
       --network "$network" \
       "$CURL_IMAGE" \
       "${args[@]}" \
-      "$url" >/dev/null 2>&1; then
+      "$url" 2>&1)"; then
       echo "${display_name} is ready."
       return 0
+    fi
+
+    if [ "$attempt" -eq 1 ] ||
+      [ $((attempt % 10)) -eq 0 ]; then
+      echo "${display_name} readiness attempt ${attempt}/60 failed: ${curl_output}" >&2
     fi
 
     if [ "$attempt" -eq 60 ]; then
@@ -1115,11 +1121,82 @@ deploy_selected_services() {
   local selected_services
   local service
   local migrator
-  local stack
+  local item
   local swarm_service
   local image
   local migrator_found
+  local runtime_found
+  local expected_image
+  local -a updated_services=()
   IFS=',' read -r -a selected_services <<< "$DEPLOY_SERVICES"
+
+  service_is_selected() {
+    local expected="$1"
+    local selected
+
+    for selected in "${selected_services[@]}"; do
+      if [ "$selected" = "$expected" ]; then
+        return 0
+      fi
+    done
+
+    return 1
+  }
+
+  rollback_updated_runtime() {
+    local updated_service
+    local rollback_failed=false
+
+    if [ "${#updated_services[@]}" -eq 0 ]; then
+      return 0
+    fi
+
+    log "Roll back runtime services"
+
+    for updated_service in "${updated_services[@]}"; do
+      if ! docker_sudo service rollback \
+        --detach=true \
+        "$updated_service"; then
+        echo "Unable to start rollback for ${updated_service}." >&2
+        rollback_failed=true
+      fi
+    done
+
+    for updated_service in "${updated_services[@]}"; do
+      if ! wait_for_service_running "$updated_service" 60; then
+        rollback_failed=true
+      fi
+    done
+
+    [ "$rollback_failed" = false ]
+  }
+
+  for service in "${selected_services[@]}"; do
+    if [ -z "$service" ]; then
+      continue
+    fi
+
+    runtime_found=false
+    for item in "${APP_SERVICES[@]}"; do
+      if [ "${item##*:}" = "$service" ]; then
+        runtime_found=true
+        break
+      fi
+    done
+
+    migrator_found=false
+    for migrator in "${MIGRATORS[@]}"; do
+      if [ "${migrator%%:*}" = "$service" ]; then
+        migrator_found=true
+        break
+      fi
+    done
+
+    if [ "$runtime_found" != true ] && [ "$migrator_found" != true ]; then
+      echo "Unsupported affected service: ${service}" >&2
+      return 1
+    fi
+  done
 
   log "Run affected database migrations"
 
@@ -1145,49 +1222,69 @@ deploy_selected_services() {
     esac
   done
 
-  log "Deploy affected application services"
+  log "Restart complete runtime release"
 
-  for service in "${selected_services[@]}"; do
-    case "$service" in
-      *-migrator)
-        continue
-        ;;
-      gateway)
-        stack=gateway
-        ;;
-      *-api)
-        stack=apps
-        ;;
-      *-worker)
-        stack=workers
-        ;;
-      *)
-        echo "Unsupported affected service: ${service}" >&2
-        return 1
-        ;;
-    esac
-
-    swarm_service="$(service_name "$stack" "$service")"
+  for item in "${APP_SERVICES[@]}"; do
+    service="${item##*:}"
+    swarm_service="$(service_name "${item%%:*}" "$service")"
     if ! sudo docker service inspect "$swarm_service" >/dev/null 2>&1; then
       echo "Swarm service ${swarm_service} does not exist." >&2
       return 1
     fi
 
-    image="${ARTIFACT_REGISTRY_HOST}/${service}:${IMAGE_TAG}"
-    docker_sudo service update \
-      --detach=true \
-      --image "$image" \
-      --env-add "DEPLOY_RUN_ID=${DEPLOY_RUN_ID}" \
-      --update-failure-action rollback \
-      --update-monitor 30s \
-      --update-max-failure-ratio 0 \
-      --rollback-failure-action pause \
-      --rollback-monitor 30s \
-      --rollback-max-failure-ratio 0 \
-      --with-registry-auth \
-      "$swarm_service"
-    wait_for_service_running "$swarm_service" 60 "$image"
-    wait_for_selected_service_health "$service"
+    local -a update_args=(
+      service update
+      --detach=true
+      --force
+      --env-add "DEPLOY_RUN_ID=${DEPLOY_RUN_ID}"
+      --update-failure-action pause
+      --update-monitor 30s
+      --update-max-failure-ratio 0
+      --rollback-failure-action pause
+      --rollback-monitor 30s
+      --rollback-max-failure-ratio 0
+      --with-registry-auth
+    )
+
+    if service_is_selected "$service"; then
+      image="${ARTIFACT_REGISTRY_HOST}/${service}:${IMAGE_TAG}"
+      update_args+=(--image "$image")
+    fi
+
+    if ! docker_sudo "${update_args[@]}" "$swarm_service"; then
+      echo "Unable to update ${swarm_service}." >&2
+      rollback_updated_runtime || true
+      return 1
+    fi
+
+    updated_services+=("$swarm_service")
+  done
+
+  log "Wait for runtime services"
+
+  for item in "${APP_SERVICES[@]}"; do
+    service="${item##*:}"
+    swarm_service="$(service_name "${item%%:*}" "$service")"
+    expected_image=""
+
+    if service_is_selected "$service"; then
+      expected_image="${ARTIFACT_REGISTRY_HOST}/${service}:${IMAGE_TAG}"
+    fi
+
+    if ! wait_for_service_running "$swarm_service" 60 "$expected_image"; then
+      rollback_updated_runtime || true
+      return 1
+    fi
+  done
+
+  log "Wait for runtime endpoints"
+
+  for item in "${APP_SERVICES[@]}"; do
+    service="${item##*:}"
+    if ! wait_for_selected_service_health "$service"; then
+      rollback_updated_runtime || true
+      return 1
+    fi
   done
 }
 
@@ -1327,7 +1424,7 @@ if ! printf '%s' "$ARTIFACT_REGISTRY_PASSWORD" | docker login \
   export ARTIFACT_REGISTRY_PASSWORD
 fi
 
-if [ -n "${DEPLOY_SERVICES:-}" ]; then
+if [ "${DEPLOY_RUNTIME:-false}" = true ]; then
   log "Prepare and synchronize application configs"
   ensure_external_networks
   ensure_configs_path_on_nodes

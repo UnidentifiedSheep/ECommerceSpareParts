@@ -16,7 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      has_changes: ${{ steps.discover.outputs.has_changes }}
+      has_images: ${{ steps.discover.outputs.has_images }}
+      should_deploy: ${{ steps.discover.outputs.should_deploy }}
       matrix: ${{ steps.discover.outputs.matrix }}
       services: ${{ steps.discover.outputs.services }}
 
@@ -94,6 +95,7 @@ jobs:
         env:
           BASE_SHA: ${{ steps.refs.outputs.base }}
           HEAD_SHA: ${{ steps.refs.outputs.head }}
+          EVENT_NAME: ${{ github.event_name }}
           ARTIFACT_REGISTRY_HOST: affected.invalid
           IMAGE_TAG: affected
         run: |
@@ -103,6 +105,13 @@ jobs:
           AFFECTED_FILE="$AFFECTED_DIR/affected.txt"
           DEPLOYABLE_FILE="$AFFECTED_DIR/deployable.txt"
           mkdir -p "$AFFECTED_DIR"
+
+          if [ "$EVENT_NAME" = 'workflow_dispatch' ] ||
+            ! git diff --quiet "$BASE_SHA" "$HEAD_SHA"; then
+            echo 'should_deploy=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'should_deploy=false' >> "$GITHUB_OUTPUT"
+          fi
 
           set +e
           dotnet affected \
@@ -119,7 +128,7 @@ jobs:
           if [ "$AFFECTED_EXIT_CODE" -eq 166 ]; then
             echo "No affected projects were found."
             {
-              echo 'has_changes=false'
+              echo 'has_images=false'
               echo 'matrix={"include":[]}'
               echo 'services='
             } >> "$GITHUB_OUTPUT"
@@ -202,7 +211,7 @@ jobs:
           names = ",".join(item["service"] for item in services)
 
           with open(output_file, "a", encoding="utf-8") as stream:
-              stream.write(f"has_changes={'true' if services else 'false'}\n")
+              stream.write(f"has_images={'true' if services else 'false'}\n")
               stream.write(f"matrix={matrix}\n")
               stream.write(f"services={names}\n")
 
@@ -222,19 +231,20 @@ jobs:
   publish-images:
     needs: [build, test, discover-affected]
     if: >-
-      needs.discover-affected.outputs.has_changes == 'true' &&
+      needs.discover-affected.outputs.should_deploy == 'true' &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
        github.event_name == 'workflow_dispatch')
     uses: ./.github/workflows/publish-images.yml
     with:
       matrix: ${{ needs.discover-affected.outputs.matrix }}
+      has_images: ${{ needs.discover-affected.outputs.has_images == 'true' }}
     secrets: inherit
 
   deploy:
     needs: [publish-images, discover-affected]
     if: >-
       needs.publish-images.result == 'success' &&
-      needs.discover-affected.outputs.has_changes == 'true' &&
+      needs.discover-affected.outputs.should_deploy == 'true' &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
        github.event_name == 'workflow_dispatch')
     uses: ./.github/workflows/deploy.yml
