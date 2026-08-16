@@ -10,16 +10,24 @@ STACK_FILES=(
   monitoring
 )
 
-APP_SERVICES=(
-  "gateway:gateway"
-  "apps:main-api"
-  "apps:pricing-api"
-  "apps:search-api"
-  "apps:analytics-api"
-  "workers:main-worker"
-  "workers:pricing-worker"
-  "workers:analytics-worker"
+# Format: <priority>:<stack>:<service>. Services with the same priority roll
+# concurrently; the next priority starts only after the current wave is ready.
+RUNTIME_DEPLOY_PLAN=(
+  "10:apps:main-api"
+  "20:apps:search-api"
+  "20:apps:analytics-api"
+  "30:apps:pricing-api"
+  "40:workers:main-worker"
+  "40:workers:pricing-worker"
+  "40:workers:analytics-worker"
+  "50:gateway:gateway"
 )
+
+APP_SERVICES=()
+for runtime_plan_item in "${RUNTIME_DEPLOY_PLAN[@]}"; do
+  APP_SERVICES+=("${runtime_plan_item#*:}")
+done
+unset runtime_plan_item
 
 INFRA_SERVICES=(
   "infra:postgres"
@@ -1123,10 +1131,8 @@ deploy_selected_services() {
   local migrator
   local item
   local swarm_service
-  local image
   local migrator_found
   local runtime_found
-  local expected_image
   local -a updated_services=()
   IFS=',' read -r -a selected_services <<< "$DEPLOY_SERVICES"
 
@@ -1171,6 +1177,120 @@ deploy_selected_services() {
     [ "$rollback_failed" = false ]
   }
 
+  update_runtime_service() {
+    local definition="$1"
+    local stack="${definition%%:*}"
+    local runtime_service="${definition##*:}"
+    local runtime_swarm_service
+    local runtime_image
+    local -a update_args=(
+      service update
+      --detach=true
+      --force
+      --env-add "DEPLOY_RUN_ID=${DEPLOY_RUN_ID}"
+      --update-failure-action pause
+      --update-monitor 30s
+      --update-max-failure-ratio 0
+      --rollback-failure-action pause
+      --rollback-monitor 30s
+      --rollback-max-failure-ratio 0
+      --with-registry-auth
+    )
+
+    runtime_swarm_service="$(service_name "$stack" "$runtime_service")"
+
+    if service_is_selected "$runtime_service"; then
+      runtime_image="${ARTIFACT_REGISTRY_HOST}/${runtime_service}:${IMAGE_TAG}"
+      update_args+=(--image "$runtime_image")
+    fi
+
+    if ! docker_sudo "${update_args[@]}" "$runtime_swarm_service"; then
+      echo "Unable to update ${runtime_swarm_service}." >&2
+      return 1
+    fi
+
+    updated_services+=("$runtime_swarm_service")
+  }
+
+  wait_for_runtime_service() {
+    local definition="$1"
+    local stack="${definition%%:*}"
+    local runtime_service="${definition##*:}"
+    local runtime_swarm_service
+    local runtime_expected_image=""
+
+    runtime_swarm_service="$(service_name "$stack" "$runtime_service")"
+
+    if service_is_selected "$runtime_service"; then
+      runtime_expected_image="${ARTIFACT_REGISTRY_HOST}/${runtime_service}:${IMAGE_TAG}"
+    fi
+
+    wait_for_service_running \
+      "$runtime_swarm_service" \
+      60 \
+      "$runtime_expected_image" &&
+      wait_for_selected_service_health "$runtime_service"
+  }
+
+  deploy_runtime_wave() {
+    local display_name="$1"
+    local definition
+    shift
+
+    log "Deploy runtime wave: ${display_name}"
+
+    # Start every service in the wave before waiting, so independent services
+    # can roll in parallel while dependent waves remain behind a health barrier.
+    for definition in "$@"; do
+      update_runtime_service "$definition" || return 1
+    done
+
+    for definition in "$@"; do
+      wait_for_runtime_service "$definition" || return 1
+    done
+  }
+
+  deploy_runtime_plan() {
+    local entry
+    local priority
+    local definition
+    local current_priority=""
+    local -a wave=()
+
+    for entry in "${RUNTIME_DEPLOY_PLAN[@]}"; do
+      priority="${entry%%:*}"
+      definition="${entry#*:}"
+
+      if ! [[ "$priority" =~ ^[0-9]+$ ]]; then
+        echo "Invalid runtime deploy priority in ${entry}." >&2
+        return 1
+      fi
+
+      if [ -n "$current_priority" ] &&
+        [ "$priority" -lt "$current_priority" ]; then
+        echo "Runtime deploy plan must be ordered by priority." >&2
+        return 1
+      fi
+
+      if [ -n "$current_priority" ] &&
+        [ "$priority" != "$current_priority" ]; then
+        deploy_runtime_wave \
+          "priority ${current_priority}: ${wave[*]}" \
+          "${wave[@]}" || return 1
+        wave=()
+      fi
+
+      current_priority="$priority"
+      wave+=("$definition")
+    done
+
+    if [ "${#wave[@]}" -gt 0 ]; then
+      deploy_runtime_wave \
+        "priority ${current_priority}: ${wave[*]}" \
+        "${wave[@]}"
+    fi
+  }
+
   for service in "${selected_services[@]}"; do
     if [ -z "$service" ]; then
       continue
@@ -1194,6 +1314,14 @@ deploy_selected_services() {
 
     if [ "$runtime_found" != true ] && [ "$migrator_found" != true ]; then
       echo "Unsupported affected service: ${service}" >&2
+      return 1
+    fi
+  done
+
+  for item in "${APP_SERVICES[@]}"; do
+    swarm_service="$(service_name "${item%%:*}" "${item##*:}")"
+    if ! sudo docker service inspect "$swarm_service" >/dev/null 2>&1; then
+      echo "Swarm service ${swarm_service} does not exist." >&2
       return 1
     fi
   done
@@ -1222,70 +1350,10 @@ deploy_selected_services() {
     esac
   done
 
-  log "Restart complete runtime release"
-
-  for item in "${APP_SERVICES[@]}"; do
-    service="${item##*:}"
-    swarm_service="$(service_name "${item%%:*}" "$service")"
-    if ! sudo docker service inspect "$swarm_service" >/dev/null 2>&1; then
-      echo "Swarm service ${swarm_service} does not exist." >&2
-      return 1
-    fi
-
-    local -a update_args=(
-      service update
-      --detach=true
-      --force
-      --env-add "DEPLOY_RUN_ID=${DEPLOY_RUN_ID}"
-      --update-failure-action pause
-      --update-monitor 30s
-      --update-max-failure-ratio 0
-      --rollback-failure-action pause
-      --rollback-monitor 30s
-      --rollback-max-failure-ratio 0
-      --with-registry-auth
-    )
-
-    if service_is_selected "$service"; then
-      image="${ARTIFACT_REGISTRY_HOST}/${service}:${IMAGE_TAG}"
-      update_args+=(--image "$image")
-    fi
-
-    if ! docker_sudo "${update_args[@]}" "$swarm_service"; then
-      echo "Unable to update ${swarm_service}." >&2
-      rollback_updated_runtime || true
-      return 1
-    fi
-
-    updated_services+=("$swarm_service")
-  done
-
-  log "Wait for runtime services"
-
-  for item in "${APP_SERVICES[@]}"; do
-    service="${item##*:}"
-    swarm_service="$(service_name "${item%%:*}" "$service")"
-    expected_image=""
-
-    if service_is_selected "$service"; then
-      expected_image="${ARTIFACT_REGISTRY_HOST}/${service}:${IMAGE_TAG}"
-    fi
-
-    if ! wait_for_service_running "$swarm_service" 60 "$expected_image"; then
-      rollback_updated_runtime || true
-      return 1
-    fi
-  done
-
-  log "Wait for runtime endpoints"
-
-  for item in "${APP_SERVICES[@]}"; do
-    service="${item##*:}"
-    if ! wait_for_selected_service_health "$service"; then
-      rollback_updated_runtime || true
-      return 1
-    fi
-  done
+  if ! deploy_runtime_plan; then
+    rollback_updated_runtime || true
+    return 1
+  fi
 }
 
 show_stack_services() {
