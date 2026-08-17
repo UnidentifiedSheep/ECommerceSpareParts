@@ -28,6 +28,7 @@ public class UpdateOrganizationHandler(
                   ?? throw new OrganizationNotFoundException(request.OrganizationId);
 
         request.Organization.Name.Apply(org.SetName);
+        request.Organization.IsHidden.Apply(org.SetIsHidden);
 
         return new UpdateOrganizationResult(org.Id);
     }

@@ -12,6 +12,7 @@ public class OrganizationBuilder(Faker faker) : BuilderBase<OrganizationEntity>(
     public Guid? OwnerId { get; private set; }
     public string? Name { get; private set; }
     public string? SystemName { get; private set; }
+    public bool IsHidden { get; private set; }
 
     public OrganizationBuilder WithOwnerId(Guid ownerId)
     {
@@ -39,12 +40,20 @@ public class OrganizationBuilder(Faker faker) : BuilderBase<OrganizationEntity>(
         return this;
     }
 
+    public OrganizationBuilder WithIsHidden(bool hidden)
+    {
+        IsHidden = hidden;
+        return this;
+    }
+
     public override OrganizationEntity Build()
     {
         var organization = OrganizationEntity.CreateBusiness(
             Name ?? $"Organization {Faker.Random.AlphaNumeric(12)}",
             SystemName ?? $"organization-{Guid.NewGuid():N}",
             OwnerId ?? Guid.NewGuid());
+
+        if (IsHidden) organization.Hide();
 
         foreach (var (userId, role) in _members)
             organization.AddMember(userId, role);

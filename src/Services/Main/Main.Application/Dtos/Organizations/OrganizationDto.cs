@@ -16,6 +16,9 @@ public record OrganizationDto
 
     [JsonPropertyName("systemName")]
     public required string SystemName { get; init; }
+    
+    [JsonPropertyName("isHidden")]
+    public required bool IsHidden { get; init; }
 
     [JsonPropertyName("owner")]
     public required OrganizationMemberDto Owner { get; init; }

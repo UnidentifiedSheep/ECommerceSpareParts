@@ -173,6 +173,46 @@ public class GetOrganizationsTests : IntegrationTest
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
     }
 
+    [Fact]
+    public async Task GetOrganizations_ShowHidden_ReturnsAlsoHiddenOrganizations()
+    {
+        var hiddenOrg = await CreateOrganization(
+            "hidden_org",
+            "hidden_org",
+            true);
+        
+        var notHiddenOrg = await CreateOrganization(
+            "not_hidden_org",
+            "not_hidden_org");
+
+        var act = async () => await  Mediator.Send(CreateQuery(showHidden: true));
+        var result = await act.Should().NotThrowAsync();
+        
+        result.Which.Organizations.Should().Contain(x => x.Id == hiddenOrg.Id)
+            .Which.IsHidden.Should().BeTrue();
+        
+        result.Which.Organizations.Should().Contain(x => x.Id == notHiddenOrg.Id);
+    }
+    
+    [Fact]
+    public async Task GetOrganizations_ShowHiddenFalse_ReturnsWithOutHiddenOrganizations()
+    {
+        var hiddenOrg = await CreateOrganization(
+            "hidden_org",
+            "hidden_org",
+            true);
+        
+        var notHiddenOrg = await CreateOrganization(
+            "not_hidden_org",
+            "not_hidden_org");
+
+        var act = async () => await  Mediator.Send(CreateQuery(showHidden: false));
+        var result = await act.Should().NotThrowAsync();
+        
+        result.Which.Organizations.Should().NotContain(x => x.Id == hiddenOrg.Id);
+        result.Which.Organizations.Should().Contain(x => x.Id == notHiddenOrg.Id);
+    }
+
     private GetOrganizationsQuery CreateQuery(
         string? searchTerm = null,
         Guid? userId = null,
@@ -180,7 +220,8 @@ public class GetOrganizationsTests : IntegrationTest
         IReadOnlyCollection<OrganizationType>? types = null,
         string[]? sortBy = null,
         int page = 0,
-        int size = 20)
+        int size = 20,
+        bool showHidden = false)
     {
         return new GetOrganizationsQuery(
             new Pagination(page, size),
@@ -188,17 +229,20 @@ public class GetOrganizationsTests : IntegrationTest
             searchTerm,
             userId,
             ids ?? [],
-            types ?? []);
+            types ?? [],
+            showHidden);
     }
 
     private async Task<Organization> CreateOrganization(
         string name,
-        string systemName)
+        string systemName,
+        bool isHidden = false)
     {
         var owner = GetContext<UsersTestContext>().Users.First();
         return await new OrganizationBuilder(Faker)
             .WithOwnerId(owner.Id)
             .WithName(name)
+            .WithIsHidden(isHidden)
             .WithSystemName($"{systemName}-{Guid.NewGuid():N}")
             .BuildAndAddToDb(Context);
     }
