@@ -116,9 +116,12 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
         
         member.SetRole(role);
     }
+
+    public void Hide() => SetIsHidden(true);
+    public void Show() => SetIsHidden(false);
     
-    public void Hide() => IsHidden = true;
-    public void Show() => IsHidden = false;
+    public void SetIsHidden(bool isHidden) 
+        => IsHidden = isHidden;
     
     public void SetName(string name)
         => Name = name.TrimSafe()

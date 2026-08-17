@@ -45,6 +45,7 @@ public sealed class OrganizationDtoProjectionProvider
             Type = organization.Type,
             Name = organization.Name,
             SystemName = organization.SystemName,
+            IsHidden = organization.IsHidden,
             Owner = memberToDto.Invoke(
                 organization.Members.Single(member =>
                     member.Role == OrganizationRole.Owner))
@@ -69,6 +70,7 @@ public sealed class OrganizationListItemProjectionProvider
             Type = organization.Type,
             Name = organization.Name,
             SystemName = organization.SystemName,
+            IsHidden = organization.IsHidden,
             Owner = memberToDto.Invoke(
                 organization.Members.Single(member =>
                     member.Role == OrganizationRole.Owner)),

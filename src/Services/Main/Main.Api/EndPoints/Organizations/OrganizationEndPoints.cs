@@ -22,6 +22,9 @@ public record GetOrganizationsRequest : SortablePaginationQueryModel
 
     [FromQuery(Name = "types")]
     public OrganizationType[] Types { get; init; } = [];
+
+    [FromQuery(Name = "showHidden")]
+    public bool? ShowHidden { get; init; }
 }
 
 public record GetOrganizationsResponse(IReadOnlyList<OrganizationListItemDto> Organizations);
@@ -149,7 +152,8 @@ public class OrganizationEndPoints : ICarterModule
                             request.SearchTerm,
                             null,
                             request.Ids,
-                            request.Types),
+                            request.Types,
+                            request.ShowHidden ?? false),
                         cancellationToken);
 
                     return Results.Ok(

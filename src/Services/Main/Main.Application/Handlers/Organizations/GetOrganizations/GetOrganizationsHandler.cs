@@ -16,7 +16,8 @@ public record GetOrganizationsQuery(
     string? SearchTerm,
     Guid? UserId,
     IReadOnlyCollection<Guid> Ids,
-    IReadOnlyCollection<OrganizationType> Types
+    IReadOnlyCollection<OrganizationType> Types,
+    bool ShowHidden
 ) : IQuery<GetOrganizationsResult>;
 
 public record GetOrganizationsResult(IReadOnlyList<OrganizationListItemDto> Organizations);
@@ -33,6 +34,9 @@ public class GetOrganizationsHandler(
         var query = repository.Query
             .Where(x => x.Type != OrganizationType.System);
 
+        if (!request.ShowHidden)
+            query = query.Where(x => !x.IsHidden);
+        
         if (request.Ids.Count > 0)
             query = query.Where(x => request.Ids.Contains(x.Id));
 
