@@ -28,6 +28,9 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Entities.Organ
             .HasMaxLength(128)
             .HasColumnName("name");
 
+        builder.Property(x => x.IsHidden)
+            .HasColumnName("is_hidden");
+
         builder.Property(x => x.Type)
             .HasMaxLength(32)
             .HasColumnName("type");

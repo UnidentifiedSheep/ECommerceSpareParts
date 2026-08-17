@@ -16,6 +16,7 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
     public Guid Id { get; private set; }
     public OrganizationType Type { get; private set; }
     public string Name { get; private set; } = null!;
+    public bool IsHidden { get; private set; }
 
     [Validate]
     public string SystemName { get; private set; } = null!;
@@ -115,6 +116,9 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
         
         member.SetRole(role);
     }
+    
+    public void Hide() => IsHidden = true;
+    public void Show() => IsHidden = false;
     
     public void SetName(string name)
         => Name = name.TrimSafe()

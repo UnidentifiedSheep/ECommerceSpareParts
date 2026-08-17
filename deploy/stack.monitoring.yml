@@ -55,6 +55,9 @@ services:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     networks:
+      backend:
+        aliases:
+          - grafana
       monitoring:
         aliases:
           - grafana

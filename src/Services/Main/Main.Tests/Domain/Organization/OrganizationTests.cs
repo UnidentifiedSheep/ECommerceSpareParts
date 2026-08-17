@@ -284,6 +284,48 @@ public class OrganizationTests
             x.Role == OrganizationRole.Owner);
     }
 
+    [Fact]
+    public void Hide_ChangesVisibility()
+    {
+        var organization = CreateBusiness();
+        var action = organization.Hide;
+        
+        action.Should().NotThrow();
+        organization.IsHidden.Should().BeTrue();
+    }
+    
+    [Fact]
+    public void Hide_WhenHidden_DoesNothing()
+    {
+        var organization = CreateBusiness();
+        organization.Hide();
+        var action = organization.Hide;
+        
+        action.Should().NotThrow();
+        organization.IsHidden.Should().BeTrue();
+    }
+    
+    [Fact]
+    public void Show_ChangesVisibility()
+    {
+        var organization = CreateBusiness();
+        var action = organization.Show;
+        
+        action.Should().NotThrow();
+        organization.IsHidden.Should().BeFalse();
+    }
+    
+    [Fact]
+    public void Show_WhenVisible_DoesNothing()
+    {
+        var organization = CreateBusiness();
+        organization.Show();
+        var action = organization.Show;
+        
+        action.Should().NotThrow();
+        organization.IsHidden.Should().BeFalse();
+    }
+
     private static OrganizationDomain CreateBusiness(Guid? ownerId = null)
     {
         return OrganizationDomain.CreateBusiness(
