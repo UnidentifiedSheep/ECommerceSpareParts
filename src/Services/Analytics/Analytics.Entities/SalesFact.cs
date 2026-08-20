@@ -1,6 +1,4 @@
 using System.Linq.Expressions;
-using Analytics.Entities.Interfaces;
-using Analytics.Enums;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
@@ -9,7 +7,7 @@ using Exceptions;
 
 namespace Analytics.Entities;
 
-public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<SalesFact, Guid>
+public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
 {
     private readonly List<SaleContent> _saleContents = [];
 
@@ -31,7 +29,6 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
 
     public IReadOnlyCollection<SaleContent> SaleContents => _saleContents;
 
-    public static DependsOn DependsOn => DependsOn.Sale;
     public static Expression<Func<SalesFact, Guid>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<SalesFact, bool>> GetEqualityExpression(Guid key)

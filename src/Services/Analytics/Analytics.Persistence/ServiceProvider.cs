@@ -35,7 +35,6 @@ public static class ServiceProvider
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
         collection.AddJobRepositories<DContext>();
 
-        collection.AddScoped<IMetricRepository, MetricRepository>();
         collection.AddScoped<ISaleFactRepository, SaleFactRepository>();
 
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();

@@ -1,8 +1,6 @@
 {
   "locale": "tr",
   "keyValues": {
-    "metric_calculation_lrt_name": "Metrik yeniden hesaplama",
-    "metric_calculation_lrt_description": "Seçilen analitik metriği kimlik koduna göre yeniden hesaplatır.",
     "markup_calculation_lrt_name": "Kâr marjı hesaplama",
     "markup_calculation_lrt_description": "Kâr marjı verilerini analiz eder ve fiyatlandırma için önerilen kâr marjı aralıklarını oluşturur.",
     "markup.calculation.input.invalid": "Kâr marjı hesaplaması için geçersiz giriş verisi sağlandı.",

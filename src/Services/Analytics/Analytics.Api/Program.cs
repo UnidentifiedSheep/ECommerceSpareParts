@@ -1,7 +1,5 @@
 using System.Reflection;
 using Abstractions;
-using Analytics.Api.Consumers;
-using Analytics.Api.Hubs;
 using Analytics.Application;
 using Analytics.Application.Consumers;
 using Analytics.Cache;
@@ -63,7 +61,6 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<JobStatusUpdatedConsumer>();
     x.AddConsumer<SettingUpdatedConsumer>();
-    x.AddConsumer<MetricCalculationStatusUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -85,9 +82,6 @@ builder.Services.AddMassTransit(x =>
 
                 ep.ConfigureConsumer<BackplaneConsumer>(context);
                 ep.Bind<BackplaneMessage>();
-
-                ep.ConfigureConsumer<MetricCalculationStatusUpdatedConsumer>(context);
-                ep.Bind<MetricCalculationStatusUpdatedConsumer>();
 
                 ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
                 ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
@@ -123,9 +117,6 @@ var app = builder.Build();
 
 app.UseCommonApiPipeline();
 
-app.MapHub<MetricCalculationHub>("/hubs/calculation-jobs");
-
 app.MapHub<JobHub>("/hubs/jobs");
-app.MapHub<JobHub>("/hubs/metrics");
 
 await app.RunAsync();

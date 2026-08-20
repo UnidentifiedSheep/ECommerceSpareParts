@@ -57,7 +57,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Metrics\Validators\"/>
     </ItemGroup>
 
 </Project>
