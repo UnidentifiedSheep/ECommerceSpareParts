@@ -5,6 +5,7 @@ using Application.Common.Interfaces.NamedObject;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Localization.Abstractions.Interfaces;
+using SchemaGeneration.Abstractions;
 
 namespace Application.Common.Handlers.Jobs;
 
@@ -15,7 +16,7 @@ public sealed record GetAllAvailableJobsResult(IReadOnlyList<JobInfoDto> Jobs);
 public sealed class GetAllAvailableJobsHandler(
     IScopedStringLocalizer localizer,
     INamedObjectRegistry<ILrtNamedObject> registry,
-    IScopedLocalizedJsonSerializer jsonSerializer
+    ISchemaGenerator schemaGenerator
 ) : IQueryHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>
 {
     public Task<GetAllAvailableJobsResult> Handle(
@@ -28,7 +29,7 @@ public sealed class GetAllAvailableJobsHandler(
                 SystemName = x.SystemName,
                 Name = localizer.Get(x.NameLocalizationKey),
                 Description = localizer.Get(x.DescriptionLocalizationKey),
-                InitStateSchema = jsonSerializer.SerializeMetadata(x.InputType)
+                InitStateSchema = schemaGenerator.Generate(x.InputType)
             })
             .ToList();
 

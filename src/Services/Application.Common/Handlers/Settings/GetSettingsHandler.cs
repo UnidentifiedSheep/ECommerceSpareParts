@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
 using Localization.Abstractions.Interfaces;
+using SchemaGeneration.Abstractions;
 
 namespace Application.Common.Handlers.Settings;
 
@@ -12,7 +13,7 @@ public record GetSettingsResult(IReadOnlyList<SettingDto> Settings);
 
 public class GetSettingsHandler(
     INamedObjectRegistry<SettingDefinitionNamedObjectBase> registry,
-    IScopedLocalizedJsonSerializer jsonSerializer,
+    ISchemaGenerator schemaGenerator,
     IScopedStringLocalizer localizer
 ) : IQueryHandler<GetSettingsQuery, GetSettingsResult>
 {
@@ -27,8 +28,8 @@ public class GetSettingsHandler(
                     SystemName = definition.SystemName,
                     Name = definition.GetLocalizedName(localizer),
                     Description = definition.GetLocalizedDescription(localizer),
-                    InputData = jsonSerializer.SerializeMetadata(definition.InputSettingType),
-                    OutputMetadata = jsonSerializer.SerializeMetadata(definition.OutputSettingType),
+                    InputData = schemaGenerator.Generate(definition.InputSettingType),
+                    OutputMetadata = schemaGenerator.Generate(definition.OutputSettingType),
                     OutputData = await definition.GetOutputJsonAsync(cancellationToken)
                 });
 

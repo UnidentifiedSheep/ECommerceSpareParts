@@ -17,7 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Core\Attributes\Attributes.csproj"/>
         <ProjectReference Include="..\Localization.Abstractions\Localization.Abstractions.csproj"/>
     </ItemGroup>
 

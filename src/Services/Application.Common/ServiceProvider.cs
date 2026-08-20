@@ -21,6 +21,7 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SchemaGeneration.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
 namespace Application.Common;
@@ -36,6 +37,7 @@ public static class ServiceProvider
     {
         assembly ??= Assembly.GetExecutingAssembly();
         services
+            .AddSchemaGeneration()
             .AddCqrsMetrics()
             .RegisterIdCollector()
             .RegisterIntegrationEventScope()

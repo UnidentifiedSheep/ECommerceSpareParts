@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Internal.Integration.Core.Models.Common;
 
+using SchemaGeneration.Abstractions.Models;
+
 public class InternalJobInfo
 {
     [JsonPropertyName("systemName")]
@@ -14,5 +16,5 @@ public class InternalJobInfo
     public required string Description { get; init; }
 
     [JsonPropertyName("initStateSchema")]
-    public required string InitStateSchema { get; init; }
+    public required ObjectSchema InitStateSchema { get; init; }
 }

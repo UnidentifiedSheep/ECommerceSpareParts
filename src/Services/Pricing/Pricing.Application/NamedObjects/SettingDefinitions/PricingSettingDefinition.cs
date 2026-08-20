@@ -2,9 +2,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
-using Attributes.JsonAttributes;
+using SchemaGeneration.Abstractions.Attributes;
 using Contracts.Analytics;
-using Enums;
+using SchemaGeneration.Abstractions.Enums;
 using Exceptions;
 using MassTransit;
 using Pricing.Entities;
@@ -71,44 +71,44 @@ public class PricingSettingDefinition(
 public record PricingSettingInputData
 {
     [JsonPropertyName("selectedMarkupId")]
-    [InputControl(InputControlType.EntitySelector)]
-    [DependsOnEntity(typeof(MarkupGroup), "id")]
-    [LocalizedJsonFieldName("pricing.setting.selected.markup.id.name")]
-    [LocalizedJsonFieldDescription("pricing.setting.selected.markup.id.description")]
+    [SchemaInputControl(InputControlType.EntitySelector)]
+    [SchemaDependsOnEntity(typeof(MarkupGroup), "id")]
+    [SchemaFieldLabel("pricing.setting.selected.markup.id.name")]
+    [SchemaFieldDescription("pricing.setting.selected.markup.id.description")]
     public int? SelectedMarkupId { get; init; }
 
     [JsonPropertyName("defaultMarkup")]
-    [RequiredJsonField]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("pricing.setting.default.markup.name")]
-    [LocalizedJsonFieldDescription("pricing.setting.default.markup.description")]
+    [RequiredSchemaField]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("pricing.setting.default.markup.name")]
+    [SchemaFieldDescription("pricing.setting.default.markup.description")]
     public required decimal DefaultMarkup { get; init; }
 
     [JsonPropertyName("offerTtl")]
-    [RequiredJsonField]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("pricing.setting.offer.ttl.name")]
-    [LocalizedJsonFieldDescription("pricing.setting.offer.ttl.description")]
+    [RequiredSchemaField]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("pricing.setting.offer.ttl.name")]
+    [SchemaFieldDescription("pricing.setting.offer.ttl.description")]
     public required TimeSpan OfferTtl { get; init; }
 
     [JsonPropertyName("priceRoundingStep")]
-    [RequiredJsonField]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("pricing.setting.price.rounding.step.name")]
-    [LocalizedJsonFieldDescription("pricing.setting.price.rounding.step.description")]
+    [RequiredSchemaField]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("pricing.setting.price.rounding.step.name")]
+    [SchemaFieldDescription("pricing.setting.price.rounding.step.description")]
     public required decimal PriceRoundingStep { get; init; }
 
     [JsonPropertyName("deliveryDayPenalty")]
-    [RequiredJsonField]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("pricing.setting.delivery.day.penalty.name")]
-    [LocalizedJsonFieldDescription("pricing.setting.delivery.day.penalty.description")]
+    [RequiredSchemaField]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("pricing.setting.delivery.day.penalty.name")]
+    [SchemaFieldDescription("pricing.setting.delivery.day.penalty.description")]
     public required decimal DeliveryDayPenalty { get; init; }
     
     [JsonPropertyName("uniqProductAdditionalMarkup")]
-    [RequiredJsonField]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("pricing.setting.uniq.product.additional.markup.name")]
-    [LocalizedJsonFieldDescription("pricing.setting.uniq.product.additional.markup.description")]
+    [RequiredSchemaField]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("pricing.setting.uniq.product.additional.markup.name")]
+    [SchemaFieldDescription("pricing.setting.uniq.product.additional.markup.description")]
     public required decimal UniqProductAdditionalMarkup { get; init; }
 }

@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
 using Attributes;
 using Localization.Abstractions.Interfaces;
+using SchemaGeneration.Abstractions;
 
 namespace Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 
@@ -15,7 +16,7 @@ public sealed record ListAvailableMetricsResult(IReadOnlyList<MetricInfoDto> Met
 public class ListAvailableMetricsHandler(
     IScopedStringLocalizer localizer,
     INamedObjectRegistry<MetricDefinitionNamedObjectBase> registry,
-    IScopedLocalizedJsonSerializer jsonSerializer
+    ISchemaGenerator schemaGenerator
 ) : IQueryHandler<ListAvailableMetricsQuery, ListAvailableMetricsResult>
 {
     public Task<ListAvailableMetricsResult> Handle(
@@ -28,7 +29,7 @@ public class ListAvailableMetricsHandler(
                 SystemName = x.SystemName,
                 Name = localizer[x.NameLocalizationKey],
                 Description = localizer[x.DescriptionLocalizationKey],
-                InputSchema = jsonSerializer.SerializeMetadata(x.InputType)
+                InputSchema = schemaGenerator.Generate(x.InputType)
             })
             .ToList();
 

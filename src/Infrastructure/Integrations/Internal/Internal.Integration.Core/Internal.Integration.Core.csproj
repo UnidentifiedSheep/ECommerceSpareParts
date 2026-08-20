@@ -11,6 +11,7 @@
         <ProjectReference Include="..\..\..\..\Core\Extensions\Extensions.csproj"/>
         <ProjectReference Include="..\..\Integrations.Client.Core\Integrations.Client.Core.csproj"/>
         <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj"/>
+        <ProjectReference Include="..\..\..\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

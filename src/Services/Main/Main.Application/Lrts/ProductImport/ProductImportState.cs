@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
-using Attributes.JsonAttributes;
-using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 using Main.Application.Lrts.Base;
 
 namespace Main.Application.Lrts.ProductImport;
@@ -24,11 +24,11 @@ public record ProductImportState : ProductImportInputState, ICsvImportState<Prod
 [CsvSchema(typeof(ProductImportLrt.NewProductCsvDto))]
 public record ProductImportInputState : IInputState, ICsvImportInputState
 {
-    [Accepts(".csv")]
-    [InputControl(InputControlType.UploadFile)]
-    [RequiredJsonField]
-    [LocalizedJsonFieldDescription("file_name_description")]
-    [LocalizedJsonFieldName("file_name")]
+    [SchemaAccepts(".csv")]
+    [SchemaInputControl(InputControlType.UploadFile)]
+    [RequiredSchemaField]
+    [SchemaFieldDescription("file_name_description")]
+    [SchemaFieldLabel("file_name")]
     [JsonPropertyName("fileName")]
     public required string FileName { get; init; }
 

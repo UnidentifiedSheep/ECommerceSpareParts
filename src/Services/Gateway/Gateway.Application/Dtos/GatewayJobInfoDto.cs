@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Gateway.Application.Dtos;
 
+using SchemaGeneration.Abstractions.Models;
+
 public record GatewayJobInfoDto
 {
     [JsonPropertyName("systemName")]
@@ -14,5 +16,5 @@ public record GatewayJobInfoDto
     public required string Description { get; init; }
 
     [JsonPropertyName("initStateSchema")]
-    public required string InitStateSchema { get; init; }
+    public required ObjectSchema InitStateSchema { get; init; }
 }
