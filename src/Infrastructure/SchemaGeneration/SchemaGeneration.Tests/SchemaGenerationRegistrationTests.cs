@@ -54,6 +54,42 @@ public sealed class SchemaGenerationRegistrationTests
         schema.Fields.Single().Label.Should().BeNull();
     }
 
+    [Fact]
+    public void AddSchemaGeneration_ShouldNotLeakLocalizedSchemaBetweenScopes()
+    {
+        var scopeNumber = 0;
+        var services = new ServiceCollection();
+        services.AddScoped<IScopedStringLocalizer>(_ =>
+        {
+            var localizedValue = Interlocked.Increment(ref scopeNumber) == 1
+                ? "First scope"
+                : "Second scope";
+
+            return new StubScopedStringLocalizer(
+                new Dictionary<string, string>
+                {
+                    ["value.label"] = localizedValue
+                });
+        });
+        services.AddSchemaGeneration();
+
+        using var provider = services.BuildServiceProvider(validateScopes: true);
+
+        using var firstScope = provider.CreateScope();
+        var firstSchema = firstScope.ServiceProvider
+            .GetRequiredService<ISchemaGenerator>()
+            .Generate<LocalizedInput>();
+
+        using var secondScope = provider.CreateScope();
+        var secondSchema = secondScope.ServiceProvider
+            .GetRequiredService<ISchemaGenerator>()
+            .Generate<LocalizedInput>();
+
+        firstSchema.Fields.Single().Label.Should().Be("First scope");
+        secondSchema.Fields.Single().Label.Should().Be("Second scope");
+        secondSchema.Should().NotBeSameAs(firstSchema);
+    }
+
     private sealed record LocalizedInput
     {
         [SchemaFieldLabel("value.label")]

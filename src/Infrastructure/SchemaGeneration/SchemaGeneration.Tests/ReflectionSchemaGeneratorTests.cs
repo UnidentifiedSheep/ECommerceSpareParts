@@ -88,6 +88,55 @@ public sealed class ReflectionSchemaGeneratorTests
             .Which.SchemaType.Should().Be(typeof(string));
     }
 
+    [Fact]
+    public void Generate_WithRuntimeType_ShouldReturnSameCachedSchemaAsGenericOverload()
+    {
+        var genericSchema = _generator.Generate<TestInput>();
+
+        var runtimeSchema = _generator.Generate(typeof(TestInput));
+
+        runtimeSchema.Should().BeSameAs(genericSchema);
+    }
+
+    [Fact]
+    public void Generate_WhenRuntimeTypeIsNull_ShouldThrow()
+    {
+        var action = () => _generator.Generate(null!);
+
+        action.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void Generate_ShouldIncludeInheritedPropertiesAndExcludeJsonIgnoredProperties()
+    {
+        var schema = _generator.Generate<DerivedInput>();
+
+        schema.Fields.Select(x => x.Name).Should()
+            .BeEquivalentTo("baseValue", "alwaysIncluded", "derivedValue");
+    }
+
+    [Fact]
+    public void Generate_ShouldBuildDependencyFromEntityNameWithoutFieldName()
+    {
+        var schema = _generator.Generate<NamedDependencyInput>();
+
+        schema.Fields.Single().Dependency.Should().BeEquivalentTo(new
+        {
+            EntityName = "catalogue-product",
+            FieldName = (string?)null
+        });
+    }
+
+    [Fact]
+    public async Task Generate_WhenCalledConcurrently_ShouldReturnSingleCachedSchema()
+    {
+        var schemas = await Task.WhenAll(
+            Enumerable.Range(0, 100)
+                .Select(_ => Task.Run(() => _generator.Generate<ConcurrentInput>())));
+
+        schemas.Should().OnlyContain(schema => ReferenceEquals(schema, schemas[0]));
+    }
+
     private sealed record TestInput
     {
         [JsonPropertyName("fileName")]
@@ -126,6 +175,36 @@ public sealed class ReflectionSchemaGeneratorTests
 
     private sealed record TestNested;
     private sealed class TestEntity;
+
+    private abstract record BaseInput
+    {
+        [JsonPropertyName("baseValue")]
+        public string? BaseValue { get; init; }
+
+        [JsonIgnore]
+        public string? IgnoredValue { get; init; }
+
+        [JsonPropertyName("alwaysIncluded")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+        public string? AlwaysIncluded { get; init; }
+    }
+
+    private sealed record DerivedInput : BaseInput
+    {
+        [JsonPropertyName("derivedValue")]
+        public string? DerivedValue { get; init; }
+    }
+
+    private sealed record NamedDependencyInput
+    {
+        [SchemaDependsOnEntity("catalogue-product")]
+        public Guid ProductId { get; init; }
+    }
+
+    private sealed record ConcurrentInput
+    {
+        public string? Value { get; init; }
+    }
 
     private enum TestState
     {
