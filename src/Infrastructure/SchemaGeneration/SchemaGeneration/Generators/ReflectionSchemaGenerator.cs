@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using SchemaGeneration.Abstractions;
 using SchemaGeneration.Abstractions.Attributes;
@@ -34,6 +35,8 @@ public sealed class ReflectionSchemaGenerator : ISchemaGenerator
             throw new SchemaGenerationException(type, "The root schema type must be a JSON object.");
 
         var fields = typeInfo.Properties
+            .Where(property => property.GetAttribute<JsonIgnoreAttribute>()?.Condition
+                is not JsonIgnoreCondition.Always)
             .Select(BuildFieldSchema)
             .ToArray();
 
