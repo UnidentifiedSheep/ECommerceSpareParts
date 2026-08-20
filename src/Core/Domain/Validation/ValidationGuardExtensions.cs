@@ -41,6 +41,22 @@ public static class ValidationGuardExtensions
         return !value.IsNotNull() ? throw new InvalidInputException(errorKey) : value;
     }
 
+    public static T EnsureNotNullOrDefault<T>(this T? value, string errorKey)
+        where T : struct
+    {
+        return !value.IsNotNullOrDefault()
+            ? throw new InvalidInputException(errorKey)
+            : value.GetValueOrDefault();
+    }
+
+    public static T EnsureNullOrDefault<T>(this T? value, string errorKey)
+        where T : struct
+    {
+        return !value.IsNullOrDefault()
+            ? throw new InvalidInputException(errorKey)
+            : value.GetValueOrDefault();
+    }
+
     public static T EnsureInRange<T>(
         this T value,
         T min,
@@ -181,6 +197,26 @@ public static class ValidationGuardExtensions
         where T : class
     {
         return !value.IsNotNull() ? throw exceptionFactory() : value;
+    }
+
+    public static T EnsureNotNullOrDefault<T>(
+        this T? value,
+        Func<Exception> exceptionFactory)
+        where T : struct
+    {
+        return !value.IsNotNullOrDefault()
+            ? throw exceptionFactory()
+            : value.GetValueOrDefault();
+    }
+
+    public static T EnsureNullOrDefault<T>(
+        this T? value,
+        Func<Exception> exceptionFactory)
+        where T : struct
+    {
+        return !value.IsNullOrDefault()
+            ? throw exceptionFactory()
+            : value.GetValueOrDefault();
     }
 
     public static T EnsureInRange<T>(
