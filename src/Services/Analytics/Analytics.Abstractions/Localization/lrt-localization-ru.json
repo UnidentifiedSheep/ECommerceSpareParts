@@ -1,8 +1,6 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "metric_calculation_lrt_name": "Пересчет метрики",
-    "metric_calculation_lrt_description": "Запускает пересчет выбранной аналитической метрики по ее идентификатору.",
     "markup_calculation_lrt_name": "Расчет наценок",
     "markup_calculation_lrt_description": "Анализирует данные по наценкам и генерирует рекомендуемые диапазоны наценок для ценообразования.",
     "markup.calculation.input.invalid": "Переданы некорректные входные данные для расчета наценки.",

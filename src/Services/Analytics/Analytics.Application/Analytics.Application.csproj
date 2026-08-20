@@ -15,7 +15,6 @@
         <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Analytics.Abstractions\Analytics.Abstractions.csproj"/>
-        <ProjectReference Include="..\Analytics.Utils\Analytics.Utils.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

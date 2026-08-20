@@ -2,8 +2,6 @@ using System.Net;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
-using Analytics.Application.Interfaces.Services.Metrics;
-using Analytics.Application.Models;
 using Analytics.Entities;
 using Attributes;
 using Contracts.Sale;
@@ -18,7 +16,6 @@ public class SaleFactSynchronizer(
     IMainClient mainClient,
     ISaleFactRepository repository,
     IUnitOfWork unitOfWork,
-    ITagsService tagsService,
     ILogger<IFactSynchronizer<SalesFact, Guid>> logger
 ) : ISaleFactSynchronizer
 {
@@ -93,18 +90,9 @@ public class SaleFactSynchronizer(
                 contents);
 
             await unitOfWork.AddAsync(dbFact, cancellationToken);
-            await tagsService.UpdateTags(
-                new TagUpdateContext<SalesFact>
-                {
-                    NewFactDatetime = dbFact.CreatedAt
-                },
-                cancellationToken);
-
             await unitOfWork.SaveChangesAsync(cancellationToken);
             return dbFact;
         }
-
-        var previousFactDatetime = dbFact.CreatedAt;
 
         dbFact.Update(
             sale.Currency.Id,
@@ -113,14 +101,6 @@ public class SaleFactSynchronizer(
             sale.SaleDatetime,
             synchronizationStartedAt,
             contents);
-
-        await tagsService.UpdateTags(
-            new TagUpdateContext<SalesFact>
-            {
-                NewFactDatetime = dbFact.CreatedAt,
-                PreviousFactDatetime = previousFactDatetime
-            },
-            cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return dbFact;
@@ -162,18 +142,9 @@ public class SaleFactSynchronizer(
                 contents);
 
             await unitOfWork.AddAsync(dbFact, cancellationToken);
-            await tagsService.UpdateTags(
-                new TagUpdateContext<SalesFact>
-                {
-                    NewFactDatetime = dbFact.CreatedAt
-                },
-                cancellationToken);
-
             await unitOfWork.SaveChangesAsync(cancellationToken);
             return dbFact;
         }
-
-        var previousFactDatetime = dbFact.CreatedAt;
 
         dbFact.Update(
             sale.CurrencyId,
@@ -182,14 +153,6 @@ public class SaleFactSynchronizer(
             sale.SaleDatetime,
             saleUpdatedEvent.OccurredAt,
             contents);
-
-        await tagsService.UpdateTags(
-            new TagUpdateContext<SalesFact>
-            {
-                NewFactDatetime = dbFact.CreatedAt,
-                PreviousFactDatetime = previousFactDatetime
-            },
-            cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return dbFact;
@@ -245,17 +208,7 @@ public class SaleFactSynchronizer(
         SalesFact? dbFact,
         CancellationToken cancellationToken)
     {
-        if (dbFact is not null)
-        {
-            await tagsService.UpdateTags(
-                new TagUpdateContext<SalesFact>
-                {
-                    NewFactDatetime = dbFact.CreatedAt
-                },
-                cancellationToken);
-
-            unitOfWork.Remove(dbFact);
-        }
+        if (dbFact is not null) unitOfWork.Remove(dbFact);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return null;

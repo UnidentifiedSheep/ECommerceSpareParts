@@ -4,8 +4,6 @@ using Analytics.Application;
 using Analytics.Cache;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
-using Analytics.Worker;
-using Analytics.Worker.HostedServices;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
@@ -53,9 +51,7 @@ builder.Services
     .AddScheduledJobEnqueuerOptions()
     .AddSystemOptions();
 
-AddHostedServiceOptions(builder.Services);
 builder.Services
-    .AddHostedService<RecalculationCheckHostedService>()
     .AddLrtHostedServices();
 
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
@@ -68,14 +64,6 @@ var host = builder.Build();
 await host.RunAsync();
 
 return;
-
-void AddHostedServiceOptions(IServiceCollection collection)
-{
-    collection.AddOptions<HostedServiceOptions>()
-        .BindConfiguration(HostedServiceOptions.SectionName)
-        .ValidateDataAnnotations()
-        .ValidateOnStart();
-}
 
 void AddMassTransit(IHostApplicationBuilder hostBuilder)
 {

@@ -1,6 +1,5 @@
 ﻿using Analytics.Application.NamedObjects;
 using Analytics.Application.NamedObjects.Analyzers;
-using Analytics.Application.NamedObjects.Metrics;
 using Application.Common.Extensions;
 using Application.Common.Handlers.NamedObjects;
 using Application.Common.Interfaces.NamedObject;
@@ -20,7 +19,6 @@ public static class NamedObjectDiRegistry
 
         return services
             .AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>()
-            .RegisterNamedObject<MetricDefinitionNamedObjectBase>(objectsLifetime: ServiceLifetime.Singleton)
             .RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
     }
 }

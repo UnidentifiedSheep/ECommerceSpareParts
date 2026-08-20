@@ -1,8 +1,6 @@
 ﻿using System.Net;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
-using Analytics.Application.Interfaces.Services.Metrics;
-using Analytics.Application.Models;
 using Analytics.Entities;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -15,7 +13,6 @@ public class PurchaseFactSynchronizer(
     IMainClient mainClient,
     IRepository<PurchasesFact, Guid> repository,
     IUnitOfWork unitOfWork,
-    ITagsService tagsService,
     ILogger<IFactSynchronizer<PurchasesFact, Guid>> logger
 ) : IFactSynchronizer<PurchasesFact, Guid>
 {
@@ -89,18 +86,9 @@ public class PurchaseFactSynchronizer(
                 contents);
 
             await unitOfWork.AddAsync(dbFact, cancellationToken);
-            await tagsService.UpdateTags(
-                new TagUpdateContext<PurchasesFact>
-                {
-                    NewFactDatetime = dbFact.CreatedAt
-                },
-                cancellationToken);
-
             await unitOfWork.SaveChangesAsync(cancellationToken);
             return dbFact;
         }
-
-        var previousFactDatetime = dbFact.CreatedAt;
 
         dbFact.Update(
             purchase.Currency.Id,
@@ -108,14 +96,6 @@ public class PurchaseFactSynchronizer(
             purchase.PurchaseDatetime,
             synchronizationStartedAt,
             contents);
-
-        await tagsService.UpdateTags(
-            new TagUpdateContext<PurchasesFact>
-            {
-                NewFactDatetime = dbFact.CreatedAt,
-                PreviousFactDatetime = previousFactDatetime
-            },
-            cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return dbFact;
@@ -125,17 +105,7 @@ public class PurchaseFactSynchronizer(
         PurchasesFact? dbFact,
         CancellationToken cancellationToken)
     {
-        if (dbFact is not null)
-        {
-            await tagsService.UpdateTags(
-                new TagUpdateContext<PurchasesFact>
-                {
-                    NewFactDatetime = dbFact.CreatedAt
-                },
-                cancellationToken);
-
-            unitOfWork.Remove(dbFact);
-        }
+        if (dbFact is not null) unitOfWork.Remove(dbFact);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return null;

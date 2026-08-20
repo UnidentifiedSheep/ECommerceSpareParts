@@ -1,5 +1,3 @@
-using Analytics.Entities.Interfaces;
-using Analytics.Enums;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
@@ -8,7 +6,7 @@ using Exceptions;
 
 namespace Analytics.Entities;
 
-public class PurchasesFact : Entity<PurchasesFact, Guid>, IDependency
+public class PurchasesFact : Entity<PurchasesFact, Guid>
 {
     private PurchasesFact() { }
 
@@ -26,8 +24,6 @@ public class PurchasesFact : Entity<PurchasesFact, Guid>, IDependency
     public decimal TotalSum { get; private set; }
 
     public virtual ICollection<PurchaseContent> PurchaseContents { get; } = new List<PurchaseContent>();
-
-    public static DependsOn DependsOn => DependsOn.Purchase;
 
     public override Guid GetId() { return Id; }
 

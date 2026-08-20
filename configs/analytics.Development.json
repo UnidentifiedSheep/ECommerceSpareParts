@@ -10,12 +10,6 @@
     "Service": "Analytics",
     "Secret": "SuperAnalyticsKey222"
   },
-  "HostedServiceOptions": {
-    "RecalculationCheck": {
-      "Delay": "00:00:30",
-      "ScheduleAtOnce": 100
-    }
-  },
   "System": {
     "SystemId": "9a2a6216-6e4c-4924-841b-7923e504c852"
   }

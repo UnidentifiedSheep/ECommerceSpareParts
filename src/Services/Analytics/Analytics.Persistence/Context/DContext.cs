@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Analytics.Entities;
-using Analytics.Entities.Metrics;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using MassTransit;
@@ -20,10 +19,6 @@ public partial class DContext : DbContext
         : base(options)
     {
     }
-
-    public virtual DbSet<Metric> Metrics { get; set; }
-
-    public virtual DbSet<MetricJob> MetricJobs { get; set; }
 
     public virtual DbSet<Job> Jobs { get; set; }
 
