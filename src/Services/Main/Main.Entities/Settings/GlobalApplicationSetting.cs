@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using Attributes.JsonAttributes;
+using SchemaGeneration.Abstractions.Attributes;
 using Domain.CommonEntities;
 using Domain.Interfaces;
-using Enums;
+using SchemaGeneration.Abstractions.Enums;
 
 namespace Main.Entities.Settings;
 
@@ -21,14 +21,14 @@ public class GlobalApplicationSetting : Setting<GlobalApplicationSettingData>,
 public record GlobalApplicationSettingData
 {
     [JsonPropertyName("apiServiceUrl")]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("global.application.setting.api.service.url.name")]
-    [LocalizedJsonFieldDescription("global.application.setting.api.service.url.description")]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("global.application.setting.api.service.url.name")]
+    [SchemaFieldDescription("global.application.setting.api.service.url.description")]
     public string? ApiServiceUrl { get; init; }
 
     [JsonPropertyName("appServiceUrl")]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("global.application.setting.app.service.url.name")]
-    [LocalizedJsonFieldDescription("global.application.setting.app.service.url.description")]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("global.application.setting.app.service.url.name")]
+    [SchemaFieldDescription("global.application.setting.app.service.url.description")]
     public string? AppServiceUrl { get; init; }
 }

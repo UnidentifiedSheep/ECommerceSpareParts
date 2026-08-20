@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using Attributes.JsonAttributes;
+using SchemaGeneration.Abstractions.Attributes;
 using Domain.CommonEntities;
 using Domain.Interfaces;
-using Enums;
+using SchemaGeneration.Abstractions.Enums;
 
 namespace Main.Entities.Settings;
 
@@ -19,10 +19,10 @@ public class StorageContentSetting : Setting<StorageContentSettingData>, ISettin
 public record StorageContentSettingData
 {
     [JsonPropertyName("storageContentExtractionPolicy")]
-    [RequiredJsonField]
-    [InputControl(InputControlType.NamedObjectSelector)]
-    [DependsOnEntity("StorageContentExtractPolicy")]
-    [LocalizedJsonFieldName("storage.content.setting.extraction.policy.name")]
-    [LocalizedJsonFieldDescription("storage.content.setting.extraction.policy.description")]
+    [RequiredSchemaField]
+    [SchemaInputControl(InputControlType.NamedObjectSelector)]
+    [SchemaDependsOnEntity("StorageContentExtractPolicy")]
+    [SchemaFieldLabel("storage.content.setting.extraction.policy.name")]
+    [SchemaFieldDescription("storage.content.setting.extraction.policy.description")]
     public string StorageContentExtractionPolicy { get; init; } = "FifoStorageContentExtractPolicy";
 }

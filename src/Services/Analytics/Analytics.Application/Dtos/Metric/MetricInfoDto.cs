@@ -2,6 +2,8 @@
 
 namespace Analytics.Application.Dtos.Metric;
 
+using SchemaGeneration.Abstractions.Models;
+
 public record MetricInfoDto
 {
     [JsonPropertyName("systemName")]
@@ -14,5 +16,5 @@ public record MetricInfoDto
     public required string Description { get; init; }
 
     [JsonPropertyName("inputSchema")]
-    public required string InputSchema { get; init; }
+    public required ObjectSchema InputSchema { get; init; }
 }

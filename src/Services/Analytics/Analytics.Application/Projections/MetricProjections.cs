@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Text.Json;
 using Analytics.Application.Dtos.Metric;
 using Analytics.Application.NamedObjects.Metrics;
 using Analytics.Entities.Metrics;
@@ -16,7 +17,6 @@ public sealed class MetricDtoProjectionProvider
 {
     public MetricDtoProjectionProvider(
         IScopedStringLocalizer localizer,
-        IScopedLocalizedJsonSerializer serializer,
         INamedObjectRegistry<MetricDefinitionNamedObjectBase> registry,
         IProjectionProvider<MetricJob, MetricJobDto> metricJobProjection)
     {
@@ -36,7 +36,7 @@ public sealed class MetricDtoProjectionProvider
             SystemName = x.Discriminator,
             Description = descriptions[x.Discriminator],
             Name = names[x.Discriminator],
-            Data = serializer.Serialize(x.GetData()),
+            Data = JsonSerializer.Serialize(x.GetData()),
             Tags = x.Tags,
             RangeEnd = x.RangeEnd,
             RangeStart = x.RangeStart,

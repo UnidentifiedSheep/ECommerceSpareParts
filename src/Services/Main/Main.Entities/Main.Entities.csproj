@@ -12,6 +12,7 @@
         <ProjectReference Include="..\..\..\Core\Domain\Domain.csproj"/>
         <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj"/>
         <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\Main.Enums\Main.Enums.csproj"/>
     </ItemGroup>
 

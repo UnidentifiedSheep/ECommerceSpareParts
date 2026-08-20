@@ -1,7 +1,6 @@
 using Localization.Abstractions.Interfaces;
 using Localization.Abstractions.Models;
 using Localization.Domain.Middlewares;
-using Localization.Domain.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -44,7 +43,7 @@ public static class ServiceCollectionExtensions
         Locale defaultLocale,
         params Locale[] locales)
     {
-        services.AddSingleton<IOptions<LocalesOptions>>(
+        services.AddSingleton(
             Options.Create(
                 new LocalesOptions
                 {
@@ -62,8 +61,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddLocales(locales)
             .AddStringLocalizer()
-            .AddScopedStringLocalizer()
-            .AddLocalizableJsonSerializer();
+            .AddScopedStringLocalizer();
 
         var hs = locales.ToHashSet();
 
@@ -108,8 +106,4 @@ public static class ServiceCollectionExtensions
         return services.AddScopedStringLocalizer<ScopedStringLocalizer>();
     }
 
-    public static IServiceCollection AddLocalizableJsonSerializer(this IServiceCollection services)
-    {
-        return services.AddScoped<IScopedLocalizedJsonSerializer, ScopedLocalizedJsonSerializer>();
-    }
 }

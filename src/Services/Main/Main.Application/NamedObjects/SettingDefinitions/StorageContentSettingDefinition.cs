@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
-using Attributes.JsonAttributes;
-using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 using Exceptions;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Settings;
@@ -48,11 +48,11 @@ public class StorageContentSettingDefinition(
 
 public record StorageContentSettingInputData
 {
-    [RequiredJsonField]
-    [InputControl(InputControlType.NamedObjectSelector)]
-    [DependsOnEntity("StorageContentExtractPolicy")]
-    [LocalizedJsonFieldName("storage.content.setting.extraction.policy.name")]
-    [LocalizedJsonFieldDescription("storage.content.setting.extraction.policy.description")]
+    [RequiredSchemaField]
+    [SchemaInputControl(InputControlType.NamedObjectSelector)]
+    [SchemaDependsOnEntity("StorageContentExtractPolicy")]
+    [SchemaFieldLabel("storage.content.setting.extraction.policy.name")]
+    [SchemaFieldDescription("storage.content.setting.extraction.policy.description")]
     [JsonPropertyName("storageContentExtractionPolicy")]
     public required string StorageContentExtractionPolicy { get; init; }
 }

@@ -1,25 +1,25 @@
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
-using Attributes.JsonAttributes;
-using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 
 namespace Pricing.Application.Lrts.PriceCandidateCalculation;
 
 public class PriceCandidateCalculationState : IInputState
 {
-    [InputControl(InputControlType.EntitySelector)]
-    [DependsOnEntity("Product", "id")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldDescription("lrt.price.candidate.calculation.product.id.description")]
-    [LocalizedJsonFieldName("lrt.price.candidate.calculation.product.id.name")]
+    [SchemaInputControl(InputControlType.EntitySelector)]
+    [SchemaDependsOnEntity("Product", "id")]
+    [RequiredSchemaField]
+    [SchemaFieldDescription("lrt.price.candidate.calculation.product.id.description")]
+    [SchemaFieldLabel("lrt.price.candidate.calculation.product.id.name")]
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }
     
-    [InputControl(InputControlType.EntitySelector)]
-    [DependsOnEntity("Storage", "name")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldDescription("lrt.price.candidate.calculation.storage.name.description")]
-    [LocalizedJsonFieldName("lrt.price.candidate.calculation.storage.name.name")]
+    [SchemaInputControl(InputControlType.EntitySelector)]
+    [SchemaDependsOnEntity("Storage", "name")]
+    [RequiredSchemaField]
+    [SchemaFieldDescription("lrt.price.candidate.calculation.storage.name.description")]
+    [SchemaFieldLabel("lrt.price.candidate.calculation.storage.name.name")]
     [JsonPropertyName("storageName")]
     public required string StorageName { get; init; }
     

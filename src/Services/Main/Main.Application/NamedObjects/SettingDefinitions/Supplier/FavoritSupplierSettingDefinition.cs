@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
-using Attributes.JsonAttributes;
-using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 using Exceptions;
 using Main.Entities.Settings.Supplier;
 
@@ -93,40 +93,40 @@ public class FavoritSupplierSettingDefinition(
 public record FavoritSupplierSettingInputData
 {
     [JsonPropertyName("isEnabled")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldName("supplier.favorit.setting.is.enabled.name")]
-    [LocalizedJsonFieldDescription("supplier.favorit.setting.is.enabled.description")]
+    [RequiredSchemaField]
+    [SchemaFieldLabel("supplier.favorit.setting.is.enabled.name")]
+    [SchemaFieldDescription("supplier.favorit.setting.is.enabled.description")]
     public bool IsEnabled { get; init; }
 
     [JsonPropertyName("baseUrl")]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("supplier.favorit.setting.base.url.name")]
-    [LocalizedJsonFieldDescription("supplier.favorit.setting.base.url.description")]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("supplier.favorit.setting.base.url.name")]
+    [SchemaFieldDescription("supplier.favorit.setting.base.url.description")]
     public string? BaseUrl { get; init; }
 
     [JsonPropertyName("apiKey")]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("supplier.favorit.setting.api.key.name")]
-    [LocalizedJsonFieldDescription("supplier.favorit.setting.api.key.description")]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("supplier.favorit.setting.api.key.name")]
+    [SchemaFieldDescription("supplier.favorit.setting.api.key.description")]
     public string? ApiKey { get; init; }
 }
 
 public record FavoritSupplierSettingOutputData
 {
     [JsonPropertyName("isEnabled")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldName("supplier.favorit.setting.is.enabled.name")]
-    [LocalizedJsonFieldDescription("supplier.favorit.setting.is.enabled.description")]
+    [RequiredSchemaField]
+    [SchemaFieldLabel("supplier.favorit.setting.is.enabled.name")]
+    [SchemaFieldDescription("supplier.favorit.setting.is.enabled.description")]
     public bool IsEnabled { get; init; }
 
     [JsonPropertyName("baseUrl")]
-    [LocalizedJsonFieldName("supplier.favorit.setting.base.url.name")]
-    [LocalizedJsonFieldDescription("supplier.favorit.setting.base.url.description")]
+    [SchemaFieldLabel("supplier.favorit.setting.base.url.name")]
+    [SchemaFieldDescription("supplier.favorit.setting.base.url.description")]
     public string? BaseUrl { get; init; }
 
     [JsonPropertyName("hasApiKey")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldName("supplier.favorit.setting.has.api.key.name")]
-    [LocalizedJsonFieldDescription("supplier.favorit.setting.has.api.key.description")]
+    [RequiredSchemaField]
+    [SchemaFieldLabel("supplier.favorit.setting.has.api.key.name")]
+    [SchemaFieldDescription("supplier.favorit.setting.has.api.key.description")]
     public bool HasApiKey { get; init; }
 }

@@ -2,6 +2,8 @@
 
 namespace Application.Common.Dtos;
 
+using SchemaGeneration.Abstractions.Models;
+
 public record JobInfoDto
 {
     [JsonPropertyName("systemName")]
@@ -14,5 +16,5 @@ public record JobInfoDto
     public required string Description { get; init; }
 
     [JsonPropertyName("initStateSchema")]
-    public required string InitStateSchema { get; init; }
+    public required ObjectSchema InitStateSchema { get; init; }
 }

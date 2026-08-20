@@ -2,8 +2,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
-using Attributes.JsonAttributes;
 using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 using Exceptions;
 using Main.Entities.Settings;
 
@@ -42,11 +43,11 @@ public class CurrencySettingDefinition(
 
 public record CurrencySettingInputData
 {
-    [RequiredJsonField]
-    [InputControl(InputControlType.EnumSelector)]
-    [DependsOnEntity(nameof(ExchangeRateProvider))]
-    [LocalizedJsonFieldName("currency.setting.rate.provider.name")]
-    [LocalizedJsonFieldDescription("currency.setting.rate.provider.description")]
+    [RequiredSchemaField]
+    [SchemaInputControl(InputControlType.EnumSelector)]
+    [SchemaDependsOnEntity(nameof(ExchangeRateProvider))]
+    [SchemaFieldLabel("currency.setting.rate.provider.name")]
+    [SchemaFieldDescription("currency.setting.rate.provider.description")]
     [JsonPropertyName("rateProvider")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ExchangeRateProvider RateProvider { get; init; }

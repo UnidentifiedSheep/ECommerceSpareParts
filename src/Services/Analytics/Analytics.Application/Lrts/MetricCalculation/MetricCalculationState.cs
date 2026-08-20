@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
-using Attributes.JsonAttributes;
-using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 
 namespace Analytics.Application.Lrts.MetricCalculation;
 
@@ -9,10 +9,8 @@ public record MetricCalculationState : MetricCalculationInputState;
 
 public record MetricCalculationInputState : IInputState
 {
-    [InputControl(InputControlType.TextField)]
-    [RequiredJsonField]
-    [LocalizedJsonFieldDescription("metric.id.description")]
-    [LocalizedJsonFieldName("metric.id.name")]
+    [SchemaInputControl(InputControlType.TextField)]
+    [RequiredSchemaField]
     [JsonPropertyName("metricId")]
     public required Guid MetricId { get; init; }
 

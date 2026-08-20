@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
-using Attributes.JsonAttributes;
-using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 using Exceptions;
 
 namespace Analytics.Application.Lrts.MarkupCalculation;
@@ -10,15 +10,11 @@ public record MarkupCalculationState : MarkupCalculationInputState;
 
 public record MarkupCalculationInputState : IInputState
 {
-    [InputControl(InputControlType.DatePicker)]
-    [LocalizedJsonFieldDescription("datetime.range.start.description")]
-    [LocalizedJsonFieldName("datetime.range.start.name")]
+    [SchemaInputControl(InputControlType.DatePicker)]
     [JsonPropertyName("rangeStart")]
     public DateTime? RangeStart { get; init; }
 
-    [InputControl(InputControlType.DatePicker)]
-    [LocalizedJsonFieldDescription("datetime.range.end.description")]
-    [LocalizedJsonFieldName("datetime.range.end.name")]
+    [SchemaInputControl(InputControlType.DatePicker)]
     [JsonPropertyName("rangeEnd")]
     public DateTime? RangeEnd { get; init; }
 

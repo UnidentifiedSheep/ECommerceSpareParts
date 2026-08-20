@@ -6,7 +6,7 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
-using Attributes.JsonAttributes;
+using SchemaGeneration.Abstractions.Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;

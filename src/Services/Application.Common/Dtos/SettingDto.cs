@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Application.Common.Dtos;
 
+using SchemaGeneration.Abstractions.Models;
+
 public record SettingDto
 {
     [JsonPropertyName("systemName")]
@@ -14,10 +16,10 @@ public record SettingDto
     public required string Description { get; init; }
 
     [JsonPropertyName("inputData")]
-    public required string InputData { get; init; }
+    public required ObjectSchema InputData { get; init; }
 
     [JsonPropertyName("outputMetadata")]
-    public required string OutputMetadata { get; init; }
+    public required ObjectSchema OutputMetadata { get; init; }
 
     [JsonPropertyName("outputData")]
     public required string OutputData { get; init; }

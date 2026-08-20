@@ -34,6 +34,7 @@
         <ProjectReference Include="..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Integrations\Suppliers\Integrations.Supplier\Integrations.Supplier.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\SchemaGeneration\SchemaGeneration\SchemaGeneration.csproj"/>
     </ItemGroup>
 
 </Project>

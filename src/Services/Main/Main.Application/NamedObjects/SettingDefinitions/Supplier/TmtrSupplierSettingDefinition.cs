@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
-using Attributes.JsonAttributes;
-using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 using Exceptions;
 using Main.Entities.Settings.Supplier;
 
@@ -118,63 +118,63 @@ public class TmtrSupplierSettingDefinition(
 public record TmtrSupplierSettingInputData
 {
     [JsonPropertyName("isEnabled")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.is.enabled.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.is.enabled.description")]
+    [RequiredSchemaField]
+    [SchemaFieldLabel("supplier.tmtr.setting.is.enabled.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.is.enabled.description")]
     public bool IsEnabled { get; init; }
 
     [JsonPropertyName("baseUrl")]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.base.url.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.base.url.description")]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("supplier.tmtr.setting.base.url.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.base.url.description")]
     public string? BaseUrl { get; init; }
 
     [JsonPropertyName("guaranteedDeliveryOffsetDays")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.delivery.offset.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.delivery.offset.description")]
+    [RequiredSchemaField]
+    [SchemaFieldLabel("supplier.tmtr.setting.delivery.offset.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.delivery.offset.description")]
     public int GuaranteedDeliveryOffsetDays { get; init; } = 1;
 
     [JsonPropertyName("login")]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.login.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.login.description")]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("supplier.tmtr.setting.login.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.login.description")]
     public string? Login { get; init; }
 
     [JsonPropertyName("password")]
-    [InputControl(InputControlType.TextField)]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.password.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.password.description")]
+    [SchemaInputControl(InputControlType.TextField)]
+    [SchemaFieldLabel("supplier.tmtr.setting.password.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.password.description")]
     public string? Password { get; init; }
 }
 
 public record TmtrSupplierSettingOutputData
 {
     [JsonPropertyName("isEnabled")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.is.enabled.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.is.enabled.description")]
+    [RequiredSchemaField]
+    [SchemaFieldLabel("supplier.tmtr.setting.is.enabled.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.is.enabled.description")]
     public bool IsEnabled { get; init; }
 
     [JsonPropertyName("baseUrl")]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.base.url.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.base.url.description")]
+    [SchemaFieldLabel("supplier.tmtr.setting.base.url.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.base.url.description")]
     public string? BaseUrl { get; init; }
 
     [JsonPropertyName("guaranteedDeliveryOffsetDays")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.delivery.offset.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.delivery.offset.description")]
+    [RequiredSchemaField]
+    [SchemaFieldLabel("supplier.tmtr.setting.delivery.offset.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.delivery.offset.description")]
     public int GuaranteedDeliveryOffsetDays { get; init; }
 
     [JsonPropertyName("login")]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.login.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.login.description")]
+    [SchemaFieldLabel("supplier.tmtr.setting.login.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.login.description")]
     public string? Login { get; init; }
 
     [JsonPropertyName("hasPassword")]
-    [RequiredJsonField]
-    [LocalizedJsonFieldName("supplier.tmtr.setting.has.password.name")]
-    [LocalizedJsonFieldDescription("supplier.tmtr.setting.has.password.description")]
+    [RequiredSchemaField]
+    [SchemaFieldLabel("supplier.tmtr.setting.has.password.name")]
+    [SchemaFieldDescription("supplier.tmtr.setting.has.password.description")]
     public bool HasPassword { get; init; }
 }
