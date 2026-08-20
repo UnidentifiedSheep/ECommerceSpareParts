@@ -6,4 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="CsvHelper" Version="33.1.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Localization\Localization.Abstractions\Localization.Abstractions.csproj"/>
+    </ItemGroup>
+
 </Project>
