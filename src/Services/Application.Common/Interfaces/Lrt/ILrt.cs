@@ -7,3 +7,8 @@ public interface ILrt
         Guid leaseHolderId,
         CancellationToken cancellationToken = default);
 }
+
+public interface ILrt<in TInputState> : ILrt
+    where TInputState : IInputState
+{
+}
