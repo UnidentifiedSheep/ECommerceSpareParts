@@ -7,5 +7,6 @@ public interface IJobCreationDispatcher
     Job Create(
         string systemName,
         string inputState,
-        int maxAttempts);
+        int maxAttempts,
+        string? naturalKey = null);
 }

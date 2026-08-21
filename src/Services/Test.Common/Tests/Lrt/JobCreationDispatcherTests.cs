@@ -36,6 +36,22 @@ public sealed class JobCreationDispatcherTests
     }
 
     [Fact]
+    public void Create_UniqueSingleRunLrt_SetsNaturalKey()
+    {
+        var lrt = CreateSingleRunLrt("single-run");
+        var dispatcher = CreateDispatcher(lrt);
+
+        var job = dispatcher.Create(
+            lrt.SystemName,
+            "{}",
+            5,
+            " product:42 ");
+
+        job.Should().BeOfType<SingleRunJob>();
+        job.NaturalKey.Should().Be("product:42");
+    }
+
+    [Fact]
     public void Create_MultiStepLrt_CreatesTopologyWithBlockedSteps()
     {
         var lrt = new TestMultiStepLrt();
@@ -48,6 +64,25 @@ public sealed class JobCreationDispatcherTests
         multiStepJob.MaxAttempts.Should().Be(4);
         multiStepJob.Steps.Should().ContainSingle()
             .Which.Status.Should().Be(JobStatus.Blocked);
+    }
+
+    [Fact]
+    public void Create_UniqueMultiStepLrt_SetsNaturalKeyOnlyOnRoot()
+    {
+        var lrt = new TestMultiStepLrt();
+        var stepLrt = CreateSingleRunLrt("step");
+        var dispatcher = CreateDispatcher(lrt, stepLrt);
+
+        var job = dispatcher.Create(
+            lrt.SystemName,
+            "{}",
+            4,
+            " workflow:42 ");
+
+        var multiStepJob = job.Should().BeOfType<MultiStepJob>().Subject;
+        multiStepJob.NaturalKey.Should().Be("workflow:42");
+        multiStepJob.Steps.Should().ContainSingle()
+            .Which.NaturalKey.Should().BeNull();
     }
 
     [Fact]
@@ -67,6 +102,30 @@ public sealed class JobCreationDispatcherTests
         innerJob.Steps.Should().ContainSingle()
             .Which.Should().BeOfType<SingleRunJob>()
             .Which.Status.Should().Be(JobStatus.Blocked);
+    }
+
+    [Fact]
+    public void Create_UniqueNestedMultiStepLrt_DoesNotPropagateNaturalKeyToSteps()
+    {
+        var outer = new NestedMultiStepLrt("outer", "inner");
+        var inner = new NestedMultiStepLrt("inner", "leaf");
+        var leaf = CreateSingleRunLrt("leaf");
+        var dispatcher = CreateDispatcher(outer, inner, leaf);
+
+        var job = dispatcher.Create(
+            outer.SystemName,
+            "{}",
+            3,
+            "workflow:42");
+
+        var outerJob = job.Should().BeOfType<MultiStepJob>().Subject;
+        var innerJob = outerJob.Steps.Should().ContainSingle()
+            .Which.Should().BeOfType<MultiStepJob>().Subject;
+
+        outerJob.NaturalKey.Should().Be("workflow:42");
+        innerJob.NaturalKey.Should().BeNull();
+        innerJob.Steps.Should().ContainSingle()
+            .Which.NaturalKey.Should().BeNull();
     }
 
     [Fact]

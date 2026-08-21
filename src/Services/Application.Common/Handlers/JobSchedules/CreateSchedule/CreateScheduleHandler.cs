@@ -1,55 +1,25 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Dtos;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.NamedObject;
-using Application.Common.LRT;
-using Application.Common.NamedObject;
-using Attributes;
-using Cronos;
-using Domain.CommonEntities;
-using Domain.CommonEntities.Job;
+using Application.Common.Interfaces.Services;
 
 namespace Application.Common.Handlers.JobSchedules.CreateSchedule;
 
-[Transactional]
 public record CreateScheduleCommand(NewJobScheduleDto NewSchedule) : ICommand<CreateScheduleResult>;
 
 public record CreateScheduleResult(Guid ScheduleId);
 
 public class CreateScheduleHandler(
-    INamedObjectRegistry<ILrtNamedObject> registry,
-    IUnitOfWork unitOfWork
+    IJobScheduleService jobScheduleService
 ) : ICommandHandler<CreateScheduleCommand, CreateScheduleResult>
 {
     public async Task<CreateScheduleResult> Handle(
         CreateScheduleCommand request,
         CancellationToken cancellationToken)
     {
-        var lrt = registry.GetBySystemName(request.NewSchedule.JobSystemName);
-        var validatedState = lrt.ValidateState(request.NewSchedule.InputState);
+        var scheduleId = await jobScheduleService.CreateScheduleAsync(
+            request.NewSchedule,
+            cancellationToken);
 
-        var schedule = JobSchedule.Create(
-            request.NewSchedule.Name,
-            request.NewSchedule.Description,
-            lrt.SystemName,
-            validatedState,
-            request.NewSchedule.MaxAttempts,
-            request.NewSchedule.Cron);
-
-        if (request.NewSchedule.Enabled) schedule.Enable();
-
-        var nextRunAt = CronExpression.Parse(schedule.Cron)
-            .GetNextOccurrence(
-                DateTime.UtcNow,
-                JobSchedule.TimeZone);
-
-        schedule.SetNextRunAt(nextRunAt);
-
-        await unitOfWork.AddAsync(schedule, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return new CreateScheduleResult(schedule.Id);
+        return new CreateScheduleResult(scheduleId);
     }
 }

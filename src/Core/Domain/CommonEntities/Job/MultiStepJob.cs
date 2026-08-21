@@ -12,11 +12,13 @@ public sealed class MultiStepJob : Job
     private MultiStepJob(
         string systemName,
         string initialState,
-        int maxAttempts)
+        int maxAttempts,
+        string? naturalKey)
         : base(
             systemName,
             initialState,
-            maxAttempts)
+            maxAttempts,
+            naturalKey)
     {
     }
 
@@ -34,7 +36,23 @@ public sealed class MultiStepJob : Job
         return new MultiStepJob(
             systemName,
             initialState,
-            maxAttempts);
+            maxAttempts,
+            null);
+    }
+
+    public static MultiStepJob CreateUnique(
+        string naturalKey,
+        string systemName,
+        string initialState,
+        int maxAttempts = 3)
+    {
+        ArgumentNullException.ThrowIfNull(naturalKey);
+
+        return new MultiStepJob(
+            systemName,
+            initialState,
+            maxAttempts,
+            naturalKey);
     }
 
     public void AddStep(Job step)

@@ -1,118 +1,76 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Dapper;
-using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Persistence.Repository;
+using Persistence.Common.Jobs;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Persistence.Common;
 
-public class JobRepository<TContext>(
+internal sealed class JobRepository<TContext>(
     TContext context,
-    IUserContext userContext,
-    IQueryableExtensions extensions
-) : LinqRepositoryBase<TContext, Job, Guid>(context, extensions), 
+    IQueryableExtensions extensions,
+    PendingUniqueJobFilter<TContext> uniqueJobFilter
+) : LinqRepositoryBase<TContext, Job, Guid>(context, extensions),
     IJobRepository where TContext : DbContext
 {
-    public async Task<int> TryInsertPendingUniqueAsync(
-        IEnumerable<SingleRunJob> jobs,
+    public async Task<IReadOnlyList<Guid>> InsertJobsAsync(
+        IEnumerable<Job> jobs,
         CancellationToken cancellationToken = default)
     {
-        var all = jobs.ToList();
-        if (all.Any(x => x.NaturalKey is null))
+        ArgumentNullException.ThrowIfNull(jobs);
+
+        var all = Normalize(jobs);
+
+        EnsureValid(all);
+        if (all.Count == 0) return [];
+
+        if (Context.Database.CurrentTransaction is null)
             throw new InvalidOperationException(
-                "Pending unique jobs must have a natural key.");
+                "Jobs must be inserted inside a database transaction.");
 
-        all = all
-            .DistinctBy(x => new { x.SystemName, x.NaturalKey })
-            .ToList();
-        if (all.Count == 0) return 0;
-        
-        all.ForEach(x => x.Touch(userContext.UserIdOrNull));
+        var insertable = await uniqueJobFilter.FilterAsync(
+            all,
+            cancellationToken);
+        if (insertable.Count == 0) return [];
 
-        var connection = Context.Database.GetDbConnection();
-
-        var command = new CommandDefinition(
-            commandText: """
-                INSERT INTO job.jobs (
-                    id,
-                    job_type,
-                    system_name,
-                    natural_key,
-                    state,
-                    status,
-                    attempts,
-                    max_attempts,
-                    error_message,
-                    locked_at,
-                    lease_expires_at,
-                    lease_holder_id,
-                    created_at,
-                    updated_at
-                )
-                SELECT
-                    x.id,
-                    x.job_type,
-                    x.system_name,
-                    x.natural_key,
-                    x.state,
-                    x.status,
-                    x.attempts,
-                    x.max_attempts,
-                    NULL,
-                    NULL,
-                    NULL,
-                    NULL,
-                    x.created_at,
-                    x.updated_at
-                FROM unnest(
-                    @Ids,
-                    @JobTypes,
-                    @SystemNames,
-                    @NaturalKeys,
-                    @States,
-                    @Statuses,
-                    @Attempts,
-                    @MaxAttempts,
-                    @CreatedAts,
-                    @UpdatedAts
-                ) AS x(
-                    id,
-                    job_type,
-                    system_name,
-                    natural_key,
-                    state,
-                    status,
-                    attempts,
-                    max_attempts,
-                    created_at,
-                    updated_at
-                )
-                ON CONFLICT (system_name, natural_key)
-                WHERE status = 'Pending'
-                  AND natural_key IS NOT NULL
-                DO NOTHING;
-                """,
-            parameters: new
-            {
-                Ids = all.Select(x => x.Id).ToArray(),
-                JobTypes = all.Select(_ => "job").ToArray(),
-                SystemNames = all.Select(x => x.SystemName).ToArray(),
-                NaturalKeys = all.Select(x => x.NaturalKey).ToArray(),
-                States = all.Select(x => x.State).ToArray(),
-                Statuses = all.Select(_ => "Pending").ToArray(),
-                Attempts = all.Select(x => x.Attempts).ToArray(),
-                MaxAttempts = all.Select(x => x.MaxAttempts).ToArray(),
-                CreatedAts = all.Select(x => x.CreatedAt).ToArray(),
-                UpdatedAts = all.Select(x => x.UpdatedAt).ToArray()
-            },
-            transaction: Context.Database.CurrentTransaction?.GetDbTransaction(),
-            cancellationToken: cancellationToken);
-
-        return await connection.ExecuteAsync(command);
+        await Context.AddRangeAsync(insertable, cancellationToken);
+        return insertable.Select(x => x.Id).ToList();
     }
+
+    private static List<Job> Normalize(IEnumerable<Job> jobs)
+    {
+        var result = new List<Job>();
+        var ids = new HashSet<Guid>();
+        var uniqueKeys = new HashSet<JobKey>();
+
+        foreach (var job in jobs)
+        {
+            ArgumentNullException.ThrowIfNull(job);
+
+            if (!ids.Add(job.Id))
+                continue;
+
+            if (job.NaturalKey is not null &&
+                !uniqueKeys.Add(new JobKey(
+                    job.SystemName,
+                    job.NaturalKey)))
+                continue;
+
+            result.Add(job);
+        }
+
+        return result;
+    }
+
+    private static void EnsureValid(IReadOnlyCollection<Job> jobs)
+    {
+        if (jobs.Any(x => x is not SingleRunJob and not MultiStepJob))
+            throw new InvalidOperationException(
+                "Unsupported job type in job batch.");
+    }
+
+    private readonly record struct JobKey(
+        string SystemName,
+        string NaturalKey);
 }

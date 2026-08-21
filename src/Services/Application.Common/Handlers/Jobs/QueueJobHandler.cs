@@ -1,14 +1,10 @@
-﻿using Abstractions.Interfaces.Persistence;
-using Application.Common.Dtos;
+﻿using Application.Common.Dtos;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Lrt;
-using Attributes;
-using Domain.CommonEntities;
-using Domain.CommonEntities.Job;
+using Application.Common.Interfaces.Services;
+using JobItemModel = Application.Common.Models.Jobs.JobItem;
 
 namespace Application.Common.Handlers.Jobs;
 
-[Transactional]
 public sealed record QueueJobCommand : ICommand<QueueJobResult>
 {
     public readonly IReadOnlyList<QueueJobItem> Jobs;
@@ -39,24 +35,20 @@ public sealed record QueueJobItem(
 public sealed record QueueJobResult(IReadOnlyList<Guid> JobIds);
 
 public sealed class QueueJobHandler(
-    IJobCreationDispatcher jobCreationDispatcher,
-    IUnitOfWork unitOfWork
+    IJobService jobService
 ) : ICommandHandler<QueueJobCommand, QueueJobResult>
 {
     public async Task<QueueJobResult> Handle(
         QueueJobCommand request,
         CancellationToken cancellationToken)
     {
-        var toAdd = new List<Job>();
-        foreach (var item in request.Jobs)
-            toAdd.Add(jobCreationDispatcher.Create(
-                item.SystemName,
-                item.InputState,
-                item.MaxAttempts));
+        var addedIds = await jobService.TryEnqueueJobsAsync(
+            request.Jobs.Select(x => new JobItemModel(
+                x.SystemName,
+                x.InputState,
+                x.MaxAttempts)),
+            cancellationToken);
 
-        await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return new QueueJobResult(toAdd.Select(x => x.Id).ToList());
+        return new QueueJobResult(addedIds);
     }
 }

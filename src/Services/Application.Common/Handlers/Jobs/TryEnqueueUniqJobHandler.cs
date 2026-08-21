@@ -1,19 +1,12 @@
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.Repositories;
-using Application.Common.LRT;
-using Application.Common.NamedObject;
+using Application.Common.Interfaces.Services;
 using Attributes;
-using Domain.CommonEntities;
-using Domain.CommonEntities.Job;
 using MediatR;
 
 namespace Application.Common.Handlers.Jobs;
 
 [Diagnostics]
-[Transactional, AutoSave]
 public record TryEnqueueUniqJobCommand : ICommand
 {
     public IReadOnlyList<TryEnqueueUniqJobItem> Items { get; }
@@ -36,30 +29,24 @@ public record TryEnqueueUniqJobItem(
     int MaxAttempts);
 
 public class TryEnqueueUniqJobHandler(
-    INamedObjectRegistry<ILrtNamedObject> registry,
-    IJobRepository jobRepository
+    IJobCreationDispatcher jobCreationDispatcher,
+    IJobService jobService
     ) : ICommandHandler<TryEnqueueUniqJobCommand>
 {
     public async Task<Unit> Handle(TryEnqueueUniqJobCommand request, CancellationToken cancellationToken)
     {
-        var toAdd = new List<SingleRunJob>();
-        foreach (var item in request.Items)
-        {
-            var lrt = registry.GetBySystemName(item.SystemName);
+        var jobs = request.Items
+            .Select(x => jobCreationDispatcher.Create(
+                x.SystemName,
+                x.InputState,
+                x.MaxAttempts,
+                x.NaturalKey))
+            .ToList();
 
-            if (lrt is IMultiStepLrt)
-                throw new InvalidOperationException(
-                    "Multi-step LRT cannot be queued as a unique job.");
+        await jobService.TryEnqueueJobsAsync(
+            jobs,
+            cancellationToken);
 
-            var job = SingleRunJob.CreateUnique(
-                item.NaturalKey,
-                lrt.SystemName,
-                lrt.ValidateState(item.InputState), 
-                item.MaxAttempts);
-            toAdd.Add(job);
-        }
-        
-        await jobRepository.TryInsertPendingUniqueAsync(toAdd, cancellationToken);
         return Unit.Value;
     }
 }

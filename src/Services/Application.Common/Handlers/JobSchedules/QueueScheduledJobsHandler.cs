@@ -1,11 +1,11 @@
-using Application.Common.Handlers.Jobs;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Services;
+using Application.Common.Models.Jobs;
 using Attributes;
 using Cronos;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
-using MediatR;
 
 namespace Application.Common.Handlers.JobSchedules;
 
@@ -18,7 +18,7 @@ public record QueueScheduledJobsResult(int Queued);
 
 public class QueueScheduledJobsHandler(
     IRepository<JobSchedule, Guid> repository,
-    ISender sender
+    IJobService jobService
 ) : ICommandHandler<QueueScheduledJobsCommand, QueueScheduledJobsResult>
 {
     public async Task<QueueScheduledJobsResult> Handle(
@@ -41,15 +41,12 @@ public class QueueScheduledJobsHandler(
         var schedules = await repository.ListAsync(criteria, cancellationToken);
         if (schedules.Count == 0) return new QueueScheduledJobsResult(0);
 
-        var jobs = (await sender.Send(
-            new QueueJobCommand(
-                schedules
-                    .Select(x => new QueueJobItem(
-                        x.JobSystemName,
-                        x.InputState,
-                        x.MaxAttempts))
-                    .ToList()),
-            cancellationToken)).JobIds;
+        var jobs = await jobService.TryEnqueueJobsAsync(
+            schedules.Select(x => new JobItem(
+                x.JobSystemName,
+                x.InputState,
+                x.MaxAttempts)),
+            cancellationToken);
 
         for (var i = 0; i < schedules.Count; i++)
         {

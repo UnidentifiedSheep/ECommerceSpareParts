@@ -11,11 +11,13 @@ using Application.Common.Handlers.JobSchedules.CreateSchedule;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
 using Application.Common.Handlers.JobSchedules.UpdateSchedule;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Services;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Application.Common.Projections;
 using Application.Common.Services;
 using Application.Common.Services.Events;
+using Application.Common.Services.Job;
 using Domain.CommonEntities.Job.Events;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -97,6 +99,8 @@ public static class ServiceProvider
 
         services.AddScoped<IJobLeaseService, JobLeaseService>();
         services.AddScoped<IJobCreationDispatcher, JobCreationDispatcher>();
+        services.AddScoped<IJobService, JobService>();
+        services.AddScoped<IJobScheduleService, JobScheduleService>();
         services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();
         services.AddScoped<
             INotificationHandler<Batch<JobStepFinishedDomainEvent>>,
