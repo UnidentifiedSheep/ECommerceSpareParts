@@ -3,6 +3,8 @@ using System.Text;
 using Abstractions.Models.Options;
 using Integrations.Client.Core;
 using Integrations.Common;
+using Integrations.Tmtr.Enums;
+using Integrations.Tmtr.Responses;
 using Internal.Integration.Core.Models.Common;
 using SchemaGeneration.Abstractions.Enums;
 
@@ -37,10 +39,8 @@ public sealed class ClientBaseTests
                               ]
                             }
                             """;
-        using var response = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(json, Encoding.UTF8, "application/json")
-        };
+        using var response = new HttpResponseMessage(HttpStatusCode.OK);
+        response.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var client = new TestClient(new ProjectJsonOptions());
         var result = await client.Read<AvailableJobsResponse>(response);
@@ -51,6 +51,31 @@ public sealed class ClientBaseTests
         var field = Assert.Single(job.InitStateSchema.Fields);
         Assert.Equal(SchemaValueType.Integer, field.Type);
         Assert.Equal(InputControlType.EntitySelector, field.Control);
+    }
+
+    [Theory]
+    [InlineData(1, OfferLocationType.OwnWarehouse)]
+    [InlineData(2, OfferLocationType.InTransit)]
+    [InlineData(3, OfferLocationType.PartnerNetworkWarehouse)]
+    public async Task ReadResponse_ShouldDeserializeNumericTmtrEnums(
+        int wireValue,
+        OfferLocationType expected)
+    {
+        var json = $$"""
+                     [
+                       {
+                         "OS": {{wireValue}}
+                       }
+                     ]
+                     """;
+        using var response = new HttpResponseMessage(HttpStatusCode.OK);
+        response.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var client = new TestClient(new ProjectJsonOptions());
+        var result = await client.Read<GetPricesResponse>(response);
+
+        Assert.True(result.Success, result.Error);
+        Assert.Equal(expected, Assert.Single(result.ValueOrThrow).LocationType);
     }
 
     private sealed record AvailableJobsResponse

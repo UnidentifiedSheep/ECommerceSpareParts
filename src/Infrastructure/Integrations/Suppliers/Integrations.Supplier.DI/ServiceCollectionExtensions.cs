@@ -1,3 +1,4 @@
+using Abstractions.Models.Options;
 using Integrations.Common;
 using Integrations.Favorit;
 using Integrations.Supplier.Connections;
@@ -49,6 +50,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddSupplierBase(this IServiceCollection services)
     {
+        services.TryAddSingleton<ProjectJsonOptions>();
         services.TryAddScoped<ISupplierFactory, SupplierFactory>();
         return services;
     }
