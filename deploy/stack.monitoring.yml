@@ -7,6 +7,10 @@ services:
         mode: 0444
     command:
       - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+    volumes:
+      - prometheus_data:/prometheus
     networks:
       backend:
         aliases:
@@ -23,6 +27,33 @@ services:
         condition: on-failure
         delay: 10s
         window: 60s
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.12.1
+    command:
+      - --path.rootfs=/host
+      - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($$|/)
+    pid: host
+    volumes:
+      - type: bind
+        source: /
+        target: /host
+        read_only: true
+        bind:
+          propagation: rslave
+    networks:
+      monitoring:
+        aliases:
+          - node-exporter
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.platform.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 30s
 
   loki:
     image: grafana/loki:latest
@@ -48,6 +79,16 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    configs:
+      - source: grafana_datasources_config
+        target: /etc/grafana/provisioning/datasources/prometheus.yml
+        mode: 0444
+      - source: grafana_dashboards_config
+        target: /etc/grafana/provisioning/dashboards/swarm.yml
+        mode: 0444
+      - source: grafana_swarm_nodes_dashboard
+        target: /var/lib/grafana/dashboards/swarm-nodes.json
+        mode: 0444
     volumes:
       - grafana_data:/var/lib/grafana
     environment:
@@ -131,8 +172,20 @@ configs:
   prometheus_config:
     external: true
     name: ${PROMETHEUS_CONFIG:?PROMETHEUS_CONFIG is required}
+  grafana_datasources_config:
+    external: true
+    name: ${GRAFANA_DATASOURCES_CONFIG:?GRAFANA_DATASOURCES_CONFIG is required}
+  grafana_dashboards_config:
+    external: true
+    name: ${GRAFANA_DASHBOARDS_CONFIG:?GRAFANA_DASHBOARDS_CONFIG is required}
+  grafana_swarm_nodes_dashboard:
+    external: true
+    name: ${GRAFANA_SWARM_NODES_DASHBOARD_CONFIG:?GRAFANA_SWARM_NODES_DASHBOARD_CONFIG is required}
 
 volumes:
+  prometheus_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_prometheus_data
+    external: true
   grafana_data:
     name: ${VOLUME_PREFIX:-ecommerce}_grafana_data
     external: true
