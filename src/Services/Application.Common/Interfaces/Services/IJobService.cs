@@ -1,4 +1,4 @@
-using Application.Common.Models.Jobs;
+using Application.Common.Models;
 using JobEntity = Domain.CommonEntities.Job.Job;
 
 namespace Application.Common.Interfaces.Services;
@@ -14,6 +14,6 @@ public interface IJobService
         CancellationToken token = default);
 
     Task<IReadOnlyList<Guid>> TryEnqueueJobsAsync(
-        IEnumerable<JobItem> jobs,
+        IEnumerable<IJobItem> jobs,
         CancellationToken token = default);
 }

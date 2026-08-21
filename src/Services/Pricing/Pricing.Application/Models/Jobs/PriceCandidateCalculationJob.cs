@@ -1,12 +1,12 @@
 using System.Text.Json;
-using Application.Common.Handlers.Jobs;
+using Application.Common.Models;
 using Pricing.Application.Lrts.PriceCandidateCalculation;
 
 namespace Pricing.Application.Models.Jobs;
 
 public static class PriceCandidateCalculationJob
 {
-    public static TryEnqueueUniqJobItem Create(
+    public static UniqJobItem Create(
         int productId,
         string storageName,
         int maxAttempts = 3)
@@ -19,11 +19,11 @@ public static class PriceCandidateCalculationJob
 
         var naturalKey = BuildNaturalKey(productId, storageName);
 
-        return new TryEnqueueUniqJobItem(
-            naturalKey,
+        return new UniqJobItem(
             PriceCandidateCalculationLrt.LrtName,
             JsonSerializer.Serialize(state),
-            maxAttempts);
+            maxAttempts,
+            naturalKey);
     }
 
     private static string BuildNaturalKey(int productId, string storageName)

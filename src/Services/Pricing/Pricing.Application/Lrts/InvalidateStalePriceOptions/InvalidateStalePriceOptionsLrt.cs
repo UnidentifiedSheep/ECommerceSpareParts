@@ -1,15 +1,14 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Handlers.Jobs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Attributes;
 using MassTransit;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Interfaces.Markup;
@@ -29,7 +28,7 @@ public class InvalidateStalePriceOptionsLrt(
     ILogger<InvalidateStalePriceOptionsLrt> logger,
     IReadRepository<ProductPriceOption, Guid> readRepository,
     IProductPriceOptionRepository productPriceOptionRepository,
-    ISender sender,
+    IJobService jobService,
     IMarkupContainer markupContainer,
     IPriceApplierService priceApplierService,
     ISettingsService settingsService
@@ -83,8 +82,8 @@ public class InvalidateStalePriceOptionsLrt(
                         .DistinctBy(x => x.NaturalKey)
                         .ToList();
 
-                    await sender.Send(
-                        new TryEnqueueUniqJobCommand(jobItems),
+                    await jobService.TryEnqueueJobsAsync(
+                        jobItems,
                         cancellationToken);
 
                     await productPriceOptionRepository.DeleteManyAsync(

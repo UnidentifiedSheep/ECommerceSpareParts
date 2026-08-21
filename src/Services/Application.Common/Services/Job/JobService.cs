@@ -3,15 +3,16 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
-using Application.Common.Models.Jobs;
+using Application.Common.Models;
 using Attributes;
+using Microsoft.Extensions.DependencyInjection;
 using JobEntity = Domain.CommonEntities.Job.Job;
 
 namespace Application.Common.Services.Job;
 
 public class JobService(
     IApplicationTransactionService transactionService,
-    IJobCreationDispatcher jobCreationDispatcher) : IJobService
+    IServiceProvider serviceProvider) : IJobService
 {
     public Task CancelJobAsync(
         Guid jobId,
@@ -64,15 +65,22 @@ public class JobService(
     }
     
     public Task<IReadOnlyList<Guid>> TryEnqueueJobsAsync(
-        IEnumerable<JobItem> jobs,
+        IEnumerable<IJobItem> jobs,
         CancellationToken token = default)
     {
+        ArgumentNullException.ThrowIfNull(jobs);
+
+        var jobCreationDispatcher = serviceProvider
+            .GetRequiredService<IJobCreationDispatcher>();
         var toAdd = new List<JobEntity>();
         foreach (var item in jobs)
             toAdd.Add(jobCreationDispatcher.Create(
                 item.SystemName,
                 item.InputState,
-                item.MaxAttempts));
+                item.MaxAttempts,
+                item is UniqJobItem uniqJobItem
+                    ? uniqJobItem.NaturalKey
+                    : null));
         
         return TryEnqueueJobsAsync(toAdd, token);
     }

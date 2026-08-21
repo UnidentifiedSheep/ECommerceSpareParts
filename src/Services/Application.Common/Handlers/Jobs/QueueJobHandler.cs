@@ -1,20 +1,20 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Services;
-using JobItemModel = Application.Common.Models.Jobs.JobItem;
+using Application.Common.Models;
 
 namespace Application.Common.Handlers.Jobs;
 
 public sealed record QueueJobCommand : ICommand<QueueJobResult>
 {
-    public readonly IReadOnlyList<QueueJobItem> Jobs;
+    public readonly IReadOnlyList<JobItem> Jobs;
 
     public QueueJobCommand(
         string systemName,
         string inputState,
         int maxAttempts)
     {
-        Jobs = new List<QueueJobItem>
+        Jobs = new List<JobItem>
         {
             new(
                 systemName,
@@ -23,14 +23,8 @@ public sealed record QueueJobCommand : ICommand<QueueJobResult>
         };
     }
 
-    public QueueJobCommand(IEnumerable<QueueJobItem> jobs) { Jobs = jobs.ToList(); }
+    public QueueJobCommand(IEnumerable<JobItem> jobs) { Jobs = jobs.ToList(); }
 }
-
-public sealed record QueueJobItem(
-    string SystemName,
-    string InputState,
-    int MaxAttempts
-);
 
 public sealed record QueueJobResult(IReadOnlyList<Guid> JobIds);
 
@@ -43,10 +37,7 @@ public sealed class QueueJobHandler(
         CancellationToken cancellationToken)
     {
         var addedIds = await jobService.TryEnqueueJobsAsync(
-            request.Jobs.Select(x => new JobItemModel(
-                x.SystemName,
-                x.InputState,
-                x.MaxAttempts)),
+            request.Jobs,
             cancellationToken);
 
         return new QueueJobResult(addedIds);

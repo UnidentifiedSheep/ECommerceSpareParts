@@ -1,6 +1,6 @@
 using System.Text.Json;
-using Application.Common.Handlers.Jobs;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Services;
 using Attributes;
 using MediatR;
 using Pricing.Application.Dtos.Price;
@@ -15,7 +15,7 @@ public record RequestPriceCandidateRecalculationCommand(
     ) : ICommand;
 
 public class RequestPriceCandidateRecalculationHandler(
-    ISender sender
+    IJobService jobService
     ) : ICommandHandler<RequestPriceCandidateRecalculationCommand>
 {
     public async Task<Unit> Handle(RequestPriceCandidateRecalculationCommand requests, CancellationToken cancellationToken)
@@ -25,7 +25,7 @@ public class RequestPriceCandidateRecalculationHandler(
                 .Create(x.ProductId, x.StorageName))
             .ToList();
         
-        await sender.Send(new TryEnqueueUniqJobCommand(items), cancellationToken);
+        await jobService.TryEnqueueJobsAsync(items, cancellationToken);
         return Unit.Value;
     }
 }

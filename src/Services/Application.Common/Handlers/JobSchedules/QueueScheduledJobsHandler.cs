@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
-using Application.Common.Models.Jobs;
+using Application.Common.Models;
 using Attributes;
 using Cronos;
 using Domain.CommonEntities;
