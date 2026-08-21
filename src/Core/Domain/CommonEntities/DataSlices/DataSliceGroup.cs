@@ -16,6 +16,9 @@ public abstract class DataSliceGroup :
     public string SystemName { get; private set; } = null!;
     public uint RowVersion { get; private set; }
 
+    private readonly List<DataSliceDefinition> _definitions = [];
+    public IReadOnlyList<DataSliceDefinition> Definitions => _definitions;
+
     protected DataSliceGroup() { }
 
     protected DataSliceGroup(string systemName)

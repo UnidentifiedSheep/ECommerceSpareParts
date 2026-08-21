@@ -19,6 +19,9 @@ public abstract class DataSliceDefinition :
 
     public DataSliceGroup Group { get; private set; } = null!;
 
+    private readonly List<DataSlice> _slices = [];
+    public IReadOnlyList<DataSlice> Slices => _slices;
+
     protected DataSliceDefinition() { }
 
     protected DataSliceDefinition(DataSliceGroup group)

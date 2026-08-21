@@ -53,7 +53,8 @@ public partial class DContext : DbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
             .ApplyConfiguration(new SettingConfiguration())
-            .ApplyJobConfigurations();
+            .ApplyJobConfigurations()
+            .ApplyDataSliceConfigurations();
 
 
         modelBuilder.Entity<Setting>()
