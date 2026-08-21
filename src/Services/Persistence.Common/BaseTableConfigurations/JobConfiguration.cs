@@ -32,6 +32,11 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
             .HasColumnName("system_name")
             .HasMaxLength(128);
 
+        builder.Property(e => e.NaturalKey)
+            .HasColumnName("natural_key")
+            .HasMaxLength(256)
+            .IsRequired(false);
+
         builder.Property(e => e.ErrorMessage)
             .HasColumnName("error_message");
 
@@ -54,6 +59,14 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.HasIndex(e => new { e.Status, e.Id }, "jobs_status_id_idx");
         builder.HasIndex(e => e.LockedAt, "jobs_locked_at_idx");
         builder.HasIndex(e => e.MultiStepJobId, "jobs_multi_step_job_id_idx");
+        builder.HasIndex(e => new
+                {
+                    e.SystemName,
+                    e.NaturalKey
+                },
+                "jobs_pending_system_name_natural_key_uq")
+            .IsUnique()
+            .HasFilter("status = 'Pending' AND natural_key IS NOT NULL");
 
         builder.HasOne(e => e.MultiStepJob)
             .WithMany(e => e.Steps)
@@ -64,7 +77,6 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder
             .HasDiscriminator<string>("job_type")
             .HasValue<SingleRunJob>("job")
-            .HasValue<UniqJob>("uniq_job")
             .HasValue<MultiStepJob>("multi_step_job");
     }
 }

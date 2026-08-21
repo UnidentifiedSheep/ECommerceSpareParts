@@ -13,7 +13,6 @@ public static class ModelBuilderExtensions
     {
         return modelBuilder
             .ApplyConfiguration(new JobConfiguration())
-            .ApplyConfiguration(new UniqJobConfiguration())
             .ApplyConfiguration(new MultiStepJobConfiguration())
             .ApplyConfiguration(new JobStepDependencyConfiguration())
             .ApplyConfiguration(new JobScheduleConfiguration())

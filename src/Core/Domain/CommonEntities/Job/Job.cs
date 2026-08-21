@@ -15,10 +15,12 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     protected Job(
         string systemName,
         string initialState,
-        int maxAttempts)
+        int maxAttempts,
+        string? naturalKey = null)
     {
         Id = Guid.NewGuid();
         SystemName = systemName;
+        SetNaturalKey(naturalKey);
         Attempts = 1;
         SetMaxAttempts(maxAttempts);
         State = initialState;
@@ -27,6 +29,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
     public Guid Id { get; private set; }
     public string SystemName { get; private set; } = null!;
+    public string? NaturalKey { get; private set; }
     public string State { get; protected set; } = string.Empty;
     public JobStatus Status { get; private set; }
     public int Attempts { get; private set; }
@@ -85,6 +88,15 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         MaxAttempts = maxAttempts.EnsureGreaterThan(
             0,
             () => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
+    }
+
+    private void SetNaturalKey(string? naturalKey)
+    {
+        NaturalKey = naturalKey is null
+            ? null
+            : naturalKey.TrimSafe()
+                .EnsureNotNullOrWhiteSpace(() =>
+                    new InvalidOperationException("Natural key cannot be null or empty."));
     }
 
     public virtual void Start(Guid leaseHolderId)

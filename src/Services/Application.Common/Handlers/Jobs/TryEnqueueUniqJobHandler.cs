@@ -42,7 +42,7 @@ public class TryEnqueueUniqJobHandler(
 {
     public async Task<Unit> Handle(TryEnqueueUniqJobCommand request, CancellationToken cancellationToken)
     {
-        var toAdd = new List<UniqJob>();
+        var toAdd = new List<SingleRunJob>();
         foreach (var item in request.Items)
         {
             var lrt = registry.GetBySystemName(item.SystemName);
@@ -51,7 +51,7 @@ public class TryEnqueueUniqJobHandler(
                 throw new InvalidOperationException(
                     "Multi-step LRT cannot be queued as a unique job.");
 
-            var job = UniqJob.Create(
+            var job = SingleRunJob.CreateUnique(
                 item.NaturalKey,
                 lrt.SystemName,
                 lrt.ValidateState(item.InputState), 

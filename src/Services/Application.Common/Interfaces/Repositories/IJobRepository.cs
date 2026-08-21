@@ -6,6 +6,6 @@ namespace Application.Common.Interfaces.Repositories;
 public interface IJobRepository : IRepository<Job, Guid>
 {
     Task<int> TryInsertPendingUniqueAsync(
-        IEnumerable<UniqJob> jobs,
+        IEnumerable<SingleRunJob> jobs,
         CancellationToken cancellationToken = default);
 }

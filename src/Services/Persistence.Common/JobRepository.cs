@@ -19,10 +19,17 @@ public class JobRepository<TContext>(
     IJobRepository where TContext : DbContext
 {
     public async Task<int> TryInsertPendingUniqueAsync(
-        IEnumerable<UniqJob> jobs,
+        IEnumerable<SingleRunJob> jobs,
         CancellationToken cancellationToken = default)
     {
-        var all = jobs.DistinctBy(x => x.NaturalKey).ToList();
+        var all = jobs.ToList();
+        if (all.Any(x => x.NaturalKey is null))
+            throw new InvalidOperationException(
+                "Pending unique jobs must have a natural key.");
+
+        all = all
+            .DistinctBy(x => new { x.SystemName, x.NaturalKey })
+            .ToList();
         if (all.Count == 0) return 0;
         
         all.ForEach(x => x.Touch(userContext.UserIdOrNull));
@@ -87,13 +94,13 @@ public class JobRepository<TContext>(
                 )
                 ON CONFLICT (system_name, natural_key)
                 WHERE status = 'Pending'
-                  AND job_type = 'uniq_job'
+                  AND natural_key IS NOT NULL
                 DO NOTHING;
                 """,
             parameters: new
             {
                 Ids = all.Select(x => x.Id).ToArray(),
-                JobTypes = all.Select(_ => "uniq_job").ToArray(),
+                JobTypes = all.Select(_ => "job").ToArray(),
                 SystemNames = all.Select(x => x.SystemName).ToArray(),
                 NaturalKeys = all.Select(x => x.NaturalKey).ToArray(),
                 States = all.Select(x => x.State).ToArray(),

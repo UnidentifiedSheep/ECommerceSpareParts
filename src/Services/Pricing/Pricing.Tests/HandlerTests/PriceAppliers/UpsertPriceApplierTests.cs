@@ -440,9 +440,11 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         appliers.Should().Contain(x =>
             x.SystemName == systemName
             && x.Name == "Created rule");
-        var recalculationJobExists = await Context.Set<UniqJob>()
+        var recalculationJobExists = await Context.Set<Job>()
             .AsNoTracking()
-            .AnyAsync(x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName);
+            .AnyAsync(x =>
+                x.SystemName == InvalidateStalePriceOptionsLrt.LrtName &&
+                x.NaturalKey != null);
         recalculationJobExists.Should().BeTrue();
     }
 
