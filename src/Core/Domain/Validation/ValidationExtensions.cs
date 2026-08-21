@@ -48,6 +48,16 @@ public static class ValidationExtensions
         return value is not null;
     }
 
+    public static bool IsNotNullOrDefault<T>(this T? value)
+        where T : struct
+    {
+        return value.HasValue &&
+               !EqualityComparer<T>.Default.Equals(value.Value, default);
+    }
+
+    public static bool IsNullOrDefault<T>(this T? value) where T : struct
+        => !value.IsNotNullOrDefault();
+
     public static bool IsInRange<T>(this T value, T min, T max)
         where T : IComparable<T>
     {
