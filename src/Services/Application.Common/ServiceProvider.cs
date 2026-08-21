@@ -3,6 +3,7 @@ using Abstractions.Interfaces;
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
 using Application.Common.DomainEventHandlers.Jobs;
+using Application.Common.Domains;
 using Application.Common.Extensions;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
@@ -87,6 +88,7 @@ public static class ServiceProvider
         Assembly? assembly = null)
     {
         assembly ??= Assembly.GetExecutingAssembly();
+        services.AddCommonDomain<JobsDomain>();
         services.RegisterNamedObject<ILrtNamedObject>(assembly)
             .RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly)
             .RegisterProjectionProviders<JobDtoProjectionProvider>();

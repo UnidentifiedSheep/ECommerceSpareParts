@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
+using Application.Common.Domains;
 using Application.Common.Dtos;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
@@ -65,6 +66,8 @@ public class JobEndPoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
+        if (!app.HasCommonDomain<JobsDomain>()) return;
+
         var jobs = app.MapGroup("/jobs")
             .WithTags("Jobs")
             .AddScheduleEndPoints();
