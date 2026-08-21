@@ -3,10 +3,8 @@ using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Application.Common.Dtos;
-using Application.Common.Handlers.JobSchedules;
-using Application.Common.Handlers.JobSchedules.CreateSchedule;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
-using Application.Common.Handlers.JobSchedules.UpdateSchedule;
+using Application.Common.Interfaces.Services;
 using Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -102,16 +100,17 @@ public static class JobScheduleEndPoints
                 "",
                 async (
                     ISender sender,
+                    IJobScheduleService jobScheduleService,
                     NewJobScheduleDto schedule,
                     CancellationToken ct) =>
                 {
-                    var result = await sender.Send(new CreateScheduleCommand(schedule), ct);
+                    var scheduleId = await jobScheduleService.CreateScheduleAsync(schedule, ct);
                     var created = await sender.Send(
-                        new GetScheduleByIdQuery(result.ScheduleId),
+                        new GetScheduleByIdQuery(scheduleId),
                         ct);
 
                     return Results.Created(
-                        $"/jobs/schedules/{result.ScheduleId}",
+                        $"/jobs/schedules/{scheduleId}",
                         new CreateJobScheduleResponse
                         {
                             Schedule = created.Schedule
@@ -127,13 +126,14 @@ public static class JobScheduleEndPoints
                 "{scheduleId:guid}",
                 async (
                     ISender sender,
+                    IJobScheduleService jobScheduleService,
                     Guid scheduleId,
                     PatchJobScheduleDto patch,
                     CancellationToken ct) =>
                 {
-                    var result = await sender.Send(new UpdateScheduleCommand(scheduleId, patch), ct);
+                    await jobScheduleService.UpdateScheduleAsync(scheduleId, patch, ct);
                     var updated = await sender.Send(
-                        new GetScheduleByIdQuery(result.ScheduleId),
+                        new GetScheduleByIdQuery(scheduleId),
                         ct);
 
                     return Results.Ok(
@@ -152,11 +152,11 @@ public static class JobScheduleEndPoints
         schedules.MapDelete(
                 "{scheduleId:guid}",
                 async (
-                    ISender sender,
+                    IJobScheduleService jobScheduleService,
                     Guid scheduleId,
                     CancellationToken ct) =>
                 {
-                    await sender.Send(new RemoveJobScheduleCommand(scheduleId), ct);
+                    await jobScheduleService.RemoveScheduleAsync(scheduleId, ct);
                     return Results.NoContent();
                 })
             .WithName("RemoveJobSchedule")

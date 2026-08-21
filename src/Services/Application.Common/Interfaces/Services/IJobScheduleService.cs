@@ -16,4 +16,8 @@ public interface IJobScheduleService
     Task RemoveScheduleAsync(
         Guid scheduleId,
         CancellationToken token = default);
+
+    Task<int> QueueDueSchedulesAsync(
+        int batchSize,
+        CancellationToken token = default);
 }

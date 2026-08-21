@@ -5,14 +5,13 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
 using Application.Common.Models;
 using Attributes;
-using Microsoft.Extensions.DependencyInjection;
 using JobEntity = Domain.CommonEntities.Job.Job;
 
 namespace Application.Common.Services.Job;
 
 public class JobService(
     IApplicationTransactionService transactionService,
-    IServiceProvider serviceProvider) : IJobService
+    Func<IJobCreationDispatcher> jobCreationDispatcherFactory) : IJobService
 {
     public Task CancelJobAsync(
         Guid jobId,
@@ -70,17 +69,14 @@ public class JobService(
     {
         ArgumentNullException.ThrowIfNull(jobs);
 
-        var jobCreationDispatcher = serviceProvider
-            .GetRequiredService<IJobCreationDispatcher>();
+        var jobCreationDispatcher = jobCreationDispatcherFactory();
         var toAdd = new List<JobEntity>();
         foreach (var item in jobs)
             toAdd.Add(jobCreationDispatcher.Create(
                 item.SystemName,
                 item.InputState,
                 item.MaxAttempts,
-                item is UniqJobItem uniqJobItem
-                    ? uniqJobItem.NaturalKey
-                    : null));
+                item.NaturalKey));
         
         return TryEnqueueJobsAsync(toAdd, token);
     }

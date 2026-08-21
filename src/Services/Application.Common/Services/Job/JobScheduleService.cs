@@ -4,24 +4,32 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
+using Application.Common.Models;
 using Attributes;
 using Cronos;
 using Domain.CommonEntities.Job;
+using FluentValidation;
 
 namespace Application.Common.Services.Job;
 
 public class JobScheduleService(
     IApplicationTransactionService transactionService,
-    INamedObjectRegistry<ILrtNamedObject> registry) : IJobScheduleService
+    INamedObjectRegistry<ILrtNamedObject> registry,
+    IJobService jobService,
+    IValidator<NewJobScheduleDto> newScheduleValidator,
+    IValidator<PatchJobScheduleDto> patchScheduleValidator,
+    TimeProvider timeProvider) : IJobScheduleService
 {
-    public Task<Guid> CreateScheduleAsync(
+    public async Task<Guid> CreateScheduleAsync(
         NewJobScheduleDto newSchedule,
         CancellationToken token = default)
     {
         ArgumentNullException.ThrowIfNull(newSchedule);
+        await newScheduleValidator.ValidateAndThrowAsync(newSchedule, token);
 
-        return transactionService.ExecuteAsync(
+        return await transactionService.ExecuteAsync(
             settings: TransactionalAttribute.ReadCommitted(30, 2),
             action: async (ctx, ct) =>
             {
@@ -43,7 +51,7 @@ public class JobScheduleService(
 
                 var nextRunAt = CronExpression.Parse(schedule.Cron)
                     .GetNextOccurrence(
-                        DateTime.UtcNow,
+                        GetUtcNow(),
                         JobSchedule.TimeZone);
 
                 schedule.SetNextRunAt(nextRunAt);
@@ -56,20 +64,21 @@ public class JobScheduleService(
             cancellationToken: token);
     }
 
-    public Task<Guid> UpdateScheduleAsync(
+    public async Task<Guid> UpdateScheduleAsync(
         Guid scheduleId,
         PatchJobScheduleDto patch,
         CancellationToken token = default)
     {
         ArgumentNullException.ThrowIfNull(patch);
+        await patchScheduleValidator.ValidateAndThrowAsync(patch, token);
 
-        return transactionService.ExecuteAsync(
+        return await transactionService.ExecuteAsync(
             settings: TransactionalAttribute.ReadCommitted(30, 2),
             action: async (ctx, ct) =>
             {
                 var repository = ctx.Repositories
                     .Get<JobSchedule, Guid>();
-                var schedule = await repository.GetById(scheduleId, ct)
+                var schedule = await GetForUpdateAsync(repository, scheduleId, ct)
                                ?? throw new JobScheduleNotFoundException(
                                    scheduleId);
 
@@ -127,7 +136,7 @@ public class JobScheduleService(
             {
                 var repository = ctx.Repositories
                     .Get<JobSchedule, Guid>();
-                var schedule = await repository.GetById(scheduleId, ct)
+                var schedule = await GetForUpdateAsync(repository, scheduleId, ct)
                                ?? throw new JobScheduleNotFoundException(
                                    scheduleId);
 
@@ -137,11 +146,82 @@ public class JobScheduleService(
             cancellationToken: token);
     }
 
-    private static DateTime? GetNextRunAt(JobSchedule schedule)
+    public Task<int> QueueDueSchedulesAsync(
+        int batchSize,
+        CancellationToken token = default)
+    {
+        if (batchSize <= 0) return Task.FromResult(0);
+
+        return transactionService.ExecuteAsync(
+            settings: TransactionalAttribute.ReadCommitted(30, 2),
+            action: async (ctx, ct) =>
+            {
+                var utcNow = GetUtcNow();
+                var repository = ctx.Repositories.Get<JobSchedule, Guid>();
+                var criteria = Criteria<JobSchedule>.New()
+                    .Where(x => x.Enabled)
+                    .Where(x => x.NextRunAt != null && x.NextRunAt <= utcNow)
+                    .OrderByAsc(x => x.NextRunAt)
+                    .ForUpdate(true, true)
+                    .Track()
+                    .Size(batchSize)
+                    .Build();
+
+                var schedules = await repository.ListAsync(criteria, ct);
+                if (schedules.Count == 0) return 0;
+
+                var jobIds = await jobService.TryEnqueueJobsAsync(
+                    schedules.Select(x => new JobItem(
+                        x.JobSystemName,
+                        x.InputState,
+                        x.MaxAttempts)),
+                    ct);
+
+                if (jobIds.Count != schedules.Count)
+                    throw new InvalidOperationException(
+                        "All non-unique scheduled jobs must be enqueued.");
+
+                for (var i = 0; i < schedules.Count; i++)
+                {
+                    var schedule = schedules[i];
+                    var scheduledAt = schedule.NextRunAt!.Value;
+                    var nextRunAt = CronExpression.Parse(schedule.Cron)
+                        .GetNextOccurrence(utcNow, JobSchedule.TimeZone);
+
+                    schedule.MarkQueued(utcNow, nextRunAt);
+                    schedule.AddScheduleRun(jobIds[i], scheduledAt, utcNow);
+                }
+
+                await ctx.UnitOfWork.SaveChangesAsync(ct);
+                return schedules.Count;
+            },
+            cancellationToken: token);
+    }
+
+    private DateTime? GetNextRunAt(JobSchedule schedule)
     {
         return CronExpression.Parse(schedule.Cron)
             .GetNextOccurrence(
-                DateTime.UtcNow,
+                GetUtcNow(),
                 JobSchedule.TimeZone);
+    }
+
+    private DateTime GetUtcNow()
+    {
+        return timeProvider.GetUtcNow().UtcDateTime;
+    }
+
+    private static Task<JobSchedule?> GetForUpdateAsync(
+        IRepository<JobSchedule, Guid> repository,
+        Guid scheduleId,
+        CancellationToken token)
+    {
+        var criteria = Criteria<JobSchedule>.New()
+            .Where(x => x.Id == scheduleId)
+            .Track()
+            .ForUpdate()
+            .Build();
+
+        return repository.FirstOrDefaultAsync(criteria, token);
     }
 }

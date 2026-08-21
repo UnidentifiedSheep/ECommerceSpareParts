@@ -1,43 +1,43 @@
+using Application.Common.Dtos;
 using Cronos;
-using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Application.Common.Handlers.JobSchedules.UpdateSchedule;
+namespace Application.Common.Validators;
 
-public class UpdateScheduleValidation : AbstractValidator<UpdateScheduleCommand>
+public sealed class PatchJobScheduleDtoValidator : AbstractValidator<PatchJobScheduleDto>
 {
-    public UpdateScheduleValidation()
+    public PatchJobScheduleDtoValidator()
     {
-        RuleFor(x => x.Patch.Name.Value)
+        RuleFor(x => x.Name.Value)
             .NotEmpty()
             .WithLocalizationKey("job.schedule.name.required")
             .MaximumLength(JobSchedule.NameMaxLength)
             .WithLocalizationKey("job.schedule.name.max.length")
-            .When(x => x.Patch.Name.IsSet);
+            .When(x => x.Name.IsSet);
 
-        RuleFor(x => x.Patch.Description.Value)
+        RuleFor(x => x.Description.Value)
             .MaximumLength(JobSchedule.DescriptionMaxLength)
             .WithLocalizationKey("job.schedule.description.max.length")
-            .When(x => x.Patch.Description.IsSet);
+            .When(x => x.Description.IsSet);
 
-        RuleFor(x => x.Patch.InputState.Value)
+        RuleFor(x => x.InputState.Value)
             .NotEmpty()
             .WithLocalizationKey("job.schedule.input.state.required")
-            .When(x => x.Patch.InputState.IsSet);
+            .When(x => x.InputState.IsSet);
 
-        RuleFor(x => x.Patch.Cron.Value)
+        RuleFor(x => x.Cron.Value)
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .WithLocalizationKey("job.schedule.cron.required")
             .Must(x => x is not null && CronExpression.TryParse(x, out _))
             .WithLocalizationKey("job.schedule.cron.invalid")
-            .When(x => x.Patch.Cron.IsSet);
+            .When(x => x.Cron.IsSet);
 
-        RuleFor(x => x.Patch.MaxAttempts.Value)
+        RuleFor(x => x.MaxAttempts.Value)
             .GreaterThan(0)
             .WithLocalizationKey("job.max.attempts.must.be.greater.than.zero")
-            .When(x => x.Patch.MaxAttempts.IsSet);
+            .When(x => x.MaxAttempts.IsSet);
     }
 }

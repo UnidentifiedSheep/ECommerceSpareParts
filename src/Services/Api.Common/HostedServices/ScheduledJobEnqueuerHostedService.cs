@@ -1,8 +1,6 @@
 using Api.Common.Models.Options;
-using Application.Common.Handlers.JobSchedules;
-using Application.Common.Models;
+using Application.Common.Interfaces.Services;
 using Application.Common.Models.Options;
-using MediatR;
 using Microsoft.Extensions.Options;
 
 namespace Api.Common.HostedServices;
@@ -32,13 +30,14 @@ public class ScheduledJobEnqueuerHostedService(
         try
         {
             await using var scope = scopeFactory.CreateAsyncScope();
-            var sender = scope.ServiceProvider.GetRequiredService<ISender>();
+            var jobScheduleService = scope.ServiceProvider
+                .GetRequiredService<IJobScheduleService>();
 
-            var result = await sender.Send(
-                new QueueScheduledJobsCommand(opt.BatchSize),
+            var queued = await jobScheduleService.QueueDueSchedulesAsync(
+                opt.BatchSize,
                 ct);
 
-            return result.Queued == opt.BatchSize;
+            return queued == opt.BatchSize;
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
         catch (Exception ex)

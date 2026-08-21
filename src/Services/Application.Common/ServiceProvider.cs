@@ -6,10 +6,7 @@ using Application.Common.DomainEventHandlers.Jobs;
 using Application.Common.Extensions;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
-using Application.Common.Handlers.JobSchedules;
-using Application.Common.Handlers.JobSchedules.CreateSchedule;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
-using Application.Common.Handlers.JobSchedules.UpdateSchedule;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Services;
 using Application.Common.LRT;
@@ -99,6 +96,8 @@ public static class ServiceProvider
 
         services.AddScoped<IJobLeaseService, JobLeaseService>();
         services.AddScoped<IJobCreationDispatcher, JobCreationDispatcher>();
+        services.AddScoped<Func<IJobCreationDispatcher>>(serviceProvider =>
+            serviceProvider.GetRequiredService<IJobCreationDispatcher>);
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<IJobScheduleService, JobScheduleService>();
         services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();
@@ -114,14 +113,6 @@ public static class ServiceProvider
             GetAllAvailableJobsHandler>();
 
         services.AddScoped<
-            IRequestHandler<QueueJobCommand, QueueJobResult>,
-            QueueJobHandler>();
-        
-        services.AddScoped<
-            IRequestHandler<CancelJobCommand, Unit>,
-            CancelJobHandler>();
-
-        services.AddScoped<
             IRequestHandler<GetJobsQuery, GetJobsResult>,
             GetJobsHandler>();
 
@@ -134,28 +125,12 @@ public static class ServiceProvider
             GetJobStateHandler>();
 
         services.AddScoped<
-            IRequestHandler<CreateScheduleCommand, CreateScheduleResult>,
-            CreateScheduleHandler>();
-
-        services.AddScoped<
             IRequestHandler<GetScheduleQuery, GetScheduleResult>,
             GetScheduleHandler>();
 
         services.AddScoped<
             IRequestHandler<GetScheduleByIdQuery, GetScheduleByIdResult>,
             GetScheduleByIdHandler>();
-
-        services.AddScoped<
-            IRequestHandler<UpdateScheduleCommand, UpdateScheduleResult>,
-            UpdateScheduleHandler>();
-
-        services.AddScoped<
-            IRequestHandler<QueueScheduledJobsCommand, QueueScheduledJobsResult>,
-            QueueScheduledJobsHandler>();
-        
-        services.AddScoped<
-            IRequestHandler<RemoveJobScheduleCommand, Unit>,
-            RemoveJobScheduleHandler>();
 
         return services;
     }
