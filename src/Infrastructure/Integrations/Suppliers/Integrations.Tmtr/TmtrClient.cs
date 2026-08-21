@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using Abstractions.Models.Options;
 using Integrations.Client.Core;
 using Integrations.Common;
 using Integrations.Supplier.Connections;
@@ -21,8 +22,9 @@ public interface ITmtrClient
 
 public class TmtrClient(
     HttpClient client,
-    IConnectionProvider<TmtrConnection> connectionProvider
-    ) : ClientBase, ITmtrClient
+    IConnectionProvider<TmtrConnection> connectionProvider,
+    ProjectJsonOptions jsonOptions
+) : ClientBase(jsonOptions), ITmtrClient
 {
     public async Task<Response<GetPricesResponse>> GetPricesAsync(
         GetPricesRequest request, 

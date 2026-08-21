@@ -1,3 +1,4 @@
+using Abstractions.Models.Options;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Common;
@@ -9,7 +10,8 @@ public class RootClient(
     IOptionsMonitor<InternalServicesOptions> serviceOptions,
     IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
     IAuthClient authClient,
-    HttpClient httpClient
+    HttpClient httpClient,
+    ProjectJsonOptions jsonOptions
 ) : ICommonClient
 {
     public IJobNode JobNode { get; }
@@ -17,12 +19,14 @@ public class RootClient(
             httpClient,
             authClient,
             serviceOptions,
-            credentialsMonitor);
+            credentialsMonitor,
+            jsonOptions);
 
     public ISettingNode SettingNode { get; }
         = new SettingNode(
             httpClient,
             authClient,
             serviceOptions,
-            credentialsMonitor);
+            credentialsMonitor,
+            jsonOptions);
 }

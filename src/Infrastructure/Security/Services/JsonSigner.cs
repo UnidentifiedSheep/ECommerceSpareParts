@@ -16,11 +16,11 @@ public class JsonSigner : IJsonSigner
 
     public JsonSigner(
         IOptions<SecretEncryptionOptions> secretOptions,
-        IOptions<ProjectJsonOptions> jsonOptions)
+        ProjectJsonOptions jsonOptions)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(secretOptions.Value.Secret);
 
-        _options = new JsonSerializerOptions(jsonOptions.Value.SerializerOptions);
+        _options = new JsonSerializerOptions(jsonOptions.SerializerOptions);
         _secretBytes = Encoding.UTF8.GetBytes(secretOptions.Value.Secret);
     }
 

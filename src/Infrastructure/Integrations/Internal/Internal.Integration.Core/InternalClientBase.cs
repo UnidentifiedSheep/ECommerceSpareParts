@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using Abstractions.Models.Options;
 using Integrations.Client.Core;
 using Internal.Integration.Core.Interfaces;
 using Microsoft.Extensions.Options;
@@ -7,8 +8,9 @@ namespace Internal.Integration.Core;
 
 public abstract class InternalClientBase(
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor
-) : ClientBase
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+    ProjectJsonOptions jsonOptions
+) : ClientBase(jsonOptions)
 {
     protected async Task<HttpRequestMessage> GetRequest(
         HttpMethod method,

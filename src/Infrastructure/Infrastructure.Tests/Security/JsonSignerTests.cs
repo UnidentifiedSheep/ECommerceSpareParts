@@ -55,7 +55,7 @@ public class JsonSignerTests
                 {
                     Secret = "json-signer-test-secret"
                 }),
-            Options.Create(new ProjectJsonOptions()));
+            new ProjectJsonOptions());
     }
 
     private sealed record TestPayload(Guid Id, string Value);

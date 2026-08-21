@@ -23,6 +23,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Integrations\Integrations.Client.Core\Integrations.Client.Core.csproj"/>
+        <ProjectReference Include="..\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
         <ProjectReference Include="..\Mailing\EmailTemplates\EmailTemplates.csproj"/>
         <ProjectReference Include="..\Mailing\Mailing.Core\Mailing.Core.csproj"/>
         <ProjectReference Include="..\Persistence\Persistence.csproj"/>

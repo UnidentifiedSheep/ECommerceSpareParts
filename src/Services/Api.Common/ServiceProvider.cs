@@ -6,6 +6,7 @@ using Application.Common.Models;
 using Application.Common.Models.Options;
 using Application.Common.Models.Options.S3;
 using Cache;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Persistence;
 using RabbitMq;
 using S3;
@@ -22,9 +23,7 @@ public static class ServiceProvider
 
     public static IServiceCollection AddProjectJsonSerialization(this IServiceCollection collection)
     {
-        collection
-            .AddOptions<ProjectJsonOptions>()
-            .Configure(options => ProjectJsonOptions.Configure(options.SerializerOptions));
+        collection.TryAddSingleton<ProjectJsonOptions>();
 
         return collection;
     }

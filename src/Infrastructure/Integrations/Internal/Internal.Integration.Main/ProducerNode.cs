@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Abstractions.Models.Options;
 using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
@@ -11,8 +12,9 @@ namespace Internal.Integration.Main;
 internal sealed class ProducerNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor
-) : InternalClientBase(authClient, optionsMonitor), IProducerNode
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+    ProjectJsonOptions jsonOptions
+) : InternalClientBase(authClient, optionsMonitor, jsonOptions), IProducerNode
 {
     public async Task<Response<IReadOnlyList<InternalFullProducer>>> GetFullProducer(
         IEnumerable<int> producerIds,

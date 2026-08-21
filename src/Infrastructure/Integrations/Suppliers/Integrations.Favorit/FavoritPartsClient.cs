@@ -1,3 +1,4 @@
+using Abstractions.Models.Options;
 using Integrations.Client.Core;
 using Integrations.Common;
 using Integrations.Favorit.Requests;
@@ -17,8 +18,9 @@ public interface IFavoritPartsClient
 
 public class FavoritPartsClient(
     HttpClient client,
-    IConnectionProvider<FavoritConnection> connectionProvider
-) : ClientBase, IFavoritPartsClient
+    IConnectionProvider<FavoritConnection> connectionProvider,
+    ProjectJsonOptions jsonOptions
+) : ClientBase(jsonOptions), IFavoritPartsClient
 {
     public async Task<Response<GetPricesResponse>> GetPricesAsync(
         GetPricesRequest request,

@@ -1,3 +1,4 @@
+using Abstractions.Models.Options;
 using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
@@ -10,9 +11,10 @@ namespace Internal.Integration.Main;
 internal sealed class SaleNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+    ProjectJsonOptions jsonOptions
 )
-    : InternalClientBase(authClient, optionsMonitor), ISaleNode
+    : InternalClientBase(authClient, optionsMonitor, jsonOptions), ISaleNode
 {
     public async Task<Response<InternalFullSale>> GetFullSale(
         Guid saleId,
