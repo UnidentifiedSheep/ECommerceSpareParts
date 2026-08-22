@@ -4,8 +4,8 @@ public abstract class DataSliceRangeDefinition<TRange> :
     DataSliceDefinition 
     where TRange : IComparable<TRange>, IEquatable<TRange>
 {
-    public TRange RangeStart { get; protected set; }
-    public TRange RangeEnd { get; protected set; }
+    public TRange RangeStart { get; protected set; } = default!;
+    public TRange RangeEnd { get; protected set; } = default!;
 
     protected DataSliceRangeDefinition(
         DataSliceGroup group,

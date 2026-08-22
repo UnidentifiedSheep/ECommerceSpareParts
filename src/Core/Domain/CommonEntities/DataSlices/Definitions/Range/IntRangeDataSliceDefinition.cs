@@ -1,12 +1,10 @@
 namespace Domain.CommonEntities.DataSlices.Definitions.Range;
 
-public class IntRangeDataSliceDefinition : DataSliceRangeDefinition<int>
+public abstract class IntRangeDataSliceDefinition : DataSliceRangeDefinition<int>
 {
-    public IntRangeDataSliceDefinition(
-        DataSliceGroup group, 
+    protected IntRangeDataSliceDefinition(
+        DataSliceGroup group,
         int rangeStart,
-        int rangeEnd) : base(group, rangeStart, rangeEnd)
-    {
-        
-    }
+        int rangeEnd)
+        : base(group, rangeStart, rangeEnd) { }
 }

@@ -1,9 +1,9 @@
 namespace Domain.CommonEntities.DataSlices.Definitions.Scalar;
 
-public class IntDataSliceDefinition : ScalarDataSliceDefinition<int>
+public abstract class IntDataSliceDefinition : ScalarDataSliceDefinition<int>
 {
-    public IntDataSliceDefinition(
+    protected IntDataSliceDefinition(
         DataSliceGroup group,
-        int value
-        ) : base(group, value) { }
+        int value)
+        : base(group, value) { }
 }

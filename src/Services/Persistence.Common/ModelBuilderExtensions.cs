@@ -38,7 +38,13 @@ public static class ModelBuilderExtensions
         return modelBuilder
             .ApplyConfiguration(new DataSliceGroupConfiguration())
             .ApplyConfiguration(new DataSliceDefinitionConfiguration())
-            .ApplyConfiguration(new DataSliceConfiguration());
+            .ApplyConfiguration(new DateRangeDataSliceDefinitionConfiguration())
+            .ApplyConfiguration(new IntRangeDataSliceDefinitionConfiguration())
+            .ApplyConfiguration(new IntDataSliceDefinitionConfiguration())
+            .ApplyConfiguration(new StringDataSliceDefinitionConfiguration())
+            .ApplyConfiguration(new DataSliceConfiguration())
+            .ApplyConfiguration(new DateRangeDataSliceConfiguration())
+            .ApplyConfiguration(new IntRangeDataSliceConfiguration());
     }
 
     public static ModelBuilder AllDateTimesToUtc(this ModelBuilder modelBuilder)

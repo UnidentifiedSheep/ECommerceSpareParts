@@ -2,7 +2,7 @@ using Domain.CommonEntities.DataSlices.Definitions.Range;
 
 namespace Domain.CommonEntities.DataSlices.Slices;
 
-public class DateRangeDataSlice : RangeDataSlice<DateTime, DateRangeDataSliceDefinition>
+public abstract class DateRangeDataSlice : RangeDataSlice<DateTime, DateRangeDataSliceDefinition>
 {
     protected DateRangeDataSlice(
         DateRangeDataSliceDefinition definition,

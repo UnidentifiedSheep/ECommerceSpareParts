@@ -1,10 +1,10 @@
 namespace Domain.CommonEntities.DataSlices.Definitions.Scalar;
 
-public class ScalarDataSliceDefinition<TScalar> : 
+public abstract class ScalarDataSliceDefinition<TScalar> :
     DataSliceDefinition
 {
-    public TScalar Value { get; protected set; }
-    
+    public TScalar Value { get; protected set; } = default!;
+
     protected ScalarDataSliceDefinition(
         DataSliceGroup group,
         TScalar scalar) : base(group)

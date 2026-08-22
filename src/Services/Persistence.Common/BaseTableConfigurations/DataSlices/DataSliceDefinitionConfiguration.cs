@@ -39,6 +39,15 @@ public sealed class DataSliceDefinitionConfiguration : IEntityTypeConfiguration<
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("slices_definition_group_id_fk");
 
+        builder.HasIndex(e => e.DataSliceGroupId)
+            .HasDatabaseName("slices_definitions_group_id_idx");
+
+        builder.HasIndex(e => e.PublishedRevisionId)
+            .HasDatabaseName("slices_definitions_published_revision_id_idx");
+
+        builder.HasIndex(e => e.PreparingRevisionId)
+            .HasDatabaseName("slices_definitions_preparing_revision_id_idx");
+
         builder.HasDiscriminator<string>("definition_type");
 
         builder.Navigation(e => e.Slices)

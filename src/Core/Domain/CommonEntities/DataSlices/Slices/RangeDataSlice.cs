@@ -6,7 +6,7 @@ public abstract class RangeDataSlice<TValue, TDefinition> : DataSlice
     where TValue : IComparable<TValue>, IEquatable<TValue>
     where TDefinition : DataSliceRangeDefinition<TValue>
 {
-    public TValue Value { get; private set; }
+    public TValue Value { get; private set; } = default!;
 
     protected RangeDataSlice(
         TDefinition definition,

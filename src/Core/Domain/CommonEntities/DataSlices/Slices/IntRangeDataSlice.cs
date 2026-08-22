@@ -2,10 +2,10 @@ using Domain.CommonEntities.DataSlices.Definitions.Range;
 
 namespace Domain.CommonEntities.DataSlices.Slices;
 
-public class IntRangeDataSlice
+public abstract class IntRangeDataSlice
     : RangeDataSlice<int, IntRangeDataSliceDefinition>
 {
-    public IntRangeDataSlice(
+    protected IntRangeDataSlice(
         IntRangeDataSliceDefinition definition,
         int value,
         string? payload = null)

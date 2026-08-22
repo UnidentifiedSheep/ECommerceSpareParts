@@ -1,13 +1,10 @@
 namespace Domain.CommonEntities.DataSlices.Definitions.Range;
 
-public class DateRangeDataSliceDefinition : DataSliceRangeDefinition<DateTime>
+public abstract class DateRangeDataSliceDefinition : DataSliceRangeDefinition<DateTime>
 {
-    public DateRangeDataSliceDefinition(
-        DataSliceGroup group, 
+    protected DateRangeDataSliceDefinition(
+        DataSliceGroup group,
         DateTime rangeStart,
-        DateTime rangeEnd
-        ) : base(group, rangeStart, rangeEnd)
-    {
-        
-    }
+        DateTime rangeEnd)
+        : base(group, rangeStart, rangeEnd) { }
 }
