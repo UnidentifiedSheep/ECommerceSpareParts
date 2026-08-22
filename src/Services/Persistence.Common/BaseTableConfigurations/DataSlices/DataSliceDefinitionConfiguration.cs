@@ -1,4 +1,5 @@
 using Domain.CommonEntities.DataSlices;
+using Domain.CommonEntities.DataSlices.Definitions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

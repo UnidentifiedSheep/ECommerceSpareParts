@@ -1,4 +1,6 @@
 using Domain.CommonEntities.DataSlices;
+using Domain.CommonEntities.DataSlices.Definitions;
+using Domain.CommonEntities.DataSlices.Slices;
 using Domain.Interfaces;
 using FluentAssertions;
 

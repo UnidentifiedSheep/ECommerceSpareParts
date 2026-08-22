@@ -1,9 +1,10 @@
 using System.Linq.Expressions;
+using Domain.CommonEntities.DataSlices.Definitions;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Domain.CommonEntities.DataSlices;
+namespace Domain.CommonEntities.DataSlices.Slices;
 
 public abstract class DataSlice :
     Entity<DataSlice, int>,

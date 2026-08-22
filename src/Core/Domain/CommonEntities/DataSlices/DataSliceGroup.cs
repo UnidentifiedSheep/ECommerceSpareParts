@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Domain.CommonEntities.DataSlices.Definitions;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
