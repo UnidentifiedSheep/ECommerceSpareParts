@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Abstractions.Models.Options;
 using Enums;
 using Integrations.Common;
 using Internal.Integration.Core;
@@ -13,8 +14,9 @@ namespace Internal.Integration.Main;
 internal sealed class ProductNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor
-) : InternalClientBase(authClient, optionsMonitor), IProductNode
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+    ProjectJsonOptions jsonOptions
+) : InternalClientBase(authClient, optionsMonitor, jsonOptions), IProductNode
 {
     public async Task<Response<IReadOnlyList<InternalFullProduct>>> GetFullProduct(
         IEnumerable<int> productIds,

@@ -74,6 +74,7 @@ if (routeCount == 0 || clusterCount == 0)
 
 builder.Services
     .AddBaseExceptionHandlers()
+    .AddProjectJsonSerialization()
     .AddCacheLayer("gateway")
     .AddLocalization(builder.Configuration)
     .AddApplicationLayer(builder.Configuration)

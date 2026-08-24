@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
+using Abstractions.Models.Options;
 using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
@@ -12,11 +13,13 @@ public class SettingNode(
     HttpClient httpClient,
     IAuthClient authClient,
     IOptionsMonitor<InternalServicesOptions> serviceOptions,
-    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor
+    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
+    ProjectJsonOptions jsonOptions
 ) : InternalCommonClientBase(
     authClient,
     credentialsMonitor,
-    serviceOptions), ISettingNode
+    serviceOptions,
+    jsonOptions), ISettingNode
 {
     public async Task<Response<string>> GetSetting(
         IServiceDefinition serviceDefinition,

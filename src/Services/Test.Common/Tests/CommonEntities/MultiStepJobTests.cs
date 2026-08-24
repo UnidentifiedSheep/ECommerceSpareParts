@@ -10,6 +10,32 @@ namespace Tests.Tests.CommonEntities;
 public class MultiStepJobTests
 {
     [Fact]
+    public void CreateUnique_ValidData_SetsNaturalKey()
+    {
+        var job = MultiStepJob.CreateUnique(
+            " workflow:42 ",
+            "multi-step",
+            "{}",
+            5);
+
+        job.NaturalKey.Should().Be("workflow:42");
+        job.SystemName.Should().Be("multi-step");
+        job.MaxAttempts.Should().Be(5);
+        job.Status.Should().Be(JobStatus.Pending);
+    }
+
+    [Fact]
+    public void CreateUnique_NullNaturalKey_Throws()
+    {
+        var act = () => MultiStepJob.CreateUnique(
+            null!,
+            "multi-step",
+            "{}");
+
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
     public void AddStep_NewStep_IsBlocked()
     {
         var job = Create();

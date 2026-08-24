@@ -212,6 +212,7 @@ ecommerce_pg_data
 ecommerce_redis_data
 ecommerce_rabbitmq_data
 ecommerce_opensearch_data
+ecommerce_prometheus_data
 ecommerce_grafana_data
 ecommerce_loki_data
 ```
@@ -219,6 +220,12 @@ ecommerce_loki_data
 The default `local` volume driver stores data on one node. Before moving a stateful placement label, migrate its volume data or configure shared storage. Stack removal does not delete these external volumes.
 
 Exactly one active ready node must carry `infra.postgres=true`. PostgreSQL and its backup service share the node-local `pg_data` volume, so allowing multiple eligible PostgreSQL nodes could place them over different local volumes. Portainer has the same node-local storage consideration: migrate `portainer_data` before moving `management.portainer=true` to another manager.
+
+Prometheus retains metrics for 30 days in `prometheus_data`. The monitoring
+stack runs `node-exporter` as a global service and discovers its tasks through
+`tasks.node-exporter` on the private `monitoring` overlay network. Grafana
+automatically provisions the Prometheus data source and the **Swarm / Node
+resources** dashboard from versioned Docker configs.
 
 ## Portainer CE
 

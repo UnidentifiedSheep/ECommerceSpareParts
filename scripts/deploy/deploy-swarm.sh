@@ -39,6 +39,7 @@ INFRA_SERVICES=(
 
 MONITORING_SERVICES=(
   "monitoring:prometheus"
+  "monitoring:node-exporter"
   "monitoring:loki"
   "monitoring:grafana"
   "monitoring:opensearch-dashboards"
@@ -64,6 +65,7 @@ PERSISTENT_VOLUMES=(
   redis_data
   rabbitmq_data
   opensearch_data
+  prometheus_data
   grafana_data
   loki_data
 )
@@ -284,11 +286,29 @@ prepare_versioned_configs() {
       "${STACK_NAME}_prometheus_config" \
       prometheus.yml
   )"
+  GRAFANA_DATASOURCES_CONFIG="$(
+    ensure_versioned_config \
+      "${STACK_NAME}_grafana_datasources" \
+      deploy/grafana/provisioning/datasources/prometheus.yml
+  )"
+  GRAFANA_DASHBOARDS_CONFIG="$(
+    ensure_versioned_config \
+      "${STACK_NAME}_grafana_dashboards" \
+      deploy/grafana/provisioning/dashboards/swarm.yml
+  )"
+  GRAFANA_SWARM_NODES_DASHBOARD_CONFIG="$(
+    ensure_versioned_config \
+      "${STACK_NAME}_grafana_swarm_nodes_dashboard" \
+      deploy/grafana/dashboards/swarm-nodes.json
+  )"
 
   export CLOUDRU_SECRETS_SCRIPT_CONFIG
   export POSTGRES_INIT_SQL_CONFIG
   export POSTGRES_INIT_SCRIPT_CONFIG
   export PROMETHEUS_CONFIG
+  export GRAFANA_DATASOURCES_CONFIG
+  export GRAFANA_DASHBOARDS_CONFIG
+  export GRAFANA_SWARM_NODES_DASHBOARD_CONFIG
 }
 
 validate_node_labels() {
@@ -1390,14 +1410,20 @@ cleanup_unused_versioned_configs() {
       "$CLOUDRU_SECRETS_SCRIPT_CONFIG" \
       "$POSTGRES_INIT_SQL_CONFIG" \
       "$POSTGRES_INIT_SCRIPT_CONFIG" \
-      "$PROMETHEUS_CONFIG"
+      "$PROMETHEUS_CONFIG" \
+      "$GRAFANA_DATASOURCES_CONFIG" \
+      "$GRAFANA_DASHBOARDS_CONFIG" \
+      "$GRAFANA_SWARM_NODES_DASHBOARD_CONFIG"
   )"
 
   for prefix in \
     cloudru_secrets_script_ \
     "${STACK_NAME}_postgres_init_sql_" \
     "${STACK_NAME}_postgres_init_script_" \
-    "${STACK_NAME}_prometheus_config_"; do
+    "${STACK_NAME}_prometheus_config_" \
+    "${STACK_NAME}_grafana_datasources_" \
+    "${STACK_NAME}_grafana_dashboards_" \
+    "${STACK_NAME}_grafana_swarm_nodes_dashboard_"; do
     while read -r config_id config_name; do
       [ -n "$config_id" ] || continue
 

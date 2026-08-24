@@ -45,9 +45,11 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture)
             x.SystemName == existing.SystemName);
         updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);
 
-        var recalculationJobExists = await Context.Set<UniqJob>()
+        var recalculationJobExists = await Context.Set<Job>()
             .AsNoTracking()
-            .AnyAsync(x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName);
+            .AnyAsync(x =>
+                x.SystemName == InvalidateStalePriceOptionsLrt.LrtName &&
+                x.NaturalKey != null);
         recalculationJobExists.Should().BeTrue();
     }
 

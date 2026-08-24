@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using Abstractions.Models.Options;
 using Integrations.Common;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -7,7 +8,14 @@ namespace Integrations.Client.Core;
 
 public abstract class ClientBase
 {
-    protected static async Task<Response<T>> ReadResponse<T>(
+    private readonly JsonSerializerOptions _serializerOptions;
+
+    protected ClientBase(ProjectJsonOptions jsonOptions)
+    {
+        _serializerOptions = jsonOptions.SerializerOptions;
+    }
+
+    protected async Task<Response<T>> ReadResponse<T>(
         HttpResponseMessage response,
         CancellationToken cancellationToken = default)
     {
@@ -21,13 +29,13 @@ public abstract class ClientBase
 
         try
         {
-            var value = JsonSerializer.Deserialize<T>(json);
+            var value = JsonSerializer.Deserialize<T>(json, _serializerOptions);
             return Response<T>.Ok(value);
         }
         catch (JsonException ex) { return Response<T>.Fail(response.StatusCode, ex.Message); }
     }
 
-    protected static async Task<Response<TValue>> ReadResponse<TResponse, TValue>(
+    protected async Task<Response<TValue>> ReadResponse<TResponse, TValue>(
         HttpResponseMessage response,
         Func<TResponse, TValue> selector,
         CancellationToken cancellationToken = default)

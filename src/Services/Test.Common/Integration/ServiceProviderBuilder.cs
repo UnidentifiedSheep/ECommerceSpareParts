@@ -2,11 +2,13 @@ using Abstractions.Interfaces;
 using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Localization.Domain.Extensions;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Persistence;
 using Persistence.Common;
 using Persistence.Extensions;
@@ -32,10 +34,8 @@ internal sealed class ServiceProviderBuilder :
         services.RegisterTestContexts();
         services.AddLogging();
 
-        ApplicationServiceProvider
-            .AddApplicationBase(
-                services,
-                new CommonTestServiceDefinition(),
+        services
+            .AddApplicationBase(new CommonTestServiceDefinition(),
                 null,
                 typeof(ApplicationServiceProvider).Assembly,
                 typeof(CacheBehavior<,>),
@@ -65,6 +65,10 @@ internal sealed class ServiceProviderBuilder :
         services.AddScoped<MessageBrokerStub>();
         services.AddScoped<IPublishEndpoint>(sp =>
             sp.GetRequiredService<MessageBrokerStub>());
+        services.AddSingleton<ILrtNamedObject, JobScheduleTestLrt>();
+        services.AddSingleton<TestTimeProvider>();
+        services.Replace(ServiceDescriptor.Singleton<TimeProvider>(sp =>
+            sp.GetRequiredService<TestTimeProvider>()));
 
         return services.BuildServiceProvider();
     }

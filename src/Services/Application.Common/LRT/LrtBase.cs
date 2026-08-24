@@ -20,7 +20,7 @@ public abstract class LrtBase<TInputState, TState>(
     IPublishEndpoint publisher,
     IApplicationTransactionService transactionService,
     ILogger logger
-) : ILrtNamedObject
+) : ILrtNamedObject<TInputState>
     where TInputState : class, IInputState
     where TState : class, TInputState
 {

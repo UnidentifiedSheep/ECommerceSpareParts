@@ -15,6 +15,7 @@ public class JobTests
         var job = SingleRunJob.Create("import-products", "{\"page\":1}", 5);
 
         job.SystemName.Should().Be("import-products");
+        job.NaturalKey.Should().BeNull();
         job.State.Should().Be("{\"page\":1}");
         job.MaxAttempts.Should().Be(5);
         job.Attempts.Should().Be(1);
@@ -25,6 +26,47 @@ public class JobTests
         job.LeaseHolderId.Should().BeNull();
         job.IsTerminal.Should().BeFalse();
         job.IsCancellationRequested.Should().BeFalse();
+    }
+
+    [Fact]
+    public void CreateUnique_ValidData_SetsNaturalKey()
+    {
+        var job = SingleRunJob.CreateUnique(
+            " product:42 ",
+            "import-product",
+            "{\"productId\":42}",
+            5);
+
+        job.Should().BeOfType<SingleRunJob>();
+        job.NaturalKey.Should().Be("product:42");
+        job.SystemName.Should().Be("import-product");
+        job.State.Should().Be("{\"productId\":42}");
+        job.MaxAttempts.Should().Be(5);
+        job.Status.Should().Be(JobStatus.Pending);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void CreateUnique_EmptyNaturalKey_Throws(string naturalKey)
+    {
+        var act = () => SingleRunJob.CreateUnique(
+            naturalKey,
+            "import-product",
+            "{}");
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void CreateUnique_NullNaturalKey_Throws()
+    {
+        var act = () => SingleRunJob.CreateUnique(
+            null!,
+            "import-product",
+            "{}");
+
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]

@@ -8,3 +8,10 @@ public interface ILrtNamedObject :
     ILocalizableNamedObject
 {
 }
+
+public interface ILrtNamedObject<in TInputState> :
+    ILrtNamedObject,
+    ILrt<TInputState>
+    where TInputState : IInputState
+{
+}

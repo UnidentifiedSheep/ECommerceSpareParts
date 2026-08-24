@@ -61,6 +61,11 @@ namespace Pricing.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("multi_step_job_id");
 
+                    b.Property<string>("NaturalKey")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("natural_key");
+
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("text")
@@ -98,14 +103,18 @@ namespace Pricing.Migrator.Migrations
                         .HasName("jobs_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.job.uniqjob_who_created_idx");
+                        .HasDatabaseName("domain.commonentities.job.singlerunjob_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.job.uniqjob_who_updated_idx");
+                        .HasDatabaseName("domain.commonentities.job.singlerunjob_who_updated_idx");
 
                     b.HasIndex(new[] { "LockedAt" }, "jobs_locked_at_idx");
 
                     b.HasIndex(new[] { "MultiStepJobId" }, "jobs_multi_step_job_id_idx");
+
+                    b.HasIndex(new[] { "SystemName", "NaturalKey" }, "jobs_pending_system_name_natural_key_uq")
+                        .IsUnique()
+                        .HasFilter("status = 'Pending' AND natural_key IS NOT NULL");
 
                     b.HasIndex(new[] { "Status", "Id" }, "jobs_status_id_idx");
 
@@ -896,23 +905,6 @@ namespace Pricing.Migrator.Migrations
                     b.HasBaseType("Domain.CommonEntities.Job.Job");
 
                     b.HasDiscriminator().HasValue("job");
-                });
-
-            modelBuilder.Entity("Domain.CommonEntities.Job.UniqJob", b =>
-                {
-                    b.HasBaseType("Domain.CommonEntities.Job.Job");
-
-                    b.Property<string>("NaturalKey")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("natural_key");
-
-                    b.HasIndex(new[] { "SystemName", "NaturalKey" }, "jobs_pending_system_name_natural_key_uq")
-                        .IsUnique()
-                        .HasFilter("status = 'Pending'");
-
-                    b.HasDiscriminator().HasValue("uniq_job");
                 });
 
             modelBuilder.Entity("Pricing.Entities.Settings.PricingSetting", b =>

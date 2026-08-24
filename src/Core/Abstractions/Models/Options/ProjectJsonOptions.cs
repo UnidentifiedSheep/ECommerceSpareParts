@@ -17,6 +17,6 @@ public sealed class ProjectJsonOptions
     public static void Configure(JsonSerializerOptions options)
     {
         if (options.Converters.All(converter => converter is not JsonStringEnumConverter))
-            options.Converters.Add(new JsonStringEnumConverter());
+            options.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: true));
     }
 }

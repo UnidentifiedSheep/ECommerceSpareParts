@@ -1,20 +1,21 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Handlers.Jobs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Attributes;
 using MassTransit;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
+using Pricing.Application.Lrts.PriceCandidateCalculation;
 using Pricing.Application.Models.Jobs;
 using Pricing.Entities.Offers;
 using Pricing.Entities.Settings;
@@ -29,7 +30,8 @@ public class InvalidateStalePriceOptionsLrt(
     ILogger<InvalidateStalePriceOptionsLrt> logger,
     IReadRepository<ProductPriceOption, Guid> readRepository,
     IProductPriceOptionRepository productPriceOptionRepository,
-    ISender sender,
+    IJobService jobService,
+    IJobProvider<PriceCandidateCalculationLrt, PriceCandidateCalculationState> jobProvider,
     IMarkupContainer markupContainer,
     IPriceApplierService priceApplierService,
     ISettingsService settingsService
@@ -77,14 +79,17 @@ public class InvalidateStalePriceOptionsLrt(
                     if (items.Count == 0) return 0;
 
                     var jobItems = items
-                        .Select(x => PriceCandidateCalculationJob.Create(
-                            x.ProductId,
-                            x.OfferForStorage))
+                        .Select(x => jobProvider.Create(
+                            new PriceCandidateCalculationState
+                            {
+                                ProductId = x.ProductId,
+                                StorageName = x.OfferForStorage
+                            }))
                         .DistinctBy(x => x.NaturalKey)
                         .ToList();
 
-                    await sender.Send(
-                        new TryEnqueueUniqJobCommand(jobItems),
+                    await jobService.TryEnqueueJobsAsync(
+                        jobItems,
                         cancellationToken);
 
                     await productPriceOptionRepository.DeleteManyAsync(

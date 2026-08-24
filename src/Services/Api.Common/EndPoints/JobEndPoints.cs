@@ -1,9 +1,12 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
+using Application.Common.Domains;
 using Application.Common.Dtos;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
+using Application.Common.Interfaces.Services;
+using Application.Common.Models;
 using Carter;
 using Domain.CommonEnums;
 using Enums;
@@ -63,6 +66,8 @@ public class JobEndPoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
+        if (!app.HasCommonDomain<JobsDomain>()) return;
+
         var jobs = app.MapGroup("/jobs")
             .WithTags("Jobs")
             .AddScheduleEndPoints();
@@ -130,11 +135,11 @@ public class JobEndPoints : ICarterModule
 
         jobs.MapGet("{id:guid}/cancel",
                 async (
-                    ISender sender,
+                    IJobService jobService,
                     Guid id,
                     CancellationToken ct) =>
                 {
-                    await sender.Send(new CancelJobCommand(id), ct);
+                    await jobService.CancelJobAsync(id, ct);
                     return Results.Accepted();
                 })
             .WithName("CancelJobState")
@@ -166,21 +171,22 @@ public class JobEndPoints : ICarterModule
                 "",
                 async (
                     ISender sender,
+                    IJobService jobService,
                     CreateJobRequest request,
                     CancellationToken ct) =>
                 {
-                    var result = await sender.Send(
-                        new QueueJobCommand(
+                    var jobIds = await jobService.TryEnqueueJobsAsync(
+                        [new JobItem(
                             request.SystemName,
                             request.InputState,
-                            request.MaxAttempts),
+                            request.MaxAttempts)],
                         ct);
                     var job = await sender.Send(
-                        new GetJobQuery(result.JobIds[0]),
+                        new GetJobQuery(jobIds[0]),
                         ct);
 
                     return Results.Created(
-                        $"/jobs/{result.JobIds[0]}",
+                        $"/jobs/{jobIds[0]}",
                         new CreateJobResponse
                         {
                             Job = job.Job

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Abstractions.Models.Options;
 using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
@@ -11,9 +12,10 @@ namespace Internal.Integration.Main;
 internal sealed class CurrencyNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+    ProjectJsonOptions jsonOptions
 )
-    : InternalClientBase(authClient, optionsMonitor), ICurrencyNode
+    : InternalClientBase(authClient, optionsMonitor, jsonOptions), ICurrencyNode
 {
     public async Task<Response<decimal>> GetCurrencyRate(
         int currencyId,

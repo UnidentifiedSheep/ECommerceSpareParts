@@ -43,6 +43,7 @@ public static class ServiceProvider
 
         collection.RegisterSettingsService();
         collection.RegisterProjectionProviders<PriceCandidateCalculationLrt>();
+        collection.RegisterJobProviders<PriceCandidateCalculationLrt>();
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();

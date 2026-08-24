@@ -1,4 +1,5 @@
-﻿using Integrations.Common;
+﻿using Abstractions.Models.Options;
+using Integrations.Common;
 using Internal.Integration.Auth;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
@@ -6,6 +7,7 @@ using Internal.Integration.Core.Interfaces.Common;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Main;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Internal.Integration.Di;
@@ -17,6 +19,8 @@ public static class ServiceProviderExtensions
     public static IServiceCollection AddIntegrationClients(
         this IServiceCollection services)
     {
+        services.TryAddSingleton<ProjectJsonOptions>();
+
         services.AddOptions<InternalServicesOptions>()
             .BindConfiguration(InternalServicesOptions.SectionName)
             .ValidateDataAnnotations()

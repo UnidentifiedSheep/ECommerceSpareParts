@@ -37,4 +37,8 @@
         <ProjectReference Include="..\..\Infrastructure\SchemaGeneration\SchemaGeneration\SchemaGeneration.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="LRT\DataSlice\" />
+    </ItemGroup>
+
 </Project>

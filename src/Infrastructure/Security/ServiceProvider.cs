@@ -31,7 +31,7 @@ public static class ServiceProvider
     public static IServiceCollection AddJsonSigner(
         this IServiceCollection collection)
     {
-        collection.AddOptions<ProjectJsonOptions>();
+        collection.TryAddSingleton<ProjectJsonOptions>();
         collection.AddSingleton<IJsonSigner, JsonSigner>();
         return collection;
     }

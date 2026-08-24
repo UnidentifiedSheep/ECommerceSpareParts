@@ -1,4 +1,5 @@
 using Abstractions.Interfaces;
+using Abstractions.Models.Options;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Extensions;
 using Internal.Integration.Core.Interfaces;
@@ -9,8 +10,9 @@ namespace Internal.Integration.Common;
 public abstract class InternalCommonClientBase(
     IAuthClient authClient,
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
-    IOptionsMonitor<InternalServicesOptions> serviceOptions
-) : InternalClientBase(authClient, optionsMonitor)
+    IOptionsMonitor<InternalServicesOptions> serviceOptions,
+    ProjectJsonOptions jsonOptions
+) : InternalClientBase(authClient, optionsMonitor, jsonOptions)
 {
     protected async Task<HttpRequestMessage> GetRequest(
         IServiceDefinition serviceDefinition,

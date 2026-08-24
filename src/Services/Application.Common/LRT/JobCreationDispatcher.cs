@@ -12,21 +12,29 @@ public sealed class JobCreationDispatcher(
     public Job Create(
         string systemName,
         string inputState,
-        int maxAttempts)
+        int maxAttempts,
+        string? naturalKey = null)
     {
         var lrt = registry.GetBySystemName(systemName);
         var state = lrt.ValidateState(inputState);
 
         if (lrt is not IMultiStepLrt multiStepLrt)
-            return SingleRunJob.Create(
-                lrt.SystemName,
-                state,
-                maxAttempts);
+            return naturalKey is null
+                ? SingleRunJob.Create(
+                    lrt.SystemName,
+                    state,
+                    maxAttempts)
+                : SingleRunJob.CreateUnique(
+                    naturalKey,
+                    lrt.SystemName,
+                    state,
+                    maxAttempts);
 
         return CreateMultiStepJob(
             multiStepLrt,
             state,
             maxAttempts,
+            naturalKey,
             new HashSet<string>(StringComparer.OrdinalIgnoreCase));
     }
 
@@ -34,6 +42,7 @@ public sealed class JobCreationDispatcher(
         IMultiStepLrt lrt,
         string state,
         int maxAttempts,
+        string? naturalKey,
         HashSet<string> compositionPath)
     {
         if (!compositionPath.Add(lrt.SystemName))
@@ -42,10 +51,16 @@ public sealed class JobCreationDispatcher(
 
         try
         {
-            var job = MultiStepJob.Create(
-                lrt.SystemName,
-                state,
-                maxAttempts);
+            var job = naturalKey is null
+                ? MultiStepJob.Create(
+                    lrt.SystemName,
+                    state,
+                    maxAttempts)
+                : MultiStepJob.CreateUnique(
+                    naturalKey,
+                    lrt.SystemName,
+                    state,
+                    maxAttempts);
             var builder = new MultiStepJobBuilder(
                 (childSystemName, childState, childMaxAttempts) => Create(
                     job,
@@ -89,6 +104,7 @@ public sealed class JobCreationDispatcher(
                 multiStepLrt,
                 state,
                 maxAttempts,
+                naturalKey: null,
                 compositionPath);
 
         parent.AddStep(step);
