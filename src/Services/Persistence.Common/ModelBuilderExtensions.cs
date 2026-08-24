@@ -1,11 +1,7 @@
-﻿using Domain.CommonEntities.DataSlices;
-using Domain.CommonEntities.DataSlices.Definitions;
-using Domain.CommonEntities.DataSlices.Slices;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Common.BaseTableConfigurations;
-using Persistence.Common.BaseTableConfigurations.DataSlices;
 
 namespace Persistence.Common;
 
@@ -19,32 +15,6 @@ public static class ModelBuilderExtensions
             .ApplyConfiguration(new JobStepDependencyConfiguration())
             .ApplyConfiguration(new JobScheduleConfiguration())
             .ApplyConfiguration(new JobScheduleRunConfiguration());
-    }
-
-    public static ModelBuilder ApplyDataSliceConfigurations(this ModelBuilder modelBuilder)
-    {
-        var concreteEntityTypes = modelBuilder.Model.GetEntityTypes()
-            .Select(entityType => entityType.ClrType)
-            .Where(type => !type.IsAbstract)
-            .ToArray();
-
-        var hasConcreteHierarchy = concreteEntityTypes
-            .Any(type => typeof(DataSliceGroup).IsAssignableFrom(type))
-            && concreteEntityTypes.Any(type => typeof(DataSliceDefinition).IsAssignableFrom(type))
-            && concreteEntityTypes.Any(type => typeof(DataSlice).IsAssignableFrom(type));
-
-        if (!hasConcreteHierarchy) return modelBuilder;
-
-        return modelBuilder
-            .ApplyConfiguration(new DataSliceGroupConfiguration())
-            .ApplyConfiguration(new DataSliceDefinitionConfiguration())
-            .ApplyConfiguration(new DateRangeDataSliceDefinitionConfiguration())
-            .ApplyConfiguration(new IntRangeDataSliceDefinitionConfiguration())
-            .ApplyConfiguration(new IntDataSliceDefinitionConfiguration())
-            .ApplyConfiguration(new StringDataSliceDefinitionConfiguration())
-            .ApplyConfiguration(new DataSliceConfiguration())
-            .ApplyConfiguration(new DateRangeDataSliceConfiguration())
-            .ApplyConfiguration(new IntRangeDataSliceConfiguration());
     }
 
     public static ModelBuilder AllDateTimesToUtc(this ModelBuilder modelBuilder)
