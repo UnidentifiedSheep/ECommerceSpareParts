@@ -3,6 +3,8 @@
   "keyValues": {
     "chart.sales.profit.over.time.name": "Прибыль от продаж по времени",
     "chart.sales.profit.over.time.description": "Выручка, себестоимость и валовая прибыль с группировкой по периоду.",
+    "chart.data.source.not.found": "Источник данных графика {0} не найден.",
+    "chart.data.source.query.input.invalid": "Некорректные параметры запроса графика.",
     "chart.sales.profit.query.required": "Параметры запроса графика обязательны.",
     "chart.sales.profit.query.start.date.must.be.utc": "Дата начала должна быть указана в UTC.",
     "chart.sales.profit.query.end.date.must.be.utc": "Дата окончания должна быть указана в UTC.",

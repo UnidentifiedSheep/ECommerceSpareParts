@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Analytics.Application.Interfaces.ChartData;
 using SchemaGeneration.Abstractions.Attributes;
 
-namespace Analytics.Application.NamedObjects.ChartDataSlices.SalesProfitOverTime;
+namespace Analytics.Application.NamedObjects.ChartDataSources.SalesProfitOverTime;
 
 public sealed record SalesProfitDataPoint : IChartDataPoint
 {

@@ -5,7 +5,7 @@ using Domain.Validation;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Analytics.Application.NamedObjects.ChartDataSlices.SalesProfitOverTime;
+namespace Analytics.Application.NamedObjects.ChartDataSources.SalesProfitOverTime;
 
 public sealed record SalesProfitChartQuery : IChartQueryInput
 {

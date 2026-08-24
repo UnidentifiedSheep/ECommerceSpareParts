@@ -3,12 +3,15 @@ using Application.Common.Abstractions.NamedObjects;
 using SchemaGeneration.Abstractions;
 using SchemaGeneration.Abstractions.Models;
 
-namespace Analytics.Application.NamedObjects.ChartDataSlices;
+namespace Analytics.Application.NamedObjects.ChartDataSources;
 
 public abstract class ChartDataSourceNamedObject : LocalizableNameObject
 {
     public abstract Type DataPointType { get; }
     public abstract Type QueryInputType { get; }
+    
+    public abstract ObjectSchema DataPointSchema { get; }
+    public abstract ObjectSchema QueryInputSchema { get; }
 
     public abstract Task<IReadOnlyList<IChartDataPoint>> QueryAsync(
         IChartQueryInput queryInput,
@@ -24,8 +27,8 @@ public abstract class ChartDataSourceNamedObject<TDataPoint, TQueryInput>(
     public sealed override Type DataPointType => typeof(TDataPoint);
     public sealed override Type QueryInputType => typeof(TQueryInput);
 
-    public ObjectSchema DataPointSchema => schemaGenerator.Generate<TDataPoint>();
-    public ObjectSchema QueryInputSchema => schemaGenerator.Generate<TQueryInput>();
+    public override ObjectSchema DataPointSchema => schemaGenerator.Generate<TDataPoint>();
+    public override ObjectSchema QueryInputSchema => schemaGenerator.Generate<TQueryInput>();
     
     public abstract Task<IReadOnlyList<TDataPoint>> QueryAsync(
         TQueryInput queryInput,

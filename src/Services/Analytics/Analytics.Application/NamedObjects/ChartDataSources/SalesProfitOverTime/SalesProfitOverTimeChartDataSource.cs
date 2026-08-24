@@ -5,7 +5,7 @@ using Domain.Validation;
 using Microsoft.EntityFrameworkCore;
 using SchemaGeneration.Abstractions;
 
-namespace Analytics.Application.NamedObjects.ChartDataSlices.SalesProfitOverTime;
+namespace Analytics.Application.NamedObjects.ChartDataSources.SalesProfitOverTime;
 
 public sealed class SalesProfitOverTimeChartDataSource(
     IReadRepository<SalesFact, Guid> repository,

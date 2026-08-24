@@ -1,5 +1,5 @@
 using Analytics.Application.NamedObjects.Analyzers;
-using Analytics.Application.NamedObjects.ChartDataSlices;
+using Analytics.Application.NamedObjects.ChartDataSources;
 using Application.Common.Abstractions.NamedObjects;
 
 namespace Analytics.Application.NamedObjects;

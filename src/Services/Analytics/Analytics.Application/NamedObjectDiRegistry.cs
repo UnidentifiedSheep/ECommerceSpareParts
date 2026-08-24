@@ -1,6 +1,6 @@
 ﻿using Analytics.Application.NamedObjects;
 using Analytics.Application.NamedObjects.Analyzers;
-using Analytics.Application.NamedObjects.ChartDataSlices;
+using Analytics.Application.NamedObjects.ChartDataSources;
 using Application.Common.Extensions;
 using Application.Common.Handlers.NamedObjects;
 using Application.Common.Interfaces.NamedObject;

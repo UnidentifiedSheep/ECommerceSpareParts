@@ -214,6 +214,8 @@
     "permissions.metrics.create.name": "Create metric",
     "permissions.metrics.create.description": "Permission to create metrics.",
     "permissions.metrics.get.name": "View metrics",
-    "permissions.metrics.get.description": "Permission to view metrics."
+    "permissions.metrics.get.description": "Permission to view metrics.",
+    "permissions.charts.get.name": "View charts",
+    "permissions.charts.get.description": "Permission to view analytics charts."
   }
 }

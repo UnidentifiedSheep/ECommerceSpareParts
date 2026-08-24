@@ -3,6 +3,8 @@
   "keyValues": {
     "chart.sales.profit.over.time.name": "Zamana göre satış kârı",
     "chart.sales.profit.over.time.description": "Zaman dönemine göre gruplandırılmış gelir, maliyet ve brüt kâr.",
+    "chart.data.source.not.found": "{0} grafik veri kaynağı bulunamadı.",
+    "chart.data.source.query.input.invalid": "Grafik sorgusu girdisi geçersiz.",
     "chart.sales.profit.query.required": "Grafik sorgusu gereklidir.",
     "chart.sales.profit.query.start.date.must.be.utc": "Başlangıç tarihi UTC olmalıdır.",
     "chart.sales.profit.query.end.date.must.be.utc": "Bitiş tarihi UTC olmalıdır.",
