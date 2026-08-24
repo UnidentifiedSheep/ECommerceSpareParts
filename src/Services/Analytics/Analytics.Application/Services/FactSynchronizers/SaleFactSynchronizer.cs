@@ -85,6 +85,7 @@ public class SaleFactSynchronizer(
                 sale.Currency.Id,
                 sale.Currency.Id,
                 sale.Organization.Id,
+                sale.Buyer.Id,
                 sale.SaleDatetime,
                 synchronizationStartedAt,
                 contents);
@@ -98,6 +99,7 @@ public class SaleFactSynchronizer(
             sale.Currency.Id,
             sale.Currency.Id,
             sale.Organization.Id,
+            sale.Buyer.Id,
             sale.SaleDatetime,
             synchronizationStartedAt,
             contents);
@@ -137,6 +139,7 @@ public class SaleFactSynchronizer(
                 sale.CurrencyId,
                 saleUpdatedEvent.BaseCurrencyId,
                 sale.OrganizationId,
+                sale.UserId,
                 sale.SaleDatetime,
                 saleUpdatedEvent.OccurredAt,
                 contents);
@@ -150,6 +153,7 @@ public class SaleFactSynchronizer(
             sale.CurrencyId,
             saleUpdatedEvent.BaseCurrencyId,
             sale.OrganizationId,
+            sale.UserId,
             sale.SaleDatetime,
             saleUpdatedEvent.OccurredAt,
             contents);

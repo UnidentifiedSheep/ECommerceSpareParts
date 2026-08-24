@@ -170,5 +170,8 @@ public enum PermissionCodes
 
     // ===== METRICS =====
     METRICS_CREATE,
-    METRICS_GET
+    METRICS_GET,
+
+    // ===== CHARTS =====
+    CHARTS_GET
 }

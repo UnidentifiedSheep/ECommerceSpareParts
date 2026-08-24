@@ -193,6 +193,10 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("buyer_id");
 
+                    b.Property<decimal>("CostInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cost_in_base_currency");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -201,9 +205,25 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("currency_id");
 
+                    b.Property<decimal>("GrossProfitInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("gross_profit_in_base_currency");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
                     b.Property<DateTime>("ProcessedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("processed_at");
+
+                    b.Property<int>("ProductsCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("products_count");
+
+                    b.Property<decimal>("RevenueInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("revenue_in_base_currency");
 
                     b.Property<decimal>("TotalSum")
                         .HasColumnType("numeric")
@@ -217,6 +237,8 @@ namespace Analytics.Migrator.Migrations
                     b.HasIndex(new[] { "CreatedAt" }, "sales_fact_created_at_index");
 
                     b.HasIndex(new[] { "CurrencyId" }, "sales_fact_currency_id_index");
+
+                    b.HasIndex(new[] { "OrganizationId" }, "sales_fact_organization_id_index");
 
                     b.ToTable("sales_fact", (string)null);
                 });

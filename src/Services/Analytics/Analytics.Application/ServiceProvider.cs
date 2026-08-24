@@ -24,6 +24,7 @@ public static class ServiceProvider
         IConfiguration? configuration)
     {
         SortByConfig.Configure();
+        CursorConfig.Configure();
         collection
             .AddApplicationBase(
                 ServicesDefinitions.Analytics,

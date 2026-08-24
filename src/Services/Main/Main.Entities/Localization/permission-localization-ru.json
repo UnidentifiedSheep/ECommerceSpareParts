@@ -214,6 +214,8 @@
     "permissions.metrics.create.name": "Создание метрики",
     "permissions.metrics.create.description": "Право на создание метрики.",
     "permissions.metrics.get.name": "Просмотр метрик",
-    "permissions.metrics.get.description": "Право на получение метрик."
+    "permissions.metrics.get.description": "Право на получение метрик.",
+    "permissions.charts.get.name": "Просмотр графиков",
+    "permissions.charts.get.description": "Право на просмотр аналитических графиков."
   }
 }

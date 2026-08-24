@@ -214,6 +214,8 @@
     "permissions.metrics.create.name": "Metrik oluşturma",
     "permissions.metrics.create.description": "Metrik oluşturma izni.",
     "permissions.metrics.get.name": "Metrikleri görüntüleme",
-    "permissions.metrics.get.description": "Metrikleri görüntüleme izni."
+    "permissions.metrics.get.description": "Metrikleri görüntüleme izni.",
+    "permissions.charts.get.name": "Grafikleri görüntüleme",
+    "permissions.charts.get.description": "Analitik grafikleri görüntüleme izni."
   }
 }
