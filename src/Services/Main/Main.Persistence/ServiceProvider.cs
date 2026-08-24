@@ -1,6 +1,3 @@
-using Abstractions.Interfaces;
-using Application.Common.Interfaces.Repositories;
-using BulkValidation.Pgsql.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
@@ -9,14 +6,8 @@ using Main.Persistence.Repositories.Currency;
 using Main.Persistence.Repositories.Product;
 using Main.Persistence.Repositories.Sale;
 using Main.Persistence.Repositories.Storage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Persistence;
 using Persistence.Common;
-using Persistence.DbValidator;
-using Persistence.Extensions;
-using Persistence.Interceptors;
 using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
 using StorageContentRepository = Main.Persistence.Repositories.Storage.StorageContentRepository;
 using UserRepository = Main.Persistence.Repositories.User.UserRepository;
@@ -27,15 +18,9 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
     {
-        collection.AddScoped<AuditableEntitySaveChangesInterceptor>();
-        collection.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
-        collection.AddDbContext<DContext>((sp, options) =>
-        {
-            var dbOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-            options.UseNpgsql(dbOptions.ConnectionString);
-            options.AddInterceptors(sp.GetRequiredService<AuditableEntitySaveChangesInterceptor>());
-            options.AddInterceptors(sp.GetRequiredService<DomainEventFlusherSaveChangesInterceptor>());
-        });
+        collection.AddPersistenceBase<DContext>(
+            typeof(BasicEfRepository<,>),
+            typeof(ReadRepository<,>));
 
         collection.AddScoped<IProductRepository, ProductRepository>();
         collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();
@@ -48,17 +33,6 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
         collection.AddScoped<ISaleRepository, SaleRepository>();
-        collection.AddJobRepositories<DContext>();
-        
-
-        collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
-        collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
-
-        collection.AddUnitOfWork<DContext>();
-
-        collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
-        collection.AddPgsqlDbValidators<DContext>();
-
 
         return collection;
     }

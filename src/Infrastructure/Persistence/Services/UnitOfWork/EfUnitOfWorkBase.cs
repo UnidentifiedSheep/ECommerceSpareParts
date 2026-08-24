@@ -6,7 +6,7 @@ using Persistence.TransactionBuilder;
 
 namespace Persistence.Services.UnitOfWork;
 
-public class UnitOfWorkBase(DbContext context) : IUnitOfWork
+public class EfUnitOfWorkBase(DbContext context) : IUnitOfWork
 {
     public UnitOfWorkContext Context { get; } = new();
 
@@ -39,9 +39,9 @@ public class UnitOfWorkBase(DbContext context) : IUnitOfWork
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default)
+    public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : notnull
     {
-        await context.AddAsync(entity ?? throw new ArgumentNullException(nameof(entity)), cancellationToken);
+        await context.AddAsync(entity, cancellationToken);
     }
 
     public async Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default)
@@ -53,9 +53,9 @@ public class UnitOfWorkBase(DbContext context) : IUnitOfWork
     public Task ReloadAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
         => context.Entry(entity ?? throw new ArgumentNullException(nameof(entity))).ReloadAsync(cancellationToken);
 
-    public void Remove<T>(T entity)
+    public void Remove<T>(T entity) where T : notnull
     {
-        context.Remove(entity ?? throw new ArgumentNullException(nameof(entity)));
+        context.Remove(entity);
     }
 
     public void RemoveRange<T>(IEnumerable<T> entities) where T : class

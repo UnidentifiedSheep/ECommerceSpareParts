@@ -19,13 +19,13 @@ public interface IUnitOfWork
 
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 
-    Task AddAsync<T>(T entity, CancellationToken cancellationToken = default);
+    Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : notnull;
 
     Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default)
         where T : class;
     
     Task ReloadAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class;
 
-    void Remove<T>(T entity);
+    void Remove<T>(T entity) where T : notnull;
     void RemoveRange<T>(IEnumerable<T> entities) where T : class;
 }

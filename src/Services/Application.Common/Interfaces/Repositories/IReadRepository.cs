@@ -12,5 +12,6 @@ public interface IReadRepository<TEntity, TKey> : IReadRepository
 
     Task<IEnumerable<T>> QuerySqlAsync<T>(
         string sql,
-        object param);
+        object param,
+        CancellationToken cancellationToken = default);
 }

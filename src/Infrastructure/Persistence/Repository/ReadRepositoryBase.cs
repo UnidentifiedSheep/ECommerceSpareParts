@@ -16,11 +16,12 @@ public abstract class ReadRepositoryBase<TContext, TEntity, TKey>(TContext ctx)
 
     public async Task<IEnumerable<T>> QuerySqlAsync<T>(
         string sql,
-        object param)
+        object param,
+        CancellationToken cancellationToken = default)
     {
         var connection = ctx.Database.GetDbConnection();
 
-        if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+        if (connection.State != ConnectionState.Open) await connection.OpenAsync(cancellationToken);
 
         return await connection.QueryAsync<T>(sql, param);
     }
