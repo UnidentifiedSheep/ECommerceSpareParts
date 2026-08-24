@@ -20,6 +20,7 @@
     "chart.sales.profit.query.end.date.description": "Satış döneminin UTC bitişi.",
     "chart.sales.profit.query.granularity.name": "Zaman ayrıntısı",
     "chart.sales.profit.query.granularity.description": "Satışları gün, ay veya yıl bazında gruplar.",
+    "chart.sales.profit.query.cursor.invalid": "Grafik imleci geçersiz veya seçilen zaman ayrıntısıyla eşleşmiyor.",
     "chart.sales.profit.point.period.start.name": "Dönem",
     "chart.sales.profit.point.period.start.description": "Toplanan dönemin UTC başlangıcı.",
     "chart.sales.profit.point.revenue.name": "Gelir",

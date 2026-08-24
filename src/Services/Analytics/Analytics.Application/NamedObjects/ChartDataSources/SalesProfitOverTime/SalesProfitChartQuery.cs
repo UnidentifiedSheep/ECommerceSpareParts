@@ -7,7 +7,7 @@ using SchemaGeneration.Abstractions.Enums;
 
 namespace Analytics.Application.NamedObjects.ChartDataSources.SalesProfitOverTime;
 
-public sealed record SalesProfitChartQuery : IChartQueryInput
+public sealed record SalesProfitChartQuery : CursorChartQueryInput<DateTime>
 {
     [JsonPropertyName("organizationId")]
     [SchemaInputControl(InputControlType.EntitySelector)]
@@ -60,5 +60,10 @@ public sealed record SalesProfitChartQuery : IChartQueryInput
         Granularity.Ensure(
             Enum.IsDefined,
             "chart.sales.profit.query.granularity.unsupported");
+        if (Cursor is { } cursor)
+            cursor.Ensure(
+                value => value.Kind == DateTimeKind.Utc,
+                "chart.sales.profit.query.cursor.invalid");
+        ValidateCursor();
     }
 }

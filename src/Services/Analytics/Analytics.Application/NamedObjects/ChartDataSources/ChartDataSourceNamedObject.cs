@@ -1,4 +1,5 @@
 using Analytics.Application.Interfaces.ChartData;
+using Analytics.Application.Models;
 using Application.Common.Abstractions.NamedObjects;
 using SchemaGeneration.Abstractions;
 using SchemaGeneration.Abstractions.Models;
@@ -13,7 +14,7 @@ public abstract class ChartDataSourceNamedObject : LocalizableNameObject
     public abstract ObjectSchema DataPointSchema { get; }
     public abstract ObjectSchema QueryInputSchema { get; }
 
-    public abstract Task<IReadOnlyList<IChartDataPoint>> QueryAsync(
+    public abstract Task<ChartDataResult> QueryAsync(
         IChartQueryInput queryInput,
         CancellationToken cancellationToken);
 }
@@ -30,11 +31,11 @@ public abstract class ChartDataSourceNamedObject<TDataPoint, TQueryInput>(
     public override ObjectSchema DataPointSchema => schemaGenerator.Generate<TDataPoint>();
     public override ObjectSchema QueryInputSchema => schemaGenerator.Generate<TQueryInput>();
     
-    public abstract Task<IReadOnlyList<TDataPoint>> QueryAsync(
+    public abstract Task<ChartDataResult<TDataPoint>> QueryAsync(
         TQueryInput queryInput,
         CancellationToken cancellationToken);
 
-    public sealed override async Task<IReadOnlyList<IChartDataPoint>> QueryAsync(
+    public sealed override async Task<ChartDataResult> QueryAsync(
         IChartQueryInput queryInput,
         CancellationToken cancellationToken)
     {
@@ -45,6 +46,6 @@ public abstract class ChartDataSourceNamedObject<TDataPoint, TQueryInput>(
                 nameof(queryInput));
         
 
-        return await QueryAsync(typedInput, cancellationToken);
+        return (await QueryAsync(typedInput, cancellationToken)).ToUntyped();
     }
 }

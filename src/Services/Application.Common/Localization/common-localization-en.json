@@ -2,6 +2,10 @@
   "locale": "en",
   "keyValues": {
     "pagination.page.min": "Page must be greater than or equal to 0.",
+    "pagination.cursor.name": "Cursor",
+    "pagination.cursor.description": "Cursor returned by the previous request.",
+    "pagination.size.name": "Page size",
+    "pagination.size.description": "Maximum number of items returned per request.",
     "pagination.size.range": "Number of items must be between 1 and 100.",
     "row.is.out.dated": "The data you are trying to update, is out dated. Pleas reload the data.",
     "job.not.found": "Requested job not found.",

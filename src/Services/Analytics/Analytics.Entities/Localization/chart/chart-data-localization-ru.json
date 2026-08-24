@@ -20,6 +20,7 @@
     "chart.sales.profit.query.end.date.description": "Окончание периода продаж в UTC.",
     "chart.sales.profit.query.granularity.name": "Детализация по времени",
     "chart.sales.profit.query.granularity.description": "Группирует продажи по дням, месяцам или годам.",
+    "chart.sales.profit.query.cursor.invalid": "Курсор графика некорректен или не соответствует выбранной детализации.",
     "chart.sales.profit.point.period.start.name": "Период",
     "chart.sales.profit.point.period.start.description": "Начало агрегированного периода в UTC.",
     "chart.sales.profit.point.revenue.name": "Выручка",

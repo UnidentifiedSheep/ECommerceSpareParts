@@ -25,6 +25,9 @@ public sealed record QueryChartDataSourceResponse
 {
     [JsonPropertyName("dataPoints")]
     public required IReadOnlyList<object> DataPoints { get; init; }
+
+    [JsonPropertyName("nextCursor")]
+    public string? NextCursor { get; init; }
 }
 
 public sealed class ChartEndPoints : ICarterModule
@@ -72,7 +75,8 @@ public sealed class ChartEndPoints : ICarterModule
                     return Results.Ok(
                         new QueryChartDataSourceResponse
                         {
-                            DataPoints = result.DataPoints
+                            DataPoints = result.DataPoints,
+                            NextCursor = result.NextCursor
                         });
                 })
             .WithTags("Charts")

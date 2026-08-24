@@ -20,6 +20,7 @@
     "chart.sales.profit.query.end.date.description": "End of the sales period in UTC.",
     "chart.sales.profit.query.granularity.name": "Time granularity",
     "chart.sales.profit.query.granularity.description": "Groups sales by day, month, or year.",
+    "chart.sales.profit.query.cursor.invalid": "The chart cursor is invalid or does not match the selected granularity.",
     "chart.sales.profit.point.period.start.name": "Period",
     "chart.sales.profit.point.period.start.description": "Start of the aggregated period in UTC.",
     "chart.sales.profit.point.revenue.name": "Revenue",

@@ -1,5 +1,7 @@
+using Analytics.Application.Models;
 using Analytics.Entities;
 using Analytics.Entities.Enums;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Domain.Validation;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +20,7 @@ public sealed class SalesProfitOverTimeChartDataSource(
     public override string DescriptionLocalizationKey => "chart.sales.profit.over.time.description";
     public override string SystemName => DataSourceSystemName;
 
-    public override async Task<IReadOnlyList<SalesProfitDataPoint>> QueryAsync(
+    public override async Task<ChartDataResult<SalesProfitDataPoint>> QueryAsync(
         SalesProfitChartQuery queryInput,
         CancellationToken cancellationToken)
     {
@@ -35,8 +37,15 @@ public sealed class SalesProfitOverTimeChartDataSource(
         if (queryInput.BuyerId is { } buyerId)
             query = query.Where(x => x.BuyerId == buyerId);
 
-        return await BuildAggregateQuery(query, queryInput.Granularity)
+        var cursor = queryInput.GetCursor();
+        
+        var dataPoints = await BuildAggregateQuery(query, queryInput.Granularity)
+            .ApplyCursor(cursor)
             .ToListAsync(cancellationToken);
+
+        return new ChartDataResult<SalesProfitDataPoint>(
+            dataPoints,
+            dataPoints.GetNextCursor(cursor));
     }
 
     private static IQueryable<SalesProfitDataPoint> BuildAggregateQuery(
@@ -54,9 +63,6 @@ public sealed class SalesProfitOverTimeChartDataSource(
                     ? x.CreatedAt.Day
                     : 1
             })
-            .OrderBy(group => group.Key.Year)
-            .ThenBy(group => group.Key.Month)
-            .ThenBy(group => group.Key.Day)
             .Select(group => new SalesProfitDataPoint
             {
                 PeriodStart = new DateTime(
@@ -74,4 +80,5 @@ public sealed class SalesProfitOverTimeChartDataSource(
                 ProductsCount = group.Sum(x => x.ProductsCount)
             });
     }
+
 }
