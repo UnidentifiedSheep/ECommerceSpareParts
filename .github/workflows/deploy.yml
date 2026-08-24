@@ -30,6 +30,7 @@ jobs:
           mkdir -p deploy-payload/deploy deploy-payload/init deploy-payload/scripts/deploy
 
           cp deploy/stack.*.yml deploy-payload/deploy/
+          cp -R deploy/grafana deploy-payload/deploy/
           cp prometheus.yml deploy-payload/prometheus.yml
           cp scripts/deploy/deploy-swarm.sh deploy-payload/scripts/deploy/deploy-swarm.sh
           cp scripts/deploy/load-secrets.py deploy-payload/scripts/deploy/load-secrets.py

@@ -251,7 +251,7 @@ ensure_versioned_config() {
   local name
 
   if [ ! -f "$source_file" ]; then
-    echo "Required config source ${source_file} does not exist."
+    echo "Required config source ${source_file} does not exist." >&2
     exit 1
   fi
 
