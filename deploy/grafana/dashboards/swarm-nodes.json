@@ -65,7 +65,7 @@
       },
       "targets": [
         {
-          "expr": "(100 - avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"idle\",instance=~\"$instance\"}[5m])) * 100) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\"}",
+          "expr": "(100 - avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"idle\"}[5m])) * 100) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
           "legendFormat": "{{nodename}}",
           "refId": "A"
         }
@@ -102,7 +102,7 @@
       },
       "targets": [
         {
-          "expr": "(100 * (1 - node_memory_MemAvailable_bytes{job=\"node-exporter\",instance=~\"$instance\"} / node_memory_MemTotal_bytes{job=\"node-exporter\",instance=~\"$instance\"})) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\"}",
+          "expr": "(100 * (1 - node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"})) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
           "legendFormat": "{{nodename}}",
           "refId": "A"
         }
@@ -136,7 +136,7 @@
       },
       "targets": [
         {
-          "expr": "(100 - avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"idle\",instance=~\"$instance\"}[5m])) * 100) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\"}",
+          "expr": "(100 - avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"idle\"}[5m])) * 100) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
           "legendFormat": "{{nodename}}",
           "refId": "A"
         }
@@ -170,7 +170,7 @@
       },
       "targets": [
         {
-          "expr": "(100 * (1 - node_memory_MemAvailable_bytes{job=\"node-exporter\",instance=~\"$instance\"} / node_memory_MemTotal_bytes{job=\"node-exporter\",instance=~\"$instance\"})) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\"}",
+          "expr": "(100 * (1 - node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"})) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
           "legendFormat": "{{nodename}}",
           "refId": "A"
         }
@@ -207,7 +207,7 @@
       },
       "targets": [
         {
-          "expr": "(100 * (1 - node_filesystem_avail_bytes{job=\"node-exporter\",instance=~\"$instance\",fstype!~\"tmpfs|overlay|squashfs\"} / node_filesystem_size_bytes{job=\"node-exporter\",instance=~\"$instance\",fstype!~\"tmpfs|overlay|squashfs\"})) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\"}",
+          "expr": "(100 * (1 - node_filesystem_avail_bytes{job=\"node-exporter\",fstype!~\"tmpfs|overlay|squashfs\"} / node_filesystem_size_bytes{job=\"node-exporter\",fstype!~\"tmpfs|overlay|squashfs\"})) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
           "legendFormat": "{{nodename}} {{mountpoint}}",
           "refId": "A"
         }
@@ -239,18 +239,84 @@
       },
       "targets": [
         {
-          "expr": "sum by (instance) (rate(node_network_receive_bytes_total{job=\"node-exporter\",instance=~\"$instance\",device!=\"lo\"}[5m])) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\"}",
+          "expr": "sum by (instance) (rate(node_network_receive_bytes_total{job=\"node-exporter\",device!=\"lo\"}[5m])) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
           "legendFormat": "{{nodename}} receive",
           "refId": "A"
         },
         {
-          "expr": "-sum by (instance) (rate(node_network_transmit_bytes_total{job=\"node-exporter\",instance=~\"$instance\",device!=\"lo\"}[5m])) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\"}",
+          "expr": "-sum by (instance) (rate(node_network_transmit_bytes_total{job=\"node-exporter\",device!=\"lo\"}[5m])) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
           "legendFormat": "{{nodename}} transmit",
           "refId": "B"
         }
       ],
       "title": "Network throughput",
       "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "id": 8,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "expr": "(node_filesystem_size_bytes{job=\"node-exporter\",fstype!~\"tmpfs|overlay|squashfs\"} - node_filesystem_avail_bytes{job=\"node-exporter\",fstype!~\"tmpfs|overlay|squashfs\"}) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
+          "legendFormat": "{{nodename}} {{mountpoint}} used",
+          "refId": "A"
+        },
+        {
+          "expr": "node_filesystem_avail_bytes{job=\"node-exporter\",fstype!~\"tmpfs|overlay|squashfs\"} * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
+          "legendFormat": "{{nodename}} {{mountpoint}} available",
+          "refId": "B"
+        }
+      ],
+      "title": "Filesystem used / available",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "id": 9,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "expr": "(node_memory_MemTotal_bytes{job=\"node-exporter\"} - node_memory_MemAvailable_bytes{job=\"node-exporter\"}) * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
+          "legendFormat": "{{nodename}} used",
+          "refId": "A"
+        },
+        {
+          "expr": "node_memory_MemAvailable_bytes{job=\"node-exporter\"} * on(instance) group_left(nodename) node_uname_info{job=\"node-exporter\",nodename=~\"$node\"}",
+          "legendFormat": "{{nodename}} available",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory used / available",
+      "type": "bargauge"
     }
   ],
   "refresh": "30s",
@@ -262,13 +328,13 @@
         "allValue": ".*",
         "current": { "selected": true, "text": "All", "value": "$__all" },
         "datasource": { "type": "prometheus", "uid": "prometheus" },
-        "definition": "label_values(node_uname_info{job=\"node-exporter\"}, instance)",
+        "definition": "label_values(node_uname_info{job=\"node-exporter\"}, nodename)",
         "includeAll": true,
         "label": "Node",
         "multi": true,
-        "name": "instance",
+        "name": "node",
         "options": [],
-        "query": { "query": "label_values(node_uname_info{job=\"node-exporter\"}, instance)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+        "query": { "query": "label_values(node_uname_info{job=\"node-exporter\"}, nodename)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
         "refresh": 1,
         "regex": "",
         "sort": 1,
@@ -281,5 +347,5 @@
   "timezone": "browser",
   "title": "Swarm / Node resources",
   "uid": "swarm-node-resources",
-  "version": 1
+  "version": 2
 }
