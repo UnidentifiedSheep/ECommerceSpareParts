@@ -1,5 +1,6 @@
 ﻿using Analytics.Application.NamedObjects;
 using Analytics.Application.NamedObjects.Analyzers;
+using Analytics.Application.NamedObjects.ChartDataSlices;
 using Application.Common.Extensions;
 using Application.Common.Handlers.NamedObjects;
 using Application.Common.Interfaces.NamedObject;
@@ -19,6 +20,7 @@ public static class NamedObjectDiRegistry
 
         return services
             .AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>()
-            .RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
+            .RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped)
+            .RegisterNamedObject<ChartDataSourceNamedObject>(objectsLifetime: ServiceLifetime.Scoped);
     }
 }
