@@ -39,7 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\Analytics.Abstractions\Localization\**\*">
+        <Content Include="..\Analytics.Entities\Localization\**\*">
             <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

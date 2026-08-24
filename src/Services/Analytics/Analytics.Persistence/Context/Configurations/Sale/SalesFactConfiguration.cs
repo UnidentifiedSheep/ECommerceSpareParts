@@ -12,6 +12,8 @@ public class SalesFactConfiguration : IEntityTypeConfiguration<SalesFact>
 
         builder.ToTable("sales_fact");
 
+        builder.HasIndex(e => e.OrganizationId, "sales_fact_organization_id_index");
+
         builder.HasIndex(e => e.BuyerId, "sales_fact_buyer_id_index");
 
         builder.HasIndex(e => e.CurrencyId, "sales_fact_currency_id_index");
@@ -21,12 +23,17 @@ public class SalesFactConfiguration : IEntityTypeConfiguration<SalesFact>
         builder.Property(e => e.Id)
             .HasMaxLength(128)
             .HasColumnName("id");
+        builder.Property(e => e.OrganizationId).HasColumnName("organization_id");
         builder.Property(e => e.BuyerId).HasColumnName("buyer_id");
         builder.Property(e => e.CreatedAt).HasColumnName("created_at");
         builder.Property(e => e.ProcessedAt).HasColumnName("processed_at");
         builder.Property(e => e.CurrencyId).HasColumnName("currency_id");
         builder.Property(e => e.BaseCurrencyId).HasColumnName("base_currency_id");
         builder.Property(e => e.TotalSum).HasColumnName("total_sum");
+        builder.Property(e => e.RevenueInBaseCurrency).HasColumnName("revenue_in_base_currency");
+        builder.Property(e => e.CostInBaseCurrency).HasColumnName("cost_in_base_currency");
+        builder.Property(e => e.GrossProfitInBaseCurrency).HasColumnName("gross_profit_in_base_currency");
+        builder.Property(e => e.ProductsCount).HasColumnName("products_count");
 
         builder.Navigation(e => e.SaleContents)
             .HasField("_saleContents")

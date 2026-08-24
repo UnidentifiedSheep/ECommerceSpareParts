@@ -19,6 +19,8 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
 
     public int BaseCurrencyId { get; private set; }
 
+    public Guid OrganizationId { get; private set; }
+
     public Guid BuyerId { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
@@ -26,6 +28,14 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
     public DateTime ProcessedAt { get; private set; }
 
     public decimal TotalSum { get; private set; }
+
+    public decimal RevenueInBaseCurrency { get; private set; }
+
+    public decimal CostInBaseCurrency { get; private set; }
+
+    public decimal GrossProfitInBaseCurrency { get; private set; }
+
+    public int ProductsCount { get; private set; }
 
     public IReadOnlyCollection<SaleContent> SaleContents => _saleContents;
 
@@ -42,6 +52,7 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
         Guid id,
         int currencyId,
         int baseCurrencyId,
+        Guid organizationId,
         Guid buyerId,
         DateTime createdAt,
         DateTime processedAt,
@@ -52,6 +63,7 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
             Id = id,
             CurrencyId = currencyId,
             BaseCurrencyId = baseCurrencyId,
+            OrganizationId = organizationId,
             BuyerId = buyerId,
             CreatedAt = createdAt,
             ProcessedAt = processedAt
@@ -65,6 +77,7 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
     public void Update(
         int currencyId,
         int baseCurrencyId,
+        Guid organizationId,
         Guid buyerId,
         DateTime createdAt,
         DateTime processedAt,
@@ -72,6 +85,7 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
     {
         CurrencyId = currencyId;
         BaseCurrencyId = baseCurrencyId;
+        OrganizationId = organizationId;
         BuyerId = buyerId;
         CreatedAt = createdAt;
         ProcessedAt = processedAt;
@@ -89,11 +103,18 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
         var existingContents = _saleContents.ToDictionary(x => x.Id);
         var toRemove = new Dictionary<int, SaleContent>(existingContents);
         var totalSum = 0m;
+        var revenueInBaseCurrency = 0m;
+        var costInBaseCurrency = 0m;
+        var productsCount = 0;
 
         foreach (var incomingContent in incomingContents)
         {
             toRemove.Remove(incomingContent.Id);
             totalSum += incomingContent.TotalSum;
+            revenueInBaseCurrency += incomingContent.PriceInBaseCurrency * incomingContent.Count;
+            costInBaseCurrency += incomingContent.Details.Sum(
+                detail => detail.BuyPriceInBaseCurrency * detail.Count);
+            productsCount += incomingContent.Count;
 
             if (existingContents.TryGetValue(incomingContent.Id, out var existingContent))
                 existingContent.Update(
@@ -110,5 +131,9 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
         foreach (var item in toRemove.Values) _saleContents.Remove(item);
 
         TotalSum = totalSum;
+        RevenueInBaseCurrency = revenueInBaseCurrency;
+        CostInBaseCurrency = costInBaseCurrency;
+        GrossProfitInBaseCurrency = revenueInBaseCurrency - costInBaseCurrency;
+        ProductsCount = productsCount;
     }
 }
