@@ -23,7 +23,7 @@ public class PublishStorageContentUpdatedEvents(
             {
                 OccurredAt = now,
                 ProductId = item.Content.ProductId,
-                StorageName = item.Content.StorageName,
+                StorageCode = item.Content.StorageCode,
                 StorageContentId = item.Content.Id,
                 AvailableCount = item.Deleted ? 0 : item.Content.Count,
                 BuyPrice = item.Content.BuyPrice,

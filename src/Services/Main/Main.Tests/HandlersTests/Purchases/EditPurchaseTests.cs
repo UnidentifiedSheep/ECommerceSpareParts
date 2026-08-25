@@ -205,7 +205,7 @@ public class EditPurchaseTests : IntegrationTest
             null,
             DateTime.UtcNow,
             true,
-            route.FromStorageName);
+            route.FromStorageCode);
 
         await Mediator.Send(editCommand);
 
@@ -305,7 +305,7 @@ public class EditPurchaseTests : IntegrationTest
 
     private async Task AddStorageOwner(StorageRoute route, Guid supplierId)
     {
-        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, supplierId));
+        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, supplierId));
         await Context.SaveChangesAsync();
     }
 }

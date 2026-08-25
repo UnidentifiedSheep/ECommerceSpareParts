@@ -83,7 +83,7 @@ public class InvalidateStalePriceOptionsLrt(
                             new PriceCandidateCalculationState
                             {
                                 ProductId = x.ProductId,
-                                StorageName = x.OfferForStorage
+                                StorageCode = x.OfferForStorage
                             }))
                         .DistinctBy(x => x.NaturalKey)
                         .ToList();

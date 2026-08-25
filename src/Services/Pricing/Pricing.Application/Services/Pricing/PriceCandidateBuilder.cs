@@ -12,7 +12,7 @@ public sealed class PriceCandidateBuilder() : IPriceCandidateBuilder
 {
     public async Task<IReadOnlyCollection<PriceCandidate>> Build(
         IReadOnlyCollection<PriceOffer> offers,
-        string targetStorageName,
+        string targetStorageCode,
         CancellationToken cancellationToken = default)
     {
         var result = new List<PriceCandidate>();
@@ -25,13 +25,13 @@ public sealed class PriceCandidateBuilder() : IPriceCandidateBuilder
             result.Add(new PriceCandidate(
                 PriceOfferId: offer.Id,
                 ProductId: offer.ProductId,
-                TargetStorageName: targetStorageName,
+                TargetStorageCode: targetStorageCode,
                 SourceType: sourceType,
                 Cost: offer.PurchasePrice,
                 CurrencyId: offer.CurrencyId,
                 AvailableQuantity: offer.AvailableQuantity,
                 Fulfillment: sourceType == PriceOfferSourceType.OurWarehouse 
-                    ? FulfillmentRouteInfo.SameStorage(targetStorageName)
+                    ? FulfillmentRouteInfo.SameStorage(targetStorageCode)
                     : FulfillmentRouteInfo.FromSupplier(offer)));
         }
         

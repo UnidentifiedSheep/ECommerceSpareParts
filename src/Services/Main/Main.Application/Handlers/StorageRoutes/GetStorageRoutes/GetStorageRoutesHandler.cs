@@ -31,9 +31,9 @@ public class GetStorageRoutesHandler(
         var query = repository.Query;
 
         if (!string.IsNullOrWhiteSpace(request.StorageFrom))
-            query = query.Where(x => x.FromStorageName == request.StorageFrom);
+            query = query.Where(x => x.FromStorageCode == request.StorageFrom);
         if (!string.IsNullOrWhiteSpace(request.StorageTo))
-            query = query.Where(x => x.ToStorageName == request.StorageTo);
+            query = query.Where(x => x.ToStorageCode == request.StorageTo);
         if (request.IsActive.HasValue) query = query.Where(x => x.IsActive == request.IsActive);
 
         query = query.ApplyPagination(request.Pagination);

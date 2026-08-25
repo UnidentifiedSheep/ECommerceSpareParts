@@ -36,14 +36,14 @@ public class ApplyOurPositionsHandler(
         {
             events.Add(new ProductPriceOffersUpdatedEvent
             {
-                StorageName = x.StorageName,
+                StorageCode = x.StorageCode,
                 ProductId = x.ProductId,
             });
             
             offers.Add(PriceOffer.CreateForOurWarehouse(
                 x.ProductId,
                 x.CurrencyId,
-                x.StorageName,
+                x.StorageCode,
                 x.BuyPrice,
                 x.StorageContentId.ToString(),
                 x.AvailableCount,

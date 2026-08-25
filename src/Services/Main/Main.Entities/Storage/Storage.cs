@@ -15,14 +15,14 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
 
     private Storage() { }
 
-    private Storage(string name, StorageType type)
+    private Storage(string code, StorageType type)
     {
-        SetName(name);
+        SetCode(code);
         SetType(type);
     }
 
     [Validate]
-    public string Name { get; private set; } = null!;
+    public string Code { get; private set; } = null!;
 
     public string? Description { get; private set; }
 
@@ -31,22 +31,22 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
     public StorageType Type { get; private set; }
     public IReadOnlyCollection<StorageOwner> Owners => _owners;
 
-    public static Expression<Func<Storage, string>> GetKeySelector() { return x => x.Name; }
+    public static Expression<Func<Storage, string>> GetKeySelector() { return x => x.Code; }
 
     public static Expression<Func<Storage, bool>> GetEqualityExpression(string key)
     {
-        return x => x.Name == key;
+        return x => x.Code == key;
     }
 
-    public static Storage Create(string name, StorageType type) { return new Storage(name, type); }
+    public static Storage Create(string code, StorageType type) { return new Storage(code, type); }
 
-    private void SetName(string name)
+    private void SetCode(string code)
     {
-        Name = name
+        Code = code
             .Trim()
-            .EnsureNotNullOrEmpty("storage.name.not.empty")
-            .EnsureMinLength(6, "storage.name.min.length")
-            .EnsureMaxLength(128, "storage.name.max.length");
+            .EnsureNotNullOrEmpty("storage.code.not.empty")
+            .EnsureMinLength(6, "storage.code.min.length")
+            .EnsureMaxLength(128, "storage.code.max.length");
     }
 
     public void SetType(StorageType type)
@@ -78,7 +78,7 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
     public void AddOwner(Guid userId)
     {
         if (_owners.Any(x => x.UserId == userId)) return;
-        _owners.Add(StorageOwner.Create(Name, userId));
+        _owners.Add(StorageOwner.Create(Code, userId));
     }
 
     public void RemoveOwner(Guid userId)
@@ -88,5 +88,5 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
         _owners.Remove(found);
     }
 
-    public override string GetId() { return Name; }
+    public override string GetId() { return Code; }
 }

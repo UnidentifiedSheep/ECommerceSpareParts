@@ -109,7 +109,7 @@ public class DeletePurchaseTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var storageContent = await new StorageContentBuilder(Faker)
-            .WithStorageName(route.ToStorageName)
+            .WithStorageCode(route.ToStorageCode)
             .WithProductIds(product.Id)
             .WithCurrencyId(currencyId)
             .WithCount(2)
@@ -133,7 +133,7 @@ public class DeletePurchaseTests : IntegrationTest
             .WithSupplierOrganizationId(supplier.Id)
             .WithCurrencyId(currencyId)
             .WithTransactionId(purchaseTransaction.Id)
-            .WithStorage(route.ToStorageName)
+            .WithStorage(route.ToStorageCode)
             .WithContent(purchaseContent)
             .WithLogistic(route, logisticsTransaction.Id)
             .BuildAndAddToDb(Context);

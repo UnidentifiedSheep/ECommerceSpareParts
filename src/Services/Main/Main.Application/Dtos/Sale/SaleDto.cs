@@ -29,8 +29,8 @@ public record SaleDto
     [JsonPropertyName("totalSum")]
     public required decimal TotalSum { get; init; }
 
-    [JsonPropertyName("storage")]
-    public required string Storage { get; init; }
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
 
     [JsonPropertyName("rowVersion")]
     public required uint RowVersion { get; init; }

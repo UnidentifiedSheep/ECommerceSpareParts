@@ -8,6 +8,6 @@ public class CreateStorageDbValidation : AbstractDbValidation<CreateStorageComma
 {
     public override void Build(IValidationPlan plan, CreateStorageCommand request)
     {
-        plan.ValidateStorageNotExistsName(request.Name.Trim());
+        plan.ValidateStorageNotExistsCode(request.Code.Trim());
     }
 }

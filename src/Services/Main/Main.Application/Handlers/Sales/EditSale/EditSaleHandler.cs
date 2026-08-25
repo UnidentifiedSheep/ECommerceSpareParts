@@ -68,7 +68,7 @@ public class EditSaleHandler(
         await saleService.CheckReservations(
             contentDtos,
             sale.OrganizationId,
-            sale.StorageName,
+            sale.StorageCode,
             false,
             request.ConfirmationCode,
             cancellationToken);
@@ -156,7 +156,7 @@ public class EditSaleHandler(
             ids => new SaleContentNotFoundException(ids[0]));
 
         var distributed = await saleService.TakeFromStorageAndDistributeDetails(
-            sale.StorageName,
+            sale.StorageCode,
             contentDtos,
             StorageMovementType.SaleEditing,
             sellFromOtherStorages,

@@ -31,7 +31,7 @@ public class AddContentToStorageTests : IntegrationTest
         var storage = GetContext<StorageTestContext>().Storages.First();
         var command = new AddContentCommand(
             [],
-            storage.Name,
+            storage.Code,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
@@ -49,7 +49,7 @@ public class AddContentToStorageTests : IntegrationTest
         storageContent[^1] = storageContent[^1] with { BuyPrice = price };
         var command = new AddContentCommand(
             storageContent,
-            storage.Name,
+            storage.Code,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
@@ -66,7 +66,7 @@ public class AddContentToStorageTests : IntegrationTest
         storageContent[^1] = storageContent[^1] with { Count = count };
         var command = new AddContentCommand(
             storageContent,
-            storage.Name,
+            storage.Code,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
@@ -79,13 +79,13 @@ public class AddContentToStorageTests : IntegrationTest
         storageContent[^1] = storageContent[^1] with { CurrencyId = int.MaxValue };
         var command = new AddContentCommand(
             storageContent,
-            storage.Name,
+            storage.Code,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
-    public async Task AddContentToStorage_WithInvalidStorageName_ThrowsStorageNotFoundException()
+    public async Task AddContentToStorage_WithInvalidStorageCode_ThrowsStorageNotFoundException()
     {
         var storageContent = GetNewStorageContents(3);
         var command = new AddContentCommand(
@@ -105,7 +105,7 @@ public class AddContentToStorageTests : IntegrationTest
         storageContent[^1] = storageContent[^1] with { ProductId = int.MaxValue };
         var command = new AddContentCommand(
             storageContent,
-            storage.Name,
+            storage.Code,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ProductNotFoundException>(async () => await Mediator.Send(command));
     }
@@ -148,7 +148,7 @@ public class AddContentToStorageTests : IntegrationTest
         var command =
             new AddContentCommand(
                 storageContent,
-                storage.Name,
+                storage.Code,
                 StorageMovementType.StorageContentAddition);
         await mediator.Send(command);
 
@@ -176,7 +176,7 @@ public class AddContentToStorageTests : IntegrationTest
             .ToDictionaryAsync(x => x.Id);
 
         var dbStorageContents = await Context.StorageContents.AsNoTracking()
-            .Where(x => x.StorageName == storage.Name)
+            .Where(x => x.StorageCode == storage.Code)
             .ToListAsync();
 
         var events = await Context.Events.OfType<StorageMovementEvent>().ToListAsync();
@@ -206,7 +206,7 @@ public class AddContentToStorageTests : IntegrationTest
 
             Assert.NotNull(actual);
             Assert.Equal(exp.Count, actual.Count);
-            Assert.Equal(storage.Name, actual.StorageName);
+            Assert.Equal(storage.Code, actual.StorageCode);
         }
 
         Assert.Equal(dbStorageContents.Count, events.Count);
@@ -217,7 +217,7 @@ public class AddContentToStorageTests : IntegrationTest
                 m.Data.Count == sc.Count &&
                 m.Data.BuyPrice == sc.BuyPrice &&
                 m.Data.CurrencyId == sc.CurrencyId &&
-                m.Data.StorageName == sc.StorageName &&
+                m.Data.StorageCode == sc.StorageCode &&
                 m.Data.MovementType == StorageMovementType.StorageContentAddition);
 
             Assert.NotNull(match);
@@ -234,7 +234,7 @@ public class AddContentToStorageTests : IntegrationTest
             .WithProducts(products)
             .WithCurrencyId(currency.Id)
             .WithPurchaseDate(DateTime.UtcNow)
-            .WithStorageName(storage.Name)
+            .WithStorageCode(storage.Code)
             .BuildMany(count)
             .Select(x => new NewStorageContentDto
             {

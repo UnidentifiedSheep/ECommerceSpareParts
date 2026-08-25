@@ -9,7 +9,7 @@ public class GetStorageRoutesDbValidation : AbstractDbValidation<GetStorageRoute
     public override void Build(IValidationPlan plan, GetStorageRoutesQuery request)
     {
         if (!string.IsNullOrWhiteSpace(request.StorageFrom))
-            plan.ValidateStorageExistsName(request.StorageFrom);
-        if (!string.IsNullOrWhiteSpace(request.StorageTo)) plan.ValidateStorageExistsName(request.StorageTo);
+            plan.ValidateStorageExistsCode(request.StorageFrom);
+        if (!string.IsNullOrWhiteSpace(request.StorageTo)) plan.ValidateStorageExistsCode(request.StorageTo);
     }
 }

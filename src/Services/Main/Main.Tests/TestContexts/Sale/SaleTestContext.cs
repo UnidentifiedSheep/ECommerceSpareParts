@@ -94,7 +94,7 @@ public class SaleTestContext(
             .WithContents([saleContent])
             .WithUserId(Buyer.Id)
             .WithOrganizationId(Buyer.Id)
-            .WithStorageName(StorageContent.StorageName)
+            .WithStorageCode(StorageContent.StorageCode)
             .WithTransactionId(Transaction.Id)
             .Completed()
             .Build();

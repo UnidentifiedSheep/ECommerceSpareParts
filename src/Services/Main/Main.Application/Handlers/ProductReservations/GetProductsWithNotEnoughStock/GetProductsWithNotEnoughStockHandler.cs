@@ -10,7 +10,7 @@ namespace Main.Application.Handlers.ProductReservations.GetProductsWithNotEnough
 /// </summary>
 public record GetProductsWithNotEnoughStockQuery(
     Guid BuyerOrganizationId,
-    string StorageName,
+    string StorageCode,
     bool TakeFromOtherStorages,
     Dictionary<int, int> NeededCounts
 ) : IQuery<GetProductsWithNotEnoughStockResult>;
@@ -33,7 +33,7 @@ public class GetProductsWithNotEnoughStockHandler(
         CancellationToken cancellationToken)
     {
         var articleIds = request.NeededCounts.Keys;
-        var storageName = request.StorageName;
+        var storageCode = request.StorageCode;
         var organizationId = request.BuyerOrganizationId;
         var takeFromOtherStorages = request.TakeFromOtherStorages;
 
@@ -51,7 +51,7 @@ public class GetProductsWithNotEnoughStockHandler(
                 articleIds,
                 cancellationToken);
         var storageCounts = await storageContentRepository.GetStorageContentCounts(
-            storageName,
+            storageCode,
             articleIds,
             takeFromOtherStorages,
             cancellationToken);

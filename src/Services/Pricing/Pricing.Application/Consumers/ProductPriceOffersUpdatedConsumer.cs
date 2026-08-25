@@ -16,7 +16,7 @@ public class ProductPriceOffersUpdatedConsumer(
             .Select(x => new PriceRecalculationRequestDto
             {
                 ProductId = x.Message.ProductId,
-                StorageName = x.Message.StorageName
+                StorageCode = x.Message.StorageCode
             })
             .ToList();
 

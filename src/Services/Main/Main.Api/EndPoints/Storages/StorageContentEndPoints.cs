@@ -15,7 +15,7 @@ namespace Main.Api.EndPoints.Storages;
 
 public record AddContentToStorageRequest(
     IEnumerable<NewStorageContentDto> StorageContent,
-    string StorageName
+    string StorageCode
 );
 
 public record EditStorageContentRequest(
@@ -24,8 +24,8 @@ public record EditStorageContentRequest(
 
 public record GetStorageContentRequest : PaginationQueryModel
 {
-    [FromQuery(Name = "storageName")]
-    public string? StorageName { get; init; }
+    [FromQuery(Name = "storageCode")]
+    public string? StorageCode { get; init; }
 
     [FromQuery(Name = "productId")]
     public int? ArticleId { get; init; }
@@ -49,7 +49,7 @@ public static class StorageContentEndPoints
                 {
                     var command = new AddContentCommand(
                         request.StorageContent,
-                        request.StorageName,
+                        request.StorageCode,
                         StorageMovementType.StorageContentAddition);
                     await sender.Send(command, cancellationToken);
                     return Results.NoContent();
@@ -112,7 +112,7 @@ public static class StorageContentEndPoints
                     [AsParameters] GetStorageContentRequest request) =>
                 {
                     var query = new GetStorageContentQuery(
-                        request.StorageName,
+                        request.StorageCode,
                         request.ArticleId,
                         request,
                         request.ShowZeroCount);

@@ -9,7 +9,7 @@ public class StorageConfiguration : IEntityTypeConfiguration<Entities.Storage.St
     {
         builder.ToTable("storages", "public");
 
-        builder.HasKey(e => e.Name).HasName("storages_pk");
+        builder.HasKey(e => e.Code).HasName("storages_pk");
 
         builder.HasIndex(e => e.Description, "storages_description_index")
             .HasMethod("gin")
@@ -21,9 +21,9 @@ public class StorageConfiguration : IEntityTypeConfiguration<Entities.Storage.St
 
         builder.HasIndex(e => e.Type, "storages_type_index");
 
-        builder.Property(e => e.Name)
+        builder.Property(e => e.Code)
             .HasMaxLength(128)
-            .HasColumnName("name");
+            .HasColumnName("code");
         builder.Property(e => e.Description)
             .HasMaxLength(256)
             .HasColumnName("description");

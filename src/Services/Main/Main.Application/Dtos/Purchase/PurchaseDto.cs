@@ -22,8 +22,8 @@ public record PurchaseDto
     [JsonPropertyName("comment")]
     public required string? Comment { get; init; }
 
-    [JsonPropertyName("storage")]
-    public required string Storage { get; init; }
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
 
     [JsonPropertyName("purchaseDatetime")]
     public required DateTime PurchaseDatetime { get; init; }

@@ -34,7 +34,7 @@ public class PriceCandidateCalculationLrt(
     {
         await sender.Send(new CalculateCandidatesCommand(
                 State.ProductId,
-                State.StorageName),
+                State.StorageCode),
             CancellationToken);
     }
 }

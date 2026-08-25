@@ -37,17 +37,17 @@ public class StorageContentNotFoundException : LocalizedNotFoundException
     }
 }
 
-public class StorageNotFoundException(string name)
+public class StorageNotFoundException(string code)
     : LocalizedNotFoundException(
         "storage.not.found",
-        new { Name = name },
-        [name]);
+        new { Code = code },
+        [code]);
 
-public class StorageOwnerNotFoundException(Guid userId, string storageName)
+public class StorageOwnerNotFoundException(Guid userId, string storageCode)
     : LocalizedNotFoundException(
         "storage.not.found.in.user",
-        new { UserId = userId, StorageName = storageName },
-        [storageName]);
+        new { UserId = userId, StorageCode = storageCode },
+        [storageCode]);
 
 public class StorageRouteActiveExistsException(string from, string to)
     : LocalizedConflictException(

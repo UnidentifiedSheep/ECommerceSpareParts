@@ -13,7 +13,7 @@ public interface IPriceOfferRepository : IRepository<PriceOffer, Guid>
 
     Task DeleteOffersAsync(
         int productId,
-        string storageName,
+        string storageCode,
         IEnumerable<PriceOfferSource> sources,
         CancellationToken cancellationToken = default);
 }

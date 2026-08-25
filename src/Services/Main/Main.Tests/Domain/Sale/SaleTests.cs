@@ -28,7 +28,7 @@ public class SaleTests
         sale.OrganizationId.Should().Be(organizationId);
         sale.TransactionId.Should().Be(transactionId);
         sale.CurrencyId.Should().Be(1);
-        sale.StorageName.Should().Be("WH-1");
+        sale.StorageCode.Should().Be("WH-1");
         sale.SaleDatetime.Should().Be(saleDate);
         sale.State.Should().Be(SaleState.Draft);
         sale.Contents.Should().BeEmpty();

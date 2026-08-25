@@ -20,7 +20,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 
         builder.HasIndex(e => e.CurrencyId, "sale_currency_id_index");
 
-        builder.HasIndex(e => e.StorageName, "sale_storage_name_index");
+        builder.HasIndex(e => e.StorageCode, "sale_storage_name_index");
 
         builder.HasIndex(e => e.SaleDatetime, "sale_sale_datetime_index");
 
@@ -44,7 +44,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
             .HasColumnName("comment");
 
         builder.Property(e => e.CurrencyId).HasColumnName("currency_id");
-        builder.Property(e => e.StorageName)
+        builder.Property(e => e.StorageCode)
             .HasMaxLength(128)
             .HasColumnName("storage_name");
 
@@ -81,7 +81,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 
         builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
-            .HasForeignKey(d => d.StorageName)
+            .HasForeignKey(d => d.StorageCode)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_storages_name_fk");
 

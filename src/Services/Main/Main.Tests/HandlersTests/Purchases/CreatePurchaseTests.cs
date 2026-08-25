@@ -50,7 +50,7 @@ public class CreatePurchaseTests : IntegrationTest
         var command = CreateCommand(
             _supplier.Id,
             currency.Id,
-            storage.Name,
+            storage.Code,
             false,
             null,
             products.Select((product, index) => NewContent(
@@ -69,7 +69,7 @@ public class CreatePurchaseTests : IntegrationTest
         purchase.SupplierUserId.Should().Be(_supplier.Id);
         purchase.SupplierOrganizationId.Should().Be(_supplier.Id);
         purchase.CurrencyId.Should().Be(currency.Id);
-        purchase.Storage.Should().Be(storage.Name);
+        purchase.Storage.Should().Be(storage.Code);
         purchase.State.Should().Be(PurchaseState.Completed);
         purchase.Comment.Should().Be(command.Comment);
         purchase.PurchaseLogistic.Should().BeNull();
@@ -84,7 +84,7 @@ public class CreatePurchaseTests : IntegrationTest
                     x.Count == item.Count &&
                     x.BuyPrice == item.Price &&
                     x.CurrencyId == command.CurrencyId &&
-                    x.StorageName == command.StorageName);
+                    x.StorageCode == command.StorageCode);
 
         var purchaseTransaction = await Context.Transactions
             .AsNoTracking()
@@ -133,7 +133,7 @@ public class CreatePurchaseTests : IntegrationTest
         var command = CreateCommand(
             member.Id,
             currency.Id,
-            storage.Name,
+            storage.Code,
             false,
             null,
             [
@@ -166,9 +166,9 @@ public class CreatePurchaseTests : IntegrationTest
         var command = CreateCommand(
             _supplier.Id,
             currency.Id,
-            route.ToStorageName,
+            route.ToStorageCode,
             true,
-            route.FromStorageName,
+            route.FromStorageCode,
             [
                 NewContent(
                     product,
@@ -223,7 +223,7 @@ public class CreatePurchaseTests : IntegrationTest
         var command = CreateCommand(
             _supplier.Id,
             currency.Id,
-            storage.Name,
+            storage.Code,
             false,
             null,
             [
@@ -276,7 +276,7 @@ public class CreatePurchaseTests : IntegrationTest
         var command = CreateCommand(
             _supplier.Id,
             currency.Id,
-            storage.Name,
+            storage.Code,
             false,
             null,
             [
@@ -300,15 +300,15 @@ public class CreatePurchaseTests : IntegrationTest
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
         var route = GetContext<StorageRouteTestContext>().ActiveRoute;
         var product = GetContext<ProductTestContext>().Products.First();
-        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, _supplier.Id));
+        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
         await Context.SaveChangesAsync();
 
         var command = CreateCommand(
             _supplier.Id,
             currency.Id,
-            route.ToStorageName,
+            route.ToStorageCode,
             true,
-            route.FromStorageName,
+            route.FromStorageCode,
             [
                 NewContent(
                     product,
@@ -432,7 +432,7 @@ public class CreatePurchaseTests : IntegrationTest
     [Fact]
     public async Task CreatePurchase_WithMissingStorage_ThrowsDbValidationException()
     {
-        var command = CreateValidCommand() with { StorageName = Faker.Lorem.Letter(200) };
+        var command = CreateValidCommand() with { StorageCode = Faker.Lorem.Letter(200) };
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
 
@@ -455,9 +455,9 @@ public class CreatePurchaseTests : IntegrationTest
         var route = GetContext<StorageRouteTestContext>().ActiveRoute;
         var command = CreateValidCommand() with
         {
-            StorageName = route.ToStorageName,
+            StorageCode = route.ToStorageCode,
             WithLogistics = true,
-            StorageFrom = route.FromStorageName
+            StorageFrom = route.FromStorageCode
         };
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
@@ -475,15 +475,15 @@ public class CreatePurchaseTests : IntegrationTest
                 product.Id,
                 2m,
                 WeightUnit.Kilogram));
-        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, _supplier.Id));
+        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
         await Context.SaveChangesAsync();
 
         var command = CreateCommand(
             _supplier.Id,
             GetContext<CurrencyTestContext>().Currencies[0].Id,
-            route.ToStorageName,
+            route.ToStorageCode,
             true,
-            route.FromStorageName,
+            route.FromStorageCode,
             [
                 NewContent(
                     product,
@@ -507,15 +507,15 @@ public class CreatePurchaseTests : IntegrationTest
                 1m,
                 1m,
                 DimensionUnit.Meter));
-        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, _supplier.Id));
+        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
         await Context.SaveChangesAsync();
 
         var command = CreateCommand(
             _supplier.Id,
             GetContext<CurrencyTestContext>().Currencies[0].Id,
-            route.ToStorageName,
+            route.ToStorageCode,
             true,
-            route.FromStorageName,
+            route.FromStorageCode,
             [
                 NewContent(
                     product,
@@ -529,7 +529,7 @@ public class CreatePurchaseTests : IntegrationTest
     private CreatePurchaseCommand CreateCommand(
         Guid supplierUserId,
         int currencyId,
-        string storageName,
+        string storageCode,
         bool withLogistics,
         string? storageFrom,
         IEnumerable<NewPurchaseContentDto> contents,
@@ -540,7 +540,7 @@ public class CreatePurchaseTests : IntegrationTest
             supplierUserId,
             supplierOrganizationId ?? supplierUserId,
             currencyId,
-            storageName,
+            storageCode,
             DateTime.UtcNow,
             contents.ToList(),
             Faker.Lorem.Sentence(),
@@ -558,7 +558,7 @@ public class CreatePurchaseTests : IntegrationTest
         return CreateCommand(
             _supplier.Id,
             currency.Id,
-            storage.Name,
+            storage.Code,
             false,
             null,
             [
@@ -601,7 +601,7 @@ public class CreatePurchaseTests : IntegrationTest
                 product.Id,
                 2m,
                 WeightUnit.Kilogram));
-        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, supplierId));
+        Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, supplierId));
         await Context.SaveChangesAsync();
     }
 }

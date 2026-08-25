@@ -26,11 +26,11 @@ public class OfferRefreshService(
 {
     public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
         int productId,
-        string storageName,
+        string storageCode,
         CancellationToken token = default)
     {
         var extracted = await extractorService.ExtractOffers(
-            storageName,
+            storageCode,
             productId,
             token);
 
@@ -45,7 +45,7 @@ public class OfferRefreshService(
             {
                 Supplier = x.Supplier,
                 OccurredAt = now,
-                RequestedStorageFor = storageName,
+                RequestedStorageCode = storageCode,
                 Products = [x.Offer!.ToContract()]
             })
             .ToList();
@@ -61,7 +61,7 @@ public class OfferRefreshService(
         var offers = await RefreshOffersAsync(
             dataExtractionTime: now,
             productId: productId,
-            storageName: storageName,
+            storageCode: storageCode,
             supplierPositions: supplierPositions,
             token: token);
 
@@ -72,14 +72,14 @@ public class OfferRefreshService(
 
     public Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
         int productId,
-        string storageName,
+        string storageCode,
         IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> supplierPositions,
         CancellationToken token = default)
     {
         return RefreshOffersAsync(
             dataExtractionTime: DateTime.UtcNow,
             productId: productId,
-            storageName: storageName,
+            storageCode: storageCode,
             supplierPositions: supplierPositions,
             token: token);
     }
@@ -87,7 +87,7 @@ public class OfferRefreshService(
     private async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
         DateTime dataExtractionTime,
         int productId,
-        string storageName,
+        string storageCode,
         IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> supplierPositions,
         CancellationToken token = default)
     {
@@ -96,7 +96,7 @@ public class OfferRefreshService(
 
         var result = await converterService.ConvertAsync(
             productId,
-            storageName,
+            storageCode,
             supplierPositions,
             token);
 
@@ -120,7 +120,7 @@ public class OfferRefreshService(
             var state = PriceOfferRefreshState.Create(
                 productId,
                 source,
-                storageName);
+                storageCode);
 
             state.OffersUpdated(dataExtractionTime, positions.Count);
 
@@ -137,7 +137,7 @@ public class OfferRefreshService(
 
         await offerRepository.DeleteOffersAsync(
             productId,
-            storageName,
+            storageCode,
             sourcesToRemove,
             token);
 
@@ -153,7 +153,7 @@ public class OfferRefreshService(
             
         integrationEventScope.Add(new ProductPriceOffersUpdatedEvent
         {
-            StorageName = storageName,
+            StorageCode = storageCode,
             ProductId = productId,
         });
         await offerRepository.UpsertOffersAsync(filteredOffers, token);
@@ -163,7 +163,7 @@ public class OfferRefreshService(
 
     public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
         DateTime dataExtractionTime,
-        string storageName,
+        string storageCode,
         Supplier supplier,
         IReadOnlyDictionary<int, IReadOnlyList<SupplierPosition>> supplierPositions,
         CancellationToken token = default)
@@ -183,7 +183,7 @@ public class OfferRefreshService(
             var state = PriceOfferRefreshState.Create(
                 productId,
                 source,
-                storageName);
+                storageCode);
 
             state.OffersUpdated(dataExtractionTime, positions.Count);
 
@@ -197,12 +197,12 @@ public class OfferRefreshService(
             events.Add(new ProductPriceOffersUpdatedEvent
             {
                 ProductId = productId,
-                StorageName = storageName,
+                StorageCode = storageCode,
             });
             
             var result = await converterService.ConvertAsync(
                 productId,
-                storageName,
+                storageCode,
                 new Dictionary<Supplier, IReadOnlyList<SupplierPosition>>
                 {
                     [supplier] = positions
@@ -217,7 +217,7 @@ public class OfferRefreshService(
 
             await offerRepository.DeleteOffersAsync(
                 productId,
-                storageName,
+                storageCode,
                 [source],
                 token);
         }
@@ -230,7 +230,7 @@ public class OfferRefreshService(
         await markerService.MarkAsOkAsync(
             refreshed, 
             supplier, 
-            storageName, 
+            storageCode,
             token);
 
         integrationEventScope.AddRange(events);

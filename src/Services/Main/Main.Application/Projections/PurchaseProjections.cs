@@ -39,7 +39,7 @@ public sealed class PurchaseDtoProjectionProvider
                 ? null
                 : logisticToDto.Invoke(x.PurchaseLogistic),
             PurchaseDatetime = x.PurchaseDatetime,
-            Storage = x.Storage,
+            StorageCode = x.Storage,
             Supplier = userToDto.Invoke(x.SupplierUser),
             SupplierOrganization = organizationToDto.Invoke(
                 x.SupplierOrganization),

@@ -13,7 +13,7 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
 {
     public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
         int? productId,
-        string? storageName,
+        string? storageCode,
         IEnumerable<int>? exceptProductIds = null,
         IEnumerable<string>? exceptStorages = null,
         int countGreaterThen = 0,
@@ -21,7 +21,7 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
     {
         return BuildStorageContentsForUpdateQuery(
                 productId,
-                storageName,
+                storageCode,
                 exceptProductIds,
                 exceptStorages,
                 countGreaterThen,
@@ -30,7 +30,7 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
     }
 
     public async Task<Dictionary<int, int>> GetStorageContentCounts(
-        string storageName,
+        string storageCode,
         IEnumerable<int> productIds,
         bool takeFromOtherStorages,
         CancellationToken cancellationToken = default)
@@ -39,7 +39,7 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
             .AsNoTracking()
             .Where(x => x.Count > 0 &&
                         productIds.Contains(x.ProductId) &&
-                        (takeFromOtherStorages || x.StorageName == storageName))
+                        (takeFromOtherStorages || x.StorageCode == storageCode))
             .GroupBy(x => x.ProductId)
             .Select(g => new
             {
@@ -54,14 +54,14 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
 
     private IQueryable<StorageContent> BuildStorageContentsForUpdateQuery(
         int? productId,
-        string? storageName,
+        string? storageCode,
         IEnumerable<int>? exceptProductIds = null,
         IEnumerable<string>? exceptStorages = null,
         int countGreaterThen = 0,
         StorageContentExtractPolicyBase? policy = null)
     {
         var exceptProducts = exceptProductIds?.ToList();
-        var exceptStorageNames = exceptStorages?.ToList();
+        var exceptStorageCodes = exceptStorages?.ToList();
         var query = Context.StorageContents
             .Where(x => x.Count > countGreaterThen);
 
@@ -69,10 +69,10 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
 
         if (exceptProducts is { Count: > 0 }) query = query.Where(x => !exceptProducts.Contains(x.ProductId));
 
-        if (storageName != null) query = query.Where(x => x.StorageName == storageName);
+        if (storageCode != null) query = query.Where(x => x.StorageCode == storageCode);
 
-        if (exceptStorageNames is { Count: > 0 })
-            query = query.Where(x => !exceptStorageNames.Contains(x.StorageName));
+        if (exceptStorageCodes is { Count: > 0 })
+            query = query.Where(x => !exceptStorageCodes.Contains(x.StorageCode));
 
         query = QueryableExtensions.ForUpdate(query);
 

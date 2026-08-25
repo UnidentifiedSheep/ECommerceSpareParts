@@ -21,7 +21,7 @@ public sealed class StorageContentDtoProjectionProvider
         Projection = x => new StorageContentDto
         {
             Id = x.Id,
-            StorageName = x.StorageName,
+            StorageCode = x.StorageCode,
             ProductId = x.ProductId,
             Count = x.Count,
             BuyPrice = x.BuyPrice,

@@ -14,7 +14,7 @@ namespace Pricing.Application.Handlers.Pricing;
 [Transactional, AutoSave]
 public record RefreshOffersCommand(
     int ProductId,
-    string StorageName,
+    string StorageCode,
     bool ForceRefresh = false
 ) : ICommand<RefreshOffersResult>;
 
@@ -29,7 +29,7 @@ public class RefreshOffersHandler(
         var offers = await refreshService
             .RefreshOffersAsync(
                 request.ProductId, 
-                request.StorageName, 
+                request.StorageCode,
                 cancellationToken);
             
         return new RefreshOffersResult(offers);

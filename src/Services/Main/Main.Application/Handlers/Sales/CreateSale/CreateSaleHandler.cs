@@ -24,7 +24,7 @@ public record CreateSaleCommand(
     Guid UserId,
     Guid OrganizationId,
     int CurrencyId,
-    string StorageName,
+    string StorageCode,
     DateTime SaleDateTime,
     IEnumerable<NewSaleContentDto> Contents,
     string? Comment,
@@ -50,7 +50,7 @@ public class CreateSaleHandler(
         await saleService.CheckReservations(
             contents,
             request.OrganizationId,
-            request.StorageName,
+            request.StorageCode,
             false,
             request.ConfirmationCode,
             cancellationToken);
@@ -89,13 +89,13 @@ public class CreateSaleHandler(
             request.OrganizationId,
             saleTransaction.Id,
             request.CurrencyId,
-            request.StorageName,
+            request.StorageCode,
             request.SaleDateTime);
 
         sale.SetComment(request.Comment);
 
         var distributed = await saleService.TakeFromStorageAndDistributeDetails(
-            request.StorageName,
+            request.StorageCode,
             contents,
             StorageMovementType.Sale,
             false,

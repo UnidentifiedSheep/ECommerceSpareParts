@@ -9,6 +9,6 @@ public interface IPriceCandidateBuilder
 {
     Task<IReadOnlyCollection<PriceCandidate>> Build(
         IReadOnlyCollection<PriceOffer> offers,
-        string targetStorageName,
+        string targetStorageCode,
         CancellationToken cancellationToken = default);
 }

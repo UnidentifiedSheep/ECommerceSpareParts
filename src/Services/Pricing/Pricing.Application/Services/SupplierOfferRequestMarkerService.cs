@@ -14,13 +14,13 @@ public class SupplierOfferRequestMarkerService(
     public async Task<bool> HasAnyMarkerAsync(
         Supplier supplier,
         int productId,
-        string storageName,
+        string storageCode,
         CancellationToken token)
         => (await cache.KeyExistsAsync(
                 keys:
                 [
-                    CacheKeys.Offer.Failed.Key(supplier, productId, storageName),
-                    CacheKeys.Offer.Ok.Key(supplier, productId, storageName)
+                    CacheKeys.Offer.Failed.Key(supplier, productId, storageCode),
+                    CacheKeys.Offer.Ok.Key(supplier, productId, storageCode)
                 ],
                 token))
             .Any(x => x.Value);
@@ -28,21 +28,21 @@ public class SupplierOfferRequestMarkerService(
     public async Task MarkAsOkAsync(
         Supplier supplier,
         int productId,
-        string storageName,
+        string storageCode,
         CancellationToken token)
         => await cache.SetAsync(
-            CacheKeys.Offer.Ok.Key(supplier, productId, storageName),
+            CacheKeys.Offer.Ok.Key(supplier, productId, storageCode),
             true,
             CacheKeys.Offer.Ok.Ttl((await settingsService.GetOrDefault<PricingSetting>(token)).Data));
 
     public async Task MarkAsOkAsync(
         IEnumerable<int> productId,
         Supplier supplier,
-        string storageName,
+        string storageCode,
         CancellationToken token)
     {
         var keys = productId.Select(x => (
-                CacheKeys.Offer.Ok.Key(supplier, x, storageName),
+                CacheKeys.Offer.Ok.Key(supplier, x, storageCode),
                 true))
             .ToArray();
 
@@ -56,9 +56,9 @@ public class SupplierOfferRequestMarkerService(
     public async Task MarkAsFailedAsync(
         Supplier supplier,
         int productId,
-        string storageName)
+        string storageCode)
         => await cache.SetAsync(
-            CacheKeys.Offer.Failed.Key(supplier, productId, storageName),
+            CacheKeys.Offer.Failed.Key(supplier, productId, storageCode),
             true,
             CacheKeys.Offer.Failed.Ttl);
 }

@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Sales.GetProductSaleHistory;
 public record GetProductSaleHistoryQuery(
     int ProductId,
     Pagination Pagination,
-    string? StorageName,
+    string? StorageCode,
     Guid? OrganizationId,
     Guid? PreferredOrganizationId,
     int? CurrencyId,
@@ -35,8 +35,8 @@ public class GetProductSaleHistoryHandler(
             .CompletedSales()
             .Where(x => x.ProductId == request.ProductId);
 
-        if (!string.IsNullOrWhiteSpace(request.StorageName))
-            query = query.Where(x => x.Sale.StorageName == request.StorageName);
+        if (!string.IsNullOrWhiteSpace(request.StorageCode))
+            query = query.Where(x => x.Sale.StorageCode == request.StorageCode);
 
         if (request.OrganizationId.HasValue)
             query = query.Where(x => x.Sale.OrganizationId == request.OrganizationId);

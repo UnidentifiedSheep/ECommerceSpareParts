@@ -11,7 +11,7 @@ public class GetProductsWithNotEnoughStockValidation : AbstractValidator<GetProd
             .NotEmpty()
             .WithLocalizationKey("article.reservation.organization.id.must.not.be.empty");
 
-        RuleFor(x => x.StorageName)
+        RuleFor(x => x.StorageCode)
             .NotEmpty()
             .WithLocalizationKey("article.reservation.storage.name.must.not.be.empty");
 

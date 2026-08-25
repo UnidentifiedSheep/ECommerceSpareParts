@@ -44,10 +44,10 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
     public Guid Id { get; private set; }
 
     [ValidateTuple("FromTo")]
-    public string FromStorageName { get; private set; } = null!;
+    public string FromStorageCode { get; private set; } = null!;
 
     [ValidateTuple("FromTo")]
-    public string ToStorageName { get; private set; } = null!;
+    public string ToStorageCode { get; private set; } = null!;
 
     public int DistanceM { get; private set; }
 
@@ -113,8 +113,8 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
     private void SetRoute(string from, string to)
     {
         (from, to).Ensure(x => x.from.Trim() != x.to.Trim(), "storage.route.same.storages");
-        FromStorageName = from;
-        ToStorageName = to;
+        FromStorageCode = from;
+        ToStorageCode = to;
     }
 
     public void SetDistanceM(int distanceM)

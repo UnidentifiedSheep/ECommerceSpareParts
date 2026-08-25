@@ -10,7 +10,7 @@ namespace Main.Application.Handlers.Storages.DeleteStorage;
 
 [AutoSave]
 [Transactional]
-public record DeleteStorageCommand(string StorageName) : ICommand;
+public record DeleteStorageCommand(string StorageCode) : ICommand;
 
 public class DeleteStorageHandler(
     IRepository<Storage, string> repository,
@@ -20,8 +20,8 @@ public class DeleteStorageHandler(
 {
     public async Task<Unit> Handle(DeleteStorageCommand request, CancellationToken cancellationToken)
     {
-        var storage = await repository.GetById(request.StorageName, cancellationToken)
-                      ?? throw new StorageNotFoundException(request.StorageName);
+        var storage = await repository.GetById(request.StorageCode, cancellationToken)
+                      ?? throw new StorageNotFoundException(request.StorageCode);
 
         unitOfWork.Remove(storage);
         return Unit.Value;

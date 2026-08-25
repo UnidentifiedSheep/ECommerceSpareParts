@@ -55,15 +55,15 @@ public class SubtractStorageContentsHandler(
         //StorageContentId | Count
         var byStorageContents = new Dictionary<int, int>();
 
-        //Key = StorageName + productId + takeFromOtherStorages, Value = Count
+        //Key = StorageCode + productId + takeFromOtherStorages, Value = Count
         var byProductAndStorage =
-            new Dictionary<(string storageName, int productId, bool takeFromOtherStorages), int>();
+            new Dictionary<(string storageCode, int productId, bool takeFromOtherStorages), int>();
 
         foreach (var item in items)
             switch (item)
             {
                 case SubtractProductFromStorageItem byProduct:
-                    var key = (byProduct.StorageName, byProduct.ProductId, byProduct.TakeFromOtherStorages);
+                    var key = (byProduct.StorageCode, byProduct.ProductId, byProduct.TakeFromOtherStorages);
                     byProductAndStorage[key] = byProductAndStorage.GetValueOrDefault(key) + byProduct.Count;
                     break;
                 case SubtractStorageContentItem byContent:
@@ -126,7 +126,7 @@ public class SubtractStorageContentsHandler(
                 remaining,
                 count,
                 content.ProductId,
-                content.StorageName,
+                content.StorageCode,
                 policy,
                 affected,
                 movementType,
@@ -136,7 +136,7 @@ public class SubtractStorageContentsHandler(
     }
 
     private async Task SubtractByProductAndStorageAsync(
-        Dictionary<(string storageName, int productId, bool takeFromOtherStorages), int> byProductAndStorage,
+        Dictionary<(string storageCode, int productId, bool takeFromOtherStorages), int> byProductAndStorage,
         List<StorageLot> affected,
         StorageMovementType movementType,
         StorageContentExtractPolicyBase policy,
@@ -161,7 +161,7 @@ public class SubtractStorageContentsHandler(
         int count,
         int requestedCount,
         int productId,
-        string? storageName,
+        string? storageCode,
         StorageContentExtractPolicyBase policy,
         List<StorageLot> affected,
         StorageMovementType movementType,
@@ -174,7 +174,7 @@ public class SubtractStorageContentsHandler(
             await foreach (var content in storageContentRepository
                                .GetStorageContentsForUpdateAsync(
                                    productId,
-                                   storageName,
+                                   storageCode,
                                    policy: policy)
                                .WithCancellation(cancellationToken))
             {

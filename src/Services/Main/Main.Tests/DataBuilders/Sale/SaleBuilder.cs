@@ -11,7 +11,7 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
     public Guid? OrganizationId { get; private set; }
     public Guid? TransactionId { get; private set; }
     public int? CurrencyId { get; private set; }
-    public string? StorageName { get; private set; }
+    public string? StorageCode { get; private set; }
     public DateTime? SaleDate { get; private set; }
     public bool CompleteSale { get; private set; }
     public IReadOnlyList<SaleContent> Contents => _contents;
@@ -40,9 +40,9 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
         return this;
     }
 
-    public SaleBuilder WithStorageName(string name)
+    public SaleBuilder WithStorageCode(string name)
     {
-        StorageName = name;
+        StorageCode = name;
         return this;
     }
 
@@ -73,7 +73,7 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
             OrganizationId ?? userId,
             TransactionId ?? Guid.NewGuid(),
             CurrencyId ?? Faker.Random.Int(1),
-            StorageName ?? Faker.Lorem.Letter(8),
+            StorageCode ?? Faker.Lorem.Letter(8),
             SaleDate ?? DateTime.Now);
 
         foreach (var content in _contents) sale.AddContent(content);

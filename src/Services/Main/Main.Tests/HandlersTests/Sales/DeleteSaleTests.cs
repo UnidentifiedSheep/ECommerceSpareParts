@@ -56,7 +56,7 @@ public class DeleteSaleTests : IntegrationTest
         transaction.IsReversalApplied.Should().BeTrue();
         transaction.SourceType.Should().Be(TransactionSourceType.Sale);
         movement.Data.ProductId.Should().Be(productId);
-        movement.Data.StorageName.Should().Be(storageContent.StorageName);
+        movement.Data.StorageCode.Should().Be(storageContent.StorageCode);
         movement.Data.MovementType.Should().Be(StorageMovementType.SaleDeletion);
     }
 

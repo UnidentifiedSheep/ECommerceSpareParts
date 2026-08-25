@@ -20,7 +20,7 @@ public record CalculatedScoredPriceCandidate : CalculatedPriceCandidate
             ProductId = candidate.ProductId,
             PriceOfferId = candidate.PriceOfferId,
             SourceType = candidate.SourceType,
-            StorageName = candidate.StorageName,
+            StorageCode = candidate.StorageCode,
         };
     }
 }

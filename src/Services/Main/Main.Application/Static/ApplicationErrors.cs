@@ -7,7 +7,7 @@ public static class ApplicationErrors
     public const string ProducersNotFound = "ProducersNotFound";
 
     public const string StoragesNotFound = "StoragesNotFound";
-    public const string StoragesNameAlreadyTaken = "StoragesNameAlreadyTaken";
+    public const string StoragesCodeAlreadyTaken = "StoragesCodeAlreadyTaken";
 
     public const string UsersNotFound = "UsersNotFound";
     public const string OrganizationsNotFound = "OrganizationsNotFound";

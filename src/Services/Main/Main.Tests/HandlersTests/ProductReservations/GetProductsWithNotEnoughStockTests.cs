@@ -36,11 +36,11 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var storage = Storage();
         await AddStorageContent(
             product.Id,
-            storage.Name,
+            storage.Code,
             5);
         var query = Query(
             buyer.Id,
-            storage.Name,
+            storage.Code,
             product.Id,
             5);
 
@@ -58,11 +58,11 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var storage = Storage();
         await AddStorageContent(
             product.Id,
-            storage.Name,
+            storage.Code,
             2);
         var query = Query(
             buyer.Id,
-            storage.Name,
+            storage.Code,
             product.Id,
             5);
 
@@ -84,7 +84,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var storage = Storage();
         await AddStorageContent(
             product.Id,
-            storage.Name,
+            storage.Code,
             5);
         await AddReservation(
             otherBuyer.Id,
@@ -93,7 +93,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
             1);
         var query = Query(
             buyer.Id,
-            storage.Name,
+            storage.Code,
             product.Id,
             5);
 
@@ -115,7 +115,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var storage = Storage();
         await AddStorageContent(
             product.Id,
-            storage.Name,
+            storage.Code,
             5);
         await AddReservation(
             otherBuyer.Id,
@@ -129,7 +129,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
             2);
         var query = Query(
             buyer.Id,
-            storage.Name,
+            storage.Code,
             product.Id,
             5);
 
@@ -145,18 +145,18 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var buyer = Buyer();
         var product = Product();
         var storage = Storage();
-        var otherStorage = OtherStorage(storage.Name);
+        var otherStorage = OtherStorage(storage.Code);
         await AddStorageContent(
             product.Id,
-            storage.Name,
+            storage.Code,
             2);
         await AddStorageContent(
             product.Id,
-            otherStorage.Name,
+            otherStorage.Code,
             4);
         var query = Query(
             buyer.Id,
-            storage.Name,
+            storage.Code,
             product.Id,
             5);
 
@@ -175,18 +175,18 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var buyer = Buyer();
         var product = Product();
         var storage = Storage();
-        var otherStorage = OtherStorage(storage.Name);
+        var otherStorage = OtherStorage(storage.Code);
         await AddStorageContent(
             product.Id,
-            storage.Name,
+            storage.Code,
             2);
         await AddStorageContent(
             product.Id,
-            otherStorage.Name,
+            otherStorage.Code,
             4);
         var query = Query(
             buyer.Id,
-            storage.Name,
+            storage.Code,
             product.Id,
             5,
             true);
@@ -206,7 +206,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var storage = Storage();
         await AddStorageContent(
             product.Id,
-            storage.Name,
+            storage.Code,
             5);
         await AddReservation(
             otherBuyer.Id,
@@ -222,7 +222,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         await Context.SaveChangesAsync();
         var query = Query(
             buyer.Id,
-            storage.Name,
+            storage.Code,
             product.Id,
             5);
 
@@ -239,7 +239,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var storage = Storage();
         var query = Query(
             Guid.Empty,
-            storage.Name,
+            storage.Code,
             product.Id,
             1);
 
@@ -247,7 +247,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
     }
 
     [Fact]
-    public async Task WithEmptyStorageName_ThrowsValidationException()
+    public async Task WithEmptyStorageCode_ThrowsValidationException()
     {
         var query = Query(
             Buyer().Id,
@@ -265,7 +265,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
     {
         var query = Query(
             Buyer().Id,
-            Storage().Name,
+            Storage().Code,
             Product().Id,
             neededCount);
 
@@ -289,7 +289,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
     {
         var query = Query(
             Buyer().Id,
-            Storage().Name,
+            Storage().Code,
             999999,
             1);
 
@@ -298,14 +298,14 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 
     private GetProductsWithNotEnoughStockQuery Query(
         Guid buyerId,
-        string storageName,
+        string storageCode,
         int productId,
         int neededCount,
         bool takeFromOtherStorages = false)
     {
         return new GetProductsWithNotEnoughStockQuery(
             buyerId,
-            storageName,
+            storageCode,
             takeFromOtherStorages,
             new Dictionary<int, int>
             {
@@ -315,12 +315,12 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 
     private async Task AddStorageContent(
         int productId,
-        string storageName,
+        string storageCode,
         int count)
     {
         await new StorageContentBuilder(Faker)
             .WithProductIds(productId)
-            .WithStorageName(storageName)
+            .WithStorageCode(storageCode)
             .WithCurrencyId(CurrencyContext.Currencies[0].Id)
             .WithCount(count)
             .BuildAndAddToDb(Context);
@@ -348,8 +348,8 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 
     private Storage Storage() { return StorageContext.Storages.First(x => x.Type == StorageType.Warehouse); }
 
-    private Storage OtherStorage(string storageName)
+    private Storage OtherStorage(string storageCode)
     {
-        return StorageContext.Storages.First(x => x.Name != storageName);
+        return StorageContext.Storages.First(x => x.Code != storageCode);
     }
 }

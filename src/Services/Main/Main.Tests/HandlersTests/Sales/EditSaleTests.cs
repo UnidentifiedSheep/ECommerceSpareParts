@@ -278,7 +278,7 @@ public class EditSaleTests : IntegrationTest
             content.ProductId,
             detail.StorageContentId,
             1);
-        var storageCountBeforeEdit = await StorageProductCount(content.ProductId, sale.StorageName);
+        var storageCountBeforeEdit = await StorageProductCount(content.ProductId, sale.StorageCode);
         var productStockBeforeEdit = await ProductStock(content.ProductId);
         var command = new EditSaleCommand(
             sale.Id,
@@ -306,7 +306,7 @@ public class EditSaleTests : IntegrationTest
         editedContent.Count.Should().Be(content.Count + 1);
         editedContent.Details.Sum(x => x.Count).Should().Be(soldCount);
         (await ProductStock(content.ProductId)).Should().Be(productStockBeforeEdit - 1);
-        (await StorageProductCount(content.ProductId, sale.StorageName)).Should()
+        (await StorageProductCount(content.ProductId, sale.StorageCode)).Should()
             .Be(storageCountBeforeEdit - 1);
     }
 
@@ -348,16 +348,16 @@ public class EditSaleTests : IntegrationTest
         return Context.StorageContents
             .AsNoTracking()
             .Where(x => x.Count > 0)
-            .Where(x => x.StorageName == SaleContext.StorageContent.StorageName)
+            .Where(x => x.StorageCode == SaleContext.StorageContent.StorageCode)
             .Where(x => x.ProductId != SaleContext.Product.Id)
             .FirstAsync();
     }
 
-    private Task<int> StorageProductCount(int productId, string storageName)
+    private Task<int> StorageProductCount(int productId, string storageCode)
     {
         return Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == productId && x.StorageName == storageName)
+            .Where(x => x.ProductId == productId && x.StorageCode == storageCode)
             .SumAsync(x => x.Count);
     }
 

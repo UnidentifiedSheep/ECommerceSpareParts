@@ -27,8 +27,8 @@ public record CreatePurchaseRequest
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }
 
-    [JsonPropertyName("storageName")]
-    public required string StorageName { get; init; }
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
 
     [JsonPropertyName("purchaseDate")]
     public required DateTime PurchaseDate { get; init; }
@@ -117,7 +117,7 @@ public class PurchaseEndPoints : ICarterModule
                         request.SupplierUserId,
                         request.SupplierOrganizationId,
                         request.CurrencyId,
-                        request.StorageName,
+                        request.StorageCode,
                         request.PurchaseDate,
                         request.PurchaseContent,
                         request.Comment,

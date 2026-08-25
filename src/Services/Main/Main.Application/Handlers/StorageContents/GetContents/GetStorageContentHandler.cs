@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.StorageContents.GetContents;
 
 public record GetStorageContentQuery(
-    string? StorageName,
+    string? StorageCode,
     int? ProductId,
     Pagination Pagination,
     bool ShowZeroCount
@@ -32,8 +32,8 @@ public class GetStorageContentHandler(
 
         if (request.ProductId.HasValue) query = query.Where(x => x.ProductId == request.ProductId);
 
-        if (!string.IsNullOrWhiteSpace(request.StorageName))
-            query = query.Where(x => x.StorageName == request.StorageName);
+        if (!string.IsNullOrWhiteSpace(request.StorageCode))
+            query = query.Where(x => x.StorageCode == request.StorageCode);
 
         if (!request.ShowZeroCount) query = query.Where(x => x.Count > 0);
 

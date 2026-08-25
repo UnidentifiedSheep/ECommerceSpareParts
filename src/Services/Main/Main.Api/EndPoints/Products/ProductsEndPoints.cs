@@ -127,11 +127,11 @@ public class ProductsEndPoints : ICarterModule
                 async (
                     ISender sender,
                     int productId,
-                    [FromQuery] string? storageName,
+                    [FromQuery] string? storageCode,
                     CancellationToken token) =>
                 {
                     var result = await sender.Send(
-                        new GetProductStockQuery(productId, storageName),
+                        new GetProductStockQuery(productId, storageCode),
                         token);
 
                     return Results.Ok(

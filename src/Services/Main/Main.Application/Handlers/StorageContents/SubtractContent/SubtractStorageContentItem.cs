@@ -12,7 +12,7 @@ public record SubtractStorageContentItem(
 
 public record SubtractProductFromStorageItem(
     int ProductId,
-    string StorageName,
+    string StorageCode,
     int Count,
     bool TakeFromOtherStorages = false
 ) : ISubtractStorageContentItem;

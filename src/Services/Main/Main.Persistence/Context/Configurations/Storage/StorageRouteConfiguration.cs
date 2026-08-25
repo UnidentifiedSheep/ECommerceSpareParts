@@ -13,7 +13,7 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
         builder.HasKey(e => e.Id).HasName("storage_routes_pk");
 
         builder.HasIndex(
-                e => new { e.FromStorageName, e.ToStorageName, e.IsActive },
+                e => new { e.FromStorageCode, e.ToStorageCode, e.IsActive },
                 "storage_from_to_active_uindex")
             .IsUnique()
             .HasFilter("(is_active = true)");
@@ -39,7 +39,7 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
         builder.Property(e => e.DistanceM)
             .HasColumnName("distance_m");
 
-        builder.Property(e => e.FromStorageName)
+        builder.Property(e => e.FromStorageCode)
             .HasMaxLength(128)
             .HasColumnName("from_storage_name");
 
@@ -67,7 +67,7 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
             .HasMaxLength(24)
             .HasColumnName("route_type");
 
-        builder.Property(e => e.ToStorageName)
+        builder.Property(e => e.ToStorageCode)
             .HasMaxLength(128)
             .HasColumnName("to_storage_name");
 
@@ -85,12 +85,12 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
 
         builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
-            .HasForeignKey(d => d.FromStorageName)
+            .HasForeignKey(d => d.FromStorageCode)
             .HasConstraintName("storage_routes_storages_name_fk");
 
         builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
-            .HasForeignKey(d => d.ToStorageName)
+            .HasForeignKey(d => d.ToStorageCode)
             .HasConstraintName("storage_routes_storages_name_fk_2");
     }
 }

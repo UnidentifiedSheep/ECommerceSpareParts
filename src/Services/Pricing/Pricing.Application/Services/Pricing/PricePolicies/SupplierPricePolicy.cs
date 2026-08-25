@@ -46,7 +46,7 @@ public class SupplierPricePolicy(
                 ProductId = candidate.ProductId,
                 PriceOfferId = candidate.PriceOfferId,
                 SourceType = candidate.SourceType,
-                StorageName = candidate.TargetStorageName
+                StorageCode = candidate.TargetStorageCode
             });
         }
         

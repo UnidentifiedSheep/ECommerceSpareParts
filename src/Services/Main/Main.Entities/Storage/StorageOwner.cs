@@ -10,15 +10,15 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>,
 {
     private StorageOwner() { }
 
-    private StorageOwner(string storageName, Guid userId)
+    private StorageOwner(string storageCode, Guid userId)
     {
-        StorageName = storageName;
+        StorageCode = storageCode;
         UserId = userId;
     }
 
     [ValidateTuple("PK")]
     [Validate]
-    public string StorageName { get; } = null!;
+    public string StorageCode { get; } = null!;
 
     [ValidateTuple("PK")]
     public Guid UserId { get; }
@@ -29,18 +29,18 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>,
 
     public static Expression<Func<StorageOwner, (string, Guid)>> GetKeySelector()
     {
-        return x => ValueTuple.Create(x.StorageName, x.UserId);
+        return x => ValueTuple.Create(x.StorageCode, x.UserId);
     }
 
     public static Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key)
     {
-        return x => x.StorageName == key.Item1 && x.UserId == key.Item2;
+        return x => x.StorageCode == key.Item1 && x.UserId == key.Item2;
     }
 
-    public static StorageOwner Create(string storageName, Guid ownerId)
+    public static StorageOwner Create(string storageCode, Guid ownerId)
     {
-        return new StorageOwner(storageName, ownerId);
+        return new StorageOwner(storageCode, ownerId);
     }
 
-    public override (string, Guid) GetId() { return (StorageName, UserId); }
+    public override (string, Guid) GetId() { return (StorageCode, UserId); }
 }

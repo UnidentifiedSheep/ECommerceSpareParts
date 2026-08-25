@@ -8,8 +8,8 @@ public class AddStorageToUserDbValidation : AbstractDbValidation<AddStorageToUse
 {
     public override void Build(IValidationPlan plan, AddStorageToUserCommand request)
     {
-        plan.ValidateStorageOwnerNotExistsPK((request.StorageName, request.UserId))
+        plan.ValidateStorageOwnerNotExistsPK((request.StorageCode, request.UserId))
             .ValidateUserExistsId(request.UserId)
-            .ValidateStorageExistsName(request.StorageName);
+            .ValidateStorageExistsCode(request.StorageCode);
     }
 }

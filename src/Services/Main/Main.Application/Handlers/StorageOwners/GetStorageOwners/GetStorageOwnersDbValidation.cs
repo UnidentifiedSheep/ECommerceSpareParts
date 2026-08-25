@@ -8,6 +8,6 @@ public class GetStorageOwnersDbValidation : AbstractDbValidation<GetStorageOwner
 {
     public override void Build(IValidationPlan plan, GetStorageOwnersQuery request)
     {
-        plan.ValidateStorageExistsName(request.Name);
+        plan.ValidateStorageExistsCode(request.StorageCode);
     }
 }

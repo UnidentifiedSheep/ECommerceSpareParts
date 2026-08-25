@@ -10,7 +10,7 @@ namespace Main.Application.Handlers.StorageOwners.DeleteStorageFromUser;
 
 [AutoSave]
 [Transactional]
-public record DeleteStorageFromUserCommand(Guid UserId, string StorageName) : ICommand;
+public record DeleteStorageFromUserCommand(Guid UserId, string StorageCode) : ICommand;
 
 public class DeleteStorageFromUserHandler(
     IRepository<StorageOwner, (string, Guid)> repository,
@@ -20,8 +20,8 @@ public class DeleteStorageFromUserHandler(
 {
     public async Task<Unit> Handle(DeleteStorageFromUserCommand request, CancellationToken cancellationToken)
     {
-        var model = await repository.GetById((request.StorageName, request.UserId), cancellationToken)
-                    ?? throw new StorageOwnerNotFoundException(request.UserId, request.StorageName);
+        var model = await repository.GetById((request.StorageCode, request.UserId), cancellationToken)
+                    ?? throw new StorageOwnerNotFoundException(request.UserId, request.StorageCode);
         unitOfWork.Remove(model);
         return Unit.Value;
     }

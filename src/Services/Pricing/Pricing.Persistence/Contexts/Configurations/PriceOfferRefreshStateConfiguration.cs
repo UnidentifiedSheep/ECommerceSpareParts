@@ -15,7 +15,7 @@ public class PriceOfferRefreshStateConfiguration : IEntityTypeConfiguration<Pric
             {
                 e.ProductId,
                 e.Source,
-                e.StorageName
+                e.StorageCode
             })
             .HasName("price_offer_refresh_state_pk");
 
@@ -26,7 +26,7 @@ public class PriceOfferRefreshStateConfiguration : IEntityTypeConfiguration<Pric
             .HasMaxLength(64)
             .HasColumnName("source");
 
-        builder.Property(e => e.StorageName)
+        builder.Property(e => e.StorageCode)
             .HasMaxLength(128)
             .HasColumnName("storage_name");
 

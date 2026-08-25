@@ -13,8 +13,8 @@ public record ProductSaleHistoryDto
     [JsonPropertyName("organizationId")]
     public required Guid OrganizationId { get; init; }
 
-    [JsonPropertyName("storageName")]
-    public required string StorageName { get; init; }
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
     
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }

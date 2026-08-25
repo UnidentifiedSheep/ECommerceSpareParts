@@ -38,10 +38,10 @@ public class SubtractStorageContentsValidation : AbstractValidator<SubtractStora
                                     nameof(SubtractProductFromStorageItem.ProductId),
                                     "article.id.greater.than.zero"));
 
-                        if (string.IsNullOrWhiteSpace(byProduct.StorageName))
+                        if (string.IsNullOrWhiteSpace(byProduct.StorageCode))
                             context.AddFailure(
                                 CreateFailure(
-                                    nameof(SubtractProductFromStorageItem.StorageName),
+                                    nameof(SubtractProductFromStorageItem.StorageCode),
                                     "storage.name.not.empty"));
                         break;
                 }

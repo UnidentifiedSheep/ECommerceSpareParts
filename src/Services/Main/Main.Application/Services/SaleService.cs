@@ -55,7 +55,7 @@ public class SaleService(
     public Task CheckReservations(
         IEnumerable<NewSaleContentDto> saleContents,
         Guid buyerOrganizationId,
-        string storageName,
+        string storageCode,
         bool takeFromOtherStorages,
         string? confirmationCode,
         CancellationToken cancellationToken = default)
@@ -69,7 +69,7 @@ public class SaleService(
                 x.Count,
                 x.Comment)),
             buyerOrganizationId,
-            storageName,
+            storageCode,
             takeFromOtherStorages,
             confirmationCode,
             cancellationToken);
@@ -78,7 +78,7 @@ public class SaleService(
     public Task CheckReservations(
         IEnumerable<EditSaleContentDto> saleContents,
         Guid buyerOrganizationId,
-        string storageName,
+        string storageCode,
         bool takeFromOtherStorages,
         string? confirmationCode,
         CancellationToken cancellationToken = default)
@@ -92,14 +92,14 @@ public class SaleService(
                 x.Count,
                 x.Comment)),
             buyerOrganizationId,
-            storageName,
+            storageCode,
             takeFromOtherStorages,
             confirmationCode,
             cancellationToken);
     }
 
     public async Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
-        string storageName,
+        string storageCode,
         IEnumerable<NewSaleContentDto> saleContents,
         StorageMovementType movementType,
         bool takeFromOtherStorages,
@@ -107,7 +107,7 @@ public class SaleService(
     {
         var contents = saleContents.ToList();
         var takenFromStorage = await TakeFromStorage(
-            storageName,
+            storageCode,
             contents.Select(x => (x.ProductId, x.Count)),
             movementType,
             takeFromOtherStorages,
@@ -117,7 +117,7 @@ public class SaleService(
     }
 
     public async Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
-        string storageName,
+        string storageCode,
         IEnumerable<EditSaleContentDto> saleContents,
         StorageMovementType movementType,
         bool takeFromOtherStorages,
@@ -125,7 +125,7 @@ public class SaleService(
     {
         var contents = saleContents.ToList();
         var takenFromStorage = await TakeFromStorage(
-            storageName,
+            storageCode,
             contents.Select(x => (x.ProductId, x.Count)),
             movementType,
             takeFromOtherStorages,
@@ -274,7 +274,7 @@ public class SaleService(
     }
 
     private async Task<SubtractStorageContentsResult> TakeFromStorage(
-        string storageName,
+        string storageCode,
         IEnumerable<(int ProductId, int Count)> contents,
         StorageMovementType movementType,
         bool takeFromOtherStorages,
@@ -285,7 +285,7 @@ public class SaleService(
                 contents.Select(x =>
                     new SubtractProductFromStorageItem(
                         x.ProductId,
-                        storageName,
+                        storageCode,
                         x.Count,
                         takeFromOtherStorages)),
                 movementType),
@@ -295,7 +295,7 @@ public class SaleService(
     private async Task CheckReservations(
         IEnumerable<SaleContentInput> saleContents,
         Guid buyerOrganizationId,
-        string storageName,
+        string storageCode,
         bool takeFromOtherStorages,
         string? confirmationCode,
         CancellationToken cancellationToken)
@@ -304,7 +304,7 @@ public class SaleService(
         var (byReservation, byStock) = await GetStockReservations(
             contentList,
             buyerOrganizationId,
-            storageName,
+            storageCode,
             takeFromOtherStorages,
             cancellationToken);
 
@@ -339,7 +339,7 @@ public class SaleService(
         GetStockReservations(
             IEnumerable<SaleContentInput> saleContents,
             Guid buyerOrganizationId,
-            string storageName,
+            string storageCode,
             bool takeFromOtherStorages,
             CancellationToken cancellationToken = default)
     {
@@ -352,7 +352,7 @@ public class SaleService(
         var result = await sender.Send(
             new GetProductsWithNotEnoughStockQuery(
                 buyerOrganizationId,
-                storageName,
+                storageCode,
                 takeFromOtherStorages,
                 neededProductCounts),
             cancellationToken);

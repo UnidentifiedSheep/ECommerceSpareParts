@@ -9,14 +9,14 @@ namespace Main.Application.Handlers.Storages.CreateStorage;
 [AutoSave]
 [Transactional]
 public record CreateStorageCommand(
-    string Name,
+    string Code,
     string? Description,
     string? Location,
     StorageType Type
 )
     : ICommand<CreateStorageResult>;
 
-public record CreateStorageResult(string Name);
+public record CreateStorageResult(string Code);
 
 public class CreateStorageHandler(IUnitOfWork unitOfWork)
     : ICommandHandler<CreateStorageCommand, CreateStorageResult>
@@ -25,11 +25,11 @@ public class CreateStorageHandler(IUnitOfWork unitOfWork)
         CreateStorageCommand request,
         CancellationToken cancellationToken)
     {
-        var storage = Storage.Create(request.Name, request.Type);
+        var storage = Storage.Create(request.Code, request.Type);
         storage.SetDescription(request.Description);
         storage.SetLocation(request.Location);
 
         await unitOfWork.AddAsync(storage, cancellationToken);
-        return new CreateStorageResult(storage.Name);
+        return new CreateStorageResult(storage.Code);
     }
 }

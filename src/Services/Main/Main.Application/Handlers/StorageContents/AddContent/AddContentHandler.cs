@@ -22,7 +22,7 @@ namespace Main.Application.Handlers.StorageContents.AddContent;
     2)]
 public record AddContentCommand(
     IEnumerable<NewStorageContentDto> StorageContent,
-    string StorageName,
+    string StorageCode,
     StorageMovementType MovementType
 ) : ICommand<AddContentResult>;
 
@@ -64,7 +64,7 @@ public class AddContentHandler(
         foreach (var item in request.StorageContent)
         {
             var content = StorageContent.Create(
-                request.StorageName,
+                request.StorageCode,
                 item.ProductId,
                 item.BuyPrice,
                 item.CurrencyId,

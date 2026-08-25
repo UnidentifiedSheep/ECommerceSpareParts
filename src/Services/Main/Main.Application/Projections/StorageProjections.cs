@@ -25,7 +25,7 @@ public sealed class StorageRouteDtoProjectionProvider
             Currency = currencyToDto.Invoke(x.Currency),
             DeliveryTimeMinutes = x.DeliveryTimeMinutes,
             DistanceM = x.DistanceM,
-            FromStorageName = x.FromStorageName,
+            FromStorageCode = x.FromStorageCode,
             IsActive = x.IsActive,
             MinimumPrice = x.MinimumPrice,
             PricePerKg = x.PriceKg,
@@ -33,7 +33,7 @@ public sealed class StorageRouteDtoProjectionProvider
             PricePerOrder = x.PricePerOrder,
             PricingModel = x.PricingModel,
             RouteType = x.RouteType,
-            ToStorageName = x.ToStorageName
+            ToStorageCode = x.ToStorageCode
         };
     }
 
@@ -47,7 +47,7 @@ public sealed class StorageDtoProjectionProvider
     public override Expression<Func<Storage, StorageDto>> Projection { get; } =
         x => new StorageDto
         {
-            Name = x.Name,
+            Code = x.Code,
             Location = x.Location,
             Description = x.Description,
             Type = x.Type

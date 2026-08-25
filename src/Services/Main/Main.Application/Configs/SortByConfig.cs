@@ -57,7 +57,7 @@ public static class SortByConfig
         QueryableSortBy.Value
             .MapDefault<SaleContent, DateTime>(x => x.Sale.SaleDatetime, true)
             .Map<SaleContent, int>("saleContentId", x => x.Id)
-            .Map<SaleContent, string>("storageName", x => x.Sale.StorageName)
+            .Map<SaleContent, string>("storageCode", x => x.Sale.StorageCode)
             .Map<SaleContent, int>("quantity", x => x.Count)
             .Map<SaleContent, decimal>("discount", x => x.Discount)
             .Map<SaleContent, decimal>("price", x => x.Price)

@@ -20,7 +20,7 @@ public record PriceOptionDto
     public required decimal Markup { get; init; }
     
     [JsonPropertyName("forStorage")]
-    public required string ForStorageName { get; init; }
+    public required string ForStorageCode { get; init; }
     
     [JsonPropertyName("deliveryTime")]
     public required TimeSpan DeliveryTime { get; init; }

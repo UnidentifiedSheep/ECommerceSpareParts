@@ -11,7 +11,7 @@ using UserEntity = Main.Entities.User.User;
 
 namespace Main.Application.Handlers.StorageOwners.GetStorageOwners;
 
-public record GetStorageOwnersQuery(string Name, Pagination Pagination) : IQuery<GetStorageOwnersResult>;
+public record GetStorageOwnersQuery(string StorageCode, Pagination Pagination) : IQuery<GetStorageOwnersResult>;
 
 public record GetStorageOwnersResult(IReadOnlyList<UserDto> Owners);
 
@@ -26,7 +26,7 @@ public class GetStorageOwnersHandler(
         CancellationToken cancellationToken)
     {
         var result = await repository.Query
-            .Where(x => x.StorageName == request.Name)
+            .Where(x => x.StorageCode == request.StorageCode)
             .OrderByDescending(x => x.UserId)
             .Select(x => x.User)
             .Project(projection)

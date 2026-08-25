@@ -31,8 +31,8 @@ public class StorageRouteTestContext(
         var storages = storageTestContext.Storages.ToList();
         var currencyId = currencyTestContext.Currencies[0].Id;
 
-        var from = storages.First().Name;
-        var to = storages.Last().Name;
+        var from = storages.First().Code;
+        var to = storages.Last().Code;
 
         var builders = new List<StorageRouteBuilder>
         {

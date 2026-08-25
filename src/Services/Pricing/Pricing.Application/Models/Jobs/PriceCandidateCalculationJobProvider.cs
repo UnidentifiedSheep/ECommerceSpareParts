@@ -16,7 +16,7 @@ public sealed class PriceCandidateCalculationJobProvider
     {
         var naturalKey = BuildNaturalKey(
             inputState.ProductId,
-            inputState.StorageName);
+            inputState.StorageCode);
 
         return SingleRunJob.CreateUnique(
             naturalKey,
@@ -25,8 +25,8 @@ public sealed class PriceCandidateCalculationJobProvider
             maxAttempts);
     }
 
-    private static string BuildNaturalKey(int productId, string storageName)
+    private static string BuildNaturalKey(int productId, string storageCode)
     {
-        return $"{PriceCandidateCalculationLrt.LrtName}:{productId}:{storageName}";
+        return $"{PriceCandidateCalculationLrt.LrtName}:{productId}:{storageCode}";
     }
 }

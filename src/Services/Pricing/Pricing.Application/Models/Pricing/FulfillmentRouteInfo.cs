@@ -5,18 +5,18 @@ using Pricing.Entities.Offers;
 namespace Pricing.Application.Models.Pricing;
 
 public sealed record FulfillmentRouteInfo(
-    [property: JsonPropertyName("sourceStorageName")] string SourceStorageName,
-    [property: JsonPropertyName("targetStorageName")] string TargetStorageName,
+    [property: JsonPropertyName("sourceStorageCode")] string SourceStorageCode,
+    [property: JsonPropertyName("targetStorageCode")] string TargetStorageCode,
     [property: JsonPropertyName("logisticsCostInBaseCurrency")] decimal LogisticsCostInBaseCurrency,
     [property: JsonPropertyName("deliveryTime")] TimeSpan DeliveryTime,
     [property: JsonPropertyName("guaranteedDeliveryTime")] TimeSpan GuaranteedDeliveryTime,
     [property: JsonPropertyName("deliveryProbability")] int DeliveryProbability)
 {
-    public static FulfillmentRouteInfo SameStorage(string storageName)
+    public static FulfillmentRouteInfo SameStorage(string storageCode)
     {
         return new FulfillmentRouteInfo(
-            SourceStorageName: storageName,
-            TargetStorageName: storageName,
+            SourceStorageCode: storageCode,
+            TargetStorageCode: storageCode,
             LogisticsCostInBaseCurrency: 0,
             DeliveryTime: TimeSpan.Zero,
             GuaranteedDeliveryTime: TimeSpan.Zero,
@@ -26,8 +26,8 @@ public sealed record FulfillmentRouteInfo(
     public static FulfillmentRouteInfo FromSupplier(PriceOffer offer)
     {
         return new FulfillmentRouteInfo(
-            SourceStorageName: offer.OfferForStorage,
-            TargetStorageName: offer.OfferForStorage,
+            SourceStorageCode: offer.OfferForStorage,
+            TargetStorageCode: offer.OfferForStorage,
             LogisticsCostInBaseCurrency: 0,
             DeliveryTime: offer.DeliveryDate == null 
                 ? TimeSpan.Zero 

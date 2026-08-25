@@ -16,14 +16,14 @@ public static class UserStorageEndPoints
     public static RouteGroupBuilder MapUserStorageEndPoints(this RouteGroupBuilder users)
     {
         users.MapPost(
-                "/{userId:guid}/storages/{storageName}",
+                "/{userId:guid}/storages/{storageCode}",
                 async (
                     ISender sender,
                     Guid userId,
-                    string storageName,
+                    string storageCode,
                     CancellationToken token) =>
                 {
-                    await sender.Send(new AddStorageToUserCommand(userId, storageName), token);
+                    await sender.Send(new AddStorageToUserCommand(userId, storageCode), token);
                     return Results.NoContent();
                 })
             .WithName("AddStorageToUser")
@@ -35,14 +35,14 @@ public static class UserStorageEndPoints
             .RequireAnyPermission(PermissionCodes.USERS_STORAGES_ADD);
 
         users.MapDelete(
-                "/{userId:guid}/storages/{storageName}",
+                "/{userId:guid}/storages/{storageCode}",
                 async (
                     ISender sender,
                     Guid userId,
-                    string storageName,
+                    string storageCode,
                     CancellationToken token) =>
                 {
-                    await sender.Send(new DeleteStorageFromUserCommand(userId, storageName), token);
+                    await sender.Send(new DeleteStorageFromUserCommand(userId, storageCode), token);
                     return Results.NoContent();
                 })
             .WithName("DeleteStorageFromUser")

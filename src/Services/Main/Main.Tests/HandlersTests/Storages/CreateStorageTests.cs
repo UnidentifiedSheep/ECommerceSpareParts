@@ -10,16 +10,16 @@ namespace Tests.HandlersTests.Storages;
 public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
     [Fact]
-    public async Task CreateStorage_TooLargeName_FailsValidation()
+    public async Task CreateStorage_TooLargeCode_FailsValidation()
     {
-        var command = GetCommand() with { Name = Faker.Lorem.Letter(500) };
+        var command = GetCommand() with { Code = Faker.Lorem.Letter(500) };
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
-    public async Task CreateStorage_TooSmallName_FailsValidation()
+    public async Task CreateStorage_TooSmallCode_FailsValidation()
     {
-        var command = GetCommand() with { Name = Faker.Lorem.Letter() };
+        var command = GetCommand() with { Code = Faker.Lorem.Letter() };
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -31,19 +31,19 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
     }
 
     [Fact]
-    public async Task CreateStorage_ExistingName_ThrowStorageNameIsTaken()
+    public async Task CreateStorage_ExistingCode_ThrowsStorageCodeIsTaken()
     {
         var storageModel = await new StorageBuilder(Faker)
             .BuildAndAddToDb(Context);
 
         var command = new CreateStorageCommand(
-            storageModel.Name,
+            storageModel.Code,
             storageModel.Description,
             storageModel.Location,
             storageModel.Type);
         var exception =
             await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
-        Assert.Equal(ApplicationErrors.StoragesNameAlreadyTaken, exception.Failures[0].ErrorName);
+        Assert.Equal(ApplicationErrors.StoragesCodeAlreadyTaken, exception.Failures[0].ErrorName);
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
         var command = GetCommand();
         await Mediator.Send(command);
 
-        var createdStorage = await Context.Storages.FirstOrDefaultAsync(x => x.Name == command.Name);
+        var createdStorage = await Context.Storages.FirstOrDefaultAsync(x => x.Code == command.Code);
         Assert.NotNull(createdStorage);
 
         Assert.Equal(command.Description, createdStorage.Description);
@@ -64,7 +64,7 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
     {
         var storageModel = new StorageBuilder(Faker).Build();
         return new CreateStorageCommand(
-            storageModel.Name,
+            storageModel.Code,
             storageModel.Description,
             storageModel.Location,
             storageModel.Type);

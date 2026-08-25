@@ -348,7 +348,7 @@ public static class ValidationConfiguration
     private static void ConfigureStorage()
     {
         ConfigureDbValidation.AddConfig(
-            ValidationFunctions.ValidateStorageExistsName,
+            ValidationFunctions.ValidateStorageExistsCode,
             KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StoragesNotFound)
                 .WithMessageTemplate("storage.not.found")
@@ -356,7 +356,7 @@ public static class ValidationConfiguration
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(
-            ValidationFunctions.ValidateStorageExistsName,
+            ValidationFunctions.ValidateStorageExistsCode,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StoragesNotFound)
                 .WithMessageTemplate("storage.not.found")
@@ -364,18 +364,18 @@ public static class ValidationConfiguration
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(
-            ValidationFunctions.ValidateStorageNotExistsName,
+            ValidationFunctions.ValidateStorageNotExistsCode,
             KeyValueType.Single,
-            config => config.WithErrorName(ApplicationErrors.StoragesNameAlreadyTaken)
-                .WithMessageTemplate("storage.name.taken")
+            config => config.WithErrorName(ApplicationErrors.StoragesCodeAlreadyTaken)
+                .WithMessageTemplate("storage.code.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(
-            ValidationFunctions.ValidateStorageNotExistsName,
+            ValidationFunctions.ValidateStorageNotExistsCode,
             KeyValueType.MultipleKeys,
-            config => config.WithErrorName(ApplicationErrors.StoragesNameAlreadyTaken)
-                .WithMessageTemplate("storage.name.taken")
+            config => config.WithErrorName(ApplicationErrors.StoragesCodeAlreadyTaken)
+                .WithMessageTemplate("storage.code.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }

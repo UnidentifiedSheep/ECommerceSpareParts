@@ -40,8 +40,8 @@
     "lrt.price.candidate.calculation.description": "Calculates and stores price candidates for the selected product and storage.",
     "lrt.price.candidate.calculation.product.id.name": "Product",
     "lrt.price.candidate.calculation.product.id.description": "Product for which price candidates should be calculated.",
-    "lrt.price.candidate.calculation.storage.name.name": "Storage",
-    "lrt.price.candidate.calculation.storage.name.description": "Storage for which price candidates should be calculated.",
+    "lrt.price.candidate.calculation.storage.code.name": "Storage code",
+    "lrt.price.candidate.calculation.storage.code.description": "Code of the storage for which price candidates should be calculated.",
     "lrt.invalidate.stale.price.options.name": "Invalidate stale price options",
     "lrt.invalidate.stale.price.options.description": "Removes price options calculated with an outdated pricing configuration and enqueues recalculation jobs."
   }

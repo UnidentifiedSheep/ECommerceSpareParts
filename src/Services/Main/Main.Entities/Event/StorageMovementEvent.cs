@@ -20,7 +20,7 @@ public class StorageMovementEvent : Event<StorageMovementEventData>
         var data = new StorageMovementEventData
         {
             ProductId = content.ProductId,
-            StorageName = content.StorageName,
+            StorageCode = content.StorageCode,
             CurrencyId = content.CurrencyId,
             Count = content.Count,
             BuyPrice = content.BuyPrice,
@@ -36,8 +36,8 @@ public record StorageMovementEventData
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }
 
-    [JsonPropertyName("storageName")]
-    public required string StorageName { get; init; }
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
 
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }

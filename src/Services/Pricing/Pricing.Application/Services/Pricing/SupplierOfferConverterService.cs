@@ -17,7 +17,7 @@ public class SupplierOfferConverterService(
 {
     public async Task<IReadOnlyList<SupplierOfferConversionResult>> ConvertAsync(
         int productId,
-        string storageName,
+        string storageCode,
         IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> offers,
         CancellationToken token = default)
     {
@@ -25,14 +25,14 @@ public class SupplierOfferConverterService(
         if (offers.Count == 0) return results;
 
         foreach (var (supplier, positions) in offers)
-            results.Add(await ConvertAsync(productId, storageName, supplier, positions, token));
+            results.Add(await ConvertAsync(productId, storageCode, supplier, positions, token));
         
         return results;
     }
     
     public async Task<SupplierOfferConversionResult> ConvertAsync(
         int productId,
-        string storageName,
+        string storageCode,
         Supplier supplier,
         IReadOnlyList<SupplierPosition> positions,
         CancellationToken token = default)
@@ -60,7 +60,7 @@ public class SupplierOfferConverterService(
             offers.Add(PriceOffer.CreateForSupplier(
                 productId,
                 currencyId.Value,
-                storageName,
+                storageCode,
                 supplierOffer.PurchaseInfo.PriceInfo.Price,
                 supplier.ToSource(),
                 supplierOffer.Id,

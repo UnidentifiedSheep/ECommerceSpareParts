@@ -10,11 +10,11 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
     {
         builder.ToTable("storage_owners", "public");
 
-        builder.HasKey(e => new { e.StorageName, e.UserId }).HasName("storage_owners_pk");
+        builder.HasKey(e => new { e.StorageCode, e.UserId }).HasName("storage_owners_pk");
 
         builder.HasIndex(e => e.UserId, "storage_owners_owner_id_index");
 
-        builder.Property(e => e.StorageName)
+        builder.Property(e => e.StorageCode)
             .HasMaxLength(128)
             .HasColumnName("storage_name");
 
@@ -28,7 +28,7 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
 
         builder.HasOne(d => d.Storage)
             .WithMany(d => d.Owners)
-            .HasForeignKey(d => d.StorageName)
+            .HasForeignKey(d => d.StorageCode)
             .HasConstraintName("storage_owners_storages_name_fk");
     }
 }

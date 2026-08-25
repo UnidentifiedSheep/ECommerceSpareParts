@@ -29,14 +29,14 @@ public class EditStorageRouteHandler(
             if (patch.IsActive.Value)
             {
                 var isActiveExists = await repository.IsAnyRouteActiveAsync(
-                    storageRoute.FromStorageName,
-                    storageRoute.ToStorageName,
+                    storageRoute.FromStorageCode,
+                    storageRoute.ToStorageCode,
                     cancellationToken);
 
                 if (isActiveExists)
                     throw new StorageRouteActiveExistsException(
-                        storageRoute.FromStorageName,
-                        storageRoute.ToStorageName);
+                        storageRoute.FromStorageCode,
+                        storageRoute.ToStorageCode);
 
                 storageRoute.Activate();
             }

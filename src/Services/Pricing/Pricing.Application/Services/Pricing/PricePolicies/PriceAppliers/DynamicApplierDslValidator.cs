@@ -42,7 +42,7 @@ public static class DynamicApplierDslValidator
         var candidate = new PriceCandidate(
             PriceOfferId: Guid.Empty,
             ProductId: 1,
-            TargetStorageName: "validation-storage",
+            TargetStorageCode: "validation-storage",
             SourceType: PriceOfferSourceType.Supplier,
             Cost: 100m,
             CurrencyId: 1,

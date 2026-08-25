@@ -8,7 +8,7 @@ using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Application.Handlers.Storages.DeleteStorage;
 using Main.Application.Handlers.Storages.EditStorage;
 using Main.Application.Handlers.Storages.GetStorage;
-using Main.Application.Handlers.Storages.GetStorageByName;
+using Main.Application.Handlers.Storages.GetStorageByCode;
 using Main.Entities.Exceptions;
 using Main.Enums;
 using MediatR;
@@ -17,8 +17,8 @@ namespace Main.Api.EndPoints.Storages;
 
 public record CreateStorageRequest
 {
-    [JsonPropertyName("name")]
-    public required string Name { get; init; }
+    [JsonPropertyName("code")]
+    public required string Code { get; init; }
 
     [JsonPropertyName("description")]
     public string? Description { get; init; }
@@ -32,8 +32,8 @@ public record CreateStorageRequest
 
 public record CreateStorageResponse
 {
-    [JsonPropertyName("name")]
-    public required string Name { get; init; }
+    [JsonPropertyName("code")]
+    public required string Code { get; init; }
 }
 
 public record EditStorageRequest
@@ -48,7 +48,7 @@ public record GetStoragesResponse
     public required IEnumerable<StorageDto> Storages { get; init; }
 }
 
-public record GetStorageByNameResponse
+public record GetStorageByCodeResponse
 {
     [JsonPropertyName("storage")]
     public required StorageDto Storage { get; init; }
@@ -73,7 +73,7 @@ public class StoragesEndPoints : ICarterModule
                 {
                     var result = await sender.Send(
                         new CreateStorageCommand(
-                            request.Name,
+                            request.Code,
                             request.Description,
                             request.Location,
                             request.Type),
@@ -82,7 +82,7 @@ public class StoragesEndPoints : ICarterModule
                         "/storages/",
                         new CreateStorageResponse
                         {
-                            Name = result.Name
+                            Code = result.Code
                         });
                 })
             .WithName("CreateStorage")
@@ -95,32 +95,32 @@ public class StoragesEndPoints : ICarterModule
             .RequireAnyPermission(PermissionCodes.STORAGES_CREATE);
 
         storages.MapDelete(
-                "/{storageName}",
+                "/{storageCode}",
                 async (
                     ISender sender,
-                    string storageName,
+                    string storageCode,
                     CancellationToken cancellationToken) =>
                 {
-                    await sender.Send(new DeleteStorageCommand(storageName), cancellationToken);
+                    await sender.Send(new DeleteStorageCommand(storageCode), cancellationToken);
                     return Results.NoContent();
                 })
             .WithName("DeleteStorage")
             .WithSummary("Удалить склад")
-            .WithDescription("Полное удаление склада по его имени")
+            .WithDescription("Полное удаление склада по его коду")
             .WithDisplayName("Удаление склада")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_DELETE);
 
         storages.MapPatch(
-                "/{storageName}",
+                "/{storageCode}",
                 async (
                     ISender sender,
-                    string storageName,
+                    string storageCode,
                     EditStorageRequest request,
                     CancellationToken token) =>
                 {
-                    await sender.Send(new EditStorageCommand(storageName, request.EditStorage), token);
+                    await sender.Send(new EditStorageCommand(storageCode, request.EditStorage), token);
                     return Results.NoContent();
                 })
             .WithName("EditStorage")
@@ -163,24 +163,24 @@ public class StoragesEndPoints : ICarterModule
             .RequireAnyPermission(PermissionCodes.STORAGES_GET);
 
         storages.MapGet(
-                "/{name}",
+                "/{code}",
                 async (
                     ISender sender,
-                    string name,
+                    string code,
                     CancellationToken token) =>
                 {
-                    var result = await sender.Send(new GetStorageByNameQuery(name), token);
+                    var result = await sender.Send(new GetStorageByCodeQuery(code), token);
                     return Results.Ok(
-                        new GetStorageByNameResponse
+                        new GetStorageByCodeResponse
                         {
                             Storage = result.Storage
                         });
                 })
-            .WithName("GetStorageByName")
-            .WithSummary("Получить склад по имени")
-            .WithDescription("Получение склада по имени")
-            .WithDisplayName("Получение склада по имени")
-            .Produces<GetStorageByNameResponse>()
+            .WithName("GetStorageByCode")
+            .WithSummary("Получить склад по коду")
+            .WithDescription("Получение склада по коду")
+            .WithDisplayName("Получение склада по коду")
+            .Produces<GetStorageByCodeResponse>()
             .Produces<StorageNotFoundException>(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_GET);
     }

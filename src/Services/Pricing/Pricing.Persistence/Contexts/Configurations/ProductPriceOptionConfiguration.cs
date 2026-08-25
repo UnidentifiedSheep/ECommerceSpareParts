@@ -42,7 +42,7 @@ public class ProductPriceOptionConfiguration : IEntityTypeConfiguration<ProductP
         builder.Property(e => e.Markup)
             .HasColumnName("markup");
 
-        builder.Property(e => e.ForStorageName)
+        builder.Property(e => e.ForStorageCode)
             .HasMaxLength(128)
             .HasColumnName("for_storage_name");
 

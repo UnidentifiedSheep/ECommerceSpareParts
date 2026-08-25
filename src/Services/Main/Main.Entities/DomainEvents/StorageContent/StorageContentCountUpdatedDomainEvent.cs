@@ -5,7 +5,7 @@ namespace Main.Entities.DomainEvents.StorageContent;
 
 public record StorageContentCountUpdatedDomainEvent(
     int ProductId,
-    string StorageName,
+    string StorageCode,
     int CurrencyId,
     int NewCount,
     decimal BuyPrice,

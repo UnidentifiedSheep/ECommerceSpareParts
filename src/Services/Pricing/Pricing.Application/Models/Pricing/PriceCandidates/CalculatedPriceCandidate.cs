@@ -6,7 +6,7 @@ public record CalculatedPriceCandidate
 {
     public required Guid PriceOfferId { get; init; }
     public required int ProductId { get; init; }
-    public required string StorageName { get; init; }
+    public required string StorageCode { get; init; }
 
     public required PriceOfferSourceType SourceType { get; init; }
     

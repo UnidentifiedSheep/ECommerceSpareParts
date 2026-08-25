@@ -147,7 +147,7 @@ public class ProductPriceCalculatorTests
         {
             PriceOfferId = candidate.PriceOfferId,
             ProductId = candidate.ProductId,
-            StorageName = candidate.TargetStorageName,
+            StorageCode = candidate.TargetStorageCode,
             SourceType = candidate.SourceType,
             CurrencyId = candidate.CurrencyId,
             Cost = candidate.Cost,

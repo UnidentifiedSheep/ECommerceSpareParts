@@ -23,8 +23,8 @@ public class StorageRouteRepository(DContext context, IQueryableExtensions exten
 
         return await query
             .FirstOrDefaultAsync(
-                x => x.FromStorageName == from
-                     && x.ToStorageName == to
+                x => x.FromStorageCode == from
+                     && x.ToStorageCode == to
                      && x.IsActive,
                 ct);
     }
@@ -37,8 +37,8 @@ public class StorageRouteRepository(DContext context, IQueryableExtensions exten
         return await Context.StorageRoutes
             .AnyAsync(
                 x =>
-                    x.FromStorageName == from &&
-                    x.ToStorageName == to &&
+                    x.FromStorageCode == from &&
+                    x.ToStorageCode == to &&
                     x.IsActive,
                 ct);
     }

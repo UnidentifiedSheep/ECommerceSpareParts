@@ -9,16 +9,16 @@ namespace Tests.DataBuilders.Storage;
 public class StorageContentBuilder(Faker faker) : BuilderBase<StorageContent>(faker)
 {
     private readonly HashSet<int> _productIds = [];
-    public string? StorageName { get; private set; }
+    public string? StorageCode { get; private set; }
     public int? CurrencyId { get; private set; }
     public int? Count { get; private set; }
     public decimal? BuyPrice { get; private set; }
     public DateTime? PurchaseDate { get; private set; }
     public IReadOnlySet<int> ProductIds => _productIds;
 
-    public StorageContentBuilder WithStorageName(string storageName)
+    public StorageContentBuilder WithStorageCode(string storageCode)
     {
-        StorageName = storageName;
+        StorageCode = storageCode;
         return this;
     }
 
@@ -61,7 +61,7 @@ public class StorageContentBuilder(Faker faker) : BuilderBase<StorageContent>(fa
     public override StorageContent Build()
     {
         var content = StorageContent.Create(
-            StorageName ?? Faker.Lorem.Word(),
+            StorageCode ?? Faker.Lorem.Word(),
             _productIds.Count > 0 ? Faker.PickRandom<int>(_productIds) : Faker.Random.Int(1),
             BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
             CurrencyId ?? Faker.Random.Int(1),

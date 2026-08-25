@@ -8,8 +8,8 @@ public record StorageContentDto
     [JsonPropertyName("id")]
     public required int Id { get; init; }
 
-    [JsonPropertyName("storageName")]
-    public required string StorageName { get; init; }
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
 
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }

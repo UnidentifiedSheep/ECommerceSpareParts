@@ -12,6 +12,6 @@ public class CreateSaleDbValidation : AbstractDbValidation<CreateSaleCommand>
             .ValidateUserExistsId(request.UserId)
             .ValidateOrganizationExistsId(request.OrganizationId)
             .ValidateOrganizationMemberExistsPK((request.OrganizationId, request.UserId))
-            .ValidateStorageExistsName(request.StorageName);
+            .ValidateStorageExistsCode(request.StorageCode);
     }
 }

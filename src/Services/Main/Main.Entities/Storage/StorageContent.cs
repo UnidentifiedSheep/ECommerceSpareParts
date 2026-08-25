@@ -15,7 +15,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     private StorageContent() { }
 
     private StorageContent(
-        string storageName,
+        string storageCode,
         int productId,
         decimal buyPrice,
         int currencyId,
@@ -23,7 +23,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         int buyPriceInBaseCurrencyId,
         DateTime purchaseDatetime)
     {
-        StorageName = storageName;
+        StorageCode = storageCode;
         ProductId = productId;
         PurchaseDatetime = purchaseDatetime;
         SetCurrencyId(currencyId);
@@ -34,7 +34,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     [Validate]
     public int Id { get; private set; }
 
-    public string StorageName { get; private set; } = null!;
+    public string StorageCode { get; private set; } = null!;
 
     public int ProductId { get; private set; }
 
@@ -61,7 +61,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     public uint RowVersion { get; private set; }
 
     public static StorageContent Create(
-        string storageName,
+        string storageCode,
         int productId,
         decimal buyPrice,
         int currencyId,
@@ -70,7 +70,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         DateTime purchaseDatetime)
     {
         return new StorageContent(
-            storageName,
+            storageCode,
             productId,
             buyPrice,
             currencyId,
@@ -90,7 +90,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
 
         AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
             ProductId,
-            StorageName,
+            StorageCode,
             CurrencyId,
             newCount,
             BuyPrice,
@@ -127,7 +127,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     {
         AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
             ProductId,
-            StorageName,
+            StorageCode,
             CurrencyId,
             0,
             BuyPrice,

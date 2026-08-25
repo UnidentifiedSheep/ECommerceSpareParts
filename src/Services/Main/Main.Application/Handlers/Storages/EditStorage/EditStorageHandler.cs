@@ -11,7 +11,7 @@ namespace Main.Application.Handlers.Storages.EditStorage;
 
 [AutoSave]
 [Transactional]
-public record EditStorageCommand(string StorageName, PatchStorageDto EditStorage) : ICommand;
+public record EditStorageCommand(string StorageCode, PatchStorageDto EditStorage) : ICommand;
 
 public class EditStorageHandler(IRepository<Storage, string> repository)
     : ICommandHandler<EditStorageCommand>
@@ -19,13 +19,13 @@ public class EditStorageHandler(IRepository<Storage, string> repository)
     public async Task<Unit> Handle(EditStorageCommand request, CancellationToken cancellationToken)
     {
         var criteria = Criteria<Storage>.New()
-            .Where(x => x.Name == request.StorageName)
+            .Where(x => x.Code == request.StorageCode)
             .Include(x => x.Owners)
             .Track()
             .Build();
 
         var storage = await repository.FirstOrDefaultAsync(criteria, cancellationToken)
-                      ?? throw new StorageNotFoundException(request.StorageName);
+                      ?? throw new StorageNotFoundException(request.StorageCode);
 
         var patch = request.EditStorage;
 

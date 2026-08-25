@@ -8,7 +8,7 @@ namespace Main.Application.Handlers.Products;
 
 public record GetProductStockQuery(
     int ProductId,
-    string? StorageName
+    string? StorageCode
 ) : IQuery<GetProductStockResult>;
 
 public record GetProductStockResult(int Stock);
@@ -22,14 +22,14 @@ public class GetProductStockHandler(
         GetProductStockQuery request,
         CancellationToken cancellationToken)
     {
-        var result = string.IsNullOrWhiteSpace(request.StorageName)
+        var result = string.IsNullOrWhiteSpace(request.StorageCode)
             ? await productReadRepository.Query
                 .Where(x => x.Id == request.ProductId)
                 .Select(x => x.Stock.Value)
                 .FirstOrDefaultAsync(cancellationToken)
             : await storageContentReadRepository.Query
                 .Where(x =>
-                    x.StorageName == request.StorageName &&
+                    x.StorageCode == request.StorageCode &&
                     x.ProductId == request.ProductId &&
                     x.Count > 0)
                 .SumAsync(x => x.Count, cancellationToken);

@@ -40,8 +40,8 @@
     "lrt.price.candidate.calculation.description": "Seçilen ürün ve depo için fiyat adaylarını hesaplar ve kaydeder.",
     "lrt.price.candidate.calculation.product.id.name": "Ürün",
     "lrt.price.candidate.calculation.product.id.description": "Fiyat adayları hesaplanacak ürün.",
-    "lrt.price.candidate.calculation.storage.name.name": "Depo",
-    "lrt.price.candidate.calculation.storage.name.description": "Fiyat adayları hesaplanacak depo.",
+    "lrt.price.candidate.calculation.storage.code.name": "Depo kodu",
+    "lrt.price.candidate.calculation.storage.code.description": "Fiyat adaylarının hesaplanacağı depo kodu.",
     "lrt.invalidate.stale.price.options.name": "Eski fiyat seçeneklerini geçersiz kıl",
     "lrt.invalidate.stale.price.options.description": "Eski fiyatlandırma yapılandırmasıyla hesaplanan fiyat seçeneklerini siler ve yeniden hesaplama işleri kuyruğa alır."
   }

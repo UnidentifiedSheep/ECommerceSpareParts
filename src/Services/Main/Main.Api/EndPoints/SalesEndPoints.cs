@@ -28,8 +28,8 @@ public record CreateSaleRequest
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }
 
-    [JsonPropertyName("storageName")]
-    public required string StorageName { get; init; }
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
 
     [JsonPropertyName("saleDateTime")]
     public required DateTime SaleDateTime { get; init; }
@@ -117,8 +117,8 @@ public record GetSaleContentResponse(IReadOnlyList<SaleContentDto> Content);
 
 public record GetProductSaleHistoryRequest : SortablePaginationQueryModel
 {
-    [FromQuery(Name = "storageName")]
-    public string? StorageName { get; init; }
+    [FromQuery(Name = "storageCode")]
+    public string? StorageCode { get; init; }
 
     [FromQuery(Name = "organizationId")]
     public Guid? OrganizationId { get; init; }
@@ -152,7 +152,7 @@ public class SalesEndPoints : ICarterModule
                             request.UserId,
                             request.OrganizationId,
                             request.CurrencyId,
-                            request.StorageName,
+                            request.StorageCode,
                             request.SaleDateTime,
                             request.Contents,
                             request.Comment,
@@ -290,7 +290,7 @@ public class SalesEndPoints : ICarterModule
                         new GetProductSaleHistoryQuery(
                             productId,
                             request,
-                            request.StorageName,
+                            request.StorageCode,
                             request.OrganizationId,
                             request.PreferredOrganizationId,
                             request.CurrencyId,

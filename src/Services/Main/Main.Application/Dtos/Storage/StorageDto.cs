@@ -5,8 +5,8 @@ namespace Main.Application.Dtos.Storage;
 
 public record StorageDto
 {
-    [JsonPropertyName("name")]
-    public required string Name { get; init; }
+    [JsonPropertyName("code")]
+    public required string Code { get; init; }
 
     [JsonPropertyName("description")]
     public required string? Description { get; init; }

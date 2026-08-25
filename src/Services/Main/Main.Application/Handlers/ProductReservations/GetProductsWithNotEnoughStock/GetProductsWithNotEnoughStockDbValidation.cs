@@ -9,7 +9,7 @@ public class
 {
     public override void Build(IValidationPlan plan, GetProductsWithNotEnoughStockQuery request)
     {
-        plan.ValidateStorageExistsName(request.StorageName)
+        plan.ValidateStorageExistsCode(request.StorageCode)
             .ValidateOrganizationExistsId(request.BuyerOrganizationId)
             .ValidateProductExistsId(request.NeededCounts.Keys);
     }

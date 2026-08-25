@@ -7,6 +7,6 @@ public record PriceRecalculationRequestDto
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }
     
-    [JsonPropertyName("storageName")]
-    public required string StorageName { get; init; }
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
 }

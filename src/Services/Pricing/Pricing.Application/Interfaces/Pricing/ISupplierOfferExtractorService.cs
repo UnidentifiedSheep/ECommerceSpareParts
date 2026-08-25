@@ -5,7 +5,7 @@ namespace Pricing.Application.Interfaces.Pricing;
 public interface ISupplierOfferExtractorService
 {
     Task<SupplierOfferExtractionResult[]> ExtractOffers(
-        string storageName,
+        string storageCode,
         int productId,
         CancellationToken token = default);
 }

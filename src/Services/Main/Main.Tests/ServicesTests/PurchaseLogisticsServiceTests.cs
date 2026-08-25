@@ -44,7 +44,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         await _service.ApplyAsync(
             purchase,
             [ToLogisticsItem(purchase.Contents.Single())],
-            route.FromStorageName,
+            route.FromStorageCode,
             DateTime.UtcNow,
             GetContext<UserContextTestContext>().SystemUser.Id);
         await Context.SaveChangesAsync();
@@ -64,7 +64,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         await _service.ApplyAsync(
             purchase,
             [ToLogisticsItem(purchase.Contents.Single())],
-            route.FromStorageName,
+            route.FromStorageCode,
             DateTime.UtcNow,
             GetContext<UserContextTestContext>().SystemUser.Id);
         await Context.SaveChangesAsync();
@@ -92,7 +92,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         await _service.ApplyAsync(
             purchase,
             [ToLogisticsItem(purchase.Contents.Single())],
-            route.FromStorageName,
+            route.FromStorageCode,
             DateTime.UtcNow,
             GetContext<UserContextTestContext>().SystemUser.Id);
         await Context.SaveChangesAsync();
@@ -127,7 +127,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         await _service.ApplyAsync(
             purchase,
             [ToLogisticsItem(content)],
-            route.FromStorageName,
+            route.FromStorageCode,
             DateTime.UtcNow,
             GetContext<UserContextTestContext>().SystemUser.Id);
         await Context.SaveChangesAsync();
@@ -145,7 +145,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         var firstContent = purchase.Contents.Single();
         var secondProduct = GetContext<ProductTestContext>().Products.Skip(1).First();
         var secondStorageContent = await new StorageContentBuilder(Faker)
-            .WithStorageName(route.ToStorageName)
+            .WithStorageCode(route.ToStorageCode)
             .WithProductIds(secondProduct.Id)
             .WithCurrencyId(GetContext<CurrencyTestContext>().Currencies[0].Id)
             .WithCount(1)
@@ -163,7 +163,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         await _service.ApplyAsync(
             purchase,
             [ToLogisticsItem(firstContent), ToLogisticsItem(secondContent)],
-            route.FromStorageName,
+            route.FromStorageCode,
             DateTime.UtcNow,
             GetContext<UserContextTestContext>().SystemUser.Id);
         await Context.SaveChangesAsync();
@@ -171,7 +171,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         await _service.ApplyAsync(
             purchase,
             [ToLogisticsItem(firstContent)],
-            route.FromStorageName,
+            route.FromStorageCode,
             DateTime.UtcNow,
             GetContext<UserContextTestContext>().SystemUser.Id);
         await Context.SaveChangesAsync();
@@ -194,7 +194,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         await _service.ApplyAsync(
             purchase,
             [ToLogisticsItem(purchase.Contents.Single())],
-            route.FromStorageName,
+            route.FromStorageCode,
             DateTime.UtcNow,
             GetContext<UserContextTestContext>().SystemUser.Id);
         await Context.SaveChangesAsync();

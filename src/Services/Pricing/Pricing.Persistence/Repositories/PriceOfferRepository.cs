@@ -64,12 +64,12 @@ public class PriceOfferRepository(
     }
     public Task DeleteOffersAsync(
         int productId,
-        string storageName,
+        string storageCode,
         IEnumerable<PriceOfferSource> sources,
         CancellationToken cancellationToken = default)
         => Context.PriceOffers
             .Where(x => x.ProductId == productId)
-            .Where(x => x.OfferForStorage == storageName)
+            .Where(x => x.OfferForStorage == storageCode)
             .Where(x => sources.Contains(x.Source))
             .ExecuteDeleteAsync(cancellationToken);
 }

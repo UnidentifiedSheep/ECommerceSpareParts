@@ -9,7 +9,7 @@ public class PriceOfferDataBuilder(Faker faker) : BuilderBase<PriceOffer>(faker)
 {
     public int ProductId { get; private set; } = faker.Random.Int(1, 10_000);
     public int CurrencyId { get; private set; } = 1;
-    public string StorageName { get; private set; } = "main";
+    public string StorageCode { get; private set; } = "main";
     public DateTime ExpiresAt { get; private set; } = DateTime.UtcNow.AddDays(1);
 
     public PriceOfferDataBuilder WithProductId(int productId)
@@ -24,9 +24,9 @@ public class PriceOfferDataBuilder(Faker faker) : BuilderBase<PriceOffer>(faker)
         return this;
     }
 
-    public PriceOfferDataBuilder WithStorageName(string storageName)
+    public PriceOfferDataBuilder WithStorageCode(string storageCode)
     {
-        StorageName = storageName;
+        StorageCode = storageCode;
         return this;
     }
 
@@ -42,7 +42,7 @@ public class PriceOfferDataBuilder(Faker faker) : BuilderBase<PriceOffer>(faker)
         return PriceOffer.CreateForSupplier(
             ProductId,
             CurrencyId,
-            StorageName,
+            StorageCode,
             Faker.Random.Decimal(1m, 10_000m),
             PriceOfferSource.Armtek,
             $"offer-{Faker.Random.Guid():N}",

@@ -6,7 +6,7 @@ namespace Pricing.Application.Models.Pricing.PriceCandidates;
 public sealed record PriceCandidate(
     [property: JsonPropertyName("priceOfferId")] Guid PriceOfferId,
     [property: JsonPropertyName("productId")] int ProductId,
-    [property: JsonPropertyName("targetStorageName")] string TargetStorageName,
+    [property: JsonPropertyName("targetStorageCode")] string TargetStorageCode,
 
     [property: JsonPropertyName("sourceType")] PriceOfferSourceType SourceType,
 

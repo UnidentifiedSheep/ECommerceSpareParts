@@ -14,15 +14,15 @@ public static class StorageOwnersEndPoints
     public static RouteGroupBuilder MapStorageOwnersEndPoints(this RouteGroupBuilder storages)
     {
         storages.MapGet(
-                "/{storageName}/owners",
+                "/{storageCode}/owners",
                 async (
-                    string storageName,
+                    string storageCode,
                     int page,
                     int size,
                     ISender sender,
                     CancellationToken cancellationToken) =>
                 {
-                    var query = new GetStorageOwnersQuery(storageName, new Pagination(page, size));
+                    var query = new GetStorageOwnersQuery(storageCode, new Pagination(page, size));
                     var result = await sender.Send(query, cancellationToken);
                     return Results.Ok(new GetStorageOwnersResponse(result.Owners));
                 })

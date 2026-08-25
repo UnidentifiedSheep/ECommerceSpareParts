@@ -19,7 +19,7 @@ namespace Pricing.Integration.Tests.HandlerTests.Pricing;
 public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
     private const int ProductId = 100;
-    private const string StorageName = "main";
+    private const string StorageCode = "main";
 
     [Fact]
     public async Task Handle_WithCalculatedCandidate_PersistsAllConfigurationVersions()
@@ -33,7 +33,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
             [ScoredCandidate(offer)]));
 
         await handler.Handle(
-            new CalculateCandidatesCommand(ProductId, StorageName),
+            new CalculateCandidatesCommand(ProductId, StorageCode),
             CancellationToken.None);
 
         var option = await Context.Set<ProductPriceOption>()
@@ -60,7 +60,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
             [ScoredCandidate(offer)]));
 
         await handler.Handle(
-            new CalculateCandidatesCommand(ProductId, StorageName),
+            new CalculateCandidatesCommand(ProductId, StorageCode),
             CancellationToken.None);
 
         var option = await Context.Set<ProductPriceOption>()
@@ -87,7 +87,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
             []));
 
         await handler.Handle(
-            new CalculateCandidatesCommand(ProductId, StorageName),
+            new CalculateCandidatesCommand(ProductId, StorageCode),
             CancellationToken.None);
 
         var option = await Context.Set<ProductPriceOption>()
@@ -104,7 +104,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
         builder
             .Setup(x => x.Build(
                 It.IsAny<IReadOnlyCollection<PriceOffer>>(),
-                StorageName,
+                StorageCode,
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
@@ -126,7 +126,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
     {
         return new PriceOfferDataBuilder(Faker)
             .WithProductId(ProductId)
-            .WithStorageName(StorageName)
+            .WithStorageCode(StorageCode)
             .BuildAndAddToDb(Context);
     }
 
@@ -151,7 +151,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
         {
             PriceOfferId = offer.Id,
             ProductId = offer.ProductId,
-            StorageName = offer.OfferForStorage,
+            StorageCode = offer.OfferForStorage,
             SourceType = PriceOfferSourceType.Supplier,
             CurrencyId = offer.CurrencyId,
             Cost = offer.PurchasePrice,

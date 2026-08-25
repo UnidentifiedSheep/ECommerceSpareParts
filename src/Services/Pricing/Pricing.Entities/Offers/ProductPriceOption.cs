@@ -16,7 +16,7 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
     public decimal Price { get; private set; }
     public decimal Markup { get; private set; }
     
-    public string ForStorageName { get; private set; } = string.Empty;
+    public string ForStorageCode { get; private set; } = string.Empty;
     public TimeSpan DeliveryTime { get; private set; }
     public TimeSpan GuaranteedDeliveryTime { get; private set; }
     public int DeliveryProbability { get; private set; }
@@ -32,7 +32,7 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
         string markupVersion,
         string appliersVersion,
         Guid pricingSettingsVersion,
-        string storageName,
+        string storageCode,
         decimal score,
         decimal price,
         int currencyId,
@@ -46,7 +46,7 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
             PriceOfferId = priceOfferId,
             CurrencyId = currencyId
         };
-        option.SetStorageName(storageName);
+        option.SetStorageCode(storageCode);
         option.SetScore(score);
         option.SetPrice(price);
         option.SetMarkup(markup);
@@ -88,7 +88,7 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
         DeliveryProbability = deliveryProbability;
     }
     
-    public void SetStorageName(string storageName) => ForStorageName = storageName
+    public void SetStorageCode(string storageCode) => ForStorageCode = storageCode
         .TrimSafe()
         .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Storage name cannot be empty"));
     

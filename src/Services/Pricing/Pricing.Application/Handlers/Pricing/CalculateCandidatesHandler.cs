@@ -14,7 +14,7 @@ namespace Pricing.Application.Handlers.Pricing;
 [Transactional, AutoSave]
 public record CalculateCandidatesCommand(
     int ProductId,
-    string StorageName) : ICommand;
+    string StorageCode) : ICommand;
 
 public class CalculateCandidatesHandler(
     IReadRepository<PriceOffer, Guid> repository,
@@ -30,12 +30,12 @@ public class CalculateCandidatesHandler(
         var offers = await repository.Query
             .Where(x => x.ExpiresAt >= now)
             .Where(x => x.ProductId == request.ProductId)
-            .Where(x => x.OfferForStorage == request.StorageName)
+            .Where(x => x.OfferForStorage == request.StorageCode)
             .ToListAsync(cancellationToken);
         
         var candidates = await builder.Build(
             offers,
-            request.StorageName,
+            request.StorageCode,
             cancellationToken);
         
         var calculated = await calculator
@@ -49,7 +49,7 @@ public class CalculateCandidatesHandler(
                     calculated.MarkupVersion,
                     calculated.AppliersVersion,
                     calculated.PricingSettingsVersion,
-                    x.StorageName,
+                    x.StorageCode,
                     x.Score,
                     x.Price,
                     x.CurrencyId,

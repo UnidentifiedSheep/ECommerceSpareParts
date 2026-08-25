@@ -30,7 +30,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
         history.ProductId.Should().Be(content.ProductId);
         history.OrganizationId.Should().Be(sale.OrganizationId);
         history.CurrencyId.Should().Be(sale.CurrencyId);
-        history.StorageName.Should().Be(sale.StorageName);
+        history.StorageCode.Should().Be(sale.StorageCode);
         history.Quantity.Should().Be(content.Count);
         history.Discount.Should().Be(content.Discount);
         history.Price.Should().Be(content.Price);
@@ -59,7 +59,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
             .WithContents([draftContent])
             .WithUserId(completedSale.UserId)
             .WithOrganizationId(completedSale.OrganizationId)
-            .WithStorageName(completedSale.StorageName)
+            .WithStorageCode(completedSale.StorageCode)
             .WithTransactionId(completedSale.TransactionId)
             .Build();
 
@@ -79,7 +79,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 
         var result = await Mediator.Send(
             CreateQuery(
-                storageName: sale.StorageName,
+                storageCode: sale.StorageCode,
                 organizationId: sale.OrganizationId,
                 preferredOrganizationId: sale.OrganizationId,
                 currencyId: sale.CurrencyId,
@@ -116,7 +116,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
             .WithContents([fallbackContent])
             .WithUserId(preferredSale.UserId)
             .WithOrganizationId(fallbackOrganizationId)
-            .WithStorageName(preferredSale.StorageName)
+            .WithStorageCode(preferredSale.StorageCode)
             .WithTransactionId(preferredSale.TransactionId)
             .WithSaleDate(preferredSale.SaleDatetime.AddDays(1))
             .Completed()
@@ -136,7 +136,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
     }
 
     private GetProductSaleHistoryQuery CreateQuery(
-        string? storageName = null,
+        string? storageCode = null,
         Guid? organizationId = null,
         Guid? preferredOrganizationId = null,
         int? currencyId = null,
@@ -145,7 +145,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
         return new GetProductSaleHistoryQuery(
             SaleContext.Product.Id,
             new Pagination(0, 20),
-            storageName,
+            storageCode,
             organizationId,
             preferredOrganizationId,
             currencyId,

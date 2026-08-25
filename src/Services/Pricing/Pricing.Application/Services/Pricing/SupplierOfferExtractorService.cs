@@ -17,7 +17,7 @@ public class SupplierOfferExtractorService(
     ISupplierFactory supplierFactory) : ISupplierOfferExtractorService
 {
     public async Task<SupplierOfferExtractionResult[]> ExtractOffers(
-        string storageName,
+        string storageCode,
         int productId,
         CancellationToken token = default)
     {
@@ -25,7 +25,7 @@ public class SupplierOfferExtractorService(
         if (suppliers.Count == 0) return [];
         
         var tasks = suppliers
-            .Select(x => GetFromSupplier(x, productId, storageName, token))
+            .Select(x => GetFromSupplier(x, productId, storageCode, token))
             .ToList();
 
         return await Task.WhenAll(tasks);
@@ -34,12 +34,12 @@ public class SupplierOfferExtractorService(
     private async Task<SupplierOfferExtractionResult> GetFromSupplier(
         ISupplier supplier,
         int productId,
-        string storageName,
+        string storageCode,
         CancellationToken token)
     {
         try
         {
-            return await GetFromSupplierCore(supplier, productId, storageName, token);
+            return await GetFromSupplierCore(supplier, productId, storageCode, token);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
@@ -49,11 +49,11 @@ public class SupplierOfferExtractorService(
         {
             logger.LogError(
                 exception: ex, 
-                message: "Supplier offer extraction failed. Supplier: {Supplier}, ProductId: {ProductId}, Storage: {StorageName}", 
+                message: "Supplier offer extraction failed. Supplier: {Supplier}, ProductId: {ProductId}, Storage: {StorageCode}",
                 supplier.Supplier, 
                 productId,
-                storageName);
-            await markerService.MarkAsFailedAsync(supplier.Supplier, productId, storageName);
+                storageCode);
+            await markerService.MarkAsFailedAsync(supplier.Supplier, productId, storageCode);
             return SupplierOfferExtractionResult.Failed(supplier.Supplier);
         }
     }
@@ -61,18 +61,18 @@ public class SupplierOfferExtractorService(
     private async Task<SupplierOfferExtractionResult> GetFromSupplierCore(
         ISupplier supplier, 
         int productId,
-        string storageName,
+        string storageCode,
         CancellationToken token)
     {
-        if (await markerService.HasAnyMarkerAsync(supplier.Supplier, productId, storageName, token))
+        if (await markerService.HasAnyMarkerAsync(supplier.Supplier, productId, storageCode, token))
             return SupplierOfferExtractionResult.SkippedByRefreshMarker(supplier.Supplier);
         
         var result = await distributedLockProvider.TryExecuteWithLock(
-            CacheKeys.Offer.Lock.Key(supplier.Supplier, productId, storageName),
+            CacheKeys.Offer.Lock.Key(supplier.Supplier, productId, storageCode),
             CacheKeys.Offer.Lock.Ttl,
             async ct =>
             {
-                if (await markerService.HasAnyMarkerAsync(supplier.Supplier, productId, storageName, ct))
+                if (await markerService.HasAnyMarkerAsync(supplier.Supplier, productId, storageCode, ct))
                     return SupplierOfferExtractionResult.SkippedByRefreshMarker(supplier.Supplier);
                 
                 var mainResponse = await mainClient.ProductNode
@@ -80,7 +80,7 @@ public class SupplierOfferExtractorService(
 
                 if (!mainResponse.Success || mainResponse.Value is { Count: 0 })
                 {
-                    await markerService.MarkAsFailedAsync(supplier.Supplier, productId, storageName);
+                    await markerService.MarkAsFailedAsync(supplier.Supplier, productId, storageCode);
                     return SupplierOfferExtractionResult.NoSupplierReference(supplier.Supplier);
                 }
 
@@ -88,7 +88,7 @@ public class SupplierOfferExtractorService(
                 
                 var response = await supplier.GetProductsAsync(new GetProductsRequest
                 {
-                    StorageName = storageName,
+                    StorageCode = storageCode,
                     Brand = reference.SupplierProducerName,
                     Number = reference.Sku,
                     ShowAnalogues = true
@@ -96,11 +96,11 @@ public class SupplierOfferExtractorService(
 
                 if (!response.Success || response.Value == null)
                 {
-                    await markerService.MarkAsFailedAsync(supplier.Supplier, productId, storageName);
+                    await markerService.MarkAsFailedAsync(supplier.Supplier, productId, storageCode);
                     return SupplierOfferExtractionResult.SupplierRequestFailed(supplier.Supplier);
                 }
                 
-                await markerService.MarkAsOkAsync(supplier.Supplier, productId, storageName, ct);
+                await markerService.MarkAsOkAsync(supplier.Supplier, productId, storageCode, ct);
 
                 return response.ValueOrThrow.Count switch
                 {

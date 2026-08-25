@@ -19,7 +19,7 @@ namespace Pricing.Application.Handlers.Pricing;
 public record GetPriceOptionsForProductQuery(
     int ProductId,
     int CurrencyId,
-    string StorageName,
+    string StorageCode,
     IEnumerable<PriceOfferSource> Sources,
     Pagination Pagination,
     string[] SortBy) : IQuery<GetPriceOptionsForProductResult>;
@@ -40,7 +40,7 @@ public class GetPriceOptionsForProductHandler(
         CancellationToken cancellationToken)
     {
         var refreshed = await sender.Send(
-            new RefreshOffersCommand(request.ProductId, request.StorageName),
+            new RefreshOffersCommand(request.ProductId, request.StorageCode),
             cancellationToken);
 
         if (refreshed.CreatedOffers.Count != 0)
@@ -71,7 +71,7 @@ public class GetPriceOptionsForProductHandler(
                 DeliveryProbability = option.DeliveryProbability,
                 DeliveryTime = option.DeliveryTime,
                 GuaranteedDeliveryTime = option.GuaranteedDeliveryTime,
-                ForStorageName = option.ForStorageName,
+                ForStorageCode = option.ForStorageCode,
                 Markup = option.Markup,
                 Price = await currencyConverter.ConvertAsync(option.Price, option.CurrencyId, request.CurrencyId, cancellationToken),
                 Score = option.Score,
@@ -105,7 +105,7 @@ public class GetPriceOptionsForProductHandler(
         CancellationToken cancellationToken)
     {
         await sender.Send(
-            new CalculateCandidatesCommand(request.ProductId, request.StorageName), 
+            new CalculateCandidatesCommand(request.ProductId, request.StorageCode),
             cancellationToken);
     }
 
@@ -116,7 +116,7 @@ public class GetPriceOptionsForProductHandler(
         var query = repository.Query
             .Include(x => x.PriceOffer)
             .Where(x => x.PriceOffer.ProductId == request.ProductId)
-            .Where(x => x.PriceOffer.OfferForStorage == request.StorageName)
+            .Where(x => x.PriceOffer.OfferForStorage == request.StorageCode)
             .Where(x => x.PriceOffer.ExpiresAt > DateTime.UtcNow);
 
         if (request.Sources.Any())

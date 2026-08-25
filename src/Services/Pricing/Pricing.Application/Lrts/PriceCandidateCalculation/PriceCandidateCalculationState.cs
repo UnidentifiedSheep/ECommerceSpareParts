@@ -16,12 +16,12 @@ public class PriceCandidateCalculationState : IInputState
     public required int ProductId { get; init; }
     
     [SchemaInputControl(InputControlType.EntitySelector)]
-    [SchemaDependsOnEntity("Storage", "name")]
+    [SchemaDependsOnEntity("Storage", "code")]
     [RequiredSchemaField]
-    [SchemaFieldDescription("lrt.price.candidate.calculation.storage.name.description")]
-    [SchemaFieldLabel("lrt.price.candidate.calculation.storage.name.name")]
-    [JsonPropertyName("storageName")]
-    public required string StorageName { get; init; }
+    [SchemaFieldDescription("lrt.price.candidate.calculation.storage.code.description")]
+    [SchemaFieldLabel("lrt.price.candidate.calculation.storage.code.name")]
+    [JsonPropertyName("storageCode")]
+    public required string StorageCode { get; init; }
     
     public void ValidateState() { }
 }

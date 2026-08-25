@@ -9,18 +9,18 @@ public interface IOfferRefreshService
 {
     Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
         int productId,
-        string storageName,
+        string storageCode,
         CancellationToken token = default);
 
     Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
         int productId,
-        string storageName,
+        string storageCode,
         IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> supplierPositions,
         CancellationToken token = default);
 
     Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
         DateTime dataExtractionTime,
-        string storageName,
+        string storageCode,
         Supplier supplier,
         IReadOnlyDictionary<int, IReadOnlyList<SupplierPosition>> supplierPositions,
         CancellationToken token = default);

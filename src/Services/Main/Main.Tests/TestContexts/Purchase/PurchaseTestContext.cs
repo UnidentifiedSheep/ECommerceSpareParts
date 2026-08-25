@@ -70,7 +70,7 @@ public class PurchaseTestContext(
         await DbContext.SaveChangesAsync(cancellationToken);
 
         StorageContent = await new StorageContentBuilder(Faker)
-            .WithStorageName(storageRouteContext.ActiveRoute.ToStorageName)
+            .WithStorageCode(storageRouteContext.ActiveRoute.ToStorageCode)
             .WithProductIds(Product.Id)
             .WithCurrencyId(currencyId)
             .WithCount(2)
@@ -91,7 +91,7 @@ public class PurchaseTestContext(
             .WithSupplierOrganizationId(Supplier.Id)
             .WithCurrencyId(currencyId)
             .WithTransactionId(transaction.Id)
-            .WithStorage(storageRouteContext.ActiveRoute.ToStorageName)
+            .WithStorage(storageRouteContext.ActiveRoute.ToStorageCode)
             .WithContent(purchaseContent)
             .BuildAndAddToDb(DbContext);
     }

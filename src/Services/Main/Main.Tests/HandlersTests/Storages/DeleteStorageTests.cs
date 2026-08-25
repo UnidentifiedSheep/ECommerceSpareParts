@@ -33,23 +33,23 @@ public class DeleteStorageTests : IntegrationTest
         var storage = GetContext<StorageTestContext>()
             .Storages
             .First(x =>
-                x.Name != GetContext<StorageContentTestContext>().StorageContents.First().StorageName);
-        var command = new DeleteStorageCommand(storage.Name);
+                x.Code != GetContext<StorageContentTestContext>().StorageContents.First().StorageCode);
+        var command = new DeleteStorageCommand(storage.Code);
         await Mediator.Send(command);
 
-        var exists = await Context.Storages.AnyAsync(x => x.Name == storage.Name);
+        var exists = await Context.Storages.AnyAsync(x => x.Code == storage.Code);
         Assert.False(exists);
     }
 
     [Fact]
     public async Task DeleteStorage_WithContents_ThrowsDbUpdateException()
     {
-        var storage = GetContext<StorageContentTestContext>().StorageContents.First().StorageName;
+        var storage = GetContext<StorageContentTestContext>().StorageContents.First().StorageCode;
 
         var command = new DeleteStorageCommand(storage);
         await Assert.ThrowsAsync<DbUpdateException>(async () => await Mediator.Send(command));
 
-        var exists = await Context.Storages.AnyAsync(x => x.Name == storage);
+        var exists = await Context.Storages.AnyAsync(x => x.Code == storage);
         Assert.True(exists);
     }
 }

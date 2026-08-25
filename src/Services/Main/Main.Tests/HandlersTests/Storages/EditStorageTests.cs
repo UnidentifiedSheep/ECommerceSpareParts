@@ -29,15 +29,15 @@ public class EditStorageTests : IntegrationTest
                 Value = Faker.Lorem.Sentence(30)
             }
         };
-        var command = new EditStorageCommand(storage.Name, model);
+        var command = new EditStorageCommand(storage.Code, model);
         await Mediator.Send(command);
 
         var dbStorage = await Context.Storages
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == storage.Name);
+            .FirstOrDefaultAsync(x => x.Code == storage.Code);
         Assert.NotNull(dbStorage);
 
-        Assert.Equal(storage.Name, dbStorage.Name);
+        Assert.Equal(storage.Code, dbStorage.Code);
         Assert.Equal(storage.Description, dbStorage.Description);
         Assert.Equal(storage.Location, dbStorage.Location);
     }
@@ -54,16 +54,16 @@ public class EditStorageTests : IntegrationTest
                 Value = Faker.Lorem.Sentence(30)
             }
         };
-        var command = new EditStorageCommand(storage.Name, model);
+        var command = new EditStorageCommand(storage.Code, model);
         await Mediator.Send(command);
 
         var dbStorage = await Context.Storages
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == storage.Name);
+            .FirstOrDefaultAsync(x => x.Code == storage.Code);
 
         Assert.NotNull(dbStorage);
 
-        Assert.Equal(storage.Name, dbStorage.Name);
+        Assert.Equal(storage.Code, dbStorage.Code);
         Assert.Equal(storage.Description, dbStorage.Description);
         Assert.Equal(storage.Location, dbStorage.Location);
     }
@@ -80,7 +80,7 @@ public class EditStorageTests : IntegrationTest
                 Value = Faker.Lorem.Letter(300)
             }
         };
-        var command = new EditStorageCommand(storage.Name, model);
+        var command = new EditStorageCommand(storage.Code, model);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -96,7 +96,7 @@ public class EditStorageTests : IntegrationTest
                 Value = Faker.Lorem.Letter(300)
             }
         };
-        var command = new EditStorageCommand(storage.Name, model);
+        var command = new EditStorageCommand(storage.Code, model);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -122,12 +122,12 @@ public class EditStorageTests : IntegrationTest
                 Value = StorageType.SupplierStorage
             }
         };
-        var command = new EditStorageCommand(storage.Name, model);
+        var command = new EditStorageCommand(storage.Code, model);
         await Mediator.Send(command);
 
         var dbStorage = await Context.Storages
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == storage.Name);
+            .FirstOrDefaultAsync(x => x.Code == storage.Code);
 
         Assert.NotNull(dbStorage);
         Assert.Equal(dbStorage.Description, model.Description);
@@ -136,7 +136,7 @@ public class EditStorageTests : IntegrationTest
     }
 
     [Fact]
-    public async Task EditStorage_InvalidStorageName_ThrowsStorageNotFound()
+    public async Task EditStorage_InvalidStorageCode_ThrowsStorageNotFound()
     {
         var model = new PatchStorageDto
         {

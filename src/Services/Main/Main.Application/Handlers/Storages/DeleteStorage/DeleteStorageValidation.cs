@@ -7,8 +7,8 @@ public class DeleteStorageValidation : AbstractValidator<DeleteStorageCommand>
 {
     public DeleteStorageValidation()
     {
-        RuleFor(x => x.StorageName)
+        RuleFor(x => x.StorageCode)
             .NotEmpty()
-            .WithLocalizationKey("storage.name.not.empty");
+            .WithLocalizationKey("storage.code.not.empty");
     }
 }

@@ -55,13 +55,13 @@ public class SubtractStorageContentsTests : IntegrationTest
         events.Should()
             .Contain(x =>
                 x.Data.ProductId == product.Id &&
-                x.Data.StorageName == passedContent.StorageName &&
+                x.Data.StorageCode == passedContent.StorageCode &&
                 x.Data.Count == 0 &&
                 x.Data.MovementType == StorageMovementType.Sale);
         events.Should()
             .Contain(x =>
                 x.Data.ProductId == product.Id &&
-                x.Data.StorageName == passedContent.StorageName &&
+                x.Data.StorageCode == passedContent.StorageCode &&
                 x.Data.Count == firstByDateOriginalCount - 1 &&
                 x.Data.MovementType == StorageMovementType.Sale);
     }
@@ -126,7 +126,7 @@ public class SubtractStorageContentsTests : IntegrationTest
         var content = GetContext<StorageContentTestContext>().StorageContents.First();
         var countToSubtract = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == content.ProductId && x.StorageName == content.StorageName)
+            .Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
             .SumAsync(x => x.Count);
 
         var result = await Mediator.Send(
@@ -139,7 +139,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 
         var leftOnSameStorage = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == content.ProductId && x.StorageName == content.StorageName)
+            .Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
             .SumAsync(x => x.Count);
         leftOnSameStorage.Should().Be(0);
     }
@@ -181,7 +181,7 @@ public class SubtractStorageContentsTests : IntegrationTest
         events.Should()
             .OnlyContain(x =>
                 x.Data.ProductId == first.ProductId &&
-                x.Data.StorageName == first.StorageName &&
+                x.Data.StorageCode == first.StorageCode &&
                 x.Data.MovementType == StorageMovementType.PurchaseEditing);
         events.Select(x => x.Data.Count)
             .Should()
@@ -199,7 +199,7 @@ public class SubtractStorageContentsTests : IntegrationTest
         var second = contentsForSameProductAndStorage.Skip(1).First();
         var originalCounts = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == first.ProductId && x.StorageName == first.StorageName)
+            .Where(x => x.ProductId == first.ProductId && x.StorageCode == first.StorageCode)
             .ToDictionaryAsync(x => x.Id, x => x.Count);
         var originalProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == first.ProductId);
         var countOnSameStorage = originalCounts.Values.Sum();
@@ -215,7 +215,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 
         var actualCounts = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == first.ProductId && x.StorageName == first.StorageName)
+            .Where(x => x.ProductId == first.ProductId && x.StorageCode == first.StorageCode)
             .ToDictionaryAsync(x => x.Id, x => x.Count);
         var actualProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == first.ProductId);
         actualCounts.Should().Equal(originalCounts);
@@ -232,7 +232,7 @@ public class SubtractStorageContentsTests : IntegrationTest
         var content = GetContext<StorageContentTestContext>().StorageContents.First();
         var countOnSameStorage = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == content.ProductId && x.StorageName == content.StorageName)
+            .Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
             .SumAsync(x => x.Count);
 
         await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() =>
@@ -249,7 +249,7 @@ public class SubtractStorageContentsTests : IntegrationTest
         var content = GetContext<StorageContentTestContext>().StorageContents.First();
         var originalCounts = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == content.ProductId && x.StorageName == content.StorageName)
+            .Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
             .ToDictionaryAsync(x => x.Id, x => x.Count);
         var originalProduct =
             await Context.Products.AsNoTracking().SingleAsync(x => x.Id == content.ProductId);
@@ -264,7 +264,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 
         var actualCounts = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == content.ProductId && x.StorageName == content.StorageName)
+            .Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
             .ToDictionaryAsync(x => x.Id, x => x.Count);
         var actualProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == content.ProductId);
         actualCounts.Should().Equal(originalCounts);
@@ -338,7 +338,7 @@ public class SubtractStorageContentsTests : IntegrationTest
                 [
                     new SubtractProductFromStorageItem(
                         firstByDate.ProductId,
-                        firstByDate.StorageName,
+                        firstByDate.StorageCode,
                         countToSubtract)
                 ],
                 StorageMovementType.Sale));
@@ -362,7 +362,7 @@ public class SubtractStorageContentsTests : IntegrationTest
         var groups = GetContext<StorageContentTestContext>()
             .StorageContents
             .Where(x => x.Count > 0)
-            .GroupBy(x => new { x.ProductId, x.StorageName })
+            .GroupBy(x => new { x.ProductId, x.StorageCode })
             .Where(x => x.Count() >= 1)
             .Take(2)
             .Select(x => x.First())
@@ -376,7 +376,7 @@ public class SubtractStorageContentsTests : IntegrationTest
                     new SubtractStorageContentItem(groups[0].Id, 1),
                     new SubtractProductFromStorageItem(
                         groups[1].ProductId,
-                        groups[1].StorageName,
+                        groups[1].StorageCode,
                         1)
                 ],
                 StorageMovementType.Sale));
@@ -421,7 +421,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 
     [Fact]
     public async Task
-        SubtractStorageContents_ByProductAndStorage_WithInvalidStorageName_ThrowsValidationException()
+        SubtractStorageContents_ByProductAndStorage_WithInvalidStorageCode_ThrowsValidationException()
     {
         await Assert.ThrowsAsync<ValidationException>(() =>
             Mediator.Send(
@@ -440,7 +440,7 @@ public class SubtractStorageContentsTests : IntegrationTest
         return GetContext<StorageContentTestContext>()
             .StorageContents
             .Where(x => x.Count > 0)
-            .GroupBy(x => new { x.ProductId, x.StorageName })
+            .GroupBy(x => new { x.ProductId, x.StorageCode })
             .Where(x => x.Count() >= minCount)
             .OrderByDescending(x => x.Sum(z => z.Count))
             .First()

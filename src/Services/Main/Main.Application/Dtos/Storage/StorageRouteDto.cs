@@ -9,11 +9,11 @@ public record StorageRouteDto
     [JsonPropertyName("id")]
     public required Guid Id { get; init; }
 
-    [JsonPropertyName("fromStorageName")]
-    public required string FromStorageName { get; init; }
+    [JsonPropertyName("fromStorageCode")]
+    public required string FromStorageCode { get; init; }
 
-    [JsonPropertyName("toStorageName")]
-    public required string ToStorageName { get; init; }
+    [JsonPropertyName("toStorageCode")]
+    public required string ToStorageCode { get; init; }
 
     [JsonPropertyName("distanceM")]
     public required int DistanceM { get; init; }

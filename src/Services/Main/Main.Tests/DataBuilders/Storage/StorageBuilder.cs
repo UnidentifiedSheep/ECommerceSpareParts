@@ -6,14 +6,14 @@ namespace Tests.DataBuilders.Storage;
 
 public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Storage>(faker)
 {
-    public string? Name { get; private set; }
+    public string? Code { get; private set; }
     public StorageType? Type { get; private set; }
     public string? Location { get; private set; }
     public string? Description { get; private set; }
 
-    public StorageBuilder WithName(string name)
+    public StorageBuilder WithCode(string code)
     {
-        Name = name;
+        Code = code;
         return this;
     }
 
@@ -38,7 +38,7 @@ public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Sto
     public override Main.Entities.Storage.Storage Build()
     {
         var storage = Main.Entities.Storage.Storage.Create(
-            Name ?? Faker.Lorem.Letter(7),
+            Code ?? Faker.Lorem.Letter(7),
             Type ?? Faker.PickRandom<StorageType>());
 
         storage.SetDescription(Description);

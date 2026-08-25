@@ -18,7 +18,7 @@ public interface ISaleService
     Task CheckReservations(
         IEnumerable<NewSaleContentDto> saleContents,
         Guid buyerOrganizationId,
-        string storageName,
+        string storageCode,
         bool takeFromOtherStorages,
         string? confirmationCode,
         CancellationToken cancellationToken = default);
@@ -26,20 +26,20 @@ public interface ISaleService
     Task CheckReservations(
         IEnumerable<EditSaleContentDto> saleContents,
         Guid buyerOrganizationId,
-        string storageName,
+        string storageCode,
         bool takeFromOtherStorages,
         string? confirmationCode,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
-        string storageName,
+        string storageCode,
         IEnumerable<NewSaleContentDto> saleContents,
         StorageMovementType movementType,
         bool takeFromOtherStorages,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
-        string storageName,
+        string storageCode,
         IEnumerable<EditSaleContentDto> saleContents,
         StorageMovementType movementType,
         bool takeFromOtherStorages,

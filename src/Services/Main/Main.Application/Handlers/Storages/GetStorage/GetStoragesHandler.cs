@@ -34,7 +34,7 @@ public class GetStoragesHandler(
                 {
                     Entity = x,
                     Rank =
-                        (EF.Functions.ILike(x.Name, $"%{searchTerm}%") ? 3 : 0) +
+                        (EF.Functions.ILike(x.Code, $"%{searchTerm}%") ? 3 : 0) +
                         (x.Description != null && EF.Functions.ILike(x.Description, $"%{searchTerm}%")
                             ? 2
                             : 0) +
@@ -44,7 +44,7 @@ public class GetStoragesHandler(
                 .OrderByDescending(x => x.Rank)
                 .Select(x => x.Entity);
         else
-            query = query.OrderByDescending(x => x.Name);
+            query = query.OrderByDescending(x => x.Code);
 
         var result = await query
             .Where(x => request.Type == null || x.Type == request.Type)

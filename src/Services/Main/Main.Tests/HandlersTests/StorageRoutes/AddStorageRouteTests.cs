@@ -45,8 +45,8 @@ public class AddStorageRouteTests : IntegrationTest
     public async Task AddStorageRoute_WithValidData_Succeeds()
     {
         var command = new AddStorageRouteCommand(
-            _toStorage.Name,
-            _fromStorage.Name,
+            _toStorage.Code,
+            _fromStorage.Code,
             1000,
             RouteType.IntraCity,
             LogisticPricingType.PerOrder,
@@ -62,8 +62,8 @@ public class AddStorageRouteTests : IntegrationTest
 
         var route = await Context.StorageRoutes.FirstOrDefaultAsync(x => x.Id == result.RouteId);
         Assert.NotNull(route);
-        Assert.Equal(_toStorage.Name, route.FromStorageName);
-        Assert.Equal(_fromStorage.Name, route.ToStorageName);
+        Assert.Equal(_toStorage.Code, route.FromStorageCode);
+        Assert.Equal(_fromStorage.Code, route.ToStorageCode);
         Assert.Equal(1000, route.DistanceM);
         Assert.Equal(10.5m, route.PriceKg);
     }
@@ -72,8 +72,8 @@ public class AddStorageRouteTests : IntegrationTest
     public async Task AddStorageRoute_WithInvalidDistance_ThrowsValidationException()
     {
         var command = new AddStorageRouteCommand(
-            _fromStorage.Name,
-            _toStorage.Name,
+            _fromStorage.Code,
+            _toStorage.Code,
             0,
             RouteType.IntraCity,
             LogisticPricingType.PerOrder,
@@ -92,8 +92,8 @@ public class AddStorageRouteTests : IntegrationTest
     public async Task AddStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
     {
         var command = new AddStorageRouteCommand(
-            _fromStorage.Name,
-            _toStorage.Name,
+            _fromStorage.Code,
+            _toStorage.Code,
             1000,
             RouteType.IntraCity,
             LogisticPricingType.PerOrder,
@@ -112,8 +112,8 @@ public class AddStorageRouteTests : IntegrationTest
     public async Task AddStorageRoute_WithNonExistentCurrency_ThrowsValidationException()
     {
         var command = new AddStorageRouteCommand(
-            _fromStorage.Name,
-            _toStorage.Name,
+            _fromStorage.Code,
+            _toStorage.Code,
             1000,
             RouteType.IntraCity,
             LogisticPricingType.PerOrder,
@@ -133,7 +133,7 @@ public class AddStorageRouteTests : IntegrationTest
     {
         var command = new AddStorageRouteCommand(
             "NonExistentStorage",
-            _toStorage.Name,
+            _toStorage.Code,
             1000,
             RouteType.IntraCity,
             LogisticPricingType.PerOrder,

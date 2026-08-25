@@ -11,7 +11,7 @@ namespace Pricing.Application.Handlers.Pricing;
 public record ApplySupplierProductsCommand(
     DateTime DataExtractionTime,
     Supplier Supplier,
-    string StorageName,
+    string StorageCode,
     IReadOnlyList<SupplierProduct> Products
 ) : ICommand<ApplySupplierProductsResult>;
 
@@ -53,7 +53,7 @@ public class ApplySupplierProductsHandler(
         
         var offers = await refreshService.RefreshOffersAsync(
             request.DataExtractionTime,
-            request.StorageName,
+            request.StorageCode,
             request.Supplier,
             refreshDict,
             cancellationToken);

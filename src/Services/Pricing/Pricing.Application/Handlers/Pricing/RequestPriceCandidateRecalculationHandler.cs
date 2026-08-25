@@ -26,7 +26,7 @@ public class RequestPriceCandidateRecalculationHandler(
             .Select(x => jobProvider.Create(new PriceCandidateCalculationState
             {
                 ProductId = x.ProductId,
-                StorageName = x.StorageName
+                StorageCode = x.StorageCode
             }))
             .ToList();
         

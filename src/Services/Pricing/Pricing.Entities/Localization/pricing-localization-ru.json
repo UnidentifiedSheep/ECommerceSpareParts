@@ -40,8 +40,8 @@
     "lrt.price.candidate.calculation.description": "Рассчитывает и сохраняет варианты цены для выбранного товара и склада.",
     "lrt.price.candidate.calculation.product.id.name": "Товар",
     "lrt.price.candidate.calculation.product.id.description": "Товар, для которого нужно рассчитать варианты цены.",
-    "lrt.price.candidate.calculation.storage.name.name": "Склад",
-    "lrt.price.candidate.calculation.storage.name.description": "Склад, для которого нужно рассчитать варианты цены.",
+    "lrt.price.candidate.calculation.storage.code.name": "Код склада",
+    "lrt.price.candidate.calculation.storage.code.description": "Код склада, для которого нужно рассчитать варианты цены.",
     "lrt.invalidate.stale.price.options.name": "Инвалидация устаревших вариантов цены",
     "lrt.invalidate.stale.price.options.description": "Удаляет варианты цены, рассчитанные с устаревшей конфигурацией ценообразования, и ставит задачи на перерасчет."
   }

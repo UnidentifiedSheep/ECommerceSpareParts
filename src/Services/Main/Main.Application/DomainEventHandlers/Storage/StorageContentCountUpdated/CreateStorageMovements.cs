@@ -18,7 +18,7 @@ public class CreateStorageMovements(
                 new StorageMovementEventData
                 {
                     ProductId = item.ProductId,
-                    StorageName = item.StorageName,
+                    StorageCode = item.StorageCode,
                     CurrencyId = item.CurrencyId,
                     Count = item.NewCount,
                     BuyPrice = item.BuyPrice,

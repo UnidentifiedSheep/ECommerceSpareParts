@@ -14,14 +14,14 @@ public class SupplierProductsRequestedConsumer(
     public async Task Consume(ConsumeContext<SupplierProductsRequestedEvent> context)
     {
         var supplier = context.Message.Supplier;
-        var storageName = context.Message.RequestedStorageFor;
+        var storageCode = context.Message.RequestedStorageCode;
         var products = context.Message
             .Products
             .Select(x => x.FromContract())
             .ToList();
 
         await sender.Send(
-            new ApplySupplierProductsCommand(context.Message.OccurredAt, supplier, storageName, products),
+            new ApplySupplierProductsCommand(context.Message.OccurredAt, supplier, storageCode, products),
             context.CancellationToken);
     }
 }

@@ -31,7 +31,7 @@ public class StorageContentTestContext(
         StorageContents = await new StorageContentBuilder(Faker)
             .WithCurrencyId(currency.Currencies[0].Id)
             .WithProducts(product.Products)
-            .WithStorageName(storage.Storages.First(x => x.Type == StorageType.Warehouse).Name)
+            .WithStorageCode(storage.Storages.First(x => x.Type == StorageType.Warehouse).Code)
             .BuildManyAndAddToDb(DbContext, 10);
 
         var products = product.Products.ToDictionary(k => k.Id);

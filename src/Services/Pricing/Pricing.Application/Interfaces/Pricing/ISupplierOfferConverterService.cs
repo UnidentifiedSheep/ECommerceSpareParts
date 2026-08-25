@@ -8,13 +8,13 @@ public interface ISupplierOfferConverterService
 {
     Task<IReadOnlyList<SupplierOfferConversionResult>> ConvertAsync(
         int productId,
-        string storageName,
+        string storageCode,
         IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> offers,
         CancellationToken token = default);
 
     Task<SupplierOfferConversionResult> ConvertAsync(
         int productId,
-        string storageName,
+        string storageCode,
         Supplier supplier,
         IReadOnlyList<SupplierPosition> positions,
         CancellationToken token = default);

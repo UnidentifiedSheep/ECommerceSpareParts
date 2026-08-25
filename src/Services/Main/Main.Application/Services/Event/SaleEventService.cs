@@ -35,7 +35,7 @@ public sealed class SaleEventService(
             State = x.State == SaleState.Completed ? SaleStateEventModel.Completed :
                 x.State == SaleState.Deleted ? SaleStateEventModel.Deleted :
                 SaleStateEventModel.Draft,
-            Storage = x.StorageName,
+            StorageCode = x.StorageCode,
             TotalSum = x.Transaction.Amount,
             TransactionId = x.TransactionId,
             Contents = x.Contents.Select(z => ToSaleContentEvent.Invoke(z)).ToList()

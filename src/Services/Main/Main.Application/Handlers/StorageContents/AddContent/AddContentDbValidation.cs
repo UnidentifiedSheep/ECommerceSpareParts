@@ -8,7 +8,7 @@ public class AddContentDbValidation : AbstractDbValidation<AddContentCommand>
 {
     public override void Build(IValidationPlan plan, AddContentCommand request)
     {
-        plan.ValidateStorageExistsName(request.StorageName)
+        plan.ValidateStorageExistsCode(request.StorageCode)
             .ValidateCurrencyExistsId(request.StorageContent.Select(x => x.CurrencyId));
     }
 }

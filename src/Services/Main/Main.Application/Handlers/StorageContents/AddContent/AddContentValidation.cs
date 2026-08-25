@@ -27,7 +27,7 @@ public class AddContentValidation : AbstractValidator<AddContentCommand>
             .NotEmpty()
             .WithLocalizationKey("storage.content.list.not.empty");
 
-        RuleFor(x => x.StorageName)
+        RuleFor(x => x.StorageCode)
             .NotEmpty()
             .WithLocalizationKey("storage.name.not.empty");
     }

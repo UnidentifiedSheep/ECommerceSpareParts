@@ -29,7 +29,7 @@ public record CreatePurchaseCommand(
     Guid SupplierUserId,
     Guid SupplierOrganizationId,
     int CurrencyId,
-    string StorageName,
+    string StorageCode,
     DateTime PurchaseDate,
     IEnumerable<NewPurchaseContentDto> PurchaseContent,
     string? Comment,
@@ -122,7 +122,7 @@ public class CreatePurchaseHandler(
                 PurchaseDate = request.PurchaseDate,
                 ProductId = x.ProductId
             }),
-            request.StorageName,
+            request.StorageCode,
             StorageMovementType.Purchase);
 
         return (await sender.Send(command, cancellationToken))
@@ -143,7 +143,7 @@ public class CreatePurchaseHandler(
             request.SupplierOrganizationId,
             request.CurrencyId,
             transactionId,
-            request.StorageName,
+            request.StorageCode,
             request.PurchaseDate);
 
         purchase.SetComment(request.Comment);

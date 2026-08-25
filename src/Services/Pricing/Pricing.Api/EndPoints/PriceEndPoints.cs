@@ -24,8 +24,8 @@ public record GetPriceOffersForProductRequest : SortablePaginationQueryModel
     [FromQuery(Name = "source")]
     public PriceOfferSource[] Sources { get; init; } = [];
 
-    [FromQuery(Name = "storageName")]
-    public string StorageName { get; init; } = string.Empty;
+    [FromQuery(Name = "storageCode")]
+    public string StorageCode { get; init; } = string.Empty;
 }
 
 public record GetPriceOffersForProductResponse
@@ -51,7 +51,7 @@ public class PriceEndPoints : ICarterModule
                     var query = new GetPriceOptionsForProductQuery(
                         request.ProductId,
                         request.CurrencyId,
-                        request.StorageName,
+                        request.StorageCode,
                         request.Sources,
                         request,
                         request.SortBy);

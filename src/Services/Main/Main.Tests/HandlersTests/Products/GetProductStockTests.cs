@@ -15,7 +15,7 @@ public class GetProductStockTests : IntegrationTest
     private StorageContentTestContext TestContext => GetContext<StorageContentTestContext>();
 
     [Fact]
-    public async Task GetProductStock_WithoutStorageName_ReturnsProductStock()
+    public async Task GetProductStock_WithoutStorageCode_ReturnsProductStock()
     {
         var content = TestContext.StorageContents.First(x => x.Count > 0);
         var expected = TestContext.StorageContents
@@ -28,23 +28,23 @@ public class GetProductStockTests : IntegrationTest
     }
 
     [Fact]
-    public async Task GetProductStock_WithStorageName_ReturnsStorageContentStock()
+    public async Task GetProductStock_WithStorageCode_ReturnsStorageContentStock()
     {
         var content = TestContext.StorageContents.First(x => x.Count > 0);
         var expected = TestContext.StorageContents
             .Where(x =>
                 x.ProductId == content.ProductId &&
-                x.StorageName == content.StorageName &&
+                x.StorageCode == content.StorageCode &&
                 x.Count > 0)
             .Sum(x => x.Count);
 
-        var result = await Mediator.Send(new GetProductStockQuery(content.ProductId, content.StorageName));
+        var result = await Mediator.Send(new GetProductStockQuery(content.ProductId, content.StorageCode));
 
         result.Stock.Should().Be(expected);
     }
 
     [Fact]
-    public async Task GetProductStock_WithUnknownStorageName_ReturnsZero()
+    public async Task GetProductStock_WithUnknownStorageCode_ReturnsZero()
     {
         var content = TestContext.StorageContents.First(x => x.Count > 0);
 

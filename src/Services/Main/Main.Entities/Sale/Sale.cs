@@ -19,14 +19,14 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
         Guid organizationId,
         Guid transactionId,
         int currencyId,
-        string storageName,
+        string storageCode,
         DateTime saleDate)
     {
         TransactionId = transactionId;
         CurrencyId = currencyId;
         UserId = userId;
         OrganizationId = organizationId;
-        StorageName = storageName;
+        StorageCode = storageCode;
         SaleDatetime = saleDate;
         State = SaleState.Draft;
     }
@@ -36,7 +36,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
     public Guid OrganizationId { get; private set; }
     public Guid TransactionId { get; private set; }
     public int CurrencyId { get; private set; }
-    public string StorageName { get; private set; } = null!;
+    public string StorageCode { get; private set; } = null!;
     public string? Comment { get; private set; }
     public DateTime SaleDatetime { get; private set; }
     public SaleState State { get; private set; }
@@ -57,7 +57,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
         Guid organizationId,
         Guid transactionId,
         int currencyId,
-        string storageName,
+        string storageCode,
         DateTime saleDate)
     {
         return new Sale(
@@ -65,7 +65,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
             organizationId,
             transactionId,
             currencyId,
-            storageName,
+            storageCode,
             saleDate);
     }
 
