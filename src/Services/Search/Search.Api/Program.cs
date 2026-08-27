@@ -12,12 +12,15 @@ using MassTransit;
 using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using Search.Abstractions.Options;
+using Search.Api.GraphQl;
 using Search.Application;
 using Search.Application.Consumers.CatalogueCandidate;
 using Search.Application.Consumers.Producer;
 using Search.Application.Consumers.Product;
 using Search.Persistence;
 using Security;
+
+const string serviceName = "Search";
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.AddServiceConfiguration("search");
@@ -32,7 +35,8 @@ AddOpenSearchOptions(builder.Services)
     .AddHeaderSecretsOptions()
     .AddRedisOptions();
 
-builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Search);
+builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Search)
+    .AddGraphQlServices(serviceName);
 
 builder.Services.AddMassTransit(x =>
 {
@@ -83,8 +87,9 @@ builder.Services.AddHostedService<StartupTaskHostedService>();
 var app = builder.Build();
 
 app.UseCommonApiPipeline();
+app.MapGraphQL();
 
-await app.RunAsync();
+await app.RunWithGraphQLCommandsAsync(args);
 return;
 
 static IServiceCollection AddOpenSearchOptions(IServiceCollection services)
