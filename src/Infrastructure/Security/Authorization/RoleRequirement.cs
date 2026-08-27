@@ -1,3 +1,4 @@
+using Enums;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Security.Authorization;
@@ -20,6 +21,10 @@ public sealed class RoleRequirement : IAuthorizationRequirement
 
         Match = match;
     }
+    
+    public RoleRequirement(
+        IEnumerable<PermissionCodes> roles,
+        AuthorizationMatch match) : this(roles.Select(x => x.ToString()), match) { }
 
     public IReadOnlyList<string> Roles { get; }
     public AuthorizationMatch Match { get; }

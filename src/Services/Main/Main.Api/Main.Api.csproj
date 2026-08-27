@@ -31,6 +31,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\..\GraphQL.Common\GraphQL.Common.csproj" />
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
         <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>

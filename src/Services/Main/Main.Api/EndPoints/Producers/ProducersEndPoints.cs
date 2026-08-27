@@ -52,7 +52,7 @@ public class ProducersEndPoints : ICarterModule
                 {
                     var result = await sender.Send(new CreateProducerCommand(request.NewProducer), token);
                     var producer = await sender.Send(
-                        new GetProducerByIdQuery(result.ProducerId),
+                        new GetProducersByIdsQuery(result.ProducerId),
                         token);
 
                     return Results.Created(
@@ -79,7 +79,7 @@ public class ProducersEndPoints : ICarterModule
                     var result = await sender
                         .Send(new EditProducerCommand(producerId, request.EditProducer), cancellationToken);
                     var producer = await sender.Send(
-                        new GetProducerByIdQuery(result.ProducerId),
+                        new GetProducersByIdsQuery(result.ProducerId),
                         cancellationToken);
 
                     return Results.Ok(new PatchProducerResponse(producer.Producer));
@@ -140,7 +140,7 @@ public class ProducersEndPoints : ICarterModule
                     int id,
                     CancellationToken ct) =>
                 {
-                    var result = await sender.Send(new GetProducerByIdQuery(id), ct);
+                    var result = await sender.Send(new GetProducersByIdsQuery(id), ct);
                     return Results.Ok(new GetProducerByIdResponse(result.Producer));
                 })
             .WithName("GetProducerById")

@@ -89,7 +89,7 @@ public class AuthorizationHandlerTests
     public void PermissionRequirement_WhenPermissionsAreEmpty_Throws()
     {
         Assert.Throws<ArgumentException>(
-            () => new PermissionRequirement([], AuthorizationMatch.Any));
+            () => new PermissionRequirement(new string[]{}, AuthorizationMatch.Any));
     }
 
     private static async Task<AuthorizationHandlerContext> Authorize(

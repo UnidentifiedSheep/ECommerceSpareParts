@@ -19,10 +19,13 @@ using Contracts.Products;
 using Contracts.Settings;
 using Contracts.User;
 using ExchangeRate;
+using GraphQL.Common.Extensions;
 using Localization.Domain.Extensions;
 using Mail;
 using Main.Api;
 using Main.Api.EndPoints.Products;
+using Main.Api.GraphQl;
+using Main.Api.GraphQl.DataLoaders;
 using Main.Application;
 using Main.Application.Configs;
 using Main.Application.Consumers;
@@ -138,6 +141,8 @@ builder.Services.AddCarter(
         typeof(JobEndPoints).Assembly),
     c => c.WithEmptyValidators());
 
+builder.Services.AddGraphQlServices();
+
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
@@ -148,5 +153,6 @@ SortByConfig.Configure();
 app.UseCommonApiPipeline();
 
 app.MapHub<JobHub>("/hubs/jobs");
+app.MapCommonGraphQl();
 
-await app.RunAsync();
+await app.RunWithGraphQLCommandsAsync(args);

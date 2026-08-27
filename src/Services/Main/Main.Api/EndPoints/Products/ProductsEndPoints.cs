@@ -107,7 +107,7 @@ public class ProductsEndPoints : ICarterModule
                     int productId,
                     CancellationToken token) =>
                 {
-                    var result = await sender.Send(new GetByIdQuery(productId), token);
+                    var result = await sender.Send(new GetProductByIdQuery(productId), token);
                     return Results.Ok(
                         new GetProductByIdResponse
                         {

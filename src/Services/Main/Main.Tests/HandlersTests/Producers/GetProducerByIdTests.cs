@@ -17,7 +17,7 @@ public class GetProducerByIdTests(CombinedContainerFixture fixture) : Integratio
             .WithDescription("Requested description")
             .BuildAndAddToDb(Context);
 
-        var result = await Mediator.Send(new GetProducerByIdQuery(producer.Id));
+        var result = await Mediator.Send(new GetProducersByIdsQuery(producer.Id));
 
         result.Producer.Id.Should().Be(producer.Id);
         result.Producer.Name.Should().Be(producer.Name);
@@ -27,7 +27,7 @@ public class GetProducerByIdTests(CombinedContainerFixture fixture) : Integratio
     [Fact]
     public async Task GetProducerById_MissingProducer_ThrowsProducerNotFoundException()
     {
-        var act = () => Mediator.Send(new GetProducerByIdQuery(int.MaxValue));
+        var act = () => Mediator.Send(new GetProducersByIdsQuery(int.MaxValue));
 
         await act.Should().ThrowAsync<ProducerNotFoundException>();
     }
