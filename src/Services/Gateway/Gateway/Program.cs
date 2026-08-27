@@ -7,6 +7,7 @@ using Cache;
 using Common;
 using Gateway.Application;
 using Gateway.EndPoints;
+using Gateway.Extensions;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
@@ -144,10 +145,7 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddHttpClient("fusion", x =>
-{
-    x.DefaultRequestHeaders.Add("X-Internal-Token", secret);
-});
+builder.Services.AddFusionHttpClient(secret);
 
 builder.AddGraphQLGateway()
     .AddFileSystemConfiguration("./gateway.far")
@@ -163,6 +161,8 @@ MapDocs(app);
 
 app.UseCors();
 
+app.UseHeaderPropagation();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseWebSockets();
