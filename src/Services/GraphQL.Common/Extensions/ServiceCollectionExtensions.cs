@@ -1,4 +1,5 @@
 using GraphQL.Common.Authorization;
+using GraphQL.Common.Types;
 using HotChocolate.Execution.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ public static class ServiceCollectionExtensions
     {
         return services
             .AddGraphQLServer(name)
+            .AddType<GqlPagination>()
+            .AddType<GqlSortBy>()
             .AddCommonAuthorization();
     }
 }

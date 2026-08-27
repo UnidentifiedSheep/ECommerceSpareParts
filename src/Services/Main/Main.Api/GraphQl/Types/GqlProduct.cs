@@ -4,7 +4,7 @@ using Main.Application.Dtos.Product;
 
 namespace Main.Api.GraphQl.Types;
 
-[GraphQLName("product")]
+[GraphQLName("Product")]
 public record GqlProduct(
     [property: GraphQLIgnore]
     ProductDto Product)

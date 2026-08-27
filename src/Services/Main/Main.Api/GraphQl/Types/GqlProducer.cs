@@ -3,7 +3,7 @@ using Main.Application.Dtos.Producer;
 
 namespace Main.Api.GraphQl.Types;
 
-[GraphQLName("producer")]
+[GraphQLName("Producer")]
 public record GqlProducer(
     [property: GraphQLIgnore]
     ProducerDto Producer)

@@ -54,8 +54,4 @@
     <ItemGroup>
         <Folder Include="EndPoints\Producers\"/>
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="GraphQl\Types\GqlCatalogueCandidate.cs" />
-    </ItemGroup>
 </Project>
