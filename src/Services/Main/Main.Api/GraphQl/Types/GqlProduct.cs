@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Application.Dtos.Product;
 
@@ -10,6 +11,7 @@ public record GqlProduct(
     ProductDto Product)
 {
     [GraphQLName("id")]
+    [Shareable]
     public int Id => Product.Id;
 
     [GraphQLName("sku")]

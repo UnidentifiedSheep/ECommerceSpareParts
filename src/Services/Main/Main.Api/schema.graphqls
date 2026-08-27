@@ -4,17 +4,35 @@ schema {
 
 type Query {
   products: ProductQueries!
+  catalogueCandidates: CatalogueCandidateQueries!
 }
 
-type producer {
-  id: Int!
+type CatalogueCandidate {
+  id: UUID! @shareable
+  producer: Producer!
+  product: Product
+  sku: String!
+  supplierProducts: [SupplierProduct!]!
+}
+
+type CatalogueCandidateQueries {
+  byId(id: UUID!): CatalogueCandidate @lookup @cost(weight: "10")
+}
+
+type Pagination {
+  page: Int!
+  size: Int!
+}
+
+type Producer {
+  id: Int! @shareable
   name: String!
   description: String
 }
 
-type product {
-  producer: producer! @cost(weight: "10")
-  id: Int!
+type Product {
+  producer: Producer! @cost(weight: "10")
+  id: Int! @shareable
   sku: String!
   name: String!
   description: String
@@ -24,8 +42,27 @@ type product {
 }
 
 type ProductQueries {
-  byId(id: Int!): product @lookup @cost(weight: "10")
-  byIds(ids: [Int!]!): [product!]! @cost(weight: "10")
+  byId(id: Int!): Product @lookup @cost(weight: "10")
+  byIds(ids: [Int!]!): [Product!]! @cost(weight: "10")
+}
+
+type SortBy {
+  field: String!
+  isDescending: Boolean!
+}
+
+type SupplierProduct {
+  id: Int! @shareable
+  sku: String!
+  producer: String!
+  supplier: Supplier!
+  names: [SupplierProductName!]!
+}
+
+type SupplierProductName {
+  id: Int! @shareable
+  supplierProductId: Int!
+  name: String!
 }
 
 "Defines when a policy shall be executed."
@@ -37,6 +74,16 @@ enum ApplyPolicy {
   "The policy is applied in the validation step before the execution."
   VALIDATION
 }
+
+enum Supplier {
+  ARMTEK
+  FAVORIT_PARTS
+  TMTR
+}
+
+"The `UUID` scalar type represents a Universally Unique Identifier (UUID) as defined by RFC 9562."
+scalar UUID
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/uuid.html")
 
 "The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
 directive @cost(
@@ -56,3 +103,5 @@ that can be used by the distributed GraphQL executor to resolve an entity by
 a stable key.
 """
 directive @lookup on FIELD_DEFINITION
+
+directive @shareable repeatable on OBJECT | FIELD_DEFINITION

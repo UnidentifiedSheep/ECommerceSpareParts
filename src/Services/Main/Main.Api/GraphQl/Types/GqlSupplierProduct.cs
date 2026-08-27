@@ -1,5 +1,6 @@
 using Enums;
 using HotChocolate;
+using HotChocolate.Types.Composite;
 using Main.Application.Dtos.Product.Enrichment;
 
 namespace Main.Api.GraphQl.Types;
@@ -10,6 +11,7 @@ public record GqlSupplierProduct(
     SupplierProductDto SupplierProductDto)
 {
     [GraphQLName("id")]
+    [Shareable]
     public int Id => SupplierProductDto.Id;
 
     [GraphQLName("sku")]

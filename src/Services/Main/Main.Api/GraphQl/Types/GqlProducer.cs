@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Types.Composite;
 using Main.Application.Dtos.Producer;
 
 namespace Main.Api.GraphQl.Types;
@@ -9,6 +10,7 @@ public record GqlProducer(
     ProducerDto Producer)
 {
     [GraphQLName("id")]
+    [Shareable]
     public int Id => Producer.Id;
 
     [GraphQLName("name")]

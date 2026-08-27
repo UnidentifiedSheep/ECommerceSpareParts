@@ -1,0 +1,141 @@
+schema {
+  query: Query
+}
+
+type Query {
+  catalogue: CatalogueQueries!
+}
+
+type CatalogueCandidate {
+  id: UUID! @shareable
+}
+
+type CatalogueQueries {
+  search(input: CatalogueSearchInput!): CatalogueSearchResult!
+    @authorize(policy: "GraphQL.Permission.All")
+    @cost(weight: "10")
+}
+
+type CatalogueSearchResult {
+  products: SearchCatalogueSectionOfProduct!
+  catalogues: SearchCatalogueSectionOfCatalogueCandidate!
+}
+
+type Highlight {
+  field: String!
+  fragments: [String!]!
+}
+
+type Highlights {
+  items: [Highlight!]!
+}
+
+type Pagination {
+  page: Int!
+  size: Int!
+}
+
+type Product {
+  id: Int! @shareable
+}
+
+type SearchCatalogueSectionItemOfCatalogueCandidate {
+  item: CatalogueCandidate!
+  highlights: Highlights
+}
+
+type SearchCatalogueSectionItemOfProduct {
+  item: Product!
+  highlights: Highlights
+}
+
+type SearchCatalogueSectionOfCatalogueCandidate {
+  items: [SearchCatalogueSectionItemOfCatalogueCandidate!]!
+  total: Long!
+}
+
+type SearchCatalogueSectionOfProduct {
+  items: [SearchCatalogueSectionItemOfProduct!]!
+  total: Long!
+}
+
+type SortBy {
+  field: String!
+  isDescending: Boolean!
+}
+
+input CatalogueSearchInput {
+  query: String
+  targets: [SearchTarget!]!
+  skuModes: [SearchMatchType!]!
+  nameModes: [SearchMatchType!]!
+  producerIds: [Int!]!
+  pagination: PaginationInput!
+  productSortBy: [SortByInput!]!
+  catalogueCandidateSortBy: [SortByInput!]!
+  includeHighlights: Boolean!
+}
+
+input PaginationInput {
+  page: Int!
+  size: Int!
+}
+
+input SortByInput {
+  field: String!
+  isDescending: Boolean!
+}
+
+"Defines when a policy shall be executed."
+enum ApplyPolicy {
+  "Before the resolver was executed."
+  BEFORE_RESOLVER
+  "After the resolver was executed."
+  AFTER_RESOLVER
+  "The policy is applied in the validation step before the execution."
+  VALIDATION
+}
+
+enum SearchMatchType {
+  EXACT
+  STARTS_WITH
+  CONTAINS
+  FUZZY
+}
+
+enum SearchTarget {
+  PRODUCTS
+  CATALOGUE_CANDIDATES
+}
+
+"The `Long` scalar type represents a signed 64-bit integer."
+scalar Long
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/long.html")
+
+"The `UUID` scalar type represents a Universally Unique Identifier (UUID) as defined by RFC 9562."
+scalar UUID
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/uuid.html")
+
+"The authorize directive."
+directive @authorize(
+  "The name of the authorization policy that determines access to the annotated resource."
+  policy: String
+  "Roles that are allowed to access the annotated resource."
+  roles: [String!]
+  "Defines when the authorize directive shall be applied. By default the authorize directive is applied before the resolver is executed."
+  apply: ApplyPolicy! = BEFORE_RESOLVER
+) repeatable on OBJECT | FIELD_DEFINITION
+
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost(
+  "The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc."
+  weight: String!
+) on
+  | SCALAR
+  | OBJECT
+  | FIELD_DEFINITION
+  | ARGUMENT_DEFINITION
+  | ENUM
+  | INPUT_FIELD_DEFINITION
+
+directive @shareable repeatable on OBJECT | FIELD_DEFINITION
