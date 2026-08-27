@@ -26,11 +26,11 @@ public sealed class CatalogueQueries
                 input.Targets,
                 input.SkuModes,
                 input.NameModes,
-                input.ProducerIds,
+                input.ProducerIds ?? [],
                 input.Pagination,
-                input.ProductSortBy.Select(x => x.ToSortExpression()).ToArray(),
-                input.CatalogueCandidateSortBy.Select(x => x.ToSortExpression()).ToArray(),
-                input.IncludeHighlights),
+                input.ProductSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
+                input.CatalogueCandidateSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
+                input.IncludeHighlights ?? false),
             ct);
 
 

@@ -13,8 +13,8 @@ public static class ServiceCollectionExtensions
     {
         return services
             .AddGraphQLServer(name)
+            .AddCommonAuthorization()
             .AddType<GqlPagination>()
-            .AddType<GqlSortBy>()
-            .AddCommonAuthorization();
+            .AddType<GqlSortBy>();
     }
 }

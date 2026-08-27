@@ -69,11 +69,11 @@ input CatalogueSearchInput {
   targets: [SearchTarget!]!
   skuModes: [SearchMatchType!]!
   nameModes: [SearchMatchType!]!
-  producerIds: [Int!]!
+  producerIds: [Int!]
   pagination: PaginationInput!
-  productSortBy: [SortByInput!]!
-  catalogueCandidateSortBy: [SortByInput!]!
-  includeHighlights: Boolean!
+  productSortBy: [SortByInput!]
+  catalogueCandidateSortBy: [SortByInput!]
+  includeHighlights: Boolean
 }
 
 input PaginationInput {

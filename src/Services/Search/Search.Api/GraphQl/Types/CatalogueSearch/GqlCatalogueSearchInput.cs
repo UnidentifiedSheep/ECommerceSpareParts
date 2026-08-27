@@ -11,26 +11,26 @@ public record GqlCatalogueSearchInput
     public string? Query { get; init; }
 
     [GraphQLName("targets")]
-    public IReadOnlySet<SearchTarget> Targets { get; init; } = new HashSet<SearchTarget>();
+    public required IReadOnlySet<SearchTarget> Targets { get; init; }
 
     [GraphQLName("skuModes")]
-    public IReadOnlySet<SearchMatchType> SkuModes { get; init; } = new HashSet<SearchMatchType>();
+    public required IReadOnlySet<SearchMatchType> SkuModes { get; init; }
 
     [GraphQLName("nameModes")]
-    public IReadOnlySet<SearchMatchType> NameModes { get; init; } = new HashSet<SearchMatchType>();
+    public required IReadOnlySet<SearchMatchType> NameModes { get; init; }
 
     [GraphQLName("producerIds")]
-    public IReadOnlyCollection<int> ProducerIds { get; init; } = [];
+    public IReadOnlyCollection<int>? ProducerIds { get; init; } = [];
 
     [GraphQLName("pagination")]
     public required GqlPagination Pagination { get; init; }
 
     [GraphQLName("productSortBy")]
-    public IReadOnlyCollection<GqlSortBy> ProductSortBy { get; init; } = [];
+    public IReadOnlyCollection<GqlSortBy>? ProductSortBy { get; init; }
 
     [GraphQLName("catalogueCandidateSortBy")]
-    public IReadOnlyCollection<GqlSortBy> CatalogueCandidateSortBy { get; init; } = [];
+    public IReadOnlyCollection<GqlSortBy>? CatalogueCandidateSortBy { get; init; }
 
     [GraphQLName("includeHighlights")]
-    public bool IncludeHighlights { get; init; }
+    public bool? IncludeHighlights { get; init; }
 }

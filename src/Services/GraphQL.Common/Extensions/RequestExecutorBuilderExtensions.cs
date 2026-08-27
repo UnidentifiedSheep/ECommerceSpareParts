@@ -44,7 +44,7 @@ public static class RequestExecutorBuilderExtensions
         builder.Services.TryAddEnumerable(
             ServiceDescriptor.Scoped<
                 IAuthorizationHandler,
-                GraphQLFieldAuthorizationHandler>());
+                GraphQlFieldAuthorizationHandler>());
 
         return builder;
     }

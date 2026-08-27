@@ -8,7 +8,7 @@ using Security.Authorization;
 
 namespace GraphQL.Common.Authorization;
 
-internal sealed class GraphQLFieldAuthorizationHandler(IUserContext userContext)
+internal sealed class GraphQlFieldAuthorizationHandler(IUserContext userContext)
     : AuthorizationHandler<GraphQlFieldAuthorizationRequirement, IResolverContext>
 {
     private readonly PermissionAuthorizationHandler _permissionHandler = new(userContext);
