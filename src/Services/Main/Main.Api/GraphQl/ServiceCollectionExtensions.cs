@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddCommonGraphQl(name)
             .AddQueryType<Query>()
+            .AddDataLoader<ProductByIdDataLoader>()
             .AddDataLoader<ProducerByIdDataLoader>();
         
         return services;

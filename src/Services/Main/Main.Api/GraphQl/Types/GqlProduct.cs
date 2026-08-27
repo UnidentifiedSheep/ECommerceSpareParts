@@ -41,6 +41,6 @@ public record GqlProduct(
             ?? throw new KeyNotFoundException(
                 $"Producer with id {Product.ProducerId} does not exist");
 
-        return new GqlProducer(producer);
+        return producer;
     }
 }

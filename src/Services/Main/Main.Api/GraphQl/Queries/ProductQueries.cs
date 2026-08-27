@@ -2,6 +2,7 @@ using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using HotChocolate.Types.Composite;
+using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 using Main.Application.Handlers.Products;
 using MediatR;
@@ -12,13 +13,12 @@ public sealed class ProductQueries
 {
     [GraphQLName("byId")]
     [Lookup]
-    public async Task<GqlProduct?> GetProductByIdAsync(
-        ISender sender,
+    public Task<GqlProduct?> GetProductByIdAsync(
+        ProductByIdDataLoader loader,
         int id,
         CancellationToken ct)
     {
-        var result = await sender.Send(new GetProductByIdQuery(id), ct);
-        return new GqlProduct(result.Product);
+        return loader.LoadAsync(id, ct);
     }
     
     [GraphQLName("byIds")]
