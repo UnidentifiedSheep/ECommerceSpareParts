@@ -1,6 +1,8 @@
+using HotChocolate;
+
 namespace Search.Api.GraphQl.Types;
 
-public class GqlCatalogueCandidate
-{
-    
-}
+[GraphQLName("CatalogueCandidate")]
+public record GqlCatalogueCandidate(
+    [property: GraphQLName("id")]
+    Guid Id);

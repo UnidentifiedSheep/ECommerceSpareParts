@@ -11,7 +11,8 @@ public record GqlSortBy
     [GraphQLName("isDescending")]
     public required bool IsDescending { get; init; }
 
-    public override string ToString()
+    [GraphQLIgnore]
+    public string ToSortExpression()
     {
         var dir = IsDescending ? "desc" : "asc";
         return $"{Field}{QueryableSortBy.Value.Delimiter}{dir}";
