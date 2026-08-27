@@ -11,13 +11,13 @@ public record GqlCatalogueSearchInput
     public string? Query { get; init; }
 
     [GraphQLName("targets")]
-    public required IReadOnlySet<SearchTarget> Targets { get; init; }
+    public required IReadOnlyCollection<SearchTarget> Targets { get; init; }
 
     [GraphQLName("skuModes")]
-    public required IReadOnlySet<SearchMatchType> SkuModes { get; init; }
+    public required IReadOnlyCollection<SearchMatchType> SkuModes { get; init; }
 
     [GraphQLName("nameModes")]
-    public required IReadOnlySet<SearchMatchType> NameModes { get; init; }
+    public required IReadOnlyCollection<SearchMatchType> NameModes { get; init; }
 
     [GraphQLName("producerIds")]
     public IReadOnlyCollection<int>? ProducerIds { get; init; } = [];

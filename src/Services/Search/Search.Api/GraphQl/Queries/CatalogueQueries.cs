@@ -23,9 +23,9 @@ public sealed class CatalogueQueries
         var result = await sender.Send(
             new SearchCatalogueQuery(
                 input.Query,
-                input.Targets,
-                input.SkuModes,
-                input.NameModes,
+                input.Targets.ToHashSet(),
+                input.SkuModes.ToHashSet(),
+                input.NameModes.ToHashSet(),
                 input.ProducerIds ?? [],
                 input.Pagination,
                 input.ProductSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
@@ -50,7 +50,7 @@ public sealed class CatalogueQueries
             },
             Candidates = new GqlSearchCatalogueSection<GqlCatalogueCandidate>
             {
-                Total = result.Products.Total,
+                Total = result.CatalogueCandidates.Total,
                 Items = result.CatalogueCandidates
                     .Items
                     .Select(x => new GqlSearchCatalogueSectionItem<GqlCatalogueCandidate>
