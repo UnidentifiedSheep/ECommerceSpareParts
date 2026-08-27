@@ -7,10 +7,11 @@ namespace GraphQL.Common.Extensions;
 public static class ServiceCollectionExtensions
 {
     public static IRequestExecutorBuilder AddCommonGraphQl(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        string name)
     {
         return services
-            .AddGraphQLServer()
+            .AddGraphQLServer(name)
             .AddCommonAuthorization();
     }
 }

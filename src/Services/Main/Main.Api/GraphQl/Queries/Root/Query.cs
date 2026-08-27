@@ -2,8 +2,8 @@ using HotChocolate;
 
 namespace Main.Api.GraphQl.Queries.Root;
 
-public sealed class RootQuery
+public sealed class Query
 {
     [GraphQLName("products")]
-    public readonly ProductQueries ProductQueries = new();
+    public ProductQueries ProductQueries => new();
 }

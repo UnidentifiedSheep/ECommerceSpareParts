@@ -4,7 +4,9 @@ using Main.Application.Dtos.Producer;
 namespace Main.Api.GraphQl.Types;
 
 [GraphQLName("producer")]
-public record GqlProducer(ProducerDto Producer)
+public record GqlProducer(
+    [property: GraphQLIgnore]
+    ProducerDto Producer)
 {
     [GraphQLName("id")]
     public int Id => Producer.Id;

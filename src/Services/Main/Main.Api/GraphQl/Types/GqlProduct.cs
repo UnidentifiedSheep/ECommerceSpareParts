@@ -5,7 +5,9 @@ using Main.Application.Dtos.Product;
 namespace Main.Api.GraphQl.Types;
 
 [GraphQLName("product")]
-public record GqlProduct(ProductDto Product)
+public record GqlProduct(
+    [property: GraphQLIgnore]
+    ProductDto Product)
 {
     [GraphQLName("id")]
     public int Id => Product.Id;

@@ -97,8 +97,6 @@ builder.Services
         });
     });
 
-builder.Services.AddHttpClient();
-
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -146,6 +144,19 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddHttpClient("fusion", x =>
+{
+    x.DefaultRequestHeaders.Add("X-Internal-Token", secret);
+});
+
+builder.AddGraphQLGateway()
+    .AddFileSystemConfiguration("./gateway.far")
+    .ModifyRequestOptions(o =>
+    {
+        o.CollectOperationPlanTelemetry = true;
+        o.AllowOperationPlanRequests = true;
+    });
+
 var app = builder.Build();
 
 MapDocs(app);
@@ -164,6 +175,9 @@ app.UseExceptionHandler(_ => { });
 
 app.MapGet("/health", () => Results.Ok());
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
+app.MapGraphQL();
+
 await app.RunAsync();
 
 

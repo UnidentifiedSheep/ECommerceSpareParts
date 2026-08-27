@@ -7,10 +7,11 @@ namespace Main.Api.GraphQl;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddGraphQlServices(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        string name)
     {
-        services.AddCommonGraphQl()
-            .AddQueryType<RootQuery>()
+        services.AddCommonGraphQl(name)
+            .AddQueryType<Query>()
             .AddDataLoader<ProducerByIdDataLoader>();
         
         return services;

@@ -25,7 +25,6 @@ using Mail;
 using Main.Api;
 using Main.Api.EndPoints.Products;
 using Main.Api.GraphQl;
-using Main.Api.GraphQl.DataLoaders;
 using Main.Application;
 using Main.Application.Configs;
 using Main.Application.Consumers;
@@ -39,6 +38,7 @@ using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 using Global = Main.Application.Global;
 
+const string serviceName = "Main";
 var builder = WebApplication.CreateBuilder(args);
 
 var env = builder.AddServiceConfiguration("main");
@@ -141,7 +141,7 @@ builder.Services.AddCarter(
         typeof(JobEndPoints).Assembly),
     c => c.WithEmptyValidators());
 
-builder.Services.AddGraphQlServices();
+builder.Services.AddGraphQlServices(serviceName);
 
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
