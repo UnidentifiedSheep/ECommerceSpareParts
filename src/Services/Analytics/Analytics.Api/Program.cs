@@ -1,5 +1,6 @@
 using System.Reflection;
 using Abstractions;
+using Analytics.Api.GraphQl;
 using Analytics.Application;
 using Analytics.Application.Consumers;
 using Analytics.Cache;
@@ -18,6 +19,7 @@ using Cache;
 using Carter;
 using Contracts.Job;
 using Contracts.Settings;
+using GraphQL.Common.Extensions;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
@@ -25,6 +27,8 @@ using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
+
+const string serviceName = "Analytics";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +45,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddDatabaseOptions();
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Analytics);
+builder.Services.AddGraphQlServices(serviceName);
 
 builder.Services
     .AddPersistenceLayer()
@@ -118,5 +123,6 @@ var app = builder.Build();
 app.UseCommonApiPipeline();
 
 app.MapHub<JobHub>("/hubs/jobs");
+app.MapCommonGraphQl();
 
-await app.RunAsync();
+await app.RunWithGraphQLCommandsAsync(args);
