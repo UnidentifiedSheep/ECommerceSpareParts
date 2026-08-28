@@ -1,8 +1,8 @@
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Dtos.Product;
+using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.ProductContent.AddProductContent;
-using Main.Application.Handlers.ProductContent.GetProductContents;
 using Main.Application.Handlers.ProductContent.RemoveProductContent;
 using Main.Application.Handlers.ProductContent.SetProductContentQuantity;
 using MediatR;
@@ -26,8 +26,8 @@ public static class ProductContentEndPoints
                     int productId,
                     CancellationToken token) =>
                 {
-                    var result = await sender.Send(new GetProductContentsQuery(productId), token);
-                    var response = new GetProductContentResponse(result.Contents);
+                    var result = await sender.Send(new GetProductsContentsQuery(productId), token);
+                    var response = new GetProductContentResponse(result.Contents.GetValueOrDefault(productId) ?? []);
                     return Results.Ok(response);
                 })
             .WithName("GetProductContent")

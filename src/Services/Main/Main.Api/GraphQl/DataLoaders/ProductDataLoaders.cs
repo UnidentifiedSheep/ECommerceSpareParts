@@ -1,5 +1,6 @@
 using GreenDonut;
 using Main.Api.GraphQl.Types.Product;
+using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.ProductSizes;
 using Main.Application.Handlers.ProductWeight;
@@ -71,5 +72,23 @@ public static class ProductDataLoaders
             .ToDictionary(
                 x => x.ProductId,
                 x => new GqlProductWeight(x));
+    }
+    
+    [DataLoader]
+    public static async Task<Dictionary<int, List<GqlProductContent>>>
+        GetProductContentsByIdAsync(
+            IReadOnlyList<int> keys,
+            ISender sender,
+            CancellationToken cancellationToken)
+    {
+        return (await sender.Send(
+                new GetProductsContentsQuery(keys),
+                cancellationToken))
+            .Contents
+            .ToDictionary(
+                x => x.Key,
+                x => x.Value
+                    .Select(z => new GqlProductContent(z))
+                    .ToList());
     }
 }

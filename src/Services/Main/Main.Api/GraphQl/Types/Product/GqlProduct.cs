@@ -63,4 +63,10 @@ public record GqlProduct(
         IProductPairByIdDataLoader loader,
         CancellationToken cancellationToken)
         => loader.LoadAsync(Id, cancellationToken);
+    
+    [GraphQLName("contents")]
+    public async Task<IReadOnlyList<GqlProductContent>> GetContentsAsync(
+        IProductContentsByIdDataLoader loader,
+        CancellationToken cancellationToken)
+        => await loader.LoadAsync(Id, cancellationToken) ?? [];
 }

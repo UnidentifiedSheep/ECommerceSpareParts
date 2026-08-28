@@ -64,11 +64,6 @@
         </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="GraphQl\DataLoaders\Producer\" />
-      <Folder Include="GraphQl\DataLoaders\Product\" />
-    </ItemGroup>
-
     <Target Name="CopyEmailTemplatesToOutput" AfterTargets="CopyFilesToOutputDirectory">
         <Copy
             SourceFiles="@(EmailTemplate)"
