@@ -20,14 +20,4 @@ public sealed class ProductQueries
     {
         return loader.LoadAsync(id, ct);
     }
-    
-    [GraphQLName("byIds")]
-    public async Task<List<GqlProduct>> GetProductByIdsAsync(
-        ISender sender,
-        IEnumerable<int> ids,
-        CancellationToken ct)
-    {
-        var result = await sender.Send(new GetProductByIdsQuery(ids), ct);
-        return result.Products.Select(x => new GqlProduct(x)).ToList();
-    }
 }
