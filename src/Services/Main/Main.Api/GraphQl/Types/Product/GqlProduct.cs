@@ -1,8 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Api.GraphQl.DataLoaders.Producer;
-using Main.Api.GraphQl.DataLoaders.Product;
 using Main.Application.Dtos.Product;
 
 namespace Main.Api.GraphQl.Types.Product;
@@ -24,7 +22,7 @@ public record GqlProduct(
 
     [GraphQLName("description")]
     public string? Description => Product.Description;
-    
+
     [GraphQLName("indicator")]
     public string? Indicator => Product.Indicator;
 
@@ -36,7 +34,7 @@ public record GqlProduct(
 
     [GraphQLName("producer")]
     public async Task<GqlProducer> GetProducerAsync(
-        ProducerByIdDataLoader producerById,
+        IProducerByIdDataLoader producerById,
         CancellationToken cancellationToken)
     {
         var producer = await producerById.LoadAsync(
@@ -50,13 +48,19 @@ public record GqlProduct(
 
     [GraphQLName("size")]
     public Task<GqlProductSize?> GetSizeAsync(
-        ProductSizeByIdDataLoader loader,
+        IProductSizeByIdDataLoader loader,
         CancellationToken cancellationToken)
         => loader.LoadAsync(Id, cancellationToken);
-    
+
     [GraphQLName("weight")]
     public Task<GqlProductWeight?> GetWeightAsync(
-        ProductWeightByIdDataLoader loader,
+        IProductWeightByIdDataLoader loader,
+        CancellationToken cancellationToken)
+        => loader.LoadAsync(Id, cancellationToken);
+
+    [GraphQLName("pair")]
+    public Task<GqlProduct?> GetPairAsync(
+        IProductPairByIdDataLoader loader,
         CancellationToken cancellationToken)
         => loader.LoadAsync(Id, cancellationToken);
 }

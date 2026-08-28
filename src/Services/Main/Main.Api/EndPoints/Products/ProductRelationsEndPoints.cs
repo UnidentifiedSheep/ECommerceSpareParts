@@ -54,9 +54,10 @@ public static class ProductRelationsEndPoints
                     int productId,
                     CancellationToken token) =>
                 {
-                    var query = new GetProductPairQuery(productId);
+                    var query = new GetProductsPairsQuery(productId);
                     var result = await sender.Send(query, token);
-                    return Results.Ok(new GetProductPairResponse(result.Pair));
+                    return Results.Ok(new GetProductPairResponse(
+                        result.Pairs.Count == 0 ? null : result.Pairs[0]));
                 })
             .WithName("GetProductPairs")
             .WithDescription("Поиск пар артикула")

@@ -5,15 +5,14 @@ using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;
 
-public class CatalogueCandidateByIdDataLoader(
-    ISender sender,
-    IBatchScheduler batchScheduler,
-    DataLoaderOptions options)
-    : BatchDataLoader<Guid, GqlCatalogueCandidate>(batchScheduler, options)
+public static class CatalogueCandidateDataLoaders
 {
-
-    protected override async Task<IReadOnlyDictionary<Guid, GqlCatalogueCandidate>>
-        LoadBatchAsync(IReadOnlyList<Guid> keys, CancellationToken cancellationToken)
+    [DataLoader]
+    public static async Task<Dictionary<Guid, GqlCatalogueCandidate>>
+        GetCatalogueCandidateByIdAsync(
+            IReadOnlyList<Guid> keys,
+            ISender sender,
+            CancellationToken cancellationToken)
     {
         var result = await sender.Send(
             new GetCatalogueCandidatesByIdsQuery(keys),
