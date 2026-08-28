@@ -2,7 +2,7 @@ using Enums.Units;
 using HotChocolate;
 using Main.Application.Dtos.Product;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Product;
 
 [GraphQLName("ProductSize")]
 public record GqlProductSize(

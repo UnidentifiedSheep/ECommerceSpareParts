@@ -3,7 +3,9 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.DataLoaders.Product;
 using Main.Api.GraphQl.Types;
+using Main.Api.GraphQl.Types.Product;
 using Main.Application.Handlers.Products;
 using MediatR;
 

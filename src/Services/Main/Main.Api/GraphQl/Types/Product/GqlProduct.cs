@@ -1,9 +1,10 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.DataLoaders.Product;
 using Main.Application.Dtos.Product;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Product;
 
 [GraphQLName("Product")]
 public record GqlProduct(
@@ -49,6 +50,12 @@ public record GqlProduct(
     [GraphQLName("size")]
     public Task<GqlProductSize?> GetSizeAsync(
         ProductSizeByIdDataLoader loader,
+        CancellationToken cancellationToken)
+        => loader.LoadAsync(Id, cancellationToken);
+    
+    [GraphQLName("weight")]
+    public Task<GqlProductWeight?> GetWeightAsync(
+        ProductWeightByIdDataLoader loader,
         CancellationToken cancellationToken)
         => loader.LoadAsync(Id, cancellationToken);
 }

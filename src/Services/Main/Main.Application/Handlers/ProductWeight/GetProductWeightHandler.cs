@@ -1,5 +1,5 @@
-﻿using Application.Common.Interfaces.Cqrs;
-using Application.Common.Extensions;
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
@@ -7,7 +7,7 @@ using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using ProductWeightEntity = Main.Entities.Product.ProductWeight;
 
-namespace Main.Application.Handlers.ProductWeight.GetProductWeight;
+namespace Main.Application.Handlers.ProductWeight;
 
 public record GetProductWeightQuery(int ProductId) : IQuery<GetProductWeightResult>;
 

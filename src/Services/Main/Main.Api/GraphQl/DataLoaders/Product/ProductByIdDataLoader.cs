@@ -1,9 +1,9 @@
 using GreenDonut;
-using Main.Api.GraphQl.Types;
+using Main.Api.GraphQl.Types.Product;
 using Main.Application.Handlers.Products;
 using MediatR;
 
-namespace Main.Api.GraphQl.DataLoaders;
+namespace Main.Api.GraphQl.DataLoaders.Product;
 
 public class ProductByIdDataLoader(
     ISender sender,
