@@ -8,7 +8,6 @@ using MediatR;
 
 namespace Main.Application.Handlers.ProducerSupplierMappings;
 
-[Diagnostics]
 [Transactional, AutoSave]
 public record DeleteProducerSupplierMappingCommand(int Id) : ICommand;
 

@@ -12,7 +12,6 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Users.RemoveEmailFromUser;
 
-[Diagnostics(maxExecutionTimeMs: 300)]
 [Transactional]
 [AutoSave]
 public record RemoveEmailFromUserCommand(Guid UserId, string Email) : ICommand;

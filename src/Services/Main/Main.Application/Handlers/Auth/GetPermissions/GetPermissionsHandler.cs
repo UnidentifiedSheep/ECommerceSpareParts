@@ -1,5 +1,4 @@
 ﻿using Application.Common.Interfaces.Cqrs;
-using Attributes;
 using Enums;
 using Localization.Abstractions.Interfaces;
 using Main.Application.Dtos.Auth;
@@ -7,7 +6,6 @@ using Main.Entities.Auth;
 
 namespace Main.Application.Handlers.Auth.GetPermissions;
 
-[Diagnostics(maxExecutionTimeMs: 50)]
 public record GetPermissionsQuery : IQuery<GetPermissionsResult>;
 
 public record GetPermissionsResult(IReadOnlyList<PermissionDto> Permissions);

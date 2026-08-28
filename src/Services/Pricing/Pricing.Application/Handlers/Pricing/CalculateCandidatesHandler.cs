@@ -10,7 +10,6 @@ using Pricing.Entities.Offers;
 
 namespace Pricing.Application.Handlers.Pricing;
 
-[Diagnostics]
 [Transactional, AutoSave]
 public record CalculateCandidatesCommand(
     int ProductId,

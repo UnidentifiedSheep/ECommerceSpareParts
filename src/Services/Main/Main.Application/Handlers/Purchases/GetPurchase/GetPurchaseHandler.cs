@@ -2,7 +2,6 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Attributes;
 using Main.Application.Dtos.Purchase;
 using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
@@ -10,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Purchases.GetPurchase;
 
-[Diagnostics(maxExecutionTimeMs: 30)]
 public record GetPurchaseQuery(
     Guid? PurchaseId,
     Guid? TransactionId

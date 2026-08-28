@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.Organizations.CreateOrganization;
 
 [Transactional, AutoSave]
-[Diagnostics(maxExecutionTimeMs: 500)]
 public record CreateOrganizationCommand(
     Guid OwnerId,
     string Name,

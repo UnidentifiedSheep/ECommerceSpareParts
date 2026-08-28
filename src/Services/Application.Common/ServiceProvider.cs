@@ -63,9 +63,6 @@ public static class ServiceProvider
                     typeof(MetricsBehavior<,>))
                 .RegisterIfNotExcluded(
                     hs,
-                    typeof(DiagnosticsBehavior<,>))
-                .RegisterIfNotExcluded(
-                    hs,
                     typeof(ValidationBehavior<,>))
                 .RegisterIfNotExcluded(
                     hs,

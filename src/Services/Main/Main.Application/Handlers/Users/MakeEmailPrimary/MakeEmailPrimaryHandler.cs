@@ -10,7 +10,6 @@ using MediatR;
 
 namespace Main.Application.Handlers.Users.MakeEmailPrimary;
 
-[Diagnostics(maxExecutionTimeMs: 300)]
 [Transactional]
 [AutoSave]
 public record MakeEmailPrimaryCommand(

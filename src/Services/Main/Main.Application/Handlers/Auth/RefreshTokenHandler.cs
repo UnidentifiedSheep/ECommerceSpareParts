@@ -12,7 +12,6 @@ using Main.Enums;
 
 namespace Main.Application.Handlers.Auth;
 
-[Diagnostics(maxExecutionTimeMs: 300)]
 [Transactional]
 [AutoSave]
 public record RefreshTokenCommand(string RefreshToken, string DeviceId) : ICommand<RefreshTokenResult>;
