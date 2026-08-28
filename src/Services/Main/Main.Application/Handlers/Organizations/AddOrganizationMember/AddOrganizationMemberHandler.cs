@@ -10,7 +10,6 @@ using MediatR;
 namespace Main.Application.Handlers.Organizations.AddOrganizationMember;
 
 [Transactional, AutoSave]
-[Diagnostics(maxExecutionTimeMs: 500)]
 public record AddOrganizationMemberCommand(
     Guid OrganizationId,
     Guid UserId,

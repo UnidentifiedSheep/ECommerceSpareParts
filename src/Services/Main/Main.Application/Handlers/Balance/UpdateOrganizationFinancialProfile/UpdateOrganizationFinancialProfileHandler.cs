@@ -10,7 +10,6 @@ using Main.Entities.Organization;
 
 namespace Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 
-[Diagnostics(maxExecutionTimeMs: 200)]
 [AutoSave]
 [Transactional(
     IsolationLevel.ReadCommitted,

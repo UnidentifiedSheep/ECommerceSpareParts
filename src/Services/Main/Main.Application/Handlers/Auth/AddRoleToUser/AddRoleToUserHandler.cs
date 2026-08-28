@@ -6,7 +6,6 @@ using MediatR;
 
 namespace Main.Application.Handlers.Auth.AddRoleToUser;
 
-[Diagnostics(maxExecutionTimeMs: 400)]
 [Transactional]
 [AutoSave]
 public record AddRoleToUserCommand(Guid UserId, string RoleName) : ICommand;

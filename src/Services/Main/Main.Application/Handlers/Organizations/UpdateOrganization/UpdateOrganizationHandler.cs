@@ -8,7 +8,6 @@ using Main.Entities.Organization;
 
 namespace Main.Application.Handlers.Organizations.UpdateOrganization;
 
-[Diagnostics]
 [Transactional, AutoSave]
 public record UpdateOrganizationCommand(
     Guid OrganizationId,

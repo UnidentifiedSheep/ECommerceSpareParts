@@ -19,7 +19,6 @@ using Main.Enums;
 
 namespace Main.Application.Handlers.Auth;
 
-[Diagnostics(maxExecutionTimeMs: 500)]
 [Transactional]
 [AutoSave]
 public record LoginCommand(

@@ -9,7 +9,6 @@ using Pricing.Application.Models.Jobs;
 
 namespace Pricing.Application.Handlers.Pricing;
 
-[Diagnostics(maxExecutionTimeMs: 400)]
 [Transactional]
 public record RequestPriceCandidateRecalculationCommand(
     IEnumerable<PriceRecalculationRequestDto> RecalculationRequests

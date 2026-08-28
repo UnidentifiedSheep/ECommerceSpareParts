@@ -18,7 +18,6 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Users.AddEmailToUser;
 
-[Diagnostics(maxExecutionTimeMs: 300)]
 [Transactional]
 [AutoSave]
 public record AddEmailToUserCommand(

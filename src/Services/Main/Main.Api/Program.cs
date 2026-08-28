@@ -19,10 +19,12 @@ using Contracts.Products;
 using Contracts.Settings;
 using Contracts.User;
 using ExchangeRate;
+using GraphQL.Common.Extensions;
 using Localization.Domain.Extensions;
 using Mail;
 using Main.Api;
 using Main.Api.EndPoints.Products;
+using Main.Api.GraphQl;
 using Main.Application;
 using Main.Application.Configs;
 using Main.Application.Consumers;
@@ -36,6 +38,7 @@ using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 using Global = Main.Application.Global;
 
+const string serviceName = "Main";
 var builder = WebApplication.CreateBuilder(args);
 
 var env = builder.AddServiceConfiguration("main");
@@ -138,6 +141,8 @@ builder.Services.AddCarter(
         typeof(JobEndPoints).Assembly),
     c => c.WithEmptyValidators());
 
+builder.Services.AddGraphQlServices(serviceName);
+
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
@@ -148,5 +153,6 @@ SortByConfig.Configure();
 app.UseCommonApiPipeline();
 
 app.MapHub<JobHub>("/hubs/jobs");
+app.MapCommonGraphQl();
 
-await app.RunAsync();
+await app.RunWithGraphQLCommandsAsync(args);

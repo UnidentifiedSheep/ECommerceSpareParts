@@ -2,6 +2,7 @@
 using Abstractions.Interfaces;
 using Exceptions.Base;
 using Microsoft.AspNetCore.Http;
+using Security.Authorization;
 
 namespace Security.Services;
 
@@ -60,7 +61,8 @@ public sealed class UserContext : IUserContext
             .FindAll(ClaimTypes.Role)
             .Select(x => x.Value)
             .Where(x => !string.IsNullOrWhiteSpace(x))
-            .ToHashSet();
+            .Select(AuthorizationValueNormalizer.NormalizeRole)
+            .ToHashSet(StringComparer.Ordinal);
     }
 
     private static IReadOnlySet<string> GetPermissions(ClaimsPrincipal principal)
@@ -69,6 +71,7 @@ public sealed class UserContext : IUserContext
             .FindAll("permission")
             .Select(x => x.Value)
             .Where(x => !string.IsNullOrWhiteSpace(x))
-            .ToHashSet();
+            .Select(AuthorizationValueNormalizer.NormalizePermission)
+            .ToHashSet(StringComparer.Ordinal);
     }
 }

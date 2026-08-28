@@ -8,7 +8,6 @@ using MediatR;
 
 namespace Main.Application.Handlers.Auth.RemoveRoleFromUser;
 
-[Diagnostics(maxExecutionTimeMs: 150)]
 [Transactional]
 [AutoSave]
 public record RemoveRoleFromUserCommand(Guid UserId, string RoleName) : ICommand;

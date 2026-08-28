@@ -19,6 +19,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\..\GraphQL.Common\GraphQL.Common.csproj" />
         <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj"/>
         <ProjectReference Include="..\Search.Application\Search.Application.csproj"/>
         <ProjectReference Include="..\Search.Enums\Search.Enums.csproj"/>

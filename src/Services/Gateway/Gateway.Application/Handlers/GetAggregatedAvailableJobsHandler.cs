@@ -1,14 +1,12 @@
 using Abstractions;
 using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
-using Attributes;
 using Gateway.Application.Dtos;
 using Internal.Integration.Core.Interfaces.Common;
 using Localization.Abstractions.Models;
 
 namespace Gateway.Application.Handlers;
 
-[Diagnostics(true, 500)]
 public record GetAggregatedAvailableJobsQuery(
     Locale Locale
 ) : IQuery<GetAggregatedAvailableJobsResult>;

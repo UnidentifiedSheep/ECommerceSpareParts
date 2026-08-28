@@ -3,15 +3,19 @@ using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
+using Application.Common.Diagnostics;
 using Cache;
 using Common;
 using Gateway.Application;
 using Gateway.EndPoints;
+using Gateway.Extensions;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using RabbitMq.Extensions;
 using Scalar.AspNetCore;
 using Security;
@@ -45,6 +49,7 @@ builder.Host.AddLokiLogger(
     env);
 
 builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("gateway"))
     .WithMetrics(metrics =>
     {
         metrics
@@ -52,6 +57,14 @@ builder.Services.AddOpenTelemetry()
             .AddProcessInstrumentation()
             .AddRuntimeInstrumentation()
             .AddPrometheusExporter();
+    })
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddSource(CqrsDiagnostics.ActivitySourceName)
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter();
     });
 
 builder.Services.AddAuthorization(options =>
@@ -96,8 +109,6 @@ builder.Services
             return ValueTask.CompletedTask;
         });
     });
-
-builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
@@ -146,12 +157,24 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddFusionHttpClient(secret);
+
+builder.AddGraphQLGateway()
+    .AddFileSystemConfiguration("./gateway.far")
+    .ModifyRequestOptions(o =>
+    {
+        o.CollectOperationPlanTelemetry = true;
+        o.AllowOperationPlanRequests = true;
+    });
+
 var app = builder.Build();
 
 MapDocs(app);
 
 app.UseCors();
 
+app.UseHeaderPropagation();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseWebSockets();
@@ -164,6 +187,9 @@ app.UseExceptionHandler(_ => { });
 
 app.MapGet("/health", () => Results.Ok());
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
+app.MapGraphQL();
+
 await app.RunAsync();
 
 

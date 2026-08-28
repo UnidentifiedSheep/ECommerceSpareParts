@@ -8,7 +8,6 @@ using MediatR;
 
 namespace Main.Application.Handlers.Auth;
 
-[Diagnostics(maxExecutionTimeMs: 150)]
 [Transactional]
 [AutoSave]
 public record RemovePermissionFromUserCommand(Guid UserId, string PermissionName) : ICommand;

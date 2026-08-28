@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using Security.Authorization;
 using Security.Services;
 
 namespace Security;
@@ -46,6 +47,10 @@ public static class ServiceProvider
     public static IServiceCollection AddMinimalSecurityLayer(this IServiceCollection collection)
     {
         collection.TryAddScoped<IUserContext, UserContext>();
+        collection.TryAddEnumerable(
+            ServiceDescriptor.Scoped<IAuthorizationHandler, PermissionAuthorizationHandler>());
+        collection.TryAddEnumerable(
+            ServiceDescriptor.Scoped<IAuthorizationHandler, RoleAuthorizationHandler>());
         return collection;
     }
 

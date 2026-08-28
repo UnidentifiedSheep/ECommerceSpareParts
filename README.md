@@ -31,7 +31,7 @@ exchange integration events through RabbitMQ and use the EF Core outbox pattern.
 ## Stack
 
 .NET 10, ASP.NET Core Minimal APIs, EF Core, PostgreSQL, RabbitMQ/MassTransit, Redis, OpenSearch, MinIO, YARP,
-OpenTelemetry, Prometheus, Loki, Grafana, xUnit, Testcontainers, and Docker Compose.
+OpenTelemetry, Prometheus, Loki, Tempo, Grafana, xUnit, Testcontainers, and Docker Compose.
 
 ## Quick Start
 
@@ -67,6 +67,7 @@ Stop the stack with `docker compose down`. Add `-v` to remove development volume
 | OpenSearch Dashboards | <http://localhost:5601> |
 | MinIO Console | <http://localhost:9001> |
 | Grafana | <https://localhost:3000> |
+| Tempo API | <http://localhost:3200> |
 
 PostgreSQL, Redis, RabbitMQ, MinIO, and Loki are exposed on their standard development ports. Prometheus receives a
 dynamic host port; find it with `docker compose port prometheus 9090`.

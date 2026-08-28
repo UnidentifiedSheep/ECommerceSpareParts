@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Application.Common.Diagnostics;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Models;
 using MediatR;
@@ -10,30 +11,45 @@ public class MetricsBehavior<TRequest, TResponse>(
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
 {
-    public async Task<TResponse> Handle(TRequest request,
+    private static readonly string RequestName = typeof(TRequest).Name;
+    // ReSharper disable once StaticMemberInGenericType
+    private static readonly string RequestType = GetRequestType();
+
+    public async Task<TResponse> Handle(
+        TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        var requestName = typeof(TRequest).Name;
+        using var activity = CqrsDiagnostics.ActivitySource.StartActivity(
+            $"cqrs {RequestName}");
+
+        activity?.SetTag("cqrs.request.name", RequestName);
+        activity?.SetTag("cqrs.request.type", RequestType);
 
         var tags = new TagList
         {
-            { "cqrs.request.name", requestName },
-            { "cqrs.request.type", GetRequestType() }
+            { "cqrs.request.name", RequestName },
+            { "cqrs.request.type", RequestType }
         };
 
         metrics.Requests.Add(1, tags);
-
         var startedAt = Stopwatch.GetTimestamp();
 
         try
         {
-            var response = await next(cancellationToken);
-            return response;
+            return await next(cancellationToken);
         }
-        catch
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             metrics.Errors.Add(1, tags);
+            activity?.AddEvent(new ActivityEvent("cancelled"));
+            throw;
+        }
+        catch (Exception exception)
+        {
+            metrics.Errors.Add(1, tags);
+            activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
+            activity?.AddException(exception);
             throw;
         }
         finally
@@ -42,7 +58,7 @@ public class MetricsBehavior<TRequest, TResponse>(
             metrics.Duration.Record(elapsed.TotalMilliseconds, tags);
         }
     }
-    
+
     private static string GetRequestType()
     {
         if (typeof(TRequest).IsAssignableTo(typeof(ICommand<TResponse>)))

@@ -10,7 +10,6 @@ using Pricing.Entities.Exceptions;
 
 namespace Pricing.Application.Handlers.PriceApplier.DeletePriceApplier;
 
-[Diagnostics]
 [Transactional, AutoSave]
 public record DeletePriceApplierCommand(string SystemName) : ICommand;
 

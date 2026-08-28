@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Handlers.Mailing.SendMailBatch;
 
-[Diagnostics]
 [Transactional]
 [AutoSave]
 public record SendMailBatchCommand(int Batch = 100) : ICommand<SendMailBatchResult>;

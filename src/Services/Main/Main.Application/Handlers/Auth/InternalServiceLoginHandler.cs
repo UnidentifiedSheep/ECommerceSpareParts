@@ -3,7 +3,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Attributes;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
@@ -14,7 +13,6 @@ using Main.Entities.User.ValueObjects;
 
 namespace Main.Application.Handlers.Auth;
 
-[Diagnostics(maxExecutionTimeMs: 80)]
 public record InternalServiceLoginCommand(string Service, string ServiceSecret)
     : ICommand<InternalServiceLoginResult>;
 

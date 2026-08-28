@@ -2,7 +2,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Attributes;
 using Main.Application.Dtos.Sale;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
@@ -10,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Sales.GetSale;
 
-[Diagnostics(maxExecutionTimeMs: 30)]
 public record GetSaleQuery(
     Guid? SaleId,
     Guid? TransactionId

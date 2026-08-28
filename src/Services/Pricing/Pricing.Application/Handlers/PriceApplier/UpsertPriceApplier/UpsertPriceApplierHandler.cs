@@ -13,7 +13,6 @@ using Pricing.Enums;
 
 namespace Pricing.Application.Handlers.PriceApplier.UpsertPriceApplier;
 
-[Diagnostics]
 [Transactional, AutoSave]
 public record UpsertPriceApplierCommand(
     string SystemName,
