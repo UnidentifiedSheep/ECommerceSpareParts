@@ -3,7 +3,6 @@ using Enums;
 using Enums.Units;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductSizes;
-using Main.Application.Handlers.ProductSizes.GetProductSizes;
 using Main.Application.Handlers.ProductSizes.SetProductSizes;
 using MediatR;
 

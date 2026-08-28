@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Contracts.Products;
-using Main.Application.Handlers.ProductSizes.GetProductSizes;
+using Main.Application.Handlers.ProductSizes;
 using Main.Entities.DomainEvents.Product;
 using ZiggyCreatures.Caching.Fusion;
 

@@ -1,5 +1,5 @@
-﻿using Application.Common.Interfaces.Cqrs;
-using Application.Common.Extensions;
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
@@ -7,7 +7,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ProductSizes.GetProductSizes;
+namespace Main.Application.Handlers.ProductSizes;
 
 public record GetProductSizeQuery(int ProductId) : IQuery<GetProductSizesResult>;
 

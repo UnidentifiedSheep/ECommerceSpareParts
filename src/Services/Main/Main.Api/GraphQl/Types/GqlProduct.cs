@@ -45,4 +45,10 @@ public record GqlProduct(
 
         return producer;
     }
+
+    [GraphQLName("size")]
+    public Task<GqlProductSize?> GetSizeAsync(
+        ProductSizeByIdDataLoader loader,
+        CancellationToken cancellationToken)
+        => loader.LoadAsync(Id, cancellationToken);
 }
