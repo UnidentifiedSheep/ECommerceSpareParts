@@ -79,7 +79,7 @@ services:
         window: 60s
 
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:3.0.0
     command: -config.file=/etc/tempo/tempo.yml
     configs:
       - source: tempo_config
