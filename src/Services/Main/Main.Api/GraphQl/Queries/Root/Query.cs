@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Types.Composite;
 
 namespace Main.Api.GraphQl.Queries.Root;
 
@@ -11,5 +12,6 @@ public sealed class Query
     public CatalogueCandidateQueries CatalogueCandidate => new();
     
     [GraphQLName("producers")]
+    [Shareable]
     public ProducerQueries Producer => new();
 }

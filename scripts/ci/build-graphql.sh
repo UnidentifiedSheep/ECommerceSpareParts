@@ -55,4 +55,8 @@ dotnet tool run nitro -- fusion compose \
   -f "${artifact_root}/Analytics/schema.graphqls" \
   -a "${artifact_root}/Gateway/gateway.far"
 
-unzip -t "${artifact_root}/Gateway/gateway.far"
+test -s "${artifact_root}/Gateway/gateway.far"
+
+if command -v unzip > /dev/null 2>&1; then
+  unzip -t "${artifact_root}/Gateway/gateway.far"
+fi

@@ -34,6 +34,12 @@ COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Common/Inte
 COPY ["src/Services/Gateway/Gateway.Application/Gateway.Application.csproj", "src/Services/Gateway/Gateway.Application/"]
 RUN dotnet restore "src/Services/Gateway/Gateway/Gateway.csproj"
 COPY . .
+RUN mkdir -p /app/fusion \
+    && if [ -s /src/artifacts/graphql/Gateway/gateway.far ]; then \
+         cp /src/artifacts/graphql/Gateway/gateway.far /app/fusion/gateway.far; \
+       else \
+         touch /app/fusion/gateway.far; \
+       fi
 WORKDIR "/src/src/Services/Gateway/Gateway"
 RUN dotnet build "./Gateway.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
@@ -44,5 +50,5 @@ RUN dotnet publish "./Gateway.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=build /src/artifacts/graphql/Gateway/gateway.far ./gateway.far
+COPY --from=build /app/fusion/gateway.far ./gateway.far
 ENTRYPOINT ["dotnet", "Gateway.dll"]

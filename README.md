@@ -46,9 +46,6 @@ docker compose up -d pgql redis rabbitmq opensearch minio minio-init
 # Apply migrations and seed data
 docker compose -f migrator-compose.yaml up --build --abort-on-container-exit
 
-# Export GraphQL source schemas and compose the Gateway archive
-bash scripts/ci/build-graphql.sh
-
 # Start the complete stack
 docker compose up -d --build
 ```
@@ -58,6 +55,9 @@ Open the API documentation at <http://localhost:8080/docs>.
 Grafana uses HTTPS and requires `CERT_PATH` and `CERT_KEYPATH` pointing to certificate files mounted from `CERTS_PATH`.
 
 Stop the stack with `docker compose down`. Add `-v` to remove development volumes as well.
+
+Docker Compose builds the GraphQL source schemas and Fusion archive automatically before starting Gateway. To generate
+the same artifacts without Compose, run `bash scripts/ci/build-graphql.sh`.
 
 ## Local Endpoints
 

@@ -159,8 +159,11 @@ builder.Services.AddMassTransit(x =>
 
 builder.Services.AddFusionHttpClient(secret);
 
+var fusionArchivePath =
+    builder.Configuration["Fusion:ArchivePath"] ?? "./gateway.far";
+
 builder.AddGraphQLGateway()
-    .AddFileSystemConfiguration("./gateway.far")
+    .AddFileSystemConfiguration(fusionArchivePath)
     .ModifyRequestOptions(o =>
     {
         o.CollectOperationPlanTelemetry = true;
