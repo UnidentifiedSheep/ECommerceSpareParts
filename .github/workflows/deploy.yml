@@ -11,6 +11,10 @@ on:
         description: Comma-separated affected API, Worker and Migrator service names
         required: true
         type: string
+      full_deploy:
+        description: Apply every Swarm stack and run the complete deployment validation
+        required: true
+        type: boolean
 
 jobs:
   deploy:
@@ -31,22 +35,107 @@ jobs:
 
           cp deploy/stack.*.yml deploy-payload/deploy/
           cp -R deploy/grafana deploy-payload/deploy/
+          cp -R deploy/tempo deploy-payload/deploy/
           cp prometheus.yml deploy-payload/prometheus.yml
           cp scripts/deploy/deploy-swarm.sh deploy-payload/scripts/deploy/deploy-swarm.sh
           cp scripts/deploy/load-secrets.py deploy-payload/scripts/deploy/load-secrets.py
           cp -R init/. deploy-payload/init/
 
+          required_files=(
+            deploy/stack.secrets.yml
+            deploy/stack.gateway.yml
+            deploy/stack.apps.yml
+            deploy/stack.workers.yml
+            deploy/stack.infra.yml
+            deploy/stack.monitoring.yml
+            deploy/tempo/tempo.yml
+            deploy/grafana/provisioning/datasources/datasources.yml
+            deploy/grafana/provisioning/dashboards/swarm.yml
+            deploy/grafana/dashboards/swarm-nodes.json
+            init/clear-expired-coef.sql
+            init/create-multiple-postgresql-databases.sh
+            scripts/deploy/deploy-swarm.sh
+            scripts/deploy/load-secrets.py
+            prometheus.yml
+          )
+
+          for required_file in "${required_files[@]}"; do
+            test -s "deploy-payload/${required_file}" || {
+              echo "Required deploy payload file ${required_file} is missing or empty." >&2
+              exit 1
+            }
+          done
+
+      - name: Validate deploy scripts and Swarm stacks
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          bash -n deploy-payload/scripts/deploy/deploy-swarm.sh
+          PYTHONPYCACHEPREFIX="$RUNNER_TEMP/deploy-pycache" \
+            python3 -m py_compile deploy-payload/scripts/deploy/load-secrets.py
+
+          export ARTIFACT_REGISTRY_HOST=registry.invalid
+          export IMAGE_TAG=current
+          export DEPLOY_RUN_ID=validation
+          export PGQL_USER=validation
+          export PGQL_PASSWORD=validation
+          export REDIS_PASSWORD=validation
+          export RABBITMQ_DEFAULT_USER=validation
+          export RABBITMQ_DEFAULT_PASS=validation
+          export OPENSEARCH_PASSWORD=validation
+          export GRAFANA_ADMIN_USER=validation
+          export GRAFANA_ADMIN_PASSWORD=validation
+          export TRAEFIK_ACME_EMAIL=validation@example.invalid
+          export GATEWAY_HOST=gateway.example.invalid
+          export PORTAINER_HOST=portainer.example.invalid
+          export GRAFANA_HOST=grafana.example.invalid
+          export OPENSEARCH_DASHBOARDS_HOST=opensearch.example.invalid
+          export CLOUD_RU_SECRET_PROJECT_ID=validation
+          export CLOUDRU_SECRETS_SCRIPT_CONFIG=validation_cloudru
+          export POSTGRES_INIT_SQL_CONFIG=validation_postgres_sql
+          export POSTGRES_INIT_SCRIPT_CONFIG=validation_postgres_script
+          export PROMETHEUS_CONFIG=validation_prometheus
+          export TEMPO_CONFIG=validation_tempo
+          export GRAFANA_DATASOURCES_CONFIG=validation_grafana_datasources
+          export GRAFANA_DASHBOARDS_CONFIG=validation_grafana_dashboards
+          export GRAFANA_SWARM_NODES_DASHBOARD_CONFIG=validation_swarm_dashboard
+
+          for stack_file in deploy-payload/deploy/stack.*.yml; do
+            docker compose -f "$stack_file" config |
+              sed '/^name:/d' |
+              sed -E \
+                -e 's/^([[:space:]]+published: )"([0-9]+)"$/\1\2/' \
+                -e 's/^([[:space:]]+mode: )"([0-9]+)"$/\1\2/' |
+              docker stack config --compose-file - > /dev/null
+          done
+
       - name: Prepare leader directory
         uses: appleboy/ssh-action@v1.2.5
+        env:
+          DEPLOY_SWARM_PATH: ${{ env.SWARM_PATH }}
         with:
           host: ${{ secrets.SWARM_LEADER_HOST }}
           username: ${{ secrets.SWARM_SSH_USER }}
           key: ${{ secrets.SWARM_SSH_KEY }}
+          envs: DEPLOY_SWARM_PATH
           script: |
             set -e
 
-            mkdir -p '${{ env.SWARM_PATH }}'
-            cd '${{ env.SWARM_PATH }}'
+            case "$DEPLOY_SWARM_PATH" in
+              /|*'/../'*|*'/..'|'')
+                echo "SWARM_PATH must be a safe absolute path other than /." >&2
+                exit 1
+                ;;
+              /*) ;;
+              *)
+                echo "SWARM_PATH must be a safe absolute path other than /." >&2
+                exit 1
+                ;;
+            esac
+
+            mkdir -p "$DEPLOY_SWARM_PATH"
+            cd "$DEPLOY_SWARM_PATH"
 
             rm -rf release configs.next configs.old
             mkdir -p release configs
@@ -64,14 +153,29 @@ jobs:
 
       - name: Activate leader payload
         uses: appleboy/ssh-action@v1.2.5
+        env:
+          DEPLOY_SWARM_PATH: ${{ env.SWARM_PATH }}
         with:
           host: ${{ secrets.SWARM_LEADER_HOST }}
           username: ${{ secrets.SWARM_SSH_USER }}
           key: ${{ secrets.SWARM_SSH_KEY }}
+          envs: DEPLOY_SWARM_PATH
           script: |
             set -e
 
-            cd '${{ env.SWARM_PATH }}'
+            case "$DEPLOY_SWARM_PATH" in
+              /|*'/../'*|*'/..'|'')
+                echo "SWARM_PATH must be a safe absolute path other than /." >&2
+                exit 1
+                ;;
+              /*) ;;
+              *)
+                echo "SWARM_PATH must be a safe absolute path other than /." >&2
+                exit 1
+                ;;
+            esac
+
+            cd "$DEPLOY_SWARM_PATH"
 
             rm -rf init
             mv release/init init
@@ -98,15 +202,31 @@ jobs:
         uses: appleboy/ssh-action@v1.2.5
         env:
           SWARM_ENV_BASE64: ${{ env.SWARM_ENV_BASE64 }}
+          DEPLOY_SWARM_PATH: ${{ env.SWARM_PATH }}
+          DEPLOY_REGISTRY_HOST: ${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_HOST || secrets.ARTIFACT_REGISTRY_HOST }}
+          DEPLOY_REGISTRY_USERNAME: ${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME || secrets.ARTIFACT_REGISTRY_USERNAME }}
+          DEPLOY_REGISTRY_PASSWORD: ${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}
         with:
           host: ${{ secrets.SWARM_LEADER_HOST }}
           username: ${{ secrets.SWARM_SSH_USER }}
           key: ${{ secrets.SWARM_SSH_KEY }}
-          envs: SWARM_ENV_BASE64
+          envs: SWARM_ENV_BASE64,DEPLOY_SWARM_PATH,DEPLOY_REGISTRY_HOST,DEPLOY_REGISTRY_USERNAME,DEPLOY_REGISTRY_PASSWORD
           script: |
             set -euo pipefail
 
-            cd '${{ env.SWARM_PATH }}'
+            case "$DEPLOY_SWARM_PATH" in
+              /|*'/../'*|*'/..'|'')
+                echo "SWARM_PATH must be a safe absolute path other than /." >&2
+                exit 1
+                ;;
+              /*) ;;
+              *)
+                echo "SWARM_PATH must be a safe absolute path other than /." >&2
+                exit 1
+                ;;
+            esac
+
+            cd "$DEPLOY_SWARM_PATH"
 
             if [ -z "${SWARM_ENV_BASE64:-}" ]; then
               echo "SWARM_ENV is empty."
@@ -121,12 +241,12 @@ jobs:
             set +a
 
             export STACK_NAME='${{ env.STACK_NAME }}'
-            export ARTIFACT_REGISTRY_HOST='${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_HOST || secrets.ARTIFACT_REGISTRY_HOST }}'
-            export ARTIFACT_REGISTRY_USERNAME='${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME || secrets.ARTIFACT_REGISTRY_USERNAME }}'
-            export ARTIFACT_REGISTRY_PASSWORD='${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}'
+            export ARTIFACT_REGISTRY_HOST="$DEPLOY_REGISTRY_HOST"
+            export ARTIFACT_REGISTRY_USERNAME="$DEPLOY_REGISTRY_USERNAME"
+            export ARTIFACT_REGISTRY_PASSWORD="$DEPLOY_REGISTRY_PASSWORD"
             export ARTIFACT_REGISTRY_FALLBACK_ENABLED=false
             export IMAGE_TAG='current'
-            export DEPLOY_RUNTIME=true
+            export DEPLOY_RUNTIME='${{ inputs.full_deploy && 'false' || 'true' }}'
             export DEPLOY_SERVICES='${{ inputs.services }}'
             export DEPLOY_RUN_ID='${{ github.run_id }}-${{ github.run_attempt }}'
             export CLOUD_RU_SECRET_PROJECT_ID='${{ vars.CLOUD_RU_SECRET_PROJECT_ID }}'
@@ -136,7 +256,7 @@ jobs:
             export CLOUD_RU_SECRET_VERSION='${{ vars.CLOUD_RU_SECRET_VERSION }}'
             export DOTNET_ENVIRONMENT='${{ env.DEPLOY_ENVIRONMENT }}'
             export ASPNETCORE_ENVIRONMENT='${{ env.DEPLOY_ENVIRONMENT }}'
-            export CONFIGS_PATH="${CONFIGS_PATH:-${{ env.SWARM_PATH }}/configs}"
+            export CONFIGS_PATH="${CONFIGS_PATH:-${DEPLOY_SWARM_PATH}/configs}"
             export PUBLIC_NETWORK="${PUBLIC_NETWORK:-public}"
             export BACKEND_NETWORK="${BACKEND_NETWORK:-backend}"
             export MONITORING_NETWORK="${MONITORING_NETWORK:-monitoring}"
@@ -149,6 +269,6 @@ jobs:
             export PRICING_WORKER_REPLICAS="${PRICING_WORKER_REPLICAS:-1}"
             export ANALYTICS_WORKER_REPLICAS="${ANALYTICS_WORKER_REPLICAS:-1}"
             export MIGRATE_LEGACY_STACK="${MIGRATE_LEGACY_STACK:-true}"
-            export DOCKER_CONFIG="${{ env.SWARM_PATH }}/.docker"
+            export DOCKER_CONFIG="${DEPLOY_SWARM_PATH}/.docker"
 
             bash scripts/deploy/deploy-swarm.sh

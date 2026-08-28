@@ -18,6 +18,7 @@ jobs:
     outputs:
       has_images: ${{ steps.discover.outputs.has_images }}
       should_deploy: ${{ steps.discover.outputs.should_deploy }}
+      full_deploy: ${{ steps.discover.outputs.full_deploy }}
       matrix: ${{ steps.discover.outputs.matrix }}
       services: ${{ steps.discover.outputs.services }}
 
@@ -106,13 +107,6 @@ jobs:
           DEPLOYABLE_FILE="$AFFECTED_DIR/deployable.txt"
           mkdir -p "$AFFECTED_DIR"
 
-          if [ "$EVENT_NAME" = 'workflow_dispatch' ] ||
-            ! git diff --quiet "$BASE_SHA" "$HEAD_SHA"; then
-            echo 'should_deploy=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'should_deploy=false' >> "$GITHUB_OUTPUT"
-          fi
-
           set +e
           dotnet affected \
             --repository-path "$GITHUB_WORKSPACE" \
@@ -172,6 +166,34 @@ jobs:
               ["git", "diff", "--name-only", os.environ["BASE_SHA"], os.environ["HEAD_SHA"]],
               text=True,
           ).splitlines())
+          directly_changed_dockerfiles = {
+              os.path.normpath(path)
+              for path in changed_paths
+              if os.path.basename(path) == "Dockerfile"
+          }
+          affected_dockerfiles.update(directly_changed_dockerfiles)
+
+          postgres_image_changed = any(
+              path.startswith(".dockerfiles/pgql-cron/")
+              for path in changed_paths
+          )
+          if postgres_image_changed:
+              affected_dockerfiles.add(".dockerfiles/pgql-cron/Dockerfile")
+
+          full_deploy = os.environ["EVENT_NAME"] == "workflow_dispatch" or any(
+              path.startswith((
+                  ".dockerfiles/pgql-cron/",
+                  "deploy/stack.",
+                  "deploy/grafana/",
+                  "deploy/tempo/",
+                  "init/",
+                  "scripts/deploy/",
+              )) or path in {
+                  ".github/workflows/deploy.yml",
+                  "prometheus.yml",
+              }
+              for path in changed_paths
+          )
           graphql_api_dockerfiles = {
               "src/Services/Main/Main.Api/Dockerfile",
               "src/Services/Search/Search.Api/Dockerfile",
@@ -187,6 +209,7 @@ jobs:
               )) or path in {
                   ".config/dotnet-tools.json",
                   ".github/workflows/graphql.yml",
+                  "scripts/ci/build-graphql.sh",
               }
               for path in changed_paths
           )
@@ -199,6 +222,9 @@ jobs:
 
           services = []
           for name, service in compose["services"].items():
+              if name == "graphql-config":
+                  continue
+
               build = service.get("build")
               if not build:
                   continue
@@ -216,7 +242,7 @@ jobs:
               deploy_name = (
                   name.removesuffix(".migrator") + "-migrator"
                   if name.endswith(".migrator")
-                  else name
+                  else "postgres-cron" if name == "pgql" else name
               )
               services.append({
                   "service": deploy_name,
@@ -232,15 +258,20 @@ jobs:
           services.sort(key=lambda item: item["service"])
           matrix = json.dumps({"include": services}, separators=(",", ":"))
           names = ",".join(item["service"] for item in services)
+          should_deploy = bool(services) or full_deploy
 
           with open(output_file, "a", encoding="utf-8") as stream:
               stream.write(f"has_images={'true' if services else 'false'}\n")
+              stream.write(f"should_deploy={'true' if should_deploy else 'false'}\n")
+              stream.write(f"full_deploy={'true' if full_deploy else 'false'}\n")
               stream.write(f"matrix={matrix}\n")
               stream.write(f"services={names}\n")
 
           print(f"Affected deployable services: {names or 'none'}")
           if force_gateway:
               print("Gateway was included because a GraphQL source schema can change.")
+          if full_deploy:
+              print("A full Swarm deployment is required by deployment infrastructure changes.")
           PY
 
   build:
@@ -280,4 +311,5 @@ jobs:
     with:
       registry_kind: ${{ needs.publish-images.outputs.registry_kind }}
       services: ${{ needs.discover-affected.outputs.services }}
+      full_deploy: ${{ needs.discover-affected.outputs.full_deploy == 'true' }}
     secrets: inherit

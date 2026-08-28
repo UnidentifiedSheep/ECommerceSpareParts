@@ -1535,7 +1535,9 @@ if [ "${DEPLOY_RUNTIME:-false}" = true ]; then
   ensure_external_networks
   ensure_configs_path_on_nodes
   prepare_versioned_configs
-  render_stack_files
+  render_stack_file \
+    deploy/stack.secrets.yml \
+    deploy/stack.secrets.rendered.yml
   sync_application_configs
   deploy_selected_services
   cleanup_unused_versioned_configs
