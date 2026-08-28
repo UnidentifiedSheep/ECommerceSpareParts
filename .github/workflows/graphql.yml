@@ -1,0 +1,172 @@
+name: GraphQL
+
+on:
+  workflow_call:
+    outputs:
+      fusion_artifact:
+        description: Name of the composed Fusion archive artifact
+        value: ${{ jobs.compose-fusion.outputs.artifact_name }}
+
+jobs:
+  export-source-schemas:
+    name: Export ${{ matrix.name }} schema
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Main
+            project: src/Services/Main/Main.Api/Main.Api.csproj
+          - name: Search
+            project: src/Services/Search/Search.Api/Search.Api.csproj
+          - name: Analytics
+            project: src/Services/Analytics/Analytics.Api/Analytics.Api.csproj
+
+    env:
+      DOTNET_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Development
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-graphql-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-graphql-
+            ${{ runner.os }}-nuget-
+
+      - name: Restore ${{ matrix.name }}
+        run: dotnet restore "${{ matrix.project }}"
+
+      - name: Build ${{ matrix.name }}
+        run: dotnet build "${{ matrix.project }}" --configuration Release --no-restore
+
+      - name: Export ${{ matrix.name }} source schema
+        shell: bash
+        env:
+          SCHEMA_NAME: ${{ matrix.name }}
+          SCHEMA_PROJECT: ${{ matrix.project }}
+        run: |
+          set -euo pipefail
+
+          schema_dir="${RUNNER_TEMP}/graphql/${SCHEMA_NAME}"
+          mkdir -p "$schema_dir"
+
+          dotnet run \
+            --project "$SCHEMA_PROJECT" \
+            --configuration Release \
+            --no-build \
+            --no-launch-profile \
+            -- schema export \
+            --schema-name "$SCHEMA_NAME" \
+            --output "$schema_dir/schema.graphqls"
+
+          cp \
+            "schemas/graphql/${SCHEMA_NAME}/schema-settings.json" \
+            "$schema_dir/schema-settings.json"
+
+          test -s "$schema_dir/schema.graphqls"
+          test -s "$schema_dir/schema-settings.json"
+
+      - name: Upload ${{ matrix.name }} source schema
+        uses: actions/upload-artifact@v4
+        with:
+          name: graphql-source-${{ matrix.name }}-${{ github.sha }}
+          path: ${{ runner.temp }}/graphql/${{ matrix.name }}
+          if-no-files-found: error
+          retention-days: 14
+
+  compose-fusion:
+    name: Compose Fusion archive
+    runs-on: ubuntu-latest
+    needs: export-source-schemas
+    timeout-minutes: 10
+
+    outputs:
+      artifact_name: ${{ steps.metadata.outputs.artifact_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore local .NET tools
+        run: dotnet tool restore
+
+      - name: Download Main source schema
+        uses: actions/download-artifact@v4
+        with:
+          name: graphql-source-Main-${{ github.sha }}
+          path: artifacts/graphql/Main
+
+      - name: Download Search source schema
+        uses: actions/download-artifact@v4
+        with:
+          name: graphql-source-Search-${{ github.sha }}
+          path: artifacts/graphql/Search
+
+      - name: Download Analytics source schema
+        uses: actions/download-artifact@v4
+        with:
+          name: graphql-source-Analytics-${{ github.sha }}
+          path: artifacts/graphql/Analytics
+
+      - name: Compose gateway.far
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p artifacts/graphql/Gateway
+
+          dotnet tool run nitro -- fusion compose \
+            -f artifacts/graphql/Main/schema.graphqls \
+            -f artifacts/graphql/Search/schema.graphqls \
+            -f artifacts/graphql/Analytics/schema.graphqls \
+            -a artifacts/graphql/Gateway/gateway.far
+
+      - name: Verify Fusion archive
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          archive="artifacts/graphql/Gateway/gateway.far"
+          test -s "$archive"
+          unzip -t "$archive"
+
+          archive_entries="$(unzip -Z1 "$archive")"
+          for schema_name in Main Search Analytics; do
+            grep -Fxq \
+              "source-schemas/${schema_name}/schema.graphqls" \
+              <<< "$archive_entries"
+            grep -Fxq \
+              "source-schemas/${schema_name}/schema-settings.json" \
+              <<< "$archive_entries"
+          done
+
+      - name: Set artifact metadata
+        id: metadata
+        shell: bash
+        run: echo "artifact_name=fusion-archive-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Fusion archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.metadata.outputs.artifact_name }}
+          path: artifacts/graphql/Gateway/gateway.far
+          if-no-files-found: error
+          retention-days: 30

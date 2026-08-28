@@ -35,7 +35,7 @@ OpenTelemetry, Prometheus, Loki, Tempo, Grafana, xUnit, Testcontainers, and Dock
 
 ## Quick Start
 
-Requirements: .NET 10 SDK, Docker, and Docker Compose v2.
+Requirements: .NET 10 SDK, Docker, Docker Compose v2, and `unzip`.
 
 ```bash
 cp .env.example .env
@@ -45,6 +45,9 @@ docker compose up -d pgql redis rabbitmq opensearch minio minio-init
 
 # Apply migrations and seed data
 docker compose -f migrator-compose.yaml up --build --abort-on-container-exit
+
+# Export GraphQL source schemas and compose the Gateway archive
+bash scripts/ci/build-graphql.sh
 
 # Start the complete stack
 docker compose up -d --build

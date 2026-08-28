@@ -8,6 +8,13 @@
         "dotnet-affected"
       ],
       "rollForward": false
+    },
+    "chillicream.nitro.commandline": {
+      "version": "16.6.1",
+      "commands": [
+        "nitro"
+      ],
+      "rollForward": false
     }
   }
 }

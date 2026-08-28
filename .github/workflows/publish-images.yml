@@ -11,6 +11,10 @@ on:
         description: Whether the affected matrix contains images to publish
         required: true
         type: boolean
+      fusion_artifact:
+        description: Actions artifact containing gateway.far for this commit
+        required: true
+        type: string
     outputs:
       registry_kind:
         description: Registry selected for publishing and deployment
@@ -97,6 +101,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download Fusion archive
+        if: matrix.service == 'gateway'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.fusion_artifact }}
+          path: artifacts/graphql/Gateway
+
+      - name: Verify Fusion archive
+        if: matrix.service == 'gateway'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          archive="artifacts/graphql/Gateway/gateway.far"
+          test -s "$archive"
+          unzip -t "$archive"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

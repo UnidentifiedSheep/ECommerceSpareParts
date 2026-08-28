@@ -127,12 +127,7 @@ jobs:
 
           if [ "$AFFECTED_EXIT_CODE" -eq 166 ]; then
             echo "No affected projects were found."
-            {
-              echo 'has_images=false'
-              echo 'matrix={"include":[]}'
-              echo 'services='
-            } >> "$GITHUB_OUTPUT"
-            exit 0
+            : > "$AFFECTED_FILE"
           elif [ "$AFFECTED_EXIT_CODE" -ne 0 ]; then
             echo "dotnet-affected failed with exit code ${AFFECTED_EXIT_CODE}." >&2
             exit "$AFFECTED_EXIT_CODE"
@@ -156,6 +151,7 @@ jobs:
           python3 - "$DEPLOYABLE_FILE" "$AFFECTED_DIR/compose.json" "$GITHUB_OUTPUT" <<'PY'
           import json
           import os
+          import subprocess
           import sys
 
           projects_file, compose_file, output_file = sys.argv[1:]
@@ -172,6 +168,32 @@ jobs:
               for project in project_paths
           }
 
+          changed_paths = set(subprocess.check_output(
+              ["git", "diff", "--name-only", os.environ["BASE_SHA"], os.environ["HEAD_SHA"]],
+              text=True,
+          ).splitlines())
+          graphql_api_dockerfiles = {
+              "src/Services/Main/Main.Api/Dockerfile",
+              "src/Services/Search/Search.Api/Dockerfile",
+              "src/Services/Analytics/Analytics.Api/Dockerfile",
+          }
+          graphql_pipeline_changed = any(
+              path.startswith((
+                  "schemas/graphql/",
+                  "src/Services/GraphQL.Common/",
+                  "src/Services/Main/Main.Api/GraphQl/",
+                  "src/Services/Search/Search.Api/GraphQl/",
+                  "src/Services/Analytics/Analytics.Api/GraphQl/",
+              )) or path in {
+                  ".config/dotnet-tools.json",
+                  ".github/workflows/graphql.yml",
+              }
+              for path in changed_paths
+          )
+          force_gateway = bool(
+              affected_dockerfiles.intersection(graphql_api_dockerfiles)
+          ) or graphql_pipeline_changed
+
           with open(compose_file, encoding="utf-8-sig") as stream:
               compose = json.load(stream)
 
@@ -186,7 +208,8 @@ jobs:
                   dockerfile = os.path.relpath(dockerfile, workspace)
               dockerfile = os.path.normpath(dockerfile)
 
-              if dockerfile not in affected_dockerfiles:
+              is_forced_gateway = force_gateway and name == "gateway"
+              if dockerfile not in affected_dockerfiles and not is_forced_gateway:
                   continue
 
               image = service.get("image") or (build.get("tags") or [""])[0]
@@ -216,6 +239,8 @@ jobs:
               stream.write(f"services={names}\n")
 
           print(f"Affected deployable services: {names or 'none'}")
+          if force_gateway:
+              print("Gateway was included because a GraphQL source schema can change.")
           PY
 
   build:
@@ -224,12 +249,15 @@ jobs:
   test:
     uses: ./.github/workflows/test.yml
 
+  graphql:
+    uses: ./.github/workflows/graphql.yml
+
   coverage:
     needs: test
     uses: ./.github/workflows/coverage.yml
 
   publish-images:
-    needs: [build, test, discover-affected]
+    needs: [build, test, graphql, discover-affected]
     if: >-
       needs.discover-affected.outputs.should_deploy == 'true' &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
@@ -238,6 +266,7 @@ jobs:
     with:
       matrix: ${{ needs.discover-affected.outputs.matrix }}
       has_images: ${{ needs.discover-affected.outputs.has_images == 'true' }}
+      fusion_artifact: ${{ needs.graphql.outputs.fusion_artifact }}
     secrets: inherit
 
   deploy:
