@@ -1,5 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
+using Main.Api.GraphQl.DataLoaders.Producer;
 using Main.Application.Dtos.Producer;
 
 namespace Main.Api.GraphQl.Types;
@@ -18,4 +19,10 @@ public record GqlProducer(
 
     [GraphQLName("description")]
     public string? Description => Producer.Description;
+
+    [GraphQLName("aliases")]
+    public async Task<IReadOnlyCollection<string>> GetAliasesAsync(
+        ProducerAliasesByIdDataLoader loader,
+        CancellationToken ct)
+        => await loader.LoadAsync(Id, ct) ?? [];
 }

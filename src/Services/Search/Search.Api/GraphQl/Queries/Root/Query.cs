@@ -8,4 +8,7 @@ public sealed class Query
 {
     [GraphQLName("catalogue")]
     public CatalogueQueries Catalogue => new();
+    
+    [GraphQLName("producers")]
+    public ProducerQueries Producer => new();
 }

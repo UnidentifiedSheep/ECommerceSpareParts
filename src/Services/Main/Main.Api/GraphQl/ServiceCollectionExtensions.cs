@@ -1,5 +1,6 @@
 using GraphQL.Common.Extensions;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.DataLoaders.Producer;
 using Main.Api.GraphQl.DataLoaders.Product;
 using Main.Api.GraphQl.Queries.Root;
 
@@ -13,6 +14,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddCommonGraphQl(name)
             .AddQueryType<Query>()
+            .AddDataLoader<ProducerAliasesByIdDataLoader>()
             .AddDataLoader<CatalogueCandidateByIdDataLoader>()
             .AddDataLoader<ProductSizeByIdDataLoader>()
             .AddDataLoader<ProductWeightByIdDataLoader>()

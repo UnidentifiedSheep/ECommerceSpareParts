@@ -1,6 +1,6 @@
 using HotChocolate;
 
-namespace Search.Api.GraphQl.Types.CatalogueSearch;
+namespace Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
 
 [GraphQLName("SearchCatalogueSection")]
 public sealed record GqlSearchCatalogueSection<T>

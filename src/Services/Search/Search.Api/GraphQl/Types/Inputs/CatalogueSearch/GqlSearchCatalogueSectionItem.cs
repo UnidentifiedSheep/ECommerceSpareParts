@@ -1,7 +1,7 @@
 using HotChocolate;
 using Search.Api.GraphQl.Types.Highlights;
 
-namespace Search.Api.GraphQl.Types.CatalogueSearch;
+namespace Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
 
 [GraphQLName("SearchCatalogueSectionItem")]
 public record GqlSearchCatalogueSectionItem<T>

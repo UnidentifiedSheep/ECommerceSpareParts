@@ -1,11 +1,9 @@
 using GreenDonut;
 using Main.Api.GraphQl.Types;
-using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Main.Api.GraphQl.DataLoaders;
+namespace Main.Api.GraphQl.DataLoaders.Producer;
 
 public sealed class ProducerByIdDataLoader(
     ISender sender,

@@ -5,8 +5,11 @@ namespace Main.Api.GraphQl.Queries.Root;
 public sealed class Query
 {
     [GraphQLName("products")]
-    public ProductQueries ProductQueries => new();
+    public ProductQueries Product => new();
     
     [GraphQLName("catalogueCandidates")]
-    public CatalogueCandidateQueries CatalogueCandidateQueries => new();
+    public CatalogueCandidateQueries CatalogueCandidate => new();
+    
+    [GraphQLName("producers")]
+    public ProducerQueries Producer => new();
 }

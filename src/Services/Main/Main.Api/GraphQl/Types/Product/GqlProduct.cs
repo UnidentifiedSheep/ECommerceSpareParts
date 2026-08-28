@@ -1,6 +1,7 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.DataLoaders.Producer;
 using Main.Api.GraphQl.DataLoaders.Product;
 using Main.Application.Dtos.Product;
 

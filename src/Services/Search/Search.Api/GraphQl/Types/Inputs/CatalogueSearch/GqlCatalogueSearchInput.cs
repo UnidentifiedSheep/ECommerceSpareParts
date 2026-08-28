@@ -2,7 +2,7 @@ using GraphQL.Common.Types;
 using HotChocolate;
 using Search.Enums;
 
-namespace Search.Api.GraphQl.Types.CatalogueSearch;
+namespace Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
 
 [GraphQLName("CatalogueSearchInput")]
 public record GqlCatalogueSearchInput

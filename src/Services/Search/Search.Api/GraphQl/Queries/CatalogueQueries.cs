@@ -3,8 +3,8 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using MediatR;
 using Search.Api.GraphQl.Types;
-using Search.Api.GraphQl.Types.CatalogueSearch;
 using Search.Api.GraphQl.Types.Highlights;
+using Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
 using Search.Application.Handlers.Catalogue.SearchCatalogue;
 
 namespace Search.Api.GraphQl.Queries;
