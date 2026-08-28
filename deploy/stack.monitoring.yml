@@ -78,11 +78,37 @@ services:
         delay: 10s
         window: 60s
 
+  tempo:
+    image: grafana/tempo:latest
+    command: -config.file=/etc/tempo/tempo.yml
+    configs:
+      - source: tempo_config
+        target: /etc/tempo/tempo.yml
+        mode: 0444
+    volumes:
+      - tempo_data:/var/tempo
+    networks:
+      backend:
+        aliases:
+          - tempo
+      monitoring:
+        aliases:
+          - tempo
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring.tempo == true
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        window: 60s
+
   grafana:
     image: grafana/grafana:latest
     configs:
       - source: grafana_datasources_config
-        target: /etc/grafana/provisioning/datasources/prometheus.yml
+        target: /etc/grafana/provisioning/datasources/datasources.yml
         mode: 0444
       - source: grafana_dashboards_config
         target: /etc/grafana/provisioning/dashboards/swarm.yml
@@ -173,6 +199,9 @@ configs:
   prometheus_config:
     external: true
     name: ${PROMETHEUS_CONFIG:?PROMETHEUS_CONFIG is required}
+  tempo_config:
+    external: true
+    name: ${TEMPO_CONFIG:?TEMPO_CONFIG is required}
   grafana_datasources_config:
     external: true
     name: ${GRAFANA_DATASOURCES_CONFIG:?GRAFANA_DATASOURCES_CONFIG is required}
@@ -192,4 +221,7 @@ volumes:
     external: true
   loki_data:
     name: ${VOLUME_PREFIX:-ecommerce}_loki_data
+    external: true
+  tempo_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_tempo_data
     external: true

@@ -48,6 +48,7 @@ services:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
       - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
     networks:
       public:
         aliases:

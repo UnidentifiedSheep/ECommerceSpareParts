@@ -41,6 +41,7 @@ MONITORING_SERVICES=(
   "monitoring:prometheus"
   "monitoring:node-exporter"
   "monitoring:loki"
+  "monitoring:tempo"
   "monitoring:grafana"
   "monitoring:opensearch-dashboards"
 )
@@ -68,6 +69,7 @@ PERSISTENT_VOLUMES=(
   prometheus_data
   grafana_data
   loki_data
+  tempo_data
 )
 
 REQUIRED_NODE_LABELS=(
@@ -82,6 +84,7 @@ REQUIRED_NODE_LABELS=(
   infra.opensearch=true
   monitoring.grafana=true
   monitoring.loki=true
+  monitoring.tempo=true
   monitoring.prometheus=true
   monitoring.opensearch-dashboards=true
 )
@@ -286,10 +289,15 @@ prepare_versioned_configs() {
       "${STACK_NAME}_prometheus_config" \
       prometheus.yml
   )"
+  TEMPO_CONFIG="$(
+    ensure_versioned_config \
+      "${STACK_NAME}_tempo_config" \
+      deploy/tempo/tempo.yml
+  )"
   GRAFANA_DATASOURCES_CONFIG="$(
     ensure_versioned_config \
       "${STACK_NAME}_grafana_datasources" \
-      deploy/grafana/provisioning/datasources/prometheus.yml
+      deploy/grafana/provisioning/datasources/datasources.yml
   )"
   GRAFANA_DASHBOARDS_CONFIG="$(
     ensure_versioned_config \
@@ -306,6 +314,7 @@ prepare_versioned_configs() {
   export POSTGRES_INIT_SQL_CONFIG
   export POSTGRES_INIT_SCRIPT_CONFIG
   export PROMETHEUS_CONFIG
+  export TEMPO_CONFIG
   export GRAFANA_DATASOURCES_CONFIG
   export GRAFANA_DASHBOARDS_CONFIG
   export GRAFANA_SWARM_NODES_DASHBOARD_CONFIG
@@ -1061,6 +1070,7 @@ wait_for_monitoring_endpoints() {
   log "Wait for monitoring endpoints"
   wait_for_http Prometheus "$MONITORING_NETWORK" "http://prometheus:9090/-/ready"
   wait_for_http Loki "$MONITORING_NETWORK" "http://loki:3100/ready"
+  wait_for_http Tempo "$MONITORING_NETWORK" "http://tempo:3200/ready"
   wait_for_http Grafana "$MONITORING_NETWORK" "http://grafana:3000/api/health"
   wait_for_http \
     "OpenSearch Dashboards" \
@@ -1411,6 +1421,7 @@ cleanup_unused_versioned_configs() {
       "$POSTGRES_INIT_SQL_CONFIG" \
       "$POSTGRES_INIT_SCRIPT_CONFIG" \
       "$PROMETHEUS_CONFIG" \
+      "$TEMPO_CONFIG" \
       "$GRAFANA_DATASOURCES_CONFIG" \
       "$GRAFANA_DASHBOARDS_CONFIG" \
       "$GRAFANA_SWARM_NODES_DASHBOARD_CONFIG"
@@ -1421,6 +1432,7 @@ cleanup_unused_versioned_configs() {
     "${STACK_NAME}_postgres_init_sql_" \
     "${STACK_NAME}_postgres_init_script_" \
     "${STACK_NAME}_prometheus_config_" \
+    "${STACK_NAME}_tempo_config_" \
     "${STACK_NAME}_grafana_datasources_" \
     "${STACK_NAME}_grafana_dashboards_" \
     "${STACK_NAME}_grafana_swarm_nodes_dashboard_"; do

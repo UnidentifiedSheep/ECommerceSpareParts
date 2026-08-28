@@ -2,10 +2,12 @@ using Abstractions.Interfaces;
 using Abstractions.Models.Options;
 using Api.Common.Middleware;
 using Api.Common.OperationFilters;
+using Application.Common.Diagnostics;
 using Application.Common.Models;
 using Common;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace Api.Common.Extensions;
 
@@ -53,7 +55,11 @@ public static class WebApplicationBuilderExtensions
                     .AllowAnyMethod();
             });
         });
-        services.AddOpenTelemetry(serviceDefinition);
+        services.AddOpenTelemetry(
+            serviceDefinition,
+            serviceNameSuffix: "api",
+            includeAspNetCoreInstrumentation: true,
+            includePrometheusMetrics: true);
         
         services.AddTransient<HeaderSecretMiddleware>();
 
@@ -65,18 +71,36 @@ public static class WebApplicationBuilderExtensions
         IServiceDefinition serviceDefinition)
     {
         services.AddProjectJsonSerialization();
+        services.AddOpenTelemetry(
+            serviceDefinition,
+            serviceNameSuffix: "worker");
 
         return services;
     }
 
     private static IServiceCollection AddOpenTelemetry(
         this IServiceCollection collection,
-        IServiceDefinition serviceDefinition)
+        IServiceDefinition serviceDefinition,
+        string serviceNameSuffix,
+        bool includeAspNetCoreInstrumentation = false,
+        bool includePrometheusMetrics = false)
     {
-        collection.AddOpenTelemetry()
+        var openTelemetry = collection.AddOpenTelemetry()
             .ConfigureResource(x =>
-                x.AddService(serviceDefinition.ServiceName))
-            .WithMetrics(metrics =>
+                x.AddService($"{serviceDefinition.ServiceName}.{serviceNameSuffix}"))
+            .WithTracing(tracing =>
+            {
+                tracing
+                    .AddSource(CqrsDiagnostics.ActivitySourceName)
+                    .AddHttpClientInstrumentation()
+                    .AddOtlpExporter();
+
+                if (includeAspNetCoreInstrumentation)
+                    tracing.AddAspNetCoreInstrumentation();
+            });
+
+        if (includePrometheusMetrics)
+            openTelemetry.WithMetrics(metrics =>
             {
                 metrics
                     .AddAspNetCoreInstrumentation()

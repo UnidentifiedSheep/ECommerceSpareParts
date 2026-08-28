@@ -8,7 +8,7 @@ Production uses one Docker Swarm cluster and six independently deployed stacks:
 | `${STACK_NAME}-infra` | PostgreSQL, Redis, RabbitMQ and OpenSearch |
 | `${STACK_NAME}-apps` | Main, Analytics, Pricing and Search APIs |
 | `${STACK_NAME}-workers` | Main, Analytics and Pricing workers |
-| `${STACK_NAME}-monitoring` | Prometheus, Grafana, Loki and OpenSearch Dashboards |
+| `${STACK_NAME}-monitoring` | Prometheus, Grafana, Loki, Tempo and OpenSearch Dashboards |
 | `${STACK_NAME}-gateway` | Traefik, Gateway/YARP, Portainer CE and global Portainer agents |
 
 MinIO is intentionally not deployed. Applications must use the configured external S3-compatible storage.
@@ -52,7 +52,7 @@ docker network create --driver overlay --attachable monitoring
 
 The deployment script also creates missing networks idempotently and rejects an existing network if it is not a Swarm overlay network.
 
-Internal services use stable aliases such as `postgres`, `redis`, `rabbitmq`, `opensearch`, `main-api`, `pricing-api`, `search-api`, `analytics-api`, `gateway`, `prometheus`, and `loki`.
+Internal services use stable aliases such as `postgres`, `redis`, `rabbitmq`, `opensearch`, `main-api`, `pricing-api`, `search-api`, `analytics-api`, `gateway`, `prometheus`, `loki`, and `tempo`.
 
 ## Node labels
 
@@ -72,6 +72,7 @@ docker node update --label-add infra.opensearch=true <opensearch-node>
 
 docker node update --label-add monitoring.grafana=true <grafana-node>
 docker node update --label-add monitoring.loki=true <loki-node>
+docker node update --label-add monitoring.tempo=true <tempo-node>
 docker node update --label-add monitoring.prometheus=true <prometheus-node>
 docker node update --label-add monitoring.opensearch-dashboards=true <dashboards-node>
 ```
@@ -215,17 +216,19 @@ ecommerce_opensearch_data
 ecommerce_prometheus_data
 ecommerce_grafana_data
 ecommerce_loki_data
+ecommerce_tempo_data
 ```
 
 The default `local` volume driver stores data on one node. Before moving a stateful placement label, migrate its volume data or configure shared storage. Stack removal does not delete these external volumes.
 
 Exactly one active ready node must carry `infra.postgres=true`. PostgreSQL and its backup service share the node-local `pg_data` volume, so allowing multiple eligible PostgreSQL nodes could place them over different local volumes. Portainer has the same node-local storage consideration: migrate `portainer_data` before moving `management.portainer=true` to another manager.
 
-Prometheus retains metrics for 30 days in `prometheus_data`. The monitoring
+Prometheus retains metrics for 30 days in `prometheus_data`. Tempo retains
+traces for seven days in `tempo_data`. The monitoring
 stack runs `node-exporter` as a global service and discovers its tasks through
 `tasks.node-exporter` on the private `monitoring` overlay network. Grafana
-automatically provisions the Prometheus data source and the **Swarm / Node
-resources** dashboard from versioned Docker configs.
+automatically provisions the Prometheus, Loki, and Tempo data sources and the
+**Swarm / Node resources** dashboard from versioned Docker configs.
 
 ## Portainer CE
 

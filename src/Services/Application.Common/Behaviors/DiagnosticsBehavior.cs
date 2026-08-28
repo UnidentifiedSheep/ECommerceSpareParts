@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 using Attributes;
 using MediatR;
@@ -14,33 +14,31 @@ public class DiagnosticsBehavior<TRequest, TResponse>(
 {
     private static readonly DiagnosticsAttribute? Settings =
         typeof(TRequest).GetCustomAttribute<DiagnosticsAttribute>(true);
+    
+    private static readonly string RequestName = typeof(TRequest).Name;
 
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (Settings is not { Enabled: true }) return await next(cancellationToken);
+        if (Settings is not { Enabled: true })
+            return await next(cancellationToken);
 
-        var timer = new Stopwatch();
-        timer.Start();
-
+        var startedAt = Stopwatch.GetTimestamp();
         var response = await next(cancellationToken);
-
-        timer.Stop();
-        var elapsedMs = timer.Elapsed.TotalMilliseconds;
+        var elapsedMs = Stopwatch.GetElapsedTime(startedAt).TotalMilliseconds;
 
         if (elapsedMs > Settings.MaxExecutionTimeMs)
             logger.LogWarning(
                 "[PERFORMANCE] {Request} took {ElapsedMs:F0} ms. Expected <= {ExpectedMs} ms",
-                typeof(TRequest).Name,
+                RequestName,
                 elapsedMs,
                 Settings.MaxExecutionTimeMs);
 
-
         logger.LogInformation(
             "[END] {Request} handled in {ElapsedMs:F0} ms",
-            typeof(TRequest).Name,
+            RequestName,
             elapsedMs);
 
         return response;

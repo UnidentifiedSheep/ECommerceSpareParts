@@ -13,6 +13,8 @@ public static class HostBuilderExtensions
         string serviceName,
         string environment)
     {
+        hostBuilder.ConfigureLogging(ConfigureActivityTracking);
+
         var loggerConfiguration = GetLoggerConfiguration(
             configuration,
             serviceName,
@@ -29,6 +31,8 @@ public static class HostBuilderExtensions
         string serviceName,
         string environment)
     {
+        ConfigureActivityTracking(builder.Logging);
+
         var logger = GetLoggerConfiguration(
                 configuration,
                 serviceName,
@@ -63,5 +67,14 @@ public static class HostBuilderExtensions
                 });
 
         return loggerConfiguration;
+    }
+
+    private static void ConfigureActivityTracking(ILoggingBuilder logging)
+    {
+        logging.Configure(options =>
+            options.ActivityTrackingOptions =
+                ActivityTrackingOptions.TraceId |
+                ActivityTrackingOptions.SpanId |
+                ActivityTrackingOptions.ParentId);
     }
 }

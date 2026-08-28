@@ -3,6 +3,7 @@ using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
+using Application.Common.Diagnostics;
 using Cache;
 using Common;
 using Gateway.Application;
@@ -13,6 +14,8 @@ using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using RabbitMq.Extensions;
 using Scalar.AspNetCore;
 using Security;
@@ -46,6 +49,7 @@ builder.Host.AddLokiLogger(
     env);
 
 builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("gateway"))
     .WithMetrics(metrics =>
     {
         metrics
@@ -53,6 +57,14 @@ builder.Services.AddOpenTelemetry()
             .AddProcessInstrumentation()
             .AddRuntimeInstrumentation()
             .AddPrometheusExporter();
+    })
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddSource(CqrsDiagnostics.ActivitySourceName)
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter();
     });
 
 builder.Services.AddAuthorization(options =>
