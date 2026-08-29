@@ -5,6 +5,7 @@ using Api.Common.OperationFilters;
 using Application.Common.Diagnostics;
 using Application.Common.Models;
 using Common;
+using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -92,6 +93,7 @@ public static class WebApplicationBuilderExtensions
             {
                 tracing
                     .AddSource(CqrsDiagnostics.ActivitySourceName)
+                    .AddNpgsql()
                     .AddHttpClientInstrumentation()
                     .AddOtlpExporter();
 
