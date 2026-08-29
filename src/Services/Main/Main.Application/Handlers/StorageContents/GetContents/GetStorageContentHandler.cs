@@ -30,7 +30,8 @@ public class GetStorageContentHandler(
     {
         var query = repository.Query;
 
-        if (request.ProductId.HasValue) query = query.Where(x => x.ProductId == request.ProductId);
+        if (request.ProductId.HasValue) 
+            query = query.Where(x => x.ProductId == request.ProductId);
 
         if (!string.IsNullOrWhiteSpace(request.StorageCode))
             query = query.Where(x => x.StorageCode == request.StorageCode);

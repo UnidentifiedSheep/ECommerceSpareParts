@@ -15,7 +15,7 @@ public interface IProductCacheRepository
     Task<IReadOnlyList<ProductDto?>> GetProductsAsync(
         IEnumerable<int> ids);
 
-    Task<IEnumerable<int>> GetProductCrossesAsync(
+    Task<IReadOnlyList<int>> GetProductCrossesAsync(
         int productId,
         string[]? sortBy,
         CancellationToken cancellationToken = default);

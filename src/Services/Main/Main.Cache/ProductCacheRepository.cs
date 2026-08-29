@@ -62,7 +62,7 @@ public class ProductCacheRepository(
             CacheKeys.ProductCache.Ttl);
     }
 
-    public async Task<IEnumerable<int>> GetProductCrossesAsync(
+    public async Task<IReadOnlyList<int>> GetProductCrossesAsync(
         int productId,
         string[]? sortBy,
         CancellationToken cancellationToken = default)
