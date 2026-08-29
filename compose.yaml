@@ -97,6 +97,16 @@
       - rabbitmq
     restart: unless-stopped
 
+  graphql-config:
+    image: graphql-config
+    pull_policy: build
+    build:
+      context: .
+      dockerfile: deploy/graphql/Dockerfile
+    volumes:
+      - graphql_config:/output
+    restart: "no"
+
   gateway:
     image: gateway
     build:
@@ -107,10 +117,16 @@
     volumes:
       - ${CERTS_PATH:-./certs}:/app/certs:ro
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
+      - graphql_config:/app/graphql:ro
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+      - Fusion__ArchivePath=/app/graphql/Gateway/gateway.far
+    depends_on:
+      graphql-config:
+        condition: service_completed_successfully
+        restart: true
     networks:
       - backend-network
     restart: unless-stopped
@@ -344,6 +360,7 @@ networks:
     driver: bridge
 
 volumes:
+  graphql_config:
   pg_data:
   redis_data:
   rabbitmq_data:

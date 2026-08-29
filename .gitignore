@@ -1,5 +1,9 @@
 bin/
 obj/
 /packages/
+/artifacts/graphql/
+/src/Services/*/*.Api/schema.graphqls
+/src/Services/*/*.Api/schema-settings.json
+/src/Services/Gateway/Gateway/gateway.far
 riderModule.iml
 /_ReSharper.Caches/

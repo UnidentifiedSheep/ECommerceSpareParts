@@ -1,5 +1,4 @@
 using GraphQL.Common.Extensions;
-using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Queries.Root;
 
 namespace Main.Api.GraphQl;
@@ -10,11 +9,10 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string name)
     {
+        services.AddMainDataLoaders();
+
         services.AddCommonGraphQl(name)
-            .AddQueryType<Query>()
-            .AddDataLoader<CatalogueCandidateByIdDataLoader>()
-            .AddDataLoader<ProductByIdDataLoader>()
-            .AddDataLoader<ProducerByIdDataLoader>();
+            .AddQueryType<Query>();
         
         return services;
     }

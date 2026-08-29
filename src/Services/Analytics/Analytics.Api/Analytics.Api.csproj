@@ -21,6 +21,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\..\GraphQL.Common\GraphQL.Common.csproj"/>
         <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj"/>
         <ProjectReference Include="..\Analytics.Cache\Analytics.Cache.csproj"/>
         <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj"/>

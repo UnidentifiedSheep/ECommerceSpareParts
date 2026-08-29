@@ -35,7 +35,7 @@ OpenTelemetry, Prometheus, Loki, Tempo, Grafana, xUnit, Testcontainers, and Dock
 
 ## Quick Start
 
-Requirements: .NET 10 SDK, Docker, and Docker Compose v2.
+Requirements: .NET 10 SDK, Docker, Docker Compose v2, and `unzip`.
 
 ```bash
 cp .env.example .env
@@ -55,6 +55,9 @@ Open the API documentation at <http://localhost:8080/docs>.
 Grafana uses HTTPS and requires `CERT_PATH` and `CERT_KEYPATH` pointing to certificate files mounted from `CERTS_PATH`.
 
 Stop the stack with `docker compose down`. Add `-v` to remove development volumes as well.
+
+Docker Compose builds the GraphQL source schemas and Fusion archive automatically before starting Gateway. To generate
+the same artifacts without Compose, run `bash scripts/ci/build-graphql.sh`.
 
 ## Local Endpoints
 

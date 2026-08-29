@@ -135,7 +135,7 @@ Existing optional Secrets:
 - `SWARM_PATH`, default `/opt/ecommerce`
 - `SWARM_STACK_NAME`, default `ecommerce`
 
-Required GitHub Variable:
+Optional GitHub Variable:
 
 - `CLOUD_RU_SECRET_PROJECT_ID`
 
@@ -147,7 +147,9 @@ Optional GitHub Variables:
 - `CLOUD_RU_SECRET_NAMES`
 - `CLOUD_RU_SECRET_VERSION`
 
-`SWARM_ENV` keeps the existing non-Cloud.ru stack values, including database/cache/broker credentials, public host names, Traefik ACME email, and optional replica/network/volume settings. It must include the public Portainer host:
+`SWARM_ENV` keeps the existing non-Cloud.ru stack values, including database/cache/broker credentials, public host names,
+Traefik ACME email, and optional replica/network/volume settings. Grafana administrator values are bootstrap settings
+used when `grafana_data` is initialized; an existing Grafana instance keeps its administrator in its database. For example:
 
 ```dotenv
 PORTAINER_HOST=portainer.example.com
@@ -169,16 +171,26 @@ The following old GitHub Secrets are no longer needed:
 
 Per-worker SSH credentials are no longer used. Cloud.ru credentials are no longer passed through GitHub Actions.
 
-Before building images, the publish workflow checks both Artifact Registries:
+Before building images, the publish workflow tries the primary Artifact Registry. It tries the backup only when primary
+login fails. Images are built, promoted to `current`, and deployed from the selected registry only; the release is not
+mirrored between registries. If neither registry accepts login, publishing stops. Runtime registry fallback is disabled
+because the other registry is not guaranteed to contain the same release.
 
-- when primary and backup are available, every image tag is pushed to both and deployment prefers primary;
-- when primary is unavailable, all images are pushed to and deployed from backup;
-- when backup is unavailable but primary works, deployment continues through primary without runtime registry fallback;
-- when neither registry accepts login, publishing stops.
-
-The selected registry kind and backup availability are passed as non-secret reusable-workflow outputs to the deploy workflow; registry credentials are never placed in workflow outputs. If the release was mirrored and primary login fails on the Swarm manager, the deploy script switches `${ARTIFACT_REGISTRY_HOST}` to backup before rendering stack files and running migrators.
+The selected registry kind is passed as a non-secret reusable-workflow output to the deploy workflow; registry
+credentials are never placed in workflow outputs.
 
 Compose and Swarm files continue to use `${ARTIFACT_REGISTRY_HOST}`. The workflow assigns that variable to the selected primary or backup host, so separate copies of stack and migrator compose files are not required.
+
+## Deployment modes
+
+Application-only changes use the ordered runtime deployment plan: affected images and migrators are updated, while the
+complete API/worker/Gateway release is restarted in compatibility waves and checked for readiness. Changes that do not
+affect a deployable image or deployment infrastructure do not start a production deployment.
+
+Changes under `deploy/stack.*`, `deploy/grafana`, `deploy/tempo`, `scripts/deploy`, `init`, `prometheus.yml`, or the
+PostgreSQL image directory require a full deployment. A manual `workflow_dispatch` does the same. Full deployment
+reconciles all six Swarm stacks, applies versioned Docker configs, runs all migrators, and executes infrastructure,
+application, Portainer, and monitoring health checks.
 
 ## Configuration synchronization
 
