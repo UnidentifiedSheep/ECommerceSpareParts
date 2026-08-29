@@ -28,7 +28,7 @@ public record GetStorageContentRequest : PaginationQueryModel
     public string? StorageCode { get; init; }
 
     [FromQuery(Name = "productId")]
-    public int? ArticleId { get; init; }
+    public int ProductId { get; init; }
 
     [FromQuery(Name = "showZeroContent")]
     public bool ShowZeroCount { get; init; } = true;
@@ -111,13 +111,14 @@ public static class StorageContentEndPoints
                     CancellationToken token,
                     [AsParameters] GetStorageContentRequest request) =>
                 {
-                    var query = new GetStorageContentQuery(
-                        request.StorageCode,
-                        request.ArticleId,
+                    var item = new GetProductStorageContentsItem(
+                        request.ProductId,
                         request,
+                        request.StorageCode,
                         request.ShowZeroCount);
+                    var query = new GetProductStorageContentsQuery([item]);
                     var result = await sender.Send(query, token);
-                    return Results.Ok(new GetStorageContentResponse(result.Content));
+                    return Results.Ok(new GetStorageContentResponse(result.Content[item]));
                 })
             .WithName("GetStorageContent")
             .WithSummary("Получить содержимое склада")

@@ -1,10 +1,12 @@
 using GreenDonut;
 using Main.Api.GraphQl.Types.Product;
+using Main.Api.GraphQl.Types;
 using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.ProductSizes;
 using Main.Application.Handlers.ProductWeight;
+using Main.Application.Handlers.StorageContents.GetContents;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;
@@ -108,6 +110,24 @@ public static class ProductDataLoaders
                 x => x.Key, 
                 IReadOnlyList<GqlProduct> (x) => x.Value
                     .Select(product => new GqlProduct(product))
+                    .ToArray());
+    }
+
+    [DataLoader]
+    public static async Task<Dictionary<GetProductStorageContentsItem, IReadOnlyList<GqlStorageContent>>>
+        GetProductStorageContentsAsync(
+            IReadOnlyList<GetProductStorageContentsItem> keys,
+            ISender sender,
+            CancellationToken cancellationToken)
+    {
+        return (await sender.Send(
+                new GetProductStorageContentsQuery(keys),
+                cancellationToken))
+            .Content
+            .ToDictionary(
+                x => x.Key, 
+                IReadOnlyList<GqlStorageContent> (x) => x.Value
+                    .Select(content => new GqlStorageContent(content))
                     .ToArray());
     }
 }

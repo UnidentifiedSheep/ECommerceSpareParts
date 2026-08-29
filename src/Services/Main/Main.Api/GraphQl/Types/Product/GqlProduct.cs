@@ -1,9 +1,12 @@
+using Enums;
 using HotChocolate;
 using HotChocolate.Types.Composite;
+using GraphQL.Common.Attributes;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.GetProductCrosses;
+using Main.Application.Handlers.StorageContents.GetContents;
 
 namespace Main.Api.GraphQl.Types.Product;
 
@@ -84,6 +87,22 @@ public record GqlProduct(
             input.SortBy?
                 .Select(x => x.ToSortExpression())
                 .ToArray());
+
+        return await loader.LoadAsync(item, cancellationToken) ?? [];
+    }
+
+    [GraphQLName("storageContents")]
+    [RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_GET_ALL)]
+    public async Task<IReadOnlyList<GqlStorageContent>> GetStorageContentsAsync(
+        GqlProductStorageContentsInput input,
+        IProductStorageContentsDataLoader loader,
+        CancellationToken cancellationToken)
+    {
+        var item = new GetProductStorageContentsItem(
+            Id,
+            input.Pagination,
+            input.StorageCode,
+            input.ShowZeroCount);
 
         return await loader.LoadAsync(item, cancellationToken) ?? [];
     }
