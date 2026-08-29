@@ -9,7 +9,7 @@ using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.StorageContents;
 
-public class GetProductStorageContentsTests : IntegrationTest
+public class GetProductStorageContentsTests : IntegrationTest //TODO: write more tests.
 {
     public GetProductStorageContentsTests(CombinedContainerFixture fixture) : base(fixture)
     {

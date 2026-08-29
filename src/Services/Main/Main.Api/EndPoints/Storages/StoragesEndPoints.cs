@@ -4,11 +4,11 @@ using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Storage;
+using Main.Application.Handlers.Storages;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Application.Handlers.Storages.DeleteStorage;
 using Main.Application.Handlers.Storages.EditStorage;
 using Main.Application.Handlers.Storages.GetStorage;
-using Main.Application.Handlers.Storages.GetStorageByCode;
 using Main.Entities.Exceptions;
 using Main.Enums;
 using MediatR;
@@ -169,11 +169,13 @@ public class StoragesEndPoints : ICarterModule
                     string code,
                     CancellationToken token) =>
                 {
-                    var result = await sender.Send(new GetStorageByCodeQuery(code), token);
+                    var result = await sender.Send(new GetStoragesByCodesQuery(code), token);
                     return Results.Ok(
                         new GetStorageByCodeResponse
                         {
-                            Storage = result.Storage
+                            Storage = result.Storages.Count != 0
+                                      ? result.Storages[0]
+                                      : throw new StorageNotFoundException(code)
                         });
                 })
             .WithName("GetStorageByCode")
