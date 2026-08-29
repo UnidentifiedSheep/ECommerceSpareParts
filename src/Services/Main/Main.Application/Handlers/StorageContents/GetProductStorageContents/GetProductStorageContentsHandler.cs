@@ -8,7 +8,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.StorageContents.GetContents;
+namespace Main.Application.Handlers.StorageContents.GetProductStorageContents;
 
 public sealed record GetProductStorageContentsItem(
     int ProductId,

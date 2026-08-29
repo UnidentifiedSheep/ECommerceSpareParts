@@ -6,7 +6,7 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.GetProductCrosses;
-using Main.Application.Handlers.StorageContents.GetContents;
+using Main.Application.Handlers.StorageContents.GetProductStorageContents;
 
 namespace Main.Api.GraphQl.Types.Product;
 

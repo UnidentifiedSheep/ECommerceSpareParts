@@ -14,4 +14,7 @@ public sealed class Query
     [GraphQLName("producers")]
     [Shareable]
     public ProducerQueries Producer => new();
+
+    [GraphQLName("storageContents")]
+    public StorageContentQueries StorageContent => new();
 }

@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.StorageContents.GetContents;
+namespace Main.Application.Handlers.StorageContents.GetProductStorageContents;
 
 public class GetProductStorageContentsValidation : AbstractValidator<GetProductStorageContentsQuery>
 {

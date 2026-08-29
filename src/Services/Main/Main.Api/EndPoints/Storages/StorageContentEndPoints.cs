@@ -5,7 +5,7 @@ using Enums;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.EditContent;
-using Main.Application.Handlers.StorageContents.GetContents;
+using Main.Application.Handlers.StorageContents.GetStorageContents;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Enums;
 using MediatR;
@@ -22,13 +22,13 @@ public record EditStorageContentRequest(
     Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields
 );
 
-public record GetStorageContentRequest : PaginationQueryModel
+public record GetStorageContentRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "storageCode")]
     public string? StorageCode { get; init; }
 
     [FromQuery(Name = "productId")]
-    public int ProductId { get; init; }
+    public int? ProductId { get; init; }
 
     [FromQuery(Name = "showZeroContent")]
     public bool ShowZeroCount { get; init; } = true;
@@ -111,14 +111,14 @@ public static class StorageContentEndPoints
                     CancellationToken token,
                     [AsParameters] GetStorageContentRequest request) =>
                 {
-                    var item = new GetProductStorageContentsItem(
+                    var query = new GetStorageContentsQuery(
                         request.ProductId,
-                        request,
                         request.StorageCode,
+                        request.SortBy,
+                        request,
                         request.ShowZeroCount);
-                    var query = new GetProductStorageContentsQuery([item]);
                     var result = await sender.Send(query, token);
-                    return Results.Ok(new GetStorageContentResponse(result.Content[item]));
+                    return Results.Ok(new GetStorageContentResponse(result.Content));
                 })
             .WithName("GetStorageContent")
             .WithSummary("Получить содержимое склада")

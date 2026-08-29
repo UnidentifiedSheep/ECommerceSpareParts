@@ -6,7 +6,7 @@ using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.ProductSizes;
 using Main.Application.Handlers.ProductWeight;
-using Main.Application.Handlers.StorageContents.GetContents;
+using Main.Application.Handlers.StorageContents.GetProductStorageContents;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;
