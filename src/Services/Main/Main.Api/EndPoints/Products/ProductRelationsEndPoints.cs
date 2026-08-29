@@ -29,13 +29,13 @@ public static class ProductRelationsEndPoints
                     [AsParameters] SortablePaginationQueryModel queryParams,
                     CancellationToken token) =>
                 {
-                    var query = new GetProductCrossesQuery(
+                    var item = new GetProductCrossesItem(
                         productId,
                         queryParams,
-                        queryParams.SortBy,
-                        user.UserId);
+                        queryParams.SortBy);
+                    var query = new GetProductCrossesQuery([item]);
                     var result = await sender.Send(query, token);
-                    var response = new GetProductCrossesResponse(result.Crosses);
+                    var response = new GetProductCrossesResponse(result.Crosses[item]);
                     return Results.Ok(response);
                 })
             .WithName("GetProductCrosses")
