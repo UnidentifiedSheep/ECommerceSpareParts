@@ -56,8 +56,7 @@ public static class ProductRelationsEndPoints
                 {
                     var query = new GetProductsPairsQuery(productId);
                     var result = await sender.Send(query, token);
-                    return Results.Ok(new GetProductPairResponse(
-                        result.Pairs.Count == 0 ? null : result.Pairs[0]));
+                    return Results.Ok(new GetProductPairResponse(result.Pairs.GetValueOrDefault(productId)));
                 })
             .WithName("GetProductPairs")
             .WithDescription("Поиск пар артикула")

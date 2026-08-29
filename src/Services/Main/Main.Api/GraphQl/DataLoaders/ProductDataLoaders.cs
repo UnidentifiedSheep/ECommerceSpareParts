@@ -38,8 +38,8 @@ public static class ProductDataLoaders
                 cancellationToken))
             .Pairs
             .ToDictionary(
-                x => x.Id,
-                x => new GqlProduct(x));
+                x => x.Key,
+                x => new GqlProduct(x.Value));
     }
 
     [DataLoader]

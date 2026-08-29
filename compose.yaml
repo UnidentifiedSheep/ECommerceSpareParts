@@ -99,6 +99,7 @@
 
   graphql-config:
     image: graphql-config
+    pull_policy: build
     build:
       context: .
       dockerfile: deploy/graphql/Dockerfile
@@ -125,6 +126,7 @@
     depends_on:
       graphql-config:
         condition: service_completed_successfully
+        restart: true
     networks:
       - backend-network
     restart: unless-stopped
