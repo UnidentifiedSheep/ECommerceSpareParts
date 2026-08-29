@@ -2,6 +2,7 @@ using GreenDonut;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.Products;
+using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.ProductSizes;
 using Main.Application.Handlers.ProductWeight;
 using MediatR;
@@ -90,5 +91,23 @@ public static class ProductDataLoaders
                 x => x.Value
                     .Select(z => new GqlProductContent(z))
                     .ToList());
+    }
+
+    [DataLoader]
+    public static async Task<Dictionary<GetProductCrossesItem, IReadOnlyList<GqlProduct>>>
+        GetProductCrossesAsync(
+            IReadOnlyList<GetProductCrossesItem> keys,
+            ISender sender,
+            CancellationToken cancellationToken)
+    {
+        return (await sender.Send(
+                new GetProductCrossesQuery(keys),
+                cancellationToken))
+            .Crosses
+            .ToDictionary(
+                x => x.Key, 
+                IReadOnlyList<GqlProduct> (x) => x.Value
+                    .Select(product => new GqlProduct(product))
+                    .ToArray());
     }
 }

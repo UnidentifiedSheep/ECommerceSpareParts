@@ -1,7 +1,9 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Application.Dtos.Product;
+using Main.Application.Handlers.Products.GetProductCrosses;
 
 namespace Main.Api.GraphQl.Types.Product;
 
@@ -69,4 +71,20 @@ public record GqlProduct(
         IProductContentsByIdDataLoader loader,
         CancellationToken cancellationToken)
         => await loader.LoadAsync(Id, cancellationToken) ?? [];
+
+    [GraphQLName("crosses")]
+    public async Task<IReadOnlyList<GqlProduct>> GetCrossesAsync(
+        GqlProductCrossesInput input,
+        IProductCrossesDataLoader loader,
+        CancellationToken cancellationToken)
+    {
+        var item = new GetProductCrossesItem(
+            Id,
+            input.Pagination,
+            input.SortBy?
+                .Select(x => x.ToSortExpression())
+                .ToArray());
+
+        return await loader.LoadAsync(item, cancellationToken) ?? [];
+    }
 }
