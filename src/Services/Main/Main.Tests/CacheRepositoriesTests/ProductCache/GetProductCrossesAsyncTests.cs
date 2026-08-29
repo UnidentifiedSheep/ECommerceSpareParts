@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cache;
 using Cache;
 using FluentAssertions;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
 using Main.Application.Static;
 using Main.Entities.Product;
 using Microsoft.Extensions.DependencyInjection;
@@ -144,9 +144,9 @@ public class GetProductCrossesAsyncTests : IntegrationTest
         }
     }
 
-    private IProductCacheRepository GetRepository()
+    private IProductProvider GetRepository()
     {
-        return Scope.ServiceProvider.GetRequiredService<IProductCacheRepository>();
+        return Scope.ServiceProvider.GetRequiredService<IProductProvider>();
     }
 
     private IReadOnlyList<int> GetExpectedCrossIds(int productId)

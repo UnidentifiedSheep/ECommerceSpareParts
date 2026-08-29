@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Cache;
 using Cache;
 using FluentAssertions;
 using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
 using Main.Application.Static;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
@@ -21,12 +22,12 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
     [Fact]
     public async Task InvalidateCrossesAsync_WhenRelationsDoNotExist_DoesNotThrow()
     {
-        var repository = GetRepository();
+        var cacheInvalidator = GetCacheInvalidator();
         const int productId = int.MaxValue;
 
         await RemoveRelation(productId);
 
-        var act = () => repository.InvalidateCrossesAsync(productId);
+        var act = () => cacheInvalidator.InvalidateCrossesAsync(productId);
 
         await act.Should().NotThrowAsync();
     }
@@ -35,12 +36,13 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
     public async Task InvalidateCrossesAsync_WhenRelationsExist_RemovesCrossesCacheAndRelation()
     {
         var productId = TestContext.ProductCrosses[0].LeftProductId;
-        var repository = GetRepository();
+        var productProvider = GetProductProvider();
+        var cacheInvalidator = GetCacheInvalidator();
 
         await RemoveCrossesCache(productId, null);
-        await repository.GetProductCrossesAsync(productId, null);
+        await productProvider.GetProductCrossesAsync(productId, null);
 
-        await repository.InvalidateCrossesAsync(productId);
+        await cacheInvalidator.InvalidateCrossesAsync(productId);
 
         var cacheExists = await CacheKeyExists(CacheKeys.ProductCache.ProductCrosses(productId, null));
         cacheExists.Should().BeFalse();
@@ -53,16 +55,17 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
     public async Task InvalidateCrossesAsync_WhenMultipleSortKeysExist_RemovesAllRelatedCrossesCaches()
     {
         var productId = GetProductIdWithAtLeastTwoCrosses();
-        var repository = GetRepository();
+        var productProvider = GetProductProvider();
+        var cacheInvalidator = GetCacheInvalidator();
 
         await RemoveCrossesCache(productId, null);
         var sortBy = new[] { "id_desc", "name" };
         await RemoveCrossesCache(productId, sortBy);
 
-        await repository.GetProductCrossesAsync(productId, null);
-        await repository.GetProductCrossesAsync(productId, sortBy);
+        await productProvider.GetProductCrossesAsync(productId, null);
+        await productProvider.GetProductCrossesAsync(productId, sortBy);
 
-        await repository.InvalidateCrossesAsync(productId);
+        await cacheInvalidator.InvalidateCrossesAsync(productId);
 
         var defaultCacheExists = await CacheKeyExists(CacheKeys.ProductCache.ProductCrosses(productId, null));
         defaultCacheExists.Should().BeFalse();
@@ -79,14 +82,15 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
     public async Task InvalidateCrossesAsync_WhenCalledForCrossProduct_RemovesOriginalProductCrossesCache()
     {
         var productId = TestContext.ProductCrosses[0].LeftProductId;
-        var repository = GetRepository();
+        var productProvider = GetProductProvider();
+        var cacheInvalidator = GetCacheInvalidator();
 
         await RemoveCrossesCache(productId, null);
 
-        var crosses = (await repository.GetProductCrossesAsync(productId, null)).ToList();
+        var crosses = (await productProvider.GetProductCrossesAsync(productId, null)).ToList();
         var crossProductId = crosses[0];
 
-        await repository.InvalidateCrossesAsync(crossProductId);
+        await cacheInvalidator.InvalidateCrossesAsync(crossProductId);
 
         var cacheExists = await CacheKeyExists(CacheKeys.ProductCache.ProductCrosses(productId, null));
         cacheExists.Should().BeFalse();
@@ -95,9 +99,14 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
         relations.Should().BeEmpty();
     }
 
-    private IProductCacheRepository GetRepository()
+    private IProductProvider GetProductProvider()
     {
-        return Scope.ServiceProvider.GetRequiredService<IProductCacheRepository>();
+        return Scope.ServiceProvider.GetRequiredService<IProductProvider>();
+    }
+
+    private IProductCacheInvalidator GetCacheInvalidator()
+    {
+        return Scope.ServiceProvider.GetRequiredService<IProductCacheInvalidator>();
     }
 
     private int GetProductIdWithAtLeastTwoCrosses()

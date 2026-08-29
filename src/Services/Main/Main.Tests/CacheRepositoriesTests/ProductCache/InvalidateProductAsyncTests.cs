@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -19,13 +20,14 @@ public class InvalidateProductAsyncTests : IntegrationTest
     public async Task InvalidateProductAsync_WhenProductCached_RemovesProductCache()
     {
         var product = TestContext.Products[0];
-        var repository = GetRepository();
+        var productProvider = GetProductProvider();
+        var cacheInvalidator = GetCacheInvalidator();
 
-        await repository.GetProductOrSetAsync(product.Id);
+        await productProvider.GetProductOrSetAsync(product.Id);
 
-        await repository.InvalidateProductAsync(product.Id);
+        await cacheInvalidator.InvalidateProductAsync(product.Id);
 
-        var result = await repository.GetProductAsync(product.Id);
+        var result = await productProvider.GetProductAsync(product.Id);
 
         result.Should().BeNull();
     }
@@ -34,17 +36,18 @@ public class InvalidateProductAsyncTests : IntegrationTest
     public async Task InvalidateProductAsync_WhenProductCached_AllowsReloadingUpdatedProductFromDb()
     {
         var product = TestContext.Products[0];
-        var repository = GetRepository();
+        var productProvider = GetProductProvider();
+        var cacheInvalidator = GetCacheInvalidator();
 
-        await repository.GetProductOrSetAsync(product.Id);
+        await productProvider.GetProductOrSetAsync(product.Id);
 
         product.SetName("Updated product name");
         await Context.SaveChangesAsync();
         Context.ChangeTracker.Clear();
 
-        await repository.InvalidateProductAsync(product.Id);
+        await cacheInvalidator.InvalidateProductAsync(product.Id);
 
-        var result = await repository.GetProductOrSetAsync(product.Id);
+        var result = await productProvider.GetProductOrSetAsync(product.Id);
 
         result.Name.Should().Be("Updated product name");
     }
@@ -53,13 +56,14 @@ public class InvalidateProductAsyncTests : IntegrationTest
     public async Task InvalidateProductsAsync_WhenProductsCached_RemovesAllProductCaches()
     {
         var products = TestContext.Products.Take(3).ToList();
-        var repository = GetRepository();
+        var productProvider = GetProductProvider();
+        var cacheInvalidator = GetCacheInvalidator();
 
-        await repository.GetProductsOrSetAsync(products.Select(x => x.Id));
+        await productProvider.GetProductsOrSetAsync(products.Select(x => x.Id));
 
-        await repository.InvalidateProductsAsync(products.Select(x => x.Id));
+        await cacheInvalidator.InvalidateProductsAsync(products.Select(x => x.Id));
 
-        var result = await repository.GetProductsAsync(products.Select(x => x.Id));
+        var result = await productProvider.GetProductsAsync(products.Select(x => x.Id));
 
         result.Should().HaveCount(products.Count);
         result.Should().OnlyContain(x => x == null);
@@ -68,15 +72,20 @@ public class InvalidateProductAsyncTests : IntegrationTest
     [Fact]
     public async Task InvalidateProductsAsync_WhenProductIdsAreEmpty_DoesNotThrow()
     {
-        var repository = GetRepository();
+        var cacheInvalidator = GetCacheInvalidator();
 
-        var act = () => repository.InvalidateProductsAsync([]);
+        var act = () => cacheInvalidator.InvalidateProductsAsync([]);
 
         await act.Should().NotThrowAsync();
     }
 
-    private IProductCacheRepository GetRepository()
+    private IProductProvider GetProductProvider()
     {
-        return Scope.ServiceProvider.GetRequiredService<IProductCacheRepository>();
+        return Scope.ServiceProvider.GetRequiredService<IProductProvider>();
+    }
+
+    private IProductCacheInvalidator GetCacheInvalidator()
+    {
+        return Scope.ServiceProvider.GetRequiredService<IProductCacheInvalidator>();
     }
 }

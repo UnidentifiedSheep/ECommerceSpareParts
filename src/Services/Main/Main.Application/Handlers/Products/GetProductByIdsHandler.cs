@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Main.Application.Dtos.Product;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
 
 namespace Main.Application.Handlers.Products;
 
@@ -9,14 +9,14 @@ public record GetProductByIdsQuery(IEnumerable<int> Ids) : IQuery<GetProductById
 public record GetProductByIdsResult(IReadOnlyList<ProductDto> Products);
 
 public class GetProductByIdsHandler(
-    IProductCacheRepository cacheRepository
+    IProductProvider productProvider
 ) : IQueryHandler<GetProductByIdsQuery, GetProductByIdsResult>
 {
     public async Task<GetProductByIdsResult> Handle(
         GetProductByIdsQuery request,
         CancellationToken cancellationToken)
     {
-        var result = await cacheRepository
+        var result = await productProvider
             .GetProductsOrSetAsync(request.Ids, cancellationToken);
         return new GetProductByIdsResult(result.Values.ToList());
     }

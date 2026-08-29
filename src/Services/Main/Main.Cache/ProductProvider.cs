@@ -5,7 +5,7 @@ using Application.Common.Interfaces.Repositories;
 using Cache.Extensions;
 using Main.Application.Dtos.Product;
 using Main.Application.Extensions.QueryExtensions;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
 using Main.Application.Static;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
@@ -13,12 +13,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Cache;
 
-public class ProductCacheRepository(
+public class ProductProvider(
     ICache rawCache,
     IReadRepository<ProductCross, (int, int)> crossesReadRepository,
     IReadRepository<Product, int> productReadRepository,
     IProjectionProvider<Product, ProductDto> productProjection
-) : IProductCacheRepository
+) : IProductProvider
 {
     public async Task<ProductDto> GetProductOrSetAsync(
         int productId,
@@ -92,34 +92,9 @@ public class ProductCacheRepository(
         return crosses;
     }
 
-    public async Task InvalidateCrossesAsync(int productId)
-    {
-        var relationKey = CacheKeys.ProductCache.ProductCrossRelations(productId);
-        await rawCache.InvalidateByRelationsAsync(relationKey);
-    }
-
-    public async Task InvalidateCrossesAsync(IEnumerable<int> productIds)
-    {
-        var keys = productIds
-            .Select(CacheKeys.ProductCache.ProductCrossRelations)
-            .ToList();
-
-        if (keys.Count != 0) await rawCache.InvalidateByRelationsAsync(keys);
-    }
-
     public async Task<IReadOnlyList<ProductDto?>> GetProductsAsync(IEnumerable<int> ids)
     {
         return await rawCache.GetAsync<ProductDto>(ids.Select(CacheKeys.ProductCache.Product));
-    }
-
-    public Task InvalidateProductAsync(int productId)
-    {
-        return rawCache.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
-    }
-
-    public Task InvalidateProductsAsync(IEnumerable<int> productIds)
-    {
-        return rawCache.RemoveKeysAsync(productIds.Select(CacheKeys.ProductCache.Product));
     }
 
     private Task<List<int>> GetCrossesFromDb(

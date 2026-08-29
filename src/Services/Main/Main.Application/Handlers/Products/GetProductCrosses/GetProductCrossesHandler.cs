@@ -2,7 +2,7 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Main.Application.Dtos.Product;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
@@ -16,7 +16,7 @@ public record GetProductCrossesQuery(
 public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses);
 
 public class GetProductCrossesHandler(
-    IProductCacheRepository productCache
+    IProductProvider productProvider
 )
     : IQueryHandler<GetProductCrossesQuery, GetProductCrossesResult>
 {
@@ -41,12 +41,12 @@ public class GetProductCrossesHandler(
         string[] sortBy,
         CancellationToken token)
     {
-        var crosseIds = (await productCache.GetProductCrossesAsync(
+        var crosseIds = (await productProvider.GetProductCrossesAsync(
                 productId,
                 sortBy,
                 token))
             .ApplyPagination(pagination);
 
-        return (await productCache.GetProductsOrSetAsync(crosseIds, token)).Values.ToList();
+        return (await productProvider.GetProductsOrSetAsync(crosseIds, token)).Values.ToList();
     }
 }

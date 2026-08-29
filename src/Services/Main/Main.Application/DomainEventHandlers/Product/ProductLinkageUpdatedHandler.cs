@@ -8,7 +8,7 @@ using Main.Entities.DomainEvents.Product;
 namespace Main.Application.DomainEventHandlers.Product;
 
 public class ProductLinkageUpdatedHandler(
-    IProductCacheRepository productCacheRepository,
+    IProductCacheInvalidator productCacheInvalidator,
     IIntegrationEventScope integrationEventScope) : BatchableDomainEventHandler<ProductLinkageUpdatedDomainEvent>
 {
     public override async Task Handle(
@@ -22,6 +22,6 @@ public class ProductLinkageUpdatedHandler(
             ids.Add(@event.ProductId);
         }
 
-        await productCacheRepository.InvalidateCrossesAsync(ids);
+        await productCacheInvalidator.InvalidateCrossesAsync(ids);
     }
 }
