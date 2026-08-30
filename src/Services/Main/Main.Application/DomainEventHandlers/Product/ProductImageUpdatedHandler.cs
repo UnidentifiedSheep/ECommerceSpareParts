@@ -9,7 +9,7 @@ namespace Main.Application.DomainEventHandlers.Product;
 
 public class ProductImageUpdatedHandler(
     IIntegrationEventScope integrationEventScope,
-    IProductCacheRepository productCacheRepository
+    IProductCacheInvalidator productCacheInvalidator
     ) : BatchableDomainEventHandler<ProductImageUpdatedDomainEvent>
 {
     public override async Task Handle(Batch<ProductImageUpdatedDomainEvent> notification, CancellationToken cancellationToken)
@@ -24,6 +24,6 @@ public class ProductImageUpdatedHandler(
             ids.Add(@event.ProductId);
         }
         
-        await productCacheRepository.InvalidateProductsAsync(ids);
+        await productCacheInvalidator.InvalidateProductsAsync(ids);
     }
 }

@@ -73,6 +73,16 @@ public static class SortByConfig
             .Map<ProductReservation, DateTime>("updatedAt", x => x.UpdatedAt)
             .Map<ProductReservation, ProductReservationStatus>("status", x => x.Status);
 
+        QueryableSortBy.Value
+            .MapDefault<StorageContent, int>(x => x.Id)
+            .Map<StorageContent, int>("id", x => x.Id)
+            .Map<StorageContent, int>("productId", x => x.ProductId)
+            .Map<StorageContent, string>("storageCode", x => x.StorageCode)
+            .Map<StorageContent, int>("count", x => x.Count)
+            .Map<StorageContent, decimal>("buyPrice", x => x.BuyPriceInBaseCurrency)
+            .Map<StorageContent, DateTime>("purchaseDatetime", x => x.PurchaseDatetime)
+            .Map<StorageContent, int>("currencyId", x => x.CurrencyId);
+
         QueryableSortBy.Value.ConfigureForJob();
     }
 }

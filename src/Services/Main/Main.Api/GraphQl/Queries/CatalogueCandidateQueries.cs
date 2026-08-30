@@ -9,9 +9,12 @@ public sealed class CatalogueCandidateQueries
 {
     [GraphQLName("byId")]
     [Lookup]
-    public Task<GqlCatalogueCandidate?> GetCandidateByIdAsync(
+    public async Task<GqlCatalogueCandidate?> GetCandidateByIdAsync(
         ICatalogueCandidateByIdDataLoader loader,
         Guid id,
         CancellationToken ct)
-        => loader.LoadAsync(id, ct);
+    {
+        var candidate = await loader.LoadAsync(id, ct);
+        return candidate is null ? null : new GqlCatalogueCandidate(candidate);
+    }
 }

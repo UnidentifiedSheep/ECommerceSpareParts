@@ -7,7 +7,9 @@ public class GetArticleCrossesAmwValidation : AbstractValidator<GetProductCrosse
 {
     public GetArticleCrossesAmwValidation()
     {
-        RuleFor(x => x.Pagination)
-            .SetValidator(new PaginationValidator());
+        RuleForEach(x => x.Items)
+            .ChildRules(item =>
+                item.RuleFor(x => x.Pagination)
+                    .SetValidator(new PaginationValidator()));
     }
 }

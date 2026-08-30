@@ -7,41 +7,45 @@ using Main.Application.Dtos.Storage;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.StorageContents.GetContents;
+namespace Main.Application.Handlers.StorageContents.GetStorageContents;
 
-public record GetStorageContentQuery(
-    string? StorageCode,
+public sealed record GetStorageContentsQuery(
     int? ProductId,
+    string? StorageCode,
+    string[] SortBy,
     Pagination Pagination,
     bool ShowZeroCount
-) : IQuery<GetStorageContentResult>;
+) : IQuery<GetStorageContentsResult>;
 
-public record GetStorageContentResult(IEnumerable<StorageContentDto> Content);
+public sealed record GetStorageContentsResult(
+    IReadOnlyList<StorageContentDto> Content);
 
-public class GetStorageContentHandler(
+public sealed class GetStorageContentsHandler(
     IReadRepository<StorageContent, int> repository,
     IProjectionProvider<StorageContent, StorageContentDto> projection
-)
-    : IQueryHandler<GetStorageContentQuery, GetStorageContentResult>
+) : IQueryHandler<GetStorageContentsQuery, GetStorageContentsResult>
 {
-    public async Task<GetStorageContentResult> Handle(
-        GetStorageContentQuery request,
+    public async Task<GetStorageContentsResult> Handle(
+        GetStorageContentsQuery request,
         CancellationToken cancellationToken)
     {
         var query = repository.Query;
 
-        if (request.ProductId.HasValue) query = query.Where(x => x.ProductId == request.ProductId);
+        if (request.ProductId.HasValue)
+            query = query.Where(x => x.ProductId == request.ProductId.Value);
 
         if (!string.IsNullOrWhiteSpace(request.StorageCode))
             query = query.Where(x => x.StorageCode == request.StorageCode);
 
-        if (!request.ShowZeroCount) query = query.Where(x => x.Count > 0);
+        if (!request.ShowZeroCount)
+            query = query.Where(x => x.Count > 0);
 
-        var result = await query
+        var content = await query
+            .SortBy(request.SortBy)
             .Project(projection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 
-        return new GetStorageContentResult(result);
+        return new GetStorageContentsResult(content);
     }
 }

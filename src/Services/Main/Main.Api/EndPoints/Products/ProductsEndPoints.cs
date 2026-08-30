@@ -127,22 +127,25 @@ public class ProductsEndPoints : ICarterModule
                 async (
                     ISender sender,
                     int productId,
-                    [FromQuery] string? storageCode,
+                    [FromQuery] string storageCode,
                     CancellationToken token) =>
                 {
+                    var item = new GetAvailableProductsStockItem(
+                        productId,
+                        storageCode);
                     var result = await sender.Send(
-                        new GetProductStockQuery(productId, storageCode),
+                        new GetAvailableProductsStockQuery(item),
                         token);
 
                     return Results.Ok(
                         new GetProductStockResponse
                         {
-                            Stock = result.Stock
+                            Stock = result.Stocks[item]
                         });
                 })
             .WithName("GetProductStock")
             .WithSummary("Получить остаток продукта")
-            .WithDescription("Получение общего остатка артикула или остатка на конкретном складе")
+            .WithDescription("Получение остатка артикула на конкретном складе")
             .WithDisplayName("Получение остатка артикула")
             .Produces<GetProductStockResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

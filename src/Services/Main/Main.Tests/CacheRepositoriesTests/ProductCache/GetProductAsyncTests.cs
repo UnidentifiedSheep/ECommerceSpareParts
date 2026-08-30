@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cache;
 using Cache;
 using FluentAssertions;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
 using Main.Application.Static;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
@@ -51,9 +51,9 @@ public class GetProductAsyncTests : IntegrationTest
         result.Should().BeNull();
     }
 
-    private IProductCacheRepository GetRepository()
+    private IProductProvider GetRepository()
     {
-        return Scope.ServiceProvider.GetRequiredService<IProductCacheRepository>();
+        return Scope.ServiceProvider.GetRequiredService<IProductProvider>();
     }
 
     private async Task RemoveCachedProduct(int productId)

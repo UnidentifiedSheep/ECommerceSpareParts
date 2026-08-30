@@ -9,11 +9,12 @@ public sealed class ProductQueries
 {
     [GraphQLName("byId")]
     [Lookup]
-    public Task<GqlProduct?> GetProductByIdAsync(
+    public async Task<GqlProduct?> GetProductByIdAsync(
         IProductByIdDataLoader loader,
         int id,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        return loader.LoadAsync(id, ct);
+        var product = await loader.LoadAsync(id, cancellationToken);
+        return product is null ? null : new GqlProduct(product);
     }
 }

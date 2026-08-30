@@ -5,7 +5,7 @@ using Enums;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.EditContent;
-using Main.Application.Handlers.StorageContents.GetContents;
+using Main.Application.Handlers.StorageContents.GetStorageContents;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Enums;
 using MediatR;
@@ -22,13 +22,13 @@ public record EditStorageContentRequest(
     Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields
 );
 
-public record GetStorageContentRequest : PaginationQueryModel
+public record GetStorageContentRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "storageCode")]
     public string? StorageCode { get; init; }
 
     [FromQuery(Name = "productId")]
-    public int? ArticleId { get; init; }
+    public int? ProductId { get; init; }
 
     [FromQuery(Name = "showZeroContent")]
     public bool ShowZeroCount { get; init; } = true;
@@ -111,9 +111,10 @@ public static class StorageContentEndPoints
                     CancellationToken token,
                     [AsParameters] GetStorageContentRequest request) =>
                 {
-                    var query = new GetStorageContentQuery(
+                    var query = new GetStorageContentsQuery(
+                        request.ProductId,
                         request.StorageCode,
-                        request.ArticleId,
+                        request.SortBy,
                         request,
                         request.ShowZeroCount);
                     var result = await sender.Send(query, token);

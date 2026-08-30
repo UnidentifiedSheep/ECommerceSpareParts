@@ -1,8 +1,13 @@
-﻿using Main.Application.Interfaces.Persistence;
+﻿using System.Data;
+using Abstractions.Models;
+using Dapper;
+using Main.Application.Interfaces.Persistence;
+using Main.Application.Models.Storage;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Persistence.Interfaces;
 using Persistence.Repository;
 
@@ -11,6 +16,66 @@ namespace Main.Persistence.Repositories.Storage;
 public class StorageContentRepository(DContext context, IQueryableExtensions extensions)
     : LinqRepositoryBase<DContext, StorageContent, int>(context, extensions), IStorageContentRepository
 {
+    public async Task<IReadOnlyList<StorageContentPageItem>> GetByProductsAsync(
+        IReadOnlyCollection<int> productIds,
+        Pagination pagination,
+        string? storageCode,
+        bool showZeroCount,
+        CancellationToken cancellationToken = default)
+    {
+        if (productIds.Count == 0) return [];
+
+        var storageFilter = string.IsNullOrWhiteSpace(storageCode)
+            ? string.Empty
+            : "AND sc.storage_name = @StorageCode";
+        var countFilter = showZeroCount
+            ? string.Empty
+            : "AND sc.count > 0";
+        var sql = $"""
+                   SELECT ranked.product_id AS "ProductId",
+                          ranked.id AS "StorageContentId"
+                   FROM (
+                       SELECT sc.product_id,
+                              sc.id,
+                              row_number() OVER (
+                                  PARTITION BY sc.product_id
+                                  ORDER BY sc.id) AS row_number
+                       FROM public.storage_content AS sc
+                       WHERE sc.product_id = ANY(@ProductIds)
+                         {storageFilter}
+                         {countFilter}
+                   ) AS ranked
+                   WHERE ranked.row_number > @Offset
+                     AND ranked.row_number <= @Limit
+                   ORDER BY ranked.product_id, ranked.row_number
+                   """;
+
+        var connection = Context.Database.GetDbConnection();
+        var shouldClose = connection.State != ConnectionState.Open;
+        if (shouldClose) await connection.OpenAsync(cancellationToken);
+
+        try
+        {
+            var command = new CommandDefinition(
+                sql,
+                new
+                {
+                    ProductIds = productIds.ToArray(),
+                    StorageCode = storageCode,
+                    Offset = pagination.Page * pagination.Size,
+                    Limit = (pagination.Page + 1) * pagination.Size
+                },
+                Context.Database.CurrentTransaction?.GetDbTransaction(),
+                cancellationToken: cancellationToken);
+
+            return (await connection.QueryAsync<StorageContentPageItem>(command)).AsList();
+        }
+        finally
+        {
+            if (shouldClose) await connection.CloseAsync();
+        }
+    }
+
     public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
         int? productId,
         string? storageCode,

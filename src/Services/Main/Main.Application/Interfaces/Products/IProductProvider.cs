@@ -1,8 +1,9 @@
 ﻿using Main.Application.Dtos.Product;
+using Main.Application.Models.Product;
 
-namespace Main.Application.Interfaces.Cache;
+namespace Main.Application.Interfaces.Products;
 
-public interface IProductCacheRepository
+public interface IProductProvider
 {
     Task<ProductDto> GetProductOrSetAsync(
         int productId,
@@ -15,19 +16,16 @@ public interface IProductCacheRepository
     Task<IReadOnlyList<ProductDto?>> GetProductsAsync(
         IEnumerable<int> ids);
 
-    Task<IEnumerable<int>> GetProductCrossesAsync(
+    Task<IReadOnlyList<int>> GetProductCrossesAsync(
         int productId,
         string[]? sortBy,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyDictionary<ProductCrossesRequestItem, IReadOnlyList<int>>> GetProductsCrossesAsync(
+        IEnumerable<ProductCrossesRequestItem> requests,
         CancellationToken cancellationToken = default);
 
     Task<Dictionary<int, ProductDto>> GetProductsOrSetAsync(
         IEnumerable<int> ids,
         CancellationToken cancellationToken = default);
-
-    Task InvalidateProductAsync(int productId);
-
-    Task InvalidateProductsAsync(IEnumerable<int> productIds);
-
-    Task InvalidateCrossesAsync(int productId);
-    Task InvalidateCrossesAsync(IEnumerable<int> productIds);
 }

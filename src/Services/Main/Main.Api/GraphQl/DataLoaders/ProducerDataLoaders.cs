@@ -1,5 +1,5 @@
 using GreenDonut;
-using Main.Api.GraphQl.Types;
+using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.ProducerAliases;
 using Main.Application.Handlers.Producers;
 using MediatR;
@@ -9,7 +9,7 @@ namespace Main.Api.GraphQl.DataLoaders;
 public static class ProducerDataLoaders
 {
     [DataLoader]
-    public static async Task<Dictionary<int, GqlProducer>>
+    public static async Task<Dictionary<int, ProducerDto>>
         GetProducerByIdAsync(
             IReadOnlyList<int> keys,
             ISender sender,
@@ -21,7 +21,7 @@ public static class ProducerDataLoaders
             .Producers
             .ToDictionary(
                 x => x.Key,
-                x => new GqlProducer(x.Value));
+                x => x.Value);
     }
 
     [DataLoader]

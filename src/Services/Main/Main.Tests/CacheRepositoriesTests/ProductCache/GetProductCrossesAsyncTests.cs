@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cache;
-using Cache;
 using FluentAssertions;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
+using Main.Application.Models.Product;
 using Main.Application.Static;
 using Main.Entities.Product;
 using Microsoft.Extensions.DependencyInjection;
@@ -116,6 +116,27 @@ public class GetProductCrossesAsyncTests : IntegrationTest
     }
 
     [Fact]
+    public async Task GetProductsCrossesAsync_WhenProductHasDifferentSorts_ReturnsEachSortedResult()
+    {
+        var productId = GetProductIdWithAtLeastTwoCrosses();
+        var repository = GetRepository();
+        var ascendingRequest = new ProductCrossesRequestItem(productId, null);
+        var descendingRequest = new ProductCrossesRequestItem(productId, ["id_desc"]);
+
+        await RemoveCachedCrosses(productId, null);
+        await RemoveCachedCrosses(productId, ["id_desc"]);
+
+        var result = await repository.GetProductsCrossesAsync(
+            [ascendingRequest, descendingRequest]);
+
+        result[new ProductCrossesRequestItem(productId, null)]
+            .Should().BeInAscendingOrder();
+        result[new ProductCrossesRequestItem(productId, ["id_desc"])]
+            .Should().BeInDescendingOrder();
+        result.Should().HaveCount(2);
+    }
+
+    [Fact]
     public async Task GetProductCrossesAsync_WhenCrossesLoaded_AddsRelationsForProductAndCrosses()
     {
         var productId = TestContext.ProductCrosses[0].LeftProductId;
@@ -130,7 +151,7 @@ public class GetProductCrossesAsyncTests : IntegrationTest
         productRelations.Should().Contain(cacheKey);
         var productRelationTtl = await GetTtl(CacheKeys.ProductCache.ProductCrossRelations(productId));
         productRelationTtl.Should().NotBeNull();
-        productRelationTtl!.Value.Should().BePositive();
+        productRelationTtl.Value.Should().BePositive();
         productRelationTtl.Value.Should().BeLessThanOrEqualTo(CacheKeys.ProductCache.Ttl);
 
         foreach (var crossId in result)
@@ -139,14 +160,14 @@ public class GetProductCrossesAsyncTests : IntegrationTest
             crossRelations.Should().Contain(cacheKey);
             var crossRelationTtl = await GetTtl(CacheKeys.ProductCache.ProductCrossRelations(crossId));
             crossRelationTtl.Should().NotBeNull();
-            crossRelationTtl!.Value.Should().BePositive();
+            crossRelationTtl.Value.Should().BePositive();
             crossRelationTtl.Value.Should().BeLessThanOrEqualTo(CacheKeys.ProductCache.Ttl);
         }
     }
 
-    private IProductCacheRepository GetRepository()
+    private IProductProvider GetRepository()
     {
-        return Scope.ServiceProvider.GetRequiredService<IProductCacheRepository>();
+        return Scope.ServiceProvider.GetRequiredService<IProductProvider>();
     }
 
     private IReadOnlyList<int> GetExpectedCrossIds(int productId)
