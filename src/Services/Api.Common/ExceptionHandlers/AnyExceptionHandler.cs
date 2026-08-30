@@ -12,8 +12,8 @@ public class AnyExceptionHandler(ILogger<AnyExceptionHandler> logger)
 		Exception exception,
 		CancellationToken cancellationToken)
 	{
-		LogError(httpContext, exception);
 		var statusCode = GetStatusCode(exception);
+		LogException(httpContext, exception, statusCode);
 
 		var problemDetails = GetBaseDetails(
 			exception,

@@ -48,6 +48,8 @@
         <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\GraphQL.Common\GraphQL.Common.csproj"/>
         <ProjectReference Include="..\Persistence.Common\Persistence.Common.csproj"/>
     </ItemGroup>
 

@@ -15,8 +15,6 @@ public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> 
 		if (exception is not ValidationException dbValidationException)
 			return false;
 
-		LogError(httpContext, exception);
-
 		var problemDetails = GetBaseDetails(
 			dbValidationException,
 			httpContext,
@@ -26,6 +24,10 @@ public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> 
 			httpContext,
 			problemDetails,
 			dbValidationException);
+		LogException(
+			httpContext,
+			exception,
+			problemDetails.Status ?? StatusCodes.Status500InternalServerError);
 
 		httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
 		await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);

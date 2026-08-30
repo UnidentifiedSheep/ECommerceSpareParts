@@ -16,7 +16,7 @@ public class ValidationExceptionHandler(ILogger<ValidationExceptionHandler> logg
 		if (exception is not ValidationException validationException)
 			return false;
 
-		LogError(httpContext, exception);
+		LogException(httpContext, exception, StatusCodes.Status400BadRequest);
 
 		var problemDetails = GetBaseDetails(
 			validationException,

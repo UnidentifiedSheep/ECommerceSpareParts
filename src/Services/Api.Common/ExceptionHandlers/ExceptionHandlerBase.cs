@@ -13,19 +13,28 @@ public abstract class ExceptionHandlerBase<THandler>(ILogger<THandler> logger) :
 		Exception exception,
 		CancellationToken cancellationToken);
 
-	protected virtual void LogError(HttpContext context, Exception exception)
+	protected virtual void LogException(
+		HttpContext context,
+		Exception exception,
+		int statusCode)
 	{
-		if (!logger.IsEnabled(LogLevel.Error))
+		var logLevel = statusCode >= StatusCodes.Status500InternalServerError
+			? LogLevel.Error
+			: LogLevel.Information;
+		if (!logger.IsEnabled(logLevel))
 			return;
+
 		using (logger.BeginScope(
 					new Dictionary<string, object>
 					{
 						["TraceId"] = context.TraceIdentifier
 					}))
 		{
-			logger.LogError(
+			logger.Log(
+				logLevel,
 				exception,
-				"Error occurred at {Time}",
+				"Request failed with status code {StatusCode} at {Time}",
+				statusCode,
 				DateTime.UtcNow);
 		}
 	}
