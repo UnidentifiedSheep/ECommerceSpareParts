@@ -41,12 +41,30 @@ public class ValidationErrorFilterTests
 		result.Extensions.Should().ContainKey("status").WhoseValue.Should().Be(400);
 		result.Extensions.Should().ContainKey("traceId").WhoseValue.Should().Be("test-trace-id");
 
+		result.Message.Should().Be("Validation failed");
 		var errors = result.Extensions!["validationErrors"].Should()
-			.BeAssignableTo<IReadOnlyCollection<ValidationErrorModel>>()
+			.BeAssignableTo<IReadOnlyCollection<IReadOnlyDictionary<string, object?>>>()
 			.Subject;
-		errors.Should().ContainSingle().Which.Should().Be(
-			new ValidationErrorModel("Name", "Localized validation for Name", "value"));
+		var validationError = errors.Should().ContainSingle().Subject;
+		validationError["propertyName"].Should().Be("Name");
+		validationError["errorMessage"].Should().Be("Localized validation for Name");
+		validationError["attemptedValue"].Should().Be("value");
 		loggerFactory.LogLevels.Should().ContainSingle().Which.Should().Be(LogLevel.Information);
+	}
+
+	[Fact]
+	public void OnError_ShouldThrow_WhenLocalizationKeyDoesNotExist()
+	{
+		var failure = new ValidationFailure("Name", "fallback")
+		{
+			ErrorCode = "Validation.Missing"
+		};
+		var exception = new ValidationException([failure]);
+		var filter = CreateFilter();
+
+		var action = () => filter.OnError(ErrorFilterTestFactory.CreateError(exception));
+
+		action.Should().Throw<InvalidOperationException>();
 	}
 
 	[Fact]

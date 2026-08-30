@@ -17,7 +17,7 @@ public sealed class ValidationErrorFilter(
 {
 	protected override IError Handle(IError error, ValidationException exception)
 	{
-		var validationErrors = new List<ValidationErrorModel>();
+		var validationErrors = new List<IReadOnlyDictionary<string, object?>>();
 
 		foreach (var failure in exception.Errors)
 		{
@@ -28,20 +28,22 @@ public sealed class ValidationErrorFilter(
 			var message = failure.ErrorMessage;
 			if (!string.IsNullOrWhiteSpace(failure.ErrorCode))
 				message = state?.ErrorMessageArguments is { Length: > 0 } arguments
-					? Localizer.GetOrDefault(failure.ErrorCode, arguments) ?? message
-					: Localizer.GetOrDefault(failure.ErrorCode) ?? message;
+					? Localizer.Get(failure.ErrorCode, arguments)
+					: Localizer[failure.ErrorCode];
 
 			validationErrors.Add(
-				new ValidationErrorModel(
-					failure.PropertyName,
-					message,
-					failure.AttemptedValue));
+				new Dictionary<string, object?>
+				{
+					["propertyName"] = failure.PropertyName,
+					["errorMessage"] = message,
+					["attemptedValue"] = failure.AttemptedValue
+				});
 		}
 
 		return CreateErrorBuilder(
 				error,
 				exception,
-				exception.Message,
+				"Validation failed",
 				"VALIDATION_ERROR",
 				StatusCodes.Status400BadRequest)
 			.SetExtension("validationErrors", validationErrors)

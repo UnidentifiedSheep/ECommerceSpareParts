@@ -26,6 +26,23 @@ public class StringLocalizerTests
 	}
 
 	[Fact]
+	public void Get_ShouldSeeValuesLoadedAfterLocalizerCreation()
+	{
+		var container = new LocalizerContainer("en");
+		var localizer = new StringLocalizer([container]);
+
+		container.Initialize(
+			new Dictionary<string, string>
+			{
+				["Test.Key"] = "Test.Value"
+			});
+
+		var result = localizer.Get("Test.Key", "en");
+
+		result.Should().Be("Test.Value");
+	}
+
+	[Fact]
 	public void Get_ShouldReturnFormattedValue_WhenArgumentsProvided()
 	{
 		var container = new LocalizerContainer("en");
