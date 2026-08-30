@@ -1,7 +1,6 @@
 using HotChocolate;
-using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Storage;
-using Main.Entities.Exceptions;
 
 namespace Main.Api.GraphQl.Types;
 
@@ -13,9 +12,6 @@ public sealed record GqlStorageContent(
     [GraphQLName("id")]
     public int Id => Content.Id;
 
-    [GraphQLName("productId")]
-    public int ProductId => Content.ProductId;
-
     [GraphQLName("count")]
     public int Count => Content.Count;
 
@@ -24,10 +20,16 @@ public sealed record GqlStorageContent(
 
     [GraphQLName("purchaseDatetime")]
     public DateTime PurchaseDatetime => Content.PurchaseDatetime;
+    
+    [GraphQLName("rowVersion")]
+    public uint RowVersion => Content.RowVersion;
 
     [GraphQLName("currency")]
     public GqlCurrency Currency => new(Content.Currency);
 
     [GraphQLName("storage")]
     public GqlStorage Storage => new(Content.StorageCode);
+    
+    [GraphQLName("product")]
+    public GqlProduct Product => new(Content.ProductId);
 }

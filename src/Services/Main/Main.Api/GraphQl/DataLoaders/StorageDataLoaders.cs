@@ -1,5 +1,4 @@
 using GreenDonut;
-using Main.Api.GraphQl.Types;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Storages;
 using MediatR;

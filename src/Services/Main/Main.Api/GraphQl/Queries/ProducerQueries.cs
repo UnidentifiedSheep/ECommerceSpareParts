@@ -9,9 +9,12 @@ public sealed class ProducerQueries
 {
     [GraphQLName("byId")]
     [Lookup]
-    public Task<GqlProducer?> GetProducerByIdAsync(
+    public async Task<GqlProducer?> GetProducerByIdAsync(
         IProducerByIdDataLoader loader,
         int id,
         CancellationToken ct)
-        => loader.LoadAsync(id, ct);
+    {
+        var producer = await loader.LoadAsync(id, ct);
+        return producer is null ? null : new GqlProducer(producer);
+    }
 }

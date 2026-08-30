@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Api.GraphQl.Types.Product;
-using Main.Api.GraphQl.Types;
+using Main.Application.Dtos.Product;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
@@ -14,7 +14,7 @@ namespace Main.Api.GraphQl.DataLoaders;
 public static class ProductDataLoaders
 {
     [DataLoader]
-    public static async Task<Dictionary<int, GqlProduct>>
+    public static async Task<Dictionary<int, ProductDto>>
         GetProductByIdAsync(
             IReadOnlyList<int> keys,
             ISender sender,
@@ -26,11 +26,11 @@ public static class ProductDataLoaders
             .Products
             .ToDictionary(
                 x => x.Id,
-                x => new GqlProduct(x));
+                x => x);
     }
 
     [DataLoader]
-    public static async Task<Dictionary<int, GqlProduct>>
+    public static async Task<Dictionary<int, ProductDto>>
         GetProductPairByIdAsync(
             IReadOnlyList<int> keys,
             ISender sender,
@@ -42,11 +42,11 @@ public static class ProductDataLoaders
             .Pairs
             .ToDictionary(
                 x => x.Key,
-                x => new GqlProduct(x.Value));
+                x => x.Value);
     }
 
     [DataLoader]
-    public static async Task<Dictionary<int, GqlProductSize>>
+    public static async Task<Dictionary<int, ProductSizeDto>>
         GetProductSizeByIdAsync(
             IReadOnlyList<int> keys,
             ISender sender,
@@ -58,11 +58,11 @@ public static class ProductDataLoaders
             .Sizes
             .ToDictionary(
                 x => x.ProductId,
-                x => new GqlProductSize(x));
+                x => x);
     }
 
     [DataLoader]
-    public static async Task<Dictionary<int, GqlProductWeight>>
+    public static async Task<Dictionary<int, ProductWeightDto>>
         GetProductWeightByIdAsync(
             IReadOnlyList<int> keys,
             ISender sender,
@@ -74,11 +74,11 @@ public static class ProductDataLoaders
             .Weights
             .ToDictionary(
                 x => x.ProductId,
-                x => new GqlProductWeight(x));
+                x => x);
     }
     
     [DataLoader]
-    public static async Task<Dictionary<int, List<GqlProductContent>>>
+    public static async Task<Dictionary<int, List<ProductContentDto>>>
         GetProductContentsByIdAsync(
             IReadOnlyList<int> keys,
             ISender sender,
@@ -87,16 +87,11 @@ public static class ProductDataLoaders
         return (await sender.Send(
                 new GetProductsContentsQuery(keys),
                 cancellationToken))
-            .Contents
-            .ToDictionary(
-                x => x.Key,
-                x => x.Value
-                    .Select(z => new GqlProductContent(z))
-                    .ToList());
+            .Contents;
     }
 
     [DataLoader]
-    public static async Task<Dictionary<GetProductCrossesItem, IReadOnlyList<GqlProduct>>>
+    public static async Task<Dictionary<GetProductCrossesItem, IReadOnlyList<ProductDto>>>
         GetProductCrossesAsync(
             IReadOnlyList<GetProductCrossesItem> keys,
             ISender sender,
@@ -107,14 +102,12 @@ public static class ProductDataLoaders
                 cancellationToken))
             .Crosses
             .ToDictionary(
-                x => x.Key, 
-                IReadOnlyList<GqlProduct> (x) => x.Value
-                    .Select(product => new GqlProduct(product))
-                    .ToArray());
+                x => x.Key,
+                x => x.Value);
     }
 
     [DataLoader]
-    public static async Task<Dictionary<GetProductStorageContentsItem, IReadOnlyList<GqlStorageContent>>>
+    public static async Task<Dictionary<GetProductStorageContentsItem, IReadOnlyList<StorageContentDto>>>
         GetProductStorageContentsAsync(
             IReadOnlyList<GetProductStorageContentsItem> keys,
             ISender sender,
@@ -125,9 +118,7 @@ public static class ProductDataLoaders
                 cancellationToken))
             .Content
             .ToDictionary(
-                x => x.Key, 
-                IReadOnlyList<GqlStorageContent> (x) => x.Value
-                    .Select(content => new GqlStorageContent(content))
-                    .ToArray());
+                x => x.Key,
+                x => x.Value);
     }
 }

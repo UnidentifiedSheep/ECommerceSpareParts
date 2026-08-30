@@ -9,7 +9,7 @@ namespace Main.Api.GraphQl.Types;
 [GraphQLName("Storage")]
 public record GqlStorage
 {
-    private StorageDto? _storage;
+    private readonly StorageDto? _storage;
     
     [GraphQLName("code")]
     public string Code { get; }
@@ -32,14 +32,13 @@ public record GqlStorage
         IStorageByCodeDataLoader loader,
         CancellationToken token)
         => (await GetStorageAsync(loader, token)).Type;
-    
+
     private async Task<StorageDto> GetStorageAsync(
         IStorageByCodeDataLoader loader,
         CancellationToken token)
-    {
-        return _storage ??= await loader.LoadAsync(Code, token)
-            ?? throw new StorageNotFoundException(Code);
-    }
+        => _storage
+           ?? await loader.LoadAsync(Code, token)
+           ?? throw new StorageNotFoundException(Code);
     
     public GqlStorage(string code)
     {
