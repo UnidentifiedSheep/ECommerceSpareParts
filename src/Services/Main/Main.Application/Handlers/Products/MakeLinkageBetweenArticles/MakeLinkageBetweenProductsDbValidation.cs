@@ -6,10 +6,12 @@ namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 
 public class MakeLinkageBetweenProductsDbValidation : AbstractDbValidation<MakeLinkageBetweenProductsCommand>
 {
-    public override void Build(IValidationPlan plan, MakeLinkageBetweenProductsCommand request)
-    {
-        plan.ValidateProductExistsId(
-            request.Linkages
-                .SelectMany(x => new[] { x.ProductId, x.CrossProductId }));
-    }
+	public override void Build(IValidationPlan plan, MakeLinkageBetweenProductsCommand request)
+	{
+		plan.ValidateProductExistsId(
+			request.Linkages.SelectMany(x => new[]
+			{
+				x.ProductId, x.CrossProductId
+			}));
+	}
 }

@@ -7,9 +7,10 @@ namespace Main.Application.Handlers.Auth.AddPermissionToUser;
 
 public class AddPermissionToUserDbValidation : AbstractDbValidation<AddPermissionToUserCommand>
 {
-    public override void Build(IValidationPlan plan, AddPermissionToUserCommand request)
-    {
-        plan.ValidateUserExistsId(request.UserId)
-            .ValidatePermissionExistsName(request.PermissionName.ToNormalized());
-    }
+	public override void Build(IValidationPlan plan, AddPermissionToUserCommand request)
+	{
+		plan
+			.ValidateUserExistsId(request.UserId)
+			.ValidatePermissionExistsName(request.PermissionName.ToNormalized());
+	}
 }

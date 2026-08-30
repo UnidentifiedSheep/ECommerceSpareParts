@@ -1,11 +1,7 @@
-using Abstractions;
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
-using Application.Common.NamedObject;
-using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using MassTransit;
@@ -15,25 +11,23 @@ using Microsoft.Extensions.Logging;
 namespace Main.Application.Lrts;
 
 public class UpdateCurrencyRatesLrt(
-    IRepository<Job, Guid> jobRepository,
-    IUnitOfWork unitOfWork,
-    IPublishEndpoint publisher,
-    IApplicationTransactionService transactionService,
-    ILogger<UpdateCurrencyRatesLrt> logger,
-    ISender sender
-) : LrtBase<NoneInputState, NoneInputState>(
-    jobRepository,
-    unitOfWork,
-    publisher,
-    transactionService,
-    logger)
+	IRepository<Job, Guid> jobRepository,
+	IUnitOfWork unitOfWork,
+	IPublishEndpoint publisher,
+	IApplicationTransactionService transactionService,
+	ILogger<UpdateCurrencyRatesLrt> logger,
+	ISender sender) : LrtBase<NoneInputState, NoneInputState>(
+	jobRepository,
+	unitOfWork,
+	publisher,
+	transactionService,
+	logger)
 {
-    public override string SystemName => nameof(UpdateCurrencyRatesLrt);
-    public override string NameLocalizationKey => "lrt.currency.rates.update.name";
-    public override string DescriptionLocalizationKey => "lrt.currency.rates.update.description";
+	public override string SystemName => nameof(UpdateCurrencyRatesLrt);
 
-    protected override Task DoWork()
-    {
-        return sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
-    }
+	public override string NameLocalizationKey => "lrt.currency.rates.update.name";
+
+	public override string DescriptionLocalizationKey => "lrt.currency.rates.update.description";
+
+	protected override Task DoWork() => sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
 }

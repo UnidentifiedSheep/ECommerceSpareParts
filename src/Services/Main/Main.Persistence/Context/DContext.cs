@@ -22,7 +22,6 @@ using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Common;
 using Persistence.Common.BaseTableConfigurations;
-using Persistence.Extensions;
 using Persistence.Interceptors;
 using Event = Main.Entities.Event.Event;
 
@@ -30,171 +29,172 @@ namespace Main.Persistence.Context;
 
 public partial class DContext : DbContext
 {
-    public DContext() { }
+	public DContext()
+	{
+	}
 
-    public DContext(DbContextOptions<DContext> options)
-        : base(options)
-    {
-    }
+	public DContext(DbContextOptions<DContext> options) : base(options)
+	{
+	}
 
-    public virtual DbSet<Product> Products { get; set; }
+	public virtual DbSet<Product> Products { get; set; }
 
-    public virtual DbSet<ProductCross> ProductCrosses { get; set; }
+	public virtual DbSet<ProductCross> ProductCrosses { get; set; }
 
-    public virtual DbSet<ProductCharacteristic> ProductCharacteristics { get; set; }
+	public virtual DbSet<ProductCharacteristic> ProductCharacteristics { get; set; }
 
-    public virtual DbSet<ProductEan> ProductEans { get; set; }
+	public virtual DbSet<ProductEan> ProductEans { get; set; }
 
-    public virtual DbSet<ProductImage> ProductImages { get; set; }
+	public virtual DbSet<ProductImage> ProductImages { get; set; }
 
-    public virtual DbSet<ProductSize> ProductSizes { get; set; }
+	public virtual DbSet<ProductSize> ProductSizes { get; set; }
 
-    public virtual DbSet<ProductWeight> ProductWeights { get; set; }
+	public virtual DbSet<ProductWeight> ProductWeights { get; set; }
 
-    public virtual DbSet<ProductContent> ProductContents { get; set; }
+	public virtual DbSet<ProductContent> ProductContents { get; set; }
 
-    public virtual DbSet<SupplierProduct> SupplierProducts { get; set; }
+	public virtual DbSet<SupplierProduct> SupplierProducts { get; set; }
 
-    public virtual DbSet<SupplierProductName> SupplierProductNames { get; set; }
+	public virtual DbSet<SupplierProductName> SupplierProductNames { get; set; }
 
-    public virtual DbSet<SupplierProductCross> SupplierProductCrosses { get; set; }
+	public virtual DbSet<SupplierProductCross> SupplierProductCrosses { get; set; }
 
-    public virtual DbSet<CatalogueCandidate> CatalogueCandidates { get; set; }
+	public virtual DbSet<CatalogueCandidate> CatalogueCandidates { get; set; }
 
-    public virtual DbSet<Event> Events { get; set; }
-    public virtual DbSet<Cart> Carts { get; set; }
+	public virtual DbSet<Event> Events { get; set; }
 
-    public virtual DbSet<Category> Categories { get; set; }
+	public virtual DbSet<Cart> Carts { get; set; }
 
-    public virtual DbSet<Currency> Currencies { get; set; }
+	public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<CurrencyRateHistory> CurrencyRateHistories { get; set; }
+	public virtual DbSet<Currency> Currencies { get; set; }
 
-    public virtual DbSet<CurrencyRate> CurrencyRates { get; set; }
+	public virtual DbSet<CurrencyRateHistory> CurrencyRateHistories { get; set; }
 
-    public virtual DbSet<Setting> DefaultSettings { get; set; }
+	public virtual DbSet<CurrencyRate> CurrencyRates { get; set; }
 
-    public virtual DbSet<Order> Orders { get; set; }
+	public virtual DbSet<Setting> DefaultSettings { get; set; }
 
-    public virtual DbSet<OrderItem> OrderItems { get; set; }
+	public virtual DbSet<Order> Orders { get; set; }
 
-    public virtual DbSet<Organization> Organizations { get; set; }
+	public virtual DbSet<OrderItem> OrderItems { get; set; }
 
-    public virtual DbSet<OrganizationMember> OrganizationMembers { get; set; }
+	public virtual DbSet<Organization> Organizations { get; set; }
 
-    public virtual DbSet<Permission> Permissions { get; set; }
+	public virtual DbSet<OrganizationMember> OrganizationMembers { get; set; }
 
-    public virtual DbSet<Producer> Producers { get; set; }
+	public virtual DbSet<Permission> Permissions { get; set; }
 
-    public virtual DbSet<ProducerAlias> ProducersAliases { get; set; }
-    
-    public virtual DbSet<ProducerSupplierMapping> ProducerSupplierMappings { get; set; }
+	public virtual DbSet<Producer> Producers { get; set; }
 
-    public virtual DbSet<Purchase> Purchases { get; set; }
+	public virtual DbSet<ProducerAlias> ProducersAliases { get; set; }
 
-    public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
+	public virtual DbSet<ProducerSupplierMapping> ProducerSupplierMappings { get; set; }
 
-    public virtual DbSet<PurchaseContentLogistic> PurchaseContentLogistics { get; set; }
+	public virtual DbSet<Purchase> Purchases { get; set; }
 
-    public virtual DbSet<PurchaseLogistic> PurchaseLogistics { get; set; }
+	public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
 
-    public virtual DbSet<Role> Roles { get; set; }
+	public virtual DbSet<PurchaseContentLogistic> PurchaseContentLogistics { get; set; }
 
-    public virtual DbSet<Sale> Sales { get; set; }
+	public virtual DbSet<PurchaseLogistic> PurchaseLogistics { get; set; }
 
-    public virtual DbSet<SaleContent> SaleContents { get; set; }
+	public virtual DbSet<Role> Roles { get; set; }
 
-    public virtual DbSet<SaleContentDetail> SaleContentDetails { get; set; }
+	public virtual DbSet<Sale> Sales { get; set; }
 
-    public virtual DbSet<Storage> Storages { get; set; }
+	public virtual DbSet<SaleContent> SaleContents { get; set; }
 
-    public virtual DbSet<StorageContent> StorageContents { get; set; }
+	public virtual DbSet<SaleContentDetail> SaleContentDetails { get; set; }
 
-    public virtual DbSet<ProductReservation> ProductReservations { get; set; }
+	public virtual DbSet<Storage> Storages { get; set; }
 
-    public virtual DbSet<StorageOwner> StorageOwners { get; set; }
+	public virtual DbSet<StorageContent> StorageContents { get; set; }
 
-    public virtual DbSet<StorageRoute> StorageRoutes { get; set; }
+	public virtual DbSet<ProductReservation> ProductReservations { get; set; }
 
-    public virtual DbSet<Transaction> Transactions { get; set; }
+	public virtual DbSet<StorageOwner> StorageOwners { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+	public virtual DbSet<StorageRoute> StorageRoutes { get; set; }
 
-    public virtual DbSet<OrganizationBalance> UserBalances { get; set; }
+	public virtual DbSet<Transaction> Transactions { get; set; }
 
-    public virtual DbSet<UserDiscount> UserDiscounts { get; set; }
+	public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<UserEmail> UserEmails { get; set; }
+	public virtual DbSet<OrganizationBalance> UserBalances { get; set; }
 
-    public virtual DbSet<UserInfo> UserInfos { get; set; }
+	public virtual DbSet<UserDiscount> UserDiscounts { get; set; }
 
-    public virtual DbSet<UserPermission> UserPermissions { get; set; }
+	public virtual DbSet<UserEmail> UserEmails { get; set; }
 
-    public virtual DbSet<UserPhone> UserPhones { get; set; }
+	public virtual DbSet<UserInfo> UserInfos { get; set; }
 
-    public virtual DbSet<UserRole> UserRoles { get; set; }
+	public virtual DbSet<UserPermission> UserPermissions { get; set; }
 
-    public virtual DbSet<UserSearchHistory> UserSearchHistories { get; set; }
+	public virtual DbSet<UserPhone> UserPhones { get; set; }
 
-    public virtual DbSet<UserToken> UserTokens { get; set; }
+	public virtual DbSet<UserRole> UserRoles { get; set; }
 
-    public virtual DbSet<UserVehicle> UserVehicles { get; set; }
+	public virtual DbSet<UserSearchHistory> UserSearchHistories { get; set; }
 
-    public virtual DbSet<Job> Jobs { get; set; }
+	public virtual DbSet<UserToken> UserTokens { get; set; }
 
-    public virtual DbSet<JobSchedule> JobSchedules { get; set; }
+	public virtual DbSet<UserVehicle> UserVehicles { get; set; }
 
-    public virtual DbSet<JobScheduleRun> JobScheduleRuns { get; set; }
+	public virtual DbSet<Job> Jobs { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
+	public virtual DbSet<JobSchedule> JobSchedules { get; set; }
 
-        RegisterBaseInterceptors(optionsBuilder);
-    }
+	public virtual DbSet<JobScheduleRun> JobScheduleRuns { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.HasDefaultSchema("public");
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	{
+		base.OnConfiguring(optionsBuilder);
 
-        modelBuilder.AddOutboxMessageEntity();
-        modelBuilder.AddOutboxStateEntity();
-        modelBuilder.AddInboxStateEntity();
+		RegisterBaseInterceptors(optionsBuilder);
+	}
 
-        modelBuilder.Entity<OutboxMessage>().ToTable("OutboxMessage", "msg");
-        modelBuilder.Entity<OutboxState>().ToTable("OutboxState", "msg");
-        modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		modelBuilder.HasDefaultSchema("public");
 
-        modelBuilder
-            .HasPostgresExtension("dblink")
-            .HasPostgresExtension("pg_trgm")
-            .HasPostgresExtension("pgcrypto");
+		modelBuilder.AddOutboxMessageEntity();
+		modelBuilder.AddOutboxStateEntity();
+		modelBuilder.AddInboxStateEntity();
 
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
-            .ApplyConfiguration(new SettingConfiguration())
-            .ApplyJobConfigurations();
+		modelBuilder.Entity<OutboxMessage>().ToTable("OutboxMessage", "msg");
+		modelBuilder.Entity<OutboxState>().ToTable("OutboxState", "msg");
+		modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
 
-        modelBuilder.Entity<Setting>()
-            .HasDiscriminator(e => e.Key)
-            .HasValue<Setting>(nameof(Setting))
-            .HasValue<CurrencySetting>(CurrencySetting.SettingName)
-            .HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName)
-            .HasValue<StorageContentSetting>(StorageContentSetting.SettingName)
-            .HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)
-            .HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
+		modelBuilder
+			.HasPostgresExtension("dblink")
+			.HasPostgresExtension("pg_trgm")
+			.HasPostgresExtension("pgcrypto");
 
-        modelBuilder.AddFieldsForAuditableEntities();
+		modelBuilder
+			.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
+			.ApplyConfiguration(new SettingConfiguration())
+			.ApplyJobConfigurations();
 
-        modelBuilder.AllDateTimesToUtc()
-            .AllEnumsToString();
+		modelBuilder
+			.Entity<Setting>()
+			.HasDiscriminator(e => e.Key)
+			.HasValue<Setting>(nameof(Setting))
+			.HasValue<CurrencySetting>(CurrencySetting.SettingName)
+			.HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName)
+			.HasValue<StorageContentSetting>(StorageContentSetting.SettingName)
+			.HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)
+			.HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
 
-        OnModelCreatingPartial(modelBuilder);
-    }
+		modelBuilder.AddFieldsForAuditableEntities();
 
-    private void RegisterBaseInterceptors(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.AddInterceptors(new SelectForUpdateCommandInterceptor());
-    }
+		modelBuilder.AllDateTimesToUtc().AllEnumsToString();
 
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+		OnModelCreatingPartial(modelBuilder);
+	}
+
+	private void RegisterBaseInterceptors(DbContextOptionsBuilder optionsBuilder) =>
+		optionsBuilder.AddInterceptors(new SelectForUpdateCommandInterceptor());
+
+	partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

@@ -2,5 +2,5 @@
 
 public interface INamedObject
 {
-    string SystemName { get; }
+	string SystemName { get; }
 }

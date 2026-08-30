@@ -14,39 +14,30 @@ using ZiggyCreatures.Caching.Fusion;
 namespace Pricing.Cache;
 
 public class PriceApplierProvider(
-    IFusionCache cache,
-    IReadRepository<PriceApplier, string> repository,
-    INamedObjectRegistry<ApplierNamedObjectBase> registry,
-    IProjectionProvider<PriceApplier, PriceApplierDto> projection
-) : IPriceApplierProvider
+	IFusionCache cache,
+	IReadRepository<PriceApplier, string> repository,
+	INamedObjectRegistry<ApplierNamedObjectBase> registry,
+	IProjectionProvider<PriceApplier, PriceApplierDto> projection) : IPriceApplierProvider
 {
-    public async Task<PriceApplierConfigurationSnapshot> GetConfigurationAsync(
-        CancellationToken ct = default)
-    {
-        return await cache.GetOrSetAsync(
-            key: CacheKeys.PriceAppliers.ConfigurationKey,
-            factory: GetConfigurationFromDbAsync,
-            options: new FusionCacheEntryOptions(CacheKeys.PriceAppliers.Ttl),
-            token: ct);
-    }
+	public async Task<PriceApplierConfigurationSnapshot> GetConfigurationAsync(CancellationToken ct = default)
+	{
+		return await cache.GetOrSetAsync(
+			CacheKeys.PriceAppliers.ConfigurationKey,
+			GetConfigurationFromDbAsync,
+			new FusionCacheEntryOptions(CacheKeys.PriceAppliers.Ttl),
+			ct);
+	}
 
-    public async Task InvalidateConfigurationAsync(
-        CancellationToken ct = default)
-    {
-        await cache.RemoveAsync(
-            CacheKeys.PriceAppliers.ConfigurationKey,
-            token: ct);
-    }
+	public async Task InvalidateConfigurationAsync(CancellationToken ct = default)
+	{
+		await cache.RemoveAsync(CacheKeys.PriceAppliers.ConfigurationKey, token: ct);
+	}
 
-    private async Task<PriceApplierConfigurationSnapshot> GetConfigurationFromDbAsync(
-        CancellationToken ct = default)
-    {
-        var appliers = await repository.Query
-            .Project(projection)
-            .ToListAsync(ct);
+	private async Task<PriceApplierConfigurationSnapshot> GetConfigurationFromDbAsync(
+		CancellationToken ct = default)
+	{
+		var appliers = await repository.Query.Project(projection).ToListAsync(ct);
 
-        return PriceApplierConfigurationSnapshot.Create(
-            appliers,
-            registry.All);
-    }
+		return PriceApplierConfigurationSnapshot.Create(appliers, registry.All);
+	}
 }

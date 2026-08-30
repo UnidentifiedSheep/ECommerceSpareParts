@@ -5,5 +5,5 @@ namespace Main.Application.Interfaces.Services.Currency;
 
 public interface ICurrencyRateUpdater
 {
-    Task<UpdateRatesResult> UpdateAsync(CurrencySetting setting, CancellationToken ct);
+	Task<UpdateRatesResult> UpdateAsync(CurrencySetting setting, CancellationToken ct);
 }

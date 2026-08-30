@@ -46,7 +46,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Exceptions\PriceApplier\" />
+        <Folder Include="Exceptions\PriceApplier\"/>
     </ItemGroup>
 
 </Project>

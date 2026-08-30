@@ -5,10 +5,10 @@ namespace Main.Application.Interfaces.Services.PayloadProvider;
 
 public interface IVerificationPayloadProvider
 {
-    Task<VerificationPayload> GetPayload(
-        Guid userId,
-        VerificationType type,
-        string dataToVerify);
+	Task<VerificationPayload> GetPayload(
+		Guid userId,
+		VerificationType type,
+		string dataToVerify);
 
-    Task<bool> TryConsumeToken(Guid tokenId);
+	Task<bool> TryConsumeToken(Guid tokenId);
 }

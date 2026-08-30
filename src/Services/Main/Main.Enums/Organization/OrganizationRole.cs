@@ -2,8 +2,11 @@ namespace Main.Enums.Organization;
 
 public enum OrganizationRole
 {
-    Owner,
-    Admin,
-    Manager,
-    Member
+	Owner,
+
+	Admin,
+
+	Manager,
+
+	Member
 }

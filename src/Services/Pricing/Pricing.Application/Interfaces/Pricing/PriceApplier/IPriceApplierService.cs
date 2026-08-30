@@ -5,17 +5,15 @@ namespace Pricing.Application.Interfaces.Pricing.PriceApplier;
 
 public interface IPriceApplierService
 {
-    Task<string> GetCurrentConfigurationVersionAsync(CancellationToken ct = default);
+	Task<string> GetCurrentConfigurationVersionAsync(CancellationToken ct = default);
 
-    Task<IReadOnlyList<PriceApplierDto>> GetPriceApplierInfosAsync(
-        PriceOfferSourceType usage,
-        CancellationToken ct = default);
+	Task<IReadOnlyList<PriceApplierDto>> GetPriceApplierInfosAsync(
+		PriceOfferSourceType usage,
+		CancellationToken ct = default);
 
-    Task<PriceApplierDto?> FindPriceApplierInfoAsync(
-        string systemName,
-        CancellationToken ct = default);
+	Task<PriceApplierDto?> FindPriceApplierInfoAsync(string systemName, CancellationToken ct = default);
 
-    Task<IReadOnlyList<IPriceApplier>> GetPriceAppliersAsync(
-        PriceOfferSourceType usage,
-        CancellationToken ct = default);
+	Task<IReadOnlyList<IPriceApplier>> GetPriceAppliersAsync(
+		PriceOfferSourceType usage,
+		CancellationToken ct = default);
 }

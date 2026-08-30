@@ -44,21 +44,23 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.AddServiceConfiguration("main");
 
 builder.Host.AddLokiLogger(
-    builder.Configuration,
-    "main.api",
-    env);
+	builder.Configuration,
+	"main.api",
+	env);
 
-builder.Services.AddMessageBrokerOptions()
-    .AddHeaderSecretsOptions()
-    .AddRedisOptions()
-    .AddS3Options()
-    .AddDatabaseOptions()
-    .AddEmailOptions()
-    .AddPhoneOptions()
-    .AddJwtOptions()
-    .AddS3BucketOptions()
-    .AddSystemOptions()
-    .AddSecretEncryptionOptions();
+builder
+	.Services
+	.AddMessageBrokerOptions()
+	.AddHeaderSecretsOptions()
+	.AddRedisOptions()
+	.AddS3Options()
+	.AddDatabaseOptions()
+	.AddEmailOptions()
+	.AddPhoneOptions()
+	.AddJwtOptions()
+	.AddS3BucketOptions()
+	.AddSystemOptions()
+	.AddSecretEncryptionOptions();
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Main);
 builder.Services.AddSignalR();
@@ -67,79 +69,79 @@ var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
-    x.AddConsumer<BackplaneConsumer>();
-    x.AddConsumer<JobStatusUpdatedConsumer>();
-    x.AddConsumer<SettingUpdatedConsumer>();
+	x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
+	x.AddConsumer<BackplaneConsumer>();
+	x.AddConsumer<JobStatusUpdatedConsumer>();
+	x.AddConsumer<SettingUpdatedConsumer>();
 
-    x.AddEntityFrameworkOutbox<DContext>(o =>
-    {
-        o.UsePostgres();
-        o.UseBusOutbox();
-    });
+	x.AddEntityFrameworkOutbox<DContext>(o =>
+	{
+		o.UsePostgres();
+		o.UseBusOutbox();
+	});
 
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.ConfigureRabbitMq(context);
+	x.UsingRabbitMq((context, cfg) =>
+	{
+		cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(
-            uniqQueueName,
-            ep =>
-            {
-                ep.AutoDelete = true;
-                ep.Durable = false;
+		cfg.ReceiveEndpoint(
+			uniqQueueName,
+			ep =>
+			{
+				ep.AutoDelete = true;
+				ep.Durable = false;
 
-                ep.ConfigureConsumeTopology = false;
+				ep.ConfigureConsumeTopology = false;
 
-                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
-                ep.ConfigureConsumer<BackplaneConsumer>(context);
-                ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
+				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+				ep.ConfigureConsumer<BackplaneConsumer>(context);
+				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
-                ep.Bind<BackplaneMessage>();
-                ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
-                    .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
-            });
+				ep.Bind<BackplaneMessage>();
+				ep
+					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
+					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
+			});
 
-        cfg.ReceiveEndpoint(
-            "main-queue",
-            ep =>
-            {
-                ep.Durable = true;
+		cfg.ReceiveEndpoint(
+			"main-queue",
+			ep =>
+			{
+				ep.Durable = true;
 
-                ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-                ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
-                ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
-                ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
+				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+				ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
+				ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
+				ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
 
-                ep.Bind<CurrencyCreatedEvent>();
-                ep.Bind<ProductUpdatedEvent>();
-                ep.Bind<RoleUpdatedEvent>();
-                ep.Bind<UserDiscountUpdatedEvent>();
-                ep.Bind<CurrencyRateChangedEvent>();
-            });
-    });
+				ep.Bind<CurrencyCreatedEvent>();
+				ep.Bind<ProductUpdatedEvent>();
+				ep.Bind<RoleUpdatedEvent>();
+				ep.Bind<UserDiscountUpdatedEvent>();
+				ep.Bind<CurrencyRateChangedEvent>();
+			});
+	});
 });
 
-builder.Services
-    .AddPersistenceLayer()
-    .AddCacheLayer("main")
-    .AddApplicationCache()
-    .AddJsonSigner()
-    .AddSecretEncryptor()
-    .AddFullSecurityLayer()
-    .AddEComAuth(builder.Configuration)
-    .AddMailLayer()
-    .AddCommonLayer()
-    .AddS3()
-    .AddApplicationLayer(builder.Configuration)
-    .AddLocalization(builder.Configuration)
-    .AddExchangeRates();
+builder
+	.Services
+	.AddPersistenceLayer()
+	.AddCacheLayer("main")
+	.AddApplicationCache()
+	.AddJsonSigner()
+	.AddSecretEncryptor()
+	.AddFullSecurityLayer()
+	.AddEComAuth(builder.Configuration)
+	.AddMailLayer()
+	.AddCommonLayer()
+	.AddS3()
+	.AddApplicationLayer(builder.Configuration)
+	.AddLocalization(builder.Configuration)
+	.AddExchangeRates();
 
 builder.Services.AddCarter(
-    new DependencyContextAssemblyCatalog(
-        typeof(ProductsEndPoints).Assembly,
-        typeof(JobEndPoints).Assembly),
-    c => c.WithEmptyValidators());
+	new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly, typeof(JobEndPoints).Assembly),
+	c => c.WithEmptyValidators());
 
 builder.Services.AddGraphQlServices(serviceName);
 

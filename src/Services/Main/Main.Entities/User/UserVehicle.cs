@@ -9,102 +9,99 @@ namespace Main.Entities.User;
 
 public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserVehicle, Guid>
 {
-    public const int MaxPlateNumberLength = 32;
-    public const int MaxVinLength = 50;
-    public const int MaxCommentLength = 500;
+	public const int MaxPlateNumberLength = 32;
 
-    private UserVehicle() { }
+	public const int MaxVinLength = 50;
 
-    private UserVehicle(
-        Guid userId,
-        Guid vehicleId,
-        string plateNumber,
-        string? vin,
-        string? comment)
-    {
-        UserId = userId;
-        SetVehicle(vehicleId);
-        SetPlateNumber(plateNumber);
-        SetVin(vin);
-        SetComment(comment);
-    }
+	public const int MaxCommentLength = 500;
 
-    public Guid Id { get; private set; }
+	private UserVehicle()
+	{
+	}
 
-    public Guid UserId { get; private set; }
+	private UserVehicle(
+		Guid userId,
+		Guid vehicleId,
+		string plateNumber,
+		string? vin,
+		string? comment)
+	{
+		UserId = userId;
+		SetVehicle(vehicleId);
+		SetPlateNumber(plateNumber);
+		SetVin(vin);
+		SetComment(comment);
+	}
 
-    public Guid VehicleId { get; private set; }
+	public Guid Id { get; private set; }
 
-    public string? Vin { get; private set; }
+	public Guid UserId { get; }
 
-    public string PlateNumber { get; private set; } = null!;
+	public Guid VehicleId { get; private set; }
 
-    public string? Comment { get; private set; }
+	public string? Vin { get; private set; }
 
-    public User User { get; private set; } = null!;
+	public string PlateNumber { get; private set; } = null!;
 
-    public static Expression<Func<UserVehicle, Guid>> GetKeySelector() { return x => x.Id; }
+	public string? Comment { get; private set; }
 
-    public static Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
+	public User User { get; private set; } = null!;
 
-    internal static UserVehicle Create(
-        Guid userId,
-        Guid vehicleId,
-        string plateNumber,
-        string? vin = null,
-        string? comment = null)
-    {
-        return new UserVehicle(
-            userId,
-            vehicleId,
-            plateNumber,
-            vin,
-            comment);
-    }
+	public static Expression<Func<UserVehicle, Guid>> GetKeySelector() => x => x.Id;
 
-    public void SetVehicle(Guid vehicleId)
-    {
-        VehicleId = vehicleId.EnsureNotEqual(Guid.Empty, "user.vehicle.id.not.empty");
-    }
+	public static Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
 
-    public void SetPlateNumber(string plateNumber) { PlateNumber = NormalizePlateNumber(plateNumber); }
+	internal static UserVehicle Create(
+		Guid userId,
+		Guid vehicleId,
+		string plateNumber,
+		string? vin = null,
+		string? comment = null)
+	{
+		return new UserVehicle(
+			userId,
+			vehicleId,
+			plateNumber,
+			vin,
+			comment);
+	}
 
-    public void SetVin(string? vin) { Vin = NormalizeVin(vin); }
+	public void SetVehicle(Guid vehicleId) =>
+		VehicleId = vehicleId.EnsureNotEqual(Guid.Empty, "user.vehicle.id.not.empty");
 
-    public void SetComment(string? comment)
-    {
-        Comment = comment
-            .NullIfWhiteSpace()
-            ?
-            .EnsureMaxLength(MaxCommentLength, "user.vehicle.comment.max.length");
-    }
+	public void SetPlateNumber(string plateNumber) => PlateNumber = NormalizePlateNumber(plateNumber);
 
-    public static string NormalizePlateNumber(string plateNumber)
-    {
-        return plateNumber
-            .TrimSafe()
-            .EnsureNotNullOrWhiteSpace("user.vehicle.plate.number.not.empty")
-            .EnsureMaxLength(MaxPlateNumberLength, "user.vehicle.plate.number.max.length")
-            .ToUpperInvariant();
-    }
+	public void SetVin(string? vin) => Vin = NormalizeVin(vin);
 
-    public static string? NormalizeVin(string? vin)
-    {
-        return vin
-            .NullIfWhiteSpace()
-            ?
-            .EnsureMaxLength(MaxVinLength, "user.vehicle.vin.code.max.length")
-            .ToUpperInvariant();
-    }
+	public void SetComment(string? comment)
+	{
+		Comment = comment
+			.NullIfWhiteSpace()
+			?.EnsureMaxLength(MaxCommentLength, "user.vehicle.comment.max.length");
+	}
 
-    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public static string NormalizePlateNumber(string plateNumber)
+	{
+		return plateNumber
+			.TrimSafe()
+			.EnsureNotNullOrWhiteSpace("user.vehicle.plate.number.not.empty")
+			.EnsureMaxLength(MaxPlateNumberLength, "user.vehicle.plate.number.max.length")
+			.ToUpperInvariant();
+	}
 
-    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public static string? NormalizeVin(string? vin)
+	{
+		return vin
+			.NullIfWhiteSpace()
+			?.EnsureMaxLength(MaxVinLength, "user.vehicle.vin.code.max.length")
+			.ToUpperInvariant();
+	}
 
-    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
-    public override Guid GetId() { return Id; }
+	public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+	public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+	public override Guid GetId() => Id;
 }

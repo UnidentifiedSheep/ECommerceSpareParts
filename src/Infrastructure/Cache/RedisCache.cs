@@ -6,239 +6,205 @@ using StackExchange.Redis;
 
 namespace Cache;
 
-public class RedisCache(
-    IDatabase redis,
-    string? prefix = null
-) : ICache
+public class RedisCache(IDatabase redis, string? prefix = null) : ICache
 {
-    public Task<T?> GetAsync<T>(string key)
-        => redis.JSON().GetAsync<T>(GetWithPrefix(key));
-    
-    public async Task<IReadOnlyList<T?>> GetAsync<T>(IEnumerable<string> keys)
-    {
-        var redisResults = await redis.JSON()
-            .MGetAsync(
-                GetWithPrefixes(keys),
-                "$");
+	public Task<T?> GetAsync<T>(string key) => redis.JSON().GetAsync<T>(GetWithPrefix(key));
 
-        return redisResults.DeserializeMany<T>();
-    }
-    public async Task SetAsync<T>(
-        IEnumerable<(string key, T value)> keyValues,
-        TimeSpan? ttl = null)
-    {
-        var rawKeys = new HashSet<string>();
-        var values = keyValues
-            .Select(x =>
-            {
-                ArgumentNullException.ThrowIfNull(x.value);
-                rawKeys.Add(x.key);
-                return new KeyPathValue(
-                    GetWithPrefixString(x.key),
-                    "$",
-                    x.value);
-            })
-            .ToArray();
+	public async Task<IReadOnlyList<T?>> GetAsync<T>(IEnumerable<string> keys)
+	{
+		var redisResults = await redis.JSON().MGetAsync(GetWithPrefixes(keys), "$");
 
-        await redis.JSON().MSetAsync(values);
-        await SetExpireAsync(rawKeys, ttl);
-    }
-    public Task SetAsync<T>(
-        string key,
-        T value,
-        TimeSpan? ttl = null)
-        => SetAsync([(key, value)], ttl);
+		return redisResults.DeserializeMany<T>();
+	}
+	public async Task SetAsync<T>(IEnumerable<(string key, T value)> keyValues, TimeSpan? ttl = null)
+	{
+		var rawKeys = new HashSet<string>();
+		var values = keyValues
+			.Select(x =>
+			{
+				ArgumentNullException.ThrowIfNull(x.value);
+				rawKeys.Add(x.key);
+				return new KeyPathValue(
+					GetWithPrefixString(x.key),
+					"$",
+					x.value);
+			})
+			.ToArray();
 
-    public Task<bool> SetExpireAsync(
-        string key,
-        TimeSpan? ttl = null)
-    {
-        return SetExpireCore(
-            redis,
-            key,
-            ttl,
-            ExpireWhen.Always);
-    }
+		await redis.JSON().MSetAsync(values);
+		await SetExpireAsync(rawKeys, ttl);
+	}
+	public Task SetAsync<T>(
+		string key,
+		T value,
+		TimeSpan? ttl = null) => SetAsync([(key, value)], ttl);
 
-    public async Task<Dictionary<string, bool>> SetExpireAsync(
-        IEnumerable<string> keys,
-        TimeSpan? ttl = null)
-    {
-        var batch = redis.CreateBatch();
-        var keyedTasks = keys
-            .Distinct()
-            .Select(x => (x, SetExpireCore(
-                batch,
-                x,
-                ttl,
-                ExpireWhen.Always)))
-            .ToDictionary(x => x.x, x => x.Item2);
+	public Task<bool> SetExpireAsync(string key, TimeSpan? ttl = null)
+	{
+		return SetExpireCore(
+			redis,
+			key,
+			ttl,
+			ExpireWhen.Always);
+	}
 
-        batch.Execute();
-        await Task.WhenAll(keyedTasks.Values);
+	public async Task<Dictionary<string, bool>> SetExpireAsync(IEnumerable<string> keys, TimeSpan? ttl = null)
+	{
+		var batch = redis.CreateBatch();
+		var keyedTasks = keys
+			.Distinct()
+			.Select(x => (x, SetExpireCore(
+				batch,
+				x,
+				ttl,
+				ExpireWhen.Always)))
+			.ToDictionary(x => x.x, x => x.Item2);
 
-        return keyedTasks.ToDictionary(
-            x => x.Key,
-            x => x.Value.Result);
-    }
+		batch.Execute();
+		await Task.WhenAll(keyedTasks.Values);
 
-    public async Task<IEnumerable<T?>> GetEnumerableAsync<T>(string key)
-    {
-        if (!await redis.KeyExistsAsync(GetWithPrefix(key))) return [];
+		return keyedTasks.ToDictionary(x => x.Key, x => x.Value.Result);
+	}
 
-        return await redis.JSON().GetEnumerableAsync<T>(GetWithPrefix(key), "$[*]");
-    }
+	public async Task<IEnumerable<T?>> GetEnumerableAsync<T>(string key)
+	{
+		if (!await redis.KeyExistsAsync(GetWithPrefix(key)))
+			return [];
 
-    public Task<bool> KeyExistsAsync(string key) { return redis.KeyExistsAsync(GetWithPrefix(key)); }
-    public async Task<Dictionary<string, bool>> KeyExistsAsync(
-        IEnumerable<string> keys, 
-        CancellationToken token = default)
-    {
-        var batch = redis.CreateBatch();
+		return await redis.JSON().GetEnumerableAsync<T>(GetWithPrefix(key), "$[*]");
+	}
 
-        var tasks = keys
-            .Distinct()
-            .Select(x => (x, GetWithPrefix(x), batch.KeyExistsAsync(GetWithPrefix(x))))
-            .ToDictionary(x => x.x, x => x.Item3);
-        
-        batch.Execute();
+	public Task<bool> KeyExistsAsync(string key) => redis.KeyExistsAsync(GetWithPrefix(key));
 
-        await Task.WhenAll(tasks.Values);
+	public async Task<Dictionary<string, bool>> KeyExistsAsync(
+		IEnumerable<string> keys,
+		CancellationToken token = default)
+	{
+		var batch = redis.CreateBatch();
 
-        return tasks.ToDictionary(
-            x => x.Key,
-            x => x.Value.Result);
-    }
-    public async Task SetEnumerableAsync<T>(string key,
-        IEnumerable<T> values,
-        TimeSpan? ttl = null)
-    {
-        await redis.JSON()
-            .SetAsync(
-                GetWithPrefix(key),
-                "$",
-                values);
+		var tasks = keys
+			.Distinct()
+			.Select(x => (x, GetWithPrefix(x), batch.KeyExistsAsync(GetWithPrefix(x))))
+			.ToDictionary(x => x.x, x => x.Item3);
 
-        await SetExpireAsync(key, ttl);
-    }
+		batch.Execute();
 
-    public Task AddToSetAsync(
-        string key,
-        IEnumerable<string> values,
-        TimeSpan? ttl = null)
-    {
-        return AddToSetAsync(
-            new Dictionary<string, List<string>>
-            {
-                [key] = values.ToList()
-            },
-            ttl);
-    }
+		await Task.WhenAll(tasks.Values);
 
-    public Task RemoveKeysAsync(IEnumerable<string> keys)
-    {
-        return redis.KeyDeleteAsync(GetWithPrefixes(keys));
-    }
+		return tasks.ToDictionary(x => x.Key, x => x.Value.Result);
+	}
+	public async Task SetEnumerableAsync<T>(
+		string key,
+		IEnumerable<T> values,
+		TimeSpan? ttl = null)
+	{
+		await redis
+		.JSON()
+		.SetAsync(
+			GetWithPrefix(key),
+			"$",
+			values);
 
-    public Task RemoveKeyAsync(string key) { return redis.KeyDeleteAsync(GetWithPrefix(key)); }
+		await SetExpireAsync(key, ttl);
+	}
 
-    public async Task<string[]> GetFromSetAsync(string key)
-    {
-        var result = await redis.SetMembersAsync(GetWithPrefix(key));
-        return result
-            .Where(x => x.HasValue)
-            .Select(x => x.ToString())
-            .ToArray();
-    }
+	public Task AddToSetAsync(
+		string key,
+		IEnumerable<string> values,
+		TimeSpan? ttl = null)
+	{
+		return AddToSetAsync(
+			new Dictionary<string, List<string>>
+			{
+				[key] = values.ToList()
+			},
+			ttl);
+	}
 
-    public async Task<Dictionary<string, string[]>> GetFromManySetsAsync(IEnumerable<string> keys)
-    {
-        var distinctKeys = keys.Distinct().ToArray();
-        var batch = redis.CreateBatch();
-        var tasks = distinctKeys
-            .Select(key => batch.SetMembersAsync(GetWithPrefix(key)))
-            .ToList();
+	public Task RemoveKeysAsync(IEnumerable<string> keys) => redis.KeyDeleteAsync(GetWithPrefixes(keys));
 
-        batch.Execute();
-        await Task.WhenAll(tasks);
+	public Task RemoveKeyAsync(string key) => redis.KeyDeleteAsync(GetWithPrefix(key));
 
-        return distinctKeys.Zip(tasks.Select(x => x.Result))
-            .ToDictionary(
-                x => x.First,
-                x => x.Second
-                    .Where(z => z.HasValue)
-                    .Select(y => y.ToString())
-                    .ToArray());
-    }
+	public async Task<string[]> GetFromSetAsync(string key)
+	{
+		var result = await redis.SetMembersAsync(GetWithPrefix(key));
+		return result.Where(x => x.HasValue).Select(x => x.ToString()).ToArray();
+	}
 
-    public async Task AddToSetAsync(
-        Dictionary<string, List<string>> keyValues,
-        TimeSpan? ttl = null)
-    {
-        if (keyValues.Count == 0) return;
+	public async Task<Dictionary<string, string[]>> GetFromManySetsAsync(IEnumerable<string> keys)
+	{
+		var distinctKeys = keys.Distinct().ToArray();
+		var batch = redis.CreateBatch();
+		var tasks = distinctKeys.Select(key => batch.SetMembersAsync(GetWithPrefix(key))).ToList();
 
-        var batch = redis.CreateBatch();
-        var tasks = new List<Task>();
-        foreach (var (key, values) in keyValues)
-            tasks.Add(
-                AddToSetCore(
-                    batch,
-                    key,
-                    values));
+		batch.Execute();
+		await Task.WhenAll(tasks);
 
-        batch.Execute();
-        await Task.WhenAll(tasks);
+		return distinctKeys
+			.Zip(tasks.Select(x => x.Result))
+			.ToDictionary(
+				x => x.First,
+				x => x.Second.Where(z => z.HasValue).Select(y => y.ToString()).ToArray());
+	}
 
-        if (ttl.HasValue) await SetExpireAsync(keyValues.Keys, ttl);
-    }
+	public async Task AddToSetAsync(Dictionary<string, List<string>> keyValues, TimeSpan? ttl = null)
+	{
+		if (keyValues.Count == 0)
+			return;
 
-    public async Task<T?> GetDeleteAsync<T>(string key)
-    {
-        const string script =
-            """
-            local value = redis.call('JSON.GET', KEYS[1])
-            if value then
-                redis.call('DEL', KEYS[1])
-            end
-            return value
-            """;
-        var res = await redis.ScriptEvaluateAsync(
-            script,
-            [GetWithPrefix(key)]);
-        return res.Deserialize<T>();
-    }
+		var batch = redis.CreateBatch();
+		var tasks = new List<Task>();
+		foreach (var (key, values) in keyValues)
+			tasks.Add(
+				AddToSetCore(
+					batch,
+					key,
+					values));
 
-    private Task AddToSetCore(
-        IDatabaseAsync db,
-        string key,
-        IEnumerable<string> values)
-    {
-        return db.SetAddAsync(
-            GetWithPrefix(key),
-            values.Select(x => new RedisValue(x)).ToArray());
-    }
+		batch.Execute();
+		await Task.WhenAll(tasks);
 
-    private Task<bool> SetExpireCore(
-        IDatabaseAsync db,
-        string key,
-        TimeSpan? ttl,
-        ExpireWhen when)
-    {
-        return db.KeyExpireAsync(
-            GetWithPrefix(key),
-            ttl,
-            when);
-    }
+		if (ttl.HasValue)
+			await SetExpireAsync(keyValues.Keys, ttl);
+	}
 
-    private string GetWithPrefixString(string key)
-    {
-        return string.IsNullOrWhiteSpace(prefix) ? key : $"{prefix}:{key}";
-    }
+	public async Task<T?> GetDeleteAsync<T>(string key)
+	{
+		const string script = """
+							local value = redis.call('JSON.GET', KEYS[1])
+							if value then
+							    redis.call('DEL', KEYS[1])
+							end
+							return value
+							""";
+		var res = await redis.ScriptEvaluateAsync(script, [GetWithPrefix(key)]);
+		return res.Deserialize<T>();
+	}
 
-    private RedisKey GetWithPrefix(string key) { return GetWithPrefixString(key); }
+	private Task AddToSetCore(
+		IDatabaseAsync db,
+		string key,
+		IEnumerable<string> values)
+	{
+		return db.SetAddAsync(GetWithPrefix(key), values.Select(x => new RedisValue(x)).ToArray());
+	}
 
-    private RedisKey[] GetWithPrefixes(IEnumerable<string> keys)
-    {
-        return keys.Select(GetWithPrefix).ToArray();
-    }
+	private Task<bool> SetExpireCore(
+		IDatabaseAsync db,
+		string key,
+		TimeSpan? ttl,
+		ExpireWhen when)
+	{
+		return db.KeyExpireAsync(
+			GetWithPrefix(key),
+			ttl,
+			when);
+	}
+
+	private string GetWithPrefixString(string key) =>
+		string.IsNullOrWhiteSpace(prefix) ? key : $"{prefix}:{key}";
+
+	private RedisKey GetWithPrefix(string key) => GetWithPrefixString(key);
+
+	private RedisKey[] GetWithPrefixes(IEnumerable<string> keys) => keys.Select(GetWithPrefix).ToArray();
 }

@@ -5,43 +5,55 @@ namespace Pricing.Application.Static;
 
 public static class CacheKeys
 {
-    public static class Currency
-    {
-        public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
+	public static class Currency
+	{
+		public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
 
-        public static string CurrencyRate(int currencyId) { return $"currency:{currencyId}:rate"; }
-        public static string CurrencyIdByCode(string code) => $"currency:code:{code}";
-        public static string BaseCurrencyId => "currency:base";
-    }
+		public static string BaseCurrencyId => "currency:base";
 
-    public static class Offer
-    {
-        public static class Ok
-        {
-            public static TimeSpan Ttl(PricingSettingData setting) => setting.OfferTtl;
-            
-            public static string Key(Supplier supplier, int productId, string storageCode)
-                => $"offer:refresh:ok:{supplier.ToString()}:{productId}:{storageCode}";
-        }
-        
-        public static class Failed
-        {
-            public static readonly TimeSpan Ttl = TimeSpan.FromMinutes(5);
-            public static string Key(Supplier supplier, int productId, string storageCode)
-                => $"offer:refresh:failed:{supplier.ToString()}:{productId}:{storageCode}";
-        }
-        
-        public static class Lock
-        {
-            public static readonly TimeSpan Ttl = TimeSpan.FromSeconds(60);
-            public static string Key(Supplier supplier, int productId, string storageCode)
-                => $"offer:refresh:lock:{supplier.ToString()}:{productId}:{storageCode}";
-        }
-    }
+		public static string CurrencyRate(int currencyId) => $"currency:{currencyId}:rate";
 
-    public static class PriceAppliers
-    {
-        public static TimeSpan Ttl { get; } = TimeSpan.FromMinutes(60);
-        public static string ConfigurationKey => "price-appliers:configuration:v1";
-    }
+		public static string CurrencyIdByCode(string code) => $"currency:code:{code}";
+	}
+
+	public static class Offer
+	{
+		public static class Ok
+		{
+			public static TimeSpan Ttl(PricingSettingData setting) => setting.OfferTtl;
+
+			public static string Key(
+				Supplier supplier,
+				int productId,
+				string storageCode) => $"offer:refresh:ok:{supplier.ToString()}:{productId}:{storageCode}";
+		}
+
+		public static class Failed
+		{
+			public static readonly TimeSpan Ttl = TimeSpan.FromMinutes(5);
+
+			public static string Key(
+				Supplier supplier,
+				int productId,
+				string storageCode) =>
+				$"offer:refresh:failed:{supplier.ToString()}:{productId}:{storageCode}";
+		}
+
+		public static class Lock
+		{
+			public static readonly TimeSpan Ttl = TimeSpan.FromSeconds(60);
+
+			public static string Key(
+				Supplier supplier,
+				int productId,
+				string storageCode) => $"offer:refresh:lock:{supplier.ToString()}:{productId}:{storageCode}";
+		}
+	}
+
+	public static class PriceAppliers
+	{
+		public static TimeSpan Ttl { get; } = TimeSpan.FromMinutes(60);
+
+		public static string ConfigurationKey => "price-appliers:configuration:v1";
+	}
 }

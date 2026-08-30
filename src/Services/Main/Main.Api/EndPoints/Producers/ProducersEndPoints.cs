@@ -26,128 +26,125 @@ public record PatchProducerResponse(ProducerDto Producer);
 
 public record GetProducersRequest : PaginationQueryModel
 {
-    [FromQuery(Name = "searchTerm")]
-    public string? SearchTerm { get; init; }
+	[FromQuery(Name = "searchTerm")]
+	public string? SearchTerm { get; init; }
 
-    [FromQuery(Name = "ids")]
-    public int[] Ids { get; init; } = [];
+	[FromQuery(Name = "ids")]
+	public int[] Ids { get; init; } = [];
 }
 
 public class ProducersEndPoints : ICarterModule
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
-    {
-        var producers = app.MapGroup("/producers")
-            .WithTags("Producers");
+	public void AddRoutes(IEndpointRouteBuilder app)
+	{
+		var producers = app.MapGroup("/producers").WithTags("Producers");
 
-        producers.MapProducerAliasEndPoints();
-        producers.MapProducerSupplierMappingEndPoints();
+		producers.MapProducerAliasEndPoints();
+		producers.MapProducerSupplierMappingEndPoints();
 
-        producers.MapPost(
-                "",
-                async (
-                    ISender sender,
-                    CreateProducerRequest request,
-                    CancellationToken token) =>
-                {
-                    var result = await sender.Send(new CreateProducerCommand(request.NewProducer), token);
-                    var producer = await sender.Send(
-                        new GetProducersByIdsQuery(result.ProducerId),
-                        token);
+		producers
+			.MapPost(
+				"",
+				async (
+					ISender sender, CreateProducerRequest request,
+					CancellationToken token) =>
+				{
+					var result = await sender.Send(new CreateProducerCommand(request.NewProducer), token);
+					var producer = await sender.Send(new GetProducersByIdsQuery(result.ProducerId), token);
 
-                    return Results.Created(
-                        $"/producers/{result.ProducerId}",
-                        new CreateProducerResponse(producer.Producer));
-                })
-            .WithName("CreateProducer")
-            .WithSummary("Создать производителя")
-            .WithDescription("Добавление новых производителей в бд")
-            .WithDisplayName("Добавление производителей")
-            .Accepts<CreateProducerRequest>(false, "application/json")
-            .Produces<CreateProducerResponse>(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAnyPermission(PermissionCodes.PRODUCERS_CREATE);
+					return Results.Created(
+						$"/producers/{result.ProducerId}",
+						new CreateProducerResponse(producer.Producer));
+				})
+			.WithName("CreateProducer")
+			.WithSummary("Создать производителя")
+			.WithDescription("Добавление новых производителей в бд")
+			.WithDisplayName("Добавление производителей")
+			.Accepts<CreateProducerRequest>(false, "application/json")
+			.Produces<CreateProducerResponse>(StatusCodes.Status201Created)
+			.ProducesProblem(StatusCodes.Status400BadRequest)
+			.RequireAnyPermission(PermissionCodes.PRODUCERS_CREATE);
 
-        producers.MapPatch(
-                "/{producerId:int}",
-                async (
-                    ISender sender,
-                    int producerId,
-                    EditProducerRequest request,
-                    CancellationToken cancellationToken) =>
-                {
-                    var result = await sender
-                        .Send(new EditProducerCommand(producerId, request.EditProducer), cancellationToken);
-                    var producer = await sender.Send(
-                        new GetProducersByIdsQuery(result.ProducerId),
-                        cancellationToken);
+		producers
+			.MapPatch(
+				"/{producerId:int}",
+				async (
+					ISender sender, int producerId,
+					EditProducerRequest request, CancellationToken cancellationToken) =>
+				{
+					var result = await sender.Send(
+						new EditProducerCommand(producerId, request.EditProducer),
+						cancellationToken);
+					var producer = await sender.Send(
+						new GetProducersByIdsQuery(result.ProducerId),
+						cancellationToken);
 
-                    return Results.Ok(new PatchProducerResponse(producer.Producer));
-                })
-            .WithName("EditProducer")
-            .WithSummary("Редактировать производителя")
-            .WithDescription("Редактирование производителя")
-            .WithDisplayName("Редактирование производителя")
-            .Accepts<EditProducerRequest>(false, "application/json")
-            .Produces<PatchProducerResponse>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.PRODUCERS_EDIT);
+					return Results.Ok(new PatchProducerResponse(producer.Producer));
+				})
+			.WithName("EditProducer")
+			.WithSummary("Редактировать производителя")
+			.WithDescription("Редактирование производителя")
+			.WithDisplayName("Редактирование производителя")
+			.Accepts<EditProducerRequest>(false, "application/json")
+			.Produces<PatchProducerResponse>()
+			.ProducesProblem(StatusCodes.Status400BadRequest)
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.PRODUCERS_EDIT);
 
-        producers.MapDelete(
-                "/{id:int}",
-                async (
-                    ISender sender,
-                    int id,
-                    CancellationToken cancellationToken) =>
-                {
-                    await sender.Send(new DeleteProducerCommand(id), cancellationToken);
-                    return Results.Ok();
-                })
-            .WithName("DeleteProducer")
-            .WithSummary("Удалить производителя")
-            .WithDescription("Удаление производителя из бд")
-            .WithDisplayName("Удаление производителя")
-            .Produces(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.PRODUCERS_DELETE);
+		producers
+			.MapDelete(
+				"/{id:int}",
+				async (
+					ISender sender, int id,
+					CancellationToken cancellationToken) =>
+				{
+					await sender.Send(new DeleteProducerCommand(id), cancellationToken);
+					return Results.Ok();
+				})
+			.WithName("DeleteProducer")
+			.WithSummary("Удалить производителя")
+			.WithDescription("Удаление производителя из бд")
+			.WithDisplayName("Удаление производителя")
+			.Produces(StatusCodes.Status200OK)
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.PRODUCERS_DELETE);
 
-        producers.MapGet(
-                "",
-                async (
-                    ISender sender,
-                    [AsParameters] GetProducersRequest request,
-                    CancellationToken ct) =>
-                {
-                    var result = await sender.Send(
-                        new GetProducersQuery(
-                            request.SearchTerm,
-                            request.Ids,
-                            request),
-                        ct);
-                    return Results.Ok(new GetProducersResponse(result.Producers));
-                })
-            .WithName("GetProducers")
-            .WithSummary("Получить производителей")
-            .WithDescription("Получение производителей по ключевому слову либо списком")
-            .Produces<GetProducersResponse>()
-            .ProducesProblem(StatusCodes.Status400BadRequest);
+		producers
+			.MapGet(
+				"",
+				async (
+					ISender sender, [AsParameters] GetProducersRequest request,
+					CancellationToken ct) =>
+				{
+					var result = await sender.Send(
+						new GetProducersQuery(
+							request.SearchTerm,
+							request.Ids,
+							request),
+						ct);
+					return Results.Ok(new GetProducersResponse(result.Producers));
+				})
+			.WithName("GetProducers")
+			.WithSummary("Получить производителей")
+			.WithDescription("Получение производителей по ключевому слову либо списком")
+			.Produces<GetProducersResponse>()
+			.ProducesProblem(StatusCodes.Status400BadRequest);
 
-        producers.MapGet(
-                "/{id:int}",
-                async (
-                    ISender sender,
-                    int id,
-                    CancellationToken ct) =>
-                {
-                    var result = await sender.Send(new GetProducersByIdsQuery(id), ct);
-                    return Results.Ok(new GetProducerByIdResponse(result.Producer));
-                })
-            .WithName("GetProducerById")
-            .WithSummary("Получить производителя по id")
-            .WithDisplayName("Получение производителя по Id")
-            .WithDescription("Получение производителя по Id")
-            .Produces<GetProducerByIdResponse>()
-            .ProducesProblem(StatusCodes.Status404NotFound);
-    }
+		producers
+			.MapGet(
+				"/{id:int}",
+				async (
+					ISender sender, int id,
+					CancellationToken ct) =>
+				{
+					var result = await sender.Send(new GetProducersByIdsQuery(id), ct);
+					return Results.Ok(new GetProducerByIdResponse(result.Producer));
+				})
+			.WithName("GetProducerById")
+			.WithSummary("Получить производителя по id")
+			.WithDisplayName("Получение производителя по Id")
+			.WithDescription("Получение производителя по Id")
+			.Produces<GetProducerByIdResponse>()
+			.ProducesProblem(StatusCodes.Status404NotFound);
+	}
 }

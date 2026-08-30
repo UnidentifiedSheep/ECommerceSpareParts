@@ -2,6 +2,7 @@
 
 public enum UserPartyType
 {
-    User,
-    System
+	User,
+
+	System
 }

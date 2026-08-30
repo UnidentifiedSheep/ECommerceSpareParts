@@ -1,10 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Enums;
 using Enums.Units;
 using Extensions;
 using Main.Entities.DomainEvents.Product;
@@ -13,102 +11,107 @@ namespace Main.Entities.Product;
 
 public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, int>
 {
-    private ProductSize() { }
+	private ProductSize()
+	{
+	}
 
-    private ProductSize(
-        int productId,
-        decimal length,
-        decimal width,
-        decimal height,
-        DimensionUnit unit)
-    {
-        ProductId = productId;
-        SetLength(length);
-        SetWidth(width);
-        SetHeight(height);
-        SetUnit(unit);
-    }
+	private ProductSize(
+		int productId,
+		decimal length,
+		decimal width,
+		decimal height,
+		DimensionUnit unit)
+	{
+		ProductId = productId;
+		SetLength(length);
+		SetWidth(width);
+		SetHeight(height);
+		SetUnit(unit);
+	}
 
-    [Validate]
-    public int ProductId { get; }
+	[Validate]
+	public int ProductId { get; }
 
-    public decimal Length { get; private set; }
+	public decimal Length { get; private set; }
 
-    public decimal Width { get; private set; }
+	public decimal Width { get; private set; }
 
-    public decimal Height { get; private set; }
+	public decimal Height { get; private set; }
 
-    public DimensionUnit Unit { get; private set; }
+	public DimensionUnit Unit { get; private set; }
 
-    public decimal VolumeM3 { get; private set; }
+	public decimal VolumeM3 { get; private set; }
 
-    public static Expression<Func<ProductSize, int>> GetKeySelector() { return x => x.ProductId; }
+	public static Expression<Func<ProductSize, int>> GetKeySelector() => x => x.ProductId;
 
-    public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.ProductId == key;
-    }
+	public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key) => x =>
+		x.ProductId == key;
 
-    public static ProductSize Create(
-        int productId,
-        decimal length,
-        decimal width,
-        decimal height,
-        DimensionUnit unit)
-    {
-        var size = new ProductSize(
-            productId,
-            length,
-            width,
-            height,
-            unit);
-        return size;
-    }
+	public static ProductSize Create(
+		int productId,
+		decimal length,
+		decimal width,
+		decimal height,
+		DimensionUnit unit)
+	{
+		var size = new ProductSize(
+			productId,
+			length,
+			width,
+			height,
+			unit);
+		return size;
+	}
 
-    public void SetLength(decimal length)
-    {
-        length.EnsureGreaterThan(0, "article.size.length.must.be.greater.than.zero")
-            .EnsureMaxDecimalPlaces(2, "article.size.length.max.two.decimals");
+	public void SetLength(decimal length)
+	{
+		length
+			.EnsureGreaterThan(0, "article.size.length.must.be.greater.than.zero")
+			.EnsureMaxDecimalPlaces(2, "article.size.length.max.two.decimals");
 
-        Length = length;
-        RecalculateVolume();
-    }
+		Length = length;
+		RecalculateVolume();
+	}
 
-    public void SetWidth(decimal width)
-    {
-        width.EnsureGreaterThan(0, "article.size.width.must.be.greater.than.zero")
-            .EnsureMaxDecimalPlaces(2, "article.size.width.max.two.decimals");
-        Width = width;
-        RecalculateVolume();
-    }
+	public void SetWidth(decimal width)
+	{
+		width
+			.EnsureGreaterThan(0, "article.size.width.must.be.greater.than.zero")
+			.EnsureMaxDecimalPlaces(2, "article.size.width.max.two.decimals");
+		Width = width;
+		RecalculateVolume();
+	}
 
-    public void SetHeight(decimal height)
-    {
-        height.EnsureGreaterThan(0, "article.size.height.must.be.greater.than.zero")
-            .EnsureMaxDecimalPlaces(2, "article.size.height.max.two.decimals");
+	public void SetHeight(decimal height)
+	{
+		height
+			.EnsureGreaterThan(0, "article.size.height.must.be.greater.than.zero")
+			.EnsureMaxDecimalPlaces(2, "article.size.height.max.two.decimals");
 
-        Height = height;
-        RecalculateVolume();
-    }
+		Height = height;
+		RecalculateVolume();
+	}
 
-    public void SetUnit(DimensionUnit unit)
-    {
-        Unit = unit;
-        RecalculateVolume();
-    }
+	public void SetUnit(DimensionUnit unit)
+	{
+		Unit = unit;
+		RecalculateVolume();
+	}
 
-    private void RecalculateVolume()
-    {
-        VolumeM3 = DimensionExtensions.ToCubicMeters(
-            Length,
-            Width,
-            Height,
-            Unit);
-    }
+	private void RecalculateVolume()
+	{
+		VolumeM3 = DimensionExtensions.ToCubicMeters(
+			Length,
+			Width,
+			Height,
+			Unit);
+	}
 
-    public override void OnUpdated() => AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
-    public override void OnCreated() => OnUpdated();
-    public override void OnDeleted() => OnUpdated();
+	public override void OnUpdated() => AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
 
-    public override int GetId() { return ProductId; }
+	public override void OnCreated() => OnUpdated();
+
+	public override void OnDeleted() => OnUpdated();
+
+	public override int GetId() => ProductId;
 }

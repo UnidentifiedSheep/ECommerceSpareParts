@@ -1,10 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Enums;
 using Enums.Units;
 using Main.Entities.DomainEvents.Product;
 
@@ -12,61 +10,64 @@ namespace Main.Entities.Product;
 
 public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeight, int>
 {
-    private ProductWeight() { }
+	private ProductWeight()
+	{
+	}
 
-    private ProductWeight(
-        int productId,
-        decimal weight,
-        WeightUnit unit)
-    {
-        ValidateWeight(weight);
+	private ProductWeight(
+		int productId,
+		decimal weight,
+		WeightUnit unit)
+	{
+		ValidateWeight(weight);
 
-        ProductId = productId;
-        Weight = weight;
-        Unit = unit;
-    }
+		ProductId = productId;
+		Weight = weight;
+		Unit = unit;
+	}
 
-    [Validate]
-    public int ProductId { get; }
+	[Validate]
+	public int ProductId { get; }
 
-    public decimal Weight { get; private set; }
+	public decimal Weight { get; private set; }
 
-    public WeightUnit Unit { get; private set; }
+	public WeightUnit Unit { get; private set; }
 
-    public static Expression<Func<ProductWeight, int>> GetKeySelector() { return x => x.ProductId; }
+	public static Expression<Func<ProductWeight, int>> GetKeySelector() => x => x.ProductId;
 
-    public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.ProductId == key;
-    }
+	public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key) => x =>
+		x.ProductId == key;
 
-    public static ProductWeight Create(
-        int productId,
-        decimal weight,
-        WeightUnit unit)
-    {
-        return new ProductWeight(
-            productId,
-            weight,
-            unit);
-    }
+	public static ProductWeight Create(
+		int productId,
+		decimal weight,
+		WeightUnit unit)
+	{
+		return new ProductWeight(
+			productId,
+			weight,
+			unit);
+	}
 
-    public void Update(decimal weight, WeightUnit unit)
-    {
-        ValidateWeight(weight);
-        Weight = weight;
-        Unit = unit;
-    }
+	public void Update(decimal weight, WeightUnit unit)
+	{
+		ValidateWeight(weight);
+		Weight = weight;
+		Unit = unit;
+	}
 
-    public override void OnCreated() => AddDomainEvent(new ProductWeightUpdatedDomainEvent(ProductId));
-    public override void OnUpdated() => OnCreated();
-    public override void OnDeleted() => OnCreated();
+	public override void OnCreated() => AddDomainEvent(new ProductWeightUpdatedDomainEvent(ProductId));
 
-    public override int GetId() { return ProductId; }
+	public override void OnUpdated() => OnCreated();
 
-    private static void ValidateWeight(decimal weight)
-    {
-        weight.EnsureGreaterThan(0, "article.weight.must.be.greater.than.zero")
-            .EnsureMaxDecimalPlaces(2, "article.weight.max.two.decimals");
-    }
+	public override void OnDeleted() => OnCreated();
+
+	public override int GetId() => ProductId;
+
+	private static void ValidateWeight(decimal weight)
+	{
+		weight
+			.EnsureGreaterThan(0, "article.weight.must.be.greater.than.zero")
+			.EnsureMaxDecimalPlaces(2, "article.weight.max.two.decimals");
+	}
 }

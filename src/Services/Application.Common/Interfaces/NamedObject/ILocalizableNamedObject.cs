@@ -2,6 +2,7 @@
 
 public interface ILocalizableNamedObject : INamedObject
 {
-    string NameLocalizationKey { get; }
-    string DescriptionLocalizationKey { get; }
+	string NameLocalizationKey { get; }
+
+	string DescriptionLocalizationKey { get; }
 }

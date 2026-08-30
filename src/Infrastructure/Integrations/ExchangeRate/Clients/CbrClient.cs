@@ -8,17 +8,19 @@ namespace ExchangeRate.Clients;
 
 public class CbrClient(HttpClient client) : IExchangeRateClient
 {
-    public ExchangeRateProvider Provider => ExchangeRateProvider.Cbr;
+	public ExchangeRateProvider Provider => ExchangeRateProvider.Cbr;
 
-    public async Task<ExchangeRates> GetRates(CancellationToken cancellationToken = default)
-    {
-        var response = await client.GetAsync("", cancellationToken);
-        if (!response.IsSuccessStatusCode) throw new Exception("Ошибка при получении курсов валют от ЦБР");
+	public async Task<ExchangeRates> GetRates(CancellationToken cancellationToken = default)
+	{
+		var response = await client.GetAsync("", cancellationToken);
+		if (!response.IsSuccessStatusCode)
+			throw new Exception("Ошибка при получении курсов валют от ЦБР");
 
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        var result = JsonSerializer.Deserialize<CbrRatesResponse>(json);
+		var json = await response.Content.ReadAsStringAsync(cancellationToken);
+		var result = JsonSerializer.Deserialize<CbrRatesResponse>(json);
 
-        if (result == null) throw new Exception("Сервер вернул пустой ответ.");
-        return new ExchangeRates(result.Base, result.Rates);
-    }
+		if (result == null)
+			throw new Exception("Сервер вернул пустой ответ.");
+		return new ExchangeRates(result.Base, result.Rates);
+	}
 }

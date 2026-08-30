@@ -6,10 +6,8 @@ using MassTransit;
 namespace Analytics.Application.Consumers;
 
 public class PurchaseDeletedConsumer(IFactSynchronizer<PurchasesFact, Guid> synchronizer)
-    : IConsumer<PurchaseDeleteEvent>
+	: IConsumer<PurchaseDeleteEvent>
 {
-    public async Task Consume(ConsumeContext<PurchaseDeleteEvent> context)
-    {
-        await synchronizer.SynchronizeAsync(context.Message.PurchaseId);
-    }
+	public async Task Consume(ConsumeContext<PurchaseDeleteEvent> context) =>
+		await synchronizer.SynchronizeAsync(context.Message.PurchaseId);
 }

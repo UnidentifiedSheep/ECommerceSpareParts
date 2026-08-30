@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Main.Entities.DomainEvents.Producer;
@@ -10,82 +9,86 @@ namespace Main.Entities.Producer;
 
 public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, int>
 {
-    private readonly List<ProducerAlias> _aliases = [];
-    private readonly List<ProducerSupplierMapping> _supplierMappings = [];
+	private readonly List<ProducerAlias> _aliases = [];
 
-    private Producer() { }
+	private readonly List<ProducerSupplierMapping> _supplierMappings = [];
 
-    private Producer(
-        string name,
-        string? description = null,
-        string? imagePath = null)
-    {
-        SetName(name);
-        SetImagePath(imagePath);
-        SetDescription(description);
-    }
+	private Producer()
+	{
+	}
 
-    [Validate]
-    public int Id { get; private set; }
+	private Producer(
+		string name,
+		string? description = null,
+		string? imagePath = null)
+	{
+		SetName(name);
+		SetImagePath(imagePath);
+		SetDescription(description);
+	}
 
-    [Validate]
-    public string Name { get; private set; } = null!;
+	[Validate]
+	public int Id { get; private set; }
 
-    public string? ImagePath { get; private set; }
+	[Validate]
+	public string Name { get; private set; } = null!;
 
-    public string? Description { get; private set; }
-    public IReadOnlyCollection<ProducerAlias> Aliases => _aliases;
-    public IReadOnlyCollection<ProducerSupplierMapping> SupplierMappings => _supplierMappings;
+	public string? ImagePath { get; private set; }
 
-    public static Expression<Func<Producer, int>> GetKeySelector() { return x => x.Id; }
+	public string? Description { get; private set; }
 
-    public static Expression<Func<Producer, bool>> GetEqualityExpression(int key) { return x => x.Id == key; }
+	public IReadOnlyCollection<ProducerAlias> Aliases => _aliases;
 
-    public static Producer Create(
-        string name,
-        string? description = null,
-        string? imagePath = null)
-    {
-        return new Producer(
-            name,
-            description,
-            imagePath);
-    }
+	public IReadOnlyCollection<ProducerSupplierMapping> SupplierMappings => _supplierMappings;
 
-    public void SetImagePath(string? imagePath)
-    {
-        imagePath = imagePath?.Trim()
-            .EnsureMaxLength(255, "producer.image.too.long");
+	public static Expression<Func<Producer, int>> GetKeySelector() => x => x.Id;
 
-        ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
-    }
+	public static Expression<Func<Producer, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 
-    public void SetDescription(string? description)
-    {
-        description = description?.Trim()
-            .EnsureMaxLength(500, "producer.description.max.length");
+	public static Producer Create(
+		string name,
+		string? description = null,
+		string? imagePath = null)
+	{
+		return new Producer(
+			name,
+			description,
+			imagePath);
+	}
 
-        Description = string.IsNullOrEmpty(description) ? null : description;
-    }
-    
-    public void SetName(string name)
-    {
-        var value = name.Trim();
+	public void SetImagePath(string? imagePath)
+	{
+		imagePath = imagePath?.Trim().EnsureMaxLength(255, "producer.image.too.long");
 
-        value.EnsureNotNullOrWhiteSpace("producer.name.not.empty")
-            .EnsureMinLength(2, "producer.name.min.length")
-            .EnsureMaxLength(64, "producer.name.max.length");
+		ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
+	}
 
-        Name = ToNormalizedName(value);
-    }
+	public void SetDescription(string? description)
+	{
+		description = description?.Trim().EnsureMaxLength(500, "producer.description.max.length");
 
-    public override void OnDeleted() => AddDomainEvent(new ProducerDeletedDomainEvent(Id));
+		Description = string.IsNullOrEmpty(description) ? null : description;
+	}
 
-    public override void OnCreated() => AddDomainEvent(new ProducerCreatedDomainEvent(this));
+	public void SetName(string name)
+	{
+		var value = name.Trim();
 
-    public override void OnUpdated() => AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
+		value
+			.EnsureNotNullOrWhiteSpace("producer.name.not.empty")
+			.EnsureMinLength(2, "producer.name.min.length")
+			.EnsureMaxLength(64, "producer.name.max.length");
 
-    public static string ToNormalizedName(string value) { return value.Trim().ToUpperInvariant(); }
+		Name = ToNormalizedName(value);
+	}
 
-    public override int GetId() { return Id; }
+	public override void OnDeleted() => AddDomainEvent(new ProducerDeletedDomainEvent(Id));
+
+	public override void OnCreated() => AddDomainEvent(new ProducerCreatedDomainEvent(this));
+
+	public override void OnUpdated() => AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
+
+	public static string ToNormalizedName(string value) => value.Trim().ToUpperInvariant();
+
+	public override int GetId() => Id;
 }

@@ -7,12 +7,13 @@ namespace Exceptions.Base;
 
 public class ValidationException : Exception, IStatusCode
 {
-    public ValidationException(IEnumerable<ValidationErrorModel> errors)
-        : base("Не удалось валидировать данные")
-    {
-        Errors = errors.ToImmutableList();
-    }
+	public ValidationException(IEnumerable<ValidationErrorModel> errors) : base(
+		"Не удалось валидировать данные")
+	{
+		Errors = errors.ToImmutableList();
+	}
 
-    public ImmutableList<ValidationErrorModel> Errors { get; }
-    public HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
+	public ImmutableList<ValidationErrorModel> Errors { get; }
+
+	public HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
 }

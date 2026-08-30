@@ -7,10 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Core\Enums\Enums.csproj" />
-      <ProjectReference Include="..\..\Integrations.Client.Core\Integrations.Client.Core.csproj" />
-      <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj" />
-      <ProjectReference Include="..\Integrations.Supplier\Integrations.Supplier.csproj" />
+        <ProjectReference Include="..\..\..\..\Core\Enums\Enums.csproj"/>
+        <ProjectReference Include="..\..\Integrations.Client.Core\Integrations.Client.Core.csproj"/>
+        <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj"/>
+        <ProjectReference Include="..\Integrations.Supplier\Integrations.Supplier.csproj"/>
     </ItemGroup>
 
 </Project>

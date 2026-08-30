@@ -7,69 +7,68 @@ namespace Application.Common.Extensions;
 
 public static class ProjectionServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterProjectionProviders<TAssemblyMarker>(
-        this IServiceCollection services)
-    {
-        return services.RegisterProjectionProviders(typeof(TAssemblyMarker).Assembly);
-    }
+	public static IServiceCollection RegisterProjectionProviders<TAssemblyMarker>(
+		this IServiceCollection services) =>
+		services.RegisterProjectionProviders(typeof(TAssemblyMarker).Assembly);
 
-    public static IServiceCollection RegisterProjectionProviders(
-        this IServiceCollection services,
-        params Assembly[] assemblies)
-    {
-        ArgumentNullException.ThrowIfNull(assemblies);
-        if (assemblies.Length == 0)
-            throw new ArgumentException("At least one assembly is required.", nameof(assemblies));
+	public static IServiceCollection RegisterProjectionProviders(
+		this IServiceCollection services,
+		params Assembly[] assemblies)
+	{
+		ArgumentNullException.ThrowIfNull(assemblies);
+		if (assemblies.Length == 0)
+			throw new ArgumentException("At least one assembly is required.", nameof(assemblies));
 
-        var projectionProviderType = typeof(IProjectionProvider<,>);
-        var registrations = new Dictionary<Type, (Type Implementation, ServiceLifetime Lifetime)>();
+		var projectionProviderType = typeof(IProjectionProvider<,>);
+		var registrations = new Dictionary<Type, (Type Implementation, ServiceLifetime Lifetime)>();
 
-        foreach (var implementation in assemblies
-                     .Distinct()
-                     .SelectMany(x => x.DefinedTypes)
-                     .Where(x => x is { IsClass: true, IsAbstract: false }))
-        {
-            var servicesToRegister = implementation.ImplementedInterfaces
-                .Where(x => x.IsGenericType &&
-                            x.GetGenericTypeDefinition() == projectionProviderType)
-                .ToList();
+		foreach (var implementation in assemblies
+					.Distinct()
+					.SelectMany(x => x.DefinedTypes)
+					.Where(x => x is { IsClass: true, IsAbstract: false }))
+		{
+			var servicesToRegister = implementation
+				.ImplementedInterfaces
+				.Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == projectionProviderType)
+				.ToList();
 
-            if (servicesToRegister.Count == 0)
-                continue;
+			if (servicesToRegister.Count == 0)
+				continue;
 
-            var lifetime = implementation.GetCustomAttribute<LifetimeAttribute>()?.Lifetime
-                           ?? throw new InvalidOperationException(
-                               $"Projection provider {implementation.FullName} must have " +
-                               $"{nameof(LifetimeAttribute)}.");
+			var lifetime = implementation.GetCustomAttribute<LifetimeAttribute>()?.Lifetime ??
+				throw new InvalidOperationException(
+					$"Projection provider {implementation.FullName} must have " +
+					$"{nameof(LifetimeAttribute)}.");
 
-            foreach (var service in servicesToRegister)
-            {
-                if (registrations.TryAdd(
-                        service, 
-                        (implementation.AsType(), ToServiceLifetime(lifetime)))) 
-                    continue;
-                var existing = registrations[service].Implementation;
-                throw new InvalidOperationException(
-                    $"Multiple projection providers are registered for {service}: " +
-                    $"{existing.FullName}, {implementation.FullName}.");
-            }
-        }
+			foreach (var service in servicesToRegister)
+			{
+				if (registrations.TryAdd(service, (implementation.AsType(), ToServiceLifetime(lifetime))))
+					continue;
+				var existing = registrations[service].Implementation;
+				throw new InvalidOperationException(
+					$"Multiple projection providers are registered for {service}: " +
+					$"{existing.FullName}, {implementation.FullName}.");
+			}
+		}
 
-        foreach (var (service, registration) in registrations)
-            services.Add(new ServiceDescriptor(
-                service,
-                registration.Implementation,
-                registration.Lifetime));
+		foreach (var (service, registration) in registrations)
+			services.Add(
+				new ServiceDescriptor(
+					service,
+					registration.Implementation,
+					registration.Lifetime));
 
-        return services;
-    }
+		return services;
+	}
 
-    private static ServiceLifetime ToServiceLifetime(Lifetime lifetime)
-        => lifetime switch
-        {
-            Lifetime.Singleton => ServiceLifetime.Singleton,
-            Lifetime.Scoped => ServiceLifetime.Scoped,
-            Lifetime.Transient => ServiceLifetime.Transient,
-            _ => throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null)
-        };
+	private static ServiceLifetime ToServiceLifetime(Lifetime lifetime) => lifetime switch
+	{
+		Lifetime.Singleton => ServiceLifetime.Singleton,
+		Lifetime.Scoped => ServiceLifetime.Scoped,
+		Lifetime.Transient => ServiceLifetime.Transient,
+		_ => throw new ArgumentOutOfRangeException(
+			nameof(lifetime),
+			lifetime,
+			null)
+	};
 }

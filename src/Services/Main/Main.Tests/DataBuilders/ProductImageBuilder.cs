@@ -6,23 +6,21 @@ namespace Tests.DataBuilders;
 
 public class ProductImageBuilder(Faker faker) : BuilderBase<ProductImage>(faker)
 {
-    private int _productId = 1;
-    private string _extension = ".webp";
+	private string _extension = ".webp";
 
-    public ProductImageBuilder WithProductId(int productId)
-    {
-        _productId = productId;
-        return this;
-    }
+	private int _productId = 1;
 
-    public ProductImageBuilder WithExtension(string extension)
-    {
-        _extension = extension;
-        return this;
-    }
+	public ProductImageBuilder WithProductId(int productId)
+	{
+		_productId = productId;
+		return this;
+	}
 
-    public override ProductImage Build()
-    {
-        return ProductImage.Create(_productId, _extension);
-    }
+	public ProductImageBuilder WithExtension(string extension)
+	{
+		_extension = extension;
+		return this;
+	}
+
+	public override ProductImage Build() => ProductImage.Create(_productId, _extension);
 }

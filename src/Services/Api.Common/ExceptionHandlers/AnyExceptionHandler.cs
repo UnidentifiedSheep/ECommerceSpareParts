@@ -4,48 +4,48 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class AnyExceptionHandler(
-    ILogger<AnyExceptionHandler> logger
-) : ExceptionHandlerBase<AnyExceptionHandler>(logger)
+public class AnyExceptionHandler(ILogger<AnyExceptionHandler> logger)
+	: ExceptionHandlerBase<AnyExceptionHandler>(logger)
 {
-    public override async ValueTask<bool> TryHandleAsync(
-        HttpContext httpContext,
-        Exception exception,
-        CancellationToken cancellationToken)
-    {
-        LogError(httpContext, exception);
-        var statusCode = GetStatusCode(exception);
+	public override async ValueTask<bool> TryHandleAsync(
+		HttpContext httpContext,
+		Exception exception,
+		CancellationToken cancellationToken)
+	{
+		LogError(httpContext, exception);
+		var statusCode = GetStatusCode(exception);
 
-        var problemDetails = GetBaseDetails(
-            exception,
-            httpContext,
-            statusCode);
-        if (statusCode == StatusCodes.Status500InternalServerError)
-            problemDetails.Detail = nameof(InternalServerException);
+		var problemDetails = GetBaseDetails(
+			exception,
+			httpContext,
+			statusCode);
+		if (statusCode == StatusCodes.Status500InternalServerError)
+			problemDetails.Detail = nameof(InternalServerException);
 
-        SetLocalizedDetail(
-            problemDetails,
-            httpContext,
-            exception);
-        AddExceptionRelatedData(problemDetails, exception);
+		SetLocalizedDetail(
+			problemDetails,
+			httpContext,
+			exception);
+		AddExceptionRelatedData(problemDetails, exception);
 
-        httpContext.Response.StatusCode = statusCode;
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-        return true;
-    }
+		httpContext.Response.StatusCode = statusCode;
+		await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+		return true;
+	}
 
-    private void SetLocalizedDetail(
-        ProblemDetails problemDetails,
-        HttpContext httpContext,
-        Exception exception)
-    {
-        var localizer = httpContext.RequestServices.GetService<IScopedStringLocalizer>();
-        if (localizer == null) return;
+	private void SetLocalizedDetail(
+		ProblemDetails problemDetails,
+		HttpContext httpContext,
+		Exception exception)
+	{
+		var localizer = httpContext.RequestServices.GetService<IContextualStringLocalizer>();
+		if (localizer == null)
+			return;
 
-        if (TryGetLocalizableMessageFromException(
-                localizer,
-                exception,
-                out var localizedMessage))
-            problemDetails.Detail = localizedMessage;
-    }
+		if (TryGetLocalizableMessageFromException(
+				localizer,
+				exception,
+				out var localizedMessage))
+			problemDetails.Detail = localizedMessage;
+	}
 }

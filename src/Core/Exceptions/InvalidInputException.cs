@@ -5,15 +5,16 @@ namespace Exceptions;
 
 public class InvalidInputException : BadRequestException, ILocalizableException
 {
-    public InvalidInputException(
-        string key,
-        object[]? arguments = null,
-        string? message = null) : base(message)
-    {
-        MessageKey = key;
-        Arguments = arguments;
-    }
+	public InvalidInputException(
+		string key,
+		object[]? arguments = null,
+		string? message = null) : base(message)
+	{
+		MessageKey = key;
+		Arguments = arguments;
+	}
 
-    public string MessageKey { get; }
-    public object[]? Arguments { get; }
+	public string MessageKey { get; }
+
+	public object[]? Arguments { get; }
 }

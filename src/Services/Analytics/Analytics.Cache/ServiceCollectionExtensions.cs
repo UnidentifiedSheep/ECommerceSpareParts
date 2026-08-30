@@ -5,10 +5,10 @@ namespace Analytics.Cache;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddApplicationCache(this IServiceCollection services)
-    {
-        services.AddScoped<ICurrencyCacheRepository, CurrencyCacheRepository>();
+	public static IServiceCollection AddApplicationCache(this IServiceCollection services)
+	{
+		services.AddScoped<ICurrencyCacheRepository, CurrencyCacheRepository>();
 
-        return services;
-    }
+		return services;
+	}
 }

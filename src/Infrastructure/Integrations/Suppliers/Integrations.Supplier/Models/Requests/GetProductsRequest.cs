@@ -2,9 +2,11 @@ namespace Integrations.Supplier.Models.Requests;
 
 public record GetProductsRequest
 {
-    public required string StorageCode { get; init; }
-    public required string Number { get; init; }
-    public string? Brand { get; init; }
+	public required string StorageCode { get; init; }
 
-    public bool ShowAnalogues { get; init; }
+	public required string Number { get; init; }
+
+	public string? Brand { get; init; }
+
+	public bool ShowAnalogues { get; init; }
 }

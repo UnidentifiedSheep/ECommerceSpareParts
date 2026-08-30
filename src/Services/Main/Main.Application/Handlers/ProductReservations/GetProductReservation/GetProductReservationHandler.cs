@@ -9,26 +9,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductReservations.GetProductReservation;
 
-public record GetProductReservationQuery(int ReservationId)
-    : IQuery<GetProductReservationResult>;
+public record GetProductReservationQuery(int ReservationId) : IQuery<GetProductReservationResult>;
 
 public record GetProductReservationResult(ProductReservationDto Reservation);
 
 public class GetProductReservationHandler(
-    IReadRepository<ProductReservation, int> repository,
-    IProjectionProvider<ProductReservation, ProductReservationDto> projection)
-    : IQueryHandler<GetProductReservationQuery, GetProductReservationResult>
+	IReadRepository<ProductReservation, int> repository,
+	IProjectionProvider<ProductReservation, ProductReservationDto> projection)
+	: IQueryHandler<GetProductReservationQuery, GetProductReservationResult>
 {
-    public async Task<GetProductReservationResult> Handle(
-        GetProductReservationQuery request,
-        CancellationToken cancellationToken)
-    {
-        var reservation = await repository.Query
-            .Where(x => x.Id == request.ReservationId)
-            .Project(projection)
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new ReservationNotFoundException(request.ReservationId);
+	public async Task<GetProductReservationResult> Handle(
+		GetProductReservationQuery request,
+		CancellationToken cancellationToken)
+	{
+		var reservation =
+			await repository
+				.Query
+				.Where(x => x.Id == request.ReservationId)
+				.Project(projection)
+				.FirstOrDefaultAsync(cancellationToken) ??
+			throw new ReservationNotFoundException(request.ReservationId);
 
-        return new GetProductReservationResult(reservation);
-    }
+		return new GetProductReservationResult(reservation);
+	}
 }

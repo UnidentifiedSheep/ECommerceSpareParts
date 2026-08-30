@@ -2,5 +2,5 @@
 
 public interface IServiceProviderBuilder<in TArgs> where TArgs : IServiceProviderArgument
 {
-    IServiceProvider Build(TArgs args);
+	IServiceProvider Build(TArgs args);
 }

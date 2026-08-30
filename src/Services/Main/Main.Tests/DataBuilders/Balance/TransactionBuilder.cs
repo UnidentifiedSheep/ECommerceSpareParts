@@ -7,100 +7,113 @@ namespace Tests.DataBuilders.Balance;
 
 public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
 {
-    public Guid? SenderId { get; private set; }
-    public Guid? ReceiverId { get; private set; }
-    public int? CurrencyId { get; private set; }
-    public TransactionType? Type { get; private set; }
-    public decimal? Amount { get; private set; }
-    public DateTime? TransactionDateTime { get; private set; }
-    public bool CompleteTransaction { get; private set; }
-    public bool ApplyTransaction { get; private set; }
-    public OrganizationBalance? SenderBalance { get; private set; }
-    public OrganizationBalance? ReceiverBalance { get; private set; }
-    public TransactionSourceType? SourceType { get; private set; }
+	public Guid? SenderId { get; private set; }
 
-    public TransactionBuilder WithSenderId(Guid senderId)
-    {
-        SenderId = senderId;
-        return this;
-    }
+	public Guid? ReceiverId { get; private set; }
 
-    public TransactionBuilder WithReceiverId(Guid receiverId)
-    {
-        ReceiverId = receiverId;
-        return this;
-    }
+	public int? CurrencyId { get; private set; }
 
-    public TransactionBuilder WithCurrencyId(int currencyId)
-    {
-        CurrencyId = currencyId;
-        return this;
-    }
+	public TransactionType? Type { get; private set; }
 
-    public TransactionBuilder WithType(TransactionType type)
-    {
-        Type = type;
-        return this;
-    }
+	public decimal? Amount { get; private set; }
 
-    public TransactionBuilder WithAmount(decimal amount)
-    {
-        Amount = amount;
-        return this;
-    }
+	public DateTime? TransactionDateTime { get; private set; }
 
-    public TransactionBuilder WithTransactionDateTime(DateTime transactionDateTime)
-    {
-        TransactionDateTime = transactionDateTime;
-        return this;
-    }
+	public bool CompleteTransaction { get; private set; }
 
-    public TransactionBuilder Completed()
-    {
-        CompleteTransaction = true;
-        return this;
-    }
+	public bool ApplyTransaction { get; private set; }
 
-    public TransactionBuilder WithBalances(OrganizationBalance senderBalance, OrganizationBalance receiverBalance)
-    {
-        SenderBalance = senderBalance;
-        ReceiverBalance = receiverBalance;
-        return this;
-    }
+	public OrganizationBalance? SenderBalance { get; private set; }
 
-    public TransactionBuilder Applied()
-    {
-        ApplyTransaction = true;
-        return this;
-    }
+	public OrganizationBalance? ReceiverBalance { get; private set; }
 
-    public TransactionBuilder WithSourceType(TransactionSourceType sourceType)
-    {
-        SourceType = sourceType;
-        return this;
-    }
+	public TransactionSourceType? SourceType { get; private set; }
 
-    public override Transaction Build()
-    {
-        var transaction = Transaction.Create(
-            SenderId ?? Guid.NewGuid(),
-            ReceiverId ?? Guid.NewGuid(),
-            CurrencyId ?? Faker.Random.Int(1, 100),
-            Type ?? TransactionType.Transfer,
-            Amount ?? Faker.Random.Decimal(1m, 10_000m),
-            TransactionDateTime ?? DateTime.UtcNow,
-            SourceType ?? TransactionSourceType.Manual);
+	public TransactionBuilder WithSenderId(Guid senderId)
+	{
+		SenderId = senderId;
+		return this;
+	}
 
-        if (CompleteTransaction) transaction.Complete();
+	public TransactionBuilder WithReceiverId(Guid receiverId)
+	{
+		ReceiverId = receiverId;
+		return this;
+	}
 
-        if (ApplyTransaction)
-        {
-            if (SenderBalance is null || ReceiverBalance is null)
-                throw new InvalidOperationException("Balances must be set before applying transaction.");
+	public TransactionBuilder WithCurrencyId(int currencyId)
+	{
+		CurrencyId = currencyId;
+		return this;
+	}
 
-            transaction.Apply(SenderBalance, ReceiverBalance);
-        }
+	public TransactionBuilder WithType(TransactionType type)
+	{
+		Type = type;
+		return this;
+	}
 
-        return transaction;
-    }
+	public TransactionBuilder WithAmount(decimal amount)
+	{
+		Amount = amount;
+		return this;
+	}
+
+	public TransactionBuilder WithTransactionDateTime(DateTime transactionDateTime)
+	{
+		TransactionDateTime = transactionDateTime;
+		return this;
+	}
+
+	public TransactionBuilder Completed()
+	{
+		CompleteTransaction = true;
+		return this;
+	}
+
+	public TransactionBuilder WithBalances(
+		OrganizationBalance senderBalance,
+		OrganizationBalance receiverBalance)
+	{
+		SenderBalance = senderBalance;
+		ReceiverBalance = receiverBalance;
+		return this;
+	}
+
+	public TransactionBuilder Applied()
+	{
+		ApplyTransaction = true;
+		return this;
+	}
+
+	public TransactionBuilder WithSourceType(TransactionSourceType sourceType)
+	{
+		SourceType = sourceType;
+		return this;
+	}
+
+	public override Transaction Build()
+	{
+		var transaction = Transaction.Create(
+			SenderId ?? Guid.NewGuid(),
+			ReceiverId ?? Guid.NewGuid(),
+			CurrencyId ?? Faker.Random.Int(1, 100),
+			Type ?? TransactionType.Transfer,
+			Amount ?? Faker.Random.Decimal(1m, 10_000m),
+			TransactionDateTime ?? DateTime.UtcNow,
+			SourceType ?? TransactionSourceType.Manual);
+
+		if (CompleteTransaction)
+			transaction.Complete();
+
+		if (ApplyTransaction)
+		{
+			if (SenderBalance is null || ReceiverBalance is null)
+				throw new InvalidOperationException("Balances must be set before applying transaction.");
+
+			transaction.Apply(SenderBalance, ReceiverBalance);
+		}
+
+		return transaction;
+	}
 }

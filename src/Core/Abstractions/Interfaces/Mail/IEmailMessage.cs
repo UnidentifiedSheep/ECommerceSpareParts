@@ -2,8 +2,9 @@
 
 public interface IEmailMessage
 {
-    string Subject { get; }
-    string To { get; }
+	string Subject { get; }
 
-    string GetHtmlBody();
+	string To { get; }
+
+	string GetHtmlBody();
 }

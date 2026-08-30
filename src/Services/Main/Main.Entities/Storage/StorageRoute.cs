@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Main.Enums;
@@ -10,169 +9,167 @@ namespace Main.Entities.Storage;
 
 public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<StorageRoute, Guid>
 {
-    private StorageRoute() { }
+	private StorageRoute()
+	{
+	}
 
-    private StorageRoute(
-        string from,
-        string to,
-        int distanceM,
-        RouteType routeType,
-        LogisticPricingType pricingModel,
-        int deliveryTimeMinutes,
-        decimal priceKg,
-        decimal pricePerM3,
-        decimal pricePerOrder,
-        decimal minimumPrice,
-        int currencyId,
-        Guid? carrierId)
-    {
-        SetRoute(from, to);
-        SetDistanceM(distanceM);
-        SetPrices(
-            priceKg,
-            pricePerM3,
-            pricePerOrder);
-        SetDeliveryTime(deliveryTimeMinutes);
-        SetMinimumPrice(minimumPrice);
-        SetCurrencyId(currencyId);
-        SetCarrierId(carrierId);
-        SetRouteType(routeType);
-        SetPricingModel(pricingModel);
-    }
+	private StorageRoute(
+		string from,
+		string to,
+		int distanceM,
+		RouteType routeType,
+		LogisticPricingType pricingModel,
+		int deliveryTimeMinutes,
+		decimal priceKg,
+		decimal pricePerM3,
+		decimal pricePerOrder,
+		decimal minimumPrice,
+		int currencyId,
+		Guid? carrierId)
+	{
+		SetRoute(from, to);
+		SetDistanceM(distanceM);
+		SetPrices(
+			priceKg,
+			pricePerM3,
+			pricePerOrder);
+		SetDeliveryTime(deliveryTimeMinutes);
+		SetMinimumPrice(minimumPrice);
+		SetCurrencyId(currencyId);
+		SetCarrierId(carrierId);
+		SetRouteType(routeType);
+		SetPricingModel(pricingModel);
+	}
 
-    [Validate]
-    public Guid Id { get; private set; }
+	[Validate]
+	public Guid Id { get; private set; }
 
-    [ValidateTuple("FromTo")]
-    public string FromStorageCode { get; private set; } = null!;
+	[ValidateTuple("FromTo")]
+	public string FromStorageCode { get; private set; } = null!;
 
-    [ValidateTuple("FromTo")]
-    public string ToStorageCode { get; private set; } = null!;
+	[ValidateTuple("FromTo")]
+	public string ToStorageCode { get; private set; } = null!;
 
-    public int DistanceM { get; private set; }
+	public int DistanceM { get; private set; }
 
-    public RouteType RouteType { get; private set; }
+	public RouteType RouteType { get; private set; }
 
-    public LogisticPricingType PricingModel { get; private set; }
+	public LogisticPricingType PricingModel { get; private set; }
 
-    public int DeliveryTimeMinutes { get; private set; }
+	public int DeliveryTimeMinutes { get; private set; }
 
-    public decimal PriceKg { get; private set; }
+	public decimal PriceKg { get; private set; }
 
-    public decimal PricePerM3 { get; private set; }
+	public decimal PricePerM3 { get; private set; }
 
-    public decimal PricePerOrder { get; private set; }
+	public decimal PricePerOrder { get; private set; }
 
-    [ValidateTuple("FromTo")]
-    public bool IsActive { get; private set; }
+	[ValidateTuple("FromTo")]
+	public bool IsActive { get; private set; }
 
-    public int CurrencyId { get; private set; }
+	public int CurrencyId { get; private set; }
 
-    public decimal MinimumPrice { get; private set; }
+	public decimal MinimumPrice { get; private set; }
 
-    public Guid? CarrierId { get; private set; }
+	public Guid? CarrierId { get; private set; }
 
-    public Currency.Currency Currency { get; private set; } = null!;
+	public Currency.Currency Currency { get; private set; } = null!;
 
-    public static Expression<Func<StorageRoute, Guid>> GetKeySelector() { return x => x.Id; }
+	public static Expression<Func<StorageRoute, Guid>> GetKeySelector() => x => x.Id;
 
-    public static Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
+	public static Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
 
-    public static StorageRoute Create(
-        string from,
-        string to,
-        int distanceM,
-        RouteType routeType,
-        LogisticPricingType pricingModel,
-        int deliveryTimeMinutes,
-        decimal priceKg,
-        decimal pricePerM3,
-        decimal pricePerOrder,
-        decimal minimumPrice,
-        int currencyId,
-        Guid? carrierId)
-    {
-        return new StorageRoute(
-            from,
-            to,
-            distanceM,
-            routeType,
-            pricingModel,
-            deliveryTimeMinutes,
-            priceKg,
-            pricePerM3,
-            pricePerOrder,
-            minimumPrice,
-            currencyId,
-            carrierId);
-    }
+	public static StorageRoute Create(
+		string from,
+		string to,
+		int distanceM,
+		RouteType routeType,
+		LogisticPricingType pricingModel,
+		int deliveryTimeMinutes,
+		decimal priceKg,
+		decimal pricePerM3,
+		decimal pricePerOrder,
+		decimal minimumPrice,
+		int currencyId,
+		Guid? carrierId)
+	{
+		return new StorageRoute(
+			from,
+			to,
+			distanceM,
+			routeType,
+			pricingModel,
+			deliveryTimeMinutes,
+			priceKg,
+			pricePerM3,
+			pricePerOrder,
+			minimumPrice,
+			currencyId,
+			carrierId);
+	}
 
-    private void SetRoute(string from, string to)
-    {
-        (from, to).Ensure(x => x.from.Trim() != x.to.Trim(), "storage.route.same.storages");
-        FromStorageCode = from;
-        ToStorageCode = to;
-    }
+	private void SetRoute(string from, string to)
+	{
+		(from, to).Ensure(x => x.from.Trim() != x.to.Trim(), "storage.route.same.storages");
+		FromStorageCode = from;
+		ToStorageCode = to;
+	}
 
-    public void SetDistanceM(int distanceM)
-    {
-        DistanceM = distanceM.EnsureAtLeast(1, "storage.route.distance.min");
-    }
+	public void SetDistanceM(int distanceM) =>
+		DistanceM = distanceM.EnsureAtLeast(1, "storage.route.distance.min");
 
-    public void SetDeliveryTime(int minutes)
-    {
-        DeliveryTimeMinutes = minutes.EnsureAtLeast(1, "storage.route.delivery.time.min");
-    }
+	public void SetDeliveryTime(int minutes) =>
+		DeliveryTimeMinutes = minutes.EnsureAtLeast(1, "storage.route.delivery.time.min");
 
-    public void SetPrices(
-        decimal priceKg,
-        decimal pricePerM3,
-        decimal pricePerOrder)
-    {
-        SetPriceKg(priceKg);
-        SetPricePerM3(pricePerM3);
-        SetPricePerOrder(pricePerOrder);
-    }
+	public void SetPrices(
+		decimal priceKg,
+		decimal pricePerM3,
+		decimal pricePerOrder)
+	{
+		SetPriceKg(priceKg);
+		SetPricePerM3(pricePerM3);
+		SetPricePerOrder(pricePerOrder);
+	}
 
-    public void SetPriceKg(decimal priceKg)
-    {
-        PriceKg = priceKg.EnsureMaxDecimalPlaces(2, "storage.route.price.kg.precision")
-            .EnsureAtLeast(0, "storage.route.price.kg.min");
-    }
+	public void SetPriceKg(decimal priceKg)
+	{
+		PriceKg = priceKg
+			.EnsureMaxDecimalPlaces(2, "storage.route.price.kg.precision")
+			.EnsureAtLeast(0, "storage.route.price.kg.min");
+	}
 
-    public void SetPricePerM3(decimal pricePerM3)
-    {
-        PricePerM3 = pricePerM3.EnsureMaxDecimalPlaces(2, "storage.route.price.m3.precision")
-            .EnsureAtLeast(0, "storage.route.price.m3.min");
-    }
+	public void SetPricePerM3(decimal pricePerM3)
+	{
+		PricePerM3 = pricePerM3
+			.EnsureMaxDecimalPlaces(2, "storage.route.price.m3.precision")
+			.EnsureAtLeast(0, "storage.route.price.m3.min");
+	}
 
-    public void SetPricePerOrder(decimal pricePerOrder)
-    {
-        PricePerOrder = pricePerOrder.EnsureMaxDecimalPlaces(2, "storage.route.price.order.precision")
-            .EnsureAtLeast(0, "storage.route.price.order.min");
-    }
+	public void SetPricePerOrder(decimal pricePerOrder)
+	{
+		PricePerOrder = pricePerOrder
+			.EnsureMaxDecimalPlaces(2, "storage.route.price.order.precision")
+			.EnsureAtLeast(0, "storage.route.price.order.min");
+	}
 
-    public void SetMinimumPrice(decimal minimumPrice)
-    {
-        MinimumPrice = minimumPrice
-            .EnsureMaxDecimalPlaces(2, "storage.route.minimum.price.precision")
-            .EnsureAtLeast(0, "storage.route.minimum.price.min");
-    }
+	public void SetMinimumPrice(decimal minimumPrice)
+	{
+		MinimumPrice = minimumPrice
+			.EnsureMaxDecimalPlaces(2, "storage.route.minimum.price.precision")
+			.EnsureAtLeast(0, "storage.route.minimum.price.min");
+	}
 
-    public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
+	public void SetCurrencyId(int currencyId) => CurrencyId = currencyId;
 
-    public void SetCarrierId(Guid? carrierId) { CarrierId = carrierId; }
+	public void SetCarrierId(Guid? carrierId) => CarrierId = carrierId;
 
-    public void SetRouteType(RouteType routeType) { RouteType = routeType; }
+	public void SetRouteType(RouteType routeType) => RouteType = routeType;
 
-    public void SetPricingModel(LogisticPricingType pricingModel) { PricingModel = pricingModel; }
+	public void SetPricingModel(LogisticPricingType pricingModel) => PricingModel = pricingModel;
 
-    public void Activate() { IsActive = true; }
+	public void Activate() => IsActive = true;
 
-    public void Deactivate() { IsActive = false; }
+	public void Deactivate() => IsActive = false;
 
-    public override Guid GetId() { return Id; }
+	public override Guid GetId() => Id;
 }

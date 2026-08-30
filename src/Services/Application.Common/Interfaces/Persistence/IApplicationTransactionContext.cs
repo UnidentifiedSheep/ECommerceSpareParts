@@ -5,6 +5,7 @@ namespace Application.Common.Interfaces.Persistence;
 
 public interface IApplicationTransactionContext
 {
-    IUnitOfWork UnitOfWork { get; }
-    IRepositoryProvider Repositories { get; }
+	IUnitOfWork UnitOfWork { get; }
+
+	IRepositoryProvider Repositories { get; }
 }

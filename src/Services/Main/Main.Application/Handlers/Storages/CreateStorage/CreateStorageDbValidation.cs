@@ -6,8 +6,6 @@ namespace Main.Application.Handlers.Storages.CreateStorage;
 
 public class CreateStorageDbValidation : AbstractDbValidation<CreateStorageCommand>
 {
-    public override void Build(IValidationPlan plan, CreateStorageCommand request)
-    {
-        plan.ValidateStorageNotExistsCode(request.Code.Trim());
-    }
+	public override void Build(IValidationPlan plan, CreateStorageCommand request) =>
+		plan.ValidateStorageNotExistsCode(request.Code.Trim());
 }

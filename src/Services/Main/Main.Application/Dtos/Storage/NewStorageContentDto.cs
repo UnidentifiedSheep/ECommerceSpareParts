@@ -4,18 +4,18 @@ namespace Main.Application.Dtos.Storage;
 
 public record NewStorageContentDto
 {
-    [JsonPropertyName("productId")]
-    public required int ProductId { get; init; }
+	[JsonPropertyName("productId")]
+	public required int ProductId { get; init; }
 
-    [JsonPropertyName("currencyId")]
-    public required int CurrencyId { get; init; }
+	[JsonPropertyName("currencyId")]
+	public required int CurrencyId { get; init; }
 
-    [JsonPropertyName("buyPrice")]
-    public required decimal BuyPrice { get; init; }
+	[JsonPropertyName("buyPrice")]
+	public required decimal BuyPrice { get; init; }
 
-    [JsonPropertyName("count")]
-    public required int Count { get; init; }
+	[JsonPropertyName("count")]
+	public required int Count { get; init; }
 
-    [JsonPropertyName("purchaseDate")]
-    public required DateTime PurchaseDate { get; init; }
+	[JsonPropertyName("purchaseDate")]
+	public required DateTime PurchaseDate { get; init; }
 }

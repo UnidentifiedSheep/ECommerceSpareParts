@@ -12,44 +12,42 @@ using MediatR;
 
 namespace Main.Application.Handlers.Auth.EmailVerification;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record VerifyEmailCommand(string Token) : ICommand;
 
 public class VerifyEmailHandler(
-    IJsonSigner signer,
-    IRepository<UserEmail, string> repository,
-    IVerificationPayloadProvider payloadProvider) : ICommandHandler<VerifyEmailCommand>
+	IJsonSigner signer,
+	IRepository<UserEmail, string> repository,
+	IVerificationPayloadProvider payloadProvider) : ICommandHandler<VerifyEmailCommand>
 {
-    public async Task<Unit> Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
-    {
-        var payload = GetPayload(request.Token);
-        if (payload.Type != VerificationType.EmailVerification)
-            throw new EmailVerificationTokenExpiredException();
+	public async Task<Unit> Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
+	{
+		var payload = GetPayload(request.Token);
+		if (payload.Type != VerificationType.EmailVerification)
+			throw new EmailVerificationTokenExpiredException();
 
-        var normalizedEmail = Email.ToNormalized(payload.DataToVerify);
-        var email = await repository.FirstOrDefaultAsync(
-            Criteria<UserEmail>.New()
-                .Where(x => x.Email == normalizedEmail)
-                .Track()
-                .Build(),
-            cancellationToken);
+		var normalizedEmail = Email.ToNormalized(payload.DataToVerify);
+		var email = await repository.FirstOrDefaultAsync(
+			Criteria<UserEmail>.New().Where(x => x.Email == normalizedEmail).Track().Build(),
+			cancellationToken);
 
-        if (email == null || email.UserId != payload.UserId)
-            throw new UserEmailNotFoundException(normalizedEmail);
+		if (email == null || email.UserId != payload.UserId)
+			throw new UserEmailNotFoundException(normalizedEmail);
 
-        if (!await payloadProvider.TryConsumeToken(payload.Id))
-            throw new EmailVerificationTokenExpiredException();
+		if (!await payloadProvider.TryConsumeToken(payload.Id))
+			throw new EmailVerificationTokenExpiredException();
 
-        email.Confirm();
-        return Unit.Value;
-    }
+		email.Confirm();
+		return Unit.Value;
+	}
 
-    private VerificationPayload GetPayload(string token)
-    {
-        var decodedToken = Uri.UnescapeDataString(token);
-        if (signer.VerifyJson<VerificationPayload>(decodedToken, out var payload))
-            return payload;
+	private VerificationPayload GetPayload(string token)
+	{
+		var decodedToken = Uri.UnescapeDataString(token);
+		if (signer.VerifyJson<VerificationPayload>(decodedToken, out var payload))
+			return payload;
 
-        throw new EmailVerificationTokenExpiredException();
-    }
+		throw new EmailVerificationTokenExpiredException();
+	}
 }

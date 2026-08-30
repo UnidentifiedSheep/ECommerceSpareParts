@@ -8,37 +8,37 @@ namespace Main.Application.Dtos.Sale;
 
 public record SaleDto
 {
-    [JsonPropertyName("id")]
-    public required Guid Id { get; init; }
+	[JsonPropertyName("id")]
+	public required Guid Id { get; init; }
 
-    [JsonPropertyName("buyer")]
-    public required UserDto Buyer { get; init; }
+	[JsonPropertyName("buyer")]
+	public required UserDto Buyer { get; init; }
 
-    [JsonPropertyName("organization")]
-    public required OrganizationDto Organization { get; init; }
+	[JsonPropertyName("organization")]
+	public required OrganizationDto Organization { get; init; }
 
-    [JsonPropertyName("comment")]
-    public string? Comment { get; init; }
+	[JsonPropertyName("comment")]
+	public string? Comment { get; init; }
 
-    [JsonPropertyName("saleDatetime")]
-    public required DateTime SaleDatetime { get; init; }
+	[JsonPropertyName("saleDatetime")]
+	public required DateTime SaleDatetime { get; init; }
 
-    [JsonPropertyName("transactionId")]
-    public required Guid TransactionId { get; init; }
+	[JsonPropertyName("transactionId")]
+	public required Guid TransactionId { get; init; }
 
-    [JsonPropertyName("totalSum")]
-    public required decimal TotalSum { get; init; }
+	[JsonPropertyName("totalSum")]
+	public required decimal TotalSum { get; init; }
 
-    [JsonPropertyName("storageCode")]
-    public required string StorageCode { get; init; }
+	[JsonPropertyName("storageCode")]
+	public required string StorageCode { get; init; }
 
-    [JsonPropertyName("rowVersion")]
-    public required uint RowVersion { get; init; }
+	[JsonPropertyName("rowVersion")]
+	public required uint RowVersion { get; init; }
 
-    [JsonPropertyName("state")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required SaleState State { get; init; }
+	[JsonPropertyName("state")]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	public required SaleState State { get; init; }
 
-    [JsonPropertyName("currency")]
-    public required CurrencyDto Currency { get; init; }
+	[JsonPropertyName("currency")]
+	public required CurrencyDto Currency { get; init; }
 }

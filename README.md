@@ -7,13 +7,13 @@ analytics.
 
 ## Services
 
-| Service | Responsibility |
-| --- | --- |
-| `Gateway` | Public YARP reverse proxy and aggregated API documentation. |
-| `Main` | Catalog, users, WMS, purchases, sales, logistics, and files. |
-| `Pricing` | Supplier/internal offers, markup rules, price generation, and ranking. |
-| `Search` | Product and producer search backed by OpenSearch. |
-| `Analytics` | Metrics, sale analysis, and automatic markup generation. |
+| Service     | Responsibility                                                         |
+|-------------|------------------------------------------------------------------------|
+| `Gateway`   | Public YARP reverse proxy and aggregated API documentation.            |
+| `Main`      | Catalog, users, WMS, purchases, sales, logistics, and files.           |
+| `Pricing`   | Supplier/internal offers, markup rules, price generation, and ranking. |
+| `Search`    | Product and producer search backed by OpenSearch.                      |
+| `Analytics` | Metrics, sale analysis, and automatic markup generation.               |
 
 Main, Pricing, and Analytics have separate API, worker, persistence, test, and migrator projects where needed. Services
 exchange integration events through RabbitMQ and use the EF Core outbox pattern.
@@ -61,16 +61,16 @@ the same artifacts without Compose, run `bash scripts/ci/build-graphql.sh`.
 
 ## Local Endpoints
 
-| Component | Address |
-| --- | --- |
-| Gateway | <http://localhost:8080> |
-| API documentation | <http://localhost:8080/docs> |
-| RabbitMQ UI | <http://localhost:15672> |
-| OpenSearch | <https://localhost:9200> |
-| OpenSearch Dashboards | <http://localhost:5601> |
-| MinIO Console | <http://localhost:9001> |
-| Grafana | <https://localhost:3000> |
-| Tempo API | <http://localhost:3200> |
+| Component             | Address                      |
+|-----------------------|------------------------------|
+| Gateway               | <http://localhost:8080>      |
+| API documentation     | <http://localhost:8080/docs> |
+| RabbitMQ UI           | <http://localhost:15672>     |
+| OpenSearch            | <https://localhost:9200>     |
+| OpenSearch Dashboards | <http://localhost:5601>      |
+| MinIO Console         | <http://localhost:9001>      |
+| Grafana               | <https://localhost:3000>     |
+| Tempo API             | <http://localhost:3200>      |
 
 PostgreSQL, Redis, RabbitMQ, MinIO, and Loki are exposed on their standard development ports. Prometheus receives a
 dynamic host port; find it with `docker compose port prometheus 9090`.
@@ -87,8 +87,8 @@ Integration tests use Testcontainers and require Docker.
 
 ## Configuration
 
-Copy `.env.example` to `.env`. Application settings are loaded from `configs/`, which is mounted into service
-containers through `CONFIGS_PATH`.
+Copy `.env.example` to `.env`. Application settings are loaded from `configs/`, which is mounted into service containers
+through `CONFIGS_PATH`.
 
 Values in `.env.example` are development-only. Use an external secret provider and managed TLS certificates in deployed
 environments.
@@ -98,7 +98,8 @@ environments.
 - `compose.yaml` — local stack built from source;
 - `migrator-compose.yaml` — local database migrators;
 - `compose.registry.yaml` — registry image builds;
-- [`deploy/`](docs/SWARM_DEPLOYMENT.md) — split Docker Swarm stacks for secrets sync, gateway, applications, workers, infrastructure, and monitoring.
+- [`deploy/`](docs/SWARM_DEPLOYMENT.md) — split Docker Swarm stacks for secrets sync, gateway, applications, workers,
+  infrastructure, and monitoring.
 
 ## Documentation
 

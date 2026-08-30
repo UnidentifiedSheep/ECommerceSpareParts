@@ -6,22 +6,23 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Main.Persistence.Context.Configurations.Event;
 
 public class
-    ReservationManualChangeEventConfiguration : IEntityTypeConfiguration<ReservationManualChangeEvent>
+	ReservationManualChangeEventConfiguration : IEntityTypeConfiguration<ReservationManualChangeEvent>
 {
-    public void Configure(EntityTypeBuilder<ReservationManualChangeEvent> builder)
-    {
-        builder.Metadata.SetDiscriminatorValue("ReservationManualChangeEvent");
+	public void Configure(EntityTypeBuilder<ReservationManualChangeEvent> builder)
+	{
+		builder.Metadata.SetDiscriminatorValue("ReservationManualChangeEvent");
 
-        builder.Property(e => e.ReservationId)
-            .HasColumnName("reservation_id");
+		builder.Property(e => e.ReservationId).HasColumnName("reservation_id");
 
-        builder.HasIndex(e => e.ReservationId)
-            .HasDatabaseName("reservation_manual_change_event_reservation_id_idx");
+		builder
+			.HasIndex(e => e.ReservationId)
+			.HasDatabaseName("reservation_manual_change_event_reservation_id_idx");
 
-        builder.HasOne<ProductReservation>()
-            .WithMany()
-            .HasForeignKey(e => e.ReservationId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .HasConstraintName("reservation_manual_change_event_reservation_id_fk");
-    }
+		builder
+			.HasOne<ProductReservation>()
+			.WithMany()
+			.HasForeignKey(e => e.ReservationId)
+			.OnDelete(DeleteBehavior.Cascade)
+			.HasConstraintName("reservation_manual_change_event_reservation_id_fk");
+	}
 }

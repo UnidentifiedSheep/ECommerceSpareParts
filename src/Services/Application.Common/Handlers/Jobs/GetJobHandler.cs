@@ -13,21 +13,17 @@ public record GetJobQuery(Guid JobId) : IQuery<GetJobResult>;
 
 public record GetJobResult(JobDto Job);
 
-public class GetJobHandler(
-    IReadRepository<Job, Guid> repository,
-    IProjectionProvider<Job, JobDto> projection)
-    : IQueryHandler<GetJobQuery, GetJobResult>
+public class GetJobHandler(IReadRepository<Job, Guid> repository, IProjectionProvider<Job, JobDto> projection)
+	: IQueryHandler<GetJobQuery, GetJobResult>
 {
-    public async Task<GetJobResult> Handle(
-        GetJobQuery request,
-        CancellationToken cancellationToken)
-    {
-        var job = await repository.Query
-            .Where(x => x.Id == request.JobId)
-            .Project(projection)
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new JobNotFoundException(request.JobId);
+	public async Task<GetJobResult> Handle(GetJobQuery request, CancellationToken cancellationToken)
+	{
+		var job = await repository
+			.Query
+			.Where(x => x.Id == request.JobId)
+			.Project(projection)
+			.FirstOrDefaultAsync(cancellationToken) ?? throw new JobNotFoundException(request.JobId);
 
-        return new GetJobResult(job);
-    }
+		return new GetJobResult(job);
+	}
 }

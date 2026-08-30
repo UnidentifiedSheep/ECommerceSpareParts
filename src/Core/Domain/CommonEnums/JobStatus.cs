@@ -2,13 +2,21 @@
 
 public enum JobStatus
 {
-    Pending,
-    Locked,
-    Processing,
-    Failed,
-    Succeeded,
-    CancellationRequested,
-    Cancelled,
-    Waiting,
-    Blocked
+	Pending,
+
+	Locked,
+
+	Processing,
+
+	Failed,
+
+	Succeeded,
+
+	CancellationRequested,
+
+	Cancelled,
+
+	Waiting,
+
+	Blocked
 }

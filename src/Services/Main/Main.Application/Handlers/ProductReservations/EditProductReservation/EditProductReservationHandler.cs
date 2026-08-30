@@ -12,25 +12,23 @@ namespace Main.Application.Handlers.ProductReservations.EditProductReservation;
 
 [AutoSave]
 [Transactional]
-public record EditProductReservationCommand(int ReservationId, EditProductReservationDto NewValue)
-    : ICommand;
+public record EditProductReservationCommand(int ReservationId, EditProductReservationDto NewValue) : ICommand;
 
 public class EditProductReservationHandler(
-    IRepository<ProductReservation, int> repository,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<EditProductReservationCommand>
+	IRepository<ProductReservation, int> repository,
+	IUnitOfWork unitOfWork) : ICommandHandler<EditProductReservationCommand>
 {
-    public async Task<Unit> Handle(EditProductReservationCommand request, CancellationToken cancellationToken)
-    {
-        var reservation = await repository.GetById(request.ReservationId, cancellationToken)
-                          ?? throw new ReservationNotFoundException(request.ReservationId);
+	public async Task<Unit> Handle(EditProductReservationCommand request, CancellationToken cancellationToken)
+	{
+		var reservation = await repository.GetById(request.ReservationId, cancellationToken) ??
+			throw new ReservationNotFoundException(request.ReservationId);
 
-        var @event = ReservationManualChangeEvent.Create(reservation);
-        await unitOfWork.AddAsync(@event, cancellationToken);
+		var @event = ReservationManualChangeEvent.Create(reservation);
+		await unitOfWork.AddAsync(@event, cancellationToken);
 
-        reservation.SetComment(request.NewValue.Comment);
-        reservation.ProposePrice(request.NewValue.GivenPrice, request.NewValue.GivenCurrencyId);
+		reservation.SetComment(request.NewValue.Comment);
+		reservation.ProposePrice(request.NewValue.GivenPrice, request.NewValue.GivenCurrencyId);
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

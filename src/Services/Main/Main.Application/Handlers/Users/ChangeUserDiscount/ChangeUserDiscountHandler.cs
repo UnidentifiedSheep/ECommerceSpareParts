@@ -14,33 +14,32 @@ namespace Main.Application.Handlers.Users.ChangeUserDiscount;
 public record ChangeUserDiscountCommand(Guid UserId, decimal Discount) : ICommand;
 
 public class ChangeUserDiscountHandler(
-    IRepository<User, Guid> usersRepository,
-    IIntegrationEventScope integrationEventScope
-)
-    : ICommandHandler<ChangeUserDiscountCommand>
+	IRepository<User, Guid> usersRepository,
+	IIntegrationEventScope integrationEventScope) : ICommandHandler<ChangeUserDiscountCommand>
 {
-    public async Task<Unit> Handle(ChangeUserDiscountCommand request, CancellationToken cancellationToken)
-    {
-        var userId = request.UserId;
-        var criteria = Criteria<User>.New()
-            .Track()
-            .Where(x => x.Id == userId)
-            .Include(x => x.Discount)
-            .Build();
+	public async Task<Unit> Handle(ChangeUserDiscountCommand request, CancellationToken cancellationToken)
+	{
+		var userId = request.UserId;
+		var criteria = Criteria<User>
+			.New()
+			.Track()
+			.Where(x => x.Id == userId)
+			.Include(x => x.Discount)
+			.Build();
 
-        var user = await usersRepository.FirstOrDefaultAsync(criteria, cancellationToken)
-                   ?? throw new UserNotFoundException(userId);
+		var user = await usersRepository.FirstOrDefaultAsync(criteria, cancellationToken) ??
+			throw new UserNotFoundException(userId);
 
-        user.SetDiscount(request.Discount);
+		user.SetDiscount(request.Discount);
 
-        integrationEventScope.Add(
-            new UserDiscountUpdatedEvent
-            {
-                UserId = userId,
-                Discount = request.Discount,
-                ChangedAt = DateTime.UtcNow
-            });
+		integrationEventScope.Add(
+			new UserDiscountUpdatedEvent
+			{
+				UserId = userId,
+				Discount = request.Discount,
+				ChangedAt = DateTime.UtcNow
+			});
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

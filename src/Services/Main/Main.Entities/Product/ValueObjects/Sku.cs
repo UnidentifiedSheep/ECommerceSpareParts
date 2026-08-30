@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using Domain.Extensions;
 using Domain.Validation;
 using Exceptions;
 
@@ -8,55 +7,57 @@ namespace Main.Entities.Product.ValueObjects;
 
 public partial record Sku
 {
-    private Sku() { }
+	private Sku()
+	{
+	}
 
-    public Sku(string value)
-    {
-        value = value.Trim();
+	public Sku(string value)
+	{
+		value = value.Trim();
 
-        if (!IsValid(value, out var exception))
-            throw exception;
+		if (!IsValid(value, out var exception))
+			throw exception;
 
-        Value = value;
-        NormalizedValue = ToNormalized(Value);
-    }
+		Value = value;
+		NormalizedValue = ToNormalized(Value);
+	}
 
-    public string Value { get; } = null!;
-    public string NormalizedValue { get; } = null!;
+	public string Value { get; } = null!;
 
-    [GeneratedRegex("[^a-zA-Z0-9а-яА-Я]+")]
-    private static partial Regex OnlyCharacter();
+	public string NormalizedValue { get; } = null!;
 
-    public static string ToNormalized(string source)
-    {
-        return OnlyCharacter().Replace(source, "").ToUpperInvariant();
-    }
+	[GeneratedRegex("[^a-zA-Z0-9а-яА-Я]+")]
+	private static partial Regex OnlyCharacter();
 
-    public static bool IsValid(string? sku, [NotNullWhen(false)] out Exception? exception)
-    {
-        exception = null;
+	public static string ToNormalized(string source) =>
+		OnlyCharacter().Replace(source, "").ToUpperInvariant();
 
-        if (string.IsNullOrWhiteSpace(sku))
-        {
-            exception = new InvalidInputException("article.articleNumber.must.not.be.empty");
-            return false;
-        }
+	public static bool IsValid(string? sku, [NotNullWhen(false)] out Exception? exception)
+	{
+		exception = null;
 
-        if (!sku.HasMinLength(3))
-        {
-            exception = new InvalidInputException("article.articleNumber.min.length.3");
-            return false;
-        }
+		if (string.IsNullOrWhiteSpace(sku))
+		{
+			exception = new InvalidInputException("article.articleNumber.must.not.be.empty");
+			return false;
+		}
 
-        if (!sku.HasMaxLength(128))
-        {
-            exception = new InvalidInputException("article.articleNumber.max.length.128");
-            return false;
-        }
-        return true;
-    }
+		if (!sku.HasMinLength(3))
+		{
+			exception = new InvalidInputException("article.articleNumber.min.length.3");
+			return false;
+		}
 
-    public static implicit operator Sku(string value) { return new Sku(value); }
+		if (!sku.HasMaxLength(128))
+		{
+			exception = new InvalidInputException("article.articleNumber.max.length.128");
+			return false;
+		}
 
-    public static implicit operator string(Sku sku) { return sku.Value; }
+		return true;
+	}
+
+	public static implicit operator Sku(string value) => new(value);
+
+	public static implicit operator string(Sku sku) => sku.Value;
 }

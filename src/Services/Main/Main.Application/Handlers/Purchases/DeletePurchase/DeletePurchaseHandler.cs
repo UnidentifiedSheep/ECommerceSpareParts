@@ -18,74 +18,66 @@ namespace Main.Application.Handlers.Purchases.DeletePurchase;
 
 [AutoSave]
 [Transactional(
-    IsolationLevel.Serializable,
-    20,
-    2)]
+	IsolationLevel.Serializable,
+	20,
+	2)]
 public record DeletePurchaseCommand(Guid PurchaseId) : ICommand<Unit>;
 
 public class DeletePurchaseHandler(
-    IUnitOfWork unitOfWork,
-    IRepository<Purchase, Guid> repository,
-    IIntegrationEventScope interfaceScope,
-    ISender sender
-)
-    : ICommandHandler<DeletePurchaseCommand, Unit>
+	IUnitOfWork unitOfWork,
+	IRepository<Purchase, Guid> repository,
+	IIntegrationEventScope interfaceScope,
+	ISender sender) : ICommandHandler<DeletePurchaseCommand, Unit>
 {
-    public async Task<Unit> Handle(DeletePurchaseCommand request, CancellationToken cancellationToken)
-    {
-        var purchase = await GetPurchase(request.PurchaseId, cancellationToken);
-        await SubtractStock(purchase, cancellationToken);
-        await RevertTransactions(purchase, cancellationToken);
+	public async Task<Unit> Handle(DeletePurchaseCommand request, CancellationToken cancellationToken)
+	{
+		var purchase = await GetPurchase(request.PurchaseId, cancellationToken);
+		await SubtractStock(purchase, cancellationToken);
+		await RevertTransactions(purchase, cancellationToken);
 
-        unitOfWork.Remove(purchase);
+		unitOfWork.Remove(purchase);
 
-        interfaceScope.Add(
-            new PurchaseDeleteEvent
-            {
-                PurchaseId = request.PurchaseId
-            });
+		interfaceScope.Add(
+			new PurchaseDeleteEvent
+			{
+				PurchaseId = request.PurchaseId
+			});
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 
-    private async Task<Purchase> GetPurchase(Guid id, CancellationToken cancellationToken)
-    {
-        return await repository.EnsureExistForUpdateAsync(
-            id,
-            key => new PurchaseNotFoundException(key),
-            Criteria<Purchase>.New()
-                .Include(x => x.PurchaseLogistic)
-                .Include(x => x.Contents),
-            cancellationToken);
-    }
+	private async Task<Purchase> GetPurchase(Guid id, CancellationToken cancellationToken)
+	{
+		return await repository.EnsureExistForUpdateAsync(
+			id,
+			key => new PurchaseNotFoundException(key),
+			Criteria<Purchase>.New().Include(x => x.PurchaseLogistic).Include(x => x.Contents),
+			cancellationToken);
+	}
 
-    private async Task SubtractStock(
-        Purchase purchase,
-        CancellationToken token)
-    {
-        var items = purchase.Contents
-            .Select(x => new SubtractStorageContentItem(x.StorageContentId, x.Count));
-        var command = new SubtractStorageContentsCommand(items, StorageMovementType.PurchaseDeletion);
-        await sender.Send(command, token);
-    }
+	private async Task SubtractStock(Purchase purchase, CancellationToken token)
+	{
+		var items =
+			purchase.Contents.Select(x => new SubtractStorageContentItem(x.StorageContentId, x.Count));
+		var command = new SubtractStorageContentsCommand(items, StorageMovementType.PurchaseDeletion);
+		await sender.Send(command, token);
+	}
 
-    private async Task RevertTransactions(
-        Purchase purchase,
-        CancellationToken token)
-    {
-        await sender.Send(
-            new ReverseTransactionCommand(
-                purchase.TransactionId,
-                TransactionReversalMode.System,
-                true),
-            token);
+	private async Task RevertTransactions(Purchase purchase, CancellationToken token)
+	{
+		await sender.Send(
+			new ReverseTransactionCommand(
+				purchase.TransactionId,
+				TransactionReversalMode.System,
+				true),
+			token);
 
-        if (purchase.PurchaseLogistic?.TransactionId != null)
-            await sender.Send(
-                new ReverseTransactionCommand(
-                    purchase.PurchaseLogistic.TransactionId.Value,
-                    TransactionReversalMode.System,
-                    true),
-                token);
-    }
+		if (purchase.PurchaseLogistic?.TransactionId != null)
+			await sender.Send(
+				new ReverseTransactionCommand(
+					purchase.PurchaseLogistic.TransactionId.Value,
+					TransactionReversalMode.System,
+					true),
+				token);
+	}
 }

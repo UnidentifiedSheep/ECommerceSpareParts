@@ -12,11 +12,11 @@ public record AddStorageToUserCommand(Guid UserId, string StorageCode) : IComman
 
 public class AddStorageToUserHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddStorageToUserCommand>
 {
-    public async Task<Unit> Handle(AddStorageToUserCommand request, CancellationToken cancellationToken)
-    {
-        var model = StorageOwner.Create(request.StorageCode, request.UserId);
+	public async Task<Unit> Handle(AddStorageToUserCommand request, CancellationToken cancellationToken)
+	{
+		var model = StorageOwner.Create(request.StorageCode, request.UserId);
 
-        await unitOfWork.AddAsync(model, cancellationToken);
-        return Unit.Value;
-    }
+		await unitOfWork.AddAsync(model, cancellationToken);
+		return Unit.Value;
+	}
 }

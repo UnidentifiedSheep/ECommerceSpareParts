@@ -2,7 +2,9 @@ namespace Enums;
 
 public enum Supplier
 {
-    Armtek,
-    FavoritParts,
-    Tmtr
+	Armtek,
+
+	FavoritParts,
+
+	Tmtr
 }

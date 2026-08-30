@@ -2,11 +2,7 @@
 
 public interface IEmailSender
 {
-    Task SendAsync(
-        IEmailMessage message,
-        CancellationToken token = default);
+	Task SendAsync(IEmailMessage message, CancellationToken token = default);
 
-    Task SendBatchAsync(
-        IEnumerable<IEmailMessage> messages,
-        CancellationToken token = default);
+	Task SendBatchAsync(IEnumerable<IEmailMessage> messages, CancellationToken token = default);
 }

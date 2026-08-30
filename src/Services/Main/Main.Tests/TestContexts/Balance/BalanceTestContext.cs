@@ -10,58 +10,61 @@ using Tests.TestContexts.Currency;
 namespace Tests.TestContexts.Balance;
 
 public class BalanceTestContext(
-    DContext context,
-    UsersTestContext usersTestContext,
-    CurrencyTestContext currencyTestContext
-) : TestContextBase<DContext>(context), IDependentTestContext
+	DContext context,
+	UsersTestContext usersTestContext,
+	CurrencyTestContext currencyTestContext) : TestContextBase<DContext>(context), IDependentTestContext
 {
-    private readonly List<Transaction> _transactions = [];
+	private readonly List<Transaction> _transactions = [];
 
-    public IReadOnlyList<User> Users => usersTestContext.Users.ToList();
-    public IReadOnlyList<Main.Entities.Currency.Currency> Currencies => currencyTestContext.Currencies;
-    public IReadOnlyList<Transaction> Transactions => _transactions;
+	public IReadOnlyList<User> Users => usersTestContext.Users.ToList();
 
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(UsersTestContext),
-        typeof(CurrencyTestContext)
-    ];
+	public IReadOnlyList<Main.Entities.Currency.Currency> Currencies => currencyTestContext.Currencies;
 
-    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        var users = Users;
-        var currency = Currencies.First();
+	public IReadOnlyList<Transaction> Transactions => _transactions;
 
-        var senderBalance = new UserBalanceBuilder(Faker)
-            .WithUserId(users[0].Id)
-            .WithCurrencyId(currency.Id)
-            .Build();
+	public static Type[] DependsOn { get; } = [typeof(UsersTestContext), typeof(CurrencyTestContext)];
 
-        var receiverBalance = new UserBalanceBuilder(Faker)
-            .WithUserId(users[1].Id)
-            .WithCurrencyId(currency.Id)
-            .Build();
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+	{
+		var users = Users;
+		var currency = Currencies.First();
 
-        var senderProfile = OrganizationFinancialProfile.Create(users[0].Id);
-        var receiverProfile = OrganizationFinancialProfile.Create(users[1].Id);
-        receiverBalance.IncrementBalance(100m);
+		var senderBalance = new UserBalanceBuilder(Faker)
+			.WithUserId(users[0].Id)
+			.WithCurrencyId(currency.Id)
+			.Build();
 
-        var transaction = new TransactionBuilder(Faker)
-            .WithSenderId(users[0].Id)
-            .WithReceiverId(users[1].Id)
-            .WithCurrencyId(currency.Id)
-            .WithAmount(100m)
-            .WithTransactionDateTime(DateTime.UtcNow.AddDays(-2))
-            .WithBalances(senderBalance, receiverBalance)
-            .Completed()
-            .Applied()
-            .Build();
+		var receiverBalance = new UserBalanceBuilder(Faker)
+			.WithUserId(users[1].Id)
+			.WithCurrencyId(currency.Id)
+			.Build();
 
-        await DbContext.AddRangeAsync(
-            [transaction, senderBalance, receiverBalance, senderProfile, receiverProfile],
-            cancellationToken);
-        await DbContext.SaveChangesAsync(cancellationToken);
+		var senderProfile = OrganizationFinancialProfile.Create(users[0].Id);
+		var receiverProfile = OrganizationFinancialProfile.Create(users[1].Id);
+		receiverBalance.IncrementBalance(100m);
 
-        _transactions.Add(transaction);
-    }
+		var transaction = new TransactionBuilder(Faker)
+			.WithSenderId(users[0].Id)
+			.WithReceiverId(users[1].Id)
+			.WithCurrencyId(currency.Id)
+			.WithAmount(100m)
+			.WithTransactionDateTime(DateTime.UtcNow.AddDays(-2))
+			.WithBalances(senderBalance, receiverBalance)
+			.Completed()
+			.Applied()
+			.Build();
+
+		await DbContext.AddRangeAsync(
+			[
+				transaction,
+				senderBalance,
+				receiverBalance,
+				senderProfile,
+				receiverProfile
+			],
+			cancellationToken);
+		await DbContext.SaveChangesAsync(cancellationToken);
+
+		_transactions.Add(transaction);
+	}
 }

@@ -15,213 +15,209 @@ namespace Tests.HandlersTests.ProductReservations;
 
 public class CreateProductReservationTests : IntegrationTest
 {
-    public CreateProductReservationTests(CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<ProductTestContext>();
-        RegisterBasicContext<UsersTestContext>();
-        RegisterBasicContext<CurrencyTestContext>();
-    }
+	public CreateProductReservationTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+		RegisterBasicContext<UsersTestContext>();
+		RegisterBasicContext<CurrencyTestContext>();
+	}
 
-    private ProductTestContext ProductContext => GetContext<ProductTestContext>();
-    private UsersTestContext UsersContext => GetContext<UsersTestContext>();
-    private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
+	private ProductTestContext ProductContext => GetContext<ProductTestContext>();
 
-    [Fact]
-    public async Task WithValidData_CreatesReservation()
-    {
-        var dto = GetValidDto();
-        var command = new CreateProductReservationCommand(dto);
+	private UsersTestContext UsersContext => GetContext<UsersTestContext>();
 
-        var result = await Mediator.Send(command);
+	private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
 
-        result.ReservationId.Should().BeGreaterThan(0);
+	[Fact]
+	public async Task WithValidData_CreatesReservation()
+	{
+		var dto = GetValidDto();
+		var command = new CreateProductReservationCommand(dto);
 
-        var db = await Context.ProductReservations
-            .AsNoTracking()
-            .SingleAsync(x => x.Id == result.ReservationId);
+		var result = await Mediator.Send(command);
 
-        db.Comment.Should().Be(dto.Comment);
-        db.ProductId.Should().Be(dto.ProductId);
-        db.OrganizationId.Should().Be(dto.OrganizationId);
-        db.ReservedCount.Should().Be(dto.ReservedCount);
-        db.CurrentCount.Should().Be(dto.CurrentCount);
-        db.ProposedPrice.Should().Be(dto.ProposedPrice);
-        db.ProposedCurrencyId.Should().Be(dto.GivenCurrencyId);
-        db.Status.Should().Be(ProductReservationStatus.Locked);
-    }
+		result.ReservationId.Should().BeGreaterThan(0);
 
-    [Fact]
-    public async Task WithReservedCountLessThanCurrentCount_ThrowsValidationException()
-    {
-        var dto = GetValidDto() with
-        {
-            ReservedCount = 1,
-            CurrentCount = 2
-        };
-        var command = new CreateProductReservationCommand(dto);
+		var db = await Context
+			.ProductReservations
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == result.ReservationId);
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
-    }
+		db.Comment.Should().Be(dto.Comment);
+		db.ProductId.Should().Be(dto.ProductId);
+		db.OrganizationId.Should().Be(dto.OrganizationId);
+		db.ReservedCount.Should().Be(dto.ReservedCount);
+		db.CurrentCount.Should().Be(dto.CurrentCount);
+		db.ProposedPrice.Should().Be(dto.ProposedPrice);
+		db.ProposedCurrencyId.Should().Be(dto.GivenCurrencyId);
+		db.Status.Should().Be(ProductReservationStatus.Locked);
+	}
 
-    [Fact]
-    public async Task WithCurrentCountEqualReservedCount_CreatesDoneReservation()
-    {
-        var dto = GetValidDto() with
-        {
-            ReservedCount = 3,
-            CurrentCount = 3
-        };
-        var command = new CreateProductReservationCommand(dto);
+	[Fact]
+	public async Task WithReservedCountLessThanCurrentCount_ThrowsValidationException()
+	{
+		var dto = GetValidDto() with
+		{
+			ReservedCount = 1, CurrentCount = 2
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-        var result = await Mediator.Send(command);
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+	}
 
-        var db = await Context.ProductReservations
-            .AsNoTracking()
-            .SingleAsync(x => x.Id == result.ReservationId);
-        db.Status.Should().Be(ProductReservationStatus.Done);
-    }
+	[Fact]
+	public async Task WithCurrentCountEqualReservedCount_CreatesDoneReservation()
+	{
+		var dto = GetValidDto() with
+		{
+			ReservedCount = 3, CurrentCount = 3
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-    [Fact]
-    public async Task WithoutProposedPriceAndCurrency_CreatesReservation()
-    {
-        var dto = GetValidDto() with
-        {
-            ProposedPrice = null,
-            GivenCurrencyId = null
-        };
-        var command = new CreateProductReservationCommand(dto);
+		var result = await Mediator.Send(command);
 
-        var result = await Mediator.Send(command);
-        var reservation = await Context.ProductReservations
-            .AsNoTracking()
-            .SingleAsync(x => x.Id == result.ReservationId);
+		var db = await Context
+			.ProductReservations
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == result.ReservationId);
+		db.Status.Should().Be(ProductReservationStatus.Done);
+	}
 
-        reservation.ProposedPrice.Should().BeNull();
-        reservation.ProposedCurrencyId.Should().BeNull();
-    }
+	[Fact]
+	public async Task WithoutProposedPriceAndCurrency_CreatesReservation()
+	{
+		var dto = GetValidDto() with
+		{
+			ProposedPrice = null, GivenCurrencyId = null
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public async Task WithInvalidReservedCount_ThrowsValidationException(int reservedCount)
-    {
-        var dto = GetValidDto() with
-        {
-            ReservedCount = reservedCount,
-            CurrentCount = 1
-        };
-        var command = new CreateProductReservationCommand(dto);
+		var result = await Mediator.Send(command);
+		var reservation = await Context
+			.ProductReservations
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == result.ReservationId);
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
-    }
+		reservation.ProposedPrice.Should().BeNull();
+		reservation.ProposedCurrencyId.Should().BeNull();
+	}
 
-    [Theory]
-    [InlineData(-1)]
-    public async Task WithInvalidCurrentCount_ThrowsValidationException(int currentCount)
-    {
-        var dto = GetValidDto() with
-        {
-            ReservedCount = 3,
-            CurrentCount = currentCount
-        };
-        var command = new CreateProductReservationCommand(dto);
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task WithInvalidReservedCount_ThrowsValidationException(int reservedCount)
+	{
+		var dto = GetValidDto() with
+		{
+			ReservedCount = reservedCount, CurrentCount = 1
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
-    }
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+	}
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public async Task WithInvalidProposedPrice_ThrowsValidationException(decimal proposedPrice)
-    {
-        var dto = GetValidDto() with
-        {
-            ProposedPrice = proposedPrice,
-            GivenCurrencyId = CurrencyContext.Currencies.First().Id
-        };
-        var command = new CreateProductReservationCommand(dto);
+	[Theory]
+	[InlineData(-1)]
+	public async Task WithInvalidCurrentCount_ThrowsValidationException(int currentCount)
+	{
+		var dto = GetValidDto() with
+		{
+			ReservedCount = 3, CurrentCount = currentCount
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
-    }
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+	}
 
-    [Fact]
-    public async Task WithPriceWithoutCurrency_ThrowsInvalidInputException()
-    {
-        var dto = GetValidDto() with
-        {
-            ProposedPrice = 100m,
-            GivenCurrencyId = null
-        };
-        var command = new CreateProductReservationCommand(dto);
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task WithInvalidProposedPrice_ThrowsValidationException(decimal proposedPrice)
+	{
+		var dto = GetValidDto() with
+		{
+			ProposedPrice = proposedPrice, GivenCurrencyId = CurrencyContext.Currencies.First().Id
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-        await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
-    }
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+	}
 
-    [Fact]
-    public async Task WithCurrencyWithoutPrice_ThrowsInvalidInputException()
-    {
-        var dto = GetValidDto() with
-        {
-            ProposedPrice = null,
-            GivenCurrencyId = CurrencyContext.Currencies.First().Id
-        };
-        var command = new CreateProductReservationCommand(dto);
+	[Fact]
+	public async Task WithPriceWithoutCurrency_ThrowsInvalidInputException()
+	{
+		var dto = GetValidDto() with
+		{
+			ProposedPrice = 100m, GivenCurrencyId = null
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-        await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
-    }
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
+	}
 
-    [Fact]
-    public async Task WithMissingProduct_ThrowsDbValidationException()
-    {
-        var dto = GetValidDto() with
-        {
-            ProductId = 999999
-        };
-        var command = new CreateProductReservationCommand(dto);
+	[Fact]
+	public async Task WithCurrencyWithoutPrice_ThrowsInvalidInputException()
+	{
+		var dto = GetValidDto() with
+		{
+			ProposedPrice = null, GivenCurrencyId = CurrencyContext.Currencies.First().Id
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-        await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
-    }
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
+	}
 
-    [Fact]
-    public async Task WithMissingOrganization_ThrowsDbValidationException()
-    {
-        var dto = GetValidDto() with
-        {
-            OrganizationId = Guid.NewGuid()
-        };
+	[Fact]
+	public async Task WithMissingProduct_ThrowsDbValidationException()
+	{
+		var dto = GetValidDto() with
+		{
+			ProductId = 999999
+		};
+		var command = new CreateProductReservationCommand(dto);
 
-        await Assert.ThrowsAsync<DbValidationException>(() =>
-            Mediator.Send(new CreateProductReservationCommand(dto)));
-    }
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+	}
 
-    [Fact]
-    public async Task WithMissingCurrency_ThrowsDbValidationException()
-    {
-        var dto = GetValidDto() with
-        {
-            ProposedPrice = 100m,
-            GivenCurrencyId = 999999
-        };
-        var command = new CreateProductReservationCommand(dto);
+	[Fact]
+	public async Task WithMissingOrganization_ThrowsDbValidationException()
+	{
+		var dto = GetValidDto() with
+		{
+			OrganizationId = Guid.NewGuid()
+		};
 
-        await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
-    }
+		await Assert.ThrowsAsync<DbValidationException>(() =>
+			Mediator.Send(new CreateProductReservationCommand(dto)));
+	}
 
-    private NewProductReservationDto GetValidDto()
-    {
-        var reservedCount = Faker.Random.Int(10, 1000);
-        var hasProposedPrice = Faker.Random.Bool();
-        var user = Faker.PickRandom<User>(UsersContext.Users);
-        return new NewProductReservationDto
-        {
-            ProductId = Faker.PickRandom<Product>(ProductContext.Products).Id,
-            Comment = Faker.Lorem.Sentence(),
-            GivenCurrencyId =
-                hasProposedPrice ? Faker.PickRandom<Currency>(CurrencyContext.Currencies).Id : null,
-            ReservedCount = reservedCount,
-            CurrentCount = Faker.Random.Int(1, reservedCount - 1),
-            ProposedPrice = hasProposedPrice ? Math.Round(Faker.Random.Decimal(1, 1000), 2) : null,
-            OrganizationId = user.Id
-        };
-    }
+	[Fact]
+	public async Task WithMissingCurrency_ThrowsDbValidationException()
+	{
+		var dto = GetValidDto() with
+		{
+			ProposedPrice = 100m, GivenCurrencyId = 999999
+		};
+		var command = new CreateProductReservationCommand(dto);
+
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+	}
+
+	private NewProductReservationDto GetValidDto()
+	{
+		var reservedCount = Faker.Random.Int(10, 1000);
+		var hasProposedPrice = Faker.Random.Bool();
+		var user = Faker.PickRandom<User>(UsersContext.Users);
+		return new NewProductReservationDto
+		{
+			ProductId = Faker.PickRandom<Product>(ProductContext.Products).Id,
+			Comment = Faker.Lorem.Sentence(),
+			GivenCurrencyId =
+				hasProposedPrice ? Faker.PickRandom<Currency>(CurrencyContext.Currencies).Id : null,
+			ReservedCount = reservedCount,
+			CurrentCount = Faker.Random.Int(1, reservedCount - 1),
+			ProposedPrice = hasProposedPrice ? Math.Round(Faker.Random.Decimal(1, 1000), 2) : null,
+			OrganizationId = user.Id
+		};
+	}
 }

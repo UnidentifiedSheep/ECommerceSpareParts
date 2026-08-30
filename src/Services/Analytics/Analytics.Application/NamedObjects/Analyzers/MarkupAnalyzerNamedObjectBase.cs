@@ -5,7 +5,7 @@ namespace Analytics.Application.NamedObjects.Analyzers;
 
 public abstract class MarkupAnalyzerNamedObjectBase : LocalizableNameObject
 {
-    public abstract Task<IReadOnlyList<MarkupRangeDraft>> AnalyzeAsync(
-        MarkupAnalyzerInput input,
-        CancellationToken cancellationToken = default);
+	public abstract Task<IReadOnlyList<MarkupRangeDraft>> AnalyzeAsync(
+		MarkupAnalyzerInput input,
+		CancellationToken cancellationToken = default);
 }

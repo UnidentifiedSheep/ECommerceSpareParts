@@ -4,7 +4,6 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Enums;
 using Exceptions;
 using Main.Entities.Balance;
 using Main.Enums;
@@ -13,150 +12,161 @@ namespace Main.Entities.Purchase;
 
 public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, Guid>
 {
-    private readonly List<PurchaseContent> _contents = [];
+	private readonly List<PurchaseContent> _contents = [];
 
-    private Purchase() { }
+	private Purchase()
+	{
+	}
 
-    private Purchase(
-        Guid supplierUserId,
-        Guid supplierOrganizationId,
-        int currencyId,
-        Guid transactionId,
-        string storage,
-        DateTime purchaseDatetime)
-    {
-        SupplierUserId = supplierUserId;
-        SupplierOrganizationId = supplierOrganizationId;
-        SetPurchaseDate(purchaseDatetime);
-        SetCurrencyId(currencyId);
-        TransactionId = transactionId;
-        Storage = storage;
-        State = PurchaseState.Draft;
-    }
+	private Purchase(
+		Guid supplierUserId,
+		Guid supplierOrganizationId,
+		int currencyId,
+		Guid transactionId,
+		string storage,
+		DateTime purchaseDatetime)
+	{
+		SupplierUserId = supplierUserId;
+		SupplierOrganizationId = supplierOrganizationId;
+		SetPurchaseDate(purchaseDatetime);
+		SetCurrencyId(currencyId);
+		TransactionId = transactionId;
+		Storage = storage;
+		State = PurchaseState.Draft;
+	}
 
-    [Validate]
-    public Guid Id { get; private set; }
+	[Validate]
+	public Guid Id { get; private set; }
 
-    public Guid SupplierUserId { get; private set; }
-    public Guid SupplierOrganizationId { get; private set; }
-    public int CurrencyId { get; private set; }
-    public Guid TransactionId { get; private set; }
-    public string Storage { get; private set; } = null!;
-    public DateTime PurchaseDatetime { get; private set; }
-    public string? Comment { get; private set; }
-    public PurchaseState State { get; private set; }
-    public virtual Currency.Currency Currency { get; private set; } = null!;
-    public virtual PurchaseLogistic? PurchaseLogistic { get; private set; }
-    public virtual User.User SupplierUser { get; private set; } = null!;
-    public virtual Organization.Organization SupplierOrganization { get; private set; } = null!;
-    public virtual Transaction Transaction { get; private set; } = null!;
-    public IReadOnlyCollection<PurchaseContent> Contents => _contents;
+	public Guid SupplierUserId { get; private set; }
 
-    public static Expression<Func<Purchase, Guid>> GetKeySelector() { return x => x.Id; }
+	public Guid SupplierOrganizationId { get; private set; }
 
-    public static Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
+	public int CurrencyId { get; private set; }
 
-    public static Purchase Create(
-        Guid supplierUserId,
-        Guid supplierOrganizationId,
-        int currencyId,
-        Guid transactionId,
-        string storage,
-        DateTime purchaseDatetime)
-    {
-        return new Purchase(
-            supplierUserId,
-            supplierOrganizationId,
-            currencyId,
-            transactionId,
-            storage,
-            purchaseDatetime);
-    }
+	public Guid TransactionId { get; private set; }
 
-    public void SetComment(string? comment)
-    {
-        Comment = comment
-            .NullIfWhiteSpace()
-            ?
-            .EnsureMaxLength(
-                256,
-                () => throw new InvalidInputException("purchase.comment.too.long"));
-    }
+	public string Storage { get; private set; } = null!;
 
-    public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
+	public DateTime PurchaseDatetime { get; private set; }
 
-    public void SetTransactionId(Guid transactionId) { TransactionId = transactionId; }
+	public string? Comment { get; private set; }
 
-    public void SetPurchaseDate(DateTime purchaseDatetime) { PurchaseDatetime = purchaseDatetime; }
+	public PurchaseState State { get; private set; }
 
-    public void AddContent(PurchaseContent content)
-    {
-        if (content.PurchaseId == Guid.Empty) content.SetPurchaseId(GetId());
+	public virtual Currency.Currency Currency { get; private set; } = null!;
 
-        if (content.PurchaseId != GetId())
-            throw new InvalidOperationException("Invalid purchase id in purchase content");
-        if (_contents.Contains(content)) return;
-        _contents.Add(content);
-    }
+	public virtual PurchaseLogistic? PurchaseLogistic { get; private set; }
 
-    public void RemoveContent(PurchaseContent content)
-    {
-        if (content.PurchaseId != GetId())
-            throw new InvalidOperationException("Invalid purchase id in purchase content");
+	public virtual User.User SupplierUser { get; private set; } = null!;
 
-        _contents.Remove(content);
-    }
+	public virtual Organization.Organization SupplierOrganization { get; private set; } = null!;
 
-    public void SetPurchaseLogistic(
-        Guid routeId,
-        int logisticsCurrencyId,
-        LogisticPricingType pricingModel,
-        RouteType routeType,
-        decimal priceKg,
-        decimal pricePerM3,
-        decimal pricePerOrder,
-        decimal? minimumPrice,
-        Guid? transactionId,
-        bool minimumPriceApplied)
-    {
-        if (PurchaseLogistic == null)
-            PurchaseLogistic = PurchaseLogistic.Create(
-                GetId(),
-                routeId,
-                logisticsCurrencyId,
-                transactionId,
-                pricingModel,
-                routeType,
-                priceKg,
-                pricePerM3,
-                pricePerOrder,
-                minimumPrice,
-                minimumPriceApplied);
-        else
-            PurchaseLogistic.Update(
-                routeId,
-                logisticsCurrencyId,
-                transactionId,
-                pricingModel,
-                routeType,
-                priceKg,
-                pricePerM3,
-                pricePerOrder,
-                minimumPrice,
-                minimumPriceApplied);
-    }
+	public virtual Transaction Transaction { get; private set; } = null!;
 
-    public PurchaseLogistic? ClearPurchaseLogistic()
-    {
-        var logistic = PurchaseLogistic;
-        PurchaseLogistic = null;
-        return logistic;
-    }
+	public IReadOnlyCollection<PurchaseContent> Contents => _contents;
 
-    public void Complete() { State = PurchaseState.Completed; }
+	public static Expression<Func<Purchase, Guid>> GetKeySelector() => x => x.Id;
 
-    public override Guid GetId() { return Id; }
+	public static Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
+
+	public static Purchase Create(
+		Guid supplierUserId,
+		Guid supplierOrganizationId,
+		int currencyId,
+		Guid transactionId,
+		string storage,
+		DateTime purchaseDatetime)
+	{
+		return new Purchase(
+			supplierUserId,
+			supplierOrganizationId,
+			currencyId,
+			transactionId,
+			storage,
+			purchaseDatetime);
+	}
+
+	public void SetComment(string? comment)
+	{
+		Comment = comment
+			.NullIfWhiteSpace()
+			?.EnsureMaxLength(256, () => throw new InvalidInputException("purchase.comment.too.long"));
+	}
+
+	public void SetCurrencyId(int currencyId) => CurrencyId = currencyId;
+
+	public void SetTransactionId(Guid transactionId) => TransactionId = transactionId;
+
+	public void SetPurchaseDate(DateTime purchaseDatetime) => PurchaseDatetime = purchaseDatetime;
+
+	public void AddContent(PurchaseContent content)
+	{
+		if (content.PurchaseId == Guid.Empty)
+			content.SetPurchaseId(GetId());
+
+		if (content.PurchaseId != GetId())
+			throw new InvalidOperationException("Invalid purchase id in purchase content");
+		if (_contents.Contains(content))
+			return;
+		_contents.Add(content);
+	}
+
+	public void RemoveContent(PurchaseContent content)
+	{
+		if (content.PurchaseId != GetId())
+			throw new InvalidOperationException("Invalid purchase id in purchase content");
+
+		_contents.Remove(content);
+	}
+
+	public void SetPurchaseLogistic(
+		Guid routeId,
+		int logisticsCurrencyId,
+		LogisticPricingType pricingModel,
+		RouteType routeType,
+		decimal priceKg,
+		decimal pricePerM3,
+		decimal pricePerOrder,
+		decimal? minimumPrice,
+		Guid? transactionId,
+		bool minimumPriceApplied)
+	{
+		if (PurchaseLogistic == null)
+			PurchaseLogistic = PurchaseLogistic.Create(
+				GetId(),
+				routeId,
+				logisticsCurrencyId,
+				transactionId,
+				pricingModel,
+				routeType,
+				priceKg,
+				pricePerM3,
+				pricePerOrder,
+				minimumPrice,
+				minimumPriceApplied);
+		else
+			PurchaseLogistic.Update(
+				routeId,
+				logisticsCurrencyId,
+				transactionId,
+				pricingModel,
+				routeType,
+				priceKg,
+				pricePerM3,
+				pricePerOrder,
+				minimumPrice,
+				minimumPriceApplied);
+	}
+
+	public PurchaseLogistic? ClearPurchaseLogistic()
+	{
+		var logistic = PurchaseLogistic;
+		PurchaseLogistic = null;
+		return logistic;
+	}
+
+	public void Complete() => State = PurchaseState.Completed;
+
+	public override Guid GetId() => Id;
 }

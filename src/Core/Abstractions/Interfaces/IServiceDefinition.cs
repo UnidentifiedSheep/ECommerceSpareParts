@@ -2,5 +2,5 @@ namespace Abstractions.Interfaces;
 
 public interface IServiceDefinition
 {
-    string ServiceName { get; }
+	string ServiceName { get; }
 }

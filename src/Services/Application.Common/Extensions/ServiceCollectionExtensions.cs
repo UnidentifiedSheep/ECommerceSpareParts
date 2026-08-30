@@ -25,167 +25,157 @@ namespace Application.Common.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterIdCollector(this IServiceCollection collection)
-    {
-        collection.AddScoped<IIdsCollector, IdsCollector>();
-        return collection;
-    }
+	public static IServiceCollection RegisterIdCollector(this IServiceCollection collection)
+	{
+		collection.AddScoped<IIdsCollector, IdsCollector>();
+		return collection;
+	}
 
-    public static IServiceCollection RegisterSettingsService(
-        this IServiceCollection collection)
-    {
-        collection.AddSingleton<ISettingsContainer, SettingsContainer>();
-        collection.AddScoped<ISettingsService, SettingsService>();
-        collection.AddScoped<
-            INotificationHandler<Batch<SettingUpdatedDomainEvent>>,
-            PublishSettingUpdatedEventHandler>();
+	public static IServiceCollection RegisterSettingsService(this IServiceCollection collection)
+	{
+		collection.AddSingleton<ISettingsContainer, SettingsContainer>();
+		collection.AddScoped<ISettingsService, SettingsService>();
+		collection.AddScoped<
+			INotificationHandler<Batch<SettingUpdatedDomainEvent>>, PublishSettingUpdatedEventHandler>();
 
-        collection.TryAddScoped<
-            IRequestHandler<UpdateSettingCommand, UpdateSettingResult>,
-            UpdateSettingHandler>();
+		collection.TryAddScoped<
+			IRequestHandler<UpdateSettingCommand, UpdateSettingResult>, UpdateSettingHandler>();
 
-        collection.TryAddScoped<
-            IRequestHandler<GetSettingsQuery, GetSettingsResult>,
-            GetSettingsHandler>();
-        
-        collection.TryAddScoped<
-            IRequestHandler<GetRawSettingQuery, GetRawSettingResult>,
-            GetRawSettingHandler>();
+		collection.TryAddScoped<IRequestHandler<GetSettingsQuery, GetSettingsResult>, GetSettingsHandler>();
 
-        return collection;
-    }
+		collection.TryAddScoped<
+			IRequestHandler<GetRawSettingQuery, GetRawSettingResult>, GetRawSettingHandler>();
 
-    public static IServiceCollection RegisterCachePolicies(
-        this IServiceCollection services,
-        Assembly? assembly = null)
-    {
-        assembly ??= Assembly.GetExecutingAssembly();
+		return collection;
+	}
 
-        var types = assembly.GetTypes()
-            .Where(t => t is { IsAbstract: false, IsInterface: false })
-            .Select(t => new
-            {
-                Implementation = t,
-                Interfaces = t.GetInterfaces()
-                    .Where(i => i.IsGenericType &&
-                                i.GetGenericTypeDefinition() == typeof(ICachePolicy<>))
-            })
-            .Where(x => x.Interfaces.Any());
+	public static IServiceCollection RegisterCachePolicies(
+		this IServiceCollection services,
+		Assembly? assembly = null)
+	{
+		assembly ??= Assembly.GetExecutingAssembly();
 
-        foreach (var type in types)
-        foreach (var @interface in type.Interfaces)
-            services.AddScoped(@interface, type.Implementation);
+		var types = assembly
+			.GetTypes()
+			.Where(t => t is { IsAbstract: false, IsInterface: false })
+			.Select(t => new
+			{
+				Implementation = t,
+				Interfaces = t
+					.GetInterfaces()
+					.Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICachePolicy<>))
+			})
+			.Where(x => x.Interfaces.Any());
 
-        return services;
-    }
+		foreach (var type in types)
+		foreach (var @interface in type.Interfaces)
+			services.AddScoped(@interface, type.Implementation);
 
-    public static IServiceCollection RegisterDbValidations(
-        this IServiceCollection services,
-        Assembly? assembly = null)
-    {
-        assembly ??= Assembly.GetExecutingAssembly();
-        var validationTypes = assembly.GetTypes()
-            .Where(t => !t.IsAbstract && !t.IsInterface)
-            .Where(t => t.BaseType != null
-                        && t.BaseType.IsGenericType
-                        && t.BaseType.GetGenericTypeDefinition() == typeof(AbstractDbValidation<>));
+		return services;
+	}
 
-        foreach (var type in validationTypes)
-        {
-            var baseType = type.BaseType!;
-            services.AddScoped(baseType, type);
-        }
+	public static IServiceCollection RegisterDbValidations(
+		this IServiceCollection services,
+		Assembly? assembly = null)
+	{
+		assembly ??= Assembly.GetExecutingAssembly();
+		var validationTypes = assembly
+			.GetTypes()
+			.Where(t => !t.IsAbstract && !t.IsInterface)
+			.Where(t =>
+				t.BaseType != null && t.BaseType.IsGenericType && t.BaseType.GetGenericTypeDefinition() ==
+				typeof(AbstractDbValidation<>));
 
-        return services;
-    }
+		foreach (var type in validationTypes)
+		{
+			var baseType = type.BaseType!;
+			services.AddScoped(baseType, type);
+		}
 
-    public static IServiceCollection RegisterIntegrationEventScope(this IServiceCollection services)
-    {
-        services.AddScoped<IIntegrationEventScope, IntegrationEventScope>();
-        return services;
-    }
+		return services;
+	}
 
-    public static IServiceCollection RegisterDomainEventScope(this IServiceCollection services)
-    {
-        services.AddScoped<IDomainEventScope, DomainEventScope>();
-        services.AddScoped<IDomainEventExecutor, DomainEventExecutor>();
-        return services;
-    }
+	public static IServiceCollection RegisterIntegrationEventScope(this IServiceCollection services)
+	{
+		services.AddScoped<IIntegrationEventScope, IntegrationEventScope>();
+		return services;
+	}
 
-    public static IServiceCollection RegisterApplicationTransactions(
-        this IServiceCollection services)
-    {
-        services.AddScoped<IRepositoryProvider, RepositoryProvider>();
-        services.AddScoped<
-            IApplicationTransactionContext,
-            ApplicationTransactionContext>();
-        services.AddScoped<
-            IApplicationTransactionService,
-            ApplicationTransactionService>();
-        return services;
-    }
+	public static IServiceCollection RegisterDomainEventScope(this IServiceCollection services)
+	{
+		services.AddScoped<IDomainEventScope, DomainEventScope>();
+		services.AddScoped<IDomainEventExecutor, DomainEventExecutor>();
+		return services;
+	}
 
-    public static IServiceCollection RegisterFluentValidations(
-        this IServiceCollection services,
-        Assembly? assembly = null)
-    {
-        assembly ??= Assembly.GetExecutingAssembly();
-        services.AddValidatorsFromAssembly(assembly);
+	public static IServiceCollection RegisterApplicationTransactions(this IServiceCollection services)
+	{
+		services.AddScoped<IRepositoryProvider, RepositoryProvider>();
+		services.AddScoped<IApplicationTransactionContext, ApplicationTransactionContext>();
+		services.AddScoped<IApplicationTransactionService, ApplicationTransactionService>();
+		return services;
+	}
 
-        return services;
-    }
+	public static IServiceCollection RegisterFluentValidations(
+		this IServiceCollection services,
+		Assembly? assembly = null)
+	{
+		assembly ??= Assembly.GetExecutingAssembly();
+		services.AddValidatorsFromAssembly(assembly);
 
-    public static IServiceCollection RegisterNamedObject<TBaseObject>(
-        this IServiceCollection services,
-        Assembly? assembly = null,
-        ServiceLifetime objectsLifetime = ServiceLifetime.Scoped,
-        params Type[] objectsToExclude)
-        where TBaseObject : class, INamedObject
-    {
-        assembly ??= typeof(TBaseObject).Assembly;
-        var excludedTypes = objectsToExclude.ToHashSet();
+		return services;
+	}
 
-        services.Scan(scan =>
-        {
-            var registration = scan
-                .FromAssemblies(assembly)
-                .AddClasses(classes => classes
-                    .AssignableTo<TBaseObject>()
-                    .Where(type => !excludedTypes.Contains(type)))
-                .As<TBaseObject>();
+	public static IServiceCollection RegisterNamedObject<TBaseObject>(
+		this IServiceCollection services,
+		Assembly? assembly = null,
+		ServiceLifetime objectsLifetime = ServiceLifetime.Scoped,
+		params Type[] objectsToExclude) where TBaseObject : class, INamedObject
+	{
+		assembly ??= typeof(TBaseObject).Assembly;
+		var excludedTypes = objectsToExclude.ToHashSet();
 
-            switch (objectsLifetime)
-            {
-                case ServiceLifetime.Singleton:
-                    registration.WithSingletonLifetime();
-                    break;
+		services.Scan(scan =>
+		{
+			var registration = scan
+				.FromAssemblies(assembly)
+				.AddClasses(classes => classes
+					.AssignableTo<TBaseObject>()
+					.Where(type => !excludedTypes.Contains(type)))
+				.As<TBaseObject>();
 
-                case ServiceLifetime.Scoped:
-                    registration.WithScopedLifetime();
-                    break;
+			switch (objectsLifetime)
+			{
+				case ServiceLifetime.Singleton:
+					registration.WithSingletonLifetime();
+					break;
 
-                case ServiceLifetime.Transient:
-                    registration.WithTransientLifetime();
-                    break;
+				case ServiceLifetime.Scoped:
+					registration.WithScopedLifetime();
+					break;
 
-                default:
-                    throw new ArgumentOutOfRangeException(
-                        nameof(objectsLifetime),
-                        objectsLifetime,
-                        null);
-            }
-        });
+				case ServiceLifetime.Transient:
+					registration.WithTransientLifetime();
+					break;
 
-        services.TryAddScoped(typeof(INamedObjectRegistry<>), typeof(NamedObjectRegistry<>));
-        services.TryAddScoped<INamedObjectGroupResolver, NamedObjectGroupResolver>();
+				default:
+					throw new ArgumentOutOfRangeException(
+						nameof(objectsLifetime),
+						objectsLifetime,
+						null);
+			}
+		});
 
-        return services;
-    }
+		services.TryAddScoped(typeof(INamedObjectRegistry<>), typeof(NamedObjectRegistry<>));
+		services.TryAddScoped<INamedObjectGroupResolver, NamedObjectGroupResolver>();
 
-    public static IServiceCollection AddCqrsMetrics(this IServiceCollection collection)
-    {
-        collection.AddMetrics();
-        collection.AddSingleton<CqrsMetrics>();
-        return collection;
-    }
+		return services;
+	}
+
+	public static IServiceCollection AddCqrsMetrics(this IServiceCollection collection)
+	{
+		collection.AddMetrics();
+		collection.AddSingleton<CqrsMetrics>();
+		return collection;
+	}
 }

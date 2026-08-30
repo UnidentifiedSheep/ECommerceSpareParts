@@ -2,140 +2,130 @@ using Application.Common.Interfaces.Cache;
 
 namespace Cache.Extensions;
 
-public readonly record struct CacheArrayResult<T>(
-    bool IsHit,
-    IReadOnlyList<T> Values
-);
+public readonly record struct CacheArrayResult<T>(bool IsHit, IReadOnlyList<T> Values);
 
 public static class CacheExtensions
 {
-    public static async Task<T?> GetOrSetAsync<T>(
-        this ICache cache,
-        string key,
-        Func<Task<T?>> factory,
-        TimeSpan? ttl = null)
-    {
-        var cached = await cache.GetAsync<T>(key);
-        if (cached != null) return cached;
+	public static async Task<T?> GetOrSetAsync<T>(
+		this ICache cache,
+		string key,
+		Func<Task<T?>> factory,
+		TimeSpan? ttl = null)
+	{
+		var cached = await cache.GetAsync<T>(key);
+		if (cached != null)
+			return cached;
 
-        var value = await factory();
-        if (value == null) return default;
+		var value = await factory();
+		if (value == null)
+			return default;
 
-        await cache.SetAsync<T>(
-            [(key, value)],
-            ttl);
+		await cache.SetAsync<T>([(key, value)], ttl);
 
-        return value;
-    }
+		return value;
+	}
 
-    public static async Task<Dictionary<TKey, TValue>> GetOrSetManyAsync<TKey, TValue>(
-        this ICache cache,
-        IEnumerable<TKey> ids,
-        Func<TKey, string> getKey,
-        Func<TValue, TKey> getId,
-        Func<IReadOnlySet<TKey>, Task<Dictionary<TKey, TValue>>> getMissing,
-        TimeSpan? ttl = null)
-        where TKey : notnull
-    {
-        var idsSet = ids.ToHashSet();
-        var result = new Dictionary<TKey, TValue>();
+	public static async Task<Dictionary<TKey, TValue>> GetOrSetManyAsync<TKey, TValue>(
+		this ICache cache,
+		IEnumerable<TKey> ids,
+		Func<TKey, string> getKey,
+		Func<TValue, TKey> getId,
+		Func<IReadOnlySet<TKey>, Task<Dictionary<TKey, TValue>>> getMissing,
+		TimeSpan? ttl = null) where TKey : notnull
+	{
+		var idsSet = ids.ToHashSet();
+		var result = new Dictionary<TKey, TValue>();
 
-        if (idsSet.Count == 0) return result;
+		if (idsSet.Count == 0)
+			return result;
 
-        var cached = await cache.GetAsync<TValue>(idsSet.Select(getKey));
+		var cached = await cache.GetAsync<TValue>(idsSet.Select(getKey));
 
-        foreach (var found in cached)
-        {
-            if (found == null) continue;
+		foreach (var found in cached)
+		{
+			if (found == null)
+				continue;
 
-            var id = getId(found);
-            result[id] = found;
-            idsSet.Remove(id);
-        }
+			var id = getId(found);
+			result[id] = found;
+			idsSet.Remove(id);
+		}
 
-        if (idsSet.Count == 0) return result;
+		if (idsSet.Count == 0)
+			return result;
 
-        var missing = await getMissing(idsSet);
-        if (missing.Count == 0) return result;
+		var missing = await getMissing(idsSet);
+		if (missing.Count == 0)
+			return result;
 
-        await cache.SetAsync(
-            missing.Values.Select(x => (getKey(getId(x)), x)),
-            ttl);
+		await cache.SetAsync(missing.Values.Select(x => (getKey(getId(x)), x)), ttl);
 
-        foreach (var item in missing) result[item.Key] = item.Value;
+		foreach (var item in missing)
+			result[item.Key] = item.Value;
 
-        return result;
-    }
+		return result;
+	}
 
-    public static async Task<CacheArrayResult<T>> GetJsonArrayOrEmptyAsync<T>(
-        this ICache cache,
-        string key)
-    {
-        var values = (await cache.GetEnumerableAsync<T>(key))
-            .Where(x => x != null)
-            .Select(x => x!)
-            .ToList();
+	public static async Task<CacheArrayResult<T>> GetJsonArrayOrEmptyAsync<T>(this ICache cache, string key)
+	{
+		var values = (await cache.GetEnumerableAsync<T>(key)).Where(x => x != null).Select(x => x!).ToList();
 
-        if (values.Count != 0) return new CacheArrayResult<T>(true, values);
+		if (values.Count != 0)
+			return new CacheArrayResult<T>(true, values);
 
-        var exists = await cache.KeyExistsAsync(key);
-        return new CacheArrayResult<T>(exists, values);
-    }
+		var exists = await cache.KeyExistsAsync(key);
+		return new CacheArrayResult<T>(exists, values);
+	}
 
-    public static Task SetJsonArrayAsync<T>(
-        this ICache cache,
-        string key,
-        IEnumerable<T> values,
-        TimeSpan? ttl = null)
-    {
-        return cache.SetEnumerableAsync(
-            key,
-            values,
-            ttl: ttl);
-    }
+	public static Task SetJsonArrayAsync<T>(
+		this ICache cache,
+		string key,
+		IEnumerable<T> values,
+		TimeSpan? ttl = null)
+	{
+		return cache.SetEnumerableAsync(
+			key,
+			values,
+			ttl);
+	}
 
-    public static Task AddRelationsAsync<TKey>(
-        this ICache cache,
-        IEnumerable<TKey> ids,
-        Func<TKey, string> getRelationKey,
-        string cacheKey,
-        TimeSpan? ttl = null)
-    {
-        var relations = ids
-            .Distinct()
-            .GroupBy(getRelationKey)
-            .ToDictionary(
-                x => x.Key,
-                x => x.Select(_ => cacheKey).ToList());
+	public static Task AddRelationsAsync<TKey>(
+		this ICache cache,
+		IEnumerable<TKey> ids,
+		Func<TKey, string> getRelationKey,
+		string cacheKey,
+		TimeSpan? ttl = null)
+	{
+		var relations = ids
+			.Distinct()
+			.GroupBy(getRelationKey)
+			.ToDictionary(x => x.Key, x => x.Select(_ => cacheKey).ToList());
 
-        return cache.AddToSetAsync(relations, ttl);
-    }
+		return cache.AddToSetAsync(relations, ttl);
+	}
 
-    public static async Task InvalidateByRelationsAsync(
-        this ICache cache,
-        string relationKey)
-    {
-        var keysToDelete = (await cache.GetFromSetAsync(relationKey))
-            .ToList();
+	public static async Task InvalidateByRelationsAsync(this ICache cache, string relationKey)
+	{
+		var keysToDelete = (await cache.GetFromSetAsync(relationKey)).ToList();
 
-        if (keysToDelete.Count == 0) return;
+		if (keysToDelete.Count == 0)
+			return;
 
-        keysToDelete.Add(relationKey);
-        await cache.RemoveKeysAsync(keysToDelete);
-    }
+		keysToDelete.Add(relationKey);
+		await cache.RemoveKeysAsync(keysToDelete);
+	}
 
-    public static async Task InvalidateByRelationsAsync(
-        this ICache cache,
-        IEnumerable<string> relationKeys)
-    {
-        var relationKeysList = relationKeys as string[] ?? relationKeys.ToArray();
-        var keysToDelete = (await cache.GetFromManySetsAsync(relationKeysList))
-            .Values
-            .SelectMany(x => x)
-            .ToList();
+	public static async Task InvalidateByRelationsAsync(this ICache cache, IEnumerable<string> relationKeys)
+	{
+		var relationKeysList = relationKeys as string[] ?? relationKeys.ToArray();
+		var keysToDelete = (await cache.GetFromManySetsAsync(relationKeysList))
+			.Values
+			.SelectMany(x => x)
+			.ToList();
 
-        if (keysToDelete.Count == 0) return;
+		if (keysToDelete.Count == 0)
+			return;
 
-        await cache.RemoveKeysAsync(keysToDelete.Concat(relationKeysList));
-    }
+		await cache.RemoveKeysAsync(keysToDelete.Concat(relationKeysList));
+	}
 }

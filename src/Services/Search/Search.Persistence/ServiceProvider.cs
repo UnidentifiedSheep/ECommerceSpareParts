@@ -15,37 +15,35 @@ namespace Search.Persistence;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddPersistenceLayer(this IServiceCollection services)
-    {
-        services.AddSingleton<IOpenSearchClient>(sp =>
-        {
-            var options = sp.GetRequiredService<IOptions<OpenSearchOptions>>().Value;
-            var connectionSettings = new ConnectionSettings(new Uri(options.Uri));
+	public static IServiceCollection AddPersistenceLayer(this IServiceCollection services)
+	{
+		services.AddSingleton<IOpenSearchClient>(sp =>
+		{
+			var options = sp.GetRequiredService<IOptions<OpenSearchOptions>>().Value;
+			var connectionSettings = new ConnectionSettings(new Uri(options.Uri));
 
-            if (!string.IsNullOrWhiteSpace(options.Username) &&
-                !string.IsNullOrWhiteSpace(options.Password))
-                connectionSettings = connectionSettings.BasicAuthentication(
-                    options.Username,
-                    options.Password);
+			if (!string.IsNullOrWhiteSpace(options.Username) && !string.IsNullOrWhiteSpace(options.Password))
+				connectionSettings = connectionSettings.BasicAuthentication(
+					options.Username,
+					options.Password);
 
-            if (options.AllowInvalidCertificate)
-                connectionSettings = connectionSettings.ServerCertificateValidationCallback(
-                    CertificateValidations.AllowAll);
+			if (options.AllowInvalidCertificate)
+				connectionSettings =
+					connectionSettings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
 
-            return new OpenSearchClient(connectionSettings);
-        });
+			return new OpenSearchClient(connectionSettings);
+		});
 
-        services.AddSingleton<IProductRepository, ProductRepository>();
-        services.AddSingleton<IProducerRepository, ProducerRepository>();
-        services.AddSingleton<ICatalogueCandidateRepository, CatalogueCandidateRepository>();
-        services.AddSingleton<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();
-        services.AddSingleton<IProducerSearchDocumentProvider, MainProducerSearchDocumentProvider>();
+		services.AddSingleton<IProductRepository, ProductRepository>();
+		services.AddSingleton<IProducerRepository, ProducerRepository>();
+		services.AddSingleton<ICatalogueCandidateRepository, CatalogueCandidateRepository>();
+		services.AddSingleton<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();
+		services.AddSingleton<IProducerSearchDocumentProvider, MainProducerSearchDocumentProvider>();
 
+		services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();
+		services.AddSingleton<IIndexInitializer<Producer>, ProducerIndexInitializer>();
+		services.AddSingleton<IIndexInitializer<CatalogueCandidate>, CatalogueCandidateIndexInitializer>();
 
-        services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();
-        services.AddSingleton<IIndexInitializer<Producer>, ProducerIndexInitializer>();
-        services.AddSingleton<IIndexInitializer<CatalogueCandidate>, CatalogueCandidateIndexInitializer>();
-
-        return services;
-    }
+		return services;
+	}
 }

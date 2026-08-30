@@ -12,22 +12,19 @@ public record GetBaseCurrencyQuery : IQuery<GetBaseCurrencyResult>;
 public record GetBaseCurrencyResult(CurrencyDto Currency);
 
 public class GetBaseCurrencyHandler(
-    ISettingsService settingsService,
-    ICurrencyCacheRepository cacheRepository)
-    : IQueryHandler<GetBaseCurrencyQuery, GetBaseCurrencyResult>
+	ISettingsService settingsService,
+	ICurrencyCacheRepository cacheRepository) : IQueryHandler<GetBaseCurrencyQuery, GetBaseCurrencyResult>
 {
-    public async Task<GetBaseCurrencyResult> Handle(
-        GetBaseCurrencyQuery request,
-        CancellationToken cancellationToken)
-    {
-        var setting = await settingsService
-            .GetOrDefault<CurrencySetting>(cancellationToken);
-        var baseCurrencyId = setting.Data.BaseCurrencyId;
+	public async Task<GetBaseCurrencyResult> Handle(
+		GetBaseCurrencyQuery request,
+		CancellationToken cancellationToken)
+	{
+		var setting = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
+		var baseCurrencyId = setting.Data.BaseCurrencyId;
 
-        var currency = await cacheRepository
-                           .GetCurrency(baseCurrencyId, cancellationToken)
-                       ?? throw new CurrencyNotFoundException(baseCurrencyId);
+		var currency = await cacheRepository.GetCurrency(baseCurrencyId, cancellationToken) ??
+			throw new CurrencyNotFoundException(baseCurrencyId);
 
-        return new GetBaseCurrencyResult(currency);
-    }
+		return new GetBaseCurrencyResult(currency);
+	}
 }

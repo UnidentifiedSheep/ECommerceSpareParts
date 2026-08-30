@@ -16,29 +16,24 @@ namespace Main.Application.Handlers.Users.RemoveEmailFromUser;
 [AutoSave]
 public record RemoveEmailFromUserCommand(Guid UserId, string Email) : ICommand;
 
-public class RemoveEmailFromUserHandler(
-    IOptions<UserEmailOptions> options,
-    IUserRepository repository
-) : ICommandHandler<RemoveEmailFromUserCommand>
+public class RemoveEmailFromUserHandler(IOptions<UserEmailOptions> options, IUserRepository repository)
+	: ICommandHandler<RemoveEmailFromUserCommand>
 {
-    public async Task<Unit> Handle(
-        RemoveEmailFromUserCommand request,
-        CancellationToken cancellationToken)
-    {
-        var criteria = Criteria<User>.New()
-            .Where(x => x.Id == request.UserId)
-            .WhereDoesNotHaveRole(Role.System)
-            .Include(x => x.Emails)
-            .Track()
-            .Build();
+	public async Task<Unit> Handle(RemoveEmailFromUserCommand request, CancellationToken cancellationToken)
+	{
+		var criteria = Criteria<User>
+			.New()
+			.Where(x => x.Id == request.UserId)
+			.WhereDoesNotHaveRole(Role.System)
+			.Include(x => x.Emails)
+			.Track()
+			.Build();
 
-        var user = await repository.FirstOrDefaultAsync(criteria, cancellationToken)
-                   ?? throw new UserNotFoundException(request.UserId);
+		var user = await repository.FirstOrDefaultAsync(criteria, cancellationToken) ??
+			throw new UserNotFoundException(request.UserId);
 
-        user.RemoveEmail(
-            request.Email,
-            options.Value.MinEmailCount);
+		user.RemoveEmail(request.Email, options.Value.MinEmailCount);
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

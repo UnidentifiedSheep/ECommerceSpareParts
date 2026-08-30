@@ -9,34 +9,30 @@ using MediatR;
 
 namespace Main.Application.Handlers.Organizations.ChangeOrganizationMemberRole;
 
-[Transactional, AutoSave]
-public record ChangeOrganizationMemberRoleCommand(
-    Guid OrganizationId,
-    Guid UserId,
-    OrganizationRole Role
-) : ICommand;
+[Transactional]
+[AutoSave]
+public record ChangeOrganizationMemberRoleCommand(Guid OrganizationId, Guid UserId, OrganizationRole Role)
+	: ICommand;
 
 public class ChangeOrganizationMemberRoleHandler(IRepository<Organization, Guid> repository)
-    : ICommandHandler<ChangeOrganizationMemberRoleCommand>
+	: ICommandHandler<ChangeOrganizationMemberRoleCommand>
 {
-    public async Task<Unit> Handle(
-        ChangeOrganizationMemberRoleCommand request,
-        CancellationToken cancellationToken)
-    {
-        var organization = await GetOrganization(request.OrganizationId, cancellationToken);
-        organization.ChangeMemberRole(request.UserId, request.Role);
+	public async Task<Unit> Handle(
+		ChangeOrganizationMemberRoleCommand request,
+		CancellationToken cancellationToken)
+	{
+		var organization = await GetOrganization(request.OrganizationId, cancellationToken);
+		organization.ChangeMemberRole(request.UserId, request.Role);
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 
-    private Task<Organization> GetOrganization(
-        Guid organizationId,
-        CancellationToken cancellationToken)
-    {
-        return repository.EnsureExistForUpdateAsync(
-            organizationId,
-            id => new OrganizationNotFoundException(id),
-            Criteria<Organization>.New().Include(x => x.Members),
-            cancellationToken);
-    }
+	private Task<Organization> GetOrganization(Guid organizationId, CancellationToken cancellationToken)
+	{
+		return repository.EnsureExistForUpdateAsync(
+			organizationId,
+			id => new OrganizationNotFoundException(id),
+			Criteria<Organization>.New().Include(x => x.Members),
+			cancellationToken);
+	}
 }

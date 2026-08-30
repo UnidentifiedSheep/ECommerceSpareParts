@@ -4,14 +4,13 @@ namespace Main.Application.NamedObjects.StorageContentExtractPolicies;
 
 public class FirstCheapestStorageContentExtractPolicy : StorageContentExtractPolicyBase
 {
-    public override string SystemName => "FirstCheapestStorageContentExtractPolicy";
-    public override string NameLocalizationKey => "first.cheapest.storage.content.extract.policy.name";
+	public override string SystemName => "FirstCheapestStorageContentExtractPolicy";
 
-    public override string DescriptionLocalizationKey =>
-        "first.cheapest.storage.content.extract.policy.description";
+	public override string NameLocalizationKey => "first.cheapest.storage.content.extract.policy.name";
 
-    public override IOrderedQueryable<StorageContent> Apply(IQueryable<StorageContent> query)
-    {
-        return query.OrderBy(x => x.BuyPriceInBaseCurrency);
-    }
+	public override string DescriptionLocalizationKey =>
+		"first.cheapest.storage.content.extract.policy.description";
+
+	public override IOrderedQueryable<StorageContent> Apply(IQueryable<StorageContent> query) =>
+		query.OrderBy(x => x.BuyPriceInBaseCurrency);
 }

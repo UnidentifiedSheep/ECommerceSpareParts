@@ -6,8 +6,6 @@ namespace Main.Application.Handlers.StorageOwners.GetStorageOwners;
 
 public class GetStorageOwnersDbValidation : AbstractDbValidation<GetStorageOwnersQuery>
 {
-    public override void Build(IValidationPlan plan, GetStorageOwnersQuery request)
-    {
-        plan.ValidateStorageExistsCode(request.StorageCode);
-    }
+	public override void Build(IValidationPlan plan, GetStorageOwnersQuery request) =>
+		plan.ValidateStorageExistsCode(request.StorageCode);
 }

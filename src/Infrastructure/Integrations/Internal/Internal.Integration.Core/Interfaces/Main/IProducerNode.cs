@@ -5,7 +5,7 @@ namespace Internal.Integration.Core.Interfaces.Main;
 
 public interface IProducerNode
 {
-    Task<Response<IReadOnlyList<InternalFullProducer>>> GetFullProducer(
-        IEnumerable<int> producerIds,
-        CancellationToken cancellationToken = default);
+	Task<Response<IReadOnlyList<InternalFullProducer>>> GetFullProducer(
+		IEnumerable<int> producerIds,
+		CancellationToken cancellationToken = default);
 }

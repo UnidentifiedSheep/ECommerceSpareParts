@@ -8,28 +8,25 @@ using Tests.Extensions;
 
 namespace Tests.TestContexts.Currency;
 
-public class CurrencyTestContext(
-    DContext context,
-    ISettingsService settingsService
-) : TestContextBase<DContext>(context)
+public class CurrencyTestContext(DContext context, ISettingsService settingsService)
+	: TestContextBase<DContext>(context)
 {
-    private readonly List<Main.Entities.Currency.Currency> _currencies = [];
-    public IReadOnlyList<Main.Entities.Currency.Currency> Currencies => _currencies;
+	private readonly List<Main.Entities.Currency.Currency> _currencies = [];
 
-    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        var created = await new CurrencyBuilder(Faker)
-            .BuildManyAndAddToDb(DbContext, 3);
+	public IReadOnlyList<Main.Entities.Currency.Currency> Currencies => _currencies;
 
-        await settingsService.SetSetting(
-            new CurrencySetting(
-                new CurrencySettingData
-                {
-                    BaseCurrencyId = created.First().Id,
-                    RateProvider = ExchangeRateProvider.Cbr
-                }),
-            cancellationToken);
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+	{
+		var created = await new CurrencyBuilder(Faker).BuildManyAndAddToDb(DbContext, 3);
 
-        _currencies.AddRange(created);
-    }
+		await settingsService.SetSetting(
+			new CurrencySetting(
+				new CurrencySettingData
+				{
+					BaseCurrencyId = created.First().Id, RateProvider = ExchangeRateProvider.Cbr
+				}),
+			cancellationToken);
+
+		_currencies.AddRange(created);
+	}
 }

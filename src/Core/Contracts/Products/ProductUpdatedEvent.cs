@@ -4,7 +4,7 @@ namespace Contracts.Products;
 
 public record ProductUpdatedEvent : IKeyedEvent
 {
-    public required int Id { get; init; }
+	public required int Id { get; init; }
 
-    public string GetKey() { return $"product-updated:{Id}"; }
+	public string GetKey() => $"product-updated:{Id}";
 }

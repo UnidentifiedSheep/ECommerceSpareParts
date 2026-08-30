@@ -2,7 +2,9 @@ namespace Main.Enums;
 
 public enum EmailType
 {
-    Personal,
-    Work,
-    Unknown
+	Personal,
+
+	Work,
+
+	Unknown
 }

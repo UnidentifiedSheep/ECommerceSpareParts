@@ -6,9 +6,9 @@ namespace Analytics.Application.NamedObjects;
 
 public class NamedObjectGroupRegistry : NamedObjectGroupRegistryBase
 {
-    public NamedObjectGroupRegistry()
-    {
-        Register<MarkupAnalyzerNamedObjectBase>("MarkupAnalyzer");
-        Register<ChartDataSourceNamedObject>("ChartData");
-    }
+	public NamedObjectGroupRegistry()
+	{
+		Register<MarkupAnalyzerNamedObjectBase>("MarkupAnalyzer");
+		Register<ChartDataSourceNamedObject>("ChartData");
+	}
 }

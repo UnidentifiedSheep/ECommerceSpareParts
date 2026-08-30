@@ -1,5 +1,4 @@
-﻿using Enums;
-using Enums.Units;
+﻿using Enums.Units;
 using Main.Application.Models.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Enums;
@@ -8,30 +7,30 @@ namespace Tests.ServicesTests.Logistics;
 
 public class NonePricingTests
 {
-    private readonly NonePricing _strategy = new();
+	private readonly NonePricing _strategy = new();
 
-    [Fact]
-    public void Calculate_ShouldAlwaysReturnZeroCost()
-    {
-        var context = new LogisticsContext(
-            10,
-            100,
-            1000);
-        var items = new List<LogisticsItem>
-        {
-            new(
-                1,
-                10,
-                100,
-                WeightUnit.Kilogram,
-                10)
-        };
+	[Fact]
+	public void Calculate_ShouldAlwaysReturnZeroCost()
+	{
+		var context = new LogisticsContext(
+			10,
+			100,
+			1000);
+		var items = new List<LogisticsItem>
+		{
+			new(
+				1,
+				10,
+				100,
+				WeightUnit.Kilogram,
+				10)
+		};
 
-        var result = _strategy.Calculate(context, items);
+		var result = _strategy.Calculate(context, items);
 
-        Assert.Equal(0m, result.TotalCost);
-        Assert.Equal(LogisticPricingType.None, result.PricingModel);
-        Assert.Single(result.Items);
-        Assert.Equal(0m, result.Items[0].Cost);
-    }
+		Assert.Equal(0m, result.TotalCost);
+		Assert.Equal(LogisticPricingType.None, result.PricingModel);
+		Assert.Single(result.Items);
+		Assert.Equal(0m, result.Items[0].Cost);
+	}
 }

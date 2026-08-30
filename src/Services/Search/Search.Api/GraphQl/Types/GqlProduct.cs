@@ -5,6 +5,6 @@ namespace Search.Api.GraphQl.Types;
 
 [GraphQLName("Product")]
 public record GqlProduct(
-    [property: GraphQLName("id")]
-    [property: Shareable]
-    int Id);
+	[property: GraphQLName("id")]
+	[property: Shareable]
+	int Id);

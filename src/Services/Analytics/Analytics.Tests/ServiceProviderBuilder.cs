@@ -1,5 +1,5 @@
+using System.Globalization;
 using Abstractions.Interfaces;
-using Abstractions.Models;
 using Analytics.Application.Configs;
 using Analytics.Cache;
 using Analytics.Persistence;
@@ -25,81 +25,72 @@ namespace Analytics.Integration.Tests;
 
 public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArguments>
 {
-    private static bool _staticsConfigured;
+	private static bool _staticsConfigured;
 
-    public IServiceProvider Build(ServiceProviderArguments args)
-    {
-        RegisterGlobalBasicContexts();
-        var services = new ServiceCollection();
+	public IServiceProvider Build(ServiceProviderArguments args)
+	{
+		RegisterGlobalBasicContexts();
+		var services = new ServiceCollection();
 
-        services.RegisterTestContexts();
+		services.RegisterTestContexts();
 
-        services.AddLogging();
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .CreateLogger();
+		services.AddLogging();
+		Log.Logger = new LoggerConfiguration()
+			.MinimumLevel
+			.Debug()
+			.Enrich
+			.FromLogContext()
+			.WriteTo
+			.Console(formatProvider: CultureInfo.InvariantCulture)
+			.CreateLogger();
 
-        ApplicationServiceProvider
-            .AddApplicationLayer(services, null)
-            .AddLocalization(
-                "ru-RU",
-                "ru-RU",
-                "en-EN")
-            .AddPersistenceLayer();
+		ApplicationServiceProvider
+			.AddApplicationLayer(services, null)
+			.AddLocalization(
+				"ru-RU",
+				"ru-RU",
+				"en-EN")
+			.AddPersistenceLayer();
 
-        var passwordRules = new PasswordRules
-        {
-            RequireDigit = false,
-            RequireUppercase = false
-        };
+		services.AddSingleton(
+			Options.Create(
+				new RedisOptions
+				{
+					Url = args.CacheConnectionString, Password = null
+				}));
 
-        services.AddSingleton(
-            Options.Create(
-                new RedisOptions
-                {
-                    Url = args.CacheConnectionString,
-                    Password = null
-                }));
+		var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
 
-        var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
+		services.AddSingleton(
+			Options.Create(
+				new DatabaseOptions
+				{
+					Host = pgsqlBuilder.Host!,
+					Database = pgsqlBuilder.Database!,
+					Username = pgsqlBuilder.Username!,
+					Password = pgsqlBuilder.Password!,
+					Port = pgsqlBuilder.Port
+				}));
 
-        services.AddSingleton(
-            Options.Create(
-                new DatabaseOptions
-                {
-                    Host = pgsqlBuilder.Host!,
-                    Database = pgsqlBuilder.Database!,
-                    Username = pgsqlBuilder.Username!,
-                    Password = pgsqlBuilder.Password!,
-                    Port = pgsqlBuilder.Port
-                }));
+		services.AddCacheLayer("test").AddApplicationCache().AddCommonLayer();
 
-        services
-            .AddCacheLayer("test")
-            .AddApplicationCache()
-            .AddCommonLayer();
+		services.RemoveAll<IUserContext>();
+		services.AddScoped<IUserContext, UserContextMock>();
 
-        services.RemoveAll<IUserContext>();
-        services.AddScoped<IUserContext, UserContextMock>();
+		services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
+		services.RemoveAll<IFusionCacheBackplane>();
+		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 
-        services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
-        services.RemoveAll<IFusionCacheBackplane>();
-        services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
+		if (!_staticsConfigured)
+		{
+			_staticsConfigured = true;
+			SortByConfig.Configure();
+		}
 
-        if (!_staticsConfigured)
-        {
-            _staticsConfigured = true;
-            SortByConfig.Configure();
-        }
+		var serviceProvider = services.BuildServiceProvider();
+		return serviceProvider;
+	}
 
-        var serviceProvider = services.BuildServiceProvider();
-        return serviceProvider;
-    }
-
-    private static void RegisterGlobalBasicContexts()
-    {
-        TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
-    }
+	private static void RegisterGlobalBasicContexts() =>
+		TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
 }

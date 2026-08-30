@@ -8,71 +8,75 @@ namespace Tests.DataBuilders.Storage;
 
 public class StorageContentBuilder(Faker faker) : BuilderBase<StorageContent>(faker)
 {
-    private readonly HashSet<int> _productIds = [];
-    public string? StorageCode { get; private set; }
-    public int? CurrencyId { get; private set; }
-    public int? Count { get; private set; }
-    public decimal? BuyPrice { get; private set; }
-    public DateTime? PurchaseDate { get; private set; }
-    public IReadOnlySet<int> ProductIds => _productIds;
+	private readonly HashSet<int> _productIds = [];
 
-    public StorageContentBuilder WithStorageCode(string storageCode)
-    {
-        StorageCode = storageCode;
-        return this;
-    }
+	public string? StorageCode { get; private set; }
 
-    public StorageContentBuilder WithCurrencyId(int currencyId)
-    {
-        CurrencyId = currencyId;
-        return this;
-    }
+	public int? CurrencyId { get; private set; }
 
-    public StorageContentBuilder WithCount(int count)
-    {
-        Count = count;
-        return this;
-    }
+	public int? Count { get; private set; }
 
-    public StorageContentBuilder WithBuyPrice(decimal buyPrice)
-    {
-        BuyPrice = buyPrice;
-        return this;
-    }
+	public decimal? BuyPrice { get; private set; }
 
-    public StorageContentBuilder WithPurchaseDate(DateTime purchaseDate)
-    {
-        PurchaseDate = purchaseDate;
-        return this;
-    }
+	public DateTime? PurchaseDate { get; private set; }
 
-    public StorageContentBuilder WithProductIds(params int[] ids)
-    {
-        _productIds.UnionWith(ids);
-        return this;
-    }
+	public IReadOnlySet<int> ProductIds => _productIds;
 
-    public StorageContentBuilder WithProducts(IEnumerable<Product> products)
-    {
-        _productIds.UnionWith(products.Select(x => x.Id));
-        return this;
-    }
+	public StorageContentBuilder WithStorageCode(string storageCode)
+	{
+		StorageCode = storageCode;
+		return this;
+	}
 
-    public override StorageContent Build()
-    {
-        var content = StorageContent.Create(
-            StorageCode ?? Faker.Lorem.Word(),
-            _productIds.Count > 0 ? Faker.PickRandom<int>(_productIds) : Faker.Random.Int(1),
-            BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
-            CurrencyId ?? Faker.Random.Int(1),
-            BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
-            CurrencyId ?? Faker.Random.Int(1),
-            PurchaseDate ?? Faker.Date.Future());
+	public StorageContentBuilder WithCurrencyId(int currencyId)
+	{
+		CurrencyId = currencyId;
+		return this;
+	}
 
-        content.SetCount(
-            Count ?? Faker.Random.Int(1, 100),
-            StorageMovementType.StorageContentAddition);
+	public StorageContentBuilder WithCount(int count)
+	{
+		Count = count;
+		return this;
+	}
 
-        return content;
-    }
+	public StorageContentBuilder WithBuyPrice(decimal buyPrice)
+	{
+		BuyPrice = buyPrice;
+		return this;
+	}
+
+	public StorageContentBuilder WithPurchaseDate(DateTime purchaseDate)
+	{
+		PurchaseDate = purchaseDate;
+		return this;
+	}
+
+	public StorageContentBuilder WithProductIds(params int[] ids)
+	{
+		_productIds.UnionWith(ids);
+		return this;
+	}
+
+	public StorageContentBuilder WithProducts(IEnumerable<Product> products)
+	{
+		_productIds.UnionWith(products.Select(x => x.Id));
+		return this;
+	}
+
+	public override StorageContent Build()
+	{
+		var content = StorageContent.Create(
+			StorageCode ?? Faker.Lorem.Word(),
+			_productIds.Count > 0 ? Faker.PickRandom<int>(_productIds) : Faker.Random.Int(1),
+			BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
+			CurrencyId ?? Faker.Random.Int(1),
+			BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
+			CurrencyId ?? Faker.Random.Int(1),
+			PurchaseDate ?? Faker.Date.Future());
+
+		content.SetCount(Count ?? Faker.Random.Int(1, 100), StorageMovementType.StorageContentAddition);
+
+		return content;
+	}
 }

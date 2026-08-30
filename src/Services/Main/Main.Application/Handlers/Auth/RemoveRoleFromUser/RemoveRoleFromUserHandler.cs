@@ -13,19 +13,16 @@ namespace Main.Application.Handlers.Auth.RemoveRoleFromUser;
 public record RemoveRoleFromUserCommand(Guid UserId, string RoleName) : ICommand;
 
 public class RemoveRoleFromUserHandler(
-    IRepository<UserRole, (Guid, string)> repository,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<RemoveRoleFromUserCommand>
+	IRepository<UserRole, (Guid, string)> repository,
+	IUnitOfWork unitOfWork) : ICommandHandler<RemoveRoleFromUserCommand>
 {
-    public async Task<Unit> Handle(
-        RemoveRoleFromUserCommand request,
-        CancellationToken cancellationToken)
-    {
-        var userRole = await repository.GetById((request.UserId, request.RoleName), cancellationToken)
-                       ?? throw new UserRoleNotFoundException(request.UserId, request.RoleName);
+	public async Task<Unit> Handle(RemoveRoleFromUserCommand request, CancellationToken cancellationToken)
+	{
+		var userRole = await repository.GetById((request.UserId, request.RoleName), cancellationToken) ??
+			throw new UserRoleNotFoundException(request.UserId, request.RoleName);
 
-        unitOfWork.Remove(userRole);
+		unitOfWork.Remove(userRole);
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

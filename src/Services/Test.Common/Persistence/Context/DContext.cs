@@ -9,38 +9,36 @@ using Tests.Persistence.Entities;
 namespace Tests.Persistence.Context;
 
 /// <summary>
-/// Test-only context for tables owned by the common application layer.
-/// Service tests continue to use their own service DbContexts.
+///     Test-only context for tables owned by the common application layer.
+///     Service tests continue to use their own service DbContexts.
 /// </summary>
-internal sealed class DContext(DbContextOptions<DContext> options)
-    : DbContext(options)
+internal sealed class DContext(DbContextOptions<DContext> options) : DbContext(options)
 {
-    public DbSet<Setting> Settings => Set<Setting>();
-    public DbSet<Job> Jobs => Set<Job>();
-    public DbSet<JobSchedule> JobSchedules => Set<JobSchedule>();
-    public DbSet<JobScheduleRun> JobScheduleRuns => Set<JobScheduleRun>();
+	public DbSet<Setting> Settings => Set<Setting>();
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.AddInterceptors(
-            new SelectForUpdateCommandInterceptor());
-    }
+	public DbSet<Job> Jobs => Set<Job>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .ApplyConfiguration(new SettingConfiguration())
-            .ApplyJobConfigurations();
+	public DbSet<JobSchedule> JobSchedules => Set<JobSchedule>();
 
-        modelBuilder.Entity<Setting>()
-            .HasDiscriminator(e => e.Key)
-            .HasValue<Setting>(nameof(Setting))
-            .HasValue<TestSetting>(TestSetting.SettingName);
+	public DbSet<JobScheduleRun> JobScheduleRuns => Set<JobScheduleRun>();
 
-        modelBuilder.AddFieldsForAuditableEntities();
-        modelBuilder
-            .AllDateTimesToUtc()
-            .AllEnumsToString();
-    }
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	{
+		base.OnConfiguring(optionsBuilder);
+		optionsBuilder.AddInterceptors(new SelectForUpdateCommandInterceptor());
+	}
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		modelBuilder.ApplyConfiguration(new SettingConfiguration()).ApplyJobConfigurations();
+
+		modelBuilder
+			.Entity<Setting>()
+			.HasDiscriminator(e => e.Key)
+			.HasValue<Setting>(nameof(Setting))
+			.HasValue<TestSetting>(TestSetting.SettingName);
+
+		modelBuilder.AddFieldsForAuditableEntities();
+		modelBuilder.AllDateTimesToUtc().AllEnumsToString();
+	}
 }

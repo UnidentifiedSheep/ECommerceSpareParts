@@ -10,31 +10,27 @@ using Tests.Interfaces;
 namespace Tests.TestContexts.Currency;
 
 public class CurrencyRatesTestContext(
-    DContext context,
-    CurrencyTestContext currencyTestContext,
-    ISettingsService settingsService
-) : TestContextBase<DContext>(context), IDependentTestContext
+	DContext context,
+	CurrencyTestContext currencyTestContext,
+	ISettingsService settingsService) : TestContextBase<DContext>(context), IDependentTestContext
 {
-    public CurrencyTestContext CurrencyTestContext => currencyTestContext;
+	public CurrencyTestContext CurrencyTestContext => currencyTestContext;
 
-    public IReadOnlyCollection<CurrencyRate> Rates { get; private set; } = null!;
+	public IReadOnlyCollection<CurrencyRate> Rates { get; private set; } = null!;
 
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(CurrencyTestContext)
-    ];
+	public static Type[] DependsOn { get; } = [typeof(CurrencyTestContext)];
 
-    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        var currencySetting = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
-        var baseCurrencyId = currencySetting.Data.BaseCurrencyId;
-        var builders = CurrencyTestContext
-            .Currencies
-            .Where(x => x.Id != baseCurrencyId)
-            .Select(currency => new CurrencyRateBuilder(Faker)
-                .WithToCurrencyId(baseCurrencyId)
-                .WithFromCurrencyId(currency.Id));
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+	{
+		var currencySetting = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
+		var baseCurrencyId = currencySetting.Data.BaseCurrencyId;
+		var builders = CurrencyTestContext
+			.Currencies
+			.Where(x => x.Id != baseCurrencyId)
+			.Select(currency => new CurrencyRateBuilder(Faker)
+				.WithToCurrencyId(baseCurrencyId)
+				.WithFromCurrencyId(currency.Id));
 
-        Rates = await builders.BuildManyCombinedAndAddToDb(DbContext, 1);
-    }
+		Rates = await builders.BuildManyCombinedAndAddToDb(DbContext, 1);
+	}
 }

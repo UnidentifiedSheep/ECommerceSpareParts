@@ -7,26 +7,21 @@ using Pricing.Application.Lrts.PriceCandidateCalculation;
 namespace Pricing.Application.Models.Jobs;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class PriceCandidateCalculationJobProvider
-    : IJobProvider<PriceCandidateCalculationLrt, PriceCandidateCalculationState>
+public sealed class
+	PriceCandidateCalculationJobProvider : IJobProvider<PriceCandidateCalculationLrt,
+	PriceCandidateCalculationState>
 {
-    public Job Create(
-        PriceCandidateCalculationState inputState,
-        int maxAttempts = 3)
-    {
-        var naturalKey = BuildNaturalKey(
-            inputState.ProductId,
-            inputState.StorageCode);
+	public Job Create(PriceCandidateCalculationState inputState, int maxAttempts = 3)
+	{
+		var naturalKey = BuildNaturalKey(inputState.ProductId, inputState.StorageCode);
 
-        return SingleRunJob.CreateUnique(
-            naturalKey,
-            PriceCandidateCalculationLrt.LrtName,
-            JsonSerializer.Serialize(inputState),
-            maxAttempts);
-    }
+		return SingleRunJob.CreateUnique(
+			naturalKey,
+			PriceCandidateCalculationLrt.LrtName,
+			JsonSerializer.Serialize(inputState),
+			maxAttempts);
+	}
 
-    private static string BuildNaturalKey(int productId, string storageCode)
-    {
-        return $"{PriceCandidateCalculationLrt.LrtName}:{productId}:{storageCode}";
-    }
+	private static string BuildNaturalKey(int productId, string storageCode) =>
+		$"{PriceCandidateCalculationLrt.LrtName}:{productId}:{storageCode}";
 }

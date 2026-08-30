@@ -4,40 +4,40 @@ namespace Contracts.Sale.Model;
 
 public record SaleEventModel
 {
-    [JsonPropertyName("id")]
-    public required Guid Id { get; init; }
+	[JsonPropertyName("id")]
+	public required Guid Id { get; init; }
 
-    [JsonPropertyName("organizationId")]
-    public required Guid OrganizationId { get; init; }
+	[JsonPropertyName("organizationId")]
+	public required Guid OrganizationId { get; init; }
 
-    [JsonPropertyName("userId")]
-    public required Guid UserId { get; init; }
-    
-    [JsonPropertyName("comment")]
-    public string? Comment { get; init; }
+	[JsonPropertyName("userId")]
+	public required Guid UserId { get; init; }
 
-    [JsonPropertyName("saleDatetime")]
-    public required DateTime SaleDatetime { get; init; }
+	[JsonPropertyName("comment")]
+	public string? Comment { get; init; }
 
-    [JsonPropertyName("transactionId")]
-    public required Guid TransactionId { get; init; }
+	[JsonPropertyName("saleDatetime")]
+	public required DateTime SaleDatetime { get; init; }
 
-    [JsonPropertyName("totalSum")]
-    public required decimal TotalSum { get; init; }
+	[JsonPropertyName("transactionId")]
+	public required Guid TransactionId { get; init; }
 
-    [JsonPropertyName("storageCode")]
-    public required string StorageCode { get; init; }
+	[JsonPropertyName("totalSum")]
+	public required decimal TotalSum { get; init; }
 
-    [JsonPropertyName("rowVersion")]
-    public required uint RowVersion { get; init; }
+	[JsonPropertyName("storageCode")]
+	public required string StorageCode { get; init; }
 
-    [JsonPropertyName("state")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required SaleStateEventModel State { get; init; }
+	[JsonPropertyName("rowVersion")]
+	public required uint RowVersion { get; init; }
 
-    [JsonPropertyName("currencyId")]
-    public required int CurrencyId { get; init; }
+	[JsonPropertyName("state")]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	public required SaleStateEventModel State { get; init; }
 
-    [JsonPropertyName("contents")]
-    public required IReadOnlyList<SaleContentEventModel> Contents { get; init; }
+	[JsonPropertyName("currencyId")]
+	public required int CurrencyId { get; init; }
+
+	[JsonPropertyName("contents")]
+	public required IReadOnlyList<SaleContentEventModel> Contents { get; init; }
 }

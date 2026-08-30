@@ -4,18 +4,18 @@ namespace Tests.TestContainers.Redis;
 
 public class RedisContainerFixture : IAsyncLifetime
 {
-    private readonly RedisContainer _redisContainer = new RedisBuilder("redis/redis-stack:latest")
-        .WithPortBinding(6379, true)
-        .Build();
+	private readonly RedisContainer _redisContainer = new RedisBuilder("redis/redis-stack:latest")
+		.WithPortBinding(6379, true)
+		.Build();
 
-    public string ConnectionString =>
-        $"{_redisContainer.Hostname}:{_redisContainer.GetMappedPublicPort(6379)}";
+	public string ConnectionString =>
+		$"{_redisContainer.Hostname}:{_redisContainer.GetMappedPublicPort(6379)}";
 
-    public async Task InitializeAsync()
-    {
-        await _redisContainer.StartAsync();
-        Console.WriteLine("✅ Redis container started.");
-    }
+	public async Task InitializeAsync()
+	{
+		await _redisContainer.StartAsync();
+		Console.WriteLine("✅ Redis container started.");
+	}
 
-    public async Task DisposeAsync() { await _redisContainer.DisposeAsync().AsTask(); }
+	public async Task DisposeAsync() => await _redisContainer.DisposeAsync().AsTask();
 }

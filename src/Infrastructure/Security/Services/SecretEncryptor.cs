@@ -7,108 +7,118 @@ namespace Security.Services;
 
 public sealed class SecretEncryptor : ISecretEncryptor, IDisposable
 {
-    private const string Version = "v1";
-    private const int NonceSize = 12;
-    private const int TagSize = 16;
+	private const string Version = "v1";
 
-    private readonly AesGcm _aesGcm;
+	private const int NonceSize = 12;
 
-    public SecretEncryptor(IOptions<SecretEncryptionOptions> options)
-    {
-        var key = Convert.FromBase64String(options.Value.Secret);
+	private const int TagSize = 16;
 
-        if (key.Length != 32) throw new InvalidOperationException("Secret encryption key must be 32 bytes.");
-        _aesGcm = new AesGcm(key, TagSize);
-    }
+	private readonly AesGcm _aesGcm;
 
-    public void Dispose() { _aesGcm.Dispose(); }
+	public SecretEncryptor(IOptions<SecretEncryptionOptions> options)
+	{
+		var key = Convert.FromBase64String(options.Value.Secret);
 
-    public string Encrypt(string value)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+		if (key.Length != 32)
+			throw new InvalidOperationException("Secret encryption key must be 32 bytes.");
+		_aesGcm = new AesGcm(key, TagSize);
+	}
 
-        var plaintext = Encoding.UTF8.GetBytes(value);
-        var nonce = RandomNumberGenerator.GetBytes(NonceSize);
-        var cipher = new byte[plaintext.Length];
-        var tag = new byte[TagSize];
+	public void Dispose() => _aesGcm.Dispose();
 
-        _aesGcm.Encrypt(
-            nonce,
-            plaintext,
-            cipher,
-            tag);
+	public string Encrypt(string value)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(value);
 
-        return string.Join(
-            '.',
-            Version,
-            Base64UrlEncode(nonce),
-            Base64UrlEncode(cipher),
-            Base64UrlEncode(tag));
-    }
+		var plaintext = Encoding.UTF8.GetBytes(value);
+		var nonce = RandomNumberGenerator.GetBytes(NonceSize);
+		var cipher = new byte[plaintext.Length];
+		var tag = new byte[TagSize];
 
-    public string Decrypt(string encrypted)
-    {
-        return TryDecrypt(encrypted, out var value)
-            ? value!
-            : throw new CryptographicException("Unable to decrypt secret.");
-    }
+		_aesGcm.Encrypt(
+			nonce,
+			plaintext,
+			cipher,
+			tag);
 
-    public bool TryDecrypt(string encrypted, out string? value)
-    {
-        value = null;
+		return string.Join(
+			'.',
+			Version,
+			Base64UrlEncode(nonce),
+			Base64UrlEncode(cipher),
+			Base64UrlEncode(tag));
+	}
 
-        try
-        {
-            if (string.IsNullOrWhiteSpace(encrypted)) return false;
+	public string Decrypt(string encrypted)
+	{
+		return TryDecrypt(encrypted, out var value)
+			? value!
+			: throw new CryptographicException("Unable to decrypt secret.");
+	}
 
-            var parts = encrypted.Split('.');
-            if (parts.Length != 4 || parts[0] != Version) return false;
+	public bool TryDecrypt(string encrypted, out string? value)
+	{
+		value = null;
 
-            var nonce = Base64UrlDecode(parts[1]);
-            var cipher = Base64UrlDecode(parts[2]);
-            var tag = Base64UrlDecode(parts[3]);
+		try
+		{
+			if (string.IsNullOrWhiteSpace(encrypted))
+				return false;
 
-            if (nonce.Length != NonceSize || cipher.Length == 0 || tag.Length != TagSize) return false;
+			var parts = encrypted.Split('.');
+			if (parts.Length != 4 || parts[0] != Version)
+				return false;
 
-            var plaintext = new byte[cipher.Length];
+			var nonce = Base64UrlDecode(parts[1]);
+			var cipher = Base64UrlDecode(parts[2]);
+			var tag = Base64UrlDecode(parts[3]);
 
-            _aesGcm.Decrypt(
-                nonce,
-                cipher,
-                tag,
-                plaintext);
+			if (nonce.Length != NonceSize || cipher.Length == 0 || tag.Length != TagSize)
+				return false;
 
-            value = Encoding.UTF8.GetString(plaintext);
-            return true;
-        }
-        catch (CryptographicException) { return false; }
-        catch (FormatException) { return false; }
-        catch (ArgumentException) { return false; }
-    }
+			var plaintext = new byte[cipher.Length];
 
-    private static string Base64UrlEncode(byte[] bytes)
-    {
-        return Convert.ToBase64String(bytes)
-            .TrimEnd('=')
-            .Replace('+', '-')
-            .Replace('/', '_');
-    }
+			_aesGcm.Decrypt(
+				nonce,
+				cipher,
+				tag,
+				plaintext);
 
-    private static byte[] Base64UrlDecode(string value)
-    {
-        var base64 = value
-            .Replace('-', '+')
-            .Replace('_', '/');
+			value = Encoding.UTF8.GetString(plaintext);
+			return true;
+		}
+		catch (CryptographicException)
+		{
+			return false;
+		}
+		catch (FormatException)
+		{
+			return false;
+		}
+		catch (ArgumentException)
+		{
+			return false;
+		}
+	}
 
-        var padding = base64.Length % 4;
-        base64 += padding switch
-        {
-            0 => string.Empty,
-            2 => "==",
-            3 => "=",
-            _ => throw new FormatException("Invalid base64url length.")
-        };
+	private static string Base64UrlEncode(byte[] bytes)
+	{
+		return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+	}
 
-        return Convert.FromBase64String(base64);
-    }
+	private static byte[] Base64UrlDecode(string value)
+	{
+		var base64 = value.Replace('-', '+').Replace('_', '/');
+
+		var padding = base64.Length % 4;
+		base64 += padding switch
+		{
+			0 => string.Empty,
+			2 => "==",
+			3 => "=",
+			_ => throw new FormatException("Invalid base64url length.")
+		};
+
+		return Convert.FromBase64String(base64);
+	}
 }

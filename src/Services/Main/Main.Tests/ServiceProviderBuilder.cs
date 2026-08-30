@@ -1,3 +1,4 @@
+using System.Globalization;
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common;
@@ -6,8 +7,8 @@ using Cache;
 using Localization.Domain.Extensions;
 using Mailing.Core;
 using Main.Application.Configs;
-using Main.Cache;
 using Main.Application.Models;
+using Main.Cache;
 using Main.Persistence;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,120 +30,119 @@ namespace Tests;
 
 public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArguments>
 {
-    private static bool _staticsConfigured;
+	private static bool _staticsConfigured;
 
-    public IServiceProvider Build(ServiceProviderArguments args)
-    {
-        RegisterGlobalBasicContexts();
-        var services = new ServiceCollection();
+	public IServiceProvider Build(ServiceProviderArguments args)
+	{
+		RegisterGlobalBasicContexts();
+		var services = new ServiceCollection();
 
-        services.RegisterTestContexts();
+		services.RegisterTestContexts();
 
-        services.AddLogging();
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .CreateLogger();
+		services.AddLogging();
+		Log.Logger = new LoggerConfiguration()
+			.MinimumLevel
+			.Debug()
+			.Enrich
+			.FromLogContext()
+			.WriteTo
+			.Console(formatProvider: CultureInfo.InvariantCulture)
+			.CreateLogger();
 
-        ApplicationServiceProvider
-            .AddApplicationLayer(services, null)
-            .AddLocalization(
-                "ru-RU",
-                "ru-RU",
-                "en-EN")
-            .AddPersistenceLayer();
-        var passwordRules = new PasswordRules
-        {
-            RequireDigit = false,
-            RequireUppercase = false
-        };
+		ApplicationServiceProvider
+			.AddApplicationLayer(services, null)
+			.AddLocalization(
+				"ru-RU",
+				"ru-RU",
+				"en-EN")
+			.AddPersistenceLayer();
+		var passwordRules = new PasswordRules
+		{
+			RequireDigit = false, RequireUppercase = false
+		};
 
-        services.AddSingleton(
-            Options.Create(
-                new RedisOptions
-                {
-                    Url = args.CacheConnectionString,
-                    Password = null
-                }));
-        
-        services.AddSingleton(
-            Options.Create(
-                new S3BucketsOptions
-                {
-                    Images = new BucketOptions
-                    {
-                        Name = "images",
-                        PublicBaseUrl = "https://images.example.com"
-                    },
-                    Uploads = new BucketOptions
-                    {
-                        Name = "uploads",
-                        PublicBaseUrl = "https://images.example.com"
-                    },
-                }));
+		services.AddSingleton(
+			Options.Create(
+				new RedisOptions
+				{
+					Url = args.CacheConnectionString, Password = null
+				}));
 
-        var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
+		services.AddSingleton(
+			Options.Create(
+				new S3BucketsOptions
+				{
+					Images = new BucketOptions
+					{
+						Name = "images", PublicBaseUrl = "https://images.example.com"
+					},
+					Uploads = new BucketOptions
+					{
+						Name = "uploads", PublicBaseUrl = "https://images.example.com"
+					}
+				}));
 
-        services.AddSingleton(
-            Options.Create(
-                new DatabaseOptions
-                {
-                    Host = pgsqlBuilder.Host!,
-                    Database = pgsqlBuilder.Database!,
-                    Username = pgsqlBuilder.Username!,
-                    Password = pgsqlBuilder.Password!,
-                    Port = pgsqlBuilder.Port
-                }));
+		var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
 
-        services.AddSingleton(
-            Options.Create(
-                new SecretEncryptionOptions
-                {
-                    Secret = "some secret"
-                }));
-        services.AddSingleton(
-            Options.Create(
-                new JwtOptions
-                {
-                    ValidDuration = TimeSpan.FromMinutes(15),
-                    ValidIssuer = "main-tests",
-                    IssuerSigningKey = "main-tests-signing-key-at-least-32-characters"
-                }));
-        services.AddSingleton<IEmailMessageRenderer, EmailMessageRendererStub>();
-        services.AddScoped<S3StorageServiceStub>();
-        services.AddScoped<IS3StorageService>(sp =>
-            sp.GetRequiredService<S3StorageServiceStub>());
-        services.AddProjectJsonSerialization();
+		services.AddSingleton(
+			Options.Create(
+				new DatabaseOptions
+				{
+					Host = pgsqlBuilder.Host!,
+					Database = pgsqlBuilder.Database!,
+					Username = pgsqlBuilder.Username!,
+					Password = pgsqlBuilder.Password!,
+					Port = pgsqlBuilder.Port
+				}));
 
-        services.AddJsonSigner()
-            .AddCacheLayer("test")
-            .AddApplicationCache()
-            .AddFullSecurityLayer(passwordRules)
-            .AddCommonLayer();
+		services.AddSingleton(
+			Options.Create(
+				new SecretEncryptionOptions
+				{
+					Secret = "some secret"
+				}));
+		services.AddSingleton(
+			Options.Create(
+				new JwtOptions
+				{
+					ValidDuration = TimeSpan.FromMinutes(15),
+					ValidIssuer = "main-tests",
+					IssuerSigningKey = "main-tests-signing-key-at-least-32-characters"
+				}));
+		services.AddSingleton<IEmailMessageRenderer, EmailMessageRendererStub>();
+		services.AddScoped<S3StorageServiceStub>();
+		services.AddScoped<IS3StorageService>(sp => sp.GetRequiredService<S3StorageServiceStub>());
+		services.AddProjectJsonSerialization();
 
-        services.RemoveAll<IUserContext>();
-        services.AddScoped<IUserContext, UserContextMock>();
-        services.AddSystemOptionsForTests();
+		services
+			.AddJsonSigner()
+			.AddCacheLayer("test")
+			.AddApplicationCache()
+			.AddFullSecurityLayer(passwordRules)
+			.AddCommonLayer();
 
-        services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
-        services.RemoveAll<IFusionCacheBackplane>();
-        services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
+		services.RemoveAll<IUserContext>();
+		services.AddScoped<IUserContext, UserContextMock>();
+		services.AddSystemOptionsForTests();
 
-        if (!_staticsConfigured)
-        {
-            _staticsConfigured = true;
-            SortByConfig.Configure();
-        }
+		services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
+		services.RemoveAll<IFusionCacheBackplane>();
+		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 
-        var serviceProvider = services.BuildServiceProvider();
-        return serviceProvider;
-    }
+		if (!_staticsConfigured)
+		{
+			_staticsConfigured = true;
+			SortByConfig.Configure();
+		}
 
-    private static void RegisterGlobalBasicContexts()
-    {
-        TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
-        TestBase.RegisterGlobalBasicContext<RolesTestContext>();
-        TestBase.RegisterGlobalBasicContext<UserContextTestContext>();
-    }
+		var serviceProvider = services.BuildServiceProvider();
+		return serviceProvider;
+	}
+
+	private static void RegisterGlobalBasicContexts()
+	{
+		TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
+		TestBase.RegisterGlobalBasicContext<RolesTestContext>();
+		TestBase.RegisterGlobalBasicContext<UserContextTestContext>();
+	}
 }

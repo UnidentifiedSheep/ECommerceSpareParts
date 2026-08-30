@@ -8,46 +8,53 @@ namespace Main.Entities.Event;
 
 public abstract class Event : AuditableEntity<Event, int>, ILinqEntity<Event, int>
 {
-    protected Event() { }
+	protected Event()
+	{
+	}
 
-    protected Event(string json) { Json = json; }
+	protected Event(string json)
+	{
+		Json = json;
+	}
 
-    public int Id { get; protected set; }
+	public int Id { get; protected set; }
 
-    public string Discriminator { get; protected set; } = null!;
+	public string Discriminator { get; protected set; } = null!;
 
-    public string Json { get; protected set; } = null!;
+	public string Json { get; protected set; } = null!;
 
-    public static Expression<Func<Event, int>> GetKeySelector() { return x => x.Id; }
+	public static Expression<Func<Event, int>> GetKeySelector() => x => x.Id;
 
-    public static Expression<Func<Event, bool>> GetEqualityExpression(int key) { return x => x.Id == key; }
+	public static Expression<Func<Event, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 
-    public override int GetId() { return Id; }
+	public override int GetId() => Id;
 }
 
-public abstract class Event<T> : Event
-    where T : class
+public abstract class Event<T> : Event where T : class
 {
-    private T? _data;
+	private T? _data;
 
-    protected Event(string json) : base(json) { }
+	protected Event(string json) : base(json)
+	{
+	}
 
-    protected Event() { }
+	protected Event()
+	{
+	}
 
-    protected Event(T data)
-        : base(Serialize(data))
-    {
-        _data = data;
-    }
+	protected Event(T data) : base(Serialize(data))
+	{
+		_data = data;
+	}
 
-    [NotMapped]
-    public T Data
-    {
-        get => _data ??= Deserialize(Json);
-        init => _data = value;
-    }
+	[NotMapped]
+	public T Data
+	{
+		get => _data ??= Deserialize(Json);
+		init => _data = value;
+	}
 
-    private static string Serialize(T data) { return JsonSerializer.Serialize(data); }
+	private static string Serialize(T data) => JsonSerializer.Serialize(data);
 
-    private static T Deserialize(string json) { return JsonSerializer.Deserialize<T>(json)!; }
+	private static T Deserialize(string json) => JsonSerializer.Deserialize<T>(json)!;
 }

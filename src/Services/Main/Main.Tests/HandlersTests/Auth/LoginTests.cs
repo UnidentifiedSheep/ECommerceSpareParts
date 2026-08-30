@@ -9,60 +9,61 @@ using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Auth;
 
-public class LoginTests(
-    CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-    private const string Password = "valid-password";
-    private const string UserName = "login-user";
-    private const string PrimaryEmail = "login-primary@example.com";
-    private const string SecondaryEmail = "login-secondary@example.com";
+	private const string Password = "valid-password";
 
-    [Theory]
-    [InlineData(UserName)]
-    [InlineData(PrimaryEmail)]
-    public async Task Login_WithUserNameOrPrimaryEmail_ReturnsTokens(string login)
-    {
-        await CreateUser();
+	private const string UserName = "login-user";
 
-        var result = await Mediator.Send(
-            new LoginCommand(
-                login,
-                Password,
-                null,
-                null));
+	private const string PrimaryEmail = "login-primary@example.com";
 
-        result.Token.Should().NotBeNullOrWhiteSpace();
-        result.RefreshToken.Should().NotBeNullOrWhiteSpace();
-        result.DeviceId.Should().NotBeNullOrWhiteSpace();
-    }
+	private const string SecondaryEmail = "login-secondary@example.com";
 
-    [Fact]
-    public async Task Login_WithSecondaryEmail_ThrowsWrongCredentialsException()
-    {
-        await CreateUser();
+	[Theory]
+	[InlineData(UserName)]
+	[InlineData(PrimaryEmail)]
+	public async Task Login_WithUserNameOrPrimaryEmail_ReturnsTokens(string login)
+	{
+		await CreateUser();
 
-        var action = () => Mediator.Send(
-            new LoginCommand(
-                SecondaryEmail,
-                Password,
-                null,
-                null));
+		var result = await Mediator.Send(
+			new LoginCommand(
+				login,
+				Password,
+				null,
+				null));
 
-        await action.Should().ThrowAsync<WrongCredentialsException>();
-    }
+		result.Token.Should().NotBeNullOrWhiteSpace();
+		result.RefreshToken.Should().NotBeNullOrWhiteSpace();
+		result.DeviceId.Should().NotBeNullOrWhiteSpace();
+	}
 
-    private async Task CreateUser()
-    {
-        var passwordManager =
-            Scope.ServiceProvider.GetRequiredService<IPasswordManager>();
+	[Fact]
+	public async Task Login_WithSecondaryEmail_ThrowsWrongCredentialsException()
+	{
+		await CreateUser();
 
-        await new MemberUserBuilder(Faker)
-            .WithUserName(UserName)
-            .WithPasswordHash(passwordManager.GetHashOfPassword(Password))
-            .WithEmail(PrimaryEmail, isPrimary: true)
-            .WithEmail(SecondaryEmail)
-            .BuildAndAddToDb(Context);
+		var action = () => Mediator.Send(
+			new LoginCommand(
+				SecondaryEmail,
+				Password,
+				null,
+				null));
 
-        Context.ChangeTracker.Clear();
-    }
+		await action.Should().ThrowAsync<WrongCredentialsException>();
+	}
+
+	private async Task CreateUser()
+	{
+		var passwordManager = Scope.ServiceProvider.GetRequiredService<IPasswordManager>();
+
+		await new MemberUserBuilder(Faker)
+			.WithUserName(UserName)
+			.WithPasswordHash(passwordManager.GetHashOfPassword(Password))
+			.WithEmail(PrimaryEmail, isPrimary: true)
+			.WithEmail(SecondaryEmail)
+			.BuildAndAddToDb(Context);
+
+		Context.ChangeTracker.Clear();
+	}
 }

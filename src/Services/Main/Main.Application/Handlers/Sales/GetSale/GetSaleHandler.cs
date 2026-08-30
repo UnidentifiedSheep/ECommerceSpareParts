@@ -9,36 +9,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Sales.GetSale;
 
-public record GetSaleQuery(
-    Guid? SaleId,
-    Guid? TransactionId
-) : IQuery<GetSaleResult>;
+public record GetSaleQuery(Guid? SaleId, Guid? TransactionId) : IQuery<GetSaleResult>;
 
 public record GetSaleResult(SaleDto Sale);
 
 public class GetSaleHandler(
-    IReadRepository<Sale, Guid> repository,
-    IProjectionProvider<Sale, SaleDto> projection
-)
-    : IQueryHandler<GetSaleQuery, GetSaleResult>
+	IReadRepository<Sale, Guid> repository,
+	IProjectionProvider<Sale, SaleDto> projection) : IQueryHandler<GetSaleQuery, GetSaleResult>
 {
-    public async Task<GetSaleResult> Handle(
-        GetSaleQuery request,
-        CancellationToken cancellationToken)
-    {
-        var saleId = request.SaleId;
-        var transactionId = request.TransactionId;
+	public async Task<GetSaleResult> Handle(GetSaleQuery request, CancellationToken cancellationToken)
+	{
+		var saleId = request.SaleId;
+		var transactionId = request.TransactionId;
 
-        var dto = await repository.Query
-            .Where(x =>
-                saleId.HasValue && x.Id == saleId.Value ||
-                transactionId.HasValue && x.TransactionId == transactionId.Value)
-            .OrderByDescending(x => saleId.HasValue && x.Id == saleId.Value)
-            .Project(projection)
-            .FirstOrDefaultAsync(cancellationToken);
+		var dto = await repository
+			.Query
+			.Where(x =>
+				saleId.HasValue && x.Id == saleId.Value ||
+				transactionId.HasValue && x.TransactionId == transactionId.Value)
+			.OrderByDescending(x => saleId.HasValue && x.Id == saleId.Value)
+			.Project(projection)
+			.FirstOrDefaultAsync(cancellationToken);
 
-        return dto == null
-            ? throw new SaleNotFoundException(request.SaleId ?? request.TransactionId!.Value)
-            : new GetSaleResult(dto);
-    }
+		return dto == null
+			? throw new SaleNotFoundException(request.SaleId ?? request.TransactionId!.Value)
+			: new GetSaleResult(dto);
+	}
 }

@@ -6,8 +6,6 @@ namespace Main.Application.Handlers.Users.GetUserStorages;
 
 public class GetUserStoragesDbValidation : AbstractDbValidation<GetUserStoragesQuery>
 {
-    public override void Build(IValidationPlan plan, GetUserStoragesQuery request)
-    {
-        plan.ValidateUserExistsId(request.UserId);
-    }
+	public override void Build(IValidationPlan plan, GetUserStoragesQuery request) =>
+		plan.ValidateUserExistsId(request.UserId);
 }

@@ -4,93 +4,91 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class DbValidationExceptionHandler(
-    ILogger<DbValidationExceptionHandler> logger
-) : ExceptionHandlerBase<DbValidationExceptionHandler>(logger)
+public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> logger)
+	: ExceptionHandlerBase<DbValidationExceptionHandler>(logger)
 {
-    public override async ValueTask<bool> TryHandleAsync(
-        HttpContext httpContext,
-        Exception exception,
-        CancellationToken cancellationToken)
-    {
-        if (exception is not ValidationException dbValidationException) return false;
+	public override async ValueTask<bool> TryHandleAsync(
+		HttpContext httpContext,
+		Exception exception,
+		CancellationToken cancellationToken)
+	{
+		if (exception is not ValidationException dbValidationException)
+			return false;
 
-        LogError(httpContext, exception);
+		LogError(httpContext, exception);
 
-        var problemDetails = GetBaseDetails(
-            dbValidationException,
-            httpContext,
-            null);
-        SetStatusCode(problemDetails, dbValidationException);
-        AddDbValidationErrors(
-            httpContext,
-            problemDetails,
-            dbValidationException);
+		var problemDetails = GetBaseDetails(
+			dbValidationException,
+			httpContext,
+			null);
+		SetStatusCode(problemDetails, dbValidationException);
+		AddDbValidationErrors(
+			httpContext,
+			problemDetails,
+			dbValidationException);
 
-        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-        return true;
-    }
+		httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
+		await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+		return true;
+	}
 
-    private void AddDbValidationErrors(
-        HttpContext httpContext,
-        ProblemDetails details,
-        ValidationException bulkEx)
-    {
-        var localizer = httpContext.RequestServices.GetService<IScopedStringLocalizer>();
+	private void AddDbValidationErrors(
+		HttpContext httpContext,
+		ProblemDetails details,
+		ValidationException bulkEx)
+	{
+		var localizer = httpContext.RequestServices.GetService<IContextualStringLocalizer>();
 
-        var errors = new List<ProblemDetails>();
+		var errors = new List<ProblemDetails>();
 
-        foreach (var fail in bulkEx.Failures)
-        {
-            var errorName = fail.ErrorName ?? "An unexpected error occurred";
-            var errorCode = fail.ErrorCode;
-            if (localizer == null)
-            {
-                errors.Add(
-                    new ProblemDetails
-                    {
-                        Title = errorName,
-                        Detail = fail.Message,
-                        Status = errorCode
-                    });
-                continue;
-            }
+		foreach (var fail in bulkEx.Failures)
+		{
+			var errorName = fail.ErrorName ?? "An unexpected error occurred";
+			var errorCode = fail.ErrorCode;
+			if (localizer == null)
+			{
+				errors.Add(
+					new ProblemDetails
+					{
+						Title = errorName,
+						Detail = fail.Message,
+						Status = errorCode
+					});
+				continue;
+			}
 
-            object[]? arguments = null;
+			object[]? arguments = null;
 
-            if (fail.AttemptedValue is IEnumerable<object?> args)
-                arguments = args
-                    .Where(x => x != null)
-                    .Select(x => x!)
-                    .ToArray();
-            else if (fail.AttemptedValue != null) arguments = [fail.AttemptedValue];
+			if (fail.AttemptedValue is IEnumerable<object?> args)
+				arguments = args.Where(x => x != null).Select(x => x!).ToArray();
+			else if (fail.AttemptedValue != null)
+				arguments = [fail.AttemptedValue];
 
-            var key = fail.Message;
-            var message = arguments is { Length: > 0 }
-                ? localizer.GetOrDefault(key, arguments) ?? fail.Message
-                : localizer.GetOrDefault(key) ?? fail.Message;
+			var key = fail.Message;
+			var message = arguments is { Length: > 0 }
+				? localizer.GetOrDefault(key, arguments) ?? fail.Message
+				: localizer.GetOrDefault(key) ?? fail.Message;
 
-            errors.Add(
-                new ProblemDetails
-                {
-                    Title = errorName,
-                    Detail = message,
-                    Status = errorCode
-                });
-        }
+			errors.Add(
+				new ProblemDetails
+				{
+					Title = errorName,
+					Detail = message,
+					Status = errorCode
+				});
+		}
 
-        details.Extensions["errors"] = errors;
-    }
+		details.Extensions["errors"] = errors;
+	}
 
-    private void SetStatusCode(ProblemDetails details, ValidationException bulkEx)
-    {
-        var max = -1;
+	private void SetStatusCode(ProblemDetails details, ValidationException bulkEx)
+	{
+		var max = -1;
 
-        foreach (var failure in bulkEx.Failures)
-            if (failure.ErrorCode.HasValue && failure.ErrorCode.Value > max)
-                max = failure.ErrorCode.Value;
+		foreach (var failure in bulkEx.Failures)
+			if (failure.ErrorCode.HasValue && failure.ErrorCode.Value > max)
+				max = failure.ErrorCode.Value;
 
-        details.Status = max == -1 ? StatusCodes.Status500InternalServerError : max;
-    }
+		details.Status = max == -1 ? StatusCodes.Status500InternalServerError : max;
+	}
 }

@@ -13,26 +13,26 @@ namespace Main.Application.Handlers.Storages.EditStorage;
 [Transactional]
 public record EditStorageCommand(string StorageCode, PatchStorageDto EditStorage) : ICommand;
 
-public class EditStorageHandler(IRepository<Storage, string> repository)
-    : ICommandHandler<EditStorageCommand>
+public class EditStorageHandler(IRepository<Storage, string> repository) : ICommandHandler<EditStorageCommand>
 {
-    public async Task<Unit> Handle(EditStorageCommand request, CancellationToken cancellationToken)
-    {
-        var criteria = Criteria<Storage>.New()
-            .Where(x => x.Code == request.StorageCode)
-            .Include(x => x.Owners)
-            .Track()
-            .Build();
+	public async Task<Unit> Handle(EditStorageCommand request, CancellationToken cancellationToken)
+	{
+		var criteria = Criteria<Storage>
+			.New()
+			.Where(x => x.Code == request.StorageCode)
+			.Include(x => x.Owners)
+			.Track()
+			.Build();
 
-        var storage = await repository.FirstOrDefaultAsync(criteria, cancellationToken)
-                      ?? throw new StorageNotFoundException(request.StorageCode);
+		var storage = await repository.FirstOrDefaultAsync(criteria, cancellationToken) ??
+			throw new StorageNotFoundException(request.StorageCode);
 
-        var patch = request.EditStorage;
+		var patch = request.EditStorage;
 
-        patch.Location.Apply(storage.SetLocation);
-        patch.Description.Apply(storage.SetDescription);
-        patch.Type.Apply(storage.SetType);
+		patch.Location.Apply(storage.SetLocation);
+		patch.Description.Apply(storage.SetDescription);
+		patch.Type.Apply(storage.SetType);
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

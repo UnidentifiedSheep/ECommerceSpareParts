@@ -4,16 +4,21 @@ namespace Application.Common.Interfaces.Repositories;
 
 public sealed class Criteria<T> where T : class
 {
-    public List<Expression<Func<T, bool>>> Wheres { get; init; } = new();
-    public List<Expression<Func<T, object?>>> Includes { get; init; } = new();
-    public Func<IQueryable<T>, IOrderedQueryable<T>>? OrderBy { get; init; }
+	public List<Expression<Func<T, bool>>> Wheres { get; init; } = new();
 
-    public int? Page { get; init; }
-    public int? Size { get; init; }
+	public List<Expression<Func<T, object?>>> Includes { get; init; } = new();
 
-    public bool Track { get; init; }
-    public bool ForUpdate { get; init; }
-    public bool SkipLocked { get; init; }
+	public Func<IQueryable<T>, IOrderedQueryable<T>>? OrderBy { get; init; }
 
-    public static CriteriaBuilder<T> New() { return new CriteriaBuilder<T>(); }
+	public int? Page { get; init; }
+
+	public int? Size { get; init; }
+
+	public bool Track { get; init; }
+
+	public bool ForUpdate { get; init; }
+
+	public bool SkipLocked { get; init; }
+
+	public static CriteriaBuilder<T> New() => new();
 }

@@ -12,16 +12,15 @@ namespace Main.Application.Handlers.ProductContent.RemoveProductContent;
 public record RemoveProductContentCommand(int ParentProductId, int ChildProductId) : ICommand;
 
 public class RemoveProductContentHandler(
-    IRepository<Entities.Product.ProductContent, (int, int)> repository,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<RemoveProductContentCommand>
+	IRepository<Entities.Product.ProductContent, (int, int)> repository,
+	IUnitOfWork unitOfWork) : ICommandHandler<RemoveProductContentCommand>
 {
-    public async Task<Unit> Handle(RemoveProductContentCommand request, CancellationToken cancellationToken)
-    {
-        var content =
-            await repository.GetById((request.ParentProductId, request.ChildProductId), cancellationToken)
-            ?? throw new ProductContentNotFoundException(request.ParentProductId, request.ChildProductId);
-        unitOfWork.Remove(content);
-        return Unit.Value;
-    }
+	public async Task<Unit> Handle(RemoveProductContentCommand request, CancellationToken cancellationToken)
+	{
+		var content =
+			await repository.GetById((request.ParentProductId, request.ChildProductId), cancellationToken) ??
+			throw new ProductContentNotFoundException(request.ParentProductId, request.ChildProductId);
+		unitOfWork.Remove(content);
+		return Unit.Value;
+	}
 }

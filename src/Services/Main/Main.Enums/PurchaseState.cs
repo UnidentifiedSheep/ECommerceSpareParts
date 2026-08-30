@@ -2,7 +2,9 @@
 
 public enum PurchaseState
 {
-    Draft,
-    Completed,
-    Deleted
+	Draft,
+
+	Completed,
+
+	Deleted
 }

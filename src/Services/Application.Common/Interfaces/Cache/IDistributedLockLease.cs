@@ -2,6 +2,7 @@ namespace Application.Common.Interfaces.Cache;
 
 public interface IDistributedLockLease : IAsyncDisposable
 {
-    string Key { get; }
-    string Token { get; }
+	string Key { get; }
+
+	string Token { get; }
 }

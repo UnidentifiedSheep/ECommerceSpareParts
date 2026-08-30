@@ -1,13 +1,10 @@
-using Abstractions;
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.LRT;
-using Application.Common.NamedObject;
 using Attributes;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -16,96 +13,99 @@ using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Lrts.PriceCandidateCalculation;
-using Pricing.Application.Models.Jobs;
 using Pricing.Entities.Offers;
 using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Lrts.InvalidateStalePriceOptions;
 
 public class InvalidateStalePriceOptionsLrt(
-    IJobRepository jobRepository,
-    IUnitOfWork unitOfWork,
-    IPublishEndpoint publisher,
-    IApplicationTransactionService transactionService,
-    ILogger<InvalidateStalePriceOptionsLrt> logger,
-    IReadRepository<ProductPriceOption, Guid> readRepository,
-    IProductPriceOptionRepository productPriceOptionRepository,
-    IJobService jobService,
-    IJobProvider<PriceCandidateCalculationLrt, PriceCandidateCalculationState> jobProvider,
-    IMarkupContainer markupContainer,
-    IPriceApplierService priceApplierService,
-    ISettingsService settingsService
-) : LrtBase<NoneInputState, InvalidateStalePriceOptionsState>(
-    jobRepository,
-    unitOfWork,
-    publisher,
-    transactionService,
-    logger)
+	IJobRepository jobRepository,
+	IUnitOfWork unitOfWork,
+	IPublishEndpoint publisher,
+	IApplicationTransactionService transactionService,
+	ILogger<InvalidateStalePriceOptionsLrt> logger,
+	IReadRepository<ProductPriceOption, Guid> readRepository,
+	IProductPriceOptionRepository productPriceOptionRepository,
+	IJobService jobService,
+	IJobProvider<PriceCandidateCalculationLrt, PriceCandidateCalculationState> jobProvider,
+	IMarkupContainer markupContainer,
+	IPriceApplierService priceApplierService,
+	ISettingsService settingsService) : LrtBase<NoneInputState, InvalidateStalePriceOptionsState>(
+	jobRepository,
+	unitOfWork,
+	publisher,
+	transactionService,
+	logger)
 {
-    public const string LrtName = nameof(InvalidateStalePriceOptionsLrt); 
-    public override string SystemName => LrtName;
-    public override string NameLocalizationKey => "lrt.invalidate.stale.price.options.name";
-    public override string DescriptionLocalizationKey => "lrt.invalidate.stale.price.options.description";
+	public const string LrtName = nameof(InvalidateStalePriceOptionsLrt);
 
-    protected override async Task DoWork()
-    {
-        const int batchSize = 1000;
+	public override string SystemName => LrtName;
 
-        while (true)
-        {
-            var processedCount = await TransactionService.ExecuteAsync(
-                TransactionalAttribute.ReadCommitted(30, 3),
-                async (_, cancellationToken) =>
-                {
-                    var currentVersion = markupContainer.CurrentVersion;
-                    var currentAppliersVersion = await priceApplierService
-                        .GetCurrentConfigurationVersionAsync(cancellationToken);
-                    var currentPricingSettingsVersion = (await settingsService
-                        .GetOrDefault<PricingSetting>(cancellationToken)).Data.Version;
+	public override string NameLocalizationKey => "lrt.invalidate.stale.price.options.name";
 
-                    var items = await readRepository.Query
-                        .Where(x => x.MarkupVersion != currentVersion
-                                    || x.AppliersVersion != currentAppliersVersion
-                                    || x.PricingSettingsVersion != currentPricingSettingsVersion)
-                        .Take(batchSize)
-                        .Select(x => new
-                        {
-                            x.PriceOfferId,
-                            x.PriceOffer.ProductId,
-                            x.PriceOffer.OfferForStorage
-                        })
-                        .ToListAsync(cancellationToken);
+	public override string DescriptionLocalizationKey => "lrt.invalidate.stale.price.options.description";
 
-                    if (items.Count == 0) return 0;
+	protected override async Task DoWork()
+	{
+		const int batchSize = 1000;
 
-                    var jobItems = items
-                        .Select(x => jobProvider.Create(
-                            new PriceCandidateCalculationState
-                            {
-                                ProductId = x.ProductId,
-                                StorageCode = x.OfferForStorage
-                            }))
-                        .DistinctBy(x => x.NaturalKey)
-                        .ToList();
+		while (true)
+		{
+			var processedCount = await TransactionService.ExecuteAsync(
+				TransactionalAttribute.ReadCommitted(30, 3),
+				async (_, cancellationToken) =>
+				{
+					var currentVersion = markupContainer.CurrentVersion;
+					var currentAppliersVersion =
+						await priceApplierService.GetCurrentConfigurationVersionAsync(cancellationToken);
+					var currentPricingSettingsVersion =
+						(await settingsService.GetOrDefault<PricingSetting>(cancellationToken)).Data.Version;
 
-                    await jobService.TryEnqueueJobsAsync(
-                        jobItems,
-                        cancellationToken);
+					var items = await readRepository
+						.Query
+						.Where(x =>
+							x.MarkupVersion != currentVersion ||
+							x.AppliersVersion != currentAppliersVersion ||
+							x.PricingSettingsVersion != currentPricingSettingsVersion)
+						.Take(batchSize)
+						.Select(x => new
+						{
+							x.PriceOfferId,
+							x.PriceOffer.ProductId,
+							x.PriceOffer.OfferForStorage
+						})
+						.ToListAsync(cancellationToken);
 
-                    await productPriceOptionRepository.DeleteManyAsync(
-                        items.Select(x => x.PriceOfferId),
-                        cancellationToken);
+					if (items.Count == 0)
+						return 0;
 
-                    await SaveStateAsync(new InvalidateStalePriceOptionsState
-                    {
-                        ProcessedRows = State.ProcessedRows + items.Count
-                    });
+					var jobItems = items
+						.Select(x => jobProvider.Create(
+							new PriceCandidateCalculationState
+							{
+								ProductId = x.ProductId, StorageCode = x.OfferForStorage
+							}))
+						.DistinctBy(x => x.NaturalKey)
+						.ToList();
 
-                    return items.Count;
-                },
-                CancellationToken);
+					await jobService.TryEnqueueJobsAsync(jobItems, cancellationToken);
 
-            if (processedCount < batchSize) break;
-        }
-    }
+					await productPriceOptionRepository.DeleteManyAsync(
+						items.Select(x => x.PriceOfferId),
+						cancellationToken);
+
+					await SaveStateAsync(
+						new InvalidateStalePriceOptionsState
+						{
+							ProcessedRows = State.ProcessedRows + items.Count
+						});
+
+					return items.Count;
+				},
+				CancellationToken);
+
+			if (processedCount < batchSize)
+				break;
+		}
+	}
 }

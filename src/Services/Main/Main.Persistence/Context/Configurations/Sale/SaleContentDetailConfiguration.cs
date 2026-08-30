@@ -7,42 +7,45 @@ namespace Main.Persistence.Context.Configurations.Sale;
 
 public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleContentDetail>
 {
-    public void Configure(EntityTypeBuilder<SaleContentDetail> builder)
-    {
-        builder.ToTable("sale_content_details", "public");
+	public void Configure(EntityTypeBuilder<SaleContentDetail> builder)
+	{
+		builder.ToTable("sale_content_details", "public");
 
-        builder.HasKey(e => e.Id).HasName("sale_content_details_pk");
+		builder.HasKey(e => e.Id).HasName("sale_content_details_pk");
 
-        builder.HasIndex(e => e.CurrencyId, "sale_content_details_currency_id_index");
+		builder.HasIndex(e => e.CurrencyId, "sale_content_details_currency_id_index");
 
-        builder.HasIndex(e => e.SaleContentId, "sale_content_details_sale_content_id_index");
+		builder.HasIndex(e => e.SaleContentId, "sale_content_details_sale_content_id_index");
 
-        builder.HasIndex(e => e.StorageContentId, "sale_content_details_storage_content_id_index");
+		builder.HasIndex(e => e.StorageContentId, "sale_content_details_storage_content_id_index");
 
-        builder.Property(e => e.Id).HasColumnName("id");
-        builder.Property(e => e.BuyPrice).HasColumnName("buy_price");
-        builder.Property(e => e.Count).HasColumnName("count");
-        builder.Property(e => e.CurrencyId).HasColumnName("currency_id");
-        builder.Property(e => e.PurchaseDatetime).HasColumnName("purchase_datetime");
-        builder.Property(e => e.SaleContentId).HasColumnName("sale_content_id");
+		builder.Property(e => e.Id).HasColumnName("id");
+		builder.Property(e => e.BuyPrice).HasColumnName("buy_price");
+		builder.Property(e => e.Count).HasColumnName("count");
+		builder.Property(e => e.CurrencyId).HasColumnName("currency_id");
+		builder.Property(e => e.PurchaseDatetime).HasColumnName("purchase_datetime");
+		builder.Property(e => e.SaleContentId).HasColumnName("sale_content_id");
 
-        builder.Property(e => e.StorageContentId).HasColumnName("storage_content_id");
+		builder.Property(e => e.StorageContentId).HasColumnName("storage_content_id");
 
-        builder.HasOne<Entities.Currency.Currency>(e => e.Currency)
-            .WithMany()
-            .HasForeignKey(d => d.CurrencyId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("sale_content_details_currency_id_fk");
+		builder
+			.HasOne<Entities.Currency.Currency>(e => e.Currency)
+			.WithMany()
+			.HasForeignKey(d => d.CurrencyId)
+			.OnDelete(DeleteBehavior.Restrict)
+			.HasConstraintName("sale_content_details_currency_id_fk");
 
-        builder.HasOne<SaleContent>()
-            .WithMany(p => p.Details)
-            .HasForeignKey(d => d.SaleContentId)
-            .HasConstraintName("sale_content_details_sale_content_id_fk");
+		builder
+			.HasOne<SaleContent>()
+			.WithMany(p => p.Details)
+			.HasForeignKey(d => d.SaleContentId)
+			.HasConstraintName("sale_content_details_sale_content_id_fk");
 
-        builder.HasOne<StorageContent>(e => e.StorageContent)
-            .WithMany()
-            .HasForeignKey(d => d.StorageContentId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("sale_content_details_storage_content_id_fk");
-    }
+		builder
+			.HasOne<StorageContent>(e => e.StorageContent)
+			.WithMany()
+			.HasForeignKey(d => d.StorageContentId)
+			.OnDelete(DeleteBehavior.Restrict)
+			.HasConstraintName("sale_content_details_storage_content_id_fk");
+	}
 }

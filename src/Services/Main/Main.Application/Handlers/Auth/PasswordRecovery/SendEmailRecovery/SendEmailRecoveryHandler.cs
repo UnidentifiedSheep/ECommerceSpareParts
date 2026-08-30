@@ -5,12 +5,10 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Exceptions;
 using Localization.Abstractions.Interfaces;
-using Mailing.Core;
 using Mailing.Core.Models;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
-using Main.Application.Models.Auth;
 using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Enums.Auth;
@@ -23,47 +21,39 @@ namespace Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 public record SendEmailRecoveryCommand(string Email) : ICommand;
 
 public class SendEmailRecoveryHandler(
-    IJsonSigner jsonSigner,
-    IUserRepository userRepository,
-    IMailingService mailingService,
-    IScopedStringLocalizer localizer,
-    ISettingsService settingsService,
-    IResetPayloadProvider payloadProvider
-) : ICommandHandler<SendEmailRecoveryCommand>
+	IJsonSigner jsonSigner,
+	IUserRepository userRepository,
+	IMailingService mailingService,
+	IContextualStringLocalizer localizer,
+	ISettingsService settingsService,
+	IResetPayloadProvider payloadProvider) : ICommandHandler<SendEmailRecoveryCommand>
 {
-    public async Task<Unit> Handle(
-        SendEmailRecoveryCommand request,
-        CancellationToken cancellationToken)
-    {
-        var user = await userRepository
-            .GetUserByPrimaryEmailAsync(
-                request.Email,
-                Criteria<User>.New().Track(false).Build(),
-                cancellationToken);
+	public async Task<Unit> Handle(SendEmailRecoveryCommand request, CancellationToken cancellationToken)
+	{
+		var user = await userRepository.GetUserByPrimaryEmailAsync(
+			request.Email,
+			Criteria<User>.New().Track(false).Build(),
+			cancellationToken);
 
-        if (user == null) return Unit.Value;
+		if (user == null)
+			return Unit.Value;
 
-        var setting = (await settingsService
-                .GetOrDefault<GlobalApplicationSetting>(cancellationToken))
-            .Data;
-        var appServiceUrl = setting.AppServiceUrl
-                            ?? throw new InvalidInputException(
-                                "global.application.setting.app.service.url.not.configured");
+		var setting = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
+		var appServiceUrl = setting.AppServiceUrl ??
+			throw new InvalidInputException("global.application.setting.app.service.url.not.configured");
 
-        var signed = jsonSigner.Sign(
-            await payloadProvider
-                .GetPayload(user.Id, ResetType.PasswordReset));
+		var signed = jsonSigner.Sign(await payloadProvider.GetPayload(user.Id, ResetType.PasswordReset));
 
-        var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
-        var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
+		var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
+		var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
 
-        await mailingService.QueueEmailAsync(
-            new ResetPasswordData(
-                localizer,
-                resetUrl.ToString(),
-                request.Email),
-            cancellationToken);
+		await mailingService.QueueEmailAsync(
+			new ResetPasswordData(
+				localizer,
+				resetUrl.ToString(),
+				request.Email),
+			cancellationToken);
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

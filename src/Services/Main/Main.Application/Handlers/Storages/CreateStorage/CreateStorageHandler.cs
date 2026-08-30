@@ -9,27 +9,25 @@ namespace Main.Application.Handlers.Storages.CreateStorage;
 [AutoSave]
 [Transactional]
 public record CreateStorageCommand(
-    string Code,
-    string? Description,
-    string? Location,
-    StorageType Type
-)
-    : ICommand<CreateStorageResult>;
+	string Code,
+	string? Description,
+	string? Location,
+	StorageType Type) : ICommand<CreateStorageResult>;
 
 public record CreateStorageResult(string Code);
 
 public class CreateStorageHandler(IUnitOfWork unitOfWork)
-    : ICommandHandler<CreateStorageCommand, CreateStorageResult>
+	: ICommandHandler<CreateStorageCommand, CreateStorageResult>
 {
-    public async Task<CreateStorageResult> Handle(
-        CreateStorageCommand request,
-        CancellationToken cancellationToken)
-    {
-        var storage = Storage.Create(request.Code, request.Type);
-        storage.SetDescription(request.Description);
-        storage.SetLocation(request.Location);
+	public async Task<CreateStorageResult> Handle(
+		CreateStorageCommand request,
+		CancellationToken cancellationToken)
+	{
+		var storage = Storage.Create(request.Code, request.Type);
+		storage.SetDescription(request.Description);
+		storage.SetLocation(request.Location);
 
-        await unitOfWork.AddAsync(storage, cancellationToken);
-        return new CreateStorageResult(storage.Code);
-    }
+		await unitOfWork.AddAsync(storage, cancellationToken);
+		return new CreateStorageResult(storage.Code);
+	}
 }

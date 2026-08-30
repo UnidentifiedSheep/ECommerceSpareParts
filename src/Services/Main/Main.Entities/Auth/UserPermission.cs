@@ -6,40 +6,35 @@ using Main.Entities.DomainEvents.User;
 namespace Main.Entities.Auth;
 
 public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>,
-    ILinqEntity<UserPermission, (Guid, string)>
+	ILinqEntity<UserPermission, (Guid, string)>
 {
-    private UserPermission() { }
+	private UserPermission()
+	{
+	}
 
-    private UserPermission(Guid userId, string permission)
-    {
-        UserId = userId;
-        Permission = permission;
-    }
+	private UserPermission(Guid userId, string permission)
+	{
+		UserId = userId;
+		Permission = permission;
+	}
 
-    public Guid UserId { get; }
+	public Guid UserId { get; }
 
-    public string Permission { get; } = null!;
+	public string Permission { get; } = null!;
 
-    public static Expression<Func<UserPermission, (Guid, string)>> GetKeySelector()
-    {
-        return x => ValueTuple.Create(x.UserId, x.Permission);
-    }
+	public static Expression<Func<UserPermission, (Guid, string)>> GetKeySelector() => x =>
+		ValueTuple.Create(x.UserId, x.Permission);
 
-    public static Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key)
-    {
-        return x => x.UserId == key.Item1 && x.Permission == key.Item2;
-    }
+	public static Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key) => x =>
+		x.UserId == key.Item1 && x.Permission == key.Item2;
 
-    public static UserPermission Create(Guid userId, string permission)
-    {
-        return new UserPermission(userId, permission);
-    }
+	public static UserPermission Create(Guid userId, string permission) => new(userId, permission);
 
-    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
-    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
-    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
-    public override (Guid, string) GetId() { return (UserId, Permission); }
+	public override (Guid, string) GetId() => (UserId, Permission);
 }

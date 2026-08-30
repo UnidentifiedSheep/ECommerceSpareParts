@@ -2,16 +2,19 @@ namespace Pricing.Enums;
 
 public enum SupplierOfferExtractionStatus
 {
-    Success,
+	Success,
 
-    SkippedByRefreshMarker,
-    AlreadyRefreshing,
+	SkippedByRefreshMarker,
 
-    NoSupplierReference,
+	AlreadyRefreshing,
 
-    SupplierRequestFailed,
-    SupplierReturnedEmpty,
-    InvalidSupplierResponse,
+	NoSupplierReference,
 
-    Failed
+	SupplierRequestFailed,
+
+	SupplierReturnedEmpty,
+
+	InvalidSupplierResponse,
+
+	Failed
 }

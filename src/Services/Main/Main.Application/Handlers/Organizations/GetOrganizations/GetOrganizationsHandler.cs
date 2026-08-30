@@ -11,80 +11,76 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.Organizations.GetOrganizations;
 
 public record GetOrganizationsQuery(
-    Pagination Pagination,
-    string[] SortBy,
-    string? SearchTerm,
-    Guid? UserId,
-    IReadOnlyCollection<Guid> Ids,
-    IReadOnlyCollection<OrganizationType> Types,
-    bool ShowHidden
-) : IQuery<GetOrganizationsResult>;
+	Pagination Pagination,
+	string[] SortBy,
+	string? SearchTerm,
+	Guid? UserId,
+	IReadOnlyCollection<Guid> Ids,
+	IReadOnlyCollection<OrganizationType> Types,
+	bool ShowHidden) : IQuery<GetOrganizationsResult>;
 
 public record GetOrganizationsResult(IReadOnlyList<OrganizationListItemDto> Organizations);
 
 public class GetOrganizationsHandler(
-    IReadRepository<Organization, Guid> repository,
-    IProjectionProvider<Organization, OrganizationListItemDto> projection)
-    : IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
+	IReadRepository<Organization, Guid> repository,
+	IProjectionProvider<Organization, OrganizationListItemDto> projection)
+	: IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
 {
-    public async Task<GetOrganizationsResult> Handle(
-        GetOrganizationsQuery request,
-        CancellationToken cancellationToken)
-    {
-        var query = repository.Query
-            .Where(x => x.Type != OrganizationType.System);
+	public async Task<GetOrganizationsResult> Handle(
+		GetOrganizationsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var query = repository.Query.Where(x => x.Type != OrganizationType.System);
 
-        if (!request.ShowHidden)
-            query = query.Where(x => !x.IsHidden);
-        
-        if (request.Ids.Count > 0)
-            query = query.Where(x => request.Ids.Contains(x.Id));
+		if (!request.ShowHidden)
+			query = query.Where(x => !x.IsHidden);
 
-        if (request.Types.Count > 0)
-            query = query.Where(x => request.Types.Contains(x.Type));
+		if (request.Ids.Count > 0)
+			query = query.Where(x => request.Ids.Contains(x.Id));
 
-        if (request.UserId.HasValue)
-            query = query.Where(x => x.Members.Any(member =>
-                member.UserId == request.UserId.Value));
+		if (request.Types.Count > 0)
+			query = query.Where(x => request.Types.Contains(x.Type));
 
-        var searchTerm = request.SearchTerm?.Trim();
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            var pattern = $"%{searchTerm}%";
-            query = query
-                .Select(x => new
-                {
-                    Organization = x,
-                    OrganizationRank =
-                        EF.Functions.TrigramsSimilarity(x.Name, searchTerm) +
-                        EF.Functions.TrigramsSimilarity(x.SystemName, searchTerm),
-                    MemberRank = x.Members
-                        .Where(member => member.User.UserInfo != null)
-                        .Select(member =>
-                            EF.Functions.TrigramsSimilarity(
-                                member.User.UserInfo!.SearchColumn,
-                                searchTerm) +
-                            EF.Functions.TrigramsWordSimilarity(
-                                member.User.UserInfo!.SearchColumn,
-                                searchTerm) * 0.7)
-                        .OrderByDescending(rank => rank)
-                        .FirstOrDefault()
-                })
-                .Where(x =>
-                    EF.Functions.ILike(x.Organization.Name, pattern) ||
-                    EF.Functions.ILike(x.Organization.SystemName, pattern) ||
-                    x.MemberRank >= 0.3 ||
-                    x.OrganizationRank >= 0.3)
-                .OrderByDescending(x => x.OrganizationRank + x.MemberRank)
-                .Select(x => x.Organization);
-        }
+		if (request.UserId.HasValue)
+			query = query.Where(x => x.Members.Any(member => member.UserId == request.UserId.Value));
 
-        var organizations = await query
-            .SortBy(request.SortBy)
-            .Project(projection)
-            .ApplyPagination(request.Pagination)
-            .ToListAsync(cancellationToken);
+		var searchTerm = request.SearchTerm?.Trim();
+		if (!string.IsNullOrWhiteSpace(searchTerm))
+		{
+			var pattern = $"%{searchTerm}%";
+			query = query
+				.Select(x => new
+				{
+					Organization = x,
+					OrganizationRank =
+						EF.Functions.TrigramsSimilarity(x.Name, searchTerm) +
+						EF.Functions.TrigramsSimilarity(x.SystemName, searchTerm),
+					MemberRank = x
+						.Members
+						.Where(member => member.User.UserInfo != null)
+						.Select(member =>
+							EF.Functions.TrigramsSimilarity(member.User.UserInfo!.SearchColumn, searchTerm) +
+							EF.Functions.TrigramsWordSimilarity(
+								member.User.UserInfo!.SearchColumn,
+								searchTerm) *
+							0.7)
+						.OrderByDescending(rank => rank)
+						.FirstOrDefault()
+				})
+				.Where(x =>
+					EF.Functions.ILike(x.Organization.Name, pattern) ||
+					EF.Functions.ILike(x.Organization.SystemName, pattern) || x.MemberRank >= 0.3 ||
+					x.OrganizationRank >= 0.3)
+				.OrderByDescending(x => x.OrganizationRank + x.MemberRank)
+				.Select(x => x.Organization);
+		}
 
-        return new GetOrganizationsResult(organizations);
-    }
+		var organizations = await query
+			.SortBy(request.SortBy)
+			.Project(projection)
+			.ApplyPagination(request.Pagination)
+			.ToListAsync(cancellationToken);
+
+		return new GetOrganizationsResult(organizations);
+	}
 }

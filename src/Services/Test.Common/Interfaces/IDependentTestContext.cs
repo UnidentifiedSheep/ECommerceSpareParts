@@ -2,5 +2,5 @@
 
 public interface IDependentTestContext
 {
-    public static abstract Type[] DependsOn { get; }
+	static abstract Type[] DependsOn { get; }
 }

@@ -8,23 +8,25 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Common;
 
 public abstract class InternalCommonClientBase(
-    IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
-    IOptionsMonitor<InternalServicesOptions> serviceOptions,
-    ProjectJsonOptions jsonOptions
-) : InternalClientBase(authClient, optionsMonitor, jsonOptions)
+	IAuthClient authClient,
+	IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+	IOptionsMonitor<InternalServicesOptions> serviceOptions,
+	ProjectJsonOptions jsonOptions) : InternalClientBase(
+	authClient,
+	optionsMonitor,
+	jsonOptions)
 {
-    protected async Task<HttpRequestMessage> GetRequest(
-        IServiceDefinition serviceDefinition,
-        HttpMethod method,
-        string url,
-        CancellationToken cancellationToken = default)
-    {
-        var options = serviceOptions.CurrentValue.GetOptionsForService(serviceDefinition);
+	protected async Task<HttpRequestMessage> GetRequest(
+		IServiceDefinition serviceDefinition,
+		HttpMethod method,
+		string url,
+		CancellationToken cancellationToken = default)
+	{
+		var options = serviceOptions.CurrentValue.GetOptionsForService(serviceDefinition);
 
-        return await GetRequest(
-            method,
-            new Uri(new Uri(options.Url), url).ToString(),
-            cancellationToken);
-    }
+		return await GetRequest(
+			method,
+			new Uri(new Uri(options.Url), url).ToString(),
+			cancellationToken);
+	}
 }

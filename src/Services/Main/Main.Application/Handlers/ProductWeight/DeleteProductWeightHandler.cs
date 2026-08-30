@@ -12,15 +12,14 @@ namespace Main.Application.Handlers.ProductWeight;
 public record DeleteProductWeightCommand(int ProductId) : ICommand;
 
 public class DeleteProductWeightHandler(
-    IRepository<Entities.Product.ProductWeight, int> repository,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<DeleteProductWeightCommand>
+	IRepository<Entities.Product.ProductWeight, int> repository,
+	IUnitOfWork unitOfWork) : ICommandHandler<DeleteProductWeightCommand>
 {
-    public async Task<Unit> Handle(DeleteProductWeightCommand request, CancellationToken cancellationToken)
-    {
-        var weight = await repository.GetById(request.ProductId, cancellationToken)
-            ?? throw new ProductWeightNotFoundException(request.ProductId);
-        unitOfWork.Remove(weight);
-        return Unit.Value;
-    }
+	public async Task<Unit> Handle(DeleteProductWeightCommand request, CancellationToken cancellationToken)
+	{
+		var weight = await repository.GetById(request.ProductId, cancellationToken) ??
+			throw new ProductWeightNotFoundException(request.ProductId);
+		unitOfWork.Remove(weight);
+		return Unit.Value;
+	}
 }

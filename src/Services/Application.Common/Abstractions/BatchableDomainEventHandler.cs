@@ -4,9 +4,8 @@ using MediatR;
 
 namespace Application.Common.Abstractions;
 
-public abstract class BatchableDomainEventHandler<TEvent>
-    : INotificationHandler<Batch<TEvent>>
-    where TEvent : IBatchableDomainEvent
+public abstract class BatchableDomainEventHandler<TEvent> : INotificationHandler<Batch<TEvent>>
+	where TEvent : IBatchableDomainEvent
 {
-    public abstract Task Handle(Batch<TEvent> notification, CancellationToken cancellationToken);
+	public abstract Task Handle(Batch<TEvent> notification, CancellationToken cancellationToken);
 }

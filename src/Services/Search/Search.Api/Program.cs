@@ -9,7 +9,6 @@ using Carter;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
-using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using Search.Abstractions.Options;
 using Search.Api.GraphQl;
@@ -26,60 +25,57 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.AddServiceConfiguration("search");
 
 builder.Host.AddLokiLogger(
-    builder.Configuration,
-    "search.api",
-    env);
+	builder.Configuration,
+	"search.api",
+	env);
 
-AddOpenSearchOptions(builder.Services)
-    .AddMessageBrokerOptions()
-    .AddHeaderSecretsOptions()
-    .AddRedisOptions();
+AddOpenSearchOptions(builder.Services).AddMessageBrokerOptions().AddHeaderSecretsOptions().AddRedisOptions();
 
-builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Search)
-    .AddGraphQlServices(serviceName);
+builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Search).AddGraphQlServices(serviceName);
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<ProducerUpdatedConsumer, ProducerUpdatedConsumerDefinition>();
-    x.AddConsumer<ProductUpdatedConsumer, ProductUpdatedConsumerDefinition>();
-    x.AddConsumer<ProductDeletedConsumer, ProductDeletedConsumerDefinition>();
-    x.AddConsumer<CatalogueCandidateUpdatedConsumer, CatalogueCandidateUpdatedConsumerDefinition>();
-    x.AddConsumer<CatalogueCandidateDeletedConsumer, CatalogueCandidateDeletedConsumerDefinition>();
+	x.AddConsumer<ProducerUpdatedConsumer, ProducerUpdatedConsumerDefinition>();
+	x.AddConsumer<ProductUpdatedConsumer, ProductUpdatedConsumerDefinition>();
+	x.AddConsumer<ProductDeletedConsumer, ProductDeletedConsumerDefinition>();
+	x.AddConsumer<CatalogueCandidateUpdatedConsumer, CatalogueCandidateUpdatedConsumerDefinition>();
+	x.AddConsumer<CatalogueCandidateDeletedConsumer, CatalogueCandidateDeletedConsumerDefinition>();
 
-    x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
+	x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
 
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.ConfigureRabbitMq(context);
+	x.UsingRabbitMq((context, cfg) =>
+	{
+		cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(
-            "search-queue",
-            ep =>
-            {
-                ep.Durable = true;
+		cfg.ReceiveEndpoint(
+			"search-queue",
+			ep =>
+			{
+				ep.Durable = true;
 
-                ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
-                ep.ConfigureConsumer<ProductDeletedConsumer>(context);
-                ep.ConfigureConsumer<CatalogueCandidateUpdatedConsumer>(context);
-                ep.ConfigureConsumer<CatalogueCandidateDeletedConsumer>(context);
+				ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
+				ep.ConfigureConsumer<ProductDeletedConsumer>(context);
+				ep.ConfigureConsumer<CatalogueCandidateUpdatedConsumer>(context);
+				ep.ConfigureConsumer<CatalogueCandidateDeletedConsumer>(context);
 
-                ep.ConfigureConsumer<ProducerUpdatedConsumer>(context);
-            });
-    });
+				ep.ConfigureConsumer<ProducerUpdatedConsumer>(context);
+			});
+	});
 });
 
-builder.Services
-    .AddEComAuth(builder.Configuration)
-    .AddMinimalSecurityLayer()
-    .AddIntegrationClients()
-    .AddApplicationLayer(builder.Configuration)
-    .AddPersistenceLayer()
-    .AddLocalization(builder.Configuration);
+builder
+	.Services
+	.AddEComAuth(builder.Configuration)
+	.AddMinimalSecurityLayer()
+	.AddIntegrationClients()
+	.AddApplicationLayer(builder.Configuration)
+	.AddPersistenceLayer()
+	.AddLocalization(builder.Configuration);
 
 var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(
-    new DependencyContextAssemblyCatalog(endpointAssembly),
-    c => c.WithEmptyValidators());
+	new DependencyContextAssemblyCatalog(endpointAssembly),
+	c => c.WithEmptyValidators());
 
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
@@ -94,9 +90,10 @@ return;
 
 static IServiceCollection AddOpenSearchOptions(IServiceCollection services)
 {
-    services.AddOptions<OpenSearchOptions>()
-        .BindConfiguration(OpenSearchOptions.SectionName)
-        .ValidateDataAnnotations()
-        .ValidateOnStart();
-    return services;
+	services
+		.AddOptions<OpenSearchOptions>()
+		.BindConfiguration(OpenSearchOptions.SectionName)
+		.ValidateDataAnnotations()
+		.ValidateOnStart();
+	return services;
 }

@@ -6,9 +6,10 @@ namespace Main.Application.Handlers.Cart.AddToCart;
 
 public class AddToCartDbValidation : AbstractDbValidation<AddToCartCommand>
 {
-    public override void Build(IValidationPlan plan, AddToCartCommand request)
-    {
-        plan.ValidateUserExistsId(request.UserId)
-            .ValidateCartNotExistsPK((request.UserId, request.ProductId));
-    }
+	public override void Build(IValidationPlan plan, AddToCartCommand request)
+	{
+		plan
+			.ValidateUserExistsId(request.UserId)
+			.ValidateCartNotExistsPK((request.UserId, request.ProductId));
+	}
 }

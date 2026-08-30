@@ -2,11 +2,12 @@ namespace Application.Common.Static;
 
 public static class CacheKeys
 {
-    public static class SettingsCache
-    {
-        public static TimeSpan Ttl { get; } = TimeSpan.FromMinutes(5);
+	public static class SettingsCache
+	{
+		public static TimeSpan Ttl { get; } = TimeSpan.FromMinutes(5);
 
-        public static string FavoritSettings => "favorit-settings";
-        public static string TmtrSettings => "tmtr-settings";
-    }
+		public static string FavoritSettings => "favorit-settings";
+
+		public static string TmtrSettings => "tmtr-settings";
+	}
 }

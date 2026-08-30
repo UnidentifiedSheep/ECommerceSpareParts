@@ -7,4 +7,4 @@ using Persistence.Repository;
 namespace Main.Persistence.Repositories.Balance;
 
 public class TransactionRepository(DContext context, IQueryableExtensions extensions)
-    : LinqRepositoryBase<DContext, Transaction, Guid>(context, extensions), ITransactionRepository;
+	: LinqRepositoryBase<DContext, Transaction, Guid>(context, extensions), ITransactionRepository;

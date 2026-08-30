@@ -2,17 +2,13 @@ namespace Main.Application.Handlers.StorageContents.SubtractContent;
 
 public interface ISubtractStorageContentItem
 {
-    int Count { get; }
+	int Count { get; }
 }
 
-public record SubtractStorageContentItem(
-    int StorageContentId,
-    int Count
-) : ISubtractStorageContentItem;
+public record SubtractStorageContentItem(int StorageContentId, int Count) : ISubtractStorageContentItem;
 
 public record SubtractProductFromStorageItem(
-    int ProductId,
-    string StorageCode,
-    int Count,
-    bool TakeFromOtherStorages = false
-) : ISubtractStorageContentItem;
+	int ProductId,
+	string StorageCode,
+	int Count,
+	bool TakeFromOtherStorages = false) : ISubtractStorageContentItem;

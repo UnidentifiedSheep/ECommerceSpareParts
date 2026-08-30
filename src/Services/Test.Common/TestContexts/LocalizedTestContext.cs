@@ -1,13 +1,13 @@
-﻿using Localization.Abstractions.Interfaces;
+﻿using System.Globalization;
 using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class LocalizedTestContext(IScopedStringLocalizer localizer) : ITestContext
+public class LocalizedTestContext : ITestContext
 {
-    public virtual Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        localizer.SetLocale("ru-RU");
-        return Task.CompletedTask;
-    }
+	public virtual Task InitializeAsync(CancellationToken cancellationToken = default)
+	{
+		CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = new CultureInfo("ru-RU");
+		return Task.CompletedTask;
+	}
 }

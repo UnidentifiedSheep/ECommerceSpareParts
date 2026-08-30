@@ -4,7 +4,7 @@ namespace SchemaGeneration.Abstractions;
 
 public interface ISchemaGenerator
 {
-    ObjectSchema Generate<T>();
+	ObjectSchema Generate<T>();
 
-    ObjectSchema Generate(Type type);
+	ObjectSchema Generate(Type type);
 }

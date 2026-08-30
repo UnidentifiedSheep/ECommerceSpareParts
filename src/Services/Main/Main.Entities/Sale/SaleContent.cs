@@ -8,103 +8,100 @@ namespace Main.Entities.Sale;
 
 public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, int>
 {
-    private readonly List<SaleContentDetail> _details = [];
+	private readonly List<SaleContentDetail> _details = [];
 
-    private SaleContent() { }
+	private SaleContent()
+	{
+	}
 
-    private SaleContent(
-        int productId,
-        decimal priceWithOutDiscount,
-        decimal priceWithDiscount,
-        IEnumerable<SaleContentDetail> details)
-    {
-        ProductId = productId;
-        SetPriceAndDetails(
-            priceWithOutDiscount,
-            priceWithDiscount,
-            details);
-    }
+	private SaleContent(
+		int productId,
+		decimal priceWithOutDiscount,
+		decimal priceWithDiscount,
+		IEnumerable<SaleContentDetail> details)
+	{
+		ProductId = productId;
+		SetPriceAndDetails(
+			priceWithOutDiscount,
+			priceWithDiscount,
+			details);
+	}
 
-    public int Id { get; private set; }
+	public int Id { get; private set; }
 
-    public Guid SaleId { get; private set; }
+	public Guid SaleId { get; private set; }
 
-    public int ProductId { get; private set; }
+	public int ProductId { get; private set; }
 
-    public int Count { get; private set; }
+	public int Count { get; private set; }
 
-    public decimal Price { get; private set; }
+	public decimal Price { get; private set; }
 
-    public decimal TotalSum { get; private set; }
+	public decimal TotalSum { get; private set; }
 
-    public string? Comment { get; private set; }
+	public string? Comment { get; private set; }
 
-    public decimal Discount { get; private set; }
+	public decimal Discount { get; private set; }
 
-    public Product.Product Product { get; private set; } = null!;
-    public Sale Sale { get; private set; } = null!;
-    
-    public IReadOnlyList<SaleContentDetail> Details => _details;
+	public Product.Product Product { get; private set; } = null!;
 
-    public static Expression<Func<SaleContent, int>> GetKeySelector() { return x => x.Id; }
+	public Sale Sale { get; private set; } = null!;
 
-    public static Expression<Func<SaleContent, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.Id == key;
-    }
+	public IReadOnlyList<SaleContentDetail> Details => _details;
 
-    public static SaleContent Create(
-        int productId,
-        decimal priceWithOutDiscount,
-        decimal priceWithDiscount,
-        IEnumerable<SaleContentDetail> details)
-    {
-        return new SaleContent(
-            productId,
-            priceWithOutDiscount,
-            priceWithDiscount,
-            details);
-    }
+	public static Expression<Func<SaleContent, int>> GetKeySelector() => x => x.Id;
 
-    private void SetCount(int count) { Count = count.EnsureGreaterThan(0, "sale.content.count.min"); }
+	public static Expression<Func<SaleContent, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 
-    public void SetPriceAndDetails(
-        decimal withOutDiscount,
-        decimal withDiscount,
-        IEnumerable<SaleContentDetail> details)
-    {
-        withOutDiscount
-            .EnsureMaxDecimalPlaces(2, "sale.content.price.precision")
-            .EnsureGreaterThan(0, "sale.content.price.min");
+	public static SaleContent Create(
+		int productId,
+		decimal priceWithOutDiscount,
+		decimal priceWithDiscount,
+		IEnumerable<SaleContentDetail> details)
+	{
+		return new SaleContent(
+			productId,
+			priceWithOutDiscount,
+			priceWithDiscount,
+			details);
+	}
 
-        Price = withDiscount
-            .EnsureMaxDecimalPlaces(2, "sale.content.price.with.discount.precision")
-            .EnsureGreaterThan(0, "sale.content.price.with.discount.min")
-            .EnsureAtMost(withOutDiscount, "sale.content.price.with.discount.max");
+	private void SetCount(int count) => Count = count.EnsureGreaterThan(0, "sale.content.count.min");
 
-        Discount = (withOutDiscount - withDiscount) / withOutDiscount;
-        ClearAndSetDetails(details);
-        TotalSum = Price * Count;
-    }
+	public void SetPriceAndDetails(
+		decimal withOutDiscount,
+		decimal withDiscount,
+		IEnumerable<SaleContentDetail> details)
+	{
+		withOutDiscount
+			.EnsureMaxDecimalPlaces(2, "sale.content.price.precision")
+			.EnsureGreaterThan(0, "sale.content.price.min");
 
-    private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)
-    {
-        var list = details.ToList();
-        var detailsCount = list.Sum(detail => detail.Count);
+		Price = withDiscount
+			.EnsureMaxDecimalPlaces(2, "sale.content.price.with.discount.precision")
+			.EnsureGreaterThan(0, "sale.content.price.with.discount.min")
+			.EnsureAtMost(withOutDiscount, "sale.content.price.with.discount.max");
 
-        SetCount(detailsCount);
+		Discount = (withOutDiscount - withDiscount) / withOutDiscount;
+		ClearAndSetDetails(details);
+		TotalSum = Price * Count;
+	}
 
-        _details.Clear();
-        _details.AddRange(list);
-    }
+	private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)
+	{
+		var list = details.ToList();
+		var detailsCount = list.Sum(detail => detail.Count);
 
-    public void SetComment(string? comment)
-    {
-        Comment = comment
-            .NullIfWhiteSpace()
-            ?
-            .EnsureMaxLength(256, "sale.content.comment.max");
-    }
+		SetCount(detailsCount);
 
-    public override int GetId() { return Id; }
+		_details.Clear();
+		_details.AddRange(list);
+	}
+
+	public void SetComment(string? comment)
+	{
+		Comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, "sale.content.comment.max");
+	}
+
+	public override int GetId() => Id;
 }

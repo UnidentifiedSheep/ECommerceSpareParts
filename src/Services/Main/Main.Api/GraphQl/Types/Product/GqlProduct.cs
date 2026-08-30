@@ -1,7 +1,7 @@
 using Enums;
+using GraphQL.Common.Attributes;
 using HotChocolate;
 using HotChocolate.Types.Composite;
-using GraphQL.Common.Attributes;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Producer;
@@ -16,156 +16,140 @@ namespace Main.Api.GraphQl.Types.Product;
 [GraphQLName("Product")]
 public record GqlProduct
 {
-    private readonly ProductDto? _product;
+	private readonly ProductDto? _product;
 
-    [GraphQLName("id")]
-    [Shareable]
-    public int Id { get; }
+	public GqlProduct(int id)
+	{
+		Id = id;
+	}
 
-    [GraphQLName("sku")]
-    public async Task<string> GetSkuAsync(
-        IProductByIdDataLoader loader,
-        CancellationToken cancellationToken)
-        => (await GetProductAsync(loader, cancellationToken)).Sku;
+	public GqlProduct(ProductDto product) : this(product.Id)
+	{
+		_product = product;
+	}
 
-    [GraphQLName("name")]
-    public async Task<string> GetNameAsync(
-        IProductByIdDataLoader loader,
-        CancellationToken cancellationToken)
-        => (await GetProductAsync(loader, cancellationToken)).Name;
+	[GraphQLName("id")]
+	[Shareable]
+	public int Id { get; }
 
-    [GraphQLName("description")]
-    public async Task<string?> GetDescriptionAsync(
-        IProductByIdDataLoader loader,
-        CancellationToken cancellationToken)
-        => (await GetProductAsync(loader, cancellationToken)).Description;
+	[GraphQLName("sku")]
+	public async Task<string> GetSkuAsync(
+		IProductByIdDataLoader loader,
+		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Sku;
 
-    [GraphQLName("indicator")]
-    public async Task<string?> GetIndicatorAsync(
-        IProductByIdDataLoader loader,
-        CancellationToken cancellationToken)
-        => (await GetProductAsync(loader, cancellationToken)).Indicator;
+	[GraphQLName("name")]
+	public async Task<string> GetNameAsync(
+		IProductByIdDataLoader loader,
+		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Name;
 
-    [GraphQLName("images")]
-    public async Task<List<string>> GetImagesAsync(
-        IProductByIdDataLoader loader,
-        CancellationToken cancellationToken)
-        => (await GetProductAsync(loader, cancellationToken)).Images;
+	[GraphQLName("description")]
+	public async Task<string?> GetDescriptionAsync(
+		IProductByIdDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetProductAsync(loader, cancellationToken)).Description;
 
-    [GraphQLName("stock")]
-    public async Task<int> GetStockAsync(
-        IProductByIdDataLoader loader,
-        CancellationToken cancellationToken)
-        => (await GetProductAsync(loader, cancellationToken)).Stock;
+	[GraphQLName("indicator")]
+	public async Task<string?> GetIndicatorAsync(
+		IProductByIdDataLoader loader,
+		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Indicator;
 
-    [GraphQLName("producer")]
-    public async Task<GqlProducer> GetProducerAsync(
-        IProductByIdDataLoader productLoader,
-        CancellationToken cancellationToken)
-    {
-        var product = await GetProductAsync(productLoader, cancellationToken);
-        return new GqlProducer(product.ProducerId);
-    }
+	[GraphQLName("images")]
+	public async Task<List<string>> GetImagesAsync(
+		IProductByIdDataLoader loader,
+		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Images;
 
-    [GraphQLName("size")]
-    public async Task<GqlProductSize?> GetSizeAsync(
-        IProductSizeByIdDataLoader loader,
-        CancellationToken cancellationToken)
-    {
-        var size = await loader.LoadAsync(Id, cancellationToken);
-        return size is null ? null : new GqlProductSize(size);
-    }
+	[GraphQLName("stock")]
+	public async Task<int> GetStockAsync(
+		IProductByIdDataLoader loader,
+		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Stock;
 
-    [GraphQLName("weight")]
-    public async Task<GqlProductWeight?> GetWeightAsync(
-        IProductWeightByIdDataLoader loader,
-        CancellationToken cancellationToken)
-    {
-        var weight = await loader.LoadAsync(Id, cancellationToken);
-        return weight is null ? null : new GqlProductWeight(weight);
-    }
+	[GraphQLName("producer")]
+	public async Task<GqlProducer> GetProducerAsync(
+		IProductByIdDataLoader productLoader,
+		CancellationToken cancellationToken)
+	{
+		var product = await GetProductAsync(productLoader, cancellationToken);
+		return new GqlProducer(product.ProducerId);
+	}
 
-    [GraphQLName("pair")]
-    public async Task<GqlProduct?> GetPairAsync(
-        IProductPairByIdDataLoader loader,
-        CancellationToken cancellationToken)
-    {
-        var pair = await loader.LoadAsync(Id, cancellationToken);
-        return pair is null ? null : new GqlProduct(pair);
-    }
-    
-    [GraphQLName("contents")]
-    public async Task<IReadOnlyList<GqlProductContent>> GetContentsAsync(
-        IProductContentsByIdDataLoader loader,
-        CancellationToken cancellationToken)
-    {
-        var contents = await loader.LoadAsync(Id, cancellationToken);
-        return contents?
-            .Select(x => new GqlProductContent(x))
-            .ToArray() ?? [];
-    }
+	[GraphQLName("size")]
+	public async Task<GqlProductSize?> GetSizeAsync(
+		IProductSizeByIdDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var size = await loader.LoadAsync(Id, cancellationToken);
+		return size is null ? null : new GqlProductSize(size);
+	}
 
-    [GraphQLName("crosses")]
-    public async Task<IReadOnlyList<GqlProduct>> GetCrossesAsync(
-        GqlProductCrossesInput input,
-        IProductCrossesDataLoader loader,
-        CancellationToken cancellationToken)
-    {
-        var item = new GetProductCrossesItem(
-            Id,
-            input.Pagination,
-            input.SortBy?
-                .Select(x => x.ToSortExpression())
-                .ToArray());
+	[GraphQLName("weight")]
+	public async Task<GqlProductWeight?> GetWeightAsync(
+		IProductWeightByIdDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var weight = await loader.LoadAsync(Id, cancellationToken);
+		return weight is null ? null : new GqlProductWeight(weight);
+	}
 
-        var crosses = await loader.LoadAsync(item, cancellationToken);
-        return crosses?
-            .Select(x => new GqlProduct(x))
-            .ToArray() ?? [];
-    }
+	[GraphQLName("pair")]
+	public async Task<GqlProduct?> GetPairAsync(
+		IProductPairByIdDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var pair = await loader.LoadAsync(Id, cancellationToken);
+		return pair is null ? null : new GqlProduct(pair);
+	}
 
-    [GraphQLName("storageContents")]
-    [RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_GET_ALL)]
-    public async Task<IReadOnlyList<GqlStorageContent>> GetStorageContentsAsync(
-        GqlProductStorageContentsInput input,
-        IProductStorageContentsDataLoader loader,
-        CancellationToken cancellationToken)
-    {
-        var item = new GetProductStorageContentsItem(
-            Id,
-            input.Pagination,
-            input.StorageCode,
-            input.ShowZeroCount);
+	[GraphQLName("contents")]
+	public async Task<IReadOnlyList<GqlProductContent>> GetContentsAsync(
+		IProductContentsByIdDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var contents = await loader.LoadAsync(Id, cancellationToken);
+		return contents?.Select(x => new GqlProductContent(x)).ToArray() ?? [];
+	}
 
-        var content = await loader.LoadAsync(item, cancellationToken);
-        return content?
-            .Select(x => new GqlStorageContent(x))
-            .ToArray() ?? [];
-    }
+	[GraphQLName("crosses")]
+	public async Task<IReadOnlyList<GqlProduct>> GetCrossesAsync(
+		GqlProductCrossesInput input,
+		IProductCrossesDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var item = new GetProductCrossesItem(
+			Id,
+			input.Pagination,
+			input.SortBy?.Select(x => x.ToSortExpression()).ToArray());
 
-    [GraphQLName("availableStock")]
-    public async Task<int> GetAvailableStockAsync(
-        IProductAvailableStockDataLoader loader,
-        GqlProductAvailableStocksInput input,
-        CancellationToken cancellationToken)
-        => await loader.LoadAsync(
-            new GetAvailableProductsStockItem(Id, input.StorageCode),
-            cancellationToken);
+		var crosses = await loader.LoadAsync(item, cancellationToken);
+		return crosses?.Select(x => new GqlProduct(x)).ToArray() ?? [];
+	}
 
-    private async Task<ProductDto> GetProductAsync(
-        IProductByIdDataLoader loader,
-        CancellationToken cancellationToken)
-        => _product
-           ?? await loader.LoadAsync(Id, cancellationToken)
-           ?? throw new ProductNotFoundException(Id);
+	[GraphQLName("storageContents")]
+	[RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_GET_ALL)]
+	public async Task<IReadOnlyList<GqlStorageContent>> GetStorageContentsAsync(
+		GqlProductStorageContentsInput input,
+		IProductStorageContentsDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var item = new GetProductStorageContentsItem(
+			Id,
+			input.Pagination,
+			input.StorageCode,
+			input.ShowZeroCount);
 
-    public GqlProduct(int id)
-    {
-        Id = id;
-    }
+		var content = await loader.LoadAsync(item, cancellationToken);
+		return content?.Select(x => new GqlStorageContent(x)).ToArray() ?? [];
+	}
 
-    public GqlProduct(ProductDto product) : this(product.Id)
-    {
-        _product = product;
-    }
+	[GraphQLName("availableStock")]
+	public async Task<int> GetAvailableStockAsync(
+		IProductAvailableStockDataLoader loader,
+		GqlProductAvailableStocksInput input,
+		CancellationToken cancellationToken) => await loader.LoadAsync(
+		new GetAvailableProductsStockItem(Id, input.StorageCode),
+		cancellationToken);
+
+	private async Task<ProductDto> GetProductAsync(
+		IProductByIdDataLoader loader,
+		CancellationToken cancellationToken) => _product ?? await loader.LoadAsync(Id, cancellationToken) ??
+		throw new ProductNotFoundException(Id);
 }

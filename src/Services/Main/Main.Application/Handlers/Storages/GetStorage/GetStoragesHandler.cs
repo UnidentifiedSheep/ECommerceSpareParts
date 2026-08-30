@@ -10,48 +10,43 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Storages.GetStorage;
 
-public record GetStoragesQuery(
-    Pagination Pagination,
-    string? SearchTerm,
-    StorageType? Type
-)
-    : IQuery<GetStoragesResult>;
+public record GetStoragesQuery(Pagination Pagination, string? SearchTerm, StorageType? Type)
+	: IQuery<GetStoragesResult>;
 
 public record GetStoragesResult(IReadOnlyList<StorageDto> Storages);
 
 public class GetStoragesHandler(
-    IReadRepository<Storage, string> repository,
-    IProjectionProvider<Storage, StorageDto> projection
-) : IQueryHandler<GetStoragesQuery, GetStoragesResult>
+	IReadRepository<Storage, string> repository,
+	IProjectionProvider<Storage, StorageDto> projection) : IQueryHandler<GetStoragesQuery, GetStoragesResult>
 {
-    public async Task<GetStoragesResult> Handle(GetStoragesQuery request, CancellationToken cancellationToken)
-    {
-        var query = repository.Query;
-        var searchTerm = request.SearchTerm?.Trim();
+	public async Task<GetStoragesResult> Handle(GetStoragesQuery request, CancellationToken cancellationToken)
+	{
+		var query = repository.Query;
+		var searchTerm = request.SearchTerm?.Trim();
 
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-            query = query.Select(x => new
-                {
-                    Entity = x,
-                    Rank =
-                        (EF.Functions.ILike(x.Code, $"%{searchTerm}%") ? 3 : 0) +
-                        (x.Description != null && EF.Functions.ILike(x.Description, $"%{searchTerm}%")
-                            ? 2
-                            : 0) +
-                        (x.Location != null && EF.Functions.ILike(x.Location, $"%{searchTerm}%") ? 1 : 0)
-                })
-                .Where(x => x.Rank > 0)
-                .OrderByDescending(x => x.Rank)
-                .Select(x => x.Entity);
-        else
-            query = query.OrderByDescending(x => x.Code);
+		if (!string.IsNullOrWhiteSpace(searchTerm))
+			query = query
+				.Select(x => new
+				{
+					Entity = x,
+					Rank = (EF.Functions.ILike(x.Code, $"%{searchTerm}%") ? 3 : 0) +
+						(x.Description != null && EF.Functions.ILike(x.Description, $"%{searchTerm}%")
+							? 2
+							: 0) +
+						(x.Location != null && EF.Functions.ILike(x.Location, $"%{searchTerm}%") ? 1 : 0)
+				})
+				.Where(x => x.Rank > 0)
+				.OrderByDescending(x => x.Rank)
+				.Select(x => x.Entity);
+		else
+			query = query.OrderByDescending(x => x.Code);
 
-        var result = await query
-            .Where(x => request.Type == null || x.Type == request.Type)
-            .Project(projection)
-            .ApplyPagination(request.Pagination)
-            .ToListAsync(cancellationToken);
+		var result = await query
+			.Where(x => request.Type == null || x.Type == request.Type)
+			.Project(projection)
+			.ApplyPagination(request.Pagination)
+			.ToListAsync(cancellationToken);
 
-        return new GetStoragesResult(result);
-    }
+		return new GetStoragesResult(result);
+	}
 }

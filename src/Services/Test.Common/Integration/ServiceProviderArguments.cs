@@ -4,5 +4,5 @@ namespace Tests.Integration;
 
 internal sealed record ServiceProviderArguments : IServiceProviderArgument
 {
-    public required string PgsqlConnectionString { get; init; }
+	public required string PgsqlConnectionString { get; init; }
 }

@@ -1,6 +1,5 @@
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Extensions;
 using Domain.Validation;
 using Exceptions;
 
@@ -8,91 +7,93 @@ namespace Analytics.Entities;
 
 public class PurchasesFact : Entity<PurchasesFact, Guid>
 {
-    private PurchasesFact() { }
+	private PurchasesFact()
+	{
+	}
 
-    [Validate]
-    public Guid Id { get; private set; }
+	[Validate]
+	public Guid Id { get; private set; }
 
-    public int CurrencyId { get; private set; }
+	public int CurrencyId { get; private set; }
 
-    public Guid SupplierId { get; private set; }
+	public Guid SupplierId { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+	public DateTime CreatedAt { get; private set; }
 
-    public DateTime ProcessedAt { get; private set; }
+	public DateTime ProcessedAt { get; private set; }
 
-    public decimal TotalSum { get; private set; }
+	public decimal TotalSum { get; private set; }
 
-    public virtual ICollection<PurchaseContent> PurchaseContents { get; } = new List<PurchaseContent>();
+	public virtual ICollection<PurchaseContent> PurchaseContents { get; } = new List<PurchaseContent>();
 
-    public override Guid GetId() { return Id; }
+	public override Guid GetId() => Id;
 
-    public static PurchasesFact Create(
-        Guid id,
-        int currencyId,
-        Guid supplierId,
-        DateTime createdAt,
-        DateTime processedAt,
-        IEnumerable<PurchaseContent> contents)
-    {
-        var fact = new PurchasesFact
-        {
-            Id = id,
-            CurrencyId = currencyId,
-            SupplierId = supplierId,
-            CreatedAt = createdAt,
-            ProcessedAt = processedAt
-        };
+	public static PurchasesFact Create(
+		Guid id,
+		int currencyId,
+		Guid supplierId,
+		DateTime createdAt,
+		DateTime processedAt,
+		IEnumerable<PurchaseContent> contents)
+	{
+		var fact = new PurchasesFact
+		{
+			Id = id,
+			CurrencyId = currencyId,
+			SupplierId = supplierId,
+			CreatedAt = createdAt,
+			ProcessedAt = processedAt
+		};
 
-        fact.ApplyContents(contents);
+		fact.ApplyContents(contents);
 
-        return fact;
-    }
+		return fact;
+	}
 
-    public void Update(
-        int currencyId,
-        Guid supplierId,
-        DateTime createdAt,
-        DateTime processedAt,
-        IEnumerable<PurchaseContent> contents)
-    {
-        CurrencyId = currencyId;
-        SupplierId = supplierId;
-        CreatedAt = createdAt;
-        ProcessedAt = processedAt;
+	public void Update(
+		int currencyId,
+		Guid supplierId,
+		DateTime createdAt,
+		DateTime processedAt,
+		IEnumerable<PurchaseContent> contents)
+	{
+		CurrencyId = currencyId;
+		SupplierId = supplierId;
+		CreatedAt = createdAt;
+		ProcessedAt = processedAt;
 
-        ApplyContents(contents);
-    }
+		ApplyContents(contents);
+	}
 
-    private void ApplyContents(IEnumerable<PurchaseContent> contents)
-    {
-        var incomingContents = contents
-            .EnsureNotNull(() => new InvalidInputException("purchase.fact.content.required"))
-            .ToList();
+	private void ApplyContents(IEnumerable<PurchaseContent> contents)
+	{
+		var incomingContents = contents
+			.EnsureNotNull(() => new InvalidInputException("purchase.fact.content.required"))
+			.ToList();
 
-        incomingContents
-            .EnsureNotEmpty(() => new InvalidInputException("purchase.fact.content.required"));
+		incomingContents.EnsureNotEmpty(() => new InvalidInputException("purchase.fact.content.required"));
 
-        var existingContents = PurchaseContents.ToDictionary(x => x.Id);
-        var toRemove = new Dictionary<int, PurchaseContent>(existingContents);
-        var totalSum = 0m;
+		var existingContents = PurchaseContents.ToDictionary(x => x.Id);
+		var toRemove = new Dictionary<int, PurchaseContent>(existingContents);
+		var totalSum = 0m;
 
-        foreach (var incomingContent in incomingContents)
-        {
-            toRemove.Remove(incomingContent.Id);
-            totalSum += incomingContent.Count * incomingContent.Price;
+		foreach (var incomingContent in incomingContents)
+		{
+			toRemove.Remove(incomingContent.Id);
+			totalSum += incomingContent.Count * incomingContent.Price;
 
-            if (existingContents.TryGetValue(incomingContent.Id, out var existingContent))
-                existingContent.Update(
-                    incomingContent.ProductId,
-                    incomingContent.Price,
-                    incomingContent.Count);
-            else
-                PurchaseContents.Add(incomingContent);
-        }
+			if (existingContents.TryGetValue(incomingContent.Id, out var existingContent))
+				existingContent.Update(
+					incomingContent.ProductId,
+					incomingContent.Price,
+					incomingContent.Count);
+			else
+				PurchaseContents.Add(incomingContent);
+		}
 
-        foreach (var item in toRemove.Values) PurchaseContents.Remove(item);
+		foreach (var item in toRemove.Values)
+			PurchaseContents.Remove(item);
 
-        TotalSum = totalSum;
-    }
+		TotalSum = totalSum;
+	}
 }

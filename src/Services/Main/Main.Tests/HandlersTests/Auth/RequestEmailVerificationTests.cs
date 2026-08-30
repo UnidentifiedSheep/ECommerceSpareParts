@@ -22,148 +22,123 @@ namespace Tests.HandlersTests.Auth;
 
 public class RequestEmailVerificationTests : IntegrationTest
 {
-    public RequestEmailVerificationTests(
-        CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<UserContextTestContext>();
-    }
+	public RequestEmailVerificationTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<UserContextTestContext>();
+	}
 
-    [Fact]
-    public async Task RequestVerification_ExistingUserEmail_QueuesVerificationEmail()
-    {
-        const string email = "verification@example.com";
-        var user = await CreateUser(email, isConfirmed: false);
-        var mailingService = new Mock<IMailingService>();
-        IEmailData? queuedEmail = null;
-        mailingService
-            .Setup(x => x.QueueEmailAsync(
-                It.IsAny<IEmailData>(),
-                It.IsAny<CancellationToken>()))
-            .Callback((
-                IEmailData data,
-                CancellationToken _) => queuedEmail = data)
-            .Returns(Task.CompletedTask);
+	[Fact]
+	public async Task RequestVerification_ExistingUserEmail_QueuesVerificationEmail()
+	{
+		const string email = "verification@example.com";
+		var user = await CreateUser(email, false);
+		var mailingService = new Mock<IMailingService>();
+		IEmailData? queuedEmail = null;
+		mailingService
+			.Setup(x => x.QueueEmailAsync(It.IsAny<IEmailData>(), It.IsAny<CancellationToken>()))
+			.Callback((IEmailData data, CancellationToken _) => queuedEmail = data)
+			.Returns(Task.CompletedTask);
 
-        var handler = CreateHandler(mailingService.Object);
+		var handler = CreateHandler(mailingService.Object);
 
-        await handler.Handle(
-            new RequestEmailVerificationCommand(
-                user.Id,
-                "Verification@Example.com"),
-            CancellationToken.None);
+		await handler.Handle(
+			new RequestEmailVerificationCommand(user.Id, "Verification@Example.com"),
+			CancellationToken.None);
 
-        var verificationEmail = Assert.IsType<EmailVerificationData>(queuedEmail);
-        Assert.Equal(email, verificationEmail.To);
-        Assert.StartsWith(
-            "https://www.somewebsite.com/verify-email?token=",
-            verificationEmail.VerificationUrl);
-        mailingService.Verify(
-            x => x.QueueEmailAsync(
-                It.IsAny<IEmailData>(),
-                It.IsAny<CancellationToken>()),
-            Times.Once);
-    }
+		var verificationEmail = Assert.IsType<EmailVerificationData>(queuedEmail);
+		Assert.Equal(email, verificationEmail.To);
+		Assert.StartsWith(
+			"https://www.somewebsite.com/verify-email?token=",
+			verificationEmail.VerificationUrl);
+		mailingService.Verify(
+			x => x.QueueEmailAsync(It.IsAny<IEmailData>(), It.IsAny<CancellationToken>()),
+			Times.Once);
+	}
 
-    [Fact]
-    public async Task RequestVerification_ConfirmedEmail_DoesNotQueueEmail()
-    {
-        const string email = "confirmed@example.com";
-        var user = await CreateUser(email, isConfirmed: true);
-        var mailingService = new Mock<IMailingService>();
-        var handler = CreateHandler(mailingService.Object);
+	[Fact]
+	public async Task RequestVerification_ConfirmedEmail_DoesNotQueueEmail()
+	{
+		const string email = "confirmed@example.com";
+		var user = await CreateUser(email);
+		var mailingService = new Mock<IMailingService>();
+		var handler = CreateHandler(mailingService.Object);
 
-        await handler.Handle(
-            new RequestEmailVerificationCommand(user.Id, email),
-            CancellationToken.None);
+		await handler.Handle(new RequestEmailVerificationCommand(user.Id, email), CancellationToken.None);
 
-        mailingService.Verify(
-            x => x.QueueEmailAsync(
-                It.IsAny<IEmailData>(),
-                It.IsAny<CancellationToken>()),
-            Times.Never);
-    }
+		mailingService.Verify(
+			x => x.QueueEmailAsync(It.IsAny<IEmailData>(), It.IsAny<CancellationToken>()),
+			Times.Never);
+	}
 
-    [Fact]
-    public async Task RequestVerification_EmailDoesNotExist_Throws()
-    {
-        var user = await CreateUser();
-        var handler = CreateHandler(Mock.Of<IMailingService>());
+	[Fact]
+	public async Task RequestVerification_EmailDoesNotExist_Throws()
+	{
+		var user = await CreateUser();
+		var handler = CreateHandler(Mock.Of<IMailingService>());
 
-        var action = () => handler.Handle(
-            new RequestEmailVerificationCommand(
-                user.Id,
-                "missing@example.com"),
-            CancellationToken.None);
+		var action = () => handler.Handle(
+			new RequestEmailVerificationCommand(user.Id, "missing@example.com"),
+			CancellationToken.None);
 
-        await Assert.ThrowsAsync<UserEmailNotFoundException>(action);
-    }
+		await Assert.ThrowsAsync<UserEmailNotFoundException>(action);
+	}
 
-    [Fact]
-    public async Task RequestVerification_EmailBelongsToAnotherUser_Throws()
-    {
-        const string email = "other-user@example.com";
-        await CreateUser(email, isConfirmed: false);
-        var requestingUser = await CreateUser();
-        var handler = CreateHandler(Mock.Of<IMailingService>());
+	[Fact]
+	public async Task RequestVerification_EmailBelongsToAnotherUser_Throws()
+	{
+		const string email = "other-user@example.com";
+		await CreateUser(email, false);
+		var requestingUser = await CreateUser();
+		var handler = CreateHandler(Mock.Of<IMailingService>());
 
-        var action = () => handler.Handle(
-            new RequestEmailVerificationCommand(
-                requestingUser.Id,
-                email),
-            CancellationToken.None);
+		var action = () => handler.Handle(
+			new RequestEmailVerificationCommand(requestingUser.Id, email),
+			CancellationToken.None);
 
-        await Assert.ThrowsAsync<UserEmailNotFoundException>(action);
-    }
+		await Assert.ThrowsAsync<UserEmailNotFoundException>(action);
+	}
 
-    [Fact]
-    public async Task RequestVerification_AppServiceUrlIsMissing_Throws()
-    {
-        const string email = "verification@example.com";
-        var user = await CreateUser(email, isConfirmed: false);
-        var settingsService = Scope.ServiceProvider.GetRequiredService<ISettingsService>();
-        await settingsService.SetSetting(
-            new GlobalApplicationSetting(
-                new GlobalApplicationSettingData
-                {
-                    ApiServiceUrl = "https://api.example.com",
-                    AppServiceUrl = null
-                }));
-        var handler = CreateHandler(Mock.Of<IMailingService>());
+	[Fact]
+	public async Task RequestVerification_AppServiceUrlIsMissing_Throws()
+	{
+		const string email = "verification@example.com";
+		var user = await CreateUser(email, false);
+		var settingsService = Scope.ServiceProvider.GetRequiredService<ISettingsService>();
+		await settingsService.SetSetting(
+			new GlobalApplicationSetting(
+				new GlobalApplicationSettingData
+				{
+					ApiServiceUrl = "https://api.example.com", AppServiceUrl = null
+				}));
+		var handler = CreateHandler(Mock.Of<IMailingService>());
 
-        var action = () => handler.Handle(
-            new RequestEmailVerificationCommand(user.Id, email),
-            CancellationToken.None);
+		var action = () => handler.Handle(
+			new RequestEmailVerificationCommand(user.Id, email),
+			CancellationToken.None);
 
-        var exception = await Assert.ThrowsAsync<InvalidInputException>(action);
-        Assert.Equal(
-            "global.application.setting.app.service.url.not.configured",
-            exception.MessageKey);
-    }
+		var exception = await Assert.ThrowsAsync<InvalidInputException>(action);
+		Assert.Equal("global.application.setting.app.service.url.not.configured", exception.MessageKey);
+	}
 
-    private RequestEmailVerificationHandler CreateHandler(
-        IMailingService mailingService)
-    {
-        return new RequestEmailVerificationHandler(
-            Scope.ServiceProvider.GetRequiredService<IRepository<UserEmail, string>>(),
-            Scope.ServiceProvider.GetRequiredService<IJsonSigner>(),
-            mailingService,
-            Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>(),
-            Scope.ServiceProvider.GetRequiredService<IScopedStringLocalizer>(),
-            Scope.ServiceProvider.GetRequiredService<ISettingsService>());
-    }
+	private RequestEmailVerificationHandler CreateHandler(IMailingService mailingService)
+	{
+		return new RequestEmailVerificationHandler(
+			Scope.ServiceProvider.GetRequiredService<IRepository<UserEmail, string>>(),
+			Scope.ServiceProvider.GetRequiredService<IJsonSigner>(),
+			mailingService,
+			Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>(),
+			Scope.ServiceProvider.GetRequiredService<IContextualStringLocalizer>(),
+			Scope.ServiceProvider.GetRequiredService<ISettingsService>());
+	}
 
-    private async Task<Main.Entities.User.User> CreateUser(
-        string? email = null,
-        bool isConfirmed = true)
-    {
-        var builder = new MemberUserBuilder(Faker);
-        if (email is not null)
-            builder.WithEmail(
-                email,
-                isConfirmed: isConfirmed);
+	private async Task<User> CreateUser(string? email = null, bool isConfirmed = true)
+	{
+		var builder = new MemberUserBuilder(Faker);
+		if (email is not null)
+			builder.WithEmail(email, isConfirmed: isConfirmed);
 
-        var user = await builder.BuildAndAddToDb(Context);
-        Context.ChangeTracker.Clear();
-        return user;
-    }
+		var user = await builder.BuildAndAddToDb(Context);
+		Context.ChangeTracker.Clear();
+		return user;
+	}
 }

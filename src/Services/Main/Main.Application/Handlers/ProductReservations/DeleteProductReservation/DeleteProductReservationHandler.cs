@@ -11,17 +11,16 @@ namespace Main.Application.Handlers.ProductReservations.DeleteProductReservation
 [Transactional]
 public record DeleteProductReservationCommand(int ReservationId) : ICommand;
 
-public class DeleteProductReservationHandler(
-    IRepository<ProductReservation, int> repository
-) : ICommandHandler<DeleteProductReservationCommand>
+public class DeleteProductReservationHandler(IRepository<ProductReservation, int> repository)
+	: ICommandHandler<DeleteProductReservationCommand>
 {
-    public async Task<Unit> Handle(
-        DeleteProductReservationCommand request,
-        CancellationToken cancellationToken)
-    {
-        var reservation = await repository.GetById(request.ReservationId, cancellationToken)
-                          ?? throw new ReservationNotFoundException(request.ReservationId);
-        reservation.Cancel();
-        return Unit.Value;
-    }
+	public async Task<Unit> Handle(
+		DeleteProductReservationCommand request,
+		CancellationToken cancellationToken)
+	{
+		var reservation = await repository.GetById(request.ReservationId, cancellationToken) ??
+			throw new ReservationNotFoundException(request.ReservationId);
+		reservation.Cancel();
+		return Unit.Value;
+	}
 }

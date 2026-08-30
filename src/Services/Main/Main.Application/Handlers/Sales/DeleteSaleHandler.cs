@@ -16,47 +16,46 @@ namespace Main.Application.Handlers.Sales;
 
 [AutoSave]
 [Transactional(
-    IsolationLevel.Serializable,
-    20,
-    2)]
+	IsolationLevel.Serializable,
+	20,
+	2)]
 public record DeleteSaleCommand(Guid Id, uint RowVersion) : ICommand;
 
 public class DeleteSaleHandler(
-    ISaleRepository repository,
-    ISender sender,
-    IIntegrationEventScope integrationEventScope,
-    ISaleService saleService
-) : ICommandHandler<DeleteSaleCommand>
+	ISaleRepository repository,
+	ISender sender,
+	IIntegrationEventScope integrationEventScope,
+	ISaleService saleService) : ICommandHandler<DeleteSaleCommand>
 {
-    public async Task<Unit> Handle(DeleteSaleCommand request, CancellationToken cancellationToken)
-    {
-        var sale = await repository.GetFullSaleForUpdate(request.Id, cancellationToken)
-                   ?? throw new SaleNotFoundException(request.Id);
+	public async Task<Unit> Handle(DeleteSaleCommand request, CancellationToken cancellationToken)
+	{
+		var sale = await repository.GetFullSaleForUpdate(request.Id, cancellationToken) ??
+			throw new SaleNotFoundException(request.Id);
 
-        if (sale.State == SaleState.Deleted) return Unit.Value;
+		if (sale.State == SaleState.Deleted)
+			return Unit.Value;
 
-        sale.ValidateVersion(request.RowVersion);
-        sale.Delete();
+		sale.ValidateVersion(request.RowVersion);
+		sale.Delete();
 
-        await sender.Send(
-            new ReverseTransactionCommand(
-                sale.TransactionId,
-                TransactionReversalMode.System,
-                true),
-            cancellationToken);
+		await sender.Send(
+			new ReverseTransactionCommand(
+				sale.TransactionId,
+				TransactionReversalMode.System,
+				true),
+			cancellationToken);
 
-        await saleService.RestoreContents(
-            sale,
-            StorageMovementType.SaleDeletion,
-            cancellationToken);
+		await saleService.RestoreContents(
+			sale,
+			StorageMovementType.SaleDeletion,
+			cancellationToken);
 
-        integrationEventScope.Add(
-            new SaleDeletedEvent
-            {
-                SaleId = sale.Id,
-                OccurredAt = DateTime.UtcNow
-            });
+		integrationEventScope.Add(
+			new SaleDeletedEvent
+			{
+				SaleId = sale.Id, OccurredAt = DateTime.UtcNow
+			});
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

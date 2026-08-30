@@ -2,6 +2,7 @@
 
 public enum LogisticsCalculationMode
 {
-    Strict,
-    Soft
+	Strict,
+
+	Soft
 }

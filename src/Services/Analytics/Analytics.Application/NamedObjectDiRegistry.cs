@@ -12,15 +12,14 @@ namespace Analytics.Application;
 
 public static class NamedObjectDiRegistry
 {
-    public static IServiceCollection AddNamedObjects(this IServiceCollection services)
-    {
-        services.TryAddScoped<
-            IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>,
-            GetNamedObjectsHandler>();
+	public static IServiceCollection AddNamedObjects(this IServiceCollection services)
+	{
+		services.TryAddScoped<
+			IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>, GetNamedObjectsHandler>();
 
-        return services
-            .AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>()
-            .RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped)
-            .RegisterNamedObject<ChartDataSourceNamedObject>(objectsLifetime: ServiceLifetime.Scoped);
-    }
+		return services
+			.AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>()
+			.RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped)
+			.RegisterNamedObject<ChartDataSourceNamedObject>(objectsLifetime: ServiceLifetime.Scoped);
+	}
 }

@@ -4,7 +4,7 @@ namespace Pricing.Entities.DomainEvents;
 
 public record PriceApplierUpdatedDomainEvent : IBatchableDomainEvent, IKeyedDomainEvent
 {
-    public required string SystemName { get; init; }
+	public required string SystemName { get; init; }
 
-    public string GetKey() => $"price:applier:{SystemName}:updated";
+	public string GetKey() => $"price:applier:{SystemName}:updated";
 }

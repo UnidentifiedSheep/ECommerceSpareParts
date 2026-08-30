@@ -3,78 +3,68 @@ using Domain.Interfaces;
 
 namespace Domain.CommonEntities.Job;
 
-public sealed class JobStepDependency :
-    Entity<JobStepDependency, JobStepDependencyKey>,
-    ILinqEntity<JobStepDependency, JobStepDependencyKey>
+public sealed class JobStepDependency : Entity<JobStepDependency, JobStepDependencyKey>,
+	ILinqEntity<JobStepDependency, JobStepDependencyKey>
 {
-    private JobStepDependency()
-    {
-    }
+	private JobStepDependency()
+	{
+	}
 
-    private JobStepDependency(
-        MultiStepJob multiStepJob,
-        Job step,
-        Job dependsOnStep)
-    {
-        MultiStepJobId = multiStepJob.Id;
-        MultiStepJob = multiStepJob;
-        StepId = step.Id;
-        Step = step;
-        DependsOnStepId = dependsOnStep.Id;
-        DependsOnStep = dependsOnStep;
-    }
+	private JobStepDependency(
+		MultiStepJob multiStepJob,
+		Job step,
+		Job dependsOnStep)
+	{
+		MultiStepJobId = multiStepJob.Id;
+		MultiStepJob = multiStepJob;
+		StepId = step.Id;
+		Step = step;
+		DependsOnStepId = dependsOnStep.Id;
+		DependsOnStep = dependsOnStep;
+	}
 
-    public Guid MultiStepJobId { get; private set; }
-    public MultiStepJob MultiStepJob { get; private set; } = null!;
+	public Guid MultiStepJobId { get; private set; }
 
-    public Guid StepId { get; private set; }
-    public Job Step { get; private set; } = null!;
+	public MultiStepJob MultiStepJob { get; private set; } = null!;
 
-    public Guid DependsOnStepId { get; private set; }
-    public Job DependsOnStep { get; private set; } = null!;
+	public Guid StepId { get; }
 
-    internal static JobStepDependency Create(
-        MultiStepJob multiStepJob,
-        Job step,
-        Job dependsOnStep)
-    {
-        ArgumentNullException.ThrowIfNull(multiStepJob);
-        ArgumentNullException.ThrowIfNull(step);
-        ArgumentNullException.ThrowIfNull(dependsOnStep);
+	public Job Step { get; private set; } = null!;
 
-        if (step.Id == dependsOnStep.Id)
-            throw new InvalidOperationException(
-                "Job step cannot depend on itself.");
+	public Guid DependsOnStepId { get; }
 
-        return new JobStepDependency(
-            multiStepJob,
-            step,
-            dependsOnStep);
-    }
+	public Job DependsOnStep { get; private set; } = null!;
 
-    public override JobStepDependencyKey GetId()
-    {
-        return new JobStepDependencyKey(StepId, DependsOnStepId);
-    }
+	public static Expression<Func<JobStepDependency, JobStepDependencyKey>> GetKeySelector() => x =>
+		new JobStepDependencyKey(x.StepId, x.DependsOnStepId);
 
-    public static Expression<Func<JobStepDependency, JobStepDependencyKey>>
-        GetKeySelector()
-    {
-        return x => new JobStepDependencyKey(x.StepId, x.DependsOnStepId);
-    }
+	public static Expression<Func<JobStepDependency, bool>> GetEqualityExpression(JobStepDependencyKey key)
+	{
+		return x => x.StepId == key.StepId && x.DependsOnStepId == key.DependsOnStepId;
+	}
 
-    public static Expression<Func<JobStepDependency, bool>>
-        GetEqualityExpression(JobStepDependencyKey key)
-    {
-        return x =>
-            x.StepId == key.StepId &&
-            x.DependsOnStepId == key.DependsOnStepId;
-    }
+	internal static JobStepDependency Create(
+		MultiStepJob multiStepJob,
+		Job step,
+		Job dependsOnStep)
+	{
+		ArgumentNullException.ThrowIfNull(multiStepJob);
+		ArgumentNullException.ThrowIfNull(step);
+		ArgumentNullException.ThrowIfNull(dependsOnStep);
+
+		if (step.Id == dependsOnStep.Id)
+			throw new InvalidOperationException("Job step cannot depend on itself.");
+
+		return new JobStepDependency(
+			multiStepJob,
+			step,
+			dependsOnStep);
+	}
+
+	public override JobStepDependencyKey GetId() => new(StepId, DependsOnStepId);
 }
 
-public readonly record struct JobStepDependencyKey(
-    Guid StepId,
-    Guid DependsOnStepId) : ICompositeKey
+public readonly record struct JobStepDependencyKey(Guid StepId, Guid DependsOnStepId) : ICompositeKey
 {
-    public object[] ToArray() => [StepId, DependsOnStepId];
+	public object[] ToArray() => [StepId, DependsOnStepId];
 }

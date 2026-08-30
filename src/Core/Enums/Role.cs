@@ -2,9 +2,13 @@
 
 public enum Role
 {
-    Admin,
-    System,
-    Member,
-    Worker,
-    Supplier
+	Admin,
+
+	System,
+
+	Member,
+
+	Worker,
+
+	Supplier
 }

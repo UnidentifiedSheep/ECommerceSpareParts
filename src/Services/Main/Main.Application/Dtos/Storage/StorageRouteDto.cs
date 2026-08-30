@@ -6,45 +6,45 @@ namespace Main.Application.Dtos.Storage;
 
 public record StorageRouteDto
 {
-    [JsonPropertyName("id")]
-    public required Guid Id { get; init; }
+	[JsonPropertyName("id")]
+	public required Guid Id { get; init; }
 
-    [JsonPropertyName("fromStorageCode")]
-    public required string FromStorageCode { get; init; }
+	[JsonPropertyName("fromStorageCode")]
+	public required string FromStorageCode { get; init; }
 
-    [JsonPropertyName("toStorageCode")]
-    public required string ToStorageCode { get; init; }
+	[JsonPropertyName("toStorageCode")]
+	public required string ToStorageCode { get; init; }
 
-    [JsonPropertyName("distanceM")]
-    public required int DistanceM { get; init; }
+	[JsonPropertyName("distanceM")]
+	public required int DistanceM { get; init; }
 
-    [JsonPropertyName("routeType")]
-    public required RouteType RouteType { get; init; }
+	[JsonPropertyName("routeType")]
+	public required RouteType RouteType { get; init; }
 
-    [JsonPropertyName("pricingModel")]
-    public required LogisticPricingType PricingModel { get; init; }
+	[JsonPropertyName("pricingModel")]
+	public required LogisticPricingType PricingModel { get; init; }
 
-    [JsonPropertyName("deliveryTimeMinutes")]
-    public required int DeliveryTimeMinutes { get; init; }
+	[JsonPropertyName("deliveryTimeMinutes")]
+	public required int DeliveryTimeMinutes { get; init; }
 
-    [JsonPropertyName("pricePerKg")]
-    public required decimal PricePerKg { get; init; }
+	[JsonPropertyName("pricePerKg")]
+	public required decimal PricePerKg { get; init; }
 
-    [JsonPropertyName("pricePerM3")]
-    public required decimal PricePerM3 { get; init; }
+	[JsonPropertyName("pricePerM3")]
+	public required decimal PricePerM3 { get; init; }
 
-    [JsonPropertyName("pricePerOrder")]
-    public required decimal PricePerOrder { get; init; }
+	[JsonPropertyName("pricePerOrder")]
+	public required decimal PricePerOrder { get; init; }
 
-    [JsonPropertyName("isActive")]
-    public required bool IsActive { get; init; }
+	[JsonPropertyName("isActive")]
+	public required bool IsActive { get; init; }
 
-    [JsonPropertyName("currency")]
-    public required CurrencyDto Currency { get; init; }
+	[JsonPropertyName("currency")]
+	public required CurrencyDto Currency { get; init; }
 
-    [JsonPropertyName("minimumPrice")]
-    public required decimal MinimumPrice { get; init; }
+	[JsonPropertyName("minimumPrice")]
+	public required decimal MinimumPrice { get; init; }
 
-    [JsonPropertyName("carrierId")]
-    public required Guid? CarrierId { get; init; }
+	[JsonPropertyName("carrierId")]
+	public required Guid? CarrierId { get; init; }
 }

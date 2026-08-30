@@ -7,13 +7,13 @@ namespace Main.Application.Handlers.Auth.RemoveRoleFromUser;
 
 public class RemoveRoleFromUserValidation : AbstractValidator<RemoveRoleFromUserCommand>
 {
-    public RemoveRoleFromUserValidation()
-    {
-        RuleFor(x => x.RoleName)
-            .Cascade(CascadeMode.Stop)
-            .NotEmpty()
-            .WithLocalizationKey("role.name.not.empty")
-            .Must(x => RoleNames.Normalize(x) != RoleNames.Normalize(nameof(Role.System)))
-            .WithLocalizationKey("cant.remove.system.role.from.user");
-    }
+	public RemoveRoleFromUserValidation()
+	{
+		RuleFor(x => x.RoleName)
+			.Cascade(CascadeMode.Stop)
+			.NotEmpty()
+			.WithLocalizationKey("role.name.not.empty")
+			.Must(x => RoleNames.Normalize(x) != RoleNames.Normalize(nameof(Role.System)))
+			.WithLocalizationKey("cant.remove.system.role.from.user");
+	}
 }

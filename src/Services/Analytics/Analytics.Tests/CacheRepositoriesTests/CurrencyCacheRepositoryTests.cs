@@ -13,103 +13,98 @@ namespace Analytics.Integration.Tests.CacheRepositoriesTests;
 
 public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-    private IFusionCache _cache = null!;
-    private Mock<ICurrencyNode> _currencyMock = null!;
-    private Mock<IMainClient> _mock = null!;
+	private IFusionCache _cache = null!;
 
-    public override async Task InitializeAsync()
-    {
-        await base.InitializeAsync();
-        _cache = Sp.GetRequiredService<IFusionCache>();
-        _mock = new Mock<IMainClient>();
-        _currencyMock = new Mock<ICurrencyNode>();
+	private Mock<ICurrencyNode> _currencyMock = null!;
 
-        _mock.SetupGet(x => x.CurrencyNode).Returns(_currencyMock.Object);
-    }
+	private Mock<IMainClient> _mock = null!;
 
-    [Fact]
-    public async Task GetCurrencyRate_WhenRateNotCached_ReturnsRateFromMainAndCaches()
-    {
-        const int currencyId = 1;
-        var repository = Repository();
-        SetupCurrencyRate(currencyId, 2.5m);
+	public override async Task InitializeAsync()
+	{
+		await base.InitializeAsync();
+		_cache = Sp.GetRequiredService<IFusionCache>();
+		_mock = new Mock<IMainClient>();
+		_currencyMock = new Mock<ICurrencyNode>();
 
-        var result = await repository.GetCurrencyRate(currencyId);
+		_mock.SetupGet(x => x.CurrencyNode).Returns(_currencyMock.Object);
+	}
 
-        SetupCurrencyRate(currencyId, 3.5m);
-        var cachedResult = await repository.GetCurrencyRate(currencyId);
+	[Fact]
+	public async Task GetCurrencyRate_WhenRateNotCached_ReturnsRateFromMainAndCaches()
+	{
+		const int currencyId = 1;
+		var repository = Repository();
+		SetupCurrencyRate(currencyId, 2.5m);
 
-        result.Should().Be(2.5m);
-        cachedResult.Should().Be(2.5m);
-        VerifyCurrencyRateRequested(currencyId, Times.Once());
-    }
+		var result = await repository.GetCurrencyRate(currencyId);
 
-    [Fact]
-    public async Task GetCurrencyRate_WhenCurrencyNodeReturnsNotFound_ReturnsNullAndDoesNotCache()
-    {
-        const int currencyId = 2;
-        var repository = Repository();
-        SetupCurrencyRateNotFound(currencyId);
+		SetupCurrencyRate(currencyId, 3.5m);
+		var cachedResult = await repository.GetCurrencyRate(currencyId);
 
-        var result = await repository.GetCurrencyRate(currencyId);
+		result.Should().Be(2.5m);
+		cachedResult.Should().Be(2.5m);
+		VerifyCurrencyRateRequested(currencyId, Times.Once());
+	}
 
-        SetupCurrencyRate(currencyId, 4.5m);
-        var retryResult = await repository.GetCurrencyRate(currencyId);
+	[Fact]
+	public async Task GetCurrencyRate_WhenCurrencyNodeReturnsNotFound_ReturnsNullAndDoesNotCache()
+	{
+		const int currencyId = 2;
+		var repository = Repository();
+		SetupCurrencyRateNotFound(currencyId);
 
-        result.Should().BeNull();
-        retryResult.Should().Be(4.5m);
-        VerifyCurrencyRateRequested(currencyId, Times.Exactly(2));
-    }
+		var result = await repository.GetCurrencyRate(currencyId);
 
-    [Fact]
-    public async Task InvalidateCurrencyRate_WhenRateCached_RemovesCachedRate()
-    {
-        const int currencyId = 3;
-        var repository = Repository();
-        SetupCurrencyRate(currencyId, 5.5m);
+		SetupCurrencyRate(currencyId, 4.5m);
+		var retryResult = await repository.GetCurrencyRate(currencyId);
 
-        var cached = await repository.GetCurrencyRate(currencyId);
+		result.Should().BeNull();
+		retryResult.Should().Be(4.5m);
+		VerifyCurrencyRateRequested(currencyId, Times.Exactly(2));
+	}
 
-        SetupCurrencyRate(currencyId, 6.5m);
-        await repository.InvalidateCurrencyRate(currencyId);
-        var result = await repository.GetCurrencyRate(currencyId);
+	[Fact]
+	public async Task InvalidateCurrencyRate_WhenRateCached_RemovesCachedRate()
+	{
+		const int currencyId = 3;
+		var repository = Repository();
+		SetupCurrencyRate(currencyId, 5.5m);
 
-        cached.Should().Be(5.5m);
-        result.Should().Be(6.5m);
-        VerifyCurrencyRateRequested(currencyId, Times.Exactly(2));
-    }
+		var cached = await repository.GetCurrencyRate(currencyId);
 
-    private ICurrencyCacheRepository Repository()
-    {
-        return new CurrencyCacheRepository(_cache, _mock.Object);
-    }
+		SetupCurrencyRate(currencyId, 6.5m);
+		await repository.InvalidateCurrencyRate(currencyId);
+		var result = await repository.GetCurrencyRate(currencyId);
 
-    private void SetupCurrencyRate(int currencyId, decimal rate)
-    {
-        _currencyMock
-            .Setup(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Response<decimal>.Ok(rate));
-    }
+		cached.Should().Be(5.5m);
+		result.Should().Be(6.5m);
+		VerifyCurrencyRateRequested(currencyId, Times.Exactly(2));
+	}
 
-    private void SetupCurrencyRateNotFound(int currencyId)
-    {
-        SetupCurrencyRateFailure(currencyId, HttpStatusCode.NotFound);
-    }
+	private ICurrencyCacheRepository Repository() => new CurrencyCacheRepository(_cache, _mock.Object);
 
-    private void SetupCurrencyRateFailure(
-        int currencyId,
-        HttpStatusCode statusCode,
-        string? error = null)
-    {
-        _currencyMock
-            .Setup(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Response<decimal>.Fail(statusCode, error));
-    }
+	private void SetupCurrencyRate(int currencyId, decimal rate)
+	{
+		_currencyMock
+			.Setup(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()))
+			.ReturnsAsync(Response<decimal>.Ok(rate));
+	}
 
-    private void VerifyCurrencyRateRequested(int currencyId, Times times)
-    {
-        _currencyMock.Verify(
-            x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()),
-            times);
-    }
+	private void SetupCurrencyRateNotFound(int currencyId) =>
+		SetupCurrencyRateFailure(currencyId, HttpStatusCode.NotFound);
+
+	private void SetupCurrencyRateFailure(
+		int currencyId,
+		HttpStatusCode statusCode,
+		string? error = null)
+	{
+		_currencyMock
+			.Setup(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()))
+			.ReturnsAsync(Response<decimal>.Fail(statusCode, error));
+	}
+
+	private void VerifyCurrencyRateRequested(int currencyId, Times times)
+	{
+		_currencyMock.Verify(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()), times);
+	}
 }

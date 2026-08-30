@@ -13,20 +13,18 @@ namespace Main.Application.Handlers.Auth;
 public record RemovePermissionFromUserCommand(Guid UserId, string PermissionName) : ICommand;
 
 public class RemovePermissionFromUserHandler(
-    IRepository<UserPermission, (Guid, string)> repository,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<RemovePermissionFromUserCommand>
+	IRepository<UserPermission, (Guid, string)> repository,
+	IUnitOfWork unitOfWork) : ICommandHandler<RemovePermissionFromUserCommand>
 {
-    public async Task<Unit> Handle(
-        RemovePermissionFromUserCommand request,
-        CancellationToken cancellationToken)
-    {
-        var userPermission = await repository.GetById(
-                                 (request.UserId, request.PermissionName),
-                                 cancellationToken)
-                             ?? throw new UserPermissionNotFound(request.UserId, request.PermissionName);
-        unitOfWork.Remove(userPermission);
+	public async Task<Unit> Handle(
+		RemovePermissionFromUserCommand request,
+		CancellationToken cancellationToken)
+	{
+		var userPermission =
+			await repository.GetById((request.UserId, request.PermissionName), cancellationToken) ??
+			throw new UserPermissionNotFound(request.UserId, request.PermissionName);
+		unitOfWork.Remove(userPermission);
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

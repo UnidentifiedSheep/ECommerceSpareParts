@@ -5,8 +5,5 @@ namespace Analytics.Application.Configs;
 
 public static class SortByConfig
 {
-    public static void Configure()
-    {
-        QueryableSortBy.Value.ConfigureForJob();
-    }
+	public static void Configure() => QueryableSortBy.Value.ConfigureForJob();
 }

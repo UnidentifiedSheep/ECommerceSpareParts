@@ -5,8 +5,8 @@ namespace Main.Application.Interfaces.Persistence;
 
 public interface ICurrencyRateRepository : IRepository<CurrencyRate, (int, int)>
 {
-    Task<List<CurrencyRate>> GetByBaseCurrency(
-        int baseCurrencyId,
-        Criteria<CurrencyRate>? criteria = null,
-        CancellationToken cancellationToken = default);
+	Task<List<CurrencyRate>> GetByBaseCurrency(
+		int baseCurrencyId,
+		Criteria<CurrencyRate>? criteria = null,
+		CancellationToken cancellationToken = default);
 }

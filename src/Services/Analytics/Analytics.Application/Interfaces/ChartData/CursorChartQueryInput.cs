@@ -6,32 +6,28 @@ using SchemaGeneration.Abstractions.Enums;
 
 namespace Analytics.Application.Interfaces.ChartData;
 
-public abstract record CursorChartQueryInput<TCursor> : ICursorChartQueryInput<TCursor>
-    where TCursor : struct
+public abstract record CursorChartQueryInput<TCursor> : ICursorChartQueryInput<TCursor> where TCursor : struct
 {
-    [JsonPropertyName("cursor")]
-    [SchemaInputControl(InputControlType.TextField)]
-    [SchemaFieldLabel("pagination.cursor.name")]
-    [SchemaFieldDescription("pagination.cursor.description")]
-    public TCursor? Cursor { get; init; }
+	[JsonPropertyName("cursor")]
+	[SchemaInputControl(InputControlType.TextField)]
+	[SchemaFieldLabel("pagination.cursor.name")]
+	[SchemaFieldDescription("pagination.cursor.description")]
+	public TCursor? Cursor { get; init; }
 
-    [JsonPropertyName("size")]
-    [RequiredSchemaField]
-    [SchemaInputControl(InputControlType.TextField)]
-    [SchemaFieldLabel("pagination.size.name")]
-    [SchemaFieldDescription("pagination.size.description")]
-    public int Size { get; init; } = 100;
+	[JsonPropertyName("size")]
+	[RequiredSchemaField]
+	[SchemaInputControl(InputControlType.TextField)]
+	[SchemaFieldLabel("pagination.size.name")]
+	[SchemaFieldDescription("pagination.size.description")]
+	public int Size { get; init; } = 100;
 
-    public Cursor<TCursor?> GetCursor()
-    {
-        return new Cursor<TCursor?>(Cursor, Size);
-    }
+	public Cursor<TCursor?> GetCursor() => new(Cursor, Size);
 
-    protected void ValidateCursor()
-    {
-        Size.EnsureInRange(
-            1,
-            100,
-            "pagination.size.range");
-    }
+	protected void ValidateCursor()
+	{
+		Size.EnsureInRange(
+			1,
+			100,
+			"pagination.size.range");
+	}
 }

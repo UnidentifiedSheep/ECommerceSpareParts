@@ -5,17 +5,15 @@ namespace Application.Common.Abstractions.NamedObjects;
 
 public abstract class LocalizableNameObject : ILocalizableNamedObject
 {
-    public abstract string NameLocalizationKey { get; }
-    public abstract string DescriptionLocalizationKey { get; }
-    public abstract string SystemName { get; }
+	public abstract string NameLocalizationKey { get; }
 
-    public string GetLocalizedName(IScopedStringLocalizer stringLocalizer)
-    {
-        return stringLocalizer.Get(NameLocalizationKey);
-    }
+	public abstract string DescriptionLocalizationKey { get; }
 
-    public string GetLocalizedDescription(IScopedStringLocalizer stringLocalizer)
-    {
-        return stringLocalizer.Get(DescriptionLocalizationKey);
-    }
+	public abstract string SystemName { get; }
+
+	public string GetLocalizedName(IContextualStringLocalizer stringLocalizer) =>
+		stringLocalizer.Get(NameLocalizationKey);
+
+	public string GetLocalizedDescription(IContextualStringLocalizer stringLocalizer) =>
+		stringLocalizer.Get(DescriptionLocalizationKey);
 }

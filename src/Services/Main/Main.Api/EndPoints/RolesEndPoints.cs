@@ -20,110 +20,105 @@ public record GetRolesResponse(IReadOnlyList<RoleDto> Roles);
 
 public record GetRoleResponse
 {
-    [JsonPropertyName("role")]
-    public required RoleDto Role { get; init; }
+	[JsonPropertyName("role")]
+	public required RoleDto Role { get; init; }
 
-    [JsonPropertyName("permissions")]
-    public required IReadOnlyList<PermissionDto> Permissions { get; init; }
+	[JsonPropertyName("permissions")]
+	public required IReadOnlyList<PermissionDto> Permissions { get; init; }
 }
 
 public record GetRolesRequest : SortablePaginationQueryModel
 {
-    [FromQuery(Name = "searchTerm")]
-    public string? SearchTerm { get; init; }
+	[FromQuery(Name = "searchTerm")]
+	public string? SearchTerm { get; init; }
 }
 
 public class RolesEndPoints : ICarterModule
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
-    {
-        var roles = app.MapGroup("/roles")
-            .WithTags("Roles");
+	public void AddRoutes(IEndpointRouteBuilder app)
+	{
+		var roles = app.MapGroup("/roles").WithTags("Roles");
 
-        roles.MapPost(
-                "/{roleName}/permissions/",
-                async (
-                    ISender sender,
-                    string roleName,
-                    AddPermissionToRoleRequest request,
-                    CancellationToken ct) =>
-                {
-                    await sender.Send(new AddPermissionToRoleCommand(roleName, request.PermissionName), ct);
-                    return Results.NoContent();
-                })
-            .WithName("AddPermissionToRole")
-            .WithSummary("Добавить разрешение роли")
-            .WithDescription("Добавление разрешения в роль")
-            .WithDisplayName("Добавление разрешения в роль")
-            .Accepts<AddPermissionToRoleRequest>(false, "application/json")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(404)
-            .RequireAnyPermission(PermissionCodes.ROLES_PERMISSIONS_CREATE);
+		roles
+			.MapPost(
+				"/{roleName}/permissions/",
+				async (
+					ISender sender, string roleName,
+					AddPermissionToRoleRequest request, CancellationToken ct) =>
+				{
+					await sender.Send(new AddPermissionToRoleCommand(roleName, request.PermissionName), ct);
+					return Results.NoContent();
+				})
+			.WithName("AddPermissionToRole")
+			.WithSummary("Добавить разрешение роли")
+			.WithDescription("Добавление разрешения в роль")
+			.WithDisplayName("Добавление разрешения в роль")
+			.Accepts<AddPermissionToRoleRequest>(false, "application/json")
+			.Produces(StatusCodes.Status204NoContent)
+			.ProducesProblem(404)
+			.RequireAnyPermission(PermissionCodes.ROLES_PERMISSIONS_CREATE);
 
-        roles.MapPost(
-                "",
-                async (
-                    ISender sender,
-                    CreateRoleRequest request,
-                    CancellationToken cancellationToken) =>
-                {
-                    await sender.Send(
-                        new UpsertRoleCommand(request.Name, request.Description),
-                        cancellationToken);
-                    return Results.Created();
-                })
-            .WithName("CreateRole")
-            .WithSummary("Создать роль")
-            .WithDescription("Создание роли")
-            .WithDisplayName("Создание роли")
-            .Accepts<CreateRoleRequest>(false, "application/json")
-            .Produces(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAnyPermission(PermissionCodes.ROLES_CREATE);
+		roles
+			.MapPost(
+				"",
+				async (
+					ISender sender, CreateRoleRequest request,
+					CancellationToken cancellationToken) =>
+				{
+					await sender.Send(
+						new UpsertRoleCommand(request.Name, request.Description),
+						cancellationToken);
+					return Results.Created();
+				})
+			.WithName("CreateRole")
+			.WithSummary("Создать роль")
+			.WithDescription("Создание роли")
+			.WithDisplayName("Создание роли")
+			.Accepts<CreateRoleRequest>(false, "application/json")
+			.Produces(StatusCodes.Status201Created)
+			.ProducesProblem(StatusCodes.Status400BadRequest)
+			.RequireAnyPermission(PermissionCodes.ROLES_CREATE);
 
-        roles.MapGet(
-                "",
-                async (
-                    ISender sender,
-                    [AsParameters] GetRolesRequest queryParams,
-                    CancellationToken cancellationToken) =>
-                {
-                    var result = await sender.Send(
-                        new GetRolesQuery(queryParams.SearchTerm, queryParams),
-                        cancellationToken);
-                    return Results.Ok(new GetRolesResponse(result.Roles));
-                })
-            .WithName("GetRoles")
-            .WithSummary("Получить роли")
-            .WithDescription("Получение ролей")
-            .WithDisplayName("Получение ролей")
-            .Produces<GetRolesResponse>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAnyPermission(PermissionCodes.ROLES_GET);
+		roles
+			.MapGet(
+				"",
+				async (
+					ISender sender, [AsParameters] GetRolesRequest queryParams,
+					CancellationToken cancellationToken) =>
+				{
+					var result = await sender.Send(
+						new GetRolesQuery(queryParams.SearchTerm, queryParams),
+						cancellationToken);
+					return Results.Ok(new GetRolesResponse(result.Roles));
+				})
+			.WithName("GetRoles")
+			.WithSummary("Получить роли")
+			.WithDescription("Получение ролей")
+			.WithDisplayName("Получение ролей")
+			.Produces<GetRolesResponse>()
+			.ProducesProblem(StatusCodes.Status400BadRequest)
+			.RequireAnyPermission(PermissionCodes.ROLES_GET);
 
-        roles.MapGet(
-                "{roleName}",
-                async (
-                    ISender sender,
-                    string roleName,
-                    CancellationToken cancellationToken) =>
-                {
-                    var result = await sender.Send(
-                        new GetRoleQuery(roleName),
-                        cancellationToken);
-                    return Results.Ok(
-                        new GetRoleResponse
-                        {
-                            Role = result.Role,
-                            Permissions = result.Permissions
-                        });
-                })
-            .WithName("GetRole")
-            .WithSummary("Получить роль")
-            .WithDescription("Получение роли")
-            .WithDisplayName("Получение роли")
-            .Produces<GetRoleResponse>()
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.ROLES_GET);
-    }
+		roles
+			.MapGet(
+				"{roleName}",
+				async (
+					ISender sender, string roleName,
+					CancellationToken cancellationToken) =>
+				{
+					var result = await sender.Send(new GetRoleQuery(roleName), cancellationToken);
+					return Results.Ok(
+						new GetRoleResponse
+						{
+							Role = result.Role, Permissions = result.Permissions
+						});
+				})
+			.WithName("GetRole")
+			.WithSummary("Получить роль")
+			.WithDescription("Получение роли")
+			.WithDisplayName("Получение роли")
+			.Produces<GetRoleResponse>()
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.ROLES_GET);
+	}
 }

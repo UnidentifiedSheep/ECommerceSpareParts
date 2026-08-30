@@ -2,9 +2,13 @@ namespace Main.Enums;
 
 public enum GeneralSearchStrategy
 {
-    General,
-    Exec,
-    Similarity,
-    FromStart,
-    Contains
+	General,
+
+	Exec,
+
+	Similarity,
+
+	FromStart,
+
+	Contains
 }

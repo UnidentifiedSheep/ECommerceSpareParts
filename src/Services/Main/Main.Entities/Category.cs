@@ -2,9 +2,9 @@
 
 public class Category
 {
-    public int Id { get; set; }
+	public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+	public string Name { get; set; } = null!;
 
-    public virtual ICollection<Product.Product> Articles { get; set; } = new List<Product.Product>();
+	public virtual ICollection<Product.Product> Articles { get; set; } = new List<Product.Product>();
 }

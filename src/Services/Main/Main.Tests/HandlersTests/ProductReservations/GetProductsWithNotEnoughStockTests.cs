@@ -15,341 +15,333 @@ namespace Tests.HandlersTests.ProductReservations;
 
 public class GetProductsWithNotEnoughStockTests : IntegrationTest
 {
-    public GetProductsWithNotEnoughStockTests(CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<ProductTestContext>();
-        RegisterBasicContext<UsersTestContext>();
-        RegisterBasicContext<StorageTestContext>();
-        RegisterBasicContext<CurrencyTestContext>();
-    }
+	public GetProductsWithNotEnoughStockTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+		RegisterBasicContext<UsersTestContext>();
+		RegisterBasicContext<StorageTestContext>();
+		RegisterBasicContext<CurrencyTestContext>();
+	}
 
-    private ProductTestContext ProductContext => GetContext<ProductTestContext>();
-    private UsersTestContext UsersContext => GetContext<UsersTestContext>();
-    private StorageTestContext StorageContext => GetContext<StorageTestContext>();
-    private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
+	private ProductTestContext ProductContext => GetContext<ProductTestContext>();
 
-    [Fact]
-    public async Task WhenStockIsEnoughAndNoReservations_ReturnsEmptyResult()
-    {
-        var buyer = Buyer();
-        var product = Product();
-        var storage = Storage();
-        await AddStorageContent(
-            product.Id,
-            storage.Code,
-            5);
-        var query = Query(
-            buyer.Id,
-            storage.Code,
-            product.Id,
-            5);
+	private UsersTestContext UsersContext => GetContext<UsersTestContext>();
 
-        var result = await Mediator.Send(query);
+	private StorageTestContext StorageContext => GetContext<StorageTestContext>();
 
-        result.NotEnoughByStock.Should().BeEmpty();
-        result.NotEnoughByReservation.Should().BeEmpty();
-    }
+	private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
 
-    [Fact]
-    public async Task WhenStockIsNotEnough_ReturnsStockShortage()
-    {
-        var buyer = Buyer();
-        var product = Product();
-        var storage = Storage();
-        await AddStorageContent(
-            product.Id,
-            storage.Code,
-            2);
-        var query = Query(
-            buyer.Id,
-            storage.Code,
-            product.Id,
-            5);
+	[Fact]
+	public async Task WhenStockIsEnoughAndNoReservations_ReturnsEmptyResult()
+	{
+		var buyer = Buyer();
+		var product = Product();
+		var storage = Storage();
+		await AddStorageContent(
+			product.Id,
+			storage.Code,
+			5);
+		var query = Query(
+			buyer.Id,
+			storage.Code,
+			product.Id,
+			5);
 
-        var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query);
 
-        result.NotEnoughByStock.Should()
-            .ContainKey(product.Id)
-            .WhoseValue.Should()
-            .Be(3);
-        result.NotEnoughByReservation.Should().BeEmpty();
-    }
+		result.NotEnoughByStock.Should().BeEmpty();
+		result.NotEnoughByReservation.Should().BeEmpty();
+	}
 
-    [Fact]
-    public async Task WhenOtherReservationsExceedFreeStock_ReturnsReservationShortage()
-    {
-        var buyer = Buyer();
-        var otherBuyer = OtherBuyer(buyer.Id);
-        var product = Product();
-        var storage = Storage();
-        await AddStorageContent(
-            product.Id,
-            storage.Code,
-            5);
-        await AddReservation(
-            otherBuyer.Id,
-            product.Id,
-            2,
-            1);
-        var query = Query(
-            buyer.Id,
-            storage.Code,
-            product.Id,
-            5);
+	[Fact]
+	public async Task WhenStockIsNotEnough_ReturnsStockShortage()
+	{
+		var buyer = Buyer();
+		var product = Product();
+		var storage = Storage();
+		await AddStorageContent(
+			product.Id,
+			storage.Code,
+			2);
+		var query = Query(
+			buyer.Id,
+			storage.Code,
+			product.Id,
+			5);
 
-        var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query);
 
-        result.NotEnoughByStock.Should().BeEmpty();
-        result.NotEnoughByReservation.Should()
-            .ContainKey(product.Id)
-            .WhoseValue.Should()
-            .Be(1);
-    }
+		result.NotEnoughByStock.Should().ContainKey(product.Id).WhoseValue.Should().Be(3);
+		result.NotEnoughByReservation.Should().BeEmpty();
+	}
 
-    [Fact]
-    public async Task WhenBuyerHasReservation_OffsetsOtherReservations()
-    {
-        var buyer = Buyer();
-        var otherBuyer = OtherBuyer(buyer.Id);
-        var product = Product();
-        var storage = Storage();
-        await AddStorageContent(
-            product.Id,
-            storage.Code,
-            5);
-        await AddReservation(
-            otherBuyer.Id,
-            product.Id,
-            3,
-            2);
-        await AddReservation(
-            buyer.Id,
-            product.Id,
-            3,
-            2);
-        var query = Query(
-            buyer.Id,
-            storage.Code,
-            product.Id,
-            5);
+	[Fact]
+	public async Task WhenOtherReservationsExceedFreeStock_ReturnsReservationShortage()
+	{
+		var buyer = Buyer();
+		var otherBuyer = OtherBuyer(buyer.Id);
+		var product = Product();
+		var storage = Storage();
+		await AddStorageContent(
+			product.Id,
+			storage.Code,
+			5);
+		await AddReservation(
+			otherBuyer.Id,
+			product.Id,
+			2,
+			1);
+		var query = Query(
+			buyer.Id,
+			storage.Code,
+			product.Id,
+			5);
 
-        var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query);
 
-        result.NotEnoughByStock.Should().BeEmpty();
-        result.NotEnoughByReservation.Should().BeEmpty();
-    }
+		result.NotEnoughByStock.Should().BeEmpty();
+		result.NotEnoughByReservation.Should().ContainKey(product.Id).WhoseValue.Should().Be(1);
+	}
 
-    [Fact]
-    public async Task WhenTakeFromOtherStoragesIsFalse_UsesOnlyRequestedStorage()
-    {
-        var buyer = Buyer();
-        var product = Product();
-        var storage = Storage();
-        var otherStorage = OtherStorage(storage.Code);
-        await AddStorageContent(
-            product.Id,
-            storage.Code,
-            2);
-        await AddStorageContent(
-            product.Id,
-            otherStorage.Code,
-            4);
-        var query = Query(
-            buyer.Id,
-            storage.Code,
-            product.Id,
-            5);
+	[Fact]
+	public async Task WhenBuyerHasReservation_OffsetsOtherReservations()
+	{
+		var buyer = Buyer();
+		var otherBuyer = OtherBuyer(buyer.Id);
+		var product = Product();
+		var storage = Storage();
+		await AddStorageContent(
+			product.Id,
+			storage.Code,
+			5);
+		await AddReservation(
+			otherBuyer.Id,
+			product.Id,
+			3,
+			2);
+		await AddReservation(
+			buyer.Id,
+			product.Id,
+			3,
+			2);
+		var query = Query(
+			buyer.Id,
+			storage.Code,
+			product.Id,
+			5);
 
-        var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query);
 
-        result.NotEnoughByStock.Should()
-            .ContainKey(product.Id)
-            .WhoseValue.Should()
-            .Be(3);
-        result.NotEnoughByReservation.Should().BeEmpty();
-    }
+		result.NotEnoughByStock.Should().BeEmpty();
+		result.NotEnoughByReservation.Should().BeEmpty();
+	}
 
-    [Fact]
-    public async Task WhenTakeFromOtherStoragesIsTrue_UsesAllStorages()
-    {
-        var buyer = Buyer();
-        var product = Product();
-        var storage = Storage();
-        var otherStorage = OtherStorage(storage.Code);
-        await AddStorageContent(
-            product.Id,
-            storage.Code,
-            2);
-        await AddStorageContent(
-            product.Id,
-            otherStorage.Code,
-            4);
-        var query = Query(
-            buyer.Id,
-            storage.Code,
-            product.Id,
-            5,
-            true);
+	[Fact]
+	public async Task WhenTakeFromOtherStoragesIsFalse_UsesOnlyRequestedStorage()
+	{
+		var buyer = Buyer();
+		var product = Product();
+		var storage = Storage();
+		var otherStorage = OtherStorage(storage.Code);
+		await AddStorageContent(
+			product.Id,
+			storage.Code,
+			2);
+		await AddStorageContent(
+			product.Id,
+			otherStorage.Code,
+			4);
+		var query = Query(
+			buyer.Id,
+			storage.Code,
+			product.Id,
+			5);
 
-        var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query);
 
-        result.NotEnoughByStock.Should().BeEmpty();
-        result.NotEnoughByReservation.Should().BeEmpty();
-    }
+		result.NotEnoughByStock.Should().ContainKey(product.Id).WhoseValue.Should().Be(3);
+		result.NotEnoughByReservation.Should().BeEmpty();
+	}
 
-    [Fact]
-    public async Task DoneAndCanceledReservations_DoNotAffectShortage()
-    {
-        var buyer = Buyer();
-        var otherBuyer = OtherBuyer(buyer.Id);
-        var product = Product();
-        var storage = Storage();
-        await AddStorageContent(
-            product.Id,
-            storage.Code,
-            5);
-        await AddReservation(
-            otherBuyer.Id,
-            product.Id,
-            2,
-            2);
-        var canceled = await AddReservation(
-            otherBuyer.Id,
-            product.Id,
-            3,
-            1);
-        canceled.Cancel();
-        await Context.SaveChangesAsync();
-        var query = Query(
-            buyer.Id,
-            storage.Code,
-            product.Id,
-            5);
+	[Fact]
+	public async Task WhenTakeFromOtherStoragesIsTrue_UsesAllStorages()
+	{
+		var buyer = Buyer();
+		var product = Product();
+		var storage = Storage();
+		var otherStorage = OtherStorage(storage.Code);
+		await AddStorageContent(
+			product.Id,
+			storage.Code,
+			2);
+		await AddStorageContent(
+			product.Id,
+			otherStorage.Code,
+			4);
+		var query = Query(
+			buyer.Id,
+			storage.Code,
+			product.Id,
+			5,
+			true);
 
-        var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query);
 
-        result.NotEnoughByStock.Should().BeEmpty();
-        result.NotEnoughByReservation.Should().BeEmpty();
-    }
+		result.NotEnoughByStock.Should().BeEmpty();
+		result.NotEnoughByReservation.Should().BeEmpty();
+	}
 
-    [Fact]
-    public async Task WithEmptyBuyerId_ThrowsValidationException()
-    {
-        var product = Product();
-        var storage = Storage();
-        var query = Query(
-            Guid.Empty,
-            storage.Code,
-            product.Id,
-            1);
+	[Fact]
+	public async Task DoneAndCanceledReservations_DoNotAffectShortage()
+	{
+		var buyer = Buyer();
+		var otherBuyer = OtherBuyer(buyer.Id);
+		var product = Product();
+		var storage = Storage();
+		await AddStorageContent(
+			product.Id,
+			storage.Code,
+			5);
+		await AddReservation(
+			otherBuyer.Id,
+			product.Id,
+			2,
+			2);
+		var canceled = await AddReservation(
+			otherBuyer.Id,
+			product.Id,
+			3,
+			1);
+		canceled.Cancel();
+		await Context.SaveChangesAsync();
+		var query = Query(
+			buyer.Id,
+			storage.Code,
+			product.Id,
+			5);
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
-    }
+		var result = await Mediator.Send(query);
 
-    [Fact]
-    public async Task WithEmptyStorageCode_ThrowsValidationException()
-    {
-        var query = Query(
-            Buyer().Id,
-            "",
-            Product().Id,
-            1);
+		result.NotEnoughByStock.Should().BeEmpty();
+		result.NotEnoughByReservation.Should().BeEmpty();
+	}
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
-    }
+	[Fact]
+	public async Task WithEmptyBuyerId_ThrowsValidationException()
+	{
+		var product = Product();
+		var storage = Storage();
+		var query = Query(
+			Guid.Empty,
+			storage.Code,
+			product.Id,
+			1);
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public async Task WithInvalidNeededCount_ThrowsValidationException(int neededCount)
-    {
-        var query = Query(
-            Buyer().Id,
-            Storage().Code,
-            Product().Id,
-            neededCount);
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+	}
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
-    }
+	[Fact]
+	public async Task WithEmptyStorageCode_ThrowsValidationException()
+	{
+		var query = Query(
+			Buyer().Id,
+			"",
+			Product().Id,
+			1);
 
-    [Fact]
-    public async Task WithMissingStorage_ThrowsDbValidationException()
-    {
-        var query = Query(
-            Buyer().Id,
-            "missing-storage",
-            Product().Id,
-            1);
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+	}
 
-        await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
-    }
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task WithInvalidNeededCount_ThrowsValidationException(int neededCount)
+	{
+		var query = Query(
+			Buyer().Id,
+			Storage().Code,
+			Product().Id,
+			neededCount);
 
-    [Fact]
-    public async Task WithMissingProduct_ThrowsDbValidationException()
-    {
-        var query = Query(
-            Buyer().Id,
-            Storage().Code,
-            999999,
-            1);
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+	}
 
-        await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
-    }
+	[Fact]
+	public async Task WithMissingStorage_ThrowsDbValidationException()
+	{
+		var query = Query(
+			Buyer().Id,
+			"missing-storage",
+			Product().Id,
+			1);
 
-    private GetProductsWithNotEnoughStockQuery Query(
-        Guid buyerId,
-        string storageCode,
-        int productId,
-        int neededCount,
-        bool takeFromOtherStorages = false)
-    {
-        return new GetProductsWithNotEnoughStockQuery(
-            buyerId,
-            storageCode,
-            takeFromOtherStorages,
-            new Dictionary<int, int>
-            {
-                [productId] = neededCount
-            });
-    }
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
+	}
 
-    private async Task AddStorageContent(
-        int productId,
-        string storageCode,
-        int count)
-    {
-        await new StorageContentBuilder(Faker)
-            .WithProductIds(productId)
-            .WithStorageCode(storageCode)
-            .WithCurrencyId(CurrencyContext.Currencies[0].Id)
-            .WithCount(count)
-            .BuildAndAddToDb(Context);
-    }
+	[Fact]
+	public async Task WithMissingProduct_ThrowsDbValidationException()
+	{
+		var query = Query(
+			Buyer().Id,
+			Storage().Code,
+			999999,
+			1);
 
-    private async Task<ProductReservation> AddReservation(
-        Guid organizationId,
-        int productId,
-        int reservedCount,
-        int currentCount)
-    {
-        return await new ProductReservationBuilder(Faker)
-            .WithOrganizationId(organizationId)
-            .WithProductId(productId)
-            .WithReservedCount(reservedCount)
-            .WithCurrentCount(currentCount)
-            .BuildAndAddToDb(Context);
-    }
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
+	}
 
-    private User Buyer() { return UsersContext.Users.First(); }
+	private GetProductsWithNotEnoughStockQuery Query(
+		Guid buyerId,
+		string storageCode,
+		int productId,
+		int neededCount,
+		bool takeFromOtherStorages = false)
+	{
+		return new GetProductsWithNotEnoughStockQuery(
+			buyerId,
+			storageCode,
+			takeFromOtherStorages,
+			new Dictionary<int, int>
+			{
+				[productId] = neededCount
+			});
+	}
 
-    private User OtherBuyer(Guid buyerId) { return UsersContext.Users.First(x => x.Id != buyerId); }
+	private async Task AddStorageContent(
+		int productId,
+		string storageCode,
+		int count)
+	{
+		await new StorageContentBuilder(Faker)
+			.WithProductIds(productId)
+			.WithStorageCode(storageCode)
+			.WithCurrencyId(CurrencyContext.Currencies[0].Id)
+			.WithCount(count)
+			.BuildAndAddToDb(Context);
+	}
 
-    private Product Product() { return ProductContext.Products[0]; }
+	private async Task<ProductReservation> AddReservation(
+		Guid organizationId,
+		int productId,
+		int reservedCount,
+		int currentCount)
+	{
+		return await new ProductReservationBuilder(Faker)
+			.WithOrganizationId(organizationId)
+			.WithProductId(productId)
+			.WithReservedCount(reservedCount)
+			.WithCurrentCount(currentCount)
+			.BuildAndAddToDb(Context);
+	}
 
-    private Storage Storage() { return StorageContext.Storages.First(x => x.Type == StorageType.Warehouse); }
+	private User Buyer() => UsersContext.Users.First();
 
-    private Storage OtherStorage(string storageCode)
-    {
-        return StorageContext.Storages.First(x => x.Code != storageCode);
-    }
+	private User OtherBuyer(Guid buyerId) => UsersContext.Users.First(x => x.Id != buyerId);
+
+	private Product Product() => ProductContext.Products[0];
+
+	private Storage Storage() => StorageContext.Storages.First(x => x.Type == StorageType.Warehouse);
+
+	private Storage OtherStorage(string storageCode) =>
+		StorageContext.Storages.First(x => x.Code != storageCode);
 }

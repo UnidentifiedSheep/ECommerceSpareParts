@@ -11,7 +11,6 @@ using Gateway.EndPoints;
 using Gateway.Extensions;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
-using Localization.Domain.Middlewares;
 using MassTransit;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -24,57 +23,63 @@ using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
-builder.Configuration
-    .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs")
-    .AddConfigsFromJsons(
-        "gateway",
-        null,
-        "/app/configs")
-    .AddConfigsFromJsons(
-        "gateway",
-        env,
-        "/app/configs");
+builder
+	.Configuration
+	.AddAppSettingsFromJsons(env)
+	.AddAppSettingsFromJsons(env, "/app/configs")
+	.AddConfigsFromJsons(
+		"gateway",
+		null,
+		"/app/configs")
+	.AddConfigsFromJsons(
+		"gateway",
+		env,
+		"/app/configs");
 
-builder.Services
-    .AddRedisOptions()
-    .AddMessageBrokerOptions();
+builder.Services.AddRedisOptions().AddMessageBrokerOptions();
 
 builder.Host.AddLokiLogger(
-    builder.Configuration,
-    "gateway",
-    env);
+	builder.Configuration,
+	"gateway",
+	env);
 
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resource => resource.AddService("gateway"))
-    .WithMetrics(metrics =>
-    {
-        metrics
-            .AddAspNetCoreInstrumentation()
-            .AddProcessInstrumentation()
-            .AddRuntimeInstrumentation()
-            .AddPrometheusExporter();
-    })
-    .WithTracing(tracing =>
-    {
-        tracing
-            .AddSource(CqrsDiagnostics.ActivitySourceName)
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddOtlpExporter();
-    });
+builder
+	.Services
+	.AddOpenTelemetry()
+	.ConfigureResource(resource => resource.AddService("gateway"))
+	.WithMetrics(metrics =>
+	{
+		metrics
+			.AddAspNetCoreInstrumentation()
+			.AddProcessInstrumentation()
+			.AddRuntimeInstrumentation()
+			.AddPrometheusExporter();
+	})
+	.WithTracing(tracing =>
+	{
+		tracing
+			.AddSource(CqrsDiagnostics.ActivitySourceName)
+			.AddAspNetCoreInstrumentation()
+			.AddHttpClientInstrumentation()
+			.AddOtlpExporter();
+	});
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("DenyAll", policy => { policy.RequireAssertion(_ => false); });
+	options.AddPolicy(
+		"DenyAll",
+		policy =>
+		{
+			policy.RequireAssertion(_ => false);
+		});
 });
 
 var secret = builder.Configuration["HeaderSecret:Key"];
 
-if (secret == null) throw new ArgumentNullException(nameof(secret), "HeaderSecret:Key cannot be null.");
+if (secret == null)
+	throw new ArgumentNullException(nameof(secret), "HeaderSecret:Key cannot be null.");
 
 var reverseProxySection = builder.Configuration.GetSection("ReverseProxy");
 var routeCount = reverseProxySection.GetSection("Routes").GetChildren().Count();
@@ -83,92 +88,93 @@ var clusterCount = reverseProxySection.GetSection("Clusters").GetChildren().Coun
 Console.WriteLine($"Gateway reverse proxy config loaded. Routes: {routeCount}, clusters: {clusterCount}");
 
 if (routeCount == 0 || clusterCount == 0)
-    throw new InvalidOperationException("Gateway reverse proxy config is empty.");
+	throw new InvalidOperationException("Gateway reverse proxy config is empty.");
 
-builder.Services
-    .AddBaseExceptionHandlers()
-    .AddProjectJsonSerialization()
-    .AddCacheLayer("gateway")
-    .AddLocalization(builder.Configuration)
-    .AddApplicationLayer(builder.Configuration)
-    .AddEComAuth(builder.Configuration)
-    .AddMinimalSecurityLayer()
-    .AddIntegrationClients()
-    .AddHttpContextAccessor()
-    .AddReverseProxy()
-    .LoadFromConfig(reverseProxySection)
-    .AddTransforms(builderContext =>
-    {
-        builderContext.CopyRequestHeaders = true;
+builder
+	.Services
+	.AddBaseExceptionHandlers()
+	.AddProjectJsonSerialization()
+	.AddCacheLayer("gateway")
+	.AddLocalization(builder.Configuration)
+	.AddApplicationLayer(builder.Configuration)
+	.AddEComAuth(builder.Configuration)
+	.AddMinimalSecurityLayer()
+	.AddIntegrationClients()
+	.AddHttpContextAccessor()
+	.AddReverseProxy()
+	.LoadFromConfig(reverseProxySection)
+	.AddTransforms(builderContext =>
+	{
+		builderContext.CopyRequestHeaders = true;
 
-        builderContext.AddRequestTransform(transformContext =>
-        {
-            var headers = transformContext.ProxyRequest.Headers;
-            headers.Remove("X-Internal-Token");
-            headers.Add("X-Internal-Token", secret);
-            return ValueTask.CompletedTask;
-        });
-    });
+		builderContext.AddRequestTransform(transformContext =>
+		{
+			var headers = transformContext.ProxyRequest.Headers;
+			headers.Remove("X-Internal-Token");
+			headers.Add("X-Internal-Token", secret);
+			return ValueTask.CompletedTask;
+		});
+	});
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
-    {
-        var allowedOrigins = builder.Configuration
-            .GetSection("Cors:AllowedOrigins")
-            .Get<string[]>() ?? [];
+	options.AddDefaultPolicy(policy =>
+	{
+		var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
-        policy
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+		policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
 
-        if (allowedOrigins.Length > 0)
-            policy.WithOrigins(allowedOrigins);
-        else
-            policy.SetIsOriginAllowed(_ => true);
-    });
+		if (allowedOrigins.Length > 0)
+			policy.WithOrigins(allowedOrigins);
+		else
+			policy.SetIsOriginAllowed(_ => true);
+	});
 });
 
 var uniqQueueName = $"queue-of-gateway-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<BackplaneConsumer>();
+	x.AddConsumer<BackplaneConsumer>();
 
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.ConfigureRabbitMq(context);
+	x.UsingRabbitMq((context, cfg) =>
+	{
+		cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(
-            uniqQueueName,
-            ep =>
-            {
-                ep.AutoDelete = true;
-                ep.Durable = false;
+		cfg.ReceiveEndpoint(
+			uniqQueueName,
+			ep =>
+			{
+				ep.AutoDelete = true;
+				ep.Durable = false;
 
-                ep.ConfigureConsumeTopology = false;
+				ep.ConfigureConsumeTopology = false;
 
-                ep.ConfigureConsumer<BackplaneConsumer>(context);
-                ep.Bind<BackplaneMessage>();
-            });
+				ep.ConfigureConsumer<BackplaneConsumer>(context);
+				ep.Bind<BackplaneMessage>();
+			});
 
-        cfg.ReceiveEndpoint("gateway-queue", ep => { ep.Durable = true; });
-    });
+		cfg.ReceiveEndpoint(
+			"gateway-queue",
+			ep =>
+			{
+				ep.Durable = true;
+			});
+	});
 });
 
 builder.Services.AddFusionHttpClient(secret);
 
-var fusionArchivePath =
-    builder.Configuration["Fusion:ArchivePath"] ?? "./gateway.far";
+var fusionArchivePath = builder.Configuration["Fusion:ArchivePath"] ?? "./gateway.far";
 
-builder.AddGraphQLGateway()
-    .AddFileSystemConfiguration(fusionArchivePath)
-    .ModifyRequestOptions(o =>
-    {
-        o.CollectOperationPlanTelemetry = true;
-        o.AllowOperationPlanRequests = true;
-    });
+builder
+	.AddGraphQLGateway()
+	.AddFileSystemConfiguration(fusionArchivePath)
+	.ModifyRequestOptions(o =>
+	{
+		o.CollectOperationPlanTelemetry = true;
+		o.AllowOperationPlanRequests = true;
+	});
 
 var app = builder.Build();
 
@@ -184,9 +190,9 @@ app.UseWebSockets();
 app.MapJobEndPoints();
 app.MapReverseProxy();
 
-app.UseMiddleware<ScopedLocalizationMiddleware>();
-
-app.UseExceptionHandler(_ => { });
+app.UseExceptionHandler(_ =>
+{
+});
 
 app.MapGet("/health", () => Results.Ok());
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
@@ -195,73 +201,71 @@ app.MapGraphQL();
 
 await app.RunAsync();
 
-
 void MapDocs(WebApplication application)
 {
-    application.MapGet(
-        "/docs/openapi/{service}.json",
-        async (
-            string service,
-            HttpContext context,
-            IHttpClientFactory httpClientFactory) =>
-        {
-            var services = new Dictionary<string, string>
-            {
-                [ServicesDefinitions.Main.ServiceName] = "/main/swagger/v1/swagger.json",
-                [ServicesDefinitions.Analytics.ServiceName] = "/analytics/swagger/v1/swagger.json",
-                [ServicesDefinitions.Search.ServiceName] = "/search/swagger/v1/swagger.json",
-                [ServicesDefinitions.Pricing.ServiceName] = "/pricing/swagger/v1/swagger.json"
-            };
+	application.MapGet(
+		"/docs/openapi/{service}.json",
+		async (
+			string service, HttpContext context,
+			IHttpClientFactory httpClientFactory) =>
+		{
+			var services = new Dictionary<string, string>
+			{
+				[ServicesDefinitions.Main.ServiceName] = "/main/swagger/v1/swagger.json",
+				[ServicesDefinitions.Analytics.ServiceName] = "/analytics/swagger/v1/swagger.json",
+				[ServicesDefinitions.Search.ServiceName] = "/search/swagger/v1/swagger.json",
+				[ServicesDefinitions.Pricing.ServiceName] = "/pricing/swagger/v1/swagger.json"
+			};
 
-            if (!services.TryGetValue(service, out var swaggerPath)) return Results.NotFound();
+			if (!services.TryGetValue(service, out var swaggerPath))
+				return Results.NotFound();
 
-            var request = context.Request;
+			var request = context.Request;
 
-            var baseUrl = $"{request.Scheme}://{request.Host}";
+			var baseUrl = $"{request.Scheme}://{request.Host}";
 
-            var client = httpClientFactory.CreateClient();
+			var client = httpClientFactory.CreateClient();
 
-            var swaggerUrl = $"{baseUrl}{swaggerPath}";
+			var swaggerUrl = $"{baseUrl}{swaggerPath}";
 
-            var json = await client.GetStringAsync(swaggerUrl);
+			var json = await client.GetStringAsync(swaggerUrl);
 
-            var node = JsonNode.Parse(json);
+			var node = JsonNode.Parse(json);
 
-            if (node is null) return Results.Problem("Invalid OpenAPI document.");
+			if (node is null)
+				return Results.Problem("Invalid OpenAPI document.");
 
-            node["servers"] = new JsonArray
-            {
-                new JsonObject
-                {
-                    ["url"] = $"/{service}"
-                }
-            };
+			node["servers"] = new JsonArray
+			{
+				new JsonObject
+				{
+					["url"] = $"/{service}"
+				}
+			};
 
-            return Results.Content(
-                node.ToJsonString(),
-                "application/json");
-        });
+			return Results.Content(node.ToJsonString(), "application/json");
+		});
 
-    application.MapScalarApiReference(
-        "/docs",
-        options =>
-        {
-            options
-                .AddDocument(
-                    ServicesDefinitions.Main.ServiceName,
-                    "Main API",
-                    "/docs/openapi/main.json")
-                .AddDocument(
-                    ServicesDefinitions.Analytics.ServiceName,
-                    "Analytics API",
-                    "/docs/openapi/analytics.json")
-                .AddDocument(
-                    ServicesDefinitions.Search.ServiceName,
-                    "Search API",
-                    "/docs/openapi/search.json")
-                .AddDocument(
-                    ServicesDefinitions.Pricing.ServiceName,
-                    "Pricing API",
-                    "/docs/openapi/pricing.json");
-        });
+	application.MapScalarApiReference(
+		"/docs",
+		options =>
+		{
+			options
+				.AddDocument(
+					ServicesDefinitions.Main.ServiceName,
+					"Main API",
+					"/docs/openapi/main.json")
+				.AddDocument(
+					ServicesDefinitions.Analytics.ServiceName,
+					"Analytics API",
+					"/docs/openapi/analytics.json")
+				.AddDocument(
+					ServicesDefinitions.Search.ServiceName,
+					"Search API",
+					"/docs/openapi/search.json")
+				.AddDocument(
+					ServicesDefinitions.Pricing.ServiceName,
+					"Pricing API",
+					"/docs/openapi/pricing.json");
+		});
 }

@@ -10,104 +10,99 @@ using Microsoft.Extensions.Logging;
 namespace Analytics.Application.Services.FactSynchronizers;
 
 public class PurchaseFactSynchronizer(
-    IMainClient mainClient,
-    IRepository<PurchasesFact, Guid> repository,
-    IUnitOfWork unitOfWork,
-    ILogger<IFactSynchronizer<PurchasesFact, Guid>> logger
-) : IFactSynchronizer<PurchasesFact, Guid>
+	IMainClient mainClient,
+	IRepository<PurchasesFact, Guid> repository,
+	IUnitOfWork unitOfWork,
+	ILogger<IFactSynchronizer<PurchasesFact, Guid>> logger) : IFactSynchronizer<PurchasesFact, Guid>
 {
-    public async Task<PurchasesFact?> SynchronizeAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        return await unitOfWork.ExecuteWithTransaction(
-            TransactionalAttribute.ReadCommitted(20, 2),
-            async () => await ExecuteAsync(id, cancellationToken),
-            cancellationToken);
-    }
+	public async Task<PurchasesFact?> SynchronizeAsync(Guid id, CancellationToken cancellationToken = default)
+	{
+		return await unitOfWork.ExecuteWithTransaction(
+			TransactionalAttribute.ReadCommitted(20, 2),
+			async () => await ExecuteAsync(id, cancellationToken),
+			cancellationToken);
+	}
 
-    private async Task<PurchasesFact?> ExecuteAsync(
-        Guid id,
-        CancellationToken cancellationToken)
-    {
-        var synchronizationStartedAt = DateTime.UtcNow;
+	private async Task<PurchasesFact?> ExecuteAsync(Guid id, CancellationToken cancellationToken)
+	{
+		var synchronizationStartedAt = DateTime.UtcNow;
 
-        var response = await mainClient.PurchaseNode.GetFullPurchase(id, cancellationToken);
-        var dbFact = await repository.FirstOrDefaultAsync(
-            Criteria<PurchasesFact>
-                .New()
-                .Where(x => x.Id == id)
-                .Include(x => x.PurchaseContents)
-                .Track()
-                .Build(),
-            cancellationToken);
+		var response = await mainClient.PurchaseNode.GetFullPurchase(id, cancellationToken);
+		var dbFact = await repository.FirstOrDefaultAsync(
+			Criteria<PurchasesFact>
+				.New()
+				.Where(x => x.Id == id)
+				.Include(x => x.PurchaseContents)
+				.Track()
+				.Build(),
+			cancellationToken);
 
-        if (synchronizationStartedAt <= dbFact?.ProcessedAt)
-        {
-            logger.LogWarning(
-                "Purchase fact Id: {id} upsert skipped, because current record is newer than incoming." +
-                "Last processed at: {lastProcessedAt}. Incoming creation date time: {creationDate}",
-                id,
-                dbFact.ProcessedAt,
-                synchronizationStartedAt);
+		if (synchronizationStartedAt <= dbFact?.ProcessedAt)
+		{
+			logger.LogWarning(
+				"Purchase fact Id: {id} upsert skipped, because current record is newer than incoming." +
+				"Last processed at: {lastProcessedAt}. Incoming creation date time: {creationDate}",
+				id,
+				dbFact.ProcessedAt,
+				synchronizationStartedAt);
 
-            return dbFact;
-        }
+			return dbFact;
+		}
 
-        if (!response.Success)
-        {
-            if (response.StatusCode == HttpStatusCode.NotFound)
-                return await RemoveFactIfExists(dbFact, cancellationToken);
+		if (!response.Success)
+		{
+			if (response.StatusCode == HttpStatusCode.NotFound)
+				return await RemoveFactIfExists(dbFact, cancellationToken);
 
-            throw new InvalidOperationException(
-                $"Unable to synchronize purchase fact {id}. " +
-                $"Main service returned {response.StatusCode}: {response.Error}");
-        }
+			throw new InvalidOperationException(
+				$"Unable to synchronize purchase fact {id}. " +
+				$"Main service returned {response.StatusCode}: {response.Error}");
+		}
 
-        var fromMain = response.ValueOrThrow;
+		var fromMain = response.ValueOrThrow;
 
-        var purchase = fromMain.Purchase;
-        var contents = fromMain.Contents.Select(x =>
-            PurchaseContent.Create(
-                x.Id,
-                purchase.Id,
-                x.Product.Id,
-                x.Price,
-                x.Count));
+		var purchase = fromMain.Purchase;
+		var contents = fromMain.Contents.Select(x => PurchaseContent.Create(
+			x.Id,
+			purchase.Id,
+			x.Product.Id,
+			x.Price,
+			x.Count));
 
-        if (dbFact is null)
-        {
-            dbFact = PurchasesFact.Create(
-                purchase.Id,
-                purchase.Currency.Id,
-                purchase.SupplierOrganization.Id,
-                purchase.PurchaseDatetime,
-                synchronizationStartedAt,
-                contents);
+		if (dbFact is null)
+		{
+			dbFact = PurchasesFact.Create(
+				purchase.Id,
+				purchase.Currency.Id,
+				purchase.SupplierOrganization.Id,
+				purchase.PurchaseDatetime,
+				synchronizationStartedAt,
+				contents);
 
-            await unitOfWork.AddAsync(dbFact, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            return dbFact;
-        }
+			await unitOfWork.AddAsync(dbFact, cancellationToken);
+			await unitOfWork.SaveChangesAsync(cancellationToken);
+			return dbFact;
+		}
 
-        dbFact.Update(
-            purchase.Currency.Id,
-            purchase.SupplierOrganization.Id,
-            purchase.PurchaseDatetime,
-            synchronizationStartedAt,
-            contents);
+		dbFact.Update(
+			purchase.Currency.Id,
+			purchase.SupplierOrganization.Id,
+			purchase.PurchaseDatetime,
+			synchronizationStartedAt,
+			contents);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return dbFact;
-    }
+		await unitOfWork.SaveChangesAsync(cancellationToken);
+		return dbFact;
+	}
 
-    private async Task<PurchasesFact?> RemoveFactIfExists(
-        PurchasesFact? dbFact,
-        CancellationToken cancellationToken)
-    {
-        if (dbFact is not null) unitOfWork.Remove(dbFact);
+	private async Task<PurchasesFact?> RemoveFactIfExists(
+		PurchasesFact? dbFact,
+		CancellationToken cancellationToken)
+	{
+		if (dbFact is not null)
+			unitOfWork.Remove(dbFact);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return null;
-    }
+		await unitOfWork.SaveChangesAsync(cancellationToken);
+		return null;
+	}
 }

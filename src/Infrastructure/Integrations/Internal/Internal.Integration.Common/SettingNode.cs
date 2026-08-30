@@ -10,41 +10,39 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Common;
 
 public class SettingNode(
-    HttpClient httpClient,
-    IAuthClient authClient,
-    IOptionsMonitor<InternalServicesOptions> serviceOptions,
-    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
-    ProjectJsonOptions jsonOptions
-) : InternalCommonClientBase(
-    authClient,
-    credentialsMonitor,
-    serviceOptions,
-    jsonOptions), ISettingNode
+	HttpClient httpClient,
+	IAuthClient authClient,
+	IOptionsMonitor<InternalServicesOptions> serviceOptions,
+	IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
+	ProjectJsonOptions jsonOptions) : InternalCommonClientBase(
+		authClient,
+		credentialsMonitor,
+		serviceOptions,
+		jsonOptions),
+	ISettingNode
 {
-    public async Task<Response<string>> GetSetting(
-        IServiceDefinition serviceDefinition,
-        string systemName,
-        CancellationToken cancellationToken = default)
-    {
-        using var request = await GetRequest(
-            serviceDefinition,
-            HttpMethod.Get,
-            "/internal/settings/" + systemName,
-            cancellationToken);
+	public async Task<Response<string>> GetSetting(
+		IServiceDefinition serviceDefinition,
+		string systemName,
+		CancellationToken cancellationToken = default)
+	{
+		using var request = await GetRequest(
+			serviceDefinition,
+			HttpMethod.Get,
+			"/internal/settings/" + systemName,
+			cancellationToken);
 
-        using var response = await httpClient.SendAsync(
-            request,
-            cancellationToken);
+		using var response = await httpClient.SendAsync(request, cancellationToken);
 
-        return await ReadResponse<GetSettingResponse, string>(
-            response,
-            x => x.Json,
-            cancellationToken);
-    }
+		return await ReadResponse<GetSettingResponse, string>(
+			response,
+			x => x.Json,
+			cancellationToken);
+	}
 
-    private record GetSettingResponse
-    {
-        [JsonPropertyName("json")]
-        public required string Json { get; init; }
-    }
+	private record GetSettingResponse
+	{
+		[JsonPropertyName("json")]
+		public required string Json { get; init; }
+	}
 }

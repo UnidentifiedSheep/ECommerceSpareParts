@@ -7,23 +7,19 @@ namespace EmailTemplates.Renderer;
 
 public class EmailMessageRenderer(IRazorLightEngine engine) : IEmailMessageRenderer
 {
-    public async Task<IEmailMessage> RenderAsync<TTemplate>(
-        TTemplate templateData,
-        CancellationToken cancellationToken = default)
-        where TTemplate : IEmailData
-    {
-        var body = await engine.CompileRenderAsync(
-            $"{templateData.TemplateName}.cshtml",
-            templateData);
+	public async Task<IEmailMessage> RenderAsync<TTemplate>(
+		TTemplate templateData,
+		CancellationToken cancellationToken = default) where TTemplate : IEmailData
+	{
+		var body = await engine.CompileRenderAsync($"{templateData.TemplateName}.cshtml", templateData);
 
-        if (string.IsNullOrWhiteSpace(body))
-            throw new InvalidOperationException(
-                $"Email template '{templateData.TemplateName}' rendered empty body.");
+		if (string.IsNullOrWhiteSpace(body))
+			throw new InvalidOperationException(
+				$"Email template '{templateData.TemplateName}' rendered empty body.");
 
-
-        return new EmailMessage(
-            templateData.Subject,
-            templateData.To,
-            body);
-    }
+		return new EmailMessage(
+			templateData.Subject,
+			templateData.To,
+			body);
+	}
 }

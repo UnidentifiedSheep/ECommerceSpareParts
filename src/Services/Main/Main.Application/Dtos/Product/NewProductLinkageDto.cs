@@ -5,12 +5,12 @@ namespace Main.Application.Dtos.Product;
 
 public record NewProductLinkageDto
 {
-    [JsonPropertyName("productId")]
-    public int ProductId { get; set; }
+	[JsonPropertyName("productId")]
+	public int ProductId { get; set; }
 
-    [JsonPropertyName("crossProductId")]
-    public int CrossProductId { get; set; }
+	[JsonPropertyName("crossProductId")]
+	public int CrossProductId { get; set; }
 
-    [JsonPropertyName("linkageType")]
-    public ProductLinkageType LinkageType { get; set; }
+	[JsonPropertyName("linkageType")]
+	public ProductLinkageType LinkageType { get; set; }
 }

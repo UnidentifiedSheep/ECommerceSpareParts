@@ -14,20 +14,22 @@ public record GetProductWeightQuery(int ProductId) : IQuery<GetProductWeightResu
 public record GetProductWeightResult(ProductWeightDto ProductWeight);
 
 public class GetProductWeightHandler(
-    IReadRepository<ProductWeightEntity, int> context,
-    IProjectionProvider<ProductWeightEntity, ProductWeightDto> projection)
-    : IQueryHandler<GetProductWeightQuery, GetProductWeightResult>
+	IReadRepository<ProductWeightEntity, int> context,
+	IProjectionProvider<ProductWeightEntity, ProductWeightDto> projection)
+	: IQueryHandler<GetProductWeightQuery, GetProductWeightResult>
 {
-    public async Task<GetProductWeightResult> Handle(
-        GetProductWeightQuery request,
-        CancellationToken cancellationToken)
-    {
-        var productWeight = await context.Query
-                                .Where(x => x.ProductId == request.ProductId)
-                                .Project(projection)
-                                .FirstOrDefaultAsync(cancellationToken)
-                            ?? throw new ProductWeightNotFoundException(request.ProductId);
+	public async Task<GetProductWeightResult> Handle(
+		GetProductWeightQuery request,
+		CancellationToken cancellationToken)
+	{
+		var productWeight =
+			await context
+				.Query
+				.Where(x => x.ProductId == request.ProductId)
+				.Project(projection)
+				.FirstOrDefaultAsync(cancellationToken) ??
+			throw new ProductWeightNotFoundException(request.ProductId);
 
-        return new GetProductWeightResult(productWeight);
-    }
+		return new GetProductWeightResult(productWeight);
+	}
 }

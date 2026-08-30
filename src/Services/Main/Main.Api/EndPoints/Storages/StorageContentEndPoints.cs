@@ -14,120 +14,117 @@ using Microsoft.AspNetCore.Mvc;
 namespace Main.Api.EndPoints.Storages;
 
 public record AddContentToStorageRequest(
-    IEnumerable<NewStorageContentDto> StorageContent,
-    string StorageCode
-);
+	IEnumerable<NewStorageContentDto> StorageContent,
+	string StorageCode);
 
 public record EditStorageContentRequest(
-    Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields
-);
+	Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields);
 
 public record GetStorageContentRequest : SortablePaginationQueryModel
 {
-    [FromQuery(Name = "storageCode")]
-    public string? StorageCode { get; init; }
+	[FromQuery(Name = "storageCode")]
+	public string? StorageCode { get; init; }
 
-    [FromQuery(Name = "productId")]
-    public int? ProductId { get; init; }
+	[FromQuery(Name = "productId")]
+	public int? ProductId { get; init; }
 
-    [FromQuery(Name = "showZeroContent")]
-    public bool ShowZeroCount { get; init; } = true;
+	[FromQuery(Name = "showZeroContent")]
+	public bool ShowZeroCount { get; init; } = true;
 }
 
 public record GetStorageContentResponse(IEnumerable<StorageContentDto> Content);
 
 public static class StorageContentEndPoints
 {
-    public static RouteGroupBuilder MapStorageContentEndPoints(this RouteGroupBuilder storages)
-    {
-        storages.MapPost(
-                "/contents",
-                async (
-                    ISender sender,
-                    AddContentToStorageRequest request,
-                    CancellationToken cancellationToken) =>
-                {
-                    var command = new AddContentCommand(
-                        request.StorageContent,
-                        request.StorageCode,
-                        StorageMovementType.StorageContentAddition);
-                    await sender.Send(command, cancellationToken);
-                    return Results.NoContent();
-                })
-            .WithName("AddStorageContent")
-            .WithSummary("Добавить содержимое склада")
-            .WithDescription("Добавление позиций на склад")
-            .WithDisplayName("Добавление позиций на склад")
-            .Accepts<AddContentToStorageRequest>(false, "application/json")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_CREATE);
+	public static RouteGroupBuilder MapStorageContentEndPoints(this RouteGroupBuilder storages)
+	{
+		storages
+			.MapPost(
+				"/contents",
+				async (
+					ISender sender, AddContentToStorageRequest request,
+					CancellationToken cancellationToken) =>
+				{
+					var command = new AddContentCommand(
+						request.StorageContent,
+						request.StorageCode,
+						StorageMovementType.StorageContentAddition);
+					await sender.Send(command, cancellationToken);
+					return Results.NoContent();
+				})
+			.WithName("AddStorageContent")
+			.WithSummary("Добавить содержимое склада")
+			.WithDescription("Добавление позиций на склад")
+			.WithDisplayName("Добавление позиций на склад")
+			.Accepts<AddContentToStorageRequest>(false, "application/json")
+			.Produces(StatusCodes.Status204NoContent)
+			.ProducesProblem(StatusCodes.Status400BadRequest)
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_CREATE);
 
-        storages.MapDelete(
-                "/contents/{contentId:int}",
-                async (
-                    ISender sender,
-                    int contentId,
-                    uint rowVersion,
-                    CancellationToken cancellationToken) =>
-                {
-                    await sender.Send(new SetToZeroContentCommand(contentId, rowVersion), cancellationToken);
-                    return Results.NoContent();
-                })
-            .WithName("DeleteStorageContent")
-            .WithSummary("Удалить содержимое склада")
-            .WithDescription("Полное удаление позиции со склада по его Id")
-            .WithDisplayName("Удаление позиции со склада")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_DELETE);
+		storages
+			.MapDelete(
+				"/contents/{contentId:int}",
+				async (
+					ISender sender, int contentId,
+					uint rowVersion, CancellationToken cancellationToken) =>
+				{
+					await sender.Send(new SetToZeroContentCommand(contentId, rowVersion), cancellationToken);
+					return Results.NoContent();
+				})
+			.WithName("DeleteStorageContent")
+			.WithSummary("Удалить содержимое склада")
+			.WithDescription("Полное удаление позиции со склада по его Id")
+			.WithDisplayName("Удаление позиции со склада")
+			.Produces(StatusCodes.Status204NoContent)
+			.ProducesProblem(StatusCodes.Status400BadRequest)
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_DELETE);
 
-        storages.MapPatch(
-                "/contents",
-                async (
-                    ISender sender,
-                    EditStorageContentRequest request,
-                    CancellationToken cancellationToken) =>
-                {
-                    await sender.Send(new EditStorageContentCommand(request.EditedFields), cancellationToken);
-                    return Results.NoContent();
-                })
-            .WithName("EditStorageContent")
-            .WithSummary("Редактировать содержимое склада")
-            .WithDescription("Редактирование позиций на складе")
-            .WithDisplayName("Редактирование позиций склада")
-            .Accepts<EditStorageContentRequest>(false, "application/json")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_EDIT);
+		storages
+			.MapPatch(
+				"/contents",
+				async (
+					ISender sender, EditStorageContentRequest request,
+					CancellationToken cancellationToken) =>
+				{
+					await sender.Send(new EditStorageContentCommand(request.EditedFields), cancellationToken);
+					return Results.NoContent();
+				})
+			.WithName("EditStorageContent")
+			.WithSummary("Редактировать содержимое склада")
+			.WithDescription("Редактирование позиций на складе")
+			.WithDisplayName("Редактирование позиций склада")
+			.Accepts<EditStorageContentRequest>(false, "application/json")
+			.Produces(StatusCodes.Status204NoContent)
+			.ProducesProblem(StatusCodes.Status400BadRequest)
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_EDIT);
 
-        storages.MapGet(
-                "/contents",
-                async (
-                    ISender sender,
-                    CancellationToken token,
-                    [AsParameters] GetStorageContentRequest request) =>
-                {
-                    var query = new GetStorageContentsQuery(
-                        request.ProductId,
-                        request.StorageCode,
-                        request.SortBy,
-                        request,
-                        request.ShowZeroCount);
-                    var result = await sender.Send(query, token);
-                    return Results.Ok(new GetStorageContentResponse(result.Content));
-                })
-            .WithName("GetStorageContent")
-            .WithSummary("Получить содержимое склада")
-            .WithDescription("Получение позиций на складе")
-            .WithDisplayName("Получение позиций склада")
-            .Produces<GetStorageContentResponse>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_GET_ALL);
+		storages
+			.MapGet(
+				"/contents",
+				async (
+					ISender sender, CancellationToken token,
+					[AsParameters] GetStorageContentRequest request) =>
+				{
+					var query = new GetStorageContentsQuery(
+						request.ProductId,
+						request.StorageCode,
+						request.SortBy,
+						request,
+						request.ShowZeroCount);
+					var result = await sender.Send(query, token);
+					return Results.Ok(new GetStorageContentResponse(result.Content));
+				})
+			.WithName("GetStorageContent")
+			.WithSummary("Получить содержимое склада")
+			.WithDescription("Получение позиций на складе")
+			.WithDisplayName("Получение позиций склада")
+			.Produces<GetStorageContentResponse>()
+			.ProducesProblem(StatusCodes.Status400BadRequest)
+			.RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_GET_ALL);
 
-        return storages;
-    }
+		return storages;
+	}
 }

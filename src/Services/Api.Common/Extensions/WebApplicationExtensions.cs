@@ -1,32 +1,36 @@
 using Api.Common.Middleware;
 using Carter;
-using Localization.Domain.Middlewares;
 using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Api.Common.Extensions;
 
 public static class WebApplicationExtensions
 {
-    public static WebApplication UseCommonApiPipeline(this WebApplication app)
-    {
-        app.UseMiddleware<HeaderSecretMiddleware>();
-        app.UseMiddleware<ScopedLocalizationMiddleware>();
-        app.UseForwardedHeaders(
-            new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
+	public static WebApplication UseCommonApiPipeline(this WebApplication app)
+	{
+		app.UseMiddleware<HeaderSecretMiddleware>();
 
-        app.UseExceptionHandler(_ => { });
-        app.UseRouting();
-        app.UseCors();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.MapCarter();
-        app.UseSwagger();
-        app.MapHealthChecks("/health");
-        app.UseOpenTelemetryPrometheusScrapingEndpoint();
+		app.UseForwardedHeaders(
+			new ForwardedHeadersOptions
+			{
+				ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+			});
 
-        return app;
-    }
+		app.UseRequestLocalization();
+
+		app.UseExceptionHandler(_ =>
+		{
+		});
+		app.UseRouting();
+		app.UseCors();
+
+		app.UseAuthentication();
+		app.UseAuthorization();
+		app.MapCarter();
+		app.UseSwagger();
+		app.MapHealthChecks("/health");
+		app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
+		return app;
+	}
 }

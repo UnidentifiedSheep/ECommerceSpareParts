@@ -8,76 +8,76 @@ using Persistence.Interfaces;
 namespace Persistence.Repository;
 
 public abstract class RepositoryBase<TContext, TEntity, TKey>(
-    TContext context,
-    IQueryableExtensions queryableExtensions
-) : IRepository<TEntity, TKey>
-    where TEntity : Entity<TEntity, TKey> where TContext : DbContext where TKey : notnull
+	TContext context,
+	IQueryableExtensions queryableExtensions) : IRepository<TEntity, TKey>
+	where TEntity : Entity<TEntity, TKey> where TContext : DbContext where TKey : notnull
 {
-    protected readonly TContext Context = context;
-    protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
-    protected readonly IQueryableExtensions QueryableExtensions = queryableExtensions;
+	protected readonly TContext Context = context;
 
-    public async ValueTask<TEntity?> GetById(TKey id, CancellationToken ct = default)
-    {
-        return await DbSet.FindAsync(ToKeyValues(id), ct);
-    }
+	protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
 
-    public async Task<TEntity?> FirstOrDefaultAsync(
-        Criteria<TEntity>? criteria = null,
-        CancellationToken ct = default)
-    {
-        var query = DbSet.AsQueryable();
+	protected readonly IQueryableExtensions QueryableExtensions = queryableExtensions;
 
-        if (criteria != null) query = QueryableExtensions.Apply(query, criteria);
+	public async ValueTask<TEntity?> GetById(TKey id, CancellationToken ct = default) =>
+		await DbSet.FindAsync(ToKeyValues(id), ct);
 
-        return await query.FirstOrDefaultAsync(ct);
-    }
+	public async Task<TEntity?> FirstOrDefaultAsync(
+		Criteria<TEntity>? criteria = null,
+		CancellationToken ct = default)
+	{
+		var query = DbSet.AsQueryable();
 
-    public async Task<List<TEntity>> ListAsync(
-        Criteria<TEntity>? criteria = null,
-        CancellationToken ct = default)
-    {
-        var query = DbSet.AsQueryable();
+		if (criteria != null)
+			query = QueryableExtensions.Apply(query, criteria);
 
-        if (criteria != null) query = QueryableExtensions.Apply(query, criteria);
+		return await query.FirstOrDefaultAsync(ct);
+	}
 
-        return await query.ToListAsync(ct);
-    }
+	public async Task<List<TEntity>> ListAsync(
+		Criteria<TEntity>? criteria = null,
+		CancellationToken ct = default)
+	{
+		var query = DbSet.AsQueryable();
 
-    public IAsyncEnumerable<TEntity> AsyncEnumerable(
-        Criteria<TEntity>? criteria = null)
-    {
-        var query = DbSet.AsQueryable();
-        query = QueryableExtensions.Apply(query, criteria);
-        return query.AsAsyncEnumerable();
-    }
+		if (criteria != null)
+			query = QueryableExtensions.Apply(query, criteria);
 
-    public abstract Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
-        IEnumerable<TKey> ids,
-        Criteria<TEntity>? criteria = null,
-        CancellationToken ct = default);
-    public abstract Task DeleteManyAsync(
-        IEnumerable<TKey> ids,
-        CancellationToken cancellationToken = default);
+		return await query.ToListAsync(ct);
+	}
 
-    private static object[] ToKeyValues(TKey key)
-    {
-        return key switch
-        {
-            null => [],
-            ITuple v => GetTupleValues(v),
-            ICompositeKey k => k.ToArray(),
-            _ => [key]
-        };
-    }
+	public IAsyncEnumerable<TEntity> AsyncEnumerable(Criteria<TEntity>? criteria = null)
+	{
+		var query = DbSet.AsQueryable();
+		query = QueryableExtensions.Apply(query, criteria);
+		return query.AsAsyncEnumerable();
+	}
 
+	public abstract Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
+		IEnumerable<TKey> ids,
+		Criteria<TEntity>? criteria = null,
+		CancellationToken ct = default);
+	public abstract Task DeleteManyAsync(
+		IEnumerable<TKey> ids,
+		CancellationToken cancellationToken = default);
 
-    private static object[] GetTupleValues(ITuple tuple)
-    {
-        var values = new object[tuple.Length];
+	private static object[] ToKeyValues(TKey key)
+	{
+		return key switch
+		{
+			null => [],
+			ITuple v => GetTupleValues(v),
+			ICompositeKey k => k.ToArray(),
+			_ => [key]
+		};
+	}
 
-        for (var i = 0; i < tuple.Length; i++) values[i] = tuple[i]!;
+	private static object[] GetTupleValues(ITuple tuple)
+	{
+		var values = new object[tuple.Length];
 
-        return values;
-    }
+		for (var i = 0; i < tuple.Length; i++)
+			values[i] = tuple[i]!;
+
+		return values;
+	}
 }

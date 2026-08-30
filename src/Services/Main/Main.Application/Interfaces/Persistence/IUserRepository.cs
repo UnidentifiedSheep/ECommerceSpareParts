@@ -6,20 +6,20 @@ namespace Main.Application.Interfaces.Persistence;
 
 public interface IUserRepository : IRepository<User, Guid>
 {
-    Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
-        Guid userId,
-        CancellationToken cancellationToken);
+	Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
+		Guid userId,
+		CancellationToken cancellationToken);
 
-    Task<decimal?> GetUsersDiscountAsync(Guid userId, CancellationToken cancellationToken = default);
+	Task<decimal?> GetUsersDiscountAsync(Guid userId, CancellationToken cancellationToken = default);
 
-    Task<User?> GetUserByPrimaryEmailAsync(
-        string email,
-        Criteria<User>? criteria = null,
-        CancellationToken cancellationToken = default);
+	Task<User?> GetUserByPrimaryEmailAsync(
+		string email,
+		Criteria<User>? criteria = null,
+		CancellationToken cancellationToken = default);
 
-    Task<User?> GetUserByLoginAsync(
-        string login,
-        bool isEmail,
-        Criteria<User>? criteria = null,
-        CancellationToken cancellationToken = default);
+	Task<User?> GetUserByLoginAsync(
+		string login,
+		bool isEmail,
+		Criteria<User>? criteria = null,
+		CancellationToken cancellationToken = default);
 }

@@ -9,57 +9,60 @@ namespace Persistence.Extensions;
 
 public static class HostExtensions
 {
-    public static async Task<IHost> EnsureDbExists<TContext>(this IHost host) where TContext : DbContext
-    {
-        await using var scope = host.Services.CreateAsyncScope();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<TContext>>();
-        DbContext context = scope.ServiceProvider.GetRequiredService<TContext>();
-        await context.Database.EnsureCreatedAsync();
-        DatabaseEvents.DatabaseEnsuredCreated(
-            logger,
-            typeof(TContext).Name,
-            null);
-        return host;
-    }
+	public static async Task<IHost> EnsureDbExists<TContext>(this IHost host) where TContext : DbContext
+	{
+		await using var scope = host.Services.CreateAsyncScope();
+		var logger = scope.ServiceProvider.GetRequiredService<ILogger<TContext>>();
+		DbContext context = scope.ServiceProvider.GetRequiredService<TContext>();
+		await context.Database.EnsureCreatedAsync();
+		DatabaseEvents.DatabaseEnsuredCreated(
+			logger,
+			typeof(TContext).Name,
+			null);
+		return host;
+	}
 
-    public static async Task SeedAsync<TContext>(this IServiceScope scope) where TContext : DbContext
-    {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<TContext>>();
+	public static async Task SeedAsync<TContext>(this IServiceScope scope) where TContext : DbContext
+	{
+		var logger = scope.ServiceProvider.GetRequiredService<ILogger<TContext>>();
 
-        var context = scope.ServiceProvider.GetRequiredService<TContext>();
-        await context.Database.EnsureCreatedAsync();
+		var context = scope.ServiceProvider.GetRequiredService<TContext>();
+		await context.Database.EnsureCreatedAsync();
 
-        var seeds = scope.ServiceProvider.GetServices<ISeed<TContext>>()
-            .OrderBy(x => x.GetPriority())
-            .ToList();
-        if (seeds.Count == 0)
-        {
-            SeedEvents.NoSeedsFound(
-                logger,
-                typeof(TContext).Name,
-                null);
-            return;
-        }
+		var seeds = scope
+			.ServiceProvider
+			.GetServices<ISeed<TContext>>()
+			.OrderBy(x => x.GetPriority())
+			.ToList();
+		if (seeds.Count == 0)
+		{
+			SeedEvents.NoSeedsFound(
+				logger,
+				typeof(TContext).Name,
+				null);
+			return;
+		}
 
-        DatabaseEvents.DatabaseEnsuredCreated(
-            logger,
-            typeof(TContext).Name,
-            null);
+		DatabaseEvents.DatabaseEnsuredCreated(
+			logger,
+			typeof(TContext).Name,
+			null);
 
-        SeedEvents.SeedStarted(
-            logger,
-            typeof(TContext).Name,
-            null);
-        foreach (var seed in seeds) await seed.SeedAsync(context);
-        SeedEvents.SeedCompleted(
-            logger,
-            typeof(TContext).Name,
-            null);
-    }
+		SeedEvents.SeedStarted(
+			logger,
+			typeof(TContext).Name,
+			null);
+		foreach (var seed in seeds)
+			await seed.SeedAsync(context);
+		SeedEvents.SeedCompleted(
+			logger,
+			typeof(TContext).Name,
+			null);
+	}
 
-    public static async Task SeedAsync<TContext>(this IHost host) where TContext : DbContext
-    {
-        await using var scope = host.Services.CreateAsyncScope();
-        await scope.SeedAsync<TContext>();
-    }
+	public static async Task SeedAsync<TContext>(this IHost host) where TContext : DbContext
+	{
+		await using var scope = host.Services.CreateAsyncScope();
+		await scope.SeedAsync<TContext>();
+	}
 }

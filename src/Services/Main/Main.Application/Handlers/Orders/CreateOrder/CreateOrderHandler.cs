@@ -8,10 +8,7 @@ public record CreateOrderResult(Guid OrderId);
 
 public class CreateOrderHandler : ICommandHandler<CreateOrderCommand, CreateOrderResult>
 {
-    public async Task<CreateOrderResult> Handle(
-        CreateOrderCommand request,
-        CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+	public async Task<CreateOrderResult> Handle(
+		CreateOrderCommand request,
+		CancellationToken cancellationToken) => throw new NotImplementedException();
 }

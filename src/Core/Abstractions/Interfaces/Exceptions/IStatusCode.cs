@@ -4,5 +4,5 @@ namespace Abstractions.Interfaces.Exceptions;
 
 public interface IStatusCode
 {
-    HttpStatusCode StatusCode { get; }
+	HttpStatusCode StatusCode { get; }
 }

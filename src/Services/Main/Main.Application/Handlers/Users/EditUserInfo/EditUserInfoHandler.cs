@@ -1,4 +1,3 @@
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -16,29 +15,29 @@ public record EditUserInfoCommand(Guid UserId, UserInfoDto UserInfo) : ICommand<
 
 public record EditUserInfoResult(Guid UserId);
 
-public class EditUserInfoHandler(
-    IRepository<User, Guid> repository
-) : ICommandHandler<EditUserInfoCommand, EditUserInfoResult>
+public class EditUserInfoHandler(IRepository<User, Guid> repository)
+	: ICommandHandler<EditUserInfoCommand, EditUserInfoResult>
 {
-    public async Task<EditUserInfoResult> Handle(
-        EditUserInfoCommand request,
-        CancellationToken cancellationToken)
-    {
-        var criteria = Criteria<User>.New()
-            .Where(x => x.Id == request.UserId)
-            .Include(x => x.UserInfo)
-            .WhereDoesNotHaveRole(Role.System)
-            .Track()
-            .Build();
+	public async Task<EditUserInfoResult> Handle(
+		EditUserInfoCommand request,
+		CancellationToken cancellationToken)
+	{
+		var criteria = Criteria<User>
+			.New()
+			.Where(x => x.Id == request.UserId)
+			.Include(x => x.UserInfo)
+			.WhereDoesNotHaveRole(Role.System)
+			.Track()
+			.Build();
 
-        var user = await repository.FirstOrDefaultAsync(criteria, cancellationToken)
-                   ?? throw new UserNotFoundException(request.UserId);
+		var user = await repository.FirstOrDefaultAsync(criteria, cancellationToken) ??
+			throw new UserNotFoundException(request.UserId);
 
-        user.SetUserInfo(
-            request.UserInfo.Name,
-            request.UserInfo.Surname,
-            request.UserInfo.Description);
+		user.SetUserInfo(
+			request.UserInfo.Name,
+			request.UserInfo.Surname,
+			request.UserInfo.Description);
 
-        return new EditUserInfoResult(user.Id);
-    }
+		return new EditUserInfoResult(user.Id);
+	}
 }

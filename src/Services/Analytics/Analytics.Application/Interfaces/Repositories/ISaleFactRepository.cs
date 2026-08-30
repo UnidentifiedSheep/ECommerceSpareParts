@@ -5,5 +5,5 @@ namespace Analytics.Application.Interfaces.Repositories;
 
 public interface ISaleFactRepository : IRepository<SalesFact, Guid>
 {
-    Task<SalesFact?> GetFullSalesFact(Guid id, CancellationToken cancellationToken = default);
+	Task<SalesFact?> GetFullSalesFact(Guid id, CancellationToken cancellationToken = default);
 }

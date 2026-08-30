@@ -2,5 +2,5 @@ namespace Integrations.Tmtr.Requests;
 
 public record GetProductsRequest
 {
-    public required string Number { get; init; }
+	public required string Number { get; init; }
 }

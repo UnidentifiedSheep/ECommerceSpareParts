@@ -4,12 +4,9 @@ using MassTransit;
 
 namespace Main.Application.Consumers;
 
-public class CurrencyCreatedConsumer(
-    ICurrencyCacheRepository cacheRepository
-) : IConsumer<CurrencyCreatedEvent>
+public class CurrencyCreatedConsumer(ICurrencyCacheRepository cacheRepository)
+	: IConsumer<CurrencyCreatedEvent>
 {
-    public async Task Consume(ConsumeContext<CurrencyCreatedEvent> context)
-    {
-        await cacheRepository.InvalidateAllCurrencies();
-    }
+	public async Task Consume(ConsumeContext<CurrencyCreatedEvent> context) =>
+		await cacheRepository.InvalidateAllCurrencies();
 }

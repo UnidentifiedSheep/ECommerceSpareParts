@@ -9,55 +9,61 @@ namespace Tests.HandlersTests.Producers;
 
 public class CreateProducerTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-    [Theory]
-    [InlineData("")]
-    [InlineData("           ")]
-    [InlineData("a")]
-    public async Task CreateProducer_TooShortName_FailsValidation(string name)
-    {
-        var producer = CreateDto() with { Name = name };
-        var command = new CreateProducerCommand(producer);
+	[Theory]
+	[InlineData("")]
+	[InlineData("           ")]
+	[InlineData("a")]
+	public async Task CreateProducer_TooShortName_FailsValidation(string name)
+	{
+		var producer = CreateDto() with
+		{
+			Name = name
+		};
+		var command = new CreateProducerCommand(producer);
 
-        var act = () => Mediator.Send(command);
+		var act = () => Mediator.Send(command);
 
-        await act.Should().ThrowAsync<ValidationException>();
-    }
+		await act.Should().ThrowAsync<ValidationException>();
+	}
 
-    [Fact]
-    public async Task CreateProducer_TooLargeDescription_FailsValidation()
-    {
-        var producer = CreateDto() with { Description = Faker.Lorem.Letter(600) };
-        var command = new CreateProducerCommand(producer);
+	[Fact]
+	public async Task CreateProducer_TooLargeDescription_FailsValidation()
+	{
+		var producer = CreateDto() with
+		{
+			Description = Faker.Lorem.Letter(600)
+		};
+		var command = new CreateProducerCommand(producer);
 
-        var act = () => Mediator.Send(command);
+		var act = () => Mediator.Send(command);
 
-        await act.Should().ThrowAsync<ValidationException>();
-    }
+		await act.Should().ThrowAsync<ValidationException>();
+	}
 
-    [Fact]
-    public async Task CreateProducer_WithValidData_Succeeds()
-    {
-        var producer = CreateDto();
-        var command = new CreateProducerCommand(producer);
+	[Fact]
+	public async Task CreateProducer_WithValidData_Succeeds()
+	{
+		var producer = CreateDto();
+		var command = new CreateProducerCommand(producer);
 
-        var created = await Mediator.Send(command);
+		var created = await Mediator.Send(command);
 
-        var createdProducer = await Context.Producers
-            .AsNoTracking()
-            .SingleAsync(x => x.Id == created.ProducerId);
+		var createdProducer = await Context
+			.Producers
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == created.ProducerId);
 
-        created.ProducerId.Should().BeGreaterThan(0);
+		created.ProducerId.Should().BeGreaterThan(0);
 
-        createdProducer.Name.Should().Be(Producer.ToNormalizedName(producer.Name));
-        createdProducer.Description.Should().Be(producer.Description);
-    }
+		createdProducer.Name.Should().Be(Producer.ToNormalizedName(producer.Name));
+		createdProducer.Description.Should().Be(producer.Description);
+	}
 
-    private NewProducerDto CreateDto()
-    {
-        return new NewProducerDto
-        {
-            Name = Faker.Lorem.Word(),
-            Description = Faker.Lorem.Sentence()
-        };
-    }
+	private NewProducerDto CreateDto()
+	{
+		return new NewProducerDto
+		{
+			Name = Faker.Lorem.Word(), Description = Faker.Lorem.Sentence()
+		};
+	}
 }

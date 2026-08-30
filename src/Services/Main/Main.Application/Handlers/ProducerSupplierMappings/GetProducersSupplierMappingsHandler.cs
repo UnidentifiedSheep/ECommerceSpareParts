@@ -8,30 +8,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProducerSupplierMappings;
 
-public record GetProducersSupplierMappingsQuery(
-    IEnumerable<int> ProducerIds) : IQuery<GetProducersSupplierMappingsResult>;
+public record GetProducersSupplierMappingsQuery(IEnumerable<int> ProducerIds)
+	: IQuery<GetProducersSupplierMappingsResult>;
 
-public record GetProducersSupplierMappingsResult(
-    Dictionary<int, List<ProducerSupplierMappingDto>> Mappings);
+public record GetProducersSupplierMappingsResult(Dictionary<int, List<ProducerSupplierMappingDto>> Mappings);
 
 public class GetProducersSupplierMappingsHandler(
-    IReadRepository<ProducerSupplierMapping, int> repository,
-    IProjectionProvider<ProducerSupplierMapping, ProducerSupplierMappingDto> projectionProvider
-    ) : IQueryHandler<GetProducersSupplierMappingsQuery, GetProducersSupplierMappingsResult>
+	IReadRepository<ProducerSupplierMapping, int> repository,
+	IProjectionProvider<ProducerSupplierMapping, ProducerSupplierMappingDto> projectionProvider)
+	: IQueryHandler<GetProducersSupplierMappingsQuery, GetProducersSupplierMappingsResult>
 {
-    public async Task<GetProducersSupplierMappingsResult> Handle(
-        GetProducersSupplierMappingsQuery request, 
-        CancellationToken cancellationToken)
-    {
-        var mappings = (await repository.Query
-            .Where(x => request.ProducerIds.Contains(x.ProducerId))
-            .Project(projectionProvider)
-            .ToListAsync(cancellationToken))
-            .GroupBy(x => x.ProducerId)
-            .ToDictionary(
-                x => x.Key, 
-                x=> x.ToList());
-        
-        return new GetProducersSupplierMappingsResult(mappings);
-    }
+	public async Task<GetProducersSupplierMappingsResult> Handle(
+		GetProducersSupplierMappingsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var mappings =
+			(await repository
+				.Query
+				.Where(x => request.ProducerIds.Contains(x.ProducerId))
+				.Project(projectionProvider)
+				.ToListAsync(cancellationToken))
+			.GroupBy(x => x.ProducerId)
+			.ToDictionary(x => x.Key, x => x.ToList());
+
+		return new GetProducersSupplierMappingsResult(mappings);
+	}
 }

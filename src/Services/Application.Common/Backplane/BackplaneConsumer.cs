@@ -5,12 +5,14 @@ using ZiggyCreatures.Caching.Fusion.Backplane;
 namespace Application.Common.Backplane;
 
 public class BackplaneConsumer(IBackplaneDispatcher dispatcher, IFusionCache cache)
-    : IConsumer<BackplaneMessage>
+	: IConsumer<BackplaneMessage>
 {
-    public async Task Consume(ConsumeContext<BackplaneMessage> context)
-    {
-        if (dispatcher.Handler is null) return;
-        if (context.Message.SourceId == cache.InstanceId) return;
-        await dispatcher.Handler(context.Message);
-    }
+	public async Task Consume(ConsumeContext<BackplaneMessage> context)
+	{
+		if (dispatcher.Handler is null)
+			return;
+		if (context.Message.SourceId == cache.InstanceId)
+			return;
+		await dispatcher.Handler(context.Message);
+	}
 }

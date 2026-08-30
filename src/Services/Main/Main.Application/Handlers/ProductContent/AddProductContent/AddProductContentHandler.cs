@@ -11,18 +11,17 @@ public record AddProductContentCommand(int ParentProductId, Dictionary<int, int>
 
 public class AddProductContentHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddProductContentCommand>
 {
-    public async Task<Unit> Handle(AddProductContentCommand request, CancellationToken cancellationToken)
-    {
-        var contents = request.Contents
-            .Select(x =>
-                Entities.Product.ProductContent.Create(
-                    request.ParentProductId,
-                    x.Key,
-                    x.Value)
-            )
-            .ToList();
+	public async Task<Unit> Handle(AddProductContentCommand request, CancellationToken cancellationToken)
+	{
+		var contents = request
+			.Contents
+			.Select(x => Entities.Product.ProductContent.Create(
+				request.ParentProductId,
+				x.Key,
+				x.Value))
+			.ToList();
 
-        await unitOfWork.AddRangeAsync(contents, cancellationToken);
-        return Unit.Value;
-    }
+		await unitOfWork.AddRangeAsync(contents, cancellationToken);
+		return Unit.Value;
+	}
 }

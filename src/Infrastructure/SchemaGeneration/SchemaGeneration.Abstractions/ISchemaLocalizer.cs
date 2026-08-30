@@ -4,5 +4,5 @@ namespace SchemaGeneration.Abstractions;
 
 public interface ISchemaLocalizer
 {
-    ObjectSchema Localize(ObjectSchema schema);
+	ObjectSchema Localize(ObjectSchema schema);
 }

@@ -4,12 +4,8 @@ using MassTransit;
 
 namespace Main.Application.Consumers;
 
-public class RoleUpdatedConsumer(
-    IUserCacheRepository userCache
-) : IConsumer<RoleUpdatedEvent>
+public class RoleUpdatedConsumer(IUserCacheRepository userCache) : IConsumer<RoleUpdatedEvent>
 {
-    public async Task Consume(ConsumeContext<RoleUpdatedEvent> context)
-    {
-        await userCache.InvalidateRolesAsync();
-    }
+	public async Task Consume(ConsumeContext<RoleUpdatedEvent> context) =>
+		await userCache.InvalidateRolesAsync();
 }

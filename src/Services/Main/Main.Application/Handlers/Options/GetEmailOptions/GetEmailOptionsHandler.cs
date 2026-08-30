@@ -9,12 +9,10 @@ public record GetEmailOptionsQuery : IQuery<GetEmailOptionsResult>;
 public record GetEmailOptionsResult(UserEmailOptions EmailOptions);
 
 public class GetEmailOptionsHandler(IOptions<UserEmailOptions> options)
-    : IQueryHandler<GetEmailOptionsQuery, GetEmailOptionsResult>
+	: IQueryHandler<GetEmailOptionsQuery, GetEmailOptionsResult>
 {
-    public async Task<GetEmailOptionsResult> Handle(
-        GetEmailOptionsQuery request,
-        CancellationToken cancellationToken)
-    {
-        return await Task.FromResult(new GetEmailOptionsResult(options.Value));
-    }
+	public async Task<GetEmailOptionsResult> Handle(
+		GetEmailOptionsQuery request,
+		CancellationToken cancellationToken) =>
+		await Task.FromResult(new GetEmailOptionsResult(options.Value));
 }

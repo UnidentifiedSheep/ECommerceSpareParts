@@ -8,69 +8,70 @@ using Tests.TestContexts.Currency;
 namespace Tests.TestContexts.Storage;
 
 public class ProductReservationTestContext(
-    DContext context,
-    UsersTestContext usersTestContext,
-    ProductTestContext productTestContext,
-    CurrencyTestContext currencyTestContext
-)
-    : TestContextBase<DContext>(context), IDependentTestContext
+	DContext context,
+	UsersTestContext usersTestContext,
+	ProductTestContext productTestContext,
+	CurrencyTestContext currencyTestContext) : TestContextBase<DContext>(context), IDependentTestContext
 {
-    private readonly List<ProductReservation> _activeReservations = [];
-    private readonly List<ProductReservation> _reservations = [];
+	private readonly List<ProductReservation> _activeReservations = [];
 
-    public IReadOnlyList<ProductReservation> Reservations => _reservations;
-    public IReadOnlyList<ProductReservation> ActiveReservations => _activeReservations;
-    public ProductReservation LockedReservation { get; private set; } = null!;
-    public ProductReservation DoneReservation { get; private set; } = null!;
-    public ProductReservation CanceledReservation { get; private set; } = null!;
+	private readonly List<ProductReservation> _reservations = [];
 
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(UsersTestContext),
-        typeof(ProductTestContext),
-        typeof(CurrencyTestContext)
-    ];
+	public IReadOnlyList<ProductReservation> Reservations => _reservations;
 
-    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        var users = usersTestContext.Users.ToList();
-        var products = productTestContext.Products;
-        var currencyId = currencyTestContext.Currencies[0].Id;
+	public IReadOnlyList<ProductReservation> ActiveReservations => _activeReservations;
 
-        _activeReservations.AddRange(
-            new ProductReservationBuilder(Faker)
-                .WithOrganizationIds(users.Select(x => x.Id).ToArray())
-                .WithProducts(products)
-                .WithReservedCount(Faker.Random.Int(1, 10))
-                .WithProposedPrice(100m, currencyId)
-                .WithComment("reservation")
-                .BuildMany(3));
+	public ProductReservation LockedReservation { get; private set; } = null!;
 
-        LockedReservation = new ProductReservationBuilder(Faker)
-            .WithOrganizationId(users[0].Id)
-            .WithProductId(products[3 % products.Count].Id)
-            .WithReservedCount(3)
-            .WithCurrentCount(1)
-            .Build();
+	public ProductReservation DoneReservation { get; private set; } = null!;
 
-        DoneReservation = new ProductReservationBuilder(Faker)
-            .WithOrganizationId(users[1 % users.Count].Id)
-            .WithProductId(products[4 % products.Count].Id)
-            .WithReservedCount(3)
-            .WithCurrentCount(3)
-            .Build();
+	public ProductReservation CanceledReservation { get; private set; } = null!;
 
-        CanceledReservation = new ProductReservationBuilder(Faker)
-            .WithOrganizationId(users[2 % users.Count].Id)
-            .WithProductId(products[5 % products.Count].Id)
-            .WithReservedCount(3)
-            .Build();
-        CanceledReservation.Cancel();
+	public static Type[] DependsOn { get; } =
+	[
+		typeof(UsersTestContext), typeof(ProductTestContext), typeof(CurrencyTestContext)
+	];
 
-        _reservations.AddRange(_activeReservations);
-        _reservations.AddRange([LockedReservation, DoneReservation, CanceledReservation]);
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+	{
+		var users = usersTestContext.Users.ToList();
+		var products = productTestContext.Products;
+		var currencyId = currencyTestContext.Currencies[0].Id;
 
-        await DbContext.AddRangeAsync(_reservations, cancellationToken);
-        await DbContext.SaveChangesAsync(cancellationToken);
-    }
+		_activeReservations.AddRange(
+			new ProductReservationBuilder(Faker)
+				.WithOrganizationIds(users.Select(x => x.Id).ToArray())
+				.WithProducts(products)
+				.WithReservedCount(Faker.Random.Int(1, 10))
+				.WithProposedPrice(100m, currencyId)
+				.WithComment("reservation")
+				.BuildMany(3));
+
+		LockedReservation = new ProductReservationBuilder(Faker)
+			.WithOrganizationId(users[0].Id)
+			.WithProductId(products[3 % products.Count].Id)
+			.WithReservedCount(3)
+			.WithCurrentCount(1)
+			.Build();
+
+		DoneReservation = new ProductReservationBuilder(Faker)
+			.WithOrganizationId(users[1 % users.Count].Id)
+			.WithProductId(products[4 % products.Count].Id)
+			.WithReservedCount(3)
+			.WithCurrentCount(3)
+			.Build();
+
+		CanceledReservation = new ProductReservationBuilder(Faker)
+			.WithOrganizationId(users[2 % users.Count].Id)
+			.WithProductId(products[5 % products.Count].Id)
+			.WithReservedCount(3)
+			.Build();
+		CanceledReservation.Cancel();
+
+		_reservations.AddRange(_activeReservations);
+		_reservations.AddRange([LockedReservation, DoneReservation, CanceledReservation]);
+
+		await DbContext.AddRangeAsync(_reservations, cancellationToken);
+		await DbContext.SaveChangesAsync(cancellationToken);
+	}
 }

@@ -12,60 +12,59 @@ using Main.Entities.Organization;
 namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class TransactionDtoProjectionProvider
-    : ProjectionProviderBase<Transaction, TransactionDto>
+public sealed class TransactionDtoProjectionProvider : ProjectionProviderBase<Transaction, TransactionDto>
 {
-    public TransactionDtoProjectionProvider(
-        IProjectionProvider<Organization, OrganizationDto> organizationProjection)
-    {
-        var organizationToDto = organizationProjection.Projection;
+	public TransactionDtoProjectionProvider(
+		IProjectionProvider<Organization, OrganizationDto> organizationProjection)
+	{
+		var organizationToDto = organizationProjection.Projection;
 
-        Projection = x => new TransactionDto
-        {
-            Amount = x.Amount,
-            Id = x.Id,
-            CurrencyId = x.CurrencyId,
-            Receiver = organizationToDto.Invoke(x.Receiver),
-            Sender = organizationToDto.Invoke(x.Sender),
-            Status = x.Status,
-            Type = x.Type,
-            TransactionDate = x.TransactionDatetime,
-            SourceType = x.SourceType
-        };
-    }
+		Projection = x => new TransactionDto
+		{
+			Amount = x.Amount,
+			Id = x.Id,
+			CurrencyId = x.CurrencyId,
+			Receiver = organizationToDto.Invoke(x.Receiver),
+			Sender = organizationToDto.Invoke(x.Sender),
+			Status = x.Status,
+			Type = x.Type,
+			TransactionDate = x.TransactionDatetime,
+			SourceType = x.SourceType
+		};
+	}
 
-    public override Expression<Func<Transaction, TransactionDto>> Projection { get; }
+	public override Expression<Func<Transaction, TransactionDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class OrganizationBalanceDtoProjectionProvider
-    : ProjectionProviderBase<OrganizationBalance, OrganizationBalanceDto>
+public sealed class
+	OrganizationBalanceDtoProjectionProvider : ProjectionProviderBase<OrganizationBalance,
+	OrganizationBalanceDto>
 {
-    public OrganizationBalanceDtoProjectionProvider(
-        IProjectionProvider<Currency, CurrencyDto> currencyProjection)
-    {
-        var currencyToDto = currencyProjection.Projection;
+	public OrganizationBalanceDtoProjectionProvider(
+		IProjectionProvider<Currency, CurrencyDto> currencyProjection)
+	{
+		var currencyToDto = currencyProjection.Projection;
 
-        Projection = x => new OrganizationBalanceDto
-        {
-            Balance = x.Balance,
-            Currency = currencyToDto.Invoke(x.Currency)
-        };
-    }
+		Projection = x => new OrganizationBalanceDto
+		{
+			Balance = x.Balance, Currency = currencyToDto.Invoke(x.Currency)
+		};
+	}
 
-    public override Expression<Func<OrganizationBalance, OrganizationBalanceDto>> Projection { get; }
+	public override Expression<Func<OrganizationBalance, OrganizationBalanceDto>> Projection { get; }
 }
 
 public static class OrganizationFinancialProfileDtoFactory
 {
-    public static OrganizationFinancialProfileDto Create(
-        OrganizationFinancialProfile profile,
-        decimal netPositionInBaseCurrency)
-    {
-        return new OrganizationFinancialProfileDto
-        {
-            NetPositionInBaseCurrency = netPositionInBaseCurrency,
-            MinimalAllowedBalance = profile.MinAllowedBalance
-        };
-    }
+	public static OrganizationFinancialProfileDto Create(
+		OrganizationFinancialProfile profile,
+		decimal netPositionInBaseCurrency)
+	{
+		return new OrganizationFinancialProfileDto
+		{
+			NetPositionInBaseCurrency = netPositionInBaseCurrency,
+			MinimalAllowedBalance = profile.MinAllowedBalance
+		};
+	}
 }

@@ -6,16 +6,16 @@ namespace Main.Api.GraphQl.Types;
 
 [GraphQLName("SupplierProductName")]
 public record GqlSupplierProductName(
-    [property: GraphQLIgnore]
-    SupplierProductNameDto SupplierProductName)
+	[property: GraphQLIgnore]
+	SupplierProductNameDto SupplierProductName)
 {
-    [GraphQLName("id")]
-    [Shareable]
-    public int Id => SupplierProductName.Id;
+	[GraphQLName("id")]
+	[Shareable]
+	public int Id => SupplierProductName.Id;
 
-    [GraphQLName("supplierProductId")]
-    public int SupplierProductId => SupplierProductName.SupplierProductId;
+	[GraphQLName("supplierProductId")]
+	public int SupplierProductId => SupplierProductName.SupplierProductId;
 
-    [GraphQLName("name")]
-    public string Name => SupplierProductName.Name;
+	[GraphQLName("name")]
+	public string Name => SupplierProductName.Name;
 }

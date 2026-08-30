@@ -9,14 +9,13 @@ namespace Persistence.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddUnitOfWork<T>(this IServiceCollection collection) where T : DbContext
-    {
-        collection.AddScoped<IUnitOfWork, EfUnitOfWork<T>>();
-        collection.AddScoped<IContextMetadata, ContextMetadata<T>>();
-        collection.AddScoped<IQueryableExtensions, QueryableExtensions>();
-        Application.Common.Extensions.ServiceCollectionExtensions
-            .RegisterApplicationTransactions(collection);
+	public static IServiceCollection AddUnitOfWork<T>(this IServiceCollection collection) where T : DbContext
+	{
+		collection.AddScoped<IUnitOfWork, EfUnitOfWork<T>>();
+		collection.AddScoped<IContextMetadata, ContextMetadata<T>>();
+		collection.AddScoped<IQueryableExtensions, QueryableExtensions>();
+		Application.Common.Extensions.ServiceCollectionExtensions.RegisterApplicationTransactions(collection);
 
-        return collection;
-    }
+		return collection;
+	}
 }

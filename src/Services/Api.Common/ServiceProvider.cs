@@ -2,7 +2,6 @@ using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
 using Api.Common.HostedServices;
 using Api.Common.Models.Options;
-using Application.Common.Models;
 using Application.Common.Models.Options;
 using Application.Common.Models.Options.S3;
 using Cache;
@@ -16,134 +15,142 @@ namespace Api.Common;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddCommonLayer(this IServiceCollection collection)
-    {
-        return collection;
-    }
+	public static IServiceCollection AddCommonLayer(this IServiceCollection collection) => collection;
 
-    public static IServiceCollection AddProjectJsonSerialization(this IServiceCollection collection)
-    {
-        collection.TryAddSingleton<ProjectJsonOptions>();
+	public static IServiceCollection AddProjectJsonSerialization(this IServiceCollection collection)
+	{
+		collection.TryAddSingleton<ProjectJsonOptions>();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddBaseExceptionHandlers(this IServiceCollection collection)
-    {
-        collection.AddExceptionHandler<ValidationExceptionHandler>();
-        collection.AddExceptionHandler<DbValidationExceptionHandler>();
-        collection.AddExceptionHandler<AnyExceptionHandler>();
-        return collection;
-    }
+	public static IServiceCollection AddBaseExceptionHandlers(this IServiceCollection collection)
+	{
+		collection.AddExceptionHandler<ValidationExceptionHandler>();
+		collection.AddExceptionHandler<DbValidationExceptionHandler>();
+		collection.AddExceptionHandler<AnyExceptionHandler>();
+		return collection;
+	}
 
-    public static IServiceCollection AddMessageBrokerOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<MessageBrokerOptions>()
-            .BindConfiguration(MessageBrokerOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-        return collection;
-    }
+	public static IServiceCollection AddMessageBrokerOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<MessageBrokerOptions>()
+			.BindConfiguration(MessageBrokerOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
+		return collection;
+	}
 
-    public static IServiceCollection AddHeaderSecretsOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<HeaderSecretOptions>()
-            .BindConfiguration(HeaderSecretOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+	public static IServiceCollection AddHeaderSecretsOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<HeaderSecretOptions>()
+			.BindConfiguration(HeaderSecretOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddRedisOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<RedisOptions>()
-            .BindConfiguration(RedisOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+	public static IServiceCollection AddRedisOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<RedisOptions>()
+			.BindConfiguration(RedisOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddDatabaseOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<DatabaseOptions>()
-            .BindConfiguration(DatabaseOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+	public static IServiceCollection AddDatabaseOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<DatabaseOptions>()
+			.BindConfiguration(DatabaseOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddS3Options(this IServiceCollection collection)
-    {
-        collection.AddOptions<S3Options>()
-            .BindConfiguration(S3Options.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+	public static IServiceCollection AddS3Options(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<S3Options>()
+			.BindConfiguration(S3Options.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddLrtOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<LrtExecutorOptions>()
-            .BindConfiguration(LrtExecutorOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+	public static IServiceCollection AddLrtOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<LrtExecutorOptions>()
+			.BindConfiguration(LrtExecutorOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddLrtHostedServices(this IServiceCollection serviceCollection)
-    {
-        return serviceCollection.AddHostedService<LrtExecutorHostedService>()
-            .AddHostedService<ScheduledJobEnqueuerHostedService>()
-            .AddHostedService<ExpiredJobsWiperHostedService>();
-    }
+	public static IServiceCollection AddLrtHostedServices(this IServiceCollection serviceCollection)
+	{
+		return serviceCollection
+			.AddHostedService<LrtExecutorHostedService>()
+			.AddHostedService<ScheduledJobEnqueuerHostedService>()
+			.AddHostedService<ExpiredJobsWiperHostedService>();
+	}
 
-    public static IServiceCollection AddScheduledJobEnqueuerOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<ScheduledJobEnqueuerOptions>()
-            .BindConfiguration(ScheduledJobEnqueuerOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+	public static IServiceCollection AddScheduledJobEnqueuerOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<ScheduledJobEnqueuerOptions>()
+			.BindConfiguration(ScheduledJobEnqueuerOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddSystemOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<SystemOptions>()
-            .BindConfiguration(SystemOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+	public static IServiceCollection AddSystemOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<SystemOptions>()
+			.BindConfiguration(SystemOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddSecretEncryptionOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<SecretEncryptionOptions>()
-            .BindConfiguration(SecretEncryptionOptions.SectionName)
-            .Configure<IConfiguration>((options, configuration) =>
-            {
-                if (string.IsNullOrWhiteSpace(options.Secret))
-                    options.Secret = configuration["SignSecret"] ?? string.Empty;
-            })
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+	public static IServiceCollection AddSecretEncryptionOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<SecretEncryptionOptions>()
+			.BindConfiguration(SecretEncryptionOptions.SectionName)
+			.Configure<IConfiguration>((options, configuration) =>
+			{
+				if (string.IsNullOrWhiteSpace(options.Secret))
+					options.Secret = configuration["SignSecret"] ?? string.Empty;
+			})
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        return collection;
-    }
+		return collection;
+	}
 
-    public static IServiceCollection AddS3BucketOptions(this IServiceCollection collection)
-    {
-        collection.AddOptions<S3BucketsOptions>()
-            .BindConfiguration(S3BucketsOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-        
-        return collection;
-    }
+	public static IServiceCollection AddS3BucketOptions(this IServiceCollection collection)
+	{
+		collection
+			.AddOptions<S3BucketsOptions>()
+			.BindConfiguration(S3BucketsOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
+
+		return collection;
+	}
 }

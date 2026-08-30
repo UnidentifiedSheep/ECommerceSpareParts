@@ -9,50 +9,46 @@ using Tests.TestContexts.Currency;
 namespace Tests.TestContexts.Storage;
 
 public class StorageRouteTestContext(
-    DContext ctx,
-    StorageTestContext storageTestContext,
-    CurrencyTestContext currencyTestContext,
-    UsersTestContext usersTestContext
-)
-    : TestContextBase<DContext>(ctx), IDependentTestContext
+	DContext ctx,
+	StorageTestContext storageTestContext,
+	CurrencyTestContext currencyTestContext,
+	UsersTestContext usersTestContext) : TestContextBase<DContext>(ctx), IDependentTestContext
 {
-    public StorageRoute ActiveRoute { get; private set; } = null!;
-    public StorageRoute UnactiveRoute { get; private set; } = null!;
+	public StorageRoute ActiveRoute { get; private set; } = null!;
 
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(StorageTestContext),
-        typeof(CurrencyRatesTestContext),
-        typeof(UsersTestContext)
-    ];
+	public StorageRoute UnactiveRoute { get; private set; } = null!;
 
-    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        var storages = storageTestContext.Storages.ToList();
-        var currencyId = currencyTestContext.Currencies[0].Id;
+	public static Type[] DependsOn { get; } =
+	[
+		typeof(StorageTestContext), typeof(CurrencyRatesTestContext), typeof(UsersTestContext)
+	];
 
-        var from = storages.First().Code;
-        var to = storages.Last().Code;
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+	{
+		var storages = storageTestContext.Storages.ToList();
+		var currencyId = currencyTestContext.Currencies[0].Id;
 
-        var builders = new List<StorageRouteBuilder>
-        {
-            new StorageRouteBuilder(Faker)
-                .WithFrom(from)
-                .WithTo(to)
-                .WithCurrencyId(currencyId)
-                .WithCarrierId(usersTestContext.Users.First().Id)
-                .Active(),
+		var from = storages.First().Code;
+		var to = storages.Last().Code;
 
-            new StorageRouteBuilder(Faker)
-                .WithFrom(to)
-                .WithTo(from)
-                .WithCurrencyId(currencyId)
-                .WithCarrierId(usersTestContext.Users.Last().Id)
-                .Inactive()
-        };
+		var builders = new List<StorageRouteBuilder>
+		{
+			new StorageRouteBuilder(Faker)
+				.WithFrom(from)
+				.WithTo(to)
+				.WithCurrencyId(currencyId)
+				.WithCarrierId(usersTestContext.Users.First().Id)
+				.Active(),
+			new StorageRouteBuilder(Faker)
+				.WithFrom(to)
+				.WithTo(from)
+				.WithCurrencyId(currencyId)
+				.WithCarrierId(usersTestContext.Users.Last().Id)
+				.Inactive()
+		};
 
-        var routes = await builders.BuildManyCombinedAndAddToDb(DbContext, 1);
-        ActiveRoute = routes.First(x => x.IsActive);
-        UnactiveRoute = routes.First(x => !x.IsActive);
-    }
+		var routes = await builders.BuildManyCombinedAndAddToDb(DbContext, 1);
+		ActiveRoute = routes.First(x => x.IsActive);
+		UnactiveRoute = routes.First(x => !x.IsActive);
+	}
 }

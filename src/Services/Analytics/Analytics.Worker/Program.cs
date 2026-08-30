@@ -1,4 +1,3 @@
-using System.Reflection;
 using Abstractions;
 using Analytics.Application;
 using Analytics.Cache;
@@ -25,34 +24,30 @@ var builder = Host.CreateApplicationBuilder(args);
 
 var env = builder.AddServiceConfiguration("analytics");
 
-builder.Services
-    .AddMessageBrokerOptions()
-    .AddHeaderSecretsOptions()
-    .AddRedisOptions()
-    .AddDatabaseOptions();
+builder.Services.AddMessageBrokerOptions().AddHeaderSecretsOptions().AddRedisOptions().AddDatabaseOptions();
 
 builder.Services.AddCommonWorkerInfrastructure(ServicesDefinitions.Analytics);
 
 builder.AddLokiLogger(
-    builder.Configuration,
-    "analytics.worker",
-    env);
+	builder.Configuration,
+	"analytics.worker",
+	env);
 
 builder.Services.AddLocalization(builder.Configuration);
 
-builder.Services
-    .AddPersistenceLayer()
-    .AddApplicationCache()
-    .AddCacheLayer("analytics")
-    .AddIntegrationClients()
-    .AddApplicationLayer(builder.Configuration)
-    .AddWorkerSecurityLayer()
-    .AddLrtOptions()
-    .AddScheduledJobEnqueuerOptions()
-    .AddSystemOptions();
+builder
+	.Services
+	.AddPersistenceLayer()
+	.AddApplicationCache()
+	.AddCacheLayer("analytics")
+	.AddIntegrationClients()
+	.AddApplicationLayer(builder.Configuration)
+	.AddWorkerSecurityLayer()
+	.AddLrtOptions()
+	.AddScheduledJobEnqueuerOptions()
+	.AddSystemOptions();
 
-builder.Services
-    .AddLrtHostedServices();
+builder.Services.AddLrtHostedServices();
 
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
@@ -67,39 +62,45 @@ return;
 
 void AddMassTransit(IHostApplicationBuilder hostBuilder)
 {
-    var uniqQueueName = $"queue-of-analytics-worker-{Environment.MachineName}";
-    hostBuilder.Services.AddMassTransit(x =>
-    {
-        x.AddConsumer<BackplaneConsumer>();
-        x.AddConsumer<SettingUpdatedConsumer>();
+	var uniqQueueName = $"queue-of-analytics-worker-{Environment.MachineName}";
+	hostBuilder.Services.AddMassTransit(x =>
+	{
+		x.AddConsumer<BackplaneConsumer>();
+		x.AddConsumer<SettingUpdatedConsumer>();
 
-        x.AddEntityFrameworkOutbox<DContext>(o =>
-        {
-            o.UsePostgres();
-            o.UseBusOutbox();
-        });
+		x.AddEntityFrameworkOutbox<DContext>(o =>
+		{
+			o.UsePostgres();
+			o.UseBusOutbox();
+		});
 
-        x.UsingRabbitMq((context, cfg) =>
-        {
-            cfg.ConfigureRabbitMq(context);
+		x.UsingRabbitMq((context, cfg) =>
+		{
+			cfg.ConfigureRabbitMq(context);
 
-            cfg.ReceiveEndpoint(
-                uniqQueueName,
-                ep =>
-                {
-                    ep.AutoDelete = true;
-                    ep.Durable = false;
+			cfg.ReceiveEndpoint(
+				uniqQueueName,
+				ep =>
+				{
+					ep.AutoDelete = true;
+					ep.Durable = false;
 
-                    ep.ConfigureConsumer<BackplaneConsumer>(context);
-                    ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+					ep.ConfigureConsumer<BackplaneConsumer>(context);
+					ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
-                    ep.Bind<BackplaneMessage>();
+					ep.Bind<BackplaneMessage>();
 
-                    ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
-                        .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
-                });
+					ep
+						.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
+						.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
+				});
 
-            cfg.ReceiveEndpoint("analytics-work-queue", ep => { ep.Durable = true; });
-        });
-    });
+			cfg.ReceiveEndpoint(
+				"analytics-work-queue",
+				ep =>
+				{
+					ep.Durable = true;
+				});
+		});
+	});
 }

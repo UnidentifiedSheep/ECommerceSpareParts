@@ -14,7 +14,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
-        <ProjectReference Include="..\Analytics.Entities\Analytics.Entities.csproj" />
+        <ProjectReference Include="..\Analytics.Entities\Analytics.Entities.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

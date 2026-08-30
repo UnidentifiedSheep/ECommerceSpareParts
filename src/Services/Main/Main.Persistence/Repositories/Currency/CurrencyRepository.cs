@@ -6,4 +6,4 @@ using Persistence.Repository;
 namespace Main.Persistence.Repositories.Currency;
 
 public class CurrencyRepository(DContext context, IQueryableExtensions extensions)
-    : LinqRepositoryBase<DContext, Entities.Currency.Currency, int>(context, extensions), ICurrencyRepository;
+	: LinqRepositoryBase<DContext, Entities.Currency.Currency, int>(context, extensions), ICurrencyRepository;

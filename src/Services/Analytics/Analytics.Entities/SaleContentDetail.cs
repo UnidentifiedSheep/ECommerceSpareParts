@@ -1,5 +1,4 @@
 ﻿using Domain;
-using Domain.Extensions;
 using Domain.Validation;
 using Exceptions;
 
@@ -7,64 +6,66 @@ namespace Analytics.Entities;
 
 public class SaleContentDetail : Entity<SaleContentDetail, int>
 {
-    private SaleContentDetail() { }
+	private SaleContentDetail()
+	{
+	}
 
-    public int Id { get; private set; }
+	public int Id { get; private set; }
 
-    public int SaleContentId { get; private set; }
+	public int SaleContentId { get; private set; }
 
-    public int CurrencyId { get; private set; }
+	public int CurrencyId { get; private set; }
 
-    public decimal BuyPrice { get; private set; }
+	public decimal BuyPrice { get; private set; }
 
-    public decimal BuyPriceInBaseCurrency { get; private set; }
+	public decimal BuyPriceInBaseCurrency { get; private set; }
 
-    public int Count { get; private set; }
+	public int Count { get; private set; }
 
-    public DateTime PurchaseDate { get; private set; }
+	public DateTime PurchaseDate { get; private set; }
 
-    public virtual SaleContent SaleContent { get; private set; } = null!;
+	public virtual SaleContent SaleContent { get; private set; } = null!;
 
-    public static SaleContentDetail Create(
-        int id,
-        int saleContentId,
-        int currencyId,
-        decimal buyPrice,
-        decimal buyPriceInBaseCurrency,
-        int count,
-        DateTime purchaseDate)
-    {
-        var detail = new SaleContentDetail
-        {
-            Id = id,
-            SaleContentId = saleContentId,
-            CurrencyId = currencyId
-        };
+	public static SaleContentDetail Create(
+		int id,
+		int saleContentId,
+		int currencyId,
+		decimal buyPrice,
+		decimal buyPriceInBaseCurrency,
+		int count,
+		DateTime purchaseDate)
+	{
+		var detail = new SaleContentDetail
+		{
+			Id = id,
+			SaleContentId = saleContentId,
+			CurrencyId = currencyId
+		};
 
-        detail.Update(
-            currencyId,
-            buyPrice,
-            buyPriceInBaseCurrency,
-            count,
-            purchaseDate);
-        return detail;
-    }
+		detail.Update(
+			currencyId,
+			buyPrice,
+			buyPriceInBaseCurrency,
+			count,
+			purchaseDate);
+		return detail;
+	}
 
-    public void Update(
-        int currencyId,
-        decimal buyPrice,
-        decimal buyPriceInBaseCurrency,
-        int count,
-        DateTime purchaseDate)
-    {
-        CurrencyId = currencyId;
-        BuyPrice = buyPrice;
-        BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
-        Count = count.EnsureGreaterThan(
-            0,
-            () => new InvalidInputException("sale.fact.content.detail.count.required"));
-        PurchaseDate = purchaseDate;
-    }
+	public void Update(
+		int currencyId,
+		decimal buyPrice,
+		decimal buyPriceInBaseCurrency,
+		int count,
+		DateTime purchaseDate)
+	{
+		CurrencyId = currencyId;
+		BuyPrice = buyPrice;
+		BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
+		Count = count.EnsureGreaterThan(
+			0,
+			() => new InvalidInputException("sale.fact.content.detail.count.required"));
+		PurchaseDate = purchaseDate;
+	}
 
-    public override int GetId() { return Id; }
+	public override int GetId() => Id;
 }

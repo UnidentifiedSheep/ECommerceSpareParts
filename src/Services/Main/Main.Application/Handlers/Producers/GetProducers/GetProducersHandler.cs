@@ -9,45 +9,39 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Producers.GetProducers;
 
-public record GetProducersQuery(
-    string? SearchTerm,
-    IEnumerable<int> Ids,
-    Pagination Pagination
-) : IQuery<GetProducersResult>;
+public record GetProducersQuery(string? SearchTerm, IEnumerable<int> Ids, Pagination Pagination)
+	: IQuery<GetProducersResult>;
 
 public record GetProducersResult(IEnumerable<ProducerDto> Producers);
 
 public class GetProducersHandler(
-    IReadRepository<Producer, int> repository,
-    IProjectionProvider<Producer, ProducerDto> projection)
-    : IQueryHandler<GetProducersQuery, GetProducersResult>
+	IReadRepository<Producer, int> repository,
+	IProjectionProvider<Producer, ProducerDto> projection)
+	: IQueryHandler<GetProducersQuery, GetProducersResult>
 {
-    public async Task<GetProducersResult> Handle(
-        GetProducersQuery request,
-        CancellationToken cancellationToken)
-    {
-        var query = repository.Query;
-        var searchTerm = request.SearchTerm;
-        var ids = request.Ids
-            .Distinct()
-            .ToList();
+	public async Task<GetProducersResult> Handle(
+		GetProducersQuery request,
+		CancellationToken cancellationToken)
+	{
+		var query = repository.Query;
+		var searchTerm = request.SearchTerm;
+		var ids = request.Ids.Distinct().ToList();
 
-        if (ids.Count != 0)
-            query = query.Where(x => ids.Contains(x.Id));
+		if (ids.Count != 0)
+			query = query.Where(x => ids.Contains(x.Id));
 
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-            query = query
-                .Where(x => EF.Functions.ILike(x.Name, $"%{searchTerm}%"))
-                .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.Name, searchTerm));
-        else
-            query = query.OrderBy(x => x.Name);
+		if (!string.IsNullOrWhiteSpace(searchTerm))
+			query = query
+				.Where(x => EF.Functions.ILike(x.Name, $"%{searchTerm}%"))
+				.OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.Name, searchTerm));
+		else
+			query = query.OrderBy(x => x.Name);
 
+		var result = await query
+			.Project(projection)
+			.ApplyPagination(request.Pagination)
+			.ToListAsync(cancellationToken);
 
-        var result = await query
-            .Project(projection)
-            .ApplyPagination(request.Pagination)
-            .ToListAsync(cancellationToken);
-
-        return new GetProducersResult(result);
-    }
+		return new GetProducersResult(result);
+	}
 }

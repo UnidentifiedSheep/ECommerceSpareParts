@@ -4,9 +4,9 @@ namespace Internal.Integration.Core.Models.Main.Sale;
 
 public record InternalFullSale
 {
-    [JsonPropertyName("sale")]
-    public required InternalSale Sale { get; init; }
+	[JsonPropertyName("sale")]
+	public required InternalSale Sale { get; init; }
 
-    [JsonPropertyName("contents")]
-    public required IReadOnlyList<InternalSaleContent> Contents { get; init; }
+	[JsonPropertyName("contents")]
+	public required IReadOnlyList<InternalSaleContent> Contents { get; init; }
 }

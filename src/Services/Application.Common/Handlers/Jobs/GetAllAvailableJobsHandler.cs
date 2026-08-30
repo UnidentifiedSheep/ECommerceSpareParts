@@ -2,8 +2,6 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
-using Application.Common.LRT;
-using Application.Common.NamedObject;
 using Localization.Abstractions.Interfaces;
 using SchemaGeneration.Abstractions;
 
@@ -14,25 +12,25 @@ public sealed record GetAllAvailableJobsQuery : IQuery<GetAllAvailableJobsResult
 public sealed record GetAllAvailableJobsResult(IReadOnlyList<JobInfoDto> Jobs);
 
 public sealed class GetAllAvailableJobsHandler(
-    IScopedStringLocalizer localizer,
-    INamedObjectRegistry<ILrtNamedObject> registry,
-    ISchemaGenerator schemaGenerator
-) : IQueryHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>
+	IContextualStringLocalizer localizer,
+	INamedObjectRegistry<ILrtNamedObject> registry,
+	ISchemaGenerator schemaGenerator) : IQueryHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>
 {
-    public Task<GetAllAvailableJobsResult> Handle(
-        GetAllAvailableJobsQuery request,
-        CancellationToken cancellationToken)
-    {
-        var result = registry.All
-            .Select(x => new JobInfoDto
-            {
-                SystemName = x.SystemName,
-                Name = localizer.Get(x.NameLocalizationKey),
-                Description = localizer.Get(x.DescriptionLocalizationKey),
-                InitStateSchema = schemaGenerator.Generate(x.InputType)
-            })
-            .ToList();
+	public Task<GetAllAvailableJobsResult> Handle(
+		GetAllAvailableJobsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var result = registry
+			.All
+			.Select(x => new JobInfoDto
+			{
+				SystemName = x.SystemName,
+				Name = localizer.Get(x.NameLocalizationKey),
+				Description = localizer.Get(x.DescriptionLocalizationKey),
+				InitStateSchema = schemaGenerator.Generate(x.InputType)
+			})
+			.ToList();
 
-        return Task.FromResult(new GetAllAvailableJobsResult(result));
-    }
+		return Task.FromResult(new GetAllAvailableJobsResult(result));
+	}
 }

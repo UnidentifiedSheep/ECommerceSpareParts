@@ -7,74 +7,77 @@ using Localization.Abstractions.Models;
 
 namespace Gateway.Application.Handlers;
 
-public record GetAggregatedAvailableJobsQuery(
-    Locale Locale
-) : IQuery<GetAggregatedAvailableJobsResult>;
+public record GetAggregatedAvailableJobsQuery(Locale Locale) : IQuery<GetAggregatedAvailableJobsResult>;
 
 public record GetAggregatedAvailableJobsResult(ServiceJobsDto[] Jobs);
 
-public class GetAggregatedAvailableJobsHandler(
-    ICommonClient commonClient
-) : IQueryHandler<GetAggregatedAvailableJobsQuery, GetAggregatedAvailableJobsResult>
+public class GetAggregatedAvailableJobsHandler(ICommonClient commonClient)
+	: IQueryHandler<GetAggregatedAvailableJobsQuery, GetAggregatedAvailableJobsResult>
 {
-    private static readonly IServiceDefinition[] Services =
-    [
-        ServicesDefinitions.Main,
-        ServicesDefinitions.Analytics,
-        ServicesDefinitions.Pricing,
-        ServicesDefinitions.Search
-    ];
+	private static readonly IServiceDefinition[] Services =
+	[
+		ServicesDefinitions.Main,
+		ServicesDefinitions.Analytics,
+		ServicesDefinitions.Pricing,
+		ServicesDefinitions.Search
+	];
 
-    public async Task<GetAggregatedAvailableJobsResult> Handle(
-        GetAggregatedAvailableJobsQuery request,
-        CancellationToken cancellationToken)
-    {
-        var tasks = Services.Select(service => GetJobsForAsync(
-            service,
-            request.Locale,
-            cancellationToken));
-        var results = await Task.WhenAll(tasks);
-        return new GetAggregatedAvailableJobsResult(results);
-    }
+	public async Task<GetAggregatedAvailableJobsResult> Handle(
+		GetAggregatedAvailableJobsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var tasks = Services.Select(service => GetJobsForAsync(
+			service,
+			request.Locale,
+			cancellationToken));
+		var results = await Task.WhenAll(tasks);
+		return new GetAggregatedAvailableJobsResult(results);
+	}
 
-    private async Task<ServiceJobsDto> GetJobsForAsync(
-        IServiceDefinition serviceDefinition,
-        Locale locale,
-        CancellationToken token)
-    {
-        try
-        {
-            var result = await commonClient.JobNode.GetAvailableJobs(
-                serviceDefinition,
-                locale,
-                token);
+	private async Task<ServiceJobsDto> GetJobsForAsync(
+		IServiceDefinition serviceDefinition,
+		Locale locale,
+		CancellationToken token)
+	{
+		try
+		{
+			var result = await commonClient.JobNode.GetAvailableJobs(
+				serviceDefinition,
+				locale,
+				token);
 
-            if (!result.Success) return Fail(serviceDefinition.ServiceName);
+			if (!result.Success)
+				return Fail(serviceDefinition.ServiceName);
 
-            return new ServiceJobsDto
-            {
-                Available = true,
-                Jobs = result.ValueOrThrow.Select(x => new GatewayJobInfoDto
-                    {
-                        SystemName = x.SystemName,
-                        Name = x.Name,
-                        InitStateSchema = x.InitStateSchema,
-                        Description = x.Description
-                    })
-                    .ToList(),
-                ServiceName = serviceDefinition.ServiceName
-            };
-        }
-        catch (Exception) { return Fail(serviceDefinition.ServiceName); }
-    }
+			return new ServiceJobsDto
+			{
+				Available = true,
+				Jobs = result
+					.ValueOrThrow
+					.Select(x => new GatewayJobInfoDto
+					{
+						SystemName = x.SystemName,
+						Name = x.Name,
+						InitStateSchema = x.InitStateSchema,
+						Description = x.Description
+					})
+					.ToList(),
+				ServiceName = serviceDefinition.ServiceName
+			};
+		}
+		catch (Exception)
+		{
+			return Fail(serviceDefinition.ServiceName);
+		}
+	}
 
-    private static ServiceJobsDto Fail(string serviceName)
-    {
-        return new ServiceJobsDto
-        {
-            Available = false,
-            Jobs = [],
-            ServiceName = serviceName
-        };
-    }
+	private static ServiceJobsDto Fail(string serviceName)
+	{
+		return new ServiceJobsDto
+		{
+			Available = false,
+			Jobs = [],
+			ServiceName = serviceName
+		};
+	}
 }

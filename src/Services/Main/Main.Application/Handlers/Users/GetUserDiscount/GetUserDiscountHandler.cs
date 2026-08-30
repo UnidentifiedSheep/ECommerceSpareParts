@@ -7,16 +7,14 @@ public record GetUserDiscountQuery(Guid UserId) : IQuery<GetUserDiscountResult>;
 
 public record GetUserDiscountResult(decimal? Discount);
 
-public class GetUserDiscountHandler(
-    IUserCacheRepository userCache
-)
-    : IQueryHandler<GetUserDiscountQuery, GetUserDiscountResult>
+public class GetUserDiscountHandler(IUserCacheRepository userCache)
+	: IQueryHandler<GetUserDiscountQuery, GetUserDiscountResult>
 {
-    public async Task<GetUserDiscountResult> Handle(
-        GetUserDiscountQuery request,
-        CancellationToken cancellationToken)
-    {
-        var discount = await userCache.GetUserDiscountAsync(request.UserId, cancellationToken);
-        return new GetUserDiscountResult(discount);
-    }
+	public async Task<GetUserDiscountResult> Handle(
+		GetUserDiscountQuery request,
+		CancellationToken cancellationToken)
+	{
+		var discount = await userCache.GetUserDiscountAsync(request.UserId, cancellationToken);
+		return new GetUserDiscountResult(discount);
+	}
 }

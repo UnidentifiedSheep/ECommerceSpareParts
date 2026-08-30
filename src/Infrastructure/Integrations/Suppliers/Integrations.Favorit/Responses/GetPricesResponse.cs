@@ -5,6 +5,6 @@ namespace Integrations.Favorit.Responses;
 
 public record GetPricesResponse
 {
-    [JsonPropertyName("goods")]
-    public IReadOnlyList<Good> Goods { get; init; } = [];
+	[JsonPropertyName("goods")]
+	public IReadOnlyList<Good> Goods { get; init; } = [];
 }

@@ -11,22 +11,18 @@ namespace Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
 
 [AutoSave]
 [Transactional]
-public record PatchCharacteristicsCommand(
-    int ProductId,
-    string Name,
-    PatchCharacteristicsDto Patch
-) : ICommand;
+public record PatchCharacteristicsCommand(int ProductId, string Name, PatchCharacteristicsDto Patch)
+	: ICommand;
 
-public class PatchCharacteristicsHandler(
-    IRepository<ProductCharacteristic, (int, string)> repository
-) : ICommandHandler<PatchCharacteristicsCommand>
+public class PatchCharacteristicsHandler(IRepository<ProductCharacteristic, (int, string)> repository)
+	: ICommandHandler<PatchCharacteristicsCommand>
 {
-    public async Task<Unit> Handle(PatchCharacteristicsCommand request, CancellationToken cancellationToken)
-    {
-        var entity = await repository.GetById((request.ProductId, request.Name), cancellationToken)
-                     ?? throw new ProductCharacteristicsNotFoundException(request.ProductId, request.Name);
+	public async Task<Unit> Handle(PatchCharacteristicsCommand request, CancellationToken cancellationToken)
+	{
+		var entity = await repository.GetById((request.ProductId, request.Name), cancellationToken) ??
+			throw new ProductCharacteristicsNotFoundException(request.ProductId, request.Name);
 
-        request.Patch.Value.Apply(entity.SetValue);
-        return Unit.Value;
-    }
+		request.Patch.Value.Apply(entity.SetValue);
+		return Unit.Value;
+	}
 }

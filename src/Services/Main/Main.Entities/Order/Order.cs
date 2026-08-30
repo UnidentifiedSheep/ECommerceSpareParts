@@ -6,24 +6,25 @@ namespace Main.Entities.Order;
 
 public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>
 {
-    public Guid Id { get; set; }
+	public Guid Id { get; set; }
 
-    public Guid UserId { get; set; }
+	public Guid UserId { get; set; }
 
-    public int CurrencyId { get; set; }
+	public int CurrencyId { get; set; }
 
-    public string Status { get; set; } = null!;
+	public string Status { get; set; } = null!;
 
-    public bool BuyerApproved { get; set; }
+	public bool BuyerApproved { get; set; }
 
-    public bool SellerApproved { get; set; }
+	public bool SellerApproved { get; set; }
 
-    public string SignedTotalPrice { get; set; } = null!;
-    public bool IsCanceled { get; set; }
+	public string SignedTotalPrice { get; set; } = null!;
 
-    public static Expression<Func<Order, Guid>> GetKeySelector() { return x => x.Id; }
+	public bool IsCanceled { get; set; }
 
-    public static Expression<Func<Order, bool>> GetEqualityExpression(Guid key) { return x => x.Id == key; }
+	public static Expression<Func<Order, Guid>> GetKeySelector() => x => x.Id;
 
-    public override Guid GetId() { return Id; }
+	public static Expression<Func<Order, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
+
+	public override Guid GetId() => Id;
 }

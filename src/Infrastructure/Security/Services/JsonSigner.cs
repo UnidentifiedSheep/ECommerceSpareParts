@@ -11,85 +11,86 @@ namespace Security.Services;
 
 public class JsonSigner : IJsonSigner
 {
-    private readonly JsonSerializerOptions _options;
-    private readonly byte[] _secretBytes;
+	private readonly JsonSerializerOptions _options;
 
-    public JsonSigner(
-        IOptions<SecretEncryptionOptions> secretOptions,
-        ProjectJsonOptions jsonOptions)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(secretOptions.Value.Secret);
+	private readonly byte[] _secretBytes;
 
-        _options = new JsonSerializerOptions(jsonOptions.SerializerOptions);
-        _secretBytes = Encoding.UTF8.GetBytes(secretOptions.Value.Secret);
-    }
+	public JsonSigner(IOptions<SecretEncryptionOptions> secretOptions, ProjectJsonOptions jsonOptions)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(secretOptions.Value.Secret);
 
-    public string Sign<T>(T data)
-    {
-        ArgumentNullException.ThrowIfNull(data);
+		_options = new JsonSerializerOptions(jsonOptions.SerializerOptions);
+		_secretBytes = Encoding.UTF8.GetBytes(secretOptions.Value.Secret);
+	}
 
-        var json = JsonSerializer.Serialize(data, _options);
-        var jsonBytes = Encoding.UTF8.GetBytes(json);
+	public string Sign<T>(T data)
+	{
+		ArgumentNullException.ThrowIfNull(data);
 
-        using var hmac = new HMACSHA256(_secretBytes);
-        var hash = hmac.ComputeHash(jsonBytes);
+		var json = JsonSerializer.Serialize(data, _options);
+		var jsonBytes = Encoding.UTF8.GetBytes(json);
 
-        var payload = EncodingUtils.Base64UrlEncode(jsonBytes);
-        var signature = EncodingUtils.Base64UrlEncode(hash);
+		using var hmac = new HMACSHA256(_secretBytes);
+		var hash = hmac.ComputeHash(jsonBytes);
 
-        return $"{payload}.{signature}";
-    }
+		var payload = EncodingUtils.Base64UrlEncode(jsonBytes);
+		var signature = EncodingUtils.Base64UrlEncode(hash);
 
-    public bool VerifyJson(string signed, out string? json)
-    {
-        json = null;
-        if (string.IsNullOrWhiteSpace(signed)) return false;
+		return $"{payload}.{signature}";
+	}
 
-        var parts = signed.Split('.');
-        if (parts.Length != 2) return false;
+	public bool VerifyJson(string signed, out string? json)
+	{
+		json = null;
+		if (string.IsNullOrWhiteSpace(signed))
+			return false;
 
-        var payload = parts[0];
-        var signature = parts[1];
+		var parts = signed.Split('.');
+		if (parts.Length != 2)
+			return false;
 
-        byte[] jsonBytes;
-        try
-        {
-            jsonBytes = EncodingUtils.Base64UrlDecode(payload);
-        }
-        catch (FormatException)
-        {
-            return false;
-        }
+		var payload = parts[0];
+		var signature = parts[1];
 
-        using var hmac = new HMACSHA256(_secretBytes);
-        var expectedHash = hmac.ComputeHash(jsonBytes);
+		byte[] jsonBytes;
+		try
+		{
+			jsonBytes = EncodingUtils.Base64UrlDecode(payload);
+		}
+		catch (FormatException)
+		{
+			return false;
+		}
 
-        var expectedSignature = EncodingUtils.Base64UrlEncode(expectedHash);
+		using var hmac = new HMACSHA256(_secretBytes);
+		var expectedHash = hmac.ComputeHash(jsonBytes);
 
-        var valid = CryptographicOperations.FixedTimeEquals(
-            Encoding.UTF8.GetBytes(signature),
-            Encoding.UTF8.GetBytes(expectedSignature)
-        );
+		var expectedSignature = EncodingUtils.Base64UrlEncode(expectedHash);
 
-        if (valid) json = Encoding.UTF8.GetString(jsonBytes);
+		var valid = CryptographicOperations.FixedTimeEquals(
+			Encoding.UTF8.GetBytes(signature),
+			Encoding.UTF8.GetBytes(expectedSignature));
 
-        return valid;
-    }
+		if (valid)
+			json = Encoding.UTF8.GetString(jsonBytes);
 
-    public bool VerifyJson<T>(string signed, [NotNullWhen(true)] out T? obj)
-    {
-        obj = default;
-        if (!VerifyJson(signed, out var jsonString) || jsonString is null)
-            return false;
+		return valid;
+	}
 
-        try
-        {
-            obj = JsonSerializer.Deserialize<T>(jsonString, _options);
-            return obj is not null;
-        }
-        catch (JsonException)
-        {
-            return false;
-        }
-    }
+	public bool VerifyJson<T>(string signed, [NotNullWhen(true)] out T? obj)
+	{
+		obj = default;
+		if (!VerifyJson(signed, out var jsonString) || jsonString is null)
+			return false;
+
+		try
+		{
+			obj = JsonSerializer.Deserialize<T>(jsonString, _options);
+			return obj is not null;
+		}
+		catch (JsonException)
+		{
+			return false;
+		}
+	}
 }

@@ -8,65 +8,68 @@ namespace Domain.CommonEntities;
 
 public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, string>
 {
-    private Setting() { }
+	private Setting()
+	{
+	}
 
-    protected Setting(string json) { Json = json; }
+	protected Setting(string json)
+	{
+		Json = json;
+	}
 
-    public string Key { get; protected set; } = null!;
+	public string Key { get; protected set; } = null!;
 
-    public string Json { get; protected set; } = null!;
+	public string Json { get; protected set; } = null!;
 
-    public static Expression<Func<Setting, string>> GetKeySelector() { return x => x.Key; }
+	public static Expression<Func<Setting, string>> GetKeySelector() => x => x.Key;
 
-    public static Expression<Func<Setting, bool>> GetEqualityExpression(string key)
-    {
-        return x => x.Key == key;
-    }
+	public static Expression<Func<Setting, bool>> GetEqualityExpression(string key) => x => x.Key == key;
 
-    public void SetData(string json)
-    {
-        Json = json;
-        RaiseUpdatedEvent();
-    }
+	public void SetData(string json)
+	{
+		Json = json;
+		RaiseUpdatedEvent();
+	}
 
-    public override void OnCreated()
-    {
-        RaiseUpdatedEvent();
-    }
+	public override void OnCreated() => RaiseUpdatedEvent();
 
-    private void RaiseUpdatedEvent()
-    {
-        AddDomainEvent(new SettingUpdatedDomainEvent(
-            Key,
-            Json,
-            DateTime.UtcNow));
-    }
+	private void RaiseUpdatedEvent()
+	{
+		AddDomainEvent(
+			new SettingUpdatedDomainEvent(
+				Key,
+				Json,
+				DateTime.UtcNow));
+	}
 
-    public override string GetId() { return Key; }
+	public override string GetId() => Key;
 }
 
 public abstract class Setting<T> : Setting
 {
-    private T? _data;
+	private T? _data;
 
-    protected Setting(string key, string json) : base(json) { Key = key; }
+	protected Setting(string key, string json) : base(json)
+	{
+		Key = key;
+	}
 
-    protected Setting(string key, T data) : base(Serialize(data))
-    {
-        Key = key;
-        _data = data;
-    }
+	protected Setting(string key, T data) : base(Serialize(data))
+	{
+		Key = key;
+		_data = data;
+	}
 
-    [NotMapped]
-    public T Data => _data ??= Deserialize(Json);
+	[NotMapped]
+	public T Data => _data ??= Deserialize(Json);
 
-    public void SetData(T data)
-    {
-        base.SetData(Serialize(data));
-        _data = data;
-    }
+	public void SetData(T data)
+	{
+		base.SetData(Serialize(data));
+		_data = data;
+	}
 
-    private static string Serialize(T data) { return JsonSerializer.Serialize(data); }
+	private static string Serialize(T data) => JsonSerializer.Serialize(data);
 
-    private static T Deserialize(string json) { return JsonSerializer.Deserialize<T>(json)!; }
+	private static T Deserialize(string json) => JsonSerializer.Deserialize<T>(json)!;
 }

@@ -1,5 +1,4 @@
 using System.Data;
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
@@ -8,221 +7,217 @@ using Attributes;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Storage;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
-using Main.Entities.Event;
 using Main.Entities.Exceptions;
-using Main.Entities.Product;
 using Main.Entities.Settings;
 using Main.Entities.Storage;
 using Main.Enums;
-using Event = Main.Entities.Event.Event;
 
 namespace Main.Application.Handlers.StorageContents.SubtractContent;
 
 [AutoSave]
 [Transactional(
-    IsolationLevel.ReadCommitted,
-    20,
-    2)]
+	IsolationLevel.ReadCommitted,
+	20,
+	2)]
 public record SubtractStorageContentsCommand(
-    IEnumerable<ISubtractStorageContentItem> Items,
-    StorageMovementType MovementType
-) : ICommand<SubtractStorageContentsResult>
+	IEnumerable<ISubtractStorageContentItem> Items,
+	StorageMovementType MovementType) : ICommand<SubtractStorageContentsResult>
 {
-    public SubtractStorageContentsCommand(
-        int storageContentId,
-        int count,
-        StorageMovementType movementType)
-        : this([new SubtractStorageContentItem(storageContentId, count)], movementType)
-    {
-    }
+	public SubtractStorageContentsCommand(
+		int storageContentId,
+		int count,
+		StorageMovementType movementType) : this(
+		[new SubtractStorageContentItem(storageContentId, count)],
+		movementType)
+	{
+	}
 }
 
 public record SubtractStorageContentsResult(IReadOnlyList<StorageLot> Contents);
 
 public class SubtractStorageContentsHandler(
-    IStorageContentRepository storageContentRepository,
-    ISettingsService settingsService,
-    INamedObjectRegistry<StorageContentExtractPolicyBase> policyRegistry
-)
-    : ICommandHandler<SubtractStorageContentsCommand, SubtractStorageContentsResult>
+	IStorageContentRepository storageContentRepository,
+	ISettingsService settingsService,
+	INamedObjectRegistry<StorageContentExtractPolicyBase> policyRegistry)
+	: ICommandHandler<SubtractStorageContentsCommand, SubtractStorageContentsResult>
 {
-    public async Task<SubtractStorageContentsResult> Handle(
-        SubtractStorageContentsCommand request,
-        CancellationToken cancellationToken)
-    {
-        var items = request.Items.ToList();
+	public async Task<SubtractStorageContentsResult> Handle(
+		SubtractStorageContentsCommand request,
+		CancellationToken cancellationToken)
+	{
+		var items = request.Items.ToList();
 
-        //StorageContentId | Count
-        var byStorageContents = new Dictionary<int, int>();
+		//StorageContentId | Count
+		var byStorageContents = new Dictionary<int, int>();
 
-        //Key = StorageCode + productId + takeFromOtherStorages, Value = Count
-        var byProductAndStorage =
-            new Dictionary<(string storageCode, int productId, bool takeFromOtherStorages), int>();
+		//Key = StorageCode + productId + takeFromOtherStorages, Value = Count
+		var byProductAndStorage =
+			new Dictionary<(string storageCode, int productId, bool takeFromOtherStorages), int>();
 
-        foreach (var item in items)
-            switch (item)
-            {
-                case SubtractProductFromStorageItem byProduct:
-                    var key = (byProduct.StorageCode, byProduct.ProductId, byProduct.TakeFromOtherStorages);
-                    byProductAndStorage[key] = byProductAndStorage.GetValueOrDefault(key) + byProduct.Count;
-                    break;
-                case SubtractStorageContentItem byContent:
-                    byStorageContents[byContent.StorageContentId] =
-                        byStorageContents.GetValueOrDefault(byContent.StorageContentId) + byContent.Count;
-                    break;
-                default:
-                    throw new InvalidOperationException(
-                        $"Unsupported subtract item type {item.GetType().Name}.");
-            }
+		foreach (var item in items)
+			switch (item)
+			{
+				case SubtractProductFromStorageItem byProduct:
+					var key = (byProduct.StorageCode, byProduct.ProductId, byProduct.TakeFromOtherStorages);
+					byProductAndStorage[key] = byProductAndStorage.GetValueOrDefault(key) + byProduct.Count;
+					break;
+				case SubtractStorageContentItem byContent:
+					byStorageContents[byContent.StorageContentId] =
+						byStorageContents.GetValueOrDefault(byContent.StorageContentId) + byContent.Count;
+					break;
+				default:
+					throw new InvalidOperationException(
+						$"Unsupported subtract item type {item.GetType().Name}.");
+			}
 
-        var storageContents = byStorageContents.Count == 0
-            ? new Dictionary<int, StorageContent>()
-            : await storageContentRepository
-                .EnsureExistsForUpdateAsync(
-                    byStorageContents.Keys,
-                    ids => new StorageContentNotFoundException(ids[0]),
-                    cancellationToken);
-        
-        var affected = new List<StorageLot>();
-        var policy = await GetExtractionPolicy(cancellationToken);
+		var storageContents = byStorageContents.Count == 0
+			? new Dictionary<int, StorageContent>()
+			: await storageContentRepository.EnsureExistsForUpdateAsync(
+				byStorageContents.Keys,
+				ids => new StorageContentNotFoundException(ids[0]),
+				cancellationToken);
 
-        await SubtractByStorageContentsAsync(
-            byStorageContents,
-            storageContents,
-            affected,
-            request.MovementType,
-            policy,
-            cancellationToken);
+		var affected = new List<StorageLot>();
+		var policy = await GetExtractionPolicy(cancellationToken);
 
-        await SubtractByProductAndStorageAsync(
-            byProductAndStorage,
-            affected,
-            request.MovementType,
-            policy,
-            cancellationToken);
+		await SubtractByStorageContentsAsync(
+			byStorageContents,
+			storageContents,
+			affected,
+			request.MovementType,
+			policy,
+			cancellationToken);
 
-        return new SubtractStorageContentsResult(affected);
-    }
+		await SubtractByProductAndStorageAsync(
+			byProductAndStorage,
+			affected,
+			request.MovementType,
+			policy,
+			cancellationToken);
 
-    private async Task SubtractByStorageContentsAsync(
-        Dictionary<int, int> byStorageContents,
-        Dictionary<int, StorageContent> storageContents,
-        List<StorageLot> affected,
-        StorageMovementType movementType,
-        StorageContentExtractPolicyBase policy,
-        CancellationToken cancellationToken)
-    {
-        foreach (var (contentId, count) in byStorageContents)
-        {
-            var remaining = count;
-            var content = storageContents[contentId];
+		return new SubtractStorageContentsResult(affected);
+	}
 
-            Subtract(
-                content,
-                ref remaining,
-                affected,
-                movementType);
-            await SubtractFromStorageContentsAsync(
-                remaining,
-                count,
-                content.ProductId,
-                content.StorageCode,
-                policy,
-                affected,
-                movementType,
-                contentId,
-                cancellationToken);
-        }
-    }
+	private async Task SubtractByStorageContentsAsync(
+		Dictionary<int, int> byStorageContents,
+		Dictionary<int, StorageContent> storageContents,
+		List<StorageLot> affected,
+		StorageMovementType movementType,
+		StorageContentExtractPolicyBase policy,
+		CancellationToken cancellationToken)
+	{
+		foreach (var (contentId, count) in byStorageContents)
+		{
+			var remaining = count;
+			var content = storageContents[contentId];
 
-    private async Task SubtractByProductAndStorageAsync(
-        Dictionary<(string storageCode, int productId, bool takeFromOtherStorages), int> byProductAndStorage,
-        List<StorageLot> affected,
-        StorageMovementType movementType,
-        StorageContentExtractPolicyBase policy,
-        CancellationToken cancellationToken)
-    {
-        foreach (var ((storage, productId, takeFromOtherStorages), count) in byProductAndStorage)
-        {
-            await SubtractFromStorageContentsAsync(
-                count,
-                count,
-                productId,
-                takeFromOtherStorages ? null : storage,
-                policy,
-                affected,
-                movementType,
-                null,
-                cancellationToken);
-        }
-    }
+			Subtract(
+				content,
+				ref remaining,
+				affected,
+				movementType);
+			await SubtractFromStorageContentsAsync(
+				remaining,
+				count,
+				content.ProductId,
+				content.StorageCode,
+				policy,
+				affected,
+				movementType,
+				contentId,
+				cancellationToken);
+		}
+	}
 
-    private async Task SubtractFromStorageContentsAsync(
-        int count,
-        int requestedCount,
-        int productId,
-        string? storageCode,
-        StorageContentExtractPolicyBase policy,
-        List<StorageLot> affected,
-        StorageMovementType movementType,
-        int? skipStorageContentId = null,
-        CancellationToken cancellationToken = default)
-    {
-        var remaining = count;
+	private async Task SubtractByProductAndStorageAsync(
+		Dictionary<(string storageCode, int productId, bool takeFromOtherStorages), int> byProductAndStorage,
+		List<StorageLot> affected,
+		StorageMovementType movementType,
+		StorageContentExtractPolicyBase policy,
+		CancellationToken cancellationToken)
+	{
+		foreach (var ((storage, productId, takeFromOtherStorages), count) in byProductAndStorage)
+			await SubtractFromStorageContentsAsync(
+				count,
+				count,
+				productId,
+				takeFromOtherStorages ? null : storage,
+				policy,
+				affected,
+				movementType,
+				null,
+				cancellationToken);
+	}
 
-        if (remaining > 0)
-            await foreach (var content in storageContentRepository
-                               .GetStorageContentsForUpdateAsync(
-                                   productId,
-                                   storageCode,
-                                   policy: policy)
-                               .WithCancellation(cancellationToken))
-            {
-                if (skipStorageContentId.HasValue && content.Id == skipStorageContentId) continue;
+	private async Task SubtractFromStorageContentsAsync(
+		int count,
+		int requestedCount,
+		int productId,
+		string? storageCode,
+		StorageContentExtractPolicyBase policy,
+		List<StorageLot> affected,
+		StorageMovementType movementType,
+		int? skipStorageContentId = null,
+		CancellationToken cancellationToken = default)
+	{
+		var remaining = count;
 
-                Subtract(
-                    content,
-                    ref remaining,
-                    affected,
-                    movementType);
-                if (remaining == 0) break;
-            }
+		if (remaining > 0)
+			await foreach (var content in storageContentRepository
+								.GetStorageContentsForUpdateAsync(
+									productId,
+									storageCode,
+									policy: policy)
+								.WithCancellation(cancellationToken))
+			{
+				if (skipStorageContentId.HasValue && content.Id == skipStorageContentId)
+					continue;
 
-        if (remaining > 0)
-        {
-            var availableCount = requestedCount - remaining;
-            throw new NotEnoughCountOnStorageException(
-                productId,
-                availableCount,
-                requestedCount);
-        }
-    }
+				Subtract(
+					content,
+					ref remaining,
+					affected,
+					movementType);
+				if (remaining == 0)
+					break;
+			}
 
-    private async Task<StorageContentExtractPolicyBase> GetExtractionPolicy(
-        CancellationToken cancellationToken)
-    {
-        var setting = (await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Data;
-        return policyRegistry.GetBySystemName(setting.StorageContentExtractionPolicy);
-    }
+		if (remaining > 0)
+		{
+			var availableCount = requestedCount - remaining;
+			throw new NotEnoughCountOnStorageException(
+				productId,
+				availableCount,
+				requestedCount);
+		}
+	}
 
-    private static void Subtract(
-        StorageContent content,
-        ref int remaining,
-        ICollection<StorageLot> affected,
-        StorageMovementType movementType)
-    {
-        if (remaining == 0 || content.Count == 0) return;
+	private async Task<StorageContentExtractPolicyBase> GetExtractionPolicy(
+		CancellationToken cancellationToken)
+	{
+		var setting = (await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Data;
+		return policyRegistry.GetBySystemName(setting.StorageContentExtractionPolicy);
+	}
 
-        var countToSubtract = Math.Min(content.Count, remaining);
-        content.IncreaseCount(-countToSubtract, movementType);
-        affected.Add(
-            new StorageLot(
-                content.Id,
-                content.ProductId,
-                content.CurrencyId,
-                content.BuyPrice,
-                countToSubtract,
-                content.PurchaseDatetime));
-        remaining -= countToSubtract;
-    }
+	private static void Subtract(
+		StorageContent content,
+		ref int remaining,
+		ICollection<StorageLot> affected,
+		StorageMovementType movementType)
+	{
+		if (remaining == 0 || content.Count == 0)
+			return;
+
+		var countToSubtract = Math.Min(content.Count, remaining);
+		content.IncreaseCount(-countToSubtract, movementType);
+		affected.Add(
+			new StorageLot(
+				content.Id,
+				content.ProductId,
+				content.CurrencyId,
+				content.BuyPrice,
+				countToSubtract,
+				content.PurchaseDatetime));
+		remaining -= countToSubtract;
+	}
 }

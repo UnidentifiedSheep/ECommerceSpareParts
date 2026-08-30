@@ -1,23 +1,24 @@
-﻿using Domain.Extensions;
-using Domain.Validation;
+﻿using Domain.Validation;
 
 namespace Main.Entities.Product.ValueObjects;
 
 public record Indicator
 {
-    private Indicator() { }
+	private Indicator()
+	{
+	}
 
-    public Indicator(string? value)
-    {
-        value = value?.Trim();
-        value?.EnsureMaxLength(24, "article.indicator.max.length.24");
+	public Indicator(string? value)
+	{
+		value = value?.Trim();
+		value?.EnsureMaxLength(24, "article.indicator.max.length.24");
 
-        Value = string.IsNullOrWhiteSpace(value) ? null : value;
-    }
+		Value = string.IsNullOrWhiteSpace(value) ? null : value;
+	}
 
-    public string? Value { get; }
+	public string? Value { get; }
 
-    public static implicit operator Indicator(string? value) { return new Indicator(value); }
+	public static implicit operator Indicator(string? value) => new(value);
 
-    public static implicit operator string?(Indicator? indicator) { return indicator?.Value; }
+	public static implicit operator string?(Indicator? indicator) => indicator?.Value;
 }

@@ -2,47 +2,65 @@
 
 public static class ApplicationErrors
 {
-    public const string ArticlesNotFound = "ArticlesNotFound";
+	public const string ArticlesNotFound = "ArticlesNotFound";
 
-    public const string ProducersNotFound = "ProducersNotFound";
+	public const string ProducersNotFound = "ProducersNotFound";
 
-    public const string StoragesNotFound = "StoragesNotFound";
-    public const string StoragesCodeAlreadyTaken = "StoragesCodeAlreadyTaken";
+	public const string StoragesNotFound = "StoragesNotFound";
 
-    public const string UsersNotFound = "UsersNotFound";
-    public const string OrganizationsNotFound = "OrganizationsNotFound";
-    public const string OrganizationMemberNotFound = "OrganizationMemberNotFound";
-    public const string OrganizationMemberAlreadyExists = "OrganizationMemberAlreadyExists";
-    public const string OrganizationSystemNameAlreadyTaken = "OrganizationSystemNameAlreadyTaken";
-    public const string UserNameAlreadyTaken = "UserNameAlreadyTaken";
-    public const string UserEmailAlreadyTaken = "UserEmailAlreadyTaken";
-    public const string UserEmailNotFound = "UserEmailNotFound";
+	public const string StoragesCodeAlreadyTaken = "StoragesCodeAlreadyTaken";
 
-    public const string TransactionsNotFound = "TransactionsNotFound";
+	public const string UsersNotFound = "UsersNotFound";
 
-    public const string PermissionNotFound = "PermissionNotFound";
-    public const string PermissionAlreadyExists = "PermissionAlreadyExists";
+	public const string OrganizationsNotFound = "OrganizationsNotFound";
 
-    public const string RoleNotFound = "RoleNotFound";
-    public const string RoleNameAlreadyTaken = "RoleNameAlreadyTaken";
+	public const string OrganizationMemberNotFound = "OrganizationMemberNotFound";
 
-    public const string CurrencyNotFound = "CurrencyNotFound";
-    public const string CurrencyCodeAlreadyTaken = "CurrencyCodeAlreadyTaken";
-    public const string CurrencyNameAlreadyTaken = "CurrencyNameAlreadyTaken";
-    public const string CurrencyShortNameAlreadyTaken = "CurrencyShortNameAlreadyTaken";
-    public const string CurrencySignAlreadyTaken = "CurrencySignAlreadyTaken";
+	public const string OrganizationMemberAlreadyExists = "OrganizationMemberAlreadyExists";
 
-    public const string ProducerAliasNotFound = "ProducerAliasNotFound";
-    public const string ProducerAliasAlreadyTaken = "ProducerAliasAlreadyTaken";
+	public const string OrganizationSystemNameAlreadyTaken = "OrganizationSystemNameAlreadyTaken";
 
-    public const string CartItemNotFound = "CartItemNotFound";
-    public const string CartItemAlreadyExist = "CartItemAlreadyExist";
+	public const string UserNameAlreadyTaken = "UserNameAlreadyTaken";
 
-    public const string StorageRouteNotFound = "StorageRouteNotFound";
-    public const string StorageRouteAlreadyExist = "StorageRouteAlreadyExist";
+	public const string UserEmailAlreadyTaken = "UserEmailAlreadyTaken";
 
-    public const string StorageOwnerAlreadyExist = "StorageOwnerAlreadyExist";
-    public const string StorageOwnerNotFound = "StorageOwnerNotFound";
+	public const string UserEmailNotFound = "UserEmailNotFound";
 
-    public const string StorageContentNotFound = "StorageContentNotFound";
+	public const string TransactionsNotFound = "TransactionsNotFound";
+
+	public const string PermissionNotFound = "PermissionNotFound";
+
+	public const string PermissionAlreadyExists = "PermissionAlreadyExists";
+
+	public const string RoleNotFound = "RoleNotFound";
+
+	public const string RoleNameAlreadyTaken = "RoleNameAlreadyTaken";
+
+	public const string CurrencyNotFound = "CurrencyNotFound";
+
+	public const string CurrencyCodeAlreadyTaken = "CurrencyCodeAlreadyTaken";
+
+	public const string CurrencyNameAlreadyTaken = "CurrencyNameAlreadyTaken";
+
+	public const string CurrencyShortNameAlreadyTaken = "CurrencyShortNameAlreadyTaken";
+
+	public const string CurrencySignAlreadyTaken = "CurrencySignAlreadyTaken";
+
+	public const string ProducerAliasNotFound = "ProducerAliasNotFound";
+
+	public const string ProducerAliasAlreadyTaken = "ProducerAliasAlreadyTaken";
+
+	public const string CartItemNotFound = "CartItemNotFound";
+
+	public const string CartItemAlreadyExist = "CartItemAlreadyExist";
+
+	public const string StorageRouteNotFound = "StorageRouteNotFound";
+
+	public const string StorageRouteAlreadyExist = "StorageRouteAlreadyExist";
+
+	public const string StorageOwnerAlreadyExist = "StorageOwnerAlreadyExist";
+
+	public const string StorageOwnerNotFound = "StorageOwnerNotFound";
+
+	public const string StorageContentNotFound = "StorageContentNotFound";
 }

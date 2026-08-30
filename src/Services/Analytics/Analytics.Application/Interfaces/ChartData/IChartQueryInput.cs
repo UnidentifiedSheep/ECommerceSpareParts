@@ -6,8 +6,7 @@ public interface IChartQueryInput
 {
 }
 
-public interface ICursorChartQueryInput<TCursor> : IChartQueryInput
-    where TCursor : struct
+public interface ICursorChartQueryInput<TCursor> : IChartQueryInput where TCursor : struct
 {
-    Cursor<TCursor?> GetCursor();
+	Cursor<TCursor?> GetCursor();
 }

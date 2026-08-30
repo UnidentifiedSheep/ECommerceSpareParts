@@ -2,5 +2,5 @@
 
 public interface ITestContext
 {
-    Task InitializeAsync(CancellationToken cancellationToken = default);
+	Task InitializeAsync(CancellationToken cancellationToken = default);
 }

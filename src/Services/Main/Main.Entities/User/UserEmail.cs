@@ -9,67 +9,64 @@ namespace Main.Entities.User;
 
 public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEmail, string>
 {
-    private UserEmail() { }
+	private UserEmail()
+	{
+	}
 
-    private UserEmail(
-        Guid userId,
-        Email email,
-        EmailType emailType)
-    {
-        UserId = userId;
-        Email = email;
-        EmailType = emailType;
-    }
+	private UserEmail(
+		Guid userId,
+		Email email,
+		EmailType emailType)
+	{
+		UserId = userId;
+		Email = email;
+		EmailType = emailType;
+	}
 
-    public Guid UserId { get; private set; }
+	public Guid UserId { get; }
 
-    public Email Email { get; } = null!;
+	public Email Email { get; } = null!;
 
-    public bool Confirmed { get; private set; }
+	public bool Confirmed { get; private set; }
 
-    public EmailType EmailType { get; private set; }
+	public EmailType EmailType { get; private set; }
 
-    public bool IsPrimary { get; private set; }
+	public bool IsPrimary { get; private set; }
 
-    public DateTime? ConfirmedAt { get; private set; }
-    public User User { get; private set; } = null!;
+	public DateTime? ConfirmedAt { get; private set; }
 
-    public static Expression<Func<UserEmail, string>> GetKeySelector() { return x => x.Email.Value; }
+	public User User { get; private set; } = null!;
 
-    public static Expression<Func<UserEmail, bool>> GetEqualityExpression(string key)
-    {
-        return x => x.Email == key;
-    }
+	public static Expression<Func<UserEmail, string>> GetKeySelector() => x => x.Email.Value;
 
-    internal static UserEmail Create(
-        Guid userId,
-        Email email,
-        EmailType emailType)
-    {
-        return new UserEmail(
-            userId,
-            email,
-            emailType);
-    }
+	public static Expression<Func<UserEmail, bool>> GetEqualityExpression(string key) => x => x.Email == key;
 
-    public void Confirm(bool confirmed = true)
-    {
-        Confirmed = confirmed;
-        ConfirmedAt = confirmed ? DateTime.UtcNow : null;
-    }
+	internal static UserEmail Create(
+		Guid userId,
+		Email email,
+		EmailType emailType)
+	{
+		return new UserEmail(
+			userId,
+			email,
+			emailType);
+	}
 
-    public override void OnUpdated()
-        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public void Confirm(bool confirmed = true)
+	{
+		Confirmed = confirmed;
+		ConfirmedAt = confirmed ? DateTime.UtcNow : null;
+	}
 
-    public override void OnDeleted()
-        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
-    public override void OnCreated()
-        => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
-    public void ChangeType(EmailType emailType) { EmailType = emailType; }
+	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 
-    public void MakePrimary(bool isPrimary = true) { IsPrimary = isPrimary; }
+	public void ChangeType(EmailType emailType) => EmailType = emailType;
 
-    public override string GetId() { return Email.Value; }
+	public void MakePrimary(bool isPrimary = true) => IsPrimary = isPrimary;
+
+	public override string GetId() => Email.Value;
 }

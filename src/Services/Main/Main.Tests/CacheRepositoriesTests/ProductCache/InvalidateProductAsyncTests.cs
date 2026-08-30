@@ -9,83 +9,79 @@ namespace Tests.CacheRepositoriesTests.ProductCache;
 
 public class InvalidateProductAsyncTests : IntegrationTest
 {
-    public InvalidateProductAsyncTests(CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<ProductTestContext>();
-    }
+	public InvalidateProductAsyncTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+	}
 
-    private ProductTestContext TestContext => GetContext<ProductTestContext>();
+	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
-    [Fact]
-    public async Task InvalidateProductAsync_WhenProductCached_RemovesProductCache()
-    {
-        var product = TestContext.Products[0];
-        var productProvider = GetProductProvider();
-        var cacheInvalidator = GetCacheInvalidator();
+	[Fact]
+	public async Task InvalidateProductAsync_WhenProductCached_RemovesProductCache()
+	{
+		var product = TestContext.Products[0];
+		var productProvider = GetProductProvider();
+		var cacheInvalidator = GetCacheInvalidator();
 
-        await productProvider.GetProductOrSetAsync(product.Id);
+		await productProvider.GetProductOrSetAsync(product.Id);
 
-        await cacheInvalidator.InvalidateProductAsync(product.Id);
+		await cacheInvalidator.InvalidateProductAsync(product.Id);
 
-        var result = await productProvider.GetProductAsync(product.Id);
+		var result = await productProvider.GetProductAsync(product.Id);
 
-        result.Should().BeNull();
-    }
+		result.Should().BeNull();
+	}
 
-    [Fact]
-    public async Task InvalidateProductAsync_WhenProductCached_AllowsReloadingUpdatedProductFromDb()
-    {
-        var product = TestContext.Products[0];
-        var productProvider = GetProductProvider();
-        var cacheInvalidator = GetCacheInvalidator();
+	[Fact]
+	public async Task InvalidateProductAsync_WhenProductCached_AllowsReloadingUpdatedProductFromDb()
+	{
+		var product = TestContext.Products[0];
+		var productProvider = GetProductProvider();
+		var cacheInvalidator = GetCacheInvalidator();
 
-        await productProvider.GetProductOrSetAsync(product.Id);
+		await productProvider.GetProductOrSetAsync(product.Id);
 
-        product.SetName("Updated product name");
-        await Context.SaveChangesAsync();
-        Context.ChangeTracker.Clear();
+		product.SetName("Updated product name");
+		await Context.SaveChangesAsync();
+		Context.ChangeTracker.Clear();
 
-        await cacheInvalidator.InvalidateProductAsync(product.Id);
+		await cacheInvalidator.InvalidateProductAsync(product.Id);
 
-        var result = await productProvider.GetProductOrSetAsync(product.Id);
+		var result = await productProvider.GetProductOrSetAsync(product.Id);
 
-        result.Name.Should().Be("Updated product name");
-    }
+		result.Name.Should().Be("Updated product name");
+	}
 
-    [Fact]
-    public async Task InvalidateProductsAsync_WhenProductsCached_RemovesAllProductCaches()
-    {
-        var products = TestContext.Products.Take(3).ToList();
-        var productProvider = GetProductProvider();
-        var cacheInvalidator = GetCacheInvalidator();
+	[Fact]
+	public async Task InvalidateProductsAsync_WhenProductsCached_RemovesAllProductCaches()
+	{
+		var products = TestContext.Products.Take(3).ToList();
+		var productProvider = GetProductProvider();
+		var cacheInvalidator = GetCacheInvalidator();
 
-        await productProvider.GetProductsOrSetAsync(products.Select(x => x.Id));
+		await productProvider.GetProductsOrSetAsync(products.Select(x => x.Id));
 
-        await cacheInvalidator.InvalidateProductsAsync(products.Select(x => x.Id));
+		await cacheInvalidator.InvalidateProductsAsync(products.Select(x => x.Id));
 
-        var result = await productProvider.GetProductsAsync(products.Select(x => x.Id));
+		var result = await productProvider.GetProductsAsync(products.Select(x => x.Id));
 
-        result.Should().HaveCount(products.Count);
-        result.Should().OnlyContain(x => x == null);
-    }
+		result.Should().HaveCount(products.Count);
+		result.Should().OnlyContain(x => x == null);
+	}
 
-    [Fact]
-    public async Task InvalidateProductsAsync_WhenProductIdsAreEmpty_DoesNotThrow()
-    {
-        var cacheInvalidator = GetCacheInvalidator();
+	[Fact]
+	public async Task InvalidateProductsAsync_WhenProductIdsAreEmpty_DoesNotThrow()
+	{
+		var cacheInvalidator = GetCacheInvalidator();
 
-        var act = () => cacheInvalidator.InvalidateProductsAsync([]);
+		var act = () => cacheInvalidator.InvalidateProductsAsync([]);
 
-        await act.Should().NotThrowAsync();
-    }
+		await act.Should().NotThrowAsync();
+	}
 
-    private IProductProvider GetProductProvider()
-    {
-        return Scope.ServiceProvider.GetRequiredService<IProductProvider>();
-    }
+	private IProductProvider GetProductProvider() =>
+		Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 
-    private IProductCacheInvalidator GetCacheInvalidator()
-    {
-        return Scope.ServiceProvider.GetRequiredService<IProductCacheInvalidator>();
-    }
+	private IProductCacheInvalidator GetCacheInvalidator() =>
+		Scope.ServiceProvider.GetRequiredService<IProductCacheInvalidator>();
 }

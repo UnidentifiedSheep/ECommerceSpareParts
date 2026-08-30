@@ -9,25 +9,25 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Main;
 
 internal sealed class SaleNode(
-    HttpClient httpClient,
-    IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
-    ProjectJsonOptions jsonOptions
-)
-    : InternalClientBase(authClient, optionsMonitor, jsonOptions), ISaleNode
+	HttpClient httpClient,
+	IAuthClient authClient,
+	IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+	ProjectJsonOptions jsonOptions) : InternalClientBase(
+		authClient,
+		optionsMonitor,
+		jsonOptions),
+	ISaleNode
 {
-    public async Task<Response<InternalFullSale>> GetFullSale(
-        Guid saleId,
-        CancellationToken cancellationToken = default)
-    {
-        using var request = await GetRequest(
-            HttpMethod.Get,
-            $"/internal/sales/{saleId}",
-            cancellationToken);
-        using var response = await httpClient.SendAsync(
-            request,
-            cancellationToken);
+	public async Task<Response<InternalFullSale>> GetFullSale(
+		Guid saleId,
+		CancellationToken cancellationToken = default)
+	{
+		using var request = await GetRequest(
+			HttpMethod.Get,
+			$"/internal/sales/{saleId}",
+			cancellationToken);
+		using var response = await httpClient.SendAsync(request, cancellationToken);
 
-        return await ReadResponse<InternalFullSale>(response, cancellationToken);
-    }
+		return await ReadResponse<InternalFullSale>(response, cancellationToken);
+	}
 }

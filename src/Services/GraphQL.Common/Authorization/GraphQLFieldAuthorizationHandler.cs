@@ -9,56 +9,58 @@ using Security.Authorization;
 namespace GraphQL.Common.Authorization;
 
 internal sealed class GraphQlFieldAuthorizationHandler(IUserContext userContext)
-    : AuthorizationHandler<GraphQlFieldAuthorizationRequirement, IResolverContext>
+	: AuthorizationHandler<GraphQlFieldAuthorizationRequirement, IResolverContext>
 {
-    private readonly PermissionAuthorizationHandler _permissionHandler = new(userContext);
-    private readonly RoleAuthorizationHandler _roleHandler = new(userContext);
+	private readonly PermissionAuthorizationHandler _permissionHandler = new(userContext);
 
-    protected override async Task HandleRequirementAsync(
-        AuthorizationHandlerContext context,
-        GraphQlFieldAuthorizationRequirement requirement,
-        IResolverContext resolverContext)
-    {
-        var member = resolverContext.Selection.Field.ResolverMember
-            ?? resolverContext.Selection.Field.Member;
-        if (member is null) return;
+	private readonly RoleAuthorizationHandler _roleHandler = new(userContext);
 
-        var requirements = member
-            .GetCustomAttributes<RequireAuthorizationAttribute>(true)
-            .Select(x => x.Requirement)
-            .Where(x => Matches(x, requirement))
-            .ToArray();
-        if (requirements.Length == 0) return;
+	protected override async Task HandleRequirementAsync(
+		AuthorizationHandlerContext context,
+		GraphQlFieldAuthorizationRequirement requirement,
+		IResolverContext resolverContext)
+	{
+		var member = resolverContext.Selection.Field.ResolverMember ?? resolverContext.Selection.Field.Member;
+		if (member is null)
+			return;
 
-        foreach (var fieldRequirement in requirements)
-        {
-            var nestedContext = new AuthorizationHandlerContext(
-                [fieldRequirement],
-                context.User,
-                resolverContext);
+		var requirements = member
+			.GetCustomAttributes<RequireAuthorizationAttribute>(true)
+			.Select(x => x.Requirement)
+			.Where(x => Matches(x, requirement))
+			.ToArray();
+		if (requirements.Length == 0)
+			return;
 
-            if (fieldRequirement is PermissionRequirement)
-                await _permissionHandler.HandleAsync(nestedContext);
-            else
-                await _roleHandler.HandleAsync(nestedContext);
+		foreach (var fieldRequirement in requirements)
+		{
+			var nestedContext = new AuthorizationHandlerContext(
+				[fieldRequirement],
+				context.User,
+				resolverContext);
 
-            if (!nestedContext.HasSucceeded) return;
-        }
+			if (fieldRequirement is PermissionRequirement)
+				await _permissionHandler.HandleAsync(nestedContext);
+			else
+				await _roleHandler.HandleAsync(nestedContext);
 
-        context.Succeed(requirement);
-    }
+			if (!nestedContext.HasSucceeded)
+				return;
+		}
 
-    private static bool Matches(
-        IAuthorizationRequirement fieldRequirement,
-        GraphQlFieldAuthorizationRequirement policyRequirement)
-    {
-        return (fieldRequirement, policyRequirement.Target) switch
-        {
-            (PermissionRequirement permission, GraphQlAuthorizationTarget.Permission) =>
-                permission.Match == policyRequirement.Match,
-            (RoleRequirement role, GraphQlAuthorizationTarget.Role) =>
-                role.Match == policyRequirement.Match,
-            _ => false
-        };
-    }
+		context.Succeed(requirement);
+	}
+
+	private static bool Matches(
+		IAuthorizationRequirement fieldRequirement,
+		GraphQlFieldAuthorizationRequirement policyRequirement)
+	{
+		return (fieldRequirement, policyRequirement.Target) switch
+		{
+			(PermissionRequirement permission, GraphQlAuthorizationTarget.Permission) => permission.Match ==
+				policyRequirement.Match,
+			(RoleRequirement role, GraphQlAuthorizationTarget.Role) => role.Match == policyRequirement.Match,
+			_ => false
+		};
+	}
 }

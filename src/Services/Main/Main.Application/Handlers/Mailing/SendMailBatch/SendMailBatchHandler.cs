@@ -16,44 +16,44 @@ public record SendMailBatchCommand(int Batch = 100) : ICommand<SendMailBatchResu
 public record SendMailBatchResult(int Sent);
 
 public class SendMailBatchHandler(
-    IRepository<EmailOutBox, Guid> repository,
-    ILogger<SendMailBatchCommand> logger,
-    IEmailSender sender
-) : ICommandHandler<SendMailBatchCommand, SendMailBatchResult>
+	IRepository<EmailOutBox, Guid> repository,
+	ILogger<SendMailBatchCommand> logger,
+	IEmailSender sender) : ICommandHandler<SendMailBatchCommand, SendMailBatchResult>
 {
-    public async Task<SendMailBatchResult> Handle(
-        SendMailBatchCommand request,
-        CancellationToken cancellationToken)
-    {
-        var batch = await repository.ListAsync(
-            Criteria<EmailOutBox>
-                .New()
-                .OrderByDesc(x => x.Id)
-                .Where(x => x.Status == EmailStatus.Pending)
-                .ForUpdate(true, true)
-                .Track()
-                .Size(request.Batch)
-                .Build(),
-            cancellationToken);
+	public async Task<SendMailBatchResult> Handle(
+		SendMailBatchCommand request,
+		CancellationToken cancellationToken)
+	{
+		var batch = await repository.ListAsync(
+			Criteria<EmailOutBox>
+				.New()
+				.OrderByDesc(x => x.Id)
+				.Where(x => x.Status == EmailStatus.Pending)
+				.ForUpdate(true, true)
+				.Track()
+				.Size(request.Batch)
+				.Build(),
+			cancellationToken);
 
-        if (batch.Count == 0) return new SendMailBatchResult(0);
+		if (batch.Count == 0)
+			return new SendMailBatchResult(0);
 
-        var messages = new List<EmailMessage>();
+		var messages = new List<EmailMessage>();
 
-        batch.ForEach(m =>
-        {
-            messages.Add(
-                new EmailMessage(
-                    m.Subject,
-                    m.To,
-                    m.Body));
-            m.Sent();
-        });
+		batch.ForEach(m =>
+		{
+			messages.Add(
+				new EmailMessage(
+					m.Subject,
+					m.To,
+					m.Body));
+			m.Sent();
+		});
 
-        logger.LogInformation("Sending mails. Count: {Count}", messages.Count);
+		logger.LogInformation("Sending mails. Count: {Count}", messages.Count);
 
-        await sender.SendBatchAsync(messages, cancellationToken);
+		await sender.SendBatchAsync(messages, cancellationToken);
 
-        return new SendMailBatchResult(batch.Count);
-    }
+		return new SendMailBatchResult(batch.Count);
+	}
 }

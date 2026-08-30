@@ -10,34 +10,31 @@ using Tests.TestContexts.Currency;
 namespace Tests.TestContexts.Storage;
 
 public class StorageContentTestContext(
-    DContext ctx,
-    StorageTestContext storage,
-    ProductTestContext product,
-    CurrencyTestContext currency
-)
-    : TestContextBase<DContext>(ctx), IDependentTestContext
+	DContext ctx,
+	StorageTestContext storage,
+	ProductTestContext product,
+	CurrencyTestContext currency) : TestContextBase<DContext>(ctx), IDependentTestContext
 {
-    public IReadOnlyCollection<StorageContent> StorageContents { get; private set; } = null!;
+	public IReadOnlyCollection<StorageContent> StorageContents { get; private set; } = null!;
 
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(CurrencyRatesTestContext),
-        typeof(ProductTestContext),
-        typeof(StorageTestContext)
-    ];
+	public static Type[] DependsOn { get; } =
+	[
+		typeof(CurrencyRatesTestContext), typeof(ProductTestContext), typeof(StorageTestContext)
+	];
 
-    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        StorageContents = await new StorageContentBuilder(Faker)
-            .WithCurrencyId(currency.Currencies[0].Id)
-            .WithProducts(product.Products)
-            .WithStorageCode(storage.Storages.First(x => x.Type == StorageType.Warehouse).Code)
-            .BuildManyAndAddToDb(DbContext, 10);
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+	{
+		StorageContents = await new StorageContentBuilder(Faker)
+			.WithCurrencyId(currency.Currencies[0].Id)
+			.WithProducts(product.Products)
+			.WithStorageCode(storage.Storages.First(x => x.Type == StorageType.Warehouse).Code)
+			.BuildManyAndAddToDb(DbContext, 10);
 
-        var products = product.Products.ToDictionary(k => k.Id);
+		var products = product.Products.ToDictionary(k => k.Id);
 
-        foreach (var content in StorageContents) products[content.ProductId].IncreaseStock(content.Count);
+		foreach (var content in StorageContents)
+			products[content.ProductId].IncreaseStock(content.Count);
 
-        await DbContext.SaveChangesAsync(cancellationToken);
-    }
+		await DbContext.SaveChangesAsync(cancellationToken);
+	}
 }

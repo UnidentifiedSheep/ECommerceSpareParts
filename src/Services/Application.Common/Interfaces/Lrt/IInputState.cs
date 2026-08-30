@@ -2,5 +2,5 @@
 
 public interface IInputState
 {
-    void ValidateState();
+	void ValidateState();
 }

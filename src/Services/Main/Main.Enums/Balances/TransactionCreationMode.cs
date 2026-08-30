@@ -2,6 +2,7 @@
 
 public enum TransactionCreationMode
 {
-    User,
-    System
+	User,
+
+	System
 }

@@ -10,106 +10,123 @@ namespace Main.Entities.Sale;
 
 public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersionable<uint>
 {
-    private readonly List<SaleContent> _contents = [];
+	private readonly List<SaleContent> _contents = [];
 
-    private Sale() { }
+	private Sale()
+	{
+	}
 
-    private Sale(
-        Guid userId,
-        Guid organizationId,
-        Guid transactionId,
-        int currencyId,
-        string storageCode,
-        DateTime saleDate)
-    {
-        TransactionId = transactionId;
-        CurrencyId = currencyId;
-        UserId = userId;
-        OrganizationId = organizationId;
-        StorageCode = storageCode;
-        SaleDatetime = saleDate;
-        State = SaleState.Draft;
-    }
+	private Sale(
+		Guid userId,
+		Guid organizationId,
+		Guid transactionId,
+		int currencyId,
+		string storageCode,
+		DateTime saleDate)
+	{
+		TransactionId = transactionId;
+		CurrencyId = currencyId;
+		UserId = userId;
+		OrganizationId = organizationId;
+		StorageCode = storageCode;
+		SaleDatetime = saleDate;
+		State = SaleState.Draft;
+	}
 
-    public Guid Id { get; private set; }
-    public Guid UserId { get; private set; }
-    public Guid OrganizationId { get; private set; }
-    public Guid TransactionId { get; private set; }
-    public int CurrencyId { get; private set; }
-    public string StorageCode { get; private set; } = null!;
-    public string? Comment { get; private set; }
-    public DateTime SaleDatetime { get; private set; }
-    public SaleState State { get; private set; }
-    public User.User User { get; private set; } = null!;
-    public Organization.Organization Organization { get; private set; } = null!;
-    public Currency.Currency Currency { get; private set; } = null!;
-    public Transaction Transaction { get; private set; } = null!;
-    public IReadOnlyList<SaleContent> Contents => _contents;
+	public Guid Id { get; private set; }
 
-    public static Expression<Func<Sale, Guid>> GetKeySelector() { return x => x.Id; }
+	public Guid UserId { get; private set; }
 
-    public static Expression<Func<Sale, bool>> GetEqualityExpression(Guid key) { return x => x.Id == key; }
+	public Guid OrganizationId { get; private set; }
 
-    public uint RowVersion { get; private set; }
+	public Guid TransactionId { get; private set; }
 
-    public static Sale Create(
-        Guid userId,
-        Guid organizationId,
-        Guid transactionId,
-        int currencyId,
-        string storageCode,
-        DateTime saleDate)
-    {
-        return new Sale(
-            userId,
-            organizationId,
-            transactionId,
-            currencyId,
-            storageCode,
-            saleDate);
-    }
+	public int CurrencyId { get; private set; }
 
-    public void SetComment(string? comment)
-    {
-        Comment = comment.NullIfWhiteSpace()
-            ?
-            .EnsureMaxLength(256, "sale.comment.max");
-    }
+	public string StorageCode { get; private set; } = null!;
 
-    public void AddContent(SaleContent content)
-    {
-        if (content.SaleId != Guid.Empty && content.SaleId != Id)
-            throw new InvalidOperationException("Content already added to another sale");
-        _contents.Add(content);
-    }
+	public string? Comment { get; private set; }
 
-    public void RemoveContent(SaleContent content)
-    {
-        if (content.SaleId != GetId()) throw new InvalidOperationException("Invalid sale id in sale content");
-        _contents.Remove(content);
-    }
+	public DateTime SaleDatetime { get; private set; }
 
-    public void SetDateTime(DateTime dateTime) { SaleDatetime = dateTime; }
+	public SaleState State { get; private set; }
 
-    public void SetCurrency(int currencyId) { CurrencyId = currencyId; }
+	public User.User User { get; private set; } = null!;
 
-    public void SetTransactionId(Guid transactionId) { TransactionId = transactionId; }
+	public Organization.Organization Organization { get; private set; } = null!;
 
-    public void Complete()
-    {
-        if (State == SaleState.Deleted) throw new InvalidOperationException("Cannot complete deleted sale");
+	public Currency.Currency Currency { get; private set; } = null!;
 
-        if (Contents.Count == 0) throw new InvalidOperationException("Cannot complete empty sale");
+	public Transaction Transaction { get; private set; } = null!;
 
-        State = SaleState.Completed;
-    }
+	public IReadOnlyList<SaleContent> Contents => _contents;
 
-    public void Delete()
-    {
-        if (State == SaleState.Deleted) return;
+	public static Expression<Func<Sale, Guid>> GetKeySelector() => x => x.Id;
 
-        State = SaleState.Deleted;
-    }
+	public static Expression<Func<Sale, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
 
-    public override Guid GetId() { return Id; }
+	public uint RowVersion { get; private set; }
+
+	public static Sale Create(
+		Guid userId,
+		Guid organizationId,
+		Guid transactionId,
+		int currencyId,
+		string storageCode,
+		DateTime saleDate)
+	{
+		return new Sale(
+			userId,
+			organizationId,
+			transactionId,
+			currencyId,
+			storageCode,
+			saleDate);
+	}
+
+	public void SetComment(string? comment)
+	{
+		Comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, "sale.comment.max");
+	}
+
+	public void AddContent(SaleContent content)
+	{
+		if (content.SaleId != Guid.Empty && content.SaleId != Id)
+			throw new InvalidOperationException("Content already added to another sale");
+		_contents.Add(content);
+	}
+
+	public void RemoveContent(SaleContent content)
+	{
+		if (content.SaleId != GetId())
+			throw new InvalidOperationException("Invalid sale id in sale content");
+		_contents.Remove(content);
+	}
+
+	public void SetDateTime(DateTime dateTime) => SaleDatetime = dateTime;
+
+	public void SetCurrency(int currencyId) => CurrencyId = currencyId;
+
+	public void SetTransactionId(Guid transactionId) => TransactionId = transactionId;
+
+	public void Complete()
+	{
+		if (State == SaleState.Deleted)
+			throw new InvalidOperationException("Cannot complete deleted sale");
+
+		if (Contents.Count == 0)
+			throw new InvalidOperationException("Cannot complete empty sale");
+
+		State = SaleState.Completed;
+	}
+
+	public void Delete()
+	{
+		if (State == SaleState.Deleted)
+			return;
+
+		State = SaleState.Deleted;
+	}
+
+	public override Guid GetId() => Id;
 }

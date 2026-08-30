@@ -6,55 +6,56 @@ namespace Application.Common.Services.Settings;
 
 public class SettingsContainer : ISettingsContainer
 {
-    private readonly ConcurrentDictionary<Type, Setting> _settings = new();
+	private readonly ConcurrentDictionary<Type, Setting> _settings = new();
 
-    public bool Loaded { get; private set; }
+	public bool Loaded { get; private set; }
 
-    public T Get<T>() where T : Setting
-    {
-        if (!Loaded)
-            throw new InvalidOperationException(
-                "Настройки не инициализированы. Используйте ISettingsService.LoadAsync().");
+	public T Get<T>() where T : Setting
+	{
+		if (!Loaded)
+			throw new InvalidOperationException(
+				"Настройки не инициализированы. Используйте ISettingsService.LoadAsync().");
 
-        if (_settings.TryGetValue(typeof(T), out var value)) return (T)value;
+		if (_settings.TryGetValue(typeof(T), out var value))
+			return (T)value;
 
-        throw new KeyNotFoundException($"Настройка {typeof(T).Name} не найдена");
-    }
+		throw new KeyNotFoundException($"Настройка {typeof(T).Name} не найдена");
+	}
 
-    public bool TryGet<T>(out T? value) where T : Setting
-    {
-        if (_settings.TryGetValue(typeof(T), out var temp))
-        {
-            value = (T)temp;
-            return true;
-        }
+	public bool TryGet<T>(out T? value) where T : Setting
+	{
+		if (_settings.TryGetValue(typeof(T), out var temp))
+		{
+			value = (T)temp;
+			return true;
+		}
 
-        value = null;
-        return false;
-    }
+		value = null;
+		return false;
+	}
 
-    public void Load(IEnumerable<Setting> settings)
-    {
-        ArgumentNullException.ThrowIfNull(settings);
+	public void Load(IEnumerable<Setting> settings)
+	{
+		ArgumentNullException.ThrowIfNull(settings);
 
-        foreach (var setting in settings)
-            SetCore(setting);
+		foreach (var setting in settings)
+			SetCore(setting);
 
-        Loaded = true;
-    }
+		Loaded = true;
+	}
 
-    public void Set(Setting setting)
-    {
-        ArgumentNullException.ThrowIfNull(setting);
-        SetCore(setting);
-        Loaded = true;
-    }
+	public void Set(Setting setting)
+	{
+		ArgumentNullException.ThrowIfNull(setting);
+		SetCore(setting);
+		Loaded = true;
+	}
 
-    private void SetCore(Setting setting)
-    {
-        _settings.AddOrUpdate(
-            setting.GetType(),
-            setting,
-            (_, _) => setting);
-    }
+	private void SetCore(Setting setting)
+	{
+		_settings.AddOrUpdate(
+			setting.GetType(),
+			setting,
+			(_, _) => setting);
+	}
 }

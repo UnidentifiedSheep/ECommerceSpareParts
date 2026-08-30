@@ -11,38 +11,33 @@ namespace Main.Application.Handlers.Currencies.CreateCurrency;
 [AutoSave]
 [Transactional]
 public record CreateCurrencyCommand(
-    string ShortName,
-    string Name,
-    string CurrencySign,
-    string Code
-)
-    : ICommand<CreateCurrencyResult>;
+	string ShortName,
+	string Name,
+	string CurrencySign,
+	string Code) : ICommand<CreateCurrencyResult>;
 
 public record CreateCurrencyResult(int Id);
 
-public class CreateCurrencyHandler(
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
-)
-    : ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
+public class CreateCurrencyHandler(IUnitOfWork unitOfWork, IIntegrationEventScope integrationEventScope)
+	: ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
 {
-    public async Task<CreateCurrencyResult> Handle(
-        CreateCurrencyCommand request,
-        CancellationToken cancellationToken)
-    {
-        var model = Currency.Create(
-            request.Name,
-            request.ShortName,
-            request.CurrencySign,
-            request.Code);
-        await unitOfWork.AddAsync(model, cancellationToken);
+	public async Task<CreateCurrencyResult> Handle(
+		CreateCurrencyCommand request,
+		CancellationToken cancellationToken)
+	{
+		var model = Currency.Create(
+			request.Name,
+			request.ShortName,
+			request.CurrencySign,
+			request.Code);
+		await unitOfWork.AddAsync(model, cancellationToken);
 
-        integrationEventScope.Add(
-            new CurrencyCreatedEvent
-            {
-                Currency = model.ToContract()
-            });
+		integrationEventScope.Add(
+			new CurrencyCreatedEvent
+			{
+				Currency = model.ToContract()
+			});
 
-        return new CreateCurrencyResult(model.Id);
-    }
+		return new CreateCurrencyResult(model.Id);
+	}
 }

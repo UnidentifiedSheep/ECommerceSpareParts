@@ -5,5 +5,5 @@ namespace Internal.Integration.Core.Interfaces.Main;
 
 public interface ISaleNode
 {
-    Task<Response<InternalFullSale>> GetFullSale(Guid saleId, CancellationToken cancellationToken = default);
+	Task<Response<InternalFullSale>> GetFullSale(Guid saleId, CancellationToken cancellationToken = default);
 }

@@ -8,27 +8,26 @@ using Main.Entities.Organization;
 
 namespace Main.Application.Handlers.Organizations.UpdateOrganization;
 
-[Transactional, AutoSave]
-public record UpdateOrganizationCommand(
-    Guid OrganizationId,
-    PatchOrganizationDto Organization) : ICommand<UpdateOrganizationResult>;
+[Transactional]
+[AutoSave]
+public record UpdateOrganizationCommand(Guid OrganizationId, PatchOrganizationDto Organization)
+	: ICommand<UpdateOrganizationResult>;
 
 public record UpdateOrganizationResult(Guid OrganizationId);
 
-public class UpdateOrganizationHandler(
-    IRepository<Organization, Guid> repository)
-    : ICommandHandler<UpdateOrganizationCommand, UpdateOrganizationResult>
+public class UpdateOrganizationHandler(IRepository<Organization, Guid> repository)
+	: ICommandHandler<UpdateOrganizationCommand, UpdateOrganizationResult>
 {
-    public async Task<UpdateOrganizationResult> Handle(
-        UpdateOrganizationCommand request,
-        CancellationToken cancellationToken)
-    {
-        var org = await repository.GetById(request.OrganizationId, cancellationToken)
-                  ?? throw new OrganizationNotFoundException(request.OrganizationId);
+	public async Task<UpdateOrganizationResult> Handle(
+		UpdateOrganizationCommand request,
+		CancellationToken cancellationToken)
+	{
+		var org = await repository.GetById(request.OrganizationId, cancellationToken) ??
+			throw new OrganizationNotFoundException(request.OrganizationId);
 
-        request.Organization.Name.Apply(org.SetName);
-        request.Organization.IsHidden.Apply(org.SetIsHidden);
+		request.Organization.Name.Apply(org.SetName);
+		request.Organization.IsHidden.Apply(org.SetIsHidden);
 
-        return new UpdateOrganizationResult(org.Id);
-    }
+		return new UpdateOrganizationResult(org.Id);
+	}
 }

@@ -1,12 +1,11 @@
 using Abstractions.Interfaces.Validators;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
+using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
-using Main.Application.Dtos.Users;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
@@ -14,45 +13,46 @@ using Main.Entities.User.ValueObjects;
 namespace Main.Application.Handlers.Auth;
 
 public record InternalServiceLoginCommand(string Service, string ServiceSecret)
-    : ICommand<InternalServiceLoginResult>;
+	: ICommand<InternalServiceLoginResult>;
 
 public record InternalServiceLoginResult(string Token);
 
 public class InternalServiceLoginHandler(
-    IPasswordManager passwordManager,
-    IUserRepository userRepository,
-    IJwtGenerator tokenGenerator,
-    IUserCacheRepository userCache,
-    IProjectionProvider<User, UserDto> userProjection
-) : ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
+	IPasswordManager passwordManager,
+	IUserRepository userRepository,
+	IJwtGenerator tokenGenerator,
+	IUserCacheRepository userCache,
+	IProjectionProvider<User, UserDto> userProjection)
+	: ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
 {
-    private static readonly TimeSpan AdditionalValidDuration = TimeSpan.FromHours(1);
+	private static readonly TimeSpan AdditionalValidDuration = TimeSpan.FromHours(1);
 
-    public async Task<InternalServiceLoginResult> Handle(
-        InternalServiceLoginCommand request,
-        CancellationToken cancellationToken)
-    {
-        var criteria = Criteria<User>.New()
-            .Include(x => x.UserInfo)
-            .Where(x => x.UserName.NormalizedValue == UserName.ToNormalized(request.Service))
-            .Build();
+	public async Task<InternalServiceLoginResult> Handle(
+		InternalServiceLoginCommand request,
+		CancellationToken cancellationToken)
+	{
+		var criteria = Criteria<User>
+			.New()
+			.Include(x => x.UserInfo)
+			.Where(x => x.UserName.NormalizedValue == UserName.ToNormalized(request.Service))
+			.Build();
 
-        var user = await userRepository.FirstOrDefaultAsync(criteria, cancellationToken)
-                   ?? throw new WrongCredentialsException(request.Service, request.ServiceSecret);
-        if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.ServiceSecret))
-            throw new WrongCredentialsException(request.Service, request.ServiceSecret);
+		var user = await userRepository.FirstOrDefaultAsync(criteria, cancellationToken) ??
+			throw new WrongCredentialsException(request.Service, request.ServiceSecret);
+		if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.ServiceSecret))
+			throw new WrongCredentialsException(request.Service, request.ServiceSecret);
 
-        var (roles, permissions) =
-            await userCache.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken)
-            ?? throw new UserNotFoundException(user.Id);
+		var (roles, permissions) =
+			await userCache.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken) ??
+			throw new UserNotFoundException(user.Id);
 
-        var userDto = userProjection.ProjectionFunc(user);
-        var token = tokenGenerator.CreateToken(
-            userDto,
-            request.Service,
-            roles,
-            permissions,
-            AdditionalValidDuration);
-        return new InternalServiceLoginResult(token);
-    }
+		var userDto = userProjection.ProjectionFunc(user);
+		var token = tokenGenerator.CreateToken(
+			userDto,
+			request.Service,
+			roles,
+			permissions,
+			AdditionalValidDuration);
+		return new InternalServiceLoginResult(token);
+	}
 }

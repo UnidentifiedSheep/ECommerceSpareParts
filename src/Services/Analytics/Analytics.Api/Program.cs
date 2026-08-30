@@ -23,7 +23,6 @@ using GraphQL.Common.Extensions;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
-using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -35,26 +34,24 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.AddServiceConfiguration("analytics");
 
 builder.Host.AddLokiLogger(
-    builder.Configuration,
-    "analytics.api",
-    env);
+	builder.Configuration,
+	"analytics.api",
+	env);
 
-builder.Services.AddMessageBrokerOptions()
-    .AddHeaderSecretsOptions()
-    .AddRedisOptions()
-    .AddDatabaseOptions();
+builder.Services.AddMessageBrokerOptions().AddHeaderSecretsOptions().AddRedisOptions().AddDatabaseOptions();
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Analytics);
 builder.Services.AddGraphQlServices(serviceName);
 
-builder.Services
-    .AddPersistenceLayer()
-    .AddCacheLayer("analytics")
-    .AddApplicationCache()
-    .AddApplicationLayer(builder.Configuration)
-    .AddIntegrationClients()
-    .AddEComAuth(builder.Configuration)
-    .AddMinimalSecurityLayer();
+builder
+	.Services
+	.AddPersistenceLayer()
+	.AddCacheLayer("analytics")
+	.AddApplicationCache()
+	.AddApplicationLayer(builder.Configuration)
+	.AddIntegrationClients()
+	.AddEComAuth(builder.Configuration)
+	.AddMinimalSecurityLayer();
 
 builder.Services.AddLocalization(builder.Configuration);
 
@@ -62,53 +59,54 @@ var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyRatesChangedConsumer)));
-    x.AddConsumer<BackplaneConsumer>();
-    x.AddConsumer<JobStatusUpdatedConsumer>();
-    x.AddConsumer<SettingUpdatedConsumer>();
+	x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyRatesChangedConsumer)));
+	x.AddConsumer<BackplaneConsumer>();
+	x.AddConsumer<JobStatusUpdatedConsumer>();
+	x.AddConsumer<SettingUpdatedConsumer>();
 
-    x.AddEntityFrameworkOutbox<DContext>(o =>
-    {
-        o.UsePostgres();
-        o.UseBusOutbox();
-    });
+	x.AddEntityFrameworkOutbox<DContext>(o =>
+	{
+		o.UsePostgres();
+		o.UseBusOutbox();
+	});
 
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.ConfigureRabbitMq(context);
+	x.UsingRabbitMq((context, cfg) =>
+	{
+		cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(
-            uniqQueueName,
-            ep =>
-            {
-                ep.AutoDelete = true;
-                ep.Durable = false;
-                ep.ConfigureConsumeTopology = false;
+		cfg.ReceiveEndpoint(
+			uniqQueueName,
+			ep =>
+			{
+				ep.AutoDelete = true;
+				ep.Durable = false;
+				ep.ConfigureConsumeTopology = false;
 
-                ep.ConfigureConsumer<BackplaneConsumer>(context);
-                ep.Bind<BackplaneMessage>();
+				ep.ConfigureConsumer<BackplaneConsumer>(context);
+				ep.Bind<BackplaneMessage>();
 
-                ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
-                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
+				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
-                ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
-                    .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
-            });
+				ep
+					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
+					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
+			});
 
-        cfg.ReceiveEndpoint(
-            "analytics-queue",
-            ep =>
-            {
-                ep.Durable = true;
+		cfg.ReceiveEndpoint(
+			"analytics-queue",
+			ep =>
+			{
+				ep.Durable = true;
 
-                ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-                ep.ConfigureConsumer<SaleDeletedConsumer>(context);
-                ep.ConfigureConsumer<SaleUpdatedConsumer>(context);
+				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+				ep.ConfigureConsumer<SaleDeletedConsumer>(context);
+				ep.ConfigureConsumer<SaleUpdatedConsumer>(context);
 
-                ep.ConfigureConsumer<PurchaseDeletedConsumer>(context);
-                ep.ConfigureConsumer<PurchaseUpdatedConsumer>(context);
-            });
-    });
+				ep.ConfigureConsumer<PurchaseDeletedConsumer>(context);
+				ep.ConfigureConsumer<PurchaseUpdatedConsumer>(context);
+			});
+	});
 });
 
 builder.Services.AddSignalR();

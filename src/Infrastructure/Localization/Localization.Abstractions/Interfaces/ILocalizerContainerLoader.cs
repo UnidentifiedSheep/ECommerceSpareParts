@@ -2,5 +2,5 @@
 
 public interface ILocalizerContainerLoader
 {
-    Task LoadAsync(IEnumerable<ILocalizerContainer> containers);
+	Task LoadAsync(IEnumerable<ILocalizerContainer> containers);
 }

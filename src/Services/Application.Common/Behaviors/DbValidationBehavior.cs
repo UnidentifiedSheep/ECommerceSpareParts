@@ -6,29 +6,28 @@ using MediatR;
 namespace Application.Common.Behaviors;
 
 public class DbValidationBehavior<TRequest, TResponse>(
-    IDbValidator dbValidator,
-    AbstractDbValidation<TRequest>? validation = null
-)
-    : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse> where TResponse : notnull
+	IDbValidator dbValidator,
+	AbstractDbValidation<TRequest>? validation = null) : IPipelineBehavior<TRequest, TResponse>
+	where TRequest : IRequest<TResponse> where TResponse : notnull
 {
-    public async Task<TResponse> Handle(
-        TRequest request,
-        RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
-    {
-        if (validation == null) return await next(cancellationToken);
+	public async Task<TResponse> Handle(
+		TRequest request,
+		RequestHandlerDelegate<TResponse> next,
+		CancellationToken cancellationToken)
+	{
+		if (validation == null)
+			return await next(cancellationToken);
 
-        var plan = new ValidationPlan();
+		var plan = new ValidationPlan();
 
-        validation.Build(plan, request);
+		validation.Build(plan, request);
 
-        if (plan.Build().Count > 0)
-            await dbValidator.Validate(
-                plan,
-                true,
-                cancellationToken);
+		if (plan.Build().Count > 0)
+			await dbValidator.Validate(
+				plan,
+				true,
+				cancellationToken);
 
-
-        return await next(cancellationToken);
-    }
+		return await next(cancellationToken);
+	}
 }

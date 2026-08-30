@@ -20,46 +20,45 @@ namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 /// <param name="PricePerOrder">Fixed price per order (if applicable).</param>
 [Transactional]
 public record AddStorageRouteCommand(
-    string StorageFrom,
-    string StorageTo,
-    int Distance,
-    RouteType RouteType,
-    LogisticPricingType PricingType,
-    int DeliveryTime,
-    decimal PriceKg,
-    decimal PriceM3,
-    int CurrencyId,
-    decimal PricePerOrder,
-    decimal MinimumPrice,
-    Guid? CarrierId
-) : ICommand<AddStorageRouteResult>;
+	string StorageFrom,
+	string StorageTo,
+	int Distance,
+	RouteType RouteType,
+	LogisticPricingType PricingType,
+	int DeliveryTime,
+	decimal PriceKg,
+	decimal PriceM3,
+	int CurrencyId,
+	decimal PricePerOrder,
+	decimal MinimumPrice,
+	Guid? CarrierId) : ICommand<AddStorageRouteResult>;
 
 public record AddStorageRouteResult(Guid RouteId);
 
 public class AddStorageRouteHandler(IUnitOfWork unitOfWork)
-    : ICommandHandler<AddStorageRouteCommand, AddStorageRouteResult>
+	: ICommandHandler<AddStorageRouteCommand, AddStorageRouteResult>
 {
-    public async Task<AddStorageRouteResult> Handle(
-        AddStorageRouteCommand request,
-        CancellationToken cancellationToken)
-    {
-        var storageRoute = StorageRoute.Create(
-            request.StorageFrom,
-            request.StorageTo,
-            request.Distance,
-            request.RouteType,
-            request.PricingType,
-            request.DeliveryTime,
-            request.PriceKg,
-            request.PriceM3,
-            request.PricePerOrder,
-            request.MinimumPrice,
-            request.CurrencyId,
-            request.CarrierId);
+	public async Task<AddStorageRouteResult> Handle(
+		AddStorageRouteCommand request,
+		CancellationToken cancellationToken)
+	{
+		var storageRoute = StorageRoute.Create(
+			request.StorageFrom,
+			request.StorageTo,
+			request.Distance,
+			request.RouteType,
+			request.PricingType,
+			request.DeliveryTime,
+			request.PriceKg,
+			request.PriceM3,
+			request.PricePerOrder,
+			request.MinimumPrice,
+			request.CurrencyId,
+			request.CarrierId);
 
-        await unitOfWork.AddAsync(storageRoute, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+		await unitOfWork.AddAsync(storageRoute, cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new AddStorageRouteResult(storageRoute.Id);
-    }
+		return new AddStorageRouteResult(storageRoute.Id);
+	}
 }

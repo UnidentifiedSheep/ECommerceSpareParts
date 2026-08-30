@@ -13,22 +13,17 @@ namespace Pricing.Application;
 
 public static class NamedObjectDiRegistry
 {
-    public static IServiceCollection AddNamedObjects(this IServiceCollection services)
-    {
-        services.AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>();
+	public static IServiceCollection AddNamedObjects(this IServiceCollection services)
+	{
+		services.AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>();
 
-        services.TryAddScoped<
-            IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>,
-            GetNamedObjectsHandler>();
+		services.TryAddScoped<
+			IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>, GetNamedObjectsHandler>();
 
-        return services
-            .RegisterNamedObject<SettingDefinitionNamedObjectBase>(
-                assembly: typeof(PricingSettingDefinition).Assembly,
-                objectsLifetime: ServiceLifetime.Scoped)
-            .RegisterNamedObject<ApplierNamedObjectBase>(
-                objectsLifetime: ServiceLifetime.Scoped,
-                objectsToExclude: [
-                    typeof(DynamicApplierNamedObject)
-                ]);
-    }
+		return services
+			.RegisterNamedObject<SettingDefinitionNamedObjectBase>(typeof(PricingSettingDefinition).Assembly)
+			.RegisterNamedObject<ApplierNamedObjectBase>(
+				objectsLifetime: ServiceLifetime.Scoped,
+				objectsToExclude: [typeof(DynamicApplierNamedObject)]);
+	}
 }

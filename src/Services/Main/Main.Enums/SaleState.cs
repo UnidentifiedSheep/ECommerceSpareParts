@@ -2,7 +2,9 @@
 
 public enum SaleState
 {
-    Draft,
-    Completed,
-    Deleted
+	Draft,
+
+	Completed,
+
+	Deleted
 }

@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Main.Application.Handlers.Balance;
-using Main.Entities.Balance;
 using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
@@ -12,97 +11,105 @@ namespace Tests.HandlersTests.Balances;
 
 public class CreateSystemTransactionTests : IntegrationTest
 {
-    public CreateSystemTransactionTests(CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<UsersTestContext>();
-        RegisterBasicContext<UserContextTestContext>();
-        RegisterBasicContext<CurrencyTestContext>();
-    }
+	public CreateSystemTransactionTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<UsersTestContext>();
+		RegisterBasicContext<UserContextTestContext>();
+		RegisterBasicContext<CurrencyTestContext>();
+	}
 
-    private UsersTestContext UsersContext => GetContext<UsersTestContext>();
-    private UserContextTestContext UserContext => GetContext<UserContextTestContext>();
-    private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
+	private UsersTestContext UsersContext => GetContext<UsersTestContext>();
 
-    [Fact]
-    public async Task CreateSystemTransaction_UserToSystem_CreatesTransaction()
-    {
-        var user = UsersContext.Users.ElementAt(0);
-        var systemUser = UserContext.SystemUser;
-        var currency = CurrencyContext.Currencies[0];
-        var amount = 125.50m;
+	private UserContextTestContext UserContext => GetContext<UserContextTestContext>();
 
-        var result = await Mediator.Send(
-            new CreateSystemTransactionCommand(
-                user.Id,
-                amount,
-                currency.Id,
-                DateTime.UtcNow,
-                SystemTransactionDirection.UserToSystem));
+	private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
 
-        var transaction = await Context.Transactions
-            .AsNoTracking()
-            .FirstAsync(x => x.Id == result.Transaction.Id);
+	[Fact]
+	public async Task CreateSystemTransaction_UserToSystem_CreatesTransaction()
+	{
+		var user = UsersContext.Users.ElementAt(0);
+		var systemUser = UserContext.SystemUser;
+		var currency = CurrencyContext.Currencies[0];
+		var amount = 125.50m;
 
-        transaction.SenderId.Should().Be(user.Id);
-        transaction.ReceiverId.Should().Be(systemUser.Id);
-        transaction.Amount.Should().Be(amount);
-        transaction.SourceType.Should().Be(TransactionSourceType.Manual);
-        transaction.IsCompleted.Should().BeTrue();
+		var result = await Mediator.Send(
+			new CreateSystemTransactionCommand(
+				user.Id,
+				amount,
+				currency.Id,
+				DateTime.UtcNow,
+				SystemTransactionDirection.UserToSystem));
 
-        var userBalance = await Context.UserBalances
-            .AsNoTracking()
-            .FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id);
-        var systemBalance = await Context.UserBalances
-            .AsNoTracking()
-            .FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id);
+		var transaction = await Context
+			.Transactions
+			.AsNoTracking()
+			.FirstAsync(x => x.Id == result.Transaction.Id);
 
-        userBalance.Balance.Should().Be(amount);
-        systemBalance.Balance.Should().Be(-amount);
-    }
+		transaction.SenderId.Should().Be(user.Id);
+		transaction.ReceiverId.Should().Be(systemUser.Id);
+		transaction.Amount.Should().Be(amount);
+		transaction.SourceType.Should().Be(TransactionSourceType.Manual);
+		transaction.IsCompleted.Should().BeTrue();
 
-    [Fact]
-    public async Task CreateSystemTransaction_SystemToUser_CreatesTransaction()
-    {
-        var user = UsersContext.Users.ElementAt(0);
-        var systemUser = UserContext.SystemUser;
-        var currency = CurrencyContext.Currencies[0];
-        var amount = 75m;
-        await AllowDebit(user.Id, amount);
+		var userBalance = await Context
+			.UserBalances
+			.AsNoTracking()
+			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id);
+		var systemBalance = await Context
+			.UserBalances
+			.AsNoTracking()
+			.FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id);
 
-        var result = await Mediator.Send(
-            new CreateSystemTransactionCommand(
-                user.Id,
-                amount,
-                currency.Id,
-                DateTime.UtcNow,
-                SystemTransactionDirection.SystemToUser));
+		userBalance.Balance.Should().Be(amount);
+		systemBalance.Balance.Should().Be(-amount);
+	}
 
-        var transaction = await Context.Transactions
-            .AsNoTracking()
-            .FirstAsync(x => x.Id == result.Transaction.Id);
+	[Fact]
+	public async Task CreateSystemTransaction_SystemToUser_CreatesTransaction()
+	{
+		var user = UsersContext.Users.ElementAt(0);
+		var systemUser = UserContext.SystemUser;
+		var currency = CurrencyContext.Currencies[0];
+		var amount = 75m;
+		await AllowDebit(user.Id, amount);
 
-        transaction.SenderId.Should().Be(systemUser.Id);
-        transaction.ReceiverId.Should().Be(user.Id);
-        transaction.Amount.Should().Be(amount);
-        transaction.SourceType.Should().Be(TransactionSourceType.Manual);
-        transaction.IsCompleted.Should().BeTrue();
+		var result = await Mediator.Send(
+			new CreateSystemTransactionCommand(
+				user.Id,
+				amount,
+				currency.Id,
+				DateTime.UtcNow,
+				SystemTransactionDirection.SystemToUser));
 
-        var userBalance = await Context.UserBalances
-            .AsNoTracking()
-            .FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id);
-        var systemBalance = await Context.UserBalances
-            .AsNoTracking()
-            .FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id);
+		var transaction = await Context
+			.Transactions
+			.AsNoTracking()
+			.FirstAsync(x => x.Id == result.Transaction.Id);
 
-        userBalance.Balance.Should().Be(-amount);
-        systemBalance.Balance.Should().Be(amount);
-    }
+		transaction.SenderId.Should().Be(systemUser.Id);
+		transaction.ReceiverId.Should().Be(user.Id);
+		transaction.Amount.Should().Be(amount);
+		transaction.SourceType.Should().Be(TransactionSourceType.Manual);
+		transaction.IsCompleted.Should().BeTrue();
 
-    private async Task AllowDebit(Guid userId, decimal amount)
-    {
-        var profile = OrganizationFinancialProfile.Create(userId, -amount);
+		var userBalance = await Context
+			.UserBalances
+			.AsNoTracking()
+			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id);
+		var systemBalance = await Context
+			.UserBalances
+			.AsNoTracking()
+			.FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id);
 
-        await Context.AddAsync(profile);
-        await Context.SaveChangesAsync();
-    }
+		userBalance.Balance.Should().Be(-amount);
+		systemBalance.Balance.Should().Be(amount);
+	}
+
+	private async Task AllowDebit(Guid userId, decimal amount)
+	{
+		var profile = OrganizationFinancialProfile.Create(userId, -amount);
+
+		await Context.AddAsync(profile);
+		await Context.SaveChangesAsync();
+	}
 }

@@ -14,18 +14,16 @@ public record GetStorageRouteByIdQuery(Guid Id) : IQuery<GetStorageRouteByIdResu
 public record GetStorageRouteByIdResult(StorageRouteDto StorageRoute);
 
 public class GetStorageRouteByIdHandler(
-    IReadRepository<StorageRoute, Guid> repository,
-    IProjectionProvider<StorageRoute, StorageRouteDto> projection
-)
-    : IQueryHandler<GetStorageRouteByIdQuery, GetStorageRouteByIdResult>
+	IReadRepository<StorageRoute, Guid> repository,
+	IProjectionProvider<StorageRoute, StorageRouteDto> projection)
+	: IQueryHandler<GetStorageRouteByIdQuery, GetStorageRouteByIdResult>
 {
-    public async Task<GetStorageRouteByIdResult> Handle(
-        GetStorageRouteByIdQuery request,
-        CancellationToken cancellationToken)
-    {
-        var route = await repository.Query
-            .Project(projection)
-            .FirstOrDefaultAsync(cancellationToken) ?? throw new StorageRouteNotFound(request.Id);
-        return new GetStorageRouteByIdResult(route);
-    }
+	public async Task<GetStorageRouteByIdResult> Handle(
+		GetStorageRouteByIdQuery request,
+		CancellationToken cancellationToken)
+	{
+		var route = await repository.Query.Project(projection).FirstOrDefaultAsync(cancellationToken) ??
+			throw new StorageRouteNotFound(request.Id);
+		return new GetStorageRouteByIdResult(route);
+	}
 }

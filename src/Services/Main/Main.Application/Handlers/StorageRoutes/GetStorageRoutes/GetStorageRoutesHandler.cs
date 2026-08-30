@@ -10,38 +10,35 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.StorageRoutes.GetStorageRoutes;
 
 public record GetStorageRoutesQuery(
-    string? StorageFrom,
-    string? StorageTo,
-    bool? IsActive,
-    Pagination Pagination
-) : IQuery<GetStorageRoutesResult>;
+	string? StorageFrom,
+	string? StorageTo,
+	bool? IsActive,
+	Pagination Pagination) : IQuery<GetStorageRoutesResult>;
 
 public record GetStorageRoutesResult(List<StorageRouteDto> StorageRoutes);
 
 public class GetStorageRoutesHandler(
-    IReadRepository<StorageRoute, Guid> repository,
-    IProjectionProvider<StorageRoute, StorageRouteDto> projection
-)
-    : IQueryHandler<GetStorageRoutesQuery, GetStorageRoutesResult>
+	IReadRepository<StorageRoute, Guid> repository,
+	IProjectionProvider<StorageRoute, StorageRouteDto> projection)
+	: IQueryHandler<GetStorageRoutesQuery, GetStorageRoutesResult>
 {
-    public async Task<GetStorageRoutesResult> Handle(
-        GetStorageRoutesQuery request,
-        CancellationToken cancellationToken)
-    {
-        var query = repository.Query;
+	public async Task<GetStorageRoutesResult> Handle(
+		GetStorageRoutesQuery request,
+		CancellationToken cancellationToken)
+	{
+		var query = repository.Query;
 
-        if (!string.IsNullOrWhiteSpace(request.StorageFrom))
-            query = query.Where(x => x.FromStorageCode == request.StorageFrom);
-        if (!string.IsNullOrWhiteSpace(request.StorageTo))
-            query = query.Where(x => x.ToStorageCode == request.StorageTo);
-        if (request.IsActive.HasValue) query = query.Where(x => x.IsActive == request.IsActive);
+		if (!string.IsNullOrWhiteSpace(request.StorageFrom))
+			query = query.Where(x => x.FromStorageCode == request.StorageFrom);
+		if (!string.IsNullOrWhiteSpace(request.StorageTo))
+			query = query.Where(x => x.ToStorageCode == request.StorageTo);
+		if (request.IsActive.HasValue)
+			query = query.Where(x => x.IsActive == request.IsActive);
 
-        query = query.ApplyPagination(request.Pagination);
+		query = query.ApplyPagination(request.Pagination);
 
-        var routes = await query
-            .Project(projection)
-            .ToListAsync(cancellationToken);
+		var routes = await query.Project(projection).ToListAsync(cancellationToken);
 
-        return new GetStorageRoutesResult(routes);
-    }
+		return new GetStorageRoutesResult(routes);
+	}
 }

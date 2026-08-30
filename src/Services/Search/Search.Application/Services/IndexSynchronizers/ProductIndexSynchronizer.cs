@@ -5,32 +5,26 @@ using Search.Entities;
 namespace Search.Application.Services.IndexSynchronizers;
 
 public class ProductIndexSynchronizer(
-    IProductSearchDocumentProvider productSearchDocumentProvider,
-    IProductRepository productRepository
-) : IIndexSynchronizer<Product, int>
+	IProductSearchDocumentProvider productSearchDocumentProvider,
+	IProductRepository productRepository) : IIndexSynchronizer<Product, int>
 {
-    public async Task Reindex(IEnumerable<int> ids, CancellationToken cancellationToken = default)
-    {
-        var products = await productSearchDocumentProvider
-            .GetByIds(ids, cancellationToken);
+	public async Task Reindex(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+	{
+		var products = await productSearchDocumentProvider.GetByIds(ids, cancellationToken);
 
-        var toDelete = new List<int>();
-        var toUpsert = new List<Product>();
+		var toDelete = new List<int>();
+		var toUpsert = new List<Product>();
 
-        foreach (var (id, product) in products)
-        {
-            if (product == null)
-                toDelete.Add(id);
-            else
-                toUpsert.Add(product);
-        }
+		foreach (var (id, product) in products)
+			if (product == null)
+				toDelete.Add(id);
+			else
+				toUpsert.Add(product);
 
-        await productRepository.DeleteMany(toDelete, cancellationToken);
-        await productRepository.UpsertMany(toUpsert, cancellationToken);
-    }
+		await productRepository.DeleteMany(toDelete, cancellationToken);
+		await productRepository.UpsertMany(toUpsert, cancellationToken);
+	}
 
-    public Task Delete(IEnumerable<int> ids, CancellationToken cancellationToken = default)
-    {
-        return productRepository.DeleteMany(ids, cancellationToken);
-    }
+	public Task Delete(IEnumerable<int> ids, CancellationToken cancellationToken = default) =>
+		productRepository.DeleteMany(ids, cancellationToken);
 }

@@ -1,5 +1,4 @@
-﻿using Enums;
-using Enums.Units;
+﻿using Enums.Units;
 using Main.Application.Models.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Enums;
@@ -8,37 +7,37 @@ namespace Tests.ServicesTests.Logistics;
 
 public class PerAreaOrWeightPricingTests
 {
-    private readonly PerAreaOrWeightPricing _strategy = new();
+	private readonly PerAreaOrWeightPricing _strategy = new();
 
-    [Fact]
-    public void Calculate_ShouldReturnMaxOfAreaAndWeight()
-    {
-        var context = new LogisticsContext(
-            10,
-            100,
-            0);
+	[Fact]
+	public void Calculate_ShouldReturnMaxOfAreaAndWeight()
+	{
+		var context = new LogisticsContext(
+			10,
+			100,
+			0);
 
-        // Item 1: Weight cost (1kg * 10 = 10) vs Area cost (0.05m3 * 100 = 5). Max = 10.
-        // Item 2: Weight cost (0.5kg * 10 = 5) vs Area cost (0.1m3 * 100 = 10). Max = 10.
-        var items = new List<LogisticsItem>
-        {
-            new(
-                1,
-                1,
-                1,
-                WeightUnit.Kilogram,
-                0.05m),
-            new(
-                2,
-                1,
-                0.5m,
-                WeightUnit.Kilogram,
-                0.1m)
-        };
+		// Item 1: Weight cost (1kg * 10 = 10) vs Area cost (0.05m3 * 100 = 5). Max = 10.
+		// Item 2: Weight cost (0.5kg * 10 = 5) vs Area cost (0.1m3 * 100 = 10). Max = 10.
+		var items = new List<LogisticsItem>
+		{
+			new(
+				1,
+				1,
+				1,
+				WeightUnit.Kilogram,
+				0.05m),
+			new(
+				2,
+				1,
+				0.5m,
+				WeightUnit.Kilogram,
+				0.1m)
+		};
 
-        var result = _strategy.Calculate(context, items);
+		var result = _strategy.Calculate(context, items);
 
-        Assert.Equal(20m, result.TotalCost);
-        Assert.Equal(LogisticPricingType.PerAreaOrWeight, result.PricingModel);
-    }
+		Assert.Equal(20m, result.TotalCost);
+		Assert.Equal(LogisticPricingType.PerAreaOrWeight, result.PricingModel);
+	}
 }

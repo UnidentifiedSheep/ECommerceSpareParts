@@ -5,5 +5,5 @@ namespace SchemaGeneration.Abstractions.Attributes;
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class SchemaInputControlAttribute(InputControlType inputControl) : Attribute
 {
-    public InputControlType InputControl { get; } = inputControl;
+	public InputControlType InputControl { get; } = inputControl;
 }

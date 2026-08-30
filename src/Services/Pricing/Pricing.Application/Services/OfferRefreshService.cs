@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Events;
 using Contracts.Pricing;
@@ -9,242 +8,236 @@ using Microsoft.Extensions.Logging;
 using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
-using Pricing.Entities;
 using Pricing.Entities.Offers;
 using Pricing.Enums;
 
 namespace Pricing.Application.Services;
 
 public class OfferRefreshService(
-    ISupplierOfferExtractorService extractorService,
-    ISupplierOfferConverterService converterService,
-    IPriceOfferRepository offerRepository,
-    IIntegrationEventScope integrationEventScope,
-    IPriceOfferRefreshStateRepository stateRepository,
-    ISupplierOfferRequestMarkerService markerService,
-    ILogger<OfferRefreshService> logger) : IOfferRefreshService
+	ISupplierOfferExtractorService extractorService,
+	ISupplierOfferConverterService converterService,
+	IPriceOfferRepository offerRepository,
+	IIntegrationEventScope integrationEventScope,
+	IPriceOfferRefreshStateRepository stateRepository,
+	ISupplierOfferRequestMarkerService markerService,
+	ILogger<OfferRefreshService> logger) : IOfferRefreshService
 {
-    public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
-        int productId,
-        string storageCode,
-        CancellationToken token = default)
-    {
-        var extracted = await extractorService.ExtractOffers(
-            storageCode,
-            productId,
-            token);
+	public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
+		int productId,
+		string storageCode,
+		CancellationToken token = default)
+	{
+		var extracted = await extractorService.ExtractOffers(
+			storageCode,
+			productId,
+			token);
 
-        var now = DateTime.UtcNow;
+		var now = DateTime.UtcNow;
 
-        var successful = extracted
-            .Where(x => x is { IsSuccess: true, Offer: not null })
-            .ToList();
+		var successful = extracted.Where(x => x is { IsSuccess: true, Offer: not null }).ToList();
 
-        var events = successful
-            .Select(x => new SupplierProductsRequestedEvent
-            {
-                Supplier = x.Supplier,
-                OccurredAt = now,
-                RequestedStorageCode = storageCode,
-                Products = [x.Offer!.ToContract()]
-            })
-            .ToList();
+		var events = successful
+			.Select(x => new SupplierProductsRequestedEvent
+			{
+				Supplier = x.Supplier,
+				OccurredAt = now,
+				RequestedStorageCode = storageCode,
+				Products = [x.Offer!.ToContract()]
+			})
+			.ToList();
 
-        var supplierPositions = successful
-            .GroupBy(x => x.Supplier)
-            .ToDictionary(
-                x => x.Key,
-                IReadOnlyList<SupplierPosition> (x) => x
-                    .SelectMany(r => r.Offer!.Positions)
-                    .ToList());
+		var supplierPositions = successful
+			.GroupBy(x => x.Supplier)
+			.ToDictionary(
+				x => x.Key,
+				IReadOnlyList<SupplierPosition> (x) => x.SelectMany(r => r.Offer!.Positions).ToList());
 
-        var offers = await RefreshOffersAsync(
-            dataExtractionTime: now,
-            productId: productId,
-            storageCode: storageCode,
-            supplierPositions: supplierPositions,
-            token: token);
+		var offers = await RefreshOffersAsync(
+			now,
+			productId,
+			storageCode,
+			supplierPositions,
+			token);
 
-        integrationEventScope.AddRange(events);
+		integrationEventScope.AddRange(events);
 
-        return offers;
-    }
+		return offers;
+	}
 
-    public Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
-        int productId,
-        string storageCode,
-        IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> supplierPositions,
-        CancellationToken token = default)
-    {
-        return RefreshOffersAsync(
-            dataExtractionTime: DateTime.UtcNow,
-            productId: productId,
-            storageCode: storageCode,
-            supplierPositions: supplierPositions,
-            token: token);
-    }
+	public Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
+		int productId,
+		string storageCode,
+		IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> supplierPositions,
+		CancellationToken token = default)
+	{
+		return RefreshOffersAsync(
+			DateTime.UtcNow,
+			productId,
+			storageCode,
+			supplierPositions,
+			token);
+	}
 
-    private async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
-        DateTime dataExtractionTime,
-        int productId,
-        string storageCode,
-        IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> supplierPositions,
-        CancellationToken token = default)
-    {
-        if (supplierPositions.Count == 0)
-            return [];
+	public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
+		DateTime dataExtractionTime,
+		string storageCode,
+		Supplier supplier,
+		IReadOnlyDictionary<int, IReadOnlyList<SupplierPosition>> supplierPositions,
+		CancellationToken token = default)
+	{
+		if (supplierPositions.Count == 0)
+			return [];
 
-        var result = await converterService.ConvertAsync(
-            productId,
-            storageCode,
-            supplierPositions,
-            token);
+		var source = supplier.ToSource();
 
-        var offers = new List<PriceOffer>();
-        var notFoundCurrencies = new HashSet<string>();
+		var events = new List<ProductPriceOffersUpdatedEvent>();
+		var offers = new List<PriceOffer>();
+		var notFoundCurrencies = new HashSet<string>();
+		var refreshed = new HashSet<int>();
 
-        foreach (var supplierOffer in result)
-        {
-            offers.AddRange(supplierOffer.Offers);
-            notFoundCurrencies.UnionWith(supplierOffer.NotFoundCurrencies);
-        }
+		foreach (var (productId, positions) in supplierPositions)
+		{
+			var state = PriceOfferRefreshState.Create(
+				productId,
+				source,
+				storageCode);
 
-        LogNotFoundCurrencies(notFoundCurrencies);
+			state.OffersUpdated(dataExtractionTime, positions.Count);
 
-        var sourcesToRemove = new List<PriceOfferSource>();
+			var canRefresh = await stateRepository.UpsertStateAsync(state, token);
 
-        foreach (var (supplier, positions) in supplierPositions)
-        {
-            var source = supplier.ToSource();
+			if (!canRefresh)
+				continue;
 
-            var state = PriceOfferRefreshState.Create(
-                productId,
-                source,
-                storageCode);
+			refreshed.Add(productId);
+			events.Add(
+				new ProductPriceOffersUpdatedEvent
+				{
+					ProductId = productId, StorageCode = storageCode
+				});
 
-            state.OffersUpdated(dataExtractionTime, positions.Count);
+			var result = await converterService.ConvertAsync(
+				productId,
+				storageCode,
+				new Dictionary<Supplier, IReadOnlyList<SupplierPosition>>
+				{
+					[supplier] = positions
+				},
+				token);
 
-            var canRefresh = await stateRepository
-                .UpsertStateAsync(state, token);
+			foreach (var supplierOffer in result)
+			{
+				offers.AddRange(supplierOffer.Offers);
+				notFoundCurrencies.UnionWith(supplierOffer.NotFoundCurrencies);
+			}
 
-            if (!canRefresh) continue;
+			await offerRepository.DeleteOffersAsync(
+				productId,
+				storageCode,
+				[source],
+				token);
+		}
 
-            sourcesToRemove.Add(source);
-        }
+		LogNotFoundCurrencies(notFoundCurrencies);
 
-        if (sourcesToRemove.Count == 0)
-            return [];
+		if (offers.Count != 0)
+			await offerRepository.UpsertOffersAsync(offers, token);
 
-        await offerRepository.DeleteOffersAsync(
-            productId,
-            storageCode,
-            sourcesToRemove,
-            token);
+		await markerService.MarkAsOkAsync(
+			refreshed,
+			supplier,
+			storageCode,
+			token);
 
-        if (offers.Count == 0) return [];
-        
-        var allowedSources = sourcesToRemove.ToHashSet();
+		integrationEventScope.AddRange(events);
 
-        var filteredOffers = offers
-            .Where(x => allowedSources.Contains(x.Source))
-            .ToList();
+		return offers;
+	}
 
-        if (filteredOffers.Count == 0) return filteredOffers;
-            
-        integrationEventScope.Add(new ProductPriceOffersUpdatedEvent
-        {
-            StorageCode = storageCode,
-            ProductId = productId,
-        });
-        await offerRepository.UpsertOffersAsync(filteredOffers, token);
+	private async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
+		DateTime dataExtractionTime,
+		int productId,
+		string storageCode,
+		IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> supplierPositions,
+		CancellationToken token = default)
+	{
+		if (supplierPositions.Count == 0)
+			return [];
 
-        return filteredOffers;
-    }
+		var result = await converterService.ConvertAsync(
+			productId,
+			storageCode,
+			supplierPositions,
+			token);
 
-    public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
-        DateTime dataExtractionTime,
-        string storageCode,
-        Supplier supplier,
-        IReadOnlyDictionary<int, IReadOnlyList<SupplierPosition>> supplierPositions,
-        CancellationToken token = default)
-    {
-        if (supplierPositions.Count == 0)
-            return [];
+		var offers = new List<PriceOffer>();
+		var notFoundCurrencies = new HashSet<string>();
 
-        var source = supplier.ToSource();
+		foreach (var supplierOffer in result)
+		{
+			offers.AddRange(supplierOffer.Offers);
+			notFoundCurrencies.UnionWith(supplierOffer.NotFoundCurrencies);
+		}
 
-        var events = new List<ProductPriceOffersUpdatedEvent>();
-        var offers = new List<PriceOffer>();
-        var notFoundCurrencies = new HashSet<string>();
-        var refreshed = new HashSet<int>();
+		LogNotFoundCurrencies(notFoundCurrencies);
 
-        foreach (var (productId, positions) in supplierPositions)
-        {
-            var state = PriceOfferRefreshState.Create(
-                productId,
-                source,
-                storageCode);
+		var sourcesToRemove = new List<PriceOfferSource>();
 
-            state.OffersUpdated(dataExtractionTime, positions.Count);
+		foreach (var (supplier, positions) in supplierPositions)
+		{
+			var source = supplier.ToSource();
 
-            var canRefresh = await stateRepository.UpsertStateAsync(
-                state,
-                token);
+			var state = PriceOfferRefreshState.Create(
+				productId,
+				source,
+				storageCode);
 
-            if (!canRefresh) continue;
+			state.OffersUpdated(dataExtractionTime, positions.Count);
 
-            refreshed.Add(productId);
-            events.Add(new ProductPriceOffersUpdatedEvent
-            {
-                ProductId = productId,
-                StorageCode = storageCode,
-            });
-            
-            var result = await converterService.ConvertAsync(
-                productId,
-                storageCode,
-                new Dictionary<Supplier, IReadOnlyList<SupplierPosition>>
-                {
-                    [supplier] = positions
-                },
-                token);
+			var canRefresh = await stateRepository.UpsertStateAsync(state, token);
 
-            foreach (var supplierOffer in result)
-            {
-                offers.AddRange(supplierOffer.Offers);
-                notFoundCurrencies.UnionWith(supplierOffer.NotFoundCurrencies);
-            }
+			if (!canRefresh)
+				continue;
 
-            await offerRepository.DeleteOffersAsync(
-                productId,
-                storageCode,
-                [source],
-                token);
-        }
+			sourcesToRemove.Add(source);
+		}
 
-        LogNotFoundCurrencies(notFoundCurrencies);
+		if (sourcesToRemove.Count == 0)
+			return [];
 
-        if (offers.Count != 0)
-            await offerRepository.UpsertOffersAsync(offers, token);
-        
-        await markerService.MarkAsOkAsync(
-            refreshed, 
-            supplier, 
-            storageCode,
-            token);
+		await offerRepository.DeleteOffersAsync(
+			productId,
+			storageCode,
+			sourcesToRemove,
+			token);
 
-        integrationEventScope.AddRange(events);
+		if (offers.Count == 0)
+			return [];
 
-        return offers;
-    }
+		var allowedSources = sourcesToRemove.ToHashSet();
 
-    private void LogNotFoundCurrencies(HashSet<string> notFoundCurrencies)
-    {
-        if (notFoundCurrencies.Count == 0)
-            return;
+		var filteredOffers = offers.Where(x => allowedSources.Contains(x.Source)).ToList();
 
-        logger.LogWarning(
-            "Unable to find currency for {CurrencyCode}. When tried to get price offers from supplier.",
-            string.Join(", ", notFoundCurrencies));
-    }
+		if (filteredOffers.Count == 0)
+			return filteredOffers;
+
+		integrationEventScope.Add(
+			new ProductPriceOffersUpdatedEvent
+			{
+				StorageCode = storageCode, ProductId = productId
+			});
+		await offerRepository.UpsertOffersAsync(filteredOffers, token);
+
+		return filteredOffers;
+	}
+
+	private void LogNotFoundCurrencies(HashSet<string> notFoundCurrencies)
+	{
+		if (notFoundCurrencies.Count == 0)
+			return;
+
+		logger.LogWarning(
+			"Unable to find currency for {CurrencyCode}. When tried to get price offers from supplier.",
+			string.Join(", ", notFoundCurrencies));
+	}
 }

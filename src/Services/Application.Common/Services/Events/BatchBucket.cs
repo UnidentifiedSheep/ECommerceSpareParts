@@ -3,31 +3,31 @@ using Domain.Interfaces.Events;
 
 namespace Application.Common.Services.Events;
 
-public sealed class BatchBucket<TEvent> : IBatchBucket
-    where TEvent : IBatchableDomainEvent
+public sealed class BatchBucket<TEvent> : IBatchBucket where TEvent : IBatchableDomainEvent
 {
-    private readonly List<TEvent> _items = [];
-    private readonly Dictionary<string, TEvent> _keyedEvents = new();
+	private readonly List<TEvent> _items = [];
 
-    public void Add(IBatchableDomainEvent item)
-    {
-        var typedItem = (TEvent)item;
+	private readonly Dictionary<string, TEvent> _keyedEvents = new();
 
-        if (typedItem is IKeyedDomainEvent ke)
-            _keyedEvents[ke.GetKey()] = typedItem;
-        else
-            _items.Add(typedItem);
-    }
+	public void Add(IBatchableDomainEvent item)
+	{
+		var typedItem = (TEvent)item;
 
-    public int Count => _items.Count + _keyedEvents.Count;
+		if (typedItem is IKeyedDomainEvent ke)
+			_keyedEvents[ke.GetKey()] = typedItem;
+		else
+			_items.Add(typedItem);
+	}
 
-    public IDomainEvent BuildNotification()
-    {
-        var result = new List<TEvent>(_items.Count + _keyedEvents.Count);
+	public int Count => _items.Count + _keyedEvents.Count;
 
-        result.AddRange(_items);
-        result.AddRange(_keyedEvents.Values);
+	public IDomainEvent BuildNotification()
+	{
+		var result = new List<TEvent>(_items.Count + _keyedEvents.Count);
 
-        return new Batch<TEvent>(result);
-    }
+		result.AddRange(_items);
+		result.AddRange(_keyedEvents.Values);
+
+		return new Batch<TEvent>(result);
+	}
 }

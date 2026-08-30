@@ -2,5 +2,5 @@
 
 public interface IIndexInitializer<TDocument>
 {
-    Task LazyInitialize(CancellationToken cancellationToken = default);
+	Task LazyInitialize(CancellationToken cancellationToken = default);
 }

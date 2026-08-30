@@ -6,14 +6,12 @@ namespace Main.Persistence.Context.Configurations.Auth;
 
 public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 {
-    public void Configure(EntityTypeBuilder<Permission> builder)
-    {
-        builder.ToTable("permissions", "auth");
+	public void Configure(EntityTypeBuilder<Permission> builder)
+	{
+		builder.ToTable("permissions", "auth");
 
-        builder.HasKey(e => e.Name)
-            .HasName("permissions_pk");
+		builder.HasKey(e => e.Name).HasName("permissions_pk");
 
-        builder.Property(e => e.Name)
-            .HasColumnName("name");
-    }
+		builder.Property(e => e.Name).HasColumnName("name");
+	}
 }

@@ -6,8 +6,6 @@ namespace Main.Application.Handlers.Users.GetUserFullInfo;
 
 public class GetUserFullInfoDbValidation : AbstractDbValidation<GetUserFullInfoQuery>
 {
-    public override void Build(IValidationPlan plan, GetUserFullInfoQuery request)
-    {
-        plan.ValidateUserExistsId(request.UserId);
-    }
+	public override void Build(IValidationPlan plan, GetUserFullInfoQuery request) =>
+		plan.ValidateUserExistsId(request.UserId);
 }

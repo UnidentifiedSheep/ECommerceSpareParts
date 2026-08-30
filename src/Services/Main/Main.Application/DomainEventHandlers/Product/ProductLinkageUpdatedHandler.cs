@@ -8,20 +8,25 @@ using Main.Entities.DomainEvents.Product;
 namespace Main.Application.DomainEventHandlers.Product;
 
 public class ProductLinkageUpdatedHandler(
-    IProductCacheInvalidator productCacheInvalidator,
-    IIntegrationEventScope integrationEventScope) : BatchableDomainEventHandler<ProductLinkageUpdatedDomainEvent>
+	IProductCacheInvalidator productCacheInvalidator,
+	IIntegrationEventScope integrationEventScope)
+	: BatchableDomainEventHandler<ProductLinkageUpdatedDomainEvent>
 {
-    public override async Task Handle(
-        Batch<ProductLinkageUpdatedDomainEvent> notification,
-        CancellationToken cancellationToken)
-    {
-        var ids = new List<int>(notification.Items.Count);
-        foreach (var @event in notification.Items)
-        {
-            integrationEventScope.Add(new ProductUpdatedEvent { Id = @event.ProductId });
-            ids.Add(@event.ProductId);
-        }
+	public override async Task Handle(
+		Batch<ProductLinkageUpdatedDomainEvent> notification,
+		CancellationToken cancellationToken)
+	{
+		var ids = new List<int>(notification.Items.Count);
+		foreach (var @event in notification.Items)
+		{
+			integrationEventScope.Add(
+				new ProductUpdatedEvent
+				{
+					Id = @event.ProductId
+				});
+			ids.Add(@event.ProductId);
+		}
 
-        await productCacheInvalidator.InvalidateCrossesAsync(ids);
-    }
+		await productCacheInvalidator.InvalidateCrossesAsync(ids);
+	}
 }

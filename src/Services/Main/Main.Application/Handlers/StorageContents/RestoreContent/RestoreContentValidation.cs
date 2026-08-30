@@ -6,20 +6,18 @@ namespace Main.Application.Handlers.StorageContents.RestoreContent;
 
 public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
 {
-    public RestoreContentValidation()
-    {
-        RuleForEach(z => z.ContentDetails)
-            .ChildRules(z =>
-            {
-                z.RuleFor(x => x.Count)
-                    .SetValidator(new CountValidator());
+	public RestoreContentValidation()
+	{
+		RuleForEach(z => z.ContentDetails)
+			.ChildRules(z =>
+			{
+				z.RuleFor(x => x.Count).SetValidator(new CountValidator());
 
-                z.RuleFor(x => x.BuyPrice)
-                    .SetValidator(new PriceValidator());
-            });
+				z.RuleFor(x => x.BuyPrice).SetValidator(new PriceValidator());
+			});
 
-        RuleFor(x => x.ContentDetails)
-            .NotEmpty()
-            .WithLocalizationKey("storage.content.restore.list.not.empty");
-    }
+		RuleFor(x => x.ContentDetails)
+			.NotEmpty()
+			.WithLocalizationKey("storage.content.restore.list.not.empty");
+	}
 }

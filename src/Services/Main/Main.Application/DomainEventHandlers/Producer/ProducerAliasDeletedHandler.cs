@@ -6,19 +6,21 @@ using Main.Entities.DomainEvents.Producer;
 
 namespace Main.Application.DomainEventHandlers.Producer;
 
-public class ProducerAliasDeletedHandler(
-    IIntegrationEventScope integrationEventScope
-    ) : BatchableDomainEventHandler<ProducerAliasDeletedDomainEvent>
+public class ProducerAliasDeletedHandler(IIntegrationEventScope integrationEventScope)
+	: BatchableDomainEventHandler<ProducerAliasDeletedDomainEvent>
 {
-    public override Task Handle(Batch<ProducerAliasDeletedDomainEvent> notification, CancellationToken cancellationToken)
-    {
-        var events = notification.Items
-            .Select(x => new ProducerUpdatedEvent
-            {
-                Id = x.ProducerId
-            })
-            .ToList();
-        integrationEventScope.AddRange(events);
-        return Task.CompletedTask;
-    }
+	public override Task Handle(
+		Batch<ProducerAliasDeletedDomainEvent> notification,
+		CancellationToken cancellationToken)
+	{
+		var events = notification
+			.Items
+			.Select(x => new ProducerUpdatedEvent
+			{
+				Id = x.ProducerId
+			})
+			.ToList();
+		integrationEventScope.AddRange(events);
+		return Task.CompletedTask;
+	}
 }

@@ -12,111 +12,114 @@ namespace Main.Entities.User;
 
 public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity<UserPhone, string>
 {
-    public const int MinNormalizedPhoneLength = 7;
-    public const int MaxNormalizedPhoneLength = 15;
-    public const int MaxPhoneNumberLength = 32;
+	public const int MinNormalizedPhoneLength = 7;
 
-    private UserPhone() { }
+	public const int MaxNormalizedPhoneLength = 15;
 
-    private UserPhone(
-        Guid userId,
-        string phoneNumber,
-        PhoneType phoneType)
-    {
-        UserId = userId;
-        SetPhoneNumber(phoneNumber);
-        PhoneType = phoneType;
-    }
+	public const int MaxPhoneNumberLength = 32;
 
-    public Guid UserId { get; private set; }
+	private UserPhone()
+	{
+	}
 
-    public string PhoneNumber { get; private set; } = null!;
+	private UserPhone(
+		Guid userId,
+		string phoneNumber,
+		PhoneType phoneType)
+	{
+		UserId = userId;
+		SetPhoneNumber(phoneNumber);
+		PhoneType = phoneType;
+	}
 
-    public string NormalizedPhone { get; private set; } = null!;
+	public Guid UserId { get; }
 
-    public bool Confirmed { get; private set; }
+	public string PhoneNumber { get; private set; } = null!;
 
-    public bool IsPrimary { get; private set; }
+	public string NormalizedPhone { get; private set; } = null!;
 
-    public PhoneType PhoneType { get; private set; }
+	public bool Confirmed { get; private set; }
 
-    public DateTime? ConfirmedAt { get; private set; }
-    public User User { get; private set; } = null!;
+	public bool IsPrimary { get; private set; }
 
-    public static Expression<Func<UserPhone, string>> GetKeySelector() { return x => x.NormalizedPhone; }
+	public PhoneType PhoneType { get; private set; }
 
-    public static Expression<Func<UserPhone, bool>> GetEqualityExpression(string key)
-    {
-        return x => x.NormalizedPhone == key;
-    }
+	public DateTime? ConfirmedAt { get; private set; }
 
-    internal static UserPhone Create(
-        Guid userId,
-        string phoneNumber,
-        PhoneType phoneType)
-    {
-        return new UserPhone(
-            userId,
-            phoneNumber,
-            phoneType);
-    }
+	public User User { get; private set; } = null!;
 
-    public void SetPhoneNumber(string phoneNumber)
-    {
-        PhoneNumber = phoneNumber
-            .TrimSafe()
-            .Ensure(IsValidPhone, "user.phone.invalid")
-            .EnsureNotNullOrWhiteSpace("phone.number.required")
-            .EnsureMaxLength(MaxPhoneNumberLength, "phone.number.max.length");
+	public static Expression<Func<UserPhone, string>> GetKeySelector() => x => x.NormalizedPhone;
 
-        NormalizedPhone = ToNormalizedPhone(phoneNumber)
-            .EnsureNotNullOrWhiteSpace("phone.number.must.contain.digits")
-            .EnsureMinLength(MinNormalizedPhoneLength, "phone.number.min.normalized.length")
-            .EnsureMaxLength(MaxNormalizedPhoneLength, "phone.number.max.normalized.length");
-    }
+	public static Expression<Func<UserPhone, bool>> GetEqualityExpression(string key) => x =>
+		x.NormalizedPhone == key;
 
-    public void Confirm(bool confirmed = true)
-    {
-        Confirmed = confirmed;
-        ConfirmedAt = confirmed ? DateTime.UtcNow : null;
-    }
+	internal static UserPhone Create(
+		Guid userId,
+		string phoneNumber,
+		PhoneType phoneType)
+	{
+		return new UserPhone(
+			userId,
+			phoneNumber,
+			phoneType);
+	}
 
-    public void ChangeType(PhoneType phoneType) { PhoneType = phoneType; }
+	public void SetPhoneNumber(string phoneNumber)
+	{
+		PhoneNumber = phoneNumber
+			.TrimSafe()
+			.Ensure(IsValidPhone, "user.phone.invalid")
+			.EnsureNotNullOrWhiteSpace("phone.number.required")
+			.EnsureMaxLength(MaxPhoneNumberLength, "phone.number.max.length");
 
-    public void MakePrimary(bool isPrimary = true) { IsPrimary = isPrimary; }
+		NormalizedPhone = ToNormalizedPhone(phoneNumber)
+			.EnsureNotNullOrWhiteSpace("phone.number.must.contain.digits")
+			.EnsureMinLength(MinNormalizedPhoneLength, "phone.number.min.normalized.length")
+			.EnsureMaxLength(MaxNormalizedPhoneLength, "phone.number.max.normalized.length");
+	}
 
-    public static string ToNormalizedPhone(string phoneNumber)
-    {
-        return phoneNumber.ToNormalizedPhoneNumber();
-    }
+	public void Confirm(bool confirmed = true)
+	{
+		Confirmed = confirmed;
+		ConfirmedAt = confirmed ? DateTime.UtcNow : null;
+	}
 
-    public bool IsValidPhone(string phone)
-    {
-        if (string.IsNullOrWhiteSpace(phone)) return false;
+	public void ChangeType(PhoneType phoneType) => PhoneType = phoneType;
 
-        phone = phone.Trim();
+	public void MakePrimary(bool isPrimary = true) => IsPrimary = isPrimary;
 
-        if (phone.Length is < 7 or > 20) return false;
+	public static string ToNormalizedPhone(string phoneNumber) => phoneNumber.ToNormalizedPhoneNumber();
 
-        if (!PhoneRegex().IsMatch(phone)) return false;
+	public bool IsValidPhone(string phone)
+	{
+		if (string.IsNullOrWhiteSpace(phone))
+			return false;
 
-        var digitsOnly = new string(phone.Where(char.IsDigit).ToArray());
-        return digitsOnly.Length >= 7;
-    }
-    //Допустимые форматы
-    // +1 (555) 123-4567
-    // +44 20 7946 0958
-    // (495) 123-45-67
-    // 89001234567
+		phone = phone.Trim();
 
-    [GeneratedRegex(@"^\+?[0-9\s\-\(\)]{7,20}$")]
-    private static partial Regex PhoneRegex();
+		if (phone.Length is < 7 or > 20)
+			return false;
 
-    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+		if (!PhoneRegex().IsMatch(phone))
+			return false;
 
-    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+		string digitsOnly = new(phone.Where(char.IsDigit).ToArray());
+		return digitsOnly.Length >= 7;
+	}
+	//Допустимые форматы
+	// +1 (555) 123-4567
+	// +44 20 7946 0958
+	// (495) 123-45-67
+	// 89001234567
 
-    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	[GeneratedRegex(@"^\+?[0-9\s\-\(\)]{7,20}$")]
+	private static partial Regex PhoneRegex();
 
-    public override string GetId() { return NormalizedPhone; }
+	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+	public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+	public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+	public override string GetId() => NormalizedPhone;
 }

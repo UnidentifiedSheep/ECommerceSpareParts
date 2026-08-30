@@ -5,8 +5,8 @@ namespace Main.Application.NamedObjects;
 
 public class NamedObjectGroupRegistry : NamedObjectGroupRegistryBase
 {
-    public NamedObjectGroupRegistry()
-    {
-        Register<StorageContentExtractPolicyBase>("StorageContentExtractPolicy");
-    }
+	public NamedObjectGroupRegistry()
+	{
+		Register<StorageContentExtractPolicyBase>("StorageContentExtractPolicy");
+	}
 }

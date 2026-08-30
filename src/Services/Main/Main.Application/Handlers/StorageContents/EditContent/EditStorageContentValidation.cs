@@ -8,31 +8,32 @@ namespace Main.Application.Handlers.StorageContents.EditContent;
 
 public class EditStorageContentValidation : AbstractValidator<EditStorageContentCommand>
 {
-    public EditStorageContentValidation(IOperationDatePolicy datePolicy)
-    {
-        RuleFor(x => x.EditedFields)
-            .NotEmpty()
-            .WithLocalizationKey("storage.content.edit.list.not.empty");
+	public EditStorageContentValidation(IOperationDatePolicy datePolicy)
+	{
+		RuleFor(x => x.EditedFields).NotEmpty().WithLocalizationKey("storage.content.edit.list.not.empty");
 
-        RuleFor(x => x.EditedFields)
-            .Must(x => x.Count < 100)
-            .WithLocalizationKey("storage.content.edit.max.count");
+		RuleFor(x => x.EditedFields)
+			.Must(x => x.Count < 100)
+			.WithLocalizationKey("storage.content.edit.max.count");
 
-        RuleForEach(x => x.EditedFields.Values)
-            .ChildRules(z =>
-            {
-                z.RuleFor(x => x.Model.BuyPrice.Value)
-                    .SetValidator(new PriceValidator())
-                    .When(x => x.Model.BuyPrice.IsSet);
+		RuleForEach(x => x.EditedFields.Values)
+			.ChildRules(z =>
+			{
+				z
+					.RuleFor(x => x.Model.BuyPrice.Value)
+					.SetValidator(new PriceValidator())
+					.When(x => x.Model.BuyPrice.IsSet);
 
-                z.RuleFor(x => x.Model.Count.Value)
-                    .GreaterThanOrEqualTo(0)
-                    .When(x => x.Model.Count.IsSet)
-                    .WithLocalizationKey("storage.content.count.min.zero");
+				z
+					.RuleFor(x => x.Model.Count.Value)
+					.GreaterThanOrEqualTo(0)
+					.When(x => x.Model.Count.IsSet)
+					.WithLocalizationKey("storage.content.count.min.zero");
 
-                z.RuleFor(x => x.Model.PurchaseDatetime.Value)
-                    .SetValidator(new RecordDateValidator(datePolicy))
-                    .When(x => x.Model.PurchaseDatetime.IsSet);
-            });
-    }
+				z
+					.RuleFor(x => x.Model.PurchaseDatetime.Value)
+					.SetValidator(new RecordDateValidator(datePolicy))
+					.When(x => x.Model.PurchaseDatetime.IsSet);
+			});
+	}
 }

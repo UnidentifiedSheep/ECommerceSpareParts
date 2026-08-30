@@ -2,6 +2,7 @@ namespace Main.Enums;
 
 public enum TokenType
 {
-    RefreshToken,
-    JwtToken
+	RefreshToken,
+
+	JwtToken
 }

@@ -6,88 +6,92 @@ namespace Tests.DataBuilders.Sale;
 
 public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
 {
-    private readonly List<int> _storageContentIds = [];
-    public int? ProductId { get; private set; }
+	private readonly List<int> _storageContentIds = [];
 
-    public decimal? PriceWithDiscount { get; private set; }
-    public decimal? PriceWithOutDiscount { get; private set; }
-    public IReadOnlyList<int> StorageContentIds => _storageContentIds;
+	public int? ProductId { get; private set; }
 
-    public int? CurrencyId { get; private set; }
+	public decimal? PriceWithDiscount { get; private set; }
 
-    public int? DetailsCount { get; private set; }
-    public int? Count { get; private set; }
+	public decimal? PriceWithOutDiscount { get; private set; }
 
-    public SaleContentBuilder WithProductId(int productId)
-    {
-        ProductId = productId;
-        return this;
-    }
+	public IReadOnlyList<int> StorageContentIds => _storageContentIds;
 
-    public SaleContentBuilder WithDetailsCount(int detailsCount)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(detailsCount);
-        DetailsCount = detailsCount;
-        return this;
-    }
+	public int? CurrencyId { get; private set; }
 
-    public SaleContentBuilder WithCount(int count)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
-        Count = count;
-        return this;
-    }
+	public int? DetailsCount { get; private set; }
 
-    public SaleContentBuilder WithStorageContentIds(IEnumerable<int> storageContentIds)
-    {
-        _storageContentIds.Clear();
-        _storageContentIds.AddRange(storageContentIds);
-        return this;
-    }
+	public int? Count { get; private set; }
 
-    public SaleContentBuilder WithCurrencyId(int currencyId)
-    {
-        CurrencyId = currencyId;
-        return this;
-    }
+	public SaleContentBuilder WithProductId(int productId)
+	{
+		ProductId = productId;
+		return this;
+	}
 
-    public override SaleContent Build()
-    {
-        var price = PriceWithOutDiscount ?? Math.Round(Faker.Random.Decimal(1), 2);
-        return SaleContent.Create(
-            ProductId ?? Faker.Random.Int(1),
-            price,
-            PriceWithDiscount ?? price,
-            GetDetails());
-    }
+	public SaleContentBuilder WithDetailsCount(int detailsCount)
+	{
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(detailsCount);
+		DetailsCount = detailsCount;
+		return this;
+	}
 
-    private List<SaleContentDetail> GetDetails()
-    {
-        var details = new List<SaleContentDetail>();
-        Count ??= Faker.Random.Int(1, 100);
-        DetailsCount ??= Faker.Random.Int(1, Math.Min(5, Count.Value));
+	public SaleContentBuilder WithCount(int count)
+	{
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
+		Count = count;
+		return this;
+	}
 
-        var remaining = Count.Value;
-        var detailsCount = Math.Min(DetailsCount.Value, Count.Value);
+	public SaleContentBuilder WithStorageContentIds(IEnumerable<int> storageContentIds)
+	{
+		_storageContentIds.Clear();
+		_storageContentIds.AddRange(storageContentIds);
+		return this;
+	}
 
-        var builder = new SaleContentDetailBuilder(Faker)
-            .WithPurchaseDate(Faker.Date.Recent())
-            .WithPurchasePrice(Math.Round(Faker.Random.Decimal(1), 2))
-            .WithStorageContentIds(_storageContentIds)
-            .WithCurrencyId(CurrencyId ?? Faker.Random.Int(1));
+	public SaleContentBuilder WithCurrencyId(int currencyId)
+	{
+		CurrencyId = currencyId;
+		return this;
+	}
 
-        for (var i = 0; i < detailsCount; i++)
-        {
-            var remainingDetails = detailsCount - i;
-            var toTake = i == detailsCount - 1
-                ? remaining
-                : Faker.Random.Int(1, remaining - remainingDetails + 1);
+	public override SaleContent Build()
+	{
+		var price = PriceWithOutDiscount ?? Math.Round(Faker.Random.Decimal(1), 2);
+		return SaleContent.Create(
+			ProductId ?? Faker.Random.Int(1),
+			price,
+			PriceWithDiscount ?? price,
+			GetDetails());
+	}
 
-            remaining -= toTake;
+	private List<SaleContentDetail> GetDetails()
+	{
+		var details = new List<SaleContentDetail>();
+		Count ??= Faker.Random.Int(1, 100);
+		DetailsCount ??= Faker.Random.Int(1, Math.Min(5, Count.Value));
 
-            details.Add(builder.WithCount(toTake).Build());
-        }
+		var remaining = Count.Value;
+		var detailsCount = Math.Min(DetailsCount.Value, Count.Value);
 
-        return details;
-    }
+		var builder = new SaleContentDetailBuilder(Faker)
+			.WithPurchaseDate(Faker.Date.Recent())
+			.WithPurchasePrice(Math.Round(Faker.Random.Decimal(1), 2))
+			.WithStorageContentIds(_storageContentIds)
+			.WithCurrencyId(CurrencyId ?? Faker.Random.Int(1));
+
+		for (var i = 0; i < detailsCount; i++)
+		{
+			var remainingDetails = detailsCount - i;
+			var toTake = i == detailsCount - 1
+				? remaining
+				: Faker.Random.Int(1, remaining - remainingDetails + 1);
+
+			remaining -= toTake;
+
+			details.Add(builder.WithCount(toTake).Build());
+		}
+
+		return details;
+	}
 }

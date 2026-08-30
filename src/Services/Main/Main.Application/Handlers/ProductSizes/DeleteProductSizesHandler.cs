@@ -12,17 +12,15 @@ namespace Main.Application.Handlers.ProductSizes;
 [Transactional]
 public record DeleteArticleSizesCommand(int ProductId) : ICommand;
 
-public class DeleteProductSizesHandler(
-    IRepository<ProductSize, int> repository,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<DeleteArticleSizesCommand>
+public class DeleteProductSizesHandler(IRepository<ProductSize, int> repository, IUnitOfWork unitOfWork)
+	: ICommandHandler<DeleteArticleSizesCommand>
 {
-    public async Task<Unit> Handle(DeleteArticleSizesCommand request, CancellationToken cancellationToken)
-    {
-        var sizes = await repository.GetById(request.ProductId, cancellationToken)
-                    ?? throw new ProductSizesNotFoundException(request.ProductId);
+	public async Task<Unit> Handle(DeleteArticleSizesCommand request, CancellationToken cancellationToken)
+	{
+		var sizes = await repository.GetById(request.ProductId, cancellationToken) ??
+			throw new ProductSizesNotFoundException(request.ProductId);
 
-        unitOfWork.Remove(sizes);
-        return Unit.Value;
-    }
+		unitOfWork.Remove(sizes);
+		return Unit.Value;
+	}
 }

@@ -2,8 +2,11 @@
 
 public enum TransactionSourceType
 {
-    Manual,
-    Purchase,
-    Sale,
-    Logistic
+	Manual,
+
+	Purchase,
+
+	Sale,
+
+	Logistic
 }

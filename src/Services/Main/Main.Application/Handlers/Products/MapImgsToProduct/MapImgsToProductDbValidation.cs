@@ -6,8 +6,6 @@ namespace Main.Application.Handlers.Products.MapImgsToProduct;
 
 public class MapImgsToProductDbValidation : AbstractDbValidation<MapImgsToProductCommand>
 {
-    public override void Build(IValidationPlan plan, MapImgsToProductCommand request)
-    {
-        plan.ValidateProductExistsId(request.ProductId);
-    }
+	public override void Build(IValidationPlan plan, MapImgsToProductCommand request) =>
+		plan.ValidateProductExistsId(request.ProductId);
 }

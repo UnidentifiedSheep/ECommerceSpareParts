@@ -5,5 +5,5 @@ namespace Exceptions.Base;
 
 public class UnauthorizedException(string? message) : Exception(message), IStatusCode
 {
-    public HttpStatusCode StatusCode => HttpStatusCode.Unauthorized;
+	public HttpStatusCode StatusCode => HttpStatusCode.Unauthorized;
 }

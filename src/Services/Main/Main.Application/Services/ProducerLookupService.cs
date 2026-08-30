@@ -7,102 +7,97 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Services;
 
 public class ProducerLookupService(
-    IReadRepository<Producer, int> producerReadRepository,
-    IReadRepository<ProducerSupplierMapping, int> mappingRepository)
-    : IProducerLookupService
+	IReadRepository<Producer, int> producerReadRepository,
+	IReadRepository<ProducerSupplierMapping, int> mappingRepository) : IProducerLookupService
 {
-    private readonly object _loadLock = new();
-    private Task<IProducerLookup>? _loadTask;
+	private readonly object _loadLock = new();
 
-    public Task<IProducerLookup> Load(
-        CancellationToken cancellationToken = default)
-    {
-        Task<IProducerLookup> loadTask;
-        lock (_loadLock)
-            loadTask = _loadTask ??= LoadCore(cancellationToken);
+	private Task<IProducerLookup>? _loadTask;
 
-        return AwaitAndResetOnFailure(loadTask);
-    }
+	public Task<IProducerLookup> Load(CancellationToken cancellationToken = default)
+	{
+		Task<IProducerLookup> loadTask;
+		lock (_loadLock)
+			loadTask = _loadTask ??= LoadCore(cancellationToken);
 
-    private async Task<IProducerLookup> LoadCore(
-        CancellationToken cancellationToken)
-    {
-        var producerNamesToIds = new Dictionary<string, int>();
-        var aliasesToIds = new Dictionary<string, int>();
+		return AwaitAndResetOnFailure(loadTask);
+	}
 
-        const int batchSize = 1000;
+	private async Task<IProducerLookup> LoadCore(CancellationToken cancellationToken)
+	{
+		var producerNamesToIds = new Dictionary<string, int>();
+		var aliasesToIds = new Dictionary<string, int>();
 
-        var baseQuery = producerReadRepository.Query
-            .Select(x => new
-            {
-                id = x.Id,
-                name = x.Name,
-                aliases = x.Aliases.Select(z => z.Alias)
-            })
-            .OrderBy(x => x.id);
+		const int batchSize = 1000;
 
-        var lastId = 0;
+		var baseQuery = producerReadRepository
+			.Query
+			.Select(x => new
+			{
+				id = x.Id,
+				name = x.Name,
+				aliases = x.Aliases.Select(z => z.Alias)
+			})
+			.OrderBy(x => x.id);
 
-        while (true)
-        {
-            var id = lastId;
-            var producers = await baseQuery
-                .Where(x => x.id > id)
-                .Take(batchSize)
-                .ToListAsync(cancellationToken);
+		var lastId = 0;
 
-            if (producers.Count == 0) break;
+		while (true)
+		{
+			var id = lastId;
+			var producers = await baseQuery
+				.Where(x => x.id > id)
+				.Take(batchSize)
+				.ToListAsync(cancellationToken);
 
-            lastId = producers.Last().id;
+			if (producers.Count == 0)
+				break;
 
-            foreach (var item in producers)
-            {
-                producerNamesToIds.TryAdd(item.name, item.id);
-                foreach (var alias in item.aliases) aliasesToIds.TryAdd(alias, item.id);
-            }
+			lastId = producers.Last().id;
 
-            if (producers.Count != batchSize) break;
-        }
+			foreach (var item in producers)
+			{
+				producerNamesToIds.TryAdd(item.name, item.id);
+				foreach (var alias in item.aliases)
+					aliasesToIds.TryAdd(alias, item.id);
+			}
 
-        var supplierMappingItems = await mappingRepository.Query
-            .Select(x => new
-            {
-                x.Supplier,
-                x.SupplierProducerName,
-                x.ProducerId
-            })
-            .ToListAsync(cancellationToken);
+			if (producers.Count != batchSize)
+				break;
+		}
 
-        var supplierMappings = supplierMappingItems
-            .ToDictionary(
-                x => new ProducerSupplierLookupKey(
-                    x.Supplier,
-                    x.SupplierProducerName),
-                x => x.ProducerId);
+		var supplierMappingItems = await mappingRepository
+			.Query
+			.Select(x => new
+			{
+				x.Supplier,
+				x.SupplierProducerName,
+				x.ProducerId
+			})
+			.ToListAsync(cancellationToken);
 
-        IProducerLookup lookup = new ProducerLookup(
-            producerNamesToIds,
-            aliasesToIds);
+		var supplierMappings = supplierMappingItems.ToDictionary(
+			x => new ProducerSupplierLookupKey(x.Supplier, x.SupplierProducerName),
+			x => x.ProducerId);
 
-        return new SupplierProducerLookup(
-            lookup,
-            supplierMappings);
-    }
+		IProducerLookup lookup = new ProducerLookup(producerNamesToIds, aliasesToIds);
 
-    private async Task<IProducerLookup> AwaitAndResetOnFailure(
-        Task<IProducerLookup> loadTask)
-    {
-        try
-        {
-            return await loadTask;
-        }
-        catch
-        {
-            lock (_loadLock)
-                if (ReferenceEquals(_loadTask, loadTask))
-                    _loadTask = null;
+		return new SupplierProducerLookup(lookup, supplierMappings);
+	}
 
-            throw;
-        }
-    }
+	private async Task<IProducerLookup> AwaitAndResetOnFailure(Task<IProducerLookup> loadTask)
+	{
+		try
+		{
+			return await loadTask;
+		}
+		catch
+		{
+			lock (_loadLock)
+				if (ReferenceEquals(_loadTask, loadTask))
+					_loadTask = null;
+
+			throw;
+		}
+	}
 }

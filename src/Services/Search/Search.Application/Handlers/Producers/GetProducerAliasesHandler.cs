@@ -1,4 +1,3 @@
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Search.Application.Dtos.Producers;
@@ -12,19 +11,16 @@ public record GetProducerAliasesQuery(int ProducerId) : IQuery<GetProducerAliase
 public record GetProducerAliasesResult(IEnumerable<ProducerAlias> Aliases);
 
 public class GetProducerAliasesHandler(
-    IProducerRepository producerRepository,
-    IProjectionProvider<ProducerAliasEntity, ProducerAlias> projection
-) : IQueryHandler<GetProducerAliasesQuery, GetProducerAliasesResult>
+	IProducerRepository producerRepository,
+	IProjectionProvider<ProducerAliasEntity, ProducerAlias> projection)
+	: IQueryHandler<GetProducerAliasesQuery, GetProducerAliasesResult>
 {
-    public async Task<GetProducerAliasesResult> Handle(
-        GetProducerAliasesQuery request,
-        CancellationToken cancellationToken)
-    {
-        var producer = await producerRepository.GetById(
-            request.ProducerId,
-            cancellationToken);
+	public async Task<GetProducerAliasesResult> Handle(
+		GetProducerAliasesQuery request,
+		CancellationToken cancellationToken)
+	{
+		var producer = await producerRepository.GetById(request.ProducerId, cancellationToken);
 
-        return new GetProducerAliasesResult(
-            producer?.Aliases.Select(projection.ProjectionFunc) ?? []);
-    }
+		return new GetProducerAliasesResult(producer?.Aliases.Select(projection.ProjectionFunc) ?? []);
+	}
 }

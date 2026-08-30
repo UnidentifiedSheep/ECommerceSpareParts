@@ -6,9 +6,10 @@ namespace Main.Application.Handlers.StorageContents.AddContent;
 
 public class AddContentDbValidation : AbstractDbValidation<AddContentCommand>
 {
-    public override void Build(IValidationPlan plan, AddContentCommand request)
-    {
-        plan.ValidateStorageExistsCode(request.StorageCode)
-            .ValidateCurrencyExistsId(request.StorageContent.Select(x => x.CurrencyId));
-    }
+	public override void Build(IValidationPlan plan, AddContentCommand request)
+	{
+		plan
+			.ValidateStorageExistsCode(request.StorageCode)
+			.ValidateCurrencyExistsId(request.StorageContent.Select(x => x.CurrencyId));
+	}
 }

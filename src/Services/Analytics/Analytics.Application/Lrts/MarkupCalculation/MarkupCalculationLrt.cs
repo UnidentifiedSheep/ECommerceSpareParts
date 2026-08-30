@@ -1,16 +1,12 @@
-using Abstractions;
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
-using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
-using Application.Common.NamedObject;
 using Attributes;
 using Contracts.Analytics;
-using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -18,57 +14,58 @@ using Microsoft.Extensions.Logging;
 namespace Analytics.Application.Lrts.MarkupCalculation;
 
 public class MarkupCalculationLrt(
-    IRepository<Job, Guid> jobRepository,
-    IUnitOfWork unitOfWork,
-    INamedObjectRegistry<MarkupAnalyzerNamedObjectBase> registry,
-    IPublishEndpoint publisher,
-    IApplicationTransactionService transactionService,
-    ILogger<MarkupCalculationLrt> logger
-) : LrtBase<MarkupCalculationInputState, MarkupCalculationState>(
-    jobRepository,
-    unitOfWork,
-    publisher,
-    transactionService,
-    logger)
+	IRepository<Job, Guid> jobRepository,
+	IUnitOfWork unitOfWork,
+	INamedObjectRegistry<MarkupAnalyzerNamedObjectBase> registry,
+	IPublishEndpoint publisher,
+	IApplicationTransactionService transactionService,
+	ILogger<MarkupCalculationLrt> logger) : LrtBase<MarkupCalculationInputState, MarkupCalculationState>(
+	jobRepository,
+	unitOfWork,
+	publisher,
+	transactionService,
+	logger)
 {
-    public override string SystemName => nameof(MarkupCalculationLrt);
-    public override string NameLocalizationKey => "markup_calculation_lrt_name";
-    public override string DescriptionLocalizationKey => "markup_calculation_lrt_description";
+	public override string SystemName => nameof(MarkupCalculationLrt);
 
-    protected override async Task DoWork()
-    {
-        var analyzer = registry.GetBySystemName(MarkupRangeAnalyzer.AnalyzerSystemName);
-        var result = await analyzer.AnalyzeAsync(
-            new MarkupAnalyzerInput
-            {
-                StartDate = State.RangeStart,
-                EndDate = State.RangeEnd
-            },
-            CancellationToken);
+	public override string NameLocalizationKey => "markup_calculation_lrt_name";
 
-        var ranges = result.Select(x => new MarkupRangeItem
-            {
-                Count = x.Count,
-                FromCost = x.FromCost,
-                MeanMarkup = x.MeanMarkup,
-                StdDevMarkup = x.StdDevMarkup,
-                ToCost = x.ToCost
-            })
-            .ToList();
+	public override string DescriptionLocalizationKey => "markup_calculation_lrt_description";
 
-        await TransactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommitted(20, 2),
-            async (context, cancellationToken) =>
-            {
-                await Publisher.Publish(
-                    new MarkupAnalyzedEvent
-                    {
-                        Ranges = ranges
-                    },
-                    cancellationToken);
+	protected override async Task DoWork()
+	{
+		var analyzer = registry.GetBySystemName(MarkupRangeAnalyzer.AnalyzerSystemName);
+		var result = await analyzer.AnalyzeAsync(
+			new MarkupAnalyzerInput
+			{
+				StartDate = State.RangeStart, EndDate = State.RangeEnd
+			},
+			CancellationToken);
 
-                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-            },
-            CancellationToken);
-    }
+		var ranges = result
+			.Select(x => new MarkupRangeItem
+			{
+				Count = x.Count,
+				FromCost = x.FromCost,
+				MeanMarkup = x.MeanMarkup,
+				StdDevMarkup = x.StdDevMarkup,
+				ToCost = x.ToCost
+			})
+			.ToList();
+
+		await TransactionService.ExecuteAsync(
+			TransactionalAttribute.ReadCommitted(20, 2),
+			async (context, cancellationToken) =>
+			{
+				await Publisher.Publish(
+					new MarkupAnalyzedEvent
+					{
+						Ranges = ranges
+					},
+					cancellationToken);
+
+				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+			},
+			CancellationToken);
+	}
 }

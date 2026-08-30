@@ -8,31 +8,25 @@ namespace Main.Application.Handlers.Sales.CreateSale;
 
 public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
 {
-    public CreateSaleValidation(IOperationDatePolicy datePolicy)
-    {
-        RuleFor(x => x.SaleDateTime)
-            .SetValidator(new RecordDateValidator(datePolicy));
+	public CreateSaleValidation(IOperationDatePolicy datePolicy)
+	{
+		RuleFor(x => x.SaleDateTime).SetValidator(new RecordDateValidator(datePolicy));
 
-        RuleFor(x => x.Contents)
-            .SetValidator(new NewSaleContentValidator());
+		RuleFor(x => x.Contents).SetValidator(new NewSaleContentValidator());
 
-        RuleFor(x => x.PayedSum)
-            .GreaterThanOrEqualTo(0)
-            .When(x => x.PayedSum != null)
-            .WithLocalizationKey("sale.payed.sum.min")
-            .PrecisionScale(
-                18,
-                2,
-                true)
-            .When(x => x.PayedSum != null)
-            .WithLocalizationKey("sale.payed.sum.precision");
+		RuleFor(x => x.PayedSum)
+			.GreaterThanOrEqualTo(0)
+			.When(x => x.PayedSum != null)
+			.WithLocalizationKey("sale.payed.sum.min")
+			.PrecisionScale(
+				18,
+				2,
+				true)
+			.When(x => x.PayedSum != null)
+			.WithLocalizationKey("sale.payed.sum.precision");
 
-        RuleFor(x => x.UserId)
-            .NotEmpty()
-            .WithLocalizationKey("sale.buyer.id.not.empty");
+		RuleFor(x => x.UserId).NotEmpty().WithLocalizationKey("sale.buyer.id.not.empty");
 
-        RuleFor(x => x.OrganizationId)
-            .NotEmpty()
-            .WithLocalizationKey("sale.organization.id.not.empty");
-    }
+		RuleFor(x => x.OrganizationId).NotEmpty().WithLocalizationKey("sale.organization.id.not.empty");
+	}
 }

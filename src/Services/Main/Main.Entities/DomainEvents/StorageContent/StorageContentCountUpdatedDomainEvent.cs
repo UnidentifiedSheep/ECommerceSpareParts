@@ -4,11 +4,10 @@ using Main.Enums;
 namespace Main.Entities.DomainEvents.StorageContent;
 
 public record StorageContentCountUpdatedDomainEvent(
-    int ProductId,
-    string StorageCode,
-    int CurrencyId,
-    int NewCount,
-    decimal BuyPrice,
-    StorageMovementType MovementType,
-    int Delta
-    ) : IBatchableDomainEvent;
+	int ProductId,
+	string StorageCode,
+	int CurrencyId,
+	int NewCount,
+	decimal BuyPrice,
+	StorageMovementType MovementType,
+	int Delta) : IBatchableDomainEvent;

@@ -17,81 +17,80 @@ namespace Security;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddFullSecurityLayer(
-        this IServiceCollection collection,
-        PasswordRules? passwordRules = null)
-    {
-        collection.AddSingleton<IPasswordManager, PasswordManager>();
-        collection.AddSingleton(passwordRules ?? new PasswordRules());
-        collection.AddSingleton<ITokenHasher, TokenHasher>();
+	public static IServiceCollection AddFullSecurityLayer(
+		this IServiceCollection collection,
+		PasswordRules? passwordRules = null)
+	{
+		collection.AddSingleton<IPasswordManager, PasswordManager>();
+		collection.AddSingleton(passwordRules ?? new PasswordRules());
+		collection.AddSingleton<ITokenHasher, TokenHasher>();
 
-        collection.AddMinimalSecurityLayer();
-        return collection;
-    }
+		collection.AddMinimalSecurityLayer();
+		return collection;
+	}
 
-    public static IServiceCollection AddJsonSigner(
-        this IServiceCollection collection)
-    {
-        collection.TryAddSingleton<ProjectJsonOptions>();
-        collection.AddSingleton<IJsonSigner, JsonSigner>();
-        return collection;
-    }
+	public static IServiceCollection AddJsonSigner(this IServiceCollection collection)
+	{
+		collection.TryAddSingleton<ProjectJsonOptions>();
+		collection.AddSingleton<IJsonSigner, JsonSigner>();
+		return collection;
+	}
 
-    public static IServiceCollection AddSecretEncryptor(
-        this IServiceCollection collection)
-    {
-        collection.AddSingleton<ISecretEncryptor, SecretEncryptor>();
-        return collection;
-    }
+	public static IServiceCollection AddSecretEncryptor(this IServiceCollection collection)
+	{
+		collection.AddSingleton<ISecretEncryptor, SecretEncryptor>();
+		return collection;
+	}
 
-    public static IServiceCollection AddMinimalSecurityLayer(this IServiceCollection collection)
-    {
-        collection.TryAddScoped<IUserContext, UserContext>();
-        collection.TryAddEnumerable(
-            ServiceDescriptor.Scoped<IAuthorizationHandler, PermissionAuthorizationHandler>());
-        collection.TryAddEnumerable(
-            ServiceDescriptor.Scoped<IAuthorizationHandler, RoleAuthorizationHandler>());
-        return collection;
-    }
+	public static IServiceCollection AddMinimalSecurityLayer(this IServiceCollection collection)
+	{
+		collection.TryAddScoped<IUserContext, UserContext>();
+		collection.TryAddEnumerable(
+			ServiceDescriptor.Scoped<IAuthorizationHandler, PermissionAuthorizationHandler>());
+		collection.TryAddEnumerable(
+			ServiceDescriptor.Scoped<IAuthorizationHandler, RoleAuthorizationHandler>());
+		return collection;
+	}
 
-    public static IServiceCollection AddWorkerSecurityLayer(this IServiceCollection collection)
-    {
-        collection.TryAddSingleton<IUserContext, WorkerUserContext>();
-        return collection;
-    }
+	public static IServiceCollection AddWorkerSecurityLayer(this IServiceCollection collection)
+	{
+		collection.TryAddSingleton<IUserContext, WorkerUserContext>();
+		return collection;
+	}
 
-    public static IServiceCollection AddEComAuth(
-        this IServiceCollection collection,
-        IConfiguration configuration)
-    {
-        collection.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                var iss = configuration["JwtBearer:ValidIssuer"];
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = iss,
-                    IssuerSigningKey =
-                        new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!))
-                };
-            });
+	public static IServiceCollection AddEComAuth(
+		this IServiceCollection collection,
+		IConfiguration configuration)
+	{
+		collection
+			.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
+			.AddJwtBearer(options =>
+			{
+				var iss = configuration["JwtBearer:ValidIssuer"];
+				options.TokenValidationParameters = new TokenValidationParameters
+				{
+					ValidateIssuer = true,
+					ValidateAudience = false,
+					ValidateLifetime = true,
+					ValidateIssuerSigningKey = true,
+					ValidIssuer = iss,
+					IssuerSigningKey = new SymmetricSecurityKey(
+						Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!))
+				};
+			});
 
-        collection.AddAuthorizationBuilder()
-            .SetDefaultPolicy(
-                new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-                    .RequireAuthenticatedUser()
-                    .Build());
+		collection
+			.AddAuthorizationBuilder()
+			.SetDefaultPolicy(
+				new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+					.RequireAuthenticatedUser()
+					.Build());
 
-        return collection;
-    }
+		return collection;
+	}
 }

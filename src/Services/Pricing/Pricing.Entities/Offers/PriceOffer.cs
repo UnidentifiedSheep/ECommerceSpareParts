@@ -7,113 +7,119 @@ namespace Pricing.Entities.Offers;
 
 public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOffer, Guid>
 {
-    private PriceOffer() { }
-    public Guid Id { get; private set; }
-    public int ProductId { get; private set; }
-    public int CurrencyId { get; private set; }
-    public string OfferForStorage { get; private set;  } = string.Empty;
+	private PriceOffer()
+	{
+	}
 
-    public decimal PurchasePrice { get; private set; }
+	public Guid Id { get; private set; }
 
-    public PriceOfferSource Source { get; private set; }
-    public string SourceKey { get; private set; } = string.Empty;
+	public int ProductId { get; private set; }
 
-    public int AvailableQuantity { get; private set; }
-    public int MinimumPurchaseQuantity { get; private set; }
-    public int QuantityCoefficient { get; private set; }
+	public int CurrencyId { get; private set; }
 
-    public int DaysToRefund { get; private set; }
+	public string OfferForStorage { get; private set; } = string.Empty;
 
-    public DateTime? DeliveryDate { get; private set; }
-    public DateTime? GuaranteedDeliveryDate { get; private set; }
-    public DateTime? OrderTill { get; private set; }
-    public DateTime? SourceOccurredAt { get; private set; }
-    public int DeliveryProbability { get; private set; }
-    public DateTime ExpiresAt { get; private set; }
-    
-    public static Expression<Func<PriceOffer, Guid>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
-    public static Expression<Func<PriceOffer, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
+	public decimal PurchasePrice { get; private set; }
 
-    public static PriceOffer CreateForSupplier(
-        int productId,
-        int currencyId,
-        string offerForStorage,
-        decimal price,
-        PriceOfferSource source,
-        string sourceKey,
-        int availableQuantity,
-        int minimumPurchaseQuantity,
-        int quantityCoefficient,
-        int daysToRefund,
-        DateTime deliveryDate,
-        DateTime guaranteedDeliveryDate,
-        int deliveryProbability,
-        DateTime orderTill,
-        DateTime expiresAt)
-    {
-        return new PriceOffer
-        {
-            Id = Guid.NewGuid(),
-            ProductId = productId,
-            OfferForStorage = offerForStorage,
-            CurrencyId = currencyId,
-            PurchasePrice = price,
-            Source = source,
-            SourceKey = sourceKey,
-            AvailableQuantity = availableQuantity,
-            MinimumPurchaseQuantity = minimumPurchaseQuantity,
-            QuantityCoefficient = quantityCoefficient,
-            DaysToRefund = daysToRefund,
-            DeliveryDate = deliveryDate,
-            GuaranteedDeliveryDate = guaranteedDeliveryDate,
-            DeliveryProbability = deliveryProbability,
-            OrderTill = orderTill,
-            ExpiresAt = expiresAt
-        };
-    }
-    
-    public static PriceOffer CreateForOurWarehouse(
-        int productId,
-        int currencyId,
-        string offerForStorage,
-        decimal price,
-        string sourceKey,
-        int availableQuantity,
-        int minimumPurchaseQuantity,
-        int quantityCoefficient,
-        int daysToRefund,
-        DateTime occuredAt)
-    {
-        return new PriceOffer
-        {
-            Id = Guid.NewGuid(),
-            ProductId = productId,
-            OfferForStorage = offerForStorage,
-            CurrencyId = currencyId,
-            PurchasePrice = price,
-            Source = PriceOfferSource.OurWarehouse,
-            SourceKey = sourceKey,
-            AvailableQuantity = availableQuantity,
-            MinimumPurchaseQuantity = minimumPurchaseQuantity,
-            QuantityCoefficient = quantityCoefficient,
-            DaysToRefund = daysToRefund,
-            DeliveryDate = null,
-            GuaranteedDeliveryDate = null,
-            DeliveryProbability = 99,
-            OrderTill = null,
-            SourceOccurredAt = occuredAt,
-            ExpiresAt = DateTime.SpecifyKind(DateTime.MaxValue, DateTimeKind.Utc)
-        };
-    }
-    
-    public override Guid GetId()
-    {
-        return Id;
-    }
+	public PriceOfferSource Source { get; private set; }
+
+	public string SourceKey { get; private set; } = string.Empty;
+
+	public int AvailableQuantity { get; private set; }
+
+	public int MinimumPurchaseQuantity { get; private set; }
+
+	public int QuantityCoefficient { get; private set; }
+
+	public int DaysToRefund { get; private set; }
+
+	public DateTime? DeliveryDate { get; private set; }
+
+	public DateTime? GuaranteedDeliveryDate { get; private set; }
+
+	public DateTime? OrderTill { get; private set; }
+
+	public DateTime? SourceOccurredAt { get; private set; }
+
+	public int DeliveryProbability { get; private set; }
+
+	public DateTime ExpiresAt { get; private set; }
+
+	public static Expression<Func<PriceOffer, Guid>> GetKeySelector() => x => x.Id;
+
+	public static Expression<Func<PriceOffer, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
+
+	public static PriceOffer CreateForSupplier(
+		int productId,
+		int currencyId,
+		string offerForStorage,
+		decimal price,
+		PriceOfferSource source,
+		string sourceKey,
+		int availableQuantity,
+		int minimumPurchaseQuantity,
+		int quantityCoefficient,
+		int daysToRefund,
+		DateTime deliveryDate,
+		DateTime guaranteedDeliveryDate,
+		int deliveryProbability,
+		DateTime orderTill,
+		DateTime expiresAt)
+	{
+		return new PriceOffer
+		{
+			Id = Guid.NewGuid(),
+			ProductId = productId,
+			OfferForStorage = offerForStorage,
+			CurrencyId = currencyId,
+			PurchasePrice = price,
+			Source = source,
+			SourceKey = sourceKey,
+			AvailableQuantity = availableQuantity,
+			MinimumPurchaseQuantity = minimumPurchaseQuantity,
+			QuantityCoefficient = quantityCoefficient,
+			DaysToRefund = daysToRefund,
+			DeliveryDate = deliveryDate,
+			GuaranteedDeliveryDate = guaranteedDeliveryDate,
+			DeliveryProbability = deliveryProbability,
+			OrderTill = orderTill,
+			ExpiresAt = expiresAt
+		};
+	}
+
+	public static PriceOffer CreateForOurWarehouse(
+		int productId,
+		int currencyId,
+		string offerForStorage,
+		decimal price,
+		string sourceKey,
+		int availableQuantity,
+		int minimumPurchaseQuantity,
+		int quantityCoefficient,
+		int daysToRefund,
+		DateTime occuredAt)
+	{
+		return new PriceOffer
+		{
+			Id = Guid.NewGuid(),
+			ProductId = productId,
+			OfferForStorage = offerForStorage,
+			CurrencyId = currencyId,
+			PurchasePrice = price,
+			Source = PriceOfferSource.OurWarehouse,
+			SourceKey = sourceKey,
+			AvailableQuantity = availableQuantity,
+			MinimumPurchaseQuantity = minimumPurchaseQuantity,
+			QuantityCoefficient = quantityCoefficient,
+			DaysToRefund = daysToRefund,
+			DeliveryDate = null,
+			GuaranteedDeliveryDate = null,
+			DeliveryProbability = 99,
+			OrderTill = null,
+			SourceOccurredAt = occuredAt,
+			ExpiresAt = DateTime.SpecifyKind(DateTime.MaxValue, DateTimeKind.Utc)
+		};
+	}
+
+	public override Guid GetId() => Id;
 }

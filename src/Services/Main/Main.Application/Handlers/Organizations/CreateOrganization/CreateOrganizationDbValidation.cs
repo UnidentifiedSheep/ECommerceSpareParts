@@ -7,12 +7,10 @@ namespace Main.Application.Handlers.Organizations.CreateOrganization;
 
 public class CreateOrganizationDbValidation : AbstractDbValidation<CreateOrganizationCommand>
 {
-    public override void Build(
-        IValidationPlan plan,
-        CreateOrganizationCommand request)
-    {
-        plan.ValidateUserExistsId(request.OwnerId)
-            .ValidateOrganizationNotExistsSystemName(
-                Organization.NormalizeSystemName(request.SystemName));
-    }
+	public override void Build(IValidationPlan plan, CreateOrganizationCommand request)
+	{
+		plan
+			.ValidateUserExistsId(request.OwnerId)
+			.ValidateOrganizationNotExistsSystemName(Organization.NormalizeSystemName(request.SystemName));
+	}
 }

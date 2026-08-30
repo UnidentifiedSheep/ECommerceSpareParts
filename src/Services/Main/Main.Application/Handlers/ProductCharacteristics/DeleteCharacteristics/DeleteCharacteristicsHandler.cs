@@ -13,15 +13,14 @@ namespace Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics
 public record DeleteCharacteristicsCommand(int ProductId, string Name) : ICommand;
 
 public class DeleteCharacteristicsHandler(
-    IRepository<ProductCharacteristic, (int, string)> repository,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<DeleteCharacteristicsCommand>
+	IRepository<ProductCharacteristic, (int, string)> repository,
+	IUnitOfWork unitOfWork) : ICommandHandler<DeleteCharacteristicsCommand>
 {
-    public async Task<Unit> Handle(DeleteCharacteristicsCommand request, CancellationToken cancellationToken)
-    {
-        var entity = await repository.GetById((request.ProductId, request.Name))
-                     ?? throw new ProductCharacteristicsNotFoundException(request.ProductId, request.Name);
-        unitOfWork.Remove(entity);
-        return Unit.Value;
-    }
+	public async Task<Unit> Handle(DeleteCharacteristicsCommand request, CancellationToken cancellationToken)
+	{
+		var entity = await repository.GetById((request.ProductId, request.Name), cancellationToken) ??
+			throw new ProductCharacteristicsNotFoundException(request.ProductId, request.Name);
+		unitOfWork.Remove(entity);
+		return Unit.Value;
+	}
 }

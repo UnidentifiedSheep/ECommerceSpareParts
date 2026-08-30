@@ -8,14 +8,12 @@ namespace Analytics.Persistence;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
-    {
-        collection.AddPersistenceBase<DContext>(
-            typeof(BasicEfRepository<,>),
-            typeof(ReadRepository<,>));
+	public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
+	{
+		collection.AddPersistenceBase<DContext>(typeof(BasicEfRepository<,>), typeof(ReadRepository<,>));
 
-        collection.AddScoped<ISaleFactRepository, SaleFactRepository>();
+		collection.AddScoped<ISaleFactRepository, SaleFactRepository>();
 
-        return collection;
-    }
+		return collection;
+	}
 }

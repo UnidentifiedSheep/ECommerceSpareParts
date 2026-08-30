@@ -1,12 +1,10 @@
-﻿using Enums;
-using Enums.Units;
+﻿using Enums.Units;
 
 namespace Main.Application.Models.Logistics;
 
 public record LogisticsItem(
-    int Id,
-    int Quantity,
-    decimal Weight,
-    WeightUnit WeightUnit,
-    decimal AreaM3
-);
+	int Id,
+	int Quantity,
+	decimal Weight,
+	WeightUnit WeightUnit,
+	decimal AreaM3);

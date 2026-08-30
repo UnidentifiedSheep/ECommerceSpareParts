@@ -5,14 +5,14 @@ namespace Main.Application.Services.Logistics.PricingStrategies;
 
 public class NonePricing : LogisticsPricingStrategyBase
 {
-    public override LogisticPricingType Type => LogisticPricingType.None;
+	public override LogisticPricingType Type => LogisticPricingType.None;
 
-    public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
-    {
-        return Iterate(
-            context,
-            items,
-            _ => 0,
-            LogisticsDataRequirements.None);
-    }
+	public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
+	{
+		return Iterate(
+			context,
+			items,
+			_ => 0,
+			LogisticsDataRequirements.None);
+	}
 }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json.Serialization;
 using Abstractions.Models.Options;
 using Integrations.Common;
@@ -10,35 +11,36 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Main;
 
 internal sealed class ProducerNode(
-    HttpClient httpClient,
-    IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
-    ProjectJsonOptions jsonOptions
-) : InternalClientBase(authClient, optionsMonitor, jsonOptions), IProducerNode
+	HttpClient httpClient,
+	IAuthClient authClient,
+	IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+	ProjectJsonOptions jsonOptions) : InternalClientBase(
+		authClient,
+		optionsMonitor,
+		jsonOptions),
+	IProducerNode
 {
-    public async Task<Response<IReadOnlyList<InternalFullProducer>>> GetFullProducer(
-        IEnumerable<int> producerIds,
-        CancellationToken cancellationToken = default)
-    {
-        var ids = producerIds.Select(x => x.ToString()).ToArray();
-        using var request = await GetRequest(
-            HttpMethod.Get,
-            $"/internal/producers{IdsAsQueryString(ids, "id")}",
-            cancellationToken);
+	public async Task<Response<IReadOnlyList<InternalFullProducer>>> GetFullProducer(
+		IEnumerable<int> producerIds,
+		CancellationToken cancellationToken = default)
+	{
+		var ids = producerIds.Select(x => x.ToString(CultureInfo.InvariantCulture)).ToArray();
+		using var request = await GetRequest(
+			HttpMethod.Get,
+			$"/internal/producers{IdsAsQueryString(ids, "id")}",
+			cancellationToken);
 
-        using var response = await httpClient.SendAsync(
-            request,
-            cancellationToken);
+		using var response = await httpClient.SendAsync(request, cancellationToken);
 
-        return await ReadResponse<GetFullProducersResponse, IReadOnlyList<InternalFullProducer>>(
-            response,
-            x => x.Producers,
-            cancellationToken);
-    }
+		return await ReadResponse<GetFullProducersResponse, IReadOnlyList<InternalFullProducer>>(
+			response,
+			x => x.Producers,
+			cancellationToken);
+	}
 
-    private record GetFullProducersResponse
-    {
-        [JsonPropertyName("producers")]
-        public IReadOnlyList<InternalFullProducer> Producers { get; init; } = [];
-    }
+	private record GetFullProducersResponse
+	{
+		[JsonPropertyName("producers")]
+		public IReadOnlyList<InternalFullProducer> Producers { get; } = [];
+	}
 }

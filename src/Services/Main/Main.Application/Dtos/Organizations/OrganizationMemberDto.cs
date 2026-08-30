@@ -6,12 +6,12 @@ namespace Main.Application.Dtos.Organizations;
 
 public record OrganizationMemberDto
 {
-    [JsonPropertyName("organizationId")]
-    public required Guid OrganizationId { get; init; }
+	[JsonPropertyName("organizationId")]
+	public required Guid OrganizationId { get; init; }
 
-    [JsonPropertyName("role")]
-    public required OrganizationRole Role { get; init; }
+	[JsonPropertyName("role")]
+	public required OrganizationRole Role { get; init; }
 
-    [JsonPropertyName("user")]
-    public required UserDto User { get; init; }
+	[JsonPropertyName("user")]
+	public required UserDto User { get; init; }
 }

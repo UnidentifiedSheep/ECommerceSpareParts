@@ -15,46 +15,48 @@ using Persistence.Extensions;
 using Persistence.Interfaces;
 using Security.Services;
 
-var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) =>
-        config.AddMigratorSettingsFromJsons("main.settings")
-            .AddMigratorSettingsFromJsons("main.settings", "/app/configs"));
-
+var builder = Host
+	.CreateDefaultBuilder(args)
+	.ConfigureAppConfiguration((_, config) =>
+		config
+			.AddMigratorSettingsFromJsons("main.settings")
+			.AddMigratorSettingsFromJsons("main.settings", "/app/configs"));
 
 var seedingRequested = false;
 
 builder.ConfigureServices((context, services) =>
 {
-    services.AddDatabaseOptions();
+	services.AddDatabaseOptions();
 
-    var seedValue = context.Configuration.GetValue<bool?>("Seed");
-    seedingRequested = seedValue == true;
+	var seedValue = context.Configuration.GetValue<bool?>("Seed");
+	seedingRequested = seedValue == true;
 
-    //add db context
-    services.AddDbContext<DContext>((sp, options) =>
-    {
-        var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
-        options.UseNpgsql(connectionString, x => x.MigrationsAssembly("Main.Migrator"));
-    });
+	//add db context
+	services.AddDbContext<DContext>((sp, options) =>
+	{
+		var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
+		options.UseNpgsql(connectionString, x => x.MigrationsAssembly("Main.Migrator"));
+	});
 
-    //used for password hash etc
-    services.AddSingleton<IPasswordManager, PasswordManager>(_ => new PasswordManager(new PasswordRules()));
+	//used for password hash etc
+	services.AddSingleton<IPasswordManager, PasswordManager>(_ => new PasswordManager(new PasswordRules()));
 
-    services.AddOptions<ServiceSecrets>()
-        .BindConfiguration(ServiceSecrets.SectionName)
-        .ValidateDataAnnotations()
-        .ValidateOnStart();
+	services
+		.AddOptions<ServiceSecrets>()
+		.BindConfiguration(ServiceSecrets.SectionName)
+		.ValidateDataAnnotations()
+		.ValidateOnStart();
 });
 
 builder.ConfigureServices((_, services) =>
 {
-    services.AddScoped<ISeed<DContext>, PermissionSeed>();
-    services.AddScoped<ISeed<DContext>, RoleSeed>();
-    services.AddScoped<ISeed<DContext>, RolePermissionSeed>();
-    services.AddScoped<ISeed<DContext>, UserSeed>();
-    services.AddScoped<ISeed<DContext>, SystemOrganizationSeed>();
-    services.AddScoped<ISeed<DContext>, CurrencySeed>();
-    services.AddScoped<ISeed<DContext>, AdminSeed>();
+	services.AddScoped<ISeed<DContext>, PermissionSeed>();
+	services.AddScoped<ISeed<DContext>, RoleSeed>();
+	services.AddScoped<ISeed<DContext>, RolePermissionSeed>();
+	services.AddScoped<ISeed<DContext>, UserSeed>();
+	services.AddScoped<ISeed<DContext>, SystemOrganizationSeed>();
+	services.AddScoped<ISeed<DContext>, CurrencySeed>();
+	services.AddScoped<ISeed<DContext>, AdminSeed>();
 });
 
 var host = builder.Build();
@@ -66,7 +68,8 @@ await db.Database.MigrateAsync();
 
 Console.WriteLine("Main migrations applied successfully");
 
-if (!seedingRequested) return;
+if (!seedingRequested)
+	return;
 
 Console.WriteLine("Seeding database...");
 

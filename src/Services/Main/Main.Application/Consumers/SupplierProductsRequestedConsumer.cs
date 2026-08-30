@@ -5,14 +5,12 @@ using MediatR;
 
 namespace Main.Application.Consumers;
 
-public class SupplierProductsRequestedConsumer(
-    ISender sender) : IConsumer<SupplierProductsRequestedEvent>
+public class SupplierProductsRequestedConsumer(ISender sender) : IConsumer<SupplierProductsRequestedEvent>
 {
-    public async Task Consume(ConsumeContext<SupplierProductsRequestedEvent> context)
-    {
-        await sender.Send(new ImportSupplierProductCommand(
-            context.Message.Supplier,
-            context.Message.Products),
-            context.CancellationToken);
-    }
+	public async Task Consume(ConsumeContext<SupplierProductsRequestedEvent> context)
+	{
+		await sender.Send(
+			new ImportSupplierProductCommand(context.Message.Supplier, context.Message.Products),
+			context.CancellationToken);
+	}
 }

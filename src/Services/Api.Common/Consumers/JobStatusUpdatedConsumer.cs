@@ -5,12 +5,8 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Api.Common.Consumers;
 
-public class JobStatusUpdatedConsumer(
-    IHubContext<JobHub> hubContext
-) : IConsumer<JobStatusUpdatedEvent>
+public class JobStatusUpdatedConsumer(IHubContext<JobHub> hubContext) : IConsumer<JobStatusUpdatedEvent>
 {
-    public async Task Consume(ConsumeContext<JobStatusUpdatedEvent> context)
-    {
-        await hubContext.Clients.All.SendAsync("JobStatusUpdated", context.Message);
-    }
+	public async Task Consume(ConsumeContext<JobStatusUpdatedEvent> context) =>
+		await hubContext.Clients.All.SendAsync("JobStatusUpdated", context.Message);
 }

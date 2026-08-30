@@ -1,5 +1,5 @@
+using System.Globalization;
 using Abstractions.Interfaces;
-using Abstractions.Models;
 using Api.Common;
 using Cache;
 using Localization.Domain.Extensions;
@@ -26,71 +26,69 @@ namespace Pricing.Integration.Tests;
 
 public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArguments>
 {
-    public IServiceProvider Build(ServiceProviderArguments args)
-    {
-        RegisterGlobalBasicContexts();
-        var services = new ServiceCollection();
+	public IServiceProvider Build(ServiceProviderArguments args)
+	{
+		RegisterGlobalBasicContexts();
+		var services = new ServiceCollection();
 
-        services.RegisterTestContexts();
+		services.RegisterTestContexts();
 
-        services.AddLogging();
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .CreateLogger();
+		services.AddLogging();
+		Log.Logger = new LoggerConfiguration()
+			.MinimumLevel
+			.Debug()
+			.Enrich
+			.FromLogContext()
+			.WriteTo
+			.Console(formatProvider: CultureInfo.InvariantCulture)
+			.CreateLogger();
 
-        ApplicationServiceProvider
-            .AddApplicationLayer(services, null!)
-            .AddApplicationCache()
-            .AddLocalization(
-                "ru-RU",
-                "ru-RU",
-                "en-EN")
-            .AddPersistenceLayer();
+		ApplicationServiceProvider
+			.AddApplicationLayer(services, null!)
+			.AddApplicationCache()
+			.AddLocalization(
+				"ru-RU",
+				"ru-RU",
+				"en-EN")
+			.AddPersistenceLayer();
 
-        services.AddSingleton(
-            Options.Create(
-                new RedisOptions
-                {
-                    Url = args.CacheConnectionString,
-                    Password = null
-                }));
+		services.AddSingleton(
+			Options.Create(
+				new RedisOptions
+				{
+					Url = args.CacheConnectionString, Password = null
+				}));
 
-        var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
+		var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
 
-        services.AddSingleton(
-            Options.Create(
-                new DatabaseOptions
-                {
-                    Host = pgsqlBuilder.Host!,
-                    Database = pgsqlBuilder.Database!,
-                    Username = pgsqlBuilder.Username!,
-                    Password = pgsqlBuilder.Password!,
-                    Port = pgsqlBuilder.Port
-                }));
+		services.AddSingleton(
+			Options.Create(
+				new DatabaseOptions
+				{
+					Host = pgsqlBuilder.Host!,
+					Database = pgsqlBuilder.Database!,
+					Username = pgsqlBuilder.Username!,
+					Password = pgsqlBuilder.Password!,
+					Port = pgsqlBuilder.Port
+				}));
 
-        services
-            .AddCacheLayer("test")
-            .AddCommonLayer();
+		services.AddCacheLayer("test").AddCommonLayer();
 
-        services.RemoveAll<IUserContext>();
-        services.AddScoped<IUserContext, UserContextMock>();
-        services.AddSystemOptionsForTests();
+		services.RemoveAll<IUserContext>();
+		services.AddScoped<IUserContext, UserContextMock>();
+		services.AddSystemOptionsForTests();
 
-        services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
-        services.RemoveAll<IFusionCacheBackplane>();
-        services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
+		services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
+		services.RemoveAll<IFusionCacheBackplane>();
+		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 
-        services.RemoveAll<ICachedCurrencyProvider>();
-        services.AddScoped(_ => Mock.Of<ICachedCurrencyProvider>());
-        
-        var serviceProvider = services.BuildServiceProvider();
-        return serviceProvider;
-    }
+		services.RemoveAll<ICachedCurrencyProvider>();
+		services.AddScoped(_ => Mock.Of<ICachedCurrencyProvider>());
 
-    private static void RegisterGlobalBasicContexts()
-    {
-        TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
-    }
+		var serviceProvider = services.BuildServiceProvider();
+		return serviceProvider;
+	}
+
+	private static void RegisterGlobalBasicContexts() =>
+		TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
 }

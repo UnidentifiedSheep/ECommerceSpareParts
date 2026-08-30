@@ -6,30 +6,28 @@ using Main.Enums.Auth;
 
 namespace Main.Application.Services.PayloadProvider;
 
-public class VerificationPayloadProvider(
-    IOneTimeTokenStore oneTimeTokenStore) : IVerificationPayloadProvider
+public class VerificationPayloadProvider(IOneTimeTokenStore oneTimeTokenStore) : IVerificationPayloadProvider
 {
-    public async Task<VerificationPayload> GetPayload(
-        Guid userId,
-        VerificationType type,
-        string dataToVerify)
-    {
-        var payload = new VerificationPayload
-        {
-            UserId = userId,
-            Type = type,
-            DataToVerify = dataToVerify,
-        };
+	public async Task<VerificationPayload> GetPayload(
+		Guid userId,
+		VerificationType type,
+		string dataToVerify)
+	{
+		var payload = new VerificationPayload
+		{
+			UserId = userId,
+			Type = type,
+			DataToVerify = dataToVerify
+		};
 
-        await oneTimeTokenStore.StoreAsync(
-            OneTimeTokenPurpose.Verification,
-            payload.Id,
-            TimeSpan.FromMinutes(30));
-        return payload;
-    }
-    
-    public Task<bool> TryConsumeToken(Guid tokenId)
-        => oneTimeTokenStore.ConsumeAsync(
-            OneTimeTokenPurpose.Verification,
-            tokenId);
+		await oneTimeTokenStore.StoreAsync(
+			OneTimeTokenPurpose.Verification,
+			payload.Id,
+			TimeSpan.FromMinutes(30));
+		return payload;
+	}
+
+	public Task<bool> TryConsumeToken(Guid tokenId) => oneTimeTokenStore.ConsumeAsync(
+		OneTimeTokenPurpose.Verification,
+		tokenId);
 }

@@ -4,24 +4,24 @@ namespace Main.Application.Dtos.Product.Reservation;
 
 public record NewProductReservationDto
 {
-    [JsonPropertyName("organizationId")]
-    public required Guid OrganizationId { get; init; }
+	[JsonPropertyName("organizationId")]
+	public required Guid OrganizationId { get; init; }
 
-    [JsonPropertyName("productId")]
-    public required int ProductId { get; init; }
+	[JsonPropertyName("productId")]
+	public required int ProductId { get; init; }
 
-    [JsonPropertyName("reservedCount")]
-    public required int ReservedCount { get; init; }
+	[JsonPropertyName("reservedCount")]
+	public required int ReservedCount { get; init; }
 
-    [JsonPropertyName("currentCount")]
-    public required int CurrentCount { get; init; }
+	[JsonPropertyName("currentCount")]
+	public required int CurrentCount { get; init; }
 
-    [JsonPropertyName("proposedPrice")]
-    public required decimal? ProposedPrice { get; init; }
+	[JsonPropertyName("proposedPrice")]
+	public required decimal? ProposedPrice { get; init; }
 
-    [JsonPropertyName("givenCurrencyId")]
-    public required int? GivenCurrencyId { get; init; }
+	[JsonPropertyName("givenCurrencyId")]
+	public required int? GivenCurrencyId { get; init; }
 
-    [JsonPropertyName("comment")]
-    public string? Comment { get; init; }
+	[JsonPropertyName("comment")]
+	public string? Comment { get; init; }
 }

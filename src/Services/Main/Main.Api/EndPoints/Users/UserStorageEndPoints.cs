@@ -13,67 +13,64 @@ public record GetUserStoragesResponse(List<StorageDto> Storages);
 
 public static class UserStorageEndPoints
 {
-    public static RouteGroupBuilder MapUserStorageEndPoints(this RouteGroupBuilder users)
-    {
-        users.MapPost(
-                "/{userId:guid}/storages/{storageCode}",
-                async (
-                    ISender sender,
-                    Guid userId,
-                    string storageCode,
-                    CancellationToken token) =>
-                {
-                    await sender.Send(new AddStorageToUserCommand(userId, storageCode), token);
-                    return Results.NoContent();
-                })
-            .WithName("AddStorageToUser")
-            .WithSummary("Добавить склад пользователю")
-            .WithDescription("Добавление склада к пользователю")
-            .WithDisplayName("Добавление склада к пользователю")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.USERS_STORAGES_ADD);
+	public static RouteGroupBuilder MapUserStorageEndPoints(this RouteGroupBuilder users)
+	{
+		users
+			.MapPost(
+				"/{userId:guid}/storages/{storageCode}",
+				async (
+					ISender sender, Guid userId,
+					string storageCode, CancellationToken token) =>
+				{
+					await sender.Send(new AddStorageToUserCommand(userId, storageCode), token);
+					return Results.NoContent();
+				})
+			.WithName("AddStorageToUser")
+			.WithSummary("Добавить склад пользователю")
+			.WithDescription("Добавление склада к пользователю")
+			.WithDisplayName("Добавление склада к пользователю")
+			.Produces(StatusCodes.Status204NoContent)
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.USERS_STORAGES_ADD);
 
-        users.MapDelete(
-                "/{userId:guid}/storages/{storageCode}",
-                async (
-                    ISender sender,
-                    Guid userId,
-                    string storageCode,
-                    CancellationToken token) =>
-                {
-                    await sender.Send(new DeleteStorageFromUserCommand(userId, storageCode), token);
-                    return Results.NoContent();
-                })
-            .WithName("DeleteStorageFromUser")
-            .WithSummary("Удалить склад пользователя")
-            .WithDescription("Удаление склада у пользователя")
-            .WithDisplayName("Удаление склада у пользователя")
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.USERS_STORAGES_DELETE);
+		users
+			.MapDelete(
+				"/{userId:guid}/storages/{storageCode}",
+				async (
+					ISender sender, Guid userId,
+					string storageCode, CancellationToken token) =>
+				{
+					await sender.Send(new DeleteStorageFromUserCommand(userId, storageCode), token);
+					return Results.NoContent();
+				})
+			.WithName("DeleteStorageFromUser")
+			.WithSummary("Удалить склад пользователя")
+			.WithDescription("Удаление склада у пользователя")
+			.WithDisplayName("Удаление склада у пользователя")
+			.Produces(StatusCodes.Status204NoContent)
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.USERS_STORAGES_DELETE);
 
-        users.MapGet(
-                "/{userId:guid}/storages",
-                async (
-                    ISender sender,
-                    Guid userId,
-                    int page,
-                    int limit,
-                    CancellationToken token) =>
-                {
-                    var query = new GetUserStoragesQuery(userId, new Pagination(page, limit));
-                    var result = await sender.Send(query, token);
-                    return Results.Ok(new GetUserStoragesResponse(result.Storages));
-                })
-            .WithName("GetUserStorages")
-            .WithSummary("Получить склады пользователя")
-            .WithDescription("Получение складов привязанных к пользователю.")
-            .WithDisplayName("Получение складов пользователя.")
-            .Produces<GetUserStoragesResponse>()
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.USERS_STORAGES_GET);
+		users
+			.MapGet(
+				"/{userId:guid}/storages",
+				async (
+					ISender sender, Guid userId,
+					int page, int limit,
+					CancellationToken token) =>
+				{
+					var query = new GetUserStoragesQuery(userId, new Pagination(page, limit));
+					var result = await sender.Send(query, token);
+					return Results.Ok(new GetUserStoragesResponse(result.Storages));
+				})
+			.WithName("GetUserStorages")
+			.WithSummary("Получить склады пользователя")
+			.WithDescription("Получение складов привязанных к пользователю.")
+			.WithDisplayName("Получение складов пользователя.")
+			.Produces<GetUserStoragesResponse>()
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAnyPermission(PermissionCodes.USERS_STORAGES_GET);
 
-        return users;
-    }
+		return users;
+	}
 }

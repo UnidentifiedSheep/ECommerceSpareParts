@@ -4,8 +4,8 @@ namespace Pricing.Application;
 
 public static class Global
 {
-    public static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+	public static readonly JsonSerializerOptions JsonOptions = new()
+	{
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+	};
 }

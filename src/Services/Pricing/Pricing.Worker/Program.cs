@@ -32,97 +32,102 @@ var builder = Host.CreateApplicationBuilder(args);
 
 var env = builder.AddServiceConfiguration("pricing");
 
-builder.Services
-    .AddMessageBrokerOptions()
-    .AddHeaderSecretsOptions()
-    .AddRedisOptions()
-    .AddDatabaseOptions()
-    .AddLrtOptions()
-    .AddScheduledJobEnqueuerOptions()
-    .AddSystemOptions()
-    .AddSecretEncryptionOptions();
+builder
+	.Services
+	.AddMessageBrokerOptions()
+	.AddHeaderSecretsOptions()
+	.AddRedisOptions()
+	.AddDatabaseOptions()
+	.AddLrtOptions()
+	.AddScheduledJobEnqueuerOptions()
+	.AddSystemOptions()
+	.AddSecretEncryptionOptions();
 
 builder.Services.AddCommonWorkerInfrastructure(ServicesDefinitions.Pricing);
 
 builder.AddLokiLogger(
-    builder.Configuration,
-    "pricing.worker",
-    env);
+	builder.Configuration,
+	"pricing.worker",
+	env);
 
 builder.Services.AddLocalization(builder.Configuration);
 
-builder.Services
-    .AddPersistenceLayer()
-    .AddApplicationCache()
-    .AddCacheLayer("pricing")
-    .AddIntegrationClients()
-    .AddApplicationLayer(builder.Configuration)
-    .AddCommonLayer()
-    .AddWorkerSecurityLayer()
-    .AddMainSupplierSettingProviders()
-    .AddFavoriteIntegration<FavoriteConnectionProvider, FavoriteSettingsProvider>()
-    .AddTmtrIntegration<TmtrConnectionProvider, TmtrSettingsProvider>()
-    .AddJsonSigner()
-    .AddSecretEncryptor();
+builder
+	.Services
+	.AddPersistenceLayer()
+	.AddApplicationCache()
+	.AddCacheLayer("pricing")
+	.AddIntegrationClients()
+	.AddApplicationLayer(builder.Configuration)
+	.AddCommonLayer()
+	.AddWorkerSecurityLayer()
+	.AddMainSupplierSettingProviders()
+	.AddFavoriteIntegration<FavoriteConnectionProvider, FavoriteSettingsProvider>()
+	.AddTmtrIntegration<TmtrConnectionProvider, TmtrSettingsProvider>()
+	.AddJsonSigner()
+	.AddSecretEncryptor();
 
-builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>()
-    .AddScoped<IStartupTask, LoadLocalesStartupTask>()
-    .AddHostedService<StartupTaskHostedService>()
-    .AddLrtHostedServices();
+builder
+	.Services
+	.AddScoped<IStartupTask, MarkupInitializationStartupTask>()
+	.AddScoped<IStartupTask, LoadLocalesStartupTask>()
+	.AddHostedService<StartupTaskHostedService>()
+	.AddLrtHostedServices();
 
 var uniqQueueName = $"queue-of-pricing-worker-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
-    x.AddConsumer<BackplaneConsumer>();
-    x.AddConsumer<SettingUpdatedConsumer>();
-    x.AddConsumer<ProductPriceOffersUpdatedConsumer, ProductPriceOffersUpdatedDefinition>();
-    x.AddConsumer<StorageContentUpdatedConsumer, StorageContentUpdatedDefinition>();
+	x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
+	x.AddConsumer<BackplaneConsumer>();
+	x.AddConsumer<SettingUpdatedConsumer>();
+	x.AddConsumer<ProductPriceOffersUpdatedConsumer, ProductPriceOffersUpdatedDefinition>();
+	x.AddConsumer<StorageContentUpdatedConsumer, StorageContentUpdatedDefinition>();
 
-    x.AddEntityFrameworkOutbox<DContext>(o =>
-    {
-        o.UsePostgres();
-        o.UseBusOutbox();
-    });
+	x.AddEntityFrameworkOutbox<DContext>(o =>
+	{
+		o.UsePostgres();
+		o.UseBusOutbox();
+	});
 
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.ConfigureRabbitMq(context);
+	x.UsingRabbitMq((context, cfg) =>
+	{
+		cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(
-            uniqQueueName,
-            ep =>
-            {
-                ep.AutoDelete = true;
-                ep.Durable = false;
-                ep.ConfigureConsumeTopology = false;
+		cfg.ReceiveEndpoint(
+			uniqQueueName,
+			ep =>
+			{
+				ep.AutoDelete = true;
+				ep.Durable = false;
+				ep.ConfigureConsumeTopology = false;
 
-                ep.ConfigureConsumer<BackplaneConsumer>(context);
-                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+				ep.ConfigureConsumer<BackplaneConsumer>(context);
+				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
-                ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
+				ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 
-                ep.Bind<BackplaneMessage>();
-                ep.Bind<MarkupRangesRefreshRequestedEvent>();
+				ep.Bind<BackplaneMessage>();
+				ep.Bind<MarkupRangesRefreshRequestedEvent>();
 
-                ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Pricing)
-                    .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Pricing);
-            });
+				ep
+					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Pricing)
+					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Pricing);
+			});
 
-        cfg.ReceiveEndpoint(
-            "pricing-worker-queue",
-            ep =>
-            {
-                ep.Durable = true;
+		cfg.ReceiveEndpoint(
+			"pricing-worker-queue",
+			ep =>
+			{
+				ep.Durable = true;
 
-                ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-                ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
-                ep.ConfigureConsumer<ProductPriceOffersUpdatedConsumer>(context);
-                ep.ConfigureConsumer<StorageContentUpdatedConsumer>(context);
-                ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
-            });
-    });
+				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+				ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
+				ep.ConfigureConsumer<ProductPriceOffersUpdatedConsumer>(context);
+				ep.ConfigureConsumer<StorageContentUpdatedConsumer>(context);
+				ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
+			});
+	});
 });
 
 var host = builder.Build();

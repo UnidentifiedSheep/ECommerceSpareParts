@@ -4,17 +4,14 @@ namespace S3;
 
 public interface IPresignedS3Client
 {
-    IAmazonS3 Client { get; }
+	IAmazonS3 Client { get; }
 
-    Protocol Protocol { get; }
+	Protocol Protocol { get; }
 }
 
-public sealed class PresignedS3Client(
-    IAmazonS3 client,
-    Protocol protocol
-) : IPresignedS3Client
+public sealed class PresignedS3Client(IAmazonS3 client, Protocol protocol) : IPresignedS3Client
 {
-    public IAmazonS3 Client { get; } = client;
+	public IAmazonS3 Client { get; } = client;
 
-    public Protocol Protocol { get; } = protocol;
+	public Protocol Protocol { get; } = protocol;
 }

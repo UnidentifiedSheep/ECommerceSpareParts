@@ -4,8 +4,8 @@ namespace Abstractions.Models.Options;
 
 public sealed class SystemOptions
 {
-    public const string SectionName = "System";
+	public const string SectionName = "System";
 
-    [Required]
-    public required Guid SystemId { get; init; }
+	[Required]
+	public required Guid SystemId { get; init; }
 }

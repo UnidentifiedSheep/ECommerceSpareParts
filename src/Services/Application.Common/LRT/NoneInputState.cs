@@ -4,6 +4,9 @@ namespace Application.Common.LRT;
 
 public record NoneInputState : IInputState
 {
-    public const string Json = "{}";
-    public void ValidateState() { }
+	public const string Json = "{}";
+
+	public void ValidateState()
+	{
+	}
 }

@@ -6,14 +6,15 @@ namespace Main.Application.Handlers.ProductReservations.CreateProductReservation
 
 public class CreateProductReservationDbValidation : AbstractDbValidation<CreateProductReservationCommand>
 {
-    public override void Build(IValidationPlan plan, CreateProductReservationCommand request)
-    {
-        var reservation = request.Reservation;
+	public override void Build(IValidationPlan plan, CreateProductReservationCommand request)
+	{
+		var reservation = request.Reservation;
 
-        plan.ValidateProductExistsId(reservation.ProductId)
-            .ValidateOrganizationExistsId(reservation.OrganizationId);
+		plan
+			.ValidateProductExistsId(reservation.ProductId)
+			.ValidateOrganizationExistsId(reservation.OrganizationId);
 
-        if (reservation.GivenCurrencyId.HasValue)
-            plan.ValidateCurrencyExistsId(reservation.GivenCurrencyId.Value);
-    }
+		if (reservation.GivenCurrencyId.HasValue)
+			plan.ValidateCurrencyExistsId(reservation.GivenCurrencyId.Value);
+	}
 }

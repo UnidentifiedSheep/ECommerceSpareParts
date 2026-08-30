@@ -6,67 +6,69 @@ using MediatR;
 
 namespace Application.Common.Behaviors;
 
-public class MetricsBehavior<TRequest, TResponse>(
-    CqrsMetrics metrics) : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-    where TResponse : notnull
+public class MetricsBehavior<TRequest, TResponse>(CqrsMetrics metrics)
+	: IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse> where TResponse : notnull
 {
-    private static readonly string RequestName = typeof(TRequest).Name;
-    // ReSharper disable once StaticMemberInGenericType
-    private static readonly string RequestType = GetRequestType();
+	private static readonly string RequestName = typeof(TRequest).Name;
 
-    public async Task<TResponse> Handle(
-        TRequest request,
-        RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
-    {
-        using var activity = CqrsDiagnostics.ActivitySource.StartActivity(
-            $"cqrs {RequestName}");
+	// ReSharper disable once StaticMemberInGenericType
+	private static readonly string RequestType = GetRequestType();
 
-        activity?.SetTag("cqrs.request.name", RequestName);
-        activity?.SetTag("cqrs.request.type", RequestType);
+	public async Task<TResponse> Handle(
+		TRequest request,
+		RequestHandlerDelegate<TResponse> next,
+		CancellationToken cancellationToken)
+	{
+		using var activity = CqrsDiagnostics.ActivitySource.StartActivity($"cqrs {RequestName}");
 
-        var tags = new TagList
-        {
-            { "cqrs.request.name", RequestName },
-            { "cqrs.request.type", RequestType }
-        };
+		activity?.SetTag("cqrs.request.name", RequestName);
+		activity?.SetTag("cqrs.request.type", RequestType);
 
-        metrics.Requests.Add(1, tags);
-        var startedAt = Stopwatch.GetTimestamp();
+		var tags = new TagList
+		{
+			{
+				"cqrs.request.name", RequestName
+			},
+			{
+				"cqrs.request.type", RequestType
+			}
+		};
 
-        try
-        {
-            return await next(cancellationToken);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            metrics.Errors.Add(1, tags);
-            activity?.AddEvent(new ActivityEvent("cancelled"));
-            throw;
-        }
-        catch (Exception exception)
-        {
-            metrics.Errors.Add(1, tags);
-            activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
-            activity?.AddException(exception);
-            throw;
-        }
-        finally
-        {
-            var elapsed = Stopwatch.GetElapsedTime(startedAt);
-            metrics.Duration.Record(elapsed.TotalMilliseconds, tags);
-        }
-    }
+		metrics.Requests.Add(1, tags);
+		var startedAt = Stopwatch.GetTimestamp();
 
-    private static string GetRequestType()
-    {
-        if (typeof(TRequest).IsAssignableTo(typeof(ICommand<TResponse>)))
-            return "command";
+		try
+		{
+			return await next(cancellationToken);
+		}
+		catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+		{
+			metrics.Errors.Add(1, tags);
+			activity?.AddEvent(new ActivityEvent("cancelled"));
+			throw;
+		}
+		catch (Exception exception)
+		{
+			metrics.Errors.Add(1, tags);
+			activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
+			activity?.AddException(exception);
+			throw;
+		}
+		finally
+		{
+			var elapsed = Stopwatch.GetElapsedTime(startedAt);
+			metrics.Duration.Record(elapsed.TotalMilliseconds, tags);
+		}
+	}
 
-        if (typeof(TRequest).IsAssignableTo(typeof(IQuery<TResponse>)))
-            return "query";
+	private static string GetRequestType()
+	{
+		if (typeof(TRequest).IsAssignableTo(typeof(ICommand<TResponse>)))
+			return "command";
 
-        return "unknown";
-    }
+		if (typeof(TRequest).IsAssignableTo(typeof(IQuery<TResponse>)))
+			return "query";
+
+		return "unknown";
+	}
 }

@@ -6,8 +6,6 @@ namespace Main.Application.Handlers.Products.CreateProducts;
 
 public class CreateProductsDbValidation : AbstractDbValidation<CreateProductsCommand>
 {
-    public override void Build(IValidationPlan plan, CreateProductsCommand request)
-    {
-        plan.ValidateProducerExistsId(request.NewProducts.Select(x => x.ProducerId));
-    }
+	public override void Build(IValidationPlan plan, CreateProductsCommand request) =>
+		plan.ValidateProducerExistsId(request.NewProducts.Select(x => x.ProducerId));
 }

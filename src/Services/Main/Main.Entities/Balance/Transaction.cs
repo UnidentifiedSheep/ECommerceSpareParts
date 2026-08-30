@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Exceptions;
@@ -12,235 +11,249 @@ namespace Main.Entities.Balance;
 
 public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Transaction, Guid>
 {
-    private Transaction() { }
+	private Transaction()
+	{
+	}
 
-    private Transaction(
-        Guid senderId,
-        Guid receiverId,
-        int currencyId,
-        TransactionType type,
-        decimal transactionSum,
-        DateTime transactionDatetime,
-        TransactionSourceType sourceType)
-    {
-        if (senderId == receiverId)
-            throw new InvalidInputException("transaction.sender.receiver.must.not.be.same");
-        SenderId = senderId;
-        ReceiverId = receiverId;
-        Type = type;
-        Status = TransactionStatus.Pending;
-        SourceType = sourceType;
-        SetTransactionDatetime(transactionDatetime);
-        SetCurrencyId(currencyId);
-        SetAmount(transactionSum);
-    }
+	private Transaction(
+		Guid senderId,
+		Guid receiverId,
+		int currencyId,
+		TransactionType type,
+		decimal transactionSum,
+		DateTime transactionDatetime,
+		TransactionSourceType sourceType)
+	{
+		if (senderId == receiverId)
+			throw new InvalidInputException("transaction.sender.receiver.must.not.be.same");
+		SenderId = senderId;
+		ReceiverId = receiverId;
+		Type = type;
+		Status = TransactionStatus.Pending;
+		SourceType = sourceType;
+		SetTransactionDatetime(transactionDatetime);
+		SetCurrencyId(currencyId);
+		SetAmount(transactionSum);
+	}
 
-    [Validate]
-    public Guid Id { get; private set; }
+	[Validate]
+	public Guid Id { get; private set; }
 
-    public int CurrencyId { get; private set; }
-    public Guid SenderId { get; }
-    public Guid ReceiverId { get; }
-    public decimal Amount { get; private set; }
-    public TransactionType Type { get; private set; }
-    public TransactionStatus Status { get; private set; }
-    public DateTime TransactionDatetime { get; private set; }
-    public DateTime? ReversedAt { get; private set; }
-    public Guid? ReversedBy { get; private set; }
-    public TransactionSourceType SourceType { get; private set; }
-    public uint RowVersion { get; private set; }
+	public int CurrencyId { get; private set; }
 
-    public bool IsCompleted => Status.HasFlag(TransactionStatus.Completed);
-    public bool IsCompletionApplied => Status.HasFlag(TransactionStatus.CompletionApplied);
+	public Guid SenderId { get; }
 
-    public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
-    public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
-    public bool IsReversalProfileApplied => Status.HasFlag(TransactionStatus.ReversalProfileApplied);
-    public bool IsCompletionProfileApplied => Status.HasFlag(TransactionStatus.CompletionProfileApplied);
-    public Organization.Organization Receiver { get; private set; } = null!;
-    public Organization.Organization Sender { get; private set; } = null!;
+	public Guid ReceiverId { get; }
 
-    public static Expression<Func<Transaction, Guid>> GetKeySelector() { return x => x.Id; }
+	public decimal Amount { get; private set; }
 
-    public static Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
+	public TransactionType Type { get; private set; }
 
-    public static Transaction Create(
-        Guid senderId,
-        Guid receiverId,
-        int currencyId,
-        TransactionType type,
-        decimal transactionSum,
-        DateTime transactionDatetime,
-        TransactionSourceType sourceType)
-    {
-        return new Transaction(
-            senderId,
-            receiverId,
-            currencyId,
-            type,
-            transactionSum,
-            transactionDatetime,
-            sourceType);
-    }
+	public TransactionStatus Status { get; private set; }
 
-    private void SetAmount(decimal newAmount)
-    {
-        Amount = newAmount.EnsureMaxDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
-            .EnsureGreaterThan(0m, "transaction.amount.must.be.positive");
-    }
+	public DateTime TransactionDatetime { get; private set; }
 
-    private void SetCurrencyId(int currencyId)
-    {
-        currencyId.EnsureGreaterThan(
-            0,
-            () => new ArgumentException("CurrencyId must be greater than zero"));
-        CurrencyId = currencyId;
-    }
+	public DateTime? ReversedAt { get; private set; }
 
-    private void SetTransactionDatetime(DateTime newDatetime) { TransactionDatetime = newDatetime; }
+	public Guid? ReversedBy { get; private set; }
 
-    public void Complete()
-    {
-        EnsureCanMutate();
+	public TransactionSourceType SourceType { get; private set; }
 
-        if (Status != TransactionStatus.Pending)
-            throw new InvalidOperationException("Only Pending transactions can be completed");
+	public uint RowVersion { get; private set; }
 
-        Status |= TransactionStatus.Completed;
-    }
+	public bool IsCompleted => Status.HasFlag(TransactionStatus.Completed);
 
-    public void Reverse(Guid reversedBy)
-    {
-        EnsureCanMutate();
+	public bool IsCompletionApplied => Status.HasFlag(TransactionStatus.CompletionApplied);
 
-        if (!IsCompleted) throw new InvalidOperationException("Only Completed transactions can be reversed");
+	public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
 
-        if (!IsCompletionApplied)
-            throw new InvalidOperationException("Cannot reverse before completion is applied");
+	public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
 
-        Status |= TransactionStatus.Reversed;
-        ReversedAt = DateTime.UtcNow;
-        ReversedBy = reversedBy;
-    }
+	public bool IsReversalProfileApplied => Status.HasFlag(TransactionStatus.ReversalProfileApplied);
 
-    public void EnsureCanMutate()
-    {
-        if (IsCompleted && IsReversed)
-            throw new InvalidOperationException("Invalid state: both Completed and Reversed");
+	public bool IsCompletionProfileApplied => Status.HasFlag(TransactionStatus.CompletionProfileApplied);
 
-        if (IsReversed) throw new InvalidOperationException("Transaction is in terminal state");
-    }
+	public Organization.Organization Receiver { get; private set; } = null!;
 
-    internal void EnsureCanApplyProfile(
-        OrganizationFinancialProfile senderProfile,
-        OrganizationFinancialProfile receiverProfile)
-    {
-        ValidateProfiles(senderProfile, receiverProfile);
+	public Organization.Organization Sender { get; private set; } = null!;
 
-        if (IsReversalApplied)
-        {
-            if (IsReversalProfileApplied)
-                throw new InvalidOperationException("Reversal profile already applied");
+	public static Expression<Func<Transaction, Guid>> GetKeySelector() => x => x.Id;
 
-            return;
-        }
+	public static Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
 
-        if (IsCompletionApplied)
-        {
-            if (IsCompletionProfileApplied)
-                throw new InvalidOperationException("Completion profile already applied");
+	public static Transaction Create(
+		Guid senderId,
+		Guid receiverId,
+		int currencyId,
+		TransactionType type,
+		decimal transactionSum,
+		DateTime transactionDatetime,
+		TransactionSourceType sourceType)
+	{
+		return new Transaction(
+			senderId,
+			receiverId,
+			currencyId,
+			type,
+			transactionSum,
+			transactionDatetime,
+			sourceType);
+	}
 
-            return;
-        }
+	private void SetAmount(decimal newAmount)
+	{
+		Amount = newAmount
+			.EnsureMaxDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
+			.EnsureGreaterThan(0m, "transaction.amount.must.be.positive");
+	}
 
-        throw new InvalidOperationException("Transaction is not completed");
-    }
+	private void SetCurrencyId(int currencyId)
+	{
+		currencyId.EnsureGreaterThan(0, () => new ArgumentException("CurrencyId must be greater than zero"));
+		CurrencyId = currencyId;
+	}
 
-    internal void MarkCompletionProfileApplied()
-    {
-        if (!IsCompletionApplied) throw new InvalidOperationException("Completion is not applied");
-        if (IsCompletionProfileApplied)
-            throw new InvalidOperationException("Completion profile already applied");
+	private void SetTransactionDatetime(DateTime newDatetime) => TransactionDatetime = newDatetime;
 
-        Status |= TransactionStatus.CompletionProfileApplied;
-    }
+	public void Complete()
+	{
+		EnsureCanMutate();
 
-    internal void MarkReversalProfileApplied()
-    {
-        if (!IsReversalApplied) throw new InvalidOperationException("Reversal is not applied");
-        if (IsReversalProfileApplied) throw new InvalidOperationException("Reversal profile already applied");
+		if (Status != TransactionStatus.Pending)
+			throw new InvalidOperationException("Only Pending transactions can be completed");
 
-        Status |= TransactionStatus.ReversalProfileApplied;
-    }
+		Status |= TransactionStatus.Completed;
+	}
 
-    private void ValidateProfiles(
-        OrganizationFinancialProfile senderProfile,
-        OrganizationFinancialProfile receiverProfile)
-    {
-        if (SenderId != senderProfile.OrganizationId)
-            throw new InvalidOperationException("Sender profile organization mismatch");
-        if (ReceiverId != receiverProfile.OrganizationId)
-            throw new InvalidOperationException("Receiver profile organization mismatch");
-    }
+	public void Reverse(Guid reversedBy)
+	{
+		EnsureCanMutate();
 
-    public void Apply(
-        OrganizationBalance senderBalance,
-        OrganizationBalance receiverBalance)
-    {
-        ValidateBalances(senderBalance, receiverBalance);
+		if (!IsCompleted)
+			throw new InvalidOperationException("Only Completed transactions can be reversed");
 
-        if (!IsCompleted && !IsReversed) throw new InvalidOperationException("Nothing to apply");
+		if (!IsCompletionApplied)
+			throw new InvalidOperationException("Cannot reverse before completion is applied");
 
-        if (IsReversed)
-        {
-            if (!IsCompletionApplied)
-                throw new InvalidOperationException("Cannot reverse before completion is applied");
-            if (IsReversalApplied) throw new InvalidOperationException("Reversed already applied.");
-            ApplyReversed(senderBalance, receiverBalance);
-            return;
-        }
+		Status |= TransactionStatus.Reversed;
+		ReversedAt = DateTime.UtcNow;
+		ReversedBy = reversedBy;
+	}
 
-        if (IsCompleted)
-        {
-            if (IsCompletionApplied) throw new InvalidOperationException("Completion already applied.");
-            ApplyCompleted(senderBalance, receiverBalance);
-        }
-    }
+	public void EnsureCanMutate()
+	{
+		if (IsCompleted && IsReversed)
+			throw new InvalidOperationException("Invalid state: both Completed and Reversed");
 
-    private void ValidateBalances(
-        OrganizationBalance senderBalance,
-        OrganizationBalance receiverBalance)
-    {
-        if (senderBalance.CurrencyId != CurrencyId)
-            throw new InvalidOperationException("Sender balance currency mismatch");
-        if (receiverBalance.CurrencyId != CurrencyId)
-            throw new InvalidOperationException("Receiver balance currency mismatch");
-        if (senderBalance.OrganizationId != SenderId)
-            throw new InvalidOperationException("Sender balance organization mismatch");
-        if (receiverBalance.OrganizationId != ReceiverId)
-            throw new InvalidOperationException("Receiver balance organization mismatch");
-    }
+		if (IsReversed)
+			throw new InvalidOperationException("Transaction is in terminal state");
+	}
 
-    private void ApplyCompleted(
-        OrganizationBalance sender,
-        OrganizationBalance receiver)
-    {
-        sender.IncrementBalance(Amount);
-        receiver.IncrementBalance(-Amount);
-        Status |= TransactionStatus.CompletionApplied;
-    }
+	internal void EnsureCanApplyProfile(
+		OrganizationFinancialProfile senderProfile,
+		OrganizationFinancialProfile receiverProfile)
+	{
+		ValidateProfiles(senderProfile, receiverProfile);
 
-    private void ApplyReversed(
-        OrganizationBalance sender,
-        OrganizationBalance receiver)
-    {
-        sender.IncrementBalance(-Amount);
-        receiver.IncrementBalance(Amount);
-        Status |= TransactionStatus.ReversedApplied;
-    }
+		if (IsReversalApplied)
+		{
+			if (IsReversalProfileApplied)
+				throw new InvalidOperationException("Reversal profile already applied");
 
-    public override Guid GetId() { return Id; }
+			return;
+		}
+
+		if (IsCompletionApplied)
+		{
+			if (IsCompletionProfileApplied)
+				throw new InvalidOperationException("Completion profile already applied");
+
+			return;
+		}
+
+		throw new InvalidOperationException("Transaction is not completed");
+	}
+
+	internal void MarkCompletionProfileApplied()
+	{
+		if (!IsCompletionApplied)
+			throw new InvalidOperationException("Completion is not applied");
+		if (IsCompletionProfileApplied)
+			throw new InvalidOperationException("Completion profile already applied");
+
+		Status |= TransactionStatus.CompletionProfileApplied;
+	}
+
+	internal void MarkReversalProfileApplied()
+	{
+		if (!IsReversalApplied)
+			throw new InvalidOperationException("Reversal is not applied");
+		if (IsReversalProfileApplied)
+			throw new InvalidOperationException("Reversal profile already applied");
+
+		Status |= TransactionStatus.ReversalProfileApplied;
+	}
+
+	private void ValidateProfiles(
+		OrganizationFinancialProfile senderProfile,
+		OrganizationFinancialProfile receiverProfile)
+	{
+		if (SenderId != senderProfile.OrganizationId)
+			throw new InvalidOperationException("Sender profile organization mismatch");
+		if (ReceiverId != receiverProfile.OrganizationId)
+			throw new InvalidOperationException("Receiver profile organization mismatch");
+	}
+
+	public void Apply(OrganizationBalance senderBalance, OrganizationBalance receiverBalance)
+	{
+		ValidateBalances(senderBalance, receiverBalance);
+
+		if (!IsCompleted && !IsReversed)
+			throw new InvalidOperationException("Nothing to apply");
+
+		if (IsReversed)
+		{
+			if (!IsCompletionApplied)
+				throw new InvalidOperationException("Cannot reverse before completion is applied");
+			if (IsReversalApplied)
+				throw new InvalidOperationException("Reversed already applied.");
+			ApplyReversed(senderBalance, receiverBalance);
+			return;
+		}
+
+		if (IsCompleted)
+		{
+			if (IsCompletionApplied)
+				throw new InvalidOperationException("Completion already applied.");
+			ApplyCompleted(senderBalance, receiverBalance);
+		}
+	}
+
+	private void ValidateBalances(OrganizationBalance senderBalance, OrganizationBalance receiverBalance)
+	{
+		if (senderBalance.CurrencyId != CurrencyId)
+			throw new InvalidOperationException("Sender balance currency mismatch");
+		if (receiverBalance.CurrencyId != CurrencyId)
+			throw new InvalidOperationException("Receiver balance currency mismatch");
+		if (senderBalance.OrganizationId != SenderId)
+			throw new InvalidOperationException("Sender balance organization mismatch");
+		if (receiverBalance.OrganizationId != ReceiverId)
+			throw new InvalidOperationException("Receiver balance organization mismatch");
+	}
+
+	private void ApplyCompleted(OrganizationBalance sender, OrganizationBalance receiver)
+	{
+		sender.IncrementBalance(Amount);
+		receiver.IncrementBalance(-Amount);
+		Status |= TransactionStatus.CompletionApplied;
+	}
+
+	private void ApplyReversed(OrganizationBalance sender, OrganizationBalance receiver)
+	{
+		sender.IncrementBalance(-Amount);
+		receiver.IncrementBalance(Amount);
+		Status |= TransactionStatus.ReversedApplied;
+	}
+
+	public override Guid GetId() => Id;
 }

@@ -3,33 +3,43 @@ using Main.Enums.Balances;
 
 namespace Main.Entities.Exceptions;
 
-public class BadTransactionStatusException(string status)
-    : LocalizedBadRequestException(
-        "transaction.invalid.status.for.deletion",
-        new { Status = status },
-        [status]);
+public class BadTransactionStatusException(string status) : LocalizedBadRequestException(
+	"transaction.invalid.status.for.deletion",
+	new
+	{
+		Status = status
+	},
+	[status]);
 
-public class EditingDeletedTransactionException(Guid transactionId)
-    : LocalizedBadRequestException(
-        "deleted.transaction.cannot.be.edited",
-        new { TransactionId = transactionId });
+public class EditingDeletedTransactionException(Guid transactionId) : LocalizedBadRequestException(
+	"deleted.transaction.cannot.be.edited",
+	new
+	{
+		TransactionId = transactionId
+	});
 
-public class TransactionAlreadyDeletedException(Guid transactionId)
-    : LocalizedBadRequestException(
-        "transaction.already.deleted",
-        new { TransactionId = transactionId });
+public class TransactionAlreadyDeletedException(Guid transactionId) : LocalizedBadRequestException(
+	"transaction.already.deleted",
+	new
+	{
+		TransactionId = transactionId
+	});
 
-public class TransactionNotFoundException(Guid transactionId)
-    : LocalizedNotFoundException(
-        "transaction.not.found",
-        new { TransactionId = transactionId });
+public class TransactionNotFoundException(Guid transactionId) : LocalizedNotFoundException(
+	"transaction.not.found",
+	new
+	{
+		TransactionId = transactionId
+	});
 
 public class TransactionSourceCannotBeReversedByUserException(TransactionSourceType sourceType)
-    : LocalizedBadRequestException(
-        "transaction.source.cannot.be.reversed.by.user",
-        new { SourceType = sourceType },
-        [sourceType.ToString()]);
+	: LocalizedBadRequestException(
+		"transaction.source.cannot.be.reversed.by.user",
+		new
+		{
+			SourceType = sourceType
+		},
+		[sourceType.ToString()]);
 
 public class TransactionWithSystemOrganizationCannotBeCreatedByUserException()
-    : LocalizedBadRequestException(
-        "transaction.with.system.organization.cannot.be.created.by.user");
+	: LocalizedBadRequestException("transaction.with.system.organization.cannot.be.created.by.user");

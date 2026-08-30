@@ -2,6 +2,7 @@
 
 public enum TransactionReversalMode
 {
-    User,
-    System
+	User,
+
+	System
 }

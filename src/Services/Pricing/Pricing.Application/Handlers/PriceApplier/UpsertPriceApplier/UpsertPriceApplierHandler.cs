@@ -13,172 +13,159 @@ using Pricing.Enums;
 
 namespace Pricing.Application.Handlers.PriceApplier.UpsertPriceApplier;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record UpsertPriceApplierCommand(
-    string SystemName,
-    string? Name,
-    string? DslLogic,
-    IReadOnlyList<UpsertPriceApplierStateDto> States
-    ) : ICommand<UpsertPriceApplierResult>;
+	string SystemName,
+	string? Name,
+	string? DslLogic,
+	IReadOnlyList<UpsertPriceApplierStateDto> States) : ICommand<UpsertPriceApplierResult>;
+
 public record UpsertPriceApplierResult(string SystemName);
 
 public class UpsertPriceApplierHandler(
-    INamedObjectRegistry<ApplierNamedObjectBase> registry,
-    IRepository<Entities.Pricing.PriceApplier, string> repository,
-    IReadRepository<PriceApplierState, PriceApplierStateKey> stateRepository,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<UpsertPriceApplierCommand, UpsertPriceApplierResult>
+	INamedObjectRegistry<ApplierNamedObjectBase> registry,
+	IRepository<Entities.Pricing.PriceApplier, string> repository,
+	IReadRepository<PriceApplierState, PriceApplierStateKey> stateRepository,
+	IUnitOfWork unitOfWork) : ICommandHandler<UpsertPriceApplierCommand, UpsertPriceApplierResult>
 {
-    public async Task<UpsertPriceApplierResult> Handle(
-        UpsertPriceApplierCommand request, 
-        CancellationToken cancellationToken)
-    {
-        var local = registry.TryGetBySystemName(request.SystemName);
-        var criteria = Criteria<Entities.Pricing.PriceApplier>
-            .New()
-            .Where(x => x.SystemName == request.SystemName)
-            .Include(x => x.States)
-            .Track()
-            .Build();
-        
-        var model = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
-        var created = model is null;
-        var dslLogic = local is null
-            ? GetRequiredDslLogic(request.DslLogic)
-            : null;
-        var name = local is null
-            ? GetRequiredName(request.Name)
-            : null;
+	public async Task<UpsertPriceApplierResult> Handle(
+		UpsertPriceApplierCommand request,
+		CancellationToken cancellationToken)
+	{
+		var local = registry.TryGetBySystemName(request.SystemName);
+		var criteria = Criteria<Entities.Pricing.PriceApplier>
+			.New()
+			.Where(x => x.SystemName == request.SystemName)
+			.Include(x => x.States)
+			.Track()
+			.Build();
 
-        if (dslLogic is not null
-            && !await DynamicApplierDslValidator.IsValidAsync(
-                dslLogic,
-                cancellationToken))
-            throw new InvalidInputException("price.applier.dsl.logic.invalid");
+		var model = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
+		var created = model is null;
+		var dslLogic = local is null ? GetRequiredDslLogic(request.DslLogic) : null;
+		var name = local is null ? GetRequiredName(request.Name) : null;
 
-        if (model is not null)
-            EnsureKindMatches(model, local);
+		if (dslLogic is not null &&
+			!await DynamicApplierDslValidator.IsValidAsync(dslLogic, cancellationToken))
+			throw new InvalidInputException("price.applier.dsl.logic.invalid");
 
-        await EnsureOrdersAreAvailableAsync(
-            request.SystemName,
-            request.States,
-            local,
-            cancellationToken);
+		if (model is not null)
+			EnsureKindMatches(model, local);
 
-        if (model is null)
-        {
-            model = local is null
-                ? Entities.Pricing.PriceApplier.Create(
-                    request.SystemName,
-                    name!,
-                    dslLogic!)
-                : Entities.Pricing.PriceApplier.CreateLocal(request.SystemName);
-            
-            await unitOfWork.AddAsync(model, cancellationToken);
-        }
+		await EnsureOrdersAreAvailableAsync(
+			request.SystemName,
+			request.States,
+			local,
+			cancellationToken);
 
-        if (!created && local is null)
-        {
-            model.SetName(name!);
-            model.SetDslLogic(dslLogic!);
-        }
+		if (model is null)
+		{
+			model = local is null
+				? Entities.Pricing.PriceApplier.Create(
+					request.SystemName,
+					name!,
+					dslLogic!)
+				: Entities.Pricing.PriceApplier.CreateLocal(request.SystemName);
 
-        foreach (var state in request.States)
-            UpdateState(model, state, GetOrder(state, local));
+			await unitOfWork.AddAsync(model, cancellationToken);
+		}
 
-        model.RemoveStatesExcept(request.States.Select(x => x.Usage));
-        
-        return new UpsertPriceApplierResult(model.SystemName);
-    }
+		if (!created && local is null)
+		{
+			model.SetName(name!);
+			model.SetDslLogic(dslLogic!);
+		}
 
-    private static void UpdateState(
-        Entities.Pricing.PriceApplier applier,
-        UpsertPriceApplierStateDto stateDto,
-        int order)
-    {
-        var state = applier
-            .States
-            .FirstOrDefault(x => x.Usage == stateDto.Usage);
+		foreach (var state in request.States)
+			UpdateState(
+				model,
+				state,
+				GetOrder(state, local));
 
-        if (state == null)
-            applier.AddState(PriceApplierState.Create(
-                applier.SystemName,
-                stateDto.Usage,
-                order,
-                stateDto.Enabled));
-        else
-            state.Update(order, stateDto.Enabled);
-    }
+		model.RemoveStatesExcept(request.States.Select(x => x.Usage));
 
-    private static string GetRequiredDslLogic(string? dslLogic)
-    {
-        return string.IsNullOrWhiteSpace(dslLogic)
-            ? throw new InvalidInputException("price.applier.dsl.logic.required")
-            : dslLogic;
-    }
+		return new UpsertPriceApplierResult(model.SystemName);
+	}
 
-    private static string GetRequiredName(string? name)
-    {
-        return string.IsNullOrWhiteSpace(name)
-            ? throw new InvalidInputException("price.applier.name.required")
-            : name;
-    }
+	private static void UpdateState(
+		Entities.Pricing.PriceApplier applier,
+		UpsertPriceApplierStateDto stateDto,
+		int order)
+	{
+		var state = applier.States.FirstOrDefault(x => x.Usage == stateDto.Usage);
 
-    private static int GetLocalOrder(
-        ApplierNamedObjectBase local,
-        PriceOfferSourceType usage)
-    {
-        var supportsUsage = usage switch
-        {
-            PriceOfferSourceType.OurWarehouse => local is IInternalPriceApplier,
-            PriceOfferSourceType.Supplier => local is ISupplierPriceApplier,
-            _ => false
-        };
+		if (state == null)
+			applier.AddState(
+				PriceApplierState.Create(
+					applier.SystemName,
+					stateDto.Usage,
+					order,
+					stateDto.Enabled));
+		else
+			state.Update(order, stateDto.Enabled);
+	}
 
-        return !supportsUsage
-            ? throw new InvalidInputException("price.applier.usage.not.supported")
-            : local.Order;
-    }
+	private static string GetRequiredDslLogic(string? dslLogic)
+	{
+		return string.IsNullOrWhiteSpace(dslLogic)
+			? throw new InvalidInputException("price.applier.dsl.logic.required")
+			: dslLogic;
+	}
 
-    private static int GetOrder(
-        UpsertPriceApplierStateDto state,
-        ApplierNamedObjectBase? local)
-    {
-        return local is null
-            ? state.Order
-              ?? throw new InvalidInputException("price.applier.order.required")
-            : GetLocalOrder(local, state.Usage);
-    }
+	private static string GetRequiredName(string? name)
+	{
+		return string.IsNullOrWhiteSpace(name)
+			? throw new InvalidInputException("price.applier.name.required")
+			: name;
+	}
 
-    private static void EnsureKindMatches(
-        Entities.Pricing.PriceApplier model,
-        ApplierNamedObjectBase? local)
-    {
-        if ((local is null) == (model.DslLogic is null))
-            throw new InvalidInputException("price.applier.system.name.conflict");
-    }
+	private static int GetLocalOrder(ApplierNamedObjectBase local, PriceOfferSourceType usage)
+	{
+		var supportsUsage = usage switch
+		{
+			PriceOfferSourceType.OurWarehouse => local is IInternalPriceApplier,
+			PriceOfferSourceType.Supplier => local is ISupplierPriceApplier,
+			_ => false
+		};
 
-    private async Task EnsureOrdersAreAvailableAsync(
-        string systemName,
-        IReadOnlyList<UpsertPriceApplierStateDto> states,
-        ApplierNamedObjectBase? local,
-        CancellationToken cancellationToken)
-    {
-        foreach (var state in states)
-        {
-            var order = GetOrder(state, local);
-            if (!state.Enabled) continue;
+		return !supportsUsage
+			? throw new InvalidInputException("price.applier.usage.not.supported")
+			: local.Order;
+	}
 
-            var orderIsOccupied = await stateRepository.Query.AnyAsync(
-                x => x.Enabled
-                     && x.PriceApplierSystemName != systemName
-                     && x.Usage == state.Usage
-                     && x.Order == order,
-                cancellationToken);
+	private static int GetOrder(UpsertPriceApplierStateDto state, ApplierNamedObjectBase? local)
+	{
+		return local is null
+			? state.Order ?? throw new InvalidInputException("price.applier.order.required")
+			: GetLocalOrder(local, state.Usage);
+	}
 
-            if (orderIsOccupied)
-                throw new InvalidInputException("price.applier.order.duplicate");
-        }
-    }
+	private static void EnsureKindMatches(Entities.Pricing.PriceApplier model, ApplierNamedObjectBase? local)
+	{
+		if (local is null == model.DslLogic is null)
+			throw new InvalidInputException("price.applier.system.name.conflict");
+	}
 
+	private async Task EnsureOrdersAreAvailableAsync(
+		string systemName,
+		IReadOnlyList<UpsertPriceApplierStateDto> states,
+		ApplierNamedObjectBase? local,
+		CancellationToken cancellationToken)
+	{
+		foreach (var state in states)
+		{
+			var order = GetOrder(state, local);
+			if (!state.Enabled)
+				continue;
+
+			var orderIsOccupied = await stateRepository.Query.AnyAsync(
+				x => x.Enabled && x.PriceApplierSystemName != systemName && x.Usage == state.Usage &&
+					x.Order == order,
+				cancellationToken);
+
+			if (orderIsOccupied)
+				throw new InvalidInputException("price.applier.order.duplicate");
+		}
+	}
 }

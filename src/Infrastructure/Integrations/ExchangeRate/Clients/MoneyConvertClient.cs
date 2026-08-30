@@ -8,18 +8,20 @@ namespace ExchangeRate.Clients;
 
 public class MoneyConvertClient(HttpClient client) : IExchangeRateClient
 {
-    public ExchangeRateProvider Provider => ExchangeRateProvider.MoneyConvert;
+	public ExchangeRateProvider Provider => ExchangeRateProvider.MoneyConvert;
 
-    public async Task<ExchangeRates> GetRates(CancellationToken cancellationToken = default)
-    {
-        var response = await client.GetAsync("", cancellationToken);
-        if (!response.IsSuccessStatusCode) throw new Exception("Ошибка при получении курсов валют от ЦБР");
+	public async Task<ExchangeRates> GetRates(CancellationToken cancellationToken = default)
+	{
+		var response = await client.GetAsync("", cancellationToken);
+		if (!response.IsSuccessStatusCode)
+			throw new Exception("Ошибка при получении курсов валют от ЦБР");
 
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        var result = JsonSerializer.Deserialize<MoneyConvertRatesResponse>(json);
+		var json = await response.Content.ReadAsStringAsync(cancellationToken);
+		var result = JsonSerializer.Deserialize<MoneyConvertRatesResponse>(json);
 
-        if (result == null) throw new Exception("Сервер вернул пустой ответ.");
+		if (result == null)
+			throw new Exception("Сервер вернул пустой ответ.");
 
-        return new ExchangeRates(result.Base, result.Rates);
-    }
+		return new ExchangeRates(result.Base, result.Rates);
+	}
 }

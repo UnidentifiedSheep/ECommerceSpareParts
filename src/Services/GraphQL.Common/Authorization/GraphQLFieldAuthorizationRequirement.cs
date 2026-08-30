@@ -5,5 +5,5 @@ using Security.Authorization;
 namespace GraphQL.Common.Authorization;
 
 internal sealed record GraphQlFieldAuthorizationRequirement(
-    GraphQlAuthorizationTarget Target,
-    AuthorizationMatch Match) : IAuthorizationRequirement;
+	GraphQlAuthorizationTarget Target,
+	AuthorizationMatch Match) : IAuthorizationRequirement;

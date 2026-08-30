@@ -4,120 +4,121 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
 using Domain.CommonEntities.Job;
-using MassTransit;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product.Enrichment;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.MapCatalogueCandidatesToProducts;
 
 public class MapCatalogueCandidatesToProductsLrt(
-    IRepository<Job, Guid> jobRepository, 
-    IUnitOfWork unitOfWork, 
-    IPublishEndpoint publisher,
-    IApplicationTransactionService transactionService,
-    IRepository<CatalogueCandidate, Guid> catalogueCandidateRepository,
-    IProductRepository productRepository,
-    ILogger<MapCatalogueCandidatesToProductsLrt> logger)
-    : LrtBase<NoneInputState, MapCatalogueCandidatesToProductsState>(
-    jobRepository, 
-    unitOfWork,
-    publisher, 
-    transactionService,
-    logger)
+	IRepository<Job, Guid> jobRepository,
+	IUnitOfWork unitOfWork,
+	IPublishEndpoint publisher,
+	IApplicationTransactionService transactionService,
+	IRepository<CatalogueCandidate, Guid> catalogueCandidateRepository,
+	IProductRepository productRepository,
+	ILogger<MapCatalogueCandidatesToProductsLrt> logger)
+	: LrtBase<NoneInputState, MapCatalogueCandidatesToProductsState>(
+		jobRepository,
+		unitOfWork,
+		publisher,
+		transactionService,
+		logger)
 {
-    public const string LrtSystemName = nameof(MapCatalogueCandidatesToProductsLrt);
-    public override string SystemName => LrtSystemName;
-    public override string NameLocalizationKey => "lrt.catalogue.candidates.map.to.products.name";
-    public override string DescriptionLocalizationKey => "lrt.catalogue.candidates.map.to.products.description";
+	public const string LrtSystemName = nameof(MapCatalogueCandidatesToProductsLrt);
 
-    protected override async Task DoWork()
-    {
-        const int batchSize = 1000;
+	public override string SystemName => LrtSystemName;
 
-        while (true)
-        {
-            var result = await ProcessBatchAsync(
-                State.LastProcessedId,
-                batchSize);
+	public override string NameLocalizationKey => "lrt.catalogue.candidates.map.to.products.name";
 
-            if (result.ReadRows == 0) return;
+	public override string DescriptionLocalizationKey =>
+		"lrt.catalogue.candidates.map.to.products.description";
 
-            await SaveStateAsync(new MapCatalogueCandidatesToProductsState
-            {
-                LastProcessedId = result.LastProcessedId,
-                ProcessedRows = State.ProcessedRows + result.ReadRows,
-                MappedRows = State.MappedRows + result.MappedRows,
-                SkippedRows = State.SkippedRows + result.SkippedRows
-            });
+	protected override async Task DoWork()
+	{
+		const int batchSize = 1000;
 
-            if (!result.HasMore) break;
-        }
-    }
+		while (true)
+		{
+			var result = await ProcessBatchAsync(State.LastProcessedId, batchSize);
 
-    private Task<BatchResult> ProcessBatchAsync(
-        Guid lastProcessedId,
-        int batchSize)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
+			if (result.ReadRows == 0)
+				return;
 
-        return TransactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommitted(30,3),
-            async (context, cancellationToken) =>
-            {
-                var candidates = await catalogueCandidateRepository.ListAsync(
-                    Criteria<CatalogueCandidate>
-                        .New()
-                        .Where(x => x.ProductId == null)
-                        .Where(x => x.Id > lastProcessedId)
-                        .OrderByAsc(x => x.Id)
-                        .Track()
-                        .Size(batchSize)
-                        .Build(),
-                    cancellationToken);
+			await SaveStateAsync(
+				new MapCatalogueCandidatesToProductsState
+				{
+					LastProcessedId = result.LastProcessedId,
+					ProcessedRows = State.ProcessedRows + result.ReadRows,
+					MappedRows = State.MappedRows + result.MappedRows,
+					SkippedRows = State.SkippedRows + result.SkippedRows
+				});
 
-                if (candidates.Count == 0)
-                    return new BatchResult(
-                        lastProcessedId,
-                        0,
-                        0,
-                        0,
-                        false);
+			if (!result.HasMore)
+				break;
+		}
+	}
 
-                var productIds = await productRepository.GetProductIdsByKeys(
-                    candidates.Select(x => (
-                        NormalizedSku: x.Sku.NormalizedValue,
-                        x.ProducerId)),
-                    cancellationToken);
+	private Task<BatchResult> ProcessBatchAsync(Guid lastProcessedId, int batchSize)
+	{
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
 
-                var mappedRows = 0;
-                foreach (var candidate in candidates)
-                {
-                    if (!productIds.TryGetValue(
-                            (candidate.Sku.NormalizedValue, candidate.ProducerId),
-                            out var productId))
-                        continue;
+		return TransactionService.ExecuteAsync(
+			TransactionalAttribute.ReadCommitted(30, 3),
+			async (context, cancellationToken) =>
+			{
+				var candidates = await catalogueCandidateRepository.ListAsync(
+					Criteria<CatalogueCandidate>
+						.New()
+						.Where(x => x.ProductId == null)
+						.Where(x => x.Id > lastProcessedId)
+						.OrderByAsc(x => x.Id)
+						.Track()
+						.Size(batchSize)
+						.Build(),
+					cancellationToken);
 
-                    candidate.MapToProduct(productId);
-                    mappedRows++;
-                }
+				if (candidates.Count == 0)
+					return new BatchResult(
+						lastProcessedId,
+						0,
+						0,
+						0,
+						false);
 
-                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+				var productIds = await productRepository.GetProductIdsByKeys(
+					candidates.Select(x => (NormalizedSku: x.Sku.NormalizedValue, x.ProducerId)),
+					cancellationToken);
 
-                return new BatchResult(
-                    candidates[^1].Id,
-                    candidates.Count,
-                    mappedRows,
-                    candidates.Count - mappedRows,
-                    candidates.Count == batchSize);
-            },
-            CancellationToken);
-    }
+				var mappedRows = 0;
+				foreach (var candidate in candidates)
+				{
+					if (!productIds.TryGetValue(
+							(candidate.Sku.NormalizedValue, candidate.ProducerId),
+							out var productId))
+						continue;
 
-    private sealed record BatchResult(
-        Guid LastProcessedId,
-        int ReadRows,
-        int MappedRows,
-        int SkippedRows,
-        bool HasMore);
+					candidate.MapToProduct(productId);
+					mappedRows++;
+				}
+
+				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+				return new BatchResult(
+					candidates[^1].Id,
+					candidates.Count,
+					mappedRows,
+					candidates.Count - mappedRows,
+					candidates.Count == batchSize);
+			},
+			CancellationToken);
+	}
+
+	private sealed record BatchResult(
+		Guid LastProcessedId,
+		int ReadRows,
+		int MappedRows,
+		int SkippedRows,
+		bool HasMore);
 }

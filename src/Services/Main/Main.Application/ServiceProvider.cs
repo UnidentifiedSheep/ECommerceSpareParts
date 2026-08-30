@@ -27,57 +27,57 @@ namespace Main.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(
-        this IServiceCollection collection,
-        IConfiguration? configuration)
-    {
-        collection
-            .AddNamedObjects()
-            .AddLrtLayer(typeof(ProducerImportLrt).Assembly)
-            .AddFusionCache()
-            .WithRegisteredDistributedCache()
-            .WithRegisteredBackplane()
-            .WithSystemTextJsonSerializer();
+	public static IServiceCollection AddApplicationLayer(
+		this IServiceCollection collection,
+		IConfiguration? configuration)
+	{
+		collection
+			.AddNamedObjects()
+			.AddLrtLayer(typeof(ProducerImportLrt).Assembly)
+			.AddFusionCache()
+			.WithRegisteredDistributedCache()
+			.WithRegisteredBackplane()
+			.WithSystemTextJsonSerializer();
 
-        collection.AddSingleton<IJwtGenerator, JwtGenerator>();
-        collection.RegisterProjectionProviders<ProducerImportLrt>();
+		collection.AddSingleton<IJwtGenerator, JwtGenerator>();
+		collection.RegisterProjectionProviders<ProducerImportLrt>();
 
-        collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
+		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 
-        collection.RegisterSettingsService();
+		collection.RegisterSettingsService();
 
-        collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();
-        collection.AddSingleton<ILogisticsPricingStrategy, PerAreaAndWeight>();
-        collection.AddSingleton<ILogisticsPricingStrategy, PerAreaOrWeightPricing>();
-        collection.AddSingleton<ILogisticsPricingStrategy, PerAreaPricing>();
-        collection.AddSingleton<ILogisticsPricingStrategy, PerOrderPricing>();
-        collection.AddSingleton<ILogisticsPricingStrategy, PerWeightPricing>();
-        collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
+		collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();
+		collection.AddSingleton<ILogisticsPricingStrategy, PerAreaAndWeight>();
+		collection.AddSingleton<ILogisticsPricingStrategy, PerAreaOrWeightPricing>();
+		collection.AddSingleton<ILogisticsPricingStrategy, PerAreaPricing>();
+		collection.AddSingleton<ILogisticsPricingStrategy, PerOrderPricing>();
+		collection.AddSingleton<ILogisticsPricingStrategy, PerWeightPricing>();
+		collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
 
-        collection.AddScoped<ISaleEventService, SaleEventService>();
+		collection.AddScoped<ISaleEventService, SaleEventService>();
 
-        collection.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();
-        collection.AddScoped<IVerificationPayloadProvider, VerificationPayloadProvider>();
+		collection.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();
+		collection.AddScoped<IVerificationPayloadProvider, VerificationPayloadProvider>();
 
-        collection.AddScoped<IMailingService, MailingService>();
-        collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
-        collection.AddScoped<IBalanceService, BalanceService>();
-        collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
-        collection.AddScoped<ISaleService, SaleService>();
-        collection.AddScoped<IUserTokenService, UserTokenService>();
-        collection.AddScoped<IProducerLookupService, ProducerLookupService>();
-        collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
-        collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
-        
-        collection.AddApplicationBase(
-            ServicesDefinitions.Main,
-            configuration,
-            typeof(Global).Assembly);
+		collection.AddScoped<IMailingService, MailingService>();
+		collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
+		collection.AddScoped<IBalanceService, BalanceService>();
+		collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
+		collection.AddScoped<ISaleService, SaleService>();
+		collection.AddScoped<IUserTokenService, UserTokenService>();
+		collection.AddScoped<IProducerLookupService, ProducerLookupService>();
+		collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
+		collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
 
-        collection.AddSingleton<IEmailValidator, EmailValidator>();
+		collection.AddApplicationBase(
+			ServicesDefinitions.Main,
+			configuration,
+			typeof(Global).Assembly);
 
-        ValidationConfiguration.Configure();
+		collection.AddSingleton<IEmailValidator, EmailValidator>();
 
-        return collection;
-    }
+		ValidationConfiguration.Configure();
+
+		return collection;
+	}
 }

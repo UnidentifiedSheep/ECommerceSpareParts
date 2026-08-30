@@ -1,176 +1,177 @@
-using Analytics.Entities;
 using Analytics.Application.Extensions;
+using Analytics.Entities;
 using Application.Common.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Analytics.Application.NamedObjects.Analyzers.Markup;
 
-public class MarkupRangeAnalyzer(
-    IReadRepository<SaleContent, int> repository
-) : MarkupAnalyzerNamedObjectBase
+public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) : MarkupAnalyzerNamedObjectBase
 {
-    private const int BatchSize = 1000;
-    private const int DecimalScale = 10;
-    private const int MinBucketSampleSize = 20;
-    private const double MaxStdDev = 0.08;
-    private const decimal MaxCostRatio = 1.5m;
-    private const decimal MinAllowedMarkup = 0.01m;
-    private const decimal MaxAllowedMarkup = 3m;
+	private const int BatchSize = 1000;
 
-    public const string AnalyzerSystemName = nameof(MarkupRangeAnalyzer);
+	private const int DecimalScale = 10;
 
-    public override string NameLocalizationKey => "markup.range.analyzer.name";
-    public override string DescriptionLocalizationKey => "markup.range.analyzer.description";
-    public override string SystemName => AnalyzerSystemName;
+	private const int MinBucketSampleSize = 20;
 
-    public override async Task<IReadOnlyList<MarkupRangeDraft>> AnalyzeAsync(
-        MarkupAnalyzerInput input,
-        CancellationToken cancellationToken = default)
-    {
-        var ranges = new List<MarkupRangeDraft>();
-        var currentBucket = new MarkupBucketBuilder();
-        MarkupRangeCursor? cursor = null;
+	private const double MaxStdDev = 0.08;
 
-        while (true)
-        {
-            var result = await LoadBatch(
-                input,
-                cursor,
-                cancellationToken);
+	private const decimal MaxCostRatio = 1.5m;
 
-            if (result.Count == 0) break;
+	private const decimal MinAllowedMarkup = 0.01m;
 
-            foreach (var row in result)
-                TryAddToRanges(
-                    row,
-                    ranges,
-                    ref currentBucket);
+	private const decimal MaxAllowedMarkup = 3m;
 
-            cursor = MarkupRangeCursor.From(result[^1]);
-        }
+	public const string AnalyzerSystemName = nameof(MarkupRangeAnalyzer);
 
-        if (currentBucket.Count > 0) ranges.Add(currentBucket.Build());
+	public override string NameLocalizationKey => "markup.range.analyzer.name";
 
-        return ranges;
-    }
+	public override string DescriptionLocalizationKey => "markup.range.analyzer.description";
 
-    private async Task<List<SaleContentMarkupRow>> LoadBatch(
-        MarkupAnalyzerInput input,
-        MarkupRangeCursor? cursor,
-        CancellationToken cancellationToken)
-    {
-        var query = BuildRowsQuery(input);
+	public override string SystemName => AnalyzerSystemName;
 
-        if (cursor is not null)
-            query = query.Where(x =>
-                x.AvgBuyPriceBase > cursor.AvgBuyPriceBase ||
-                x.AvgBuyPriceBase == cursor.AvgBuyPriceBase && x.Id > cursor.Id);
+	public override async Task<IReadOnlyList<MarkupRangeDraft>> AnalyzeAsync(
+		MarkupAnalyzerInput input,
+		CancellationToken cancellationToken = default)
+	{
+		var ranges = new List<MarkupRangeDraft>();
+		var currentBucket = new MarkupBucketBuilder();
+		MarkupRangeCursor? cursor = null;
 
-        return await query
-            .OrderBy(x => x.AvgBuyPriceBase)
-            .ThenBy(x => x.Id)
-            .Take(BatchSize)
-            .ToListAsync(cancellationToken);
-    }
+		while (true)
+		{
+			var result = await LoadBatch(
+				input,
+				cursor,
+				cancellationToken);
 
-    private IQueryable<SaleContentMarkupRow> BuildRowsQuery(MarkupAnalyzerInput input)
-    {
-        var query = repository.Query
-            .AsNoTracking()
-            .ExcludeDeleted()
-            .Where(x => x.Details.Any());
+			if (result.Count == 0)
+				break;
 
-        if (input.StartDate is not null) query = query.Where(x => x.Sale.CreatedAt >= input.StartDate);
+			foreach (var row in result)
+				TryAddToRanges(
+					row,
+					ranges,
+					ref currentBucket);
 
-        if (input.EndDate is not null) query = query.Where(x => x.Sale.CreatedAt <= input.EndDate);
+			cursor = MarkupRangeCursor.From(result[^1]);
+		}
 
-        return query.Select(x => new SaleContentMarkupRow
-        {
-            Id = x.Id,
-            SaleUnitPriceBase = Math.Round(
-                x.PriceInBaseCurrency / (1 - x.Discount),
-                DecimalScale),
-            AvgBuyPriceBase = Math.Round(
-                x.Details.Sum(d => d.BuyPriceInBaseCurrency * d.Count) /
-                x.Details.Sum(d => d.Count),
-                DecimalScale)
-        });
-    }
+		if (currentBucket.Count > 0)
+			ranges.Add(currentBucket.Build());
 
-    private static void TryAddToRanges(
-        SaleContentMarkupRow row,
-        List<MarkupRangeDraft> ranges,
-        ref MarkupBucketBuilder currentBucket)
-    {
-        if (!TryCalculateMarkup(row, out var markup)) return;
+		return ranges;
+	}
 
-        if (currentBucket.Count == 0)
-        {
-            currentBucket.Add(row.AvgBuyPriceBase, markup);
-            return;
-        }
+	private async Task<List<SaleContentMarkupRow>> LoadBatch(
+		MarkupAnalyzerInput input,
+		MarkupRangeCursor? cursor,
+		CancellationToken cancellationToken)
+	{
+		var query = BuildRowsQuery(input);
 
-        var testBucket = currentBucket.Copy();
-        testBucket.Add(row.AvgBuyPriceBase, markup);
+		if (cursor is not null)
+			query = query.Where(x =>
+				x.AvgBuyPriceBase > cursor.AvgBuyPriceBase ||
+				x.AvgBuyPriceBase == cursor.AvgBuyPriceBase && x.Id > cursor.Id);
 
-        if (!ShouldStartNewBucket(
-                row,
-                currentBucket,
-                testBucket) || currentBucket.Count <= 1)
-        {
-            currentBucket = testBucket;
-            return;
-        }
+		return await query
+			.OrderBy(x => x.AvgBuyPriceBase)
+			.ThenBy(x => x.Id)
+			.Take(BatchSize)
+			.ToListAsync(cancellationToken);
+	}
 
-        ranges.Add(currentBucket.Build());
+	private IQueryable<SaleContentMarkupRow> BuildRowsQuery(MarkupAnalyzerInput input)
+	{
+		var query = repository.Query.AsNoTracking().ExcludeDeleted().Where(x => x.Details.Any());
 
-        currentBucket = new MarkupBucketBuilder();
-        currentBucket.Add(row.AvgBuyPriceBase, markup);
-    }
+		if (input.StartDate is not null)
+			query = query.Where(x => x.Sale.CreatedAt >= input.StartDate);
 
-    private static bool TryCalculateMarkup(
-        SaleContentMarkupRow row,
-        out decimal markup)
-    {
-        markup = 0;
+		if (input.EndDate is not null)
+			query = query.Where(x => x.Sale.CreatedAt <= input.EndDate);
 
-        if (row.AvgBuyPriceBase <= 0) return false;
+		return query.Select(x => new SaleContentMarkupRow
+		{
+			Id = x.Id,
+			SaleUnitPriceBase = Math.Round(x.PriceInBaseCurrency / (1 - x.Discount), DecimalScale),
+			AvgBuyPriceBase = Math.Round(
+				x.Details.Sum(d => d.BuyPriceInBaseCurrency * d.Count) / x.Details.Sum(d => d.Count),
+				DecimalScale)
+		});
+	}
 
-        markup = (row.SaleUnitPriceBase - row.AvgBuyPriceBase) / row.AvgBuyPriceBase;
-        return markup is >= MinAllowedMarkup and <= MaxAllowedMarkup;
-    }
+	private static void TryAddToRanges(
+		SaleContentMarkupRow row,
+		List<MarkupRangeDraft> ranges,
+		ref MarkupBucketBuilder currentBucket)
+	{
+		if (!TryCalculateMarkup(row, out var markup))
+			return;
 
-    private static bool ShouldStartNewBucket(
-        SaleContentMarkupRow row,
-        MarkupBucketBuilder currentBucket,
-        MarkupBucketBuilder testBucket)
-    {
-        if (row.AvgBuyPriceBase == currentBucket.ToCost)
-            return false;
+		if (currentBucket.Count == 0)
+		{
+			currentBucket.Add(row.AvgBuyPriceBase, markup);
+			return;
+		}
 
-        var costRatioExceeded =
-            currentBucket.FromCost > 0 &&
-            row.AvgBuyPriceBase / currentBucket.FromCost > MaxCostRatio;
+		var testBucket = currentBucket.Copy();
+		testBucket.Add(row.AvgBuyPriceBase, markup);
 
-        var stdDevExceeded =
-            currentBucket.Count >= MinBucketSampleSize &&
-            testBucket is { Count: > 1, StdDev: > MaxStdDev };
+		if (!ShouldStartNewBucket(
+				row,
+				currentBucket,
+				testBucket) || currentBucket.Count <= 1)
+		{
+			currentBucket = testBucket;
+			return;
+		}
 
-        return stdDevExceeded || costRatioExceeded;
-    }
+		ranges.Add(currentBucket.Build());
 
-    private sealed class SaleContentMarkupRow
-    {
-        public int Id { get; init; }
-        public decimal SaleUnitPriceBase { get; init; }
-        public decimal AvgBuyPriceBase { get; init; }
-    }
+		currentBucket = new MarkupBucketBuilder();
+		currentBucket.Add(row.AvgBuyPriceBase, markup);
+	}
 
-    private sealed record MarkupRangeCursor(int Id, decimal AvgBuyPriceBase)
-    {
-        public static MarkupRangeCursor From(SaleContentMarkupRow row)
-        {
-            return new MarkupRangeCursor(row.Id, row.AvgBuyPriceBase);
-        }
-    }
+	private static bool TryCalculateMarkup(SaleContentMarkupRow row, out decimal markup)
+	{
+		markup = 0;
+
+		if (row.AvgBuyPriceBase <= 0)
+			return false;
+
+		markup = (row.SaleUnitPriceBase - row.AvgBuyPriceBase) / row.AvgBuyPriceBase;
+		return markup is >= MinAllowedMarkup and <= MaxAllowedMarkup;
+	}
+
+	private static bool ShouldStartNewBucket(
+		SaleContentMarkupRow row,
+		MarkupBucketBuilder currentBucket,
+		MarkupBucketBuilder testBucket)
+	{
+		if (row.AvgBuyPriceBase == currentBucket.ToCost)
+			return false;
+
+		var costRatioExceeded = currentBucket.FromCost > 0 &&
+			row.AvgBuyPriceBase / currentBucket.FromCost > MaxCostRatio;
+
+		var stdDevExceeded = currentBucket.Count >= MinBucketSampleSize &&
+			testBucket is { Count: > 1, StdDev: > MaxStdDev };
+
+		return stdDevExceeded || costRatioExceeded;
+	}
+
+	private sealed class SaleContentMarkupRow
+	{
+		public int Id { get; init; }
+
+		public decimal SaleUnitPriceBase { get; init; }
+
+		public decimal AvgBuyPriceBase { get; init; }
+	}
+
+	private sealed record MarkupRangeCursor(int Id, decimal AvgBuyPriceBase)
+	{
+		public static MarkupRangeCursor From(SaleContentMarkupRow row) => new(row.Id, row.AvgBuyPriceBase);
+	}
 }

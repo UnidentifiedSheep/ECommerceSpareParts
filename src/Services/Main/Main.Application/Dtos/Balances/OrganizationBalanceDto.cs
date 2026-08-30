@@ -5,9 +5,9 @@ namespace Main.Application.Dtos.Balances;
 
 public record OrganizationBalanceDto
 {
-    [JsonPropertyName("balance")]
-    public required decimal Balance { get; init; }
+	[JsonPropertyName("balance")]
+	public required decimal Balance { get; init; }
 
-    [JsonPropertyName("currency")]
-    public required CurrencyDto Currency { get; init; }
+	[JsonPropertyName("currency")]
+	public required CurrencyDto Currency { get; init; }
 }

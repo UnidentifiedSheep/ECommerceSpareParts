@@ -19,31 +19,31 @@ namespace Analytics.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(
-        this IServiceCollection collection,
-        IConfiguration? configuration)
-    {
-        SortByConfig.Configure();
-        CursorConfig.Configure();
-        collection
-            .AddApplicationBase(
-                ServicesDefinitions.Analytics,
-                configuration,
-                typeof(CurrencyRatesProvider).Assembly)
-            .AddNamedObjects()
-            .AddLrtLayer(typeof(MarkupCalculationLrt).Assembly)
-            .AddFusionCache()
-            .WithRegisteredDistributedCache()
-            .WithRegisteredBackplane()
-            .WithSystemTextJsonSerializer();
+	public static IServiceCollection AddApplicationLayer(
+		this IServiceCollection collection,
+		IConfiguration? configuration)
+	{
+		SortByConfig.Configure();
+		CursorConfig.Configure();
+		collection
+			.AddApplicationBase(
+				ServicesDefinitions.Analytics,
+				configuration,
+				typeof(CurrencyRatesProvider).Assembly)
+			.AddNamedObjects()
+			.AddLrtLayer(typeof(MarkupCalculationLrt).Assembly)
+			.AddFusionCache()
+			.WithRegisteredDistributedCache()
+			.WithRegisteredBackplane()
+			.WithSystemTextJsonSerializer();
 
-        collection.RegisterSettingsService();
-        collection.AddSingleton<IJsonSerializer, JsonSerializer>();
-        collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
-        collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
-        collection.AddScoped<IFactSynchronizer<PurchasesFact, Guid>, PurchaseFactSynchronizer>();
-        collection.AddScoped<ISaleFactSynchronizer, SaleFactSynchronizer>();
+		collection.RegisterSettingsService();
+		collection.AddSingleton<IJsonSerializer, JsonSerializer>();
+		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
+		collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
+		collection.AddScoped<IFactSynchronizer<PurchasesFact, Guid>, PurchaseFactSynchronizer>();
+		collection.AddScoped<ISaleFactSynchronizer, SaleFactSynchronizer>();
 
-        return collection;
-    }
+		return collection;
+	}
 }

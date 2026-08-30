@@ -2,6 +2,7 @@
 
 public interface IBuilder<TEntity>
 {
-    TEntity Build();
-    IReadOnlyCollection<TEntity> BuildMany(int count);
+	TEntity Build();
+
+	IReadOnlyCollection<TEntity> BuildMany(int count);
 }

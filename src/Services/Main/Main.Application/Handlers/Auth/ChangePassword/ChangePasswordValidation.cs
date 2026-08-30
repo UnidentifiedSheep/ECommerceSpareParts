@@ -6,9 +6,8 @@ namespace Main.Application.Handlers.Auth.ChangePassword;
 
 public class ChangePasswordValidation : AbstractValidator<ChangePasswordCommand>
 {
-    public ChangePasswordValidation(IPasswordManager passwordManager)
-    {
-        RuleFor(x => x.NewPassword)
-            .SetValidator(new PasswordValidator(passwordManager));
-    }
+	public ChangePasswordValidation(IPasswordManager passwordManager)
+	{
+		RuleFor(x => x.NewPassword).SetValidator(new PasswordValidator(passwordManager));
+	}
 }

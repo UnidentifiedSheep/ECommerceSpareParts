@@ -8,16 +8,14 @@ namespace Pricing.Persistence;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
-    {
-        collection.AddPersistenceBase<DContext>(
-            typeof(BasicEfRepository<,>),
-            typeof(ReadRepository<,>));
-        
-        collection.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
-        collection.AddScoped<IProductPriceOptionRepository, ProductPriceOptionRepository>();
-        collection.AddScoped<IPriceOfferRefreshStateRepository, PriceOfferRefreshStateRepository>();
+	public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
+	{
+		collection.AddPersistenceBase<DContext>(typeof(BasicEfRepository<,>), typeof(ReadRepository<,>));
 
-        return collection;
-    }
+		collection.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
+		collection.AddScoped<IProductPriceOptionRepository, ProductPriceOptionRepository>();
+		collection.AddScoped<IPriceOfferRefreshStateRepository, PriceOfferRefreshStateRepository>();
+
+		return collection;
+	}
 }

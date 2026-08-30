@@ -1,5 +1,4 @@
 using Application.Common.Interfaces.Cache;
-using Cache;
 using FluentAssertions;
 using Main.Application.Interfaces.Products;
 using Main.Application.Static;
@@ -11,55 +10,53 @@ namespace Tests.CacheRepositoriesTests.ProductCache;
 
 public class GetProductAsyncTests : IntegrationTest
 {
-    public GetProductAsyncTests(CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<ProductTestContext>();
-    }
+	public GetProductAsyncTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+	}
 
-    private ProductTestContext TestContext => GetContext<ProductTestContext>();
+	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
-    [Fact]
-    public async Task GetProductAsync_WhenProductCached_ReturnsCachedProduct()
-    {
-        var product = TestContext.Products[0];
-        var repository = GetRepository();
+	[Fact]
+	public async Task GetProductAsync_WhenProductCached_ReturnsCachedProduct()
+	{
+		var product = TestContext.Products[0];
+		var repository = GetRepository();
 
-        await RemoveCachedProduct(product.Id);
+		await RemoveCachedProduct(product.Id);
 
-        var cached = await repository.GetProductOrSetAsync(product.Id);
+		var cached = await repository.GetProductOrSetAsync(product.Id);
 
-        product.SetName("Updated product name");
-        await Context.SaveChangesAsync();
-        Context.ChangeTracker.Clear();
+		product.SetName("Updated product name");
+		await Context.SaveChangesAsync();
+		Context.ChangeTracker.Clear();
 
-        var result = await repository.GetProductAsync(product.Id);
+		var result = await repository.GetProductAsync(product.Id);
 
-        result.Should().BeEquivalentTo(cached);
-        result!.Name.Should().NotBe("Updated product name");
-    }
+		result.Should().BeEquivalentTo(cached);
+		result!.Name.Should().NotBe("Updated product name");
+	}
 
-    [Fact]
-    public async Task GetProductAsync_WhenProductNotCached_ReturnsNull()
-    {
-        var product = TestContext.Products[0];
-        var repository = GetRepository();
+	[Fact]
+	public async Task GetProductAsync_WhenProductNotCached_ReturnsNull()
+	{
+		var product = TestContext.Products[0];
+		var repository = GetRepository();
 
-        await RemoveCachedProduct(product.Id);
+		await RemoveCachedProduct(product.Id);
 
-        var result = await repository.GetProductAsync(product.Id);
+		var result = await repository.GetProductAsync(product.Id);
 
-        result.Should().BeNull();
-    }
+		result.Should().BeNull();
+	}
 
-    private IProductProvider GetRepository()
-    {
-        return Scope.ServiceProvider.GetRequiredService<IProductProvider>();
-    }
+	private IProductProvider GetRepository() => Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 
-    private async Task RemoveCachedProduct(int productId)
-    {
-        await Scope.ServiceProvider
-            .GetRequiredService<ICache>()
-            .RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
-    }
+	private async Task RemoveCachedProduct(int productId)
+	{
+		await Scope
+			.ServiceProvider
+			.GetRequiredService<ICache>()
+			.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
+	}
 }

@@ -13,25 +13,24 @@ namespace Search.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        SortByConfig.Configure();
+	public static IServiceCollection AddApplicationLayer(
+		this IServiceCollection services,
+		IConfiguration configuration)
+	{
+		SortByConfig.Configure();
 
-        services
-            .AddApplicationBase(
-                ServicesDefinitions.Search,
-                configuration,
-                typeof(ServiceProvider).Assembly,
-                typeof(ApplicationTransactionBehavior<,>),
-                typeof(DbValidationBehavior<,>),
-                typeof(CacheBehavior<,>));
+		services.AddApplicationBase(
+			ServicesDefinitions.Search,
+			configuration,
+			typeof(ServiceProvider).Assembly,
+			typeof(ApplicationTransactionBehavior<,>),
+			typeof(DbValidationBehavior<,>),
+			typeof(CacheBehavior<,>));
 
-        services.RegisterProjectionProviders<ProductIndexSynchronizer>();
-        services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
-        services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
+		services.RegisterProjectionProviders<ProductIndexSynchronizer>();
+		services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
+		services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
 
-        return services;
-    }
+		return services;
+	}
 }

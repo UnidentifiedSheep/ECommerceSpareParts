@@ -5,9 +5,8 @@ namespace Main.Application.Handlers.Cart.GetCartItems;
 
 public class GetCartItemsValidation : AbstractValidator<GetCartItemsQuery>
 {
-    public GetCartItemsValidation()
-    {
-        RuleFor(x => x.Pagination)
-            .SetValidator(new PaginationValidator());
-    }
+	public GetCartItemsValidation()
+	{
+		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
+	}
 }

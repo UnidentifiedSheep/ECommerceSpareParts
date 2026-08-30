@@ -11,22 +11,19 @@ namespace Main.Application.Handlers.Auth.UpsertRole;
 [Transactional]
 public record UpsertRoleCommand(string Name, string? Description) : ICommand;
 
-public class UpsertRoleHandler(
-    IUnitOfWork unitOfWork,
-    IRepository<Role, string> repository
-)
-    : ICommandHandler<UpsertRoleCommand>
+public class UpsertRoleHandler(IUnitOfWork unitOfWork, IRepository<Role, string> repository)
+	: ICommandHandler<UpsertRoleCommand>
 {
-    public async Task<Unit> Handle(UpsertRoleCommand request, CancellationToken cancellationToken)
-    {
-        var role = await repository.GetById(request.Name, cancellationToken);
-        if (role == null)
-        {
-            role = Role.Create(request.Name);
-            await unitOfWork.AddAsync(role, cancellationToken);
-        }
+	public async Task<Unit> Handle(UpsertRoleCommand request, CancellationToken cancellationToken)
+	{
+		var role = await repository.GetById(request.Name, cancellationToken);
+		if (role == null)
+		{
+			role = Role.Create(request.Name);
+			await unitOfWork.AddAsync(role, cancellationToken);
+		}
 
-        role.SetDescription(request.Description);
-        return Unit.Value;
-    }
+		role.SetDescription(request.Description);
+		return Unit.Value;
+	}
 }

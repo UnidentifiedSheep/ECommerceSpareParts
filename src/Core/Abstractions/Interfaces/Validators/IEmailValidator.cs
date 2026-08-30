@@ -2,5 +2,5 @@ namespace Abstractions.Interfaces.Validators;
 
 public interface IEmailValidator
 {
-    bool IsValidEmail(string email);
+	bool IsValidEmail(string email);
 }

@@ -11,86 +11,85 @@ namespace Tests.HandlersTests.Cart;
 
 public class AddToCartTests : IntegrationTest
 {
-    private ProductTestContext _productContext = null!;
-    private UsersTestContext _usersContext = null!;
+	private ProductTestContext _productContext = null!;
 
-    public AddToCartTests(CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<UsersTestContext>();
-        RegisterBasicContext<ProductTestContext>();
-    }
+	private UsersTestContext _usersContext = null!;
 
-    public override async Task InitializeAsync()
-    {
-        await base.InitializeAsync();
-        _usersContext = GetContext<UsersTestContext>();
-        _productContext = GetContext<ProductTestContext>();
-    }
+	public AddToCartTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<UsersTestContext>();
+		RegisterBasicContext<ProductTestContext>();
+	}
 
-    [Fact]
-    public async Task AddToCart_ValidData_Succeeds()
-    {
-        var (user, product) = GetUserAndProduct();
-        var count = Faker.Random.Int(1, 100);
+	public override async Task InitializeAsync()
+	{
+		await base.InitializeAsync();
+		_usersContext = GetContext<UsersTestContext>();
+		_productContext = GetContext<ProductTestContext>();
+	}
 
-        var act = () => Mediator.Send(
-            new AddToCartCommand(
-                user.Id,
-                product.Id,
-                count));
+	[Fact]
+	public async Task AddToCart_ValidData_Succeeds()
+	{
+		var (user, product) = GetUserAndProduct();
+		var count = Faker.Random.Int(1, 100);
 
-        await act.Should().NotThrowAsync();
+		var act = () => Mediator.Send(
+			new AddToCartCommand(
+				user.Id,
+				product.Id,
+				count));
 
-        var cartItem = await Context.Carts
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id);
-        Assert.NotNull(cartItem);
-        Assert.Equal(count, cartItem.Count);
-    }
+		await act.Should().NotThrowAsync();
 
-    [Fact]
-    public async Task AddToCart_SameItem_ThrowsSameItemInCartException()
-    {
-        var (user, product) = GetUserAndProduct();
-        var command = new AddToCartCommand(
-            user.Id,
-            product.Id,
-            5);
-        await Mediator.Send(command);
+		var cartItem = await Context
+			.Carts
+			.AsNoTracking()
+			.FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id);
+		Assert.NotNull(cartItem);
+		Assert.Equal(count, cartItem.Count);
+	}
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
-        Assert.Equal(ApplicationErrors.CartItemAlreadyExist, exception.Failures[0].ErrorName);
-    }
+	[Fact]
+	public async Task AddToCart_SameItem_ThrowsSameItemInCartException()
+	{
+		var (user, product) = GetUserAndProduct();
+		var command = new AddToCartCommand(
+			user.Id,
+			product.Id,
+			5);
+		await Mediator.Send(command);
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public async Task AddToCart_InvalidCount_ThrowsValidationException(int count)
-    {
-        var (user, product) = GetUserAndProduct();
-        var command = new AddToCartCommand(
-            user.Id,
-            product.Id,
-            count);
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		Assert.Equal(ApplicationErrors.CartItemAlreadyExist, exception.Failures[0].ErrorName);
+	}
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
-    }
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task AddToCart_InvalidCount_ThrowsValidationException(int count)
+	{
+		var (user, product) = GetUserAndProduct();
+		var command = new AddToCartCommand(
+			user.Id,
+			product.Id,
+			count);
 
-    [Fact]
-    public async Task AddToCart_UserNotFound_ThrowsUserNotFoundException()
-    {
-        var (_, product) = GetUserAndProduct();
-        var command = new AddToCartCommand(
-            Guid.NewGuid(),
-            product.Id,
-            1);
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+	}
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
-        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
-    }
+	[Fact]
+	public async Task AddToCart_UserNotFound_ThrowsUserNotFoundException()
+	{
+		var (_, product) = GetUserAndProduct();
+		var command = new AddToCartCommand(
+			Guid.NewGuid(),
+			product.Id,
+			1);
 
-    private (User, Product) GetUserAndProduct()
-    {
-        return (_usersContext.Users.First(), _productContext.Products[0]);
-    }
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
+	}
+
+	private (User, Product) GetUserAndProduct() => (_usersContext.Users.First(), _productContext.Products[0]);
 }

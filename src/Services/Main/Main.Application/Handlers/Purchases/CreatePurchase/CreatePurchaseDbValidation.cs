@@ -6,14 +6,14 @@ namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 public class CreatePurchaseDbValidation : AbstractDbValidation<CreatePurchaseCommand>
 {
-    public override void Build(IValidationPlan plan, CreatePurchaseCommand request)
-    {
-        plan.ValidateUserExistsId(request.SupplierUserId)
-            .ValidateOrganizationExistsId(request.SupplierOrganizationId)
-            .ValidateOrganizationMemberExistsPK(
-                (request.SupplierOrganizationId, request.SupplierUserId));
+	public override void Build(IValidationPlan plan, CreatePurchaseCommand request)
+	{
+		plan
+			.ValidateUserExistsId(request.SupplierUserId)
+			.ValidateOrganizationExistsId(request.SupplierOrganizationId)
+			.ValidateOrganizationMemberExistsPK((request.SupplierOrganizationId, request.SupplierUserId));
 
-        if (request is { WithLogistics: true, StorageFrom: not null })
-            plan.ValidateStorageOwnerExistsPK((request.StorageFrom, request.SupplierUserId));
-    }
+		if (request is { WithLogistics: true, StorageFrom: not null })
+			plan.ValidateStorageOwnerExistsPK((request.StorageFrom, request.SupplierUserId));
+	}
 }

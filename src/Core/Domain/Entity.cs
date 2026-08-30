@@ -4,69 +4,64 @@ using Domain.Interfaces.Events;
 
 namespace Domain;
 
-public abstract class Entity<TModel, TKey>
-    : IEntity<TKey> where TModel : Entity<TModel, TKey> where TKey : notnull
+public abstract class Entity<TModel, TKey> : IEntity<TKey>
+	where TModel : Entity<TModel, TKey> where TKey : notnull
 {
-    private readonly List<IDomainEvent> _domainEvents = [];
-    private readonly Dictionary<string, IDomainEvent> _keyedDomainEvents = [];
-    public abstract TKey GetId();
+	private readonly List<IDomainEvent> _domainEvents = [];
 
-    object IEntity.GetId() { return GetId(); }
+	private readonly Dictionary<string, IDomainEvent> _keyedDomainEvents = [];
 
-    public IReadOnlyCollection<IDomainEvent> FlushDomainEvents()
-    {
-        var result = new List<IDomainEvent>(
-            _domainEvents.Count + _keyedDomainEvents.Count);
+	public abstract TKey GetId();
 
-        result.AddRange(_domainEvents);
-        result.AddRange(_keyedDomainEvents.Values);
+	object IEntity.GetId() => GetId();
 
-        _domainEvents.Clear();
-        _keyedDomainEvents.Clear();
+	public IReadOnlyCollection<IDomainEvent> FlushDomainEvents()
+	{
+		var result = new List<IDomainEvent>(_domainEvents.Count + _keyedDomainEvents.Count);
 
-        return result;
-    }
+		result.AddRange(_domainEvents);
+		result.AddRange(_keyedDomainEvents.Values);
 
-    protected void AddDomainEvent(IDomainEvent domainEvent)
-    {
-        ArgumentNullException.ThrowIfNull(domainEvent);
+		_domainEvents.Clear();
+		_keyedDomainEvents.Clear();
 
-        if (domainEvent is IKeyedDomainEvent keyed)
-            _keyedDomainEvents[keyed.GetKey()] = domainEvent;
-        else
-            _domainEvents.Add(domainEvent);
-    }
+		return result;
+	}
 
-    public virtual void OnDeleted()
-    {
-        if (this is IGenerateAutomaticDomainEvents)
-            AddEntityDeleteDomainEvent();
-    }
+	public virtual void OnDeleted()
+	{
+		if (this is IGenerateAutomaticDomainEvents)
+			AddEntityDeleteDomainEvent();
+	}
 
-    public virtual void OnUpdated()
-    {
-        if (this is IGenerateAutomaticDomainEvents)
-            AddEntityUpdateDomainEvent();
-    }
+	public virtual void OnUpdated()
+	{
+		if (this is IGenerateAutomaticDomainEvents)
+			AddEntityUpdateDomainEvent();
+	}
 
-    public virtual void OnCreated()
-    {
-        if (this is IGenerateAutomaticDomainEvents)
-            AddEntityCreateDomainEvent();
-    }
+	public virtual void OnCreated()
+	{
+		if (this is IGenerateAutomaticDomainEvents)
+			AddEntityCreateDomainEvent();
+	}
 
-    protected void AddEntityCreateDomainEvent()
-    {
-        AddDomainEvent(new EntityCreatedDomainEvent<TModel>((TModel)this));
-    }
-    
-    protected void AddEntityUpdateDomainEvent()
-    {
-        AddDomainEvent(new EntityUpdatedDomainEvent<TModel, TKey>(GetId()));
-    }
+	protected void AddDomainEvent(IDomainEvent domainEvent)
+	{
+		ArgumentNullException.ThrowIfNull(domainEvent);
 
-    protected void AddEntityDeleteDomainEvent()
-    {
-        AddDomainEvent(new EntityDeletedDomainEvent<TModel, TKey>(GetId()));
-    }
+		if (domainEvent is IKeyedDomainEvent keyed)
+			_keyedDomainEvents[keyed.GetKey()] = domainEvent;
+		else
+			_domainEvents.Add(domainEvent);
+	}
+
+	protected void AddEntityCreateDomainEvent() =>
+		AddDomainEvent(new EntityCreatedDomainEvent<TModel>((TModel)this));
+
+	protected void AddEntityUpdateDomainEvent() =>
+		AddDomainEvent(new EntityUpdatedDomainEvent<TModel, TKey>(GetId()));
+
+	protected void AddEntityDeleteDomainEvent() =>
+		AddDomainEvent(new EntityDeletedDomainEvent<TModel, TKey>(GetId()));
 }

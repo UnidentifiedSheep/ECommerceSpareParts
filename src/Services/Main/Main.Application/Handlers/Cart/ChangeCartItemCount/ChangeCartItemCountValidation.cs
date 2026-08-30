@@ -5,9 +5,8 @@ namespace Main.Application.Handlers.Cart.ChangeCartItemCount;
 
 public class ChangeCartItemCountValidation : AbstractValidator<ChangeCartItemCountCommand>
 {
-    public ChangeCartItemCountValidation()
-    {
-        RuleFor(x => x.NewCount)
-            .SetValidator(new CountValidator());
-    }
+	public ChangeCartItemCountValidation()
+	{
+		RuleFor(x => x.NewCount).SetValidator(new CountValidator());
+	}
 }

@@ -6,13 +6,10 @@ namespace Main.Application.Handlers.Users.AddEmailToUser;
 
 public class AddEmailToUserValidation : AbstractValidator<AddEmailToUserCommand>
 {
-    public AddEmailToUserValidation(
-        IEmailValidator emailValidator)
-    {
-        RuleFor(x => x.Email)
-            .SetValidator(new EmailValidator(emailValidator));
+	public AddEmailToUserValidation(IEmailValidator emailValidator)
+	{
+		RuleFor(x => x.Email).SetValidator(new EmailValidator(emailValidator));
 
-        RuleFor(x => x.EmailType)
-            .IsInEnum();
-    }
+		RuleFor(x => x.EmailType).IsInEnum();
+	}
 }

@@ -1,26 +1,28 @@
-﻿using Domain.Extensions;
-using Domain.Validation;
+﻿using Domain.Validation;
 
 namespace Main.Entities.Product.ValueObjects;
 
 public record Name
 {
-    private Name() { }
+	private Name()
+	{
+	}
 
-    public Name(string value)
-    {
-        value = value.Trim();
+	public Name(string value)
+	{
+		value = value.Trim();
 
-        value.EnsureNotNullOrWhiteSpace("article.name.must.not.be.empty")
-            .EnsureMinLength(3, "article.name.min.length.3")
-            .EnsureMaxLength(255, "article.name.max.length.255");
+		value
+			.EnsureNotNullOrWhiteSpace("article.name.must.not.be.empty")
+			.EnsureMinLength(3, "article.name.min.length.3")
+			.EnsureMaxLength(255, "article.name.max.length.255");
 
-        Value = char.ToUpperInvariant(value[0]) + value[1..];
-    }
+		Value = char.ToUpperInvariant(value[0]) + value[1..];
+	}
 
-    public string Value { get; } = null!;
+	public string Value { get; } = null!;
 
-    public static implicit operator Name(string value) { return new Name(value); }
+	public static implicit operator Name(string value) => new(value);
 
-    public static implicit operator string(Name name) { return name.Value; }
+	public static implicit operator string(Name name) => name.Value;
 }

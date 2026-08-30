@@ -3,5 +3,5 @@ namespace SchemaGeneration.Abstractions.Attributes;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 public sealed class CsvSchemaAttribute(Type rowType) : Attribute
 {
-    public Type RowType { get; } = rowType;
+	public Type RowType { get; } = rowType;
 }

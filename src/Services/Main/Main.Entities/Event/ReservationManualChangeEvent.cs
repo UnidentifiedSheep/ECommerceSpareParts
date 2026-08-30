@@ -5,53 +5,50 @@ namespace Main.Entities.Event;
 
 public class ReservationManualChangeEvent : Event<ReservationManualChangeEventData>
 {
-    public ReservationManualChangeEvent(
-        int reservationId,
-        ReservationManualChangeEventData data) : base(data)
-    {
-        ReservationId = reservationId;
-    }
+	public ReservationManualChangeEvent(int reservationId, ReservationManualChangeEventData data) : base(data)
+	{
+		ReservationId = reservationId;
+	}
 
-    private ReservationManualChangeEvent() { }
+	private ReservationManualChangeEvent()
+	{
+	}
 
-    public int ReservationId { get; private set; }
+	public int ReservationId { get; private set; }
 
-    public static ReservationManualChangeEvent Create(
-        int reservationId,
-        ReservationManualChangeEventData data)
-    {
-        return new ReservationManualChangeEvent(reservationId, data);
-    }
+	public static ReservationManualChangeEvent Create(
+		int reservationId,
+		ReservationManualChangeEventData data) => new(reservationId, data);
 
-    public static ReservationManualChangeEvent Create(ProductReservation reservation)
-    {
-        var data = new ReservationManualChangeEventData
-        {
-            Comment = reservation.Comment,
-            ProposedCurrencyId = reservation.ProposedCurrencyId,
-            ProposePrice = reservation.ProposedPrice,
-            UpdatedAt = reservation.UpdatedAt,
-            UpdatedBy = reservation.WhoUpdated
-        };
+	public static ReservationManualChangeEvent Create(ProductReservation reservation)
+	{
+		var data = new ReservationManualChangeEventData
+		{
+			Comment = reservation.Comment,
+			ProposedCurrencyId = reservation.ProposedCurrencyId,
+			ProposePrice = reservation.ProposedPrice,
+			UpdatedAt = reservation.UpdatedAt,
+			UpdatedBy = reservation.WhoUpdated
+		};
 
-        return new ReservationManualChangeEvent(reservation.Id, data);
-    }
+		return new ReservationManualChangeEvent(reservation.Id, data);
+	}
 }
 
 public record ReservationManualChangeEventData
 {
-    [JsonPropertyName("comment")]
-    public string? Comment { get; init; }
+	[JsonPropertyName("comment")]
+	public string? Comment { get; init; }
 
-    [JsonPropertyName("proposePrice")]
-    public decimal? ProposePrice { get; init; }
+	[JsonPropertyName("proposePrice")]
+	public decimal? ProposePrice { get; init; }
 
-    [JsonPropertyName("proposedCurrencyId")]
-    public int? ProposedCurrencyId { get; init; }
+	[JsonPropertyName("proposedCurrencyId")]
+	public int? ProposedCurrencyId { get; init; }
 
-    [JsonPropertyName("updatedBy")]
-    public Guid? UpdatedBy { get; init; }
+	[JsonPropertyName("updatedBy")]
+	public Guid? UpdatedBy { get; init; }
 
-    [JsonPropertyName("updatedAt")]
-    public DateTime UpdatedAt { get; init; }
+	[JsonPropertyName("updatedAt")]
+	public DateTime UpdatedAt { get; init; }
 }

@@ -6,8 +6,8 @@ namespace Internal.Integration.Core.Interfaces.Common;
 
 public interface IJobNode
 {
-    Task<Response<IReadOnlyList<InternalJobInfo>>> GetAvailableJobs(
-        IServiceDefinition serviceDefinition,
-        string? locale,
-        CancellationToken cancellationToken = default);
+	Task<Response<IReadOnlyList<InternalJobInfo>>> GetAvailableJobs(
+		IServiceDefinition serviceDefinition,
+		string? locale,
+		CancellationToken cancellationToken = default);
 }

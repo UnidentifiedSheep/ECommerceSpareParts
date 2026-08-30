@@ -1,5 +1,4 @@
 using Bogus;
-using Enums;
 using Enums.Units;
 using Main.Entities.Product;
 using Tests.Abstractions;
@@ -8,33 +7,35 @@ namespace Tests.DataBuilders;
 
 public class ProductWeightBuilder(Faker faker) : BuilderBase<ProductWeight>(faker)
 {
-    public int? ProductId { get; private set; }
-    public decimal? Weight { get; private set; }
-    public WeightUnit? Unit { get; private set; }
+	public int? ProductId { get; private set; }
 
-    public ProductWeightBuilder WithProductId(int productId)
-    {
-        ProductId = productId;
-        return this;
-    }
+	public decimal? Weight { get; private set; }
 
-    public ProductWeightBuilder WithWeight(decimal weight)
-    {
-        Weight = weight;
-        return this;
-    }
+	public WeightUnit? Unit { get; private set; }
 
-    public ProductWeightBuilder WithUnit(WeightUnit unit)
-    {
-        Unit = unit;
-        return this;
-    }
+	public ProductWeightBuilder WithProductId(int productId)
+	{
+		ProductId = productId;
+		return this;
+	}
 
-    public override ProductWeight Build()
-    {
-        return ProductWeight.Create(
-            ProductId ?? Faker.Random.Int(1),
-            Weight ?? 2m,
-            Unit ?? WeightUnit.Kilogram);
-    }
+	public ProductWeightBuilder WithWeight(decimal weight)
+	{
+		Weight = weight;
+		return this;
+	}
+
+	public ProductWeightBuilder WithUnit(WeightUnit unit)
+	{
+		Unit = unit;
+		return this;
+	}
+
+	public override ProductWeight Build()
+	{
+		return ProductWeight.Create(
+			ProductId ?? Faker.Random.Int(1),
+			Weight ?? 2m,
+			Unit ?? WeightUnit.Kilogram);
+	}
 }

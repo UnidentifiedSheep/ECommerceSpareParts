@@ -4,5 +4,5 @@ namespace Main.Entities.DomainEvents.Product;
 
 public record ProductImageUpdatedDomainEvent(int ProductId) : IBatchableDomainEvent, IKeyedDomainEvent
 {
-    public string GetKey() => $"product:{ProductId}:image:updated";
+	public string GetKey() => $"product:{ProductId}:image:updated";
 }

@@ -11,44 +11,41 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Common;
 
 internal sealed class JobNode(
-    HttpClient httpClient,
-    IAuthClient authClient,
-    IOptionsMonitor<InternalServicesOptions> serviceOptions,
-    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
-    ProjectJsonOptions jsonOptions
-)
-    : InternalCommonClientBase(
-        authClient,
-        credentialsMonitor,
-        serviceOptions,
-        jsonOptions), IJobNode
+	HttpClient httpClient,
+	IAuthClient authClient,
+	IOptionsMonitor<InternalServicesOptions> serviceOptions,
+	IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
+	ProjectJsonOptions jsonOptions) : InternalCommonClientBase(
+		authClient,
+		credentialsMonitor,
+		serviceOptions,
+		jsonOptions),
+	IJobNode
 {
-    public async Task<Response<IReadOnlyList<InternalJobInfo>>> GetAvailableJobs(
-        IServiceDefinition serviceDefinition,
-        string? locale,
-        CancellationToken cancellationToken = default)
-    {
-        using var request = await GetRequest(
-            serviceDefinition,
-            HttpMethod.Get,
-            "/jobs/available",
-            cancellationToken);
+	public async Task<Response<IReadOnlyList<InternalJobInfo>>> GetAvailableJobs(
+		IServiceDefinition serviceDefinition,
+		string? locale,
+		CancellationToken cancellationToken = default)
+	{
+		using var request = await GetRequest(
+			serviceDefinition,
+			HttpMethod.Get,
+			"/jobs/available",
+			cancellationToken);
 
-        AddLocalizationHeader(request, locale);
+		AddLocalizationHeader(request, locale);
 
-        using var response = await httpClient.SendAsync(
-            request,
-            cancellationToken);
+		using var response = await httpClient.SendAsync(request, cancellationToken);
 
-        return await ReadResponse<GetAvailableJobsResponse, IReadOnlyList<InternalJobInfo>>(
-            response,
-            x => x.Jobs,
-            cancellationToken);
-    }
+		return await ReadResponse<GetAvailableJobsResponse, IReadOnlyList<InternalJobInfo>>(
+			response,
+			x => x.Jobs,
+			cancellationToken);
+	}
 
-    private record GetAvailableJobsResponse
-    {
-        [JsonPropertyName("jobs")]
-        public required IReadOnlyList<InternalJobInfo> Jobs { get; init; }
-    }
+	private record GetAvailableJobsResponse
+	{
+		[JsonPropertyName("jobs")]
+		public required IReadOnlyList<InternalJobInfo> Jobs { get; init; }
+	}
 }

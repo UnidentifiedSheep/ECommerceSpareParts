@@ -5,26 +5,27 @@ namespace Tests.Stubs;
 
 public class FusionCacheBackplaneStub : IFusionCacheBackplane
 {
-    public void Subscribe(BackplaneSubscriptionOptions options) { }
+	public void Subscribe(BackplaneSubscriptionOptions options)
+	{
+	}
 
-    public ValueTask SubscribeAsync(BackplaneSubscriptionOptions options) { return ValueTask.CompletedTask; }
+	public ValueTask SubscribeAsync(BackplaneSubscriptionOptions options) => ValueTask.CompletedTask;
 
-    public void Unsubscribe() { }
+	public void Unsubscribe()
+	{
+	}
 
-    public ValueTask UnsubscribeAsync() { return ValueTask.CompletedTask; }
+	public ValueTask UnsubscribeAsync() => ValueTask.CompletedTask;
 
-    public void Publish(
-        BackplaneMessage message,
-        FusionCacheEntryOptions options,
-        CancellationToken token = default)
-    {
-    }
+	public void Publish(
+		BackplaneMessage message,
+		FusionCacheEntryOptions options,
+		CancellationToken token = default)
+	{
+	}
 
-    public ValueTask PublishAsync(
-        BackplaneMessage message,
-        FusionCacheEntryOptions options,
-        CancellationToken token = default)
-    {
-        return ValueTask.CompletedTask;
-    }
+	public ValueTask PublishAsync(
+		BackplaneMessage message,
+		FusionCacheEntryOptions options,
+		CancellationToken token = default) => ValueTask.CompletedTask;
 }

@@ -9,70 +9,71 @@ namespace Main.Application.Handlers.ProductReservations.GetProductsWithNotEnough
 ///     не покрывает продажу и резервацию.
 /// </summary>
 public record GetProductsWithNotEnoughStockQuery(
-    Guid BuyerOrganizationId,
-    string StorageCode,
-    bool TakeFromOtherStorages,
-    Dictionary<int, int> NeededCounts
-) : IQuery<GetProductsWithNotEnoughStockResult>;
+	Guid BuyerOrganizationId,
+	string StorageCode,
+	bool TakeFromOtherStorages,
+	Dictionary<int, int> NeededCounts) : IQuery<GetProductsWithNotEnoughStockResult>;
 
 /// <param name="NotEnoughByReservation">Список артикулов которых не хватает из-за резерваций</param>
-/// <param name="NotEnoughByStock">Список артикулов которых не хватает на складе для продажи без учета резерваций.</param>
+/// <param name="NotEnoughByStock">
+///     Список артикулов которых не хватает на складе для продажи без учета
+///     резерваций.
+/// </param>
 public record GetProductsWithNotEnoughStockResult(
-    Dictionary<int, int> NotEnoughByReservation,
-    Dictionary<int, int> NotEnoughByStock
-);
+	Dictionary<int, int> NotEnoughByReservation,
+	Dictionary<int, int> NotEnoughByStock);
 
 public class GetProductsWithNotEnoughStockHandler(
-    IStorageContentRepository storageContentRepository,
-    IProductReservationRepository reservationRepository
-)
-    : IQueryHandler<GetProductsWithNotEnoughStockQuery, GetProductsWithNotEnoughStockResult>
+	IStorageContentRepository storageContentRepository,
+	IProductReservationRepository reservationRepository)
+	: IQueryHandler<GetProductsWithNotEnoughStockQuery, GetProductsWithNotEnoughStockResult>
 {
-    public async Task<GetProductsWithNotEnoughStockResult> Handle(
-        GetProductsWithNotEnoughStockQuery request,
-        CancellationToken cancellationToken)
-    {
-        var articleIds = request.NeededCounts.Keys;
-        var storageCode = request.StorageCode;
-        var organizationId = request.BuyerOrganizationId;
-        var takeFromOtherStorages = request.TakeFromOtherStorages;
+	public async Task<GetProductsWithNotEnoughStockResult> Handle(
+		GetProductsWithNotEnoughStockQuery request,
+		CancellationToken cancellationToken)
+	{
+		var articleIds = request.NeededCounts.Keys;
+		var storageCode = request.StorageCode;
+		var organizationId = request.BuyerOrganizationId;
+		var takeFromOtherStorages = request.TakeFromOtherStorages;
 
-        var notEnoughByReservation = new Dictionary<int, int>();
-        var notEnoughStock = new Dictionary<int, int>();
+		var notEnoughByReservation = new Dictionary<int, int>();
+		var notEnoughStock = new Dictionary<int, int>();
 
-        var organizationReservations =
-            await reservationRepository.GetReservationsCountForOrganizationAsync(
-                organizationId,
-                articleIds,
-                cancellationToken);
-        var otherOrganizationsReservations =
-            await reservationRepository.GetOtherOrganizationsReservationsCountAsync(
-                organizationId,
-                articleIds,
-                cancellationToken);
-        var storageCounts = await storageContentRepository.GetStorageContentCounts(
-            storageCode,
-            articleIds,
-            takeFromOtherStorages,
-            cancellationToken);
+		var organizationReservations =
+			await reservationRepository.GetReservationsCountForOrganizationAsync(
+				organizationId,
+				articleIds,
+				cancellationToken);
+		var otherOrganizationsReservations =
+			await reservationRepository.GetOtherOrganizationsReservationsCountAsync(
+				organizationId,
+				articleIds,
+				cancellationToken);
+		var storageCounts = await storageContentRepository.GetStorageContentCounts(
+			storageCode,
+			articleIds,
+			takeFromOtherStorages,
+			cancellationToken);
 
-        foreach (var (id, count) in request.NeededCounts)
-        {
-            storageCounts.TryGetValue(id, out var storageCount);
-            otherOrganizationsReservations.TryGetValue(id, out var reservationsCount);
-            organizationReservations.TryGetValue(id, out var organizationReservation);
+		foreach (var (id, count) in request.NeededCounts)
+		{
+			storageCounts.TryGetValue(id, out var storageCount);
+			otherOrganizationsReservations.TryGetValue(id, out var reservationsCount);
+			organizationReservations.TryGetValue(id, out var organizationReservation);
 
-            var stockDiff = storageCount - count;
-            if (stockDiff < 0)
-            {
-                notEnoughStock.Add(id, Math.Abs(stockDiff));
-                continue;
-            }
+			var stockDiff = storageCount - count;
+			if (stockDiff < 0)
+			{
+				notEnoughStock.Add(id, Math.Abs(stockDiff));
+				continue;
+			}
 
-            var reservationsDiff = stockDiff - reservationsCount + organizationReservation;
-            if (reservationsDiff < 0) notEnoughByReservation.Add(id, Math.Abs(reservationsDiff));
-        }
+			var reservationsDiff = stockDiff - reservationsCount + organizationReservation;
+			if (reservationsDiff < 0)
+				notEnoughByReservation.Add(id, Math.Abs(reservationsDiff));
+		}
 
-        return new GetProductsWithNotEnoughStockResult(notEnoughByReservation, notEnoughStock);
-    }
+		return new GetProductsWithNotEnoughStockResult(notEnoughByReservation, notEnoughStock);
+	}
 }

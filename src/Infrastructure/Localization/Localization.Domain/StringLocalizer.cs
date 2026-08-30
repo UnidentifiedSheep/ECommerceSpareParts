@@ -6,63 +6,66 @@ namespace Localization.Domain;
 
 public class StringLocalizer : IStringLocalizer
 {
-    private readonly Dictionary<string, Dictionary<string, string>> _localization;
+	private readonly Dictionary<string, Dictionary<string, string>> _localization;
 
-    public StringLocalizer(IEnumerable<ILocalizerContainer> containers)
-    {
-        _localization = new Dictionary<string, Dictionary<string, string>>();
-        foreach (var container in containers)
-            _localization[container.Locale] = container.KetMessages.ToDictionary();
-    }
+	public StringLocalizer(IEnumerable<ILocalizerContainer> containers)
+	{
+		_localization = new Dictionary<string, Dictionary<string, string>>();
+		foreach (var container in containers)
+			_localization[container.Locale] = container.KetMessages.ToDictionary();
+	}
 
-    public string Get(string key, Locale locale)
-    {
-        if (!_localization.TryGetValue(locale, out var localeValues))
-            throw new InvalidOperationException($"Locale '{locale}' not found");
-        if (!localeValues.TryGetValue(key, out var value))
-            throw new InvalidOperationException($"Unable to find value for {key} in {locale} locale");
+	public string Get(string key, Locale locale)
+	{
+		if (!_localization.TryGetValue(locale, out var localeValues))
+			throw new InvalidOperationException($"Locale '{locale}' not found");
+		if (!localeValues.TryGetValue(key, out var value))
+			throw new InvalidOperationException($"Unable to find value for {key} in {locale} locale");
 
-        return value;
-    }
+		return value;
+	}
 
-    public string Get(
-        string key,
-        Locale locale,
-        params object[] arguments)
-    {
-        var template = Get(key, locale);
-        LocalizedMessageFormatter.TryFormat(
-            template,
-            arguments,
-            out var value);
-        return value;
-    }
+	public string Get(
+		string key,
+		Locale locale,
+		params object[] arguments)
+	{
+		var template = Get(key, locale);
+		LocalizedMessageFormatter.TryFormat(
+			template,
+			arguments,
+			out var value);
+		return value;
+	}
 
-    public bool TryGet(
-        string key,
-        Locale locale,
-        out string? value)
-    {
-        value = null;
-        if (!_localization.TryGetValue(locale, out var localeValues)) return false;
-        return localeValues.TryGetValue(key, out value);
-    }
+	public bool TryGet(
+		string key,
+		Locale locale,
+		out string? value)
+	{
+		value = null;
+		if (!_localization.TryGetValue(locale, out var localeValues))
+			return false;
+		return localeValues.TryGetValue(key, out value);
+	}
 
-    public bool TryGet(
-        string key,
-        Locale locale,
-        out string? value,
-        params object[] arguments)
-    {
-        if (!TryGet(
-                key,
-                locale,
-                out value) || value == null)
-            return false;
+	public bool TryGet(
+		string key,
+		Locale locale,
+		out string? value,
+		params object[] arguments)
+	{
+		if (!TryGet(
+				key,
+				locale,
+				out value) || value == null)
+			return false;
 
-        return LocalizedMessageFormatter.TryFormat(
-            value,
-            arguments,
-            out value);
-    }
+		return LocalizedMessageFormatter.TryFormat(
+			value,
+			arguments,
+			out value);
+	}
+
+	public bool IsSupported(Locale locale) => _localization.ContainsKey(locale);
 }

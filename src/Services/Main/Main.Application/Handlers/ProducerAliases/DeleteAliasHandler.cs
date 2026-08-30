@@ -12,22 +12,19 @@ namespace Main.Application.Handlers.ProducerAliases;
 [Transactional]
 public record DeleteAliasCommand(int ProducerId, string Alias) : ICommand;
 
-public class DeleteAliasHandler(
-    IRepository<ProducerAlias, string> repository,
-    IUnitOfWork unitOfWork)
-    : ICommandHandler<DeleteAliasCommand>
+public class DeleteAliasHandler(IRepository<ProducerAlias, string> repository, IUnitOfWork unitOfWork)
+	: ICommandHandler<DeleteAliasCommand>
 {
-    public async Task<Unit> Handle(DeleteAliasCommand request, CancellationToken cancellationToken)
-    {
-        var producerAlias = await repository.GetById(
-                                Producer.ToNormalizedName(request.Alias),
-                                cancellationToken)
-                            ?? throw new ProducersAliasNotFoundException(request.Alias);
+	public async Task<Unit> Handle(DeleteAliasCommand request, CancellationToken cancellationToken)
+	{
+		var producerAlias = await repository.GetById(
+			Producer.ToNormalizedName(request.Alias),
+			cancellationToken) ?? throw new ProducersAliasNotFoundException(request.Alias);
 
-        if (producerAlias.ProducerId != request.ProducerId)
-            throw new ProducersAliasNotFoundException(request.Alias);
+		if (producerAlias.ProducerId != request.ProducerId)
+			throw new ProducersAliasNotFoundException(request.Alias);
 
-        unitOfWork.Remove(producerAlias);
-        return Unit.Value;
-    }
+		unitOfWork.Remove(producerAlias);
+		return Unit.Value;
+	}
 }

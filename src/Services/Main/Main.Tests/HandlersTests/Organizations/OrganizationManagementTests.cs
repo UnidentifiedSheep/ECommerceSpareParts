@@ -6,6 +6,7 @@ using Main.Application.Handlers.Organizations.CreateOrganization;
 using Main.Application.Handlers.Organizations.RemoveOrganizationMember;
 using Main.Application.Static;
 using Main.Entities.Organization;
+using Main.Entities.User;
 using Main.Enums.Organization;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.Organization;
@@ -17,160 +18,161 @@ namespace Tests.HandlersTests.Organizations;
 
 public class OrganizationManagementTests : IntegrationTest
 {
-    public OrganizationManagementTests(CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<UsersTestContext>();
-    }
+	public OrganizationManagementTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<UsersTestContext>();
+	}
 
-    [Fact]
-    public async Task CreateOrganization_CreatesBusinessOrganizationWithOwner()
-    {
-        var owner = Users[0];
-        var systemName = $"new-organization-{Guid.NewGuid():N}";
-        var command = new CreateOrganizationCommand(
-            owner.Id,
-            "  New organization  ",
-            $"  {systemName.ToUpperInvariant()}  ");
+	private IReadOnlyList<User> Users => GetContext<UsersTestContext>().Users.ToArray();
 
-        var result = await Mediator.Send(command);
+	[Fact]
+	public async Task CreateOrganization_CreatesBusinessOrganizationWithOwner()
+	{
+		var owner = Users[0];
+		var systemName = $"new-organization-{Guid.NewGuid():N}";
+		var command = new CreateOrganizationCommand(
+			owner.Id,
+			"  New organization  ",
+			$"  {systemName.ToUpperInvariant()}  ");
 
-        var organization = await Context.Organizations
-            .Include(x => x.Members)
-            .AsNoTracking()
-            .SingleAsync(x => x.Id == result.OrganizationId);
+		var result = await Mediator.Send(command);
 
-        organization.Name.Should().Be("New organization");
-        organization.SystemName.Should().Be(systemName);
-        organization.Type.Should().Be(OrganizationType.Business);
-        organization.Members.Should().ContainSingle(x =>
-            x.UserId == owner.Id && x.Role == OrganizationRole.Owner);
-    }
+		var organization = await Context
+			.Organizations
+			.Include(x => x.Members)
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == result.OrganizationId);
 
-    [Fact]
-    public async Task CreateOrganization_MissingOwner_ThrowsDbValidationException()
-    {
-        var command = new CreateOrganizationCommand(
-            Guid.NewGuid(),
-            "New organization",
-            $"new-organization-{Guid.NewGuid():N}");
+		organization.Name.Should().Be("New organization");
+		organization.SystemName.Should().Be(systemName);
+		organization.Type.Should().Be(OrganizationType.Business);
+		organization
+			.Members
+			.Should()
+			.ContainSingle(x => x.UserId == owner.Id && x.Role == OrganizationRole.Owner);
+	}
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+	[Fact]
+	public async Task CreateOrganization_MissingOwner_ThrowsDbValidationException()
+	{
+		var command = new CreateOrganizationCommand(
+			Guid.NewGuid(),
+			"New organization",
+			$"new-organization-{Guid.NewGuid():N}");
 
-        exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.UsersNotFound);
-    }
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
 
-    [Fact]
-    public async Task CreateOrganization_DuplicateSystemName_ThrowsDbValidationException()
-    {
-        var existing = await CreateOrganization();
-        var command = new CreateOrganizationCommand(
-            Users[1].Id,
-            "Another organization",
-            $"  {existing.SystemName.ToUpperInvariant()}  ");
+		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.UsersNotFound);
+	}
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+	[Fact]
+	public async Task CreateOrganization_DuplicateSystemName_ThrowsDbValidationException()
+	{
+		var existing = await CreateOrganization();
+		var command = new CreateOrganizationCommand(
+			Users[1].Id,
+			"Another organization",
+			$"  {existing.SystemName.ToUpperInvariant()}  ");
 
-        exception.Failures.Should().Contain(x =>
-            x.ErrorName == ApplicationErrors.OrganizationSystemNameAlreadyTaken);
-    }
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
 
-    [Fact]
-    public async Task AddOrganizationMember_AddsUserWithRole()
-    {
-        var organization = await CreateOrganization();
-        var member = Users[1];
+		exception
+			.Failures
+			.Should()
+			.Contain(x => x.ErrorName == ApplicationErrors.OrganizationSystemNameAlreadyTaken);
+	}
 
-        await Mediator.Send(
-            new AddOrganizationMemberCommand(
-                organization.Id,
-                member.Id,
-                OrganizationRole.Manager));
+	[Fact]
+	public async Task AddOrganizationMember_AddsUserWithRole()
+	{
+		var organization = await CreateOrganization();
+		var member = Users[1];
 
-        var organizationMember = await Context.Set<OrganizationMember>()
-            .AsNoTracking()
-            .SingleAsync(x =>
-                x.OrganizationId == organization.Id &&
-                x.UserId == member.Id);
-        organizationMember.Role.Should().Be(OrganizationRole.Manager);
-    }
+		await Mediator.Send(
+			new AddOrganizationMemberCommand(
+				organization.Id,
+				member.Id,
+				OrganizationRole.Manager));
 
-    [Fact]
-    public async Task AddOrganizationMember_DuplicateMember_ThrowsDbValidationException()
-    {
-        var organization = await CreateOrganization();
-        var command = new AddOrganizationMemberCommand(
-            organization.Id,
-            Users[0].Id,
-            OrganizationRole.Member);
+		var organizationMember = await Context
+			.Set<OrganizationMember>()
+			.AsNoTracking()
+			.SingleAsync(x => x.OrganizationId == organization.Id && x.UserId == member.Id);
+		organizationMember.Role.Should().Be(OrganizationRole.Manager);
+	}
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+	[Fact]
+	public async Task AddOrganizationMember_DuplicateMember_ThrowsDbValidationException()
+	{
+		var organization = await CreateOrganization();
+		var command = new AddOrganizationMemberCommand(
+			organization.Id,
+			Users[0].Id,
+			OrganizationRole.Member);
 
-        exception.Failures.Should().Contain(x =>
-            x.ErrorName == ApplicationErrors.OrganizationMemberAlreadyExists);
-    }
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
 
-    [Fact]
-    public async Task ChangeOrganizationMemberRole_ChangesRole()
-    {
-        var organization = await CreateOrganization(Users[1].Id);
+		exception
+			.Failures
+			.Should()
+			.Contain(x => x.ErrorName == ApplicationErrors.OrganizationMemberAlreadyExists);
+	}
 
-        await Mediator.Send(
-            new ChangeOrganizationMemberRoleCommand(
-                organization.Id,
-                Users[1].Id,
-                OrganizationRole.Admin));
+	[Fact]
+	public async Task ChangeOrganizationMemberRole_ChangesRole()
+	{
+		var organization = await CreateOrganization(Users[1].Id);
 
-        var member = await Context.Set<OrganizationMember>()
-            .AsNoTracking()
-            .SingleAsync(x =>
-                x.OrganizationId == organization.Id &&
-                x.UserId == Users[1].Id);
-        member.Role.Should().Be(OrganizationRole.Admin);
-    }
+		await Mediator.Send(
+			new ChangeOrganizationMemberRoleCommand(
+				organization.Id,
+				Users[1].Id,
+				OrganizationRole.Admin));
 
-    [Fact]
-    public async Task RemoveOrganizationMember_RemovesMember()
-    {
-        var organization = await CreateOrganization(Users[1].Id);
+		var member = await Context
+			.Set<OrganizationMember>()
+			.AsNoTracking()
+			.SingleAsync(x => x.OrganizationId == organization.Id && x.UserId == Users[1].Id);
+		member.Role.Should().Be(OrganizationRole.Admin);
+	}
 
-        await Mediator.Send(
-            new RemoveOrganizationMemberCommand(organization.Id, Users[1].Id));
+	[Fact]
+	public async Task RemoveOrganizationMember_RemovesMember()
+	{
+		var organization = await CreateOrganization(Users[1].Id);
 
-        var exists = await Context.Set<OrganizationMember>()
-            .AsNoTracking()
-            .AnyAsync(x =>
-                x.OrganizationId == organization.Id &&
-                x.UserId == Users[1].Id);
-        exists.Should().BeFalse();
-    }
+		await Mediator.Send(new RemoveOrganizationMemberCommand(organization.Id, Users[1].Id));
 
-    [Fact]
-    public async Task RemoveOrganizationMember_Owner_ThrowsInvalidInputException()
-    {
-        var organization = await CreateOrganization();
+		var exists = await Context
+			.Set<OrganizationMember>()
+			.AsNoTracking()
+			.AnyAsync(x => x.OrganizationId == organization.Id && x.UserId == Users[1].Id);
+		exists.Should().BeFalse();
+	}
 
-        var exception = await Assert.ThrowsAsync<InvalidInputException>(() =>
-            Mediator.Send(
-                new RemoveOrganizationMemberCommand(organization.Id, Users[0].Id)));
+	[Fact]
+	public async Task RemoveOrganizationMember_Owner_ThrowsInvalidInputException()
+	{
+		var organization = await CreateOrganization();
 
-        exception.MessageKey.Should().Be("organization.owner.cannot.be.removed");
-    }
+		var exception = await Assert.ThrowsAsync<InvalidInputException>(() =>
+			Mediator.Send(new RemoveOrganizationMemberCommand(organization.Id, Users[0].Id)));
 
-    private IReadOnlyList<Main.Entities.User.User> Users =>
-        GetContext<UsersTestContext>().Users.ToArray();
+		exception.MessageKey.Should().Be("organization.owner.cannot.be.removed");
+	}
 
-    private async Task<Organization> CreateOrganization(Guid? memberId = null)
-    {
-        var builder = new OrganizationBuilder(Faker)
-            .WithOwnerId(Users[0].Id)
-            .WithName("Managed organization");
+	private async Task<Organization> CreateOrganization(Guid? memberId = null)
+	{
+		var builder = new OrganizationBuilder(Faker)
+			.WithOwnerId(Users[0].Id)
+			.WithName("Managed organization");
 
-        if (memberId.HasValue)
-            builder.WithMember(memberId.Value);
+		if (memberId.HasValue)
+			builder.WithMember(memberId.Value);
 
-        var organization = await builder.BuildAndAddToDb(Context);
-        Context.ChangeTracker.Clear();
+		var organization = await builder.BuildAndAddToDb(Context);
+		Context.ChangeTracker.Clear();
 
-        return organization;
-    }
+		return organization;
+	}
 }

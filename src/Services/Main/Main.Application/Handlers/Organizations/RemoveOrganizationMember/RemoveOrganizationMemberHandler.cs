@@ -10,26 +10,23 @@ namespace Main.Application.Handlers.Organizations.RemoveOrganizationMember;
 
 [AutoSave]
 [Transactional]
-public record RemoveOrganizationMemberCommand(
-    Guid OrganizationId,
-    Guid UserId
-) : ICommand;
+public record RemoveOrganizationMemberCommand(Guid OrganizationId, Guid UserId) : ICommand;
 
 public class RemoveOrganizationMemberHandler(IRepository<Organization, Guid> repository)
-    : ICommandHandler<RemoveOrganizationMemberCommand>
+	: ICommandHandler<RemoveOrganizationMemberCommand>
 {
-    public async Task<Unit> Handle(
-        RemoveOrganizationMemberCommand request,
-        CancellationToken cancellationToken)
-    {
-        var organization = await repository.EnsureExistForUpdateAsync(
-            request.OrganizationId,
-            id => new OrganizationNotFoundException(id),
-            Criteria<Organization>.New().Include(x => x.Members),
-            cancellationToken);
+	public async Task<Unit> Handle(
+		RemoveOrganizationMemberCommand request,
+		CancellationToken cancellationToken)
+	{
+		var organization = await repository.EnsureExistForUpdateAsync(
+			request.OrganizationId,
+			id => new OrganizationNotFoundException(id),
+			Criteria<Organization>.New().Include(x => x.Members),
+			cancellationToken);
 
-        organization.RemoveMember(request.UserId);
+		organization.RemoveMember(request.UserId);
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

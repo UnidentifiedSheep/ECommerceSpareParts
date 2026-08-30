@@ -10,33 +10,40 @@ namespace Main.Application.Handlers.ProductSizes;
 
 public record GetProductsSizesByIdsQuery : IQuery<GetProductsSizesByIdsResult>
 {
-    public IReadOnlyList<int> Ids { get; }
 
-    public GetProductsSizesByIdsQuery(IEnumerable<int> ids)
-    {
-        Ids = ids.Distinct().ToList();
-    }
+	public GetProductsSizesByIdsQuery(IEnumerable<int> ids)
+	{
+		Ids = ids.Distinct().ToList();
+	}
 
-    public GetProductsSizesByIdsQuery(int id)
-    {
-        Ids = new List<int> { id };
-    }
+	public GetProductsSizesByIdsQuery(int id)
+	{
+		Ids = new List<int>
+		{
+			id
+		};
+	}
+
+	public IReadOnlyList<int> Ids { get; }
 }
 
 public record GetProductsSizesByIdsResult(IReadOnlyList<ProductSizeDto> Sizes);
 
 public class GetProductsSizesByIdsHandler(
-    IReadRepository<ProductSize, int> repository,
-    IProjectionProvider<ProductSize, ProductSizeDto> projectionProvider
-    ) : IQueryHandler<GetProductsSizesByIdsQuery, GetProductsSizesByIdsResult>
+	IReadRepository<ProductSize, int> repository,
+	IProjectionProvider<ProductSize, ProductSizeDto> projectionProvider)
+	: IQueryHandler<GetProductsSizesByIdsQuery, GetProductsSizesByIdsResult>
 {
-    public async Task<GetProductsSizesByIdsResult> Handle(GetProductsSizesByIdsQuery request, CancellationToken cancellationToken)
-    {
-        var result = await repository.Query
-            .Where(x => request.Ids.Contains(x.ProductId))
-            .Project(projectionProvider)
-            .ToListAsync(cancellationToken);
-        
-        return new GetProductsSizesByIdsResult(result);
-    }
+	public async Task<GetProductsSizesByIdsResult> Handle(
+		GetProductsSizesByIdsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var result = await repository
+			.Query
+			.Where(x => request.Ids.Contains(x.ProductId))
+			.Project(projectionProvider)
+			.ToListAsync(cancellationToken);
+
+		return new GetProductsSizesByIdsResult(result);
+	}
 }

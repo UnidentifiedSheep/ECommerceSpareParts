@@ -9,38 +9,36 @@ namespace Main.Entities.Auth;
 
 public class Permission : AuditableEntity<Permission, string>, ILinqEntity<Permission, string>
 {
-    private const string Prefix = "permissions.";
-    private const string NamePostfix = ".name";
-    private const string DescriptionPostfix = ".description";
+	private const string Prefix = "permissions.";
 
-    private Permission() { }
+	private const string NamePostfix = ".name";
 
-    public Permission(PermissionCodes name) { Name = ToNormalizedPermission(name); }
+	private const string DescriptionPostfix = ".description";
 
-    [Validate]
-    public string Name { get; } = null!;
+	private Permission()
+	{
+	}
 
-    public static Expression<Func<Permission, string>> GetKeySelector() { return x => x.Name; }
+	public Permission(PermissionCodes name)
+	{
+		Name = ToNormalizedPermission(name);
+	}
 
-    public static Expression<Func<Permission, bool>> GetEqualityExpression(string key)
-    {
-        return x => x.Name == key;
-    }
+	[Validate]
+	public string Name { get; } = null!;
 
-    public override string GetId() { return Name; }
+	public static Expression<Func<Permission, string>> GetKeySelector() => x => x.Name;
 
-    public static string ToNormalizedPermission(PermissionCodes permission)
-    {
-        return permission.ToString().ToNormalizedPermission();
-    }
+	public static Expression<Func<Permission, bool>> GetEqualityExpression(string key) => x => x.Name == key;
 
-    public static string GetLocalizationNameKey(PermissionCodes permission)
-    {
-        return Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + NamePostfix;
-    }
+	public override string GetId() => Name;
 
-    public static string GetLocalizationDescriptionKey(PermissionCodes permission)
-    {
-        return Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + DescriptionPostfix;
-    }
+	public static string ToNormalizedPermission(PermissionCodes permission) =>
+		permission.ToString().ToNormalizedPermission();
+
+	public static string GetLocalizationNameKey(PermissionCodes permission) =>
+		Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + NamePostfix;
+
+	public static string GetLocalizationDescriptionKey(PermissionCodes permission) =>
+		Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + DescriptionPostfix;
 }

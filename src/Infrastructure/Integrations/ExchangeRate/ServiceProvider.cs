@@ -7,18 +7,18 @@ namespace ExchangeRate;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddExchangeRates(this IServiceCollection services)
-    {
-        services.AddHttpClient<IExchangeRateClient, CbrClient>((_, client) =>
-        {
-            client.BaseAddress = new Uri("https://www.cbr-xml-daily.ru/latest.js");
-        });
-        services.AddHttpClient<IExchangeRateClient, MoneyConvertClient>((_, client) =>
-        {
-            client.BaseAddress = new Uri("https://cdn.moneyconvert.net/api/latest.json");
-        });
+	public static IServiceCollection AddExchangeRates(this IServiceCollection services)
+	{
+		services.AddHttpClient<IExchangeRateClient, CbrClient>((_, client) =>
+		{
+			client.BaseAddress = new Uri("https://www.cbr-xml-daily.ru/latest.js");
+		});
+		services.AddHttpClient<IExchangeRateClient, MoneyConvertClient>((_, client) =>
+		{
+			client.BaseAddress = new Uri("https://cdn.moneyconvert.net/api/latest.json");
+		});
 
-        services.AddTransient<IExchangeRateClientFactory, ExchangeRateClientFactory>();
-        return services;
-    }
+		services.AddTransient<IExchangeRateClientFactory, ExchangeRateClientFactory>();
+		return services;
+	}
 }

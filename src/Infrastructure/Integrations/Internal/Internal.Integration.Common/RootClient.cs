@@ -7,26 +7,23 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Common;
 
 public class RootClient(
-    IOptionsMonitor<InternalServicesOptions> serviceOptions,
-    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
-    IAuthClient authClient,
-    HttpClient httpClient,
-    ProjectJsonOptions jsonOptions
-) : ICommonClient
+	IOptionsMonitor<InternalServicesOptions> serviceOptions,
+	IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
+	IAuthClient authClient,
+	HttpClient httpClient,
+	ProjectJsonOptions jsonOptions) : ICommonClient
 {
-    public IJobNode JobNode { get; }
-        = new JobNode(
-            httpClient,
-            authClient,
-            serviceOptions,
-            credentialsMonitor,
-            jsonOptions);
+	public IJobNode JobNode { get; } = new JobNode(
+		httpClient,
+		authClient,
+		serviceOptions,
+		credentialsMonitor,
+		jsonOptions);
 
-    public ISettingNode SettingNode { get; }
-        = new SettingNode(
-            httpClient,
-            authClient,
-            serviceOptions,
-            credentialsMonitor,
-            jsonOptions);
+	public ISettingNode SettingNode { get; } = new SettingNode(
+		httpClient,
+		authClient,
+		serviceOptions,
+		credentialsMonitor,
+		jsonOptions);
 }

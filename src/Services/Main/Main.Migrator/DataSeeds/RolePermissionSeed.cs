@@ -9,390 +9,389 @@ namespace Main.Migrator.DataSeeds;
 
 public class RolePermissionSeed : ISeed<DContext>
 {
-    public async Task SeedAsync(DContext context)
-    {
-        var roles = await context.Roles
-            .ToListAsync();
+	public async Task SeedAsync(DContext context)
+	{
+		var roles = await context.Roles.ToListAsync();
 
-        if (roles.Count == 0) return;
+		if (roles.Count == 0)
+			return;
 
-        var permissions = await context.Permissions
-            .ToDictionaryAsync(p => p.Name);
+		var permissions = await context.Permissions.ToDictionaryAsync(p => p.Name);
 
-        var rolePermissions = BuildRolePermissions();
-        var existingRolePermissions = (await context.Set<RolePermission>()
-                .Select(x => new { x.RoleName, x.PermissionName })
-                .ToListAsync())
-            .Select(x => (x.RoleName, x.PermissionName))
-            .ToHashSet();
+		var rolePermissions = BuildRolePermissions();
+		var existingRolePermissions = (await context
+				.Set<RolePermission>()
+				.Select(x => new
+				{
+					x.RoleName, x.PermissionName
+				})
+				.ToListAsync())
+			.Select(x => (x.RoleName, x.PermissionName))
+			.ToHashSet();
 
-        var newRolePermissions = new List<RolePermission>();
+		var newRolePermissions = new List<RolePermission>();
 
-        foreach (var role in roles)
-        {
-            if (!Enum.TryParse(
-                    role.Name,
-                    true,
-                    out Role parsedRole))
-                continue;
-            if (!rolePermissions.TryGetValue(parsedRole, out var needed)) continue;
+		foreach (var role in roles)
+		{
+			if (!Enum.TryParse(
+					role.Name,
+					true,
+					out Role parsedRole))
+				continue;
+			if (!rolePermissions.TryGetValue(parsedRole, out var needed))
+				continue;
 
-            var permissionsToAdd = ResolvePermissions(
-                    role.Name,
-                    needed,
-                    permissions)
-                .Where(x => existingRolePermissions.Add(x.GetId()))
-                .ToList();
+			var permissionsToAdd = ResolvePermissions(
+					role.Name,
+					needed,
+					permissions)
+				.Where(x => existingRolePermissions.Add(x.GetId()))
+				.ToList();
 
-            newRolePermissions.AddRange(permissionsToAdd);
-        }
+			newRolePermissions.AddRange(permissionsToAdd);
+		}
 
-        if (newRolePermissions.Count == 0) return;
+		if (newRolePermissions.Count == 0)
+			return;
 
-        await context.AddRangeAsync(newRolePermissions);
-        await context.SaveChangesAsync();
-    }
+		await context.AddRangeAsync(newRolePermissions);
+		await context.SaveChangesAsync();
+	}
 
-    public int GetPriority() { return 1; }
+	public int GetPriority() => 1;
 
-    private static IReadOnlyDictionary<Role, PermissionCodes[]> BuildRolePermissions()
-    {
-        return new Dictionary<Role, PermissionCodes[]>
-        {
-            [Role.Admin] =
-            [
-                PermissionCodes.CREATE_HISTORICAL_RECORDS,
-                PermissionCodes.STORAGES_CONTENT_GET_ALL,
-                PermissionCodes.STORAGES_GET,
-                PermissionCodes.USERS_PERMISSIONS_CREATE,
-                PermissionCodes.USERS_VEHICLES_CREATE_ME,
-                PermissionCodes.USERS_VEHICLES_CREATE_ALL,
-                PermissionCodes.USERS_STORAGES_ADD,
-                PermissionCodes.USERS_STORAGES_GET,
-                PermissionCodes.USERS_STORAGES_DELETE,
-                PermissionCodes.ARTICLES_CREATE,
-                PermissionCodes.USERS_MAILS_CREATE,
-                PermissionCodes.USERS_ROLES_CREATE,
-                PermissionCodes.USERS_CREATE,
-                PermissionCodes.USERS_GET,
-                PermissionCodes.USERS_INFO_GET,
-                PermissionCodes.USERS_DISCOUNT_CREATE,
-                PermissionCodes.USERS_DISCOUNT_GET,
-                PermissionCodes.ORGANIZATIONS_CREATE,
-                PermissionCodes.ORGANIZATIONS_EDIT,
-                PermissionCodes.ORGANIZATIONS_GET,
-                PermissionCodes.PERMISSIONS_GET,
-                PermissionCodes.PERMISSIONS_CREATE,
-                PermissionCodes.ARTICLES_EDIT,
-                PermissionCodes.ARTICLES_DELETE,
-                PermissionCodes.ARTICLES_GET_FULL,
-                PermissionCodes.ARTICLES_GET_MAIN,
-                PermissionCodes.CATALOGUE_CANDIDATES_REVIEW,
-                PermissionCodes.PRODUCERS_CREATE,
-                PermissionCodes.PRODUCERS_EDIT,
-                PermissionCodes.PRODUCERS_DELETE,
-                PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
-                PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE,
-                PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE,
-                PermissionCodes.ARTICLE_CROSSES_GET,
-                PermissionCodes.ARTICLE_CROSSES_CREATE,
-                PermissionCodes.ARTICLE_CROSSES_DELETE,
-                PermissionCodes.ARTICLE_CONTENT_CREATE,
-                PermissionCodes.ARTICLE_CONTENT_DELETE,
-                PermissionCodes.ARTICLE_CONTENT_EDIT,
-                PermissionCodes.ARTICLE_PAIR_EDIT,
-                PermissionCodes.ARTICLE_PAIR_CREATE,
-                PermissionCodes.ARTICLE_PAIR_DELETE,
-                PermissionCodes.ARTICLE_IMAGES_CREATE,
-                PermissionCodes.ARTICLE_IMAGES_DELETE,
-                PermissionCodes.ARTICLE_RESERVATIONS_CREATE,
-                PermissionCodes.ARTICLE_RESERVATIONS_DELETE,
-                PermissionCodes.ARTICLE_RESERVATIONS_EDIT,
-                PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
-                PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL,
-                PermissionCodes.ARTICLE_SIZES_CREATE,
-                PermissionCodes.ARTICLE_SIZES_GET,
-                PermissionCodes.ARTICLE_SIZES_UPDATE,
-                PermissionCodes.ARTICLE_SIZES_DELETE,
-                PermissionCodes.ARTICLE_WEIGHT_CREATE,
-                PermissionCodes.ARTICLE_WEIGHT_GET,
-                PermissionCodes.ARTICLE_WEIGHT_UPDATE,
-                PermissionCodes.ARTICLE_WEIGHT_DELETE,
-                PermissionCodes.BALANCES_TRANSACTION_CREATE,
-                PermissionCodes.BALANCES_TRANSACTION_DELETE,
-                PermissionCodes.BALANCES_TRANSACTION_GET_ALL,
-                PermissionCodes.BALANCES_TRANSACTION_GET_ME,
-                PermissionCodes.BALANCES_TRANSACTION_EDIT,
-                PermissionCodes.BALANCES_FINANCES_UPDATE,
-                PermissionCodes.BALANCES_FINANCES_GET,
-                PermissionCodes.BALANCES_FINANCES_GET_ME,
-                PermissionCodes.CURRENCIES_CREATE,
-                PermissionCodes.CURRENCIES_GET,
-                PermissionCodes.MARKUP_CREATE,
-                PermissionCodes.MARKUP_DELETE,
-                PermissionCodes.MARKUP_GET,
-                PermissionCodes.MARKUP_SET_DEFAULT,
-                PermissionCodes.PRICES_GET_DETAILED,
-                PermissionCodes.PRICES_GET_STANDARD,
-                PermissionCodes.PRICE_APPLIERS_MANAGE,
-                PermissionCodes.PURCHASE_CREATE,
-                PermissionCodes.PURCHASE_DELETE,
-                PermissionCodes.PURCHASE_EDIT,
-                PermissionCodes.PURCHASE_GET,
-                PermissionCodes.ROLES_PERMISSIONS_CREATE,
-                PermissionCodes.ROLES_CREATE,
-                PermissionCodes.ROLES_GET,
-                PermissionCodes.SALES_CREATE,
-                PermissionCodes.SALES_DELETE,
-                PermissionCodes.SALES_EDIT,
-                PermissionCodes.SALES_GET,
-                PermissionCodes.STORAGES_CONTENT_CREATE,
-                PermissionCodes.STORAGES_CREATE,
-                PermissionCodes.STORAGES_CONTENT_DELETE,
-                PermissionCodes.STORAGES_DELETE,
-                PermissionCodes.STORAGES_CONTENT_EDIT,
-                PermissionCodes.STORAGES_EDIT,
-                PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
-                PermissionCodes.OPTIONS_GET,
-                PermissionCodes.STORAGE_ROUTES_GET,
-                PermissionCodes.STORAGE_ROUTES_EDIT,
-                PermissionCodes.STORAGE_ROUTES_CREATE,
-                PermissionCodes.STORAGE_ROUTES_DELETE,
-                PermissionCodes.LOGISTICS_CALCULATE,
-                PermissionCodes.UPLOADS_CREATE,
-                PermissionCodes.JOBS_CREATE,
-                PermissionCodes.JOBS_GET,
-                PermissionCodes.METRICS_CREATE,
-                PermissionCodes.METRICS_GET,
-                PermissionCodes.CHARTS_GET
-            ],
+	private static IReadOnlyDictionary<Role, PermissionCodes[]> BuildRolePermissions()
+	{
+		return new Dictionary<Role, PermissionCodes[]>
+		{
+			[Role.Admin] =
+			[
+				PermissionCodes.CREATE_HISTORICAL_RECORDS,
+				PermissionCodes.STORAGES_CONTENT_GET_ALL,
+				PermissionCodes.STORAGES_GET,
+				PermissionCodes.USERS_PERMISSIONS_CREATE,
+				PermissionCodes.USERS_VEHICLES_CREATE_ME,
+				PermissionCodes.USERS_VEHICLES_CREATE_ALL,
+				PermissionCodes.USERS_STORAGES_ADD,
+				PermissionCodes.USERS_STORAGES_GET,
+				PermissionCodes.USERS_STORAGES_DELETE,
+				PermissionCodes.ARTICLES_CREATE,
+				PermissionCodes.USERS_MAILS_CREATE,
+				PermissionCodes.USERS_ROLES_CREATE,
+				PermissionCodes.USERS_CREATE,
+				PermissionCodes.USERS_GET,
+				PermissionCodes.USERS_INFO_GET,
+				PermissionCodes.USERS_DISCOUNT_CREATE,
+				PermissionCodes.USERS_DISCOUNT_GET,
+				PermissionCodes.ORGANIZATIONS_CREATE,
+				PermissionCodes.ORGANIZATIONS_EDIT,
+				PermissionCodes.ORGANIZATIONS_GET,
+				PermissionCodes.PERMISSIONS_GET,
+				PermissionCodes.PERMISSIONS_CREATE,
+				PermissionCodes.ARTICLES_EDIT,
+				PermissionCodes.ARTICLES_DELETE,
+				PermissionCodes.ARTICLES_GET_FULL,
+				PermissionCodes.ARTICLES_GET_MAIN,
+				PermissionCodes.CATALOGUE_CANDIDATES_REVIEW,
+				PermissionCodes.PRODUCERS_CREATE,
+				PermissionCodes.PRODUCERS_EDIT,
+				PermissionCodes.PRODUCERS_DELETE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE,
+				PermissionCodes.ARTICLE_CROSSES_GET,
+				PermissionCodes.ARTICLE_CROSSES_CREATE,
+				PermissionCodes.ARTICLE_CROSSES_DELETE,
+				PermissionCodes.ARTICLE_CONTENT_CREATE,
+				PermissionCodes.ARTICLE_CONTENT_DELETE,
+				PermissionCodes.ARTICLE_CONTENT_EDIT,
+				PermissionCodes.ARTICLE_PAIR_EDIT,
+				PermissionCodes.ARTICLE_PAIR_CREATE,
+				PermissionCodes.ARTICLE_PAIR_DELETE,
+				PermissionCodes.ARTICLE_IMAGES_CREATE,
+				PermissionCodes.ARTICLE_IMAGES_DELETE,
+				PermissionCodes.ARTICLE_RESERVATIONS_CREATE,
+				PermissionCodes.ARTICLE_RESERVATIONS_DELETE,
+				PermissionCodes.ARTICLE_RESERVATIONS_EDIT,
+				PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
+				PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL,
+				PermissionCodes.ARTICLE_SIZES_CREATE,
+				PermissionCodes.ARTICLE_SIZES_GET,
+				PermissionCodes.ARTICLE_SIZES_UPDATE,
+				PermissionCodes.ARTICLE_SIZES_DELETE,
+				PermissionCodes.ARTICLE_WEIGHT_CREATE,
+				PermissionCodes.ARTICLE_WEIGHT_GET,
+				PermissionCodes.ARTICLE_WEIGHT_UPDATE,
+				PermissionCodes.ARTICLE_WEIGHT_DELETE,
+				PermissionCodes.BALANCES_TRANSACTION_CREATE,
+				PermissionCodes.BALANCES_TRANSACTION_DELETE,
+				PermissionCodes.BALANCES_TRANSACTION_GET_ALL,
+				PermissionCodes.BALANCES_TRANSACTION_GET_ME,
+				PermissionCodes.BALANCES_TRANSACTION_EDIT,
+				PermissionCodes.BALANCES_FINANCES_UPDATE,
+				PermissionCodes.BALANCES_FINANCES_GET,
+				PermissionCodes.BALANCES_FINANCES_GET_ME,
+				PermissionCodes.CURRENCIES_CREATE,
+				PermissionCodes.CURRENCIES_GET,
+				PermissionCodes.MARKUP_CREATE,
+				PermissionCodes.MARKUP_DELETE,
+				PermissionCodes.MARKUP_GET,
+				PermissionCodes.MARKUP_SET_DEFAULT,
+				PermissionCodes.PRICES_GET_DETAILED,
+				PermissionCodes.PRICES_GET_STANDARD,
+				PermissionCodes.PRICE_APPLIERS_MANAGE,
+				PermissionCodes.PURCHASE_CREATE,
+				PermissionCodes.PURCHASE_DELETE,
+				PermissionCodes.PURCHASE_EDIT,
+				PermissionCodes.PURCHASE_GET,
+				PermissionCodes.ROLES_PERMISSIONS_CREATE,
+				PermissionCodes.ROLES_CREATE,
+				PermissionCodes.ROLES_GET,
+				PermissionCodes.SALES_CREATE,
+				PermissionCodes.SALES_DELETE,
+				PermissionCodes.SALES_EDIT,
+				PermissionCodes.SALES_GET,
+				PermissionCodes.STORAGES_CONTENT_CREATE,
+				PermissionCodes.STORAGES_CREATE,
+				PermissionCodes.STORAGES_CONTENT_DELETE,
+				PermissionCodes.STORAGES_DELETE,
+				PermissionCodes.STORAGES_CONTENT_EDIT,
+				PermissionCodes.STORAGES_EDIT,
+				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
+				PermissionCodes.OPTIONS_GET,
+				PermissionCodes.STORAGE_ROUTES_GET,
+				PermissionCodes.STORAGE_ROUTES_EDIT,
+				PermissionCodes.STORAGE_ROUTES_CREATE,
+				PermissionCodes.STORAGE_ROUTES_DELETE,
+				PermissionCodes.LOGISTICS_CALCULATE,
+				PermissionCodes.UPLOADS_CREATE,
+				PermissionCodes.JOBS_CREATE,
+				PermissionCodes.JOBS_GET,
+				PermissionCodes.METRICS_CREATE,
+				PermissionCodes.METRICS_GET,
+				PermissionCodes.CHARTS_GET
+			],
+			[Role.Worker] =
+			[
+				PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE,
+				PermissionCodes.ARTICLE_CROSSES_GET,
+				PermissionCodes.ARTICLE_CROSSES_CREATE,
+				PermissionCodes.ARTICLE_CROSSES_DELETE,
+				PermissionCodes.ARTICLE_CONTENT_CREATE,
+				PermissionCodes.ARTICLE_CONTENT_DELETE,
+				PermissionCodes.ARTICLE_SIZES_CREATE,
+				PermissionCodes.ARTICLE_SIZES_GET,
+				PermissionCodes.ARTICLE_SIZES_UPDATE,
+				PermissionCodes.ARTICLE_SIZES_DELETE,
+				PermissionCodes.ARTICLE_WEIGHT_CREATE,
+				PermissionCodes.ARTICLE_WEIGHT_GET,
+				PermissionCodes.ARTICLE_WEIGHT_UPDATE,
+				PermissionCodes.ARTICLE_WEIGHT_DELETE,
+				PermissionCodes.ARTICLES_CREATE,
+				PermissionCodes.ARTICLE_CONTENT_EDIT,
+				PermissionCodes.ARTICLE_PAIR_EDIT,
+				PermissionCodes.ARTICLE_PAIR_CREATE,
+				PermissionCodes.ARTICLE_PAIR_DELETE,
+				PermissionCodes.ARTICLE_IMAGES_CREATE,
+				PermissionCodes.ARTICLE_IMAGES_DELETE,
+				PermissionCodes.ARTICLE_RESERVATIONS_CREATE,
+				PermissionCodes.ARTICLE_RESERVATIONS_DELETE,
+				PermissionCodes.ARTICLE_RESERVATIONS_EDIT,
+				PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
+				PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL,
+				PermissionCodes.BALANCES_TRANSACTION_CREATE,
+				PermissionCodes.BALANCES_TRANSACTION_DELETE,
+				PermissionCodes.BALANCES_TRANSACTION_GET_ALL,
+				PermissionCodes.BALANCES_TRANSACTION_GET_ME,
+				PermissionCodes.BALANCES_TRANSACTION_EDIT,
+				PermissionCodes.BALANCES_FINANCES_UPDATE,
+				PermissionCodes.BALANCES_FINANCES_GET,
+				PermissionCodes.BALANCES_FINANCES_GET_ME,
+				PermissionCodes.CURRENCIES_GET,
+				PermissionCodes.PRICES_GET_DETAILED,
+				PermissionCodes.PRICES_GET_STANDARD,
+				PermissionCodes.PURCHASE_CREATE,
+				PermissionCodes.PURCHASE_DELETE,
+				PermissionCodes.PURCHASE_EDIT,
+				PermissionCodes.PURCHASE_GET,
+				PermissionCodes.SALES_CREATE,
+				PermissionCodes.SALES_DELETE,
+				PermissionCodes.SALES_EDIT,
+				PermissionCodes.SALES_GET,
+				PermissionCodes.STORAGES_CONTENT_CREATE,
+				PermissionCodes.STORAGES_CONTENT_EDIT,
+				PermissionCodes.STORAGES_EDIT,
+				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
+				PermissionCodes.STORAGES_CONTENT_GET_ALL,
+				PermissionCodes.STORAGES_GET,
+				PermissionCodes.USERS_VEHICLES_CREATE_ME,
+				PermissionCodes.USERS_VEHICLES_CREATE_ALL,
+				PermissionCodes.USERS_GET,
+				PermissionCodes.USERS_DISCOUNT_GET,
+				PermissionCodes.USERS_INFO_GET,
+				PermissionCodes.USERS_STORAGES_GET,
+				PermissionCodes.ORGANIZATIONS_GET,
+				PermissionCodes.ARTICLES_DELETE,
+				PermissionCodes.ARTICLES_EDIT,
+				PermissionCodes.ARTICLES_GET_FULL,
+				PermissionCodes.ARTICLES_GET_MAIN,
+				PermissionCodes.CATALOGUE_CANDIDATES_REVIEW,
+				PermissionCodes.PRODUCERS_CREATE,
+				PermissionCodes.PRODUCERS_EDIT,
+				PermissionCodes.PRODUCERS_DELETE,
+				PermissionCodes.OPTIONS_GET,
+				PermissionCodes.STORAGE_ROUTES_EDIT,
+				PermissionCodes.LOGISTICS_CALCULATE,
+				PermissionCodes.UPLOADS_CREATE,
+				PermissionCodes.JOBS_CREATE,
+				PermissionCodes.JOBS_GET,
+				PermissionCodes.METRICS_GET,
+				PermissionCodes.CHARTS_GET
+			],
+			[Role.Member] =
+			[
+				PermissionCodes.ARTICLE_CROSSES_GET,
+				PermissionCodes.ARTICLE_SIZES_GET,
+				PermissionCodes.ARTICLE_WEIGHT_GET,
+				PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
+				PermissionCodes.BALANCES_TRANSACTION_GET_ME,
+				PermissionCodes.BALANCES_FINANCES_GET_ME,
+				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
+				PermissionCodes.USERS_VEHICLES_CREATE_ME,
+				PermissionCodes.ARTICLES_GET_MAIN,
+				PermissionCodes.JOBS_CREATE,
+				PermissionCodes.JOBS_GET
+			],
+			[Role.Supplier] = [],
+			[Role.System] =
+			[
+				PermissionCodes.CREATE_HISTORICAL_RECORDS,
+				PermissionCodes.STORAGES_CONTENT_GET_ALL,
+				PermissionCodes.STORAGES_GET,
+				PermissionCodes.USERS_PERMISSIONS_CREATE,
+				PermissionCodes.USERS_VEHICLES_CREATE_ME,
+				PermissionCodes.USERS_VEHICLES_CREATE_ALL,
+				PermissionCodes.USERS_STORAGES_ADD,
+				PermissionCodes.USERS_STORAGES_GET,
+				PermissionCodes.USERS_STORAGES_DELETE,
+				PermissionCodes.USERS_ROLES_CREATE,
+				PermissionCodes.ARTICLES_CREATE,
+				PermissionCodes.USERS_MAILS_CREATE,
+				PermissionCodes.USERS_CREATE,
+				PermissionCodes.USERS_GET,
+				PermissionCodes.USERS_INFO_GET,
+				PermissionCodes.USERS_DISCOUNT_CREATE,
+				PermissionCodes.USERS_DISCOUNT_GET,
+				PermissionCodes.ORGANIZATIONS_CREATE,
+				PermissionCodes.ORGANIZATIONS_EDIT,
+				PermissionCodes.ORGANIZATIONS_GET,
+				PermissionCodes.PERMISSIONS_GET,
+				PermissionCodes.PERMISSIONS_CREATE,
+				PermissionCodes.ARTICLES_EDIT,
+				PermissionCodes.ARTICLES_DELETE,
+				PermissionCodes.ARTICLES_GET_FULL,
+				PermissionCodes.ARTICLES_GET_MAIN,
+				PermissionCodes.CATALOGUE_CANDIDATES_REVIEW,
+				PermissionCodes.PRODUCERS_CREATE,
+				PermissionCodes.PRODUCERS_EDIT,
+				PermissionCodes.PRODUCERS_DELETE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE,
+				PermissionCodes.ARTICLE_CROSSES_GET,
+				PermissionCodes.ARTICLE_CROSSES_CREATE,
+				PermissionCodes.ARTICLE_CROSSES_DELETE,
+				PermissionCodes.ARTICLE_CONTENT_CREATE,
+				PermissionCodes.ARTICLE_CONTENT_DELETE,
+				PermissionCodes.ARTICLE_CONTENT_EDIT,
+				PermissionCodes.ARTICLE_PAIR_EDIT,
+				PermissionCodes.ARTICLE_PAIR_CREATE,
+				PermissionCodes.ARTICLE_PAIR_DELETE,
+				PermissionCodes.ARTICLE_IMAGES_CREATE,
+				PermissionCodes.ARTICLE_IMAGES_DELETE,
+				PermissionCodes.ARTICLE_RESERVATIONS_CREATE,
+				PermissionCodes.ARTICLE_RESERVATIONS_DELETE,
+				PermissionCodes.ARTICLE_RESERVATIONS_EDIT,
+				PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
+				PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL,
+				PermissionCodes.ARTICLE_SIZES_CREATE,
+				PermissionCodes.ARTICLE_SIZES_GET,
+				PermissionCodes.ARTICLE_SIZES_UPDATE,
+				PermissionCodes.ARTICLE_SIZES_DELETE,
+				PermissionCodes.ARTICLE_WEIGHT_CREATE,
+				PermissionCodes.ARTICLE_WEIGHT_GET,
+				PermissionCodes.ARTICLE_WEIGHT_UPDATE,
+				PermissionCodes.ARTICLE_WEIGHT_DELETE,
+				PermissionCodes.BALANCES_TRANSACTION_CREATE,
+				PermissionCodes.BALANCES_TRANSACTION_DELETE,
+				PermissionCodes.BALANCES_TRANSACTION_GET_ALL,
+				PermissionCodes.BALANCES_TRANSACTION_GET_ME,
+				PermissionCodes.BALANCES_TRANSACTION_EDIT,
+				PermissionCodes.BALANCES_FINANCES_UPDATE,
+				PermissionCodes.BALANCES_FINANCES_GET,
+				PermissionCodes.BALANCES_FINANCES_GET_ME,
+				PermissionCodes.CURRENCIES_CREATE,
+				PermissionCodes.CURRENCIES_GET,
+				PermissionCodes.MARKUP_CREATE,
+				PermissionCodes.MARKUP_DELETE,
+				PermissionCodes.MARKUP_GET,
+				PermissionCodes.MARKUP_SET_DEFAULT,
+				PermissionCodes.PRICES_GET_DETAILED,
+				PermissionCodes.PRICES_GET_STANDARD,
+				PermissionCodes.PRICE_APPLIERS_MANAGE,
+				PermissionCodes.PURCHASE_CREATE,
+				PermissionCodes.PURCHASE_DELETE,
+				PermissionCodes.PURCHASE_EDIT,
+				PermissionCodes.PURCHASE_GET,
+				PermissionCodes.ROLES_PERMISSIONS_CREATE,
+				PermissionCodes.ROLES_CREATE,
+				PermissionCodes.ROLES_GET,
+				PermissionCodes.SALES_CREATE,
+				PermissionCodes.SALES_DELETE,
+				PermissionCodes.SALES_EDIT,
+				PermissionCodes.SALES_GET,
+				PermissionCodes.STORAGES_CONTENT_CREATE,
+				PermissionCodes.STORAGES_CREATE,
+				PermissionCodes.STORAGES_CONTENT_DELETE,
+				PermissionCodes.STORAGES_DELETE,
+				PermissionCodes.STORAGES_CONTENT_EDIT,
+				PermissionCodes.STORAGES_EDIT,
+				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
+				PermissionCodes.OPTIONS_GET,
+				PermissionCodes.STORAGE_ROUTES_GET,
+				PermissionCodes.STORAGE_ROUTES_EDIT,
+				PermissionCodes.STORAGE_ROUTES_CREATE,
+				PermissionCodes.STORAGE_ROUTES_DELETE,
+				PermissionCodes.LOGISTICS_CALCULATE,
+				PermissionCodes.UPLOADS_CREATE,
+				PermissionCodes.JOBS_CREATE,
+				PermissionCodes.JOBS_GET,
+				PermissionCodes.METRICS_CREATE,
+				PermissionCodes.METRICS_GET,
+				PermissionCodes.CHARTS_GET
+			]
+		};
+	}
 
-            [Role.Worker] =
-            [
-                PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
-                PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE,
-                PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE,
-                PermissionCodes.ARTICLE_CROSSES_GET,
-                PermissionCodes.ARTICLE_CROSSES_CREATE,
-                PermissionCodes.ARTICLE_CROSSES_DELETE,
-                PermissionCodes.ARTICLE_CONTENT_CREATE,
-                PermissionCodes.ARTICLE_CONTENT_DELETE,
-                PermissionCodes.ARTICLE_SIZES_CREATE,
-                PermissionCodes.ARTICLE_SIZES_GET,
-                PermissionCodes.ARTICLE_SIZES_UPDATE,
-                PermissionCodes.ARTICLE_SIZES_DELETE,
-                PermissionCodes.ARTICLE_WEIGHT_CREATE,
-                PermissionCodes.ARTICLE_WEIGHT_GET,
-                PermissionCodes.ARTICLE_WEIGHT_UPDATE,
-                PermissionCodes.ARTICLE_WEIGHT_DELETE,
-                PermissionCodes.ARTICLES_CREATE,
-                PermissionCodes.ARTICLE_CONTENT_EDIT,
-                PermissionCodes.ARTICLE_PAIR_EDIT,
-                PermissionCodes.ARTICLE_PAIR_CREATE,
-                PermissionCodes.ARTICLE_PAIR_DELETE,
-                PermissionCodes.ARTICLE_IMAGES_CREATE,
-                PermissionCodes.ARTICLE_IMAGES_DELETE,
-                PermissionCodes.ARTICLE_RESERVATIONS_CREATE,
-                PermissionCodes.ARTICLE_RESERVATIONS_DELETE,
-                PermissionCodes.ARTICLE_RESERVATIONS_EDIT,
-                PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
-                PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL,
-                PermissionCodes.BALANCES_TRANSACTION_CREATE,
-                PermissionCodes.BALANCES_TRANSACTION_DELETE,
-                PermissionCodes.BALANCES_TRANSACTION_GET_ALL,
-                PermissionCodes.BALANCES_TRANSACTION_GET_ME,
-                PermissionCodes.BALANCES_TRANSACTION_EDIT,
-                PermissionCodes.BALANCES_FINANCES_UPDATE,
-                PermissionCodes.BALANCES_FINANCES_GET,
-                PermissionCodes.BALANCES_FINANCES_GET_ME,
-                PermissionCodes.CURRENCIES_GET,
-                PermissionCodes.PRICES_GET_DETAILED,
-                PermissionCodes.PRICES_GET_STANDARD,
-                PermissionCodes.PURCHASE_CREATE,
-                PermissionCodes.PURCHASE_DELETE,
-                PermissionCodes.PURCHASE_EDIT,
-                PermissionCodes.PURCHASE_GET,
-                PermissionCodes.SALES_CREATE,
-                PermissionCodes.SALES_DELETE,
-                PermissionCodes.SALES_EDIT,
-                PermissionCodes.SALES_GET,
-                PermissionCodes.STORAGES_CONTENT_CREATE,
-                PermissionCodes.STORAGES_CONTENT_EDIT,
-                PermissionCodes.STORAGES_EDIT,
-                PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
-                PermissionCodes.STORAGES_CONTENT_GET_ALL,
-                PermissionCodes.STORAGES_GET,
-                PermissionCodes.USERS_VEHICLES_CREATE_ME,
-                PermissionCodes.USERS_VEHICLES_CREATE_ALL,
-                PermissionCodes.USERS_GET,
-                PermissionCodes.USERS_DISCOUNT_GET,
-                PermissionCodes.USERS_INFO_GET,
-                PermissionCodes.USERS_STORAGES_GET,
-                PermissionCodes.ORGANIZATIONS_GET,
-                PermissionCodes.ARTICLES_DELETE,
-                PermissionCodes.ARTICLES_EDIT,
-                PermissionCodes.ARTICLES_GET_FULL,
-                PermissionCodes.ARTICLES_GET_MAIN,
-                PermissionCodes.CATALOGUE_CANDIDATES_REVIEW,
-                PermissionCodes.PRODUCERS_CREATE,
-                PermissionCodes.PRODUCERS_EDIT,
-                PermissionCodes.PRODUCERS_DELETE,
-                PermissionCodes.OPTIONS_GET,
-                PermissionCodes.STORAGE_ROUTES_EDIT,
-                PermissionCodes.LOGISTICS_CALCULATE,
-                PermissionCodes.UPLOADS_CREATE,
-                PermissionCodes.JOBS_CREATE,
-                PermissionCodes.JOBS_GET,
-                PermissionCodes.METRICS_GET,
-                PermissionCodes.CHARTS_GET
-            ],
+	private static List<RolePermission> ResolvePermissions(
+		string role,
+		IEnumerable<PermissionCodes> needed,
+		IReadOnlyDictionary<string, Permission> permissions)
+	{
+		var result = new List<RolePermission>();
 
-            [Role.Member] =
-            [
-                PermissionCodes.ARTICLE_CROSSES_GET,
-                PermissionCodes.ARTICLE_SIZES_GET,
-                PermissionCodes.ARTICLE_WEIGHT_GET,
-                PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
-                PermissionCodes.BALANCES_TRANSACTION_GET_ME,
-                PermissionCodes.BALANCES_FINANCES_GET_ME,
-                PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
-                PermissionCodes.USERS_VEHICLES_CREATE_ME,
-                PermissionCodes.ARTICLES_GET_MAIN,
-                PermissionCodes.JOBS_CREATE,
-                PermissionCodes.JOBS_GET
-            ],
+		foreach (var code in needed)
+		{
+			var key = Permission.ToNormalizedPermission(code);
 
-            [Role.Supplier] = [],
+			if (!permissions.TryGetValue(key, out var permission))
+				throw new InvalidOperationException($"Permission '{key}' not found in database");
 
-            [Role.System] =
-            [
-                PermissionCodes.CREATE_HISTORICAL_RECORDS,
-                PermissionCodes.STORAGES_CONTENT_GET_ALL,
-                PermissionCodes.STORAGES_GET,
-                PermissionCodes.USERS_PERMISSIONS_CREATE,
-                PermissionCodes.USERS_VEHICLES_CREATE_ME,
-                PermissionCodes.USERS_VEHICLES_CREATE_ALL,
-                PermissionCodes.USERS_STORAGES_ADD,
-                PermissionCodes.USERS_STORAGES_GET,
-                PermissionCodes.USERS_STORAGES_DELETE,
-                PermissionCodes.USERS_ROLES_CREATE,
-                PermissionCodes.ARTICLES_CREATE,
-                PermissionCodes.USERS_MAILS_CREATE,
-                PermissionCodes.USERS_CREATE,
-                PermissionCodes.USERS_GET,
-                PermissionCodes.USERS_INFO_GET,
-                PermissionCodes.USERS_DISCOUNT_CREATE,
-                PermissionCodes.USERS_DISCOUNT_GET,
-                PermissionCodes.ORGANIZATIONS_CREATE,
-                PermissionCodes.ORGANIZATIONS_EDIT,
-                PermissionCodes.ORGANIZATIONS_GET,
-                PermissionCodes.PERMISSIONS_GET,
-                PermissionCodes.PERMISSIONS_CREATE,
-                PermissionCodes.ARTICLES_EDIT,
-                PermissionCodes.ARTICLES_DELETE,
-                PermissionCodes.ARTICLES_GET_FULL,
-                PermissionCodes.ARTICLES_GET_MAIN,
-                PermissionCodes.CATALOGUE_CANDIDATES_REVIEW,
-                PermissionCodes.PRODUCERS_CREATE,
-                PermissionCodes.PRODUCERS_EDIT,
-                PermissionCodes.PRODUCERS_DELETE,
-                PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
-                PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE,
-                PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE,
-                PermissionCodes.ARTICLE_CROSSES_GET,
-                PermissionCodes.ARTICLE_CROSSES_CREATE,
-                PermissionCodes.ARTICLE_CROSSES_DELETE,
-                PermissionCodes.ARTICLE_CONTENT_CREATE,
-                PermissionCodes.ARTICLE_CONTENT_DELETE,
-                PermissionCodes.ARTICLE_CONTENT_EDIT,
-                PermissionCodes.ARTICLE_PAIR_EDIT,
-                PermissionCodes.ARTICLE_PAIR_CREATE,
-                PermissionCodes.ARTICLE_PAIR_DELETE,
-                PermissionCodes.ARTICLE_IMAGES_CREATE,
-                PermissionCodes.ARTICLE_IMAGES_DELETE,
-                PermissionCodes.ARTICLE_RESERVATIONS_CREATE,
-                PermissionCodes.ARTICLE_RESERVATIONS_DELETE,
-                PermissionCodes.ARTICLE_RESERVATIONS_EDIT,
-                PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
-                PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL,
-                PermissionCodes.ARTICLE_SIZES_CREATE,
-                PermissionCodes.ARTICLE_SIZES_GET,
-                PermissionCodes.ARTICLE_SIZES_UPDATE,
-                PermissionCodes.ARTICLE_SIZES_DELETE,
-                PermissionCodes.ARTICLE_WEIGHT_CREATE,
-                PermissionCodes.ARTICLE_WEIGHT_GET,
-                PermissionCodes.ARTICLE_WEIGHT_UPDATE,
-                PermissionCodes.ARTICLE_WEIGHT_DELETE,
-                PermissionCodes.BALANCES_TRANSACTION_CREATE,
-                PermissionCodes.BALANCES_TRANSACTION_DELETE,
-                PermissionCodes.BALANCES_TRANSACTION_GET_ALL,
-                PermissionCodes.BALANCES_TRANSACTION_GET_ME,
-                PermissionCodes.BALANCES_TRANSACTION_EDIT,
-                PermissionCodes.BALANCES_FINANCES_UPDATE,
-                PermissionCodes.BALANCES_FINANCES_GET,
-                PermissionCodes.BALANCES_FINANCES_GET_ME,
-                PermissionCodes.CURRENCIES_CREATE,
-                PermissionCodes.CURRENCIES_GET,
-                PermissionCodes.MARKUP_CREATE,
-                PermissionCodes.MARKUP_DELETE,
-                PermissionCodes.MARKUP_GET,
-                PermissionCodes.MARKUP_SET_DEFAULT,
-                PermissionCodes.PRICES_GET_DETAILED,
-                PermissionCodes.PRICES_GET_STANDARD,
-                PermissionCodes.PRICE_APPLIERS_MANAGE,
-                PermissionCodes.PURCHASE_CREATE,
-                PermissionCodes.PURCHASE_DELETE,
-                PermissionCodes.PURCHASE_EDIT,
-                PermissionCodes.PURCHASE_GET,
-                PermissionCodes.ROLES_PERMISSIONS_CREATE,
-                PermissionCodes.ROLES_CREATE,
-                PermissionCodes.ROLES_GET,
-                PermissionCodes.SALES_CREATE,
-                PermissionCodes.SALES_DELETE,
-                PermissionCodes.SALES_EDIT,
-                PermissionCodes.SALES_GET,
-                PermissionCodes.STORAGES_CONTENT_CREATE,
-                PermissionCodes.STORAGES_CREATE,
-                PermissionCodes.STORAGES_CONTENT_DELETE,
-                PermissionCodes.STORAGES_DELETE,
-                PermissionCodes.STORAGES_CONTENT_EDIT,
-                PermissionCodes.STORAGES_EDIT,
-                PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
-                PermissionCodes.OPTIONS_GET,
-                PermissionCodes.STORAGE_ROUTES_GET,
-                PermissionCodes.STORAGE_ROUTES_EDIT,
-                PermissionCodes.STORAGE_ROUTES_CREATE,
-                PermissionCodes.STORAGE_ROUTES_DELETE,
-                PermissionCodes.LOGISTICS_CALCULATE,
-                PermissionCodes.UPLOADS_CREATE,
-                PermissionCodes.JOBS_CREATE,
-                PermissionCodes.JOBS_GET,
-                PermissionCodes.METRICS_CREATE,
-                PermissionCodes.METRICS_GET,
-                PermissionCodes.CHARTS_GET
-            ]
-        };
-    }
+			result.Add(RolePermission.Create(role, permission.Name));
+		}
 
-
-    private static List<RolePermission> ResolvePermissions(
-        string role,
-        IEnumerable<PermissionCodes> needed,
-        IReadOnlyDictionary<string, Permission> permissions)
-    {
-        var result = new List<RolePermission>();
-
-        foreach (var code in needed)
-        {
-            var key = Permission.ToNormalizedPermission(code);
-
-            if (!permissions.TryGetValue(key, out var permission))
-                throw new InvalidOperationException(
-                    $"Permission '{key}' not found in database");
-
-            result.Add(RolePermission.Create(role, permission.Name));
-        }
-
-        return result;
-    }
+		return result;
+	}
 }

@@ -4,6 +4,6 @@ namespace Contracts.Auth;
 
 public record RoleUpdatedEvent
 {
-    [JsonPropertyName("roleName")]
-    public required string RoleName { get; init; }
+	[JsonPropertyName("roleName")]
+	public required string RoleName { get; init; }
 }

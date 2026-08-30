@@ -12,18 +12,15 @@ namespace Main.Application.Handlers.Storages.DeleteStorage;
 [Transactional]
 public record DeleteStorageCommand(string StorageCode) : ICommand;
 
-public class DeleteStorageHandler(
-    IRepository<Storage, string> repository,
-    IUnitOfWork unitOfWork
-)
-    : ICommandHandler<DeleteStorageCommand>
+public class DeleteStorageHandler(IRepository<Storage, string> repository, IUnitOfWork unitOfWork)
+	: ICommandHandler<DeleteStorageCommand>
 {
-    public async Task<Unit> Handle(DeleteStorageCommand request, CancellationToken cancellationToken)
-    {
-        var storage = await repository.GetById(request.StorageCode, cancellationToken)
-                      ?? throw new StorageNotFoundException(request.StorageCode);
+	public async Task<Unit> Handle(DeleteStorageCommand request, CancellationToken cancellationToken)
+	{
+		var storage = await repository.GetById(request.StorageCode, cancellationToken) ??
+			throw new StorageNotFoundException(request.StorageCode);
 
-        unitOfWork.Remove(storage);
-        return Unit.Value;
-    }
+		unitOfWork.Remove(storage);
+		return Unit.Value;
+	}
 }

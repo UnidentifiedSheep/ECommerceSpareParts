@@ -7,57 +7,59 @@ namespace Tests.DataBuilders.Organization;
 
 public class OrganizationBuilder(Faker faker) : BuilderBase<OrganizationEntity>(faker)
 {
-    private readonly List<(Guid UserId, OrganizationRole Role)> _members = [];
+	private readonly List<(Guid UserId, OrganizationRole Role)> _members = [];
 
-    public Guid? OwnerId { get; private set; }
-    public string? Name { get; private set; }
-    public string? SystemName { get; private set; }
-    public bool IsHidden { get; private set; }
+	public Guid? OwnerId { get; private set; }
 
-    public OrganizationBuilder WithOwnerId(Guid ownerId)
-    {
-        OwnerId = ownerId;
-        return this;
-    }
+	public string? Name { get; private set; }
 
-    public OrganizationBuilder WithName(string name)
-    {
-        Name = name;
-        return this;
-    }
+	public string? SystemName { get; private set; }
 
-    public OrganizationBuilder WithSystemName(string systemName)
-    {
-        SystemName = systemName;
-        return this;
-    }
+	public bool IsHidden { get; private set; }
 
-    public OrganizationBuilder WithMember(
-        Guid userId,
-        OrganizationRole role = OrganizationRole.Member)
-    {
-        _members.Add((userId, role));
-        return this;
-    }
+	public OrganizationBuilder WithOwnerId(Guid ownerId)
+	{
+		OwnerId = ownerId;
+		return this;
+	}
 
-    public OrganizationBuilder WithIsHidden(bool hidden)
-    {
-        IsHidden = hidden;
-        return this;
-    }
+	public OrganizationBuilder WithName(string name)
+	{
+		Name = name;
+		return this;
+	}
 
-    public override OrganizationEntity Build()
-    {
-        var organization = OrganizationEntity.CreateBusiness(
-            Name ?? $"Organization {Faker.Random.AlphaNumeric(12)}",
-            SystemName ?? $"organization-{Guid.NewGuid():N}",
-            OwnerId ?? Guid.NewGuid());
+	public OrganizationBuilder WithSystemName(string systemName)
+	{
+		SystemName = systemName;
+		return this;
+	}
 
-        if (IsHidden) organization.Hide();
+	public OrganizationBuilder WithMember(Guid userId, OrganizationRole role = OrganizationRole.Member)
+	{
+		_members.Add((userId, role));
+		return this;
+	}
 
-        foreach (var (userId, role) in _members)
-            organization.AddMember(userId, role);
+	public OrganizationBuilder WithIsHidden(bool hidden)
+	{
+		IsHidden = hidden;
+		return this;
+	}
 
-        return organization;
-    }
+	public override OrganizationEntity Build()
+	{
+		var organization = OrganizationEntity.CreateBusiness(
+			Name ?? $"Organization {Faker.Random.AlphaNumeric(12)}",
+			SystemName ?? $"organization-{Guid.NewGuid():N}",
+			OwnerId ?? Guid.NewGuid());
+
+		if (IsHidden)
+			organization.Hide();
+
+		foreach (var (userId, role) in _members)
+			organization.AddMember(userId, role);
+
+		return organization;
+	}
 }

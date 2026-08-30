@@ -11,41 +11,37 @@ namespace Tests.ServicesTests;
 
 public sealed class ProducerLookupServiceCachingTests : IntegrationTest
 {
-    public ProducerLookupServiceCachingTests(CombinedContainerFixture fixture)
-        : base(fixture)
-    {
-        RegisterBasicContext<ProducerTestContext>();
-    }
+	public ProducerLookupServiceCachingTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProducerTestContext>();
+	}
 
-    [Fact]
-    public async Task ProducerLookup_LoadTwiceInScope_ReturnsSameSnapshot()
-    {
-        var service = Scope.ServiceProvider
-            .GetRequiredService<IProducerLookupService>();
+	[Fact]
+	public async Task ProducerLookup_LoadTwiceInScope_ReturnsSameSnapshot()
+	{
+		var service = Scope.ServiceProvider.GetRequiredService<IProducerLookupService>();
 
-        var first = await service.Load();
-        var second = await service.Load();
+		var first = await service.Load();
+		var second = await service.Load();
 
-        second.Should().BeSameAs(first);
-    }
+		second.Should().BeSameAs(first);
+	}
 
-    [Fact]
-    public async Task Load_IncludesSupplierMappings()
-    {
-        var producer = GetContext<ProducerTestContext>().Producers[0];
-        const string supplierProducerName = "Supplier-specific producer";
-        await new ProducerSupplierMappingBuilder(Faker)
-            .WithProducerId(producer.Id)
-            .WithSupplier(Supplier.Armtek)
-            .WithSupplierProducerName(supplierProducerName)
-            .BuildAndAddToDb(Context);
+	[Fact]
+	public async Task Load_IncludesSupplierMappings()
+	{
+		var producer = GetContext<ProducerTestContext>().Producers[0];
+		const string supplierProducerName = "Supplier-specific producer";
+		await new ProducerSupplierMappingBuilder(Faker)
+			.WithProducerId(producer.Id)
+			.WithSupplier(Supplier.Armtek)
+			.WithSupplierProducerName(supplierProducerName)
+			.BuildAndAddToDb(Context);
 
-        var service = Scope.ServiceProvider
-            .GetRequiredService<IProducerLookupService>();
+		var service = Scope.ServiceProvider.GetRequiredService<IProducerLookupService>();
 
-        var lookup = await service.Load();
+		var lookup = await service.Load();
 
-        lookup.ResolveId(supplierProducerName, Supplier.Armtek)
-            .Should().Be(producer.Id);
-    }
+		lookup.ResolveId(supplierProducerName, Supplier.Armtek).Should().Be(producer.Id);
+	}
 }

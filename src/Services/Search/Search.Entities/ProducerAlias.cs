@@ -2,5 +2,5 @@
 
 public class ProducerAlias
 {
-    public required string Alias { get; init; }
+	public required string Alias { get; init; }
 }

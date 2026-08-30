@@ -6,80 +6,90 @@ namespace Tests.DataBuilders.Sale;
 
 public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(faker)
 {
-    private readonly List<SaleContent> _contents = [];
-    public Guid? UserId { get; private set; }
-    public Guid? OrganizationId { get; private set; }
-    public Guid? TransactionId { get; private set; }
-    public int? CurrencyId { get; private set; }
-    public string? StorageCode { get; private set; }
-    public DateTime? SaleDate { get; private set; }
-    public bool CompleteSale { get; private set; }
-    public IReadOnlyList<SaleContent> Contents => _contents;
+	private readonly List<SaleContent> _contents = [];
 
-    public SaleBuilder WithUserId(Guid id)
-    {
-        UserId = id;
-        return this;
-    }
+	public Guid? UserId { get; private set; }
 
-    public SaleBuilder WithOrganizationId(Guid id)
-    {
-        OrganizationId = id;
-        return this;
-    }
+	public Guid? OrganizationId { get; private set; }
 
-    public SaleBuilder WithTransactionId(Guid id)
-    {
-        TransactionId = id;
-        return this;
-    }
+	public Guid? TransactionId { get; private set; }
 
-    public SaleBuilder WithCurrencyId(int id)
-    {
-        CurrencyId = id;
-        return this;
-    }
+	public int? CurrencyId { get; private set; }
 
-    public SaleBuilder WithStorageCode(string name)
-    {
-        StorageCode = name;
-        return this;
-    }
+	public string? StorageCode { get; private set; }
 
-    public SaleBuilder WithSaleDate(DateTime date)
-    {
-        SaleDate = date;
-        return this;
-    }
+	public DateTime? SaleDate { get; private set; }
 
-    public SaleBuilder WithContents(IEnumerable<SaleContent> contents)
-    {
-        _contents.Clear();
-        _contents.AddRange(contents);
-        return this;
-    }
+	public bool CompleteSale { get; private set; }
 
-    public SaleBuilder Completed()
-    {
-        CompleteSale = true;
-        return this;
-    }
+	public IReadOnlyList<SaleContent> Contents => _contents;
 
-    public override Main.Entities.Sale.Sale Build()
-    {
-        var userId = UserId ?? Guid.NewGuid();
-        var sale = Main.Entities.Sale.Sale.Create(
-            userId,
-            OrganizationId ?? userId,
-            TransactionId ?? Guid.NewGuid(),
-            CurrencyId ?? Faker.Random.Int(1),
-            StorageCode ?? Faker.Lorem.Letter(8),
-            SaleDate ?? DateTime.Now);
+	public SaleBuilder WithUserId(Guid id)
+	{
+		UserId = id;
+		return this;
+	}
 
-        foreach (var content in _contents) sale.AddContent(content);
+	public SaleBuilder WithOrganizationId(Guid id)
+	{
+		OrganizationId = id;
+		return this;
+	}
 
-        if (CompleteSale) sale.Complete();
+	public SaleBuilder WithTransactionId(Guid id)
+	{
+		TransactionId = id;
+		return this;
+	}
 
-        return sale;
-    }
+	public SaleBuilder WithCurrencyId(int id)
+	{
+		CurrencyId = id;
+		return this;
+	}
+
+	public SaleBuilder WithStorageCode(string name)
+	{
+		StorageCode = name;
+		return this;
+	}
+
+	public SaleBuilder WithSaleDate(DateTime date)
+	{
+		SaleDate = date;
+		return this;
+	}
+
+	public SaleBuilder WithContents(IEnumerable<SaleContent> contents)
+	{
+		_contents.Clear();
+		_contents.AddRange(contents);
+		return this;
+	}
+
+	public SaleBuilder Completed()
+	{
+		CompleteSale = true;
+		return this;
+	}
+
+	public override Main.Entities.Sale.Sale Build()
+	{
+		var userId = UserId ?? Guid.NewGuid();
+		var sale = Main.Entities.Sale.Sale.Create(
+			userId,
+			OrganizationId ?? userId,
+			TransactionId ?? Guid.NewGuid(),
+			CurrencyId ?? Faker.Random.Int(1),
+			StorageCode ?? Faker.Lorem.Letter(8),
+			SaleDate ?? DateTime.Now);
+
+		foreach (var content in _contents)
+			sale.AddContent(content);
+
+		if (CompleteSale)
+			sale.Complete();
+
+		return sale;
+	}
 }

@@ -15,23 +15,27 @@ namespace Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 public record UpdateCurrenciesRatesCommand : ICommand;
 
 public class UpdateCurrenciesRatesHandler(
-    ILogger<UpdateCurrenciesRatesCommand> logger,
-    ICurrencyRateUpdater updater,
-    IIntegrationEventScope integrationEventScope,
-    ISettingsService settingsService
-) : ICommandHandler<UpdateCurrenciesRatesCommand>
+	ILogger<UpdateCurrenciesRatesCommand> logger,
+	ICurrencyRateUpdater updater,
+	IIntegrationEventScope integrationEventScope,
+	ISettingsService settingsService) : ICommandHandler<UpdateCurrenciesRatesCommand>
 {
-    public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
-    {
-        var settings = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
+	public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
+	{
+		var settings = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
 
-        var result = await updater.UpdateAsync(settings, cancellationToken);
+		var result = await updater.UpdateAsync(settings, cancellationToken);
 
-        if (result.NotFound.Count > 0) logger.LogWarning("Missing rates: {@Currencies}", result.NotFound);
+		if (result.NotFound.Count > 0)
+			logger.LogWarning("Missing rates: {@Currencies}", result.NotFound);
 
-        if (result.Changed.Count > 0)
-            integrationEventScope.Add(new CurrencyRateChangedEvent { Rates = result.Changed });
+		if (result.Changed.Count > 0)
+			integrationEventScope.Add(
+				new CurrencyRateChangedEvent
+				{
+					Rates = result.Changed
+				});
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

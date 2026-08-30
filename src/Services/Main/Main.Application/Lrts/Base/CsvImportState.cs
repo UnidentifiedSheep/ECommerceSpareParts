@@ -4,22 +4,23 @@ namespace Main.Application.Lrts.Base;
 
 public interface ICsvImportInputState
 {
-    string FileName { get; }
+	string FileName { get; }
 }
 
 public interface ICsvImportState<TState> : ICsvImportInputState
 {
-    int CurrentLine { get; }
-    List<CsvImportError> Errors { get; }
+	int CurrentLine { get; }
 
-    TState WithCurrentLine(int currentLine);
+	List<CsvImportError> Errors { get; }
+
+	TState WithCurrentLine(int currentLine);
 }
 
 public sealed record CsvImportError
 {
-    [JsonPropertyName("rowIdx")]
-    public int RowIdx { get; init; }
+	[JsonPropertyName("rowIdx")]
+	public int RowIdx { get; init; }
 
-    [JsonPropertyName("message")]
-    public required string Message { get; init; }
+	[JsonPropertyName("message")]
+	public required string Message { get; init; }
 }

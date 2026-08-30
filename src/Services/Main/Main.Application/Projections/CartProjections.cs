@@ -10,23 +10,21 @@ using Main.Entities.Product;
 namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class CartItemDtoProjectionProvider
-    : ProjectionProviderBase<Cart, CartItemDto>
+public sealed class CartItemDtoProjectionProvider : ProjectionProviderBase<Cart, CartItemDto>
 {
-    public CartItemDtoProjectionProvider(
-        IProjectionProvider<Product, ProductDto> productProjection)
-    {
-        var productToDto = productProjection.Projection;
+	public CartItemDtoProjectionProvider(IProjectionProvider<Product, ProductDto> productProjection)
+	{
+		var productToDto = productProjection.Projection;
 
-        Projection = x => new CartItemDto
-        {
-            Count = x.Count,
-            CreatedAt = x.CreatedAt,
-            UpdatedAt = x.UpdatedAt,
-            ProductId = x.ProductId,
-            Product = productToDto.Invoke(x.Product)
-        };
-    }
+		Projection = x => new CartItemDto
+		{
+			Count = x.Count,
+			CreatedAt = x.CreatedAt,
+			UpdatedAt = x.UpdatedAt,
+			ProductId = x.ProductId,
+			Product = productToDto.Invoke(x.Product)
+		};
+	}
 
-    public override Expression<Func<Cart, CartItemDto>> Projection { get; }
+	public override Expression<Func<Cart, CartItemDto>> Projection { get; }
 }

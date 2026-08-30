@@ -5,64 +5,68 @@ namespace Domain.CommonEntities.Job;
 
 public class JobScheduleRun : Entity<JobScheduleRun, Guid>, ILinqEntity<JobScheduleRun, Guid>
 {
-    private JobScheduleRun() { }
+	private JobScheduleRun()
+	{
+	}
 
-    private JobScheduleRun(
-        Guid jobScheduleId,
-        Guid jobId,
-        DateTime scheduledAt,
-        DateTime queuedAt)
-    {
-        SetJobScheduleId(jobScheduleId);
-        SetJobId(jobId);
-        SetScheduledAt(scheduledAt);
-        SetQueuedAt(queuedAt);
-    }
+	private JobScheduleRun(
+		Guid jobScheduleId,
+		Guid jobId,
+		DateTime scheduledAt,
+		DateTime queuedAt)
+	{
+		SetJobScheduleId(jobScheduleId);
+		SetJobId(jobId);
+		SetScheduledAt(scheduledAt);
+		SetQueuedAt(queuedAt);
+	}
 
-    public Guid Id { get; private set; }
-    public Guid JobScheduleId { get; private set; }
-    public Guid JobId { get; private set; }
-    public DateTime ScheduledAt { get; private set; }
-    public DateTime QueuedAt { get; private set; }
+	public Guid Id { get; private set; }
 
-    public static Expression<Func<JobScheduleRun, Guid>> GetKeySelector() { return x => x.Id; }
+	public Guid JobScheduleId { get; private set; }
 
-    public static Expression<Func<JobScheduleRun, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
+	public Guid JobId { get; private set; }
 
-    public static JobScheduleRun Create(
-        Guid jobScheduleId,
-        Guid jobId,
-        DateTime scheduledAt,
-        DateTime queuedAt)
-    {
-        return new JobScheduleRun(
-            jobScheduleId,
-            jobId,
-            scheduledAt,
-            queuedAt);
-    }
+	public DateTime ScheduledAt { get; private set; }
 
-    public void SetJobScheduleId(Guid jobScheduleId)
-    {
-        if (jobScheduleId == Guid.Empty)
-            throw new ArgumentException("Job schedule id must be specified.", nameof(jobScheduleId));
+	public DateTime QueuedAt { get; private set; }
 
-        JobScheduleId = jobScheduleId;
-    }
+	public static Expression<Func<JobScheduleRun, Guid>> GetKeySelector() => x => x.Id;
 
-    public void SetJobId(Guid jobId)
-    {
-        if (jobId == Guid.Empty) throw new ArgumentException("Job id must be specified.", nameof(jobId));
+	public static Expression<Func<JobScheduleRun, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
 
-        JobId = jobId;
-    }
+	public static JobScheduleRun Create(
+		Guid jobScheduleId,
+		Guid jobId,
+		DateTime scheduledAt,
+		DateTime queuedAt)
+	{
+		return new JobScheduleRun(
+			jobScheduleId,
+			jobId,
+			scheduledAt,
+			queuedAt);
+	}
 
-    public void SetScheduledAt(DateTime scheduledAt) { ScheduledAt = scheduledAt; }
+	public void SetJobScheduleId(Guid jobScheduleId)
+	{
+		if (jobScheduleId == Guid.Empty)
+			throw new ArgumentException("Job schedule id must be specified.", nameof(jobScheduleId));
 
-    public void SetQueuedAt(DateTime queuedAt) { QueuedAt = queuedAt; }
+		JobScheduleId = jobScheduleId;
+	}
 
-    public override Guid GetId() { return Id; }
+	public void SetJobId(Guid jobId)
+	{
+		if (jobId == Guid.Empty)
+			throw new ArgumentException("Job id must be specified.", nameof(jobId));
+
+		JobId = jobId;
+	}
+
+	public void SetScheduledAt(DateTime scheduledAt) => ScheduledAt = scheduledAt;
+
+	public void SetQueuedAt(DateTime queuedAt) => QueuedAt = queuedAt;
+
+	public override Guid GetId() => Id;
 }

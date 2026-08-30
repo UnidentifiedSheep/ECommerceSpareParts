@@ -15,56 +15,54 @@ namespace Main.Application.Handlers.Users.CreateUser;
 [AutoSave]
 [Transactional]
 public record CreateUserCommand(
-    string UserName,
-    string Password,
-    UserInfoDto UserInfo,
-    IEnumerable<EmailDto> Emails,
-    IEnumerable<UserPhoneDto> Phones,
-    IEnumerable<string> Roles
-) : ICommand<CreateUserResult>;
+	string UserName,
+	string Password,
+	UserInfoDto UserInfo,
+	IEnumerable<EmailDto> Emails,
+	IEnumerable<UserPhoneDto> Phones,
+	IEnumerable<string> Roles) : ICommand<CreateUserResult>;
 
 public record CreateUserResult(Guid UserId);
 
-public class CreateUserHandler(
-    IUnitOfWork unitOfWork,
-    IPasswordManager passwordManager)
-    : ICommandHandler<CreateUserCommand, CreateUserResult>
+public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager passwordManager)
+	: ICommandHandler<CreateUserCommand, CreateUserResult>
 {
-    public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
-    {
-        var passwordHash = passwordManager.GetHashOfPassword(request.Password);
-        var user = User.Create(request.UserName, passwordHash);
-        user.SetUserInfo(
-            request.UserInfo.Name,
-            request.UserInfo.Surname,
-            request.UserInfo.Description);
+	public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+	{
+		var passwordHash = passwordManager.GetHashOfPassword(request.Password);
+		var user = User.Create(request.UserName, passwordHash);
+		user.SetUserInfo(
+			request.UserInfo.Name,
+			request.UserInfo.Surname,
+			request.UserInfo.Description);
 
-        foreach (var role in request.Roles)
-        {
-            if (role == RoleNames.Normalize(nameof(Role.System))) throw new CantCreateSystemUserException();
-            user.AddRole(role);
-        }
+		foreach (var role in request.Roles)
+		{
+			if (role == RoleNames.Normalize(nameof(Role.System)))
+				throw new CantCreateSystemUserException();
+			user.AddRole(role);
+		}
 
-        foreach (var email in request.Emails)
-            user.AddEmail(
-                email.Email,
-                email.Type,
-                email.IsPrimary,
-                email.IsConfirmed);
+		foreach (var email in request.Emails)
+			user.AddEmail(
+				email.Email,
+				email.Type,
+				email.IsPrimary,
+				email.IsConfirmed);
 
-        foreach (var phone in request.Phones)
-            user.AddUserPhone(
-                phone.Number,
-                phone.Type,
-                phone.IsPrimary,
-                phone.IsConfirmed);
-        
-        var organization = Organization.CreateIndividual(
-            $"{user.UserInfo!.Name} {user.UserInfo.Surname}",
-            user.Id);
+		foreach (var phone in request.Phones)
+			user.AddUserPhone(
+				phone.Number,
+				phone.Type,
+				phone.IsPrimary,
+				phone.IsConfirmed);
 
-        await unitOfWork.AddAsync(user, cancellationToken);
-        await unitOfWork.AddAsync(organization, cancellationToken);
-        return new CreateUserResult(user.Id);
-    }
+		var organization = Organization.CreateIndividual(
+			$"{user.UserInfo!.Name} {user.UserInfo.Surname}",
+			user.Id);
+
+		await unitOfWork.AddAsync(user, cancellationToken);
+		await unitOfWork.AddAsync(organization, cancellationToken);
+		return new CreateUserResult(user.Id);
+	}
 }

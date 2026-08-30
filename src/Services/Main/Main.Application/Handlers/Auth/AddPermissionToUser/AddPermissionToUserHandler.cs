@@ -10,15 +10,13 @@ namespace Main.Application.Handlers.Auth.AddPermissionToUser;
 [AutoSave]
 public record AddPermissionToUserCommand(Guid UserId, string PermissionName) : ICommand;
 
-public class AddPermissionToUserHandler(
-    IUnitOfWork unitOfWork
-) : ICommandHandler<AddPermissionToUserCommand>
+public class AddPermissionToUserHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddPermissionToUserCommand>
 {
-    public async Task<Unit> Handle(AddPermissionToUserCommand request, CancellationToken cancellationToken)
-    {
-        var model = UserPermission.Create(request.UserId, request.PermissionName);
+	public async Task<Unit> Handle(AddPermissionToUserCommand request, CancellationToken cancellationToken)
+	{
+		var model = UserPermission.Create(request.UserId, request.PermissionName);
 
-        await unitOfWork.AddAsync(model, cancellationToken);
-        return Unit.Value;
-    }
+		await unitOfWork.AddAsync(model, cancellationToken);
+		return Unit.Value;
+	}
 }

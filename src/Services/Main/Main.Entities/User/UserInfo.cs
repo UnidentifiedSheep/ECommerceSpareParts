@@ -9,91 +9,94 @@ namespace Main.Entities.User;
 
 public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 {
-    private UserInfo() { }
+	private UserInfo()
+	{
+	}
 
-    private UserInfo(
-        Guid userId,
-        string name,
-        string surname,
-        string? description)
-    {
-        UserId = userId;
-        SetName(name);
-        SetSurname(surname);
-        SetDescription(description);
-    }
+	private UserInfo(
+		Guid userId,
+		string name,
+		string surname,
+		string? description)
+	{
+		UserId = userId;
+		SetName(name);
+		SetSurname(surname);
+		SetDescription(description);
+	}
 
-    public Guid UserId { get; }
-    public string Name { get; private set; } = null!;
-    public string Surname { get; private set; } = null!;
-    public string? Description { get; private set; }
-    public string SearchColumn { get; private set; } = null!;
+	public Guid UserId { get; }
 
-    public static Expression<Func<UserInfo, Guid>> GetKeySelector() { return x => x.UserId; }
+	public string Name { get; private set; } = null!;
 
-    public static Expression<Func<UserInfo, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.UserId == key;
-    }
+	public string Surname { get; private set; } = null!;
 
-    internal static UserInfo Create(
-        Guid userId,
-        string name,
-        string surname,
-        string? description)
-    {
-        return new UserInfo(
-            userId,
-            name,
-            surname,
-            description);
-    }
+	public string? Description { get; private set; }
 
-    public void SetName(string name)
-    {
-        Name = name.Trim()
-            .EnsureNotNullOrWhiteSpace("user.name.required")
-            .EnsureMinLength(3, "user.name.min.length")
-            .Ensure(x => x.All(c => !char.IsSymbol(c)), "user.name.no.special.chars")
-            .EnsureMaxLength(30, "user.name.max.length");
-        UpdateSearchColumn();
-    }
+	public string SearchColumn { get; private set; } = null!;
 
-    public void SetSurname(string surname)
-    {
-        Surname = surname.Trim()
-            .EnsureNotNullOrWhiteSpace("user.surname.required")
-            .EnsureMinLength(3, "user.surname.min.length")
-            .Ensure(x => x.All(c => !char.IsSymbol(c)), "user.surname.no.special.chars")
-            .EnsureMaxLength(30, "user.surname.max.length");
-        UpdateSearchColumn();
-    }
+	public static Expression<Func<UserInfo, Guid>> GetKeySelector() => x => x.UserId;
 
-    public void SetDescription(string? description)
-    {
-        Description = description
-            .NullIfWhiteSpace()
-            ?.EnsureMaxLength(300, "user.description.max.length");
-        UpdateSearchColumn();
-    }
+	public static Expression<Func<UserInfo, bool>> GetEqualityExpression(Guid key) => x => x.UserId == key;
 
-    internal void Update(
-        string name,
-        string surname,
-        string? description)
-    {
-        SetName(name);
-        SetSurname(surname);
-        SetDescription(description);
-    }
+	internal static UserInfo Create(
+		Guid userId,
+		string name,
+		string surname,
+		string? description)
+	{
+		return new UserInfo(
+			userId,
+			name,
+			surname,
+			description);
+	}
 
-    private void UpdateSearchColumn() { SearchColumn = $"{Name} {Surname} {Description}".ToUpperInvariant(); }
+	public void SetName(string name)
+	{
+		Name = name
+			.Trim()
+			.EnsureNotNullOrWhiteSpace("user.name.required")
+			.EnsureMinLength(3, "user.name.min.length")
+			.Ensure(x => x.All(c => !char.IsSymbol(c)), "user.name.no.special.chars")
+			.EnsureMaxLength(30, "user.name.max.length");
+		UpdateSearchColumn();
+	}
 
-    public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public void SetSurname(string surname)
+	{
+		Surname = surname
+			.Trim()
+			.EnsureNotNullOrWhiteSpace("user.surname.required")
+			.EnsureMinLength(3, "user.surname.min.length")
+			.Ensure(x => x.All(c => !char.IsSymbol(c)), "user.surname.no.special.chars")
+			.EnsureMaxLength(30, "user.surname.max.length");
+		UpdateSearchColumn();
+	}
 
-    public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public void SetDescription(string? description)
+	{
+		Description = description.NullIfWhiteSpace()?.EnsureMaxLength(300, "user.description.max.length");
+		UpdateSearchColumn();
+	}
 
-    public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	internal void Update(
+		string name,
+		string surname,
+		string? description)
+	{
+		SetName(name);
+		SetSurname(surname);
+		SetDescription(description);
+	}
 
-    public override Guid GetId() { return UserId; }
+	private void UpdateSearchColumn() => SearchColumn = $"{Name} {Surname} {Description}".ToUpperInvariant();
+
+	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+	public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+	public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+
+	public override Guid GetId() => UserId;
 }

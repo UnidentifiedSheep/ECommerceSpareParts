@@ -1,44 +1,42 @@
-using Application.Common.Interfaces.Settings;
 using Contracts.Analytics;
 using MassTransit;
 using MediatR;
 using Pricing.Application.Dtos.Markup;
 using Pricing.Application.Handlers.Markup.UpsertMarkupGroup;
 using Pricing.Application.Interfaces.Cache;
-using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Consumers;
 
-public class MarkupAnalyzedConsumer(
-    ISender sender,
-    ICachedCurrencyProvider cachedCurrencyProvider
-) : IConsumer<MarkupAnalyzedEvent>
+public class MarkupAnalyzedConsumer(ISender sender, ICachedCurrencyProvider cachedCurrencyProvider)
+	: IConsumer<MarkupAnalyzedEvent>
 {
-    public async Task Consume(ConsumeContext<MarkupAnalyzedEvent> context)
-    {
-        if (context.Message.Ranges.Count == 0) return;
+	public async Task Consume(ConsumeContext<MarkupAnalyzedEvent> context)
+	{
+		if (context.Message.Ranges.Count == 0)
+			return;
 
-        var baseCurrencyId = await cachedCurrencyProvider
-            .GetBaseCurrencyIdAsync(context.CancellationToken);
+		var baseCurrencyId = await cachedCurrencyProvider.GetBaseCurrencyIdAsync(context.CancellationToken);
 
-        await sender.Send(
-            new UpsertMarkupGroupCommand(
-                new UpsertMarkupGroupDto
-                {
-                    Name = "Auto Generated Markup",
-                    CurrencyId = baseCurrencyId,
-                    Ranges = context.Message.Ranges
-                        .Select(x => new UpsertMarkupRangeDto
-                        {
-                            RangeStart = x.FromCost,
-                            RangeEnd = x.ToCost,
-                            Markup = x.MeanMarkup
-                        })
-                        .ToList()
-                },
-                true),
-            context.CancellationToken);
+		await sender.Send(
+			new UpsertMarkupGroupCommand(
+				new UpsertMarkupGroupDto
+				{
+					Name = "Auto Generated Markup",
+					CurrencyId = baseCurrencyId,
+					Ranges = context
+						.Message
+						.Ranges
+						.Select(x => new UpsertMarkupRangeDto
+						{
+							RangeStart = x.FromCost,
+							RangeEnd = x.ToCost,
+							Markup = x.MeanMarkup
+						})
+						.ToList()
+				},
+				true),
+			context.CancellationToken);
 
-        await context.Publish(new MarkupRangesRefreshRequestedEvent(), context.CancellationToken);
-    }
+		await context.Publish(new MarkupRangesRefreshRequestedEvent(), context.CancellationToken);
+	}
 }

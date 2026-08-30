@@ -2,25 +2,22 @@ using Integrations.Supplier.Interfaces;
 
 namespace Integrations.Supplier;
 
-public class SupplierFactory(
-    IEnumerable<ISupplier> suppliers
-) : ISupplierFactory
+public class SupplierFactory(IEnumerable<ISupplier> suppliers) : ISupplierFactory
 {
-    private readonly Dictionary<global::Enums.Supplier, ISupplier> _suppliers = suppliers.ToDictionary(s => s.Supplier);
-    public ISupplier Create(global::Enums.Supplier supplier) { return _suppliers[supplier]; }
-    public async Task<IReadOnlyList<ISupplier>> GetAvailableSuppliers(
-        CancellationToken cancellationToken = default)
-    {
-        var suppliers = _suppliers.Values.ToList();
+	private readonly Dictionary<global::Enums.Supplier, ISupplier> _suppliers =
+		suppliers.ToDictionary(s => s.Supplier);
 
-        var tasks = suppliers
-            .Select(x => x.CheckConnectionAsync(cancellationToken))
-            .ToList();
+	public ISupplier Create(global::Enums.Supplier supplier) => _suppliers[supplier];
 
-        var results = await Task.WhenAll(tasks);
+	public async Task<IReadOnlyList<ISupplier>> GetAvailableSuppliers(
+		CancellationToken cancellationToken = default)
+	{
+		var suppliers = _suppliers.Values.ToList();
 
-        return suppliers
-            .Where((_, i) => results[i].CanUse)
-            .ToList();
-    }
+		var tasks = suppliers.Select(x => x.CheckConnectionAsync(cancellationToken)).ToList();
+
+		var results = await Task.WhenAll(tasks);
+
+		return suppliers.Where((_, i) => results[i].CanUse).ToList();
+	}
 }

@@ -8,18 +8,21 @@ using MediatR;
 
 namespace Main.Application.Handlers.ProducerSupplierMappings;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record DeleteProducerSupplierMappingCommand(int Id) : ICommand;
 
 public class DeleteProducerSupplierMappingHandler(
-    IRepository<ProducerSupplierMapping, int> repository,
-    IUnitOfWork unitOfWork) : ICommandHandler<DeleteProducerSupplierMappingCommand>
+	IRepository<ProducerSupplierMapping, int> repository,
+	IUnitOfWork unitOfWork) : ICommandHandler<DeleteProducerSupplierMappingCommand>
 {
-    public async Task<Unit> Handle(DeleteProducerSupplierMappingCommand request, CancellationToken cancellationToken)
-    {
-        var mapping = await repository.GetById(request.Id, cancellationToken)
-                      ?? throw new ProducersSupplierMappingNotFoundException(request.Id);
-        unitOfWork.Remove(mapping);
-        return Unit.Value;
-    }
+	public async Task<Unit> Handle(
+		DeleteProducerSupplierMappingCommand request,
+		CancellationToken cancellationToken)
+	{
+		var mapping = await repository.GetById(request.Id, cancellationToken) ??
+			throw new ProducersSupplierMappingNotFoundException(request.Id);
+		unitOfWork.Remove(mapping);
+		return Unit.Value;
+	}
 }

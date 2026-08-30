@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 
@@ -9,54 +8,52 @@ namespace Main.Entities.Cart;
 
 public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid, int)>
 {
-    private Cart() { }
+	private Cart()
+	{
+	}
 
-    private Cart(
-        Guid userId,
-        int productId,
-        int count)
-    {
-        UserId = userId;
-        ProductId = productId;
-        SetCount(count);
-    }
+	private Cart(
+		Guid userId,
+		int productId,
+		int count)
+	{
+		UserId = userId;
+		ProductId = productId;
+		SetCount(count);
+	}
 
-    [ValidateTuple("PK")]
-    public Guid UserId { get; }
+	[ValidateTuple("PK")]
+	public Guid UserId { get; }
 
-    [ValidateTuple("PK")]
-    public int ProductId { get; }
+	[ValidateTuple("PK")]
+	public int ProductId { get; }
 
-    public int Count { get; private set; }
+	public int Count { get; private set; }
 
-    public Product.Product Product { get; private set; } = null!;
+	public Product.Product Product { get; private set; } = null!;
 
-    public static Expression<Func<Cart, (Guid, int)>> GetKeySelector()
-    {
-        return x => ValueTuple.Create(x.UserId, x.ProductId);
-    }
+	public static Expression<Func<Cart, (Guid, int)>> GetKeySelector() => x =>
+		ValueTuple.Create(x.UserId, x.ProductId);
 
-    public static Expression<Func<Cart, bool>> GetEqualityExpression((Guid, int) key)
-    {
-        return x => x.UserId == key.Item1 && x.ProductId == key.Item2;
-    }
+	public static Expression<Func<Cart, bool>> GetEqualityExpression((Guid, int) key) => x =>
+		x.UserId == key.Item1 && x.ProductId == key.Item2;
 
-    public static Cart Create(
-        Guid userId,
-        int productId,
-        int count)
-    {
-        return new Cart(
-            userId,
-            productId,
-            count);
-    }
+	public static Cart Create(
+		Guid userId,
+		int productId,
+		int count)
+	{
+		return new Cart(
+			userId,
+			productId,
+			count);
+	}
 
-    public void SetCount(int count)
-    {
-        count.EnsureGreaterThan(0, "position.count.must.be.greater.than.zero");
-        Count = count;
-    }
+	public void SetCount(int count)
+	{
+		count.EnsureGreaterThan(0, "position.count.must.be.greater.than.zero");
+		Count = count;
+	}
 
-    public override (Guid, int) GetId() { return (UserId, ProductId); }
+	public override (Guid, int) GetId() => (UserId, ProductId);
 }

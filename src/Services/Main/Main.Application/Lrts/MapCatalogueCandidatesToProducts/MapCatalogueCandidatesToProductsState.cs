@@ -5,15 +5,15 @@ namespace Main.Application.Lrts.MapCatalogueCandidatesToProducts;
 
 public sealed record MapCatalogueCandidatesToProductsState : NoneInputState
 {
-    [JsonPropertyName("lastProcessedId")]
-    public Guid LastProcessedId { get; init; }
+	[JsonPropertyName("lastProcessedId")]
+	public Guid LastProcessedId { get; init; }
 
-    [JsonPropertyName("processedRows")]
-    public long ProcessedRows { get; init; }
+	[JsonPropertyName("processedRows")]
+	public long ProcessedRows { get; init; }
 
-    [JsonPropertyName("mappedRows")]
-    public long MappedRows { get; init; }
+	[JsonPropertyName("mappedRows")]
+	public long MappedRows { get; init; }
 
-    [JsonPropertyName("skippedRows")]
-    public long SkippedRows { get; init; }
+	[JsonPropertyName("skippedRows")]
+	public long SkippedRows { get; init; }
 }

@@ -14,20 +14,21 @@ public record GetProductSizeQuery(int ProductId) : IQuery<GetProductSizesResult>
 public record GetProductSizesResult(ProductSizeDto ProductSize);
 
 public class GetProductSizeHandler(
-    IReadRepository<ProductSize, int> context,
-    IProjectionProvider<ProductSize, ProductSizeDto> projection)
-    : IQueryHandler<GetProductSizeQuery, GetProductSizesResult>
+	IReadRepository<ProductSize, int> context,
+	IProjectionProvider<ProductSize, ProductSizeDto> projection)
+	: IQueryHandler<GetProductSizeQuery, GetProductSizesResult>
 {
-    public async Task<GetProductSizesResult> Handle(
-        GetProductSizeQuery request,
-        CancellationToken cancellationToken)
-    {
-        var size = await context.Query
-                       .Where(x => x.ProductId == request.ProductId)
-                       .Project(projection)
-                       .FirstOrDefaultAsync(cancellationToken)
-                   ?? throw new ProductSizesNotFoundException(request.ProductId);
+	public async Task<GetProductSizesResult> Handle(
+		GetProductSizeQuery request,
+		CancellationToken cancellationToken)
+	{
+		var size = await context
+				.Query
+				.Where(x => x.ProductId == request.ProductId)
+				.Project(projection)
+				.FirstOrDefaultAsync(cancellationToken) ??
+			throw new ProductSizesNotFoundException(request.ProductId);
 
-        return new GetProductSizesResult(size);
-    }
+		return new GetProductSizesResult(size);
+	}
 }

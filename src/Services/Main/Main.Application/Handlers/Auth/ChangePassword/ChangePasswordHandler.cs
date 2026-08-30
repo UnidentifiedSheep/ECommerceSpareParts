@@ -9,27 +9,21 @@ namespace Main.Application.Handlers.Auth.ChangePassword;
 
 [AutoSave]
 [Transactional]
-public record ChangePasswordCommand(
-    Guid UserId,
-    string PreviousPassword,
-    string NewPassword
-) : ICommand;
+public record ChangePasswordCommand(Guid UserId, string PreviousPassword, string NewPassword) : ICommand;
 
-public class ChangePasswordHandler(
-    IUserRepository userRepository,
-    IPasswordManager passwordManager
-) : ICommandHandler<ChangePasswordCommand>
+public class ChangePasswordHandler(IUserRepository userRepository, IPasswordManager passwordManager)
+	: ICommandHandler<ChangePasswordCommand>
 {
-    public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
-    {
-        var user = await userRepository.GetById(request.UserId, cancellationToken)
-                   ?? throw new UserNotFoundException(request.UserId);
+	public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
+	{
+		var user = await userRepository.GetById(request.UserId, cancellationToken) ??
+			throw new UserNotFoundException(request.UserId);
 
-        if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.PreviousPassword))
-            throw new WrongCredentialsException(null, request.PreviousPassword);
+		if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.PreviousPassword))
+			throw new WrongCredentialsException(null, request.PreviousPassword);
 
-        user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
+		user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
 
-        return Unit.Value;
-    }
+		return Unit.Value;
+	}
 }

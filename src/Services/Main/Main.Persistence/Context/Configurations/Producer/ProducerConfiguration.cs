@@ -5,38 +5,30 @@ namespace Main.Persistence.Context.Configurations.Producer;
 
 public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.Producer>
 {
-    public void Configure(EntityTypeBuilder<Entities.Producer.Producer> builder)
-    {
-        builder.ToTable("producer", "public");
+	public void Configure(EntityTypeBuilder<Entities.Producer.Producer> builder)
+	{
+		builder.ToTable("producer", "public");
 
-        builder.HasKey(e => e.Id)
-            .HasName("producer_id");
+		builder.HasKey(e => e.Id).HasName("producer_id");
 
-        builder.Property(e => e.Id)
-            .HasColumnName("id");
+		builder.Property(e => e.Id).HasColumnName("id");
 
-        builder.Property(e => e.Description)
-            .HasColumnName("description")
-            .HasMaxLength(500);
+		builder.Property(e => e.Description).HasColumnName("description").HasMaxLength(500);
 
-        builder.Property(e => e.ImagePath)
-            .HasMaxLength(255)
-            .HasColumnName("image_path");
+		builder.Property(e => e.ImagePath).HasMaxLength(255).HasColumnName("image_path");
 
-        builder.Property(x => x.Name)
-            .HasMaxLength(64)
-            .HasColumnName("name");
+		builder.Property(x => x.Name).HasMaxLength(64).HasColumnName("name");
 
-        builder.HasIndex(e => e.Name)
-            .HasDatabaseName("producer_name_uindex")
-            .IsUnique();
+		builder.HasIndex(e => e.Name).HasDatabaseName("producer_name_uindex").IsUnique();
 
-        builder.Navigation(e => e.Aliases)
-            .HasField("_aliases")
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-        
-        builder.Navigation(e => e.SupplierMappings)
-            .HasField("_supplierMappings")
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-    }
+		builder
+			.Navigation(e => e.Aliases)
+			.HasField("_aliases")
+			.UsePropertyAccessMode(PropertyAccessMode.Field);
+
+		builder
+			.Navigation(e => e.SupplierMappings)
+			.HasField("_supplierMappings")
+			.UsePropertyAccessMode(PropertyAccessMode.Field);
+	}
 }

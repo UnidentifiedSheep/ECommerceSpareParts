@@ -12,46 +12,44 @@ namespace Integrations.Supplier.DI;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddFavoriteIntegration<TConnectionProvider, TSettingsProvider>(
-        this IServiceCollection services)
-        where TConnectionProvider : class, IConnectionProvider<FavoritConnection>
-        where TSettingsProvider : class, ISupplierSettingsProvider<FavoriteSettings>
-    {
-        services.AddSupplierBase();
+	public static IServiceCollection AddFavoriteIntegration<TConnectionProvider, TSettingsProvider>(
+		this IServiceCollection services)
+		where TConnectionProvider : class, IConnectionProvider<FavoritConnection>
+		where TSettingsProvider : class, ISupplierSettingsProvider<FavoriteSettings>
+	{
+		services.AddSupplierBase();
 
-        services.AddScoped<IConnectionProvider<FavoritConnection>, TConnectionProvider>();
-        services.AddScoped<ISupplierSettingsProvider<FavoriteSettings>, TSettingsProvider>();
+		services.AddScoped<IConnectionProvider<FavoritConnection>, TConnectionProvider>();
+		services.AddScoped<ISupplierSettingsProvider<FavoriteSettings>, TSettingsProvider>();
 
-        services.AddHttpClient<IFavoritPartsClient, FavoritPartsClient>()
-            .AddDefaultResilenceHandler();
+		services.AddHttpClient<IFavoritPartsClient, FavoritPartsClient>().AddDefaultResilenceHandler();
 
-        services.AddScoped<ISupplier, FavoritPartsSupplier>();
+		services.AddScoped<ISupplier, FavoritPartsSupplier>();
 
-        return services;
-    }
-    
-    public static IServiceCollection AddTmtrIntegration<TConnectionProvider, TSettingsProvider>(
-        this IServiceCollection services)
-        where TConnectionProvider : class, IConnectionProvider<TmtrConnection>
-        where TSettingsProvider : class, ISupplierSettingsProvider<TmtrSettings>
-    {
-        services.AddSupplierBase();
+		return services;
+	}
 
-        services.AddScoped<IConnectionProvider<TmtrConnection>, TConnectionProvider>();
-        services.AddScoped<ISupplierSettingsProvider<TmtrSettings>, TSettingsProvider>();
+	public static IServiceCollection
+		AddTmtrIntegration<TConnectionProvider, TSettingsProvider>(this IServiceCollection services)
+		where TConnectionProvider : class, IConnectionProvider<TmtrConnection>
+		where TSettingsProvider : class, ISupplierSettingsProvider<TmtrSettings>
+	{
+		services.AddSupplierBase();
 
-        services.AddHttpClient<ITmtrClient, TmtrClient>()
-            .AddDefaultResilenceHandler();
+		services.AddScoped<IConnectionProvider<TmtrConnection>, TConnectionProvider>();
+		services.AddScoped<ISupplierSettingsProvider<TmtrSettings>, TSettingsProvider>();
 
-        services.AddScoped<ISupplier, TmtrSupplier>();
+		services.AddHttpClient<ITmtrClient, TmtrClient>().AddDefaultResilenceHandler();
 
-        return services;
-    }
+		services.AddScoped<ISupplier, TmtrSupplier>();
 
-    public static IServiceCollection AddSupplierBase(this IServiceCollection services)
-    {
-        services.TryAddSingleton<ProjectJsonOptions>();
-        services.TryAddScoped<ISupplierFactory, SupplierFactory>();
-        return services;
-    }
+		return services;
+	}
+
+	public static IServiceCollection AddSupplierBase(this IServiceCollection services)
+	{
+		services.TryAddSingleton<ProjectJsonOptions>();
+		services.TryAddScoped<ISupplierFactory, SupplierFactory>();
+		return services;
+	}
 }

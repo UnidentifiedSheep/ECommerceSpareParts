@@ -16,24 +16,22 @@ namespace Main.Persistence;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
-    {
-        collection.AddPersistenceBase<DContext>(
-            typeof(BasicEfRepository<,>),
-            typeof(ReadRepository<,>));
+	public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
+	{
+		collection.AddPersistenceBase<DContext>(typeof(BasicEfRepository<,>), typeof(ReadRepository<,>));
 
-        collection.AddScoped<IProductRepository, ProductRepository>();
-        collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();
-        collection.AddScoped<IProducerRepository, ProducerRepository>();
-        collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
-        collection.AddScoped<IStorageContentRepository, StorageContentRepository>();
-        collection.AddScoped<IProductReservationRepository, ProductReservationRepository>();
-        collection.AddScoped<IUserRepository, UserRepository>();
-        collection.AddScoped<ITransactionRepository, TransactionRepository>();
-        collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
-        collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
-        collection.AddScoped<ISaleRepository, SaleRepository>();
+		collection.AddScoped<IProductRepository, ProductRepository>();
+		collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();
+		collection.AddScoped<IProducerRepository, ProducerRepository>();
+		collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
+		collection.AddScoped<IStorageContentRepository, StorageContentRepository>();
+		collection.AddScoped<IProductReservationRepository, ProductReservationRepository>();
+		collection.AddScoped<IUserRepository, UserRepository>();
+		collection.AddScoped<ITransactionRepository, TransactionRepository>();
+		collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
+		collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
+		collection.AddScoped<ISaleRepository, SaleRepository>();
 
-        return collection;
-    }
+		return collection;
+	}
 }

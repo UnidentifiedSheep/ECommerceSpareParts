@@ -77,7 +77,7 @@
       - redis
       - rabbitmq
     restart: unless-stopped
-    
+  
   pricing-worker:
     image: pricing-worker
     build:

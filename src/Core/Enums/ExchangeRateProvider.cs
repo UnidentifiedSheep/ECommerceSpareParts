@@ -2,6 +2,7 @@
 
 public enum ExchangeRateProvider
 {
-    Cbr,
-    MoneyConvert
+	Cbr,
+
+	MoneyConvert
 }

@@ -14,48 +14,52 @@ namespace Internal.Integration.Di;
 
 public static class ServiceProviderExtensions
 {
-    private const string InternalTokenHeader = "X-Internal-Token";
+	private const string InternalTokenHeader = "X-Internal-Token";
 
-    public static IServiceCollection AddIntegrationClients(
-        this IServiceCollection services)
-    {
-        services.TryAddSingleton<ProjectJsonOptions>();
+	public static IServiceCollection AddIntegrationClients(this IServiceCollection services)
+	{
+		services.TryAddSingleton<ProjectJsonOptions>();
 
-        services.AddOptions<InternalServicesOptions>()
-            .BindConfiguration(InternalServicesOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+		services
+			.AddOptions<InternalServicesOptions>()
+			.BindConfiguration(InternalServicesOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        services.AddOptions<InternalServiceCredentials>()
-            .BindConfiguration(InternalServiceCredentials.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+		services
+			.AddOptions<InternalServiceCredentials>()
+			.BindConfiguration(InternalServiceCredentials.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
-        services.AddSingleton<IAuthTokenCache, AuthTokenCache>();
+		services.AddSingleton<IAuthTokenCache, AuthTokenCache>();
 
-        services.AddHttpClient<IAuthClient, CacheableAuthClient>((sp, client) =>
-            {
-                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-                client.BaseAddress = new Uri(options.Main.Url);
-                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-            })
-            .AddDefaultResilenceHandler();
+		services
+			.AddHttpClient<IAuthClient, CacheableAuthClient>((sp, client) =>
+			{
+				var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+				client.BaseAddress = new Uri(options.Main.Url);
+				client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+			})
+			.AddDefaultResilenceHandler();
 
-        services.AddHttpClient<IMainClient, RootClient>((sp, client) =>
-            {
-                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-                client.BaseAddress = new Uri(options.Main.Url);
-                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-            })
-            .AddDefaultResilenceHandler();
+		services
+			.AddHttpClient<IMainClient, RootClient>((sp, client) =>
+			{
+				var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+				client.BaseAddress = new Uri(options.Main.Url);
+				client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+			})
+			.AddDefaultResilenceHandler();
 
-        services.AddHttpClient<ICommonClient, Common.RootClient>((sp, client) =>
-            {
-                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-            })
-            .AddDefaultResilenceHandler();
+		services
+			.AddHttpClient<ICommonClient, Common.RootClient>((sp, client) =>
+			{
+				var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+				client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+			})
+			.AddDefaultResilenceHandler();
 
-        return services;
-    }
+		return services;
+	}
 }

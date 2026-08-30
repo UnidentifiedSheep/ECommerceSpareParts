@@ -14,104 +14,101 @@ namespace Api.Common.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static string AddServiceConfiguration(
-        this IHostApplicationBuilder builder,
-        string serviceName,
-        string configsPath = "/app/configs")
-    {
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
+	public static string AddServiceConfiguration(
+		this IHostApplicationBuilder builder,
+		string serviceName,
+		string configsPath = "/app/configs")
+	{
+		var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
-        builder.Configuration
-            .AddAppSettingsFromJsons(environment)
-            .AddAppSettingsFromJsons(environment, configsPath)
-            .AddConfigsFromJsons(
-                serviceName,
-                environment,
-                configsPath);
+		builder
+			.Configuration
+			.AddAppSettingsFromJsons(environment)
+			.AddAppSettingsFromJsons(environment, configsPath)
+			.AddConfigsFromJsons(
+				serviceName,
+				environment,
+				configsPath);
 
-        return environment;
-    }
+		return environment;
+	}
 
-    public static IServiceCollection AddCommonApiInfrastructure(
-        this IServiceCollection services,
-        IServiceDefinition serviceDefinition)
-    {
-        services.AddProjectJsonSerialization();
-        services.AddOpenApi();
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c => c.OperationFilter<PermissionsOperationFilter>());
-        services.ConfigureHttpJsonOptions(options =>
-        {
-            ProjectJsonOptions.Configure(options.SerializerOptions);
-        });
-        services.AddHttpContextAccessor();
-        services.AddBaseExceptionHandlers();
-        services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(policy =>
-            {
-                policy
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-            });
-        });
-        services.AddOpenTelemetry(
-            serviceDefinition,
-            serviceNameSuffix: "api",
-            includeAspNetCoreInstrumentation: true,
-            includePrometheusMetrics: true);
-        
-        services.AddTransient<HeaderSecretMiddleware>();
+	public static IServiceCollection AddCommonApiInfrastructure(
+		this IServiceCollection services,
+		IServiceDefinition serviceDefinition)
+	{
+		services.AddProjectJsonSerialization();
+		services.AddOpenApi();
+		services.AddEndpointsApiExplorer();
+		services.AddSwaggerGen(c => c.OperationFilter<PermissionsOperationFilter>());
+		services.ConfigureHttpJsonOptions(options =>
+		{
+			ProjectJsonOptions.Configure(options.SerializerOptions);
+		});
+		services.AddHttpContextAccessor();
+		services.AddConfiguredRequestLocalization();
+		services.AddBaseExceptionHandlers();
+		services.AddCors(options =>
+		{
+			options.AddDefaultPolicy(policy =>
+			{
+				policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+			});
+		});
+		services.AddOpenTelemetry(
+			serviceDefinition,
+			"api",
+			true,
+			true);
 
-        return services;
-    }
+		services.AddTransient<HeaderSecretMiddleware>();
 
-    public static IServiceCollection AddCommonWorkerInfrastructure(
-        this IServiceCollection services,
-        IServiceDefinition serviceDefinition)
-    {
-        services.AddProjectJsonSerialization();
-        services.AddOpenTelemetry(
-            serviceDefinition,
-            serviceNameSuffix: "worker");
+		return services;
+	}
 
-        return services;
-    }
+	public static IServiceCollection AddCommonWorkerInfrastructure(
+		this IServiceCollection services,
+		IServiceDefinition serviceDefinition)
+	{
+		services.AddProjectJsonSerialization();
+		services.AddOpenTelemetry(serviceDefinition, "worker");
 
-    private static IServiceCollection AddOpenTelemetry(
-        this IServiceCollection collection,
-        IServiceDefinition serviceDefinition,
-        string serviceNameSuffix,
-        bool includeAspNetCoreInstrumentation = false,
-        bool includePrometheusMetrics = false)
-    {
-        var openTelemetry = collection.AddOpenTelemetry()
-            .ConfigureResource(x =>
-                x.AddService($"{serviceDefinition.ServiceName}.{serviceNameSuffix}"))
-            .WithTracing(tracing =>
-            {
-                tracing
-                    .AddSource(CqrsDiagnostics.ActivitySourceName)
-                    .AddNpgsql()
-                    .AddHttpClientInstrumentation()
-                    .AddOtlpExporter();
+		return services;
+	}
 
-                if (includeAspNetCoreInstrumentation)
-                    tracing.AddAspNetCoreInstrumentation();
-            });
+	private static IServiceCollection AddOpenTelemetry(
+		this IServiceCollection collection,
+		IServiceDefinition serviceDefinition,
+		string serviceNameSuffix,
+		bool includeAspNetCoreInstrumentation = false,
+		bool includePrometheusMetrics = false)
+	{
+		var openTelemetry = collection
+			.AddOpenTelemetry()
+			.ConfigureResource(x => x.AddService($"{serviceDefinition.ServiceName}.{serviceNameSuffix}"))
+			.WithTracing(tracing =>
+			{
+				tracing
+					.AddSource(CqrsDiagnostics.ActivitySourceName)
+					.AddNpgsql()
+					.AddHttpClientInstrumentation()
+					.AddOtlpExporter();
 
-        if (includePrometheusMetrics)
-            openTelemetry.WithMetrics(metrics =>
-            {
-                metrics
-                    .AddAspNetCoreInstrumentation()
-                    .AddProcessInstrumentation()
-                    .AddRuntimeInstrumentation()
-                    .AddPrometheusExporter();
-                metrics.AddMeter(CqrsMetrics.MeterName);
-            });
+				if (includeAspNetCoreInstrumentation)
+					tracing.AddAspNetCoreInstrumentation();
+			});
 
-        return collection;
-    }
+		if (includePrometheusMetrics)
+			openTelemetry.WithMetrics(metrics =>
+			{
+				metrics
+					.AddAspNetCoreInstrumentation()
+					.AddProcessInstrumentation()
+					.AddRuntimeInstrumentation()
+					.AddPrometheusExporter();
+				metrics.AddMeter(CqrsMetrics.MeterName);
+			});
+
+		return collection;
+	}
 }

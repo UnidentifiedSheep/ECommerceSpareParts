@@ -9,25 +9,25 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Main;
 
 internal sealed class PurchaseNode(
-    HttpClient httpClient,
-    IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
-    ProjectJsonOptions jsonOptions
-)
-    : InternalClientBase(authClient, optionsMonitor, jsonOptions), IPurchaseNode
+	HttpClient httpClient,
+	IAuthClient authClient,
+	IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+	ProjectJsonOptions jsonOptions) : InternalClientBase(
+		authClient,
+		optionsMonitor,
+		jsonOptions),
+	IPurchaseNode
 {
-    public async Task<Response<InternalFullPurchase>> GetFullPurchase(
-        Guid purchaseId,
-        CancellationToken cancellationToken = default)
-    {
-        using var request = await GetRequest(
-            HttpMethod.Get,
-            $"/internal/purchases/{purchaseId}",
-            cancellationToken);
-        using var response = await httpClient.SendAsync(
-            request,
-            cancellationToken);
+	public async Task<Response<InternalFullPurchase>> GetFullPurchase(
+		Guid purchaseId,
+		CancellationToken cancellationToken = default)
+	{
+		using var request = await GetRequest(
+			HttpMethod.Get,
+			$"/internal/purchases/{purchaseId}",
+			cancellationToken);
+		using var response = await httpClient.SendAsync(request, cancellationToken);
 
-        return await ReadResponse<InternalFullPurchase>(response, cancellationToken);
-    }
+		return await ReadResponse<InternalFullPurchase>(response, cancellationToken);
+	}
 }

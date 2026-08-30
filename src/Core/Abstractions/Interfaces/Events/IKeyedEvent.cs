@@ -2,5 +2,5 @@
 
 public interface IKeyedEvent
 {
-    string GetKey();
+	string GetKey();
 }

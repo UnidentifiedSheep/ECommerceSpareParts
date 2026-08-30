@@ -5,55 +5,52 @@ using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
 
-public sealed class CatalogueCandidateBuilder(Faker faker)
-    : BuilderBase<CatalogueCandidate>(faker)
+public sealed class CatalogueCandidateBuilder(Faker faker) : BuilderBase<CatalogueCandidate>(faker)
 {
-    private readonly HashSet<int> _producerIds = [];
+	private readonly HashSet<int> _producerIds = [];
 
-    public string? Sku { get; private set; }
-    public int? ProductId { get; private set; }
-    public IReadOnlySet<int> ProducerIds => _producerIds;
+	public string? Sku { get; private set; }
 
-    public CatalogueCandidateBuilder WithSku(string sku)
-    {
-        Sku = sku;
-        return this;
-    }
+	public int? ProductId { get; private set; }
 
-    public CatalogueCandidateBuilder WithProducerId(int producerId)
-    {
-        _producerIds.Add(producerId);
-        return this;
-    }
+	public IReadOnlySet<int> ProducerIds => _producerIds;
 
-    public CatalogueCandidateBuilder WithProducerIds(
-        IEnumerable<int> producerIds)
-    {
-        _producerIds.UnionWith(producerIds);
-        return this;
-    }
+	public CatalogueCandidateBuilder WithSku(string sku)
+	{
+		Sku = sku;
+		return this;
+	}
 
-    public CatalogueCandidateBuilder WithProducers(
-        IEnumerable<Producer> producers)
-    {
-        return WithProducerIds(producers.Select(x => x.Id));
-    }
+	public CatalogueCandidateBuilder WithProducerId(int producerId)
+	{
+		_producerIds.Add(producerId);
+		return this;
+	}
 
-    public CatalogueCandidateBuilder WithProductId(int productId)
-    {
-        ProductId = productId;
-        return this;
-    }
+	public CatalogueCandidateBuilder WithProducerIds(IEnumerable<int> producerIds)
+	{
+		_producerIds.UnionWith(producerIds);
+		return this;
+	}
 
-    public override CatalogueCandidate Build()
-    {
-        var candidate = CatalogueCandidate.Create(
-            Sku ?? Faker.Random.AlphaNumeric(12),
-            Faker.PickRandom<int>(_producerIds));
+	public CatalogueCandidateBuilder WithProducers(IEnumerable<Producer> producers) =>
+		WithProducerIds(producers.Select(x => x.Id));
 
-        if (ProductId.HasValue)
-            candidate.MapToProduct(ProductId.Value);
+	public CatalogueCandidateBuilder WithProductId(int productId)
+	{
+		ProductId = productId;
+		return this;
+	}
 
-        return candidate;
-    }
+	public override CatalogueCandidate Build()
+	{
+		var candidate = CatalogueCandidate.Create(
+			Sku ?? Faker.Random.AlphaNumeric(12),
+			Faker.PickRandom<int>(_producerIds));
+
+		if (ProductId.HasValue)
+			candidate.MapToProduct(ProductId.Value);
+
+		return candidate;
+	}
 }

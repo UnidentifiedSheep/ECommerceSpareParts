@@ -6,134 +6,74 @@ using Search.Persistence.Abstractions;
 
 namespace Search.Persistence.IndexInitializers;
 
-public class ProductIndexInitializer(
-    IOpenSearchClient client,
-    IOptions<OpenSearchOptions> options
-) : IndexInitializerBase<Product>(client, TimeSpan.FromHours(3))
+public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSearchOptions> options)
+	: IndexInitializerBase<Product>(client, TimeSpan.FromHours(3))
 {
-    public override async Task LazyInitialize(
-        CancellationToken cancellationToken = default)
-    {
-        var idx = options.Value.IndexOptions.Products;
+	public override async Task LazyInitialize(CancellationToken cancellationToken = default)
+	{
+		var idx = options.Value.IndexOptions.Products;
 
-        await InitializeIfMissing(
-            idx,
-            ct => Client.Indices.CreateAsync(
-                idx,
-                c => c
-                    .Settings(s => s
-                        .Setting("index.max_ngram_diff", 18)
-                        .Analysis(a => a
-                            .ConfigureCatalogueSearch()))
-                    .Map<Product>(m => m
-                        .Properties(p => p
-                            .Keyword(k => k
-                                .Name(x => x.Id)
-                            )
-                            .Text(t => t
-                                .Name(x => x.Name)
-                                .Analyzer(CatalogueSearchAnalysis.SearchAnalyzer)
-                                .Fields(f => f
-                                    .Keyword(k => k
-                                        .Name("keyword")
-                                        .IgnoreAbove(256)
-                                        .Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer)
-                                    )
-                                    .Text(prefix => prefix
-                                        .Name("prefix")
-                                        .Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
-                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
-                                    .Text(contains => contains
-                                        .Name("contains")
-                                        .Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
-                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
-                                )
-                            )
-                            .Keyword(k => k
-                                .Name(x => x.Sku)
-                                .Normalizer("lowercase_normalizer")
-                            )
-                            .Keyword(k => k
-                                .Name(x => x.NormalizedSku)
-                                .Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer)
-                                .Fields(fields => fields
-                                    .Text(prefix => prefix
-                                        .Name("prefix")
-                                        .Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
-                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
-                                    .Text(contains => contains
-                                        .Name("contains")
-                                        .Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
-                                        .SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer)))
-                            )
-                            .Number(n => n
-                                .Name(x => x.ProducerId)
-                                .Type(NumberType.Integer)
-                            )
-                            .Text(t => t
-                                .Name(x => x.Indicator)
-                                .Index(false)
-                            )
-                            .Number(n => n
-                                .Name(x => x.Stock)
-                                .Type(NumberType.Integer))
-                            .Object<ProductDimensions>(o => o
-                                .Name(x => x.Dimensions)
-                                .Properties(dp => dp
-                                    .Number(n => n
-                                        .Name(d => d.Length)
-                                        .Type(NumberType.Double)
-                                    )
-                                    .Number(n => n
-                                        .Name(d => d.LengthM)
-                                        .Type(NumberType.Double)
-                                    )
-                                    .Number(n => n
-                                        .Name(d => d.Width)
-                                        .Type(NumberType.Double)
-                                    )
-                                    .Number(n => n
-                                        .Name(d => d.WidthM)
-                                        .Type(NumberType.Double)
-                                    )
-                                    .Number(n => n
-                                        .Name(d => d.Height)
-                                        .Type(NumberType.Double)
-                                    )
-                                    .Number(n => n
-                                        .Name(d => d.HeightM)
-                                        .Type(NumberType.Double)
-                                    )
-                                    .Number(n => n
-                                        .Name(d => d.Unit)
-                                        .Type(NumberType.Integer)
-                                    )
-                                    .Number(n => n
-                                        .Name(d => d.VolumeM3)
-                                        .Type(NumberType.Double)
-                                    )
-                                )
-                            )
-                            .Object<ProductWeight>(o => o
-                                .Name(x => x.Weight)
-                                .Properties(wp => wp
-                                    .Number(n => n
-                                        .Name(w => w.Value)
-                                        .Type(NumberType.Double)
-                                    )
-                                    .Number(n => n
-                                        .Name(w => w.Unit)
-                                        .Type(NumberType.Integer)
-                                    )
-                                    .Number(n => n
-                                        .Name(w => w.WeightKg)
-                                        .Type(NumberType.Double)
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                ct),
-            cancellationToken);
-    }
+		await InitializeIfMissing(
+			idx,
+			ct => Client.Indices.CreateAsync(
+				idx,
+				c => c
+					.Settings(s => s
+						.Setting("index.max_ngram_diff", 18)
+						.Analysis(a => a.ConfigureCatalogueSearch()))
+					.Map<Product>(m => m.Properties(p =>
+						p
+							.Keyword(k => k.Name(x => x.Id))
+							.Text(t => t
+								.Name(x => x.Name)
+								.Analyzer(CatalogueSearchAnalysis.SearchAnalyzer)
+								.Fields(f => f
+									.Keyword(k => k
+										.Name("keyword")
+										.IgnoreAbove(256)
+										.Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer))
+									.Text(prefix => prefix
+										.Name("prefix")
+										.Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
+										.SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
+									.Text(contains => contains
+										.Name("contains")
+										.Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
+										.SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))))
+							.Keyword(k => k.Name(x => x.Sku).Normalizer("lowercase_normalizer"))
+							.Keyword(k => k
+								.Name(x => x.NormalizedSku)
+								.Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer)
+								.Fields(fields => fields
+									.Text(prefix => prefix
+										.Name("prefix")
+										.Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
+										.SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
+									.Text(contains => contains
+										.Name("contains")
+										.Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
+										.SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))))
+							.Number(n => n.Name(x => x.ProducerId).Type(NumberType.Integer))
+							.Text(t => t.Name(x => x.Indicator).Index(false))
+							.Number(n => n.Name(x => x.Stock).Type(NumberType.Integer))
+							.Object<ProductDimensions>(o => o
+								.Name(x => x.Dimensions)
+								.Properties(dp => dp
+									.Number(n => n.Name(d => d.Length).Type(NumberType.Double))
+									.Number(n => n.Name(d => d.LengthM).Type(NumberType.Double))
+									.Number(n => n.Name(d => d.Width).Type(NumberType.Double))
+									.Number(n => n.Name(d => d.WidthM).Type(NumberType.Double))
+									.Number(n => n.Name(d => d.Height).Type(NumberType.Double))
+									.Number(n => n.Name(d => d.HeightM).Type(NumberType.Double))
+									.Number(n => n.Name(d => d.Unit).Type(NumberType.Integer))
+									.Number(n => n.Name(d => d.VolumeM3).Type(NumberType.Double))))
+							.Object<ProductWeight>(o => o
+								.Name(x => x.Weight)
+								.Properties(wp => wp
+									.Number(n => n.Name(w => w.Value).Type(NumberType.Double))
+									.Number(n => n.Name(w => w.Unit).Type(NumberType.Integer))
+									.Number(n => n.Name(w => w.WeightKg).Type(NumberType.Double)))))),
+				ct),
+			cancellationToken);
+	}
 }

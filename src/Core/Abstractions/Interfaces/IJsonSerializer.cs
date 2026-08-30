@@ -2,9 +2,11 @@
 
 public interface IJsonSerializer
 {
-    string Serialize<TValue>(TValue value);
-    string Serialize(object value);
+	string Serialize<TValue>(TValue value);
 
-    TValue? Deserialize<TValue>(string value);
-    object? Deserialize(string value, Type type);
+	string Serialize(object value);
+
+	TValue? Deserialize<TValue>(string value);
+
+	object? Deserialize(string value, Type type);
 }

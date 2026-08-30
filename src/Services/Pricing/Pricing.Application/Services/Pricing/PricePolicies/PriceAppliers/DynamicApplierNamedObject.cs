@@ -7,50 +7,55 @@ namespace Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 
 public class DynamicApplierNamedObject : ApplierNamedObjectBase
 {
-    public override string NameLocalizationKey => "";
-    public override string DescriptionLocalizationKey => "";
-    public override string SystemName { get; }
-    public override int Order { get; }
-    
-    private readonly JsonNode _dslRule;
-    
-    public DynamicApplierNamedObject(
-        string systemName,
-        int order,
-        string dslLogic)
-    {
-        SystemName = systemName;
-        Order = order;
-        _dslRule = JsonNode.Parse(dslLogic) 
-                   ?? throw new InvalidOperationException("DSL logic is not valid JSON");
-    }
 
-    public override ValueTask<PriceCalculationState> ApplyAsync(
-        PriceCalculationState state, 
-        CancellationToken ct = default)
-    {
-        ct.ThrowIfCancellationRequested();
+	private readonly JsonNode _dslRule;
 
-        var data = JsonSerializer.SerializeToNode(state)
-                   ?? throw new InvalidOperationException("Failed to serialize price calculation state");
-        var result = JsonLogic.Apply(_dslRule, data);
-        var appliedPrice = result?.Deserialize<decimal>()
-                           ?? throw new InvalidOperationException("DSL logic must return a price");
+	public DynamicApplierNamedObject(
+		string systemName,
+		int order,
+		string dslLogic)
+	{
+		SystemName = systemName;
+		Order = order;
+		_dslRule = JsonNode.Parse(dslLogic) ??
+			throw new InvalidOperationException("DSL logic is not valid JSON");
+	}
 
-        if (appliedPrice < 0)
-            throw new InvalidOperationException("DSL logic must return a non-negative price");
+	public override string NameLocalizationKey => "";
 
-        return ValueTask.FromResult(state with
-        {
-            SalePrice = appliedPrice,
-            AppliedRules =
-            [
-                ..state.AppliedRules,
-                new AppliedPriceRule(
-                    Name: SystemName,
-                    PriceBefore: state.SalePrice,
-                    PriceAfter: appliedPrice)
-            ]
-        });
-    }
+	public override string DescriptionLocalizationKey => "";
+
+	public override string SystemName { get; }
+
+	public override int Order { get; }
+
+	public override ValueTask<PriceCalculationState> ApplyAsync(
+		PriceCalculationState state,
+		CancellationToken ct = default)
+	{
+		ct.ThrowIfCancellationRequested();
+
+		var data = JsonSerializer.SerializeToNode(state) ??
+			throw new InvalidOperationException("Failed to serialize price calculation state");
+		var result = JsonLogic.Apply(_dslRule, data);
+		var appliedPrice = result?.Deserialize<decimal>() ??
+			throw new InvalidOperationException("DSL logic must return a price");
+
+		if (appliedPrice < 0)
+			throw new InvalidOperationException("DSL logic must return a non-negative price");
+
+		return ValueTask.FromResult(
+			state with
+			{
+				SalePrice = appliedPrice,
+				AppliedRules =
+				[
+					.. state.AppliedRules,
+					new AppliedPriceRule(
+						SystemName,
+						state.SalePrice,
+						appliedPrice)
+				]
+			});
+	}
 }

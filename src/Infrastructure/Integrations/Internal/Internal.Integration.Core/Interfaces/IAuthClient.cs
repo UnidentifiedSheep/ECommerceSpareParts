@@ -2,8 +2,8 @@
 
 public interface IAuthClient
 {
-    Task<string> GetAuthToken(
-        string service,
-        string serviceSecret,
-        CancellationToken cancellationToken = default);
+	Task<string> GetAuthToken(
+		string service,
+		string serviceSecret,
+		CancellationToken cancellationToken = default);
 }

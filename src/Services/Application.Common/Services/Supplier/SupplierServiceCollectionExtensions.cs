@@ -6,12 +6,11 @@ namespace Application.Common.Services.Supplier;
 
 public static class SupplierServiceCollectionExtensions
 {
-    public static IServiceCollection AddMainSupplierSettingProviders(
-        this IServiceCollection services)
-    {
-        services.AddScoped<FavoriteMainSettingProvider>();
-        services.AddScoped<TmtrMainSettingProvider>();
+	public static IServiceCollection AddMainSupplierSettingProviders(this IServiceCollection services)
+	{
+		services.AddScoped<FavoriteMainSettingProvider>();
+		services.AddScoped<TmtrMainSettingProvider>();
 
-        return services;
-    }
+		return services;
+	}
 }

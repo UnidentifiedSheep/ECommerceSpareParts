@@ -8,15 +8,11 @@ public record GetAllCurrenciesQuery : IQuery<GetAllCurrenciesResult>;
 
 public record GetAllCurrenciesResult(IReadOnlyList<CurrencyDto> Currencies);
 
-public class GetAllCurrenciesHandler(
-    ICurrencyCacheRepository cacheRepository
-)
-    : IQueryHandler<GetAllCurrenciesQuery, GetAllCurrenciesResult>
+public class GetAllCurrenciesHandler(ICurrencyCacheRepository cacheRepository)
+	: IQueryHandler<GetAllCurrenciesQuery, GetAllCurrenciesResult>
 {
-    public async Task<GetAllCurrenciesResult> Handle(
-        GetAllCurrenciesQuery request,
-        CancellationToken cancellationToken)
-    {
-        return new GetAllCurrenciesResult(await cacheRepository.GetAllCurrencies(cancellationToken));
-    }
+	public async Task<GetAllCurrenciesResult> Handle(
+		GetAllCurrenciesQuery request,
+		CancellationToken cancellationToken) =>
+		new(await cacheRepository.GetAllCurrencies(cancellationToken));
 }

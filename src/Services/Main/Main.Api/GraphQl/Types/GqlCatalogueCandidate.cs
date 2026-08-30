@@ -8,29 +8,24 @@ namespace Main.Api.GraphQl.Types;
 
 [GraphQLName("CatalogueCandidate")]
 public record GqlCatalogueCandidate(
-    [property: GraphQLIgnore]
-    CatalogueCandidateReviewDto CatalogueCandidateDto)
+	[property: GraphQLIgnore]
+	CatalogueCandidateReviewDto CatalogueCandidateDto)
 {
-    [GraphQLName("id")]
-    [Shareable]
-    public Guid Id => CatalogueCandidateDto.Id;
+	[GraphQLName("id")]
+	[Shareable]
+	public Guid Id => CatalogueCandidateDto.Id;
 
-    [GraphQLName("producer")]
-    public GqlProducer Producer => new(CatalogueCandidateDto.Producer);
+	[GraphQLName("producer")]
+	public GqlProducer Producer => new(CatalogueCandidateDto.Producer);
 
-    [GraphQLName("product")]
-    public GqlProduct? Product => CatalogueCandidateDto.Product == null 
-        ? null
-        : new GqlProduct(CatalogueCandidateDto.Product);
+	[GraphQLName("product")]
+	public GqlProduct? Product =>
+		CatalogueCandidateDto.Product == null ? null : new GqlProduct(CatalogueCandidateDto.Product);
 
-    [GraphQLName("sku")]
-    public string Sku => CatalogueCandidateDto.Sku;
-    
-    [GraphQLName("supplierProducts")]
-    public IReadOnlyList<GqlSupplierProduct> SupplierProducts
-        => CatalogueCandidateDto
-            .SupplierProducts
-            .Select(z => new GqlSupplierProduct(z))
-            .ToList();
+	[GraphQLName("sku")]
+	public string Sku => CatalogueCandidateDto.Sku;
 
+	[GraphQLName("supplierProducts")]
+	public IReadOnlyList<GqlSupplierProduct> SupplierProducts =>
+		CatalogueCandidateDto.SupplierProducts.Select(z => new GqlSupplierProduct(z)).ToList();
 }

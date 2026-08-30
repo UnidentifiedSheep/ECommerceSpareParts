@@ -2,7 +2,9 @@
 
 public interface IEmailData
 {
-    string TemplateName { get; }
-    string Subject { get; }
-    string To { get; }
+	string TemplateName { get; }
+
+	string Subject { get; }
+
+	string To { get; }
 }

@@ -5,5 +5,5 @@ namespace Main.Application.Interfaces.Persistence;
 
 public interface ISaleRepository : IRepository<Sale, Guid>
 {
-    public Task<Sale?> GetFullSaleForUpdate(Guid id, CancellationToken cancellationToken = default);
+	Task<Sale?> GetFullSaleForUpdate(Guid id, CancellationToken cancellationToken = default);
 }

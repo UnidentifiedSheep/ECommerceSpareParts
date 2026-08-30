@@ -9,23 +9,23 @@ namespace Gateway.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        services.AddFusionCache()
-            .WithRegisteredDistributedCache()
-            .WithRegisteredBackplane()
-            .WithSystemTextJsonSerializer();
+	public static IServiceCollection AddApplicationLayer(
+		this IServiceCollection services,
+		IConfiguration configuration)
+	{
+		services
+			.AddFusionCache()
+			.WithRegisteredDistributedCache()
+			.WithRegisteredBackplane()
+			.WithSystemTextJsonSerializer();
 
-        services
-            .AddApplicationBase(
-                ServicesDefinitions.Gateway,
-                configuration,
-                typeof(ServiceProvider).Assembly,
-                typeof(ApplicationTransactionBehavior<,>),
-                typeof(DbValidationBehavior<,>));
+		services.AddApplicationBase(
+			ServicesDefinitions.Gateway,
+			configuration,
+			typeof(ServiceProvider).Assembly,
+			typeof(ApplicationTransactionBehavior<,>),
+			typeof(DbValidationBehavior<,>));
 
-        return services;
-    }
+		return services;
+	}
 }

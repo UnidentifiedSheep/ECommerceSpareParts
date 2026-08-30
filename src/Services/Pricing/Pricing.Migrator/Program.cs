@@ -10,27 +10,28 @@ using Persistence.Interfaces;
 using Pricing.Migrator.Seeds;
 using Pricing.Persistence.Contexts;
 
-var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) =>
-        config.AddMigratorSettingsFromJsons("pricing.settings")
-            .AddMigratorSettingsFromJsons("pricing.settings", "/app/configs"));
+var builder = Host
+	.CreateDefaultBuilder(args)
+	.ConfigureAppConfiguration((_, config) =>
+		config
+			.AddMigratorSettingsFromJsons("pricing.settings")
+			.AddMigratorSettingsFromJsons("pricing.settings", "/app/configs"));
 
 builder.ConfigureServices((_, services) =>
 {
-    services.AddDatabaseOptions();
+	services.AddDatabaseOptions();
 
-    services.AddDbContext<DContext>((sp, options) =>
-    {
-        var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
-        options.UseNpgsql(connectionString, x => x.MigrationsAssembly("Pricing.Migrator"));
-    });
+	services.AddDbContext<DContext>((sp, options) =>
+	{
+		var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
+		options.UseNpgsql(connectionString, x => x.MigrationsAssembly("Pricing.Migrator"));
+	});
 });
 
 builder.ConfigureServices((_, services) =>
 {
-    services.AddScoped<ISeed<DContext>, MarkupGroupSeed>();
+	services.AddScoped<ISeed<DContext>, MarkupGroupSeed>();
 });
-
 
 var host = builder.Build();
 

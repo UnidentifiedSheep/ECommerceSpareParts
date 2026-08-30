@@ -2,7 +2,9 @@
 
 public enum EmailStatus
 {
-    Pending,
-    Sent,
-    Cancelled
+	Pending,
+
+	Sent,
+
+	Cancelled
 }

@@ -8,21 +8,14 @@ namespace Main.Application.Handlers.ProducerAliases.AddAlias;
 
 [AutoSave]
 [Transactional]
-public record AddAliasCommand(
-    int ProducerId,
-    string Alias
-) : ICommand<Unit>;
+public record AddAliasCommand(int ProducerId, string Alias) : ICommand<Unit>;
 
-public class AddAliasHandler(
-    IUnitOfWork unitOfWork 
-    ) : ICommandHandler<AddAliasCommand>
+public class AddAliasHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddAliasCommand>
 {
-    public async Task<Unit> Handle(AddAliasCommand request, CancellationToken cancellationToken)
-    {
-        var model = ProducerAlias.Create(
-            request.ProducerId,
-            request.Alias);
-        await unitOfWork.AddAsync(model, cancellationToken);
-        return Unit.Value;
-    }
+	public async Task<Unit> Handle(AddAliasCommand request, CancellationToken cancellationToken)
+	{
+		var model = ProducerAlias.Create(request.ProducerId, request.Alias);
+		await unitOfWork.AddAsync(model, cancellationToken);
+		return Unit.Value;
+	}
 }

@@ -5,13 +5,10 @@ namespace Search.Api.GraphQl;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddGraphQlServices(
-        this IServiceCollection services,
-        string name)
-    {
-        services.AddCommonGraphQl(name)
-            .AddQueryType<Query>();
-        
-        return services;
-    }
+	public static IServiceCollection AddGraphQlServices(this IServiceCollection services, string name)
+	{
+		services.AddCommonGraphQl(name).AddQueryType<Query>();
+
+		return services;
+	}
 }

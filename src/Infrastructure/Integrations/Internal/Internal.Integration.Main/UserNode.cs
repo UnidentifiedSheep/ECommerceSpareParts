@@ -9,34 +9,34 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Main;
 
 internal sealed class UserNode(
-    HttpClient httpClient,
-    IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
-    ProjectJsonOptions jsonOptions
-)
-    : InternalClientBase(authClient, optionsMonitor, jsonOptions), IUserNode
+	HttpClient httpClient,
+	IAuthClient authClient,
+	IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
+	ProjectJsonOptions jsonOptions) : InternalClientBase(
+		authClient,
+		optionsMonitor,
+		jsonOptions),
+	IUserNode
 {
-    public async Task<Response<decimal>> GetUserDiscount(
-        Guid userId,
-        CancellationToken cancellationToken = default)
-    {
-        using var request = await GetRequest(
-            HttpMethod.Get,
-            $"/users/{userId}/discount",
-            cancellationToken);
-        using var response = await httpClient.SendAsync(
-            request,
-            cancellationToken);
+	public async Task<Response<decimal>> GetUserDiscount(
+		Guid userId,
+		CancellationToken cancellationToken = default)
+	{
+		using var request = await GetRequest(
+			HttpMethod.Get,
+			$"/users/{userId}/discount",
+			cancellationToken);
+		using var response = await httpClient.SendAsync(request, cancellationToken);
 
-        return await ReadResponse<GetUserDiscountResponse, decimal>(
-            response,
-            x => x.Discount,
-            cancellationToken);
-    }
+		return await ReadResponse<GetUserDiscountResponse, decimal>(
+			response,
+			x => x.Discount,
+			cancellationToken);
+	}
 
-    private record GetUserDiscountResponse
-    {
-        [JsonPropertyName("discount")]
-        public decimal Discount { get; init; }
-    }
+	private record GetUserDiscountResponse
+	{
+		[JsonPropertyName("discount")]
+		public decimal Discount { get; init; }
+	}
 }

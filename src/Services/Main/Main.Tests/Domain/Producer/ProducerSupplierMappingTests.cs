@@ -6,14 +6,14 @@ namespace Tests.Domain.Producer;
 
 public sealed class ProducerSupplierMappingTests
 {
-    [Fact]
-    public void Create_TrimsSupplierProducerName()
-    {
-        var mapping = ProducerSupplierMapping.Create(
-            1,
-            "  Bosch  ",
-            Supplier.Armtek);
+	[Fact]
+	public void Create_TrimsSupplierProducerName()
+	{
+		var mapping = ProducerSupplierMapping.Create(
+			1,
+			"  Bosch  ",
+			Supplier.Armtek);
 
-        mapping.SupplierProducerName.Should().Be("Bosch");
-    }
+		mapping.SupplierProducerName.Should().Be("Bosch");
+	}
 }

@@ -8,22 +8,25 @@ using Main.Entities.DomainEvents.Product;
 namespace Main.Application.DomainEventHandlers.Product;
 
 public class ProductImageUpdatedHandler(
-    IIntegrationEventScope integrationEventScope,
-    IProductCacheInvalidator productCacheInvalidator
-    ) : BatchableDomainEventHandler<ProductImageUpdatedDomainEvent>
+	IIntegrationEventScope integrationEventScope,
+	IProductCacheInvalidator productCacheInvalidator)
+	: BatchableDomainEventHandler<ProductImageUpdatedDomainEvent>
 {
-    public override async Task Handle(Batch<ProductImageUpdatedDomainEvent> notification, CancellationToken cancellationToken)
-    {
-        var ids = new List<int>(notification.Items.Count);
-        foreach (var @event in notification.Items)
-        {
-            integrationEventScope.Add(new ProductUpdatedEvent
-            {
-                Id = @event.ProductId
-            });
-            ids.Add(@event.ProductId);
-        }
-        
-        await productCacheInvalidator.InvalidateProductsAsync(ids);
-    }
+	public override async Task Handle(
+		Batch<ProductImageUpdatedDomainEvent> notification,
+		CancellationToken cancellationToken)
+	{
+		var ids = new List<int>(notification.Items.Count);
+		foreach (var @event in notification.Items)
+		{
+			integrationEventScope.Add(
+				new ProductUpdatedEvent
+				{
+					Id = @event.ProductId
+				});
+			ids.Add(@event.ProductId);
+		}
+
+		await productCacheInvalidator.InvalidateProductsAsync(ids);
+	}
 }

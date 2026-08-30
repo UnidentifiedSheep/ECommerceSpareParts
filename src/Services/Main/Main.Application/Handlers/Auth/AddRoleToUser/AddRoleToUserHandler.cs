@@ -10,14 +10,12 @@ namespace Main.Application.Handlers.Auth.AddRoleToUser;
 [AutoSave]
 public record AddRoleToUserCommand(Guid UserId, string RoleName) : ICommand;
 
-public class AddRoleToUserHandler(
-    IUnitOfWork unitOfWork
-) : ICommandHandler<AddRoleToUserCommand>
+public class AddRoleToUserHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddRoleToUserCommand>
 {
-    public async Task<Unit> Handle(AddRoleToUserCommand request, CancellationToken cancellationToken)
-    {
-        var userRole = UserRole.Create(request.UserId, request.RoleName);
-        await unitOfWork.AddAsync(userRole, cancellationToken);
-        return Unit.Value;
-    }
+	public async Task<Unit> Handle(AddRoleToUserCommand request, CancellationToken cancellationToken)
+	{
+		var userRole = UserRole.Create(request.UserId, request.RoleName);
+		await unitOfWork.AddAsync(userRole, cancellationToken);
+		return Unit.Value;
+	}
 }

@@ -6,12 +6,14 @@ namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 
 public class AddStorageRouteDbValidation : AbstractDbValidation<AddStorageRouteCommand>
 {
-    public override void Build(IValidationPlan plan, AddStorageRouteCommand request)
-    {
-        plan.ValidateStorageExistsCode(request.StorageTo)
-            .ValidateStorageExistsCode(request.StorageFrom)
-            .ValidateCurrencyExistsId(request.CurrencyId);
+	public override void Build(IValidationPlan plan, AddStorageRouteCommand request)
+	{
+		plan
+			.ValidateStorageExistsCode(request.StorageTo)
+			.ValidateStorageExistsCode(request.StorageFrom)
+			.ValidateCurrencyExistsId(request.CurrencyId);
 
-        if (request.CarrierId != null) plan.ValidateUserExistsId(request.CarrierId.Value);
-    }
+		if (request.CarrierId != null)
+			plan.ValidateUserExistsId(request.CarrierId.Value);
+	}
 }

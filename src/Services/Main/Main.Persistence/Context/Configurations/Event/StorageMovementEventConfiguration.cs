@@ -6,8 +6,6 @@ namespace Main.Persistence.Context.Configurations.Event;
 
 public class StorageMovementEventConfiguration : IEntityTypeConfiguration<StorageMovementEvent>
 {
-    public void Configure(EntityTypeBuilder<StorageMovementEvent> builder)
-    {
-        builder.Metadata.SetDiscriminatorValue("StorageMovementEvent");
-    }
+	public void Configure(EntityTypeBuilder<StorageMovementEvent> builder) =>
+		builder.Metadata.SetDiscriminatorValue("StorageMovementEvent");
 }

@@ -4,17 +4,17 @@ namespace Main.Worker;
 
 public class HostedServiceOptions
 {
-    public const string SectionName = "HostedServiceOptions";
+	public const string SectionName = "HostedServiceOptions";
 
-    [Required]
-    public required EmailWorkOptions EmailWork { get; set; }
+	[Required]
+	public required EmailWorkOptions EmailWork { get; set; }
 }
 
 public class EmailWorkOptions
 {
-    [Required]
-    public required TimeSpan Delay { get; set; }
+	[Required]
+	public required TimeSpan Delay { get; set; }
 
-    [Range(1, int.MaxValue)]
-    public required int ScheduleAtOnce { get; set; } = 100;
+	[Range(1, int.MaxValue)]
+	public required int ScheduleAtOnce { get; set; } = 100;
 }

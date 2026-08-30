@@ -6,26 +6,17 @@ using Persistence.Interfaces;
 namespace Persistence.Repository;
 
 public abstract class BasicEfRepositoryBase<TContext, TEntity, TKey>(
-    TContext context,
-    IQueryableExtensions extensions
-)
-    : EfRepository<TEntity, TKey, TContext>(context, extensions)
-    where TEntity : Entity<TEntity, TKey>
-    where TKey : notnull
-    where TContext : DbContext
+	TContext context,
+	IQueryableExtensions extensions) : EfRepository<TEntity, TKey, TContext>(context, extensions)
+	where TEntity : Entity<TEntity, TKey> where TKey : notnull where TContext : DbContext
 {
-    public override Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
-        IEnumerable<TKey> ids,
-        Criteria<TEntity>? criteria = null,
-        CancellationToken ct = default)
-    {
-        throw new InvalidOperationException("Find by ids is not implemented in BasicEfRepository.");
-    }
+	public override Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
+		IEnumerable<TKey> ids,
+		Criteria<TEntity>? criteria = null,
+		CancellationToken ct = default) =>
+		throw new InvalidOperationException("Find by ids is not implemented in BasicEfRepository.");
 
-    public override Task DeleteManyAsync(
-        IEnumerable<TKey> ids, 
-        CancellationToken cancellationToken = default)
-    {
-        throw new InvalidOperationException("DeleteMany is not implemented in BasicEfRepository.");
-    }
+	public override Task
+		DeleteManyAsync(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) =>
+		throw new InvalidOperationException("DeleteMany is not implemented in BasicEfRepository.");
 }

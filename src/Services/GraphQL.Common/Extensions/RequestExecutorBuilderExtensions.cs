@@ -11,41 +11,38 @@ namespace GraphQL.Common.Extensions;
 
 public static class RequestExecutorBuilderExtensions
 {
-    public static IRequestExecutorBuilder AddCommonAuthorization(
-        this IRequestExecutorBuilder builder)
-    {
-        builder.AddAuthorization(options =>
-        {
-            options.AddPolicy(
-                RequireAnyPermissionAttribute.PolicyName,
-                policy => policy.AddRequirements(
-                    new GraphQlFieldAuthorizationRequirement(
-                        GraphQlAuthorizationTarget.Permission,
-                        AuthorizationMatch.Any)));
-            options.AddPolicy(
-                RequireAllPermissionsAttribute.PolicyName,
-                policy => policy.AddRequirements(
-                    new GraphQlFieldAuthorizationRequirement(
-                        GraphQlAuthorizationTarget.Permission,
-                        AuthorizationMatch.All)));
-            options.AddPolicy(
-                RequireAnyRoleAttribute.PolicyName,
-                policy => policy.AddRequirements(
-                    new GraphQlFieldAuthorizationRequirement(
-                        GraphQlAuthorizationTarget.Role,
-                        AuthorizationMatch.Any)));
-            options.AddPolicy(
-                RequireAllRolesAttribute.PolicyName,
-                policy => policy.AddRequirements(
-                    new GraphQlFieldAuthorizationRequirement(
-                        GraphQlAuthorizationTarget.Role,
-                        AuthorizationMatch.All)));
-        });
-        builder.Services.TryAddEnumerable(
-            ServiceDescriptor.Scoped<
-                IAuthorizationHandler,
-                GraphQlFieldAuthorizationHandler>());
+	public static IRequestExecutorBuilder AddCommonAuthorization(this IRequestExecutorBuilder builder)
+	{
+		builder.AddAuthorization(options =>
+		{
+			options.AddPolicy(
+				RequireAnyPermissionAttribute.PolicyName,
+				policy => policy.AddRequirements(
+					new GraphQlFieldAuthorizationRequirement(
+						GraphQlAuthorizationTarget.Permission,
+						AuthorizationMatch.Any)));
+			options.AddPolicy(
+				RequireAllPermissionsAttribute.PolicyName,
+				policy => policy.AddRequirements(
+					new GraphQlFieldAuthorizationRequirement(
+						GraphQlAuthorizationTarget.Permission,
+						AuthorizationMatch.All)));
+			options.AddPolicy(
+				RequireAnyRoleAttribute.PolicyName,
+				policy => policy.AddRequirements(
+					new GraphQlFieldAuthorizationRequirement(
+						GraphQlAuthorizationTarget.Role,
+						AuthorizationMatch.Any)));
+			options.AddPolicy(
+				RequireAllRolesAttribute.PolicyName,
+				policy => policy.AddRequirements(
+					new GraphQlFieldAuthorizationRequirement(
+						GraphQlAuthorizationTarget.Role,
+						AuthorizationMatch.All)));
+		});
+		builder.Services.TryAddEnumerable(
+			ServiceDescriptor.Scoped<IAuthorizationHandler, GraphQlFieldAuthorizationHandler>());
 
-        return builder;
-    }
+		return builder;
+	}
 }

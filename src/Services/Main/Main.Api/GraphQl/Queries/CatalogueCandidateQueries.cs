@@ -7,14 +7,14 @@ namespace Main.Api.GraphQl.Queries;
 
 public sealed class CatalogueCandidateQueries
 {
-    [GraphQLName("byId")]
-    [Lookup]
-    public async Task<GqlCatalogueCandidate?> GetCandidateByIdAsync(
-        ICatalogueCandidateByIdDataLoader loader,
-        Guid id,
-        CancellationToken ct)
-    {
-        var candidate = await loader.LoadAsync(id, ct);
-        return candidate is null ? null : new GqlCatalogueCandidate(candidate);
-    }
+	[GraphQLName("byId")]
+	[Lookup]
+	public async Task<GqlCatalogueCandidate?> GetCandidateByIdAsync(
+		ICatalogueCandidateByIdDataLoader loader,
+		Guid id,
+		CancellationToken ct)
+	{
+		var candidate = await loader.LoadAsync(id, ct);
+		return candidate is null ? null : new GqlCatalogueCandidate(candidate);
+	}
 }

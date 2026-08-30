@@ -7,37 +7,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Products;
 
-public record GetSupplierProductReferencesQuery(
-    IEnumerable<int> ProductIds,
-    Supplier Supplier
-    ) : IQuery<GetSupplierProductReferencesResult>;
+public record GetSupplierProductReferencesQuery(IEnumerable<int> ProductIds, Supplier Supplier)
+	: IQuery<GetSupplierProductReferencesResult>;
 
-public record GetSupplierProductReferencesResult(
-    IReadOnlyList<ResolvedSupplierProductReferenceDto> Products);
+public record GetSupplierProductReferencesResult(IReadOnlyList<ResolvedSupplierProductReferenceDto> Products);
 
-public class GetSupplierProductReferencesHandler(
-    IReadRepository<Product, int> repository
-    ) : IQueryHandler<GetSupplierProductReferencesQuery, GetSupplierProductReferencesResult>
+public class GetSupplierProductReferencesHandler(IReadRepository<Product, int> repository)
+	: IQueryHandler<GetSupplierProductReferencesQuery, GetSupplierProductReferencesResult>
 {
-    public async Task<GetSupplierProductReferencesResult> Handle(GetSupplierProductReferencesQuery request, CancellationToken cancellationToken)
-    {
-        var ids = request.ProductIds.Distinct().ToList();
-        if (ids.Count == 0) return new GetSupplierProductReferencesResult([]);
+	public async Task<GetSupplierProductReferencesResult> Handle(
+		GetSupplierProductReferencesQuery request,
+		CancellationToken cancellationToken)
+	{
+		var ids = request.ProductIds.Distinct().ToList();
+		if (ids.Count == 0)
+			return new GetSupplierProductReferencesResult([]);
 
-        var result = await repository.Query
-            .Where(p => ids.Contains(p.Id))
-            .SelectMany(
-                p => p.Producer.SupplierMappings
-                    .Where(m => m.Supplier == request.Supplier)
-                    .Take(1),
-                (p, m) => new ResolvedSupplierProductReferenceDto
-                {
-                    ProductId = p.Id,
-                    Sku = p.Sku.NormalizedValue,
-                    SupplierProducerName = m.SupplierProducerName
-                })
-            .ToListAsync(cancellationToken);
-        
-        return new GetSupplierProductReferencesResult(result);
-    }
+		var result = await repository
+			.Query
+			.Where(p => ids.Contains(p.Id))
+			.SelectMany(
+				p => p.Producer.SupplierMappings.Where(m => m.Supplier == request.Supplier).Take(1),
+				(p, m) => new ResolvedSupplierProductReferenceDto
+				{
+					ProductId = p.Id,
+					Sku = p.Sku.NormalizedValue,
+					SupplierProducerName = m.SupplierProducerName
+				})
+			.ToListAsync(cancellationToken);
+
+		return new GetSupplierProductReferencesResult(result);
+	}
 }

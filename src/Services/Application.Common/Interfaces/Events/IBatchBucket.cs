@@ -4,7 +4,9 @@ namespace Application.Common.Interfaces.Events;
 
 public interface IBatchBucket
 {
-    void Add(IBatchableDomainEvent item);
-    int Count { get; }
-    IDomainEvent BuildNotification();
+	int Count { get; }
+
+	void Add(IBatchableDomainEvent item);
+
+	IDomainEvent BuildNotification();
 }

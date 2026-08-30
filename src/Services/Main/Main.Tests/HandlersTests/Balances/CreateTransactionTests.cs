@@ -3,13 +3,12 @@ using Extensions;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Static;
-using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
-using Tests.TestContainers.Combined;
 using Tests.Stubs;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 
@@ -17,217 +16,243 @@ namespace Tests.HandlersTests.Balances;
 
 public class CreateTransactionTests : IntegrationTest
 {
-    public CreateTransactionTests(CombinedContainerFixture fixture) : base(fixture)
-    {
-        RegisterBasicContext<UsersTestContext>();
-        RegisterBasicContext<UserContextTestContext>();
-        RegisterBasicContext<CurrencyTestContext>();
-    }
+	public CreateTransactionTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<UsersTestContext>();
+		RegisterBasicContext<UserContextTestContext>();
+		RegisterBasicContext<CurrencyTestContext>();
+	}
 
-    private UsersTestContext UsersContext => GetContext<UsersTestContext>();
-    private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
+	private UsersTestContext UsersContext => GetContext<UsersTestContext>();
 
-    [Fact]
-    public async Task CreateTransaction_ValidData_Succeeds()
-    {
-        var sender = UsersContext.Users.ElementAt(0);
-        var receiver = UsersContext.Users.ElementAt(1);
-        var currency = CurrencyContext.Currencies[0];
-        var amount = 125.50m;
-        var transactionDateTime = DateTime.UtcNow;
+	private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
 
-        await AllowDebit(receiver.Id, amount);
+	[Fact]
+	public async Task CreateTransaction_ValidData_Succeeds()
+	{
+		var sender = UsersContext.Users.ElementAt(0);
+		var receiver = UsersContext.Users.ElementAt(1);
+		var currency = CurrencyContext.Currencies[0];
+		var amount = 125.50m;
+		var transactionDateTime = DateTime.UtcNow;
 
-        var result = await Mediator.Send(
-            new CreateTransactionCommand(
-                sender.Id,
-                receiver.Id,
-                amount,
-                currency.Id,
-                transactionDateTime,
-                TransactionSourceType.Manual));
+		await AllowDebit(receiver.Id, amount);
 
-        var transaction = await Context.Transactions
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
+		var result = await Mediator.Send(
+			new CreateTransactionCommand(
+				sender.Id,
+				receiver.Id,
+				amount,
+				currency.Id,
+				transactionDateTime,
+				TransactionSourceType.Manual));
 
-        transaction.Should().NotBeNull();
-        transaction.SenderId.Should().Be(sender.Id);
-        transaction.ReceiverId.Should().Be(receiver.Id);
-        transaction.CurrencyId.Should().Be(currency.Id);
-        transaction.Amount.Should().Be(amount);
-        transaction.IsCompleted.Should().BeTrue();
-        transaction.IsCompletionApplied.Should().BeTrue();
+		var transaction = await Context
+			.Transactions
+			.AsNoTracking()
+			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
 
-        var senderBalance = await Context.UserBalances
-            .AsNoTracking()
-            .FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
-        var receiverBalance = await Context.UserBalances
-            .AsNoTracking()
-            .FirstAsync(x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
+		transaction.Should().NotBeNull();
+		transaction.SenderId.Should().Be(sender.Id);
+		transaction.ReceiverId.Should().Be(receiver.Id);
+		transaction.CurrencyId.Should().Be(currency.Id);
+		transaction.Amount.Should().Be(amount);
+		transaction.IsCompleted.Should().BeTrue();
+		transaction.IsCompletionApplied.Should().BeTrue();
 
-        senderBalance.Balance.Should().Be(amount);
-        receiverBalance.Balance.Should().Be(-amount);
-    }
+		var senderBalance = await Context
+			.UserBalances
+			.AsNoTracking()
+			.FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
+		var receiverBalance = await Context
+			.UserBalances
+			.AsNoTracking()
+			.FirstAsync(x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public async Task CreateTransaction_InvalidAmount_ThrowsValidationException(decimal amount)
-    {
-        var command = GetValidCommand();
+		senderBalance.Balance.Should().Be(amount);
+		receiverBalance.Balance.Should().Be(-amount);
+	}
 
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with { Amount = amount }));
-    }
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task CreateTransaction_InvalidAmount_ThrowsValidationException(decimal amount)
+	{
+		var command = GetValidCommand();
 
-    [Fact]
-    public async Task CreateTransaction_TooOldDate_ThrowsValidationException()
-    {
-        var command = GetValidCommand();
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			command with
+			{
+				Amount = amount
+			}));
+	}
 
-        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(command with { TransactionDateTime = DateTime.UtcNow.AddDays(-31) }));
+	[Fact]
+	public async Task CreateTransaction_TooOldDate_ThrowsValidationException()
+	{
+		var command = GetValidCommand();
 
-        exception.Errors.Should().ContainSingle()
-            .Which.ErrorCode.Should().Be("operation.date.too.old");
-    }
+		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			command with
+			{
+				TransactionDateTime = DateTime.UtcNow.AddDays(-31)
+			}));
 
-    [Fact]
-    public async Task CreateTransaction_FutureDate_ThrowsValidationException()
-    {
-        var command = GetValidCommand();
+		exception.Errors.Should().ContainSingle().Which.ErrorCode.Should().Be("operation.date.too.old");
+	}
 
-        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(command with { TransactionDateTime = DateTime.UtcNow.AddMinutes(6) }));
+	[Fact]
+	public async Task CreateTransaction_FutureDate_ThrowsValidationException()
+	{
+		var command = GetValidCommand();
 
-        exception.Errors.Should().ContainSingle()
-            .Which.ErrorCode.Should().Be("operation.date.cannot.be.in.future");
-    }
+		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			command with
+			{
+				TransactionDateTime = DateTime.UtcNow.AddMinutes(6)
+			}));
 
-    [Fact]
-    public async Task CreateTransaction_DateWithinBackdatePeriod_Succeeds()
-    {
-        var command = GetValidCommand() with
-        {
-            TransactionDateTime = DateTime.UtcNow.AddDays(-29),
-            ForcePayment = true
-        };
+		exception
+			.Errors
+			.Should()
+			.ContainSingle()
+			.Which
+			.ErrorCode
+			.Should()
+			.Be("operation.date.cannot.be.in.future");
+	}
 
-        var result = await Mediator.Send(command);
+	[Fact]
+	public async Task CreateTransaction_DateWithinBackdatePeriod_Succeeds()
+	{
+		var command = GetValidCommand() with
+		{
+			TransactionDateTime = DateTime.UtcNow.AddDays(-29), ForcePayment = true
+		};
 
-        result.Transaction.TransactionDatetime.Should().BeCloseTo(
-            command.TransactionDateTime,
-            TimeSpan.FromMilliseconds(1));
-    }
+		var result = await Mediator.Send(command);
 
-    [Fact]
-    public async Task CreateTransaction_OldDateWithHistoricalRecordsPermission_Succeeds()
-    {
-        var userContext = (UserContextMock)GetContext<UserContextTestContext>().UserContext;
-        userContext.SetPermissions(
-        [
-            nameof(PermissionCodes.CREATE_HISTORICAL_RECORDS).ToNormalizedPermission()
-        ]);
-        var command = GetValidCommand() with
-        {
-            TransactionDateTime = DateTime.UtcNow.AddDays(-31),
-            ForcePayment = true
-        };
+		result
+			.Transaction
+			.TransactionDatetime
+			.Should()
+			.BeCloseTo(command.TransactionDateTime, TimeSpan.FromMilliseconds(1));
+	}
 
-        var result = await Mediator.Send(command);
+	[Fact]
+	public async Task CreateTransaction_OldDateWithHistoricalRecordsPermission_Succeeds()
+	{
+		var userContext = (UserContextMock)GetContext<UserContextTestContext>().UserContext;
+		userContext.SetPermissions(
+			[nameof(PermissionCodes.CREATE_HISTORICAL_RECORDS).ToNormalizedPermission()]);
+		var command = GetValidCommand() with
+		{
+			TransactionDateTime = DateTime.UtcNow.AddDays(-31), ForcePayment = true
+		};
 
-        result.Transaction.TransactionDatetime.Should().BeCloseTo(
-            command.TransactionDateTime,
-            TimeSpan.FromMilliseconds(1));
-    }
+		var result = await Mediator.Send(command);
 
-    [Fact]
-    public async Task CreateTransaction_MissingOrganization_ThrowsDbValidationException()
-    {
-        var command = GetValidCommand();
+		result
+			.Transaction
+			.TransactionDatetime
+			.Should()
+			.BeCloseTo(command.TransactionDateTime, TimeSpan.FromMilliseconds(1));
+	}
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
-            Mediator.Send(command with { SenderId = Guid.NewGuid() }));
+	[Fact]
+	public async Task CreateTransaction_MissingOrganization_ThrowsDbValidationException()
+	{
+		var command = GetValidCommand();
 
-        exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.OrganizationsNotFound);
-    }
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
+			command with
+			{
+				SenderId = Guid.NewGuid()
+			}));
 
-    [Fact]
-    public async Task CreateTransaction_MissingCurrency_ThrowsDbValidationException()
-    {
-        var command = GetValidCommand();
+		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.OrganizationsNotFound);
+	}
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
-            Mediator.Send(command with { CurrencyId = int.MaxValue }));
+	[Fact]
+	public async Task CreateTransaction_MissingCurrency_ThrowsDbValidationException()
+	{
+		var command = GetValidCommand();
 
-        exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
-    }
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
+			command with
+			{
+				CurrencyId = int.MaxValue
+			}));
 
-    [Fact]
-    public async Task
-        CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemOrganizationCannotBeCreatedByUserException()
-    {
-        var command = GetValidCommand() with
-        {
-            SenderId = GetContext<UserContextTestContext>().SystemUser.Id
-        };
+		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
+	}
 
-        await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
-            Mediator.Send(command));
-    }
+	[Fact]
+	public async Task
+		CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemOrganizationCannotBeCreatedByUserException()
+	{
+		var command = GetValidCommand() with
+		{
+			SenderId = GetContext<UserContextTestContext>().SystemUser.Id
+		};
 
-    [Fact]
-    public async Task
-        CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemOrganizationCannotBeCreatedByUserException()
-    {
-        var command = GetValidCommand() with
-        {
-            ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id
-        };
+		await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
+			Mediator.Send(command));
+	}
 
-        await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
-            Mediator.Send(command));
-    }
+	[Fact]
+	public async Task
+		CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemOrganizationCannotBeCreatedByUserException()
+	{
+		var command = GetValidCommand() with
+		{
+			ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id
+		};
 
-    [Fact]
-    public async Task CreateTransaction_SystemModeAndSystemReceiver_Succeeds()
-    {
-        var command = GetValidCommand() with
-        {
-            ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id,
-            Mode = TransactionCreationMode.System
-        };
+		await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
+			Mediator.Send(command));
+	}
 
-        var result = await Mediator.Send(command);
+	[Fact]
+	public async Task CreateTransaction_SystemModeAndSystemReceiver_Succeeds()
+	{
+		var command = GetValidCommand() with
+		{
+			ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id,
+			Mode = TransactionCreationMode.System
+		};
 
-        var transaction = await Context.Transactions
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
+		var result = await Mediator.Send(command);
 
-        transaction.Should().NotBeNull();
-        transaction.ReceiverId.Should().Be(command.ReceiverId);
-    }
+		var transaction = await Context
+			.Transactions
+			.AsNoTracking()
+			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
 
-    private CreateTransactionCommand GetValidCommand()
-    {
-        var sender = UsersContext.Users.ElementAt(0);
-        var receiver = UsersContext.Users.ElementAt(1);
-        var currency = CurrencyContext.Currencies[0];
+		transaction.Should().NotBeNull();
+		transaction.ReceiverId.Should().Be(command.ReceiverId);
+	}
 
-        return new CreateTransactionCommand(
-            sender.Id,
-            receiver.Id,
-            100m,
-            currency.Id,
-            DateTime.UtcNow,
-            TransactionSourceType.Manual);
-    }
+	private CreateTransactionCommand GetValidCommand()
+	{
+		var sender = UsersContext.Users.ElementAt(0);
+		var receiver = UsersContext.Users.ElementAt(1);
+		var currency = CurrencyContext.Currencies[0];
 
-    private async Task AllowDebit(Guid userId, decimal amount)
-    {
-        var profile = OrganizationFinancialProfile.Create(userId, -amount);
+		return new CreateTransactionCommand(
+			sender.Id,
+			receiver.Id,
+			100m,
+			currency.Id,
+			DateTime.UtcNow,
+			TransactionSourceType.Manual);
+	}
 
-        await Context.AddAsync(profile);
-        await Context.SaveChangesAsync();
-    }
+	private async Task AllowDebit(Guid userId, decimal amount)
+	{
+		var profile = OrganizationFinancialProfile.Create(userId, -amount);
+
+		await Context.AddAsync(profile);
+		await Context.SaveChangesAsync();
+	}
 }

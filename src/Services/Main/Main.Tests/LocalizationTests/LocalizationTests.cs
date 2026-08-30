@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Api.Common.Extensions;
+﻿using System.Globalization;
+using System.Reflection;
 using Enums;
 using FluentAssertions;
 using Localization.Domain.Extensions;
@@ -13,79 +13,81 @@ namespace Tests.LocalizationTests;
 
 public class LocalizationTests : Tests.LocalizationTests
 {
-    [Theory]
-    [InlineData("ru")]
-    [InlineData("en")]
-    [InlineData("tr")]
-    public async Task All_LocalizableExceptions_Should_Have_Valid_Localization(string locale)
-    {
-        var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        var assembly = Assembly.GetAssembly(typeof(Product))!;
+	[Theory]
+	[InlineData("ru")]
+	[InlineData("en")]
+	[InlineData("tr")]
+	public async Task All_LocalizableExceptions_Should_Have_Valid_Localization(string locale)
+	{
+		var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+		var assembly = Assembly.GetAssembly(typeof(Product))!;
 
-        await TestLocalizableExceptions(
-            assembly,
-            localesPath,
-            locale);
-    }
+		await TestLocalizableExceptions(
+			assembly,
+			localesPath,
+			locale);
+	}
 
-    [Theory]
-    [InlineData("ru")]
-    [InlineData("en")]
-    [InlineData("tr")]
-    public async Task All_AbstractValidators_Should_Have_Valid_Localization(string locale)
-    {
-        var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        var assembly = Assembly.GetAssembly(typeof(Global))!;
+	[Theory]
+	[InlineData("ru")]
+	[InlineData("en")]
+	[InlineData("tr")]
+	public async Task All_AbstractValidators_Should_Have_Valid_Localization(string locale)
+	{
+		var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+		var assembly = Assembly.GetAssembly(typeof(Global))!;
 
-        await TestAbstractValidatorLocalization(
-            assembly,
-            localesPath,
-            locale);
-    }
+		await TestAbstractValidatorLocalization(
+			assembly,
+			localesPath,
+			locale);
+	}
 
-    [Theory]
-    [InlineData("ru")]
-    [InlineData("en")]
-    [InlineData("tr")]
-    public async Task All_DbValidators_Should_Have_Valid_Localization(string locale)
-    {
-        ValidationConfiguration.Configure();
-        var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        var constants = typeof(ValidationFunctions)
-            .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
-            .Where(f => f is { IsLiteral: true, IsInitOnly: false } && f.FieldType == typeof(string))
-            .Select(f => f.GetValue(null))
-            .Cast<string>()
-            .ToList();
+	[Theory]
+	[InlineData("ru")]
+	[InlineData("en")]
+	[InlineData("tr")]
+	public async Task All_DbValidators_Should_Have_Valid_Localization(string locale)
+	{
+		ValidationConfiguration.Configure();
+		var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+		var constants = typeof(ValidationFunctions)
+			.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+			.Where(f => f is { IsLiteral: true, IsInitOnly: false } && f.FieldType == typeof(string))
+			.Select(f => f.GetValue(null))
+			.Cast<string>()
+			.ToList();
 
-        await TestDbValidatorLocalization(
-            constants,
-            localesPath,
-            locale);
-    }
+		await TestDbValidatorLocalization(
+			constants,
+			localesPath,
+			locale);
+	}
 
-    [Theory]
-    [InlineData("ru")]
-    [InlineData("en")]
-    [InlineData("tr")]
-    public async Task All_Permissions_Have_Valid_Localization(string locale)
-    {
-        var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        using var scoped = await CreateLocalizer(localesPath, locale);
-        scoped.SetLocale(locale);
+	[Theory]
+	[InlineData("ru")]
+	[InlineData("en")]
+	[InlineData("tr")]
+	public async Task All_Permissions_Have_Valid_Localization(string locale)
+	{
+		var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+		var scoped = await CreateLocalizer(localesPath, locale);
+		CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = new CultureInfo(locale);
 
-        foreach (var permission in Enum.GetValues<PermissionCodes>())
-        {
-            var systemName = Permission.ToNormalizedPermission(permission);
-            var nameKey = Permission.GetLocalizationNameKey(permission);
-            var descriptionKey = Permission.GetLocalizationDescriptionKey(permission);
+		foreach (var permission in Enum.GetValues<PermissionCodes>())
+		{
+			var systemName = Permission.ToNormalizedPermission(permission);
+			var nameKey = Permission.GetLocalizationNameKey(permission);
+			var descriptionKey = Permission.GetLocalizationDescriptionKey(permission);
 
-            scoped.TryGet(nameKey, out _)
-                .Should()
-                .BeTrue($"Missing key '{nameKey}' for permission '{systemName}'");
-            scoped.TryGet(descriptionKey, out _)
-                .Should()
-                .BeTrue($"Missing key '{descriptionKey}' for permission '{systemName}'");
-        }
-    }
+			scoped
+				.TryGet(nameKey, out _)
+				.Should()
+				.BeTrue($"Missing key '{nameKey}' for permission '{systemName}'");
+			scoped
+				.TryGet(descriptionKey, out _)
+				.Should()
+				.BeTrue($"Missing key '{descriptionKey}' for permission '{systemName}'");
+		}
+	}
 }

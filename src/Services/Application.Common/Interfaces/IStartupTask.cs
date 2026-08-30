@@ -2,5 +2,5 @@ namespace Application.Common.Interfaces;
 
 public interface IStartupTask
 {
-    Task ExecuteAsync(CancellationToken ct);
+	Task ExecuteAsync(CancellationToken ct);
 }

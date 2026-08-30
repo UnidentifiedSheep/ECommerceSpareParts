@@ -7,24 +7,19 @@ using Pricing.Application.Lrts.InvalidateStalePriceOptions;
 namespace Pricing.Application.Models.Jobs;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class InvalidateStalePriceOptionsJobProvider
-    : IJobProvider<InvalidateStalePriceOptionsLrt, NoneInputState>
+public sealed class
+	InvalidateStalePriceOptionsJobProvider : IJobProvider<InvalidateStalePriceOptionsLrt, NoneInputState>
 {
-    public Job Create(
-        NoneInputState _,
-        int maxAttempts = 3)
-    {
-        var naturalKey = BuildNaturalKey();
+	public Job Create(NoneInputState _, int maxAttempts = 3)
+	{
+		var naturalKey = BuildNaturalKey();
 
-        return SingleRunJob.CreateUnique(
-            naturalKey,
-            InvalidateStalePriceOptionsLrt.LrtName,
-            NoneInputState.Json,
-            maxAttempts);
-    }
+		return SingleRunJob.CreateUnique(
+			naturalKey,
+			InvalidateStalePriceOptionsLrt.LrtName,
+			NoneInputState.Json,
+			maxAttempts);
+	}
 
-    private static string BuildNaturalKey()
-    {
-        return $"{InvalidateStalePriceOptionsLrt.LrtName}";
-    }
+	private static string BuildNaturalKey() => $"{InvalidateStalePriceOptionsLrt.LrtName}";
 }

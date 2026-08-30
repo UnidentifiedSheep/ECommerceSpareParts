@@ -3,88 +3,82 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
+using Enums;
 using Main.Entities.DomainEvents.CatalogueCandidate;
 using Main.Entities.Product.ValueObjects;
 
 namespace Main.Entities.Product.Enrichment;
 
-public class SupplierProduct :
-    AuditableEntity<SupplierProduct, int>,
-    ILinqEntity<SupplierProduct, int>
+public class SupplierProduct : AuditableEntity<SupplierProduct, int>, ILinqEntity<SupplierProduct, int>
 {
-    private SupplierProduct() { }
 
-    private SupplierProduct(
-        Sku sku,
-        string producer,
-        global::Enums.Supplier supplier)
-    {
-        Sku = sku;
-        Producer = producer
-            .TrimSafe()
-            .EnsureNotNullOrWhiteSpace(() =>
-                new InvalidOperationException(
-                    "Supplier product producer cannot be null or empty."));
+	private readonly List<SupplierProductName> _names = [];
 
-        Supplier = supplier;
-    }
+	private SupplierProduct()
+	{
+	}
 
-    public int Id { get; private set; }
+	private SupplierProduct(
+		Sku sku,
+		string producer,
+		Supplier supplier)
+	{
+		Sku = sku;
+		Producer = producer
+			.TrimSafe()
+			.EnsureNotNullOrWhiteSpace(() =>
+				new InvalidOperationException("Supplier product producer cannot be null or empty."));
 
-    public Sku Sku { get; private set; } = null!;
+		Supplier = supplier;
+	}
 
-    public string Producer { get; private set; } = null!;
+	public int Id { get; private set; }
 
-    public global::Enums.Supplier Supplier { get; private set; }
+	public Sku Sku { get; private set; } = null!;
 
-    public Guid? CatalogueCandidateId { get; private set; }
+	public string Producer { get; private set; } = null!;
 
-    public CatalogueCandidate? CatalogueCandidate { get; private set; }
+	public Supplier Supplier { get; private set; }
 
-    private readonly List<SupplierProductName> _names = [];
-    public IReadOnlyList<SupplierProductName> Names => _names;
+	public Guid? CatalogueCandidateId { get; private set; }
 
-    public static SupplierProduct Create(
-        Sku sku,
-        string producer,
-        global::Enums.Supplier supplier)
-    {
-        return new SupplierProduct(
-            sku,
-            producer,
-            supplier);
-    }
+	public CatalogueCandidate? CatalogueCandidate { get; private set; }
 
-    public void AddName(string name)
-    {
-        var normalizedName = name
-            .TrimSafe()
-            .EnsureNotNullOrWhiteSpace(() =>
-                new InvalidOperationException(
-                    "Supplier product name cannot be null or empty."));
+	public IReadOnlyList<SupplierProductName> Names => _names;
 
-        if (_names.Any(x =>
-                string.Equals(
-                    x.Name,
-                    normalizedName,
-                    StringComparison.OrdinalIgnoreCase)))
-            return;
+	public static Expression<Func<SupplierProduct, int>> GetKeySelector() => x => x.Id;
 
-        _names.Add(SupplierProductName.Create(Id, normalizedName));
+	public static Expression<Func<SupplierProduct, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 
-        if (CatalogueCandidateId.HasValue)
-            AddDomainEvent(
-                new CatalogueCandidateContentChangedDomainEvent(
-                    CatalogueCandidateId.Value));
-    }
+	public static SupplierProduct Create(
+		Sku sku,
+		string producer,
+		Supplier supplier)
+	{
+		return new SupplierProduct(
+			sku,
+			producer,
+			supplier);
+	}
 
-    public override int GetId() => Id;
+	public void AddName(string name)
+	{
+		var normalizedName = name
+			.TrimSafe()
+			.EnsureNotNullOrWhiteSpace(() =>
+				new InvalidOperationException("Supplier product name cannot be null or empty."));
 
-    public static Expression<Func<SupplierProduct, int>>
-        GetKeySelector()
-        => x => x.Id;
+		if (_names.Any(x => string.Equals(
+				x.Name,
+				normalizedName,
+				StringComparison.OrdinalIgnoreCase)))
+			return;
 
-    public static Expression<Func<SupplierProduct, bool>>
-        GetEqualityExpression(int key)
-        => x => x.Id == key;
+		_names.Add(SupplierProductName.Create(Id, normalizedName));
+
+		if (CatalogueCandidateId.HasValue)
+			AddDomainEvent(new CatalogueCandidateContentChangedDomainEvent(CatalogueCandidateId.Value));
+	}
+
+	public override int GetId() => Id;
 }

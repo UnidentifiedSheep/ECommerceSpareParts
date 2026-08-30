@@ -14,21 +14,22 @@ public record GetUserStoragesQuery(Guid UserId, Pagination Pagination) : IQuery<
 public record GetUserStoragesResult(List<StorageDto> Storages);
 
 public class GetUserStoragesHandler(
-    IReadRepository<StorageOwner, (string, Guid)> storageOwnersRepository,
-    IProjectionProvider<Storage, StorageDto> projection)
-    : IQueryHandler<GetUserStoragesQuery, GetUserStoragesResult>
+	IReadRepository<StorageOwner, (string, Guid)> storageOwnersRepository,
+	IProjectionProvider<Storage, StorageDto> projection)
+	: IQueryHandler<GetUserStoragesQuery, GetUserStoragesResult>
 {
-    public async Task<GetUserStoragesResult> Handle(
-        GetUserStoragesQuery request,
-        CancellationToken cancellationToken)
-    {
-        var storages = await storageOwnersRepository.Query
-            .Where(x => x.UserId == request.UserId)
-            .Select(x => x.Storage)
-            .Project(projection)
-            .ApplyPagination(request.Pagination)
-            .ToListAsync(cancellationToken);
+	public async Task<GetUserStoragesResult> Handle(
+		GetUserStoragesQuery request,
+		CancellationToken cancellationToken)
+	{
+		var storages = await storageOwnersRepository
+			.Query
+			.Where(x => x.UserId == request.UserId)
+			.Select(x => x.Storage)
+			.Project(projection)
+			.ApplyPagination(request.Pagination)
+			.ToListAsync(cancellationToken);
 
-        return new GetUserStoragesResult(storages);
-    }
+		return new GetUserStoragesResult(storages);
+	}
 }

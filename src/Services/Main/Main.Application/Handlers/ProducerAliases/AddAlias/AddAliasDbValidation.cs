@@ -7,9 +7,10 @@ namespace Main.Application.Handlers.ProducerAliases.AddAlias;
 
 public class AddAliasDbValidation : AbstractDbValidation<AddAliasCommand>
 {
-    public override void Build(IValidationPlan plan, AddAliasCommand request)
-    {
-        plan.ValidateProducerExistsId(request.ProducerId)
-            .ValidateProducerAliasNotExistsAlias(Producer.ToNormalizedName(request.Alias));
-    }
+	public override void Build(IValidationPlan plan, AddAliasCommand request)
+	{
+		plan
+			.ValidateProducerExistsId(request.ProducerId)
+			.ValidateProducerAliasNotExistsAlias(Producer.ToNormalizedName(request.Alias));
+	}
 }

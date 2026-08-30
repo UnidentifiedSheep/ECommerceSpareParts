@@ -8,76 +8,86 @@ namespace Tests.ServicesTests.Logistics;
 
 public class LogisticsCostServiceTests
 {
-    private readonly LogisticsCostService _service;
-    private readonly Mock<ILogisticsPricingStrategy> _strategyMock;
+	private readonly LogisticsCostService _service;
 
-    public LogisticsCostServiceTests()
-    {
-        _strategyMock = new Mock<ILogisticsPricingStrategy>();
-        _strategyMock.Setup(x => x.Type).Returns(LogisticPricingType.PerWeight);
+	private readonly Mock<ILogisticsPricingStrategy> _strategyMock;
 
-        _service = new LogisticsCostService([_strategyMock.Object]);
-    }
+	public LogisticsCostServiceTests()
+	{
+		_strategyMock = new Mock<ILogisticsPricingStrategy>();
+		_strategyMock.Setup(x => x.Type).Returns(LogisticPricingType.PerWeight);
 
-    [Fact]
-    public void Calculate_ShouldReturnStrategyResult_WhenNoMinimumPrice()
-    {
-        var context = new LogisticsContext(
-            0,
-            0,
-            0);
-        var strategyResult = new LogisticsCalcResult { TotalCost = 50m };
+		_service = new LogisticsCostService([_strategyMock.Object]);
+	}
 
-        _strategyMock.Setup(x => x.Calculate(context, new List<LogisticsItem>())).Returns(strategyResult);
+	[Fact]
+	public void Calculate_ShouldReturnStrategyResult_WhenNoMinimumPrice()
+	{
+		var context = new LogisticsContext(
+			0,
+			0,
+			0);
+		var strategyResult = new LogisticsCalcResult
+		{
+			TotalCost = 50m
+		};
 
-        var result = _service.Calculate(
-            LogisticPricingType.PerWeight,
-            context,
-            new List<LogisticsItem>());
+		_strategyMock.Setup(x => x.Calculate(context, new List<LogisticsItem>())).Returns(strategyResult);
 
-        Assert.Equal(50m, result.TotalCost);
-        Assert.False(result.MinimalPriceApplied);
-    }
+		var result = _service.Calculate(
+			LogisticPricingType.PerWeight,
+			context,
+			new List<LogisticsItem>());
 
-    [Fact]
-    public void Calculate_ShouldApplyMinimumPrice_WhenCostIsLower()
-    {
-        var context = new LogisticsContext(
-            0,
-            0,
-            0,
-            100m);
-        var strategyResult = new LogisticsCalcResult { TotalCost = 50m };
+		Assert.Equal(50m, result.TotalCost);
+		Assert.False(result.MinimalPriceApplied);
+	}
 
-        _strategyMock.Setup(x => x.Calculate(context, new List<LogisticsItem>())).Returns(strategyResult);
+	[Fact]
+	public void Calculate_ShouldApplyMinimumPrice_WhenCostIsLower()
+	{
+		var context = new LogisticsContext(
+			0,
+			0,
+			0,
+			100m);
+		var strategyResult = new LogisticsCalcResult
+		{
+			TotalCost = 50m
+		};
 
-        var result = _service.Calculate(
-            LogisticPricingType.PerWeight,
-            context,
-            new List<LogisticsItem>());
+		_strategyMock.Setup(x => x.Calculate(context, new List<LogisticsItem>())).Returns(strategyResult);
 
-        Assert.Equal(100m, result.TotalCost);
-        Assert.True(result.MinimalPriceApplied);
-    }
+		var result = _service.Calculate(
+			LogisticPricingType.PerWeight,
+			context,
+			new List<LogisticsItem>());
 
-    [Fact]
-    public void Calculate_ShouldNotApplyMinimumPrice_WhenCostIsHigher()
-    {
-        var context = new LogisticsContext(
-            0,
-            0,
-            0,
-            30m);
-        var strategyResult = new LogisticsCalcResult { TotalCost = 50m };
+		Assert.Equal(100m, result.TotalCost);
+		Assert.True(result.MinimalPriceApplied);
+	}
 
-        _strategyMock.Setup(x => x.Calculate(context, new List<LogisticsItem>())).Returns(strategyResult);
+	[Fact]
+	public void Calculate_ShouldNotApplyMinimumPrice_WhenCostIsHigher()
+	{
+		var context = new LogisticsContext(
+			0,
+			0,
+			0,
+			30m);
+		var strategyResult = new LogisticsCalcResult
+		{
+			TotalCost = 50m
+		};
 
-        var result = _service.Calculate(
-            LogisticPricingType.PerWeight,
-            context,
-            new List<LogisticsItem>());
+		_strategyMock.Setup(x => x.Calculate(context, new List<LogisticsItem>())).Returns(strategyResult);
 
-        Assert.Equal(50m, result.TotalCost);
-        Assert.False(result.MinimalPriceApplied);
-    }
+		var result = _service.Calculate(
+			LogisticPricingType.PerWeight,
+			context,
+			new List<LogisticsItem>());
+
+		Assert.Equal(50m, result.TotalCost);
+		Assert.False(result.MinimalPriceApplied);
+	}
 }

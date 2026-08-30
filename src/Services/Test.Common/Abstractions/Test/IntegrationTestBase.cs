@@ -11,50 +11,53 @@ using Tests.Interfaces.ServiceProvider;
 namespace Tests.Abstractions.Test;
 
 public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
-    where TSp : IServiceProviderBuilder<TArgs>, new()
-    where TArgs : IServiceProviderArgument
-    where TContext : DbContext
+	where TSp : IServiceProviderBuilder<TArgs>, new()
+	where TArgs : IServiceProviderArgument
+	where TContext : DbContext
 {
-    private IServiceScope _scope = null!;
-    private IServiceProvider _sp = null!;
-    protected override IServiceProvider Sp => _sp;
-    protected override IServiceScope Scope => _scope;
+	private IServiceScope _scope = null!;
 
-    public TContext Context { get; private set; } = null!;
+	private IServiceProvider _sp = null!;
 
-    protected void InitializeServiceProvider(TArgs args)
-    {
-        _sp = new TSp().Build(args);
-        _scope = Sp.CreateScope();
-        Context = _scope.ServiceProvider.GetRequiredService<TContext>();
-    }
-    
-    protected async Task LoadLocales()
-    {
-        var containers = Sp.GetRequiredService<IEnumerable<ILocalizerContainer>>();
-        var path = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        var loader = new JsonLocalizerContainerLoader(path);
-        await loader.LoadAsync(containers);
-    }
+	protected override IServiceProvider Sp => _sp;
 
-    protected async Task ResetDataStoresAsync(
-        CancellationToken cancellationToken = default)
-    {
-        await Context.ClearDatabase(cancellationToken);
+	protected override IServiceScope Scope => _scope;
 
-        var multiplexer = Scope.ServiceProvider
-            .GetService<IConnectionMultiplexer>();
-        if (multiplexer is null) return;
+	public TContext Context { get; private set; } = null!;
 
-        var database = multiplexer.GetDatabase();
-        foreach (var endpoint in multiplexer.GetEndPoints())
-        {
-            var server = multiplexer.GetServer(endpoint);
-            var keys = server.Keys(database.Database).ToArray();
+	protected void InitializeServiceProvider(TArgs args)
+	{
+		_sp = new TSp().Build(args);
+		_scope = Sp.CreateScope();
+		Context = _scope.ServiceProvider.GetRequiredService<TContext>();
+	}
 
-            if (keys.Length == 0) continue;
+	protected async Task LoadLocales()
+	{
+		var containers = Sp.GetRequiredService<IEnumerable<ILocalizerContainer>>();
+		var path = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+		var loader = new JsonLocalizerContainerLoader(path);
+		await loader.LoadAsync(containers);
+	}
 
-            await database.KeyDeleteAsync(keys);
-        }
-    }
+	protected async Task ResetDataStoresAsync(CancellationToken cancellationToken = default)
+	{
+		await Context.ClearDatabase(cancellationToken);
+
+		var multiplexer = Scope.ServiceProvider.GetService<IConnectionMultiplexer>();
+		if (multiplexer is null)
+			return;
+
+		var database = multiplexer.GetDatabase();
+		foreach (var endpoint in multiplexer.GetEndPoints())
+		{
+			var server = multiplexer.GetServer(endpoint);
+			var keys = server.Keys(database.Database).ToArray();
+
+			if (keys.Length == 0)
+				continue;
+
+			await database.KeyDeleteAsync(keys);
+		}
+	}
 }

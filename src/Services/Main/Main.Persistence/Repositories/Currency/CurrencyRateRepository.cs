@@ -9,47 +9,38 @@ using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Currency;
 
-public class CurrencyRateRepository(
-    DContext context,
-    IQueryableExtensions extensions
-) : LinqRepositoryBase<DContext, CurrencyRate, (int, int)>(context, extensions), ICurrencyRateRepository
+public class CurrencyRateRepository(DContext context, IQueryableExtensions extensions)
+	: LinqRepositoryBase<DContext, CurrencyRate, (int, int)>(context, extensions), ICurrencyRateRepository
 {
-    public Task<List<CurrencyRate>> GetByBaseCurrency(
-        int baseCurrencyId,
-        Criteria<CurrencyRate>? criteria = null,
-        CancellationToken cancellationToken = default)
-    {
-        var query = Context.CurrencyRates
-            .Where(x => x.ToCurrencyId == baseCurrencyId);
-        query = criteria == null ? query : QueryableExtensions.Apply(query, criteria);
-        return query.ToListAsync(cancellationToken);
-    }
+	public Task<List<CurrencyRate>> GetByBaseCurrency(
+		int baseCurrencyId,
+		Criteria<CurrencyRate>? criteria = null,
+		CancellationToken cancellationToken = default)
+	{
+		var query = Context.CurrencyRates.Where(x => x.ToCurrencyId == baseCurrencyId);
+		query = criteria == null ? query : QueryableExtensions.Apply(query, criteria);
+		return query.ToListAsync(cancellationToken);
+	}
 
-    public override Task<Dictionary<(int, int), CurrencyRate>> FindByIdsAsync(
-        IEnumerable<(int, int)> ids,
-        Criteria<CurrencyRate>? criteria = null,
-        CancellationToken ct = default)
-    {
-        var keys = ids.Distinct().ToList();
+	public override Task<Dictionary<(int, int), CurrencyRate>> FindByIdsAsync(
+		IEnumerable<(int, int)> ids,
+		Criteria<CurrencyRate>? criteria = null,
+		CancellationToken ct = default)
+	{
+		var keys = ids.Distinct().ToList();
 
-        if (keys.Count == 0) return Task.FromResult(new Dictionary<(int, int), CurrencyRate>());
+		if (keys.Count == 0)
+			return Task.FromResult(new Dictionary<(int, int), CurrencyRate>());
 
-        var query = Context.CurrencyRates
-            .AsExpandable();
+		var query = Context.CurrencyRates.AsExpandable();
 
-        query = QueryableExtensions.Apply(query, criteria);
+		query = QueryableExtensions.Apply(query, criteria);
 
-        var predicate = PredicateBuilder.New<CurrencyRate>();
+		var predicate = PredicateBuilder.New<CurrencyRate>();
 
-        foreach (var (fromId, toId) in keys)
-            predicate = predicate.Or(x =>
-                x.FromCurrencyId == fromId &&
-                x.ToCurrencyId == toId);
+		foreach (var (fromId, toId) in keys)
+			predicate = predicate.Or(x => x.FromCurrencyId == fromId && x.ToCurrencyId == toId);
 
-        return query
-            .Where(predicate)
-            .ToDictionaryAsync(
-                x => (x.FromCurrencyId, x.ToCurrencyId),
-                ct);
-    }
+		return query.Where(predicate).ToDictionaryAsync(x => (x.FromCurrencyId, x.ToCurrencyId), ct);
+	}
 }

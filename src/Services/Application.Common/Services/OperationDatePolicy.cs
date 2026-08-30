@@ -6,41 +6,45 @@ namespace Application.Common.Services;
 
 public interface IOperationDatePolicy
 {
-    OperationDateValidationResult IsAllowed(DateTime occurredAtUtc);
+	OperationDateValidationResult IsAllowed(DateTime occurredAtUtc);
 }
 
-public sealed class OperationDatePolicy(
-    TimeProvider timeProvider,
-    IUserContext userContext) : IOperationDatePolicy
+public sealed class OperationDatePolicy(TimeProvider timeProvider, IUserContext userContext)
+	: IOperationDatePolicy
 {
-    private static readonly TimeSpan AllowedClockSkew = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan DefaultBackdatePeriod = TimeSpan.FromDays(30);
+	private static readonly TimeSpan AllowedClockSkew = TimeSpan.FromMinutes(5);
 
-    public OperationDateValidationResult IsAllowed(DateTime occurredAtUtc)
-    {
-        var now = timeProvider.GetUtcNow();
+	private static readonly TimeSpan DefaultBackdatePeriod = TimeSpan.FromDays(30);
 
-        if (occurredAtUtc > now + AllowedClockSkew)
-            return OperationDateValidationResult.Invalid(
-                "operation.date.cannot.be.in.future");
-        
+	public OperationDateValidationResult IsAllowed(DateTime occurredAtUtc)
+	{
+		var now = timeProvider.GetUtcNow();
 
-        var allowHistory = userContext.Permissions
-            .Contains(nameof(PermissionCodes.CREATE_HISTORICAL_RECORDS)
-                .ToNormalizedPermission());
-        if (!allowHistory && occurredAtUtc < now - DefaultBackdatePeriod)
-            return OperationDateValidationResult.Invalid(
-                "operation.date.too.old");
+		if (occurredAtUtc > now + AllowedClockSkew)
+			return OperationDateValidationResult.Invalid("operation.date.cannot.be.in.future");
 
-        return OperationDateValidationResult.Valid();
-    }
+		var allowHistory = userContext.Permissions.Contains(
+			nameof(PermissionCodes.CREATE_HISTORICAL_RECORDS).ToNormalizedPermission());
+		if (!allowHistory && occurredAtUtc < now - DefaultBackdatePeriod)
+			return OperationDateValidationResult.Invalid("operation.date.too.old");
+
+		return OperationDateValidationResult.Valid();
+	}
 }
 
 public record OperationDateValidationResult
 {
-    public bool IsValid { get; init; }
-    public string Message { get; init; } = string.Empty;
+	public bool IsValid { get; init; }
 
-    public static OperationDateValidationResult Valid() => new() { IsValid = true };
-    public static OperationDateValidationResult Invalid(string message) => new() { Message = message };
+	public string Message { get; init; } = string.Empty;
+
+	public static OperationDateValidationResult Valid() => new()
+	{
+		IsValid = true
+	};
+
+	public static OperationDateValidationResult Invalid(string message) => new()
+	{
+		Message = message
+	};
 }

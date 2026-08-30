@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Main.Entities.DomainEvents.StorageContent;
@@ -9,150 +8,145 @@ using Main.Enums;
 
 namespace Main.Entities.Storage;
 
-public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<StorageContent, int>,
-    IVersionable<uint>
+public class StorageContent : AuditableEntity<StorageContent, int>,
+	ILinqEntity<StorageContent, int>,
+	IVersionable<uint>
 {
-    private StorageContent() { }
+	private StorageContent()
+	{
+	}
 
-    private StorageContent(
-        string storageCode,
-        int productId,
-        decimal buyPrice,
-        int currencyId,
-        decimal buyPriceInBaseCurrency,
-        int buyPriceInBaseCurrencyId,
-        DateTime purchaseDatetime)
-    {
-        StorageCode = storageCode;
-        ProductId = productId;
-        PurchaseDatetime = purchaseDatetime;
-        SetCurrencyId(currencyId);
-        SetBaseCurrencyId(buyPriceInBaseCurrencyId);
-        SetBuyPrice(buyPrice, buyPriceInBaseCurrency);
-    }
+	private StorageContent(
+		string storageCode,
+		int productId,
+		decimal buyPrice,
+		int currencyId,
+		decimal buyPriceInBaseCurrency,
+		int buyPriceInBaseCurrencyId,
+		DateTime purchaseDatetime)
+	{
+		StorageCode = storageCode;
+		ProductId = productId;
+		PurchaseDatetime = purchaseDatetime;
+		SetCurrencyId(currencyId);
+		SetBaseCurrencyId(buyPriceInBaseCurrencyId);
+		SetBuyPrice(buyPrice, buyPriceInBaseCurrency);
+	}
 
-    [Validate]
-    public int Id { get; private set; }
+	[Validate]
+	public int Id { get; private set; }
 
-    public string StorageCode { get; private set; } = null!;
+	public string StorageCode { get; } = null!;
 
-    public int ProductId { get; private set; }
+	public int ProductId { get; }
 
-    public int Count { get; private set; }
+	public int Count { get; private set; }
 
-    public decimal BuyPrice { get; private set; }
+	public decimal BuyPrice { get; private set; }
 
-    public decimal BuyPriceInBaseCurrency { get; private set; }
-    public int BaseCurrencyId { get; private set; }
+	public decimal BuyPriceInBaseCurrency { get; private set; }
 
-    public int CurrencyId { get; private set; }
+	public int BaseCurrencyId { get; private set; }
 
-    public DateTime PurchaseDatetime { get; private set; }
+	public int CurrencyId { get; private set; }
 
-    public Currency.Currency Currency { get; private set; } = null!;
+	public DateTime PurchaseDatetime { get; private set; }
 
-    public static Expression<Func<StorageContent, int>> GetKeySelector() { return x => x.Id; }
+	public Currency.Currency Currency { get; private set; } = null!;
 
-    public static Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.Id == key;
-    }
+	public static Expression<Func<StorageContent, int>> GetKeySelector() => x => x.Id;
 
-    public uint RowVersion { get; private set; }
+	public static Expression<Func<StorageContent, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 
-    public static StorageContent Create(
-        string storageCode,
-        int productId,
-        decimal buyPrice,
-        int currencyId,
-        decimal buyPriceInBaseCurrency,
-        int buyPriceInBaseCurrencyId,
-        DateTime purchaseDatetime)
-    {
-        return new StorageContent(
-            storageCode,
-            productId,
-            buyPrice,
-            currencyId,
-            buyPriceInBaseCurrency,
-            buyPriceInBaseCurrencyId,
-            purchaseDatetime);
-    }
+	public uint RowVersion { get; private set; }
 
-    public void SetCount(int count, StorageMovementType movementType)
-    {
-        var newCount = count
-            .EnsureNonNegative(() =>
-                new InvalidOperationException("Count must be greater than or equal to zero."));
-        
-        if (Count == newCount)
-            return;
+	public static StorageContent Create(
+		string storageCode,
+		int productId,
+		decimal buyPrice,
+		int currencyId,
+		decimal buyPriceInBaseCurrency,
+		int buyPriceInBaseCurrencyId,
+		DateTime purchaseDatetime)
+	{
+		return new StorageContent(
+			storageCode,
+			productId,
+			buyPrice,
+			currencyId,
+			buyPriceInBaseCurrency,
+			buyPriceInBaseCurrencyId,
+			purchaseDatetime);
+	}
 
-        AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
-            ProductId,
-            StorageCode,
-            CurrencyId,
-            newCount,
-            BuyPrice,
-            movementType,
-             newCount - Count));
-        
-        Count = newCount;
-    }
+	public void SetCount(int count, StorageMovementType movementType)
+	{
+		var newCount = count.EnsureNonNegative(() =>
+			new InvalidOperationException("Count must be greater than or equal to zero."));
 
-    public void IncreaseCount(int amount, StorageMovementType movementType)
-    {
-        SetCount(Count + amount, movementType);
-    }
+		if (Count == newCount)
+			return;
 
-    public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)
-    {
-        buyPrice
-            .EnsureMaxDecimalPlaces(
-                2,
-                () => new InvalidOperationException("Buy price must have maximum 2 decimal places."))
-            .EnsureAtLeast(
-                0.001m,
-                () => new InvalidOperationException("Buy price must be grater then 0."));
+		AddDomainEvent(
+			new StorageContentCountUpdatedDomainEvent(
+				ProductId,
+				StorageCode,
+				CurrencyId,
+				newCount,
+				BuyPrice,
+				movementType,
+				newCount - Count));
 
-        buyPriceInBaseCurrency
-            .EnsureGreaterThan(
-                0,
-                () => new InvalidOperationException("Buy price in base currency must be greater then 0."));
+		Count = newCount;
+	}
 
-        BuyPrice = buyPrice;
-        BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
-    }
-    public override void OnDeleted()
-    {
-        AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
-            ProductId,
-            StorageCode,
-            CurrencyId,
-            0,
-            BuyPrice,
-            StorageMovementType.StorageContentDeletion,
-            -Count));
-        AddDomainEvent(new StorageContentUpdatedDomainEvent(this, true));
-    }
+	public void IncreaseCount(int amount, StorageMovementType movementType) =>
+		SetCount(Count + amount, movementType);
 
-    public override void OnUpdated()
-        => AddDomainEvent(new StorageContentUpdatedDomainEvent(this, false));
+	public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)
+	{
+		buyPrice
+			.EnsureMaxDecimalPlaces(
+				2,
+				() => new InvalidOperationException("Buy price must have maximum 2 decimal places."))
+			.EnsureAtLeast(0.001m, () => new InvalidOperationException("Buy price must be grater then 0."));
 
-    public override void OnCreated() 
-        => AddDomainEvent(new StorageContentUpdatedDomainEvent(this, false));
+		buyPriceInBaseCurrency.EnsureGreaterThan(
+			0,
+			() => new InvalidOperationException("Buy price in base currency must be greater then 0."));
 
-    public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
+		BuyPrice = buyPrice;
+		BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
+	}
+	public override void OnDeleted()
+	{
+		AddDomainEvent(
+			new StorageContentCountUpdatedDomainEvent(
+				ProductId,
+				StorageCode,
+				CurrencyId,
+				0,
+				BuyPrice,
+				StorageMovementType.StorageContentDeletion,
+				-Count));
+		AddDomainEvent(new StorageContentUpdatedDomainEvent(this, true));
+	}
 
-    public void AssignCurrency(Currency.Currency currency)
-    {
-        CurrencyId = currency.Id;
-        Currency = currency;
-    }
+	public override void OnUpdated() => AddDomainEvent(new StorageContentUpdatedDomainEvent(this, false));
 
-    public void SetBaseCurrencyId(int baseCurrencyId) { BaseCurrencyId = baseCurrencyId; }
+	public override void OnCreated() => AddDomainEvent(new StorageContentUpdatedDomainEvent(this, false));
 
-    public void SetPurchaseDate(DateTime purchaseDate) { PurchaseDatetime = purchaseDate; }
+	public void SetCurrencyId(int currencyId) => CurrencyId = currencyId;
 
-    public override int GetId() { return Id; }
+	public void AssignCurrency(Currency.Currency currency)
+	{
+		CurrencyId = currency.Id;
+		Currency = currency;
+	}
+
+	public void SetBaseCurrencyId(int baseCurrencyId) => BaseCurrencyId = baseCurrencyId;
+
+	public void SetPurchaseDate(DateTime purchaseDate) => PurchaseDatetime = purchaseDate;
+
+	public override int GetId() => Id;
 }

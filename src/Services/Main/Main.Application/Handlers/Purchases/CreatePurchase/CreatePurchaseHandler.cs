@@ -1,7 +1,6 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Attributes;
@@ -22,169 +21,162 @@ namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 [AutoSave]
 [Transactional(
-    IsolationLevel.ReadCommitted,
-    20,
-    2)]
+	IsolationLevel.ReadCommitted,
+	20,
+	2)]
 public record CreatePurchaseCommand(
-    Guid SupplierUserId,
-    Guid SupplierOrganizationId,
-    int CurrencyId,
-    string StorageCode,
-    DateTime PurchaseDate,
-    IEnumerable<NewPurchaseContentDto> PurchaseContent,
-    string? Comment,
-    decimal? PayedSum,
-    bool WithLogistics,
-    string? StorageFrom,
-    bool ForcePayment = false
-) : ICommand<CreatePurchaseResult>;
+	Guid SupplierUserId,
+	Guid SupplierOrganizationId,
+	int CurrencyId,
+	string StorageCode,
+	DateTime PurchaseDate,
+	IEnumerable<NewPurchaseContentDto> PurchaseContent,
+	string? Comment,
+	decimal? PayedSum,
+	bool WithLogistics,
+	string? StorageFrom,
+	bool ForcePayment = false) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(Guid PurchaseId);
 
 public class CreatePurchaseHandler(
-    ISender sender,
-    IOptions<SystemOptions> systemOptions,
-    IPurchaseLogisticsService purchaseLogisticsService,
-    IIntegrationEventScope integrationEventScope,
-    IUnitOfWork unitOfWork
-) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
+	ISender sender,
+	IOptions<SystemOptions> systemOptions,
+	IPurchaseLogisticsService purchaseLogisticsService,
+	IIntegrationEventScope integrationEventScope,
+	IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
-    public async Task<CreatePurchaseResult> Handle(
-        CreatePurchaseCommand request,
-        CancellationToken cancellationToken)
-    {
-        var systemId = systemOptions.Value.SystemId;
+	public async Task<CreatePurchaseResult> Handle(
+		CreatePurchaseCommand request,
+		CancellationToken cancellationToken)
+	{
+		var systemId = systemOptions.Value.SystemId;
 
-        var purchaseContents = request.PurchaseContent.ToList();
+		var purchaseContents = request.PurchaseContent.ToList();
 
-        var totalSum = purchaseContents.Sum(x => x.Price * x.Count);
+		var totalSum = purchaseContents.Sum(x => x.Price * x.Count);
 
-        var purchaseTransaction = (await sender.Send(
-                new CreateTransactionCommand(
-                    request.SupplierOrganizationId,
-                    systemId,
-                    totalSum,
-                    request.CurrencyId,
-                    request.PurchaseDate,
-                    TransactionSourceType.Purchase,
-                    TransactionCreationMode.System),
-                cancellationToken))
-            .Transaction;
+		var purchaseTransaction = (await sender.Send(
+			new CreateTransactionCommand(
+				request.SupplierOrganizationId,
+				systemId,
+				totalSum,
+				request.CurrencyId,
+				request.PurchaseDate,
+				TransactionSourceType.Purchase,
+				TransactionCreationMode.System),
+			cancellationToken)).Transaction;
 
-        var storageContents = await AddContentsToStorage(
-            request,
-            cancellationToken);
+		var storageContents = await AddContentsToStorage(request, cancellationToken);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var purchase = await CreatePurchase(
-            systemId,
-            request,
-            purchaseTransaction.Id,
-            purchaseContents,
-            storageContents,
-            cancellationToken);
+		var purchase = await CreatePurchase(
+			systemId,
+			request,
+			purchaseTransaction.Id,
+			purchaseContents,
+			storageContents,
+			cancellationToken);
 
-        if (request.PayedSum > 0)
-            await sender.Send(
-                new CreateTransactionCommand(
-                    systemId,
-                    request.SupplierOrganizationId,
-                    request.PayedSum.Value,
-                    request.CurrencyId,
-                    request.PurchaseDate,
-                    TransactionSourceType.Manual,
-                    TransactionCreationMode.System,
-                    request.ForcePayment),
-                cancellationToken);
+		if (request.PayedSum > 0)
+			await sender.Send(
+				new CreateTransactionCommand(
+					systemId,
+					request.SupplierOrganizationId,
+					request.PayedSum.Value,
+					request.CurrencyId,
+					request.PurchaseDate,
+					TransactionSourceType.Manual,
+					TransactionCreationMode.System,
+					request.ForcePayment),
+				cancellationToken);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        integrationEventScope.Add(
-            new PurchaseUpdateEvent
-            {
-                PurchaseId = purchase.Id
-            });
+		integrationEventScope.Add(
+			new PurchaseUpdateEvent
+			{
+				PurchaseId = purchase.Id
+			});
 
-        return new CreatePurchaseResult(purchase.Id);
-    }
+		return new CreatePurchaseResult(purchase.Id);
+	}
 
-    private async Task<IReadOnlyList<StorageContent>> AddContentsToStorage(
-        CreatePurchaseCommand request,
-        CancellationToken cancellationToken)
-    {
-        var command = new AddContentCommand(
-            request.PurchaseContent.Select(x => new NewStorageContentDto
-            {
-                BuyPrice = x.Price,
-                Count = x.Count,
-                CurrencyId = request.CurrencyId,
-                PurchaseDate = request.PurchaseDate,
-                ProductId = x.ProductId
-            }),
-            request.StorageCode,
-            StorageMovementType.Purchase);
+	private async Task<IReadOnlyList<StorageContent>> AddContentsToStorage(
+		CreatePurchaseCommand request,
+		CancellationToken cancellationToken)
+	{
+		var command = new AddContentCommand(
+			request.PurchaseContent.Select(x => new NewStorageContentDto
+			{
+				BuyPrice = x.Price,
+				Count = x.Count,
+				CurrencyId = request.CurrencyId,
+				PurchaseDate = request.PurchaseDate,
+				ProductId = x.ProductId
+			}),
+			request.StorageCode,
+			StorageMovementType.Purchase);
 
-        return (await sender.Send(command, cancellationToken))
-            .StorageContents;
-    }
+		return (await sender.Send(command, cancellationToken)).StorageContents;
+	}
 
-    private async Task<Purchase> CreatePurchase(
-        Guid systemId,
-        CreatePurchaseCommand request,
-        Guid transactionId,
-        IReadOnlyList<NewPurchaseContentDto> purchaseContents,
-        IReadOnlyList<StorageContent> storageContents,
-        CancellationToken cancellationToken)
-    {
-        List<PurchaseLogisticsItem> toCalculate = [];
-        var purchase = Purchase.Create(
-            request.SupplierUserId,
-            request.SupplierOrganizationId,
-            request.CurrencyId,
-            transactionId,
-            request.StorageCode,
-            request.PurchaseDate);
+	private async Task<Purchase> CreatePurchase(
+		Guid systemId,
+		CreatePurchaseCommand request,
+		Guid transactionId,
+		IReadOnlyList<NewPurchaseContentDto> purchaseContents,
+		IReadOnlyList<StorageContent> storageContents,
+		CancellationToken cancellationToken)
+	{
+		List<PurchaseLogisticsItem> toCalculate = [];
+		var purchase = Purchase.Create(
+			request.SupplierUserId,
+			request.SupplierOrganizationId,
+			request.CurrencyId,
+			transactionId,
+			request.StorageCode,
+			request.PurchaseDate);
 
-        purchase.SetComment(request.Comment);
+		purchase.SetComment(request.Comment);
 
-        for (var i = 0; i < storageContents.Count; i++)
-        {
-            var content = purchaseContents[i];
-            var storageContent = storageContents[i];
+		for (var i = 0; i < storageContents.Count; i++)
+		{
+			var content = purchaseContents[i];
+			var storageContent = storageContents[i];
 
-            if (content.ProductId != storageContent.ProductId)
-                throw new InvalidOperationException(
-                    "Order of storage contents and " +
-                    "new purchase contents are invalid.");
+			if (content.ProductId != storageContent.ProductId)
+				throw new InvalidOperationException(
+					"Order of storage contents and " + "new purchase contents are invalid.");
 
-            var purchaseContent = PurchaseContent.Create(
-                content.ProductId,
-                content.Count,
-                content.Price,
-                storageContent.Id,
-                content.Comment);
+			var purchaseContent = PurchaseContent.Create(
+				content.ProductId,
+				content.Count,
+				content.Price,
+				storageContent.Id,
+				content.Comment);
 
-            purchase.AddContent(purchaseContent);
+			purchase.AddContent(purchaseContent);
 
-            if (request.WithLogistics && content.CalculateLogistics)
-                toCalculate.Add(
-                    new PurchaseLogisticsItem(
-                        purchaseContent,
-                        content.ProductId,
-                        content.Count));
-        }
+			if (request.WithLogistics && content.CalculateLogistics)
+				toCalculate.Add(
+					new PurchaseLogisticsItem(
+						purchaseContent,
+						content.ProductId,
+						content.Count));
+		}
 
-        await purchaseLogisticsService.ApplyAsync(
-            purchase,
-            toCalculate,
-            request.StorageFrom,
-            request.PurchaseDate,
-            systemId,
-            cancellationToken);
+		await purchaseLogisticsService.ApplyAsync(
+			purchase,
+			toCalculate,
+			request.StorageFrom,
+			request.PurchaseDate,
+			systemId,
+			cancellationToken);
 
-        purchase.Complete();
-        await unitOfWork.AddAsync(purchase, cancellationToken);
-        return purchase;
-    }
+		purchase.Complete();
+		await unitOfWork.AddAsync(purchase, cancellationToken);
+		return purchase;
+	}
 }

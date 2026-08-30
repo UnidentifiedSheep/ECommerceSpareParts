@@ -6,14 +6,14 @@ namespace Main.Cache;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddApplicationCache(this IServiceCollection services)
-    {
-        services.AddScoped<IProductProvider, ProductProvider>();
-        services.AddScoped<IProductCacheInvalidator, ProductCacheInvalidator>();
-        services.AddScoped<IUserCacheRepository, UserCacheRepository>();
-        services.AddScoped<ICurrencyCacheRepository, CurrencyCacheRepository>();
-        services.AddScoped<IOneTimeTokenStore, OneTimeTokenStore>();
-        
-        return services;
-    }
+	public static IServiceCollection AddApplicationCache(this IServiceCollection services)
+	{
+		services.AddScoped<IProductProvider, ProductProvider>();
+		services.AddScoped<IProductCacheInvalidator, ProductCacheInvalidator>();
+		services.AddScoped<IUserCacheRepository, UserCacheRepository>();
+		services.AddScoped<ICurrencyCacheRepository, CurrencyCacheRepository>();
+		services.AddScoped<IOneTimeTokenStore, OneTimeTokenStore>();
+
+		return services;
+	}
 }

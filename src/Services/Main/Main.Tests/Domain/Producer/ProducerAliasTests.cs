@@ -6,47 +6,33 @@ namespace Tests.Domain.Producer;
 
 public class ProducerAliasTests
 {
-    [Theory]
-    [InlineData(
-        1,
-        "KSS")]
-    [InlineData(
-        2,
-        "RjkbenSchmidt")]
-    [InlineData(
-        3,
-        "  Test alias  ")]
-    public void Create_ValidData_Succeeds(
-        int producerId,
-        string otherName)
-    {
-        var entity = ProducerAlias.Create(
-            producerId,
-            otherName);
+	[Theory]
+	[InlineData(1, "KSS")]
+	[InlineData(2, "RjkbenSchmidt")]
+	[InlineData(3, "  Test alias  ")]
+	public void Create_ValidData_Succeeds(int producerId, string otherName)
+	{
+		var entity = ProducerAlias.Create(producerId, otherName);
 
-        entity.ProducerId.Should().Be(producerId);
-        entity.Alias.Should().Be(ProducerDomain.ToNormalizedName(otherName));
-    }
+		entity.ProducerId.Should().Be(producerId);
+		entity.Alias.Should().Be(ProducerDomain.ToNormalizedName(otherName));
+	}
 
-    [Fact]
-    public void Create_EmptyWhereUsed_Throws()
-    {
-        var act = () => ProducerAlias.Create(
-            1,
-            "KSS");
+	[Fact]
+	public void Create_EmptyWhereUsed_Throws()
+	{
+		var act = () => ProducerAlias.Create(1, "KSS");
 
-        act.Should().NotThrow();
-    }
+		act.Should().NotThrow();
+	}
 
-    [Fact]
-    public void Key_IsNormalizedAlias()
-    {
-        var entity = ProducerAlias.Create(
-            1,
-            "  KSS  ");
+	[Fact]
+	public void Key_IsNormalizedAlias()
+	{
+		var entity = ProducerAlias.Create(1, "  KSS  ");
 
-        var key = entity.GetId();
+		var key = entity.GetId();
 
-        key.Should().Be("KSS");
-    }
+		key.Should().Be("KSS");
+	}
 }

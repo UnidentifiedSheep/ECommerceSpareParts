@@ -6,13 +6,12 @@ namespace Main.Application.Handlers.Users.GetUsers;
 
 public class GetUsersValidation : AbstractValidator<GetUsersQuery>
 {
-    public GetUsersValidation()
-    {
-        RuleFor(query => query.Pagination)
-            .SetValidator(new PaginationValidator());
+	public GetUsersValidation()
+	{
+		RuleFor(query => query.Pagination).SetValidator(new PaginationValidator());
 
-        RuleFor(query => query.SimilarityLevel)
-            .InclusiveBetween(0, 1)
-            .WithLocalizationKey("user.similarity.level.range");
-    }
+		RuleFor(query => query.SimilarityLevel)
+			.InclusiveBetween(0, 1)
+			.WithLocalizationKey("user.similarity.level.range");
+	}
 }

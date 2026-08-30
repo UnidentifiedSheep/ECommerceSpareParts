@@ -6,10 +6,10 @@ namespace Main.Application.Handlers.ProductContent.AddProductContent;
 
 public class AddProductContentDbValidation : AbstractDbValidation<AddProductContentCommand>
 {
-    public override void Build(IValidationPlan plan, AddProductContentCommand request)
-    {
-        var ids = request.Contents.Select(x => x.Key).ToHashSet();
-        ids.Add(request.ParentProductId);
-        plan.ValidateProductExistsId(ids);
-    }
+	public override void Build(IValidationPlan plan, AddProductContentCommand request)
+	{
+		var ids = request.Contents.Select(x => x.Key).ToHashSet();
+		ids.Add(request.ParentProductId);
+		plan.ValidateProductExistsId(ids);
+	}
 }

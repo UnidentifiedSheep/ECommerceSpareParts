@@ -7,7 +7,7 @@
 /// <typeparam name="T"></typeparam>
 public record Timestamped<T>
 {
-    public T? Value { get; init; }
+	public T? Value { get; init; }
 
-    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+	public DateTime Timestamp { get; init; } = DateTime.UtcNow;
 }

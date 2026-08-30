@@ -2,29 +2,30 @@ namespace Gateway.Extensions;
 
 public static class FusionHttpClientExtensions
 {
-    private const string ClientName = "fusion";
-    private const string InternalTokenHeader = "X-Internal-Token";
+	private const string ClientName = "fusion";
 
-    public static IServiceCollection AddFusionHttpClient(
-        this IServiceCollection services,
-        string internalToken)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(internalToken);
+	private const string InternalTokenHeader = "X-Internal-Token";
 
-        services.AddHeaderPropagation(options =>
-        {
-            options.Headers.Add("Authorization");
-        });
+	public static IServiceCollection AddFusionHttpClient(
+		this IServiceCollection services,
+		string internalToken)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(internalToken);
 
-        services
-            .AddHttpClient(ClientName, client =>
-            {
-                client.DefaultRequestHeaders.Add(
-                    InternalTokenHeader,
-                    internalToken);
-            })
-            .AddHeaderPropagation();
+		services.AddHeaderPropagation(options =>
+		{
+			options.Headers.Add("Authorization");
+		});
 
-        return services;
-    }
+		services
+			.AddHttpClient(
+				ClientName,
+				client =>
+				{
+					client.DefaultRequestHeaders.Add(InternalTokenHeader, internalToken);
+				})
+			.AddHeaderPropagation();
+
+		return services;
+	}
 }

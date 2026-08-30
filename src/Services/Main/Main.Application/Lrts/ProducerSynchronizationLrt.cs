@@ -1,13 +1,9 @@
-using Abstractions;
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
-using Application.Common.NamedObject;
 using Attributes;
 using Contracts.Producer;
-using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Main.Entities.Producer;
 using MassTransit;
@@ -17,60 +13,65 @@ using Microsoft.Extensions.Logging;
 namespace Main.Application.Lrts;
 
 public class ProducerSynchronizationLrt(
-    IRepository<Job, Guid> jobRepository,
-    IReadRepository<Producer, int> producerRepository,
-    IUnitOfWork unitOfWork,
-    IPublishEndpoint publisher,
-    IApplicationTransactionService transactionService,
-    ILogger<ProducerSynchronizationLrt> logger
-) : LrtBase<NoneInputState, NoneInputState>(
-    jobRepository,
-    unitOfWork,
-    publisher,
-    transactionService,
-    logger)
+	IRepository<Job, Guid> jobRepository,
+	IReadRepository<Producer, int> producerRepository,
+	IUnitOfWork unitOfWork,
+	IPublishEndpoint publisher,
+	IApplicationTransactionService transactionService,
+	ILogger<ProducerSynchronizationLrt> logger) : LrtBase<NoneInputState, NoneInputState>(
+	jobRepository,
+	unitOfWork,
+	publisher,
+	transactionService,
+	logger)
 {
 
-    public override string SystemName => nameof(ProducerSynchronizationLrt);
-    public override string NameLocalizationKey => "lrt.producer.synchronization.name";
-    public override string DescriptionLocalizationKey => "lrt.producer.synchronization.description";
-    protected override async Task DoWork()
-    {
-        int lastId = -1;
-        const int batchSize = 1000;
+	public override string SystemName => nameof(ProducerSynchronizationLrt);
 
-        while (true)
-        {
-            var ids = await GetIdsAsync(lastId, batchSize);
-            if (ids.Count == 0) break;
-            
-            lastId = ids[^1];
-            await PublishEventsAsync(ids);
+	public override string NameLocalizationKey => "lrt.producer.synchronization.name";
 
-            if (ids.Count < batchSize) break;
-        }
-    }
+	public override string DescriptionLocalizationKey => "lrt.producer.synchronization.description";
 
-    private async Task<IReadOnlyList<int>> GetIdsAsync(int lastId, int batchSize)
-        => await producerRepository.Query
-            .Where(x => x.Id > lastId)
-            .OrderBy(x => x.Id)
-            .Select(x => x.Id)
-            .Take(batchSize)
-            .ToListAsync(CancellationToken);
+	protected override async Task DoWork()
+	{
+		var lastId = -1;
+		const int batchSize = 1000;
 
-    private Task PublishEventsAsync(IReadOnlyList<int> ids)
-        => TransactionService.ExecuteAsync(
-            TransactionalAttribute.ReadCommitted(20, 2),
-            async (context, cancellationToken) =>
-            {
-                foreach (var id in ids)
-                    await Publisher.Publish(new ProducerUpdatedEvent
-                    {
-                        Id = id
-                    }, cancellationToken);
-                
-                await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-            },
-            CancellationToken);
+		while (true)
+		{
+			var ids = await GetIdsAsync(lastId, batchSize);
+			if (ids.Count == 0)
+				break;
+
+			lastId = ids[^1];
+			await PublishEventsAsync(ids);
+
+			if (ids.Count < batchSize)
+				break;
+		}
+	}
+
+	private async Task<IReadOnlyList<int>> GetIdsAsync(int lastId, int batchSize) => await producerRepository
+		.Query
+		.Where(x => x.Id > lastId)
+		.OrderBy(x => x.Id)
+		.Select(x => x.Id)
+		.Take(batchSize)
+		.ToListAsync(CancellationToken);
+
+	private Task PublishEventsAsync(IReadOnlyList<int> ids) => TransactionService.ExecuteAsync(
+		TransactionalAttribute.ReadCommitted(20, 2),
+		async (context, cancellationToken) =>
+		{
+			foreach (var id in ids)
+				await Publisher.Publish(
+					new ProducerUpdatedEvent
+					{
+						Id = id
+					},
+					cancellationToken);
+
+			await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+		},
+		CancellationToken);
 }

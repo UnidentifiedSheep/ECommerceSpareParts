@@ -11,39 +11,36 @@ namespace Main.Application.DomainEventHandlers.CatalogueCandidate;
 
 internal static class CatalogueCandidateInternalService
 {
-    public static async Task PublishUpdatedEvents(
-        IIntegrationEventScope integrationEventScope,
-        IProjectionProvider<Candidate, CatalogueCandidateContractDto> projection,
-        IReadRepository<Candidate, Guid> repository,
-        IEnumerable<Guid> candidateIds,
-        CancellationToken cancellationToken)
-    {
-        var occurredAt = DateTime.UtcNow;
-        var chunkedIds = candidateIds
-            .Distinct()
-            .Chunk(1000);
+	public static async Task PublishUpdatedEvents(
+		IIntegrationEventScope integrationEventScope,
+		IProjectionProvider<Candidate, CatalogueCandidateContractDto> projection,
+		IReadRepository<Candidate, Guid> repository,
+		IEnumerable<Guid> candidateIds,
+		CancellationToken cancellationToken)
+	{
+		var occurredAt = DateTime.UtcNow;
+		var chunkedIds = candidateIds.Distinct().Chunk(1000);
 
-        foreach (var ids in chunkedIds)
-        {
-            var candidates = await repository.Query
-                .Where(x => ids.AsEnumerable().Contains(x.Id))
-                .Project(projection)
-                .ToListAsync(cancellationToken);
+		foreach (var ids in chunkedIds)
+		{
+			var candidates = await repository
+				.Query
+				.Where(x => ids.AsEnumerable().Contains(x.Id))
+				.Project(projection)
+				.ToListAsync(cancellationToken);
 
-            var events = candidates
-                .Select(candidate => new CatalogueCandidateUpdatedEvent
-                {
-                    OccuredAt = occurredAt,
-                    Candidate = candidate with
-                    {
-                        Names = candidate.Names
-                            .Distinct(StringComparer.OrdinalIgnoreCase)
-                            .ToList()
-                    }
-                })
-                .ToList();
+			var events = candidates
+				.Select(candidate => new CatalogueCandidateUpdatedEvent
+				{
+					OccuredAt = occurredAt,
+					Candidate = candidate with
+					{
+						Names = candidate.Names.Distinct(StringComparer.OrdinalIgnoreCase).ToList()
+					}
+				})
+				.ToList();
 
-            integrationEventScope.AddRange(events);
-        }
-    }
+			integrationEventScope.AddRange(events);
+		}
+	}
 }

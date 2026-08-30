@@ -6,9 +6,9 @@ namespace Main.Application.Dtos.Auth;
 
 public record UserPartyDto
 {
-    [JsonPropertyName("partyType")]
-    public required UserPartyType PartyType { get; init; }
+	[JsonPropertyName("partyType")]
+	public required UserPartyType PartyType { get; init; }
 
-    [JsonPropertyName("user")]
-    public UserDto? User { get; init; }
+	[JsonPropertyName("user")]
+	public UserDto? User { get; init; }
 }

@@ -10,20 +10,20 @@ using Candidate = Main.Entities.Product.Enrichment.CatalogueCandidate;
 namespace Main.Application.DomainEventHandlers.CatalogueCandidate.ContentChanged;
 
 internal sealed class PublishIntegrationEvents(
-    IIntegrationEventScope integrationEventScope,
-    IProjectionProvider<Candidate, CatalogueCandidateContractDto> projection,
-    IReadRepository<Candidate, Guid> repository)
-    : BatchableDomainEventHandler<CatalogueCandidateContentChangedDomainEvent>
+	IIntegrationEventScope integrationEventScope,
+	IProjectionProvider<Candidate, CatalogueCandidateContractDto> projection,
+	IReadRepository<Candidate, Guid> repository)
+	: BatchableDomainEventHandler<CatalogueCandidateContentChangedDomainEvent>
 {
-    public override Task Handle(
-        Batch<CatalogueCandidateContentChangedDomainEvent> notification,
-        CancellationToken cancellationToken)
-    {
-        return CatalogueCandidateInternalService.PublishUpdatedEvents(
-            integrationEventScope,
-            projection,
-            repository,
-            notification.Items.Select(x => x.CatalogueCandidateId),
-            cancellationToken);
-    }
+	public override Task Handle(
+		Batch<CatalogueCandidateContentChangedDomainEvent> notification,
+		CancellationToken cancellationToken)
+	{
+		return CatalogueCandidateInternalService.PublishUpdatedEvents(
+			integrationEventScope,
+			projection,
+			repository,
+			notification.Items.Select(x => x.CatalogueCandidateId),
+			cancellationToken);
+	}
 }

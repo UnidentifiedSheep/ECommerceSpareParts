@@ -15,66 +15,70 @@ using Tests.TestContainers.Combined;
 namespace Tests.Integration;
 
 /// <summary>
-/// Base class exclusively for common-layer integration tests declared in
-/// Test.Common. Service test projects must use their own integration-test
-/// base and DbContext and must not inherit from this class.
+///     Base class exclusively for common-layer integration tests declared in
+///     Test.Common. Service test projects must use their own integration-test
+///     base and DbContext and must not inherit from this class.
 /// </summary>
 [Collection("Combined collection")]
 public abstract class CommonLayerIntegrationTest : TestBase
 {
-    private readonly CombinedContainerFixture _fixture;
-    private IServiceScope _scope = null!;
-    private IServiceProvider _serviceProvider = null!;
+	private readonly CombinedContainerFixture _fixture;
 
-    internal CommonLayerIntegrationTest(CombinedContainerFixture fixture)
-    {
-        _fixture = fixture;
-    }
+	private IServiceScope _scope = null!;
 
-    protected override IServiceProvider Sp => _serviceProvider;
-    protected override IServiceScope Scope => _scope;
+	private IServiceProvider _serviceProvider = null!;
 
-    private protected DContext Context { get; private set; } = null!;
-    private protected IMediator Mediator { get; private set; } = null!;
+	internal CommonLayerIntegrationTest(CombinedContainerFixture fixture)
+	{
+		_fixture = fixture;
+	}
 
-    public override async Task InitializeAsync()
-    {
-        _serviceProvider = new ServiceProviderBuilder().Build(
-            new ServiceProviderArguments
-            {
-                PgsqlConnectionString = _fixture.PostgresConnectionString
-            });
-        _scope = Sp.CreateScope();
+	protected override IServiceProvider Sp => _serviceProvider;
 
-        Context = Scope.ServiceProvider.GetRequiredService<DContext>();
-        Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
+	protected override IServiceScope Scope => _scope;
 
-        await Context.Database.EnsureCreatedAsync();
-        await LoadLocales();
-        await InitializeBasicContexts();
-    }
+	private protected DContext Context { get; private set; } = null!;
 
-    protected override async Task InitializeBasicContexts()
-    {
-        var unitOfWork = Scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        await unitOfWork.ExecuteWithTransaction(
-            new TransactionalAttribute(),
-            () => base.InitializeBasicContexts());
+	private protected IMediator Mediator { get; private set; } = null!;
 
-        Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
-    }
+	public override async Task InitializeAsync()
+	{
+		_serviceProvider = new ServiceProviderBuilder().Build(
+			new ServiceProviderArguments
+			{
+				PgsqlConnectionString = _fixture.PostgresConnectionString
+			});
+		_scope = Sp.CreateScope();
 
-    public override async Task DisposeAsync()
-    {
-        await Context.ClearDatabase();
-        Scope.Dispose();
-    }
+		Context = Scope.ServiceProvider.GetRequiredService<DContext>();
+		Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
-    private async Task LoadLocales()
-    {
-        var containers = Sp.GetRequiredService<IEnumerable<ILocalizerContainer>>();
-        var path = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        var loader = new JsonLocalizerContainerLoader(path);
-        await loader.LoadAsync(containers);
-    }
+		await Context.Database.EnsureCreatedAsync();
+		await LoadLocales();
+		await InitializeBasicContexts();
+	}
+
+	protected override async Task InitializeBasicContexts()
+	{
+		var unitOfWork = Scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+		await unitOfWork.ExecuteWithTransaction(
+			new TransactionalAttribute(),
+			() => base.InitializeBasicContexts());
+
+		Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
+	}
+
+	public override async Task DisposeAsync()
+	{
+		await Context.ClearDatabase();
+		Scope.Dispose();
+	}
+
+	private async Task LoadLocales()
+	{
+		var containers = Sp.GetRequiredService<IEnumerable<ILocalizerContainer>>();
+		var path = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+		var loader = new JsonLocalizerContainerLoader(path);
+		await loader.LoadAsync(containers);
+	}
 }

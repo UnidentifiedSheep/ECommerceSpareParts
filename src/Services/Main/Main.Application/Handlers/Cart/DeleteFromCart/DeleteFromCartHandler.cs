@@ -12,18 +12,15 @@ namespace Main.Application.Handlers.Cart.DeleteFromCart;
 public record DeleteFromCartCommand(Guid UserId, int ProductId) : ICommand;
 
 public class DeleteFromCartHandler(
-    IRepository<Entities.Cart.Cart, (Guid, int)> repository,
-    IUnitOfWork unitOfWork
-)
-    : ICommandHandler<DeleteFromCartCommand>
+	IRepository<Entities.Cart.Cart, (Guid, int)> repository,
+	IUnitOfWork unitOfWork) : ICommandHandler<DeleteFromCartCommand>
 {
-    public async Task<Unit> Handle(DeleteFromCartCommand request, CancellationToken cancellationToken)
-    {
-        var cartItem =
-            await repository.GetById((request.UserId, request.ProductId), cancellationToken) ??
-            throw new CartItemNotFoundException(request.ProductId);
+	public async Task<Unit> Handle(DeleteFromCartCommand request, CancellationToken cancellationToken)
+	{
+		var cartItem = await repository.GetById((request.UserId, request.ProductId), cancellationToken) ??
+			throw new CartItemNotFoundException(request.ProductId);
 
-        unitOfWork.Remove(cartItem);
-        return Unit.Value;
-    }
+		unitOfWork.Remove(cartItem);
+		return Unit.Value;
+	}
 }
