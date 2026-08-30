@@ -43,6 +43,7 @@ COPY ["src/Infrastructure/Integrations/Suppliers/Integrations.Favorit/Integratio
 COPY ["src/Infrastructure/S3/S3.csproj", "src/Infrastructure/S3/"]
 COPY ["src/Services/Pricing/Pricing.Cache/Pricing.Cache.csproj", "src/Services/Pricing/Pricing.Cache/"]
 COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
+COPY ["src/Services/GraphQL.Common/GraphQL.Common.csproj", "src/Services/GraphQL.Common/"]
 RUN dotnet restore "src/Services/Pricing/Pricing.Api/Pricing.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Pricing/Pricing.Api"

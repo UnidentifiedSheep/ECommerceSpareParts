@@ -16,6 +16,7 @@ source_schemas=(
   "Main:src/Services/Main/Main.Api/Main.Api.csproj"
   "Search:src/Services/Search/Search.Api/Search.Api.csproj"
   "Analytics:src/Services/Analytics/Analytics.Api/Analytics.Api.csproj"
+  "Pricing:src/Services/Pricing/Pricing.Api/Pricing.Api.csproj"
 )
 
 for source_schema in "${source_schemas[@]}"; do
@@ -53,6 +54,7 @@ dotnet tool run nitro -- fusion compose \
   -f "${artifact_root}/Main/schema.graphqls" \
   -f "${artifact_root}/Search/schema.graphqls" \
   -f "${artifact_root}/Analytics/schema.graphqls" \
+  -f "${artifact_root}/Pricing/schema.graphqls" \
   -a "${artifact_root}/Gateway/gateway.far"
 
 test -s "${artifact_root}/Gateway/gateway.far"

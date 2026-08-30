@@ -22,6 +22,7 @@ COPY ["src/Infrastructure/Integrations/Suppliers/Integrations.Supplier/Integrati
 COPY ["src/Infrastructure/Integrations/Suppliers/Integrations.Tmtr/Integrations.Tmtr.csproj", "src/Infrastructure/Integrations/Suppliers/Integrations.Tmtr/"]
 COPY ["src/Infrastructure/Integrations/Suppliers/Integrations.Favorit/Integrations.Favorit.csproj", "src/Infrastructure/Integrations/Suppliers/Integrations.Favorit/"]
 COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
+COPY ["src/Services/GraphQL.Common/GraphQL.Common.csproj", "src/Services/GraphQL.Common/"]
 COPY ["src/Infrastructure/Security/Security.csproj", "src/Infrastructure/Security/"]
 COPY ["src/Core/Exceptions/Exceptions.csproj", "src/Core/Exceptions/"]
 COPY ["src/Infrastructure/Cache/Cache.csproj", "src/Infrastructure/Cache/"]

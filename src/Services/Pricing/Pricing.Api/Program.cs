@@ -17,11 +17,13 @@ using Carter;
 using Contracts.Analytics;
 using Contracts.Job;
 using Contracts.Settings;
+using GraphQL.Common.Extensions;
 using Integrations.Supplier.DI;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
 using Pricing.Api;
+using Pricing.Api.GraphQl;
 using Pricing.Api.Startup;
 using Pricing.Application;
 using Pricing.Application.Consumers;
@@ -32,6 +34,8 @@ using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
+
+const string serviceName = "Pricing";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +53,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddSecretEncryptionOptions();
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Pricing);
+builder.Services.AddGraphQlServices(serviceName);
 
 var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 
@@ -135,5 +140,6 @@ var app = builder.Build();
 app.UseCommonApiPipeline();
 
 app.MapHub<JobHub>("/hubs/jobs");
+app.MapCommonGraphQl();
 
-await app.RunAsync();
+await app.RunWithGraphQLCommandsAsync(args);
