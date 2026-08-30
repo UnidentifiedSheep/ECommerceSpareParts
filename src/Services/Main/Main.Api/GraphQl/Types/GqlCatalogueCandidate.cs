@@ -1,5 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
+using Main.Api.GraphQl.Types.Producer;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Product.Enrichment;
 

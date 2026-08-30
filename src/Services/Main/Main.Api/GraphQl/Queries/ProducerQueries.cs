@@ -2,6 +2,7 @@ using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
+using Main.Api.GraphQl.Types.Producer;
 
 namespace Main.Api.GraphQl.Queries;
 

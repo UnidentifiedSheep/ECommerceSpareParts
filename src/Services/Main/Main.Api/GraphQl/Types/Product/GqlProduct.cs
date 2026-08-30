@@ -4,6 +4,7 @@ using HotChocolate.Types.Composite;
 using GraphQL.Common.Attributes;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
+using Main.Api.GraphQl.Types.Producer;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
