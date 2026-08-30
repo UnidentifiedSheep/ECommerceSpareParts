@@ -78,6 +78,43 @@ public class SalesFactTests
         fact.ProductsCount.Should().Be(2);
     }
 
+    [Fact]
+    public void CreateDeleted_CreatesTombstone()
+    {
+        var id = Guid.NewGuid();
+        var occurredAt = DateTime.UtcNow;
+
+        var fact = SalesFact.CreateDeleted(id, occurredAt);
+
+        fact.Id.Should().Be(id);
+        fact.IsDeleted.Should().BeTrue();
+        fact.ProcessedAt.Should().Be(occurredAt);
+        fact.SaleContents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Update_DeletedFact_RestoresFactWithRecalculatedValues()
+    {
+        var fact = SalesFact.CreateDeleted(
+            Guid.NewGuid(),
+            DateTime.UtcNow.AddMinutes(-1));
+
+        fact.Update(
+            2,
+            1,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            DateTime.UtcNow,
+            DateTime.UtcNow,
+            [CreateContent(1, 100m, 120m, 2, [CreateDetail(1, 1, 70m, 2)])]);
+
+        fact.IsDeleted.Should().BeFalse();
+        fact.RevenueInBaseCurrency.Should().Be(240m);
+        fact.CostInBaseCurrency.Should().Be(140m);
+        fact.GrossProfitInBaseCurrency.Should().Be(100m);
+        fact.ProductsCount.Should().Be(2);
+    }
+
     private static SaleContent CreateContent(
         int id,
         decimal price,

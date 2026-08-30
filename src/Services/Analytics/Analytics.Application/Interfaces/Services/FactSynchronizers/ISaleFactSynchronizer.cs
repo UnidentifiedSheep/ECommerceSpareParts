@@ -3,9 +3,13 @@ using Contracts.Sale;
 
 namespace Analytics.Application.Interfaces.Services.FactSynchronizers;
 
-public interface ISaleFactSynchronizer : IFactSynchronizer<SalesFact, Guid>
+public interface ISaleFactSynchronizer
 {
     Task<SalesFact?> SynchronizeAsync(
         SaleUpdatedEvent saleUpdatedEvent,
+        CancellationToken cancellationToken = default);
+
+    Task<SalesFact?> SynchronizeAsync(
+        SaleDeletedEvent saleDeletedEvent,
         CancellationToken cancellationToken = default);
 }

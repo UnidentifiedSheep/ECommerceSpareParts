@@ -17,4 +17,7 @@ public record GqlSortBy
         var dir = IsDescending ? "desc" : "asc";
         return $"{Field}{QueryableSortBy.Value.Delimiter}{dir}";
     }
+    
+    public static implicit operator string?(GqlSortBy? sortBy)
+        => sortBy?.ToSortExpression();
 }

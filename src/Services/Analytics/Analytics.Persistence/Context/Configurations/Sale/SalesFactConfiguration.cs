@@ -27,6 +27,7 @@ public class SalesFactConfiguration : IEntityTypeConfiguration<SalesFact>
         builder.Property(e => e.BuyerId).HasColumnName("buyer_id");
         builder.Property(e => e.CreatedAt).HasColumnName("created_at");
         builder.Property(e => e.ProcessedAt).HasColumnName("processed_at");
+        builder.Property(e => e.IsDeleted).HasColumnName("is_deleted");
         builder.Property(e => e.CurrencyId).HasColumnName("currency_id");
         builder.Property(e => e.BaseCurrencyId).HasColumnName("base_currency_id");
         builder.Property(e => e.TotalSum).HasColumnName("total_sum");

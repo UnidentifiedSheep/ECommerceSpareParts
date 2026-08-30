@@ -1,4 +1,5 @@
 using Analytics.Entities;
+using Analytics.Application.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -76,6 +77,7 @@ public class MarkupRangeAnalyzer(
     {
         var query = repository.Query
             .AsNoTracking()
+            .ExcludeDeleted()
             .Where(x => x.Details.Any());
 
         if (input.StartDate is not null) query = query.Where(x => x.Sale.CreatedAt >= input.StartDate);
