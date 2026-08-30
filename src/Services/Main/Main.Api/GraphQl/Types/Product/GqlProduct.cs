@@ -5,6 +5,7 @@ using GraphQL.Common.Attributes;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Application.Dtos.Product;
+using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.StorageContents.GetProductStorageContents;
 using Main.Entities.Exceptions;
@@ -140,6 +141,15 @@ public record GqlProduct
             .Select(x => new GqlStorageContent(x))
             .ToArray() ?? [];
     }
+
+    [GraphQLName("availableStock")]
+    public async Task<int> GetAvailableStockAsync(
+        IProductAvailableStockDataLoader loader,
+        GqlProductAvailableStocksInput input,
+        CancellationToken cancellationToken)
+        => await loader.LoadAsync(
+            new GetAvailableProductsStockItem(Id, input.StorageCode),
+            cancellationToken);
 
     private async Task<ProductDto> GetProductAsync(
         IProductByIdDataLoader loader,

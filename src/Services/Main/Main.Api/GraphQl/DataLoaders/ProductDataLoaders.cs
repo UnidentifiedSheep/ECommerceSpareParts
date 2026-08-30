@@ -121,4 +121,17 @@ public static class ProductDataLoaders
                 x => x.Key,
                 x => x.Value);
     }
+
+    [DataLoader]
+    public static async Task<Dictionary<GetAvailableProductsStockItem, int>>
+        GetProductAvailableStockAsync(
+            IReadOnlyList<GetAvailableProductsStockItem> keys,
+            ISender sender,
+            CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(
+            new GetAvailableProductsStockQuery(keys),
+            cancellationToken);
+        return result.Stocks;
+    }
 }
