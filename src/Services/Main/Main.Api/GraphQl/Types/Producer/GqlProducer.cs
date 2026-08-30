@@ -4,7 +4,7 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Application.Dtos.Producer;
 using Main.Entities.Exceptions;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Producer;
 
 [GraphQLName("Producer")]
 public record GqlProducer
@@ -32,6 +32,14 @@ public record GqlProducer
         IProducerAliasesByIdDataLoader loader,
         CancellationToken cancellationToken)
         => await loader.LoadAsync(Id, cancellationToken) ?? [];
+
+    [GraphQLName("supplierMappings")]
+    public async Task<List<GqlProducerSupplierMapping>> GetSupplierMappingsAsync(
+        IProducerSupplierMappingsByIdDataLoader loader,
+        CancellationToken cancellationToken)
+        => (await loader.LoadAsync(Id, cancellationToken) ?? [])
+            .Select(x => new GqlProducerSupplierMapping(x))
+            .ToList();
 
     private async Task<ProducerDto> GetProducerAsync(
         IProducerByIdDataLoader loader,

@@ -1,0 +1,16 @@
+{
+  "name": "Pricing",
+  "transports": {
+    "http": {
+      "url": "http://pricing-api:8080/graphql",
+      "capabilities": {
+        "batching": {
+          "variableBatching": true,
+          "requestBatching": true,
+          "aliasBatching": true
+        },
+        "onError": "propagate"
+      }
+    }
+  }
+}

@@ -1,4 +1,3 @@
-using System.Net;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
@@ -6,106 +5,34 @@ using Analytics.Entities;
 using Attributes;
 using Contracts.Sale;
 using Contracts.Sale.Model;
-using Internal.Integration.Core.Interfaces.Main;
-using Internal.Integration.Core.Models.Main.Sale;
 using Microsoft.Extensions.Logging;
 
 namespace Analytics.Application.Services.FactSynchronizers;
 
 public class SaleFactSynchronizer(
-    IMainClient mainClient,
     ISaleFactRepository repository,
     IUnitOfWork unitOfWork,
-    ILogger<IFactSynchronizer<SalesFact, Guid>> logger
+    ILogger<ISaleFactSynchronizer> logger
 ) : ISaleFactSynchronizer
 {
-    public async Task<SalesFact?> SynchronizeAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        return await unitOfWork.ExecuteWithTransaction(
-            TransactionalAttribute.ReadCommitted(20, 2),
-            async () => await ExecuteAsync(id, cancellationToken),
-            cancellationToken);
-    }
-
     public async Task<SalesFact?> SynchronizeAsync(
         SaleUpdatedEvent saleUpdatedEvent,
         CancellationToken cancellationToken = default)
     {
         return await unitOfWork.ExecuteWithTransaction(
-            TransactionalAttribute.ReadCommitted(20, 2),
+            TransactionalAttribute.Serializable(20, 2),
             async () => await ExecuteAsync(saleUpdatedEvent, cancellationToken),
             cancellationToken);
     }
 
-    private async Task<SalesFact?> ExecuteAsync(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<SalesFact?> SynchronizeAsync(
+        SaleDeletedEvent saleDeletedEvent,
+        CancellationToken cancellationToken = default)
     {
-        var synchronizationStartedAt = DateTime.UtcNow;
-
-        var response = await mainClient.SaleNode.GetFullSale(id, cancellationToken);
-        var dbFact = await repository.GetFullSalesFact(id, cancellationToken);
-
-        if (synchronizationStartedAt <= dbFact?.ProcessedAt)
-        {
-            logger.LogWarning(
-                "Sale fact Id: {id} upsert skipped, because current record is newer than incoming. " +
-                "Last processed at: {lastProcessedAt}. Incoming creation date time: {creationDate}",
-                id,
-                dbFact.ProcessedAt,
-                synchronizationStartedAt);
-
-            return dbFact;
-        }
-
-        if (!response.Success)
-        {
-            if (response.StatusCode == HttpStatusCode.NotFound)
-                return await RemoveFactIfExists(dbFact, cancellationToken);
-
-            throw new InvalidOperationException(
-                $"Unable to synchronize sale fact {id}. " +
-                $"Main service returned {response.StatusCode}: {response.Error}");
-        }
-
-        var fromMain = response.ValueOrThrow;
-
-        if (fromMain.Sale.State != InternalSaleState.Completed)
-            return await RemoveFactIfExists(dbFact, cancellationToken);
-
-        var sale = fromMain.Sale;
-        var contents = fromMain.Contents.Select(x => CreateContent(sale.Id, x));
-
-        if (dbFact is null)
-        {
-            dbFact = SalesFact.Create(
-                sale.Id,
-                sale.Currency.Id,
-                sale.Currency.Id,
-                sale.Organization.Id,
-                sale.Buyer.Id,
-                sale.SaleDatetime,
-                synchronizationStartedAt,
-                contents);
-
-            await unitOfWork.AddAsync(dbFact, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            return dbFact;
-        }
-
-        dbFact.Update(
-            sale.Currency.Id,
-            sale.Currency.Id,
-            sale.Organization.Id,
-            sale.Buyer.Id,
-            sale.SaleDatetime,
-            synchronizationStartedAt,
-            contents);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return dbFact;
+        return await unitOfWork.ExecuteWithTransaction(
+            TransactionalAttribute.Serializable(20, 2),
+            async () => await ExecuteAsync(saleDeletedEvent, cancellationToken),
+            cancellationToken);
     }
 
     private async Task<SalesFact?> ExecuteAsync(
@@ -128,7 +55,11 @@ public class SaleFactSynchronizer(
         }
 
         if (sale.State != SaleStateEventModel.Completed)
-            return await RemoveFactIfExists(dbFact, cancellationToken);
+            return await MarkDeletedAsync(
+                sale.Id,
+                saleUpdatedEvent.OccurredAt,
+                dbFact,
+                cancellationToken);
 
         var contents = sale.Contents.Select(x => CreateContent(sale.Id, x));
 
@@ -162,27 +93,34 @@ public class SaleFactSynchronizer(
         return dbFact;
     }
 
-    private static SaleContent CreateContent(Guid saleId, InternalSaleContent content)
+    private async Task<SalesFact?> ExecuteAsync(
+        SaleDeletedEvent saleDeletedEvent,
+        CancellationToken cancellationToken)
     {
-        var details = content.Details.Select(detail =>
-            SaleContentDetail.Create(
-                detail.Id,
-                content.Id,
-                detail.Currency.Id,
-                detail.BuyPrice,
-                detail.BuyPrice,
-                detail.Count,
-                detail.PurchaseDatetime));
+        var occurredAt = saleDeletedEvent.OccurredAt == default
+            ? DateTime.UtcNow
+            : saleDeletedEvent.OccurredAt;
+        var dbFact = await repository.GetFullSalesFact(
+            saleDeletedEvent.SaleId,
+            cancellationToken);
 
-        return SaleContent.Create(
-            content.Id,
-            saleId,
-            content.Product.Id,
-            content.Price,
-            content.Price,
-            content.Count,
-            content.Discount,
-            details);
+        if (occurredAt <= dbFact?.ProcessedAt)
+        {
+            logger.LogWarning(
+                "Sale fact Id: {id} delete skipped, because current record is newer than incoming. " +
+                "Last processed at: {lastProcessedAt}. Incoming creation date time: {creationDate}",
+                saleDeletedEvent.SaleId,
+                dbFact.ProcessedAt,
+                occurredAt);
+
+            return dbFact;
+        }
+
+        return await MarkDeletedAsync(
+            saleDeletedEvent.SaleId,
+            occurredAt,
+            dbFact,
+            cancellationToken);
     }
 
     private static SaleContent CreateContent(Guid saleId, SaleContentEventModel content)
@@ -208,11 +146,21 @@ public class SaleFactSynchronizer(
             details);
     }
 
-    private async Task<SalesFact?> RemoveFactIfExists(
+    private async Task<SalesFact?> MarkDeletedAsync(
+        Guid id,
+        DateTime processedAt,
         SalesFact? dbFact,
         CancellationToken cancellationToken)
     {
-        if (dbFact is not null) unitOfWork.Remove(dbFact);
+        if (dbFact is null)
+        {
+            dbFact = SalesFact.CreateDeleted(id, processedAt);
+            await unitOfWork.AddAsync(dbFact, cancellationToken);
+        }
+        else
+        {
+            dbFact.MarkDeleted(processedAt);
+        }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return null;

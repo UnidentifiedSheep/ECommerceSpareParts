@@ -27,6 +27,8 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
 
     public DateTime ProcessedAt { get; private set; }
 
+    public bool IsDeleted { get; private set; }
+
     public decimal TotalSum { get; private set; }
 
     public decimal RevenueInBaseCurrency { get; private set; }
@@ -74,6 +76,17 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
         return fact;
     }
 
+    public static SalesFact CreateDeleted(Guid id, DateTime processedAt)
+    {
+        return new SalesFact
+        {
+            Id = id,
+            CreatedAt = processedAt,
+            ProcessedAt = processedAt,
+            IsDeleted = true
+        };
+    }
+
     public void Update(
         int currencyId,
         int baseCurrencyId,
@@ -89,8 +102,15 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
         BuyerId = buyerId;
         CreatedAt = createdAt;
         ProcessedAt = processedAt;
+        IsDeleted = false;
 
         ApplyContents(contents);
+    }
+
+    public void MarkDeleted(DateTime processedAt)
+    {
+        ProcessedAt = processedAt;
+        IsDeleted = true;
     }
 
     private void ApplyContents(IEnumerable<SaleContent> contents)

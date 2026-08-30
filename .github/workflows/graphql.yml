@@ -23,6 +23,8 @@ jobs:
             project: src/Services/Search/Search.Api/Search.Api.csproj
           - name: Analytics
             project: src/Services/Analytics/Analytics.Api/Analytics.Api.csproj
+          - name: Pricing
+            project: src/Services/Pricing/Pricing.Api/Pricing.Api.csproj
 
     env:
       DOTNET_ENVIRONMENT: Development
@@ -126,6 +128,12 @@ jobs:
           name: graphql-source-Analytics-${{ github.sha }}
           path: artifacts/graphql/Analytics
 
+      - name: Download Pricing source schema
+        uses: actions/download-artifact@v4
+        with:
+          name: graphql-source-Pricing-${{ github.sha }}
+          path: artifacts/graphql/Pricing
+
       - name: Compose gateway.far
         shell: bash
         run: |
@@ -137,6 +145,7 @@ jobs:
             -f artifacts/graphql/Main/schema.graphqls \
             -f artifacts/graphql/Search/schema.graphqls \
             -f artifacts/graphql/Analytics/schema.graphqls \
+            -f artifacts/graphql/Pricing/schema.graphqls \
             -a artifacts/graphql/Gateway/gateway.far
 
       - name: Verify Fusion archive
@@ -149,7 +158,7 @@ jobs:
           unzip -t "$archive"
 
           archive_entries="$(unzip -Z1 "$archive")"
-          for schema_name in Main Search Analytics; do
+          for schema_name in Main Search Analytics Pricing; do
             grep -Fxq \
               "source-schemas/${schema_name}/schema.graphqls" \
               <<< "$archive_entries"

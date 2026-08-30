@@ -1,3 +1,4 @@
+using Analytics.Application.Extensions;
 using Analytics.Application.Models;
 using Analytics.Entities;
 using Analytics.Entities.Enums;
@@ -29,6 +30,7 @@ public sealed class SalesProfitOverTimeChartDataSource(
             .Validate();
 
         var query = repository.Query
+            .ExcludeDeleted()
             .Where(x => x.CreatedAt >= queryInput.StartDate && x.CreatedAt <= queryInput.EndDate);
 
         if (queryInput.OrganizationId is { } organizationId)
@@ -73,9 +75,15 @@ public sealed class SalesProfitOverTimeChartDataSource(
                     0,
                     0,
                     DateTimeKind.Utc),
-                Revenue = group.Sum(x => x.RevenueInBaseCurrency),
-                Cost = group.Sum(x => x.CostInBaseCurrency),
-                GrossProfit = group.Sum(x => x.GrossProfitInBaseCurrency),
+                Revenue = Math.Round(
+                    group.Sum(x => x.RevenueInBaseCurrency),
+                    12),
+                Cost = Math.Round(
+                    group.Sum(x => x.CostInBaseCurrency),
+                    12),
+                GrossProfit = Math.Round(
+                    group.Sum(x => x.GrossProfitInBaseCurrency),
+                    12),
                 SalesCount = group.Count(),
                 ProductsCount = group.Sum(x => x.ProductsCount)
             });

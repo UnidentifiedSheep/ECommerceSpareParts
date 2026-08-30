@@ -221,6 +221,7 @@ jobs:
               "src/Services/Main/Main.Api/Dockerfile",
               "src/Services/Search/Search.Api/Dockerfile",
               "src/Services/Analytics/Analytics.Api/Dockerfile",
+              "src/Services/Pricing/Pricing.Api/Dockerfile",
           }
           graphql_pipeline_changed = any(
               path.startswith((
@@ -229,6 +230,7 @@ jobs:
                   "src/Services/Main/Main.Api/GraphQl/",
                   "src/Services/Search/Search.Api/GraphQl/",
                   "src/Services/Analytics/Analytics.Api/GraphQl/",
+                  "src/Services/Pricing/Pricing.Api/GraphQl/",
               )) or path in {
                   ".config/dotnet-tools.json",
                   ".github/workflows/graphql.yml",

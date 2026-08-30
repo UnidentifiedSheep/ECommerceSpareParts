@@ -53,7 +53,8 @@ public class DeleteSaleHandler(
         integrationEventScope.Add(
             new SaleDeletedEvent
             {
-                SaleId = sale.Id
+                SaleId = sale.Id,
+                OccurredAt = DateTime.UtcNow
             });
 
         return Unit.Value;
