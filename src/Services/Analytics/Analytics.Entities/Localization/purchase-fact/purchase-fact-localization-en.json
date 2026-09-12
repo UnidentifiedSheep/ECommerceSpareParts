@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "en",
-  "keyValues": {
+  "culture": "en",
+  "messages": {
     "purchase.fact.required": "Purchase fact is required.",
     "purchase.fact.id.required": "Purchase fact id is required.",
     "purchase.fact.content.required": "Content of purchase fact must not be empty.",

@@ -1,6 +1,6 @@
 {
-  "locale": "tr",
-  "keyValues": {
+  "culture": "tr",
+  "messages": {
     "purchase.fact.required": "Satın alma olgusu zorunludur.",
     "purchase.fact.id.required": "Satın alma olgusu kimliği zorunludur.",
     "purchase.fact.content.required": "Satın alma olgusu içeriği boş olmamalıdır.",

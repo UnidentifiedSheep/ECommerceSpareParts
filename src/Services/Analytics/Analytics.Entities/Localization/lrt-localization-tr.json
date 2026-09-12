@@ -1,6 +1,6 @@
 {
-  "locale": "tr",
-  "keyValues": {
+  "culture": "tr",
+  "messages": {
     "markup_calculation_lrt_name": "Kâr marjı hesaplama",
     "markup_calculation_lrt_description": "Kâr marjı verilerini analiz eder ve fiyatlandırma için önerilen kâr marjı aralıklarını oluşturur.",
     "markup.calculation.input.invalid": "Kâr marjı hesaplaması için geçersiz giriş verisi sağlandı.",
