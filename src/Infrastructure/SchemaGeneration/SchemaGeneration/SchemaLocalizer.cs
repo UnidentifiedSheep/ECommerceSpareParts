@@ -1,10 +1,11 @@
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
+using Locan.Core.LocalizableMessages;
 using SchemaGeneration.Abstractions;
 using SchemaGeneration.Abstractions.Models;
 
 namespace SchemaGeneration;
 
-public sealed class SchemaLocalizer(IContextualStringLocalizer localizer) : ISchemaLocalizer
+public sealed class SchemaLocalizer(IContextualLocalizer localizer) : ISchemaLocalizer
 {
 	public ObjectSchema Localize(ObjectSchema schema)
 	{
@@ -49,7 +50,6 @@ public sealed class SchemaLocalizer(IContextualStringLocalizer localizer) : ISch
 		if (string.IsNullOrWhiteSpace(key))
 			return null;
 
-		var value = localizer.GetOrDefault(key);
-		return string.IsNullOrWhiteSpace(value) ? key : value;
+		return localizer.TryGet(new LocalizableMessage(key), out var s) ? s : key;
 	}
 }

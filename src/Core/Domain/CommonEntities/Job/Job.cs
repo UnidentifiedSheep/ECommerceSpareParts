@@ -177,7 +177,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 	public virtual void RequestCancellation(string? reason = null)
 	{
 		if (IsStep)
-			throw new InvalidInputException(new JobStepCannotBeCancelledDirectlyMessage());
+			throw new InvalidInputException(JobStepCannotBeCancelledDirectlyMessage.Instance);
 
 		if (IsTerminal)
 			throw new InvalidOperationException("Terminal job cannot be cancelled.");

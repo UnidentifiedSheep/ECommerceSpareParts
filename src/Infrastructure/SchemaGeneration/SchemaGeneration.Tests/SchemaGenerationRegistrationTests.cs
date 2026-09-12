@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.Extensions.DependencyInjection;
 using SchemaGeneration.Abstractions;
 using SchemaGeneration.Abstractions.Attributes;
@@ -15,7 +15,7 @@ public sealed class SchemaGenerationRegistrationTests
 	public void AddSchemaGeneration_ShouldResolveLocalizedGeneratorByDefault()
 	{
 		var services = new ServiceCollection();
-		services.AddScoped<IContextualStringLocalizer>(_ => new StubContextualStringLocalizer(
+		services.AddScoped<IContextualLocalizer>(_ => new StubContextualStringLocalizer(
 			new Dictionary<string, string>
 			{
 				["value.label"] = "Localized value"
@@ -37,7 +37,7 @@ public sealed class SchemaGenerationRegistrationTests
 	public void AddSchemaGeneration_ShouldResolveRawGeneratorAsSingleton()
 	{
 		var services = new ServiceCollection();
-		services.AddScoped<IContextualStringLocalizer>(_ =>
+		services.AddScoped<IContextualLocalizer>(_ =>
 			new StubContextualStringLocalizer(new Dictionary<string, string>()));
 		services.AddSchemaGeneration();
 
@@ -58,7 +58,7 @@ public sealed class SchemaGenerationRegistrationTests
 	{
 		var scopeNumber = 0;
 		var services = new ServiceCollection();
-		services.AddScoped<IContextualStringLocalizer>(_ =>
+		services.AddScoped<IContextualLocalizer>(_ =>
 		{
 			var localizedValue = Interlocked.Increment(ref scopeNumber) == 1 ? "First scope" : "Second scope";
 

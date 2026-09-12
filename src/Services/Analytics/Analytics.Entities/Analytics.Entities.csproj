@@ -4,6 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LocanDefaultCulture>en</LocanDefaultCulture>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,7 +15,12 @@
 
     <ItemGroup>
         <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5"/>
-        <PackageReference Include="Locan.Generator" Version="1.0.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="Locan.Generator" Version="1.0.5" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
+    <ItemGroup>
+        <LocanResource Include="Localization/**/*.json"
+                       GenerateMessages="true"
+                       CopyToOutput="false" />
+    </ItemGroup>
 </Project>

@@ -1,29 +1,29 @@
-using Localization.Abstractions.Interfaces;
-using Localization.Abstractions.Models;
+using System.Globalization;
+using Locan.Core.Interfaces.Localizers;
 
 namespace Mailing.Core.Models;
 
 public sealed class EmailVerificationData : IEmailData
 {
 	public EmailVerificationData(
-		IContextualStringLocalizer localizer,
+		IContextualLocalizer localizer,
 		string verificationUrl,
 		string to)
 	{
-		Locale = localizer.Locale;
+		Locale = CultureInfo.CurrentUICulture;
 		To = to;
 		VerificationUrl = verificationUrl;
 		HtmlLang = Locale.ToString().ToLowerInvariant();
-		Subject = localizer.Get("mail.email.verification.subject");
-		Title = localizer.Get("mail.email.verification.title");
-		Intro = localizer.Get("mail.email.verification.intro");
-		Description = localizer.Get("mail.email.verification.description");
-		Button = localizer.Get("mail.email.verification.button");
-		Fallback = localizer.Get("mail.email.verification.fallback");
-		Ignore = localizer.Get("mail.email.verification.ignore");
+		Subject = localizer.Get(new MailEmailVerificationSubjectMessage());
+		Title = localizer.Get(new MailEmailVerificationTitleMessage());
+		Intro = localizer.Get(new MailEmailVerificationIntroMessage());
+		Description = localizer.Get(new MailEmailVerificationDescriptionMessage());
+		Button = localizer.Get(new MailEmailVerificationButtonMessage());
+		Fallback = localizer.Get(new MailEmailVerificationFallbackMessage());
+		Ignore = localizer.Get(new MailEmailVerificationIgnoreMessage());
 	}
 
-	public Locale Locale { get; }
+	public CultureInfo Locale { get; }
 
 	public string HtmlLang { get; }
 

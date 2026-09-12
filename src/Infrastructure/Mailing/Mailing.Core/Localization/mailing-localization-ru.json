@@ -1,6 +1,6 @@
 {
-  "locale": "ru",
-  "keyValues": {
+  "culture": "ru",
+  "messages": {
     "mail.password.reset.subject": "Восстановление пароля",
     "mail.password.reset.title": "Восстановление пароля",
     "mail.password.reset.intro": "Мы получили запрос на восстановление пароля для вашей учетной записи.",

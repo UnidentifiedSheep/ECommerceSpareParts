@@ -1,55 +1,20 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using Localization.Abstractions.Interfaces;
-using Localization.Abstractions.Models;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 
 namespace SchemaGeneration.Tests;
 
 internal sealed class StubContextualStringLocalizer(IReadOnlyDictionary<string, string> values)
-	: IContextualStringLocalizer
+	: IContextualLocalizer
 {
-	public Locale Locale { get; private set; } = "EN";
-
-	public string this[string key] => Get(key);
-
-	public string Get(string key) => GetOrDefault(key) ?? key;
-
-	public string Get(string key, params object[] arguments) => string.Format(
-		CultureInfo.InvariantCulture,
-		Get(key),
-		arguments);
-
-	public bool TryGet(string key, out string? value) => values.TryGetValue(key, out value);
-
-	public bool TryGet(
-		string key,
-		out string? value,
-		params object[] arguments)
+	public string Get(ILocalizableMessage message)
 	{
-		if (!TryGet(key, out value))
-			return false;
-		value = string.Format(
-			CultureInfo.InvariantCulture,
-			value!,
-			arguments);
-		return true;
+		if (values.TryGetValue(message.MessageKey, out var value))
+			return value;
+
+		throw new InvalidOperationException();
 	}
-
-	public string? GetOrDefault(string key) => values.GetValueOrDefault(key);
-
-	public string? GetOrDefault(string key, params object[] arguments)
-	{
-		var value = GetOrDefault(key);
-		return value is null
-			? null
-			: string.Format(
-				CultureInfo.InvariantCulture,
-				value,
-				arguments);
-	}
-
-	public void SetLocale(Locale locale) => Locale = locale;
-
-	public void Dispose()
-	{
-	}
+	public bool TryGet(ILocalizableMessage message, [NotNullWhen(true)] out string? value)
+		=> values.TryGetValue(message.MessageKey, out value);
 }

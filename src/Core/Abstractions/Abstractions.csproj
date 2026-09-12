@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
-        <PackageReference Include="Locan.Core" Version="1.0.2" />
+        <PackageReference Include="Locan.Core" Version="1.0.5" />
     </ItemGroup>
 
 </Project>
