@@ -3,11 +3,10 @@ using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Gateway.Application.Dtos;
 using Internal.Integration.Core.Interfaces.Common;
-using Localization.Abstractions.Models;
 
 namespace Gateway.Application.Handlers;
 
-public record GetAggregatedAvailableJobsQuery(Locale Locale) : IQuery<GetAggregatedAvailableJobsResult>;
+public record GetAggregatedAvailableJobsQuery(string? Locale) : IQuery<GetAggregatedAvailableJobsResult>;
 
 public record GetAggregatedAvailableJobsResult(ServiceJobsDto[] Jobs);
 
@@ -36,7 +35,7 @@ public class GetAggregatedAvailableJobsHandler(ICommonClient commonClient)
 
 	private async Task<ServiceJobsDto> GetJobsForAsync(
 		IServiceDefinition serviceDefinition,
-		Locale locale,
+		string? locale,
 		CancellationToken token)
 	{
 		try
