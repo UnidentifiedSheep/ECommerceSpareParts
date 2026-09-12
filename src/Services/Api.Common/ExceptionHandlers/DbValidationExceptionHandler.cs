@@ -1,5 +1,4 @@
 ﻿using BulkValidation.Core.Exceptions;
-using Localization.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
@@ -21,7 +20,6 @@ public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> 
 			null);
 		SetStatusCode(problemDetails, dbValidationException);
 		AddDbValidationErrors(
-			httpContext,
 			problemDetails,
 			dbValidationException);
 		LogException(
@@ -35,47 +33,22 @@ public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> 
 	}
 
 	private void AddDbValidationErrors(
-		HttpContext httpContext,
 		ProblemDetails details,
 		ValidationException bulkEx)
 	{
-		var localizer = httpContext.RequestServices.GetService<IContextualStringLocalizer>();
-
 		var errors = new List<ProblemDetails>();
 
 		foreach (var fail in bulkEx.Failures)
 		{
 			var errorName = fail.ErrorName ?? "An unexpected error occurred";
 			var errorCode = fail.ErrorCode;
-			if (localizer == null)
-			{
-				errors.Add(
-					new ProblemDetails
-					{
-						Title = errorName,
-						Detail = fail.Message,
-						Status = errorCode
-					});
-				continue;
-			}
-
-			object[]? arguments = null;
-
-			if (fail.AttemptedValue is IEnumerable<object?> args)
-				arguments = args.Where(x => x != null).Select(x => x!).ToArray();
-			else if (fail.AttemptedValue != null)
-				arguments = [fail.AttemptedValue];
-
-			var key = fail.Message;
-			var message = arguments is { Length: > 0 }
-				? localizer.GetOrDefault(key, arguments) ?? fail.Message
-				: localizer.GetOrDefault(key) ?? fail.Message;
+			// TODO: Replace the raw message with ILocalizableMessage when BulkValidation exposes it.
 
 			errors.Add(
 				new ProblemDetails
 				{
 					Title = errorName,
-					Detail = message,
+					Detail = fail.Message,
 					Status = errorCode
 				});
 		}

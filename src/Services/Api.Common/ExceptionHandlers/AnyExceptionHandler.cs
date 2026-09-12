@@ -1,10 +1,12 @@
 ﻿using Exceptions.Base;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class AnyExceptionHandler(ILogger<AnyExceptionHandler> logger)
+public class AnyExceptionHandler(
+	ILogger<AnyExceptionHandler> logger,
+	IContextualLocalizer localizer)
 	: ExceptionHandlerBase<AnyExceptionHandler>(logger)
 {
 	public override async ValueTask<bool> TryHandleAsync(
@@ -24,7 +26,6 @@ public class AnyExceptionHandler(ILogger<AnyExceptionHandler> logger)
 
 		SetLocalizedDetail(
 			problemDetails,
-			httpContext,
 			exception);
 		AddExceptionRelatedData(problemDetails, exception);
 
@@ -35,13 +36,8 @@ public class AnyExceptionHandler(ILogger<AnyExceptionHandler> logger)
 
 	private void SetLocalizedDetail(
 		ProblemDetails problemDetails,
-		HttpContext httpContext,
 		Exception exception)
 	{
-		var localizer = httpContext.RequestServices.GetService<IContextualStringLocalizer>();
-		if (localizer == null)
-			return;
-
 		if (TryGetLocalizableMessageFromException(
 				localizer,
 				exception,

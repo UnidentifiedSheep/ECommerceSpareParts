@@ -1,6 +1,5 @@
 ﻿using Abstractions.Interfaces.Exceptions;
-using Localization.Abstractions;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -75,7 +74,7 @@ public abstract class ExceptionHandlerBase<THandler>(ILogger<THandler> logger) :
 	}
 
 	protected bool TryGetLocalizableMessageFromException(
-		IContextualStringLocalizer localizer,
+		IContextualLocalizer localizer,
 		Exception exception,
 		out string? detail)
 	{
@@ -83,20 +82,13 @@ public abstract class ExceptionHandlerBase<THandler>(ILogger<THandler> logger) :
 		if (exception is not ILocalizableException localizableException)
 			return false;
 
-		var key = localizableException.MessageKey;
-		if (!localizer.TryGet(key, out var message) || message == null)
-			logger.LogError("Unable to get localizable message for Key: {Key}", key);
-
-		if (LocalizedMessageFormatter.TryFormat(
-				message!,
-				localizableException.Arguments,
-				out detail))
+		var message = localizableException.LocalizableMessage;
+		if (localizer.TryGet(message, out detail))
 			return true;
 
 		logger.LogError(
-			"Unable to format localizable message for Key: {Key}, Arguments: {@Args}",
-			key,
-			localizableException.Arguments);
+			"Unable to get localizable message for key: {Key}",
+			message.MessageKey);
 		return false;
 	}
 }

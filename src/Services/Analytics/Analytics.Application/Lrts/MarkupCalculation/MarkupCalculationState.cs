@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Analytics.Entities;
 using Application.Common.Interfaces.Lrt;
 using Exceptions;
 using SchemaGeneration.Abstractions.Attributes;
@@ -21,6 +22,6 @@ public record MarkupCalculationInputState : IInputState
 	public void ValidateState()
 	{
 		if (RangeStart is not null && RangeEnd is not null && RangeStart > RangeEnd)
-			throw new InvalidInputException("markup.calculation.range.start.must.be.before.or.equal.end");
+			throw new InvalidInputException(MarkupCalculationRangeStartMustBeBeforeOrEqualEndMessage.Instance);
 	}
 }

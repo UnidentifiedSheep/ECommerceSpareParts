@@ -21,7 +21,6 @@ using Contracts.Job;
 using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Internal.Integration.Di;
-using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
 using Security;
@@ -52,8 +51,6 @@ builder
 	.AddIntegrationClients()
 	.AddEComAuth(builder.Configuration)
 	.AddMinimalSecurityLayer();
-
-builder.Services.AddLocalization(builder.Configuration);
 
 var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 

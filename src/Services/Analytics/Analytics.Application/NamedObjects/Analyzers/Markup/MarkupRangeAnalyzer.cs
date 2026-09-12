@@ -1,6 +1,7 @@
 using Analytics.Application.Extensions;
 using Analytics.Entities;
 using Application.Common.Interfaces.Repositories;
+using Locan.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Analytics.Application.NamedObjects.Analyzers.Markup;
@@ -23,11 +24,12 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 
 	public const string AnalyzerSystemName = nameof(MarkupRangeAnalyzer);
 
-	public override string NameLocalizationKey => "markup.range.analyzer.name";
-
-	public override string DescriptionLocalizationKey => "markup.range.analyzer.description";
-
 	public override string SystemName => AnalyzerSystemName;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> MarkupRangeAnalyzerNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		MarkupRangeAnalyzerDescriptionMessage.Instance;
 
 	public override async Task<IReadOnlyList<MarkupRangeDraft>> AnalyzeAsync(
 		MarkupAnalyzerInput input,

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Abstractions.Models;
+using Application.Common;
 using Domain.Validation;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
@@ -28,6 +29,6 @@ public abstract record CursorChartQueryInput<TCursor> : ICursorChartQueryInput<T
 		Size.EnsureInRange(
 			1,
 			100,
-			"pagination.size.range");
+			PaginationSizeRangeDefaultMessage.Instance);
 	}
 }

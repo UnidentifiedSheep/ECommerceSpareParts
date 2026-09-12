@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>14</LangVersion>
+        <LocanDefaultCulture>en</LocanDefaultCulture>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,21 +31,6 @@
         <Content Include="..\..\..\..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
-        <Content Include="..\Analytics.Entities\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\Application.Common\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\..\Core\Domain\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -52,4 +38,17 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+        <LocanResource Include="../Analytics.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
+        
+        <LocanResource Include="../../Application.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
+
+        <LocanResource Include="../../../Core/Domain/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
+    </ItemGroup>
 </Project>

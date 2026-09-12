@@ -14,7 +14,6 @@ using Cache;
 using Contracts.Job;
 using Contracts.Settings;
 using Internal.Integration.Di;
-using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
 using Security;
@@ -32,8 +31,6 @@ builder.AddLokiLogger(
 	builder.Configuration,
 	"analytics.worker",
 	env);
-
-builder.Services.AddLocalization(builder.Configuration);
 
 builder
 	.Services

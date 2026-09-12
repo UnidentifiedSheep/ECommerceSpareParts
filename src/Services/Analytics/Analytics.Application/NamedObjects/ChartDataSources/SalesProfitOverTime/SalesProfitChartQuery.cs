@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Analytics.Application.Interfaces.ChartData;
+using Analytics.Entities;
 using Analytics.Entities.Enums;
 using Domain.Validation;
 using SchemaGeneration.Abstractions.Attributes;
@@ -50,16 +51,22 @@ public sealed record SalesProfitChartQuery : CursorChartQueryInput<DateTime>
 	{
 		StartDate.Ensure(
 			date => date.Kind == DateTimeKind.Utc,
-			"chart.sales.profit.query.start.date.must.be.utc");
+			ChartSalesProfitQueryStartDateMustBeUtcMessage.Instance);
 		EndDate.Ensure(
 			date => date.Kind == DateTimeKind.Utc,
-			"chart.sales.profit.query.end.date.must.be.utc");
+			ChartSalesProfitQueryEndDateMustBeUtcMessage.Instance);
 		StartDate.EnsureAtMost(
 			EndDate,
-			"chart.sales.profit.query.start.date.must.be.before.or.equal.end.date");
-		Granularity.Ensure(Enum.IsDefined, "chart.sales.profit.query.granularity.unsupported");
+			ChartSalesProfitQueryStartDateMustBeBeforeOrEqualEndDateMessage.Instance);
+
+		Granularity.Ensure(
+			Enum.IsDefined,
+			ChartSalesProfitQueryGranularityUnsupportedMessage.Instance);
+
 		if (Cursor is { } cursor)
-			cursor.Ensure(value => value.Kind == DateTimeKind.Utc, "chart.sales.profit.query.cursor.invalid");
+			cursor.Ensure(
+				value => value.Kind == DateTimeKind.Utc,
+				ChartSalesProfitQueryCursorInvalidMessage.Instance);
 
 		ValidateCursor();
 	}

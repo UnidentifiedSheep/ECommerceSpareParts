@@ -1,6 +1,7 @@
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
+using Analytics.Entities;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -8,6 +9,7 @@ using Application.Common.LRT;
 using Attributes;
 using Contracts.Analytics;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -27,10 +29,10 @@ public class MarkupCalculationLrt(
 	logger)
 {
 	public override string SystemName => nameof(MarkupCalculationLrt);
-
-	public override string NameLocalizationKey => "markup_calculation_lrt_name";
-
-	public override string DescriptionLocalizationKey => "markup_calculation_lrt_description";
+	public override ILocalizableMessage NameLocalizationMessage
+		=> MarkupCalculationLrtNameMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> MarkupCalculationLrtDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{
