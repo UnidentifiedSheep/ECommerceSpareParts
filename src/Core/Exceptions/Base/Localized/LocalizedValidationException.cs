@@ -1,20 +1,16 @@
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Models.Validation;
+using Locan.Core.Interfaces;
 
 namespace Exceptions.Base.Localized;
 
 public abstract class LocalizedValidationException : ValidationException, ILocalizableException
 {
+	public ILocalizableMessage LocalizableMessage { get; }
 	protected LocalizedValidationException(
 		IEnumerable<ValidationErrorModel> errors,
-		string messageKey,
-		object[]? arguments = null) : base(errors)
+		ILocalizableMessage message) : base(errors)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
-
-	public string MessageKey { get; }
-
-	public object[]? Arguments { get; }
 }
