@@ -1,8 +1,9 @@
 using Application.Common.Dtos;
+using Application.Common.Extensions;
 using Cronos;
+using Domain;
 using Domain.CommonEntities.Job;
 using FluentValidation;
-using Localization.Domain.Extensions;
 
 namespace Application.Common.Validators;
 
@@ -12,27 +13,31 @@ public sealed class NewJobScheduleDtoValidator : AbstractValidator<NewJobSchedul
 	{
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithLocalizationKey("job.schedule.name.required")
+			.WithLocalizableError(JobScheduleNameRequiredMessage.Instance)
 			.MaximumLength(JobSchedule.NameMaxLength)
-			.WithLocalizationKey("job.schedule.name.max.length");
+			.WithLocalizableError(JobScheduleNameMaxLengthMessage.Instance);
 
 		RuleFor(x => x.Description)
 			.MaximumLength(JobSchedule.DescriptionMaxLength)
-			.WithLocalizationKey("job.schedule.description.max.length");
+			.WithLocalizableError(JobScheduleDescriptionMaxLengthMessage.Instance);
 
-		RuleFor(x => x.JobSystemName).NotEmpty().WithLocalizationKey("job.schedule.job.system.name.required");
+		RuleFor(x => x.JobSystemName)
+			.NotEmpty()
+			.WithLocalizableError(JobScheduleJobSystemNameRequiredMessage.Instance);
 
-		RuleFor(x => x.InputState).NotEmpty().WithLocalizationKey("job.schedule.input.state.required");
+		RuleFor(x => x.InputState)
+			.NotEmpty()
+			.WithLocalizableError(JobScheduleInputStateRequiredMessage.Instance);
 
 		RuleFor(x => x.Cron)
 			.Cascade(CascadeMode.Stop)
 			.NotEmpty()
-			.WithLocalizationKey("job.schedule.cron.required")
+			.WithLocalizableError(JobScheduleCronRequiredMessage.Instance)
 			.Must(x => CronExpression.TryParse(x, out _))
-			.WithLocalizationKey("job.schedule.cron.invalid");
+			.WithLocalizableError(JobScheduleCronInvalidMessage.Instance);
 
 		RuleFor(x => x.MaxAttempts)
 			.GreaterThan(0)
-			.WithLocalizationKey("job.max.attempts.must.be.greater.than.zero");
+			.WithLocalizableError(JobMaxAttemptsMustBeGreaterThanZeroMessage.Instance);
 	}
 }

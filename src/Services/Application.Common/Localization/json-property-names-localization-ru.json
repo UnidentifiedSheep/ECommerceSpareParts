@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "ru",
-  "keyValues": {
+  "culture": "ru",
+  "messages": {
     "price": "Цена",
     "date": "Дата",
     "quantity": "Количество",

@@ -60,8 +60,7 @@ public static class SortByExtensions
 		catch (ArgumentException exception)
 		{
 			throw new InvalidInputException(
-				"sorting.invalid",
-				[exception.Message],
+				SortingInvalidMessage.Create(exception.Message),
 				exception.Message);
 		}
 	}

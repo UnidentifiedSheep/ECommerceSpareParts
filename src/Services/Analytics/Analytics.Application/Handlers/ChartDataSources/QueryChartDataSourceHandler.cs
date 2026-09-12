@@ -2,6 +2,7 @@ using System.Text.Json;
 using Abstractions.Interfaces;
 using Analytics.Application.Interfaces.ChartData;
 using Analytics.Application.NamedObjects.ChartDataSources;
+using Analytics.Entities;
 using Analytics.Entities.Exceptions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
@@ -37,11 +38,11 @@ public sealed class QueryChartDataSourceHandler(
 		try
 		{
 			return jsonSerializer.Deserialize(json, queryInputType) as IChartQueryInput ??
-				throw new InvalidInputException("chart.data.source.query.input.invalid");
+				throw new InvalidInputException(ChartDataSourceQueryInputInvalidMessage.Instance);
 		}
 		catch (JsonException)
 		{
-			throw new InvalidInputException("chart.data.source.query.input.invalid");
+			throw new InvalidInputException(ChartDataSourceQueryInputInvalidMessage.Instance);
 		}
 	}
 }

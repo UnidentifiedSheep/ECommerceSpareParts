@@ -1,19 +1,18 @@
 ﻿using Application.Common.Interfaces.NamedObject;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 
 namespace Application.Common.Abstractions.NamedObjects;
 
 public abstract class LocalizableNameObject : ILocalizableNamedObject
 {
-	public abstract string NameLocalizationKey { get; }
-
-	public abstract string DescriptionLocalizationKey { get; }
-
 	public abstract string SystemName { get; }
+	public abstract ILocalizableMessage NameLocalizationMessage { get; }
+	public abstract ILocalizableMessage DescriptionLocalizationMessage { get; }
 
-	public string GetLocalizedName(IContextualStringLocalizer stringLocalizer) =>
-		stringLocalizer.Get(NameLocalizationKey);
+	public string GetLocalizedName(IContextualLocalizer stringLocalizer) =>
+		stringLocalizer.Get(NameLocalizationMessage);
 
-	public string GetLocalizedDescription(IContextualStringLocalizer stringLocalizer) =>
-		stringLocalizer.Get(DescriptionLocalizationKey);
+	public string GetLocalizedDescription(IContextualLocalizer stringLocalizer) =>
+		stringLocalizer.Get(DescriptionLocalizationMessage);
 }

@@ -2,7 +2,7 @@ using Application.Common.Dtos;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using SchemaGeneration.Abstractions;
 
 namespace Application.Common.Handlers.Settings;
@@ -14,7 +14,7 @@ public record GetSettingsResult(IReadOnlyList<SettingDto> Settings);
 public class GetSettingsHandler(
 	INamedObjectRegistry<SettingDefinitionNamedObjectBase> registry,
 	ISchemaGenerator schemaGenerator,
-	IContextualStringLocalizer localizer) : IQueryHandler<GetSettingsQuery, GetSettingsResult>
+	IContextualLocalizer localizer) : IQueryHandler<GetSettingsQuery, GetSettingsResult>
 {
 	public async Task<GetSettingsResult> Handle(GetSettingsQuery request, CancellationToken cancellationToken)
 	{

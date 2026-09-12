@@ -7,6 +7,7 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.CommonEntities.Job;
 using Domain.Exceptions;
+using Locan.Core.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -50,9 +51,8 @@ public abstract class LrtBase<TInputState, TState>(
 
 	public abstract string SystemName { get; }
 
-	public abstract string NameLocalizationKey { get; }
-
-	public abstract string DescriptionLocalizationKey { get; }
+	public abstract ILocalizableMessage NameLocalizationMessage { get; }
+	public abstract ILocalizableMessage DescriptionLocalizationMessage { get; }
 
 	public Type InputType => typeof(TInputState);
 
