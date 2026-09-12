@@ -2,11 +2,10 @@ using System.Reflection;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Events;
 using Attributes;
-using Localization.Abstractions.Interfaces;
-using Localization.Domain;
-using Localization.Domain.Extensions;
+using Locan.Hosting;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.Persistence.Context;
@@ -76,9 +75,10 @@ public abstract class CommonLayerIntegrationTest : TestBase
 
 	private async Task LoadLocales()
 	{
-		var containers = Sp.GetRequiredService<IEnumerable<ILocalizerContainer>>();
-		var path = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-		var loader = new JsonLocalizerContainerLoader(path);
-		await loader.LoadAsync(containers);
+		var task = Sp
+			.GetServices<IHostedService>()
+			.OfType<LocalizerInitializationHostedService>()
+			.Single();
+		await task.StartAsync(CancellationToken.None);
 	}
 }

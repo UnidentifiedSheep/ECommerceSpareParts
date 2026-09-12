@@ -6,7 +6,6 @@ using Analytics.Persistence.Context;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.HostedServices.Startup;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Application.Common.Interfaces;
@@ -46,7 +45,6 @@ builder
 
 builder.Services.AddLrtHostedServices();
 
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
 AddMassTransit(builder);

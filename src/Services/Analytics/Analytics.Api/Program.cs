@@ -10,7 +10,6 @@ using Api.Common;
 using Api.Common.Consumers;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.HostedServices.Startup;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
@@ -110,7 +109,6 @@ builder.Services.AddSignalR();
 
 builder.Services.AddCarter(configurator: c => c.WithEmptyValidators());
 
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
 var app = builder.Build();

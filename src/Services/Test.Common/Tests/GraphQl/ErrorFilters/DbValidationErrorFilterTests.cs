@@ -9,7 +9,7 @@ namespace Tests.Tests.GraphQl.ErrorFilters;
 public class DbValidationErrorFilterTests
 {
 	[Fact]
-	public void OnError_ShouldReturnLocalizedFailuresAndMaximumStatus()
+	public void OnError_ShouldReturnRawFailuresAndMaximumStatus()
 	{
 		var exception = new DbValidationException(
 			[
@@ -30,7 +30,7 @@ public class DbValidationErrorFilterTests
 			.BeAssignableTo<IReadOnlyCollection<IReadOnlyDictionary<string, object?>>>()
 			.Subject;
 		errors.Should().HaveCount(2);
-		errors.First()["detail"].Should().Be("Duplicate code");
+		errors.First()["detail"].Should().Be("Db.Duplicate");
 		errors.Last()["detail"].Should().Be("Unknown");
 	}
 }

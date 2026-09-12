@@ -2,6 +2,8 @@ using System.Net;
 using Abstractions.Interfaces.Exceptions;
 using FluentAssertions;
 using GraphQL.Common.ErrorFilters;
+using Locan.Core.Interfaces;
+using Locan.Core.LocalizableMessages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tests.Stubs;
@@ -75,8 +77,7 @@ public class AnyErrorFilterTests
 		IValuedException
 	{
 		public HttpStatusCode StatusCode => HttpStatusCode.NotFound;
-		public string MessageKey => "Domain.NotFound";
-		public object[] Arguments => [id];
+		public ILocalizableMessage LocalizableMessage { get; } = new LocalizableMessage("Domain.NotFound");
 		public object GetErrorValues() => id;
 	}
 }

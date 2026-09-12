@@ -144,34 +144,28 @@ public class JobTests
 	public void GetId_ReturnsId()
 	{
 		var job = Create();
-		var id = Guid.NewGuid();
-		SetId(job, id);
 
 		var result = job.GetId();
 
-		result.Should().Be(id);
+		result.Should().Be(job.Id);
 	}
 
 	[Fact]
 	public void GetKeySelector_ReturnsId()
 	{
 		var job = Create();
-		var id = Guid.NewGuid();
-		SetId(job, id);
 		var selector = JobDomain.GetKeySelector().Compile();
 
 		var result = selector(job);
 
-		result.Should().Be(id);
+		result.Should().Be(job.Id);
 	}
 
 	[Fact]
 	public void GetEqualityExpression_SameId_ReturnsTrue()
 	{
 		var job = Create();
-		var id = Guid.NewGuid();
-		SetId(job, id);
-		var predicate = JobDomain.GetEqualityExpression(id).Compile();
+		var predicate = JobDomain.GetEqualityExpression(job.Id).Compile();
 
 		var result = predicate(job);
 
@@ -182,7 +176,6 @@ public class JobTests
 	public void GetEqualityExpression_DifferentId_ReturnsFalse()
 	{
 		var job = Create();
-		SetId(job, Guid.NewGuid());
 		var predicate = JobDomain.GetEqualityExpression(Guid.NewGuid()).Compile();
 
 		var result = predicate(job);
@@ -775,8 +768,4 @@ public class JobTests
 		return job;
 	}
 
-	private static void SetId(JobDomain job, Guid id)
-	{
-		typeof(JobDomain).GetProperty(nameof(JobDomain.Id))!.SetValue(job, id);
-	}
 }

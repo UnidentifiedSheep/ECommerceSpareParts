@@ -4,7 +4,7 @@ using Application.Common.Behaviors;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
-using Localization.Domain.Extensions;
+using Locan.Hosting;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,10 +40,6 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 				typeof(CacheBehavior<,>),
 				typeof(DbValidationBehavior<,>))
 			.AddLrtLayer()
-			.AddLocalization(
-				"ru-RU",
-				"ru-RU",
-				"en-EN")
 			.RegisterSettingsService();
 
 		services.AddScoped<AuditableEntitySaveChangesInterceptor>();
@@ -56,6 +52,7 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 				sp.GetRequiredService<DomainEventFlusherSaveChangesInterceptor>());
 		});
 
+		services.AddLocan();
 		services.AddJobRepositories<DContext>();
 		services.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
 		services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));

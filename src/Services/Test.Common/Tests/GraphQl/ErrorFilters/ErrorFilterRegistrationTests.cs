@@ -2,8 +2,7 @@ using Abstractions.Interfaces;
 using FluentAssertions;
 using GraphQL.Common.Extensions;
 using HotChocolate.Execution;
-using Localization.Abstractions.Models;
-using Localization.Domain.Extensions;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Stubs;
 
@@ -17,7 +16,7 @@ public class ErrorFilterRegistrationTests
 		var services = new ServiceCollection();
 		services.AddLogging();
 		services.AddSingleton<IUserContext, UserContextMock>();
-		services.AddLocalization(new Locale("en"), new Locale("en"));
+		services.AddSingleton<IContextualLocalizer>(ErrorFilterTestFactory.CreateLocalizer());
 		services.AddCommonGraphQl("error-filter-tests").AddQueryType<ErrorFilterTestQuery>();
 		await using var serviceProvider = services.BuildServiceProvider();
 		var executor = await serviceProvider.GetRequestExecutorAsync("error-filter-tests");

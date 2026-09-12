@@ -1,3 +1,4 @@
+using Application.Common;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentAssertions;
@@ -42,11 +43,14 @@ public class RecordDateValidatorTests
 			0,
 			DateTimeKind.Utc);
 		var policy = new Mock<IOperationDatePolicy>();
-		policy.Setup(x => x.IsAllowed(date)).Returns(OperationDateValidationResult.Invalid(errorCode));
+		policy.Setup(x => x.IsAllowed(date))
+			.Returns(OperationDateValidationResult.Invalid(OperationDateTooOldMessage.Instance));
 		var validator = new RecordDateValidator(policy.Object);
 
 		var result = validator.Validate(date);
 
-		result.Errors.Should().ContainSingle().Which.ErrorCode.Should().Be(errorCode);
+		var error = result.Errors.Should().ContainSingle().Subject;
+		error.ErrorCode.Should().Be(errorCode);
+		error.CustomState.Should().BeSameAs(OperationDateTooOldMessage.Instance);
 	}
 }
