@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
+using Locan.Core.Interfaces;
 using static BCrypt.Net.BCrypt;
 
 namespace Security.Services;
@@ -11,26 +12,26 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
 	public bool VerifyHashedPassword(string hashedPassword, string providedPassword) =>
 		Verify(providedPassword, hashedPassword);
 
-	public (bool isValid, IEnumerable<(string key, object[]? args)> errors) IsPasswordMatchRules(
+	public (bool isValid, IEnumerable<ILocalizableMessage> errors) IsPasswordMatchRules(
 		string password)
 	{
-		var errors = new List<(string, object[]?)>();
+		var errors = new List<ILocalizableMessage>();
 
 		if (string.IsNullOrEmpty(password))
 		{
-			errors.Add(("password.must.not.be.empty", null));
+			errors.Add(PasswordMustNotBeEmptyMessage.Instance);
 			return (false, errors);
 		}
 
 		// Проверки длины сразу
 		if (password.Length < rules.MinLength)
-			errors.Add(("password.min.length", [rules.MinLength]));
+			errors.Add(new PasswordMinLengthMessage().WithMinLength(rules.MinLength));
 
 		if (rules.MaxLength.HasValue && password.Length > rules.MaxLength.Value)
-			errors.Add(("password.max.length", [rules.MaxLength.Value]));
+			errors.Add(new PasswordMaxLengthMessage().WithMaxLength(rules.MaxLength.Value));
 
 		if (!rules.CanContainTrailingSpaces && (password[0] == ' ' || password[^1] == ' '))
-			errors.Add(("password.cannot.start.or.end.with.space", null));
+			errors.Add(PasswordCannotStartOrEndWithSpaceMessage.Instance);
 
 		var hasUpper = false;
 		var hasDigit = false;
@@ -50,16 +51,16 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
 				hasSpace = true;
 
 		if (!rules.CanContainSpaces && hasSpace)
-			errors.Add(("password.cannot.contain.spaces", null));
+			errors.Add(PasswordCannotContainSpacesMessage.Instance);
 
 		if (rules.RequireUppercase && !hasUpper)
-			errors.Add(("password.must.contain.uppercase", null));
+			errors.Add(PasswordMustContainUppercaseMessage.Instance);
 
 		if (rules.RequireDigit && !hasDigit)
-			errors.Add(("password.must.contain.digit", null));
+			errors.Add(PasswordMustContainDigitMessage.Instance);
 
 		if (rules.RequireSpecial && !hasSpecial)
-			errors.Add(("password.must.contain.special", [string.Join(',', specials)]));
+			errors.Add(new PasswordMustContainSpecialMessage().WithSpecialCharacters(string.Join(',', specials)));
 
 		return (errors.Count == 0, errors);
 	}

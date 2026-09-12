@@ -1,3 +1,5 @@
+using Locan.Core.Interfaces;
+
 namespace Abstractions.Interfaces.Validators;
 
 public interface IPasswordManager
@@ -16,6 +18,6 @@ public interface IPasswordManager
 	///     Проверка на соответствие правилам пароля.
 	/// </summary>
 	/// <param name="password">Пароль для проверки</param>
-	/// <returns>isValid - соответствует ли правилам, errors - ошибки проверки</returns>
-	(bool isValid, IEnumerable<(string key, object[]? args)> errors) IsPasswordMatchRules(string password);
+	/// <returns>isValid - соответствует ли правилам, errors - локализуемые ошибки проверки</returns>
+	(bool isValid, IEnumerable<ILocalizableMessage> errors) IsPasswordMatchRules(string password);
 }
