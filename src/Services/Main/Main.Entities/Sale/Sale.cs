@@ -86,7 +86,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 
 	public void SetComment(string? comment)
 	{
-		Comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, "sale.comment.max");
+		Comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleCommentMaxMessage.Instance);
 	}
 
 	public void AddContent(SaleContent content)

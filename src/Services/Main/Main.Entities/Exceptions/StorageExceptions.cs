@@ -3,7 +3,7 @@ using Exceptions.Base.Localized;
 namespace Main.Entities.Exceptions;
 
 public class ChangeOfStorageTypeRestrictedException()
-	: LocalizedBadRequestException("storage.type.change.restricted");
+	: LocalizedBadRequestException(StorageTypeChangeRestrictedMessage.Instance);
 
 public class NotEnoughCountOnStorageException : LocalizedBadRequestException
 {
@@ -11,17 +11,19 @@ public class NotEnoughCountOnStorageException : LocalizedBadRequestException
 		int articleId,
 		int availableCount,
 		int neededCount) : base(
-		"not.enough.count.on.storage.for.article",
+		new NotEnoughCountOnStorageForArticleMessage()
+			.WithArticleId(articleId)
+			.WithAvailableCount(availableCount)
+			.WithNeededCount(neededCount),
 		new
 		{
-			ArticleId = articleId, AvailableCount = availableCount
-		},
-		[articleId, availableCount, neededCount])
+			ArticleId = articleId, AvailableCount = availableCount, NeededCount = neededCount
+		})
 	{
 	}
 
 	public NotEnoughCountOnStorageException(IEnumerable<int> ids) : base(
-		"not.enough.count.on.storage.for.articles",
+		NotEnoughCountOnStorageForArticlesMessage.Instance,
 		new
 		{
 			Ids = ids
@@ -33,7 +35,7 @@ public class NotEnoughCountOnStorageException : LocalizedBadRequestException
 public class StorageContentNotFoundException : LocalizedNotFoundException
 {
 	public StorageContentNotFoundException(int id) : base(
-		"storage.content.not.found",
+		StorageContentNotFoundMessage.Instance,
 		new
 		{
 			Id = id
@@ -42,7 +44,7 @@ public class StorageContentNotFoundException : LocalizedNotFoundException
 	}
 
 	public StorageContentNotFoundException(IEnumerable<int> ids) : base(
-		"storage.content.not.found",
+		StorageContentNotFoundMessage.Instance,
 		new
 		{
 			Ids = ids
@@ -52,43 +54,41 @@ public class StorageContentNotFoundException : LocalizedNotFoundException
 }
 
 public class StorageNotFoundException(string code) : LocalizedNotFoundException(
-	"storage.not.found",
+	new StorageNotFoundMessage().WithCode(code),
 	new
 	{
 		Code = code
-	},
-	[code]);
+	});
 
 public class StorageOwnerNotFoundException(Guid userId, string storageCode) : LocalizedNotFoundException(
-	"storage.not.found.in.user",
+	new StorageNotFoundInUserMessage().WithStorageCode(storageCode),
 	new
 	{
 		UserId = userId, StorageCode = storageCode
-	},
-	[storageCode]);
+	});
 
 public class StorageRouteActiveExistsException(string from, string to) : LocalizedConflictException(
-	"active.storage.route.exists",
+	new ActiveStorageRouteExistsMessage().WithFrom(from).WithTo(to),
 	new
 	{
 		From = from, To = to
-	},
-	[from, to]);
+	});
 
 public class StorageRouteNotFound : LocalizedNotFoundException
 {
 	public StorageRouteNotFound(string storageFrom, string storageTo) : base(
-		"storage.route.not.found.by.names",
+		new StorageRouteNotFoundByNamesMessage()
+			.WithStorageFrom(storageFrom)
+			.WithStorageTo(storageTo),
 		new
 		{
 			StorageFrom = storageFrom, StorageTo = storageTo
-		},
-		[storageFrom, storageTo])
+		})
 	{
 	}
 
 	public StorageRouteNotFound(Guid id) : base(
-		"storage.route.not.found.by.id",
+		StorageRouteNotFoundByIdMessage.Instance,
 		new
 		{
 			Id = id

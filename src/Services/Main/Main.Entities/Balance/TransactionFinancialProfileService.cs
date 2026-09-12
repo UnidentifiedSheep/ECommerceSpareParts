@@ -76,6 +76,6 @@ public class TransactionFinancialProfileService : ITransactionFinancialProfileSe
 		if (forceDebit || delta >= 0 || currentBalance + delta >= profile.MinAllowedBalance)
 			return;
 
-		throw new InvalidInputException("financial.profile.balance.below.minimum");
+		throw new InvalidInputException(FinancialProfileBalanceBelowMinimumMessage.Instance);
 	}
 }

@@ -26,13 +26,13 @@ public record GlobalApplicationSettingData
 {
 	[JsonPropertyName("apiServiceUrl")]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("global.application.setting.api.service.url.name")]
-	[SchemaFieldDescription("global.application.setting.api.service.url.description")]
+	[SchemaFieldLabel(GlobalApplicationSettingApiServiceUrlNameMessage.Key)]
+	[SchemaFieldDescription(GlobalApplicationSettingApiServiceUrlDescriptionMessage.Key)]
 	public string? ApiServiceUrl { get; init; }
 
 	[JsonPropertyName("appServiceUrl")]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("global.application.setting.app.service.url.name")]
-	[SchemaFieldDescription("global.application.setting.app.service.url.description")]
+	[SchemaFieldLabel(GlobalApplicationSettingAppServiceUrlNameMessage.Key)]
+	[SchemaFieldDescription(GlobalApplicationSettingAppServiceUrlDescriptionMessage.Key)]
 	public string? AppServiceUrl { get; init; }
 }

@@ -11,7 +11,7 @@ public record Email
 
 	public Email(string value)
 	{
-		value = value.Trim().Ensure(IsValid, "email.must.be.valid");
+		value = value.Trim().Ensure(IsValid, EmailMustBeValidMessage.Instance);
 		Value = ToNormalized(value);
 	}
 

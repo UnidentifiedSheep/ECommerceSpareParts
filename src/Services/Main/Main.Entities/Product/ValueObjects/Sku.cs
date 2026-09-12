@@ -38,19 +38,19 @@ public partial record Sku
 
 		if (string.IsNullOrWhiteSpace(sku))
 		{
-			exception = new InvalidInputException("article.articleNumber.must.not.be.empty");
+			exception = new InvalidInputException(ArticleArticleNumberMustNotBeEmptyMessage.Instance);
 			return false;
 		}
 
 		if (!sku.HasMinLength(3))
 		{
-			exception = new InvalidInputException("article.articleNumber.min.length.3");
+			exception = new InvalidInputException(ArticleArticleNumberMinLength3Message.Instance);
 			return false;
 		}
 
 		if (!sku.HasMaxLength(128))
 		{
-			exception = new InvalidInputException("article.articleNumber.max.length.128");
+			exception = new InvalidInputException(ArticleArticleNumberMaxLength128Message.Instance);
 			return false;
 		}
 

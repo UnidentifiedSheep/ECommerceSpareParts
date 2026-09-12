@@ -66,8 +66,8 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
 	public void SetLength(decimal length)
 	{
 		length
-			.EnsureGreaterThan(0, "article.size.length.must.be.greater.than.zero")
-			.EnsureMaxDecimalPlaces(2, "article.size.length.max.two.decimals");
+			.EnsureGreaterThan(0, ArticleSizeLengthMustBeGreaterThanZeroMessage.Instance)
+			.EnsureMaxDecimalPlaces(2, ArticleSizeLengthMaxTwoDecimalsMessage.Instance);
 
 		Length = length;
 		RecalculateVolume();
@@ -76,8 +76,8 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
 	public void SetWidth(decimal width)
 	{
 		width
-			.EnsureGreaterThan(0, "article.size.width.must.be.greater.than.zero")
-			.EnsureMaxDecimalPlaces(2, "article.size.width.max.two.decimals");
+			.EnsureGreaterThan(0, ArticleSizeWidthMustBeGreaterThanZeroMessage.Instance)
+			.EnsureMaxDecimalPlaces(2, ArticleSizeWidthMaxTwoDecimalsMessage.Instance);
 		Width = width;
 		RecalculateVolume();
 	}
@@ -85,8 +85,8 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
 	public void SetHeight(decimal height)
 	{
 		height
-			.EnsureGreaterThan(0, "article.size.height.must.be.greater.than.zero")
-			.EnsureMaxDecimalPlaces(2, "article.size.height.max.two.decimals");
+			.EnsureGreaterThan(0, ArticleSizeHeightMustBeGreaterThanZeroMessage.Instance)
+			.EnsureMaxDecimalPlaces(2, ArticleSizeHeightMaxTwoDecimalsMessage.Instance);
 
 		Height = height;
 		RecalculateVolume();

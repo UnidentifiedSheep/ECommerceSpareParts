@@ -33,8 +33,8 @@ public class OrganizationFinancialProfile : AuditableEntity<OrganizationFinancia
 	public void SetMinAllowedBalance(decimal minAllowedBalance)
 	{
 		minAllowedBalance
-			.EnsureMaxDecimalPlaces(2, "financial.profile.min.allowed.balance.max.two.decimal.places")
-			.EnsureNonPositive("financial.profile.min.allowed.balance.must.not.be.positive");
+			.EnsureMaxDecimalPlaces(2, FinancialProfileMinAllowedBalanceMaxTwoDecimalPlacesMessage.Instance)
+			.EnsureNonPositive(FinancialProfileMinAllowedBalanceMustNotBePositiveMessage.Instance);
 		MinAllowedBalance = minAllowedBalance;
 	}
 

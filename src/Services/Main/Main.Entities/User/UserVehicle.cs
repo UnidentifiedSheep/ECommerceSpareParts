@@ -67,7 +67,7 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
 	}
 
 	public void SetVehicle(Guid vehicleId) =>
-		VehicleId = vehicleId.EnsureNotEqual(Guid.Empty, "user.vehicle.id.not.empty");
+		VehicleId = vehicleId.EnsureNotEqual(Guid.Empty, UserVehicleIdNotEmptyMessage.Instance);
 
 	public void SetPlateNumber(string plateNumber) => PlateNumber = NormalizePlateNumber(plateNumber);
 
@@ -77,15 +77,15 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
 	{
 		Comment = comment
 			.NullIfWhiteSpace()
-			?.EnsureMaxLength(MaxCommentLength, "user.vehicle.comment.max.length");
+			?.EnsureMaxLength(MaxCommentLength, UserVehicleCommentMaxLengthMessage.Instance);
 	}
 
 	public static string NormalizePlateNumber(string plateNumber)
 	{
 		return plateNumber
 			.TrimSafe()
-			.EnsureNotNullOrWhiteSpace("user.vehicle.plate.number.not.empty")
-			.EnsureMaxLength(MaxPlateNumberLength, "user.vehicle.plate.number.max.length")
+			.EnsureNotNullOrWhiteSpace(UserVehiclePlateNumberNotEmptyMessage.Instance)
+			.EnsureMaxLength(MaxPlateNumberLength, UserVehiclePlateNumberMaxLengthMessage.Instance)
 			.ToUpperInvariant();
 	}
 
@@ -93,7 +93,7 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
 	{
 		return vin
 			.NullIfWhiteSpace()
-			?.EnsureMaxLength(MaxVinLength, "user.vehicle.vin.code.max.length")
+			?.EnsureMaxLength(MaxVinLength, UserVehicleVinCodeMaxLengthMessage.Instance)
 			.ToUpperInvariant();
 	}
 

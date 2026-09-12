@@ -4,32 +4,30 @@ using Exceptions.Base.Localized;
 namespace Main.Entities.Exceptions;
 
 public class InvalidTokenException(string token) : LocalizedBadRequestException(
-	"invalid.token",
+	InvalidTokenMessage.Instance,
 	new
 	{
 		Token = token
 	});
 
 public class PermissionNotFoundException(string name) : LocalizedNotFoundException(
-	"permission.not.found",
+	new PermissionNotFoundMessage().WithName(name),
 	new
 	{
 		Name = name
-	},
-	[name]);
+	});
 
 public class RoleAlreadyExistsException(string roleName) : LocalizedBadRequestException(
-	"role.already.exists",
+	new RoleAlreadyExistsMessage().WithName(roleName),
 	new
 	{
 		Name = roleName
-	},
-	[roleName]);
+	});
 
 public class RoleNotFoundException : LocalizedNotFoundException
 {
 	public RoleNotFoundException(Guid id) : base(
-		"role.not.found",
+		RoleNotFoundMessage.Instance,
 		new
 		{
 			Id = id
@@ -38,77 +36,73 @@ public class RoleNotFoundException : LocalizedNotFoundException
 	}
 
 	public RoleNotFoundException(string roleName) : base(
-		"role.not.found.with.role.name",
+		new RoleNotFoundWithRoleNameMessage().WithName(roleName),
 		new
 		{
 			Name = roleName
-		},
-		[roleName])
+		})
 	{
 	}
 }
 
 public class UserAlreadyContainsRoleException(Guid userId, string role) : LocalizedConflictException(
-	"user.already.have.this.role",
+	new UserAlreadyHaveThisRoleMessage().WithRole(role),
 	new
 	{
 		UserId = userId, Role = role
-	},
-	[role]);
+	});
 
 public class UserRoleNotFoundException(Guid userId, string role) : LocalizedNotFoundException(
-	"user.role.not.found",
+	new UserRoleNotFoundMessage().WithRole(role),
 	new
 	{
 		UserId = userId, Role = role
-	},
-	[role]);
+	});
 
 public class UserIsNotInNeededRole(Role role) : LocalizedBadRequestException(
-	"user.is.not.in.needed.role",
+	new UserIsNotInNeededRoleMessage().WithRole(role.ToString()),
 	new
 	{
 		Role = role.ToString()
-	},
-	[role.ToString()]);
+	});
 
 public class UserNotFoundException(Guid id) : LocalizedNotFoundException(
-	"user.not.found",
+	UserNotFoundMessage.Instance,
 	new
 	{
 		Id = id
 	});
 
 public class WrongCredentialsException(string? login, string? password) : LocalizedBadRequestException(
-	"wrong.credentials",
+	WrongCredentialsMessage.Instance,
 	new
 	{
 		Login = login, Password = password
 	});
 
 public class UserEmailAlreadyInUseException(string email) : LocalizedConflictException(
-	"user.email.already.in.use",
+	UserEmailAlreadyInUseMessage.Instance,
 	new
 	{
 		Email = email
 	});
 
 public class UserEmailNotFoundException(string email) : LocalizedNotFoundException(
-	"user.email.not.found",
+	UserEmailNotFoundMessage.Instance,
 	new
 	{
 		Email = email
 	});
 
-public class CantCreateSystemUserException() : LocalizedBadRequestException("cant.create.system.user");
+public class CantCreateSystemUserException() : LocalizedBadRequestException(CantCreateSystemUserMessage.Instance);
 
-public class ResetTokenExpiredException() : LocalizedBadRequestException("reset.token.expired");
+public class ResetTokenExpiredException() : LocalizedBadRequestException(ResetTokenExpiredMessage.Instance);
 
 public class EmailVerificationTokenExpiredException()
-	: LocalizedBadRequestException("email.verification.token.expired");
+	: LocalizedBadRequestException(EmailVerificationTokenExpiredMessage.Instance);
 
 public class UserPermissionNotFound(Guid id, string permission) : LocalizedNotFoundException(
-	"user.permission.not.found",
+	UserPermissionNotFoundMessage.Instance,
 	new
 	{
 		UserId = id, Permission = permission

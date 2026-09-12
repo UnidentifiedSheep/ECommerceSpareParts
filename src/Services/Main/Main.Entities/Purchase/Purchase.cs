@@ -91,7 +91,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
 	{
 		Comment = comment
 			.NullIfWhiteSpace()
-			?.EnsureMaxLength(256, () => throw new InvalidInputException("purchase.comment.too.long"));
+			?.EnsureMaxLength(256, () => throw new InvalidInputException(PurchaseCommentTooLongMessage.Instance));
 	}
 
 	public void SetCurrencyId(int currencyId) => CurrencyId = currencyId;

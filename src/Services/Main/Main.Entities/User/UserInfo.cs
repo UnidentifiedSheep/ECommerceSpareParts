@@ -56,10 +56,10 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 	{
 		Name = name
 			.Trim()
-			.EnsureNotNullOrWhiteSpace("user.name.required")
-			.EnsureMinLength(3, "user.name.min.length")
-			.Ensure(x => x.All(c => !char.IsSymbol(c)), "user.name.no.special.chars")
-			.EnsureMaxLength(30, "user.name.max.length");
+			.EnsureNotNullOrWhiteSpace(UserNameRequiredMessage.Instance)
+			.EnsureMinLength(3, UserNameMinLengthMessage.Instance)
+			.Ensure(x => x.All(c => !char.IsSymbol(c)), UserNameNoSpecialCharsMessage.Instance)
+			.EnsureMaxLength(30, UserNameMaxLengthMessage.Instance);
 		UpdateSearchColumn();
 	}
 
@@ -67,16 +67,16 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 	{
 		Surname = surname
 			.Trim()
-			.EnsureNotNullOrWhiteSpace("user.surname.required")
-			.EnsureMinLength(3, "user.surname.min.length")
-			.Ensure(x => x.All(c => !char.IsSymbol(c)), "user.surname.no.special.chars")
-			.EnsureMaxLength(30, "user.surname.max.length");
+			.EnsureNotNullOrWhiteSpace(UserSurnameRequiredMessage.Instance)
+			.EnsureMinLength(3, UserSurnameMinLengthMessage.Instance)
+			.Ensure(x => x.All(c => !char.IsSymbol(c)), UserSurnameNoSpecialCharsMessage.Instance)
+			.EnsureMaxLength(30, UserSurnameMaxLengthMessage.Instance);
 		UpdateSearchColumn();
 	}
 
 	public void SetDescription(string? description)
 	{
-		Description = description.NullIfWhiteSpace()?.EnsureMaxLength(300, "user.description.max.length");
+		Description = description.NullIfWhiteSpace()?.EnsureMaxLength(300, UserDescriptionMaxLengthMessage.Instance);
 		UpdateSearchColumn();
 	}
 

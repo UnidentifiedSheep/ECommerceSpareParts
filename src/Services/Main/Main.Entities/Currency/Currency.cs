@@ -68,36 +68,36 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
 	{
 		Name = name
 			.Trim()
-			.EnsureNotNullOrWhiteSpace("currency.name.not.empty")
-			.EnsureMaxLength(128, "currency.name.max.length")
-			.EnsureMinLength(3, "currency.name.min.length");
+			.EnsureNotNullOrWhiteSpace(CurrencyNameNotEmptyMessage.Instance)
+			.EnsureMaxLength(128, CurrencyNameMaxLengthMessage.Instance)
+			.EnsureMinLength(3, CurrencyNameMinLengthMessage.Instance);
 	}
 
 	private void SetShortName(string name)
 	{
 		ShortName = name
 			.Trim()
-			.EnsureNotNullOrWhiteSpace("currency.shortName.not.empty")
-			.EnsureMaxLength(5, "currency.shortName.max.length")
-			.EnsureMinLength(2, "currency.shortName.min.length");
+			.EnsureNotNullOrWhiteSpace(CurrencyShortNameNotEmptyMessage.Instance)
+			.EnsureMaxLength(5, CurrencyShortNameMaxLengthMessage.Instance)
+			.EnsureMinLength(2, CurrencyShortNameMinLengthMessage.Instance);
 	}
 
 	private void SetCurrencySign(string currencySign)
 	{
 		CurrencySign = currencySign
 			.Trim()
-			.EnsureNotNullOrWhiteSpace("currency.sign.not.empty")
-			.EnsureMaxLength(3, "currency.sign.max.length")
-			.EnsureMinLength(1, "currency.sign.min.length");
+			.EnsureNotNullOrWhiteSpace(CurrencySignNotEmptyMessage.Instance)
+			.EnsureMaxLength(3, CurrencySignMaxLengthMessage.Instance)
+			.EnsureMinLength(1, CurrencySignMinLengthMessage.Instance);
 	}
 
 	private void SetCode(string code)
 	{
 		Code = code
 			.Trim()
-			.EnsureNotNullOrWhiteSpace("currency.code.not.empty")
-			.EnsureMaxLength(26, "currency.code.max.length")
-			.EnsureMinLength(2, "currency.code.min.length");
+			.EnsureNotNullOrWhiteSpace(CurrencyCodeNotEmptyMessage.Instance)
+			.EnsureMaxLength(26, CurrencyCodeMaxLengthMessage.Instance)
+			.EnsureMinLength(2, CurrencyCodeMinLengthMessage.Instance);
 	}
 
 	public override int GetId() => Id;

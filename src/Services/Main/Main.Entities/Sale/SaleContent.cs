@@ -66,7 +66,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 			details);
 	}
 
-	private void SetCount(int count) => Count = count.EnsureGreaterThan(0, "sale.content.count.min");
+	private void SetCount(int count) => Count = count.EnsureGreaterThan(0, SaleContentCountMinMessage.Instance);
 
 	public void SetPriceAndDetails(
 		decimal withOutDiscount,
@@ -74,13 +74,13 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		IEnumerable<SaleContentDetail> details)
 	{
 		withOutDiscount
-			.EnsureMaxDecimalPlaces(2, "sale.content.price.precision")
-			.EnsureGreaterThan(0, "sale.content.price.min");
+			.EnsureMaxDecimalPlaces(2, SaleContentPricePrecisionMessage.Instance)
+			.EnsureGreaterThan(0, SaleContentPriceMinMessage.Instance);
 
 		Price = withDiscount
-			.EnsureMaxDecimalPlaces(2, "sale.content.price.with.discount.precision")
-			.EnsureGreaterThan(0, "sale.content.price.with.discount.min")
-			.EnsureAtMost(withOutDiscount, "sale.content.price.with.discount.max");
+			.EnsureMaxDecimalPlaces(2, SaleContentPriceWithDiscountPrecisionMessage.Instance)
+			.EnsureGreaterThan(0, SaleContentPriceWithDiscountMinMessage.Instance)
+			.EnsureAtMost(withOutDiscount, SaleContentPriceWithDiscountMaxMessage.Instance);
 
 		Discount = (withOutDiscount - withDiscount) / withOutDiscount;
 		ClearAndSetDetails(details);
@@ -100,7 +100,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 
 	public void SetComment(string? comment)
 	{
-		Comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, "sale.content.comment.max");
+		Comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleContentCommentMaxMessage.Instance);
 	}
 
 	public override int GetId() => Id;
