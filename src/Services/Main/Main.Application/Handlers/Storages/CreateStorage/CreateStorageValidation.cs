@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Storages.CreateStorage;
 
@@ -9,18 +10,18 @@ public class CreateStorageValidation : AbstractValidator<CreateStorageCommand>
 	{
 		RuleFor(x => x.Code)
 			.NotEmpty()
-			.WithLocalizationKey("storage.code.not.empty")
+			.WithLocalizableError(StorageCodeNotEmptyMessage.Instance)
 			.Must(x => x.Trim().Length >= 6)
-			.WithLocalizationKey("storage.code.min.length")
+			.WithLocalizableError(StorageCodeMinLengthMessage.Instance)
 			.Must(x => x.Trim().Length <= 128)
-			.WithLocalizationKey("storage.code.max.length");
+			.WithLocalizableError(StorageCodeMaxLengthMessage.Instance);
 
 		RuleFor(x => x.Description)
 			.Must(x => x == null || x.Trim().Length <= 256)
-			.WithLocalizationKey("storage.description.max.length");
+			.WithLocalizableError(StorageDescriptionMaxLengthMessage.Instance);
 
 		RuleFor(x => x.Location)
 			.Must(x => x == null || x.Trim().Length <= 256)
-			.WithLocalizationKey("storage.location.max.length");
+			.WithLocalizableError(StorageLocationMaxLengthMessage.Instance);
 	}
 }

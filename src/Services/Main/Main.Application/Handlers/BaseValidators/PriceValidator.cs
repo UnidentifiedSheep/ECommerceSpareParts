@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.BaseValidators;
 
@@ -7,13 +8,13 @@ public class PriceValidator : AbstractValidator<decimal>
 {
 	public PriceValidator()
 	{
-		RuleFor(x => x).GreaterThan(0).WithLocalizationKey("price.must.be.positive");
+		RuleFor(x => x).GreaterThan(0).WithLocalizableError(PriceMustBePositiveMessage.Instance);
 
 		RuleFor(x => x)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("price.max.two.decimal.places");
+			.WithLocalizableError(PriceMaxTwoDecimalPlacesMessage.Instance);
 	}
 }

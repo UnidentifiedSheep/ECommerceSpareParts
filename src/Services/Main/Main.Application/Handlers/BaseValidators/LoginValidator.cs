@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.BaseValidators;
 
@@ -9,14 +10,14 @@ public class LoginValidator : AbstractValidator<string>
 	{
 		RuleFor(x => x)
 			.NotEmpty()
-			.WithLocalizationKey("login.must.not.be.empty")
+			.WithLocalizableError(LoginMustNotBeEmptyMessage.Instance)
 			.Must(x => x.Trim().Length >= 5)
-			.WithLocalizationKey("login.min.length.5")
+			.WithLocalizableError(LoginMinLength5Message.Instance)
 			.Must(x => x.Trim().Length <= 36)
-			.WithLocalizationKey("login.max.length.36")
+			.WithLocalizableError(LoginMaxLength36Message.Instance)
 			.Must(x => !x.Contains(' ', StringComparison.InvariantCulture))
-			.WithLocalizationKey("login.cannot.contain.spaces")
+			.WithLocalizableError(LoginCannotContainSpacesMessage.Instance)
 			.Must(x => !x.Contains('@', StringComparison.InvariantCulture))
-			.WithLocalizationKey("login.cannot.contain.at.sign");
+			.WithLocalizableError(LoginCannotContainAtSignMessage.Instance);
 	}
 }

@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Organizations.AddOrganizationMember;
 
@@ -7,6 +8,6 @@ public class AddOrganizationMemberValidation : AbstractValidator<AddOrganization
 {
 	public AddOrganizationMemberValidation()
 	{
-		RuleFor(x => x.Role).IsInEnum().WithLocalizationKey("organization.member.role.invalid");
+		RuleFor(x => x.Role).IsInEnum().WithLocalizableError(OrganizationMemberRoleInvalidMessage.Instance);
 	}
 }

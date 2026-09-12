@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Producers.BaseValidators;
 
@@ -9,10 +10,10 @@ public class ProducerNameValidator : AbstractValidator<string?>
 	{
 		RuleFor(x => x)
 			.NotEmpty()
-			.WithLocalizationKey("producer.name.not.empty")
+			.WithLocalizableError(ProducerNameNotEmptyMessage.Instance)
 			.Must(name => name?.Trim().Length >= 2)
-			.WithLocalizationKey("producer.name.min.length")
+			.WithLocalizableError(ProducerNameMinLengthMessage.Instance)
 			.Must(name => name?.Trim().Length <= 64)
-			.WithLocalizationKey("producer.name.max.length");
+			.WithLocalizableError(ProducerNameMaxLengthMessage.Instance);
 	}
 }

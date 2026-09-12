@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 
@@ -15,12 +16,12 @@ public class
 			{
 				RuleFor(x => x.Patch.MinimalAllowedBalance.Value)
 					.LessThanOrEqualTo(0)
-					.WithLocalizationKey("financial.profile.min.allowed.balance.must.not.be.positive")
+					.WithLocalizableError(FinancialProfileMinAllowedBalanceMustNotBePositiveMessage.Instance)
 					.PrecisionScale(
 						18,
 						2,
 						true)
-					.WithLocalizationKey("financial.profile.min.allowed.balance.max.two.decimal.places");
+					.WithLocalizableError(FinancialProfileMinAllowedBalanceMaxTwoDecimalPlacesMessage.Instance);
 			});
 	}
 }

@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Sales.GetSale;
 
@@ -9,6 +10,6 @@ public class GetSaleValidation : AbstractValidator<GetSaleQuery>
 	{
 		RuleFor(x => x)
 			.Must(x => x.SaleId.HasValue || x.TransactionId.HasValue)
-			.WithLocalizationKey("sale.id.or.transaction.id.required");
+			.WithLocalizableError(SaleIdOrTransactionIdRequiredMessage.Instance);
 	}
 }

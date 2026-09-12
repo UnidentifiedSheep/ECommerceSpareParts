@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using Application.Common.Extensions;
+using FluentValidation;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
 
@@ -9,6 +11,6 @@ public class CreateProducerSupplierMappingValidation : AbstractValidator<CreateP
 		RuleFor(x => x.ProducerSupplierMapping.SupplierProducerName)
 			.NotEmpty()
 			.Must(x => !string.IsNullOrWhiteSpace(x))
-			.WithMessage("producer.supplier.mapping.supplier.producer.name.required");
+			.WithLocalizableError(ProducerSupplierMappingSupplierProducerNameRequiredMessage.Instance);
 	}
 }

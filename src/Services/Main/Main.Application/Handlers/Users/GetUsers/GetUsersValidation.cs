@@ -1,6 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Users.GetUsers;
 
@@ -12,6 +13,6 @@ public class GetUsersValidation : AbstractValidator<GetUsersQuery>
 
 		RuleFor(query => query.SimilarityLevel)
 			.InclusiveBetween(0, 1)
-			.WithLocalizationKey("user.similarity.level.range");
+			.WithLocalizableError(UserSimilarityLevelRangeMessage.Instance);
 	}
 }

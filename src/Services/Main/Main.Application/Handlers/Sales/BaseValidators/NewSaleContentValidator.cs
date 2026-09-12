@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.BaseValidators;
 
@@ -17,29 +18,29 @@ public class NewSaleContentValidator : AbstractValidator<IEnumerable<NewSaleCont
 				z
 					.RuleFor(x => x.Price)
 					.GreaterThan(0)
-					.WithLocalizationKey("sale.content.price.min")
+					.WithLocalizableError(SaleContentPriceMinMessage.Instance)
 					.PrecisionScale(
 						18,
 						2,
 						true)
-					.WithLocalizationKey("sale.content.price.precision");
+					.WithLocalizableError(SaleContentPricePrecisionMessage.Instance);
 
 				z
 					.RuleFor(x => x.PriceWithDiscount)
 					.GreaterThan(0)
-					.WithLocalizationKey("sale.content.price.with.discount.min")
+					.WithLocalizableError(SaleContentPriceWithDiscountMinMessage.Instance)
 					.PrecisionScale(
 						18,
 						2,
 						true)
-					.WithLocalizationKey("sale.content.price.with.discount.precision");
+					.WithLocalizableError(SaleContentPriceWithDiscountPrecisionMessage.Instance);
 
 				z
 					.RuleFor(x => x.PriceWithDiscount)
 					.LessThanOrEqualTo(x => x.Price)
-					.WithLocalizationKey("sale.content.price.with.discount.max");
+					.WithLocalizableError(SaleContentPriceWithDiscountMaxMessage.Instance);
 			});
 
-		RuleFor(x => x).NotEmpty().WithLocalizationKey("sale.content.list.not.empty");
+		RuleFor(x => x).NotEmpty().WithLocalizableError(SaleContentListNotEmptyMessage.Instance);
 	}
 }

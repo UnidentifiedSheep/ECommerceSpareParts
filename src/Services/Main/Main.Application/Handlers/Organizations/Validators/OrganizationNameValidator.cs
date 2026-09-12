@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Organizations.Validators;
 
@@ -9,10 +10,10 @@ public class OrganizationNameValidator : AbstractValidator<string>
 	{
 		RuleFor(x => x)
 			.NotEmpty()
-			.WithLocalizationKey("organization.name.required")
+			.WithLocalizableError(OrganizationNameRequiredMessage.Instance)
 			.MinimumLength(3)
-			.WithLocalizationKey("organization.name.min.length")
+			.WithLocalizableError(OrganizationNameMinLengthMessage.Instance)
 			.MaximumLength(128)
-			.WithLocalizationKey("organization.name.max.length");
+			.WithLocalizableError(OrganizationNameMaxLengthMessage.Instance);
 	}
 }

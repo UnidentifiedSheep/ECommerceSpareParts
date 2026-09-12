@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Entities.Auth;
 using Role = Enums.Role;
 
@@ -11,6 +12,6 @@ public class AddRoleToUserValidation : AbstractValidator<AddRoleToUserCommand>
 	{
 		RuleFor(x => x.RoleName)
 			.Must(x => RoleNames.Normalize(x) != RoleNames.Normalize(nameof(Role.System)))
-			.WithLocalizationKey("cant.add.system.role.to.user");
+			.WithLocalizableError(CantAddSystemRoleToUserMessage.Instance);
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
 
@@ -9,11 +10,11 @@ public class SetProductWeightValidation : AbstractValidator<SetProductWeightComm
 	{
 		RuleFor(x => x.Weight)
 			.GreaterThan(0)
-			.WithLocalizationKey("article.weight.must.be.greater.than.zero")
+			.WithLocalizableError(ArticleWeightMustBeGreaterThanZeroMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("article.weight.max.two.decimals");
+			.WithLocalizableError(ArticleWeightMaxTwoDecimalsMessage.Instance);
 	}
 }

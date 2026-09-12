@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Products.MapImgsToProduct;
 
@@ -24,9 +25,9 @@ public class MapImgsToProductValidation : AbstractValidator<MapImgsToProductComm
 				z
 					.RuleFor(x => x.Extension)
 					.Must(x => ImageExtensions.Any(c => c == x))
-					.WithLocalizationKey("article.image.invalid.extension");
+					.WithLocalizableError(ArticleImageInvalidExtensionMessage.Instance);
 			});
 
-		RuleFor(x => x.Images).NotEmpty().WithLocalizationKey("article.images.must.not.be.empty");
+		RuleFor(x => x.Images).NotEmpty().WithLocalizableError(ArticleImagesMustNotBeEmptyMessage.Instance);
 	}
 }

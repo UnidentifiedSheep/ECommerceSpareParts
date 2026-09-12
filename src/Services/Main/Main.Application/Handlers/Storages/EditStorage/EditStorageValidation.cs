@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Storages.EditStorage;
 
@@ -10,11 +11,11 @@ public class EditStorageValidation : AbstractValidator<EditStorageCommand>
 		RuleFor(x => x.EditStorage.Description.Value)
 			.Must(x => x?.Trim().Length <= 256)
 			.When(x => x.EditStorage.Description.IsSet)
-			.WithLocalizationKey("storage.description.max.length");
+			.WithLocalizableError(StorageDescriptionMaxLengthMessage.Instance);
 
 		RuleFor(x => x.EditStorage.Location.Value)
 			.Must(x => x?.Trim().Length <= 256)
 			.When(x => x.EditStorage.Location.IsSet)
-			.WithLocalizationKey("storage.location.max.length");
+			.WithLocalizableError(StorageLocationMaxLengthMessage.Instance);
 	}
 }

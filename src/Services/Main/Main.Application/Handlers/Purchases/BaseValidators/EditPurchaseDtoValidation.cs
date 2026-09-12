@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.BaseValidators;
 
@@ -24,6 +25,6 @@ public class EditPurchaseDtoValidation : AbstractValidator<IEnumerable<EditPurch
 				var idsSet = ids.ToHashSet();
 				return ids.Count == idsSet.Count;
 			})
-			.WithLocalizationKey("purchase.content.duplicate.ids.not.allowed");
+			.WithLocalizableError(PurchaseContentDuplicateIdsNotAllowedMessage.Instance);
 	}
 }
