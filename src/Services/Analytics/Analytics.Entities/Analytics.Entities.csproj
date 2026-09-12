@@ -14,10 +14,7 @@
 
     <ItemGroup>
         <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5"/>
-        <PackageReference Include="Locan.Generator" 
-                          Version="1.0.1" 
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false" />
+        <PackageReference Include="Locan.Generator" Version="1.0.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,11 @@
+{
+  "defaultCulture": "en",
+  "paths": [
+    {
+      "searchPattern": "*.json",
+      "folderPath": "Localization",
+      "recursive": true,
+      "generateMessages": true
+    }
+  ]
+}
