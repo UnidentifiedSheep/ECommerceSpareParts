@@ -13,7 +13,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
-        <ProjectReference Include="..\..\Localization\Localization.Abstractions\Localization.Abstractions.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -44,8 +44,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Core\Abstractions\Abstractions.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Abstractions\Localization.Abstractions.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Api.Common\Api.Common.csproj"/>

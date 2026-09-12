@@ -14,7 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Abstractions\Localization.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj"/>
     </ItemGroup>

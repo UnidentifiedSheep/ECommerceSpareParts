@@ -29,7 +29,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
