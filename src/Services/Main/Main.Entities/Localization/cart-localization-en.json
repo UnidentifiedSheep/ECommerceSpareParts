@@ -1,7 +1,0 @@
-﻿{
-  "locale": "en",
-  "keyValues": {
-    "cart.item.not.found": "Cart item not found.",
-    "item.already.in.cart": "Item already in cart."
-  }
-}
