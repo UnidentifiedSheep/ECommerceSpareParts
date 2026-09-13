@@ -1,3 +1,3 @@
-using Locan.Generator.Attributes;
+using Locan.Core.Attributes;
 
 [assembly:LocalizationModule("Domain")]

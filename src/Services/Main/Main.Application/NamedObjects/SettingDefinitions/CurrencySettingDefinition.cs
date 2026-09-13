@@ -4,6 +4,8 @@ using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Enums;
 using Exceptions;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Settings;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
@@ -14,10 +16,10 @@ public class CurrencySettingDefinition(ISettingsService settingsService)
 	: SettingDefinitionNamedObjectBase<CurrencySetting>(settingsService)
 {
 	public override string SystemName => CurrencySetting.SettingName;
-
-	public override string NameLocalizationKey => "currency.setting.name";
-
-	public override string DescriptionLocalizationKey => "currency.setting.description";
+	public override ILocalizableMessage NameLocalizationMessage
+		=> CurrencySettingNameMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> CurrencySettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(CurrencySettingInputData);
 
@@ -26,7 +28,7 @@ public class CurrencySettingDefinition(ISettingsService settingsService)
 	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
 	{
 		var deser = JsonSerializer.Deserialize<CurrencySettingInputData>(json) ??
-			throw new InvalidInputException("currency.setting.input.invalid");
+			throw new InvalidInputException(CurrencySettingInputInvalidMessage.Instance);
 		var currentSetting = await SettingsService.GetOrDefault<CurrencySetting>(cancellationToken);
 		await SettingsService.SetSetting(
 			new CurrencySetting(
@@ -46,8 +48,8 @@ public record CurrencySettingInputData
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EnumSelector)]
 	[SchemaDependsOnEntity(nameof(ExchangeRateProvider))]
-	[SchemaFieldLabel("currency.setting.rate.provider.name")]
-	[SchemaFieldDescription("currency.setting.rate.provider.description")]
+	[SchemaFieldLabel(CurrencySettingRateProviderNameMessage.Key)]
+	[SchemaFieldDescription(CurrencySettingRateProviderDescriptionMessage.Key)]
 	[JsonPropertyName("rateProvider")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public required ExchangeRateProvider RateProvider { get; init; }

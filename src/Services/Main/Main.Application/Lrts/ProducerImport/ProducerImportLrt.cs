@@ -7,9 +7,11 @@ using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
+using Main.Entities;
 using Main.Entities.Producer;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -26,7 +28,7 @@ public class ProducerImportLrt(
 	IOptions<S3BucketsOptions> bucketsOptions,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	IContextualStringLocalizer stringLocalizer)
+	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProducerImportInputState, ProducerImportState, ProducerImportLrt.NewProducerCsvDto,
 		Producer>(
 		jobRepository,
@@ -40,12 +42,13 @@ public class ProducerImportLrt(
 {
 	public override string SystemName => nameof(ProducerImportLrt);
 
-	public override string NameLocalizationKey => "lrt.producer.import.name";
+	public override ILocalizableMessage NameLocalizationMessage => LrtProducerImportNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.producer.import.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtProducerImportDescriptionMessage.Instance;
 
-	protected override string GetTooManyErrorsLocalizationKey() =>
-		"producer.too.many.errors.while.processing.batch";
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
+		ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -63,9 +66,7 @@ public class ProducerImportLrt(
 		catch (Exception ex)
 		{
 			var message = ex is ILocalizableException localizableException
-				? StringLocalizer.GetOrDefault(
-					localizableException.MessageKey,
-					localizableException.Arguments ?? []) ?? ex.Message
+				? StringLocalizer.Get(localizableException.LocalizableMessage)
 				: ex.Message;
 
 			errors.Add(CreateError(rowIdx, message));
@@ -94,7 +95,7 @@ public class ProducerImportLrt(
 				continue;
 			}
 
-			errors.Add(CreateError(idx, StringLocalizer.Get("producer.duplicate.name.in.batch")));
+			errors.Add(CreateError(idx, StringLocalizer.Get(ProducerDuplicateNameInBatchMessage.Instance)));
 		}
 
 		var created = await TransactionService.ExecuteAsync(

@@ -4,6 +4,8 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Application.Lrts.BuildCatalogueCandidates;
 using Main.Application.Lrts.MapCatalogueCandidatesToProducts;
 using MassTransit;
@@ -26,9 +28,10 @@ public class EnrichOurCatalogueLrt(
 
 	public override string SystemName => nameof(EnrichOurCatalogueLrt);
 
-	public override string NameLocalizationKey => "lrt.catalogue.enrichment.name";
+	public override ILocalizableMessage NameLocalizationMessage => LrtCatalogueEnrichmentNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.catalogue.enrichment.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtCatalogueEnrichmentDescriptionMessage.Instance;
 
 	protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState)
 	{

@@ -4,10 +4,11 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Exceptions;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Mailing.Core.Models;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
+using Main.Entities;
 using Main.Entities.Exceptions;
 using Main.Entities.Settings;
 using Main.Entities.User;
@@ -26,7 +27,7 @@ public class RequestEmailVerificationHandler(
 	IJsonSigner jsonSigner,
 	IMailingService mailingService,
 	IVerificationPayloadProvider verificationPayloadProvider,
-	IContextualStringLocalizer localizer,
+	IContextualLocalizer localizer,
 	ISettingsService settingsService) : ICommandHandler<RequestEmailVerificationCommand>
 {
 	public async Task<Unit> Handle(
@@ -45,7 +46,7 @@ public class RequestEmailVerificationHandler(
 
 		var setting = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
 		var appServiceUrl = setting.AppServiceUrl ??
-			throw new InvalidInputException("global.application.setting.app.service.url.not.configured");
+			throw new InvalidInputException(GlobalApplicationSettingAppServiceUrlNotConfiguredMessage.Instance);
 
 		var signed = jsonSigner.Sign(
 			await verificationPayloadProvider.GetPayload(

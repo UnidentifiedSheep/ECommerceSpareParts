@@ -4,7 +4,9 @@ using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Exceptions;
+using Locan.Core.Interfaces;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
+using Main.Entities;
 using Main.Entities.Settings;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
@@ -16,13 +18,11 @@ public class StorageContentSettingDefinition(
 	INamedObjectRegistry<StorageContentExtractPolicyBase> registry)
 	: SettingDefinitionNamedObjectBase<StorageContentSetting>(settingsService)
 {
-	private const string InvalidInputKey = "storage.content.setting.input.invalid";
-
 	public override string SystemName => StorageContentSetting.SettingName;
-
-	public override string NameLocalizationKey => "storage.content.setting.name";
-
-	public override string DescriptionLocalizationKey => "storage.content.setting.description";
+	public override ILocalizableMessage NameLocalizationMessage
+		=> StorageContentSettingNameMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> StorageContentSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(StorageContentSettingInputData);
 
@@ -31,10 +31,10 @@ public class StorageContentSettingDefinition(
 	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
 	{
 		var deser = JsonSerializer.Deserialize<StorageContentSettingInputData>(json) ??
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(StorageContentSettingInputInvalidMessage.Instance);
 
 		if (registry.TryGetBySystemName(deser.StorageContentExtractionPolicy) == null)
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(StorageContentSettingInputInvalidMessage.Instance);
 
 		await SettingsService.SetSetting(
 			new StorageContentSetting(
@@ -54,8 +54,8 @@ public record StorageContentSettingInputData
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.NamedObjectSelector)]
 	[SchemaDependsOnEntity("StorageContentExtractPolicy")]
-	[SchemaFieldLabel("storage.content.setting.extraction.policy.name")]
-	[SchemaFieldDescription("storage.content.setting.extraction.policy.description")]
+	[SchemaFieldLabel(StorageContentSettingExtractionPolicyNameMessage.Key)]
+	[SchemaFieldDescription(StorageContentSettingExtractionPolicyDescriptionMessage.Key)]
 	[JsonPropertyName("storageContentExtractionPolicy")]
 	public required string StorageContentExtractionPolicy { get; init; }
 }

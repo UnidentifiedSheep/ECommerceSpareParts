@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Locan.Generator" Version="1.0.5" />
+        <PackageReference Include="Locan.Generator" Version="1.0.6" />
         <PackageReference Include="MassTransit.Abstractions" Version="8.5.8"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9"/>
     </ItemGroup>

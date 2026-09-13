@@ -4,6 +4,8 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Organization;
 using MassTransit;
@@ -30,10 +32,11 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 
 	public override string SystemName => nameof(RecalculateApproximateOrganizationBalancesLrt);
 
-	public override string NameLocalizationKey => "lrt.organization.approximate.balance.recalculate.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtOrganizationApproximateBalanceRecalculateNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey =>
-		"lrt.organization.approximate.balance.recalculate.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtOrganizationApproximateBalanceRecalculateDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

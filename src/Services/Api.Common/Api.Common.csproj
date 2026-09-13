@@ -25,8 +25,8 @@
     <ItemGroup>
         <PackageReference Include="FluentValidation" Version="12.1.1"/>
         <PackageReference Include="Carter" Version="10.0.0"/>
-        <PackageReference Include="Locan.AspNetCore" Version="1.0.5" />
-        <PackageReference Include="Locan.Generator" Version="1.0.5" />
+        <PackageReference Include="Locan.AspNetCore" Version="1.0.6" />
+        <PackageReference Include="Locan.Generator" Version="1.0.6" />
         <PackageReference Include="Marten.AspNetCore" Version="9.29.0"/>
         <PackageReference Include="MediatR" Version="14.1.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>

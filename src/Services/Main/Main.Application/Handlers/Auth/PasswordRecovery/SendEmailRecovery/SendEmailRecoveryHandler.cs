@@ -4,11 +4,12 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Exceptions;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Mailing.Core.Models;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
+using Main.Entities;
 using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Enums.Auth;
@@ -24,7 +25,7 @@ public class SendEmailRecoveryHandler(
 	IJsonSigner jsonSigner,
 	IUserRepository userRepository,
 	IMailingService mailingService,
-	IContextualStringLocalizer localizer,
+	IContextualLocalizer localizer,
 	ISettingsService settingsService,
 	IResetPayloadProvider payloadProvider) : ICommandHandler<SendEmailRecoveryCommand>
 {
@@ -40,7 +41,7 @@ public class SendEmailRecoveryHandler(
 
 		var setting = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
 		var appServiceUrl = setting.AppServiceUrl ??
-			throw new InvalidInputException("global.application.setting.app.service.url.not.configured");
+			throw new InvalidInputException(GlobalApplicationSettingAppServiceUrlNotConfiguredMessage.Instance);
 
 		var signed = jsonSigner.Sign(await payloadProvider.GetPayload(user.Id, ResetType.PasswordReset));
 

@@ -10,8 +10,11 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
+using Locan.Core.LocalizableMessages;
 using Main.Application.Lrts.Base;
+using Main.Entities;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -102,7 +105,7 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		IOptions<S3BucketsOptions> bucketsOptions,
 		IPublishEndpoint publisher,
 		IApplicationTransactionService transactionService,
-		IContextualStringLocalizer stringLocalizer)
+		IContextualLocalizer stringLocalizer)
 		: CsvImportLrtBase<TestCsvImportInputState, TestCsvImportState, TestCsvRow, string>(
 			jobRepository,
 			bucketsOptions,
@@ -121,12 +124,14 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 
 		public override string SystemName => nameof(TestCsvImportLrt);
 
-		public override string NameLocalizationKey => "test.csv.import.name";
+		public override ILocalizableMessage NameLocalizationMessage =>
+			new LocalizableMessage("test.csv.import.name");
 
-		public override string DescriptionLocalizationKey => "test.csv.import.description";
+		public override ILocalizableMessage DescriptionLocalizationMessage =>
+			new LocalizableMessage("test.csv.import.description");
 
-		protected override string GetTooManyErrorsLocalizationKey() =>
-			"producer.too.many.errors.while.processing.batch";
+		protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
+			ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 		protected override bool TryProcessRow(
 			int rowIdx,

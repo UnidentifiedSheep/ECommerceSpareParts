@@ -9,7 +9,8 @@ using Application.Common.Models.Options.S3;
 using CsvHelper;
 using CsvHelper.TypeConversion;
 using Domain.CommonEntities.Job;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,7 +25,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 	IApplicationTransactionService transactionService,
 	ILogger logger,
 	IS3StorageService s3Service,
-	IContextualStringLocalizer stringLocalizer) : LrtBase<TInputState, TState>(
+	IContextualLocalizer stringLocalizer) : LrtBase<TInputState, TState>(
 	jobRepository,
 	unitOfWork,
 	publisher,
@@ -38,8 +39,9 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 	protected virtual int CheckpointInterval => BatchSize;
 
 	protected virtual int MaxErrors => 10_000;
+	protected abstract ILocalizableMessage GetTooManyErrorsLocalizationMessage { get; }
 
-	protected IContextualStringLocalizer StringLocalizer => stringLocalizer;
+	protected IContextualLocalizer StringLocalizer => stringLocalizer;
 
 	protected sealed override async Task DoWork()
 	{
@@ -69,7 +71,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 				continue;
 
 			if (errors.Count >= MaxErrors)
-				Interrupt(stringLocalizer.Get(GetTooManyErrorsLocalizationKey()));
+				Interrupt(stringLocalizer.Get(GetTooManyErrorsLocalizationMessage));
 
 			var rowParsed = true;
 			TCsvRow row = default!;
@@ -101,7 +103,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 					errors);
 
 			if (errorLimitReached)
-				Interrupt(stringLocalizer.Get(GetTooManyErrorsLocalizationKey()));
+				Interrupt(stringLocalizer.Get(GetTooManyErrorsLocalizationMessage));
 		}
 
 		if (rowsToAdd.Count > 0 || state.CurrentLine != rowIdx)
@@ -114,7 +116,6 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 
 	protected virtual Task BeforeRead(TState state) => Task.CompletedTask;
 
-	protected abstract string GetTooManyErrorsLocalizationKey();
 
 	protected abstract bool TryProcessRow(
 		int rowIdx,

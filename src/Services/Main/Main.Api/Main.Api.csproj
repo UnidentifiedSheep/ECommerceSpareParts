@@ -8,10 +8,12 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>14</LangVersion>
         <PreserveCompilationContext>true</PreserveCompilationContext>
+        <LocanDefaultCulture>en</LocanDefaultCulture>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Carter" Version="10.0.0"/>
+        <PackageReference Include="Locan.Generator" Version="1.0.6" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>
         <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1"/>
@@ -42,26 +44,25 @@
         <Content Include="..\..\..\..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
-        <Content Include="..\Main.Entities\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\Application.Common\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\..\Core\Domain\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <LocanResource Include="../Main.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../../Application.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../../../Core/Domain/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
     </ItemGroup>
 
     <Target Name="CopyEmailTemplatesToOutput" AfterTargets="CopyFilesToOutputDirectory">

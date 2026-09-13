@@ -4,6 +4,8 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Exceptions;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Settings.Supplier;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
@@ -13,13 +15,11 @@ namespace Main.Application.NamedObjects.SettingDefinitions.Supplier;
 public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISecretEncryptor secretEncryptor)
 	: SettingDefinitionNamedObjectBase<TmtrSupplierSetting>(settingsService)
 {
-	private const string InvalidInputKey = "supplier.tmtr.setting.input.invalid";
-
 	public override string SystemName => TmtrSupplierSetting.SettingName;
-
-	public override string NameLocalizationKey => "supplier.tmtr.setting.name";
-
-	public override string DescriptionLocalizationKey => "supplier.tmtr.setting.description";
+	public override ILocalizableMessage NameLocalizationMessage
+		=> SupplierTmtrSettingNameMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> SupplierTmtrSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(TmtrSupplierSettingInputData);
 
@@ -28,7 +28,7 @@ public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISe
 	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
 	{
 		var input = JsonSerializer.Deserialize<TmtrSupplierSettingInputData>(json) ??
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(SupplierTmtrSettingInputInvalidMessage.Instance);
 		var current = await SettingsService.GetOrDefault<TmtrSupplierSetting>(cancellationToken);
 
 		if (!input.IsEnabled)
@@ -51,7 +51,7 @@ public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISe
 
 		if (baseUrl is null || login is null || encryptedPassword is null ||
 			input.GuaranteedDeliveryOffsetDays < 0)
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(SupplierTmtrSettingInputInvalidMessage.Instance);
 
 		var data = new TmtrSupplierSettingData
 		{
@@ -91,7 +91,7 @@ public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISe
 				inputBaseUrl.Trim(),
 				UriKind.Absolute,
 				out var uri) || uri.Scheme is not ("http" or "https"))
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(SupplierTmtrSettingInputInvalidMessage.Instance);
 
 		return uri.AbsoluteUri;
 	}
@@ -102,7 +102,7 @@ public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISe
 			return currentLogin;
 
 		return string.IsNullOrWhiteSpace(inputLogin)
-			? throw new InvalidInputException(InvalidInputKey)
+			? throw new InvalidInputException(SupplierTmtrSettingInputInvalidMessage.Instance)
 			: inputLogin.Trim();
 	}
 
@@ -112,7 +112,7 @@ public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISe
 			return currentEncryptedPassword;
 
 		return string.IsNullOrWhiteSpace(inputPassword)
-			? throw new InvalidInputException(InvalidInputKey)
+			? throw new InvalidInputException(SupplierTmtrSettingInputInvalidMessage.Instance)
 			: secretEncryptor.Encrypt(inputPassword);
 	}
 }
@@ -121,32 +121,32 @@ public record TmtrSupplierSettingInputData
 {
 	[JsonPropertyName("isEnabled")]
 	[RequiredSchemaField]
-	[SchemaFieldLabel("supplier.tmtr.setting.is.enabled.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.is.enabled.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingIsEnabledNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingIsEnabledDescriptionMessage.Key)]
 	public bool IsEnabled { get; init; }
 
 	[JsonPropertyName("baseUrl")]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("supplier.tmtr.setting.base.url.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.base.url.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingBaseUrlNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingBaseUrlDescriptionMessage.Key)]
 	public string? BaseUrl { get; init; }
 
 	[JsonPropertyName("guaranteedDeliveryOffsetDays")]
 	[RequiredSchemaField]
-	[SchemaFieldLabel("supplier.tmtr.setting.delivery.offset.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.delivery.offset.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingDeliveryOffsetNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingDeliveryOffsetDescriptionMessage.Key)]
 	public int GuaranteedDeliveryOffsetDays { get; init; } = 1;
 
 	[JsonPropertyName("login")]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("supplier.tmtr.setting.login.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.login.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingLoginNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingLoginDescriptionMessage.Key)]
 	public string? Login { get; init; }
 
 	[JsonPropertyName("password")]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("supplier.tmtr.setting.password.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.password.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingPasswordNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingPasswordDescriptionMessage.Key)]
 	public string? Password { get; init; }
 }
 
@@ -154,29 +154,29 @@ public record TmtrSupplierSettingOutputData
 {
 	[JsonPropertyName("isEnabled")]
 	[RequiredSchemaField]
-	[SchemaFieldLabel("supplier.tmtr.setting.is.enabled.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.is.enabled.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingIsEnabledNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingIsEnabledDescriptionMessage.Key)]
 	public bool IsEnabled { get; init; }
 
 	[JsonPropertyName("baseUrl")]
-	[SchemaFieldLabel("supplier.tmtr.setting.base.url.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.base.url.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingBaseUrlNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingBaseUrlDescriptionMessage.Key)]
 	public string? BaseUrl { get; init; }
 
 	[JsonPropertyName("guaranteedDeliveryOffsetDays")]
 	[RequiredSchemaField]
-	[SchemaFieldLabel("supplier.tmtr.setting.delivery.offset.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.delivery.offset.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingDeliveryOffsetNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingDeliveryOffsetDescriptionMessage.Key)]
 	public int GuaranteedDeliveryOffsetDays { get; init; }
 
 	[JsonPropertyName("login")]
-	[SchemaFieldLabel("supplier.tmtr.setting.login.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.login.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingLoginNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingLoginDescriptionMessage.Key)]
 	public string? Login { get; init; }
 
 	[JsonPropertyName("hasPassword")]
 	[RequiredSchemaField]
-	[SchemaFieldLabel("supplier.tmtr.setting.has.password.name")]
-	[SchemaFieldDescription("supplier.tmtr.setting.has.password.description")]
+	[SchemaFieldLabel(SupplierTmtrSettingHasPasswordNameMessage.Key)]
+	[SchemaFieldDescription(SupplierTmtrSettingHasPasswordDescriptionMessage.Key)]
 	public bool HasPassword { get; init; }
 }

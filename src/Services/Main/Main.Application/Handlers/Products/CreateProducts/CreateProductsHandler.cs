@@ -4,6 +4,7 @@ using Attributes;
 using Exceptions;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
+using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 
@@ -24,11 +25,11 @@ public class CreateProductsHandler(IProductRepository productRepository, IUnitOf
 	{
 		var keys = request.NewProducts.Select(GetProductKey).ToList();
 		if (keys.Distinct().Count() != keys.Count)
-			throw new InvalidInputException("article.create.articles.duplicate");
+			throw new InvalidInputException(ArticleCreateArticlesDuplicateMessage.Instance);
 
 		var existingKeys = await productRepository.GetExistingProductKeys(keys, cancellationToken);
 		if (existingKeys.Count > 0)
-			throw new InvalidInputException("article.create.articles.duplicate");
+			throw new InvalidInputException(ArticleCreateArticlesDuplicateMessage.Instance);
 
 		var products = new List<Product>();
 

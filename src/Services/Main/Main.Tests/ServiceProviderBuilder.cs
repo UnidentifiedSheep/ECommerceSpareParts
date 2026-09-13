@@ -4,7 +4,7 @@ using Abstractions.Models;
 using Api.Common;
 using Application.Common.Models.Options.S3;
 using Cache;
-using Localization.Domain.Extensions;
+using Locan.Hosting;
 using Mailing.Core;
 using Main.Application.Configs;
 using Main.Application.Models;
@@ -51,10 +51,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
 		ApplicationServiceProvider
 			.AddApplicationLayer(services, null)
-			.AddLocalization(
-				"ru-RU",
-				"ru-RU",
-				"en-EN")
+			.AddLocan()
 			.AddPersistenceLayer();
 		var passwordRules = new PasswordRules
 		{

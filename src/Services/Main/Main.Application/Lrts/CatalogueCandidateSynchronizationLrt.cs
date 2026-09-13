@@ -8,6 +8,8 @@ using Attributes;
 using Contracts.Models.CatalogueCandidate;
 using Contracts.ProductEnrichment;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Product.Enrichment;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -31,10 +33,11 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 {
 	public override string SystemName => nameof(CatalogueCandidateSynchronizationLrt);
 
-	public override string NameLocalizationKey => "lrt.catalogue.candidates.synchronization.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtCatalogueCandidatesSynchronizationNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey =>
-		"lrt.catalogue.candidates.synchronization.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtCatalogueCandidatesSynchronizationDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

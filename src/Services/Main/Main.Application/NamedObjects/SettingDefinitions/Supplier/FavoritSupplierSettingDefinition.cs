@@ -4,6 +4,8 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Exceptions;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Settings.Supplier;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
@@ -15,13 +17,11 @@ public class FavoritSupplierSettingDefinition(
 	ISecretEncryptor secretEncryptor)
 	: SettingDefinitionNamedObjectBase<FavoritSupplierSetting>(settingsService)
 {
-	private const string InvalidInputKey = "supplier.favorit.setting.input.invalid";
-
 	public override string SystemName => FavoritSupplierSetting.SettingName;
-
-	public override string NameLocalizationKey => "supplier.favorit.setting.name";
-
-	public override string DescriptionLocalizationKey => "supplier.favorit.setting.description";
+	public override ILocalizableMessage NameLocalizationMessage
+		=> SupplierFavoritSettingNameMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> SupplierFavoritSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(FavoritSupplierSettingInputData);
 
@@ -30,7 +30,7 @@ public class FavoritSupplierSettingDefinition(
 	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
 	{
 		var deser = JsonSerializer.Deserialize<FavoritSupplierSettingInputData>(json) ??
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(SupplierFavoritSettingInputInvalidMessage.Instance);
 
 		var currentSetting = await SettingsService.GetOrDefault<FavoritSupplierSetting>(cancellationToken);
 
@@ -50,7 +50,7 @@ public class FavoritSupplierSettingDefinition(
 		var encryptedApiKey = GetEncryptedApiKey(deser.ApiKey, currentSetting.Data.EncryptedApiKey);
 
 		if (baseUrl == null || encryptedApiKey == null)
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(SupplierFavoritSettingInputInvalidMessage.Instance);
 
 		var data = new FavoritSupplierSettingData
 		{
@@ -84,7 +84,7 @@ public class FavoritSupplierSettingDefinition(
 				inputBaseUrl.Trim(),
 				UriKind.Absolute,
 				out var uri) || uri.Scheme is not ("http" or "https"))
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(SupplierFavoritSettingInputInvalidMessage.Instance);
 
 		return uri.AbsoluteUri;
 	}
@@ -95,7 +95,7 @@ public class FavoritSupplierSettingDefinition(
 			return currentEncryptedApiKey;
 
 		return string.IsNullOrWhiteSpace(inputApiKey)
-			? throw new InvalidInputException(InvalidInputKey)
+			? throw new InvalidInputException(SupplierFavoritSettingInputInvalidMessage.Instance)
 			: secretEncryptor.Encrypt(inputApiKey);
 	}
 }
@@ -104,20 +104,20 @@ public record FavoritSupplierSettingInputData
 {
 	[JsonPropertyName("isEnabled")]
 	[RequiredSchemaField]
-	[SchemaFieldLabel("supplier.favorit.setting.is.enabled.name")]
-	[SchemaFieldDescription("supplier.favorit.setting.is.enabled.description")]
+	[SchemaFieldLabel(SupplierFavoritSettingIsEnabledNameMessage.Key)]
+	[SchemaFieldDescription(SupplierFavoritSettingIsEnabledDescriptionMessage.Key)]
 	public bool IsEnabled { get; init; }
 
 	[JsonPropertyName("baseUrl")]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("supplier.favorit.setting.base.url.name")]
-	[SchemaFieldDescription("supplier.favorit.setting.base.url.description")]
+	[SchemaFieldLabel(SupplierFavoritSettingBaseUrlNameMessage.Key)]
+	[SchemaFieldDescription(SupplierFavoritSettingBaseUrlDescriptionMessage.Key)]
 	public string? BaseUrl { get; init; }
 
 	[JsonPropertyName("apiKey")]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("supplier.favorit.setting.api.key.name")]
-	[SchemaFieldDescription("supplier.favorit.setting.api.key.description")]
+	[SchemaFieldLabel(SupplierFavoritSettingApiKeyNameMessage.Key)]
+	[SchemaFieldDescription(SupplierFavoritSettingApiKeyDescriptionMessage.Key)]
 	public string? ApiKey { get; init; }
 }
 
@@ -125,18 +125,18 @@ public record FavoritSupplierSettingOutputData
 {
 	[JsonPropertyName("isEnabled")]
 	[RequiredSchemaField]
-	[SchemaFieldLabel("supplier.favorit.setting.is.enabled.name")]
-	[SchemaFieldDescription("supplier.favorit.setting.is.enabled.description")]
+	[SchemaFieldLabel(SupplierFavoritSettingIsEnabledNameMessage.Key)]
+	[SchemaFieldDescription(SupplierFavoritSettingIsEnabledDescriptionMessage.Key)]
 	public bool IsEnabled { get; init; }
 
 	[JsonPropertyName("baseUrl")]
-	[SchemaFieldLabel("supplier.favorit.setting.base.url.name")]
-	[SchemaFieldDescription("supplier.favorit.setting.base.url.description")]
+	[SchemaFieldLabel(SupplierFavoritSettingBaseUrlNameMessage.Key)]
+	[SchemaFieldDescription(SupplierFavoritSettingBaseUrlDescriptionMessage.Key)]
 	public string? BaseUrl { get; init; }
 
 	[JsonPropertyName("hasApiKey")]
 	[RequiredSchemaField]
-	[SchemaFieldLabel("supplier.favorit.setting.has.api.key.name")]
-	[SchemaFieldDescription("supplier.favorit.setting.has.api.key.description")]
+	[SchemaFieldLabel(SupplierFavoritSettingHasApiKeyNameMessage.Key)]
+	[SchemaFieldDescription(SupplierFavoritSettingHasApiKeyDescriptionMessage.Key)]
 	public bool HasApiKey { get; init; }
 }

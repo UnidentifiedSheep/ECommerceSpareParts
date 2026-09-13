@@ -2,6 +2,8 @@ using System.Text.Json;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Exceptions;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Settings;
 
 namespace Main.Application.NamedObjects.SettingDefinitions;
@@ -9,13 +11,11 @@ namespace Main.Application.NamedObjects.SettingDefinitions;
 public class GlobalApplicationSettingDefinition(ISettingsService settingsService)
 	: SettingDefinitionNamedObjectBase<GlobalApplicationSetting>(settingsService)
 {
-	private const string InvalidInputKey = "global.application.setting.input.invalid";
-
 	public override string SystemName => GlobalApplicationSetting.SettingName;
-
-	public override string NameLocalizationKey => "global.application.setting.name";
-
-	public override string DescriptionLocalizationKey => "global.application.setting.description";
+	public override ILocalizableMessage NameLocalizationMessage
+		=> GlobalApplicationSettingNameMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> GlobalApplicationSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(GlobalApplicationSettingData);
 
@@ -24,7 +24,7 @@ public class GlobalApplicationSettingDefinition(ISettingsService settingsService
 	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
 	{
 		var input = JsonSerializer.Deserialize<GlobalApplicationSettingData>(json) ??
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(GlobalApplicationSettingInputInvalidMessage.Instance);
 
 		var data = new GlobalApplicationSettingData
 		{
@@ -44,7 +44,7 @@ public class GlobalApplicationSettingDefinition(ISettingsService settingsService
 				value.Trim(),
 				UriKind.Absolute,
 				out var uri) || uri.Scheme is not ("http" or "https"))
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(GlobalApplicationSettingInputInvalidMessage.Instance);
 
 		return uri.AbsoluteUri.TrimEnd('/');
 	}

@@ -5,8 +5,10 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Entities;
 using Main.Entities.Product.Enrichment;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -38,10 +40,10 @@ public class BuildCatalogueCandidatesLrt(
 		"23505");
 
 	public override string SystemName => LrtSystemName;
-
-	public override string NameLocalizationKey => "lrt.catalogue.candidates.build.name";
-
-	public override string DescriptionLocalizationKey => "lrt.catalogue.candidates.build.description";
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtCatalogueCandidatesBuildNameMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtCatalogueCandidatesBuildDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

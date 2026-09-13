@@ -8,11 +8,13 @@ using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
+using Main.Entities;
 using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
@@ -33,7 +35,7 @@ public class ProductCrossesImportLrt(
 	IApplicationTransactionService transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductCrossesImportLrt> logger,
-	IContextualStringLocalizer stringLocalizer)
+	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductCrossesImportInputState, ProductCrossesImportState,
 		ProductCrossesImportLrt.ProductCrossCsvDto, ProductCrossesImportLrt.ProductCrossBatchItem>(
 		jobRepository,
@@ -49,15 +51,16 @@ public class ProductCrossesImportLrt(
 
 	public override string SystemName => nameof(ProductCrossesImportLrt);
 
-	public override string NameLocalizationKey => "lrt.product.crosses.import.name";
+	public override ILocalizableMessage NameLocalizationMessage => LrtProductCrossesImportNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.product.crosses.import.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtProductCrossesImportDescriptionMessage.Instance;
 
 	protected override async Task BeforeRead(ProductCrossesImportState state) =>
 		_producerLookup = await producerLookupService.Load(CancellationToken);
 
-	protected override string GetTooManyErrorsLocalizationKey() =>
-		"article.import.too.many.errors.while.processing.batch";
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
+		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -76,7 +79,8 @@ public class ProductCrossesImportLrt(
 				errors.Add(
 					CreateError(
 						rowIdx,
-						StringLocalizer.Get("article.import.producer.not.found", row.Producer)));
+						StringLocalizer.Get(
+							new ArticleImportProducerNotFoundMessage().WithProducer(row.Producer))));
 				state.SkippedLines.Add(rowIdx);
 				return false;
 			}
@@ -87,7 +91,8 @@ public class ProductCrossesImportLrt(
 				errors.Add(
 					CreateError(
 						rowIdx,
-						StringLocalizer.Get("article.import.producer.not.found", row.CrossProducer)));
+						StringLocalizer.Get(
+							new ArticleImportProducerNotFoundMessage().WithProducer(row.CrossProducer))));
 				state.SkippedLines.Add(rowIdx);
 				return false;
 			}
@@ -137,9 +142,9 @@ public class ProductCrossesImportLrt(
 					CreateError(
 						idx,
 						StringLocalizer.Get(
-							"article.cross.import.product.not.found",
-							item.Sku,
-							item.Producer)));
+							new ArticleCrossImportProductNotFoundMessage()
+								.WithArticleNumber(item.Sku)
+								.WithProducer(item.Producer))));
 				state.SkippedLines.Add(idx);
 				continue;
 			}
@@ -150,9 +155,9 @@ public class ProductCrossesImportLrt(
 					CreateError(
 						idx,
 						StringLocalizer.Get(
-							"article.cross.import.product.not.found",
-							item.CrossSku,
-							item.CrossProducer)));
+							new ArticleCrossImportProductNotFoundMessage()
+								.WithArticleNumber(item.CrossSku)
+								.WithProducer(item.CrossProducer))));
 				state.SkippedLines.Add(idx);
 				continue;
 			}
@@ -162,7 +167,7 @@ public class ProductCrossesImportLrt(
 				errors.Add(
 					CreateError(
 						idx,
-						StringLocalizer.Get("article.linkage.article.cannot.equal.cross.article")));
+						StringLocalizer.Get(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance)));
 				state.SkippedLines.Add(idx);
 				continue;
 			}
@@ -209,9 +214,7 @@ public class ProductCrossesImportLrt(
 	private string GetErrorMessage(Exception ex)
 	{
 		if (ex is ILocalizableException localizableException)
-			return StringLocalizer.GetOrDefault(
-				localizableException.MessageKey,
-				localizableException.Arguments ?? []) ?? ex.Message;
+			return StringLocalizer.Get(localizableException.LocalizableMessage);
 
 		return ex.Message;
 	}
