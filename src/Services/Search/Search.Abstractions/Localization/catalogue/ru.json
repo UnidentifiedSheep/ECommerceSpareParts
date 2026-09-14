@@ -1,0 +1,12 @@
+{
+  "culture": "ru",
+  "messages": {
+    "catalogue.search.query.max.length": "Поисковый запрос не должен превышать {Count} символов.",
+    "catalogue.search.targets.required": "Необходимо указать хотя бы одну цель поиска.",
+    "catalogue.search.target.invalid": "Указана недопустимая цель поиска.",
+    "catalogue.search.match.mode.invalid": "Указан недопустимый режим поиска.",
+    "catalogue.search.text.mode.required": "Для текстового запроса необходим хотя бы один режим поиска по артикулу или названию.",
+    "catalogue.search.fuzzy.query.min.length": "Для нечёткого поиска запрос должен содержать не менее {Count} символов.",
+    "catalogue.search.producer.count.max": "Можно указать не более {Count} производителей."
+  }
+}

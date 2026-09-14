@@ -8,22 +8,19 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Locan.Generator" Version="1.0.6"/>
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\Search.Entities\Search.Entities.csproj"/>
         <ProjectReference Include="..\Search.Enums\Search.Enums.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\Application.Common\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\..\Core\Domain\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
+        <LocanResource Include="Localization/**/*.json"
+                       GenerateMessages="true"
+                       CopyToOutput="false"/>
     </ItemGroup>
 
 </Project>

@@ -1,8 +1,8 @@
-﻿{
-  "locale": "ru",
-  "keyValues": {
+{
+  "culture": "ru",
+  "messages": {
     "suggestion.already.rebuilding": "Процесс пересборки предложений уже запущен.",
     "suggestion.search.query.empty": "Поисковый запрос для предложений не может быть пустым.",
-    "suggestion.search.limit.min": "Минимальное количество запрашиваемых предложений — 1."
+    "suggestion.search.limit.min": "Необходимо запросить хотя бы одно предложение."
   }
 }

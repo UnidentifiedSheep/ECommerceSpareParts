@@ -2,12 +2,8 @@ using System.Reflection;
 using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
-using Api.Common.HostedServices;
-using Api.Common.HostedServices.Startup;
-using Application.Common.Interfaces;
 using Carter;
 using Internal.Integration.Di;
-using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
 using Search.Abstractions.Options;
@@ -69,16 +65,12 @@ builder
 	.AddMinimalSecurityLayer()
 	.AddIntegrationClients()
 	.AddApplicationLayer(builder.Configuration)
-	.AddPersistenceLayer()
-	.AddLocalization(builder.Configuration);
+	.AddPersistenceLayer();
 
 var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(
 	new DependencyContextAssemblyCatalog(endpointAssembly),
 	c => c.WithEmptyValidators());
-
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
-builder.Services.AddHostedService<StartupTaskHostedService>();
 
 var app = builder.Build();
 

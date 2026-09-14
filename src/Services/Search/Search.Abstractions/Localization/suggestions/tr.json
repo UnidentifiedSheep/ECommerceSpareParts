@@ -1,0 +1,8 @@
+{
+  "culture": "tr",
+  "messages": {
+    "suggestion.already.rebuilding": "Önerileri yeniden oluşturma işlemi zaten devam ediyor.",
+    "suggestion.search.query.empty": "Öneri arama sorgusu boş olamaz.",
+    "suggestion.search.limit.min": "En az bir öneri istenmelidir."
+  }
+}

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Abstractions;
 using Abstractions.Models.SortyBy;
+using Application.Common;
 using Exceptions;
 using OpenSearch.Client;
 
@@ -41,8 +42,7 @@ public static class SortDescriptorExtensions
 		catch (ArgumentException exception)
 		{
 			throw new InvalidInputException(
-				"sorting.invalid",
-				[exception.Message],
+				new SortingInvalidMessage().WithSort(exception.Message),
 				exception.Message);
 		}
 

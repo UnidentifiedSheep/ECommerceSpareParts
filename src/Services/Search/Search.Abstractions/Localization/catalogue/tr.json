@@ -1,0 +1,12 @@
+{
+  "culture": "tr",
+  "messages": {
+    "catalogue.search.query.max.length": "Arama sorgusu {Count} karakteri aşmamalıdır.",
+    "catalogue.search.targets.required": "En az bir arama hedefi belirtilmelidir.",
+    "catalogue.search.target.invalid": "Belirtilen arama hedefi geçersizdir.",
+    "catalogue.search.match.mode.invalid": "Belirtilen arama eşleştirme modu geçersizdir.",
+    "catalogue.search.text.mode.required": "Metin sorgusu için en az bir ürün kodu veya ad arama modu gereklidir.",
+    "catalogue.search.fuzzy.query.min.length": "Bulanık arama için sorgu en az {Count} karakter olmalıdır.",
+    "catalogue.search.producer.count.max": "En fazla {Count} üretici belirtilebilir."
+  }
+}
