@@ -5,6 +5,7 @@ using Analytics.Cache;
 using Analytics.Persistence;
 using Api.Common;
 using Cache;
+using Locan.Hosting;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -68,6 +69,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 				}));
 
 		services.AddCacheLayer("test").AddApplicationCache().AddCommonLayer();
+		services.AddLocan();
 
 		services.RemoveAll<IUserContext>();
 		services.AddScoped<IUserContext, UserContextMock>();
