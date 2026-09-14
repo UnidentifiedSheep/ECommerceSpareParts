@@ -1,0 +1,32 @@
+﻿{
+  "culture": "en",
+  "messages": {
+    "currency.not.found": "We couldn't find the currency you were looking for.",
+    "currency.not.found.by.code": "We couldn't find the currency with code '{Code|string}'.",
+    "currency.code.already.take": "Currency with code '{Code|string}' already exists.",
+    "currency.name.already.take": "Currency with name '{Name|string}' already exists.",
+    "currency.short.name.already.take": "Currency with short name '{ShortName|string}' already exists.",
+    "currency.sign.already.take": "Currency with sign '{Sign|string}' already exists.",
+    "currency.must.exist": "The specified currency must exist.",
+    "currency.code.not.empty": "Currency code must not be empty.",
+    "currency.code.max.length": "Currency code must be at most 26 characters long.",
+    "currency.code.min.length": "Currency code must be at least 2 characters long.",
+    "currency.name.not.empty": "Currency name must not be empty.",
+    "currency.name.max.length": "Currency name must be at most 128 characters long.",
+    "currency.name.min.length": "Currency name must be at least 3 characters long.",
+    "currency.sign.not.empty": "Currency sign must not be empty.",
+    "currency.sign.max.length": "Currency sign must be at most 3 characters long.",
+    "currency.sign.min.length": "Currency sign must be at least 1 character long.",
+    "currency.shortName.not.empty": "Currency short name must not be empty.",
+    "currency.shortName.max.length": "Currency short name must be at most 5 characters long.",
+    "currency.shortName.min.length": "Currency short name must be at least 2 characters long.",
+    "currency.rate.not.found": "Currency rate can not be found.",
+    "currency.setting.name": "Currency settings",
+    "currency.setting.description": "Controls currency-related application settings, including the exchange rate provider.",
+    "currency.setting.input.invalid": "Invalid currency settings data was provided.",
+    "currency.setting.base.currency.name": "Base currency",
+    "currency.setting.base.currency.description": "Currency used as the base for application exchange rates.",
+    "currency.setting.rate.provider.name": "Exchange rate provider",
+    "currency.setting.rate.provider.description": "Provider used to update currency exchange rates."
+  }
+}

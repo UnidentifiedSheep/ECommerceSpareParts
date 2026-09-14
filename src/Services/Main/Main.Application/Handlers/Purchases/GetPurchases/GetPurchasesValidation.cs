@@ -1,6 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Purchases.GetPurchases;
 
@@ -10,7 +11,7 @@ public class GetPurchasesValidation : AbstractValidator<GetPurchasesQuery>
 	{
 		RuleFor(query => query.DateRange)
 			.Must(x => !x.Min.HasValue || !x.Max.HasValue || x.Min.Value.Date <= x.Max.Value.Date)
-			.WithLocalizationKey("purchase.date.range.start.before.end");
+			.WithLocalizableError(PurchaseDateRangeStartBeforeEndMessage.Instance);
 
 		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 	}

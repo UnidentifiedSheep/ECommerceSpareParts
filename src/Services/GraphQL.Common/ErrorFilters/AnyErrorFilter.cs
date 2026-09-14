@@ -1,6 +1,6 @@
 using Exceptions.Base;
 using HotChocolate.Execution;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +8,7 @@ namespace GraphQL.Common.ErrorFilters;
 
 public sealed class AnyErrorFilter(
 	ILoggerFactory loggerFactory,
-	IContextualStringLocalizer localizer,
+	IContextualLocalizer localizer,
 	IHttpContextAccessor httpContextAccessor)
 	: GraphQlErrorFilterBase<AnyErrorFilter, Exception>(loggerFactory, localizer, httpContextAccessor)
 {

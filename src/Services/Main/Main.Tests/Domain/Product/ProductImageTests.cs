@@ -38,7 +38,7 @@ public class ProductImageTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.MessageKey
+			.LocalizableMessage.MessageKey
 			.Should()
 			.Be("article.image.invalid.extension");
 	}

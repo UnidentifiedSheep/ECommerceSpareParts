@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Validators;
-using Abstractions.Models.Validation;
 using FluentValidation;
 using FluentValidation.Results;
 
@@ -16,15 +15,12 @@ public class PasswordValidator : AbstractValidator<string>
 				if (valid)
 					return;
 
-				foreach (var (key, args) in errors)
+				foreach (var message in errors)
 					context.AddFailure(
 						new ValidationFailure(context.PropertyPath, "Validation failed")
 						{
-							ErrorCode = key,
-							CustomState = new ValidationStateData
-							{
-								DisplayErrorToUser = true, ErrorMessageArguments = args
-							}
+							ErrorCode = message.MessageKey,
+							CustomState = message
 						});
 			});
 	}

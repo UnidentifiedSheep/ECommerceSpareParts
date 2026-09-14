@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Auth.UpsertRole;
 
@@ -9,10 +10,10 @@ public class UpsertRoleValidation : AbstractValidator<UpsertRoleCommand>
 	{
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithLocalizationKey("role.name.not.empty")
+			.WithLocalizableError(RoleNameNotEmptyMessage.Instance)
 			.Must(x => x.Trim().Length >= 3)
-			.WithLocalizationKey("role.name.min.length")
+			.WithLocalizableError(RoleNameMinLengthMessage.Instance)
 			.Must(x => x.Trim().Length <= 24)
-			.WithLocalizationKey("role.name.max.length");
+			.WithLocalizableError(RoleNameMaxLengthMessage.Instance);
 	}
 }

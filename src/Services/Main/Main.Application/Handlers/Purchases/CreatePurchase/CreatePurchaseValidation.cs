@@ -1,7 +1,8 @@
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Handlers.Purchases.BaseValidators;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
@@ -10,13 +11,13 @@ public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
 {
 	public CreatePurchaseValidation(IOperationDatePolicy datePolicy)
 	{
-		RuleFor(x => x.PurchaseContent).NotEmpty().WithLocalizationKey("purchase.content.not.empty");
+		RuleFor(x => x.PurchaseContent).NotEmpty().WithLocalizableError(PurchaseContentNotEmptyMessage.Instance);
 
-		RuleFor(x => x.SupplierUserId).NotEmpty().WithLocalizationKey("purchase.supplier.id.not.empty");
+		RuleFor(x => x.SupplierUserId).NotEmpty().WithLocalizableError(PurchaseSupplierIdNotEmptyMessage.Instance);
 
 		RuleFor(x => x.SupplierOrganizationId)
 			.NotEmpty()
-			.WithLocalizationKey("purchase.supplier.organization.id.not.empty");
+			.WithLocalizableError(PurchaseSupplierOrganizationIdNotEmptyMessage.Instance);
 
 		RuleForEach(x => x.PurchaseContent).SetValidator(new NewPurchaseContentValidation());
 
@@ -25,17 +26,17 @@ public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
 		RuleFor(x => x.StorageFrom)
 			.Must(x => x != null)
 			.When(x => x.WithLogistics)
-			.WithLocalizationKey("purchase.storage.from.required.when.logistics");
+			.WithLocalizableError(PurchaseStorageFromRequiredWhenLogisticsMessage.Instance);
 
 		RuleFor(x => x.PayedSum)
 			.GreaterThanOrEqualTo(0)
 			.When(x => x.PayedSum != null)
-			.WithLocalizationKey("purchase.payed.sum.min.value")
+			.WithLocalizableError(PurchasePayedSumMinValueMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
 			.When(x => x.PayedSum != null)
-			.WithLocalizationKey("purchase.payed.sum.precision");
+			.WithLocalizableError(PurchasePayedSumPrecisionMessage.Instance);
 	}
 }

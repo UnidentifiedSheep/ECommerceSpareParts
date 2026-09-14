@@ -34,7 +34,7 @@ public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount
 		Discount = discount.EnsureInRange(
 			0m,
 			0.99m,
-			"user.discount.range");
+			UserDiscountRangeMessage.Instance);
 	}
 
 	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));

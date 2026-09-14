@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
-using Localization.Abstractions.Interfaces;
-using Localization.Domain;
-using Localization.Domain.Extensions;
+using Locan.Core.Interfaces.Containers;
+using Locan.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 using Tests.Extensions;
 using Tests.Interfaces.ServiceProvider;
@@ -34,10 +34,11 @@ public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
 
 	protected async Task LoadLocales()
 	{
-		var containers = Sp.GetRequiredService<IEnumerable<ILocalizerContainer>>();
-		var path = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-		var loader = new JsonLocalizerContainerLoader(path);
-		await loader.LoadAsync(containers);
+		var task = Sp
+			.GetServices<IHostedService>()
+			.OfType<LocalizerInitializationHostedService>()
+			.Single();
+		await task.StartAsync(CancellationToken.None);
 	}
 
 	protected async Task ResetDataStoresAsync(CancellationToken cancellationToken = default)

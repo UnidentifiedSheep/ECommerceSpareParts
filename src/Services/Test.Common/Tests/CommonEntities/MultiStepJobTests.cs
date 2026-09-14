@@ -334,7 +334,7 @@ public class MultiStepJobTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.MessageKey
+			.LocalizableMessage.MessageKey
 			.Should()
 			.Be("job.step.cannot.be.cancelled.directly");
 		step.Status.Should().Be(JobStatus.Blocked);

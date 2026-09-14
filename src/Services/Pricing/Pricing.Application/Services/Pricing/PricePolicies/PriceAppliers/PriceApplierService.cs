@@ -1,5 +1,5 @@
 using Application.Common.Interfaces.NamedObject;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
@@ -10,7 +10,7 @@ namespace Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 public class PriceApplierService(
 	IPriceApplierProvider priceApplierProvider,
 	INamedObjectRegistry<ApplierNamedObjectBase> registry,
-	IContextualStringLocalizer localizer) : IPriceApplierService
+	IContextualLocalizer localizer) : IPriceApplierService
 {
 	public async Task<string> GetCurrentConfigurationVersionAsync(CancellationToken ct = default)
 	{

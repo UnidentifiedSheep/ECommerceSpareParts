@@ -1,6 +1,7 @@
 using Abstractions.Models.Validation;
 using FluentValidation;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +9,7 @@ namespace GraphQL.Common.ErrorFilters;
 
 public sealed class ValidationErrorFilter(
 	ILoggerFactory loggerFactory,
-	IContextualStringLocalizer localizer,
+	IContextualLocalizer localizer,
 	IHttpContextAccessor httpContextAccessor)
 	: GraphQlErrorFilterBase<ValidationErrorFilter, ValidationException>(
 		loggerFactory,
@@ -26,10 +27,9 @@ public sealed class ValidationErrorFilter(
 				continue;
 
 			var message = failure.ErrorMessage;
-			if (!string.IsNullOrWhiteSpace(failure.ErrorCode))
-				message = state?.ErrorMessageArguments is { Length: > 0 } arguments
-					? Localizer.Get(failure.ErrorCode, arguments)
-					: Localizer[failure.ErrorCode];
+			if (failure.CustomState is ILocalizableMessage localizableMessage &&
+				Localizer.TryGet(localizableMessage, out var localizedMessage))
+				message = localizedMessage;
 
 			validationErrors.Add(
 				new Dictionary<string, object?>

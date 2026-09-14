@@ -85,13 +85,13 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 	public void AddMember(Guid userId, OrganizationRole role)
 	{
 		if (Type == OrganizationType.Individual && (_members.Count >= 1 || role != OrganizationRole.Owner))
-			throw new InvalidInputException("organization.individual.only.owner.allowed");
+			throw new InvalidInputException(OrganizationIndividualOnlyOwnerAllowedMessage.Instance);
 
 		if (_members.Any(x => x.UserId == userId))
-			throw new InvalidInputException("organization.member.already.exists");
+			throw new InvalidInputException(OrganizationMemberAlreadyExistsMessage.Instance);
 
 		if (role == OrganizationRole.Owner && _members.Any(x => x.Role == OrganizationRole.Owner))
-			throw new InvalidInputException("organization.owner.already.exists");
+			throw new InvalidInputException(OrganizationOwnerAlreadyExistsMessage.Instance);
 
 		_members.Add(
 			OrganizationMember.Create(
@@ -106,7 +106,7 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 		if (member == null)
 			return;
 		if (member.Role == OrganizationRole.Owner)
-			throw new InvalidInputException("organization.owner.cannot.be.removed");
+			throw new InvalidInputException(OrganizationOwnerCannotBeRemovedMessage.Instance);
 
 		_members.Remove(member);
 	}
@@ -114,14 +114,14 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 	public void ChangeMemberRole(Guid userId, OrganizationRole role)
 	{
 		var member = _members.FirstOrDefault(x => x.UserId == userId) ??
-			throw new InvalidInputException("organization.member.not.found");
+			throw new InvalidInputException(OrganizationMemberNotFoundMessage.Instance);
 
 		if (member.Role == role)
 			return;
 		if (member.Role == OrganizationRole.Owner)
-			throw new InvalidInputException("organization.owner.role.cannot.be.changed");
+			throw new InvalidInputException(OrganizationOwnerRoleCannotBeChangedMessage.Instance);
 		if (role == OrganizationRole.Owner && _members.Any(x => x.Role == OrganizationRole.Owner))
-			throw new InvalidInputException("organization.owner.already.exists");
+			throw new InvalidInputException(OrganizationOwnerAlreadyExistsMessage.Instance);
 
 		member.SetRole(role);
 	}
@@ -134,13 +134,13 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 
 	public void SetName(string name) => Name = name
 		.TrimSafe()
-		.EnsureNotNullOrWhiteSpace("organization.name.required")
-		.EnsureMaxLength(128, "organization.name.max.length")
-		.EnsureMinLength(3, "organization.name.min.length");
+		.EnsureNotNullOrWhiteSpace(OrganizationNameRequiredMessage.Instance)
+		.EnsureMaxLength(128, OrganizationNameMaxLengthMessage.Instance)
+		.EnsureMinLength(3, OrganizationNameMinLengthMessage.Instance);
 
 	private void SetSystemName(string systemName) => SystemName = NormalizeSystemName(systemName)
-		.EnsureNotNullOrWhiteSpace("organization.system.name.required")
-		.EnsureMaxLength(128, "organization.system.name.max.length");
+		.EnsureNotNullOrWhiteSpace(OrganizationSystemNameRequiredMessage.Instance)
+		.EnsureMaxLength(128, OrganizationSystemNameMaxLengthMessage.Instance);
 
 	public override Guid GetId() => Id;
 }

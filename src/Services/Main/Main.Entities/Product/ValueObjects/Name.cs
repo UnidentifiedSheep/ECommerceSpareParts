@@ -13,9 +13,9 @@ public record Name
 		value = value.Trim();
 
 		value
-			.EnsureNotNullOrWhiteSpace("article.name.must.not.be.empty")
-			.EnsureMinLength(3, "article.name.min.length.3")
-			.EnsureMaxLength(255, "article.name.max.length.255");
+			.EnsureNotNullOrWhiteSpace(ArticleNameMustNotBeEmptyMessage.Instance)
+			.EnsureMinLength(3, ArticleNameMinLength3Message.Instance)
+			.EnsureMaxLength(255, ArticleNameMaxLength255Message.Instance);
 
 		Value = char.ToUpperInvariant(value[0]) + value[1..];
 	}

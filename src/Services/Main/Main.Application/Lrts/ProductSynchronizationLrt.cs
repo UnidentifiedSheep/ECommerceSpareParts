@@ -5,6 +5,8 @@ using Application.Common.LRT;
 using Attributes;
 using Contracts.Products;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Product;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -28,9 +30,11 @@ public sealed class ProductSynchronizationLrt(
 
 	public override string SystemName => nameof(ProductSynchronizationLrt);
 
-	public override string NameLocalizationKey => "lrt.product.synchronization.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtProductSynchronizationNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.product.synchronization.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtProductSynchronizationDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

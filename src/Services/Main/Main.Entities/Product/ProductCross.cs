@@ -14,7 +14,7 @@ public class ProductCross : Entity<ProductCross, (int, int)>, ILinqEntity<Produc
 	private ProductCross(int left, int right)
 	{
 		if (left == right)
-			throw new InvalidInputException("article.linkage.article.cannot.equal.cross.article");
+			throw new InvalidInputException(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance);
 		var min = Math.Min(left, right);
 		var max = Math.Max(left, right);
 

@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Handlers.Producers.BaseValidators;
 
 namespace Main.Application.Handlers.Producers.EditProducer;
@@ -14,7 +15,7 @@ public class EditProducerValidation : AbstractValidator<EditProducerCommand>
 
 		RuleFor(x => x.Producer.Name.Value)
 			.NotNull()
-			.WithLocalizationKey("producer.name.not.empty")
+			.WithLocalizableError(ProducerNameNotEmptyMessage.Instance)
 			.SetValidator(new ProducerNameValidator())
 			.When(x => x.Producer.Name.IsSet);
 	}

@@ -54,7 +54,7 @@ public class AddEmailToUserTests(CombinedContainerFixture fixture) : Integration
 				EmailType.Personal));
 
 		var exception = await action.Should().ThrowAsync<InvalidInputException>();
-		exception.Which.MessageKey.Should().Be("user.have.duplicate.email");
+		exception.Which.LocalizableMessage.MessageKey.Should().Be("user.have.duplicate.email");
 	}
 
 	[Fact]
@@ -92,7 +92,7 @@ public class AddEmailToUserTests(CombinedContainerFixture fixture) : Integration
 				EmailType.Personal));
 
 		var exception = await action.Should().ThrowAsync<InvalidInputException>();
-		exception.Which.MessageKey.Should().Be("user.max.email.count");
+		exception.Which.LocalizableMessage.MessageKey.Should().Be("user.max.email.count");
 	}
 
 	[Fact]

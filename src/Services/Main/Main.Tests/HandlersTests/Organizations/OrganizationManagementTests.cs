@@ -158,7 +158,7 @@ public class OrganizationManagementTests : IntegrationTest
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() =>
 			Mediator.Send(new RemoveOrganizationMemberCommand(organization.Id, Users[0].Id)));
 
-		exception.MessageKey.Should().Be("organization.owner.cannot.be.removed");
+		exception.LocalizableMessage.MessageKey.Should().Be("organization.owner.cannot.be.removed");
 	}
 
 	private async Task<Organization> CreateOrganization(Guid? memberId = null)

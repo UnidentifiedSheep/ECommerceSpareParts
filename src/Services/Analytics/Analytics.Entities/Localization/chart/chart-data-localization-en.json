@@ -1,9 +1,9 @@
 {
-  "locale": "en",
-  "keyValues": {
+  "culture": "en",
+  "messages": {
     "chart.sales.profit.over.time.name": "Sales profit over time",
     "chart.sales.profit.over.time.description": "Revenue, cost, and gross profit grouped by time period.",
-    "chart.data.source.not.found": "Chart data source {0} was not found.",
+    "chart.data.source.not.found": "Chart data source {SystemName|string} was not found.",
     "chart.data.source.query.input.invalid": "Chart query input is invalid.",
     "chart.sales.profit.query.required": "Chart query is required.",
     "chart.sales.profit.query.start.date.must.be.utc": "Start date must be in UTC.",

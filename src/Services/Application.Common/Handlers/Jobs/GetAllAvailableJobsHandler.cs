@@ -2,7 +2,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using SchemaGeneration.Abstractions;
 
 namespace Application.Common.Handlers.Jobs;
@@ -12,7 +12,7 @@ public sealed record GetAllAvailableJobsQuery : IQuery<GetAllAvailableJobsResult
 public sealed record GetAllAvailableJobsResult(IReadOnlyList<JobInfoDto> Jobs);
 
 public sealed class GetAllAvailableJobsHandler(
-	IContextualStringLocalizer localizer,
+	IContextualLocalizer localizer,
 	INamedObjectRegistry<ILrtNamedObject> registry,
 	ISchemaGenerator schemaGenerator) : IQueryHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>
 {
@@ -25,8 +25,8 @@ public sealed class GetAllAvailableJobsHandler(
 			.Select(x => new JobInfoDto
 			{
 				SystemName = x.SystemName,
-				Name = localizer.Get(x.NameLocalizationKey),
-				Description = localizer.Get(x.DescriptionLocalizationKey),
+				Name = localizer.Get(x.NameLocalizationMessage),
+				Description = localizer.Get(x.DescriptionLocalizationMessage),
 				InitStateSchema = schemaGenerator.Generate(x.InputType)
 			})
 			.ToList();

@@ -1,0 +1,13 @@
+{
+  "culture": "ru",
+  "messages": {
+    "password.must.not.be.empty": "Пароль не может быть пустым.",
+    "password.min.length": "Пароль должен содержать не менее {MinLength} символов.",
+    "password.max.length": "Пароль должен содержать не более {MaxLength} символов.",
+    "password.cannot.start.or.end.with.space": "Пароль не может начинаться или заканчиваться пробелом.",
+    "password.cannot.contain.spaces": "Пароль не может содержать пробелы.",
+    "password.must.contain.uppercase": "Пароль должен содержать хотя бы одну заглавную букву.",
+    "password.must.contain.digit": "Пароль должен содержать хотя бы одну цифру.",
+    "password.must.contain.special": "Пароль должен содержать хотя бы один специальный символ ({SpecialCharacters})."
+  }
+}

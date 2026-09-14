@@ -1,34 +1,27 @@
 using Abstractions.Interfaces.Exceptions;
+using Locan.Core.Interfaces;
 
 namespace Exceptions.Base.Localized;
 
 public abstract class LocalizedBadRequestException : BadRequestException, ILocalizableException
 {
-	protected LocalizedBadRequestException(string messageKey, object[]? arguments = null) : base(null)
+	public ILocalizableMessage LocalizableMessage { get; }
+	protected LocalizedBadRequestException(ILocalizableMessage message) : base(null)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
 
 	protected LocalizedBadRequestException(
-		string messageKey,
-		object relatedData,
-		object[]? arguments = null) : base(null, relatedData)
+		ILocalizableMessage message,
+		object relatedData) : base(null, relatedData)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
 
 	protected LocalizedBadRequestException(
-		string messageKey,
-		string details,
-		object[]? arguments = null) : base(null, details)
+		ILocalizableMessage message,
+		string details) : base(null, details)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
-
-	public string MessageKey { get; }
-
-	public object[]? Arguments { get; }
 }

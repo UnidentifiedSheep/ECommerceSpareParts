@@ -1,6 +1,6 @@
 ﻿using Abstractions.Models;
+using Application.Common.Extensions;
 using FluentValidation;
-using Localization.Domain.Extensions;
 
 namespace Application.Common.Validators;
 
@@ -8,6 +8,8 @@ public class CursorValidator<T> : AbstractValidator<Cursor<T>>
 {
 	public CursorValidator()
 	{
-		RuleFor(query => query.Size).InclusiveBetween(1, 100).WithLocalizationKey("pagination.size.range");
+		RuleFor(query => query.Size)
+			.InclusiveBetween(1, 100)
+			.WithLocalizableError(PaginationSizeRangeDefaultMessage.Instance);
 	}
 }

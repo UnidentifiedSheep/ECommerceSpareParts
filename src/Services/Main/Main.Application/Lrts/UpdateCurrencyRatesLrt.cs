@@ -3,6 +3,8 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using MassTransit;
 using MediatR;
@@ -25,9 +27,10 @@ public class UpdateCurrencyRatesLrt(
 {
 	public override string SystemName => nameof(UpdateCurrencyRatesLrt);
 
-	public override string NameLocalizationKey => "lrt.currency.rates.update.name";
+	public override ILocalizableMessage NameLocalizationMessage => LrtCurrencyRatesUpdateNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.currency.rates.update.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtCurrencyRatesUpdateDescriptionMessage.Instance;
 
 	protected override Task DoWork() => sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
 }

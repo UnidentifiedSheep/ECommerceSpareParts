@@ -1,37 +1,36 @@
 using System.Globalization;
-using Localization.Abstractions.Interfaces;
-using Localization.Abstractions.Models;
+using Locan.Core.Interfaces.Localizers;
 
 namespace Mailing.Core.Models;
 
 public sealed class LoginNotificationData : IEmailData
 {
 	public LoginNotificationData(
-		IContextualStringLocalizer localizer,
+		IContextualLocalizer localizer,
 		DateTime occurredAtUtc,
 		string? ipAddress,
 		string? userAgent,
 		string to)
 	{
-		Locale = localizer.Locale;
+		Locale = CultureInfo.CurrentUICulture;
 		To = to;
 		HtmlLang = Locale.ToString().ToLowerInvariant();
-		Subject = localizer.Get("mail.login.notification.subject");
-		Title = localizer.Get("mail.login.notification.title");
-		Intro = localizer.Get("mail.login.notification.intro");
-		DateTimeLabel = localizer.Get("mail.login.notification.date.time.label");
-		IpAddressLabel = localizer.Get("mail.login.notification.ip.address.label");
-		DeviceLabel = localizer.Get("mail.login.notification.device.label");
-		WasYou = localizer.Get("mail.login.notification.was.you");
-		NotYou = localizer.Get("mail.login.notification.not.you");
+		Subject = localizer.Get(new MailLoginNotificationSubjectMessage());
+		Title = localizer.Get(new MailLoginNotificationTitleMessage());
+		Intro = localizer.Get(new MailLoginNotificationIntroMessage());
+		DateTimeLabel = localizer.Get(new MailLoginNotificationDateTimeLabelMessage());
+		IpAddressLabel = localizer.Get(new MailLoginNotificationIpAddressLabelMessage());
+		DeviceLabel = localizer.Get(new MailLoginNotificationDeviceLabelMessage());
+		WasYou = localizer.Get(new MailLoginNotificationWasYouMessage());
+		NotYou = localizer.Get(new MailLoginNotificationNotYouMessage());
 
-		var unknown = localizer.Get("mail.login.notification.unknown");
+		var unknown = localizer.Get(new MailLoginNotificationUnknownMessage());
 		OccurredAt = FormatOccurredAt(occurredAtUtc, Locale);
 		IpAddress = string.IsNullOrWhiteSpace(ipAddress) ? unknown : ipAddress;
 		Device = FormatDevice(userAgent, unknown);
 	}
 
-	public Locale Locale { get; }
+	public CultureInfo Locale { get; }
 
 	public string HtmlLang { get; }
 
@@ -61,7 +60,7 @@ public sealed class LoginNotificationData : IEmailData
 
 	public string To { get; }
 
-	private static string FormatOccurredAt(DateTime occurredAtUtc, Locale locale)
+	private static string FormatOccurredAt(DateTime occurredAtUtc, CultureInfo locale)
 	{
 		var culture = CultureInfo.GetCultureInfo(locale.ToString());
 		return $"{occurredAtUtc.ToUniversalTime().ToString("f", culture)} UTC";

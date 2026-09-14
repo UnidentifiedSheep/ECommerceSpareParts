@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 
@@ -12,39 +13,39 @@ public class AddStorageRouteValidation : AbstractValidator<AddStorageRouteComman
 				x.StorageTo, x.StorageFrom
 			})
 			.Must(x => x.StorageTo != x.StorageFrom)
-			.WithLocalizationKey("storage.route.same.storages");
+			.WithLocalizableError(StorageRouteSameStoragesMessage.Instance);
 
-		RuleFor(x => x.Distance).GreaterThanOrEqualTo(1).WithLocalizationKey("storage.route.distance.min");
+		RuleFor(x => x.Distance).GreaterThanOrEqualTo(1).WithLocalizableError(StorageRouteDistanceMinMessage.Instance);
 
 		RuleFor(x => x.DeliveryTime)
 			.GreaterThanOrEqualTo(1)
-			.WithLocalizationKey("storage.route.delivery.time.min");
+			.WithLocalizableError(StorageRouteDeliveryTimeMinMessage.Instance);
 
 		RuleFor(x => x.PriceKg)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("storage.route.price.kg.min")
+			.WithLocalizableError(StorageRoutePriceKgMinMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("storage.route.price.kg.precision");
+			.WithLocalizableError(StorageRoutePriceKgPrecisionMessage.Instance);
 
 		RuleFor(x => x.PriceM3)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("storage.route.price.m3.min")
+			.WithLocalizableError(StorageRoutePriceM3MinMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("storage.route.price.m3.precision");
+			.WithLocalizableError(StorageRoutePriceM3PrecisionMessage.Instance);
 
 		RuleFor(x => x.PricePerOrder)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("storage.route.price.order.min")
+			.WithLocalizableError(StorageRoutePriceOrderMinMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("storage.route.price.order.precision");
+			.WithLocalizableError(StorageRoutePriceOrderPrecisionMessage.Instance);
 	}
 }

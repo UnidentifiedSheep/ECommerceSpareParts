@@ -45,7 +45,7 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 	private void SetPath(string extension)
 	{
 		IsSupportedExtension(extension, out var normalizedExtension)
-			.EnsureTrue("article.image.invalid.extension");
+			.EnsureTrue(ArticleImageInvalidExtensionMessage.Instance);
 
 		StorageKey = $"products/{ProductId}_{Guid.NewGuid():N}{normalizedExtension}";
 	}

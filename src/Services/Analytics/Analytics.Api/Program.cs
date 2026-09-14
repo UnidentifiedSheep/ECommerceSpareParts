@@ -10,7 +10,6 @@ using Api.Common;
 using Api.Common.Consumers;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.HostedServices.Startup;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
@@ -21,7 +20,6 @@ using Contracts.Job;
 using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Internal.Integration.Di;
-using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
 using Security;
@@ -52,8 +50,6 @@ builder
 	.AddIntegrationClients()
 	.AddEComAuth(builder.Configuration)
 	.AddMinimalSecurityLayer();
-
-builder.Services.AddLocalization(builder.Configuration);
 
 var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
@@ -113,7 +109,6 @@ builder.Services.AddSignalR();
 
 builder.Services.AddCarter(configurator: c => c.WithEmptyValidators());
 
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
 var app = builder.Build();

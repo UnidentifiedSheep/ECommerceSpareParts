@@ -7,12 +7,14 @@ using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
+using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using MassTransit;
@@ -31,7 +33,7 @@ public class ProductImportLrt(
 	IApplicationTransactionService transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductImportLrt> logger,
-	IContextualStringLocalizer stringLocalizer)
+	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportLrt.NewProductCsvDto,
 		CreateProductDto>(
 		jobRepository,
@@ -49,15 +51,15 @@ public class ProductImportLrt(
 
 	public override string SystemName => nameof(ProductImportLrt);
 
-	public override string NameLocalizationKey => "lrt.product.import.name";
+	public override ILocalizableMessage NameLocalizationMessage => LrtProductImportNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.product.import.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage => LrtProductImportDescriptionMessage.Instance;
 
 	protected override async Task BeforeRead(ProductImportState state) =>
 		_producerLookup = await producerLookupService.Load(CancellationToken);
 
-	protected override string GetTooManyErrorsLocalizationKey() =>
-		"article.import.too.many.errors.while.processing.batch";
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
+		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -88,7 +90,8 @@ public class ProductImportLrt(
 					new CsvImportError
 					{
 						RowIdx = idx,
-						Message = StringLocalizer.Get("article.import.producer.not.found", row.Producer)
+						Message = StringLocalizer.Get(
+							new ArticleImportProducerNotFoundMessage().WithProducer(row.Producer))
 					});
 
 				return null;
@@ -211,9 +214,7 @@ public class ProductImportLrt(
 	private string GetErrorMessage(Exception ex)
 	{
 		if (ex is ILocalizableException localizableException)
-			return StringLocalizer.GetOrDefault(
-				localizableException.MessageKey,
-				localizableException.Arguments ?? []) ?? ex.Message;
+			return StringLocalizer.Get(localizableException.LocalizableMessage);
 
 		return ex.Message;
 	}

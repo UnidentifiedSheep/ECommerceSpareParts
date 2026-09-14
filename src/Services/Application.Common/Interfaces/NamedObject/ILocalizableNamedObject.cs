@@ -1,8 +1,9 @@
-﻿namespace Application.Common.Interfaces.NamedObject;
+﻿using Locan.Core.Interfaces;
+
+namespace Application.Common.Interfaces.NamedObject;
 
 public interface ILocalizableNamedObject : INamedObject
 {
-	string NameLocalizationKey { get; }
-
-	string DescriptionLocalizationKey { get; }
+	ILocalizableMessage NameLocalizationMessage { get; }
+	ILocalizableMessage DescriptionLocalizationMessage { get; }
 }

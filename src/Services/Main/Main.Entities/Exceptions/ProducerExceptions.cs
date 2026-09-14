@@ -4,25 +4,24 @@ using Exceptions.Base.Localized;
 namespace Main.Entities.Exceptions;
 
 public class CannotDeleteProducerWithArticlesException()
-	: LocalizedBadRequestException("producer.with.articles.cannot.be.deleted");
+	: LocalizedBadRequestException(ProducerWithArticlesCannotBeDeletedMessage.Instance);
 
 public class ProducerNotFoundException(int id) : LocalizedNotFoundException(
-	"producer.not.found",
+	ProducerNotFoundMessage.Instance,
 	new
 	{
 		Id = id
 	});
 
 public class ProducersAliasNotFoundException(string name) : LocalizedNotFoundException(
-	"producer.additional.name.not.found",
+	new ProducerAdditionalNameNotFoundMessage().WithName(name),
 	new
 	{
 		Name = name
-	},
-	[name]);
+	});
 
 public class ProducersSupplierMappingNotFoundException(int id) : LocalizedNotFoundException(
-	"producer.supplier.mapping.not.found",
+	ProducerSupplierMappingNotFoundMessage.Instance,
 	new
 	{
 		Id = id
@@ -30,7 +29,7 @@ public class ProducersSupplierMappingNotFoundException(int id) : LocalizedNotFou
 
 public class ProducersSupplierMappingAlreadyExistsException(string supplierProducerName, Supplier supplier)
 	: LocalizedConflictException(
-		"producer.supplier.mapping.already.exists",
+		ProducerSupplierMappingAlreadyExistsMessage.Instance,
 		new
 		{
 			SupplierProducerName = supplierProducerName, Supplier = supplier

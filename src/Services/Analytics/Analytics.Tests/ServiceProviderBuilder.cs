@@ -5,7 +5,7 @@ using Analytics.Cache;
 using Analytics.Persistence;
 using Api.Common;
 using Cache;
-using Localization.Domain.Extensions;
+using Locan.Hosting;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -46,10 +46,6 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
 		ApplicationServiceProvider
 			.AddApplicationLayer(services, null)
-			.AddLocalization(
-				"ru-RU",
-				"ru-RU",
-				"en-EN")
 			.AddPersistenceLayer();
 
 		services.AddSingleton(
@@ -73,6 +69,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 				}));
 
 		services.AddCacheLayer("test").AddApplicationCache().AddCommonLayer();
+		services.AddLocan();
 
 		services.RemoveAll<IUserContext>();
 		services.AddScoped<IUserContext, UserContextMock>();

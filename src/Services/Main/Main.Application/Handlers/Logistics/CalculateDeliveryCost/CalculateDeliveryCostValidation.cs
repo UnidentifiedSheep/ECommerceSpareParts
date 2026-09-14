@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 
@@ -7,7 +8,7 @@ public class CalculateDeliveryCostValidation : AbstractValidator<CalculateDelive
 {
 	public CalculateDeliveryCostValidation()
 	{
-		RuleFor(x => x.Items).NotEmpty().WithLocalizationKey("delivery.items.not.empty");
+		RuleFor(x => x.Items).NotEmpty().WithLocalizableError(DeliveryItemsNotEmptyMessage.Instance);
 
 		RuleForEach(x => x.Items)
 			.ChildRules(z =>
@@ -15,7 +16,7 @@ public class CalculateDeliveryCostValidation : AbstractValidator<CalculateDelive
 				z
 					.RuleFor(x => x.Quantity)
 					.GreaterThan(0)
-					.WithLocalizationKey("delivery.item.quantity.greater.than.zero");
+					.WithLocalizableError(DeliveryItemQuantityGreaterThanZeroMessage.Instance);
 			});
 	}
 }

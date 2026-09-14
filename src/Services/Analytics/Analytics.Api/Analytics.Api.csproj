@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>14</LangVersion>
+        <LocanDefaultCulture>en</LocanDefaultCulture>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,7 +18,6 @@
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Di\Internal.Integration.Di.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
@@ -31,21 +31,6 @@
         <Content Include="..\..\..\..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
-        <Content Include="..\Analytics.Entities\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\Application.Common\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\..\Core\Domain\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -53,4 +38,17 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+        <LocanResource Include="../Analytics.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
+        
+        <LocanResource Include="../../Application.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
+
+        <LocanResource Include="../../../Core/Domain/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
+    </ItemGroup>
 </Project>

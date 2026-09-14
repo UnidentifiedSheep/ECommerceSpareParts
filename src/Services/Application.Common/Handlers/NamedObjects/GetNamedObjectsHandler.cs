@@ -2,7 +2,7 @@ using Application.Common.Abstractions.NamedObjects;
 using Application.Common.Dtos;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 
 namespace Application.Common.Handlers.NamedObjects;
 
@@ -10,7 +10,7 @@ public record GetNamedObjectsQuery(string GroupName) : IQuery<GetNamedObjectsRes
 
 public record GetNamedObjectsResult(IReadOnlyList<NamedObjectDto> NamedObjects);
 
-public class GetNamedObjectsHandler(INamedObjectGroupResolver resolver, IContextualStringLocalizer localizer)
+public class GetNamedObjectsHandler(INamedObjectGroupResolver resolver, IContextualLocalizer localizer)
 	: IQueryHandler<GetNamedObjectsQuery, GetNamedObjectsResult>
 {
 	public Task<GetNamedObjectsResult> Handle(
@@ -27,8 +27,8 @@ public class GetNamedObjectsHandler(INamedObjectGroupResolver resolver, IContext
 
 				if (x is LocalizableNameObject loc)
 				{
-					name = localizer[loc.NameLocalizationKey];
-					description = localizer[loc.DescriptionLocalizationKey];
+					name = localizer.Get(loc.NameLocalizationMessage);
+					description = localizer.Get(loc.DescriptionLocalizationMessage);
 				}
 
 				return new NamedObjectDto

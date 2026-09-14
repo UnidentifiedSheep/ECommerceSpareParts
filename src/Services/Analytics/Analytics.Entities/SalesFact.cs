@@ -114,9 +114,9 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
 	private void ApplyContents(IEnumerable<SaleContent> contents)
 	{
 		var incomingContents = contents
-			.EnsureNotNull(() => new InvalidInputException("sale.fact.content.required"))
+			.EnsureNotNull(() => new InvalidInputException(SaleFactContentRequiredMessage.Instance))
 			.ToList()
-			.EnsureNotEmpty(() => new InvalidInputException("sale.fact.content.required"));
+			.EnsureNotEmpty(() => new InvalidInputException(SaleFactContentRequiredMessage.Instance));
 
 		var existingContents = _saleContents.ToDictionary(x => x.Id);
 		var toRemove = new Dictionary<int, SaleContent>(existingContents);

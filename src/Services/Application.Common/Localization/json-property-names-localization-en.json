@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "en",
-  "keyValues": {
+  "culture": "en",
+  "messages": {
     "price": "Price",
     "date": "Date",
     "quantity": "Quantity",

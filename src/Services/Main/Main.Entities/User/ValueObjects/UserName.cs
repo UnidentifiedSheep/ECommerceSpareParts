@@ -10,14 +10,14 @@ public record UserName
 
 	public UserName(string value)
 	{
-		value.EnsureNotNullOrWhiteSpace("login.must.not.be.empty");
+		value.EnsureNotNullOrWhiteSpace(LoginMustNotBeEmptyMessage.Instance);
 		value = value.Trim();
 
 		value
-			.EnsureMinLength(5, "login.min.length.5")
-			.EnsureMaxLength(36, "login.max.length.36")
-			.EnsureNoSpaces("login.cannot.contain.spaces")
-			.Ensure(x => !x.Contains('@', StringComparison.InvariantCulture), "login.cannot.contain.at.sign");
+			.EnsureMinLength(5, LoginMinLength5Message.Instance)
+			.EnsureMaxLength(36, LoginMaxLength36Message.Instance)
+			.EnsureNoSpaces(LoginCannotContainSpacesMessage.Instance)
+			.Ensure(x => !x.Contains('@', StringComparison.InvariantCulture), LoginCannotContainAtSignMessage.Instance);
 
 		Value = value;
 		NormalizedValue = ToNormalized(Value);

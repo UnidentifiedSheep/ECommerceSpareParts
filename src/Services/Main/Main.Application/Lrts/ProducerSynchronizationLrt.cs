@@ -5,6 +5,8 @@ using Application.Common.LRT;
 using Attributes;
 using Contracts.Producer;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Producer;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -28,9 +30,11 @@ public class ProducerSynchronizationLrt(
 
 	public override string SystemName => nameof(ProducerSynchronizationLrt);
 
-	public override string NameLocalizationKey => "lrt.producer.synchronization.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtProducerSynchronizationNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.producer.synchronization.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtProducerSynchronizationDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

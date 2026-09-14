@@ -27,7 +27,7 @@ public record StorageContentSettingData
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.NamedObjectSelector)]
 	[SchemaDependsOnEntity("StorageContentExtractPolicy")]
-	[SchemaFieldLabel("storage.content.setting.extraction.policy.name")]
-	[SchemaFieldDescription("storage.content.setting.extraction.policy.description")]
+	[SchemaFieldLabel(StorageContentSettingExtractionPolicyNameMessage.Key)]
+	[SchemaFieldDescription(StorageContentSettingExtractionPolicyDescriptionMessage.Key)]
 	public string StorageContentExtractionPolicy { get; init; } = "FifoStorageContentExtractPolicy";
 }

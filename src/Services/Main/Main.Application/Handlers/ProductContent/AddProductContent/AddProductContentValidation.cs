@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductContent.AddProductContent;
 
@@ -9,10 +10,10 @@ public class AddProductContentValidation : AbstractValidator<AddProductContentCo
 	{
 		RuleForEach(cmd => cmd.Contents)
 			.Must((parent, kvp) => kvp.Key != parent.ParentProductId)
-			.WithLocalizationKey("article.content.self.reference.not.allowed");
+			.WithLocalizableError(ArticleContentSelfReferenceNotAllowedMessage.Instance);
 
 		RuleForEach(cmd => cmd.Contents)
 			.Must(kvp => kvp.Value >= 0)
-			.WithLocalizationKey("article.content.count.must.be.non.negative");
+			.WithLocalizableError(ArticleContentCountMustBeNonNegativeMessage.Instance);
 	}
 }

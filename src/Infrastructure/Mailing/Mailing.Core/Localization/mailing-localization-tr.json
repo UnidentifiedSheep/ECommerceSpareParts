@@ -1,6 +1,6 @@
 {
-  "locale": "tr",
-  "keyValues": {
+  "culture": "tr",
+  "messages": {
     "mail.password.reset.subject": "Şifre sıfırlama",
     "mail.password.reset.title": "Şifrenizi sıfırlayın",
     "mail.password.reset.intro": "Hesabınızın şifresini sıfırlamak için bir istek aldık.",

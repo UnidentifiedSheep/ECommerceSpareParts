@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "ru",
-  "keyValues": {
+  "culture": "ru",
+  "messages": {
     "purchase.fact.required": "Факт закупки не может отсутствовать.",
     "purchase.fact.id.required": "Файт закупки должен иметь идентификатор.",
     "purchase.fact.content.required": "Содержимое факта закупки не может быть пустым.",

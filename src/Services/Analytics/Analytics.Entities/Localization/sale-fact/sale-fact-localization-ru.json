@@ -1,6 +1,6 @@
 {
-  "locale": "ru",
-  "keyValues": {
+  "culture": "ru",
+  "messages": {
     "sale.fact.content.required": "Содержимое факта продажи не может быть пустым.",
     "sale.fact.content.price.required": "Цена содержимого факта продажи должна быть больше 0.",
     "sale.fact.content.count.required": "Количество содержимого факта продажи должно быть больше 0.",

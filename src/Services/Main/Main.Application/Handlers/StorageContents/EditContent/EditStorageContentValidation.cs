@@ -1,7 +1,8 @@
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
@@ -10,11 +11,11 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
 {
 	public EditStorageContentValidation(IOperationDatePolicy datePolicy)
 	{
-		RuleFor(x => x.EditedFields).NotEmpty().WithLocalizationKey("storage.content.edit.list.not.empty");
+		RuleFor(x => x.EditedFields).NotEmpty().WithLocalizableError(StorageContentEditListNotEmptyMessage.Instance);
 
 		RuleFor(x => x.EditedFields)
 			.Must(x => x.Count < 100)
-			.WithLocalizationKey("storage.content.edit.max.count");
+			.WithLocalizableError(StorageContentEditMaxCountMessage.Instance);
 
 		RuleForEach(x => x.EditedFields.Values)
 			.ChildRules(z =>
@@ -28,7 +29,7 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
 					.RuleFor(x => x.Model.Count.Value)
 					.GreaterThanOrEqualTo(0)
 					.When(x => x.Model.Count.IsSet)
-					.WithLocalizationKey("storage.content.count.min.zero");
+					.WithLocalizableError(StorageContentCountMinZeroMessage.Instance);
 
 				z
 					.RuleFor(x => x.Model.PurchaseDatetime.Value)

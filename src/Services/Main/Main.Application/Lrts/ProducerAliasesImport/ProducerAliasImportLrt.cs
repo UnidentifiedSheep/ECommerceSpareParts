@@ -7,9 +7,11 @@ using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
+using Main.Entities;
 using Main.Entities.Producer;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -27,7 +29,7 @@ public class ProducerAliasImportLrt(
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
-	IContextualStringLocalizer stringLocalizer)
+	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProducerAliasesImportInputState, ProducerAliasesImportState,
 		ProducerAliasImportLrt.ProducerAliasCsvDto, ProducerAliasImportLrt.ProducerAliasBatchItem>(
 		jobRepository,
@@ -40,14 +42,13 @@ public class ProducerAliasImportLrt(
 		stringLocalizer)
 {
 	public override string SystemName => nameof(ProducerAliasImportLrt);
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProducerOtherNamesImportNameMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProducerOtherNamesImportDescriptionMessage.Instance;
 
-	public override string NameLocalizationKey => "lrt.producer.other.names.import.name";
-
-	public override string DescriptionLocalizationKey => "lrt.producer.other.names.import.description";
-
-	protected override string GetTooManyErrorsLocalizationKey() =>
-		"producer.too.many.errors.while.processing.batch";
-
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 	protected override bool TryProcessRow(
 		int rowIdx,
 		ProducerAliasCsvDto row,
@@ -64,11 +65,9 @@ public class ProducerAliasImportLrt(
 		}
 		catch (Exception ex)
 		{
-			var message = ex is ILocalizableException localizableException
-				? StringLocalizer.GetOrDefault(
-					localizableException.MessageKey,
-					localizableException.Arguments ?? []) ?? ex.Message
-				: ex.Message;
+			var message = ex is not ILocalizableException localizableException
+				? ex.Message
+				: StringLocalizer.Get(localizableException.LocalizableMessage);
 
 			errors.Add(CreateError(rowIdx, message));
 			return false;
@@ -95,7 +94,7 @@ public class ProducerAliasImportLrt(
 				continue;
 			}
 
-			errors.Add(CreateError(item.idx, StringLocalizer.Get("producer.other.name.duplicate.in.batch")));
+			errors.Add(CreateError(item.idx, StringLocalizer.Get(ProducerOtherNameDuplicateInBatchMessage.Instance)));
 		}
 
 		var result = await TransactionService.ExecuteAsync(
@@ -123,7 +122,7 @@ public class ProducerAliasImportLrt(
 					if (existingAliases.Contains(item.Alias))
 					{
 						transactionErrors.Add(
-							CreateError(idx, StringLocalizer.Get("producer.other.name.already.taken")));
+							CreateError(idx, StringLocalizer.Get(ProducerOtherNameAlreadyTakenMessage.Instance)));
 						continue;
 					}
 
@@ -132,7 +131,7 @@ public class ProducerAliasImportLrt(
 						transactionErrors.Add(
 							CreateError(
 								idx,
-								StringLocalizer.Get("producer.other.name.producer.not.found.in.batch")));
+								StringLocalizer.Get(ProducerOtherNameProducerNotFoundInBatchMessage.Instance)));
 						continue;
 					}
 

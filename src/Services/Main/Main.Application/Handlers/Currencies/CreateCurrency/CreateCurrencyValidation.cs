@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Currencies.CreateCurrency;
 
@@ -9,34 +10,34 @@ public class CreateCurrencyValidation : AbstractValidator<CreateCurrencyCommand>
 	{
 		RuleFor(x => x.Code)
 			.NotEmpty()
-			.WithLocalizationKey("currency.code.not.empty")
+			.WithLocalizableError(CurrencyCodeNotEmptyMessage.Instance)
 			.MaximumLength(26)
-			.WithLocalizationKey("currency.code.max.length")
+			.WithLocalizableError(CurrencyCodeMaxLengthMessage.Instance)
 			.Must(x => x.Trim().Length >= 2)
-			.WithLocalizationKey("currency.code.min.length");
+			.WithLocalizableError(CurrencyCodeMinLengthMessage.Instance);
 
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithLocalizationKey("currency.name.not.empty")
+			.WithLocalizableError(CurrencyNameNotEmptyMessage.Instance)
 			.MaximumLength(128)
-			.WithLocalizationKey("currency.name.max.length")
+			.WithLocalizableError(CurrencyNameMaxLengthMessage.Instance)
 			.Must(x => x.Trim().Length >= 3)
-			.WithLocalizationKey("currency.name.min.length");
+			.WithLocalizableError(CurrencyNameMinLengthMessage.Instance);
 
 		RuleFor(x => x.CurrencySign)
 			.NotEmpty()
-			.WithLocalizationKey("currency.sign.not.empty")
+			.WithLocalizableError(CurrencySignNotEmptyMessage.Instance)
 			.MaximumLength(3)
-			.WithLocalizationKey("currency.sign.max.length")
+			.WithLocalizableError(CurrencySignMaxLengthMessage.Instance)
 			.Must(x => x.Trim().Length >= 1)
-			.WithLocalizationKey("currency.sign.min.length");
+			.WithLocalizableError(CurrencySignMinLengthMessage.Instance);
 
 		RuleFor(x => x.ShortName)
 			.NotEmpty()
-			.WithLocalizationKey("currency.shortName.not.empty")
+			.WithLocalizableError(CurrencyShortNameNotEmptyMessage.Instance)
 			.MaximumLength(5)
-			.WithLocalizationKey("currency.shortName.max.length")
+			.WithLocalizableError(CurrencyShortNameMaxLengthMessage.Instance)
 			.Must(x => x.Trim().Length >= 2)
-			.WithLocalizationKey("currency.shortName.min.length");
+			.WithLocalizableError(CurrencyShortNameMinLengthMessage.Instance);
 	}
 }

@@ -1,33 +1,19 @@
+using System.Diagnostics.CodeAnalysis;
 using HotChocolate;
-using Localization.Abstractions.Interfaces;
-using Localization.Abstractions.Models;
-using Localization.Domain;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 
 namespace Tests.Tests.GraphQl.ErrorFilters;
 
 internal static class ErrorFilterTestFactory
 {
-	public static IContextualStringLocalizer CreateLocalizer()
-	{
-		var container = new LocalizerContainer(new Locale("en"));
-		container.Initialize(
-			new Dictionary<string, string>
-			{
-				["Validation.Required"] = "Localized validation for {0}",
-				["Db.Duplicate"] = "Duplicate {0}",
-				["Domain.NotFound"] = "Entity {0} was not found"
-			});
-
-		return new ContextualStringLocalizer(
-			new StringLocalizer([container]),
-			Options.Create(
-				new LocalesOptions
-				{
-					Default = "en", Supported = ["en"]
-				}));
-	}
+	public static IContextualLocalizer CreateLocalizer() => new TestContextualLocalizer(
+		new Dictionary<string, string>
+		{
+			["Validation.Required"] = "Localized validation for Name",
+			["Domain.NotFound"] = "Entity 42 was not found"
+		});
 
 	public static IHttpContextAccessor CreateHttpContextAccessor()
 	{
@@ -49,5 +35,15 @@ internal static class ErrorFilterTestFactory
 			.SetPath(HotChocolate.Path.FromList(["field"]))
 			.AddLocation(new Location(2, 3))
 			.Build();
+	}
+
+	private sealed class TestContextualLocalizer(IReadOnlyDictionary<string, string> messages)
+		: IContextualLocalizer
+	{
+		public string Get(ILocalizableMessage message) =>
+			TryGet(message, out var value) ? value : throw new InvalidOperationException();
+
+		public bool TryGet(ILocalizableMessage message, [NotNullWhen(true)] out string? value) =>
+			messages.TryGetValue(message.MessageKey, out value);
 	}
 }

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
+using Pricing.Entities;
 using Pricing.Entities.Pricing;
 using Pricing.Enums;
 
@@ -48,7 +49,7 @@ public class UpsertPriceApplierHandler(
 
 		if (dslLogic is not null &&
 			!await DynamicApplierDslValidator.IsValidAsync(dslLogic, cancellationToken))
-			throw new InvalidInputException("price.applier.dsl.logic.invalid");
+			throw new InvalidInputException(PriceApplierDslLogicInvalidMessage.Instance);
 
 		if (model is not null)
 			EnsureKindMatches(model, local);
@@ -109,14 +110,14 @@ public class UpsertPriceApplierHandler(
 	private static string GetRequiredDslLogic(string? dslLogic)
 	{
 		return string.IsNullOrWhiteSpace(dslLogic)
-			? throw new InvalidInputException("price.applier.dsl.logic.required")
+			? throw new InvalidInputException(PriceApplierDslLogicRequiredMessage.Instance)
 			: dslLogic;
 	}
 
 	private static string GetRequiredName(string? name)
 	{
 		return string.IsNullOrWhiteSpace(name)
-			? throw new InvalidInputException("price.applier.name.required")
+			? throw new InvalidInputException(PriceApplierNameRequiredMessage.Instance)
 			: name;
 	}
 
@@ -130,21 +131,21 @@ public class UpsertPriceApplierHandler(
 		};
 
 		return !supportsUsage
-			? throw new InvalidInputException("price.applier.usage.not.supported")
+			? throw new InvalidInputException(PriceApplierUsageNotSupportedMessage.Instance)
 			: local.Order;
 	}
 
 	private static int GetOrder(UpsertPriceApplierStateDto state, ApplierNamedObjectBase? local)
 	{
 		return local is null
-			? state.Order ?? throw new InvalidInputException("price.applier.order.required")
+			? state.Order ?? throw new InvalidInputException(PriceApplierOrderRequiredMessage.Instance)
 			: GetLocalOrder(local, state.Usage);
 	}
 
 	private static void EnsureKindMatches(Entities.Pricing.PriceApplier model, ApplierNamedObjectBase? local)
 	{
 		if (local is null == model.DslLogic is null)
-			throw new InvalidInputException("price.applier.system.name.conflict");
+			throw new InvalidInputException(PriceApplierSystemNameConflictMessage.Instance);
 	}
 
 	private async Task EnsureOrdersAreAvailableAsync(
@@ -165,7 +166,7 @@ public class UpsertPriceApplierHandler(
 				cancellationToken);
 
 			if (orderIsOccupied)
-				throw new InvalidInputException("price.applier.order.duplicate");
+				throw new InvalidInputException(PriceApplierOrderDuplicateMessage.Instance);
 		}
 	}
 }

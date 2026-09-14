@@ -1,0 +1,12 @@
+{
+  "culture": "en",
+  "messages": {
+    "catalogue.search.query.max.length": "Search query must not exceed {Count|int} characters.",
+    "catalogue.search.targets.required": "At least one search target must be specified.",
+    "catalogue.search.target.invalid": "The specified search target is invalid.",
+    "catalogue.search.match.mode.invalid": "The specified search match mode is invalid.",
+    "catalogue.search.text.mode.required": "At least one SKU or name search mode is required for a text query.",
+    "catalogue.search.fuzzy.query.min.length": "Fuzzy search requires a query of at least {Count|int} characters.",
+    "catalogue.search.producer.count.max": "No more than {Count|int} producers can be specified."
+  }
+}

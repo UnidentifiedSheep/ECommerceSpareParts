@@ -51,7 +51,7 @@ public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid,
 
 	public void SetCount(int count)
 	{
-		count.EnsureGreaterThan(0, "position.count.must.be.greater.than.zero");
+		count.EnsureGreaterThan(0, PositionCountMustBeGreaterThanZeroMessage.Instance);
 		Count = count;
 	}
 

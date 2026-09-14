@@ -1,5 +1,6 @@
 using Api.Common.Middleware;
 using Carter;
+using Locan.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Api.Common.Extensions;
@@ -16,8 +17,7 @@ public static class WebApplicationExtensions
 				ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 			});
 
-		app.UseRequestLocalization();
-
+		app.UseLocanRequestLocalization();
 		app.UseExceptionHandler(_ =>
 		{
 		});

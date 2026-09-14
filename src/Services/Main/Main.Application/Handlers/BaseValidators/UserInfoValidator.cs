@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Dtos.Users;
 
 namespace Main.Application.Handlers.BaseValidators;
@@ -10,26 +11,26 @@ public class UserInfoValidator : AbstractValidator<UserInfoDto>
 	{
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithLocalizationKey("user.name.required")
+			.WithLocalizableError(UserNameRequiredMessage.Instance)
 			.Must(x => x.Trim().Length >= 3)
-			.WithLocalizationKey("user.name.min.length")
+			.WithLocalizableError(UserNameMinLengthMessage.Instance)
 			.Must(x => !x.Any(char.IsSymbol))
-			.WithLocalizationKey("user.name.no.special.chars")
+			.WithLocalizableError(UserNameNoSpecialCharsMessage.Instance)
 			.Must(x => x.Trim().Length <= 30)
-			.WithLocalizationKey("user.name.max.length");
+			.WithLocalizableError(UserNameMaxLengthMessage.Instance);
 
 		RuleFor(x => x.Surname)
 			.NotEmpty()
-			.WithLocalizationKey("user.surname.required")
+			.WithLocalizableError(UserSurnameRequiredMessage.Instance)
 			.Must(x => x.Trim().Length >= 3)
-			.WithLocalizationKey("user.surname.min.length")
+			.WithLocalizableError(UserSurnameMinLengthMessage.Instance)
 			.Must(x => !x.Any(char.IsSymbol))
-			.WithLocalizationKey("user.surname.no.special.chars")
+			.WithLocalizableError(UserSurnameNoSpecialCharsMessage.Instance)
 			.Must(x => x.Trim().Length <= 30)
-			.WithLocalizationKey("user.surname.max.length");
+			.WithLocalizableError(UserSurnameMaxLengthMessage.Instance);
 
 		RuleFor(x => x.Description)
 			.Must(x => x == null || x.Trim().Length <= 300)
-			.WithLocalizationKey("user.description.max.length");
+			.WithLocalizableError(UserDescriptionMaxLengthMessage.Instance);
 	}
 }

@@ -16,7 +16,7 @@ public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<Pr
 		int childProductId,
 		int quantity)
 	{
-		parentProductId.EnsureNotEqual(childProductId, "article.content.self.reference.not.allowed");
+		parentProductId.EnsureNotEqual(childProductId, ArticleContentSelfReferenceNotAllowedMessage.Instance);
 		ParentProductId = parentProductId;
 		ChildProductId = childProductId;
 		SetQuantity(quantity);
@@ -51,7 +51,7 @@ public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<Pr
 
 	public void SetQuantity(int quantity)
 	{
-		quantity.EnsureNonNegative("article.content.count.must.be.non.negative");
+		quantity.EnsureNonNegative(ArticleContentCountMustBeNonNegativeMessage.Instance);
 		Quantity = quantity;
 	}
 

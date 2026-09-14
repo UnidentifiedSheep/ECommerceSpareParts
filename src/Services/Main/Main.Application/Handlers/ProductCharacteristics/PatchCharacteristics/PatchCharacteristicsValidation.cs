@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
 
@@ -10,16 +11,16 @@ public class PatchCharacteristicsValidation : AbstractValidator<PatchCharacteris
 		RuleFor(x => x.Patch.Value.Value)
 			.NotEmpty()
 			.When(x => x.Patch.Value.IsSet)
-			.WithLocalizationKey("article.characteristic.value.must.not.be.empty");
+			.WithLocalizableError(ArticleCharacteristicValueMustNotBeEmptyMessage.Instance);
 
 		RuleFor(x => x.Patch.Value.Value)
 			.MinimumLength(3)
 			.When(x => x.Patch.Value.IsSet)
-			.WithLocalizationKey("article.characteristic.value.min.length");
+			.WithLocalizableError(ArticleCharacteristicValueMinLengthMessage.Instance);
 
 		RuleFor(x => x.Patch.Value.Value)
 			.MaximumLength(128)
 			.When(x => x.Patch.Value.IsSet)
-			.WithLocalizationKey("article.characteristic.value.max.length");
+			.WithLocalizableError(ArticleCharacteristicValueMaxLengthMessage.Instance);
 	}
 }

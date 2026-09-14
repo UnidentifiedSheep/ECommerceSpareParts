@@ -95,15 +95,15 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
 	{
 		Name = name
 			.TrimSafe()
-			.EnsureNotNullOrWhiteSpace("job.schedule.name.required")
-			.EnsureMaxLength(NameMaxLength, "job.schedule.name.max.length");
+			.EnsureNotNullOrWhiteSpace(JobScheduleNameRequiredMessage.Instance)
+			.EnsureMaxLength(NameMaxLength, JobScheduleNameMaxLengthMessage.Instance);
 	}
 
 	public void SetDescription(string? description)
 	{
 		Description = description
 			.NullIfWhiteSpace()
-			?.EnsureMaxLength(DescriptionMaxLength, "job.schedule.description.max.length");
+			?.EnsureMaxLength(DescriptionMaxLength, JobScheduleDescriptionMaxLengthMessage.Instance);
 	}
 
 	public void SetCron(string cron)
@@ -117,12 +117,12 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
 
 	public void SetInputState(string inputState)
 	{
-		InputState = inputState.TrimSafe().EnsureNotNullOrWhiteSpace("job.schedule.input.state.required");
+		InputState = inputState.TrimSafe().EnsureNotNullOrWhiteSpace(JobScheduleInputStateRequiredMessage.Instance);
 	}
 
 	public void SetMaxAttempts(int maxAttempts)
 	{
-		MaxAttempts = maxAttempts.EnsureGreaterThan(0, "job.max.attempts.must.be.greater.than.zero");
+		MaxAttempts = maxAttempts.EnsureGreaterThan(0, JobMaxAttemptsMustBeGreaterThanZeroMessage.Instance);
 	}
 
 	public void SetNextRunAt(DateTime? nextRunAt) => NextRunAt = nextRunAt;

@@ -25,6 +25,8 @@
     <ItemGroup>
         <PackageReference Include="FluentValidation" Version="12.1.1"/>
         <PackageReference Include="Carter" Version="10.0.0"/>
+        <PackageReference Include="Locan.AspNetCore" Version="1.0.6" />
+        <PackageReference Include="Locan.Generator" Version="1.0.6" />
         <PackageReference Include="Marten.AspNetCore" Version="9.29.0"/>
         <PackageReference Include="MediatR" Version="14.1.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>
@@ -51,8 +53,6 @@
         <ProjectReference Include="..\..\Core\Extensions\Extensions.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Cache\Cache.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Common\Common.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Abstractions\Localization.Abstractions.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\S3\S3.csproj"/>

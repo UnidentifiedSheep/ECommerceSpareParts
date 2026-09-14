@@ -5,6 +5,7 @@ using Analytics.Entities.Enums;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Domain.Validation;
+using Locan.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SchemaGeneration.Abstractions;
 
@@ -17,17 +18,19 @@ public sealed class SalesProfitOverTimeChartDataSource(
 {
 	public const string DataSourceSystemName = nameof(SalesProfitOverTimeChartDataSource);
 
-	public override string NameLocalizationKey => "chart.sales.profit.over.time.name";
-
-	public override string DescriptionLocalizationKey => "chart.sales.profit.over.time.description";
-
 	public override string SystemName => DataSourceSystemName;
+
+	public override ILocalizableMessage NameLocalizationMessage =>
+		ChartSalesProfitOverTimeNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		ChartSalesProfitOverTimeDescriptionMessage.Instance;
 
 	public override async Task<ChartDataResult<SalesProfitDataPoint>> QueryAsync(
 		SalesProfitChartQuery queryInput,
 		CancellationToken cancellationToken)
 	{
-		queryInput.EnsureNotNull("chart.sales.profit.query.required").Validate();
+		queryInput.EnsureNotNull(ChartSalesProfitQueryRequiredMessage.Instance).Validate();
 
 		var query = repository
 			.Query

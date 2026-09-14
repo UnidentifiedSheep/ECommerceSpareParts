@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductReservations.EditProductReservation;
 
@@ -10,6 +11,6 @@ public class EditProductReservationValidation : AbstractValidator<EditProductRes
 		RuleFor(z => z.NewValue.GivenPrice)
 			.Must(z => Math.Round(z!.Value, 2) > 0)
 			.When(z => z.NewValue.GivenPrice != null)
-			.WithLocalizationKey("article.reservation.given.price.must.be.positive");
+			.WithLocalizableError(ArticleReservationGivenPriceMustBePositiveMessage.Instance);
 	}
 }

@@ -28,16 +28,16 @@ public record CurrencySettingData
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EntitySelector)]
 	[SchemaDependsOnEntity("Currency")]
-	[SchemaFieldLabel("currency.setting.base.currency.name")]
-	[SchemaFieldDescription("currency.setting.base.currency.description")]
+	[SchemaFieldLabel(CurrencySettingBaseCurrencyNameMessage.Key)]
+	[SchemaFieldDescription(CurrencySettingBaseCurrencyDescriptionMessage.Key)]
 	public int BaseCurrencyId { get; init; } = 1;
 
 	[JsonPropertyName("rateProvider")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EnumSelector)]
 	[SchemaDependsOnEntity(nameof(ExchangeRateProvider))]
-	[SchemaFieldLabel("currency.setting.rate.provider.name")]
-	[SchemaFieldDescription("currency.setting.rate.provider.description")]
+	[SchemaFieldLabel(CurrencySettingRateProviderNameMessage.Key)]
+	[SchemaFieldDescription(CurrencySettingRateProviderDescriptionMessage.Key)]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public ExchangeRateProvider RateProvider { get; init; } = ExchangeRateProvider.Cbr;
 }

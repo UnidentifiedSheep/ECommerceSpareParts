@@ -1,6 +1,6 @@
 {
-  "locale": "en",
-  "keyValues": {
+  "culture": "en",
+  "messages": {
     "markup.range.analyzer.name": "Markup range analyzer",
     "markup.range.analyzer.description": "Builds recommended markup ranges from completed sales by grouping products with similar purchase cost and stable markup behavior."
   }

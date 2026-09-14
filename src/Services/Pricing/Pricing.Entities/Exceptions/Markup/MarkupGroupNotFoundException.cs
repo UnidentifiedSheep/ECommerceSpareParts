@@ -1,20 +1,15 @@
-﻿using Abstractions.Interfaces.Exceptions;
-using Exceptions.Base;
+﻿using Exceptions.Base.Localized;
 
 namespace Pricing.Entities.Exceptions.Markup;
 
-public class MarkupGroupNotFoundException : NotFoundException, ILocalizableException
+public class MarkupGroupNotFoundException : LocalizedNotFoundException
 {
 	public MarkupGroupNotFoundException(int id) : base(
-		null,
+		MarkupGroupNotFoundMessage.Instance,
 		new
 		{
 			Id = id
 		})
 	{
 	}
-
-	public string MessageKey => "markup.group.not.found";
-
-	public object[]? Arguments => null;
 }

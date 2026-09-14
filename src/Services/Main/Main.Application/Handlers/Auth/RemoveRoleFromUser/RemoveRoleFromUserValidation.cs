@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Entities.Auth;
 using Role = Enums.Role;
 
@@ -12,8 +13,8 @@ public class RemoveRoleFromUserValidation : AbstractValidator<RemoveRoleFromUser
 		RuleFor(x => x.RoleName)
 			.Cascade(CascadeMode.Stop)
 			.NotEmpty()
-			.WithLocalizationKey("role.name.not.empty")
+			.WithLocalizableError(RoleNameNotEmptyMessage.Instance)
 			.Must(x => RoleNames.Normalize(x) != RoleNames.Normalize(nameof(Role.System)))
-			.WithLocalizationKey("cant.remove.system.role.from.user");
+			.WithLocalizableError(CantRemoveSystemRoleFromUserMessage.Instance);
 	}
 }

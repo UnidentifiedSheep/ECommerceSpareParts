@@ -65,7 +65,7 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var exception = await Assert.ThrowsAsync<LocalPriceApplierCannotBeDeletedException>(() =>
 			Mediator.Send(new DeletePriceApplierCommand(existing.SystemName)));
 
-		exception.MessageKey.Should().Be("price.applier.local.cannot.be.deleted");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.local.cannot.be.deleted");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
@@ -81,7 +81,7 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var exception = await Assert.ThrowsAsync<PriceApplierNotFoundException>(() =>
 			Mediator.Send(new DeletePriceApplierCommand(systemName)));
 
-		exception.MessageKey.Should().Be("price.applier.not.found");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.not.found");
 	}
 
 	[Fact]

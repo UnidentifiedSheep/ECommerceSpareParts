@@ -44,9 +44,9 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
 	{
 		Code = code
 			.Trim()
-			.EnsureNotNullOrEmpty("storage.code.not.empty")
-			.EnsureMinLength(6, "storage.code.min.length")
-			.EnsureMaxLength(128, "storage.code.max.length");
+			.EnsureNotNullOrEmpty(StorageCodeNotEmptyMessage.Instance)
+			.EnsureMinLength(6, StorageCodeMinLengthMessage.Instance)
+			.EnsureMaxLength(128, StorageCodeMaxLengthMessage.Instance);
 	}
 
 	public void SetType(StorageType type)
@@ -55,19 +55,19 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
 			return;
 
 		if (type == StorageType.SupplierStorage && _owners.Count != 0)
-			throw new InvalidInputException("storage.type.change.restricted");
+			throw new InvalidInputException(StorageTypeChangeRestrictedMessage.Instance);
 
 		Type = type;
 	}
 
 	public void SetDescription(string? description)
 	{
-		Description = description.NullIfWhiteSpace()?.EnsureMaxLength(256, "storage.description.max.length");
+		Description = description.NullIfWhiteSpace()?.EnsureMaxLength(256, StorageDescriptionMaxLengthMessage.Instance);
 	}
 
 	public void SetLocation(string? location)
 	{
-		Location = location.NullIfWhiteSpace()?.EnsureMaxLength(256, "storage.location.max.length");
+		Location = location.NullIfWhiteSpace()?.EnsureMaxLength(256, StorageLocationMaxLengthMessage.Instance);
 	}
 
 	public void AddOwner(Guid userId)

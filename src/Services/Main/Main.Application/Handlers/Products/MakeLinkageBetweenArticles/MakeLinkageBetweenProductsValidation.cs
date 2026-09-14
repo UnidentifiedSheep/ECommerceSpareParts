@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 
@@ -16,7 +17,7 @@ public class MakeLinkageBetweenProductsValidation : AbstractValidator<MakeLinkag
 						x.ProductId, x.CrossProductId
 					})
 					.Must(x => x.ProductId != x.CrossProductId)
-					.WithLocalizationKey("article.linkage.article.cannot.equal.cross.article");
+					.WithLocalizableError(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance);
 			});
 	}
 }

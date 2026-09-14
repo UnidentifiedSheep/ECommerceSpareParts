@@ -6,6 +6,8 @@ using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
+using Locan.Core.Interfaces;
+using Locan.Core.LocalizableMessages;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -117,10 +119,10 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 		logger)
 	{
 		public override string SystemName => "step";
-
-		public override string NameLocalizationKey => "test-name";
-
-		public override string DescriptionLocalizationKey => "test-description";
+		public override ILocalizableMessage NameLocalizationMessage
+			=> new LocalizableMessage("test-name");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-description");
 
 		protected override Task DoWork() => Task.CompletedTask;
 	}

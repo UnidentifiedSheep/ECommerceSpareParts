@@ -1,8 +1,7 @@
 using System.Diagnostics;
 using Abstractions.Interfaces.Exceptions;
 using HotChocolate.Execution;
-using Localization.Abstractions;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -10,13 +9,13 @@ namespace GraphQL.Common.ErrorFilters;
 
 public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 	ILoggerFactory loggerFactory,
-	IContextualStringLocalizer localizer,
+	IContextualLocalizer localizer,
 	IHttpContextAccessor httpContextAccessor) : IErrorFilter
 	where TException : Exception
 {
 	private readonly ILogger<TFilter> _logger = loggerFactory.CreateLogger<TFilter>();
 
-	protected IContextualStringLocalizer Localizer { get; } = localizer;
+	protected IContextualLocalizer Localizer { get; } = localizer;
 
 	public IError OnError(IError error)
 	{
@@ -72,23 +71,13 @@ public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 		if (exception is not ILocalizableException localizableException)
 			return fallback;
 
-		var key = localizableException.MessageKey;
-		if (!Localizer.TryGet(key, out var message) || message is null)
-		{
-			_logger.LogError("Unable to get localizable message for Key: {Key}", key);
-			return fallback;
-		}
-
-		if (LocalizedMessageFormatter.TryFormat(
-				message,
-				localizableException.Arguments,
-				out var localizedMessage))
+		var message = localizableException.LocalizableMessage;
+		if (Localizer.TryGet(message, out var localizedMessage))
 			return localizedMessage;
 
 		_logger.LogError(
-			"Unable to format localizable message for Key: {Key}, Arguments: {@Args}",
-			key,
-			localizableException.Arguments);
+			"Unable to get localizable message for key: {Key}",
+			message.MessageKey);
 		return fallback;
 	}
 

@@ -9,6 +9,8 @@ using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using Domain.Exceptions;
 using FluentAssertions;
+using Locan.Core.Interfaces;
+using Locan.Core.LocalizableMessages;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -36,6 +38,7 @@ public class LrtBaseTests
 	{
 		var fixture = CreateFixture(maxAttempts: 3);
 		var lrt = fixture.CreateLrt();
+		// ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
 		lrt.Work = x =>
 		{
 			if (x.DoWorkCalls == 1)
@@ -88,7 +91,7 @@ public class LrtBaseTests
 	{
 		var fixture = CreateFixture();
 		var lrt = fixture.CreateLrt();
-		using var cancellationTokenSource = new CancellationTokenSource();
+		var cancellationTokenSource = new CancellationTokenSource();
 		await cancellationTokenSource.CancelAsync();
 		lrt.Work = _ => throw new OperationCanceledException(cancellationTokenSource.Token);
 
@@ -229,22 +232,16 @@ public class LrtBaseTests
 	private static TestFixture CreateFixture(string initialState = "{}", int maxAttempts = 3) =>
 		new(initialState, maxAttempts);
 
-	private static void SetJobId(Job job, Guid id)
-	{
-		typeof(Job).GetProperty(nameof(Job.Id))!.SetValue(job, id);
-	}
-
 	private sealed class TestFixture
 	{
 		public TestFixture(string initialState, int maxAttempts)
 		{
-			JobId = Guid.NewGuid();
 			LeaseHolderId = Guid.NewGuid();
 			Job = SingleRunJob.Create(
 				"test-lrt",
 				initialState,
 				maxAttempts);
-			SetJobId(Job, JobId);
+			JobId = Job.Id;
 			Job.AcquireLease(LeaseHolderId, TimeSpan.FromMinutes(5));
 
 			JobRepository
@@ -345,9 +342,10 @@ public class LrtBaseTests
 
 		public override string SystemName => nameof(TestLrt);
 
-		public override string NameLocalizationKey => "test-lrt-name";
-
-		public override string DescriptionLocalizationKey => "test-lrt-description";
+		public override ILocalizableMessage NameLocalizationMessage
+			=> new LocalizableMessage("test-lrt-name");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-lrt-description");
 
 		protected override Task DoWork()
 		{

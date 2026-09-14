@@ -1,4 +1,5 @@
 ﻿using Exceptions;
+using Locan.Core.Interfaces;
 
 namespace Domain.Validation;
 
@@ -7,36 +8,36 @@ public static class ValidationGuardExtensions
 	public static string EnsureMinLength(
 		this string value,
 		int min,
-		string errorKey) => !value.HasMinLength(min) ? throw new InvalidInputException(errorKey) : value;
+		ILocalizableMessage message) => !value.HasMinLength(min) ? throw new InvalidInputException(message) : value;
 
 	public static string EnsureMaxLength(
 		this string value,
 		int max,
-		string errorKey) => !value.HasMaxLength(max) ? throw new InvalidInputException(errorKey) : value;
+		ILocalizableMessage message) => !value.HasMaxLength(max) ? throw new InvalidInputException(message) : value;
 
-	public static string EnsureNoSpaces(this string value, string errorKey) =>
-		!value.HasNoSpaces() ? throw new InvalidInputException(errorKey) : value;
+	public static string EnsureNoSpaces(this string value, ILocalizableMessage message) =>
+		!value.HasNoSpaces() ? throw new InvalidInputException(message) : value;
 
-	public static string EnsureNotNullOrEmpty(this string value, string errorKey) =>
-		!value.IsNotNullOrEmpty() ? throw new InvalidInputException(errorKey) : value;
+	public static string EnsureNotNullOrEmpty(this string value, ILocalizableMessage message) =>
+		!value.IsNotNullOrEmpty() ? throw new InvalidInputException(message) : value;
 
-	public static string EnsureNotNullOrWhiteSpace(this string value, string errorKey) =>
-		!value.IsNotNullOrWhiteSpace() ? throw new InvalidInputException(errorKey) : value;
+	public static string EnsureNotNullOrWhiteSpace(this string value, ILocalizableMessage message) =>
+		!value.IsNotNullOrWhiteSpace() ? throw new InvalidInputException(message) : value;
 
-	public static T EnsureNotNull<T>(this T value, string errorKey) where T : class =>
-		!value.IsNotNull() ? throw new InvalidInputException(errorKey) : value;
+	public static T EnsureNotNull<T>(this T value, ILocalizableMessage message) where T : class =>
+		!value.IsNotNull() ? throw new InvalidInputException(message) : value;
 
-	public static T EnsureNotNullOrDefault<T>(this T? value, string errorKey) where T : struct
+	public static T EnsureNotNullOrDefault<T>(this T? value, ILocalizableMessage message) where T : struct
 	{
 		return !value.IsNotNullOrDefault()
-			? throw new InvalidInputException(errorKey)
+			? throw new InvalidInputException(message)
 			: value.GetValueOrDefault();
 	}
 
-	public static T EnsureNullOrDefault<T>(this T? value, string errorKey) where T : struct
+	public static T EnsureNullOrDefault<T>(this T? value, ILocalizableMessage message) where T : struct
 	{
 		return !value.IsNullOrDefault()
-			? throw new InvalidInputException(errorKey)
+			? throw new InvalidInputException(message)
 			: value.GetValueOrDefault();
 	}
 
@@ -44,70 +45,72 @@ public static class ValidationGuardExtensions
 		this T value,
 		T min,
 		T max,
-		string errorKey) where T : IComparable<T>
+		ILocalizableMessage message) where T : IComparable<T>
 	{
-		return !value.IsInRange(min, max) ? throw new InvalidInputException(errorKey) : value;
+		return !value.IsInRange(min, max) ? throw new InvalidInputException(message) : value;
 	}
 
 	public static T Ensure<T>(
 		this T value,
 		Func<T, bool> predicate,
-		string errorKey)
+		ILocalizableMessage message)
 	{
-		return !value.IsValid(predicate) ? throw new InvalidInputException(errorKey) : value;
+		return !value.IsValid(predicate) ? throw new InvalidInputException(message) : value;
 	}
 
-	public static bool EnsureTrue(this bool value, string errorKey) =>
-		!value.IsTrue() ? throw new InvalidInputException(errorKey) : value;
+	public static bool EnsureTrue(this bool value, ILocalizableMessage message) =>
+		!value.IsTrue() ? throw new InvalidInputException(message) : value;
 
 	public static T EnsureNotEqual<T>(
 		this T value,
 		T next,
-		string errorKey) where T : IComparable<T> =>
-		!value.IsNotEqual(next) ? throw new InvalidInputException(errorKey) : value;
+		ILocalizableMessage message) where T : IComparable<T> =>
+		!value.IsNotEqual(next) ? throw new InvalidInputException(message) : value;
 
 	public static T EnsureAtMost<T>(
 		this T value,
 		T max,
-		string errorKey) where T : IComparable<T> =>
-		!value.IsAtMost(max) ? throw new InvalidInputException(errorKey) : value;
+		ILocalizableMessage message) where T : IComparable<T> =>
+		!value.IsAtMost(max) ? throw new InvalidInputException(message) : value;
 
 	public static T EnsureAtLeast<T>(
 		this T value,
 		T min,
-		string errorKey) where T : IComparable<T> =>
-		!value.IsAtLeast(min) ? throw new InvalidInputException(errorKey) : value;
+		ILocalizableMessage message) where T : IComparable<T> =>
+		!value.IsAtLeast(min) ? throw new InvalidInputException(message) : value;
 
 	public static T EnsureGreaterThan<T>(
 		this T value,
 		T min,
-		string errorKey) where T : IComparable<T> =>
-		!value.IsGreaterThan(min) ? throw new InvalidInputException(errorKey) : value;
+		ILocalizableMessage message) where T : IComparable<T> =>
+		!value.IsGreaterThan(min) ? throw new InvalidInputException(message) : value;
 
 	public static T EnsureLessThan<T>(
 		this T value,
 		T max,
-		string errorKey) where T : IComparable<T> =>
-		!value.IsLessThan(max) ? throw new InvalidInputException(errorKey) : value;
+		ILocalizableMessage message) where T : IComparable<T> =>
+		!value.IsLessThan(max) ? throw new InvalidInputException(message) : value;
 
-	public static T EnsureNonNegative<T>(this T value, string errorKey) where T : struct, IComparable<T> =>
-		!value.IsNonNegative() ? throw new InvalidInputException(errorKey) : value;
+	public static T EnsureNonNegative<T>(this T value, ILocalizableMessage message)
+		where T : struct, IComparable<T> =>
+		!value.IsNonNegative() ? throw new InvalidInputException(message) : value;
 
-	public static T EnsureNonPositive<T>(this T value, string errorKey) where T : struct, IComparable<T> =>
-		!value.IsNonPositive() ? throw new InvalidInputException(errorKey) : value;
+	public static T EnsureNonPositive<T>(this T value, ILocalizableMessage message)
+		where T : struct, IComparable<T> =>
+		!value.IsNonPositive() ? throw new InvalidInputException(message) : value;
 
 	public static decimal EnsureMaxDecimalPlaces(
 		this decimal value,
 		int maxDecimals,
-		string errorKey)
+		ILocalizableMessage message)
 	{
-		return !value.HasAtMostDecimalPlaces(maxDecimals) ? throw new InvalidInputException(errorKey) : value;
+		return !value.HasAtMostDecimalPlaces(maxDecimals) ? throw new InvalidInputException(message) : value;
 	}
 
-	public static IEnumerable<T> EnsureNotEmpty<T>(this IEnumerable<T> value, string errorKey)
+	public static IEnumerable<T> EnsureNotEmpty<T>(this IEnumerable<T> value, ILocalizableMessage message)
 	{
 		// ReSharper disable once PossibleMultipleEnumeration
-		return !value.IsNotEmpty() ? throw new InvalidInputException(errorKey) : value;
+		return !value.IsNotEmpty() ? throw new InvalidInputException(message) : value;
 	}
 
 	public static string EnsureMinLength(

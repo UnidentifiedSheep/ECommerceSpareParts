@@ -1,0 +1,13 @@
+{
+  "culture": "tr",
+  "messages": {
+    "password.must.not.be.empty": "Şifre boş olmamalıdır.",
+    "password.min.length": "Şifre en az {MinLength} karakter uzunluğunda olmalıdır.",
+    "password.max.length": "Şifre en fazla {MaxLength} karakter uzunluğunda olmalıdır.",
+    "password.cannot.start.or.end.with.space": "Şifre boşlukla başlayamaz veya bitemez.",
+    "password.cannot.contain.spaces": "Şifre boşluk içeremez.",
+    "password.must.contain.uppercase": "Şifre en az bir büyük harf içermelidir.",
+    "password.must.contain.digit": "Şifre en az bir rakam içermelidir.",
+    "password.must.contain.special": "Şifre en az bir özel karakter içermelidir ({SpecialCharacters})."
+  }
+}

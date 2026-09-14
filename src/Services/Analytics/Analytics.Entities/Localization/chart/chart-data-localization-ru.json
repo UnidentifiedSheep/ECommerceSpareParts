@@ -1,9 +1,9 @@
 {
-  "locale": "ru",
-  "keyValues": {
+  "culture": "ru",
+  "messages": {
     "chart.sales.profit.over.time.name": "Прибыль от продаж по времени",
     "chart.sales.profit.over.time.description": "Выручка, себестоимость и валовая прибыль с группировкой по периоду.",
-    "chart.data.source.not.found": "Источник данных графика {0} не найден.",
+    "chart.data.source.not.found": "Источник данных графика {SystemName} не найден.",
     "chart.data.source.query.input.invalid": "Некорректные параметры запроса графика.",
     "chart.sales.profit.query.required": "Параметры запроса графика обязательны.",
     "chart.sales.profit.query.start.date.must.be.utc": "Дата начала должна быть указана в UTC.",

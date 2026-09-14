@@ -8,8 +8,8 @@ public static class RoleNames
 	{
 		var value = name
 			.Trim()
-			.EnsureMinLength(3, "role.name.min.length")
-			.EnsureMaxLength(24, "role.name.max.length");
+			.EnsureMinLength(3, RoleNameMinLengthMessage.Instance)
+			.EnsureMaxLength(24, RoleNameMaxLengthMessage.Instance);
 
 		return value.ToUpperInvariant();
 	}

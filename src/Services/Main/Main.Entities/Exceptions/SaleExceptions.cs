@@ -3,14 +3,14 @@ using Exceptions.Base.Localized;
 namespace Main.Entities.Exceptions;
 
 public class SaleContentNotFoundException(int id) : LocalizedBadRequestException(
-	"sale.content.not.found",
+	SaleContentNotFoundMessage.Instance,
 	new
 	{
 		Id = id
 	});
 
 public class SaleNotFoundException(Guid id) : LocalizedNotFoundException(
-	"sale.not.found",
+	SaleNotFoundMessage.Instance,
 	new
 	{
 		Id = id
@@ -18,9 +18,9 @@ public class SaleNotFoundException(Guid id) : LocalizedNotFoundException(
 
 public class SaleSoftConfirmationNeededException(string confirmationCode, Dictionary<string, int> reserved)
 	: LocalizedPreconditionRequiredException(
-		"soft.confirmation.needed.for.sale.reservation.reason",
+		new SoftConfirmationNeededForSaleReservationReasonMessage()
+			.WithConfirmationCode(confirmationCode),
 		new
 		{
 			ConfirmationCode = confirmationCode, Reserved = reserved
-		},
-		[confirmationCode]);
+		});

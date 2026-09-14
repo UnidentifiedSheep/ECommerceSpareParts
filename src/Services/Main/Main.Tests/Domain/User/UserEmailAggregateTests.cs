@@ -41,7 +41,7 @@ public class UserEmailAggregateTests
 			3);
 
 		var exception = action.Should().Throw<InvalidInputException>().Which;
-		exception.MessageKey.Should().Be("user.have.duplicate.email");
+		exception.LocalizableMessage.MessageKey.Should().Be("user.have.duplicate.email");
 		user.Emails.Should().ContainSingle();
 	}
 
@@ -61,7 +61,7 @@ public class UserEmailAggregateTests
 			1);
 
 		var exception = action.Should().Throw<InvalidInputException>().Which;
-		exception.MessageKey.Should().Be("user.max.email.count");
+		exception.LocalizableMessage.MessageKey.Should().Be("user.max.email.count");
 		user.Emails.Should().ContainSingle();
 	}
 
@@ -120,7 +120,7 @@ public class UserEmailAggregateTests
 		var action = () => user.RemoveEmail("primary@example.com", 1);
 
 		var exception = action.Should().Throw<InvalidInputException>().Which;
-		exception.MessageKey.Should().Be("user.email.primary.cannot.delete");
+		exception.LocalizableMessage.MessageKey.Should().Be("user.email.primary.cannot.delete");
 		user.Emails.Should().HaveCount(2);
 		user.Emails.Single(x => x.IsPrimary).Email.Value.Should().Be("primary@example.com");
 	}
@@ -138,7 +138,7 @@ public class UserEmailAggregateTests
 		var action = () => user.RemoveEmail("email@example.com", 1);
 
 		var exception = action.Should().Throw<InvalidInputException>().Which;
-		exception.MessageKey.Should().Be("user.min.email.count");
+		exception.LocalizableMessage.MessageKey.Should().Be("user.min.email.count");
 		user.Emails.Should().ContainSingle();
 	}
 
@@ -182,7 +182,7 @@ public class UserEmailAggregateTests
 		var action = () => user.MakeEmailPrimary("unconfirmed@example.com");
 
 		var exception = action.Should().Throw<InvalidInputException>().Which;
-		exception.MessageKey.Should().Be("user.email.primary.must.be.confirmed");
+		exception.LocalizableMessage.MessageKey.Should().Be("user.email.primary.must.be.confirmed");
 		user.Emails.Single(x => x.IsPrimary).Email.Value.Should().Be("current@example.com");
 	}
 

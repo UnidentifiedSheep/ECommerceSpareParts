@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 
@@ -9,42 +10,42 @@ public class EditStorageRouteValidation : AbstractValidator<EditStorageRouteComm
 	{
 		RuleFor(x => x.PatchStorageRoute.PriceKg.Value)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("storage.route.price.kg.min")
+			.WithLocalizableError(StorageRoutePriceKgMinMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("storage.route.price.kg.precision")
+			.WithLocalizableError(StorageRoutePriceKgPrecisionMessage.Instance)
 			.When(x => x.PatchStorageRoute.PriceKg.IsSet);
 
 		RuleFor(x => x.PatchStorageRoute.PricePerM3.Value)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("storage.route.price.m3.min")
+			.WithLocalizableError(StorageRoutePriceM3MinMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("storage.route.price.m3.precision")
+			.WithLocalizableError(StorageRoutePriceM3PrecisionMessage.Instance)
 			.When(x => x.PatchStorageRoute.PricePerM3.IsSet);
 
 		RuleFor(x => x.PatchStorageRoute.PricePerOrder.Value)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("storage.route.price.order.min")
+			.WithLocalizableError(StorageRoutePriceOrderMinMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("storage.route.price.order.precision")
+			.WithLocalizableError(StorageRoutePriceOrderPrecisionMessage.Instance)
 			.When(x => x.PatchStorageRoute.PricePerOrder.IsSet);
 
 		RuleFor(x => x.PatchStorageRoute.DistanceM.Value)
 			.GreaterThanOrEqualTo(1)
-			.WithLocalizationKey("storage.route.distance.min")
+			.WithLocalizableError(StorageRouteDistanceMinMessage.Instance)
 			.When(x => x.PatchStorageRoute.DistanceM.IsSet);
 
 		RuleFor(x => x.PatchStorageRoute.DeliveryTimeMinutes.Value)
 			.GreaterThanOrEqualTo(1)
-			.WithLocalizationKey("storage.route.delivery.time.min")
+			.WithLocalizableError(StorageRouteDeliveryTimeMinMessage.Instance)
 			.When(x => x.PatchStorageRoute.DeliveryTimeMinutes.IsSet);
 	}
 }

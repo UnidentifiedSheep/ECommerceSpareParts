@@ -36,7 +36,8 @@ public class OperationDatePolicyTests
 		var result = policy.IsAllowed(Now.AddMinutes(5).AddTicks(1));
 
 		result.IsValid.Should().BeFalse();
-		result.Message.Should().Be("operation.date.cannot.be.in.future");
+		result.LocalizableMessage.Should().NotBeNull();
+		result.LocalizableMessage.MessageKey.Should().Be("operation.date.cannot.be.in.future");
 	}
 
 	[Fact]
@@ -57,7 +58,8 @@ public class OperationDatePolicyTests
 		var result = policy.IsAllowed(Now.AddDays(-30).AddTicks(-1));
 
 		result.IsValid.Should().BeFalse();
-		result.Message.Should().Be("operation.date.too.old");
+		result.LocalizableMessage.Should().NotBeNull();
+		result.LocalizableMessage.MessageKey.Should().Be("operation.date.too.old");
 	}
 
 	[Fact]
@@ -88,7 +90,8 @@ public class OperationDatePolicyTests
 		var result = policy.IsAllowed(Now.AddMinutes(6));
 
 		result.IsValid.Should().BeFalse();
-		result.Message.Should().Be("operation.date.cannot.be.in.future");
+		result.LocalizableMessage.Should().NotBeNull();
+		result.LocalizableMessage.MessageKey.Should().Be("operation.date.cannot.be.in.future");
 	}
 
 	private static OperationDatePolicy CreatePolicy(IReadOnlySet<string>? permissions = null)

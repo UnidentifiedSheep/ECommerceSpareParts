@@ -49,8 +49,8 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
 	{
 		Value = value
 			.Trim()
-			.EnsureMinLength(3, "article.characteristic.value.min.length")
-			.EnsureMaxLength(128, "article.characteristic.value.max.length");
+			.EnsureMinLength(3, ArticleCharacteristicValueMinLengthMessage.Instance)
+			.EnsureMaxLength(128, ArticleCharacteristicValueMaxLengthMessage.Instance);
 	}
 
 	public void SetName(string name)
@@ -59,7 +59,7 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
 			.Trim()
 			.EnsureNotNullOrWhiteSpace(() =>
 				throw new InvalidOperationException("Product characteristic name cannot be null or empty."))
-			.EnsureMaxLength(128, "article.characteristic.name.max.length");
+			.EnsureMaxLength(128, ArticleCharacteristicNameMaxLengthMessage.Instance);
 	}
 
 	public override (int, string) GetId() => (ProductId, Name);

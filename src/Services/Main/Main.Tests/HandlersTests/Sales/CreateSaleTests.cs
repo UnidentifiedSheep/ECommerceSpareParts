@@ -400,14 +400,8 @@ public class CreateSaleTests : IntegrationTest
 
 		var exception = await Assert.ThrowsAsync<SaleSoftConfirmationNeededException>(() =>
 			Mediator.Send(commandWithoutConfirmation));
-		var confirmationCode = exception
-			.Arguments
-			.Should()
-			.ContainSingle()
-			.Subject
-			.Should()
-			.BeOfType<string>()
-			.Subject;
+		var confirmationCode = Assert.IsType<string>(
+			Assert.Single(exception.LocalizableMessage.Values).Value.Value);
 		var command = commandWithoutConfirmation with
 		{
 			ConfirmationCode = confirmationCode

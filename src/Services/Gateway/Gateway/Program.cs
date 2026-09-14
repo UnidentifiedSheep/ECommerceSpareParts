@@ -10,7 +10,7 @@ using Gateway.Application;
 using Gateway.EndPoints;
 using Gateway.Extensions;
 using Internal.Integration.Di;
-using Localization.Domain.Extensions;
+using Locan.AspNetCore;
 using MassTransit;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -95,7 +95,11 @@ builder
 	.AddBaseExceptionHandlers()
 	.AddProjectJsonSerialization()
 	.AddCacheLayer("gateway")
-	.AddLocalization(builder.Configuration)
+	.AddLocanAspNetCore(options =>
+	{
+		options.DefaultCulture = "en";
+		options.SupportedCultures = ["en", "ru", "tr"];
+	})
 	.AddApplicationLayer(builder.Configuration)
 	.AddEComAuth(builder.Configuration)
 	.AddMinimalSecurityLayer()
@@ -181,6 +185,10 @@ var app = builder.Build();
 MapDocs(app);
 
 app.UseCors();
+app.UseLocanRequestLocalization();
+app.UseExceptionHandler(_ =>
+{
+});
 
 app.UseHeaderPropagation();
 app.UseAuthentication();
@@ -189,10 +197,6 @@ app.UseAuthorization();
 app.UseWebSockets();
 app.MapJobEndPoints();
 app.MapReverseProxy();
-
-app.UseExceptionHandler(_ =>
-{
-});
 
 app.MapGet("/health", () => Results.Ok());
 app.UseOpenTelemetryPrometheusScrapingEndpoint();

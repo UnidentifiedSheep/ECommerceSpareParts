@@ -1,9 +1,9 @@
+using System.Globalization;
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
 using Gateway.Application.Dtos;
 using Gateway.Application.Handlers;
-using Localization.Abstractions.Interfaces;
 using MediatR;
 
 namespace Gateway.EndPoints;
@@ -23,11 +23,11 @@ public static class JobEndPoints
 		jobs
 			.MapGet(
 				"/available",
-				async (
-					ISender sender, IContextualStringLocalizer localizer,
-					CancellationToken ct) =>
+				async (ISender sender, CancellationToken ct) =>
 				{
-					var result = await sender.Send(new GetAggregatedAvailableJobsQuery(localizer.Locale), ct);
+					var result = await sender.Send(
+						new GetAggregatedAvailableJobsQuery(CultureInfo.CurrentUICulture.Name),
+						ct);
 					return Results.Ok(
 						new GetAggregatedAvailableJobsResponse
 						{

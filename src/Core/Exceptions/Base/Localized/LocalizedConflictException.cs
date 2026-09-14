@@ -1,34 +1,27 @@
 using Abstractions.Interfaces.Exceptions;
+using Locan.Core.Interfaces;
 
 namespace Exceptions.Base.Localized;
 
 public abstract class LocalizedConflictException : ConflictException, ILocalizableException
 {
-	protected LocalizedConflictException(string messageKey, object[]? arguments = null) : base(null)
+	public ILocalizableMessage LocalizableMessage { get; }
+	protected LocalizedConflictException(ILocalizableMessage message) : base(null)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
 
 	protected LocalizedConflictException(
-		string messageKey,
-		object relatedData,
-		object[]? arguments = null) : base(null, relatedData)
+		ILocalizableMessage message,
+		object relatedData) : base(null, relatedData)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
 
 	protected LocalizedConflictException(
-		string messageKey,
-		string details,
-		object[]? arguments = null) : base(null, details)
+		ILocalizableMessage message,
+		string details) : base(null, details)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
-
-	public string MessageKey { get; }
-
-	public object[]? Arguments { get; }
 }

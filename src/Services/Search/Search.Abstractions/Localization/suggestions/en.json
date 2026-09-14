@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "messages": {
+    "suggestion.already.rebuilding": "Suggestion rebuilding is already in progress.",
+    "suggestion.search.query.empty": "Suggestion search query must not be empty.",
+    "suggestion.search.limit.min": "At least one suggestion must be requested."
+  }
+}

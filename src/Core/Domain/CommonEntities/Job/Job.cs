@@ -30,7 +30,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 		SetStatus(JobStatus.Pending);
 	}
 
-	public Guid Id { get; }
+	public Guid Id { get; private set; }
 
 	public string SystemName { get; private set; } = null!;
 
@@ -177,7 +177,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 	public virtual void RequestCancellation(string? reason = null)
 	{
 		if (IsStep)
-			throw new InvalidInputException("job.step.cannot.be.cancelled.directly");
+			throw new InvalidInputException(JobStepCannotBeCancelledDirectlyMessage.Instance);
 
 		if (IsTerminal)
 			throw new InvalidOperationException("Terminal job cannot be cancelled.");

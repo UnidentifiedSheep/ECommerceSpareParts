@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Enums;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
+using Locan.Core.LocalizableMessages;
 using Main.Application.Dtos.Auth;
 using Main.Entities.Auth;
 
@@ -10,7 +11,7 @@ public record GetPermissionsQuery : IQuery<GetPermissionsResult>;
 
 public record GetPermissionsResult(IReadOnlyList<PermissionDto> Permissions);
 
-public class GetPermissionsHandler(IContextualStringLocalizer localizer)
+public class GetPermissionsHandler(IContextualLocalizer localizer)
 	: IQueryHandler<GetPermissionsQuery, GetPermissionsResult>
 {
 	public async Task<GetPermissionsResult> Handle(
@@ -22,8 +23,8 @@ public class GetPermissionsHandler(IContextualStringLocalizer localizer)
 			.Select(x => new PermissionDto
 			{
 				SystemName = Permission.ToNormalizedPermission(x),
-				Name = localizer.Get(Permission.GetLocalizationNameKey(x)),
-				Description = localizer.Get(Permission.GetLocalizationDescriptionKey(x))
+				Name = localizer.Get(new LocalizableMessage(Permission.GetLocalizationNameKey(x))),
+				Description = localizer.Get(new LocalizableMessage(Permission.GetLocalizationDescriptionKey(x)))
 			})
 			.ToArray();
 

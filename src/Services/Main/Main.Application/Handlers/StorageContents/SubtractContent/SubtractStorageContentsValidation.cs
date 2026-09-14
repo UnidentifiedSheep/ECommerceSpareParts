@@ -1,6 +1,8 @@
 using FluentValidation;
 using FluentValidation.Results;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Locan.Core.Interfaces;
+using Main.Entities;
 
 namespace Main.Application.Handlers.StorageContents.SubtractContent;
 
@@ -8,7 +10,7 @@ public class SubtractStorageContentsValidation : AbstractValidator<SubtractStora
 {
 	public SubtractStorageContentsValidation()
 	{
-		RuleFor(x => x.Items).NotEmpty().WithLocalizationKey("storage.content.items.required");
+		RuleFor(x => x.Items).NotEmpty().WithLocalizableError(StorageContentItemsRequiredMessage.Instance);
 
 		RuleForEach(x => x.Items)
 			.ChildRules(item =>
@@ -16,7 +18,7 @@ public class SubtractStorageContentsValidation : AbstractValidator<SubtractStora
 				item
 					.RuleFor(x => x.Count)
 					.GreaterThan(0)
-					.WithLocalizationKey("storage.content.count.greater.than.zero");
+					.WithLocalizableError(StorageContentCountGreaterThanZeroMessage.Instance);
 			});
 
 		RuleForEach(x => x.Items)
@@ -28,31 +30,32 @@ public class SubtractStorageContentsValidation : AbstractValidator<SubtractStora
 						context.AddFailure(
 							CreateFailure(
 								nameof(SubtractStorageContentItem.StorageContentId),
-								"storage.content.id.greater.than.zero"));
+								StorageContentIdGreaterThanZeroMessage.Instance));
 						break;
 					case SubtractProductFromStorageItem byProduct:
 						if (byProduct.ProductId <= 0)
 							context.AddFailure(
 								CreateFailure(
 									nameof(SubtractProductFromStorageItem.ProductId),
-									"article.id.greater.than.zero"));
+									ArticleIdGreaterThanZeroMessage.Instance));
 
 						if (string.IsNullOrWhiteSpace(byProduct.StorageCode))
 							context.AddFailure(
 								CreateFailure(
 									nameof(SubtractProductFromStorageItem.StorageCode),
-									"storage.name.not.empty"));
+									StorageNameNotEmptyMessage.Instance));
 
 						break;
 				}
 			});
 	}
 
-	private static ValidationFailure CreateFailure(string propertyName, string errorCode)
+	private static ValidationFailure CreateFailure(string propertyName, ILocalizableMessage message)
 	{
 		return new ValidationFailure(propertyName, "Validation failed")
 		{
-			ErrorCode = errorCode
+			ErrorCode = message.MessageKey,
+			CustomState = message
 		};
 	}
 }

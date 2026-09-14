@@ -1,7 +1,8 @@
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
@@ -10,11 +11,11 @@ public class CreateTransactionValidation : AbstractValidator<CreateTransactionCo
 {
 	public CreateTransactionValidation(IOperationDatePolicy datePolicy)
 	{
-		RuleFor(command => command.SenderId).NotEmpty().WithLocalizationKey("transaction.sender.id.required");
+		RuleFor(command => command.SenderId).NotEmpty().WithLocalizableError(TransactionSenderIdRequiredMessage.Instance);
 
 		RuleFor(command => command.ReceiverId)
 			.NotEmpty()
-			.WithLocalizationKey("transaction.receiver.id.required");
+			.WithLocalizableError(TransactionReceiverIdRequiredMessage.Instance);
 
 		RuleFor(command => command.Amount).SetValidator(new TransactionAmountValidator());
 

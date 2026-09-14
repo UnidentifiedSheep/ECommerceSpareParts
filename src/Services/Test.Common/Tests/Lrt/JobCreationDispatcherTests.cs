@@ -7,6 +7,8 @@ using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
+using Locan.Core.Interfaces;
+using Locan.Core.LocalizableMessages;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -208,10 +210,10 @@ public sealed class JobCreationDispatcherTests
 		}
 
 		public override string SystemName => nameof(TestMultiStepLrt);
-
-		public override string NameLocalizationKey => "test-name";
-
-		public override string DescriptionLocalizationKey => "test-description";
+		public override ILocalizableMessage NameLocalizationMessage
+			=> new LocalizableMessage("test-name");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-description");
 
 		protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState) =>
 			builder.AddStep("step", initialState);
@@ -227,9 +229,10 @@ public sealed class JobCreationDispatcherTests
 	{
 		public override string SystemName => systemName;
 
-		public override string NameLocalizationKey => "test-name";
-
-		public override string DescriptionLocalizationKey => "test-description";
+		public override ILocalizableMessage NameLocalizationMessage
+			=> new LocalizableMessage("test-name");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-description");
 
 		protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState) =>
 			builder.AddStep(childSystemName, initialState);

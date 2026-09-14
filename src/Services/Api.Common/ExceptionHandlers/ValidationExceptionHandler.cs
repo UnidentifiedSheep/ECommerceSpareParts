@@ -1,11 +1,14 @@
 ﻿using Abstractions.Models.Validation;
 using FluentValidation;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class ValidationExceptionHandler(ILogger<ValidationExceptionHandler> logger)
+public class ValidationExceptionHandler(
+	ILogger<ValidationExceptionHandler> logger,
+	IContextualLocalizer localizer)
 	: ExceptionHandlerBase<ValidationExceptionHandler>(logger)
 {
 	public override async ValueTask<bool> TryHandleAsync(
@@ -23,7 +26,6 @@ public class ValidationExceptionHandler(ILogger<ValidationExceptionHandler> logg
 			httpContext,
 			400);
 		AddValidationErrors(
-			httpContext,
 			problemDetails,
 			validationException);
 
@@ -33,11 +35,9 @@ public class ValidationExceptionHandler(ILogger<ValidationExceptionHandler> logg
 	}
 
 	private void AddValidationErrors(
-		HttpContext httpContext,
 		ProblemDetails problemDetails,
 		ValidationException exception)
 	{
-		var localizer = httpContext.RequestServices.GetService<IContextualStringLocalizer>();
 		var errors = new List<ValidationErrorModel>();
 
 		foreach (var error in exception.Errors)
@@ -46,12 +46,12 @@ public class ValidationExceptionHandler(ILogger<ValidationExceptionHandler> logg
 			if (!(state?.DisplayErrorToUser ?? true))
 				continue;
 
-			var errorCode = error.ErrorCode;
 			var propertyName = error.PropertyName;
 			var errorMessage = error.ErrorMessage;
 			var attemptedValue = error.AttemptedValue;
 
-			if (localizer == null || string.IsNullOrWhiteSpace(errorCode))
+			if (error.CustomState is not ILocalizableMessage localizableMessage ||
+				!localizer.TryGet(localizableMessage, out var localizedMessage))
 			{
 				errors.Add(
 					new ValidationErrorModel(
@@ -61,14 +61,10 @@ public class ValidationExceptionHandler(ILogger<ValidationExceptionHandler> logg
 				continue;
 			}
 
-			var message = state?.ErrorMessageArguments is { Length: > 0 } arguments
-				? localizer.Get(errorCode, arguments)
-				: localizer[errorCode];
-
 			errors.Add(
 				new ValidationErrorModel(
 					propertyName,
-					message,
+					localizedMessage,
 					attemptedValue));
 		}
 

@@ -1,6 +1,7 @@
+using Application.Common.Extensions;
 using FluentValidation;
-using Localization.Domain.Extensions;
 using Pricing.Application.Dtos.Markup;
+using Pricing.Entities;
 
 namespace Pricing.Application.Handlers.Markup.UpsertMarkupGroup;
 
@@ -10,7 +11,7 @@ public class UpsertMarkupGroupValidation : AbstractValidator<UpsertMarkupGroupCo
 	{
 		RuleFor(x => x.MarkupGroup)
 			.NotNull()
-			.WithLocalizationKey("markup.group.required")
+			.WithLocalizableError(MarkupGroupRequiredMessage.Instance)
 			.SetValidator(new UpsertMarkupGroupDtoValidation());
 	}
 }
@@ -22,17 +23,19 @@ public class UpsertMarkupGroupDtoValidation : AbstractValidator<UpsertMarkupGrou
 		RuleFor(x => x.Id)
 			.GreaterThan(0)
 			.When(x => x.Id.HasValue)
-			.WithLocalizationKey("markup.group.id.must.be.positive");
+			.WithLocalizableError(MarkupGroupIdMustBePositiveMessage.Instance);
 
 		RuleFor(x => x.Name)
 			.Must(x => x?.Trim().Length <= 128)
-			.WithLocalizationKey("markup.group.name.max.length");
+			.WithLocalizableError(MarkupGroupNameMaxLengthMessage.Instance);
 
 		RuleFor(x => x.CurrencyId)
 			.GreaterThan(0)
-			.WithLocalizationKey("markup.group.currency.id.must.be.positive");
+			.WithLocalizableError(MarkupGroupCurrencyIdMustBePositiveMessage.Instance);
 
-		RuleFor(x => x.Ranges).NotEmpty().WithLocalizationKey("markup.group.ranges.required");
+		RuleFor(x => x.Ranges)
+			.NotEmpty()
+			.WithLocalizableError(MarkupGroupRangesRequiredMessage.Instance);
 
 		RuleForEach(x => x.Ranges).SetValidator(new UpsertMarkupRangeDtoValidation());
 	}
@@ -44,18 +47,18 @@ public class UpsertMarkupRangeDtoValidation : AbstractValidator<UpsertMarkupRang
 	{
 		RuleFor(x => x.RangeStart)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("markup.range.start.must.not.be.negative");
+			.WithLocalizableError(MarkupRangeStartMustNotBeNegativeMessage.Instance);
 
 		RuleFor(x => x.RangeEnd)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("markup.range.end.must.not.be.negative");
+			.WithLocalizableError(MarkupRangeEndMustNotBeNegativeMessage.Instance);
 
 		RuleFor(x => x.RangeEnd)
 			.GreaterThanOrEqualTo(x => x.RangeStart)
-			.WithLocalizationKey("markup.range.end.must.not.be.less.than.start");
+			.WithLocalizableError(MarkupRangeEndMustNotBeLessThanStartMessage.Instance);
 
 		RuleFor(x => x.Markup)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("markup.range.markup.must.not.be.negative");
+			.WithLocalizableError(MarkupRangeMarkupMustNotBeNegativeMessage.Instance);
 	}
 }

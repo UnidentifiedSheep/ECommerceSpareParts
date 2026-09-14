@@ -2,7 +2,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Exceptions;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Mailing.Core;
 using Mailing.Core.Models;
 using Main.Application.Handlers.Auth.EmailVerification;
@@ -117,7 +117,7 @@ public class RequestEmailVerificationTests : IntegrationTest
 			CancellationToken.None);
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(action);
-		Assert.Equal("global.application.setting.app.service.url.not.configured", exception.MessageKey);
+		Assert.Equal("global.application.setting.app.service.url.not.configured", exception.LocalizableMessage.MessageKey);
 	}
 
 	private RequestEmailVerificationHandler CreateHandler(IMailingService mailingService)
@@ -127,7 +127,7 @@ public class RequestEmailVerificationTests : IntegrationTest
 			Scope.ServiceProvider.GetRequiredService<IJsonSigner>(),
 			mailingService,
 			Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>(),
-			Scope.ServiceProvider.GetRequiredService<IContextualStringLocalizer>(),
+			Scope.ServiceProvider.GetRequiredService<IContextualLocalizer>(),
 			Scope.ServiceProvider.GetRequiredService<ISettingsService>());
 	}
 

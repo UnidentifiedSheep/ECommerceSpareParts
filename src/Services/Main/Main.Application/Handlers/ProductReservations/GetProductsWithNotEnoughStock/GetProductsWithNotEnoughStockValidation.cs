@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductReservations.GetProductsWithNotEnoughStock;
 
@@ -9,11 +10,11 @@ public class GetProductsWithNotEnoughStockValidation : AbstractValidator<GetProd
 	{
 		RuleFor(x => x.BuyerOrganizationId)
 			.NotEmpty()
-			.WithLocalizationKey("article.reservation.organization.id.must.not.be.empty");
+			.WithLocalizableError(ArticleReservationOrganizationIdMustNotBeEmptyMessage.Instance);
 
 		RuleFor(x => x.StorageCode)
 			.NotEmpty()
-			.WithLocalizationKey("article.reservation.storage.name.must.not.be.empty");
+			.WithLocalizableError(ArticleReservationStorageNameMustNotBeEmptyMessage.Instance);
 
 		RuleForEach(x => x.NeededCounts)
 			.ChildRules(z =>
@@ -21,7 +22,7 @@ public class GetProductsWithNotEnoughStockValidation : AbstractValidator<GetProd
 				z
 					.RuleFor(x => x.Value)
 					.GreaterThan(0)
-					.WithLocalizationKey("article.reservation.needed.count.must.be.positive");
+					.WithLocalizableError(ArticleReservationNeededCountMustBePositiveMessage.Instance);
 			});
 	}
 }

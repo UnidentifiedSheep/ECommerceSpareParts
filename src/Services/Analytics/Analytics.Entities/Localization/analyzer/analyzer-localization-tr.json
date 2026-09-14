@@ -1,6 +1,6 @@
 {
-  "locale": "tr",
-  "keyValues": {
+  "culture": "tr",
+  "messages": {
     "markup.range.analyzer.name": "Kâr marjı aralığı analizörü",
     "markup.range.analyzer.description": "Benzer alış maliyetine ve dengeli kâr marjı davranışına sahip ürünleri gruplayarak tamamlanan satışlardan önerilen kâr marjı aralıkları oluşturur."
   }

@@ -1,7 +1,8 @@
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Handlers.Sales.BaseValidators;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
@@ -17,16 +18,16 @@ public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
 		RuleFor(x => x.PayedSum)
 			.GreaterThanOrEqualTo(0)
 			.When(x => x.PayedSum != null)
-			.WithLocalizationKey("sale.payed.sum.min")
+			.WithLocalizableError(SalePayedSumMinMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
 			.When(x => x.PayedSum != null)
-			.WithLocalizationKey("sale.payed.sum.precision");
+			.WithLocalizableError(SalePayedSumPrecisionMessage.Instance);
 
-		RuleFor(x => x.UserId).NotEmpty().WithLocalizationKey("sale.buyer.id.not.empty");
+		RuleFor(x => x.UserId).NotEmpty().WithLocalizableError(SaleBuyerIdNotEmptyMessage.Instance);
 
-		RuleFor(x => x.OrganizationId).NotEmpty().WithLocalizationKey("sale.organization.id.not.empty");
+		RuleFor(x => x.OrganizationId).NotEmpty().WithLocalizableError(SaleOrganizationIdNotEmptyMessage.Instance);
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductSizes.SetProductSizes;
 
@@ -9,29 +10,29 @@ public class SetProductSizesValidation : AbstractValidator<SetProductSizesComman
 	{
 		RuleFor(x => x.Height)
 			.GreaterThan(0)
-			.WithLocalizationKey("article.size.height.must.be.greater.than.zero")
+			.WithLocalizableError(ArticleSizeHeightMustBeGreaterThanZeroMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("article.size.height.max.two.decimals");
+			.WithLocalizableError(ArticleSizeHeightMaxTwoDecimalsMessage.Instance);
 
 		RuleFor(x => x.Width)
 			.GreaterThan(0)
-			.WithLocalizationKey("article.size.width.must.be.greater.than.zero")
+			.WithLocalizableError(ArticleSizeWidthMustBeGreaterThanZeroMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("article.size.width.max.two.decimals");
+			.WithLocalizableError(ArticleSizeWidthMaxTwoDecimalsMessage.Instance);
 
 		RuleFor(x => x.Length)
 			.GreaterThan(0)
-			.WithLocalizationKey("article.size.length.must.be.greater.than.zero")
+			.WithLocalizableError(ArticleSizeLengthMustBeGreaterThanZeroMessage.Instance)
 			.PrecisionScale(
 				18,
 				2,
 				true)
-			.WithLocalizationKey("article.size.length.max.two.decimals");
+			.WithLocalizableError(ArticleSizeLengthMaxTwoDecimalsMessage.Instance);
 	}
 }

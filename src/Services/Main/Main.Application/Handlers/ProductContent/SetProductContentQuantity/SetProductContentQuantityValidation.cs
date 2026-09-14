@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductContent.SetProductContentQuantity;
 
@@ -9,6 +10,6 @@ public class SetProductContentQuantityValidation : AbstractValidator<SetProducts
 	{
 		RuleFor(x => x.Quantity)
 			.GreaterThanOrEqualTo(0)
-			.WithLocalizationKey("article.content.count.must.be.non.negative");
+			.WithLocalizableError(ArticleContentCountMustBeNonNegativeMessage.Instance);
 	}
 }

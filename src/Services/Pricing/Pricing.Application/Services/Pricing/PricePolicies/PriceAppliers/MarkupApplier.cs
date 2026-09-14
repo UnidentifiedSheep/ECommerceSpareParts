@@ -1,6 +1,8 @@
+using Locan.Core.Interfaces;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Pricing;
+using Pricing.Entities;
 
 namespace Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 
@@ -9,9 +11,10 @@ public sealed class MarkupApplier(IMarkupCalculator calculator)
 {
 	public override string SystemName => nameof(MarkupApplier);
 
-	public override string NameLocalizationKey => "price.applier.markup.name";
+	public override ILocalizableMessage NameLocalizationMessage => PriceApplierMarkupNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "price.applier.markup.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		PriceApplierMarkupDescriptionMessage.Instance;
 
 	public override int Order => 0;
 

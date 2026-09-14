@@ -1,5 +1,6 @@
+using Application.Common.Extensions;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Pricing.Entities;
 
 namespace Pricing.Application.Handlers.PriceApplier.DeletePriceApplier;
 
@@ -7,6 +8,8 @@ public class DeletePriceApplierValidation : AbstractValidator<DeletePriceApplier
 {
 	public DeletePriceApplierValidation()
 	{
-		RuleFor(x => x.SystemName).NotEmpty().WithLocalizationKey("price.applier.system.name.required");
+		RuleFor(x => x.SystemName)
+			.NotEmpty()
+			.WithLocalizableError(PriceApplierSystemNameRequiredMessage.Instance);
 	}
 }

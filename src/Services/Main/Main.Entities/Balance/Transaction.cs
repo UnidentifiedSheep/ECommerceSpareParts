@@ -25,7 +25,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 		TransactionSourceType sourceType)
 	{
 		if (senderId == receiverId)
-			throw new InvalidInputException("transaction.sender.receiver.must.not.be.same");
+			throw new InvalidInputException(TransactionSenderReceiverMustNotBeSameMessage.Instance);
 		SenderId = senderId;
 		ReceiverId = receiverId;
 		Type = type;
@@ -103,8 +103,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 	private void SetAmount(decimal newAmount)
 	{
 		Amount = newAmount
-			.EnsureMaxDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
-			.EnsureGreaterThan(0m, "transaction.amount.must.be.positive");
+			.EnsureMaxDecimalPlaces(2, TransactionAmountMaxTwoDecimalPlacesMessage.Instance)
+			.EnsureGreaterThan(0m, TransactionAmountMustBePositiveMessage.Instance);
 	}
 
 	private void SetCurrencyId(int currencyId)

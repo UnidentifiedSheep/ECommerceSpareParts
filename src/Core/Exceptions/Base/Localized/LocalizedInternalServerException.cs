@@ -1,26 +1,21 @@
 using Abstractions.Interfaces.Exceptions;
+using Locan.Core.Interfaces;
 
 namespace Exceptions.Base.Localized;
 
 public abstract class LocalizedInternalServerException : InternalServerException, ILocalizableException
 {
-	protected LocalizedInternalServerException(string messageKey, object[]? arguments = null) : base(
-		messageKey)
+	public ILocalizableMessage LocalizableMessage { get; }
+	protected LocalizedInternalServerException(ILocalizableMessage message) : base(
+		message.MessageKey)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
 
 	protected LocalizedInternalServerException(
-		string messageKey,
-		string details,
-		object[]? arguments = null) : base(messageKey, details)
+		ILocalizableMessage message,
+		string details) : base(message.MessageKey, details)
 	{
-		MessageKey = messageKey;
-		Arguments = arguments;
+		LocalizableMessage = message;
 	}
-
-	public string MessageKey { get; }
-
-	public object[]? Arguments { get; }
 }

@@ -2,7 +2,7 @@ using Analytics.Application.Dtos.Charts;
 using Analytics.Application.NamedObjects.ChartDataSources;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 
 namespace Analytics.Application.Handlers.ChartDataSources;
 
@@ -12,7 +12,7 @@ public sealed record GetChartsResult(IReadOnlyList<ChartDto> Charts);
 
 public sealed class GetChartsHandler(
 	INamedObjectRegistry<ChartDataSourceNamedObject> registry,
-	IContextualStringLocalizer localizer) : IQueryHandler<GetChartsQuery, GetChartsResult>
+	IContextualLocalizer localizer) : IQueryHandler<GetChartsQuery, GetChartsResult>
 {
 	public Task<GetChartsResult> Handle(GetChartsQuery request, CancellationToken cancellationToken)
 	{

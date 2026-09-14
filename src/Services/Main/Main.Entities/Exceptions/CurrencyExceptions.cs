@@ -5,7 +5,7 @@ namespace Main.Entities.Exceptions;
 public class CurrencyNotFoundException : LocalizedNotFoundException
 {
 	public CurrencyNotFoundException(int id) : base(
-		"currency.not.found",
+		CurrencyNotFoundMessage.Instance,
 		new
 		{
 			Id = id
@@ -14,7 +14,7 @@ public class CurrencyNotFoundException : LocalizedNotFoundException
 	}
 
 	public CurrencyNotFoundException(IEnumerable<int> ids) : base(
-		"currency.not.found",
+		CurrencyNotFoundMessage.Instance,
 		new
 		{
 			Ids = ids
@@ -24,7 +24,7 @@ public class CurrencyNotFoundException : LocalizedNotFoundException
 }
 
 public class CurrencyRateNotFoundException(int currencyId) : LocalizedNotFoundException(
-	"currency.rate.not.found",
+	CurrencyRateNotFoundMessage.Instance,
 	new
 	{
 		CurrencyId = currencyId

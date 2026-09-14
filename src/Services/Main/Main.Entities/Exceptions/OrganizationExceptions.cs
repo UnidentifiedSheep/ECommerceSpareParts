@@ -1,11 +1,11 @@
-using Exceptions.Base;
+using Exceptions.Base.Localized;
 
 namespace Main.Entities.Exceptions;
 
-public class OrganizationNotFoundException : NotFoundException
+public class OrganizationNotFoundException : LocalizedNotFoundException
 {
 	public OrganizationNotFoundException(Guid organizationId) : base(
-		"organization.not.found",
+		OrganizationNotFoundMessage.Instance,
 		new
 		{
 			OrganizationId = organizationId
@@ -14,7 +14,7 @@ public class OrganizationNotFoundException : NotFoundException
 	}
 
 	public OrganizationNotFoundException(string systemName) : base(
-		"organization.not.found",
+		OrganizationNotFoundMessage.Instance,
 		new
 		{
 			SystemName = systemName

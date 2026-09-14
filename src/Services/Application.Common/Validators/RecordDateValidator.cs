@@ -15,10 +15,14 @@ public class RecordDateValidator : AbstractValidator<DateTime>
 				if (result.IsValid)
 					return;
 
+				var message = result.LocalizableMessage ??
+					throw new InvalidOperationException("An invalid operation date result must contain a message.");
+
 				context.AddFailure(
 					new ValidationFailure(context.PropertyPath, "Validation failed")
 					{
-						ErrorCode = result.Message
+						ErrorCode = message.MessageKey,
+						CustomState = message
 					});
 			});
 	}

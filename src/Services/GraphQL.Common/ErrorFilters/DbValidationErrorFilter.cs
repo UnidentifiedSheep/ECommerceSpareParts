@@ -1,6 +1,6 @@
 using BulkValidation.Core.Exceptions;
 using HotChocolate.Execution;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +8,7 @@ namespace GraphQL.Common.ErrorFilters;
 
 public sealed class DbValidationErrorFilter(
 	ILoggerFactory loggerFactory,
-	IContextualStringLocalizer localizer,
+	IContextualLocalizer localizer,
 	IHttpContextAccessor httpContextAccessor)
 	: GraphQlErrorFilterBase<DbValidationErrorFilter, ValidationException>(
 		loggerFactory,
@@ -21,22 +21,13 @@ public sealed class DbValidationErrorFilter(
 
 		foreach (var failure in exception.Failures)
 		{
-			var arguments = failure.AttemptedValue switch
-			{
-				IEnumerable<object?> values => values.Where(x => x is not null).Select(x => x!).ToArray(),
-				not null => [failure.AttemptedValue],
-				_ => null
-			};
-
-			var message = arguments is { Length: > 0 }
-				? Localizer.GetOrDefault(failure.Message, arguments) ?? failure.Message
-				: Localizer.GetOrDefault(failure.Message) ?? failure.Message;
+			// TODO: Replace the raw message with ILocalizableMessage when BulkValidation exposes it.
 
 			failures.Add(
 				new Dictionary<string, object?>
 				{
 					["title"] = failure.ErrorName ?? "An unexpected error occurred",
-					["detail"] = message,
+					["detail"] = failure.Message,
 					["status"] = failure.ErrorCode
 				});
 		}

@@ -1,10 +1,11 @@
+using System.Globalization;
 using System.Linq.Expressions;
 using Application.Common.Dtos;
 using Application.Common.Interfaces.Projections;
 using Attributes;
 using CronExpressionDescriptor;
 using Domain.CommonEntities.Job;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 
 namespace Application.Common.Projections;
 
@@ -26,9 +27,8 @@ public sealed class JobDtoProjectionProvider : ProjectionProviderBase<Job, JobDt
 	};
 }
 
-[Lifetime(Lifetime.Scoped)]
-public sealed class JobScheduleDtoProjectionProvider(IContextualStringLocalizer localizer)
-	: ProjectionProviderBase<JobSchedule, JobScheduleDto>
+[Lifetime(Lifetime.Singleton)]
+public sealed class JobScheduleDtoProjectionProvider : ProjectionProviderBase<JobSchedule, JobScheduleDto>
 {
 	public override Expression<Func<JobSchedule, JobScheduleDto>> Projection { get; } = schedule =>
 		new JobScheduleDto
@@ -43,7 +43,7 @@ public sealed class JobScheduleDtoProjectionProvider(IContextualStringLocalizer 
 				{
 					DayOfWeekStartIndexZero = false,
 					Use24HourTimeFormat = true,
-					Locale = localizer.Locale
+					Locale = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
 				}),
 			InputState = schedule.InputState,
 			LastQueuedAt = schedule.LastQueuedAt,

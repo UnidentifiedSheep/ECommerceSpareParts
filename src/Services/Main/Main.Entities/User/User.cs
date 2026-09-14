@@ -108,9 +108,9 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 		bool isConfirmed)
 	{
 		if (_emails.Any(x => x.Email.Value == email.Value))
-			throw new InvalidInputException("user.have.duplicate.email");
+			throw new InvalidInputException(UserHaveDuplicateEmailMessage.Instance);
 		if (isPrimary && _emails.Any(x => x.IsPrimary))
-			throw new InvalidInputException("user.email.primary.count");
+			throw new InvalidInputException(UserEmailPrimaryCountMessage.Instance);
 
 		var userEmail = UserEmail.Create(
 			Id,
@@ -127,7 +127,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 		int maxEmailCount)
 	{
 		if (_emails.Count >= maxEmailCount)
-			throw new InvalidInputException("user.max.email.count", [maxEmailCount]);
+			throw new InvalidInputException(new UserMaxEmailCountMessage().WithCount(maxEmailCount));
 
 		AddEmail(
 			email,
@@ -144,9 +144,9 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 	{
 		var normalizedPhone = UserPhone.ToNormalizedPhone(phoneNumber);
 		if (_phones.Any(x => x.NormalizedPhone == normalizedPhone))
-			throw new InvalidInputException("user.have.duplicate.phone");
+			throw new InvalidInputException(UserHaveDuplicatePhoneMessage.Instance);
 		if (isPrimary && _phones.Any(x => x.IsPrimary))
-			throw new InvalidInputException("user.phone.primary.count");
+			throw new InvalidInputException(UserPhonePrimaryCountMessage.Instance);
 
 		var userPhone = UserPhone.Create(
 			Id,
@@ -171,11 +171,11 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 	{
 		var normalizedPlateNumber = UserVehicle.NormalizePlateNumber(plateNumber);
 		if (_vehicles.Any(x => x.PlateNumber == normalizedPlateNumber))
-			throw new InvalidInputException("user.have.duplicate.vehicle.plate.number");
+			throw new InvalidInputException(UserHaveDuplicateVehiclePlateNumberMessage.Instance);
 
 		var normalizedVin = UserVehicle.NormalizeVin(vin);
 		if (normalizedVin != null && _vehicles.Any(x => x.Vin == normalizedVin))
-			throw new InvalidInputException("user.have.duplicate.vehicle.vin.code");
+			throw new InvalidInputException(UserHaveDuplicateVehicleVinCodeMessage.Instance);
 
 		_vehicles.Add(
 			UserVehicle.Create(
@@ -194,10 +194,10 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 			throw new UserEmailNotFoundException(email.Value);
 
 		if (userEmail.IsPrimary)
-			throw new InvalidInputException("user.email.primary.cannot.delete");
+			throw new InvalidInputException(UserEmailPrimaryCannotDeleteMessage.Instance);
 
 		if (_emails.Count - 1 < minEmailCount)
-			throw new InvalidInputException("user.min.email.count", [minEmailCount]);
+			throw new InvalidInputException(new UserMinEmailCountMessage().WithCount(minEmailCount));
 
 		_emails.Remove(userEmail);
 	}
@@ -208,7 +208,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 			throw new UserEmailNotFoundException(email.Value);
 
 		if (!userEmail.Confirmed)
-			throw new InvalidInputException("user.email.primary.must.be.confirmed");
+			throw new InvalidInputException(UserEmailPrimaryMustBeConfirmedMessage.Instance);
 
 		if (userEmail.IsPrimary)
 			return;

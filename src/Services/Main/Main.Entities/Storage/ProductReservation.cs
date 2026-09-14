@@ -64,7 +64,7 @@ public class ProductReservation : AuditableEntity<ProductReservation, int>,
 
 	private void SetReservedCount(int initialCount)
 	{
-		initialCount.EnsureAtLeast(1, "article.reservation.initial.count.must.be.positive");
+		initialCount.EnsureAtLeast(1, ArticleReservationInitialCountMustBePositiveMessage.Instance);
 		ReservedCount = initialCount;
 	}
 
@@ -76,7 +76,7 @@ public class ProductReservation : AuditableEntity<ProductReservation, int>,
 		var hasCurrency = givenCurrencyId.HasValue;
 
 		if (hasPrice != hasCurrency)
-			throw new InvalidInputException("article.reservation.given.price.with.out.currency");
+			throw new InvalidInputException(ArticleReservationGivenPriceWithOutCurrencyMessage.Instance);
 
 		if (givenPrice == null)
 		{
@@ -87,8 +87,8 @@ public class ProductReservation : AuditableEntity<ProductReservation, int>,
 
 		givenPrice
 			.Value
-			.EnsureMaxDecimalPlaces(2, "article.reservation.proposed.price.max.two.decimals")
-			.EnsureAtLeast(0, "article.reservation.given.price.must.be.positive");
+			.EnsureMaxDecimalPlaces(2, ArticleReservationProposedPriceMaxTwoDecimalsMessage.Instance)
+			.EnsureAtLeast(0, ArticleReservationGivenPriceMustBePositiveMessage.Instance);
 
 		ProposedPrice = givenPrice;
 		ProposedCurrencyId = givenCurrencyId;
@@ -103,7 +103,7 @@ public class ProductReservation : AuditableEntity<ProductReservation, int>,
 			return;
 		}
 
-		comment.EnsureMaxLength(500, "article.reservation.comment.max.length");
+		comment.EnsureMaxLength(500, ArticleReservationCommentMaxLengthMessage.Instance);
 		Comment = comment;
 	}
 
@@ -146,13 +146,13 @@ public class ProductReservation : AuditableEntity<ProductReservation, int>,
 	private void ThrowIfDone()
 	{
 		if (Status == ProductReservationStatus.Done)
-			throw new InvalidInputException("article.reservation.is.done");
+			throw new InvalidInputException(ArticleReservationIsDoneMessage.Instance);
 	}
 
 	private void ThrowIfCanceled()
 	{
 		if (Status == ProductReservationStatus.Canceled)
-			throw new InvalidInputException("article.reservation.is.canceled");
+			throw new InvalidInputException(ArticleReservationIsCanceledMessage.Instance);
 	}
 
 	public override int GetId() => Id;

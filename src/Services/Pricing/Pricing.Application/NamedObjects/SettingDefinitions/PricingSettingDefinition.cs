@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Contracts.Analytics;
 using Exceptions;
+using Locan.Core.Interfaces;
 using MassTransit;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
@@ -15,13 +16,11 @@ namespace Pricing.Application.NamedObjects.SettingDefinitions;
 public class PricingSettingDefinition(ISettingsService settingsService, IPublishEndpoint publishEndpoint)
 	: SettingDefinitionNamedObjectBase<PricingSetting>(settingsService)
 {
-	private const string InvalidInputKey = "pricing.setting.input.invalid";
-
 	public override string SystemName => PricingSetting.SettingName;
 
-	public override string NameLocalizationKey => "pricing.setting.name";
+	public override ILocalizableMessage NameLocalizationMessage => PricingSettingNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "pricing.setting.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage => PricingSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(PricingSettingInputData);
 
@@ -30,7 +29,7 @@ public class PricingSettingDefinition(ISettingsService settingsService, IPublish
 	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
 	{
 		var deser = JsonSerializer.Deserialize<PricingSettingInputData>(json) ??
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(PricingSettingInputInvalidMessage.Instance);
 
 		Validate(deser);
 
@@ -59,7 +58,7 @@ public class PricingSettingDefinition(ISettingsService settingsService, IPublish
 		if (input.SelectedMarkupId <= 0 || input.DefaultMarkup < 0 || input.OfferTtl <= TimeSpan.Zero ||
 			input.PriceRoundingStep <= 0 || input.DeliveryDayPenalty < 0 ||
 			input.UniqProductAdditionalMarkup <= 0)
-			throw new InvalidInputException(InvalidInputKey);
+			throw new InvalidInputException(PricingSettingInputInvalidMessage.Instance);
 	}
 }
 
@@ -68,42 +67,42 @@ public record PricingSettingInputData
 	[JsonPropertyName("selectedMarkupId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
 	[SchemaDependsOnEntity(typeof(MarkupGroup), "id")]
-	[SchemaFieldLabel("pricing.setting.selected.markup.id.name")]
-	[SchemaFieldDescription("pricing.setting.selected.markup.id.description")]
+	[SchemaFieldLabel(PricingSettingSelectedMarkupIdNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingSelectedMarkupIdDescriptionMessage.Key)]
 	public int? SelectedMarkupId { get; init; }
 
 	[JsonPropertyName("defaultMarkup")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.default.markup.name")]
-	[SchemaFieldDescription("pricing.setting.default.markup.description")]
+	[SchemaFieldLabel(PricingSettingDefaultMarkupNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingDefaultMarkupDescriptionMessage.Key)]
 	public required decimal DefaultMarkup { get; init; }
 
 	[JsonPropertyName("offerTtl")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.offer.ttl.name")]
-	[SchemaFieldDescription("pricing.setting.offer.ttl.description")]
+	[SchemaFieldLabel(PricingSettingOfferTtlNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingOfferTtlDescriptionMessage.Key)]
 	public required TimeSpan OfferTtl { get; init; }
 
 	[JsonPropertyName("priceRoundingStep")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.price.rounding.step.name")]
-	[SchemaFieldDescription("pricing.setting.price.rounding.step.description")]
+	[SchemaFieldLabel(PricingSettingPriceRoundingStepNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingPriceRoundingStepDescriptionMessage.Key)]
 	public required decimal PriceRoundingStep { get; init; }
 
 	[JsonPropertyName("deliveryDayPenalty")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.delivery.day.penalty.name")]
-	[SchemaFieldDescription("pricing.setting.delivery.day.penalty.description")]
+	[SchemaFieldLabel(PricingSettingDeliveryDayPenaltyNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingDeliveryDayPenaltyDescriptionMessage.Key)]
 	public required decimal DeliveryDayPenalty { get; init; }
 
 	[JsonPropertyName("uniqProductAdditionalMarkup")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.uniq.product.additional.markup.name")]
-	[SchemaFieldDescription("pricing.setting.uniq.product.additional.markup.description")]
+	[SchemaFieldLabel(PricingSettingUniqProductAdditionalMarkupNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingUniqProductAdditionalMarkupDescriptionMessage.Key)]
 	public required decimal UniqProductAdditionalMarkup { get; init; }
 }

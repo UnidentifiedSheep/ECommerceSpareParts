@@ -2,7 +2,7 @@ using GraphQL.Common.ErrorFilters;
 using GraphQL.Common.Types;
 using HotChocolate.AspNetCore;
 using HotChocolate.Execution.Configuration;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
 			})
 			.AddCommonAuthorization()
 			.AddApplicationService<ILoggerFactory>()
-			.AddApplicationService<IContextualStringLocalizer>()
+			.AddApplicationService<IContextualLocalizer>()
 			.AddApplicationService<IHttpContextAccessor>()
 			.AddErrorFilter<ValidationErrorFilter>()
 			.AddErrorFilter<DbValidationErrorFilter>()

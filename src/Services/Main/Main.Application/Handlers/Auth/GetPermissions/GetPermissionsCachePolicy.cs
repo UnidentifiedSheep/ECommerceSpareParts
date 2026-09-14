@@ -1,10 +1,10 @@
+using System.Globalization;
 using Application.Common.Interfaces.Cqrs;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 
 namespace Main.Application.Handlers.Auth.GetPermissions;
 
-public class GetPermissionsCachePolicy(IContextualStringLocalizer stringLocalizer)
-	: ICachePolicy<GetPermissionsQuery>
+public class GetPermissionsCachePolicy : ICachePolicy<GetPermissionsQuery>
 {
 	public TimeSpan TimeToLive => TimeSpan.FromDays(1);
 
@@ -12,5 +12,5 @@ public class GetPermissionsCachePolicy(IContextualStringLocalizer stringLocalize
 
 	public string? BaseTag => null;
 
-	public string GetCacheKey(GetPermissionsQuery request) => $"list-permissions:{stringLocalizer.Locale}";
+	public string GetCacheKey(GetPermissionsQuery request) => $"list-permissions:{CultureInfo.CurrentUICulture}";
 }

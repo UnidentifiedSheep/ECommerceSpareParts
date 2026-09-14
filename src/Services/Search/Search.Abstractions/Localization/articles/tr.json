@@ -1,0 +1,8 @@
+{
+  "culture": "tr",
+  "messages": {
+    "article.not.found": "İstenen ürün bulunamadı.",
+    "article.search.query.empty": "Ürün arama sorgusu boş olmamalıdır.",
+    "article.search.limit.min": "En az bir ürün istenmelidir."
+  }
+}

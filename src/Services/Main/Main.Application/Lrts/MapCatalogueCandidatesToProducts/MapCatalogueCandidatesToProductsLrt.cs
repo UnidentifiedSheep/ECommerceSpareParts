@@ -4,6 +4,8 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
 using Domain.CommonEntities.Job;
+using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product.Enrichment;
 using MassTransit;
@@ -30,10 +32,11 @@ public class MapCatalogueCandidatesToProductsLrt(
 
 	public override string SystemName => LrtSystemName;
 
-	public override string NameLocalizationKey => "lrt.catalogue.candidates.map.to.products.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtCatalogueCandidatesMapToProductsNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey =>
-		"lrt.catalogue.candidates.map.to.products.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtCatalogueCandidatesMapToProductsDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

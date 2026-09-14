@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
@@ -18,6 +19,6 @@ public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
 
 		RuleFor(x => x.ContentDetails)
 			.NotEmpty()
-			.WithLocalizationKey("storage.content.restore.list.not.empty");
+			.WithLocalizableError(StorageContentRestoreListNotEmptyMessage.Instance);
 	}
 }

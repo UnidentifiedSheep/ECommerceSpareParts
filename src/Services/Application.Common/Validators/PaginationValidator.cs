@@ -1,6 +1,7 @@
 using Abstractions.Models;
+using Application.Common.Extensions;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Locan.Core.Interfaces;
 
 namespace Application.Common.Validators;
 
@@ -8,10 +9,18 @@ public class PaginationValidator : AbstractValidator<Pagination>
 {
 	public PaginationValidator(int? min = null, int? max = null)
 	{
-		RuleFor(query => query.Page).GreaterThanOrEqualTo(0).WithLocalizationKey("pagination.page.min");
+		var minSize = min ?? 1;
+		var maxSize = max ?? 100;
+		ILocalizableMessage sizeMessage = min is null && max is null
+			? PaginationSizeRangeDefaultMessage.Instance
+			: PaginationSizeRangeMessage.Create(minSize, maxSize);
+
+		RuleFor(query => query.Page)
+			.GreaterThanOrEqualTo(0)
+			.WithLocalizableError(PaginationPageMinDefaultMessage.Instance);
 
 		RuleFor(query => query.Size)
-			.InclusiveBetween(min ?? 1, max ?? 100)
-			.WithLocalizationKey("pagination.size.range");
+			.InclusiveBetween(minSize, maxSize)
+			.WithLocalizableError(sizeMessage);
 	}
 }

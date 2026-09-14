@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Enums;
 using Extensions;
+using Locan.Core.Interfaces;
 
 namespace Application.Common.Services;
 
@@ -21,12 +22,12 @@ public sealed class OperationDatePolicy(TimeProvider timeProvider, IUserContext 
 		var now = timeProvider.GetUtcNow();
 
 		if (occurredAtUtc > now + AllowedClockSkew)
-			return OperationDateValidationResult.Invalid("operation.date.cannot.be.in.future");
+			return OperationDateValidationResult.Invalid(OperationDateCannotBeInFutureMessage.Instance);
 
 		var allowHistory = userContext.Permissions.Contains(
 			nameof(PermissionCodes.CREATE_HISTORICAL_RECORDS).ToNormalizedPermission());
 		if (!allowHistory && occurredAtUtc < now - DefaultBackdatePeriod)
-			return OperationDateValidationResult.Invalid("operation.date.too.old");
+			return OperationDateValidationResult.Invalid(OperationDateTooOldMessage.Instance);
 
 		return OperationDateValidationResult.Valid();
 	}
@@ -36,15 +37,15 @@ public record OperationDateValidationResult
 {
 	public bool IsValid { get; init; }
 
-	public string Message { get; init; } = string.Empty;
+	public ILocalizableMessage? LocalizableMessage { get; init; }
 
 	public static OperationDateValidationResult Valid() => new()
 	{
 		IsValid = true
 	};
 
-	public static OperationDateValidationResult Invalid(string message) => new()
+	public static OperationDateValidationResult Invalid(ILocalizableMessage message) => new()
 	{
-		Message = message
+		LocalizableMessage = message
 	};
 }

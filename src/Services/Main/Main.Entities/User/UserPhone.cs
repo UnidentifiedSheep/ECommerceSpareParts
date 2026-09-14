@@ -68,14 +68,14 @@ public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity
 	{
 		PhoneNumber = phoneNumber
 			.TrimSafe()
-			.Ensure(IsValidPhone, "user.phone.invalid")
-			.EnsureNotNullOrWhiteSpace("phone.number.required")
-			.EnsureMaxLength(MaxPhoneNumberLength, "phone.number.max.length");
+			.Ensure(IsValidPhone, UserPhoneInvalidMessage.Instance)
+			.EnsureNotNullOrWhiteSpace(PhoneNumberRequiredMessage.Instance)
+			.EnsureMaxLength(MaxPhoneNumberLength, PhoneNumberMaxLengthMessage.Instance);
 
 		NormalizedPhone = ToNormalizedPhone(phoneNumber)
-			.EnsureNotNullOrWhiteSpace("phone.number.must.contain.digits")
-			.EnsureMinLength(MinNormalizedPhoneLength, "phone.number.min.normalized.length")
-			.EnsureMaxLength(MaxNormalizedPhoneLength, "phone.number.max.normalized.length");
+			.EnsureNotNullOrWhiteSpace(PhoneNumberMustContainDigitsMessage.Instance)
+			.EnsureMinLength(MinNormalizedPhoneLength, PhoneNumberMinNormalizedLengthMessage.Instance)
+			.EnsureMaxLength(MaxNormalizedPhoneLength, PhoneNumberMaxNormalizedLengthMessage.Instance);
 	}
 
 	public void Confirm(bool confirmed = true)

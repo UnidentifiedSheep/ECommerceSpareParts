@@ -33,7 +33,7 @@ public class RemoveEmailFromUserTests(CombinedContainerFixture fixture) : Integr
 		var action = () => Mediator.Send(new RemoveEmailFromUserCommand(user.Id, "primary@example.com"));
 
 		var exception = await action.Should().ThrowAsync<InvalidInputException>();
-		exception.Which.MessageKey.Should().Be("user.email.primary.cannot.delete");
+		exception.Which.LocalizableMessage.MessageKey.Should().Be("user.email.primary.cannot.delete");
 
 		Context.ChangeTracker.Clear();
 		var emails = await Context.UserEmails.AsNoTracking().Where(x => x.UserId == user.Id).ToListAsync();

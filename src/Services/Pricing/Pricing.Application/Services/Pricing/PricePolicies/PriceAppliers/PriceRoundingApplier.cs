@@ -1,7 +1,9 @@
 using Application.Common.Interfaces.Settings;
 using Extensions;
+using Locan.Core.Interfaces;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Pricing;
+using Pricing.Entities;
 using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
@@ -11,9 +13,11 @@ public class PriceRoundingApplier(ISettingsService settingsService)
 {
 	public override string SystemName => nameof(PriceRoundingApplier);
 
-	public override string NameLocalizationKey => "price.applier.price.rounding.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		PriceApplierPriceRoundingNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "price.applier.price.rounding.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		PriceApplierPriceRoundingDescriptionMessage.Instance;
 
 	public override int Order => 100000;
 

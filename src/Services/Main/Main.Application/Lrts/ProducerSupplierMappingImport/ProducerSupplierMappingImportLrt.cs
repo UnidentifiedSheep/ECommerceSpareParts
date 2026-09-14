@@ -9,11 +9,13 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
 using Domain.Extensions;
 using Enums;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
+using Main.Entities;
 using Main.Entities.Producer;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -31,7 +33,7 @@ public class ProducerSupplierMappingImportLrt(
 	IOptions<S3BucketsOptions> bucketsOptions,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	IContextualStringLocalizer stringLocalizer)
+	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProducerSupplierMappingImportInputState, ProducerSupplierMappingImportState,
 		ProducerSupplierMappingImportLrt.ProducerSupplierMappingCsvDto,
 		ProducerSupplierMappingImportLrt.ProducerSupplierMappingBatchItem>(
@@ -48,15 +50,17 @@ public class ProducerSupplierMappingImportLrt(
 
 	public override string SystemName => nameof(ProducerSupplierMappingImportLrt);
 
-	public override string NameLocalizationKey => "lrt.producer.supplier.mapping.import.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtProducerSupplierMappingImportNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.producer.supplier.mapping.import.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtProducerSupplierMappingImportDescriptionMessage.Instance;
 
 	protected override async Task BeforeRead(ProducerSupplierMappingImportState state) =>
 		_producerLookup = await producerLookupService.Load(CancellationToken);
 
-	protected override string GetTooManyErrorsLocalizationKey() =>
-		"producer.too.many.errors.while.processing.batch";
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
+		ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -78,9 +82,7 @@ public class ProducerSupplierMappingImportLrt(
 		catch (Exception ex)
 		{
 			var message = ex is ILocalizableException localizableException
-				? StringLocalizer.GetOrDefault(
-					localizableException.MessageKey,
-					localizableException.Arguments ?? []) ?? ex.Message
+				? StringLocalizer.Get(localizableException.LocalizableMessage)
 				: ex.Message;
 
 			errors.Add(CreateError(rowIdx, message));
@@ -109,7 +111,8 @@ public class ProducerSupplierMappingImportLrt(
 				errors.Add(
 					CreateError(
 						idx,
-						StringLocalizer.Get("producer.supplier.mapping.producer.not.found.in.batch")));
+						StringLocalizer.Get(
+							ProducerSupplierMappingProducerNotFoundInBatchMessage.Instance)));
 				continue;
 			}
 
@@ -119,14 +122,17 @@ public class ProducerSupplierMappingImportLrt(
 				errors.Add(
 					CreateError(
 						idx,
-						StringLocalizer.Get("producer.supplier.mapping.supplier.producer.name.required")));
+						StringLocalizer.Get(
+							ProducerSupplierMappingSupplierProducerNameRequiredMessage.Instance)));
 				continue;
 			}
 
 			if (!uniqueMappings.Add((supplierProducerName, item.Supplier)))
 			{
 				errors.Add(
-					CreateError(idx, StringLocalizer.Get("producer.supplier.mapping.duplicate.in.batch")));
+					CreateError(
+						idx,
+						StringLocalizer.Get(ProducerSupplierMappingDuplicateInBatchMessage.Instance)));
 				continue;
 			}
 

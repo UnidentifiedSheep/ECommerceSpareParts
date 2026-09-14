@@ -2,7 +2,7 @@ using Abstractions.Interfaces.Mail;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Services.Events;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Mailing.Core;
 using Mailing.Core.Models;
 using Main.Application.Interfaces.Services;
@@ -17,7 +17,7 @@ public class SendLoginNotificationEmailHandler(
 	IReadRepository<UserEmail, string> emailRepository,
 	IMailingService mailingService,
 	IEmailMessageRenderer emailRenderer,
-	IContextualStringLocalizer localizer,
+	IContextualLocalizer localizer,
 	ILogger<SendLoginNotificationEmailHandler> logger) : BatchableDomainEventHandler<UserLoggedInDomainEvent>
 {
 	public override async Task Handle(

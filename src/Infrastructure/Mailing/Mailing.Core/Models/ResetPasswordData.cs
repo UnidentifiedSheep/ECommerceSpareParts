@@ -1,29 +1,29 @@
-﻿using Localization.Abstractions.Interfaces;
-using Localization.Abstractions.Models;
+﻿using System.Globalization;
+using Locan.Core.Interfaces.Localizers;
 
 namespace Mailing.Core.Models;
 
 public sealed class ResetPasswordData : IEmailData
 {
 	public ResetPasswordData(
-		IContextualStringLocalizer localizer,
+		IContextualLocalizer localizer,
 		string resetUrl,
 		string to)
 	{
-		Locale = localizer.Locale;
+		Locale = CultureInfo.CurrentUICulture;
 		To = to;
 		ResetUrl = resetUrl;
 		HtmlLang = Locale.ToString().ToLowerInvariant();
-		Subject = localizer.Get("mail.password.reset.subject");
-		Title = localizer.Get("mail.password.reset.title");
-		Intro = localizer.Get("mail.password.reset.intro");
-		Description = localizer.Get("mail.password.reset.description");
-		Button = localizer.Get("mail.password.reset.button");
-		Fallback = localizer.Get("mail.password.reset.fallback");
-		Ignore = localizer.Get("mail.password.reset.ignore");
+		Subject = localizer.Get(new MailPasswordResetSubjectMessage());
+		Title = localizer.Get(new MailPasswordResetTitleMessage());
+		Intro = localizer.Get(new MailPasswordResetIntroMessage());
+		Description = localizer.Get(new MailPasswordResetDescriptionMessage());
+		Button = localizer.Get(new MailPasswordResetButtonMessage());
+		Fallback = localizer.Get(new MailPasswordResetFallbackMessage());
+		Ignore = localizer.Get(new MailPasswordResetIgnoreMessage());
 	}
 
-	public Locale Locale { get; }
+	public CultureInfo Locale { get; }
 
 	public string HtmlLang { get; }
 

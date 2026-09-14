@@ -1,7 +1,8 @@
 using Application.Common.Validators;
 using Enums;
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Balance.GetTransactions;
 
@@ -17,18 +18,18 @@ public class GetTransactionsValidation : AbstractValidator<GetTransactionsQuery>
 			})
 			.Must(x => x.ReceiverId != x.SenderId || x.ReceiverId == null)
 			.When(x => x.LogicalOperation == LogicalOperation.And)
-			.WithLocalizationKey("transaction.sender.receiver.must.not.be.same");
+			.WithLocalizableError(TransactionSenderReceiverMustNotBeSameMessage.Instance);
 
 		RuleFor(x => new
 			{
 				x.ReceiverId, x.SenderId
 			})
 			.Must(x => x.ReceiverId != null || x.SenderId != null)
-			.WithLocalizationKey("transaction.sender.or.receiver.required");
+			.WithLocalizableError(TransactionSenderOrReceiverRequiredMessage.Instance);
 
 		RuleFor(x => x.DateRange)
 			.Must(x => !x.Min.HasValue || !x.Max.HasValue || x.Min.Value.Date <= x.Max.Value.Date)
-			.WithLocalizationKey("transaction.range.start.before.end");
+			.WithLocalizableError(TransactionRangeStartBeforeEndMessage.Instance);
 
 		RuleFor(x => x.Cursor).SetValidator(new CursorValidator<(Guid id, DateTime dt)>());
 	}

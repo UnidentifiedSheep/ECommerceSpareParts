@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "ru",
-  "keyValues": {
+  "culture": "ru",
+  "messages": {
     "markup_calculation_lrt_name": "Расчет наценок",
     "markup_calculation_lrt_description": "Анализирует данные по наценкам и генерирует рекомендуемые диапазоны наценок для ценообразования.",
     "markup.calculation.input.invalid": "Переданы некорректные входные данные для расчета наценки.",

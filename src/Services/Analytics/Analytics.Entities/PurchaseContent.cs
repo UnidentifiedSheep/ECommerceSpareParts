@@ -55,13 +55,13 @@ public class PurchaseContent : Entity<PurchaseContent, int>
 	{
 		return price.EnsureGreaterThan(
 			0m,
-			() => new InvalidInputException("purchase.fact.content.price.required"));
+			() => new InvalidInputException(PurchaseFactContentPriceRequiredMessage.Instance));
 	}
 
 	private static int ValidateCount(int count)
 	{
 		return count.EnsureGreaterThan(
 			0,
-			() => new InvalidInputException("purchase.fact.content.count.required"));
+			() => new InvalidInputException(PurchaseFactContentCountRequiredMessage.Instance));
 	}
 }

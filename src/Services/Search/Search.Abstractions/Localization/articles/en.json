@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "messages": {
+    "article.not.found": "Requested article was not found.",
+    "article.search.query.empty": "Article search query must not be empty.",
+    "article.search.limit.min": "At least one article must be requested."
+  }
+}

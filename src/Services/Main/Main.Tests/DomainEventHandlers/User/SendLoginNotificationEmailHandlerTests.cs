@@ -3,7 +3,7 @@ using Abstractions.Models.Mail;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Services.Events;
 using FluentAssertions;
-using Localization.Abstractions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Mailing.Core;
 using Mailing.Core.Models;
 using Main.Application.DomainEventHandlers.User.UserLoggedIn;
@@ -61,7 +61,7 @@ public class SendLoginNotificationEmailHandlerTests(CombinedContainerFixture fix
 			Scope.ServiceProvider.GetRequiredService<IReadRepository<UserEmail, string>>(),
 			mailingService.Object,
 			renderer.Object,
-			Scope.ServiceProvider.GetRequiredService<IContextualStringLocalizer>(),
+			Scope.ServiceProvider.GetRequiredService<IContextualLocalizer>(),
 			NullLogger<SendLoginNotificationEmailHandler>.Instance);
 
 		await handler.Handle(

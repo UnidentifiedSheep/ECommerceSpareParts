@@ -1,0 +1,31 @@
+﻿{
+  "culture": "ru",
+  "messages": {
+    "lrt.producer.import.name": "Импорт производителей",
+    "lrt.producer.import.description": "Загружает список производителей из файла, проверяет данные и добавляет новые записи, пропуская уже существующие.",
+    "lrt.producer.other.names.import.name": "Импорт дополнительных названий производителей",
+    "lrt.producer.other.names.import.description": "Загружает дополнительные названия производителей из файла, проверяет данные, связывает их с существующими производителями и пропускает уже существующие alias.",
+    "lrt.producer.supplier.mapping.import.name": "Импорт сопоставлений производителей поставщиков",
+    "lrt.producer.supplier.mapping.import.description": "Загружает названия производителей у поставщиков из файла, проверяет данные и связывает их с существующими производителями.",
+    "lrt.product.import.name": "Импорт товаров",
+    "lrt.product.import.description": "Загружает список товаров из файла, проверяет данные и добавляет новые записи, пропуская уже существующие.",
+    "lrt.product.crosses.import.name": "Импорт кроссов товаров",
+    "lrt.product.crosses.import.description": "Загружает кроссы товаров из CSV-файла, находит товары по артикулу и производителю и создаёт связи между ними.",
+    "lrt.producer.synchronization.name": "Синхронизация производителей",
+    "lrt.producer.synchronization.description": "Публикует события обновления для всех производителей, чтобы связанные сервисы могли обновить данные о производителях.",
+    "lrt.product.synchronization.name": "Синхронизация товаров",
+    "lrt.product.synchronization.description": "Публикует события обновления для всех товаров, чтобы связанные сервисы могли обновить данные о товарах.",
+    "lrt.catalogue.candidates.synchronization.name": "Синхронизация кандидатов каталога",
+    "lrt.catalogue.candidates.synchronization.description": "Публикует события обновления для всех кандидатов, чтобы поисковый сервис мог полностью перестроить индекс кандидатов каталога.",
+    "lrt.currency.rates.update.name": "Обновление курсов валют",
+    "lrt.currency.rates.update.description": "Обновляет курсы валют по актуальным данным и сохраняет новые значения в системе.",
+    "lrt.organization.approximate.balance.recalculate.name": "Перерасчёт приблизительных балансов организаций",
+    "lrt.organization.approximate.balance.recalculate.description": "Пересчитывает приблизительные балансы организаций в базовой валюте по их текущим балансам.",
+    "lrt.catalogue.candidates.build.name": "Формирование кандидатов каталога",
+    "lrt.catalogue.candidates.build.description": "Создаёт кандидатов каталога из товаров поставщиков и связывает каждый распознанный товар с соответствующим кандидатом.",
+    "lrt.catalogue.candidates.map.to.products.name": "Сопоставление кандидатов с каталогом",
+    "lrt.catalogue.candidates.map.to.products.description": "Сопоставляет кандидатов каталога с товарами по нормализованному артикулу и производителю.",
+    "lrt.catalogue.enrichment.name": "Обогащение каталога",
+    "lrt.catalogue.enrichment.description": "Формирует кандидатов из товаров поставщиков и последовательно сопоставляет их с товарами каталога."
+  }
+}

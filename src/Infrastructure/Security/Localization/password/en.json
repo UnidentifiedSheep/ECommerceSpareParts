@@ -1,0 +1,13 @@
+{
+  "culture": "en",
+  "messages": {
+    "password.must.not.be.empty": "Password must not be empty.",
+    "password.min.length": "Password must be at least {MinLength|int} characters long.",
+    "password.max.length": "Password must be at most {MaxLength|int} characters long.",
+    "password.cannot.start.or.end.with.space": "Password cannot start or end with a space.",
+    "password.cannot.contain.spaces": "Password cannot contain spaces.",
+    "password.must.contain.uppercase": "Password must contain at least one uppercase letter.",
+    "password.must.contain.digit": "Password must contain at least one digit.",
+    "password.must.contain.special": "Password must contain at least one special character ({SpecialCharacters|string})."
+  }
+}

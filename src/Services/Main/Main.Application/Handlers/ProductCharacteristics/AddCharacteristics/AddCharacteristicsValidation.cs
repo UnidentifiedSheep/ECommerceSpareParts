@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 
@@ -13,22 +14,22 @@ public class AddCharacteristicsValidation : AbstractValidator<AddCharacteristics
 				z
 					.RuleFor(x => x.Value)
 					.NotEmpty()
-					.WithLocalizationKey("article.characteristic.value.must.not.be.empty");
+					.WithLocalizableError(ArticleCharacteristicValueMustNotBeEmptyMessage.Instance);
 
 				z
 					.RuleFor(x => x.Value)
 					.Must(x => x.Trim().Length >= 3)
-					.WithLocalizationKey("article.characteristic.value.min.length");
+					.WithLocalizableError(ArticleCharacteristicValueMinLengthMessage.Instance);
 
 				z
 					.RuleFor(x => x.Value)
 					.Must(x => x.Trim().Length <= 128)
-					.WithLocalizationKey("article.characteristic.value.max.length");
+					.WithLocalizableError(ArticleCharacteristicValueMaxLengthMessage.Instance);
 
 				z
 					.RuleFor(x => x.Name)
 					.MaximumLength(128)
-					.WithLocalizationKey("article.characteristic.name.max.length");
+					.WithLocalizableError(ArticleCharacteristicNameMaxLengthMessage.Instance);
 			});
 	}
 }

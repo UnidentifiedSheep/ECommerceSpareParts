@@ -5,6 +5,7 @@ using Api.Common.OperationFilters;
 using Application.Common.Diagnostics;
 using Application.Common.Models;
 using Common;
+using Locan.AspNetCore;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -46,7 +47,6 @@ public static class WebApplicationBuilderExtensions
 			ProjectJsonOptions.Configure(options.SerializerOptions);
 		});
 		services.AddHttpContextAccessor();
-		services.AddConfiguredRequestLocalization();
 		services.AddBaseExceptionHandlers();
 		services.AddCors(options =>
 		{
@@ -63,6 +63,12 @@ public static class WebApplicationBuilderExtensions
 
 		services.AddTransient<HeaderSecretMiddleware>();
 
+		services.AddLocanAspNetCore(options =>
+		{
+			options.DefaultCulture = "en";
+			options.SupportedCultures = ["en", "ru", "tr"];
+		});
+
 		return services;
 	}
 
@@ -72,6 +78,12 @@ public static class WebApplicationBuilderExtensions
 	{
 		services.AddProjectJsonSerialization();
 		services.AddOpenTelemetry(serviceDefinition, "worker");
+
+		services.AddLocanAspNetCore(options =>
+		{
+			options.DefaultCulture = "en";
+			options.SupportedCultures = ["en", "ru", "tr"];
+		});
 
 		return services;
 	}

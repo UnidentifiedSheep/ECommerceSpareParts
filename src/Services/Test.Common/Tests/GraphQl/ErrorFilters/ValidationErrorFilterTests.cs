@@ -4,6 +4,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using GraphQL.Common.ErrorFilters;
 using HotChocolate;
+using Locan.Core.LocalizableMessages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tests.Stubs;
@@ -19,10 +20,7 @@ public class ValidationErrorFilterTests
 		{
 			ErrorCode = "Validation.Required",
 			AttemptedValue = "value",
-			CustomState = new ValidationStateData
-			{
-				ErrorMessageArguments = ["Name"]
-			}
+			CustomState = new LocalizableMessage("Validation.Required")
 		};
 		var hiddenFailure = new ValidationFailure("Secret", "hidden")
 		{
@@ -53,18 +51,22 @@ public class ValidationErrorFilterTests
 	}
 
 	[Fact]
-	public void OnError_ShouldThrow_WhenLocalizationKeyDoesNotExist()
+	public void OnError_ShouldUseFallback_WhenLocalizationMessageDoesNotExist()
 	{
 		var failure = new ValidationFailure("Name", "fallback")
 		{
-			ErrorCode = "Validation.Missing"
+			ErrorCode = "Validation.Missing",
+			CustomState = new LocalizableMessage("Validation.Missing")
 		};
 		var exception = new ValidationException([failure]);
 		var filter = CreateFilter();
 
-		var action = () => filter.OnError(ErrorFilterTestFactory.CreateError(exception));
+		var result = filter.OnError(ErrorFilterTestFactory.CreateError(exception));
 
-		action.Should().Throw<InvalidOperationException>();
+		var errors = result.Extensions!["validationErrors"].Should()
+			.BeAssignableTo<IReadOnlyCollection<IReadOnlyDictionary<string, object?>>>()
+			.Subject;
+		errors.Should().ContainSingle().Which["errorMessage"].Should().Be("fallback");
 	}
 
 	[Fact]

@@ -1,5 +1,6 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
+using Application.Common.Extensions;
+using Main.Entities;
 
 namespace Main.Application.Handlers.BaseValidators;
 
@@ -7,6 +8,6 @@ public class CountValidator : AbstractValidator<int>
 {
 	public CountValidator()
 	{
-		RuleFor(x => x).GreaterThan(0).WithLocalizationKey("position.count.must.be.greater.than.zero");
+		RuleFor(x => x).GreaterThan(0).WithLocalizableError(PositionCountMustBeGreaterThanZeroMessage.Instance);
 	}
 }

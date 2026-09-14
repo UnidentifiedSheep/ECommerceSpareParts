@@ -5,11 +5,9 @@ using Api.Common.Consumers;
 using Api.Common.EndPoints;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.HostedServices.Startup;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
-using Application.Common.Interfaces;
 using Cache;
 using Carter;
 using Contracts.Auth;
@@ -20,7 +18,6 @@ using Contracts.Settings;
 using Contracts.User;
 using ExchangeRate;
 using GraphQL.Common.Extensions;
-using Localization.Domain.Extensions;
 using Mail;
 using Main.Api;
 using Main.Api.EndPoints.Products;
@@ -136,7 +133,6 @@ builder
 	.AddCommonLayer()
 	.AddS3()
 	.AddApplicationLayer(builder.Configuration)
-	.AddLocalization(builder.Configuration)
 	.AddExchangeRates();
 
 builder.Services.AddCarter(
@@ -145,7 +141,6 @@ builder.Services.AddCarter(
 
 builder.Services.AddGraphQlServices(serviceName);
 
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
 var app = builder.Build();

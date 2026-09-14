@@ -6,9 +6,11 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-Analytics.Worker-04705b45-eb58-4513-b3e0-3603db44821f</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <LocanDefaultCulture>en</LocanDefaultCulture>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Locan.Generator" Version="1.0.6" />
         <PackageReference Include="MassTransit.Abstractions" Version="8.5.8"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9"/>
     </ItemGroup>
@@ -30,20 +32,24 @@
         <Content Include="..\..\..\..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
-        <Content Include="..\Analytics.Entities\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\..\Core\Domain\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <LocanResource Include="../Analytics.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
+
+        <LocanResource Include="../../Application.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
+
+        <LocanResource Include="../../../Core/Domain/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true" />
     </ItemGroup>
 </Project>

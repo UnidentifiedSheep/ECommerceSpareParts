@@ -1,8 +1,8 @@
-﻿namespace Abstractions.Interfaces.Exceptions;
+﻿using Locan.Core.Interfaces;
+
+namespace Abstractions.Interfaces.Exceptions;
 
 public interface ILocalizableException
 {
-	string MessageKey { get; }
-
-	object[]? Arguments { get; }
+	ILocalizableMessage LocalizableMessage { get; }
 }

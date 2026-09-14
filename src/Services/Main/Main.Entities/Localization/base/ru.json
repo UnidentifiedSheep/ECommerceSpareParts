@@ -1,0 +1,28 @@
+﻿{
+  "culture": "ru",
+  "messages": {
+    "position.count.must.be.greater.than.zero": "Количество позиции должно быть больше 0.",
+    "email.must.be.valid": "Адрес электронной почты должен быть корректным.",
+    "login.must.not.be.empty": "Логин не может быть пустым.",
+    "login.min.length.5": "Логин должен содержать не менее 5 символов.",
+    "login.max.length.36": "Логин должен содержать не более 36 символов.",
+    "login.cannot.contain.spaces": "Логин не может содержать пробелы.",
+    "login.cannot.contain.at.sign": "Логин не может содержать символ @.",
+    "price.must.be.positive": "Цена должна быть больше 0.",
+    "price.max.two.decimal.places": "Цена может содержать не более 2 знаков после запятой.",
+    "phone.number.required": "Номер телефона обязателен.",
+    "phone.number.must.contain.digits": "Номер телефона должен содержать цифры.",
+    "phone.number.min.normalized.length": "Номер телефона должен содержать не менее 7 цифр.",
+    "phone.number.max.normalized.length": "Номер телефона должен содержать не более 15 цифр.",
+    "phone.number.max.length": "Номер телефона должен содержать не более 32 символов.",
+    "user.name.required": "Имя пользователя обязательно.",
+    "user.name.min.length": "Имя пользователя должно содержать не менее 3 символов.",
+    "user.name.max.length": "Имя пользователя должно содержать не более 30 символов.",
+    "user.name.no.special.chars": "Имя пользователя не может содержать специальные символы.",
+    "user.surname.required": "Фамилия пользователя обязательна.",
+    "user.surname.min.length": "Фамилия пользователя должна содержать не менее 3 символов.",
+    "user.surname.max.length": "Фамилия пользователя должна содержать не более 30 символов.",
+    "user.surname.no.special.chars": "Фамилия пользователя не может содержать специальные символы.",
+    "user.description.max.length": "Описание пользователя должно содержать не более 300 символов."
+  }
+}
