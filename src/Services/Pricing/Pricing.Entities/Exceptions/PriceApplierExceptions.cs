@@ -3,14 +3,14 @@ using Exceptions.Base.Localized;
 namespace Pricing.Entities.Exceptions;
 
 public class PriceApplierNotFoundException(string systemName) : LocalizedNotFoundException(
-	"price.applier.not.found",
+	PriceApplierNotFoundMessage.Instance,
 	new
 	{
 		SystemName = systemName
 	});
 
 public class LocalPriceApplierCannotBeDeletedException(string systemName) : LocalizedBadRequestException(
-	"price.applier.local.cannot.be.deleted",
+	PriceApplierLocalCannotBeDeletedMessage.Instance,
 	new
 	{
 		SystemName = systemName

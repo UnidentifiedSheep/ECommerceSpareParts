@@ -2,10 +2,12 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
+using Locan.Core.Interfaces;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Handlers.Pricing;
+using Pricing.Entities;
 
 namespace Pricing.Application.Lrts.PriceCandidateCalculation;
 
@@ -26,9 +28,11 @@ public class PriceCandidateCalculationLrt(
 
 	public override string SystemName => LrtName;
 
-	public override string NameLocalizationKey => "lrt.price.candidate.calculation.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtPriceCandidateCalculationNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.price.candidate.calculation.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtPriceCandidateCalculationDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

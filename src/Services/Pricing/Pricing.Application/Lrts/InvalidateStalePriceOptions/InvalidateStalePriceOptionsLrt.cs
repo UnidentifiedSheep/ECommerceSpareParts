@@ -6,6 +6,7 @@ using Application.Common.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.LRT;
 using Attributes;
+using Locan.Core.Interfaces;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Lrts.PriceCandidateCalculation;
+using Pricing.Entities;
 using Pricing.Entities.Offers;
 using Pricing.Entities.Settings;
 
@@ -41,9 +43,11 @@ public class InvalidateStalePriceOptionsLrt(
 
 	public override string SystemName => LrtName;
 
-	public override string NameLocalizationKey => "lrt.invalidate.stale.price.options.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtInvalidateStalePriceOptionsNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "lrt.invalidate.stale.price.options.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtInvalidateStalePriceOptionsDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

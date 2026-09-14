@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
+using Pricing.Entities;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
@@ -10,16 +11,16 @@ public class PriceCandidateCalculationState : IInputState
 	[SchemaInputControl(InputControlType.EntitySelector)]
 	[SchemaDependsOnEntity("Product", "id")]
 	[RequiredSchemaField]
-	[SchemaFieldDescription("lrt.price.candidate.calculation.product.id.description")]
-	[SchemaFieldLabel("lrt.price.candidate.calculation.product.id.name")]
+	[SchemaFieldDescription(LrtPriceCandidateCalculationProductIdDescriptionMessage.Key)]
+	[SchemaFieldLabel(LrtPriceCandidateCalculationProductIdNameMessage.Key)]
 	[JsonPropertyName("productId")]
 	public required int ProductId { get; init; }
 
 	[SchemaInputControl(InputControlType.EntitySelector)]
 	[SchemaDependsOnEntity("Storage", "code")]
 	[RequiredSchemaField]
-	[SchemaFieldDescription("lrt.price.candidate.calculation.storage.code.description")]
-	[SchemaFieldLabel("lrt.price.candidate.calculation.storage.code.name")]
+	[SchemaFieldDescription(LrtPriceCandidateCalculationStorageCodeDescriptionMessage.Key)]
+	[SchemaFieldLabel(LrtPriceCandidateCalculationStorageCodeNameMessage.Key)]
 	[JsonPropertyName("storageCode")]
 	public required string StorageCode { get; init; }
 

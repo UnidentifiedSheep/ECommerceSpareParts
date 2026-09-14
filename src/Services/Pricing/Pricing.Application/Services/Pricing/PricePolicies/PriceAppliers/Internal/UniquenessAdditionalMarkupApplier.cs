@@ -1,6 +1,8 @@
 using Application.Common.Interfaces.Settings;
+using Locan.Core.Interfaces;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Pricing;
+using Pricing.Entities;
 using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers.Internal;
@@ -10,10 +12,11 @@ public class UniquenessAdditionalMarkupApplier(ISettingsService settingsService)
 {
 	public override string SystemName => nameof(UniquenessAdditionalMarkupApplier);
 
-	public override string NameLocalizationKey => "price.applier.uniqueness.additional.markup.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		PriceApplierUniquenessAdditionalMarkupNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey =>
-		"price.applier.uniqueness.additional.markup.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		PriceApplierUniquenessAdditionalMarkupDescriptionMessage.Instance;
 
 	public override int Order => 10000;
 

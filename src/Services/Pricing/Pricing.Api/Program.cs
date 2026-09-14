@@ -4,7 +4,6 @@ using Api.Common;
 using Api.Common.Consumers;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.HostedServices.Startup;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
@@ -20,7 +19,6 @@ using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Integrations.Supplier.DI;
 using Internal.Integration.Di;
-using Localization.Domain.Extensions;
 using MassTransit;
 using Pricing.Api.GraphQl;
 using Pricing.Api.Startup;
@@ -122,11 +120,9 @@ builder
 	.AddMinimalSecurityLayer()
 	.AddIntegrationClients()
 	.AddCommonLayer()
-	.AddApplicationLayer(builder.Configuration)
-	.AddLocalization(builder.Configuration);
+	.AddApplicationLayer(builder.Configuration);
 
 builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
 builder.Services.AddSignalR();

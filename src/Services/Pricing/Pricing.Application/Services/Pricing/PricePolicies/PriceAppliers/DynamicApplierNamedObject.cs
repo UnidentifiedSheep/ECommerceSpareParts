@@ -1,13 +1,14 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Application.Common;
 using Json.Logic;
+using Locan.Core.Interfaces;
 using Pricing.Application.Models.Pricing;
 
 namespace Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 
 public class DynamicApplierNamedObject : ApplierNamedObjectBase
 {
-
 	private readonly JsonNode _dslRule;
 
 	public DynamicApplierNamedObject(
@@ -21,9 +22,9 @@ public class DynamicApplierNamedObject : ApplierNamedObjectBase
 			throw new InvalidOperationException("DSL logic is not valid JSON");
 	}
 
-	public override string NameLocalizationKey => "";
+	public override ILocalizableMessage NameLocalizationMessage => EmptyMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "";
+	public override ILocalizableMessage DescriptionLocalizationMessage => EmptyMessage.Instance;
 
 	public override string SystemName { get; }
 

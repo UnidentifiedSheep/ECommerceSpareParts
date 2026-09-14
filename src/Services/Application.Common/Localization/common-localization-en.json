@@ -1,6 +1,7 @@
 ﻿{
   "culture": "en",
   "messages": {
+    "empty": "",
     "pagination.page.min.default": "Page must be greater than or equal to 0.",
     "pagination.page.min": "Page must be greater than or equal to {Count|int}.",
     "pagination.cursor.name": "Cursor",

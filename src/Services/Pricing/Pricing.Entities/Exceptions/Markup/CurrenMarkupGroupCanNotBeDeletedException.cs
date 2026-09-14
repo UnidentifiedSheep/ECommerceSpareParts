@@ -1,11 +1,6 @@
-﻿using Abstractions.Interfaces.Exceptions;
-using Exceptions.Base;
+﻿using Exceptions.Base.Localized;
 
 namespace Pricing.Entities.Exceptions.Markup;
 
-public class CurrenMarkupGroupCanNotBeDeletedException() : BadRequestException(null), ILocalizableException
-{
-	public string MessageKey => "current.markup.group.can.not.be.deleted";
-
-	public object[]? Arguments => null;
-}
+public class CurrenMarkupGroupCanNotBeDeletedException() : LocalizedBadRequestException(
+	CurrentMarkupGroupCanNotBeDeletedMessage.Instance);

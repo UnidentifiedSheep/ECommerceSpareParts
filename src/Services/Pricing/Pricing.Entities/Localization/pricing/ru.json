@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "ru",
-  "keyValues": {
+  "culture": "ru",
+  "messages": {
     "price.applier.markup.name": "Наценка",
     "price.applier.markup.description": "Применяет наценку к цене в соответствии с настроенными диапазонами наценок.",
     "price.applier.price.rounding.name": "Округление цены",

@@ -3,6 +3,7 @@ using Domain.CommonEntities;
 using Domain.Interfaces;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
+using Pricing.Entities;
 
 namespace Pricing.Entities.Settings;
 
@@ -29,42 +30,42 @@ public record PricingSettingData
 	[JsonPropertyName("selectedMarkupId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
 	[SchemaDependsOnEntity(nameof(MarkupGroup))]
-	[SchemaFieldLabel("pricing.setting.selected.markup.id.name")]
-	[SchemaFieldDescription("pricing.setting.selected.markup.id.description")]
+	[SchemaFieldLabel(PricingSettingSelectedMarkupIdNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingSelectedMarkupIdDescriptionMessage.Key)]
 	public int? SelectedMarkupId { get; init; }
 
 	[JsonPropertyName("defaultMarkup")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.default.markup.name")]
-	[SchemaFieldDescription("pricing.setting.default.markup.description")]
+	[SchemaFieldLabel(PricingSettingDefaultMarkupNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingDefaultMarkupDescriptionMessage.Key)]
 	public decimal DefaultMarkup { get; init; } = 0.2m;
 
 	[JsonPropertyName("offerTtl")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.offer.ttl.name")]
-	[SchemaFieldDescription("pricing.setting.offer.ttl.description")]
+	[SchemaFieldLabel(PricingSettingOfferTtlNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingOfferTtlDescriptionMessage.Key)]
 	public TimeSpan OfferTtl { get; init; } = TimeSpan.FromDays(1);
 
 	[JsonPropertyName("priceRoundingStep")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.price.rounding.step.name")]
-	[SchemaFieldDescription("pricing.setting.price.rounding.step.description")]
+	[SchemaFieldLabel(PricingSettingPriceRoundingStepNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingPriceRoundingStepDescriptionMessage.Key)]
 	public decimal PriceRoundingStep { get; init; } = 0.01m;
 
 	[JsonPropertyName("deliveryDayPenalty")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.delivery.day.penalty.name")]
-	[SchemaFieldDescription("pricing.setting.delivery.day.penalty.description")]
+	[SchemaFieldLabel(PricingSettingDeliveryDayPenaltyNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingDeliveryDayPenaltyDescriptionMessage.Key)]
 	public decimal DeliveryDayPenalty { get; init; } = 2m;
 
 	[JsonPropertyName("uniqProductAdditionalMarkup")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel("pricing.setting.uniq.product.additional.markup.name")]
-	[SchemaFieldDescription("pricing.setting.uniq.product.additional.markup.description")]
+	[SchemaFieldLabel(PricingSettingUniqProductAdditionalMarkupNameMessage.Key)]
+	[SchemaFieldDescription(PricingSettingUniqProductAdditionalMarkupDescriptionMessage.Key)]
 	public decimal UniqProductAdditionalMarkup { get; init; } = 0.2m;
 }

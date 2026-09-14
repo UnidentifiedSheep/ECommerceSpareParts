@@ -2,7 +2,7 @@ using System.Globalization;
 using Abstractions.Interfaces;
 using Api.Common;
 using Cache;
-using Localization.Domain.Extensions;
+using Locan.Hosting;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -29,6 +29,12 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 	public IServiceProvider Build(ServiceProviderArguments args)
 	{
 		RegisterGlobalBasicContexts();
+		var culture = CultureInfo.GetCultureInfo("ru-RU");
+		CultureInfo.DefaultThreadCurrentCulture = culture;
+		CultureInfo.DefaultThreadCurrentUICulture = culture;
+		CultureInfo.CurrentCulture = culture;
+		CultureInfo.CurrentUICulture = culture;
+
 		var services = new ServiceCollection();
 
 		services.RegisterTestContexts();
@@ -46,10 +52,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		ApplicationServiceProvider
 			.AddApplicationLayer(services, null!)
 			.AddApplicationCache()
-			.AddLocalization(
-				"ru-RU",
-				"ru-RU",
-				"en-EN")
+			.AddLocan()
 			.AddPersistenceLayer();
 
 		services.AddSingleton(

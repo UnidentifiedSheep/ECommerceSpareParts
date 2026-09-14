@@ -218,7 +218,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-		exception.MessageKey.Should().Be("price.applier.dsl.logic.required");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.dsl.logic.required");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
@@ -238,7 +238,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-		exception.MessageKey.Should().Be("price.applier.name.required");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.name.required");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
@@ -276,7 +276,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-		exception.MessageKey.Should().Be("price.applier.dsl.logic.invalid");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.dsl.logic.invalid");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
@@ -296,7 +296,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-		exception.MessageKey.Should().Be("price.applier.order.required");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.order.required");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
@@ -315,7 +315,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-		exception.MessageKey.Should().Be("price.applier.usage.not.supported");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.usage.not.supported");
 	}
 
 	[Fact]
@@ -332,7 +332,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-		exception.MessageKey.Should().Be("price.applier.system.name.conflict");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.system.name.conflict");
 	}
 
 	[Fact]
@@ -349,7 +349,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
-		exception.MessageKey.Should().Be("price.applier.order.duplicate");
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.order.duplicate");
 	}
 
 	[Fact]

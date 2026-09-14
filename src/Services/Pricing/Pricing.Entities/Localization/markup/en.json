@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "en",
-  "keyValues": {
+  "culture": "en",
+  "messages": {
     "markup.group.not.found": "Markup group not found.",
     "current.markup.group.can.not.be.deleted": "Currently used markup group can not be deleted. Firstly select other group.",
     "markup.group.required": "Markup group data is required.",

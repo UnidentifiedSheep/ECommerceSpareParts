@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "en",
-  "keyValues": {
+  "culture": "en",
+  "messages": {
     "price.applier.markup.name": "Markup",
     "price.applier.markup.description": "Applies a markup to the price according to the configured markup ranges.",
     "price.applier.price.rounding.name": "Price rounding",

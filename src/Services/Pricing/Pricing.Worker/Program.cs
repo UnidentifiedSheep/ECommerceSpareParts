@@ -3,7 +3,6 @@ using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.HostedServices.Startup;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Application.Common.Interfaces;
@@ -16,7 +15,6 @@ using Contracts.Job;
 using Contracts.Settings;
 using Integrations.Supplier.DI;
 using Internal.Integration.Di;
-using Localization.Domain.Extensions;
 using MassTransit;
 using Pricing.Api.Startup;
 using Pricing.Application;
@@ -50,8 +48,6 @@ builder.AddLokiLogger(
 	"pricing.worker",
 	env);
 
-builder.Services.AddLocalization(builder.Configuration);
-
 builder
 	.Services
 	.AddPersistenceLayer()
@@ -70,7 +66,6 @@ builder
 builder
 	.Services
 	.AddScoped<IStartupTask, MarkupInitializationStartupTask>()
-	.AddScoped<IStartupTask, LoadLocalesStartupTask>()
 	.AddHostedService<StartupTaskHostedService>()
 	.AddLrtHostedServices();
 

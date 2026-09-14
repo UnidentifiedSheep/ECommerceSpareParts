@@ -1,6 +1,8 @@
 using Application.Common.Interfaces.Currency;
+using Locan.Core.Interfaces;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Pricing;
+using Pricing.Entities;
 
 namespace Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers.Internal;
 
@@ -9,9 +11,11 @@ public class MinimumSupplierPriceApplier(ICurrencyConverter currencyConverter)
 {
 	public override string SystemName => nameof(MinimumSupplierPriceApplier);
 
-	public override string NameLocalizationKey => "price.applier.minimum.supplier.price.name";
+	public override ILocalizableMessage NameLocalizationMessage =>
+		PriceApplierMinimumSupplierPriceNameMessage.Instance;
 
-	public override string DescriptionLocalizationKey => "price.applier.minimum.supplier.price.description";
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		PriceApplierMinimumSupplierPriceDescriptionMessage.Instance;
 
 	public override int Order => -1000;
 

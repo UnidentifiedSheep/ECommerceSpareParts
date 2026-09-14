@@ -1,6 +1,6 @@
 ﻿{
-  "locale": "ru",
-  "keyValues": {
+  "culture": "ru",
+  "messages": {
     "markup.group.not.found": "Не удалось найти группу наценок.",
     "current.markup.group.can.not.be.deleted": "Используемая группа наценок не может быть удалена. Для начала выберите другую группу.",
     "markup.group.required": "Данные группы наценок обязательны.",

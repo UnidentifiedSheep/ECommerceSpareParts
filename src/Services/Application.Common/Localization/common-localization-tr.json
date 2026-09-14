@@ -1,6 +1,7 @@
 {
   "culture": "tr",
   "messages": {
+    "empty": "",
     "pagination.page.min.default": "Sayfa 0 veya daha büyük olmalıdır.",
     "pagination.page.min": "Sayfa {Count} veya daha büyük olmalıdır.",
     "pagination.cursor.name": "İmleç",

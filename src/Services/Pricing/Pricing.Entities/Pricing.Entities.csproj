@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
         <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5"/>
+        <PackageReference Include="Locan.Generator" Version="1.0.6"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -20,29 +21,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\Application.Common\Localization\common-localization-en.json">
-            <Link>Localization\common-localization-en.json</Link>
-        </Content>
-        <Content Include="..\..\Application.Common\Localization\common-localization-ru.json">
-            <Link>Localization\common-localization-ru.json</Link>
-        </Content>
-        <Content Include="..\..\Application.Common\Localization\common-localization-tr.json">
-            <Link>Localization\common-localization-tr.json</Link>
-        </Content>
-        <Content Include="..\..\Application.Common\Localization\json-property-names-localization-en.json">
-            <Link>Localization\json-property-names-localization-en.json</Link>
-        </Content>
-        <Content Include="..\..\Application.Common\Localization\json-property-names-localization-ru.json">
-            <Link>Localization\json-property-names-localization-ru.json</Link>
-        </Content>
-        <Content Include="..\..\Application.Common\Localization\json-property-names-localization-tr.json">
-            <Link>Localization\json-property-names-localization-tr.json</Link>
-        </Content>
-        <Content Include="..\..\..\Core\Domain\Localization\**\*">
-            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
+        <LocanResource Include="Localization/**/*.json"
+                       GenerateMessages="true"
+                       CopyToOutput="false"/>
     </ItemGroup>
 
     <ItemGroup>

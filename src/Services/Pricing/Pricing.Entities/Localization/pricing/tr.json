@@ -1,6 +1,6 @@
 {
-  "locale": "tr",
-  "keyValues": {
+  "culture": "tr",
+  "messages": {
     "price.applier.markup.name": "Kâr marjı",
     "price.applier.markup.description": "Yapılandırılmış kâr marjı aralıklarına göre fiyata kâr marjı uygular.",
     "price.applier.price.rounding.name": "Fiyat yuvarlama",

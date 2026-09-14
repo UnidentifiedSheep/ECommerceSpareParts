@@ -1,6 +1,7 @@
 ﻿{
   "culture": "ru",
   "messages": {
+    "empty": "",
     "pagination.page.min.default": "Страница должна быть не меньше 0.",
     "pagination.page.min": "Страница должна быть не меньше {Count}.",
     "pagination.cursor.name": "Курсор",
