@@ -1,6 +1,7 @@
 ﻿using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
 using Main.Entities.Product;
@@ -13,8 +14,10 @@ public record GetCharacteristicsQuery(int ProductId, Pagination Pagination)
 
 public record GetCharacteristicsResult(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 
-public class GetCharacteristicsHandler(IReadRepository<ProductCharacteristic, (int, string)> repository)
-	: IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
+public class GetCharacteristicsHandler(
+	IReadRepository<ProductCharacteristic, (int, string)> repository,
+	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection
+	) : IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
 {
 	public async Task<GetCharacteristicsResult> Handle(
 		GetCharacteristicsQuery request,
@@ -23,12 +26,7 @@ public class GetCharacteristicsHandler(IReadRepository<ProductCharacteristic, (i
 		var result = await repository
 			.Query
 			.Where(x => x.ProductId == request.ProductId)
-			.Select(x => new ProductCharacteristicDto
-			{
-				ProductId = x.ProductId,
-				Name = x.Name,
-				Value = x.Value
-			})
+			.Project(projection)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);
 

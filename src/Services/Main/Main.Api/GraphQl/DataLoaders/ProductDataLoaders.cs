@@ -1,6 +1,7 @@
 using GreenDonut;
 using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Storage;
+using Main.Application.Handlers.ProductCharacteristics.GetCharacteristicsBatch;
 using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
@@ -56,13 +57,19 @@ public static class ProductDataLoaders
 	}
 
 	[DataLoader]
+	public static async Task<Dictionary<int, List<ProductCharacteristicDto>>> GetProductCharacteristicsByIdAsync(
+		IReadOnlyList<int> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetCharacteristicsBatchQuery(keys), cancellationToken))
+			.Characteristics;
+
+	[DataLoader]
 	public static async Task<Dictionary<int, List<ProductContentDto>>> GetProductContentsByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProductsContentsQuery(keys), cancellationToken)).Contents;
-	}
+		=> (await sender.Send(new GetProductsContentsQuery(keys), cancellationToken)).Contents;
 
 	[DataLoader]
 	public static async Task<Dictionary<GetProductCrossesItem, IReadOnlyList<ProductDto>>>

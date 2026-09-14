@@ -108,6 +108,15 @@ public record GqlProduct
 		return contents?.Select(x => new GqlProductContent(x)).ToArray() ?? [];
 	}
 
+	[GraphQLName("characteristics")]
+	public async Task<IReadOnlyList<GqlProductCharacteristic>> GetCharacteristicsAsync(
+		IProductCharacteristicsByIdDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var characteristics = await loader.LoadAsync(Id, cancellationToken);
+		return characteristics?.Select(x => new GqlProductCharacteristic(x)).ToArray() ?? [];
+	}
+
 	[GraphQLName("crosses")]
 	public async Task<IReadOnlyList<GqlProduct>> GetCrossesAsync(
 		GqlProductCrossesInput input,
