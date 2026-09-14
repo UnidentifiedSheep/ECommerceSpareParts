@@ -96,6 +96,7 @@ public sealed class ProductSizeDtoProjectionProvider : ProjectionProviderBase<Pr
 		};
 }
 
+[Lifetime(Lifetime.Singleton)]
 public sealed class ProductCharacteristicDtoProjectionProvider
 	: ProjectionProviderBase<ProductCharacteristic, ProductCharacteristicDto>
 {

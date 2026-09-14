@@ -3,7 +3,7 @@ using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Enums;
 using Main.Application.Dtos.Product.Enrichment;
-using Main.Application.Handlers.ProductEnrichment.GetCatalogueCandidatesForReview;
+using Main.Application.Handlers.ProductEnrichment;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

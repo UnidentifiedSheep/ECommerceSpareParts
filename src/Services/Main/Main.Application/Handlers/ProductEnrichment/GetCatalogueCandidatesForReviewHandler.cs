@@ -8,7 +8,7 @@ using Main.Entities.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
 using ProductSku = Main.Entities.Product.ValueObjects.Sku;
 
-namespace Main.Application.Handlers.ProductEnrichment.GetCatalogueCandidatesForReview;
+namespace Main.Application.Handlers.ProductEnrichment;
 
 public record GetCatalogueCandidatesForReviewQuery(int? ProductId, string? Sku, Pagination Pagination)
 	: IQuery<GetCatalogueCandidatesForReviewResult>;

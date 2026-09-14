@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.ProductEnrichment.GetCatalogueCandidatesForReview;
+using Main.Application.Handlers.ProductEnrichment;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
