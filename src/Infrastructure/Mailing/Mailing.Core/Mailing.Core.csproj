@@ -12,14 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Localization\**\*.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-            <TargetPath>Localization\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Locan.Generator" Version="1.0.6" />
     </ItemGroup>
 

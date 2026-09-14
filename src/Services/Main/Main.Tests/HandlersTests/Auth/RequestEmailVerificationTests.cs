@@ -117,7 +117,7 @@ public class RequestEmailVerificationTests : IntegrationTest
 			CancellationToken.None);
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(action);
-		Assert.Equal("global.application.setting.app.service.url.not.configured", exception.MessageKey);
+		Assert.Equal("global.application.setting.app.service.url.not.configured", exception.LocalizableMessage.MessageKey);
 	}
 
 	private RequestEmailVerificationHandler CreateHandler(IMailingService mailingService)

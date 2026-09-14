@@ -52,16 +52,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\Application.Common\Localization\**\*">
-            <Link>Locan\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Include="..\..\Core\Domain\Localization\**\*">
-            <Link>Locan\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
+        <LocanResource Include="../Application.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../../Core/Domain/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
     </ItemGroup>
 
 </Project>

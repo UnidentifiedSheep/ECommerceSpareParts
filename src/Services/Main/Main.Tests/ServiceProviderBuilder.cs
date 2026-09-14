@@ -35,6 +35,12 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 	public IServiceProvider Build(ServiceProviderArguments args)
 	{
 		RegisterGlobalBasicContexts();
+		var culture = CultureInfo.GetCultureInfo("ru-RU");
+		CultureInfo.DefaultThreadCurrentCulture = culture;
+		CultureInfo.DefaultThreadCurrentUICulture = culture;
+		CultureInfo.CurrentCulture = culture;
+		CultureInfo.CurrentUICulture = culture;
+
 		var services = new ServiceCollection();
 
 		services.RegisterTestContexts();

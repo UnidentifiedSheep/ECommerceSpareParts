@@ -3,7 +3,6 @@ using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.HostedServices.Startup;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Application.Common.Interfaces;
@@ -16,7 +15,6 @@ using Contracts.Settings;
 using Contracts.Supplier;
 using Contracts.User;
 using ExchangeRate;
-using Localization.Domain.Extensions;
 using Mail;
 using Main.Api;
 using Main.Application;
@@ -73,7 +71,6 @@ builder
 	.AddCommonLayer()
 	.AddS3()
 	.AddApplicationLayer(builder.Configuration)
-	.AddLocalization(builder.Configuration)
 	.AddWorkerSecurityLayer()
 	.AddFullSecurityLayer()
 	.AddExchangeRates();
@@ -81,7 +78,6 @@ builder
 AddHostedServiceOptions(builder.Services);
 builder.Services.AddHostedService<EmailWorkHostedService>().AddLrtHostedServices();
 
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
 var host = builder.Build();

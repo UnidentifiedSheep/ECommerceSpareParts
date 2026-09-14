@@ -32,7 +32,7 @@ public class MakeEmailPrimaryTests(CombinedContainerFixture fixture) : Integrati
 		var action = () => Mediator.Send(new MakeEmailPrimaryCommand(user.Id, "new-primary@example.com"));
 
 		var exception = await action.Should().ThrowAsync<InvalidInputException>();
-		exception.Which.MessageKey.Should().Be("user.email.primary.must.be.confirmed");
+		exception.Which.LocalizableMessage.MessageKey.Should().Be("user.email.primary.must.be.confirmed");
 
 		Context.ChangeTracker.Clear();
 		var primaryEmail = await Context
