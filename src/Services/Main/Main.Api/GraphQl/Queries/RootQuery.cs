@@ -1,9 +1,9 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 
-namespace Main.Api.GraphQl.Queries.Root;
+namespace Main.Api.GraphQl.Queries;
 
-public sealed class Query
+public sealed class RootQuery
 {
 	[GraphQLName("products")]
 	public ProductQueries Product => new();
