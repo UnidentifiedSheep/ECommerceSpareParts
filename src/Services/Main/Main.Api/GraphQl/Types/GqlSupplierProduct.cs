@@ -1,6 +1,7 @@
 using Enums;
 using HotChocolate;
 using HotChocolate.Types.Composite;
+using Main.Api.GraphQl.DataLoaders;
 using Main.Application.Dtos.Product.Enrichment;
 
 namespace Main.Api.GraphQl.Types;
@@ -26,4 +27,12 @@ public record GqlSupplierProduct(
 	[GraphQLName("names")]
 	public IReadOnlyList<GqlSupplierProductName> Names =>
 		SupplierProductDto.Names.Select(x => new GqlSupplierProductName(x)).ToList();
+
+	[GraphQLName("crosses")]
+	public async Task<IReadOnlyList<GqlSupplierProduct>> GetCrossesAsync(
+		ISupplierProductCrossesByIdDataLoader loader,
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken))?
+			.Select(x => new GqlSupplierProduct(x))
+			.ToList() ?? [];
 }

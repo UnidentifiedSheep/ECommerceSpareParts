@@ -11,12 +11,9 @@ namespace Main.Entities.Product.Enrichment;
 
 public class SupplierProduct : AuditableEntity<SupplierProduct, int>, ILinqEntity<SupplierProduct, int>
 {
-
 	private readonly List<SupplierProductName> _names = [];
 
-	private SupplierProduct()
-	{
-	}
+	private SupplierProduct() { }
 
 	private SupplierProduct(
 		Sku sku,
