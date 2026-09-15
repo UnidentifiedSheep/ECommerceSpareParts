@@ -11,13 +11,17 @@ public sealed class CatalogueCandidateMutations
 {
 	[RequireAllPermissions(PermissionCodes.CATALOGUE_CANDIDATES_REVIEW)]
 	[GraphQLName("candidateToCatalogue")]
-	public Task AddCandidateToCatalogueAsync(
+	public async Task<bool> AddCandidateToCatalogueAsync(
 		ISender sender,
 		GqlCandidateToCatalogueInput input,
 		CancellationToken cancellationToken)
-		=> sender.Send(
+	{
+		await sender.Send(
 			new AddCandidateToCatalogueCommand(
 				input.Id,
 				input.SelectedName),
 			cancellationToken);
+
+		return true;
+	}
 }
