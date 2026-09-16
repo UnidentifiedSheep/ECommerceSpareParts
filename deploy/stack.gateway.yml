@@ -57,6 +57,7 @@ services:
         aliases:
           - gateway
     deploy:
+      ndpoint_mode: dnsrr
       replicas: 1
       placement:
         constraints:
