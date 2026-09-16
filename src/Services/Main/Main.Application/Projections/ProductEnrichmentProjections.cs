@@ -41,6 +41,7 @@ public sealed class
 			Sku = x.Sku.Value,
 			Producer = x.Producer,
 			Supplier = x.Supplier,
+			CandidateId = x.CatalogueCandidateId,
 			Names = x.Names.OrderBy(z => z.Id).Select(z => nameToDto.Invoke(z)).ToList()
 		};
 	}

@@ -10,11 +10,11 @@ namespace Main.Application.Handlers.ProductEnrichment;
 
 public record GetSupplierProductCrossesBatchQuery : IQuery<GetSupplierProductCrossesBatchResult>
 {
-	public IReadOnlyList<int> Ids { get; }
+	public IReadOnlySet<int> Ids { get; }
 
 	public GetSupplierProductCrossesBatchQuery(IEnumerable<int> ids)
 	{
-		Ids = ids.Distinct().ToList();
+		Ids = ids.ToHashSet();
 	}
 }
 
@@ -30,22 +30,33 @@ public class GetSupplierProductCrossesBatchHandler(
 		GetSupplierProductCrossesBatchQuery request,
 		CancellationToken cancellationToken)
 	{
-		var query = repository.Query.AsExpandable();
-
-		var found = (await query
-			.Where(x => request.Ids.Contains(x.LeftId))
+		var crosses = await repository.Query
+			.AsExpandable()
+			.Where(x =>
+				request.Ids.Contains(x.LeftId) ||
+				request.Ids.Contains(x.RightId))
 			.Select(x => new
 			{
-				Id = x.LeftId, Item = projection.Projection.Invoke(x.Right)
+				x.LeftId,
+				x.RightId,
+				Left = projection.Projection.Invoke(x.Left),
+				Right = projection.Projection.Invoke(x.Right)
 			})
-			.Concat(
-				query
-					.Where(x => request.Ids.Contains(x.RightId))
-					.Select(x => new
-					{
-						Id = x.RightId, Item = projection.Projection.Invoke(x.Left)
-					}))
-			.ToListAsync(cancellationToken))
+			.ToListAsync(cancellationToken);
+
+		var found = crosses
+			.SelectMany(x =>
+			{
+				var result = new List<(int Id, SupplierProductDto Item)>(2);
+
+				if (request.Ids.Contains(x.LeftId))
+					result.Add((x.LeftId, x.Right));
+
+				if (request.Ids.Contains(x.RightId))
+					result.Add((x.RightId, x.Left));
+
+				return result;
+			})
 			.ToLookup(x => x.Id, x => x.Item);
 
 		var res = request.Ids.ToDictionary(

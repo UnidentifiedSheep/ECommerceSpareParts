@@ -2,9 +2,12 @@ using Abstractions.Models;
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
+using HotChocolate.Types;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
+using Main.Api.GraphQl.Types.Inputs.CatalogueCandidate;
+using Main.Api.GraphQl.Types.ProductEnrichment;
 using Main.Application.Handlers.ProductEnrichment;
 using MediatR;
 

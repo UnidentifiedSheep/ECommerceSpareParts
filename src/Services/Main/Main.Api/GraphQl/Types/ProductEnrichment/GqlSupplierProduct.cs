@@ -4,7 +4,7 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Application.Dtos.Product.Enrichment;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.ProductEnrichment;
 
 [GraphQLName("SupplierProduct")]
 public record GqlSupplierProduct(
@@ -20,6 +20,9 @@ public record GqlSupplierProduct(
 
 	[GraphQLName("producer")]
 	public string Producer => SupplierProductDto.Producer;
+
+	[GraphQLName("candidateId")]
+	public Guid? CandidateId => SupplierProductDto.CandidateId;
 
 	[GraphQLName("supplier")]
 	public Supplier Supplier => SupplierProductDto.Supplier;

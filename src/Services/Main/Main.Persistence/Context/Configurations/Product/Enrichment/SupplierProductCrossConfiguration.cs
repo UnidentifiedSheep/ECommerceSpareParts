@@ -22,14 +22,14 @@ public class SupplierProductCrossConfiguration : IEntityTypeConfiguration<Suppli
 		builder.Property(x => x.RightId).HasColumnName("right_supplier_product_id").IsRequired();
 
 		builder
-			.HasOne<SupplierProduct>()
+			.HasOne<SupplierProduct>(e => e.Left)
 			.WithMany()
 			.HasForeignKey(x => x.LeftId)
 			.OnDelete(DeleteBehavior.Cascade)
 			.HasConstraintName("supplier_product_crosses_left_product_id_fk");
 
 		builder
-			.HasOne<SupplierProduct>()
+			.HasOne<SupplierProduct>(e => e.Right)
 			.WithMany()
 			.HasForeignKey(x => x.RightId)
 			.OnDelete(DeleteBehavior.Cascade)

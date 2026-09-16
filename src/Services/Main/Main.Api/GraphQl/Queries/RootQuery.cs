@@ -3,6 +3,7 @@ using HotChocolate.Types.Composite;
 
 namespace Main.Api.GraphQl.Queries;
 
+[GraphQLName("Query")]
 public sealed class RootQuery
 {
 	[GraphQLName("products")]
