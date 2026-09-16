@@ -17,4 +17,19 @@ public static class CatalogueCandidateDataLoaders
 
 		return result.Candidates.ToDictionary(x => x.Id, x => x);
 	}
+
+	[DataLoader]
+	public static async Task<Dictionary<int, List<SupplierProductDto>>> GetSupplierProductCrossesByIdAsync(
+		IReadOnlyList<int> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetSupplierProductCrossesBatchQuery(keys), cancellationToken)).Crosses;
+
+	[DataLoader]
+	public static async Task<Dictionary<Guid, GetCatalogueCandidateCrossesResultItem>> GetCandidateCrossesByIdAsync(
+		IReadOnlyList<Guid> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetCatalogueCandidateCrossesQuery(keys), cancellationToken)).Items;
+
 }

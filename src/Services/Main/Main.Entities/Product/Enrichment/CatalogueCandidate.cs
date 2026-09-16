@@ -10,7 +10,6 @@ public class CatalogueCandidate : AuditableEntity<CatalogueCandidate, Guid>,
 	ILinqEntity<CatalogueCandidate, Guid>,
 	IGenerateAutomaticDomainEvents
 {
-
 	private readonly List<SupplierProduct> _supplierProducts = [];
 
 	private CatalogueCandidate()
@@ -70,6 +69,15 @@ public class CatalogueCandidate : AuditableEntity<CatalogueCandidate, Guid>,
 
 		_supplierProducts.Add(supplierProduct);
 		AddContentChangedDomainEvent();
+	}
+
+	public Product CreateProduct(string selectedName)
+	{
+		return Product.Create(
+			Sku,
+			selectedName,
+			ProducerId,
+			null);
 	}
 
 	public void RemoveSupplierProduct(SupplierProduct supplierProduct)

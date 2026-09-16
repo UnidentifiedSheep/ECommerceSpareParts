@@ -14,13 +14,13 @@ public sealed class EmailVerificationData : IEmailData
 		To = to;
 		VerificationUrl = verificationUrl;
 		HtmlLang = Locale.ToString().ToLowerInvariant();
-		Subject = localizer.Get(new MailEmailVerificationSubjectMessage());
-		Title = localizer.Get(new MailEmailVerificationTitleMessage());
-		Intro = localizer.Get(new MailEmailVerificationIntroMessage());
-		Description = localizer.Get(new MailEmailVerificationDescriptionMessage());
-		Button = localizer.Get(new MailEmailVerificationButtonMessage());
-		Fallback = localizer.Get(new MailEmailVerificationFallbackMessage());
-		Ignore = localizer.Get(new MailEmailVerificationIgnoreMessage());
+		Subject = localizer.Get(MailEmailVerificationSubjectMessage.Instance);
+		Title = localizer.Get(MailEmailVerificationTitleMessage.Instance);
+		Intro = localizer.Get(MailEmailVerificationIntroMessage.Instance);
+		Description = localizer.Get(MailEmailVerificationDescriptionMessage.Instance);
+		Button = localizer.Get(MailEmailVerificationButtonMessage.Instance);
+		Fallback = localizer.Get(MailEmailVerificationFallbackMessage.Instance);
+		Ignore = localizer.Get(MailEmailVerificationIgnoreMessage.Instance);
 	}
 
 	public CultureInfo Locale { get; }

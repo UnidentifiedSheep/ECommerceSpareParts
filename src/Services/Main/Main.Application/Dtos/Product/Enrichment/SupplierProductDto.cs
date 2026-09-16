@@ -18,6 +18,9 @@ public record SupplierProductDto
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public required Supplier Supplier { get; init; }
 
+	[JsonPropertyName("candidateId")]
+	public Guid? CandidateId { get; init; }
+
 	[JsonPropertyName("names")]
 	public required IReadOnlyList<SupplierProductNameDto> Names { get; init; }
 }

@@ -25,6 +25,9 @@ public class SupplierProductCross : Entity<SupplierProductCross, SupplierProduct
 
 	public int RightId { get; init; }
 
+	public SupplierProduct Left { get; private set; } = null!;
+	public SupplierProduct Right { get; private set; } = null!;
+
 	public static Expression<Func<SupplierProductCross, SupplierProductCrossKey>> GetKeySelector() => x =>
 		new SupplierProductCrossKey(x.LeftId, x.RightId);
 	public static Expression<Func<SupplierProductCross, bool>> GetEqualityExpression(

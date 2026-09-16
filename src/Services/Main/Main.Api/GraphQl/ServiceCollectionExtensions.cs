@@ -1,5 +1,6 @@
 using GraphQL.Common.Extensions;
-using Main.Api.GraphQl.Queries.Root;
+using Main.Api.GraphQl.Mutations;
+using Main.Api.GraphQl.Queries;
 
 namespace Main.Api.GraphQl;
 
@@ -9,7 +10,9 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddMainDataLoaders();
 
-		services.AddCommonGraphQl(name).AddQueryType<Query>();
+		services.AddCommonGraphQl(name)
+			.AddMutationType<RootMutation>()
+			.AddQueryType<RootQuery>();
 
 		return services;
 	}

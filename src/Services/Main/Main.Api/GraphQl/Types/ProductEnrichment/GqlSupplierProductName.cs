@@ -2,7 +2,7 @@ using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Application.Dtos.Product.Enrichment;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.ProductEnrichment;
 
 [GraphQLName("SupplierProductName")]
 public record GqlSupplierProductName(
