@@ -1,6 +1,7 @@
 {
   "culture": "en",
   "messages": {
-    "catalogue.candidate.not.found": "Catalogue candidate not found."
+    "catalogue.candidate.not.found": "Catalogue candidate not found.",
+    "catalogue.candidate.duplicate.ids.not.allowed": "Duplicate catalogue candidate IDs are not allowed."
   }
 }

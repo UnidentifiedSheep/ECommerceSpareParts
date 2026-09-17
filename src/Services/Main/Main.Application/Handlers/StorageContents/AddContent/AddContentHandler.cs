@@ -3,10 +3,12 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
+using Main.Entities.Currency;
 using Main.Entities.Exceptions;
 using Main.Entities.Settings;
 using Main.Entities.Storage;
@@ -29,7 +31,7 @@ public record AddContentResult(IReadOnlyList<StorageContent> StorageContents);
 public class AddContentHandler(
 	ICurrencyConverter converter,
 	ISettingsService settingsService,
-	ICurrencyRepository currencyRepository,
+	IRepository<Currency, int> currencyRepository,
 	IProductRepository productRepository,
 	IUnitOfWork unitOfWork) : ICommandHandler<AddContentCommand, AddContentResult>
 {

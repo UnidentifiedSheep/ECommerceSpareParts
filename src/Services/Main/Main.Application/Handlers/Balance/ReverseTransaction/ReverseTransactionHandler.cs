@@ -24,7 +24,7 @@ public record ReverseTransactionCommand(
 public record ReverseTransactionResult(Transaction Transaction);
 
 public class ReverseTransactionHandler(
-	ITransactionRepository transactionRepository,
+	IRepository<Transaction, Guid> transactionRepository,
 	IUserContext userContext,
 	IBalanceService balanceService) : ICommandHandler<ReverseTransactionCommand, ReverseTransactionResult>
 {

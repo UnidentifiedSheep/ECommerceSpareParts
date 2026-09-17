@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Persistence;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -11,9 +12,21 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.ProductEnrichment;
 
 [Transactional, AutoSave]
-public record AddCandidateToCatalogueCommand(
-	Guid Id,
-	string? SelectedName) : ICommand;
+public record AddCandidateToCatalogueCommand : ICommand
+{
+	public IReadOnlyList<AddCandidateToCatalogueItem> Items { get; }
+	public AddCandidateToCatalogueCommand(Guid id, string? selectedName)
+	{
+		Items = [new AddCandidateToCatalogueItem(id, selectedName)];
+	}
+
+	public AddCandidateToCatalogueCommand(IEnumerable<AddCandidateToCatalogueItem> items)
+	{
+		Items = items.Distinct().ToList();
+	}
+}
+
+public record AddCandidateToCatalogueItem(Guid Id, string? SelectedName);
 
 public class AddCandidateToCatalogueHandler(
 	IRepository<CatalogueCandidate, Guid> repository,
@@ -24,29 +37,44 @@ public class AddCandidateToCatalogueHandler(
 		AddCandidateToCatalogueCommand request,
 		CancellationToken cancellationToken)
 	{
-		var candidate = await repository.GetById(request.Id, cancellationToken)
-			?? throw new CatalogueCandidateNotFoundException();
+		var ids = request.Items.Select(x => x.Id).Distinct().ToList();
 
-		if (candidate.ProductId != null) return Unit.Value;
+		if (ids.Count != request.Items.Count)
+			throw new CatalogueCandidateDuplicateIdsException();
 
-		Product product;
+		var candidates = await repository
+			.EnsureExistsAsync(
+				ids: ids,
+				errorFactory: _ => new CatalogueCandidateNotFoundException(),
+				ct: cancellationToken);
 
-		if (!string.IsNullOrWhiteSpace(request.SelectedName))
-			product = candidate.CreateProduct(request.SelectedName);
-		else
+		var names = (await readRepository
+			.Query
+			.Where(x => ids.Contains(x.Id))
+			.SelectMany(x => x.SupplierProducts)
+			.SelectMany(x => x.Names)
+			.Select(x => new
+			{
+				Id = x.SupplierProduct.CatalogueCandidateId!.Value,
+				x.Name
+			})
+			.ToListAsync(cancellationToken))
+			.ToLookup(x => x.Id, x => x.Name);
+
+		var toAdd = new List<Product>(request.Items.Count);
+
+		foreach (var item in request.Items)
 		{
-			var name = await readRepository
-				.Query
-				.Where(x => x.Id == request.Id)
-				.SelectMany(x => x.SupplierProducts)
-				.SelectMany(x => x.Names)
-				.Select(x => x.Name)
-				.FirstAsync(cancellationToken);
+			var candidate = candidates[item.Id];
+			if (candidate.ProductId != null) continue;
 
-			product = candidate.CreateProduct(name);
+			if (!string.IsNullOrWhiteSpace(item.SelectedName))
+				toAdd.Add(candidate.CreateProduct(item.SelectedName));
+			else
+				toAdd.Add(candidate.CreateProduct(names[item.Id].First()));
 		}
 
-		await unitOfWork.AddAsync(product, cancellationToken);
+		await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
 		return Unit.Value;
 	}
 }
