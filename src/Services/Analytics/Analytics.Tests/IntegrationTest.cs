@@ -9,7 +9,6 @@ using Tests.TestContainers.Combined;
 
 namespace Analytics.Integration.Tests;
 
-[Collection("Combined collection")]
 public abstract class IntegrationTest(CombinedContainerFixture fixture)
 	: IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
 {

@@ -10,7 +10,6 @@ using Tests.TestContainers.Combined;
 
 namespace Pricing.Integration.Tests;
 
-[Collection("Combined collection")]
 public abstract class LrtIntegrationTest<TLrt>(CombinedContainerFixture fixture)
 	: LrtIntegrationTestBase<TLrt, ServiceProviderBuilder, ServiceProviderArguments, DContext>
 	where TLrt : class, ILrtNamedObject
