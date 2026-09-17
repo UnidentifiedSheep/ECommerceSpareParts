@@ -58,7 +58,6 @@ builder.Services.AddMassTransit(x =>
 	x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyRatesChangedConsumer)));
 	x.AddConsumer<BackplaneConsumer>();
 	x.AddConsumer<JobStatusUpdatedConsumer>();
-	x.AddConsumer<SettingUpdatedConsumer>();
 
 	x.AddEntityFrameworkOutbox<DContext>(o =>
 	{
@@ -82,11 +81,8 @@ builder.Services.AddMassTransit(x =>
 				ep.Bind<BackplaneMessage>();
 
 				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
-				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
-				ep
-					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
-					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
+				ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics);
 			});
 
 		cfg.ReceiveEndpoint(

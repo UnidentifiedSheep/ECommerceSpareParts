@@ -61,7 +61,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 	hostBuilder.Services.AddMassTransit(x =>
 	{
 		x.AddConsumer<BackplaneConsumer>();
-		x.AddConsumer<SettingUpdatedConsumer>();
 
 		x.AddEntityFrameworkOutbox<DContext>(o =>
 		{
@@ -81,13 +80,10 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 					ep.Durable = false;
 
 					ep.ConfigureConsumer<BackplaneConsumer>(context);
-					ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
 					ep.Bind<BackplaneMessage>();
 
-					ep
-						.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
-						.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
+					ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics);
 				});
 
 			cfg.ReceiveEndpoint(
