@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Tests.Interfaces;
 using Tests.Stubs;
+using ITestContext = Tests.Interfaces.ITestContext;
 
 namespace Tests.Extensions;
 

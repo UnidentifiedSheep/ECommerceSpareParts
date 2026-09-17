@@ -1,4 +1,3 @@
-using System.Reflection;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Events;
 using Attributes;
@@ -18,7 +17,6 @@ namespace Tests.Integration;
 ///     Test.Common. Service test projects must use their own integration-test
 ///     base and DbContext and must not inherit from this class.
 /// </summary>
-[Collection("Combined collection")]
 public abstract class CommonLayerIntegrationTest : TestBase
 {
 	private readonly CombinedContainerFixture _fixture;
@@ -40,12 +38,16 @@ public abstract class CommonLayerIntegrationTest : TestBase
 
 	private protected IMediator Mediator { get; private set; } = null!;
 
-	public override async Task InitializeAsync()
+	private TestEnvironmentLease _environmentLease = null!;
+
+	public override async ValueTask InitializeAsync()
 	{
+		_environmentLease = await _fixture.AcquireAsync();
+
 		_serviceProvider = new ServiceProviderBuilder().Build(
 			new ServiceProviderArguments
 			{
-				PgsqlConnectionString = _fixture.PostgresConnectionString
+				PgsqlConnectionString = _environmentLease.Slot.PostgresConnectionString
 			});
 		_scope = Sp.CreateScope();
 
@@ -67,9 +69,10 @@ public abstract class CommonLayerIntegrationTest : TestBase
 		Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
 	}
 
-	public override async Task DisposeAsync()
+	public override async ValueTask DisposeAsync()
 	{
 		await Context.ClearDatabase();
+		await _environmentLease.DisposeAsync();
 		Scope.Dispose();
 	}
 

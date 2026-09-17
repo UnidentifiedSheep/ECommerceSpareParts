@@ -19,7 +19,7 @@ public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : In
 
 	private Mock<IMainClient> _mock = null!;
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 		_cache = Sp.GetRequiredService<IFusionCache>();

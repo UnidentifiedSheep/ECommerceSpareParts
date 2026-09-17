@@ -29,7 +29,7 @@ public class AddStorageRouteTests : IntegrationTest
 		RegisterBasicContext<StorageTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 		_carrier = await new MemberUserBuilder(Faker).BuildAndAddToDb(Context);

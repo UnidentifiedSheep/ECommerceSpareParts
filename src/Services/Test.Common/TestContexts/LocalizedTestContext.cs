@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using Tests.Interfaces;
+using ITestContext = Tests.Interfaces.ITestContext;
 
 namespace Tests.TestContexts;
 

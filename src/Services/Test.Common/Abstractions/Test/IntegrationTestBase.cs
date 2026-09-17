@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using Locan.Core.Interfaces.Containers;
-using Locan.Hosting;
+﻿using Locan.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

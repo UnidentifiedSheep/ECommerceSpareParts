@@ -32,7 +32,7 @@ public class CreatePurchaseTests : IntegrationTest
 		RegisterBasicContext<StorageRouteTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 

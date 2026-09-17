@@ -30,7 +30,7 @@ public class BalanceServiceTests : IntegrationTest
 
 	private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 

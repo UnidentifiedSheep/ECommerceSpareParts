@@ -17,7 +17,7 @@ public class EditStorageRouteTests : IntegrationTest
 		RegisterBasicContext<StorageRouteTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 		_testContext = GetContext<StorageRouteTestContext>();

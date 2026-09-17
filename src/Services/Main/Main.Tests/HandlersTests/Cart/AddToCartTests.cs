@@ -21,7 +21,7 @@ public class AddToCartTests : IntegrationTest
 		RegisterBasicContext<ProductTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 		_usersContext = GetContext<UsersTestContext>();

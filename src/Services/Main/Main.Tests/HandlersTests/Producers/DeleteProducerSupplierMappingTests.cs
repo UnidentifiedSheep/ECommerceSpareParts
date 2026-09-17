@@ -19,7 +19,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 		RegisterBasicContext<ProducerTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 		var mapping = await new ProducerSupplierMappingBuilder(Faker)

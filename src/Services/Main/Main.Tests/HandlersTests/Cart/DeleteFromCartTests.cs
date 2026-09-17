@@ -18,7 +18,7 @@ public class DeleteFromCartTests : IntegrationTest
 		RegisterBasicContext<UsersTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 
