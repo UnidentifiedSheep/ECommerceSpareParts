@@ -81,7 +81,6 @@ public static class RepositoriesExtensions
 			typeof(IReadRepository<,>),
 			readRepositoryType);
 
-		services.AddJobRepositories<TContext>();
 		services.AddUnitOfWork<TContext>();
 
 		services.AddScoped<IDbValidator, PgsqlDbValidator<TContext>>();

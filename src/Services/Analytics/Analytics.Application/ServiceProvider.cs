@@ -37,7 +37,6 @@ public static class ServiceProvider
 			.WithRegisteredBackplane()
 			.WithSystemTextJsonSerializer();
 
-		collection.RegisterSettingsService();
 		collection.AddSingleton<IJsonSerializer, JsonSerializer>();
 		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 		collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
