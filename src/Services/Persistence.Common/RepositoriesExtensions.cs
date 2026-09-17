@@ -75,6 +75,8 @@ public static class RepositoriesExtensions
 			linqRepositoryType,
 			entitiesAssembly);
 
+		services.AddJobRepositories<TContext>();
+
 		services.AddScoped(
 			typeof(IReadRepository<,>),
 			readRepositoryType);
