@@ -8,7 +8,7 @@ public sealed class CreateCandidateCrossesValidation : AbstractValidator<CreateC
 {
 	public CreateCandidateCrossesValidation()
 	{
-		RuleFor(x => x.RightCandidateIds)
+		RuleFor(x => x.CrossCandidateIds)
 			.NotEmpty()
 			.WithLocalizableError(EmptyMessage.Instance); //TODO: create message.
 	}

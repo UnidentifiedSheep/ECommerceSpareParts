@@ -10,8 +10,8 @@ namespace Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 
 [Transactional, AutoSave]
 public record CreateCandidateCrossesCommand(
-	Guid LeftCandidateId,
-	IReadOnlyCollection<Guid> RightCandidateIds,
+	Guid CandidateId,
+	IReadOnlyCollection<Guid> CrossCandidateIds,
 	ProductLinkageType LinkageType) : ICommand;
 
 public class CreateCandidateCrossesHandler(
@@ -21,15 +21,15 @@ public class CreateCandidateCrossesHandler(
 		CreateCandidateCrossesCommand request,
 		CancellationToken cancellationToken)
 	{
-		if (request.RightCandidateIds.Contains(request.LeftCandidateId))
+		if (request.CrossCandidateIds.Contains(request.CandidateId))
 			throw new ProductCrossSelfReferenceException();
 
 		var productIds = await CreateProducts(request, cancellationToken);
-		var leftProductId = productIds[request.LeftCandidateId];
+		var leftProductId = productIds[request.CandidateId];
 
 		await sender.Send(
 			new MakeLinkageBetweenProductsCommand(
-				request.RightCandidateIds
+				request.CrossCandidateIds
 					.Select(x => new NewProductLinkageDto
 					{
 						CrossProductId = productIds[x],
@@ -46,8 +46,8 @@ public class CreateCandidateCrossesHandler(
 		=> (await sender.Send(
 			new AddCandidateToCatalogueCommand(
 				request
-					.RightCandidateIds
-					.Append(request.LeftCandidateId)
+					.CrossCandidateIds
+					.Append(request.CandidateId)
 					.Select(x => new AddCandidateToCatalogueItem(x, null))),
 			ct)).CreatedIds;
 }
