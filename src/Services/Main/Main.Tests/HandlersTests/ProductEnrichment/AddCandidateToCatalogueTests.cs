@@ -25,15 +25,14 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 		var selectedNameCandidate = await CreateCandidate("BATCH-SELECTED", "Ignored name");
 		var defaultNameCandidate = await CreateCandidate("BATCH-DEFAULT", "Default name");
 
-		await Mediator.Send(
-			new AddCandidateToCatalogueCommand(
+		await Mediator.Send(new AddCandidateToCatalogueCommand(
 			[
 				new AddCandidateToCatalogueItem(selectedNameCandidate.Id, "Selected name"),
 				new AddCandidateToCatalogueItem(defaultNameCandidate.Id, null)
-			]));
+			]), CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var products = await Context.Products.AsNoTracking().ToListAsync();
+		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
 
 		products.Should().HaveCount(2);
 		products
@@ -62,10 +61,11 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 			[
 				new AddCandidateToCatalogueItem(mappedCandidate.Id, "Must not be created"),
 				new AddCandidateToCatalogueItem(newCandidate.Id, null)
-			]));
+			]),
+			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var products = await Context.Products.AsNoTracking().ToListAsync();
+		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
 
 		products.Should().HaveCount(2);
 		products.Should().ContainSingle(x => x.Id == existingProduct.Id);
@@ -86,7 +86,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 
 		await action.Should().ThrowAsync<CatalogueCandidateNotFoundException>();
 		Context.ChangeTracker.Clear();
-		(await Context.Products.AsNoTracking().CountAsync()).Should().Be(0);
+		(await Context.Products.AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	[Fact]
@@ -103,7 +103,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 
 		await action.Should().ThrowAsync<CatalogueCandidateDuplicateIdsException>();
 		Context.ChangeTracker.Clear();
-		(await Context.Products.AsNoTracking().CountAsync()).Should().Be(0);
+		(await Context.Products.AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	private async Task<CatalogueCandidate> CreateCandidate(string sku, params string[] names)

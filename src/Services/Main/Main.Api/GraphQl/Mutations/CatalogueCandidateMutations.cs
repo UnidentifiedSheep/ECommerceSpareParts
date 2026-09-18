@@ -2,6 +2,7 @@ using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.CatalogueCandidate;
+using Main.Api.GraphQl.Types.Product;
 using Main.Application.Handlers.ProductEnrichment;
 using MediatR;
 
@@ -11,17 +12,17 @@ public sealed class CatalogueCandidateMutations
 {
 	[RequireAllPermissions(PermissionCodes.CATALOGUE_CANDIDATES_REVIEW)]
 	[GraphQLName("candidateToCatalogue")]
-	public async Task<bool> AddCandidateToCatalogueAsync(
+	public async Task<GqlProduct> AddCandidateToCatalogueAsync(
 		ISender sender,
 		GqlCandidateToCatalogueInput input,
 		CancellationToken cancellationToken)
 	{
-		await sender.Send(
+		var result = await sender.Send(
 			new AddCandidateToCatalogueCommand(
 				input.Id,
 				input.SelectedName),
 			cancellationToken);
 
-		return true;
+		return new GqlProduct(result.CreatedIds[input.Id]);
 	}
 }

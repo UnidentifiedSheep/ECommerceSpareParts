@@ -99,7 +99,11 @@ public class ProductRepository(DContext context, QueryExtensions extensions)
 			crosses,
 			new BulkConfig
 			{
-				UpdateByProperties = [nameof(ProductCross.LeftProductId), nameof(ProductCross.RightProductId)]
+				UpdateByProperties =
+				[
+					nameof(ProductCross.LeftProductId),
+					nameof(ProductCross.RightProductId)
+				]
 			},
 			cancellationToken: cancellationToken);
 	}

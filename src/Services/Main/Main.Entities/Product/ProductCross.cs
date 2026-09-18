@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Exceptions;
+using Main.Entities.Exceptions;
 
 namespace Main.Entities.Product;
 
@@ -14,7 +15,7 @@ public class ProductCross : Entity<ProductCross, (int, int)>, ILinqEntity<Produc
 	private ProductCross(int left, int right)
 	{
 		if (left == right)
-			throw new InvalidInputException(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance);
+			throw new ProductCrossSelfReferenceException();
 		var min = Math.Min(left, right);
 		var max = Math.Max(left, right);
 

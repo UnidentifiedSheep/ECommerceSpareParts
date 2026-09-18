@@ -6,13 +6,12 @@ using Attributes;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Product.Enrichment;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductEnrichment;
 
 [Transactional, AutoSave]
-public record AddCandidateToCatalogueCommand : ICommand
+public record AddCandidateToCatalogueCommand : ICommand<AddCandidateToCatalogueResult>
 {
 	public IReadOnlyList<AddCandidateToCatalogueItem> Items { get; }
 	public AddCandidateToCatalogueCommand(Guid id, string? selectedName)
@@ -28,12 +27,14 @@ public record AddCandidateToCatalogueCommand : ICommand
 
 public record AddCandidateToCatalogueItem(Guid Id, string? SelectedName);
 
+public record AddCandidateToCatalogueResult(Dictionary<Guid, int> CreatedIds);
+
 public class AddCandidateToCatalogueHandler(
 	IRepository<CatalogueCandidate, Guid> repository,
 	IReadRepository<CatalogueCandidate, Guid> readRepository,
-	IUnitOfWork unitOfWork) : ICommandHandler<AddCandidateToCatalogueCommand>
+	IUnitOfWork unitOfWork) : ICommandHandler<AddCandidateToCatalogueCommand, AddCandidateToCatalogueResult>
 {
-	public async Task<Unit> Handle(
+	public async Task<AddCandidateToCatalogueResult> Handle(
 		AddCandidateToCatalogueCommand request,
 		CancellationToken cancellationToken)
 	{
@@ -61,20 +62,33 @@ public class AddCandidateToCatalogueHandler(
 			.ToListAsync(cancellationToken))
 			.ToLookup(x => x.Id, x => x.Name);
 
-		var toAdd = new List<Product>(request.Items.Count);
+		var toAdd = new Dictionary<Guid, Product>(request.Items.Count);
+		var productIds = new Dictionary<Guid, int>();
 
 		foreach (var item in request.Items)
 		{
 			var candidate = candidates[item.Id];
-			if (candidate.ProductId != null) continue;
+			if (candidate.ProductId != null)
+			{
+				productIds[item.Id] = candidate.ProductId.Value;
+				continue;
+			}
 
 			if (!string.IsNullOrWhiteSpace(item.SelectedName))
-				toAdd.Add(candidate.CreateProduct(item.SelectedName));
+				toAdd[item.Id] = candidate.CreateProduct(item.SelectedName);
 			else
-				toAdd.Add(candidate.CreateProduct(names[item.Id].First()));
+				toAdd[item.Id] = candidate.CreateProduct(names[item.Id].First());
 		}
 
-		await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
-		return Unit.Value;
+		await unitOfWork.AddRangeAsync(toAdd.Values, cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
+
+		foreach (var added in toAdd)
+		{
+			productIds[added.Key] = added.Value.Id;
+			candidates[added.Key].MapToProduct(added.Value.Id);
+		}
+
+		return new AddCandidateToCatalogueResult(productIds);
 	}
 }

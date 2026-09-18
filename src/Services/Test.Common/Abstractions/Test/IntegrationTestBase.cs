@@ -17,6 +17,8 @@ public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
 
 	private IServiceProvider _sp = null!;
 
+	protected CancellationToken CancellationToken => TestContext.Current.CancellationToken;
+
 	protected override IServiceProvider Sp => _sp;
 
 	protected override IServiceScope Scope => _scope;
