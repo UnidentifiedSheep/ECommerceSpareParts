@@ -41,6 +41,6 @@ public class CatalogueCandidateTestContext(
 	public static Type[] DependsOn =>
 	[
 		typeof(SupplierProductTestContext),
-		typeof(ProductTestContext)
+		typeof(ProducerTestContext)
 	];
 }
