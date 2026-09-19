@@ -22,6 +22,7 @@ public record MarkupCalculationInputState : IInputState
 	public void ValidateState()
 	{
 		if (RangeStart is not null && RangeEnd is not null && RangeStart > RangeEnd)
-			throw new InvalidInputException(MarkupCalculationRangeStartMustBeBeforeOrEqualEndMessage.Instance);
+			throw new InvalidInputException(
+				MarkupCalculationRangeStartMustBeBeforeOrEqualEndMessage.Instance);
 	}
 }

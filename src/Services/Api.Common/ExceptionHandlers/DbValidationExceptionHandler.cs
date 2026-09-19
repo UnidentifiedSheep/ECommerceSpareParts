@@ -19,9 +19,7 @@ public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> 
 			httpContext,
 			null);
 		SetStatusCode(problemDetails, dbValidationException);
-		AddDbValidationErrors(
-			problemDetails,
-			dbValidationException);
+		AddDbValidationErrors(problemDetails, dbValidationException);
 		LogException(
 			httpContext,
 			exception,
@@ -32,9 +30,7 @@ public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> 
 		return true;
 	}
 
-	private void AddDbValidationErrors(
-		ProblemDetails details,
-		ValidationException bulkEx)
+	private void AddDbValidationErrors(ProblemDetails details, ValidationException bulkEx)
 	{
 		var errors = new List<ProblemDetails>();
 

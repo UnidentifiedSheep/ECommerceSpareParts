@@ -42,7 +42,9 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		var loaded = SettingsContainer.Get<TestSetting>();
 		loaded.Should().BeOfType<TestSetting>();
 		loaded.Data.Value.Should().Be(42);
-		(await Context.Set<TestSetting>().AsNoTracking().SingleAsync(cancellationToken: CancellationToken)).Should().BeOfType<TestSetting>();
+		(await Context.Set<TestSetting>().AsNoTracking().SingleAsync(CancellationToken))
+			.Should()
+			.BeOfType<TestSetting>();
 	}
 
 	[Fact]
@@ -52,7 +54,7 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 
 		await SettingsService.SetSetting(setting, CancellationToken);
 
-		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
+		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.Value.Should().Be(10);
 		SettingsContainer.Get<TestSetting>().Should().BeSameAs(setting);
 		AssertPublishedEvent(10);
@@ -67,7 +69,7 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 
 		await SettingsService.SetSetting(replacement, CancellationToken);
 
-		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
+		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.Value.Should().Be(20);
 		SettingsContainer.Get<TestSetting>().Should().BeSameAs(replacement);
 		AssertPublishedEvent(20);
@@ -82,7 +84,7 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		var result = await SettingsService.GetOrDefault<TestSetting>(CancellationToken);
 
 		result.Should().BeSameAs(cached);
-		(await Context.Set<TestSetting>().CountAsync(cancellationToken: CancellationToken)).Should().Be(0);
+		(await Context.Set<TestSetting>().CountAsync(CancellationToken)).Should().Be(0);
 		MessageBroker.PublishedMessages.Should().BeEmpty();
 	}
 
@@ -105,7 +107,7 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		var result = await SettingsService.GetOrDefault<TestSetting>(CancellationToken);
 
 		result.Data.Should().Be(TestSetting.Default.Data);
-		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
+		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.Should().Be(TestSetting.Default.Data);
 		SettingsContainer.Get<TestSetting>().Should().BeSameAs(result);
 		AssertPublishedEvent(TestSetting.Default.Data.Value);

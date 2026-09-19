@@ -25,22 +25,20 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 		var selectedNameCandidate = await CreateCandidate("BATCH-SELECTED", "Ignored name");
 		var defaultNameCandidate = await CreateCandidate("BATCH-DEFAULT", "Default name");
 
-		await Mediator.Send(new AddCandidateToCatalogueCommand(
+		await Mediator.Send(
+			new AddCandidateToCatalogueCommand(
 			[
 				new AddCandidateToCatalogueItem(selectedNameCandidate.Id, "Selected name"),
 				new AddCandidateToCatalogueItem(defaultNameCandidate.Id, null)
-			]), CancellationToken);
+			]),
+			CancellationToken);
 
 		Context.ChangeTracker.Clear();
 		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
 
 		products.Should().HaveCount(2);
-		products
-			.Single(x => x.Sku.Value == "BATCH-SELECTED")
-			.Name.Value.Should().Be("Selected name");
-		products
-			.Single(x => x.Sku.Value == "BATCH-DEFAULT")
-			.Name.Value.Should().Be("Default name");
+		products.Single(x => x.Sku.Value == "BATCH-SELECTED").Name.Value.Should().Be("Selected name");
+		products.Single(x => x.Sku.Value == "BATCH-DEFAULT").Name.Value.Should().Be("Default name");
 	}
 
 	[Fact]

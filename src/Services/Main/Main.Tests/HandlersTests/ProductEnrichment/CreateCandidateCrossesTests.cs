@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProductEnrichment;
 using Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 using Main.Entities.Exceptions;
 using Main.Enums.Products;
@@ -11,11 +10,11 @@ namespace Tests.HandlersTests.ProductEnrichment;
 
 public sealed class CreateCandidateCrossesTests : IntegrationTest
 {
-	private CatalogueCandidateTestContext TestContext => GetContext<CatalogueCandidateTestContext>();
 	public CreateCandidateCrossesTests(CombinedContainerFixture fixture) : base(fixture)
 	{
 		RegisterBasicContext<CatalogueCandidateTestContext>();
 	}
+	private CatalogueCandidateTestContext TestContext => GetContext<CatalogueCandidateTestContext>();
 
 	[Fact]
 	public async Task WhenSelfReference_Throws()
@@ -47,25 +46,20 @@ public sealed class CreateCandidateCrossesTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var candidates = await Context.CatalogueCandidates
+		var candidates = await Context
+			.CatalogueCandidates
 			.Include(x => x.Product)
 			.AsNoTracking()
 			.ToListAsync(CancellationToken);
 
-		var crosses = (await Context.ProductCrosses
-			.AsNoTracking()
-			.ToListAsync(CancellationToken))
+		var crosses = (await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken))
 			.Select(x => new Tuple<Guid, Guid>(
 				candidates.First(z => z.Product!.Id == x.RightProductId).Id,
-				candidates.First(z => z.Product!.Id == x.LeftProductId).Id
-				))
+				candidates.First(z => z.Product!.Id == x.LeftProductId).Id))
 			.OrderBy(x => x.Item2)
 			.ToList();
 
-		var mustBe = otherIds
-			.Select(x => new Tuple<Guid, Guid>(leftId, x))
-			.OrderBy(x => x.Item2)
-			.ToList();
+		var mustBe = otherIds.Select(x => new Tuple<Guid, Guid>(leftId, x)).OrderBy(x => x.Item2).ToList();
 		crosses.Should().BeEquivalentTo(mustBe);
 	}
 

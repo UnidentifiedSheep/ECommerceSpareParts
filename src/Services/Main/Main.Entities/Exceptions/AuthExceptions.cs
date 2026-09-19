@@ -94,7 +94,8 @@ public class UserEmailNotFoundException(string email) : LocalizedNotFoundExcepti
 		Email = email
 	});
 
-public class CantCreateSystemUserException() : LocalizedBadRequestException(CantCreateSystemUserMessage.Instance);
+public class CantCreateSystemUserException()
+	: LocalizedBadRequestException(CantCreateSystemUserMessage.Instance);
 
 public class ResetTokenExpiredException() : LocalizedBadRequestException(ResetTokenExpiredMessage.Instance);
 

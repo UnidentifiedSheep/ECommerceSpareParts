@@ -51,7 +51,7 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 		var createdProducer = await Context
 			.Producers
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == created.ProducerId, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == created.ProducerId, CancellationToken);
 
 		created.ProducerId.Should().BeGreaterThan(0);
 

@@ -39,8 +39,9 @@ public class ChangeCartItemCountTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var cartItem = await Context.Carts.FirstOrDefaultAsync(x =>
-			x.UserId == command.UserId && x.ProductId == command.ProductId, cancellationToken: CancellationToken);
+		var cartItem = await Context.Carts.FirstOrDefaultAsync(
+			x => x.UserId == command.UserId && x.ProductId == command.ProductId,
+			CancellationToken);
 		Assert.NotNull(cartItem);
 		Assert.Equal(newCount, cartItem.Count);
 	}

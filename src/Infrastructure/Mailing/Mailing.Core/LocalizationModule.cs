@@ -1,3 +1,3 @@
 using Locan.Core.Attributes;
 
-[assembly:LocalizationModule("Mailing.Core")]
+[assembly: LocalizationModule("Mailing.Core")]

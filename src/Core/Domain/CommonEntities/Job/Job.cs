@@ -30,7 +30,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 		SetStatus(JobStatus.Pending);
 	}
 
-	public Guid Id { get; private set; }
+	public Guid Id { get; }
 
 	public string SystemName { get; private set; } = null!;
 

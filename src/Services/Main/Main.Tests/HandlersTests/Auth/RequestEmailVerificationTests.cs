@@ -104,11 +104,13 @@ public class RequestEmailVerificationTests : IntegrationTest
 		const string email = "verification@example.com";
 		var user = await CreateUser(email, false);
 		var settingsService = Scope.ServiceProvider.GetRequiredService<ISettingsService>();
-		await settingsService.SetSetting(new GlobalApplicationSetting(
+		await settingsService.SetSetting(
+			new GlobalApplicationSetting(
 				new GlobalApplicationSettingData
 				{
 					ApiServiceUrl = "https://api.example.com", AppServiceUrl = null
-				}), CancellationToken);
+				}),
+			CancellationToken);
 		var handler = CreateHandler(Mock.Of<IMailingService>());
 
 		var action = () => handler.Handle(
@@ -116,7 +118,9 @@ public class RequestEmailVerificationTests : IntegrationTest
 			CancellationToken.None);
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(action);
-		Assert.Equal("global.application.setting.app.service.url.not.configured", exception.LocalizableMessage.MessageKey);
+		Assert.Equal(
+			"global.application.setting.app.service.url.not.configured",
+			exception.LocalizableMessage.MessageKey);
 	}
 
 	private RequestEmailVerificationHandler CreateHandler(IMailingService mailingService)

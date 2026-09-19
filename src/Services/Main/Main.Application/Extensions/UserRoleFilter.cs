@@ -54,10 +54,9 @@ internal static class UserRoleFilter
 	private static IQueryable<User> Apply(
 		IQueryable<User> query,
 		IReadOnlyCollection<string> normalizedRoles,
-		bool include)
-	{
-		return normalizedRoles.Count == 0 ? query : query.Where(BuildPredicate(normalizedRoles, include));
-	}
+		bool include) => normalizedRoles.Count == 0
+		? query
+		: query.Where(BuildPredicate(normalizedRoles, include));
 
 	private static CriteriaBuilder<User> Apply(
 		CriteriaBuilder<User> criteria,

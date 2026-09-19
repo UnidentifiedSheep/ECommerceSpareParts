@@ -43,7 +43,8 @@ public class RecordDateValidatorTests
 			0,
 			DateTimeKind.Utc);
 		var policy = new Mock<IOperationDatePolicy>();
-		policy.Setup(x => x.IsAllowed(date))
+		policy
+			.Setup(x => x.IsAllowed(date))
 			.Returns(OperationDateValidationResult.Invalid(OperationDateTooOldMessage.Instance));
 		var validator = new RecordDateValidator(policy.Object);
 

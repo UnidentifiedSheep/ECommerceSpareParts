@@ -10,12 +10,12 @@ namespace Main.Application.Handlers.ProductEnrichment;
 
 public record GetCatalogueCandidateCrossesQuery : IQuery<GetCatalogueCandidateCrossesResult>
 {
-	public IReadOnlySet<Guid> Ids { get; }
 
 	public GetCatalogueCandidateCrossesQuery(IEnumerable<Guid> ids)
 	{
 		Ids = ids.ToHashSet();
 	}
+	public IReadOnlySet<Guid> Ids { get; }
 }
 
 public record GetCatalogueCandidateCrossesResultItem(
@@ -30,63 +30,48 @@ public class GetCatalogueCandidateCrossesHandler(
 	IReadRepository<SupplierProductCross, SupplierProductCrossKey> crossRepository,
 	IReadRepository<SupplierProduct, int> supplierProductRepository,
 	IProjectionProvider<CatalogueCandidate, CatalogueCandidateReviewDto> candidateProjection,
-	IProjectionProvider<SupplierProduct, SupplierProductDto> supplierProductProjection
-	) : IQueryHandler<GetCatalogueCandidateCrossesQuery, GetCatalogueCandidateCrossesResult>
+	IProjectionProvider<SupplierProduct, SupplierProductDto> supplierProductProjection)
+	: IQueryHandler<GetCatalogueCandidateCrossesQuery, GetCatalogueCandidateCrossesResult>
 {
 	public async Task<GetCatalogueCandidateCrossesResult> Handle(
 		GetCatalogueCandidateCrossesQuery request,
 		CancellationToken cancellationToken)
 	{
-		var crossesByCandidate =
-			await GetCrossesByCandidate(request.Ids, cancellationToken);
+		var crossesByCandidate = await GetCrossesByCandidate(request.Ids, cancellationToken);
 
-		var crossProducts =
-			await GetCrossProducts(crossesByCandidate, cancellationToken);
+		var crossProducts = await GetCrossProducts(crossesByCandidate, cancellationToken);
 
-		return new GetCatalogueCandidateCrossesResult(
-			BuildResultItems(crossesByCandidate, crossProducts));
+		return new GetCatalogueCandidateCrossesResult(BuildResultItems(crossesByCandidate, crossProducts));
 	}
 
 	private async Task<IReadOnlyList<CandidateCrosses>> GetCrossesByCandidate(
 		IReadOnlySet<Guid> candidateIds,
 		CancellationToken cancellationToken)
 	{
-		var candidateProducts =
-			from candidate in candidateRepository.Query
+		var candidateProducts = from candidate in candidateRepository.Query
 			where candidateIds.Contains(candidate.Id)
 			from supplierProduct in candidate.SupplierProducts
 			select new
 			{
-				CandidateId = candidate.Id,
-				SupplierProductId = supplierProduct.Id
+				CandidateId = candidate.Id, SupplierProductId = supplierProduct.Id
 			};
 
-		var directCrosses =
-			from candidateProduct in candidateProducts
-			join cross in crossRepository.Query
-				on candidateProduct.SupplierProductId equals cross.LeftId
+		var directCrosses = from candidateProduct in candidateProducts
+			join cross in crossRepository.Query on candidateProduct.SupplierProductId equals cross.LeftId
 			select new
 			{
-				candidateProduct.CandidateId,
-				SupplierProductId = cross.RightId
+				candidateProduct.CandidateId, SupplierProductId = cross.RightId
 			};
 
-		var reverseCrosses =
-			from candidateProduct in candidateProducts
-			join cross in crossRepository.Query
-				on candidateProduct.SupplierProductId equals cross.RightId
+		var reverseCrosses = from candidateProduct in candidateProducts
+			join cross in crossRepository.Query on candidateProduct.SupplierProductId equals cross.RightId
 			select new
 			{
-				candidateProduct.CandidateId,
-				SupplierProductId = cross.LeftId
+				candidateProduct.CandidateId, SupplierProductId = cross.LeftId
 			};
 
-		return (await directCrosses
-				.Concat(reverseCrosses)
-				.ToListAsync(cancellationToken))
-			.GroupBy(
-				x => x.CandidateId,
-				x => x.SupplierProductId)
+		return (await directCrosses.Concat(reverseCrosses).ToListAsync(cancellationToken))
+			.GroupBy(x => x.CandidateId, x => x.SupplierProductId)
 			.Select(x => new CandidateCrosses(x.Key, x.Distinct().ToList()))
 			.ToList();
 	}
@@ -95,10 +80,7 @@ public class GetCatalogueCandidateCrossesHandler(
 		IReadOnlyList<CandidateCrosses> crossesByCandidate,
 		CancellationToken cancellationToken)
 	{
-		var supplierProductIds = crossesByCandidate
-			.SelectMany(x => x.SupplierProductIds)
-			.Distinct()
-			.ToList();
+		var supplierProductIds = crossesByCandidate.SelectMany(x => x.SupplierProductIds).Distinct().ToList();
 
 		var crossProducts = await supplierProductRepository
 			.Query
@@ -107,18 +89,17 @@ public class GetCatalogueCandidateCrossesHandler(
 			.Select(x => new
 			{
 				x.Id,
-				Candidate = x.CatalogueCandidate == null
-					? null
-					: candidateProjection.Projection.Invoke(x.CatalogueCandidate),
+				Candidate =
+					x.CatalogueCandidate == null
+						? null
+						: candidateProjection.Projection.Invoke(x.CatalogueCandidate),
 				SupplierProduct = x.CatalogueCandidate == null
 					? supplierProductProjection.Projection.Invoke(x)
 					: null
 			})
 			.ToListAsync(cancellationToken);
 
-		return crossProducts.ToDictionary(
-			x => x.Id,
-			x => new CrossProduct(x.Candidate, x.SupplierProduct));
+		return crossProducts.ToDictionary(x => x.Id, x => new CrossProduct(x.Candidate, x.SupplierProduct));
 	}
 
 	private static Dictionary<Guid, GetCatalogueCandidateCrossesResultItem> BuildResultItems(

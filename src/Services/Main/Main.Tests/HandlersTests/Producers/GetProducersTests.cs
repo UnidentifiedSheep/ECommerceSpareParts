@@ -46,7 +46,9 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 			.BuildAndAddToDb(Context);
 		var skipped = await new ProducerBuilder(Faker).WithName("Skipped producer").BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(CreateQuery([producer.Id, producer.Id, int.MaxValue]), CancellationToken);
+		var result = await Mediator.Send(
+			CreateQuery([producer.Id, producer.Id, int.MaxValue]),
+			CancellationToken);
 
 		result.Producers.Should().ContainSingle();
 		result.Producers.Single().Id.Should().Be(producer.Id);
@@ -66,7 +68,9 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 			.WithName("Alpha skipped producer")
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(CreateQuery([matchingRequested.Id, notMatchingRequested.Id], "Alpha"), CancellationToken);
+		var result = await Mediator.Send(
+			CreateQuery([matchingRequested.Id, notMatchingRequested.Id], "Alpha"),
+			CancellationToken);
 
 		result.Producers.Should().ContainSingle();
 		result.Producers.Single().Id.Should().Be(matchingRequested.Id);
@@ -82,10 +86,12 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 		var third = await new ProducerBuilder(Faker).WithName("Gamma producer").BuildAndAddToDb(Context);
 		await new ProducerBuilder(Faker).WithName("Aardvark skipped producer").BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(CreateQuery(
+		var result = await Mediator.Send(
+			CreateQuery(
 				[first.Id, second.Id, third.Id],
 				page: 1,
-				size: 1), CancellationToken);
+				size: 1),
+			CancellationToken);
 
 		result.Producers.Should().ContainSingle();
 		result.Producers.Single().Id.Should().Be(second.Id);

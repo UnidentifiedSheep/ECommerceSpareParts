@@ -47,12 +47,14 @@ public sealed class GetStorageContentsTests : IntegrationTest
 			currencyId,
 			9);
 
-		var result = await Mediator.Send(new GetStorageContentsQuery(
+		var result = await Mediator.Send(
+			new GetStorageContentsQuery(
 				products[0].Id,
 				storages[0].Code,
 				[],
 				new Pagination(0, 20),
-				false), CancellationToken);
+				false),
+			CancellationToken);
 
 		Assert.Equal([expected.Id], result.Content.Select(x => x.Id));
 	}
@@ -79,18 +81,22 @@ public sealed class GetStorageContentsTests : IntegrationTest
 			currencyId,
 			20);
 
-		var firstPage = await Mediator.Send(new GetStorageContentsQuery(
+		var firstPage = await Mediator.Send(
+			new GetStorageContentsQuery(
 				productId,
 				storageCode,
 				["count_desc"],
 				new Pagination(0, 2),
-				true), CancellationToken);
-		var secondPage = await Mediator.Send(new GetStorageContentsQuery(
+				true),
+			CancellationToken);
+		var secondPage = await Mediator.Send(
+			new GetStorageContentsQuery(
 				productId,
 				storageCode,
 				["count_desc"],
 				new Pagination(1, 2),
-				true), CancellationToken);
+				true),
+			CancellationToken);
 
 		Assert.Equal([highest.Id, middle.Id], firstPage.Content.Select(x => x.Id));
 		Assert.Single(secondPage.Content);
@@ -108,12 +114,14 @@ public sealed class GetStorageContentsTests : IntegrationTest
 			GetCurrencyId(),
 			0);
 
-		var result = await Mediator.Send(new GetStorageContentsQuery(
+		var result = await Mediator.Send(
+			new GetStorageContentsQuery(
 				productId,
 				storageCode,
 				[],
 				new Pagination(0, 20),
-				true), CancellationToken);
+				true),
+			CancellationToken);
 
 		Assert.Contains(result.Content, x => x.Id == zeroContent.Id && x.Count == 0);
 	}

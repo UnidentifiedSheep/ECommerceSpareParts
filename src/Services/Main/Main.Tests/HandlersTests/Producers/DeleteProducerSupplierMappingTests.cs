@@ -48,7 +48,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var mappings = await Context.ProducerSupplierMappings.AsNoTracking().ToListAsync(cancellationToken: CancellationToken);
+		var mappings = await Context.ProducerSupplierMappings.AsNoTracking().ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(0);
 	}
 }

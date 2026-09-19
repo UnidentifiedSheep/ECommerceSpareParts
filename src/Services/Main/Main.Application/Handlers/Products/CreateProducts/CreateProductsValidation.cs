@@ -1,5 +1,5 @@
-using FluentValidation;
 using Application.Common.Extensions;
+using FluentValidation;
 using Main.Entities;
 
 namespace Main.Application.Handlers.Products.CreateProducts;
@@ -34,7 +34,10 @@ public class CreateProductsValidation : AbstractValidator<CreateProductsCommand>
 					.Must(x => x.Trim().Length <= 128)
 					.WithLocalizableError(ArticleArticleNumberMaxLength128Message.Instance);
 
-				content.RuleFor(x => x.Name).NotEmpty().WithLocalizableError(ArticleNameMustNotBeEmptyMessage.Instance);
+				content
+					.RuleFor(x => x.Name)
+					.NotEmpty()
+					.WithLocalizableError(ArticleNameMustNotBeEmptyMessage.Instance);
 				content
 					.RuleFor(x => x.Name)
 					.Must(x => x.Trim().Length <= 255)

@@ -21,6 +21,8 @@ public abstract class TestBase : IAsyncLifetime, ITest
 	protected abstract IServiceProvider Sp { get; }
 
 	protected abstract IServiceScope Scope { get; }
+	public abstract ValueTask DisposeAsync();
+	public abstract ValueTask InitializeAsync();
 
 	public void RegisterBasicContext<TContext>() where TContext : class, ITestContext =>
 		RegisterBasicContext(typeof(TContext));
@@ -86,6 +88,4 @@ public abstract class TestBase : IAsyncLifetime, ITest
 			await ctx.InitializeAsync();
 		}
 	}
-	public abstract ValueTask DisposeAsync();
-	public abstract ValueTask InitializeAsync();
 }

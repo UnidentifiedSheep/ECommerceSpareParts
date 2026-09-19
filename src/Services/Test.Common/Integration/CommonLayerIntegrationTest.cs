@@ -21,6 +21,8 @@ public abstract class CommonLayerIntegrationTest : TestBase
 {
 	private readonly CombinedContainerFixture _fixture;
 
+	private TestEnvironmentLease _environmentLease = null!;
+
 	private IServiceScope _scope = null!;
 
 	private IServiceProvider _serviceProvider = null!;
@@ -39,8 +41,6 @@ public abstract class CommonLayerIntegrationTest : TestBase
 	private protected DContext Context { get; private set; } = null!;
 
 	private protected IMediator Mediator { get; private set; } = null!;
-
-	private TestEnvironmentLease _environmentLease = null!;
 
 	public override async ValueTask InitializeAsync()
 	{
@@ -80,10 +80,7 @@ public abstract class CommonLayerIntegrationTest : TestBase
 
 	private async Task LoadLocales()
 	{
-		var task = Sp
-			.GetServices<IHostedService>()
-			.OfType<LocalizerInitializationHostedService>()
-			.Single();
+		var task = Sp.GetServices<IHostedService>().OfType<LocalizerInitializationHostedService>().Single();
 		await task.StartAsync(CancellationToken.None);
 	}
 }

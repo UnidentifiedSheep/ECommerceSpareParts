@@ -66,8 +66,9 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
 			comment);
 	}
 
-	public void SetVehicle(Guid vehicleId) =>
-		VehicleId = vehicleId.EnsureNotEqual(Guid.Empty, UserVehicleIdNotEmptyMessage.Instance);
+	public void SetVehicle(Guid vehicleId) => VehicleId = vehicleId.EnsureNotEqual(
+		Guid.Empty,
+		UserVehicleIdNotEmptyMessage.Instance);
 
 	public void SetPlateNumber(string plateNumber) => PlateNumber = NormalizePlateNumber(plateNumber);
 

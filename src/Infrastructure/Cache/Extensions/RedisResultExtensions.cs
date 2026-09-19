@@ -30,8 +30,6 @@ public static class RedisResultExtensions
 		return root.Deserialize<T>();
 	}
 
-	public static IReadOnlyList<T?> DeserializeMany<T>(this IEnumerable<RedisResult> results)
-	{
-		return results.Select(Deserialize<T>).ToList();
-	}
+	public static IReadOnlyList<T?> DeserializeMany<T>(this IEnumerable<RedisResult> results) =>
+		results.Select(Deserialize<T>).ToList();
 }

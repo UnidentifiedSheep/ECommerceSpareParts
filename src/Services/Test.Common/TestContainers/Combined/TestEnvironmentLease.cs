@@ -6,15 +6,13 @@ public sealed class TestEnvironmentLease : IAsyncDisposable
 
 	private bool _disposed;
 
-	public TestEnvironmentSlot Slot { get; }
-
-	internal TestEnvironmentLease(
-		TestEnvironmentSlot slot,
-		Func<TestEnvironmentSlot, ValueTask> release)
+	internal TestEnvironmentLease(TestEnvironmentSlot slot, Func<TestEnvironmentSlot, ValueTask> release)
 	{
 		Slot = slot;
 		_release = release;
 	}
+
+	public TestEnvironmentSlot Slot { get; }
 
 	public async ValueTask DisposeAsync()
 	{

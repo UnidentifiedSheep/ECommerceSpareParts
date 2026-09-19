@@ -24,17 +24,14 @@ public static class RepositoriesExtensions
 		Type repositoryType,
 		Type linqRepositoryType,
 		Type readRepositoryType,
-		Assembly entitiesAssembly)
-		where TContext : DbContext
+		Assembly entitiesAssembly) where TContext : DbContext
 	{
 		services.AddScoped<AuditableEntitySaveChangesInterceptor>();
 		services.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
 
 		services.AddDbContext<TContext>((serviceProvider, options) =>
 		{
-			var databaseOptions = serviceProvider
-				.GetRequiredService<IOptions<DatabaseOptions>>()
-				.Value;
+			var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
 
 			options.UseNpgsql(databaseOptions.ConnectionString);
 
@@ -50,9 +47,7 @@ public static class RepositoriesExtensions
 			{
 				var options = new StoreOptions();
 
-				var databaseOptions = serviceProvider
-					.GetRequiredService<IOptions<DatabaseOptions>>()
-					.Value;
+				var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
 
 				options.Connection(databaseOptions.ConnectionString);
 				options.DatabaseSchemaName = "materialized";
@@ -61,13 +56,9 @@ public static class RepositoriesExtensions
 			})
 			.UseLightweightSessions();
 
-		services.AddScoped(
-			typeof(IDocumentRepository<,>),
-			typeof(DocumentRepository<,>));
+		services.AddScoped(typeof(IDocumentRepository<,>), typeof(DocumentRepository<,>));
 
-		services.AddScoped(
-			typeof(IDocumentReadRepository<,>),
-			typeof(DocumentReadRepository<,>));
+		services.AddScoped(typeof(IDocumentReadRepository<,>), typeof(DocumentReadRepository<,>));
 
 		AddRepositories(
 			services,
@@ -77,9 +68,7 @@ public static class RepositoriesExtensions
 
 		services.AddJobRepositories<TContext>();
 
-		services.AddScoped(
-			typeof(IReadRepository<,>),
-			readRepositoryType);
+		services.AddScoped(typeof(IReadRepository<,>), readRepositoryType);
 
 		services.AddUnitOfWork<TContext>();
 
@@ -101,17 +90,18 @@ public static class RepositoriesExtensions
 		{
 			var entityBase = FindEntityBase(discoveredType);
 
-			if (entityBase is null) continue;
+			if (entityBase is null)
+				continue;
 
 			var genericArguments = entityBase.GetGenericArguments();
 
 			var entityType = genericArguments[0];
 			var keyType = genericArguments[1];
 
-			if (!registered.Add((entityType, keyType))) continue;
+			if (!registered.Add((entityType, keyType)))
+				continue;
 
-			var linqEntityType = typeof(ILinqEntity<,>)
-				.MakeGenericType(entityType, keyType);
+			var linqEntityType = typeof(ILinqEntity<,>).MakeGenericType(entityType, keyType);
 
 			var repositoryDefinition = linqEntityType.IsAssignableFrom(entityType)
 				? linqRepositoryType
@@ -128,7 +118,8 @@ public static class RepositoriesExtensions
 	{
 		for (var current = type; current is not null; current = current.BaseType)
 		{
-			if (!current.IsGenericType) continue;
+			if (!current.IsGenericType)
+				continue;
 
 			if (current.GetGenericTypeDefinition() == typeof(Entity<,>))
 				return current;
@@ -137,8 +128,7 @@ public static class RepositoriesExtensions
 		return null;
 	}
 
-	public static IServiceCollection AddJobRepositories<TContext>(
-		this IServiceCollection services)
+	public static IServiceCollection AddJobRepositories<TContext>(this IServiceCollection services)
 		where TContext : DbContext
 	{
 		services.AddScoped<PendingUniqueJobFilter<TContext>>();

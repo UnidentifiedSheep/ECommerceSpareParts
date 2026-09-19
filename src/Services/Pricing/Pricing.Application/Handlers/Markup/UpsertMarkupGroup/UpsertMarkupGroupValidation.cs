@@ -33,9 +33,7 @@ public class UpsertMarkupGroupDtoValidation : AbstractValidator<UpsertMarkupGrou
 			.GreaterThan(0)
 			.WithLocalizableError(MarkupGroupCurrencyIdMustBePositiveMessage.Instance);
 
-		RuleFor(x => x.Ranges)
-			.NotEmpty()
-			.WithLocalizableError(MarkupGroupRangesRequiredMessage.Instance);
+		RuleFor(x => x.Ranges).NotEmpty().WithLocalizableError(MarkupGroupRangesRequiredMessage.Instance);
 
 		RuleForEach(x => x.Ranges).SetValidator(new UpsertMarkupRangeDtoValidation());
 	}

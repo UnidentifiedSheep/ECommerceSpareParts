@@ -18,8 +18,7 @@ public class SaleNotFoundException(Guid id) : LocalizedNotFoundException(
 
 public class SaleSoftConfirmationNeededException(string confirmationCode, Dictionary<string, int> reserved)
 	: LocalizedPreconditionRequiredException(
-		new SoftConfirmationNeededForSaleReservationReasonMessage()
-			.WithConfirmationCode(confirmationCode),
+		new SoftConfirmationNeededForSaleReservationReasonMessage().WithConfirmationCode(confirmationCode),
 		new
 		{
 			ConfirmationCode = confirmationCode, Reserved = reserved

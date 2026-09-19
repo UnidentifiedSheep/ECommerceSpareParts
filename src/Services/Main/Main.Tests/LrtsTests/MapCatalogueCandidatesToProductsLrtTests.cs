@@ -41,7 +41,7 @@ public sealed class
 		var persistedCandidate = await Context
 			.CatalogueCandidates
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == candidate.Id, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == candidate.Id, CancellationToken);
 		persistedCandidate.ProductId.Should().Be(product.Id);
 	}
 
@@ -66,7 +66,7 @@ public sealed class
 		var persistedCandidate = await Context
 			.CatalogueCandidates
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == candidate.Id, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == candidate.Id, CancellationToken);
 		persistedCandidate.ProductId.Should().BeNull();
 	}
 }

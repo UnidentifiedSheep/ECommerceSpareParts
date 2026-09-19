@@ -17,9 +17,15 @@ public class MakeEmailPrimaryTests(CombinedContainerFixture fixture) : Integrati
 	{
 		var user = await CreateUser();
 
-		await Mediator.Send(new MakeEmailPrimaryCommand(user.Id, "new-primary@example.com"), CancellationToken);
+		await Mediator.Send(
+			new MakeEmailPrimaryCommand(user.Id, "new-primary@example.com"),
+			CancellationToken);
 
-		var emails = await Context.UserEmails.AsNoTracking().Where(x => x.UserId == user.Id).ToListAsync(cancellationToken: CancellationToken);
+		var emails = await Context
+			.UserEmails
+			.AsNoTracking()
+			.Where(x => x.UserId == user.Id)
+			.ToListAsync(CancellationToken);
 		emails.Should().ContainSingle(x => x.IsPrimary);
 		emails.Single(x => x.IsPrimary).Email.Value.Should().Be("new-primary@example.com");
 	}
@@ -38,7 +44,7 @@ public class MakeEmailPrimaryTests(CombinedContainerFixture fixture) : Integrati
 		var primaryEmail = await Context
 			.UserEmails
 			.AsNoTracking()
-			.SingleAsync(x => x.UserId == user.Id && x.IsPrimary, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.UserId == user.Id && x.IsPrimary, CancellationToken);
 		primaryEmail.Email.Value.Should().Be("current-primary@example.com");
 	}
 

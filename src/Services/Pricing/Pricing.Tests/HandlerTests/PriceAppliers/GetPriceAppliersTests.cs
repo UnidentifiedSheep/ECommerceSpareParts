@@ -36,7 +36,9 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 	[Fact]
 	public async Task BySystemName_ReturnsRegistryOnlyLocalApplier()
 	{
-		var result = await Mediator.Send(new GetPriceApplierQuery(nameof(PriceRoundingApplier)), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPriceApplierQuery(nameof(PriceRoundingApplier)),
+			CancellationToken);
 
 		result.Applier.SystemName.Should().Be(nameof(PriceRoundingApplier));
 		result.Applier.Name.Should().NotBe(result.Applier.SystemName);
@@ -105,7 +107,9 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 	{
 		var query = new GetPriceApplierQuery($"missing-{Faker.Random.Guid():N}");
 
-		await Assert.ThrowsAsync<PriceApplierNotFoundException>(() => Mediator.Send(query, CancellationToken));
+		await Assert.ThrowsAsync<PriceApplierNotFoundException>(() => Mediator.Send(
+			query,
+			CancellationToken));
 	}
 
 	[Fact]
@@ -132,7 +136,9 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 				false)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(new GetPriceAppliersQuery(PriceOfferSourceType.Supplier), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPriceAppliersQuery(PriceOfferSourceType.Supplier),
+			CancellationToken);
 
 		result
 			.Appliers
@@ -172,7 +178,9 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 			.WithState(PriceOfferSourceType.OurWarehouse, 0)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(new GetPriceAppliersQuery(PriceOfferSourceType.Supplier), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPriceAppliersQuery(PriceOfferSourceType.Supplier),
+			CancellationToken);
 
 		var markup = result.Appliers.Single(x => x.SystemName == nameof(MarkupApplier));
 		markup.States.Should().ContainSingle();

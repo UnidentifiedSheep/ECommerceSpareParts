@@ -193,10 +193,9 @@ public class JobScheduleService(
 			token);
 	}
 
-	private DateTime? GetNextRunAt(JobSchedule schedule)
-	{
-		return CronExpression.Parse(schedule.Cron).GetNextOccurrence(GetUtcNow(), JobSchedule.TimeZone);
-	}
+	private DateTime? GetNextRunAt(JobSchedule schedule) => CronExpression
+		.Parse(schedule.Cron)
+		.GetNextOccurrence(GetUtcNow(), JobSchedule.TimeZone);
 
 	private DateTime GetUtcNow() => timeProvider.GetUtcNow().UtcDateTime;
 

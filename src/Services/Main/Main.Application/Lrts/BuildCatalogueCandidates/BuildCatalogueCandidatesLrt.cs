@@ -40,10 +40,12 @@ public class BuildCatalogueCandidatesLrt(
 		"23505");
 
 	public override string SystemName => LrtSystemName;
-	public override ILocalizableMessage NameLocalizationMessage
-		=> LrtCatalogueCandidatesBuildNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage
-		=> LrtCatalogueCandidatesBuildDescriptionMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtCatalogueCandidatesBuildNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtCatalogueCandidatesBuildDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

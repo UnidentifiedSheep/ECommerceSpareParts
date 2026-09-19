@@ -6,10 +6,8 @@ namespace Main.Application.Extensions.Entities;
 
 public static class UserExtensions
 {
-	public static UserPartyType GetPartyType(this User user)
-	{
-		return user.HasSystem() ? UserPartyType.System : UserPartyType.User;
-	}
+	public static UserPartyType GetPartyType(this User user) =>
+		user.HasSystem() ? UserPartyType.System : UserPartyType.User;
 
 	public static bool HasSystem(this User user) => user.HasRole(Role.System);
 

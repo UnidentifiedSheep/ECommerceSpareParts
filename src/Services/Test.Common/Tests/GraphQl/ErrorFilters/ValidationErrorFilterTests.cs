@@ -8,6 +8,7 @@ using Locan.Core.LocalizableMessages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tests.Stubs;
+using Path = HotChocolate.Path;
 
 namespace Tests.Tests.GraphQl.ErrorFilters;
 
@@ -34,13 +35,14 @@ public class ValidationErrorFilterTests
 
 		result.Code.Should().Be("VALIDATION_ERROR");
 		result.Exception.Should().BeNull();
-		result.Path.Should().Be(HotChocolate.Path.FromList(["field"]));
+		result.Path.Should().Be(Path.FromList(["field"]));
 		result.Locations.Should().ContainSingle().Which.Should().Be(new Location(2, 3));
 		result.Extensions.Should().ContainKey("status").WhoseValue.Should().Be(400);
 		result.Extensions.Should().ContainKey("traceId").WhoseValue.Should().Be("test-trace-id");
 
 		result.Message.Should().Be("Validation failed");
-		var errors = result.Extensions!["validationErrors"].Should()
+		var errors = result.Extensions!["validationErrors"]
+			.Should()
 			.BeAssignableTo<IReadOnlyCollection<IReadOnlyDictionary<string, object?>>>()
 			.Subject;
 		var validationError = errors.Should().ContainSingle().Subject;
@@ -55,15 +57,15 @@ public class ValidationErrorFilterTests
 	{
 		var failure = new ValidationFailure("Name", "fallback")
 		{
-			ErrorCode = "Validation.Missing",
-			CustomState = new LocalizableMessage("Validation.Missing")
+			ErrorCode = "Validation.Missing", CustomState = new LocalizableMessage("Validation.Missing")
 		};
 		var exception = new ValidationException([failure]);
 		var filter = CreateFilter();
 
 		var result = filter.OnError(ErrorFilterTestFactory.CreateError(exception));
 
-		var errors = result.Extensions!["validationErrors"].Should()
+		var errors = result.Extensions!["validationErrors"]
+			.Should()
 			.BeAssignableTo<IReadOnlyCollection<IReadOnlyDictionary<string, object?>>>()
 			.Subject;
 		errors.Should().ContainSingle().Which["errorMessage"].Should().Be("fallback");
@@ -80,9 +82,8 @@ public class ValidationErrorFilterTests
 		result.Should().BeSameAs(error);
 	}
 
-	private static ValidationErrorFilter CreateFilter(ILoggerFactory? loggerFactory = null) =>
-		new(
-			loggerFactory ?? NullLoggerFactory.Instance,
-			ErrorFilterTestFactory.CreateLocalizer(),
-			ErrorFilterTestFactory.CreateHttpContextAccessor());
+	private static ValidationErrorFilter CreateFilter(ILoggerFactory? loggerFactory = null) => new(
+		loggerFactory ?? NullLoggerFactory.Instance,
+		ErrorFilterTestFactory.CreateLocalizer(),
+		ErrorFilterTestFactory.CreateHttpContextAccessor());
 }

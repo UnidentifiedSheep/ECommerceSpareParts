@@ -38,7 +38,8 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 		projectedSupplierProduct.Producer.Should().Be(supplierProduct.Producer);
 		projectedSupplierProduct.Supplier.Should().Be(supplierProduct.Supplier);
 		projectedSupplierProduct.CandidateId.Should().Be(candidate.Id);
-		projectedSupplierProduct.Names
+		projectedSupplierProduct
+			.Names
 			.Select(x => x.Name)
 			.Should()
 			.Equal(supplierProduct.Names.Select(x => x.Name));
@@ -83,9 +84,7 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 	public async Task ProductIdAndSkuSpecified_AppliesBothFilters()
 	{
 		var producerId = TestContext.Candidates[0].ProducerId;
-		var product = await new ProductBuilder(Faker)
-			.WithProducerId(producerId)
-			.BuildAndAddToDb(Context);
+		var product = await new ProductBuilder(Faker).WithProducerId(producerId).BuildAndAddToDb(Context);
 		await new CatalogueCandidateBuilder(Faker)
 			.WithSku("mapped-sku")
 			.WithProducerId(producerId)

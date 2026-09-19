@@ -75,7 +75,8 @@ public class OrganizationTests
 
 		var exception = action.Should().Throw<InvalidInputException>().Which;
 		exception
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be(
 				string.IsNullOrWhiteSpace(name)
@@ -92,7 +93,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.name.max.length");
 	}
@@ -111,7 +113,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.system.name.required");
 	}
@@ -155,7 +158,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.member.already.exists");
 	}
@@ -171,7 +175,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.owner.already.exists");
 	}
@@ -191,7 +196,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.individual.only.owner.allowed");
 	}
@@ -232,7 +238,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.owner.cannot.be.removed");
 		organization.Members.Should().ContainSingle(x => x.UserId == ownerId);
@@ -273,7 +280,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.member.not.found");
 	}
@@ -290,7 +298,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.owner.role.cannot.be.changed");
 		organization.Members.Single(x => x.UserId == ownerId).Role.Should().Be(OrganizationRole.Owner);
@@ -309,7 +318,8 @@ public class OrganizationTests
 			.Should()
 			.Throw<InvalidInputException>()
 			.Which
-			.LocalizableMessage.MessageKey
+			.LocalizableMessage
+			.MessageKey
 			.Should()
 			.Be("organization.owner.already.exists");
 		organization.Members.Should().ContainSingle(x => x.Role == OrganizationRole.Owner);

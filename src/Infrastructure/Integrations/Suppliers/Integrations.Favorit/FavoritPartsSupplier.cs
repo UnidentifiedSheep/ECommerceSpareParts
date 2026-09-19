@@ -47,10 +47,9 @@ public class FavoritPartsSupplier(
 		};
 	}
 
-	private static List<SupplierProduct> AdaptResponse(GetPricesResponse response, FavoriteSettings settings)
-	{
-		return response.Goods.Select(good => AdaptGood(good, settings)).ToList();
-	}
+	private static List<SupplierProduct>
+		AdaptResponse(GetPricesResponse response, FavoriteSettings settings) =>
+		response.Goods.Select(good => AdaptGood(good, settings)).ToList();
 
 	private static SupplierProduct AdaptGood(Good good, FavoriteSettings settings)
 	{

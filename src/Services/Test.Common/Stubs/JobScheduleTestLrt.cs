@@ -19,10 +19,11 @@ public sealed class JobScheduleTestLrt : ILrtNamedObject<JobScheduleTestInputSta
 
 	public string SystemName => LrtName;
 
-	public ILocalizableMessage NameLocalizationMessage
-		=> new LocalizableMessage("test-job-schedule-lrt.name");
-	public ILocalizableMessage DescriptionLocalizationMessage
-		=> new LocalizableMessage("test-job-schedule-lrt.description");
+	public ILocalizableMessage NameLocalizationMessage =>
+		new LocalizableMessage("test-job-schedule-lrt.name");
+
+	public ILocalizableMessage DescriptionLocalizationMessage =>
+		new LocalizableMessage("test-job-schedule-lrt.description");
 
 	public Type InputType => typeof(JobScheduleTestInputState);
 

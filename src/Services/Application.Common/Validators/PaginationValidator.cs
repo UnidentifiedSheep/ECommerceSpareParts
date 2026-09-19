@@ -19,8 +19,6 @@ public class PaginationValidator : AbstractValidator<Pagination>
 			.GreaterThanOrEqualTo(0)
 			.WithLocalizableError(PaginationPageMinDefaultMessage.Instance);
 
-		RuleFor(query => query.Size)
-			.InclusiveBetween(minSize, maxSize)
-			.WithLocalizableError(sizeMessage);
+		RuleFor(query => query.Size).InclusiveBetween(minSize, maxSize).WithLocalizableError(sizeMessage);
 	}
 }

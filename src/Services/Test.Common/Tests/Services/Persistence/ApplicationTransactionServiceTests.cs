@@ -71,11 +71,14 @@ public sealed class ApplicationTransactionServiceTests
 			CreatePublisher(calls).Object,
 			Mock.Of<IApplicationTransactionContext>());
 
-		var result = await service.ExecuteAsync(null, (_, _) =>
+		var result = await service.ExecuteAsync(
+			null,
+			(_, _) =>
 			{
 				calls.Add("action");
 				return Task.FromResult(42);
-			}, TestContext.Current.CancellationToken);
+			},
+			TestContext.Current.CancellationToken);
 
 		result.Should().Be(42);
 		calls
@@ -137,11 +140,14 @@ public sealed class ApplicationTransactionServiceTests
 			publisher.Object,
 			Mock.Of<IApplicationTransactionContext>());
 
-		await service.ExecuteAsync(null, (_, _) =>
+		await service.ExecuteAsync(
+			null,
+			(_, _) =>
 			{
 				integrationEventScope.Add("routed", "test-service");
 				return Task.CompletedTask;
-			}, TestContext.Current.CancellationToken);
+			},
+			TestContext.Current.CancellationToken);
 
 		publisher.Verify(
 			x => x.Publish(

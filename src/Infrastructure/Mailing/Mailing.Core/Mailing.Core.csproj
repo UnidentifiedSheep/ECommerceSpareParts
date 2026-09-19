@@ -12,12 +12,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Locan.Generator" Version="1.0.6" />
+        <PackageReference Include="Locan.Generator" Version="1.0.6"/>
     </ItemGroup>
 
     <ItemGroup>
         <LocanResource Include="Localization/**/*.json"
                        GenerateMessages="true"
-                       CopyToOutput="false" />
+                       CopyToOutput="false"/>
     </ItemGroup>
 </Project>

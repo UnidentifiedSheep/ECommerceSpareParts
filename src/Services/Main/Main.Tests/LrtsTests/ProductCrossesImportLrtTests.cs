@@ -46,6 +46,6 @@ public sealed class ProductCrossesImportLrtTests : CsvLrtIntegrationTest<Product
 		var state = execution.GetState<ProductCrossesImportState>();
 		state.Errors.Should().BeEmpty();
 		state.SkippedLines.Should().ContainSingle().Which.Should().Be(2);
-		(await Context.ProductCrosses.AsNoTracking().CountAsync(cancellationToken: CancellationToken)).Should().Be(1);
+		(await Context.ProductCrosses.AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
 	}
 }

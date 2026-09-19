@@ -32,17 +32,19 @@ public class CreateSystemTransactionTests : IntegrationTest
 		var currency = CurrencyContext.Currencies[0];
 		var amount = 125.50m;
 
-		var result = await Mediator.Send(new CreateSystemTransactionCommand(
+		var result = await Mediator.Send(
+			new CreateSystemTransactionCommand(
 				user.Id,
 				amount,
 				currency.Id,
 				DateTime.UtcNow,
-				SystemTransactionDirection.UserToSystem), CancellationToken);
+				SystemTransactionDirection.UserToSystem),
+			CancellationToken);
 
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.FirstAsync(x => x.Id == result.Transaction.Id, cancellationToken: CancellationToken);
+			.FirstAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
 		transaction.SenderId.Should().Be(user.Id);
 		transaction.ReceiverId.Should().Be(systemUser.Id);
@@ -53,11 +55,13 @@ public class CreateSystemTransactionTests : IntegrationTest
 		var userBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, cancellationToken: CancellationToken);
+			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var systemBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id, cancellationToken: CancellationToken);
+			.FirstAsync(
+				x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id,
+				CancellationToken);
 
 		userBalance.Balance.Should().Be(amount);
 		systemBalance.Balance.Should().Be(-amount);
@@ -72,17 +76,19 @@ public class CreateSystemTransactionTests : IntegrationTest
 		var amount = 75m;
 		await AllowDebit(user.Id, amount);
 
-		var result = await Mediator.Send(new CreateSystemTransactionCommand(
+		var result = await Mediator.Send(
+			new CreateSystemTransactionCommand(
 				user.Id,
 				amount,
 				currency.Id,
 				DateTime.UtcNow,
-				SystemTransactionDirection.SystemToUser), CancellationToken);
+				SystemTransactionDirection.SystemToUser),
+			CancellationToken);
 
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.FirstAsync(x => x.Id == result.Transaction.Id, cancellationToken: CancellationToken);
+			.FirstAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
 		transaction.SenderId.Should().Be(systemUser.Id);
 		transaction.ReceiverId.Should().Be(user.Id);
@@ -93,11 +99,13 @@ public class CreateSystemTransactionTests : IntegrationTest
 		var userBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, cancellationToken: CancellationToken);
+			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var systemBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id, cancellationToken: CancellationToken);
+			.FirstAsync(
+				x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id,
+				CancellationToken);
 
 		userBalance.Balance.Should().Be(-amount);
 		systemBalance.Balance.Should().Be(amount);

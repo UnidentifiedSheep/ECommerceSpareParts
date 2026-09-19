@@ -39,14 +39,18 @@ public class GetOrganizationMembersTests : IntegrationTest
 		var users = GetContext<UsersTestContext>().Users.ToArray();
 		var organization = await CreateOrganization(users.Select(x => x.Id).ToArray());
 
-		var firstPage = await Mediator.Send(CreateQuery(
+		var firstPage = await Mediator.Send(
+			CreateQuery(
 				organization.Id,
 				0,
-				2), CancellationToken);
-		var secondPage = await Mediator.Send(CreateQuery(
+				2),
+			CancellationToken);
+		var secondPage = await Mediator.Send(
+			CreateQuery(
 				organization.Id,
 				1,
-				2), CancellationToken);
+				2),
+			CancellationToken);
 
 		firstPage.Members.Should().HaveCount(2);
 		secondPage.Members.Should().ContainSingle();
@@ -70,7 +74,8 @@ public class GetOrganizationMembersTests : IntegrationTest
 	{
 		var query = CreateQuery(Guid.NewGuid());
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationsNotFound);
 	}
@@ -78,10 +83,7 @@ public class GetOrganizationMembersTests : IntegrationTest
 	private static GetOrganizationMembersQuery CreateQuery(
 		Guid organizationId,
 		int page = 0,
-		int size = 20)
-	{
-		return new GetOrganizationMembersQuery(organizationId, new Pagination(page, size));
-	}
+		int size = 20) => new(organizationId, new Pagination(page, size));
 
 	private async Task<Organization> CreateOrganization(Guid[] userIds)
 	{

@@ -59,9 +59,7 @@ public sealed record SalesProfitChartQuery : CursorChartQueryInput<DateTime>
 			EndDate,
 			ChartSalesProfitQueryStartDateMustBeBeforeOrEqualEndDateMessage.Instance);
 
-		Granularity.Ensure(
-			Enum.IsDefined,
-			ChartSalesProfitQueryGranularityUnsupportedMessage.Instance);
+		Granularity.Ensure(Enum.IsDefined, ChartSalesProfitQueryGranularityUnsupportedMessage.Instance);
 
 		if (Cursor is { } cursor)
 			cursor.Ensure(

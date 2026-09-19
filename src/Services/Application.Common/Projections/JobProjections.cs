@@ -5,7 +5,6 @@ using Application.Common.Interfaces.Projections;
 using Attributes;
 using CronExpressionDescriptor;
 using Domain.CommonEntities.Job;
-using Locan.Core.Interfaces.Localizers;
 
 namespace Application.Common.Projections;
 

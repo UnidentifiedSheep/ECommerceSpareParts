@@ -41,7 +41,7 @@ public class CreateProductReservationTests : IntegrationTest
 		var db = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.ReservationId, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == result.ReservationId, CancellationToken);
 
 		db.Comment.Should().Be(dto.Comment);
 		db.ProductId.Should().Be(dto.ProductId);
@@ -79,7 +79,7 @@ public class CreateProductReservationTests : IntegrationTest
 		var db = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.ReservationId, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == result.ReservationId, CancellationToken);
 		db.Status.Should().Be(ProductReservationStatus.Done);
 	}
 
@@ -96,7 +96,7 @@ public class CreateProductReservationTests : IntegrationTest
 		var reservation = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.ReservationId, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == result.ReservationId, CancellationToken);
 
 		reservation.ProposedPrice.Should().BeNull();
 		reservation.ProposedCurrencyId.Should().BeNull();
@@ -187,8 +187,9 @@ public class CreateProductReservationTests : IntegrationTest
 			OrganizationId = Guid.NewGuid()
 		};
 
-		await Assert.ThrowsAsync<DbValidationException>(() =>
-			Mediator.Send(new CreateProductReservationCommand(dto), CancellationToken));
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
+			new CreateProductReservationCommand(dto),
+			CancellationToken));
 	}
 
 	[Fact]

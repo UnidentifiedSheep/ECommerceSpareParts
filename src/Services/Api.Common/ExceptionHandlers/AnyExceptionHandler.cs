@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class AnyExceptionHandler(
-	ILogger<AnyExceptionHandler> logger,
-	IContextualLocalizer localizer)
+public class AnyExceptionHandler(ILogger<AnyExceptionHandler> logger, IContextualLocalizer localizer)
 	: ExceptionHandlerBase<AnyExceptionHandler>(logger)
 {
 	public override async ValueTask<bool> TryHandleAsync(
@@ -15,7 +13,10 @@ public class AnyExceptionHandler(
 		CancellationToken cancellationToken)
 	{
 		var statusCode = GetStatusCode(exception);
-		LogException(httpContext, exception, statusCode);
+		LogException(
+			httpContext,
+			exception,
+			statusCode);
 
 		var problemDetails = GetBaseDetails(
 			exception,
@@ -24,9 +25,7 @@ public class AnyExceptionHandler(
 		if (statusCode == StatusCodes.Status500InternalServerError)
 			problemDetails.Detail = nameof(InternalServerException);
 
-		SetLocalizedDetail(
-			problemDetails,
-			exception);
+		SetLocalizedDetail(problemDetails, exception);
 		AddExceptionRelatedData(problemDetails, exception);
 
 		httpContext.Response.StatusCode = statusCode;
@@ -34,9 +33,7 @@ public class AnyExceptionHandler(
 		return true;
 	}
 
-	private void SetLocalizedDetail(
-		ProblemDetails problemDetails,
-		Exception exception)
+	private void SetLocalizedDetail(ProblemDetails problemDetails, Exception exception)
 	{
 		if (TryGetLocalizableMessageFromException(
 				localizer,

@@ -47,7 +47,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.Set<PriceApplier>()
 			.AsNoTracking()
 			.Include(x => x.States)
-			.SingleAsync(x => x.SystemName == systemName, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.SystemName == systemName, CancellationToken);
 
 		JsonNode.DeepEquals(JsonNode.Parse(applier.DslLogic!), JsonNode.Parse(dslLogic)).Should().BeTrue();
 		applier.Name.Should().Be(name);
@@ -79,7 +79,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.Set<PriceApplier>()
 			.AsNoTracking()
 			.Include(x => x.States)
-			.SingleAsync(x => x.SystemName == existing.SystemName, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.SystemName == existing.SystemName, CancellationToken);
 
 		JsonNode.DeepEquals(JsonNode.Parse(applier.DslLogic!), JsonNode.Parse(newDslLogic)).Should().BeTrue();
 		applier.Name.Should().Be(command.Name);
@@ -105,7 +105,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.Set<PriceApplierState>()
 			.AsNoTracking()
 			.Where(x => x.PriceApplierSystemName == existing.SystemName)
-			.ToListAsync(cancellationToken: CancellationToken);
+			.ToListAsync(CancellationToken);
 		states.Should().ContainSingle(x => x.Usage == PriceOfferSourceType.Supplier && x.Order == 30);
 	}
 
@@ -126,7 +126,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.Set<PriceApplier>()
 			.AsNoTracking()
 			.Include(x => x.States)
-			.SingleAsync(x => x.SystemName == nameof(MarkupApplier), cancellationToken: CancellationToken);
+			.SingleAsync(x => x.SystemName == nameof(MarkupApplier), CancellationToken);
 
 		applier.Name.Should().BeNull();
 		applier.DslLogic.Should().BeNull();
@@ -157,7 +157,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var state = await Context
 			.Set<PriceApplierState>()
 			.AsNoTracking()
-			.SingleAsync(x => x.PriceApplierSystemName == existing.SystemName, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.PriceApplierSystemName == existing.SystemName, CancellationToken);
 
 		state.Enabled.Should().BeFalse();
 		state.Order.Should().Be(100_000);
@@ -184,11 +184,13 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.Set<PriceApplierState>()
 			.AsNoTracking()
 			.Where(x => x.PriceApplierSystemName == existing.SystemName)
-			.ToListAsync(cancellationToken: CancellationToken);
+			.ToListAsync(CancellationToken);
 		states.Should().ContainSingle(x => x.Usage == PriceOfferSourceType.Supplier);
 
 		var service = Scope.ServiceProvider.GetRequiredService<IPriceApplierService>();
-		var warehouseAppliers = await service.GetPriceAppliersAsync(PriceOfferSourceType.OurWarehouse, CancellationToken);
+		var warehouseAppliers = await service.GetPriceAppliersAsync(
+			PriceOfferSourceType.OurWarehouse,
+			CancellationToken);
 		warehouseAppliers.Should().NotContain(x => x is MarkupApplier);
 	}
 
@@ -201,7 +203,8 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			"""{"var":"salePrice"}""",
 			[State(PriceOfferSourceType.Supplier, 10), State(PriceOfferSourceType.Supplier, 20)]);
 
-		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Errors.Should().ContainSingle(x => x.ErrorCode == "price.applier.usage.duplicate");
 	}
@@ -216,13 +219,14 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			"  ",
 			[]);
 
-		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.dsl.logic.required");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == systemName, cancellationToken: CancellationToken);
+			.AnyAsync(x => x.SystemName == systemName, CancellationToken);
 		exists.Should().BeFalse();
 	}
 
@@ -236,13 +240,14 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			"""{"var":"salePrice"}""",
 			[]);
 
-		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.name.required");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == systemName, cancellationToken: CancellationToken);
+			.AnyAsync(x => x.SystemName == systemName, CancellationToken);
 		exists.Should().BeFalse();
 	}
 
@@ -255,7 +260,8 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			"""{"var":"salePrice"}""",
 			[]);
 
-		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Errors.Should().ContainSingle(x => x.ErrorCode == "price.applier.name.max.length");
 	}
@@ -274,13 +280,14 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			dslLogic,
 			[State(PriceOfferSourceType.Supplier, 10)]);
 
-		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.dsl.logic.invalid");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == systemName, cancellationToken: CancellationToken);
+			.AnyAsync(x => x.SystemName == systemName, CancellationToken);
 		exists.Should().BeFalse();
 	}
 
@@ -294,13 +301,14 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			"""{"var":"salePrice"}""",
 			[State(PriceOfferSourceType.Supplier, null)]);
 
-		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.order.required");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == systemName, cancellationToken: CancellationToken);
+			.AnyAsync(x => x.SystemName == systemName, CancellationToken);
 		exists.Should().BeFalse();
 	}
 
@@ -313,7 +321,8 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			null,
 			[State(PriceOfferSourceType.Supplier, null)]);
 
-		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.usage.not.supported");
 	}
@@ -330,7 +339,8 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			null,
 			[]);
 
-		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.system.name.conflict");
 	}
@@ -347,7 +357,8 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			"""{"var":"salePrice"}""",
 			[State(PriceOfferSourceType.Supplier, 10)]);
 
-		var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.order.duplicate");
 	}
@@ -370,7 +381,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var exists = await Context
 			.Set<PriceApplierState>()
 			.AsNoTracking()
-			.AnyAsync(x => x.PriceApplierSystemName == systemName, cancellationToken: CancellationToken);
+			.AnyAsync(x => x.PriceApplierSystemName == systemName, CancellationToken);
 		exists.Should().BeTrue();
 	}
 
@@ -395,7 +406,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var state = await Context
 			.Set<PriceApplierState>()
 			.AsNoTracking()
-			.SingleAsync(x => x.PriceApplierSystemName == systemName, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.PriceApplierSystemName == systemName, CancellationToken);
 		state.Enabled.Should().BeTrue();
 	}
 
@@ -422,7 +433,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var state = await Context
 			.Set<PriceApplierState>()
 			.AsNoTracking()
-			.SingleAsync(x => x.PriceApplierSystemName == systemName, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.PriceApplierSystemName == systemName, CancellationToken);
 		state.Enabled.Should().BeFalse();
 	}
 
@@ -433,11 +444,13 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var systemName = $"dynamic-{Faker.Random.Guid():N}";
 		var initialConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 
-		await Mediator.Send(new UpsertPriceApplierCommand(
+		await Mediator.Send(
+			new UpsertPriceApplierCommand(
 				systemName,
 				"Created rule",
 				"""{"var":"salePrice"}""",
-				[State(PriceOfferSourceType.Supplier, 10)]), CancellationToken);
+				[State(PriceOfferSourceType.Supplier, 10)]),
+			CancellationToken);
 
 		var updatedConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 		updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);
@@ -446,7 +459,9 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var recalculationJobExists = await Context
 			.Set<Job>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName && x.NaturalKey != null, cancellationToken: CancellationToken);
+			.AnyAsync(
+				x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName && x.NaturalKey != null,
+				CancellationToken);
 		recalculationJobExists.Should().BeTrue();
 	}
 
@@ -460,11 +475,13 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
 		var initialConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 
-		await Mediator.Send(new UpsertPriceApplierCommand(
+		await Mediator.Send(
+			new UpsertPriceApplierCommand(
 				existing.SystemName,
 				"Updated rule",
 				"""{"var":"cost"}""",
-				[State(PriceOfferSourceType.Supplier, 10)]), CancellationToken);
+				[State(PriceOfferSourceType.Supplier, 10)]),
+			CancellationToken);
 
 		var updatedConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 		updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);
@@ -490,11 +507,13 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
 		var initialConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 
-		await Mediator.Send(new UpsertPriceApplierCommand(
+		await Mediator.Send(
+			new UpsertPriceApplierCommand(
 				existing.SystemName,
 				null,
 				null,
-				[State(PriceOfferSourceType.Supplier, null)]), CancellationToken);
+				[State(PriceOfferSourceType.Supplier, null)]),
+			CancellationToken);
 
 		var updatedConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 		updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);

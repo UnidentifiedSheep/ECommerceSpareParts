@@ -18,7 +18,9 @@ public class GetUserEmailTests : IntegrationTest
 	[Fact]
 	public async Task ExistingEmail_ReturnsProjectedEmail()
 	{
-		var result = await Mediator.Send(new GetUserEmailQuery(TestContext.User.Id, TestContext.Email.GetId()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetUserEmailQuery(TestContext.User.Id, TestContext.Email.GetId()),
+			CancellationToken);
 
 		result.Email.Email.Should().Be(TestContext.Email.GetId());
 		result.Email.EmailType.Should().Be(TestContext.Email.EmailType);

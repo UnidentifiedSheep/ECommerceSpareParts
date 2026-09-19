@@ -46,7 +46,7 @@ public sealed class
 			.ProducerSupplierMappings
 			.AsNoTracking()
 			.Where(x => x.ProducerId == producer.Id)
-			.ToListAsync(cancellationToken: CancellationToken);
+			.ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(2);
 	}
 
@@ -67,7 +67,7 @@ public sealed class
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		Context.ChangeTracker.Clear();
-		var persisted = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
+		var persisted = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
 		persisted.ProducerId.Should().Be(existing.ProducerId);
 	}
 
@@ -98,7 +98,7 @@ public sealed class
 		var state = execution.GetState<ProducerSupplierMappingImportState>();
 		state.Errors.Should().HaveCount(3);
 
-		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
+		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
 		mapping.SupplierProducerName.Should().Be("Bosch");
 	}
 

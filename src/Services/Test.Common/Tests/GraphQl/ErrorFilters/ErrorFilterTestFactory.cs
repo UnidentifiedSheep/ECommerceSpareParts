@@ -3,6 +3,7 @@ using HotChocolate;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
+using Path = HotChocolate.Path;
 
 namespace Tests.Tests.GraphQl.ErrorFilters;
 
@@ -32,7 +33,7 @@ internal static class ErrorFilterTestFactory
 			.New()
 			.SetMessage("Unexpected Execution Error")
 			.SetException(exception)
-			.SetPath(HotChocolate.Path.FromList(["field"]))
+			.SetPath(Path.FromList(["field"]))
 			.AddLocation(new Location(2, 3))
 			.Build();
 	}

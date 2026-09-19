@@ -103,8 +103,7 @@ public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : In
 			.ReturnsAsync(Response<decimal>.Fail(statusCode, error));
 	}
 
-	private void VerifyCurrencyRateRequested(int currencyId, Times times)
-	{
-		_currencyMock.Verify(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()), times);
-	}
+	private void VerifyCurrencyRateRequested(int currencyId, Times times) => _currencyMock.Verify(
+		x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()),
+		times);
 }

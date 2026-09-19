@@ -62,7 +62,13 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
 		var purchase = PurchaseContext.Purchase;
 
-		await _service.ApplyAsync(purchase, [ToLogisticsItem(purchase.Contents.Single())], route.FromStorageCode, DateTime.UtcNow, GetContext<UserContextTestContext>().SystemUser.Id, CancellationToken);
+		await _service.ApplyAsync(
+			purchase,
+			[ToLogisticsItem(purchase.Contents.Single())],
+			route.FromStorageCode,
+			DateTime.UtcNow,
+			GetContext<UserContextTestContext>().SystemUser.Id,
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var updatedPurchase = await LoadPurchase();
@@ -71,7 +77,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId, CancellationToken);
 		transaction.SenderId.Should().Be(route.CarrierId!.Value);
 		transaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
 		transaction.SourceType.Should().Be(TransactionSourceType.Logistic);
@@ -86,7 +92,13 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 
 		var purchase = PurchaseContext.Purchase;
 
-		await _service.ApplyAsync(purchase, [ToLogisticsItem(purchase.Contents.Single())], route.FromStorageCode, DateTime.UtcNow, GetContext<UserContextTestContext>().SystemUser.Id, CancellationToken);
+		await _service.ApplyAsync(
+			purchase,
+			[ToLogisticsItem(purchase.Contents.Single())],
+			route.FromStorageCode,
+			DateTime.UtcNow,
+			GetContext<UserContextTestContext>().SystemUser.Id,
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var updatedPurchase = await LoadPurchase();
@@ -116,7 +128,13 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 			null,
 			false);
 		await Context.SaveChangesAsync(CancellationToken);
-		await _service.ApplyAsync(purchase, [ToLogisticsItem(content)], route.FromStorageCode, DateTime.UtcNow, GetContext<UserContextTestContext>().SystemUser.Id, CancellationToken);
+		await _service.ApplyAsync(
+			purchase,
+			[ToLogisticsItem(content)],
+			route.FromStorageCode,
+			DateTime.UtcNow,
+			GetContext<UserContextTestContext>().SystemUser.Id,
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var updatedPurchase = await LoadPurchase();
@@ -147,10 +165,22 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 		purchase.AddContent(secondContent);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		await _service.ApplyAsync(purchase, [ToLogisticsItem(firstContent), ToLogisticsItem(secondContent)], route.FromStorageCode, DateTime.UtcNow, GetContext<UserContextTestContext>().SystemUser.Id, CancellationToken);
+		await _service.ApplyAsync(
+			purchase,
+			[ToLogisticsItem(firstContent), ToLogisticsItem(secondContent)],
+			route.FromStorageCode,
+			DateTime.UtcNow,
+			GetContext<UserContextTestContext>().SystemUser.Id,
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		await _service.ApplyAsync(purchase, [ToLogisticsItem(firstContent)], route.FromStorageCode, DateTime.UtcNow, GetContext<UserContextTestContext>().SystemUser.Id, CancellationToken);
+		await _service.ApplyAsync(
+			purchase,
+			[ToLogisticsItem(firstContent)],
+			route.FromStorageCode,
+			DateTime.UtcNow,
+			GetContext<UserContextTestContext>().SystemUser.Id,
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var updatedPurchase = await LoadPurchase();
@@ -174,10 +204,22 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
 		var purchase = PurchaseContext.Purchase;
 
-		await _service.ApplyAsync(purchase, [ToLogisticsItem(purchase.Contents.Single())], route.FromStorageCode, DateTime.UtcNow, GetContext<UserContextTestContext>().SystemUser.Id, CancellationToken);
+		await _service.ApplyAsync(
+			purchase,
+			[ToLogisticsItem(purchase.Contents.Single())],
+			route.FromStorageCode,
+			DateTime.UtcNow,
+			GetContext<UserContextTestContext>().SystemUser.Id,
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		await _service.ApplyAsync(purchase, [], null, DateTime.UtcNow, GetContext<UserContextTestContext>().SystemUser.Id, CancellationToken);
+		await _service.ApplyAsync(
+			purchase,
+			[],
+			null,
+			DateTime.UtcNow,
+			GetContext<UserContextTestContext>().SystemUser.Id,
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var updatedPurchase = await LoadPurchase();

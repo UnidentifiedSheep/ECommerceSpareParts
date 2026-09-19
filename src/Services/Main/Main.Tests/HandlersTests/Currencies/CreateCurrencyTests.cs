@@ -29,7 +29,8 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 			GetValidName(),
 			GetValidCurrencySign(),
 			GetValidCurrencyCode());
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -46,7 +47,8 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 			name,
 			GetValidCurrencySign(),
 			GetValidCurrencyCode());
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -60,7 +62,8 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 			GetValidName(),
 			sign,
 			GetValidCurrencyCode());
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -75,7 +78,8 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 			GetValidName(),
 			GetValidCurrencySign(),
 			code);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -83,39 +87,43 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 	{
 		var created = await new CurrencyBuilder(Faker).BuildAndAddToDb(Context);
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-			await Mediator.Send(new CreateCurrencyCommand(
-					GetValidShortName(),
-					GetValidName(),
-					GetValidCurrencySign(),
-					created.Code), CancellationToken));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(
+			new CreateCurrencyCommand(
+				GetValidShortName(),
+				GetValidName(),
+				GetValidCurrencySign(),
+				created.Code),
+			CancellationToken));
 
 		Assert.Equal(ApplicationErrors.CurrencyCodeAlreadyTaken, exception.Failures[0].ErrorName);
 
-		exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-			await Mediator.Send(new CreateCurrencyCommand(
-					GetValidShortName(),
-					created.Name,
-					GetValidCurrencySign(),
-					GetValidCurrencyCode()), CancellationToken));
+		exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(
+			new CreateCurrencyCommand(
+				GetValidShortName(),
+				created.Name,
+				GetValidCurrencySign(),
+				GetValidCurrencyCode()),
+			CancellationToken));
 
 		Assert.Equal(ApplicationErrors.CurrencyNameAlreadyTaken, exception.Failures[0].ErrorName);
 
-		exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-			await Mediator.Send(new CreateCurrencyCommand(
-					GetValidShortName(),
-					GetValidName(),
-					created.CurrencySign,
-					GetValidCurrencyCode()), CancellationToken));
+		exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(
+			new CreateCurrencyCommand(
+				GetValidShortName(),
+				GetValidName(),
+				created.CurrencySign,
+				GetValidCurrencyCode()),
+			CancellationToken));
 
 		Assert.Equal(ApplicationErrors.CurrencySignAlreadyTaken, exception.Failures[0].ErrorName);
 
-		exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-			await Mediator.Send(new CreateCurrencyCommand(
-					created.ShortName,
-					GetValidName(),
-					GetValidCurrencySign(),
-					GetValidCurrencyCode()), CancellationToken));
+		exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(
+			new CreateCurrencyCommand(
+				created.ShortName,
+				GetValidName(),
+				GetValidCurrencySign(),
+				GetValidCurrencyCode()),
+			CancellationToken));
 
 		Assert.Equal(ApplicationErrors.CurrencyShortNameAlreadyTaken, exception.Failures[0].ErrorName);
 	}
@@ -128,13 +136,15 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 		var code = GetValidCurrencyCode();
 		var sign = GetValidCurrencySign();
 
-		await Mediator.Send(new CreateCurrencyCommand(
+		await Mediator.Send(
+			new CreateCurrencyCommand(
 				shortName,
 				name,
 				sign,
-				code), CancellationToken);
+				code),
+			CancellationToken);
 
-		var currencyInDb = await Context.Currencies.AsNoTracking().FirstOrDefaultAsync(cancellationToken: CancellationToken);
+		var currencyInDb = await Context.Currencies.AsNoTracking().FirstOrDefaultAsync(CancellationToken);
 		Assert.NotNull(currencyInDb);
 		Assert.Equal(shortName.Trim(), currencyInDb.ShortName);
 		Assert.Equal(name.Trim(), currencyInDb.Name);

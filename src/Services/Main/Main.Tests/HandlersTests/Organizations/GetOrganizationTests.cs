@@ -39,7 +39,9 @@ public sealed class GetOrganizationTests : IntegrationTest
 	{
 		var organization = await CreateOrganization();
 
-		var result = await Mediator.Send(new GetOrganizationQuery($"  {organization.SystemName.ToUpperInvariant()}  "), CancellationToken);
+		var result = await Mediator.Send(
+			new GetOrganizationQuery($"  {organization.SystemName.ToUpperInvariant()}  "),
+			CancellationToken);
 
 		result.Organization.Id.Should().Be(organization.Id);
 	}

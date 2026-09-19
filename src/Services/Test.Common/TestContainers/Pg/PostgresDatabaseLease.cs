@@ -5,8 +5,6 @@ public sealed class PostgresDatabaseLease : IAsyncDisposable
 	private readonly Func<PostgresDatabaseSlot, ValueTask> _release;
 	private bool _disposed;
 
-	public PostgresDatabaseSlot Database { get; }
-
 	internal PostgresDatabaseLease(
 		PostgresDatabaseSlot database,
 		Func<PostgresDatabaseSlot, ValueTask> release)
@@ -14,6 +12,8 @@ public sealed class PostgresDatabaseLease : IAsyncDisposable
 		Database = database;
 		_release = release;
 	}
+
+	public PostgresDatabaseSlot Database { get; }
 
 	public async ValueTask DisposeAsync()
 	{

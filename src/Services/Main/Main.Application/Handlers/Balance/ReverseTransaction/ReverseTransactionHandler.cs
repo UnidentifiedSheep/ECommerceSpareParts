@@ -3,7 +3,6 @@ using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;

@@ -47,7 +47,7 @@ public sealed class SupplierProductBuilder(Faker faker) : BuilderBase<SupplierPr
 			Producer ?? Faker.Company.CompanyName(),
 			Supplier ?? Faker.PickRandom<Supplier>());
 
-		for (int i = 0; i < NamesCount; i++)
+		for (var i = 0; i < NamesCount; i++)
 			product.AddName(Faker.Lorem.Letter(40));
 
 		return product;

@@ -51,10 +51,12 @@ public sealed class SearchCatalogueValidationTests
 			SearchMatchType.Fuzzy
 		};
 
-		var result = await _validator.ValidateAsync(CreateQuery(
+		var result = await _validator.ValidateAsync(
+			CreateQuery(
 				"abc",
 				skuModes: fuzzyModes,
-				nameModes: fuzzyModes), TestContext.Current.CancellationToken);
+				nameModes: fuzzyModes),
+			TestContext.Current.CancellationToken);
 
 		result.IsValid.Should().BeFalse();
 	}

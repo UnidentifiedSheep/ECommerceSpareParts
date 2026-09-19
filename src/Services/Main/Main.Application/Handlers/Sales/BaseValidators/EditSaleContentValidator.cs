@@ -1,8 +1,8 @@
-using FluentValidation;
 using Application.Common.Extensions;
-using Main.Entities;
+using FluentValidation;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.BaseValidators;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Sales.BaseValidators;
 
@@ -12,7 +12,9 @@ public class EditSaleContentValidator : AbstractValidator<EditSaleContentDto>
 	{
 		RuleFor(x => x.Count).GreaterThan(0).WithLocalizableError(SaleContentCountMinMessage.Instance);
 
-		RuleFor(x => x.Comment).MaximumLength(256).WithLocalizableError(SaleContentCommentMaxMessage.Instance);
+		RuleFor(x => x.Comment)
+			.MaximumLength(256)
+			.WithLocalizableError(SaleContentCommentMaxMessage.Instance);
 
 		RuleFor(x => x.Price).SetValidator(new PriceValidator());
 

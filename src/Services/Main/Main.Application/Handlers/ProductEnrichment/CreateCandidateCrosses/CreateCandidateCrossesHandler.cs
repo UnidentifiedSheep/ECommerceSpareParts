@@ -8,18 +8,16 @@ using MediatR;
 
 namespace Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record CreateCandidateCrossesCommand(
 	Guid CandidateId,
 	IReadOnlyCollection<Guid> CrossCandidateIds,
 	ProductLinkageType LinkageType) : ICommand;
 
-public class CreateCandidateCrossesHandler(
-	ISender sender) : ICommandHandler<CreateCandidateCrossesCommand>
+public class CreateCandidateCrossesHandler(ISender sender) : ICommandHandler<CreateCandidateCrossesCommand>
 {
-	public async Task<Unit> Handle(
-		CreateCandidateCrossesCommand request,
-		CancellationToken cancellationToken)
+	public async Task<Unit> Handle(CreateCandidateCrossesCommand request, CancellationToken cancellationToken)
 	{
 		if (request.CrossCandidateIds.Contains(request.CandidateId))
 			throw new ProductCrossSelfReferenceException();
@@ -29,7 +27,8 @@ public class CreateCandidateCrossesHandler(
 
 		await sender.Send(
 			new MakeLinkageBetweenProductsCommand(
-				request.CrossCandidateIds
+				request
+					.CrossCandidateIds
 					.Select(x => new NewProductLinkageDto
 					{
 						CrossProductId = productIds[x],
@@ -42,12 +41,12 @@ public class CreateCandidateCrossesHandler(
 		return Unit.Value;
 	}
 
-	private async Task<Dictionary<Guid, int>> CreateProducts(CreateCandidateCrossesCommand request, CancellationToken ct)
-		=> (await sender.Send(
-			new AddCandidateToCatalogueCommand(
-				request
-					.CrossCandidateIds
-					.Append(request.CandidateId)
-					.Select(x => new AddCandidateToCatalogueItem(x, null))),
-			ct)).CreatedIds;
+	private async Task<Dictionary<Guid, int>>
+		CreateProducts(CreateCandidateCrossesCommand request, CancellationToken ct) => (await sender.Send(
+		new AddCandidateToCatalogueCommand(
+			request
+				.CrossCandidateIds
+				.Append(request.CandidateId)
+				.Select(x => new AddCandidateToCatalogueItem(x, null))),
+		ct)).CreatedIds;
 }

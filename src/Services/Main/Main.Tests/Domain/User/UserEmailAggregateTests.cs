@@ -220,8 +220,6 @@ public class UserEmailAggregateTests
 		@event.UserId.Should().Be(user.Id);
 	}
 
-	private static Main.Entities.User.User CreateUser()
-	{
-		return Main.Entities.User.User.Create("test-user", "password-hash");
-	}
+	private static Main.Entities.User.User CreateUser() =>
+		Main.Entities.User.User.Create("test-user", "password-hash");
 }

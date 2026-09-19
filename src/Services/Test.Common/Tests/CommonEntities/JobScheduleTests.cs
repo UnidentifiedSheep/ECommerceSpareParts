@@ -435,8 +435,6 @@ public class JobScheduleTests
 			"0 0 * * *");
 	}
 
-	private static void SetId(JobSchedule schedule, Guid id)
-	{
+	private static void SetId(JobSchedule schedule, Guid id) =>
 		typeof(JobSchedule).GetProperty(nameof(JobSchedule.Id))!.SetValue(schedule, id);
-	}
 }

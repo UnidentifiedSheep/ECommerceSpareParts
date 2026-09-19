@@ -35,7 +35,8 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 				SupplierProducerName = supplierProducerName
 			});
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -101,7 +102,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 			.ProducerSupplierMappings
 			.AsNoTracking()
 			.Where(x => x.ProducerId == producer.Id)
-			.ToListAsync(cancellationToken: CancellationToken);
+			.ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(2);
 	}
 
@@ -124,7 +125,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		result.ProducerSupplierMapping.Supplier.Should().Be(command.ProducerSupplierMapping.Supplier);
 		result.ProducerSupplierMapping.SupplierProducerName.Should().Be(supplierProducerName.Trim());
 
-		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
+		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
 
 		mapping.Id.Should().Be(result.ProducerSupplierMapping.Id);
 		mapping.ProducerId.Should().Be(producer.Id);

@@ -23,8 +23,7 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 		var candidate = CatalogueTestContext.Candidates[1];
 		var expectedMappedIds = new[]
 		{
-			CatalogueTestContext.Candidates[0].Id,
-			CatalogueTestContext.Candidates[2].Id
+			CatalogueTestContext.Candidates[0].Id, CatalogueTestContext.Candidates[2].Id
 		};
 		var expectedNotMappedId = SupplierTestContext.SupplierProducts[3].Id;
 		Context.ChangeTracker.Clear();
@@ -34,14 +33,8 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 			CancellationToken);
 
 		var item = result.Items.Should().ContainSingle().Subject.Value;
-		item.MappedCrosses
-			.Select(x => x.Id)
-			.Should()
-			.BeEquivalentTo(expectedMappedIds);
-		item.NotMappedCrosses
-			.Select(x => x.Id)
-			.Should()
-			.BeEquivalentTo([expectedNotMappedId]);
+		item.MappedCrosses.Select(x => x.Id).Should().BeEquivalentTo(expectedMappedIds);
+		item.NotMappedCrosses.Select(x => x.Id).Should().BeEquivalentTo([expectedNotMappedId]);
 	}
 
 	[Fact]
@@ -63,10 +56,7 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 			new GetCatalogueCandidateCrossesQuery([candidate.Id]),
 			CancellationToken);
 
-		result.Items[candidate.Id]
-			.MappedCrosses
-			.Should()
-			.ContainSingle(x => x.Id == mappedCandidate.Id);
+		result.Items[candidate.Id].MappedCrosses.Should().ContainSingle(x => x.Id == mappedCandidate.Id);
 	}
 
 	[Fact]
@@ -82,16 +72,22 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 			CancellationToken);
 
 		result.Items.Keys.Should().BeEquivalentTo([firstCandidate.Id, secondCandidate.Id]);
-		result.Items[firstCandidate.Id].MappedCrosses
+		result
+			.Items[firstCandidate.Id]
+			.MappedCrosses
 			.Select(x => x.Id)
 			.Should()
 			.BeEquivalentTo([secondCandidate.Id, thirdCandidate.Id]);
 		result.Items[firstCandidate.Id].NotMappedCrosses.Should().BeEmpty();
-		result.Items[secondCandidate.Id].MappedCrosses
+		result
+			.Items[secondCandidate.Id]
+			.MappedCrosses
 			.Select(x => x.Id)
 			.Should()
 			.BeEquivalentTo([firstCandidate.Id, thirdCandidate.Id]);
-		result.Items[secondCandidate.Id].NotMappedCrosses
+		result
+			.Items[secondCandidate.Id]
+			.NotMappedCrosses
 			.Select(x => x.Id)
 			.Should()
 			.BeEquivalentTo([notMappedProduct.Id]);

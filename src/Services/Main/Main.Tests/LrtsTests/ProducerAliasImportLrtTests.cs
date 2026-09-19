@@ -43,7 +43,7 @@ public sealed class ProducerAliasImportLrtTests : CsvLrtIntegrationTest<Producer
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProducerAliasesImportState>();
 		state.Errors.Should().HaveCount(3);
-		var aliases = await Context.ProducersAliases.AsNoTracking().ToListAsync(cancellationToken: CancellationToken);
+		var aliases = await Context.ProducersAliases.AsNoTracking().ToListAsync(CancellationToken);
 		aliases.Should().ContainSingle(x => x.Alias == "NEW ALIAS");
 	}
 }

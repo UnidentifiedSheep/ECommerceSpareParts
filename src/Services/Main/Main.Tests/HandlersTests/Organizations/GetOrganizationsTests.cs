@@ -112,7 +112,8 @@ public class GetOrganizationsTests : IntegrationTest
 	{
 		var query = CreateQuery(userId: Guid.NewGuid());
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.UsersNotFound);
 	}
@@ -134,7 +135,9 @@ public class GetOrganizationsTests : IntegrationTest
 		var first = await CreateOrganization("Alpha organization", "alpha-organization");
 		var second = await CreateOrganization("Zulu organization", "zulu-organization");
 
-		var result = await Mediator.Send(CreateQuery(ids: [first.Id, second.Id], sortBy: ["name_desc"]), CancellationToken);
+		var result = await Mediator.Send(
+			CreateQuery(ids: [first.Id, second.Id], sortBy: ["name_desc"]),
+			CancellationToken);
 
 		result.Organizations.Select(x => x.Id).Should().Equal(second.Id, first.Id);
 	}
@@ -145,7 +148,9 @@ public class GetOrganizationsTests : IntegrationTest
 		var first = await CreateOrganization("Same organization", "zulu-organization");
 		var second = await CreateOrganization("Same organization", "alpha-organization");
 
-		var result = await Mediator.Send(CreateQuery(ids: [first.Id, second.Id], sortBy: ["name", "systemName_desc"]), CancellationToken);
+		var result = await Mediator.Send(
+			CreateQuery(ids: [first.Id, second.Id], sortBy: ["name", "systemName_desc"]),
+			CancellationToken);
 
 		result.Organizations.Select(x => x.Id).Should().Equal(first.Id, second.Id);
 	}

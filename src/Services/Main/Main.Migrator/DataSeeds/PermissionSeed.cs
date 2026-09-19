@@ -22,8 +22,6 @@ public class PermissionSeed : ISeed<DContext>
 
 	public int GetPriority() => 0;
 
-	private Permission[] GetPermissions()
-	{
-		return Enum.GetValues<PermissionCodes>().Select(x => new Permission(x)).ToArray();
-	}
+	private Permission[] GetPermissions() =>
+		Enum.GetValues<PermissionCodes>().Select(x => new Permission(x)).ToArray();
 }

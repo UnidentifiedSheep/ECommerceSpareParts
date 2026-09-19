@@ -5,7 +5,6 @@ using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
-using Application.Common.Interfaces;
 using Cache;
 using Contracts.Auth;
 using Contracts.Currency;

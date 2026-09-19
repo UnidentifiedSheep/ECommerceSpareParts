@@ -42,7 +42,10 @@ public class EditProductReservationTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var db = await Context.ProductReservations.AsNoTracking().SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
+		var db = await Context
+			.ProductReservations
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
 
 		db.ProposedPrice.Should().Be(250m);
 		db.ProposedCurrencyId.Should().Be(currency.Id);
@@ -53,7 +56,7 @@ public class EditProductReservationTests : IntegrationTest
 			.Events
 			.OfType<ReservationManualChangeEvent>()
 			.AsNoTracking()
-			.SingleAsync(x => x.ReservationId == reservation.Id, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.ReservationId == reservation.Id, CancellationToken);
 
 		@event.Data.Comment.Should().Be(oldComment);
 		@event.Data.ProposePrice.Should().Be(oldProposedPrice);
@@ -75,7 +78,10 @@ public class EditProductReservationTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var db = await Context.ProductReservations.AsNoTracking().SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
+		var db = await Context
+			.ProductReservations
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
 
 		db.ProposedPrice.Should().BeNull();
 		db.ProposedCurrencyId.Should().BeNull();
@@ -97,7 +103,10 @@ public class EditProductReservationTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var db = await Context.ProductReservations.AsNoTracking().SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
+		var db = await Context
+			.ProductReservations
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
 
 		db.Status.Should().Be(ProductReservationStatus.Locked);
 		db.ProposedPrice.Should().Be(300m);
@@ -110,7 +119,8 @@ public class EditProductReservationTests : IntegrationTest
 	{
 		var command = new EditProductReservationCommand(999999, ValidDto());
 
-		await Assert.ThrowsAsync<ReservationNotFoundException>(() => Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ReservationNotFoundException>(() =>
+			Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -174,12 +184,15 @@ public class EditProductReservationTests : IntegrationTest
 		var oldValue = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
 		var command = new EditProductReservationCommand(reservation.Id, ValidDto());
 
 		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
-		var db = await Context.ProductReservations.AsNoTracking().SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
+		var db = await Context
+			.ProductReservations
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
 		db.Status.Should().Be(ProductReservationStatus.Done);
 		db.Comment.Should().Be(oldValue.Comment);
 		db.ProposedPrice.Should().Be(oldValue.ProposedPrice);
@@ -192,12 +205,15 @@ public class EditProductReservationTests : IntegrationTest
 		var oldValue = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
 		var command = new EditProductReservationCommand(reservation.Id, ValidDto());
 
 		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 
-		var db = await Context.ProductReservations.AsNoTracking().SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
+		var db = await Context
+			.ProductReservations
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
 		db.Status.Should().Be(ProductReservationStatus.Canceled);
 		db.Comment.Should().Be(oldValue.Comment);
 		db.ProposedPrice.Should().Be(oldValue.ProposedPrice);

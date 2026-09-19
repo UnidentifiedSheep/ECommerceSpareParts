@@ -29,10 +29,11 @@ public class MarkupCalculationLrt(
 	logger)
 {
 	public override string SystemName => nameof(MarkupCalculationLrt);
-	public override ILocalizableMessage NameLocalizationMessage
-		=> MarkupCalculationLrtNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage
-		=> MarkupCalculationLrtDescriptionMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage => MarkupCalculationLrtNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		MarkupCalculationLrtDescriptionMessage.Instance;
 
 	protected override async Task DoWork()
 	{

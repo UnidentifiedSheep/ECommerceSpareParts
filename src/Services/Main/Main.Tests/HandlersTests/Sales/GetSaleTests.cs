@@ -45,20 +45,22 @@ public class GetSaleTests : IntegrationTest
 	[Fact]
 	public async Task GetSale_WhenSaleDoesNotExist_ThrowsSaleNotFoundException()
 	{
-		await Assert.ThrowsAsync<SaleNotFoundException>(() =>
-			Mediator.Send(new GetSaleQuery(Guid.NewGuid(), null), CancellationToken));
+		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
+			new GetSaleQuery(Guid.NewGuid(), null),
+			CancellationToken));
 	}
 
 	[Fact]
 	public async Task GetSale_WhenTransactionDoesNotExist_ThrowsSaleNotFoundException()
 	{
-		await Assert.ThrowsAsync<SaleNotFoundException>(() =>
-			Mediator.Send(new GetSaleQuery(null, Guid.NewGuid()), CancellationToken));
+		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
+			new GetSaleQuery(null, Guid.NewGuid()),
+			CancellationToken));
 	}
 
 	[Fact]
-	public async Task GetSale_WhenSaleIdAndTransactionIdAreEmpty_ThrowsValidationException()
-	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(new GetSaleQuery(null, null), CancellationToken));
-	}
+	public async Task GetSale_WhenSaleIdAndTransactionIdAreEmpty_ThrowsValidationException() =>
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			new GetSaleQuery(null, null),
+			CancellationToken));
 }

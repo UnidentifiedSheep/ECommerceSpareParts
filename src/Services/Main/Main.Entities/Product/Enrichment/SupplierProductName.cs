@@ -35,10 +35,8 @@ public class SupplierProductName : Entity<SupplierProductName, int>, ILinqEntity
 	public static Expression<Func<SupplierProductName, bool>> GetEqualityExpression(int key) => x =>
 		x.Id == key;
 
-	public static SupplierProductName Create(int supplierProductId, string name)
-	{
-		return new SupplierProductName(supplierProductId, name);
-	}
+	public static SupplierProductName Create(int supplierProductId, string name) =>
+		new(supplierProductId, name);
 
 	public override int GetId() => Id;
 }

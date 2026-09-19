@@ -42,7 +42,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		state.AssignedRows.Should().Be(2);
 		state.SkippedRows.Should().Be(0);
 
-		var candidate = await Context.CatalogueCandidates.AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
+		var candidate = await Context.CatalogueCandidates.AsNoTracking().SingleAsync(CancellationToken);
 		candidate.ProducerId.Should().Be(producer.Id);
 		candidate.Sku.NormalizedValue.Should().Be("ABC123");
 
@@ -50,7 +50,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 			.SupplierProducts
 			.AsNoTracking()
 			.Select(x => x.CatalogueCandidateId)
-			.ToListAsync(cancellationToken: CancellationToken);
+			.ToListAsync(CancellationToken);
 		candidateIds.Should().OnlyContain(x => x == candidate.Id);
 	}
 
@@ -72,13 +72,13 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded);
 		state.AssignedRows.Should().Be(1);
-		(await Context.CatalogueCandidates.CountAsync(cancellationToken: CancellationToken)).Should().Be(1);
+		(await Context.CatalogueCandidates.CountAsync(CancellationToken)).Should().Be(1);
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
 			.SupplierProducts
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == supplierProduct.Id, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == supplierProduct.Id, CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().Be(candidate.Id);
 	}
 
@@ -98,13 +98,13 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		state.ProcessedRows.Should().Be(1);
 		state.AssignedRows.Should().Be(0);
 		state.SkippedRows.Should().Be(1);
-		(await Context.CatalogueCandidates.CountAsync(cancellationToken: CancellationToken)).Should().Be(0);
+		(await Context.CatalogueCandidates.CountAsync(CancellationToken)).Should().Be(0);
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
 			.SupplierProducts
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == supplierProduct.Id, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == supplierProduct.Id, CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().BeNull();
 	}
 

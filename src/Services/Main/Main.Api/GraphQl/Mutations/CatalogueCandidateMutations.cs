@@ -19,9 +19,7 @@ public sealed class CatalogueCandidateMutations
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new AddCandidateToCatalogueCommand(
-				input.Id,
-				input.SelectedName),
+			new AddCandidateToCatalogueCommand(input.Id, input.SelectedName),
 			cancellationToken);
 
 		return new GqlProduct(result.CreatedIds[input.Id]);

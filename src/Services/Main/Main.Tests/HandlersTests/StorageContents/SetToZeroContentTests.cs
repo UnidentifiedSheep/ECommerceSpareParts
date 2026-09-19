@@ -20,24 +20,27 @@ public class SetToZeroContentTests : IntegrationTest
 	public async Task SetToZeroContent_WithInvalidContentId_ThrowsStorageContentNotFoundException()
 	{
 		var command = new SetToZeroContentCommand(99999, 0);
-		await Assert.ThrowsAsync<StorageContentNotFoundException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<StorageContentNotFoundException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
 	public async Task SetToZeroContent_WithValidData_Succeeds()
 	{
-		var eventsCount = await Context.Events.CountAsync(cancellationToken: CancellationToken);
+		var eventsCount = await Context.Events.CountAsync(CancellationToken);
 		var content = TestContext.StorageContents.First();
 		var contentCount = content.Count;
-		var productCountBefore = (await Context.Products.FirstAsync(x => x.Id == content.ProductId, cancellationToken: CancellationToken)).Stock;
+		var productCountBefore =
+			(await Context.Products.FirstAsync(x => x.Id == content.ProductId, CancellationToken)).Stock;
 
 		var command = new SetToZeroContentCommand(content.Id, content.RowVersion);
 
 		await Mediator.Send(command, CancellationToken);
 
-		var productCountAfter = (await Context.Products.FirstAsync(x => x.Id == content.ProductId, cancellationToken: CancellationToken)).Stock;
+		var productCountAfter =
+			(await Context.Products.FirstAsync(x => x.Id == content.ProductId, CancellationToken)).Stock;
 
-		var currStorageMovements = await Context.Events.CountAsync(cancellationToken: CancellationToken);
+		var currStorageMovements = await Context.Events.CountAsync(CancellationToken);
 
 		currStorageMovements.Should().Be(eventsCount + 1);
 		productCountBefore.Value.Should().Be(productCountAfter + contentCount);

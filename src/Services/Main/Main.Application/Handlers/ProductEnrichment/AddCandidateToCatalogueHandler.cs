@@ -10,10 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductEnrichment;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record AddCandidateToCatalogueCommand : ICommand<AddCandidateToCatalogueResult>
 {
-	public IReadOnlyList<AddCandidateToCatalogueItem> Items { get; }
 	public AddCandidateToCatalogueCommand(Guid id, string? selectedName)
 	{
 		Items = [new AddCandidateToCatalogueItem(id, selectedName)];
@@ -23,6 +23,7 @@ public record AddCandidateToCatalogueCommand : ICommand<AddCandidateToCatalogueR
 	{
 		Items = items.Distinct().ToList();
 	}
+	public IReadOnlyList<AddCandidateToCatalogueItem> Items { get; }
 }
 
 public record AddCandidateToCatalogueItem(Guid Id, string? SelectedName);
@@ -43,11 +44,10 @@ public class AddCandidateToCatalogueHandler(
 		if (ids.Count != request.Items.Count)
 			throw new CatalogueCandidateDuplicateIdsException();
 
-		var candidates = await repository
-			.EnsureExistsAsync(
-				ids: ids,
-				errorFactory: _ => new CatalogueCandidateNotFoundException(),
-				ct: cancellationToken);
+		var candidates = await repository.EnsureExistsAsync(
+			ids,
+			_ => new CatalogueCandidateNotFoundException(),
+			cancellationToken);
 
 		var names = (await readRepository
 			.Query
@@ -56,11 +56,9 @@ public class AddCandidateToCatalogueHandler(
 			.SelectMany(x => x.Names)
 			.Select(x => new
 			{
-				Id = x.SupplierProduct.CatalogueCandidateId!.Value,
-				x.Name
+				Id = x.SupplierProduct.CatalogueCandidateId!.Value, x.Name
 			})
-			.ToListAsync(cancellationToken))
-			.ToLookup(x => x.Id, x => x.Name);
+			.ToListAsync(cancellationToken)).ToLookup(x => x.Id, x => x.Name);
 
 		var toAdd = new Dictionary<Guid, Product>(request.Items.Count);
 		var productIds = new Dictionary<Guid, int>();

@@ -77,12 +77,14 @@ public class GetProductSaleHistoryTests : IntegrationTest
 	{
 		var sale = SaleContext.Sale;
 
-		var result = await Mediator.Send(CreateQuery(
+		var result = await Mediator.Send(
+			CreateQuery(
 				sale.StorageCode,
 				sale.OrganizationId,
 				sale.OrganizationId,
 				sale.CurrencyId,
-				["averageBuyPrice_desc"]), CancellationToken);
+				["averageBuyPrice_desc"]),
+			CancellationToken);
 
 		result.History.Should().ContainSingle();
 	}
@@ -123,7 +125,9 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		await Context.AddAsync(fallbackSale, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		var result = await Mediator.Send(CreateQuery(preferredOrganizationId: preferredSale.OrganizationId, sortBy: ["saleDate_desc"]), CancellationToken);
+		var result = await Mediator.Send(
+			CreateQuery(preferredOrganizationId: preferredSale.OrganizationId, sortBy: ["saleDate_desc"]),
+			CancellationToken);
 
 		result
 			.History

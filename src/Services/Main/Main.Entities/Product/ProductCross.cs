@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
-using Exceptions;
 using Main.Entities.Exceptions;
 
 namespace Main.Entities.Product;

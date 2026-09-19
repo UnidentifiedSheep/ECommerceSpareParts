@@ -28,7 +28,10 @@ public class ReverseTransactionTests : IntegrationTest
 
 		await Mediator.Send(new ReverseTransactionCommand(transaction.Id), CancellationToken);
 
-		var reversed = await Context.Transactions.AsNoTracking().FirstAsync(x => x.Id == transaction.Id, cancellationToken: CancellationToken);
+		var reversed = await Context
+			.Transactions
+			.AsNoTracking()
+			.FirstAsync(x => x.Id == transaction.Id, CancellationToken);
 
 		reversed.IsReversed.Should().BeTrue();
 		reversed.IsReversalApplied.Should().BeTrue();
@@ -38,13 +41,15 @@ public class ReverseTransactionTests : IntegrationTest
 		var senderBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x =>
-				x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId, cancellationToken: CancellationToken);
+			.FirstAsync(
+				x => x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId,
+				CancellationToken);
 		var receiverBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x =>
-				x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId, cancellationToken: CancellationToken);
+			.FirstAsync(
+				x => x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId,
+				CancellationToken);
 
 		senderBalance.Balance.Should().Be(0m);
 		receiverBalance.Balance.Should().Be(100m);
@@ -65,12 +70,17 @@ public class ReverseTransactionTests : IntegrationTest
 	{
 		var transaction = await CreateAppliedTransaction(TransactionSourceType.Purchase);
 
-		await Mediator.Send(new ReverseTransactionCommand(
+		await Mediator.Send(
+			new ReverseTransactionCommand(
 				transaction.Id,
 				TransactionReversalMode.System,
-				true), CancellationToken);
+				true),
+			CancellationToken);
 
-		var reversed = await Context.Transactions.AsNoTracking().FirstAsync(x => x.Id == transaction.Id, cancellationToken: CancellationToken);
+		var reversed = await Context
+			.Transactions
+			.AsNoTracking()
+			.FirstAsync(x => x.Id == transaction.Id, CancellationToken);
 
 		reversed.IsReversed.Should().BeTrue();
 		reversed.IsReversalApplied.Should().BeTrue();
@@ -81,8 +91,9 @@ public class ReverseTransactionTests : IntegrationTest
 	{
 		var reversedBy = TestContext.Users[0].Id;
 
-		await Assert.ThrowsAsync<TransactionNotFoundException>(() =>
-			Mediator.Send(new ReverseTransactionCommand(Guid.NewGuid()), CancellationToken));
+		await Assert.ThrowsAsync<TransactionNotFoundException>(() => Mediator.Send(
+			new ReverseTransactionCommand(Guid.NewGuid()),
+			CancellationToken));
 	}
 
 	[Fact]
@@ -90,8 +101,9 @@ public class ReverseTransactionTests : IntegrationTest
 	{
 		var reversedBy = TestContext.Users[0].Id;
 
-		await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(new ReverseTransactionCommand(Guid.Empty), CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			new ReverseTransactionCommand(Guid.Empty),
+			CancellationToken));
 	}
 
 	private async Task<Transaction> CreateAppliedTransaction(TransactionSourceType sourceType)

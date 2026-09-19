@@ -22,15 +22,18 @@ public class AddEmailToUserTests(CombinedContainerFixture fixture) : Integration
 		var user = await CreateUser();
 		const string email = "Additional.Email@example.com";
 
-		var created = await Mediator.Send(new AddEmailToUserCommand(
+		var created = await Mediator.Send(
+			new AddEmailToUserCommand(
 				user.Id,
 				email,
-				EmailType.Work), CancellationToken);
+				EmailType.Work),
+			CancellationToken);
 
 		created.UserId.Should().Be(user.Id);
 		created.Email.Should().Be("additional.email@example.com");
 
-		var addedEmail = await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == email, cancellationToken: CancellationToken);
+		var addedEmail =
+			await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == email, CancellationToken);
 
 		addedEmail.UserId.Should().Be(user.Id);
 		addedEmail.Email.Value.Should().Be("additional.email@example.com");

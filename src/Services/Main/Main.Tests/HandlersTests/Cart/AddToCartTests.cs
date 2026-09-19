@@ -45,7 +45,7 @@ public class AddToCartTests : IntegrationTest
 		var cartItem = await Context
 			.Carts
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id, cancellationToken: CancellationToken);
+			.FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id, CancellationToken);
 		Assert.NotNull(cartItem);
 		Assert.Equal(count, cartItem.Count);
 	}
@@ -60,7 +60,8 @@ public class AddToCartTests : IntegrationTest
 			5);
 		await Mediator.Send(command, CancellationToken);
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 		Assert.Equal(ApplicationErrors.CartItemAlreadyExist, exception.Failures[0].ErrorName);
 	}
 
@@ -87,7 +88,8 @@ public class AddToCartTests : IntegrationTest
 			product.Id,
 			1);
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 		Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
 	}
 

@@ -24,18 +24,15 @@ public static class ProducerDataLoaders
 	public static async Task<Dictionary<int, List<string>>> GetProducerAliasesByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
-		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProducersAliasesQuery(keys), cancellationToken)).ProducersAliases;
-	}
+		CancellationToken cancellationToken) =>
+		(await sender.Send(new GetProducersAliasesQuery(keys), cancellationToken)).ProducersAliases;
 
 	[DataLoader]
 	public static async Task<Dictionary<int, List<ProducerSupplierMappingDto>>>
 		GetProducerSupplierMappingsByIdAsync(
 			IReadOnlyList<int> keys,
 			ISender sender,
-			CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProducersSupplierMappingsQuery(keys), cancellationToken)).Mappings;
-	}
+			CancellationToken cancellationToken) => (await sender.Send(
+		new GetProducersSupplierMappingsQuery(keys),
+		cancellationToken)).Mappings;
 }

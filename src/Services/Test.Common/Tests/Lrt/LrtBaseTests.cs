@@ -26,7 +26,10 @@ public class LrtBaseTests
 		var fixture = CreateFixture();
 		var lrt = fixture.CreateLrt();
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		lrt.DoWorkCalls.Should().Be(1);
 		fixture.Job.Status.Should().Be(JobStatus.Succeeded);
@@ -47,7 +50,10 @@ public class LrtBaseTests
 			return Task.CompletedTask;
 		};
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		lrt.DoWorkCalls.Should().Be(2);
 		fixture.Job.Status.Should().Be(JobStatus.Succeeded);
@@ -61,7 +67,10 @@ public class LrtBaseTests
 		var lrt = fixture.CreateLrt();
 		lrt.Work = _ => throw new InvalidOperationException("permanent failure");
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		lrt.DoWorkCalls.Should().Be(1);
 		fixture.Job.Status.Should().Be(JobStatus.Failed);
@@ -79,7 +88,10 @@ public class LrtBaseTests
 			return Task.CompletedTask;
 		};
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		fixture.Job.Status.Should().Be(JobStatus.Failed);
 		fixture.Job.Attempts.Should().Be(1);
@@ -114,7 +126,10 @@ public class LrtBaseTests
 			throw new JobCancellationRequestedException(fixture.JobId);
 		};
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		fixture.Job.Status.Should().Be(JobStatus.Cancelled);
 		fixture.Job.ErrorMessage.Should().Be("cancel requested");
@@ -127,7 +142,10 @@ public class LrtBaseTests
 		var lrt = fixture.CreateLrt();
 		lrt.Work = _ => throw new JobLeaseLostException(fixture.JobId);
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		fixture.Job.Status.Should().Be(JobStatus.Processing);
 	}
@@ -149,7 +167,10 @@ public class LrtBaseTests
 			renewedLeaseExpiresAt = x.CurrentLeaseExpiresAt;
 		};
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		fixture.Job.State.Should().Be("""{"Value":42}""");
 		lrt.CapturedState!.Value.Should().Be(42);
@@ -165,7 +186,10 @@ public class LrtBaseTests
 		var lrt = fixture.CreateLrt();
 		lrt.Work = x => x.CaptureStateForTest();
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		lrt.CapturedState.Should().NotBeNull();
 		lrt.CapturedState!.Value.Should().Be(7);
@@ -183,7 +207,10 @@ public class LrtBaseTests
 			x.CapturedLeaseExpiresAt = x.CurrentLeaseExpiresAt;
 		};
 
-		await lrt.ExecuteAsync(fixture.JobId, fixture.LeaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		lrt.CapturedLeaseExpiresAt.Should().BeAfter(previousLeaseExpiresAt);
 	}
@@ -342,10 +369,11 @@ public class LrtBaseTests
 
 		public override string SystemName => nameof(TestLrt);
 
-		public override ILocalizableMessage NameLocalizationMessage
-			=> new LocalizableMessage("test-lrt-name");
-		public override ILocalizableMessage DescriptionLocalizationMessage
-			=> new LocalizableMessage("test-lrt-description");
+		public override ILocalizableMessage NameLocalizationMessage =>
+			new LocalizableMessage("test-lrt-name");
+
+		public override ILocalizableMessage DescriptionLocalizationMessage =>
+			new LocalizableMessage("test-lrt-description");
 
 		protected override Task DoWork()
 		{

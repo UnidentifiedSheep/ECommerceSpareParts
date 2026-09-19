@@ -39,10 +39,8 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
 			Interrupt(failure);
 	}
 
-	protected override Task SucceedJobAsync()
-	{
-		return Job.Status == JobStatus.Waiting ? Task.CompletedTask : base.SucceedJobAsync();
-	}
+	protected override Task SucceedJobAsync() =>
+		Job.Status == JobStatus.Waiting ? Task.CompletedTask : base.SucceedJobAsync();
 
 	private async Task<string?> ReconcileAsync()
 	{

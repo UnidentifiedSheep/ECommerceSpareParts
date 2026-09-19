@@ -1,9 +1,9 @@
+using Application.Common.Extensions;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Application.Common.Extensions;
-using Main.Entities;
 using Main.Application.Handlers.Sales.BaseValidators;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
@@ -28,6 +28,8 @@ public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
 
 		RuleFor(x => x.UserId).NotEmpty().WithLocalizableError(SaleBuyerIdNotEmptyMessage.Instance);
 
-		RuleFor(x => x.OrganizationId).NotEmpty().WithLocalizableError(SaleOrganizationIdNotEmptyMessage.Instance);
+		RuleFor(x => x.OrganizationId)
+			.NotEmpty()
+			.WithLocalizableError(SaleOrganizationIdNotEmptyMessage.Instance);
 	}
 }

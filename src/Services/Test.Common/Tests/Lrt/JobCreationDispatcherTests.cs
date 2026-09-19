@@ -210,10 +210,11 @@ public sealed class JobCreationDispatcherTests
 		}
 
 		public override string SystemName => nameof(TestMultiStepLrt);
-		public override ILocalizableMessage NameLocalizationMessage
-			=> new LocalizableMessage("test-name");
-		public override ILocalizableMessage DescriptionLocalizationMessage
-			=> new LocalizableMessage("test-description");
+
+		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-name");
+
+		public override ILocalizableMessage DescriptionLocalizationMessage =>
+			new LocalizableMessage("test-description");
 
 		protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState) =>
 			builder.AddStep("step", initialState);
@@ -229,10 +230,10 @@ public sealed class JobCreationDispatcherTests
 	{
 		public override string SystemName => systemName;
 
-		public override ILocalizableMessage NameLocalizationMessage
-			=> new LocalizableMessage("test-name");
-		public override ILocalizableMessage DescriptionLocalizationMessage
-			=> new LocalizableMessage("test-description");
+		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-name");
+
+		public override ILocalizableMessage DescriptionLocalizationMessage =>
+			new LocalizableMessage("test-description");
 
 		protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState) =>
 			builder.AddStep(childSystemName, initialState);

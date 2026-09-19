@@ -35,7 +35,8 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 	[Fact]
 	public async Task Create_ValidSchedule_PersistsAndCalculatesNextRun()
 	{
-		var id = await Service.CreateScheduleAsync(new NewJobScheduleDto
+		var id = await Service.CreateScheduleAsync(
+			new NewJobScheduleDto
 			{
 				Name = "Test schedule",
 				JobSystemName = JobScheduleTestLrt.LrtName,
@@ -43,14 +44,12 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 				MaxAttempts = 5,
 				Cron = "*/5 * * * *",
 				Enabled = true
-			}, CancellationToken);
+			},
+			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var schedule = await Context.JobSchedules
-			.AsNoTracking()
-			.SingleAsync(
-				x => x.Id == id,
-				CancellationToken);
+		var schedule =
+			await Context.JobSchedules.AsNoTracking().SingleAsync(x => x.Id == id, CancellationToken);
 
 		schedule.Enabled.Should().BeTrue();
 		schedule.MaxAttempts.Should().Be(5);
@@ -74,13 +73,17 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 	{
 		var schedule = await AddScheduleAsync(true);
 
-		await Service.UpdateScheduleAsync(schedule.Id, new PatchJobScheduleDto
+		await Service.UpdateScheduleAsync(
+			schedule.Id,
+			new PatchJobScheduleDto
 			{
 				Cron = PatchField<string>.From("*/5 * * * *")
-			}, CancellationToken);
+			},
+			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var updated = await Context.JobSchedules
+		var updated = await Context
+			.JobSchedules
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == schedule.Id, CancellationToken);
 
@@ -104,17 +107,19 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 	{
 		var schedule = await AddScheduleAsync(true);
 
-		await Service.UpdateScheduleAsync(schedule.Id, new PatchJobScheduleDto
+		await Service.UpdateScheduleAsync(
+			schedule.Id,
+			new PatchJobScheduleDto
 			{
 				Enabled = PatchField<bool>.From(false)
-			}, CancellationToken);
+			},
+			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var updated = await Context.JobSchedules
+		var updated = await Context
+			.JobSchedules
 			.AsNoTracking()
-			.SingleAsync(
-				x => x.Id == schedule.Id,
-				CancellationToken);
+			.SingleAsync(x => x.Id == schedule.Id, CancellationToken);
 
 		updated.Enabled.Should().BeFalse();
 	}
@@ -127,11 +132,9 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 		await Service.RemoveScheduleAsync(schedule.Id, CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		(await Context.JobSchedules
-			.AsNoTracking()
-			.AnyAsync(
-				x => x.Id == schedule.Id,
-				CancellationToken)).Should().BeFalse();
+		(await Context.JobSchedules.AsNoTracking().AnyAsync(x => x.Id == schedule.Id, CancellationToken))
+			.Should()
+			.BeFalse();
 	}
 
 	[Fact]

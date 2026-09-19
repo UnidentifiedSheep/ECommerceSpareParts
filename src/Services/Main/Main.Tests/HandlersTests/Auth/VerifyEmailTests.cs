@@ -35,7 +35,8 @@ public class VerifyEmailTests : IntegrationTest
 
 		await Mediator.Send(new VerifyEmailCommand(token), CancellationToken);
 
-		var email = await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == Email, cancellationToken: CancellationToken);
+		var email =
+			await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == Email, CancellationToken);
 		email.Confirmed.Should().BeTrue();
 		email.ConfirmedAt.Should().NotBeNull();
 	}
@@ -140,8 +141,6 @@ public class VerifyEmailTests : IntegrationTest
 		return (payload, signer.Sign(payload));
 	}
 
-	private IVerificationPayloadProvider GetPayloadProvider()
-	{
-		return Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>();
-	}
+	private IVerificationPayloadProvider GetPayloadProvider() =>
+		Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>();
 }

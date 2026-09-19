@@ -34,10 +34,7 @@ public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
 
 	protected async Task LoadLocales()
 	{
-		var task = Sp
-			.GetServices<IHostedService>()
-			.OfType<LocalizerInitializationHostedService>()
-			.Single();
+		var task = Sp.GetServices<IHostedService>().OfType<LocalizerInitializationHostedService>().Single();
 		await task.StartAsync(CancellationToken.None);
 	}
 

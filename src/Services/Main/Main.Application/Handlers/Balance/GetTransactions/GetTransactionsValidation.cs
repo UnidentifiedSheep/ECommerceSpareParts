@@ -1,7 +1,7 @@
+using Application.Common.Extensions;
 using Application.Common.Validators;
 using Enums;
 using FluentValidation;
-using Application.Common.Extensions;
 using Main.Entities;
 
 namespace Main.Application.Handlers.Balance.GetTransactions;

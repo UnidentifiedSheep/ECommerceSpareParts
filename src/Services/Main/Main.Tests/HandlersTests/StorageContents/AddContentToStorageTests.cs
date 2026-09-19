@@ -33,7 +33,8 @@ public class AddContentToStorageTests : IntegrationTest
 			[],
 			storage.Code,
 			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -54,7 +55,8 @@ public class AddContentToStorageTests : IntegrationTest
 			storageContent,
 			storage.Code,
 			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -73,7 +75,8 @@ public class AddContentToStorageTests : IntegrationTest
 			storageContent,
 			storage.Code,
 			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -89,7 +92,8 @@ public class AddContentToStorageTests : IntegrationTest
 			storageContent,
 			storage.Code,
 			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<DbValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -101,7 +105,8 @@ public class AddContentToStorageTests : IntegrationTest
 			Faker.Lorem.Letter(200),
 			StorageMovementType.StorageContentAddition);
 		var exception =
-			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command, CancellationToken));
+			await Assert.ThrowsAsync<DbValidationException>(async () =>
+				await Mediator.Send(command, CancellationToken));
 		Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
 	}
 
@@ -118,7 +123,8 @@ public class AddContentToStorageTests : IntegrationTest
 			storageContent,
 			storage.Code,
 			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<ProductNotFoundException>(async () => await Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ProductNotFoundException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]

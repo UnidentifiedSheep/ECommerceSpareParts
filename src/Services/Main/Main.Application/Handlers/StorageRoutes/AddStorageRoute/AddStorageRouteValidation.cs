@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using Application.Common.Extensions;
+﻿using Application.Common.Extensions;
+using FluentValidation;
 using Main.Entities;
 
 namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
@@ -15,7 +15,9 @@ public class AddStorageRouteValidation : AbstractValidator<AddStorageRouteComman
 			.Must(x => x.StorageTo != x.StorageFrom)
 			.WithLocalizableError(StorageRouteSameStoragesMessage.Instance);
 
-		RuleFor(x => x.Distance).GreaterThanOrEqualTo(1).WithLocalizableError(StorageRouteDistanceMinMessage.Instance);
+		RuleFor(x => x.Distance)
+			.GreaterThanOrEqualTo(1)
+			.WithLocalizableError(StorageRouteDistanceMinMessage.Instance);
 
 		RuleFor(x => x.DeliveryTime)
 			.GreaterThanOrEqualTo(1)

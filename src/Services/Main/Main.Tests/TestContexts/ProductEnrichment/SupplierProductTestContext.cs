@@ -7,23 +7,24 @@ using Tests.Interfaces;
 
 namespace Tests.TestContexts.ProductEnrichment;
 
-public class SupplierProductTestContext(
-	DContext context,
-	ProducerTestContext producerTestContext
-	) : TestContextBase<DContext>(context), IDependentTestContext
+public class SupplierProductTestContext(DContext context, ProducerTestContext producerTestContext)
+	: TestContextBase<DContext>(context), IDependentTestContext
 {
 	public IReadOnlyList<SupplierProduct> SupplierProducts { get; private set; } = null!;
 	public IReadOnlyList<SupplierProductCross> Crosses { get; private set; } = null!;
+
+	public static Type[] DependsOn => [typeof(ProducerTestContext)];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
 	{
 		SupplierProducts = new SupplierProductBuilder(Faker)
 			.WithNamesCount(2)
 			.BuildMany(3)
-			.Concat(new SupplierProductBuilder(Faker)
-				.WithProducer(Faker.PickRandom<Producer>(producerTestContext.Producers).Name)
-				.WithNamesCount(2)
-				.BuildMany(2))
+			.Concat(
+				new SupplierProductBuilder(Faker)
+					.WithProducer(Faker.PickRandom<Producer>(producerTestContext.Producers).Name)
+					.WithNamesCount(2)
+					.BuildMany(2))
 			.ToList();
 
 		await DbContext.AddRangeAsync(SupplierProducts, cancellationToken);
@@ -47,6 +48,4 @@ public class SupplierProductTestContext(
 		await DbContext.AddRangeAsync(Crosses, cancellationToken);
 		await DbContext.SaveChangesAsync(cancellationToken);
 	}
-
-	public static Type[] DependsOn => [typeof(ProducerTestContext)];
 }

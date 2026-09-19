@@ -1,5 +1,4 @@
 using BulkValidation.Core.Exceptions;
-using HotChocolate.Execution;
 using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -20,9 +19,7 @@ public sealed class DbValidationErrorFilter(
 		var failures = new List<IReadOnlyDictionary<string, object?>>();
 
 		foreach (var failure in exception.Failures)
-		{
 			// TODO: Replace the raw message with ILocalizableMessage when BulkValidation exposes it.
-
 			failures.Add(
 				new Dictionary<string, object?>
 				{
@@ -30,9 +27,9 @@ public sealed class DbValidationErrorFilter(
 					["detail"] = failure.Message,
 					["status"] = failure.ErrorCode
 				});
-		}
 
-		var status = exception.Failures
+		var status = exception
+			.Failures
 			.Where(x => x.ErrorCode.HasValue)
 			.Select(x => x.ErrorCode!.Value)
 			.DefaultIfEmpty(StatusCodes.Status500InternalServerError)

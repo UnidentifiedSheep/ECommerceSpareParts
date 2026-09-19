@@ -12,8 +12,7 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
 	public bool VerifyHashedPassword(string hashedPassword, string providedPassword) =>
 		Verify(providedPassword, hashedPassword);
 
-	public (bool isValid, IEnumerable<ILocalizableMessage> errors) IsPasswordMatchRules(
-		string password)
+	public (bool isValid, IEnumerable<ILocalizableMessage> errors) IsPasswordMatchRules(string password)
 	{
 		var errors = new List<ILocalizableMessage>();
 
@@ -60,7 +59,8 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
 			errors.Add(PasswordMustContainDigitMessage.Instance);
 
 		if (rules.RequireSpecial && !hasSpecial)
-			errors.Add(new PasswordMustContainSpecialMessage().WithSpecialCharacters(string.Join(',', specials)));
+			errors.Add(
+				new PasswordMustContainSpecialMessage().WithSpecialCharacters(string.Join(',', specials)));
 
 		return (errors.Count == 0, errors);
 	}

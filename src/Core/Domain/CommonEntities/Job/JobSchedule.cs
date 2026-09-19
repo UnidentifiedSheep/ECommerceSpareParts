@@ -115,15 +115,12 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
 				throw new InvalidOperationException("Cron cannot be null or empty."));
 	}
 
-	public void SetInputState(string inputState)
-	{
-		InputState = inputState.TrimSafe().EnsureNotNullOrWhiteSpace(JobScheduleInputStateRequiredMessage.Instance);
-	}
+	public void SetInputState(string inputState) => InputState = inputState
+		.TrimSafe()
+		.EnsureNotNullOrWhiteSpace(JobScheduleInputStateRequiredMessage.Instance);
 
-	public void SetMaxAttempts(int maxAttempts)
-	{
-		MaxAttempts = maxAttempts.EnsureGreaterThan(0, JobMaxAttemptsMustBeGreaterThanZeroMessage.Instance);
-	}
+	public void SetMaxAttempts(int maxAttempts) => MaxAttempts =
+		maxAttempts.EnsureGreaterThan(0, JobMaxAttemptsMustBeGreaterThanZeroMessage.Instance);
 
 	public void SetNextRunAt(DateTime? nextRunAt) => NextRunAt = nextRunAt;
 

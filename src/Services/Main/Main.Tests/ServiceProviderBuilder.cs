@@ -55,10 +55,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 			.Console(formatProvider: CultureInfo.InvariantCulture)
 			.CreateLogger();
 
-		ApplicationServiceProvider
-			.AddApplicationLayer(services, null)
-			.AddLocan()
-			.AddPersistenceLayer();
+		ApplicationServiceProvider.AddApplicationLayer(services, null).AddLocan().AddPersistenceLayer();
 		var passwordRules = new PasswordRules
 		{
 			RequireDigit = false, RequireUppercase = false

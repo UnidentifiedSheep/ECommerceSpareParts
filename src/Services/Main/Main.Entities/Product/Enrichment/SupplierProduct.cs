@@ -13,7 +13,9 @@ public class SupplierProduct : AuditableEntity<SupplierProduct, int>, ILinqEntit
 {
 	private readonly List<SupplierProductName> _names = [];
 
-	private SupplierProduct() { }
+	private SupplierProduct()
+	{
+	}
 
 	private SupplierProduct(
 		Sku sku,

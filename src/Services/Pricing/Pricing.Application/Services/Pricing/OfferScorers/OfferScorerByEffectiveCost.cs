@@ -74,8 +74,5 @@ public sealed class OfferScorerByEffectiveCost(
 		return averageDeliveryDays * penaltyPerDay;
 	}
 
-	private static decimal ToScore(decimal effectiveCost)
-	{
-		return effectiveCost <= 0 ? 0 : 1m / effectiveCost;
-	}
+	private static decimal ToScore(decimal effectiveCost) => effectiveCost <= 0 ? 0 : 1m / effectiveCost;
 }

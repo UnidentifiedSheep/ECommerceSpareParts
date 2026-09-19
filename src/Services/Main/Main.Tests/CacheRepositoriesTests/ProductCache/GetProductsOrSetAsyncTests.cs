@@ -54,7 +54,9 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
-		var result = await repository.GetProductsOrSetAsync([cachedProduct.Id, dbProduct.Id], CancellationToken);
+		var result = await repository.GetProductsOrSetAsync(
+			[cachedProduct.Id, dbProduct.Id],
+			CancellationToken);
 
 		result.Should().HaveCount(2);
 		result[cachedProduct.Id].Should().BeEquivalentTo(cachedBeforeUpdate);

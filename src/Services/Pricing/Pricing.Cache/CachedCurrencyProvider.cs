@@ -34,10 +34,8 @@ public class CachedCurrencyProvider(
 		return value;
 	}
 
-	public async Task InvalidateCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
-	{
+	public async Task InvalidateCurrencyRate(int currencyId, CancellationToken cancellationToken = default) =>
 		await fusionCache.RemoveAsync(CacheKeys.Currency.CurrencyRate(currencyId), token: cancellationToken);
-	}
 
 	public async Task<int?> GetCurrencyIdAsync(string code, CancellationToken token = default)
 	{

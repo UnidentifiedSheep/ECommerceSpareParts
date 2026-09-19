@@ -76,7 +76,9 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 
 	public void SetDescription(string? description)
 	{
-		Description = description.NullIfWhiteSpace()?.EnsureMaxLength(300, UserDescriptionMaxLengthMessage.Instance);
+		Description = description
+			.NullIfWhiteSpace()
+			?.EnsureMaxLength(300, UserDescriptionMaxLengthMessage.Instance);
 		UpdateSearchColumn();
 	}
 

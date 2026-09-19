@@ -57,19 +57,19 @@ public static class ProductDataLoaders
 	}
 
 	[DataLoader]
-	public static async Task<Dictionary<int, List<ProductCharacteristicDto>>> GetProductCharacteristicsByIdAsync(
-		IReadOnlyList<int> keys,
-		ISender sender,
-		CancellationToken cancellationToken)
-		=> (await sender.Send(new GetCharacteristicsBatchQuery(keys), cancellationToken))
-			.Characteristics;
+	public static async Task<Dictionary<int, List<ProductCharacteristicDto>>>
+		GetProductCharacteristicsByIdAsync(
+			IReadOnlyList<int> keys,
+			ISender sender,
+			CancellationToken cancellationToken) =>
+		(await sender.Send(new GetCharacteristicsBatchQuery(keys), cancellationToken)).Characteristics;
 
 	[DataLoader]
 	public static async Task<Dictionary<int, List<ProductContentDto>>> GetProductContentsByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
-		CancellationToken cancellationToken)
-		=> (await sender.Send(new GetProductsContentsQuery(keys), cancellationToken)).Contents;
+		CancellationToken cancellationToken) =>
+		(await sender.Send(new GetProductsContentsQuery(keys), cancellationToken)).Contents;
 
 	[DataLoader]
 	public static async Task<Dictionary<GetProductCrossesItem, IReadOnlyList<ProductDto>>>

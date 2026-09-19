@@ -56,11 +56,11 @@ public class ProducerSupplierMappingImportLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtProducerSupplierMappingImportDescriptionMessage.Instance;
 
-	protected override async Task BeforeRead(ProducerSupplierMappingImportState state) =>
-		_producerLookup = await producerLookupService.Load(CancellationToken);
-
 	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
 		ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
+
+	protected override async Task BeforeRead(ProducerSupplierMappingImportState state) =>
+		_producerLookup = await producerLookupService.Load(CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -111,8 +111,7 @@ public class ProducerSupplierMappingImportLrt(
 				errors.Add(
 					CreateError(
 						idx,
-						StringLocalizer.Get(
-							ProducerSupplierMappingProducerNotFoundInBatchMessage.Instance)));
+						StringLocalizer.Get(ProducerSupplierMappingProducerNotFoundInBatchMessage.Instance)));
 				continue;
 			}
 

@@ -1,9 +1,9 @@
+using Application.Common.Extensions;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Application.Common.Extensions;
-using Main.Entities;
 using Main.Application.Handlers.BaseValidators;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
@@ -11,7 +11,9 @@ public class CreateTransactionValidation : AbstractValidator<CreateTransactionCo
 {
 	public CreateTransactionValidation(IOperationDatePolicy datePolicy)
 	{
-		RuleFor(command => command.SenderId).NotEmpty().WithLocalizableError(TransactionSenderIdRequiredMessage.Instance);
+		RuleFor(command => command.SenderId)
+			.NotEmpty()
+			.WithLocalizableError(TransactionSenderIdRequiredMessage.Instance);
 
 		RuleFor(command => command.ReceiverId)
 			.NotEmpty()

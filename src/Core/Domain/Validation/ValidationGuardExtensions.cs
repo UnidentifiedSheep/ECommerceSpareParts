@@ -8,12 +8,14 @@ public static class ValidationGuardExtensions
 	public static string EnsureMinLength(
 		this string value,
 		int min,
-		ILocalizableMessage message) => !value.HasMinLength(min) ? throw new InvalidInputException(message) : value;
+		ILocalizableMessage message) =>
+		!value.HasMinLength(min) ? throw new InvalidInputException(message) : value;
 
 	public static string EnsureMaxLength(
 		this string value,
 		int max,
-		ILocalizableMessage message) => !value.HasMaxLength(max) ? throw new InvalidInputException(message) : value;
+		ILocalizableMessage message) =>
+		!value.HasMaxLength(max) ? throw new InvalidInputException(message) : value;
 
 	public static string EnsureNoSpaces(this string value, ILocalizableMessage message) =>
 		!value.HasNoSpaces() ? throw new InvalidInputException(message) : value;
@@ -45,18 +47,14 @@ public static class ValidationGuardExtensions
 		this T value,
 		T min,
 		T max,
-		ILocalizableMessage message) where T : IComparable<T>
-	{
-		return !value.IsInRange(min, max) ? throw new InvalidInputException(message) : value;
-	}
+		ILocalizableMessage message) where T : IComparable<T> =>
+		!value.IsInRange(min, max) ? throw new InvalidInputException(message) : value;
 
 	public static T Ensure<T>(
 		this T value,
 		Func<T, bool> predicate,
-		ILocalizableMessage message)
-	{
-		return !value.IsValid(predicate) ? throw new InvalidInputException(message) : value;
-	}
+		ILocalizableMessage message) =>
+		!value.IsValid(predicate) ? throw new InvalidInputException(message) : value;
 
 	public static bool EnsureTrue(this bool value, ILocalizableMessage message) =>
 		!value.IsTrue() ? throw new InvalidInputException(message) : value;
@@ -102,10 +100,9 @@ public static class ValidationGuardExtensions
 	public static decimal EnsureMaxDecimalPlaces(
 		this decimal value,
 		int maxDecimals,
-		ILocalizableMessage message)
-	{
-		return !value.HasAtMostDecimalPlaces(maxDecimals) ? throw new InvalidInputException(message) : value;
-	}
+		ILocalizableMessage message) => !value.HasAtMostDecimalPlaces(maxDecimals)
+		? throw new InvalidInputException(message)
+		: value;
 
 	public static IEnumerable<T> EnsureNotEmpty<T>(this IEnumerable<T> value, ILocalizableMessage message)
 	{
@@ -139,32 +136,23 @@ public static class ValidationGuardExtensions
 		!value.IsNotNull() ? throw exceptionFactory() : value;
 
 	public static T EnsureNotNullOrDefault<T>(this T? value, Func<Exception> exceptionFactory)
-		where T : struct
-	{
-		return !value.IsNotNullOrDefault() ? throw exceptionFactory() : value.GetValueOrDefault();
-	}
+		where T : struct =>
+		!value.IsNotNullOrDefault() ? throw exceptionFactory() : value.GetValueOrDefault();
 
-	public static T EnsureNullOrDefault<T>(this T? value, Func<Exception> exceptionFactory) where T : struct
-	{
-		return !value.IsNullOrDefault() ? throw exceptionFactory() : value.GetValueOrDefault();
-	}
+	public static T EnsureNullOrDefault<T>(this T? value, Func<Exception> exceptionFactory)
+		where T : struct => !value.IsNullOrDefault() ? throw exceptionFactory() : value.GetValueOrDefault();
 
 	public static T EnsureInRange<T>(
 		this T value,
 		T min,
 		T max,
-		Func<Exception> exceptionFactory) where T : IComparable<T>
-	{
-		return !value.IsInRange(min, max) ? throw exceptionFactory() : value;
-	}
+		Func<Exception> exceptionFactory) where T : IComparable<T> =>
+		!value.IsInRange(min, max) ? throw exceptionFactory() : value;
 
 	public static T Ensure<T>(
 		this T value,
 		Func<T, bool> predicate,
-		Func<Exception> exceptionFactory)
-	{
-		return !value.IsValid(predicate) ? throw exceptionFactory() : value;
-	}
+		Func<Exception> exceptionFactory) => !value.IsValid(predicate) ? throw exceptionFactory() : value;
 
 	public static bool EnsureTrue(this bool value, Func<Exception> exceptionFactory) =>
 		!value.IsTrue() ? throw exceptionFactory() : value;
@@ -208,10 +196,8 @@ public static class ValidationGuardExtensions
 	public static decimal EnsureMaxDecimalPlaces(
 		this decimal value,
 		int maxDecimals,
-		Func<Exception> exceptionFactory)
-	{
-		return !value.HasAtMostDecimalPlaces(maxDecimals) ? throw exceptionFactory() : value;
-	}
+		Func<Exception> exceptionFactory) =>
+		!value.HasAtMostDecimalPlaces(maxDecimals) ? throw exceptionFactory() : value;
 
 	public static IEnumerable<T> EnsureNotEmpty<T>(
 		this IEnumerable<T> value,

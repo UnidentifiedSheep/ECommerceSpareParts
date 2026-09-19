@@ -31,11 +31,11 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var applierExists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == existing.SystemName, cancellationToken: CancellationToken);
+			.AnyAsync(x => x.SystemName == existing.SystemName, CancellationToken);
 		var stateExists = await Context
 			.Set<PriceApplierState>()
 			.AsNoTracking()
-			.AnyAsync(x => x.PriceApplierSystemName == existing.SystemName, cancellationToken: CancellationToken);
+			.AnyAsync(x => x.PriceApplierSystemName == existing.SystemName, CancellationToken);
 		applierExists.Should().BeFalse();
 		stateExists.Should().BeFalse();
 
@@ -46,7 +46,9 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var recalculationJobExists = await Context
 			.Set<Job>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName && x.NaturalKey != null, cancellationToken: CancellationToken);
+			.AnyAsync(
+				x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName && x.NaturalKey != null,
+				CancellationToken);
 		recalculationJobExists.Should().BeTrue();
 	}
 
@@ -69,7 +71,7 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == existing.SystemName, cancellationToken: CancellationToken);
+			.AnyAsync(x => x.SystemName == existing.SystemName, CancellationToken);
 		exists.Should().BeTrue();
 	}
 
@@ -87,9 +89,8 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 	[Fact]
 	public async Task WithEmptySystemName_ThrowsValidationException()
 	{
-		var exception =
-			await Assert.ThrowsAsync<ValidationException>(() =>
-				Mediator.Send(new DeletePriceApplierCommand(""), CancellationToken));
+		var exception = await Assert.ThrowsAsync<ValidationException>(() =>
+			Mediator.Send(new DeletePriceApplierCommand(""), CancellationToken));
 
 		exception.Errors.Should().ContainSingle(x => x.ErrorCode == "price.applier.system.name.required");
 	}

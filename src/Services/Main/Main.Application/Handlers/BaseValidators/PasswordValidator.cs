@@ -19,8 +19,7 @@ public class PasswordValidator : AbstractValidator<string>
 					context.AddFailure(
 						new ValidationFailure(context.PropertyPath, "Validation failed")
 						{
-							ErrorCode = message.MessageKey,
-							CustomState = message
+							ErrorCode = message.MessageKey, CustomState = message
 						});
 			});
 	}

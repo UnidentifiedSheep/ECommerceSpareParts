@@ -67,4 +67,3 @@ public class ReservationNotFoundException(int id) : LocalizedNotFoundException(
 
 public class ProductCrossSelfReferenceException()
 	: LocalizedBadRequestException(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance);
-

@@ -38,7 +38,9 @@ public class DeleteFromCartTests : IntegrationTest
 		var cartItem = await Context
 			.Carts
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.UserId == command.UserId && x.ProductId == command.ProductId, cancellationToken: CancellationToken);
+			.FirstOrDefaultAsync(
+				x => x.UserId == command.UserId && x.ProductId == command.ProductId,
+				CancellationToken);
 		Assert.Null(cartItem);
 	}
 

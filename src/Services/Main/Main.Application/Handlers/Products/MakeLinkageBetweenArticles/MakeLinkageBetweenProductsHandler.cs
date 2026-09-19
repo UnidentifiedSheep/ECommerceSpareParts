@@ -14,7 +14,8 @@ namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 
 [AutoSave]
 [Transactional]
-public record MakeLinkageBetweenProductsCommand(IReadOnlyCollection<NewProductLinkageDto> Linkages) : ICommand<Unit>;
+public record MakeLinkageBetweenProductsCommand(IReadOnlyCollection<NewProductLinkageDto> Linkages)
+	: ICommand<Unit>;
 
 public class MakeLinkageBetweenProductsHandler(
 	IProductRepository repository,

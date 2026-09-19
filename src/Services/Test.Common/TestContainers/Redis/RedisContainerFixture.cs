@@ -9,9 +9,7 @@ public sealed class RedisContainerFixture : IAsyncLifetime
 	private const int DatabaseCount = AssemblyFixture.MaxThreads;
 
 	private readonly RedisContainer _redisContainer =
-		new RedisBuilder("redis/redis-stack:latest")
-			.WithPortBinding(6379, true)
-			.Build();
+		new RedisBuilder("redis/redis-stack:latest").WithPortBinding(6379, true).Build();
 
 	private Channel<RedisDatabaseSlot> _databasePool = null!;
 
@@ -31,25 +29,19 @@ public sealed class RedisContainerFixture : IAsyncLifetime
 			});
 
 		for (var i = 0; i < DatabaseCount; i++)
-		{
-			await _databasePool.Writer.WriteAsync(
-				new RedisDatabaseSlot(
-					i,
-					BuildConnectionString(i)));
-		}
+			await _databasePool.Writer.WriteAsync(new RedisDatabaseSlot(i, BuildConnectionString(i)));
 
-		Console.WriteLine(
-			$"Redis container started with {DatabaseCount} logical databases.");
+		Console.WriteLine($"Redis container started with {DatabaseCount} logical databases.");
 	}
+
+	public ValueTask DisposeAsync() => _redisContainer.DisposeAsync();
 
 	public async ValueTask<RedisDatabaseLease> AcquireDatabaseAsync(
 		CancellationToken cancellationToken = default)
 	{
 		var slot = await _databasePool.Reader.ReadAsync(cancellationToken);
 
-		return new RedisDatabaseLease(
-			slot,
-			ReleaseDatabaseAsync);
+		return new RedisDatabaseLease(slot, ReleaseDatabaseAsync);
 	}
 
 	private ValueTask ReleaseDatabaseAsync(RedisDatabaseSlot slot) => _databasePool.Writer.WriteAsync(slot);
@@ -61,6 +53,4 @@ public sealed class RedisContainerFixture : IAsyncLifetime
 
 		return options.ToString();
 	}
-
-	public ValueTask DisposeAsync() => _redisContainer.DisposeAsync();
 }

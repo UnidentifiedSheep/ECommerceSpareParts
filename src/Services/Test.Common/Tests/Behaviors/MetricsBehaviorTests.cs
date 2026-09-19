@@ -72,10 +72,8 @@ public sealed class MetricsBehaviorTests
 		activity.Events.Should().ContainSingle(x => x.Name == "exception");
 	}
 
-	private static ServiceProvider CreateServices()
-	{
-		return new ServiceCollection().AddMetrics().BuildServiceProvider();
-	}
+	private static ServiceProvider CreateServices() =>
+		new ServiceCollection().AddMetrics().BuildServiceProvider();
 
 	private static MetricsBehavior<TRequest, TResponse> CreateBehavior<TRequest, TResponse>(
 		IServiceProvider services) where TRequest : IRequest<TResponse> where TResponse : notnull

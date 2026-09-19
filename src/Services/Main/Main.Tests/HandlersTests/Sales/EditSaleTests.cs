@@ -56,12 +56,16 @@ public class EditSaleTests : IntegrationTest
 		var oldTransaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == oldTransactionId, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == oldTransactionId, CancellationToken);
 		var newTransaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == editedSale.TransactionId, cancellationToken: CancellationToken);
-		var movements = await Context.Events.OfType<StorageMovementEvent>().AsNoTracking().ToListAsync(cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == editedSale.TransactionId, CancellationToken);
+		var movements = await Context
+			.Events
+			.OfType<StorageMovementEvent>()
+			.AsNoTracking()
+			.ToListAsync(CancellationToken);
 
 		editedSale.Comment.Should().Be(command.Comment);
 		editedSale.SaleDatetime.Should().BeCloseTo(newDate, TimeSpan.FromMilliseconds(1));
@@ -112,7 +116,7 @@ public class EditSaleTests : IntegrationTest
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == sale.TransactionId, cancellationToken: CancellationToken);
+			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 
 		saleAfterFailedEdit.TransactionId.Should().Be(sale.TransactionId);
 		transaction.IsReversed.Should().BeFalse();
@@ -121,7 +125,8 @@ public class EditSaleTests : IntegrationTest
 	[Fact]
 	public async Task EditSale_WhenSaleDoesNotExist_ThrowsSaleNotFoundException()
 	{
-		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(new EditSaleCommand(
+		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
+			new EditSaleCommand(
 				Guid.NewGuid(),
 				1,
 				[
@@ -136,7 +141,8 @@ public class EditSaleTests : IntegrationTest
 				SaleContext.StorageContent.CurrencyId,
 				DateTime.UtcNow,
 				null,
-				null), CancellationToken));
+				null),
+			CancellationToken));
 	}
 
 	[Fact]
@@ -207,7 +213,8 @@ public class EditSaleTests : IntegrationTest
 			sale.Comment,
 			null);
 
-		await Assert.ThrowsAsync<SaleContentNotFoundException>(() => Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<SaleContentNotFoundException>(() =>
+			Mediator.Send(command, CancellationToken));
 
 		var saleAfterFailedEdit = await ReloadSale();
 		saleAfterFailedEdit.TransactionId.Should().Be(sale.TransactionId);
@@ -237,7 +244,8 @@ public class EditSaleTests : IntegrationTest
 			sale.Comment,
 			null);
 
-		await Assert.ThrowsAsync<ArticleDoesntMatchContentException>(() => Mediator.Send(command, CancellationToken));
+		await Assert.ThrowsAsync<ArticleDoesntMatchContentException>(() =>
+			Mediator.Send(command, CancellationToken));
 
 		var saleAfterFailedEdit = await ReloadSale();
 		saleAfterFailedEdit.TransactionId.Should().Be(sale.TransactionId);
@@ -246,7 +254,7 @@ public class EditSaleTests : IntegrationTest
 	[Fact]
 	public async Task EditSale_WhenSaleDeleted_ThrowsSaleNotFoundException()
 	{
-		var sale = await Context.Sales.SingleAsync(x => x.Id == SaleContext.Sale.Id, cancellationToken: CancellationToken);
+		var sale = await Context.Sales.SingleAsync(x => x.Id == SaleContext.Sale.Id, CancellationToken);
 		sale.Delete();
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();

@@ -19,9 +19,7 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 
 	public async ValueTask InitializeAsync()
 	{
-		await Task.WhenAll(
-			Postgres.InitializeAsync().AsTask(),
-			Redis.InitializeAsync().AsTask());
+		await Task.WhenAll(Postgres.InitializeAsync().AsTask(), Redis.InitializeAsync().AsTask());
 
 		_slots = Channel.CreateBounded<TestEnvironmentSlot>(
 			new BoundedChannelOptions(SlotCount)
@@ -47,18 +45,6 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 		}
 	}
 
-	public async ValueTask<TestEnvironmentLease> AcquireAsync(
-		CancellationToken cancellationToken = default)
-	{
-		var slot = await _slots.Reader.ReadAsync(cancellationToken);
-
-		return new TestEnvironmentLease(
-			slot,
-			ReleaseAsync);
-	}
-
-	private ValueTask ReleaseAsync(TestEnvironmentSlot slot) => _slots.Writer.WriteAsync(slot);
-
 	public async ValueTask DisposeAsync()
 	{
 		_slots.Writer.TryComplete();
@@ -72,4 +58,13 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 		await Redis.DisposeAsync();
 		await Postgres.DisposeAsync();
 	}
+
+	public async ValueTask<TestEnvironmentLease> AcquireAsync(CancellationToken cancellationToken = default)
+	{
+		var slot = await _slots.Reader.ReadAsync(cancellationToken);
+
+		return new TestEnvironmentLease(slot, ReleaseAsync);
+	}
+
+	private ValueTask ReleaseAsync(TestEnvironmentSlot slot) => _slots.Writer.WriteAsync(slot);
 }

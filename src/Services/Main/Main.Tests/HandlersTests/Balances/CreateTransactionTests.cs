@@ -38,18 +38,20 @@ public class CreateTransactionTests : IntegrationTest
 
 		await AllowDebit(receiver.Id, amount);
 
-		var result = await Mediator.Send(new CreateTransactionCommand(
+		var result = await Mediator.Send(
+			new CreateTransactionCommand(
 				sender.Id,
 				receiver.Id,
 				amount,
 				currency.Id,
 				transactionDateTime,
-				TransactionSourceType.Manual), CancellationToken);
+				TransactionSourceType.Manual),
+			CancellationToken);
 
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, cancellationToken: CancellationToken);
+			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
 		transaction.Should().NotBeNull();
 		transaction.SenderId.Should().Be(sender.Id);
@@ -62,11 +64,13 @@ public class CreateTransactionTests : IntegrationTest
 		var senderBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id, cancellationToken: CancellationToken);
+			.FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var receiverBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id, cancellationToken: CancellationToken);
+			.FirstAsync(
+				x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id,
+				CancellationToken);
 
 		senderBalance.Balance.Should().Be(amount);
 		receiverBalance.Balance.Should().Be(-amount);
@@ -79,10 +83,12 @@ public class CreateTransactionTests : IntegrationTest
 	{
 		var command = GetValidCommand();
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			command with
 			{
 				Amount = amount
-			}, CancellationToken));
+			},
+			CancellationToken));
 	}
 
 	[Fact]
@@ -90,10 +96,12 @@ public class CreateTransactionTests : IntegrationTest
 	{
 		var command = GetValidCommand();
 
-		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with
+		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			command with
 			{
 				TransactionDateTime = DateTime.UtcNow.AddDays(-31)
-			}, CancellationToken));
+			},
+			CancellationToken));
 
 		exception.Errors.Should().ContainSingle().Which.ErrorCode.Should().Be("operation.date.too.old");
 	}
@@ -103,10 +111,12 @@ public class CreateTransactionTests : IntegrationTest
 	{
 		var command = GetValidCommand();
 
-		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with
+		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			command with
 			{
 				TransactionDateTime = DateTime.UtcNow.AddMinutes(6)
-			}, CancellationToken));
+			},
+			CancellationToken));
 
 		exception
 			.Errors
@@ -160,10 +170,12 @@ public class CreateTransactionTests : IntegrationTest
 	{
 		var command = GetValidCommand();
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command with
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
+			command with
 			{
 				SenderId = Guid.NewGuid()
-			}, CancellationToken));
+			},
+			CancellationToken));
 
 		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.OrganizationsNotFound);
 	}
@@ -173,10 +185,12 @@ public class CreateTransactionTests : IntegrationTest
 	{
 		var command = GetValidCommand();
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command with
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
+			command with
 			{
 				CurrencyId = int.MaxValue
-			}, CancellationToken));
+			},
+			CancellationToken));
 
 		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
 	}
@@ -221,7 +235,7 @@ public class CreateTransactionTests : IntegrationTest
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, cancellationToken: CancellationToken);
+			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
 		transaction.Should().NotBeNull();
 		transaction.ReceiverId.Should().Be(command.ReceiverId);

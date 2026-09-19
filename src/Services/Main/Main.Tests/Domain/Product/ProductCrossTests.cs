@@ -1,5 +1,4 @@
-﻿using Exceptions;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 

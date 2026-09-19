@@ -28,10 +28,8 @@ public class PriceApplierProvider(
 			ct);
 	}
 
-	public async Task InvalidateConfigurationAsync(CancellationToken ct = default)
-	{
+	public async Task InvalidateConfigurationAsync(CancellationToken ct = default) =>
 		await cache.RemoveAsync(CacheKeys.PriceAppliers.ConfigurationKey, token: ct);
-	}
 
 	private async Task<PriceApplierConfigurationSnapshot> GetConfigurationFromDbAsync(
 		CancellationToken ct = default)

@@ -9,10 +9,11 @@ namespace Tests.TestContexts.ProductEnrichment;
 public class CatalogueCandidateTestContext(
 	DContext ctx,
 	SupplierProductTestContext supplierProductTestContext,
-	ProducerTestContext producerTestContext
-	) : TestContextBase<DContext>(ctx), IDependentTestContext
+	ProducerTestContext producerTestContext) : TestContextBase<DContext>(ctx), IDependentTestContext
 {
 	public IReadOnlyList<CatalogueCandidate> Candidates { get; private set; } = null!;
+
+	public static Type[] DependsOn => [typeof(SupplierProductTestContext), typeof(ProducerTestContext)];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
 	{
@@ -22,10 +23,11 @@ public class CatalogueCandidateTestContext(
 		{
 			var builder = new CatalogueCandidateBuilder(Faker);
 			var producer =
-				producerTestContext.Producers.FirstOrDefault(x => x.Name == supplierProduct.Producer)
-				?? producerTestContext.Producers[0];
+				producerTestContext.Producers.FirstOrDefault(x => x.Name == supplierProduct.Producer) ??
+				producerTestContext.Producers[0];
 
-			builder.WithSku(supplierProduct.Sku.Value)
+			builder
+				.WithSku(supplierProduct.Sku.Value)
 				.WithProducerId(producer.Id)
 				.WithSupplierProduct(supplierProduct);
 
@@ -37,10 +39,4 @@ public class CatalogueCandidateTestContext(
 		await DbContext.AddRangeAsync(Candidates, cancellationToken);
 		await DbContext.SaveChangesAsync(cancellationToken);
 	}
-
-	public static Type[] DependsOn =>
-	[
-		typeof(SupplierProductTestContext),
-		typeof(ProducerTestContext)
-	];
 }

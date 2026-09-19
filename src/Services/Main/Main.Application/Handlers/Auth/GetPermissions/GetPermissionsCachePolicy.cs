@@ -1,6 +1,5 @@
 using System.Globalization;
 using Application.Common.Interfaces.Cqrs;
-using Locan.Core.Interfaces.Localizers;
 
 namespace Main.Application.Handlers.Auth.GetPermissions;
 
@@ -12,5 +11,6 @@ public class GetPermissionsCachePolicy : ICachePolicy<GetPermissionsQuery>
 
 	public string? BaseTag => null;
 
-	public string GetCacheKey(GetPermissionsQuery request) => $"list-permissions:{CultureInfo.CurrentUICulture}";
+	public string GetCacheKey(GetPermissionsQuery request) =>
+		$"list-permissions:{CultureInfo.CurrentUICulture}";
 }

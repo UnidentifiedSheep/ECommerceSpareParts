@@ -94,8 +94,10 @@ public class ProducerLookupService(
 		catch
 		{
 			lock (_loadLock)
+			{
 				if (ReferenceEquals(_loadTask, loadTask))
 					_loadTask = null;
+			}
 
 			throw;
 		}
