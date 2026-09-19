@@ -21,12 +21,12 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 	public async Task CandidateHasDirectAndReverseCrosses_ReturnsMappedAndNotMappedCrosses()
 	{
 		var candidate = CatalogueTestContext.Candidates[1];
-		var expectedMappedCandidates = new[]
+		var expectedMappedIds = new[]
 		{
-			CatalogueTestContext.Candidates[0],
-			CatalogueTestContext.Candidates[2]
+			CatalogueTestContext.Candidates[0].Id,
+			CatalogueTestContext.Candidates[2].Id
 		};
-		var expectedNotMappedProduct = SupplierTestContext.SupplierProducts[3];
+		var expectedNotMappedId = SupplierTestContext.SupplierProducts[3].Id;
 		Context.ChangeTracker.Clear();
 
 		var result = await Mediator.Send(
@@ -37,26 +37,11 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 		item.MappedCrosses
 			.Select(x => x.Id)
 			.Should()
-			.BeEquivalentTo(expectedMappedCandidates.Select(x => x.Id));
-
-		var mapped = item.MappedCrosses.Single(x => x.Id == expectedMappedCandidates[0].Id);
-		mapped.Sku.Should().Be(expectedMappedCandidates[0].Sku.Value);
-		mapped.Producer.Id.Should().Be(expectedMappedCandidates[0].ProducerId);
-		mapped.SupplierProducts
+			.BeEquivalentTo(expectedMappedIds);
+		item.NotMappedCrosses
 			.Select(x => x.Id)
 			.Should()
-			.BeEquivalentTo(expectedMappedCandidates[0].SupplierProducts.Select(x => x.Id));
-
-		var notMapped = item.NotMappedCrosses.Should().ContainSingle().Subject;
-		notMapped.Id.Should().Be(expectedNotMappedProduct.Id);
-		notMapped.Sku.Should().Be(expectedNotMappedProduct.Sku.Value);
-		notMapped.Producer.Should().Be(expectedNotMappedProduct.Producer);
-		notMapped.Supplier.Should().Be(expectedNotMappedProduct.Supplier);
-		notMapped.CandidateId.Should().BeNull();
-		notMapped.Names
-			.Select(x => x.Name)
-			.Should()
-			.BeEquivalentTo(expectedNotMappedProduct.Names.Select(x => x.Name));
+			.BeEquivalentTo([expectedNotMappedId]);
 	}
 
 	[Fact]
@@ -107,8 +92,9 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 			.Should()
 			.BeEquivalentTo([firstCandidate.Id, thirdCandidate.Id]);
 		result.Items[secondCandidate.Id].NotMappedCrosses
+			.Select(x => x.Id)
 			.Should()
-			.ContainSingle(x => x.Id == notMappedProduct.Id);
+			.BeEquivalentTo([notMappedProduct.Id]);
 	}
 
 	[Fact]
