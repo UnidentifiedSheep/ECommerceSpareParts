@@ -97,8 +97,9 @@ public sealed class ProductSizeDtoProjectionProvider : ProjectionProviderBase<Pr
 }
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class ProductCharacteristicDtoProjectionProvider
-	: ProjectionProviderBase<ProductCharacteristic, ProductCharacteristicDto>
+public sealed class
+	ProductCharacteristicDtoProjectionProvider : ProjectionProviderBase<ProductCharacteristic,
+	ProductCharacteristicDto>
 {
 	public override Expression<Func<ProductCharacteristic, ProductCharacteristicDto>> Projection { get; } =
 		x => new ProductCharacteristicDto
@@ -110,8 +111,9 @@ public sealed class ProductCharacteristicDtoProjectionProvider
 }
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class ProductReservationDtoProjectionProvider
-	: ProjectionProviderBase<ProductReservation, ProductReservationDto>
+public sealed class
+	ProductReservationDtoProjectionProvider : ProjectionProviderBase<ProductReservation,
+	ProductReservationDto>
 {
 	public ProductReservationDtoProjectionProvider(
 		IProjectionProvider<Organization, OrganizationDto> organizationProjection)

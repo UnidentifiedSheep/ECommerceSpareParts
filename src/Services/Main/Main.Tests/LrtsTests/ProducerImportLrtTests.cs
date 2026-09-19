@@ -38,7 +38,7 @@ public sealed class ProducerImportLrtTests : CsvLrtIntegrationTest<ProducerImpor
 		var created = await Context
 			.Producers
 			.AsNoTracking()
-			.CountAsync(x => x.Name == newName.ToUpperInvariant());
+			.CountAsync(x => x.Name == newName.ToUpperInvariant(), CancellationToken);
 		created.Should().Be(1);
 	}
 }

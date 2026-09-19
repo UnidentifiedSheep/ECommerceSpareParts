@@ -16,8 +16,8 @@ public record GetCharacteristicsResult(IReadOnlyList<ProductCharacteristicDto> C
 
 public class GetCharacteristicsHandler(
 	IReadRepository<ProductCharacteristic, (int, string)> repository,
-	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection
-	) : IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
+	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection)
+	: IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
 {
 	public async Task<GetCharacteristicsResult> Handle(
 		GetCharacteristicsQuery request,

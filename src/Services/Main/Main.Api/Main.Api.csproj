@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="Carter" Version="10.0.0"/>
-        <PackageReference Include="Locan.Generator" Version="1.0.6" />
+        <PackageReference Include="Locan.Generator" Version="1.0.6"/>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>
         <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1"/>

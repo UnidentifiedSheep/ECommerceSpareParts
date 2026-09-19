@@ -1,5 +1,5 @@
-﻿using Exceptions;
-using FluentAssertions;
+﻿using FluentAssertions;
+using Main.Entities.Exceptions;
 using Main.Entities.Product;
 
 namespace Tests.Domain.Product;
@@ -27,7 +27,7 @@ public class ProductCrossTests
 	{
 		var act = () => ProductCross.Create(1, 1);
 
-		act.Should().Throw<InvalidInputException>();
+		act.Should().Throw<ProductCrossSelfReferenceException>();
 	}
 
 	[Theory]

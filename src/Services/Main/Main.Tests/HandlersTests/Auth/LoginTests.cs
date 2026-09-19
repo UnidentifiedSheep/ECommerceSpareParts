@@ -31,7 +31,8 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 				login,
 				Password,
 				null,
-				null));
+				null),
+			CancellationToken);
 
 		result.Token.Should().NotBeNullOrWhiteSpace();
 		result.RefreshToken.Should().NotBeNullOrWhiteSpace();

@@ -209,10 +209,11 @@ public sealed class MultiStepLrtBaseTests
 	{
 		public override string SystemName => nameof(TestMultiStepLrt);
 
-		public override ILocalizableMessage NameLocalizationMessage
-			=> new LocalizableMessage("test-multi-step-lrt-name");
-		public override ILocalizableMessage DescriptionLocalizationMessage
-			=> new LocalizableMessage("test-multi-step-lrt-description");
+		public override ILocalizableMessage NameLocalizationMessage =>
+			new LocalizableMessage("test-multi-step-lrt-name");
+
+		public override ILocalizableMessage DescriptionLocalizationMessage =>
+			new LocalizableMessage("test-multi-step-lrt-description");
 
 		protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState)
 		{

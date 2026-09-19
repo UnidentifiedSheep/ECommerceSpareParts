@@ -12,12 +12,9 @@ using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
-using Application.Common.Consumer;
-using Application.Common.Interfaces;
 using Cache;
 using Carter;
 using Contracts.Job;
-using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Internal.Integration.Di;
 using MassTransit;
@@ -58,7 +55,6 @@ builder.Services.AddMassTransit(x =>
 	x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyRatesChangedConsumer)));
 	x.AddConsumer<BackplaneConsumer>();
 	x.AddConsumer<JobStatusUpdatedConsumer>();
-	x.AddConsumer<SettingUpdatedConsumer>();
 
 	x.AddEntityFrameworkOutbox<DContext>(o =>
 	{
@@ -82,11 +78,8 @@ builder.Services.AddMassTransit(x =>
 				ep.Bind<BackplaneMessage>();
 
 				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
-				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
-				ep
-					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
-					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
+				ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics);
 			});
 
 		cfg.ReceiveEndpoint(

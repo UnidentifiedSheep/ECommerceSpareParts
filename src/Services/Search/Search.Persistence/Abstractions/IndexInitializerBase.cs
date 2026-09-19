@@ -53,8 +53,6 @@ public abstract class IndexInitializerBase<TDocument>(
 		}
 	}
 
-	private bool ShouldRefreshExistsCache()
-	{
-		return !ExistsCheckedAt.HasValue || ExistsCheckedAt.Value + durationBetweenCheck < DateTime.UtcNow;
-	}
+	private bool ShouldRefreshExistsCache() => !ExistsCheckedAt.HasValue ||
+		ExistsCheckedAt.Value + durationBetweenCheck < DateTime.UtcNow;
 }

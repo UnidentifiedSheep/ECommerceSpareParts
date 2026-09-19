@@ -30,10 +30,8 @@ public static class ValidationExtensions
 
 	public static bool IsNotNull<T>(this T? value) where T : class => value is not null;
 
-	public static bool IsNotNullOrDefault<T>(this T? value) where T : struct
-	{
-		return value.HasValue && !EqualityComparer<T>.Default.Equals(value.Value, default);
-	}
+	public static bool IsNotNullOrDefault<T>(this T? value) where T : struct =>
+		value.HasValue && !EqualityComparer<T>.Default.Equals(value.Value, default);
 
 	public static bool IsNullOrDefault<T>(this T? value) where T : struct => !value.IsNotNullOrDefault();
 

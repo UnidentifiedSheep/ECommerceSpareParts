@@ -1,9 +1,9 @@
+using Application.Common.Extensions;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Application.Common.Extensions;
-using Main.Entities;
 using Main.Application.Handlers.BaseValidators;
+using Main.Entities;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
 
@@ -11,7 +11,9 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
 {
 	public EditStorageContentValidation(IOperationDatePolicy datePolicy)
 	{
-		RuleFor(x => x.EditedFields).NotEmpty().WithLocalizableError(StorageContentEditListNotEmptyMessage.Instance);
+		RuleFor(x => x.EditedFields)
+			.NotEmpty()
+			.WithLocalizableError(StorageContentEditListNotEmptyMessage.Instance);
 
 		RuleFor(x => x.EditedFields)
 			.Must(x => x.Count < 100)

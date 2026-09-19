@@ -19,7 +19,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 		RegisterBasicContext<ProducerTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 		var mapping = await new ProducerSupplierMappingBuilder(Faker)
@@ -36,7 +36,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 		var command = new DeleteProducerSupplierMappingCommand(int.MaxValue);
 
 		await Assert.ThrowsAsync<ProducersSupplierMappingNotFoundException>(async () =>
-			await Mediator.Send(command));
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -48,7 +48,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var mappings = await Context.ProducerSupplierMappings.AsNoTracking().ToListAsync();
+		var mappings = await Context.ProducerSupplierMappings.AsNoTracking().ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(0);
 	}
 }

@@ -52,6 +52,10 @@ public class SkuTests
 
 		result.Should().BeFalse();
 		exception.Should().BeOfType<InvalidInputException>();
-		((InvalidInputException)exception!).LocalizableMessage.MessageKey.Should().Be("article.articleNumber.max.length.128");
+		((InvalidInputException)exception!)
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be("article.articleNumber.max.length.128");
 	}
 }

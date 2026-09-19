@@ -16,7 +16,8 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 	public async Task UpsertRole_InvalidName_ThrowsValidation(string invalidName)
 	{
 		var command = new UpsertRoleCommand(invalidName, null);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -25,9 +26,12 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 		var r = new RoleBuilder(Faker).Build();
 		var command = new UpsertRoleCommand(r.Name, r.Description);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var roleInDb = await Context.Roles.AsNoTracking().FirstOrDefaultAsync(x => x.Name == r.Name);
+		var roleInDb = await Context
+			.Roles
+			.AsNoTracking()
+			.FirstOrDefaultAsync(x => x.Name == r.Name, CancellationToken);
 
 		Assert.NotNull(roleInDb);
 
@@ -44,7 +48,10 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 		var act = () => Mediator.Send(command);
 		await act.Should().NotThrowAsync();
 
-		var roleInDb = await Context.Roles.AsNoTracking().FirstOrDefaultAsync(x => x.Name == role.Name);
+		var roleInDb = await Context
+			.Roles
+			.AsNoTracking()
+			.FirstOrDefaultAsync(x => x.Name == role.Name, CancellationToken);
 
 		roleInDb.Should().NotBeNull();
 		roleInDb.Description.Should().Be(command.Description);

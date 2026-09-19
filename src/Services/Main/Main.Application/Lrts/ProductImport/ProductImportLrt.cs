@@ -53,13 +53,14 @@ public class ProductImportLrt(
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtProductImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtProductImportDescriptionMessage.Instance;
-
-	protected override async Task BeforeRead(ProductImportState state) =>
-		_producerLookup = await producerLookupService.Load(CancellationToken);
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtProductImportDescriptionMessage.Instance;
 
 	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
 		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+
+	protected override async Task BeforeRead(ProductImportState state) =>
+		_producerLookup = await producerLookupService.Load(CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,

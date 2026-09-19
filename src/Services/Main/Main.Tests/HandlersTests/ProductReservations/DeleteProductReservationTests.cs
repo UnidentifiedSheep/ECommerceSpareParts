@@ -37,7 +37,7 @@ public class DeleteProductReservationTests : IntegrationTest
 		var dbValue = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Id == command.ReservationId);
+			.FirstOrDefaultAsync(x => x.Id == command.ReservationId, CancellationToken);
 
 		dbValue.Should().NotBeNull();
 		dbValue.Status.Should().Be(ProductReservationStatus.Canceled);
@@ -54,7 +54,7 @@ public class DeleteProductReservationTests : IntegrationTest
 		var dbValue = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Id == command.ReservationId);
+			.FirstOrDefaultAsync(x => x.Id == command.ReservationId, CancellationToken);
 
 		dbValue.Should().NotBeNull();
 		dbValue.Status.Should().Be(ProductReservationStatus.Canceled);

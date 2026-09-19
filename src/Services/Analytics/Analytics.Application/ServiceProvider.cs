@@ -7,7 +7,6 @@ using Analytics.Application.Services;
 using Analytics.Application.Services.FactSynchronizers;
 using Analytics.Entities;
 using Application.Common;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Services;
 using Application.Common.Services.Currency;
@@ -37,7 +36,6 @@ public static class ServiceProvider
 			.WithRegisteredBackplane()
 			.WithSystemTextJsonSerializer();
 
-		collection.RegisterSettingsService();
 		collection.AddSingleton<IJsonSerializer, JsonSerializer>();
 		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 		collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();

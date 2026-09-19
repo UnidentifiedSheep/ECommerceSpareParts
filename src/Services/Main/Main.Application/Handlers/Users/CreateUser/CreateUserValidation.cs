@@ -3,10 +3,10 @@ using Abstractions.Models.Options;
 using Extensions;
 using FluentValidation;
 using FluentValidation.Results;
+using Locan.Core.Interfaces;
 using Main.Application.Handlers.BaseValidators;
 using Main.Entities;
 using Main.Entities.User;
-using Locan.Core.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Users.CreateUser;
@@ -38,24 +38,24 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 				}
 
 				if (primaryCount > 1)
-					context.AddFailure(CreateFailure(
-						context.PropertyPath,
-						UserEmailPrimaryCountMessage.Instance));
+					context.AddFailure(
+						CreateFailure(context.PropertyPath, UserEmailPrimaryCountMessage.Instance));
 
 				if (list.Count > setOfEmails.Count)
-					context.AddFailure(CreateFailure(
-						context.PropertyPath,
-						UserHaveDuplicateEmailMessage.Instance));
+					context.AddFailure(
+						CreateFailure(context.PropertyPath, UserHaveDuplicateEmailMessage.Instance));
 
 				if (list.Count < emailOptions.Value.MinEmailCount)
-					context.AddFailure(CreateFailure(
-						context.PropertyPath,
-						new UserMinEmailCountMessage().WithCount(emailOptions.Value.MinEmailCount)));
+					context.AddFailure(
+						CreateFailure(
+							context.PropertyPath,
+							new UserMinEmailCountMessage().WithCount(emailOptions.Value.MinEmailCount)));
 
 				if (list.Count > emailOptions.Value.MaxEmailCount)
-					context.AddFailure(CreateFailure(
-						context.PropertyPath,
-						new UserMaxEmailCountMessage().WithCount(emailOptions.Value.MaxEmailCount)));
+					context.AddFailure(
+						CreateFailure(
+							context.PropertyPath,
+							new UserMaxEmailCountMessage().WithCount(emailOptions.Value.MaxEmailCount)));
 			});
 
 		RuleFor(x => x.Phones)
@@ -73,24 +73,24 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 				}
 
 				if (primaryCount > 1)
-					context.AddFailure(CreateFailure(
-						context.PropertyPath,
-						UserPhonePrimaryCountMessage.Instance));
+					context.AddFailure(
+						CreateFailure(context.PropertyPath, UserPhonePrimaryCountMessage.Instance));
 
 				if (list.Count > setOfPhones.Count)
-					context.AddFailure(CreateFailure(
-						context.PropertyPath,
-						UserHaveDuplicatePhoneMessage.Instance));
+					context.AddFailure(
+						CreateFailure(context.PropertyPath, UserHaveDuplicatePhoneMessage.Instance));
 
 				if (list.Count < phoneOptions.Value.MinPhoneCount)
-					context.AddFailure(CreateFailure(
-						context.PropertyPath,
-						new UserMinPhoneCountMessage().WithCount(phoneOptions.Value.MinPhoneCount)));
+					context.AddFailure(
+						CreateFailure(
+							context.PropertyPath,
+							new UserMinPhoneCountMessage().WithCount(phoneOptions.Value.MinPhoneCount)));
 
 				if (list.Count > phoneOptions.Value.MaxPhoneCount)
-					context.AddFailure(CreateFailure(
-						context.PropertyPath,
-						new UserMaxPhoneCountMessage().WithCount(phoneOptions.Value.MaxPhoneCount)));
+					context.AddFailure(
+						CreateFailure(
+							context.PropertyPath,
+							new UserMaxPhoneCountMessage().WithCount(phoneOptions.Value.MaxPhoneCount)));
 			});
 
 		RuleFor(x => x.UserInfo).SetValidator(new UserInfoValidator());
@@ -100,8 +100,7 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 	{
 		return new ValidationFailure(propertyName, "Validation failed")
 		{
-			ErrorCode = message.MessageKey,
-			CustomState = message
+			ErrorCode = message.MessageKey, CustomState = message
 		};
 	}
 }

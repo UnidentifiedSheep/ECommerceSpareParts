@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
-using Tests.Interfaces;
+using ITestContext = Tests.Interfaces.ITestContext;
 
 namespace Tests.Abstractions;
 

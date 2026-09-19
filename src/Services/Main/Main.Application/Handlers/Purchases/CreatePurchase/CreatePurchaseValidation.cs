@@ -1,9 +1,9 @@
+using Application.Common.Extensions;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Application.Common.Extensions;
-using Main.Entities;
 using Main.Application.Handlers.Purchases.BaseValidators;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
@@ -11,9 +11,13 @@ public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
 {
 	public CreatePurchaseValidation(IOperationDatePolicy datePolicy)
 	{
-		RuleFor(x => x.PurchaseContent).NotEmpty().WithLocalizableError(PurchaseContentNotEmptyMessage.Instance);
+		RuleFor(x => x.PurchaseContent)
+			.NotEmpty()
+			.WithLocalizableError(PurchaseContentNotEmptyMessage.Instance);
 
-		RuleFor(x => x.SupplierUserId).NotEmpty().WithLocalizableError(PurchaseSupplierIdNotEmptyMessage.Instance);
+		RuleFor(x => x.SupplierUserId)
+			.NotEmpty()
+			.WithLocalizableError(PurchaseSupplierIdNotEmptyMessage.Instance);
 
 		RuleFor(x => x.SupplierOrganizationId)
 			.NotEmpty()

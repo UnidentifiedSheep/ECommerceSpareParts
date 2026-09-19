@@ -40,7 +40,14 @@ public class UserNameTests
 	{
 		var action = () => new UserName(value!);
 
-		action.Should().Throw<InvalidInputException>().Which.LocalizableMessage.MessageKey.Should().Be(expectedMessageKey);
+		action
+			.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be(expectedMessageKey);
 	}
 
 	[Fact]
@@ -48,7 +55,14 @@ public class UserNameTests
 	{
 		var action = () => new UserName(new string('a', 37));
 
-		action.Should().Throw<InvalidInputException>().Which.LocalizableMessage.MessageKey.Should().Be("login.max.length.36");
+		action
+			.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be("login.max.length.36");
 	}
 
 	[Fact]

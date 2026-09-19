@@ -214,8 +214,6 @@ public class JobScheduleRunTests
 				DateTimeKind.Utc));
 	}
 
-	private static void SetId(JobScheduleRun run, Guid id)
-	{
+	private static void SetId(JobScheduleRun run, Guid id) =>
 		typeof(JobScheduleRun).GetProperty(nameof(JobScheduleRun.Id))!.SetValue(run, id);
-	}
 }

@@ -19,10 +19,11 @@ public class StorageContentSettingDefinition(
 	: SettingDefinitionNamedObjectBase<StorageContentSetting>(settingsService)
 {
 	public override string SystemName => StorageContentSetting.SettingName;
-	public override ILocalizableMessage NameLocalizationMessage
-		=> StorageContentSettingNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage
-		=> StorageContentSettingDescriptionMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage => StorageContentSettingNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		StorageContentSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(StorageContentSettingInputData);
 

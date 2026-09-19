@@ -33,9 +33,10 @@ public class VerifyEmailTests : IntegrationTest
 			VerificationType.EmailVerification,
 			Email);
 
-		await Mediator.Send(new VerifyEmailCommand(token));
+		await Mediator.Send(new VerifyEmailCommand(token), CancellationToken);
 
-		var email = await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == Email);
+		var email =
+			await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == Email, CancellationToken);
 		email.Confirmed.Should().BeTrue();
 		email.ConfirmedAt.Should().NotBeNull();
 	}
@@ -49,7 +50,7 @@ public class VerifyEmailTests : IntegrationTest
 			VerificationType.EmailVerification,
 			Email);
 
-		await Mediator.Send(new VerifyEmailCommand(token));
+		await Mediator.Send(new VerifyEmailCommand(token), CancellationToken);
 		var action = () => Mediator.Send(new VerifyEmailCommand(token));
 
 		await action.Should().ThrowAsync<EmailVerificationTokenExpiredException>();
@@ -140,8 +141,6 @@ public class VerifyEmailTests : IntegrationTest
 		return (payload, signer.Sign(payload));
 	}
 
-	private IVerificationPayloadProvider GetPayloadProvider()
-	{
-		return Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>();
-	}
+	private IVerificationPayloadProvider GetPayloadProvider() =>
+		Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>();
 }

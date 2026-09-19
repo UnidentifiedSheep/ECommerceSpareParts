@@ -42,13 +42,16 @@ public class ProducerAliasImportLrt(
 		stringLocalizer)
 {
 	public override string SystemName => nameof(ProducerAliasImportLrt);
-	public override ILocalizableMessage NameLocalizationMessage
-		=> LrtProducerOtherNamesImportNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage
-		=> LrtProducerOtherNamesImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
-		=> ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtProducerOtherNamesImportNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		LrtProducerOtherNamesImportDescriptionMessage.Instance;
+
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
+		ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
+
 	protected override bool TryProcessRow(
 		int rowIdx,
 		ProducerAliasCsvDto row,
@@ -94,7 +97,10 @@ public class ProducerAliasImportLrt(
 				continue;
 			}
 
-			errors.Add(CreateError(item.idx, StringLocalizer.Get(ProducerOtherNameDuplicateInBatchMessage.Instance)));
+			errors.Add(
+				CreateError(
+					item.idx,
+					StringLocalizer.Get(ProducerOtherNameDuplicateInBatchMessage.Instance)));
 		}
 
 		var result = await TransactionService.ExecuteAsync(
@@ -122,7 +128,9 @@ public class ProducerAliasImportLrt(
 					if (existingAliases.Contains(item.Alias))
 					{
 						transactionErrors.Add(
-							CreateError(idx, StringLocalizer.Get(ProducerOtherNameAlreadyTakenMessage.Instance)));
+							CreateError(
+								idx,
+								StringLocalizer.Get(ProducerOtherNameAlreadyTakenMessage.Instance)));
 						continue;
 					}
 
@@ -131,7 +139,8 @@ public class ProducerAliasImportLrt(
 						transactionErrors.Add(
 							CreateError(
 								idx,
-								StringLocalizer.Get(ProducerOtherNameProducerNotFoundInBatchMessage.Instance)));
+								StringLocalizer.Get(
+									ProducerOtherNameProducerNotFoundInBatchMessage.Instance)));
 						continue;
 					}
 

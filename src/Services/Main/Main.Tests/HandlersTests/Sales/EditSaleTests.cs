@@ -49,19 +49,23 @@ public class EditSaleTests : IntegrationTest
 			"sale edited",
 			null);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var editedSale = await ReloadSale();
 		var editedContent = editedSale.Contents.Should().ContainSingle().Subject;
 		var oldTransaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == oldTransactionId);
+			.SingleAsync(x => x.Id == oldTransactionId, CancellationToken);
 		var newTransaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == editedSale.TransactionId);
-		var movements = await Context.Events.OfType<StorageMovementEvent>().AsNoTracking().ToListAsync();
+			.SingleAsync(x => x.Id == editedSale.TransactionId, CancellationToken);
+		var movements = await Context
+			.Events
+			.OfType<StorageMovementEvent>()
+			.AsNoTracking()
+			.ToListAsync(CancellationToken);
 
 		editedSale.Comment.Should().Be(command.Comment);
 		editedSale.SaleDatetime.Should().BeCloseTo(newDate, TimeSpan.FromMilliseconds(1));
@@ -106,13 +110,13 @@ public class EditSaleTests : IntegrationTest
 			sale.Comment,
 			null);
 
-		await Assert.ThrowsAsync<InvalidRowVersionException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<InvalidRowVersionException>(() => Mediator.Send(command, CancellationToken));
 
 		var saleAfterFailedEdit = await ReloadSale();
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == sale.TransactionId);
+			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 
 		saleAfterFailedEdit.TransactionId.Should().Be(sale.TransactionId);
 		transaction.IsReversed.Should().BeFalse();
@@ -137,7 +141,8 @@ public class EditSaleTests : IntegrationTest
 				SaleContext.StorageContent.CurrencyId,
 				DateTime.UtcNow,
 				null,
-				null)));
+				null),
+			CancellationToken));
 	}
 
 	[Fact]
@@ -155,7 +160,7 @@ public class EditSaleTests : IntegrationTest
 			sale.Comment,
 			null);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var editedSale = await ReloadSale();
 		editedSale.Contents.Should().HaveCount(2);
@@ -178,7 +183,7 @@ public class EditSaleTests : IntegrationTest
 			sale.Comment,
 			null);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var editedSale = await ReloadSale();
 		editedSale.Contents.Should().ContainSingle();
@@ -208,7 +213,8 @@ public class EditSaleTests : IntegrationTest
 			sale.Comment,
 			null);
 
-		await Assert.ThrowsAsync<SaleContentNotFoundException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<SaleContentNotFoundException>(() =>
+			Mediator.Send(command, CancellationToken));
 
 		var saleAfterFailedEdit = await ReloadSale();
 		saleAfterFailedEdit.TransactionId.Should().Be(sale.TransactionId);
@@ -238,7 +244,8 @@ public class EditSaleTests : IntegrationTest
 			sale.Comment,
 			null);
 
-		await Assert.ThrowsAsync<ArticleDoesntMatchContentException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ArticleDoesntMatchContentException>(() =>
+			Mediator.Send(command, CancellationToken));
 
 		var saleAfterFailedEdit = await ReloadSale();
 		saleAfterFailedEdit.TransactionId.Should().Be(sale.TransactionId);
@@ -247,9 +254,9 @@ public class EditSaleTests : IntegrationTest
 	[Fact]
 	public async Task EditSale_WhenSaleDeleted_ThrowsSaleNotFoundException()
 	{
-		var sale = await Context.Sales.SingleAsync(x => x.Id == SaleContext.Sale.Id);
+		var sale = await Context.Sales.SingleAsync(x => x.Id == SaleContext.Sale.Id, CancellationToken);
 		sale.Delete();
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 		var deletedSale = await ReloadSale();
 		var content = deletedSale.Contents.Single();
@@ -262,7 +269,7 @@ public class EditSaleTests : IntegrationTest
 			deletedSale.Comment,
 			null);
 
-		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -295,7 +302,7 @@ public class EditSaleTests : IntegrationTest
 			sale.Comment,
 			null);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var editedSale = await ReloadSale();
 		var editedContent = editedSale.Contents.Single();

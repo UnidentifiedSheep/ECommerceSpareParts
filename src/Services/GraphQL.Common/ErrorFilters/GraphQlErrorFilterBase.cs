@@ -10,8 +10,7 @@ namespace GraphQL.Common.ErrorFilters;
 public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 	ILoggerFactory loggerFactory,
 	IContextualLocalizer localizer,
-	IHttpContextAccessor httpContextAccessor) : IErrorFilter
-	where TException : Exception
+	IHttpContextAccessor httpContextAccessor) : IErrorFilter where TException : Exception
 {
 	private readonly ILogger<TFilter> _logger = loggerFactory.CreateLogger<TFilter>();
 
@@ -24,10 +23,9 @@ public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 
 		var handledError = Handle(error, exception);
 		var statusCode = handledError.Extensions is not null &&
-			handledError.Extensions.TryGetValue("status", out var status) &&
-			status is int value
-			? value
-			: GetStatusCode(exception);
+			handledError.Extensions.TryGetValue("status", out var status) && status is int value
+				? value
+				: GetStatusCode(exception);
 		LogException(exception, statusCode);
 
 		return handledError;
@@ -51,9 +49,7 @@ public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 			foreach (var location in error.Locations)
 				builder.AddLocation(location);
 
-		builder
-			.SetExtension("title", exception.GetType().Name)
-			.SetExtension("status", status);
+		builder.SetExtension("title", exception.GetType().Name).SetExtension("status", status);
 
 		var traceId = httpContextAccessor.HttpContext?.TraceIdentifier ??
 			Activity.Current?.TraceId.ToString();
@@ -63,8 +59,9 @@ public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 		return builder;
 	}
 
-	protected int GetStatusCode(Exception exception) =>
-		exception is IStatusCode statusCodeException ? (int)statusCodeException.StatusCode : 500;
+	protected int GetStatusCode(Exception exception) => exception is IStatusCode statusCodeException
+		? (int)statusCodeException.StatusCode
+		: 500;
 
 	protected string GetLocalizedMessage(Exception exception, string fallback)
 	{
@@ -75,9 +72,7 @@ public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 		if (Localizer.TryGet(message, out var localizedMessage))
 			return localizedMessage;
 
-		_logger.LogError(
-			"Unable to get localizable message for key: {Key}",
-			message.MessageKey);
+		_logger.LogError("Unable to get localizable message for key: {Key}", message.MessageKey);
 		return fallback;
 	}
 
@@ -99,10 +94,10 @@ public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 		var traceId = httpContextAccessor.HttpContext?.TraceIdentifier ??
 			Activity.Current?.TraceId.ToString();
 		using (_logger.BeginScope(
-				new Dictionary<string, object?>
-				{
-					["TraceId"] = traceId
-				}))
+					new Dictionary<string, object?>
+					{
+						["TraceId"] = traceId
+					}))
 		{
 			_logger.Log(
 				logLevel,

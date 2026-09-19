@@ -44,9 +44,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 			.Console(formatProvider: CultureInfo.InvariantCulture)
 			.CreateLogger();
 
-		ApplicationServiceProvider
-			.AddApplicationLayer(services, null)
-			.AddPersistenceLayer();
+		ApplicationServiceProvider.AddApplicationLayer(services, null).AddPersistenceLayer();
 
 		services.AddSingleton(
 			Options.Create(

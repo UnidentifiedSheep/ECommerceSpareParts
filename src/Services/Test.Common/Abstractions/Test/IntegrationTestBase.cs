@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using Locan.Core.Interfaces.Containers;
-using Locan.Hosting;
+﻿using Locan.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,6 +17,8 @@ public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
 
 	private IServiceProvider _sp = null!;
 
+	protected CancellationToken CancellationToken => TestContext.Current.CancellationToken;
+
 	protected override IServiceProvider Sp => _sp;
 
 	protected override IServiceScope Scope => _scope;
@@ -34,10 +34,7 @@ public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
 
 	protected async Task LoadLocales()
 	{
-		var task = Sp
-			.GetServices<IHostedService>()
-			.OfType<LocalizerInitializationHostedService>()
-			.Single();
+		var task = Sp.GetServices<IHostedService>().OfType<LocalizerInitializationHostedService>().Single();
 		await task.StartAsync(CancellationToken.None);
 	}
 

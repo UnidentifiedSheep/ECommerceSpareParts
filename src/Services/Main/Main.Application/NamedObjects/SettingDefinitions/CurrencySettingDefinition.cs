@@ -16,10 +16,11 @@ public class CurrencySettingDefinition(ISettingsService settingsService)
 	: SettingDefinitionNamedObjectBase<CurrencySetting>(settingsService)
 {
 	public override string SystemName => CurrencySetting.SettingName;
-	public override ILocalizableMessage NameLocalizationMessage
-		=> CurrencySettingNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage
-		=> CurrencySettingDescriptionMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage => CurrencySettingNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		CurrencySettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(CurrencySettingInputData);
 

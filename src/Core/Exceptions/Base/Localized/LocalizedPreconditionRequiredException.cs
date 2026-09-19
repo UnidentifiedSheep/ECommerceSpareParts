@@ -6,11 +6,11 @@ namespace Exceptions.Base.Localized;
 public abstract class LocalizedPreconditionRequiredException : PreconditionRequiredException,
 	ILocalizableException
 {
-	public ILocalizableMessage LocalizableMessage { get; }
-	protected LocalizedPreconditionRequiredException(
-		ILocalizableMessage message,
-		object relatedData) : base(null, relatedData)
+	protected LocalizedPreconditionRequiredException(ILocalizableMessage message, object relatedData) : base(
+		null,
+		relatedData)
 	{
 		LocalizableMessage = message;
 	}
+	public ILocalizableMessage LocalizableMessage { get; }
 }

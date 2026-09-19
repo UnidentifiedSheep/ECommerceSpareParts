@@ -25,7 +25,7 @@ jobs:
       - name: Generate coverage report
         run: |
           "$HOME/.dotnet/tools/reportgenerator" \
-            -reports:"coverage/**/coverage.cobertura.xml" \
+            -reports:"coverage/**/*.cobertura.xml" \
             -targetdir:"coverage-report" \
             -reporttypes:"MarkdownSummaryGithub;Cobertura"
 

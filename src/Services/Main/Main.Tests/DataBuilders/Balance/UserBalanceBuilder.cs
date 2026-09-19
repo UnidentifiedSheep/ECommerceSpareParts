@@ -22,8 +22,7 @@ public class UserBalanceBuilder(Faker faker) : BuilderBase<OrganizationBalance>(
 		return this;
 	}
 
-	public override OrganizationBalance Build()
-	{
-		return OrganizationBalance.Create(UserId ?? Guid.NewGuid(), CurrencyId ?? Faker.Random.Int(1, 100));
-	}
+	public override OrganizationBalance Build() => OrganizationBalance.Create(
+		UserId ?? Guid.NewGuid(),
+		CurrencyId ?? Faker.Random.Int(1, 100));
 }

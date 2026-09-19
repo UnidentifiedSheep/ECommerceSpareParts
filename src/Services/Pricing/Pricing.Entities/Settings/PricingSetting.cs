@@ -3,7 +3,6 @@ using Domain.CommonEntities;
 using Domain.Interfaces;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
-using Pricing.Entities;
 
 namespace Pricing.Entities.Settings;
 

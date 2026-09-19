@@ -18,13 +18,15 @@ public sealed class DomainEventExecutorTests
 		var eventScope = new DomainEventScope(publisher.Object);
 		var executor = new DomainEventExecutor(eventScope, publisher.Object);
 
-		await executor.ExecuteAsync(() =>
-		{
-			eventScope.IsCollectionEnabled.Should().BeTrue();
-			eventScope.Add(new TestDomainEvent(1));
-			calls.Add("action");
-			return Task.CompletedTask;
-		});
+		await executor.ExecuteAsync(
+			() =>
+			{
+				eventScope.IsCollectionEnabled.Should().BeTrue();
+				eventScope.Add(new TestDomainEvent(1));
+				calls.Add("action");
+				return Task.CompletedTask;
+			},
+			TestContext.Current.CancellationToken);
 
 		calls.Should().Equal("action", "publish");
 		eventScope.IsCollectionEnabled.Should().BeFalse();
@@ -54,11 +56,13 @@ public sealed class DomainEventExecutorTests
 			publisher.Object,
 			unitOfWork.Object);
 
-		await executor.ExecuteAsync(() =>
-		{
-			eventScope.Add(new TestDomainEvent(1));
-			return Task.CompletedTask;
-		});
+		await executor.ExecuteAsync(
+			() =>
+			{
+				eventScope.Add(new TestDomainEvent(1));
+				return Task.CompletedTask;
+			},
+			TestContext.Current.CancellationToken);
 
 		publishedValues.Should().Equal(1, 2);
 		unitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Exactly(2));

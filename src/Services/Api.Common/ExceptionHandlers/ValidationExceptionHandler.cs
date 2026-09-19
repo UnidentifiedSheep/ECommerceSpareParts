@@ -8,8 +8,7 @@ namespace Api.Common.ExceptionHandlers;
 
 public class ValidationExceptionHandler(
 	ILogger<ValidationExceptionHandler> logger,
-	IContextualLocalizer localizer)
-	: ExceptionHandlerBase<ValidationExceptionHandler>(logger)
+	IContextualLocalizer localizer) : ExceptionHandlerBase<ValidationExceptionHandler>(logger)
 {
 	public override async ValueTask<bool> TryHandleAsync(
 		HttpContext httpContext,
@@ -19,24 +18,23 @@ public class ValidationExceptionHandler(
 		if (exception is not ValidationException validationException)
 			return false;
 
-		LogException(httpContext, exception, StatusCodes.Status400BadRequest);
+		LogException(
+			httpContext,
+			exception,
+			StatusCodes.Status400BadRequest);
 
 		var problemDetails = GetBaseDetails(
 			validationException,
 			httpContext,
 			400);
-		AddValidationErrors(
-			problemDetails,
-			validationException);
+		AddValidationErrors(problemDetails, validationException);
 
 		httpContext.Response.StatusCode = 400;
 		await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 		return true;
 	}
 
-	private void AddValidationErrors(
-		ProblemDetails problemDetails,
-		ValidationException exception)
+	private void AddValidationErrors(ProblemDetails problemDetails, ValidationException exception)
 	{
 		var errors = new List<ValidationErrorModel>();
 

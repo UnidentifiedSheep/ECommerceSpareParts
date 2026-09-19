@@ -81,10 +81,8 @@ public class CurrencyCacheRepository(
 	public Task InvalidateCurrencyRate(int currencyId, CancellationToken cancellationToken = default) =>
 		rawCache.RemoveKeyAsync(CacheKeys.CurrencyCache.CurrencyRate(currencyId));
 
-	private Task<CurrencyDto?> GetCurrencyFromDb(int id)
-	{
-		return repository.Query.Where(x => x.Id == id).Project(projection).FirstOrDefaultAsync();
-	}
+	private Task<CurrencyDto?> GetCurrencyFromDb(int id) =>
+		repository.Query.Where(x => x.Id == id).Project(projection).FirstOrDefaultAsync();
 
 	private Task<Dictionary<int, CurrencyDto>> GetMissingCurrenciesFromDb(IEnumerable<int> ids)
 	{

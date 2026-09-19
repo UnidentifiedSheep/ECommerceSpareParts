@@ -1,5 +1,4 @@
 using Exceptions.Base;
-using HotChocolate.Execution;
 using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,10 @@ public sealed class AnyErrorFilter(
 	ILoggerFactory loggerFactory,
 	IContextualLocalizer localizer,
 	IHttpContextAccessor httpContextAccessor)
-	: GraphQlErrorFilterBase<AnyErrorFilter, Exception>(loggerFactory, localizer, httpContextAccessor)
+	: GraphQlErrorFilterBase<AnyErrorFilter, Exception>(
+		loggerFactory,
+		localizer,
+		httpContextAccessor)
 {
 	protected override IError Handle(IError error, Exception exception)
 	{
@@ -24,7 +26,12 @@ public sealed class AnyErrorFilter(
 			: GetLocalizedMessage(exception, fallback);
 		var code = isInternalError ? "INTERNAL_SERVER_ERROR" : exception.GetType().Name;
 
-		var builder = CreateErrorBuilder(error, exception, message, code, status);
+		var builder = CreateErrorBuilder(
+			error,
+			exception,
+			message,
+			code,
+			status);
 		AddExceptionRelatedData(builder, exception);
 
 		return builder.Build();

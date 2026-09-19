@@ -13,6 +13,8 @@ public sealed class CatalogueCandidateBuilder(Faker faker) : BuilderBase<Catalog
 
 	public int? ProductId { get; private set; }
 
+	public SupplierProduct? SupplierProduct { get; private set; }
+
 	public IReadOnlySet<int> ProducerIds => _producerIds;
 
 	public CatalogueCandidateBuilder WithSku(string sku)
@@ -33,6 +35,12 @@ public sealed class CatalogueCandidateBuilder(Faker faker) : BuilderBase<Catalog
 		return this;
 	}
 
+	public CatalogueCandidateBuilder WithSupplierProduct(SupplierProduct supplierProduct)
+	{
+		SupplierProduct = supplierProduct;
+		return this;
+	}
+
 	public CatalogueCandidateBuilder WithProducers(IEnumerable<Producer> producers) =>
 		WithProducerIds(producers.Select(x => x.Id));
 
@@ -50,6 +58,9 @@ public sealed class CatalogueCandidateBuilder(Faker faker) : BuilderBase<Catalog
 
 		if (ProductId.HasValue)
 			candidate.MapToProduct(ProductId.Value);
+
+		if (SupplierProduct != null)
+			candidate.AddSupplierProduct(SupplierProduct);
 
 		return candidate;
 	}

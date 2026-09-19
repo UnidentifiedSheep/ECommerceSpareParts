@@ -118,8 +118,8 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
 	public void SetDistanceM(int distanceM) =>
 		DistanceM = distanceM.EnsureAtLeast(1, StorageRouteDistanceMinMessage.Instance);
 
-	public void SetDeliveryTime(int minutes) =>
-		DeliveryTimeMinutes = minutes.EnsureAtLeast(1, StorageRouteDeliveryTimeMinMessage.Instance);
+	public void SetDeliveryTime(int minutes) => DeliveryTimeMinutes =
+		minutes.EnsureAtLeast(1, StorageRouteDeliveryTimeMinMessage.Instance);
 
 	public void SetPrices(
 		decimal priceKg,

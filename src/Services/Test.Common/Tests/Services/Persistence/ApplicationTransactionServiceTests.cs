@@ -77,7 +77,8 @@ public sealed class ApplicationTransactionServiceTests
 			{
 				calls.Add("action");
 				return Task.FromResult(42);
-			});
+			},
+			TestContext.Current.CancellationToken);
 
 		result.Should().Be(42);
 		calls
@@ -145,7 +146,8 @@ public sealed class ApplicationTransactionServiceTests
 			{
 				integrationEventScope.Add("routed", "test-service");
 				return Task.CompletedTask;
-			});
+			},
+			TestContext.Current.CancellationToken);
 
 		publisher.Verify(
 			x => x.Publish(

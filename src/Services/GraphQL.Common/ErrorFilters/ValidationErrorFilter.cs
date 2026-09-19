@@ -27,8 +27,9 @@ public sealed class ValidationErrorFilter(
 				continue;
 
 			var message = failure.ErrorMessage;
-			if (failure.CustomState is ILocalizableMessage localizableMessage &&
-				Localizer.TryGet(localizableMessage, out var localizedMessage))
+			if (failure.CustomState is ILocalizableMessage localizableMessage && Localizer.TryGet(
+					localizableMessage,
+					out var localizedMessage))
 				message = localizedMessage;
 
 			validationErrors.Add(

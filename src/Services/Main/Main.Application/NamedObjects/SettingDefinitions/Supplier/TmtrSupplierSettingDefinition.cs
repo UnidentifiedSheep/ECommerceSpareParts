@@ -16,10 +16,11 @@ public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISe
 	: SettingDefinitionNamedObjectBase<TmtrSupplierSetting>(settingsService)
 {
 	public override string SystemName => TmtrSupplierSetting.SettingName;
-	public override ILocalizableMessage NameLocalizationMessage
-		=> SupplierTmtrSettingNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage
-		=> SupplierTmtrSettingDescriptionMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage => SupplierTmtrSettingNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		SupplierTmtrSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(TmtrSupplierSettingInputData);
 

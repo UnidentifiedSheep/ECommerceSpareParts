@@ -184,10 +184,9 @@ public class RedisCache(IDatabase redis, string? prefix = null) : ICache
 	private Task AddToSetCore(
 		IDatabaseAsync db,
 		string key,
-		IEnumerable<string> values)
-	{
-		return db.SetAddAsync(GetWithPrefix(key), values.Select(x => new RedisValue(x)).ToArray());
-	}
+		IEnumerable<string> values) => db.SetAddAsync(
+		GetWithPrefix(key),
+		values.Select(x => new RedisValue(x)).ToArray());
 
 	private Task<bool> SetExpireCore(
 		IDatabaseAsync db,

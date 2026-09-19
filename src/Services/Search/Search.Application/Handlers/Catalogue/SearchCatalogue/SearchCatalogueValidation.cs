@@ -46,7 +46,8 @@ public sealed class SearchCatalogueValidation : AbstractValidator<SearchCatalogu
 	private static bool HasApplicableMode(SearchCatalogueQuery query)
 	{
 		var length = query.Query?.Trim().Length ?? 0;
-		if (length is 0 or >= 4) return true;
+		if (length is 0 or >= 4)
+			return true;
 
 		return query.SkuModes.Any(mode => mode != SearchMatchType.Fuzzy) ||
 			query.NameModes.Any(mode => mode != SearchMatchType.Fuzzy);

@@ -18,7 +18,7 @@ public class ChangeCartItemCountTests : IntegrationTest
 		RegisterBasicContext<UsersTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 
@@ -37,10 +37,11 @@ public class ChangeCartItemCountTests : IntegrationTest
 			_cartItem.ProductId,
 			newCount);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var cartItem = await Context.Carts.FirstOrDefaultAsync(x =>
-			x.UserId == command.UserId && x.ProductId == command.ProductId);
+		var cartItem = await Context.Carts.FirstOrDefaultAsync(
+			x => x.UserId == command.UserId && x.ProductId == command.ProductId,
+			CancellationToken);
 		Assert.NotNull(cartItem);
 		Assert.Equal(newCount, cartItem.Count);
 	}
@@ -53,7 +54,7 @@ public class ChangeCartItemCountTests : IntegrationTest
 			999999,
 			10);
 
-		await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -66,6 +67,6 @@ public class ChangeCartItemCountTests : IntegrationTest
 			_cartItem.ProductId,
 			newCount);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 }

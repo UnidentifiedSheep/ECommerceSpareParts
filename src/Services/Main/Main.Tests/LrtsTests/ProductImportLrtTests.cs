@@ -59,7 +59,7 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		state.Errors.Should().BeEmpty();
 		state.SkippedLines.Should().BeEquivalentTo([1, 3]);
 
-		var products = await Context.Products.AsNoTracking().ToListAsync();
+		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
 		products.Should().HaveCount(3);
 		products
 			.Should()

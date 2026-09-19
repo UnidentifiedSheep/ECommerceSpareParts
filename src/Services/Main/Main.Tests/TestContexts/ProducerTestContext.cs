@@ -12,8 +12,6 @@ public class ProducerTestContext(DContext context) : TestContextBase<DContext>(c
 
 	public IReadOnlyList<Producer> Producers => _producers;
 
-	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-	{
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default) =>
 		_producers.AddRange(await new ProducerBuilder(Faker).BuildManyAndAddToDb(DbContext, 5));
-	}
 }

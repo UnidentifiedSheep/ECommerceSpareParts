@@ -71,7 +71,8 @@ public class PurchasesFact : Entity<PurchasesFact, Guid>
 			.EnsureNotNull(() => new InvalidInputException(PurchaseFactContentRequiredMessage.Instance))
 			.ToList();
 
-		incomingContents.EnsureNotEmpty(() => new InvalidInputException(PurchaseFactContentRequiredMessage.Instance));
+		incomingContents.EnsureNotEmpty(() =>
+			new InvalidInputException(PurchaseFactContentRequiredMessage.Instance));
 
 		var existingContents = PurchaseContents.ToDictionary(x => x.Id);
 		var toRemove = new Dictionary<int, PurchaseContent>(existingContents);

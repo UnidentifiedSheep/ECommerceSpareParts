@@ -21,8 +21,8 @@ public sealed class ProducerLookupServiceCachingTests : IntegrationTest
 	{
 		var service = Scope.ServiceProvider.GetRequiredService<IProducerLookupService>();
 
-		var first = await service.Load();
-		var second = await service.Load();
+		var first = await service.Load(CancellationToken);
+		var second = await service.Load(CancellationToken);
 
 		second.Should().BeSameAs(first);
 	}
@@ -40,7 +40,7 @@ public sealed class ProducerLookupServiceCachingTests : IntegrationTest
 
 		var service = Scope.ServiceProvider.GetRequiredService<IProducerLookupService>();
 
-		var lookup = await service.Load();
+		var lookup = await service.Load(CancellationToken);
 
 		lookup.ResolveId(supplierProducerName, Supplier.Armtek).Should().Be(producer.Id);
 	}

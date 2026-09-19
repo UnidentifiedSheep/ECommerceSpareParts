@@ -1,6 +1,8 @@
 using System.Net;
 using Abstractions.Interfaces.Exceptions;
 using FluentAssertions;
+using FluentValidation;
+using FluentValidation.Results;
 using GraphQL.Common.ErrorFilters;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
@@ -37,8 +39,7 @@ public class AnyErrorFilterTests
 		var loggerFactory = new RecordingLoggerFactory();
 		var filter = CreateFilter(loggerFactory);
 
-		var result = filter.OnError(
-			ErrorFilterTestFactory.CreateError(new TestNotFoundException(42)));
+		var result = filter.OnError(ErrorFilterTestFactory.CreateError(new TestNotFoundException(42)));
 
 		result.Message.Should().Be("Entity 42 was not found");
 		result.Code.Should().Be(nameof(TestNotFoundException));
@@ -55,8 +56,7 @@ public class AnyErrorFilterTests
 			ErrorFilterTestFactory.CreateLocalizer(),
 			ErrorFilterTestFactory.CreateHttpContextAccessor());
 		var anyFilter = CreateFilter();
-		var exception = new FluentValidation.ValidationException(
-			[new FluentValidation.Results.ValidationFailure("Name", "Required")]);
+		var exception = new ValidationException([new ValidationFailure("Name", "Required")]);
 
 		var validationError = validationFilter.OnError(ErrorFilterTestFactory.CreateError(exception));
 		var result = anyFilter.OnError(validationError);
@@ -65,19 +65,18 @@ public class AnyErrorFilterTests
 		result.Code.Should().Be("VALIDATION_ERROR");
 	}
 
-	private static AnyErrorFilter CreateFilter(ILoggerFactory? loggerFactory = null) =>
-		new(
-			loggerFactory ?? NullLoggerFactory.Instance,
-			ErrorFilterTestFactory.CreateLocalizer(),
-			ErrorFilterTestFactory.CreateHttpContextAccessor());
+	private static AnyErrorFilter CreateFilter(ILoggerFactory? loggerFactory = null) => new(
+		loggerFactory ?? NullLoggerFactory.Instance,
+		ErrorFilterTestFactory.CreateLocalizer(),
+		ErrorFilterTestFactory.CreateHttpContextAccessor());
 
 	private sealed class TestNotFoundException(int id) : Exception,
 		IStatusCode,
 		ILocalizableException,
 		IValuedException
 	{
-		public HttpStatusCode StatusCode => HttpStatusCode.NotFound;
 		public ILocalizableMessage LocalizableMessage { get; } = new LocalizableMessage("Domain.NotFound");
+		public HttpStatusCode StatusCode => HttpStatusCode.NotFound;
 		public object GetErrorValues() => id;
 	}
 }

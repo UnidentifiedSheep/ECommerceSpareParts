@@ -1,9 +1,9 @@
+using Application.Common.Extensions;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Application.Common.Extensions;
-using Main.Entities;
 using Main.Application.Handlers.BaseValidators;
+using Main.Entities;
 
 namespace Main.Application.Handlers.StorageContents.AddContent;
 
@@ -21,7 +21,9 @@ public class AddContentValidation : AbstractValidator<AddContentCommand>
 				content.RuleFor(x => x.PurchaseDate).SetValidator(new RecordDateValidator(datePolicy));
 			});
 
-		RuleFor(x => x.StorageContent).NotEmpty().WithLocalizableError(StorageContentListNotEmptyMessage.Instance);
+		RuleFor(x => x.StorageContent)
+			.NotEmpty()
+			.WithLocalizableError(StorageContentListNotEmptyMessage.Instance);
 
 		RuleFor(x => x.StorageCode).NotEmpty().WithLocalizableError(StorageNameNotEmptyMessage.Instance);
 	}

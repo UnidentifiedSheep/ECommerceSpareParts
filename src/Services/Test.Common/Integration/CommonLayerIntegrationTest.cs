@@ -1,4 +1,3 @@
-using System.Reflection;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Events;
 using Attributes;
@@ -18,10 +17,11 @@ namespace Tests.Integration;
 ///     Test.Common. Service test projects must use their own integration-test
 ///     base and DbContext and must not inherit from this class.
 /// </summary>
-[Collection("Combined collection")]
 public abstract class CommonLayerIntegrationTest : TestBase
 {
 	private readonly CombinedContainerFixture _fixture;
+
+	private TestEnvironmentLease _environmentLease = null!;
 
 	private IServiceScope _scope = null!;
 
@@ -36,16 +36,20 @@ public abstract class CommonLayerIntegrationTest : TestBase
 
 	protected override IServiceScope Scope => _scope;
 
+	protected CancellationToken CancellationToken => TestContext.Current.CancellationToken;
+
 	private protected DContext Context { get; private set; } = null!;
 
 	private protected IMediator Mediator { get; private set; } = null!;
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
+		_environmentLease = await _fixture.AcquireAsync();
+
 		_serviceProvider = new ServiceProviderBuilder().Build(
 			new ServiceProviderArguments
 			{
-				PgsqlConnectionString = _fixture.PostgresConnectionString
+				PgsqlConnectionString = _environmentLease.Slot.PostgresConnectionString
 			});
 		_scope = Sp.CreateScope();
 
@@ -67,18 +71,16 @@ public abstract class CommonLayerIntegrationTest : TestBase
 		Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
 	}
 
-	public override async Task DisposeAsync()
+	public override async ValueTask DisposeAsync()
 	{
 		await Context.ClearDatabase();
+		await _environmentLease.DisposeAsync();
 		Scope.Dispose();
 	}
 
 	private async Task LoadLocales()
 	{
-		var task = Sp
-			.GetServices<IHostedService>()
-			.OfType<LocalizerInitializationHostedService>()
-			.Single();
+		var task = Sp.GetServices<IHostedService>().OfType<LocalizerInitializationHostedService>().Single();
 		await task.StartAsync(CancellationToken.None);
 	}
 }

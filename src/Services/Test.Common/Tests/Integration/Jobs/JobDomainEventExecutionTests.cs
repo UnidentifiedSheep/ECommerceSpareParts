@@ -35,8 +35,8 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 		parent.ActivateStep(step);
 		parent.Wait(parentLeaseHolderId);
 
-		await Context.AddAsync(parent);
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(parent, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var leaseHolderId = Guid.NewGuid();
@@ -58,10 +58,14 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 			executor,
 			Mock.Of<ILogger>());
 
-		await lrt.ExecuteAsync(step.Id, leaseHolderId);
+		await lrt.ExecuteAsync(
+			step.Id,
+			leaseHolderId,
+			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var persistedParent = await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == parent.Id);
+		var persistedParent =
+			await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == parent.Id, CancellationToken);
 
 		persistedParent.Status.Should().Be(JobStatus.Pending);
 	}
@@ -85,8 +89,8 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 
 		step.AcquireLease(stepLeaseHolderId, TimeSpan.FromSeconds(-1));
 
-		await Context.AddAsync(parent);
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(parent, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var leaseService = Scope.ServiceProvider.GetRequiredService<IJobLeaseService>();
@@ -100,7 +104,7 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 			.Jobs
 			.AsNoTracking()
 			.Where(x => x.Id == parent.Id || x.Id == step.Id)
-			.ToDictionaryAsync(x => x.Id);
+			.ToDictionaryAsync(x => x.Id, CancellationToken);
 
 		jobs[parent.Id].Status.Should().Be(JobStatus.Pending);
 		jobs[step.Id].Status.Should().Be(JobStatus.Failed);
@@ -119,10 +123,11 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 		logger)
 	{
 		public override string SystemName => "step";
-		public override ILocalizableMessage NameLocalizationMessage
-			=> new LocalizableMessage("test-name");
-		public override ILocalizableMessage DescriptionLocalizationMessage
-			=> new LocalizableMessage("test-description");
+
+		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-name");
+
+		public override ILocalizableMessage DescriptionLocalizationMessage =>
+			new LocalizableMessage("test-description");
 
 		protected override Task DoWork() => Task.CompletedTask;
 	}

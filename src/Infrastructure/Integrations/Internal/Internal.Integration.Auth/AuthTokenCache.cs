@@ -74,10 +74,7 @@ public sealed class AuthTokenCache : IAuthTokenCache
 
 	private sealed record AuthTokenCacheKey(string Service, string SecretHash)
 	{
-		public static AuthTokenCacheKey Create(string service, string secret)
-		{
-			return new AuthTokenCacheKey(service, Sha256(secret));
-		}
+		public static AuthTokenCacheKey Create(string service, string secret) => new(service, Sha256(secret));
 
 		private static string Sha256(string value)
 		{

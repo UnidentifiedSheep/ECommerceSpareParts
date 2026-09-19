@@ -2,6 +2,7 @@
 using Bogus;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Interfaces;
+using ITestContext = Tests.Interfaces.ITestContext;
 
 namespace Tests.Abstractions.Test;
 
@@ -20,10 +21,8 @@ public abstract class TestBase : IAsyncLifetime, ITest
 	protected abstract IServiceProvider Sp { get; }
 
 	protected abstract IServiceScope Scope { get; }
-
-	public abstract Task InitializeAsync();
-
-	public abstract Task DisposeAsync();
+	public abstract ValueTask DisposeAsync();
+	public abstract ValueTask InitializeAsync();
 
 	public void RegisterBasicContext<TContext>() where TContext : class, ITestContext =>
 		RegisterBasicContext(typeof(TContext));

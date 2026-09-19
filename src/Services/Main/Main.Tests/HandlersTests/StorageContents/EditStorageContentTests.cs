@@ -36,7 +36,8 @@ public class EditStorageContentTests : IntegrationTest
 
 		var command = new EditStorageContentCommand(dict);
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -63,7 +64,8 @@ public class EditStorageContentTests : IntegrationTest
 
 		var command = new EditStorageContentCommand(dict);
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -84,14 +86,18 @@ public class EditStorageContentTests : IntegrationTest
 
 		var command = new EditStorageContentCommand(dict);
 
-		await Assert.ThrowsAsync<StorageContentNotFoundException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<StorageContentNotFoundException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
 	public async Task EditStorageContent_ValidInput_Succeeds()
 	{
 		var content = TestContext.StorageContents.First();
-		var productBefore = await Context.Products.AsNoTracking().FirstAsync(x => x.Id == content.ProductId);
+		var productBefore = await Context
+			.Products
+			.AsNoTracking()
+			.FirstAsync(x => x.Id == content.ProductId, CancellationToken);
 		var dto = new PatchStorageContentDto
 		{
 			Count = new PatchField<int>
@@ -110,10 +116,18 @@ public class EditStorageContentTests : IntegrationTest
 		};
 
 		var command = new EditStorageContentCommand(dict);
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var updated = await Context.StorageContents.FindAsync(content.Id);
-		var productAfter = await Context.Products.AsNoTracking().FirstAsync(x => x.Id == content.ProductId);
+		var updated = await Context.StorageContents.FindAsync(
+			new object?[]
+			{
+				content.Id
+			},
+			CancellationToken);
+		var productAfter = await Context
+			.Products
+			.AsNoTracking()
+			.FirstAsync(x => x.Id == content.ProductId, CancellationToken);
 
 		Assert.Equal(productBefore.Stock.Value, productAfter.Stock.Value - 5);
 		Assert.NotNull(updated);
@@ -138,7 +152,8 @@ public class EditStorageContentTests : IntegrationTest
 		};
 
 		var command = new EditStorageContentCommand(dict);
-		await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<DbValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -168,9 +183,14 @@ public class EditStorageContentTests : IntegrationTest
 
 		var command = new EditStorageContentCommand(dict);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var updated = await Context.StorageContents.FindAsync(content.Id);
+		var updated = await Context.StorageContents.FindAsync(
+			new object?[]
+			{
+				content.Id
+			},
+			CancellationToken);
 		Assert.NotNull(updated);
 		Assert.Equal(content.Count, dto.Count.Value);
 		Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);

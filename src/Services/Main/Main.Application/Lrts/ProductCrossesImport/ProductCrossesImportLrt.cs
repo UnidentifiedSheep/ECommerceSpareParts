@@ -51,16 +51,17 @@ public class ProductCrossesImportLrt(
 
 	public override string SystemName => nameof(ProductCrossesImportLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage => LrtProductCrossesImportNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage =>
+		LrtProductCrossesImportNameMessage.Instance;
 
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtProductCrossesImportDescriptionMessage.Instance;
 
-	protected override async Task BeforeRead(ProductCrossesImportState state) =>
-		_producerLookup = await producerLookupService.Load(CancellationToken);
-
 	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
 		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+
+	protected override async Task BeforeRead(ProductCrossesImportState state) =>
+		_producerLookup = await producerLookupService.Load(CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,

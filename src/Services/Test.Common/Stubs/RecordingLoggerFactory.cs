@@ -8,9 +8,13 @@ public sealed class RecordingLoggerFactory : ILoggerFactory
 
 	public ILogger CreateLogger(string categoryName) => new RecordingLogger(LogLevels);
 
-	public void AddProvider(ILoggerProvider provider) { }
+	public void AddProvider(ILoggerProvider provider)
+	{
+	}
 
-	public void Dispose() { }
+	public void Dispose()
+	{
+	}
 
 	private sealed class RecordingLogger(List<LogLevel> logLevels) : ILogger
 	{
@@ -23,9 +27,6 @@ public sealed class RecordingLoggerFactory : ILoggerFactory
 			EventId eventId,
 			TState state,
 			Exception? exception,
-			Func<TState, Exception?, string> formatter)
-		{
-			logLevels.Add(logLevel);
-		}
+			Func<TState, Exception?, string> formatter) => logLevels.Add(logLevel);
 	}
 }

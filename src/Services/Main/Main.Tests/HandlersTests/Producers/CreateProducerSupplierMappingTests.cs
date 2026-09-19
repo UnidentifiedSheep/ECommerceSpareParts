@@ -35,7 +35,8 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 				SupplierProducerName = supplierProducerName
 			});
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -50,7 +51,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 			});
 
 		var exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-			await Mediator.Send(command));
+			await Mediator.Send(command, CancellationToken));
 
 		Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
 	}
@@ -75,7 +76,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 			});
 
 		await Assert.ThrowsAsync<ProducersSupplierMappingAlreadyExistsException>(async () =>
-			await Mediator.Send(command));
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -95,13 +96,13 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 				SupplierProducerName = "Bosch Automotive"
 			});
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var mappings = await Context
 			.ProducerSupplierMappings
 			.AsNoTracking()
 			.Where(x => x.ProducerId == producer.Id)
-			.ToListAsync();
+			.ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(2);
 	}
 
@@ -118,13 +119,13 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 				SupplierProducerName = supplierProducerName
 			});
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		result.ProducerSupplierMapping.ProducerId.Should().Be(producer.Id);
 		result.ProducerSupplierMapping.Supplier.Should().Be(command.ProducerSupplierMapping.Supplier);
 		result.ProducerSupplierMapping.SupplierProducerName.Should().Be(supplierProducerName.Trim());
 
-		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync();
+		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
 
 		mapping.Id.Should().Be(result.ProducerSupplierMapping.Id);
 		mapping.ProducerId.Should().Be(producer.Id);

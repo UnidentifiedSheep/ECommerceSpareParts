@@ -19,7 +19,7 @@
     <ItemGroup>
         <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
         <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5"/>
-        <PackageReference Include="Locan.Generator" Version="1.0.6" />
+        <PackageReference Include="Locan.Generator" Version="1.0.6"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -29,6 +29,6 @@
     <ItemGroup>
         <LocanResource Include="Localization/**/*.json"
                        GenerateMessages="true"
-                       CopyToOutput="false" />
+                       CopyToOutput="false"/>
     </ItemGroup>
 </Project>

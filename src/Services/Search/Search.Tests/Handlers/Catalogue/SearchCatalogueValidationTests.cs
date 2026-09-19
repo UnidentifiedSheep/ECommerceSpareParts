@@ -12,7 +12,9 @@ public sealed class SearchCatalogueValidationTests
 	[Fact]
 	public async Task Validate_WhenTargetsAreEmpty_ShouldFail()
 	{
-		var result = await _validator.ValidateAsync(CreateQuery(targets: new HashSet<SearchTarget>()));
+		var result = await _validator.ValidateAsync(
+			CreateQuery(targets: new HashSet<SearchTarget>()),
+			TestContext.Current.CancellationToken);
 
 		result.IsValid.Should().BeFalse();
 		result.Errors.Should().Contain(error => error.PropertyName == nameof(SearchCatalogueQuery.Targets));
@@ -22,7 +24,8 @@ public sealed class SearchCatalogueValidationTests
 	public async Task Validate_WhenTextQueryHasNoModes_ShouldFail()
 	{
 		var result = await _validator.ValidateAsync(
-			CreateQuery(skuModes: new HashSet<SearchMatchType>(), nameModes: new HashSet<SearchMatchType>()));
+			CreateQuery(skuModes: new HashSet<SearchMatchType>(), nameModes: new HashSet<SearchMatchType>()),
+			TestContext.Current.CancellationToken);
 
 		result.IsValid.Should().BeFalse();
 	}
@@ -34,7 +37,8 @@ public sealed class SearchCatalogueValidationTests
 			CreateQuery(
 				null,
 				skuModes: new HashSet<SearchMatchType>(),
-				nameModes: new HashSet<SearchMatchType>()));
+				nameModes: new HashSet<SearchMatchType>()),
+			TestContext.Current.CancellationToken);
 
 		result.IsValid.Should().BeTrue();
 	}
@@ -51,7 +55,8 @@ public sealed class SearchCatalogueValidationTests
 			CreateQuery(
 				"abc",
 				skuModes: fuzzyModes,
-				nameModes: fuzzyModes));
+				nameModes: fuzzyModes),
+			TestContext.Current.CancellationToken);
 
 		result.IsValid.Should().BeFalse();
 	}

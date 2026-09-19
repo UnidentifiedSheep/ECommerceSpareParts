@@ -12,10 +12,12 @@ public class GlobalApplicationSettingDefinition(ISettingsService settingsService
 	: SettingDefinitionNamedObjectBase<GlobalApplicationSetting>(settingsService)
 {
 	public override string SystemName => GlobalApplicationSetting.SettingName;
-	public override ILocalizableMessage NameLocalizationMessage
-		=> GlobalApplicationSettingNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage
-		=> GlobalApplicationSettingDescriptionMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage =>
+		GlobalApplicationSettingNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		GlobalApplicationSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(GlobalApplicationSettingData);
 

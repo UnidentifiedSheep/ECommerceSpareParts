@@ -1,3 +1,3 @@
 using Locan.Core.Attributes;
 
-[assembly:LocalizationModule("Main.Entities")]
+[assembly: LocalizationModule("Main.Entities")]

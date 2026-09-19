@@ -25,9 +25,9 @@ public class CatalogueCandidate : AuditableEntity<CatalogueCandidate, Guid>,
 
 	public Guid Id { get; }
 
-	public Sku Sku { get; private set; } = null!;
+	public Sku Sku { get; } = null!;
 
-	public int ProducerId { get; private set; }
+	public int ProducerId { get; }
 
 	public int? ProductId { get; private set; }
 

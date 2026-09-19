@@ -74,11 +74,17 @@ jobs:
         run: dotnet restore ${{ matrix.project }}
 
       - name: Test
-        run: dotnet test ${{ matrix.project }} --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+        run: >
+          dotnet test ${{ matrix.project }}
+          --no-restore
+          --verbosity normal
+          --coverage
+          --coverage-output-format cobertura
+          --coverage-output ${{ github.workspace }}/coverage/${{ matrix.name }}.cobertura.xml
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.name }}
-          path: '**/TestResults/**/coverage.cobertura.xml'
+          path: coverage/${{ matrix.name }}.cobertura.xml
           if-no-files-found: error

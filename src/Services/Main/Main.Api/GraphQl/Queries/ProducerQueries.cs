@@ -23,9 +23,8 @@ public sealed class ProducerQueries
 	public async Task<IReadOnlyList<GqlProducer>> GetProducersByIdsAsync(
 		IProducerByIdDataLoader loader,
 		IReadOnlyCollection<int> ids,
-		CancellationToken ct)
-		=> (await loader.LoadAsync(ids, ct))
-			.OfType<ProducerDto>()
-			.Select(x => new GqlProducer(x))
-			.ToList();
+		CancellationToken ct) => (await loader.LoadAsync(ids, ct))
+		.OfType<ProducerDto>()
+		.Select(x => new GqlProducer(x))
+		.ToList();
 }

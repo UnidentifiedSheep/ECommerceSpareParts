@@ -45,12 +45,13 @@ public class CreateTransactionTests : IntegrationTest
 				amount,
 				currency.Id,
 				transactionDateTime,
-				TransactionSourceType.Manual));
+				TransactionSourceType.Manual),
+			CancellationToken);
 
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
+			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
 		transaction.Should().NotBeNull();
 		transaction.SenderId.Should().Be(sender.Id);
@@ -63,11 +64,13 @@ public class CreateTransactionTests : IntegrationTest
 		var senderBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
+			.FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var receiverBalance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.FirstAsync(x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
+			.FirstAsync(
+				x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id,
+				CancellationToken);
 
 		senderBalance.Balance.Should().Be(amount);
 		receiverBalance.Balance.Should().Be(-amount);
@@ -84,7 +87,8 @@ public class CreateTransactionTests : IntegrationTest
 			command with
 			{
 				Amount = amount
-			}));
+			},
+			CancellationToken));
 	}
 
 	[Fact]
@@ -96,7 +100,8 @@ public class CreateTransactionTests : IntegrationTest
 			command with
 			{
 				TransactionDateTime = DateTime.UtcNow.AddDays(-31)
-			}));
+			},
+			CancellationToken));
 
 		exception.Errors.Should().ContainSingle().Which.ErrorCode.Should().Be("operation.date.too.old");
 	}
@@ -110,7 +115,8 @@ public class CreateTransactionTests : IntegrationTest
 			command with
 			{
 				TransactionDateTime = DateTime.UtcNow.AddMinutes(6)
-			}));
+			},
+			CancellationToken));
 
 		exception
 			.Errors
@@ -130,7 +136,7 @@ public class CreateTransactionTests : IntegrationTest
 			TransactionDateTime = DateTime.UtcNow.AddDays(-29), ForcePayment = true
 		};
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		result
 			.Transaction
@@ -150,7 +156,7 @@ public class CreateTransactionTests : IntegrationTest
 			TransactionDateTime = DateTime.UtcNow.AddDays(-31), ForcePayment = true
 		};
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		result
 			.Transaction
@@ -168,7 +174,8 @@ public class CreateTransactionTests : IntegrationTest
 			command with
 			{
 				SenderId = Guid.NewGuid()
-			}));
+			},
+			CancellationToken));
 
 		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.OrganizationsNotFound);
 	}
@@ -182,7 +189,8 @@ public class CreateTransactionTests : IntegrationTest
 			command with
 			{
 				CurrencyId = int.MaxValue
-			}));
+			},
+			CancellationToken));
 
 		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
 	}
@@ -197,7 +205,7 @@ public class CreateTransactionTests : IntegrationTest
 		};
 
 		await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
-			Mediator.Send(command));
+			Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -210,7 +218,7 @@ public class CreateTransactionTests : IntegrationTest
 		};
 
 		await Assert.ThrowsAsync<TransactionWithSystemOrganizationCannotBeCreatedByUserException>(() =>
-			Mediator.Send(command));
+			Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -222,12 +230,12 @@ public class CreateTransactionTests : IntegrationTest
 			Mode = TransactionCreationMode.System
 		};
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
+			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
 		transaction.Should().NotBeNull();
 		transaction.ReceiverId.Should().Be(command.ReceiverId);

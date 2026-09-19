@@ -46,7 +46,7 @@ public class GetProductStorageContentsTests : IntegrationTest
 				false))
 			.ToArray();
 
-		var result = await Mediator.Send(new GetProductStorageContentsQuery(items));
+		var result = await Mediator.Send(new GetProductStorageContentsQuery(items), CancellationToken);
 
 		foreach (var item in items)
 			Assert.Equal(expected[item.ProductId], result.Content[item].Select(x => x.Id));
@@ -75,7 +75,9 @@ public class GetProductStorageContentsTests : IntegrationTest
 			Pagination = new Pagination(1, 2)
 		};
 
-		var result = await Mediator.Send(new GetProductStorageContentsQuery([firstPage, secondPage]));
+		var result = await Mediator.Send(
+			new GetProductStorageContentsQuery([firstPage, secondPage]),
+			CancellationToken);
 
 		Assert.Equal(orderedIds.Take(2), result.Content[firstPage].Select(x => x.Id));
 		Assert.Equal(orderedIds.Skip(2).Take(2), result.Content[secondPage].Select(x => x.Id));
@@ -118,7 +120,8 @@ public class GetProductStorageContentsTests : IntegrationTest
 		};
 
 		var result = await Mediator.Send(
-			new GetProductStorageContentsQuery([positiveOnly, includingZero, allStorages]));
+			new GetProductStorageContentsQuery([positiveOnly, includingZero, allStorages]),
+			CancellationToken);
 
 		Assert.Equal([positiveInFirstStorage.Id], result.Content[positiveOnly].Select(x => x.Id));
 		Assert.Equal(
@@ -144,7 +147,7 @@ public class GetProductStorageContentsTests : IntegrationTest
 			null,
 			true);
 
-		var result = await Mediator.Send(new GetProductStorageContentsQuery([item]));
+		var result = await Mediator.Send(new GetProductStorageContentsQuery([item]), CancellationToken);
 
 		Assert.Empty(result.Content[item]);
 	}
@@ -159,7 +162,7 @@ public class GetProductStorageContentsTests : IntegrationTest
 			null,
 			true);
 
-		var result = await Mediator.Send(new GetProductStorageContentsQuery([item, item]));
+		var result = await Mediator.Send(new GetProductStorageContentsQuery([item, item]), CancellationToken);
 
 		Assert.Single(result.Content);
 		Assert.True(result.Content.ContainsKey(item));
@@ -180,8 +183,9 @@ public class GetProductStorageContentsTests : IntegrationTest
 			null,
 			true);
 
-		await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(new GetProductStorageContentsQuery([item])));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
+			new GetProductStorageContentsQuery([item]),
+			CancellationToken));
 	}
 
 	private async Task<StorageContent> CreateContent(

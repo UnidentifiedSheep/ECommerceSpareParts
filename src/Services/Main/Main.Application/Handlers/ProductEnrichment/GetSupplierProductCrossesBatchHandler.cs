@@ -10,31 +10,29 @@ namespace Main.Application.Handlers.ProductEnrichment;
 
 public record GetSupplierProductCrossesBatchQuery : IQuery<GetSupplierProductCrossesBatchResult>
 {
-	public IReadOnlySet<int> Ids { get; }
 
 	public GetSupplierProductCrossesBatchQuery(IEnumerable<int> ids)
 	{
 		Ids = ids.ToHashSet();
 	}
+	public IReadOnlySet<int> Ids { get; }
 }
 
-public record GetSupplierProductCrossesBatchResult(
-	Dictionary<int, List<SupplierProductDto>> Crosses);
+public record GetSupplierProductCrossesBatchResult(Dictionary<int, List<SupplierProductDto>> Crosses);
 
 public class GetSupplierProductCrossesBatchHandler(
 	IReadRepository<SupplierProductCross, SupplierProductCrossKey> repository,
-	IProjectionProvider<SupplierProduct, SupplierProductDto> projection
-	) : IQueryHandler<GetSupplierProductCrossesBatchQuery, GetSupplierProductCrossesBatchResult>
+	IProjectionProvider<SupplierProduct, SupplierProductDto> projection)
+	: IQueryHandler<GetSupplierProductCrossesBatchQuery, GetSupplierProductCrossesBatchResult>
 {
 	public async Task<GetSupplierProductCrossesBatchResult> Handle(
 		GetSupplierProductCrossesBatchQuery request,
 		CancellationToken cancellationToken)
 	{
-		var crosses = await repository.Query
+		var crosses = await repository
+			.Query
 			.AsExpandable()
-			.Where(x =>
-				request.Ids.Contains(x.LeftId) ||
-				request.Ids.Contains(x.RightId))
+			.Where(x => request.Ids.Contains(x.LeftId) || request.Ids.Contains(x.RightId))
 			.Select(x => new
 			{
 				x.LeftId,
@@ -59,9 +57,7 @@ public class GetSupplierProductCrossesBatchHandler(
 			})
 			.ToLookup(x => x.Id, x => x.Item);
 
-		var res = request.Ids.ToDictionary(
-			id => id,
-			id => found[id].ToList());
+		var res = request.Ids.ToDictionary(id => id, id => found[id].ToList());
 
 		return new GetSupplierProductCrossesBatchResult(res);
 	}

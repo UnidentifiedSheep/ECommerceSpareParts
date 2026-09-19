@@ -30,7 +30,10 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 
 		await RemoveCachedCrosses(productId, null);
 
-		var result = (await repository.GetProductCrossesAsync(productId, null)).ToList();
+		var result = (await repository.GetProductCrossesAsync(
+			productId,
+			null,
+			CancellationToken)).ToList();
 		var expected = GetExpectedCrossIds(productId).OrderBy(x => x).ToList();
 
 		result.Should().BeEquivalentTo(expected);
@@ -45,7 +48,10 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 
 		await RemoveCachedCrosses(productId, null);
 
-		var result = (await repository.GetProductCrossesAsync(productId, null)).ToList();
+		var result = (await repository.GetProductCrossesAsync(
+			productId,
+			null,
+			CancellationToken)).ToList();
 
 		result.Should().Contain(cross.LeftProductId);
 		result.Should().BeEquivalentTo(GetExpectedCrossIds(productId));
@@ -59,7 +65,10 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 
 		await RemoveCachedCrosses(productId, null);
 
-		var result = await repository.GetProductCrossesAsync(productId, null);
+		var result = await repository.GetProductCrossesAsync(
+			productId,
+			null,
+			CancellationToken);
 
 		result.Should().BeEmpty();
 	}
@@ -72,7 +81,10 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 
 		await RemoveCachedCrosses(productId, null);
 
-		var result = await repository.GetProductCrossesAsync(productId, null);
+		var result = await repository.GetProductCrossesAsync(
+			productId,
+			null,
+			CancellationToken);
 
 		result.Should().BeEmpty();
 	}
@@ -86,13 +98,21 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 
 		await RemoveCachedCrosses(productId, null);
 
-		var cached = (await repository.GetProductCrossesAsync(productId, null)).ToList();
+		var cached = (await repository.GetProductCrossesAsync(
+			productId,
+			null,
+			CancellationToken)).ToList();
 
-		await Context.ProductCrosses.AddAsync(ProductCross.Create(productId, isolatedProductId));
-		await Context.SaveChangesAsync();
+		await Context.ProductCrosses.AddAsync(
+			ProductCross.Create(productId, isolatedProductId),
+			CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
-		var result = (await repository.GetProductCrossesAsync(productId, null)).ToList();
+		var result = (await repository.GetProductCrossesAsync(
+			productId,
+			null,
+			CancellationToken)).ToList();
 
 		result.Should().BeEquivalentTo(cached);
 		result.Should().NotContain(isolatedProductId);
@@ -111,8 +131,14 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 		};
 		await RemoveCachedCrosses(productId, sortBy);
 
-		var asc = (await repository.GetProductCrossesAsync(productId, null)).ToList();
-		var desc = (await repository.GetProductCrossesAsync(productId, sortBy)).ToList();
+		var asc = (await repository.GetProductCrossesAsync(
+			productId,
+			null,
+			CancellationToken)).ToList();
+		var desc = (await repository.GetProductCrossesAsync(
+			productId,
+			sortBy,
+			CancellationToken)).ToList();
 
 		asc.Should().BeInAscendingOrder();
 		desc.Should().BeInDescendingOrder();
@@ -130,7 +156,9 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 		await RemoveCachedCrosses(productId, null);
 		await RemoveCachedCrosses(productId, ["id_desc"]);
 
-		var result = await repository.GetProductsCrossesAsync([ascendingRequest, descendingRequest]);
+		var result = await repository.GetProductsCrossesAsync(
+			[ascendingRequest, descendingRequest],
+			CancellationToken);
 
 		result[new ProductCrossesRequestItem(productId, null)].Should().BeInAscendingOrder();
 		result[new ProductCrossesRequestItem(productId, ["id_desc"])].Should().BeInDescendingOrder();
@@ -146,7 +174,10 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 
 		await RemoveCachedCrosses(productId, null);
 
-		var result = (await repository.GetProductCrossesAsync(productId, null)).ToList();
+		var result = (await repository.GetProductCrossesAsync(
+			productId,
+			null,
+			CancellationToken)).ToList();
 
 		var productRelations = await GetRelations(productId);
 		productRelations.Should().Contain(cacheKey);

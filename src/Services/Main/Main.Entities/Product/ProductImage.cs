@@ -37,10 +37,7 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 	public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key) => x =>
 		x.ProductId == key.Item1 && x.StorageKey == key.Item2;
 
-	public static ProductImage Create(int productId, string extension)
-	{
-		return new ProductImage(productId, extension);
-	}
+	public static ProductImage Create(int productId, string extension) => new(productId, extension);
 
 	private void SetPath(string extension)
 	{

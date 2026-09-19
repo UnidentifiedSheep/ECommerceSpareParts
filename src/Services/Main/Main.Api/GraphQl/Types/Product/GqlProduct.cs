@@ -159,8 +159,6 @@ public record GqlProduct
 
 	private async Task<ProductDto> GetProductAsync(
 		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken)
-		=> _product
-			?? await loader.LoadAsync(Id, cancellationToken)
-			?? throw new ProductNotFoundException(Id);
+		CancellationToken cancellationToken) => _product ?? await loader.LoadAsync(Id, cancellationToken) ??
+		throw new ProductNotFoundException(Id);
 }

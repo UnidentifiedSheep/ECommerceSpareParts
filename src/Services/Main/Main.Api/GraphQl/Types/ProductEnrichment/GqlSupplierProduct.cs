@@ -34,8 +34,7 @@ public record GqlSupplierProduct(
 	[GraphQLName("crosses")]
 	public async Task<IReadOnlyList<GqlSupplierProduct>> GetCrossesAsync(
 		ISupplierProductCrossesByIdDataLoader loader,
-		CancellationToken cancellationToken)
-		=> (await loader.LoadAsync(Id, cancellationToken))?
-			.Select(x => new GqlSupplierProduct(x))
-			.ToList() ?? [];
+		CancellationToken cancellationToken) => (await loader.LoadAsync(Id, cancellationToken))
+		?.Select(x => new GqlSupplierProduct(x))
+		.ToList() ?? [];
 }

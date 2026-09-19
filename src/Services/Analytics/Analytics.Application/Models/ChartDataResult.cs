@@ -7,8 +7,5 @@ public sealed record ChartDataResult(IReadOnlyList<IChartDataPoint> DataPoints, 
 public sealed record ChartDataResult<TDataPoint>(IReadOnlyList<TDataPoint> DataPoints, string? NextCursor)
 	where TDataPoint : class, IChartDataPoint
 {
-	public ChartDataResult ToUntyped()
-	{
-		return new ChartDataResult(DataPoints, NextCursor);
-	}
+	public ChartDataResult ToUntyped() => new(DataPoints, NextCursor);
 }

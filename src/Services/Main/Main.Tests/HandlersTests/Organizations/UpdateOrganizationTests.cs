@@ -30,13 +30,13 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 				Name = PatchField<string>.From("  Updated organization  ")
 			});
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		result.OrganizationId.Should().Be(organization.Id);
 		var updatedOrganization = await Context
 			.Organizations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == organization.Id);
+			.SingleAsync(x => x.Id == organization.Id, CancellationToken);
 		updatedOrganization.Name.Should().Be("Updated organization");
 	}
 
@@ -46,13 +46,14 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 		var organization = await CreateOrganization();
 
 		var result = await Mediator.Send(
-			new UpdateOrganizationCommand(organization.Id, new PatchOrganizationDto()));
+			new UpdateOrganizationCommand(organization.Id, new PatchOrganizationDto()),
+			CancellationToken);
 
 		result.OrganizationId.Should().Be(organization.Id);
 		var dbOrganization = await Context
 			.Organizations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == organization.Id);
+			.SingleAsync(x => x.Id == organization.Id, CancellationToken);
 		dbOrganization.Name.Should().Be(organization.Name);
 		dbOrganization.SystemName.Should().Be(organization.SystemName);
 	}

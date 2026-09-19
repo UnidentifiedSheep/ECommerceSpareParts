@@ -24,7 +24,7 @@ public class GetAvailableProductsStockTests : IntegrationTest
 			.Where(x => x.ProductId == item.ProductId && x.StorageCode == item.StorageCode)
 			.Sum(x => x.Count);
 
-		var result = await Mediator.Send(new GetAvailableProductsStockQuery(item));
+		var result = await Mediator.Send(new GetAvailableProductsStockQuery(item), CancellationToken);
 
 		result.Stocks.Should().ContainSingle();
 		result.Stocks[item].Should().Be(expected);
@@ -40,7 +40,7 @@ public class GetAvailableProductsStockTests : IntegrationTest
 			.Take(3)
 			.ToArray();
 
-		var result = await Mediator.Send(new GetAvailableProductsStockQuery(items));
+		var result = await Mediator.Send(new GetAvailableProductsStockQuery(items), CancellationToken);
 
 		result.Stocks.Should().HaveCount(items.Length);
 
@@ -61,7 +61,7 @@ public class GetAvailableProductsStockTests : IntegrationTest
 		var content = TestContext.StorageContents.First(x => x.Count > 0);
 		var item = new GetAvailableProductsStockItem(content.ProductId, "unknown-storage");
 
-		var result = await Mediator.Send(new GetAvailableProductsStockQuery(item));
+		var result = await Mediator.Send(new GetAvailableProductsStockQuery(item), CancellationToken);
 
 		result.Stocks.Should().ContainSingle();
 		result.Stocks[item].Should().Be(0);
@@ -73,7 +73,7 @@ public class GetAvailableProductsStockTests : IntegrationTest
 		var content = TestContext.StorageContents.First(x => x.Count > 0);
 		var item = new GetAvailableProductsStockItem(content.ProductId, content.StorageCode);
 
-		var result = await Mediator.Send(new GetAvailableProductsStockQuery([item, item]));
+		var result = await Mediator.Send(new GetAvailableProductsStockQuery([item, item]), CancellationToken);
 
 		result.Stocks.Should().ContainSingle();
 		result.Stocks.Should().ContainKey(item);

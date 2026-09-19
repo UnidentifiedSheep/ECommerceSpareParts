@@ -1,6 +1,8 @@
 {
   "culture": "ru",
   "messages": {
-    "catalogue.candidate.not.found": "Кандидат каталога не найден."
+    "catalogue.candidate.not.found": "Кандидат каталога не найден.",
+    "catalogue.candidate.duplicate.ids.not.allowed": "Дубликаты идентификаторов кандидатов каталога не допускаются.",
+    "catalogue.candidate.crosses.not.empty": "Необходимо указать хотя бы одного кандидата-кросса."
   }
 }

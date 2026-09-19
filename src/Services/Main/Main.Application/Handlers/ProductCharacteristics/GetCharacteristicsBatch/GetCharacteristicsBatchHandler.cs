@@ -10,21 +10,20 @@ namespace Main.Application.Handlers.ProductCharacteristics.GetCharacteristicsBat
 
 public record GetCharacteristicsBatchQuery : IQuery<GetCharacteristicsBatchResult>
 {
-	public IReadOnlyList<int> ProductIds { get; }
 
 	public GetCharacteristicsBatchQuery(IEnumerable<int> ids)
 	{
 		ProductIds = ids.Distinct().ToList();
 	}
+	public IReadOnlyList<int> ProductIds { get; }
 }
 
-public record GetCharacteristicsBatchResult(
-	Dictionary<int, List<ProductCharacteristicDto>> Characteristics);
+public record GetCharacteristicsBatchResult(Dictionary<int, List<ProductCharacteristicDto>> Characteristics);
 
 public class GetCharacteristicsBatchHandler(
 	IReadRepository<ProductCharacteristic, (int, string)> repository,
-	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection
-	) : IQueryHandler<GetCharacteristicsBatchQuery, GetCharacteristicsBatchResult>
+	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection)
+	: IQueryHandler<GetCharacteristicsBatchQuery, GetCharacteristicsBatchResult>
 {
 	public async Task<GetCharacteristicsBatchResult> Handle(
 		GetCharacteristicsBatchQuery request,
@@ -33,15 +32,14 @@ public class GetCharacteristicsBatchHandler(
 		if (request.ProductIds.Count == 0)
 			return new GetCharacteristicsBatchResult([]);
 
-		var result = (await repository
-			.Query
-			.Where(x => request.ProductIds.Contains(x.ProductId))
-			.Project(projection)
-			.ToListAsync(cancellationToken))
+		var result =
+			(await repository
+				.Query
+				.Where(x => request.ProductIds.Contains(x.ProductId))
+				.Project(projection)
+				.ToListAsync(cancellationToken))
 			.GroupBy(x => x.ProductId)
-			.ToDictionary(
-				x => x.Key,
-				x => x.ToList());
+			.ToDictionary(x => x.Key, x => x.ToList());
 
 		return new GetCharacteristicsBatchResult(result);
 	}

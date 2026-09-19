@@ -18,10 +18,11 @@ public class FavoritSupplierSettingDefinition(
 	: SettingDefinitionNamedObjectBase<FavoritSupplierSetting>(settingsService)
 {
 	public override string SystemName => FavoritSupplierSetting.SettingName;
-	public override ILocalizableMessage NameLocalizationMessage
-		=> SupplierFavoritSettingNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage
-		=> SupplierFavoritSettingDescriptionMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage => SupplierFavoritSettingNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		SupplierFavoritSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(FavoritSupplierSettingInputData);
 

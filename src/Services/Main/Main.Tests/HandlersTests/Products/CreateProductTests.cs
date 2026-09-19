@@ -41,7 +41,7 @@ public class CreateProductTests : IntegrationTest
 	{
 		var command = new CreateProductsCommand([]);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -82,7 +82,7 @@ public class CreateProductTests : IntegrationTest
 	public async Task CreateProducts_WithExistingProduct_Throws()
 	{
 		var product = CreateDtos(1)[0];
-		await Mediator.Send(new CreateProductsCommand([product]));
+		await Mediator.Send(new CreateProductsCommand([product]), CancellationToken);
 
 		var act = () => Mediator.Send(new CreateProductsCommand([product]));
 

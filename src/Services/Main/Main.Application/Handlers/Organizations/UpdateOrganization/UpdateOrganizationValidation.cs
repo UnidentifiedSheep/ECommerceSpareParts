@@ -1,7 +1,7 @@
-using FluentValidation;
 using Application.Common.Extensions;
-using Main.Entities;
+using FluentValidation;
 using Main.Application.Handlers.Organizations.Validators;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Organizations.UpdateOrganization;
 

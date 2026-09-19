@@ -19,7 +19,7 @@ public class DeleteAliasTests : IntegrationTest
 		RegisterBasicContext<ProducerTestContext>();
 	}
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 		_alias = await new ProducerAliasBuilder(Faker)
@@ -31,14 +31,16 @@ public class DeleteAliasTests : IntegrationTest
 	public async Task DeleteAlias_InvalidProducerId_ThrowsProducerNotFound()
 	{
 		var command = new DeleteAliasCommand(int.MaxValue, _alias.Alias);
-		await Assert.ThrowsAsync<ProducersAliasNotFoundException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ProducersAliasNotFoundException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
 	public async Task DeleteAlias_UnexistingProducerAlias_ThrowsProducersAliasNotFoundException()
 	{
 		var command = new DeleteAliasCommand(_alias.ProducerId, Faker.Lorem.Letter(200));
-		await Assert.ThrowsAsync<ProducersAliasNotFoundException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ProducersAliasNotFoundException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -49,7 +51,7 @@ public class DeleteAliasTests : IntegrationTest
 		var act = () => Mediator.Send(command);
 		await act.Should().NotThrowAsync();
 
-		var dbAliass = await Context.ProducersAliases.AsNoTracking().ToListAsync();
+		var dbAliass = await Context.ProducersAliases.AsNoTracking().ToListAsync(CancellationToken);
 		dbAliass.Should().HaveCount(0);
 	}
 }

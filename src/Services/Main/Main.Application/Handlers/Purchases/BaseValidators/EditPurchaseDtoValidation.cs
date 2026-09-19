@@ -1,8 +1,8 @@
-using FluentValidation;
 using Application.Common.Extensions;
-using Main.Entities;
+using FluentValidation;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.BaseValidators;
+using Main.Entities;
 
 namespace Main.Application.Handlers.Purchases.BaseValidators;
 

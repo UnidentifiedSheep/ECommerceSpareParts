@@ -24,7 +24,8 @@ public class GetPermissionsHandler(IContextualLocalizer localizer)
 			{
 				SystemName = Permission.ToNormalizedPermission(x),
 				Name = localizer.Get(new LocalizableMessage(Permission.GetLocalizationNameKey(x))),
-				Description = localizer.Get(new LocalizableMessage(Permission.GetLocalizationDescriptionKey(x)))
+				Description = localizer.Get(
+					new LocalizableMessage(Permission.GetLocalizationDescriptionKey(x)))
 			})
 			.ToArray();
 

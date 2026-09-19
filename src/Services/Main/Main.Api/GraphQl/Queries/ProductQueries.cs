@@ -23,9 +23,8 @@ public sealed class ProductQueries
 	public async Task<IReadOnlyList<GqlProduct>> GetProductsByIdsAsync(
 		IProductByIdDataLoader loader,
 		IReadOnlyCollection<int> ids,
-		CancellationToken cancellationToken)
-		=> (await loader.LoadAsync(ids, cancellationToken))
-			.OfType<ProductDto>()
-			.Select(x => new GqlProduct(x))
-			.ToList();
+		CancellationToken cancellationToken) => (await loader.LoadAsync(ids, cancellationToken))
+		.OfType<ProductDto>()
+		.Select(x => new GqlProduct(x))
+		.ToList();
 }

@@ -12,10 +12,23 @@ public class DbValidationErrorFilterTests
 	public void OnError_ShouldReturnRawFailuresAndMaximumStatus()
 	{
 		var exception = new DbValidationException(
-			[
-				new ValidationFailure("Db.Duplicate", new object[] { "code" }, 409, "Conflict", typeof(Exception)),
-				new ValidationFailure("Unknown", null, 422, "Validation", typeof(Exception))
-			]);
+		[
+			new ValidationFailure(
+				"Db.Duplicate",
+				new object[]
+				{
+					"code"
+				},
+				409,
+				"Conflict",
+				typeof(Exception)),
+			new ValidationFailure(
+				"Unknown",
+				null,
+				422,
+				"Validation",
+				typeof(Exception))
+		]);
 		var filter = new DbValidationErrorFilter(
 			NullLoggerFactory.Instance,
 			ErrorFilterTestFactory.CreateLocalizer(),
@@ -26,7 +39,8 @@ public class DbValidationErrorFilterTests
 		result.Code.Should().Be("DB_VALIDATION_ERROR");
 		result.Exception.Should().BeNull();
 		result.Extensions.Should().ContainKey("status").WhoseValue.Should().Be(422);
-		var errors = result.Extensions!["errors"].Should()
+		var errors = result.Extensions!["errors"]
+			.Should()
 			.BeAssignableTo<IReadOnlyCollection<IReadOnlyDictionary<string, object?>>>()
 			.Subject;
 		errors.Should().HaveCount(2);

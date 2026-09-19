@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 
@@ -15,6 +14,6 @@ internal sealed class StubContextualStringLocalizer(IReadOnlyDictionary<string, 
 
 		throw new InvalidOperationException();
 	}
-	public bool TryGet(ILocalizableMessage message, [NotNullWhen(true)] out string? value)
-		=> values.TryGetValue(message.MessageKey, out value);
+	public bool TryGet(ILocalizableMessage message, [NotNullWhen(true)] out string? value) =>
+		values.TryGetValue(message.MessageKey, out value);
 }

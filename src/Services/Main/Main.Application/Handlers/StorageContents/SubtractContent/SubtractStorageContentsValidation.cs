@@ -1,6 +1,6 @@
+using Application.Common.Extensions;
 using FluentValidation;
 using FluentValidation.Results;
-using Application.Common.Extensions;
 using Locan.Core.Interfaces;
 using Main.Entities;
 
@@ -54,8 +54,7 @@ public class SubtractStorageContentsValidation : AbstractValidator<SubtractStora
 	{
 		return new ValidationFailure(propertyName, "Validation failed")
 		{
-			ErrorCode = message.MessageKey,
-			CustomState = message
+			ErrorCode = message.MessageKey, CustomState = message
 		};
 	}
 }

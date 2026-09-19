@@ -19,9 +19,11 @@ public class ErrorFilterRegistrationTests
 		services.AddSingleton<IContextualLocalizer>(ErrorFilterTestFactory.CreateLocalizer());
 		services.AddCommonGraphQl("error-filter-tests").AddQueryType<ErrorFilterTestQuery>();
 		await using var serviceProvider = services.BuildServiceProvider();
-		var executor = await serviceProvider.GetRequestExecutorAsync("error-filter-tests");
+		var executor = await serviceProvider.GetRequestExecutorAsync(
+			"error-filter-tests",
+			TestContext.Current.CancellationToken);
 
-		var result = await executor.ExecuteAsync("{ failure }");
+		var result = await executor.ExecuteAsync("{ failure }", TestContext.Current.CancellationToken);
 
 		var error = result.ExpectOperationResult().Errors.Should().ContainSingle().Subject;
 		error.Message.Should().Be("InternalServerException");

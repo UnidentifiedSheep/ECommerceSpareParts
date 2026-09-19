@@ -5,9 +5,9 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
-using Main.Entities;
 using Main.Application.Lrts.BuildCatalogueCandidates;
 using Main.Application.Lrts.MapCatalogueCandidatesToProducts;
+using Main.Entities;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 

@@ -27,9 +27,12 @@ public class SetProductWeightTests : IntegrationTest
 			12.34m,
 			WeightUnit.Gram);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var weight = await Context.ProductWeights.AsNoTracking().SingleAsync(x => x.ProductId == product.Id);
+		var weight = await Context
+			.ProductWeights
+			.AsNoTracking()
+			.SingleAsync(x => x.ProductId == product.Id, CancellationToken);
 
 		weight.Weight.Should().Be(command.Weight);
 		weight.Unit.Should().Be(command.Unit);
@@ -50,13 +53,13 @@ public class SetProductWeightTests : IntegrationTest
 			750m,
 			WeightUnit.Gram);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var weights = await Context
 			.ProductWeights
 			.AsNoTracking()
 			.Where(x => x.ProductId == product.Id)
-			.ToListAsync();
+			.ToListAsync(CancellationToken);
 
 		weights.Should().HaveCount(1);
 		weights[0].Weight.Should().Be(command.Weight);

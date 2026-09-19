@@ -112,7 +112,8 @@ public class EditProductTests : IntegrationTest
 					IsSet = true, Value = null
 				}
 			});
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	private int GetFirstId() => TestContext.Products[0].Id;

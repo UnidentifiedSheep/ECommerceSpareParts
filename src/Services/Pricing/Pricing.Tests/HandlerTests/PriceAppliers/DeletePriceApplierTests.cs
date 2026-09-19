@@ -24,29 +24,31 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.WithState(PriceOfferSourceType.Supplier, 10)
 			.BuildAndAddToDb(Context);
 		var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
-		var initialConfiguration = await provider.GetConfigurationAsync();
+		var initialConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 
-		await Mediator.Send(new DeletePriceApplierCommand(existing.SystemName));
+		await Mediator.Send(new DeletePriceApplierCommand(existing.SystemName), CancellationToken);
 
 		var applierExists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == existing.SystemName);
+			.AnyAsync(x => x.SystemName == existing.SystemName, CancellationToken);
 		var stateExists = await Context
 			.Set<PriceApplierState>()
 			.AsNoTracking()
-			.AnyAsync(x => x.PriceApplierSystemName == existing.SystemName);
+			.AnyAsync(x => x.PriceApplierSystemName == existing.SystemName, CancellationToken);
 		applierExists.Should().BeFalse();
 		stateExists.Should().BeFalse();
 
-		var updatedConfiguration = await provider.GetConfigurationAsync();
+		var updatedConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 		updatedConfiguration.Appliers.Should().NotContain(x => x.SystemName == existing.SystemName);
 		updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);
 
 		var recalculationJobExists = await Context
 			.Set<Job>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName && x.NaturalKey != null);
+			.AnyAsync(
+				x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName && x.NaturalKey != null,
+				CancellationToken);
 		recalculationJobExists.Should().BeTrue();
 	}
 
@@ -63,13 +65,13 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.BuildAndAddToDb(Context);
 
 		var exception = await Assert.ThrowsAsync<LocalPriceApplierCannotBeDeletedException>(() =>
-			Mediator.Send(new DeletePriceApplierCommand(existing.SystemName)));
+			Mediator.Send(new DeletePriceApplierCommand(existing.SystemName), CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.local.cannot.be.deleted");
 		var exists = await Context
 			.Set<PriceApplier>()
 			.AsNoTracking()
-			.AnyAsync(x => x.SystemName == existing.SystemName);
+			.AnyAsync(x => x.SystemName == existing.SystemName, CancellationToken);
 		exists.Should().BeTrue();
 	}
 
@@ -79,7 +81,7 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var systemName = $"missing-{Faker.Random.Guid():N}";
 
 		var exception = await Assert.ThrowsAsync<PriceApplierNotFoundException>(() =>
-			Mediator.Send(new DeletePriceApplierCommand(systemName)));
+			Mediator.Send(new DeletePriceApplierCommand(systemName), CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.not.found");
 	}
@@ -87,9 +89,8 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 	[Fact]
 	public async Task WithEmptySystemName_ThrowsValidationException()
 	{
-		var exception =
-			await Assert.ThrowsAsync<ValidationException>(() =>
-				Mediator.Send(new DeletePriceApplierCommand("")));
+		var exception = await Assert.ThrowsAsync<ValidationException>(() =>
+			Mediator.Send(new DeletePriceApplierCommand(""), CancellationToken));
 
 		exception.Errors.Should().ContainSingle(x => x.ErrorCode == "price.applier.system.name.required");
 	}

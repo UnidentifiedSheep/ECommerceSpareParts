@@ -17,7 +17,9 @@ public record UserName
 			.EnsureMinLength(5, LoginMinLength5Message.Instance)
 			.EnsureMaxLength(36, LoginMaxLength36Message.Instance)
 			.EnsureNoSpaces(LoginCannotContainSpacesMessage.Instance)
-			.Ensure(x => !x.Contains('@', StringComparison.InvariantCulture), LoginCannotContainAtSignMessage.Instance);
+			.Ensure(
+				x => !x.Contains('@', StringComparison.InvariantCulture),
+				LoginCannotContainAtSignMessage.Instance);
 
 		Value = value;
 		NormalizedValue = ToNormalized(Value);

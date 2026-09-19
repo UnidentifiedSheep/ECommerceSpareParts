@@ -1,4 +1,3 @@
-using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.ProductEnrichment;
 using Tests.DataBuilders;
@@ -12,79 +11,98 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 {
 	public GetCatalogueCandidateCrossesHandlerTests(CombinedContainerFixture fixture) : base(fixture)
 	{
-		RegisterBasicContext<CatalogueCandidateCrossesTestContext>();
+		RegisterBasicContext<CatalogueCandidateTestContext>();
 	}
 
-	private CatalogueCandidateCrossesTestContext TestContext =>
-		GetContext<CatalogueCandidateCrossesTestContext>();
+	private CatalogueCandidateTestContext CatalogueTestContext => GetContext<CatalogueCandidateTestContext>();
+	private SupplierProductTestContext SupplierTestContext => GetContext<SupplierProductTestContext>();
 
 	[Fact]
 	public async Task CandidateHasDirectAndReverseCrosses_ReturnsMappedAndNotMappedCrosses()
 	{
+		var candidate = CatalogueTestContext.Candidates[1];
+		var expectedMappedIds = new[]
+		{
+			CatalogueTestContext.Candidates[0].Id, CatalogueTestContext.Candidates[2].Id
+		};
+		var expectedNotMappedId = SupplierTestContext.SupplierProducts[3].Id;
 		Context.ChangeTracker.Clear();
 
 		var result = await Mediator.Send(
-			new GetCatalogueCandidateCrossesQuery([TestContext.Candidate.Id]));
+			new GetCatalogueCandidateCrossesQuery([candidate.Id]),
+			CancellationToken);
 
-		result.Items.Should().ContainSingle();
-		var item = result.Items[TestContext.Candidate.Id];
-
-		var mapped = item.MappedCrosses.Should().ContainSingle().Subject;
-		mapped.Id.Should().Be(TestContext.MappedCrossCandidate.Id);
-		mapped.Sku.Should().Be("mapped-cross-candidate");
-		mapped.Producer.Id.Should().Be(TestContext.Producer.Id);
-		var mappedSupplierProduct = mapped.SupplierProducts.Should().ContainSingle().Subject;
-		mappedSupplierProduct.Id.Should().Be(TestContext.MappedCross.Id);
-		mappedSupplierProduct.Names.Should().ContainSingle(x => x.Name == "Mapped cross name");
-
-		var notMapped = item.NotMappedCrosses.Should().ContainSingle().Subject;
-		notMapped.Id.Should().Be(TestContext.NotMappedCross.Id);
-		notMapped.Sku.Should().Be("not-mapped-cross");
-		notMapped.Producer.Should().Be("Not mapped cross producer");
-		notMapped.Supplier.Should().Be(Supplier.FavoritParts);
-		notMapped.CandidateId.Should().BeNull();
-		notMapped.Names.Should().ContainSingle(x => x.Name == "Not mapped cross name");
+		var item = result.Items.Should().ContainSingle().Subject.Value;
+		item.MappedCrosses.Select(x => x.Id).Should().BeEquivalentTo(expectedMappedIds);
+		item.NotMappedCrosses.Select(x => x.Id).Should().BeEquivalentTo([expectedNotMappedId]);
 	}
 
 	[Fact]
 	public async Task SameCrossConnectedToMultipleSourceProducts_ReturnsCrossOnce()
 	{
+		var candidate = CatalogueTestContext.Candidates[0];
+		var mappedCandidate = CatalogueTestContext.Candidates[1];
+		var mappedSupplierProduct = SupplierTestContext.SupplierProducts[1];
+		var additionalSource = await new SupplierProductBuilder(Faker)
+			.WithNamesCount(2)
+			.BuildAndAddToDb(Context);
+		candidate.AddSupplierProduct(additionalSource);
+		await Context.SaveChangesAsync(CancellationToken);
 		await new SupplierProductCrossBuilder(Faker)
-			.WithSupplierProducts(TestContext.ReverseSource, TestContext.MappedCross)
+			.WithSupplierProducts(additionalSource, mappedSupplierProduct)
 			.BuildAndAddToDb(Context);
 
 		var result = await Mediator.Send(
-			new GetCatalogueCandidateCrossesQuery([TestContext.Candidate.Id]));
+			new GetCatalogueCandidateCrossesQuery([candidate.Id]),
+			CancellationToken);
 
-		var item = result.Items[TestContext.Candidate.Id];
-		item.MappedCrosses.Should().ContainSingle(x => x.Id == TestContext.MappedCrossCandidate.Id);
-		item.NotMappedCrosses.Should().ContainSingle(x => x.Id == TestContext.NotMappedCross.Id);
+		result.Items[candidate.Id].MappedCrosses.Should().ContainSingle(x => x.Id == mappedCandidate.Id);
 	}
 
 	[Fact]
 	public async Task MultipleCandidatesRequested_ReturnsCrossesGroupedByCandidate()
 	{
-		var result = await Mediator.Send(
-			new GetCatalogueCandidateCrossesQuery(
-				[TestContext.Candidate.Id, TestContext.BatchCandidate.Id]));
+		var firstCandidate = CatalogueTestContext.Candidates[0];
+		var secondCandidate = CatalogueTestContext.Candidates[1];
+		var thirdCandidate = CatalogueTestContext.Candidates[2];
+		var notMappedProduct = SupplierTestContext.SupplierProducts[3];
 
-		result.Items.Keys.Should().BeEquivalentTo(
-			[TestContext.Candidate.Id, TestContext.BatchCandidate.Id]);
-		result.Items[TestContext.Candidate.Id]
-			.NotMappedCrosses
+		var result = await Mediator.Send(
+			new GetCatalogueCandidateCrossesQuery([firstCandidate.Id, secondCandidate.Id]),
+			CancellationToken);
+
+		result.Items.Keys.Should().BeEquivalentTo([firstCandidate.Id, secondCandidate.Id]);
+		result
+			.Items[firstCandidate.Id]
+			.MappedCrosses
+			.Select(x => x.Id)
 			.Should()
-			.ContainSingle(x => x.Id == TestContext.NotMappedCross.Id);
-		result.Items[TestContext.BatchCandidate.Id]
-			.NotMappedCrosses
+			.BeEquivalentTo([secondCandidate.Id, thirdCandidate.Id]);
+		result.Items[firstCandidate.Id].NotMappedCrosses.Should().BeEmpty();
+		result
+			.Items[secondCandidate.Id]
+			.MappedCrosses
+			.Select(x => x.Id)
 			.Should()
-			.ContainSingle(x => x.Id == TestContext.BatchNotMappedCross.Id);
+			.BeEquivalentTo([firstCandidate.Id, thirdCandidate.Id]);
+		result
+			.Items[secondCandidate.Id]
+			.NotMappedCrosses
+			.Select(x => x.Id)
+			.Should()
+			.BeEquivalentTo([notMappedProduct.Id]);
 	}
 
 	[Fact]
 	public async Task CandidateWithoutCrosses_ReturnsNoItem()
 	{
+		var candidate = await new CatalogueCandidateBuilder(Faker)
+			.WithProducerId(CatalogueTestContext.Candidates[0].ProducerId)
+			.BuildAndAddToDb(Context);
+
 		var result = await Mediator.Send(
-			new GetCatalogueCandidateCrossesQuery([TestContext.CandidateWithoutCrosses.Id]));
+			new GetCatalogueCandidateCrossesQuery([candidate.Id]),
+			CancellationToken);
 
 		result.Items.Should().BeEmpty();
 	}
@@ -93,7 +111,8 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 	public async Task UnknownCandidate_ReturnsNoItems()
 	{
 		var result = await Mediator.Send(
-			new GetCatalogueCandidateCrossesQuery([Guid.NewGuid()]));
+			new GetCatalogueCandidateCrossesQuery([Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Items.Should().BeEmpty();
 	}

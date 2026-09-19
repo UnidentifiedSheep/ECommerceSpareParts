@@ -10,9 +10,7 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddMainDataLoaders();
 
-		services.AddCommonGraphQl(name)
-			.AddMutationType<RootMutation>()
-			.AddQueryType<RootQuery>();
+		services.AddCommonGraphQl(name).AddMutationType<RootMutation>().AddQueryType<RootQuery>();
 
 		return services;
 	}

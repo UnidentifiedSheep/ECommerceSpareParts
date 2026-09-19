@@ -1,5 +1,5 @@
-using FluentValidation;
 using Application.Common.Extensions;
+using FluentValidation;
 using Main.Entities;
 using Main.Entities.Auth;
 using Role = Enums.Role;

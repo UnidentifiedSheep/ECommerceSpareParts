@@ -25,7 +25,7 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 	[Fact]
 	public async Task LoadAsync_EmptyDatabase_MarksContainerAsLoaded()
 	{
-		await SettingsService.LoadAsync();
+		await SettingsService.LoadAsync(CancellationToken);
 
 		SettingsContainer.Loaded.Should().BeTrue();
 		SettingsContainer.TryGet<TestSetting>(out _).Should().BeFalse();
@@ -37,12 +37,14 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		await new TestSettingBuilder(Faker).WithValue(42).BuildAndAddToDb(Context);
 		Context.ChangeTracker.Clear();
 
-		await SettingsService.LoadAsync();
+		await SettingsService.LoadAsync(CancellationToken);
 
 		var loaded = SettingsContainer.Get<TestSetting>();
 		loaded.Should().BeOfType<TestSetting>();
 		loaded.Data.Value.Should().Be(42);
-		(await Context.Set<TestSetting>().AsNoTracking().SingleAsync()).Should().BeOfType<TestSetting>();
+		(await Context.Set<TestSetting>().AsNoTracking().SingleAsync(CancellationToken))
+			.Should()
+			.BeOfType<TestSetting>();
 	}
 
 	[Fact]
@@ -50,9 +52,9 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 	{
 		var setting = new TestSettingBuilder(Faker).WithValue(10).Build();
 
-		await SettingsService.SetSetting(setting);
+		await SettingsService.SetSetting(setting, CancellationToken);
 
-		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync();
+		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.Value.Should().Be(10);
 		SettingsContainer.Get<TestSetting>().Should().BeSameAs(setting);
 		AssertPublishedEvent(10);
@@ -65,9 +67,9 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		Context.ChangeTracker.Clear();
 		var replacement = new TestSettingBuilder(Faker).WithValue(20).Build();
 
-		await SettingsService.SetSetting(replacement);
+		await SettingsService.SetSetting(replacement, CancellationToken);
 
-		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync();
+		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.Value.Should().Be(20);
 		SettingsContainer.Get<TestSetting>().Should().BeSameAs(replacement);
 		AssertPublishedEvent(20);
@@ -79,10 +81,10 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		var cached = new TestSettingBuilder(Faker).WithValue(30).Build();
 		SettingsContainer.Set(cached);
 
-		var result = await SettingsService.GetOrDefault<TestSetting>();
+		var result = await SettingsService.GetOrDefault<TestSetting>(CancellationToken);
 
 		result.Should().BeSameAs(cached);
-		(await Context.Set<TestSetting>().CountAsync()).Should().Be(0);
+		(await Context.Set<TestSetting>().CountAsync(CancellationToken)).Should().Be(0);
 		MessageBroker.PublishedMessages.Should().BeEmpty();
 	}
 
@@ -92,7 +94,7 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		await new TestSettingBuilder(Faker).WithValue(40).BuildAndAddToDb(Context);
 		Context.ChangeTracker.Clear();
 
-		var result = await SettingsService.GetOrDefault<TestSetting>();
+		var result = await SettingsService.GetOrDefault<TestSetting>(CancellationToken);
 
 		result.Data.Value.Should().Be(40);
 		SettingsContainer.Get<TestSetting>().Should().BeSameAs(result);
@@ -102,10 +104,10 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 	[Fact]
 	public async Task GetOrDefault_MissingSetting_PersistsCachesAndPublishesDefault()
 	{
-		var result = await SettingsService.GetOrDefault<TestSetting>();
+		var result = await SettingsService.GetOrDefault<TestSetting>(CancellationToken);
 
 		result.Data.Should().Be(TestSetting.Default.Data);
-		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync();
+		var persisted = await Context.Set<TestSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.Should().Be(TestSetting.Default.Data);
 		SettingsContainer.Get<TestSetting>().Should().BeSameAs(result);
 		AssertPublishedEvent(TestSetting.Default.Data.Value);

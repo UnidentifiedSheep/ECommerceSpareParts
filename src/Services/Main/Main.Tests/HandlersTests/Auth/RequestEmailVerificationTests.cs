@@ -109,7 +109,8 @@ public class RequestEmailVerificationTests : IntegrationTest
 				new GlobalApplicationSettingData
 				{
 					ApiServiceUrl = "https://api.example.com", AppServiceUrl = null
-				}));
+				}),
+			CancellationToken);
 		var handler = CreateHandler(Mock.Of<IMailingService>());
 
 		var action = () => handler.Handle(
@@ -117,7 +118,9 @@ public class RequestEmailVerificationTests : IntegrationTest
 			CancellationToken.None);
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(action);
-		Assert.Equal("global.application.setting.app.service.url.not.configured", exception.LocalizableMessage.MessageKey);
+		Assert.Equal(
+			"global.application.setting.app.service.url.not.configured",
+			exception.LocalizableMessage.MessageKey);
 	}
 
 	private RequestEmailVerificationHandler CreateHandler(IMailingService mailingService)

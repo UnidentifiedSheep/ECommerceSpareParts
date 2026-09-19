@@ -14,6 +14,8 @@ public sealed class SupplierProductBuilder(Faker faker) : BuilderBase<SupplierPr
 
 	public Supplier? Supplier { get; private set; }
 
+	public int NamesCount { get; private set; }
+
 	public SupplierProductBuilder WithSku(string sku)
 	{
 		Sku = sku;
@@ -32,11 +34,22 @@ public sealed class SupplierProductBuilder(Faker faker) : BuilderBase<SupplierPr
 		return this;
 	}
 
+	public SupplierProductBuilder WithNamesCount(int namesCount)
+	{
+		NamesCount = namesCount < 0 ? 0 : namesCount;
+		return this;
+	}
+
 	public override SupplierProduct Build()
 	{
-		return SupplierProduct.Create(
+		var product = SupplierProduct.Create(
 			new Sku(Sku ?? Faker.Random.AlphaNumeric(12)),
 			Producer ?? Faker.Company.CompanyName(),
 			Supplier ?? Faker.PickRandom<Supplier>());
+
+		for (var i = 0; i < NamesCount; i++)
+			product.AddName(Faker.Lorem.Letter(40));
+
+		return product;
 	}
 }

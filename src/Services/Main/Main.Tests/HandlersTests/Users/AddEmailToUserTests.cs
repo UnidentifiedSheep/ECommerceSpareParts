@@ -26,12 +26,14 @@ public class AddEmailToUserTests(CombinedContainerFixture fixture) : Integration
 			new AddEmailToUserCommand(
 				user.Id,
 				email,
-				EmailType.Work));
+				EmailType.Work),
+			CancellationToken);
 
 		created.UserId.Should().Be(user.Id);
 		created.Email.Should().Be("additional.email@example.com");
 
-		var addedEmail = await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == email);
+		var addedEmail =
+			await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == email, CancellationToken);
 
 		addedEmail.UserId.Should().Be(user.Id);
 		addedEmail.Email.Value.Should().Be("additional.email@example.com");

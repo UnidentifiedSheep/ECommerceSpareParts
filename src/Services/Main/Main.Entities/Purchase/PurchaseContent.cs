@@ -91,10 +91,9 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
 
 	public void SetStorageContentId(int storageContentId) => StorageContentId = storageContentId;
 
-	public void SetComment(string? comment)
-	{
-		Comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, PurchaseContentCommentTooLongMessage.Instance);
-	}
+	public void SetComment(string? comment) => Comment = comment
+		.NullIfWhiteSpace()
+		?.EnsureMaxLength(256, PurchaseContentCommentTooLongMessage.Instance);
 
 	public void SetLogistic(
 		decimal weightKg,

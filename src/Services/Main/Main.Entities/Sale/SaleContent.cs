@@ -66,7 +66,8 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 			details);
 	}
 
-	private void SetCount(int count) => Count = count.EnsureGreaterThan(0, SaleContentCountMinMessage.Instance);
+	private void SetCount(int count) =>
+		Count = count.EnsureGreaterThan(0, SaleContentCountMinMessage.Instance);
 
 	public void SetPriceAndDetails(
 		decimal withOutDiscount,
@@ -98,10 +99,8 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		_details.AddRange(list);
 	}
 
-	public void SetComment(string? comment)
-	{
-		Comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleContentCommentMaxMessage.Instance);
-	}
+	public void SetComment(string? comment) => Comment =
+		comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleContentCommentMaxMessage.Instance);
 
 	public override int GetId() => Id;
 }

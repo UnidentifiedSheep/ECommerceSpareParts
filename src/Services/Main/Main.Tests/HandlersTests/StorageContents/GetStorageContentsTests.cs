@@ -53,7 +53,8 @@ public sealed class GetStorageContentsTests : IntegrationTest
 				storages[0].Code,
 				[],
 				new Pagination(0, 20),
-				false));
+				false),
+			CancellationToken);
 
 		Assert.Equal([expected.Id], result.Content.Select(x => x.Id));
 	}
@@ -86,14 +87,16 @@ public sealed class GetStorageContentsTests : IntegrationTest
 				storageCode,
 				["count_desc"],
 				new Pagination(0, 2),
-				true));
+				true),
+			CancellationToken);
 		var secondPage = await Mediator.Send(
 			new GetStorageContentsQuery(
 				productId,
 				storageCode,
 				["count_desc"],
 				new Pagination(1, 2),
-				true));
+				true),
+			CancellationToken);
 
 		Assert.Equal([highest.Id, middle.Id], firstPage.Content.Select(x => x.Id));
 		Assert.Single(secondPage.Content);
@@ -117,7 +120,8 @@ public sealed class GetStorageContentsTests : IntegrationTest
 				storageCode,
 				[],
 				new Pagination(0, 20),
-				true));
+				true),
+			CancellationToken);
 
 		Assert.Contains(result.Content, x => x.Id == zeroContent.Id && x.Count == 0);
 	}
@@ -134,7 +138,7 @@ public sealed class GetStorageContentsTests : IntegrationTest
 			new Pagination(0, 20),
 			true);
 
-		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Theory]
@@ -150,7 +154,7 @@ public sealed class GetStorageContentsTests : IntegrationTest
 			new Pagination(page, size),
 			true);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	private int GetCurrencyId() =>

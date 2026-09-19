@@ -16,9 +16,15 @@ public class RemoveEmailFromUserTests(CombinedContainerFixture fixture) : Integr
 	{
 		var user = await CreateUser();
 
-		await Mediator.Send(new RemoveEmailFromUserCommand(user.Id, "secondary@example.com"));
+		await Mediator.Send(
+			new RemoveEmailFromUserCommand(user.Id, "secondary@example.com"),
+			CancellationToken);
 
-		var emails = await Context.UserEmails.AsNoTracking().Where(x => x.UserId == user.Id).ToListAsync();
+		var emails = await Context
+			.UserEmails
+			.AsNoTracking()
+			.Where(x => x.UserId == user.Id)
+			.ToListAsync(CancellationToken);
 
 		emails.Should().ContainSingle();
 		emails.Single().Email.Value.Should().Be("primary@example.com");
@@ -36,7 +42,11 @@ public class RemoveEmailFromUserTests(CombinedContainerFixture fixture) : Integr
 		exception.Which.LocalizableMessage.MessageKey.Should().Be("user.email.primary.cannot.delete");
 
 		Context.ChangeTracker.Clear();
-		var emails = await Context.UserEmails.AsNoTracking().Where(x => x.UserId == user.Id).ToListAsync();
+		var emails = await Context
+			.UserEmails
+			.AsNoTracking()
+			.Where(x => x.UserId == user.Id)
+			.ToListAsync(CancellationToken);
 		emails.Should().HaveCount(2);
 		emails.Single(x => x.IsPrimary).Email.Value.Should().Be("primary@example.com");
 	}

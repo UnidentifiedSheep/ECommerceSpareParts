@@ -10,8 +10,6 @@ public class UsersTestContext(DContext context) : TestContextBase<DContext>(cont
 {
 	public IReadOnlyCollection<User> Users { get; private set; } = null!;
 
-	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-	{
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default) =>
 		Users = await new MemberUserBuilder(Faker).BuildManyAndAddToDb(DbContext, 3);
-	}
 }

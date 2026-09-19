@@ -317,15 +317,15 @@ public class SelectForUpdateCommandInterceptorTests
 		await _interceptor.ReaderExecutingAsync(
 			command,
 			null!,
-			default);
+			default,
+			TestContext.Current.CancellationToken);
 
 		Assert.EndsWith("FOR UPDATE OF p", command.CommandText);
 	}
 
-	private static string Normalize(string value)
-	{
-		return string.Join(' ', value.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
-	}
+	private static string Normalize(string value) => string.Join(
+		' ',
+		value.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
 
 	private static TestDbCommand CreateCommand(string commandText)
 	{

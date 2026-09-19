@@ -16,7 +16,8 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 		{
 			Code = Faker.Lorem.Letter(500)
 		};
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -26,7 +27,8 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 		{
 			Code = Faker.Lorem.Letter()
 		};
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -36,7 +38,8 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 		{
 			Description = Faker.Lorem.Letter(600)
 		};
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -50,7 +53,8 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 			storageModel.Location,
 			storageModel.Type);
 		var exception =
-			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+			await Assert.ThrowsAsync<DbValidationException>(async () =>
+				await Mediator.Send(command, CancellationToken));
 		Assert.Equal(ApplicationErrors.StoragesCodeAlreadyTaken, exception.Failures[0].ErrorName);
 	}
 
@@ -58,9 +62,11 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 	public async Task CreateStorage_Normal_Succeeds()
 	{
 		var command = GetCommand();
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var createdStorage = await Context.Storages.FirstOrDefaultAsync(x => x.Code == command.Code);
+		var createdStorage = await Context.Storages.FirstOrDefaultAsync(
+			x => x.Code == command.Code,
+			CancellationToken);
 		Assert.NotNull(createdStorage);
 
 		Assert.Equal(command.Description, createdStorage.Description);

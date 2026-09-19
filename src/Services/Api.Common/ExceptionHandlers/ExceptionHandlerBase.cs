@@ -86,9 +86,7 @@ public abstract class ExceptionHandlerBase<THandler>(ILogger<THandler> logger) :
 		if (localizer.TryGet(message, out detail))
 			return true;
 
-		logger.LogError(
-			"Unable to get localizable message for key: {Key}",
-			message.MessageKey);
+		logger.LogError("Unable to get localizable message for key: {Key}", message.MessageKey);
 		return false;
 	}
 }

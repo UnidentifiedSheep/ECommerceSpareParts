@@ -20,7 +20,8 @@ public class PricingSettingDefinition(ISettingsService settingsService, IPublish
 
 	public override ILocalizableMessage NameLocalizationMessage => PricingSettingNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage => PricingSettingDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage =>
+		PricingSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(PricingSettingInputData);
 

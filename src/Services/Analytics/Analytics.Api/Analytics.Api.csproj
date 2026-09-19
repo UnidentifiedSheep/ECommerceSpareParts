@@ -41,14 +41,14 @@
     <ItemGroup>
         <LocanResource Include="../Analytics.Entities/Localization/**/*.json"
                        GenerateMessages="false"
-                       CopyToOutput="true" />
-        
+                       CopyToOutput="true"/>
+
         <LocanResource Include="../../Application.Common/Localization/**/*.json"
                        GenerateMessages="false"
-                       CopyToOutput="true" />
+                       CopyToOutput="true"/>
 
         <LocanResource Include="../../../Core/Domain/Localization/**/*.json"
                        GenerateMessages="false"
-                       CopyToOutput="true" />
+                       CopyToOutput="true"/>
     </ItemGroup>
 </Project>

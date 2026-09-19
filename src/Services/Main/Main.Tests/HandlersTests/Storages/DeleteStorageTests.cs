@@ -17,14 +17,16 @@ public class DeleteStorageTests : IntegrationTest
 	public async Task DeleteStorage_EmptyName_ThrowsValidationException()
 	{
 		var command = new DeleteStorageCommand("");
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
 	public async Task DeleteStorage_NotExisting_ThrowsStorageNotFoundException()
 	{
 		var command = new DeleteStorageCommand("some-non-existing-storage");
-		await Assert.ThrowsAsync<StorageNotFoundException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<StorageNotFoundException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -35,9 +37,9 @@ public class DeleteStorageTests : IntegrationTest
 			.First(x =>
 				x.Code != GetContext<StorageContentTestContext>().StorageContents.First().StorageCode);
 		var command = new DeleteStorageCommand(storage.Code);
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var exists = await Context.Storages.AnyAsync(x => x.Code == storage.Code);
+		var exists = await Context.Storages.AnyAsync(x => x.Code == storage.Code, CancellationToken);
 		Assert.False(exists);
 	}
 
@@ -47,9 +49,10 @@ public class DeleteStorageTests : IntegrationTest
 		var storage = GetContext<StorageContentTestContext>().StorageContents.First().StorageCode;
 
 		var command = new DeleteStorageCommand(storage);
-		await Assert.ThrowsAsync<DbUpdateException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<DbUpdateException>(async () =>
+			await Mediator.Send(command, CancellationToken));
 
-		var exists = await Context.Storages.AnyAsync(x => x.Code == storage);
+		var exists = await Context.Storages.AnyAsync(x => x.Code == storage, CancellationToken);
 		Assert.True(exists);
 	}
 }

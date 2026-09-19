@@ -41,7 +41,8 @@ public class SendEmailRecoveryHandler(
 
 		var setting = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
 		var appServiceUrl = setting.AppServiceUrl ??
-			throw new InvalidInputException(GlobalApplicationSettingAppServiceUrlNotConfiguredMessage.Instance);
+			throw new InvalidInputException(
+				GlobalApplicationSettingAppServiceUrlNotConfiguredMessage.Instance);
 
 		var signed = jsonSigner.Sign(await payloadProvider.GetPayload(user.Id, ResetType.PasswordReset));
 

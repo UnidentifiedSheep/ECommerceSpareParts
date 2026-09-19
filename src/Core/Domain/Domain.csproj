@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Locan.Generator" Version="1.0.6" />
+        <PackageReference Include="Locan.Generator" Version="1.0.6"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
         <PackageReference Include="MediatR.Contracts" Version="2.0.1"/>
     </ItemGroup>
@@ -20,6 +20,6 @@
     <ItemGroup>
         <LocanResource Include="Localization/**/*.json"
                        GenerateMessages="true"
-                       CopyToOutput="false" />
+                       CopyToOutput="false"/>
     </ItemGroup>
 </Project>

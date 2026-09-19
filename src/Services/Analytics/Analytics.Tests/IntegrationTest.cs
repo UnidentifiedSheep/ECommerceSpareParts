@@ -9,19 +9,20 @@ using Tests.TestContainers.Combined;
 
 namespace Analytics.Integration.Tests;
 
-[Collection("Combined collection")]
 public abstract class IntegrationTest(CombinedContainerFixture fixture)
 	: IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
 {
+	private TestEnvironmentLease _environmentLease = null!;
 	protected IMediator Mediator { get; private set; } = null!;
 
-	public override async Task InitializeAsync()
+	public override async ValueTask InitializeAsync()
 	{
+		_environmentLease = await fixture.AcquireAsync();
 		InitializeServiceProvider(
 			new ServiceProviderArguments
 			{
-				PgsqlConnectionString = fixture.PostgresConnectionString,
-				CacheConnectionString = fixture.RedisConnectionString
+				PgsqlConnectionString = _environmentLease.Slot.PostgresConnectionString,
+				CacheConnectionString = _environmentLease.Slot.RedisConnectionString
 			});
 		Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
@@ -39,9 +40,10 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 			() => base.InitializeBasicContexts());
 	}
 
-	public override async Task DisposeAsync()
+	public override async ValueTask DisposeAsync()
 	{
 		await ResetDataStoresAsync();
+		await _environmentLease.DisposeAsync();
 		Scope.Dispose();
 	}
 

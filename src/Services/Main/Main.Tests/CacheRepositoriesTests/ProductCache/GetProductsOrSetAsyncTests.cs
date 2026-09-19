@@ -27,7 +27,7 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
 
 		await RemoveCachedProducts(products.Select(x => x.Id));
 
-		var result = await repository.GetProductsOrSetAsync(products.Select(x => x.Id));
+		var result = await repository.GetProductsOrSetAsync(products.Select(x => x.Id), CancellationToken);
 
 		result.Should().HaveCount(products.Count);
 
@@ -48,13 +48,15 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
 		await RemoveCachedProducts([cachedProduct.Id, dbProduct.Id]);
 
 		var cachedBeforeUpdate =
-			(await repository.GetProductsOrSetAsync([cachedProduct.Id]))[cachedProduct.Id];
+			(await repository.GetProductsOrSetAsync([cachedProduct.Id], CancellationToken))[cachedProduct.Id];
 
 		cachedProduct.SetName("Updated product name");
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
-		var result = await repository.GetProductsOrSetAsync([cachedProduct.Id, dbProduct.Id]);
+		var result = await repository.GetProductsOrSetAsync(
+			[cachedProduct.Id, dbProduct.Id],
+			CancellationToken);
 
 		result.Should().HaveCount(2);
 		result[cachedProduct.Id].Should().BeEquivalentTo(cachedBeforeUpdate);
@@ -76,7 +78,7 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
 
 		await RemoveCachedProducts(ids);
 
-		var result = await repository.GetProductsOrSetAsync(ids);
+		var result = await repository.GetProductsOrSetAsync(ids, CancellationToken);
 
 		result.Should().BeEmpty();
 	}

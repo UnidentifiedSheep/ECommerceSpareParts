@@ -6,11 +6,11 @@ namespace Exceptions.Base.Localized;
 
 public abstract class LocalizedValidationException : ValidationException, ILocalizableException
 {
-	public ILocalizableMessage LocalizableMessage { get; }
 	protected LocalizedValidationException(
 		IEnumerable<ValidationErrorModel> errors,
 		ILocalizableMessage message) : base(errors)
 	{
 		LocalizableMessage = message;
 	}
+	public ILocalizableMessage LocalizableMessage { get; }
 }

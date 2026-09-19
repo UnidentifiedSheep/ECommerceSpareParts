@@ -25,8 +25,8 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 	public const string AnalyzerSystemName = nameof(MarkupRangeAnalyzer);
 
 	public override string SystemName => AnalyzerSystemName;
-	public override ILocalizableMessage NameLocalizationMessage
-		=> MarkupRangeAnalyzerNameMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage => MarkupRangeAnalyzerNameMessage.Instance;
 
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		MarkupRangeAnalyzerDescriptionMessage.Instance;

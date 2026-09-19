@@ -17,7 +17,9 @@ public class NotEnoughCountOnStorageException : LocalizedBadRequestException
 			.WithNeededCount(neededCount),
 		new
 		{
-			ArticleId = articleId, AvailableCount = availableCount, NeededCount = neededCount
+			ArticleId = articleId,
+			AvailableCount = availableCount,
+			NeededCount = neededCount
 		})
 	{
 	}
@@ -77,9 +79,7 @@ public class StorageRouteActiveExistsException(string from, string to) : Localiz
 public class StorageRouteNotFound : LocalizedNotFoundException
 {
 	public StorageRouteNotFound(string storageFrom, string storageTo) : base(
-		new StorageRouteNotFoundByNamesMessage()
-			.WithStorageFrom(storageFrom)
-			.WithStorageTo(storageTo),
+		new StorageRouteNotFoundByNamesMessage().WithStorageFrom(storageFrom).WithStorageTo(storageTo),
 		new
 		{
 			StorageFrom = storageFrom, StorageTo = storageTo
