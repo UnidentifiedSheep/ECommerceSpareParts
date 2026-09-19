@@ -1,6 +1,6 @@
-using Application.Common;
 using Application.Common.Extensions;
 using FluentValidation;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 
@@ -10,6 +10,6 @@ public sealed class CreateCandidateCrossesValidation : AbstractValidator<CreateC
 	{
 		RuleFor(x => x.CrossCandidateIds)
 			.NotEmpty()
-			.WithLocalizableError(EmptyMessage.Instance); //TODO: create message.
+			.WithLocalizableError(CatalogueCandidateCrossesNotEmptyMessage.Instance);
 	}
 }

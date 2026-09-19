@@ -2,6 +2,7 @@
   "culture": "tr",
   "messages": {
     "catalogue.candidate.not.found": "Katalog adayı bulunamadı.",
-    "catalogue.candidate.duplicate.ids.not.allowed": "Yinelenen katalog adayı kimliklerine izin verilmez."
+    "catalogue.candidate.duplicate.ids.not.allowed": "Yinelenen katalog adayı kimliklerine izin verilmez.",
+    "catalogue.candidate.crosses.not.empty": "En az bir çapraz aday belirtilmelidir."
   }
 }
