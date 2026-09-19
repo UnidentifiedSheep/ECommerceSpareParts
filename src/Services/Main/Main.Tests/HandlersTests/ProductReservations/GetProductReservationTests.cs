@@ -20,7 +20,7 @@ public class GetProductReservationTests : IntegrationTest
 	{
 		var reservation = TestContext.ActiveReservations.First();
 
-		var result = await Mediator.Send(new GetProductReservationQuery(reservation.Id));
+		var result = await Mediator.Send(new GetProductReservationQuery(reservation.Id), CancellationToken);
 
 		result.Reservation.Id.Should().Be(reservation.Id);
 		result.Reservation.Organization.Id.Should().Be(reservation.OrganizationId);

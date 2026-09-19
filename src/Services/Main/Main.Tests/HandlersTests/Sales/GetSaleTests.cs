@@ -20,7 +20,7 @@ public class GetSaleTests : IntegrationTest
 	{
 		var sale = SaleContext.Sale;
 
-		var result = await Mediator.Send(new GetSaleQuery(sale.Id, null));
+		var result = await Mediator.Send(new GetSaleQuery(sale.Id, null), CancellationToken);
 
 		result.Sale.Id.Should().Be(sale.Id);
 		result.Sale.TransactionId.Should().Be(sale.TransactionId);
@@ -36,7 +36,7 @@ public class GetSaleTests : IntegrationTest
 	{
 		var sale = SaleContext.Sale;
 
-		var result = await Mediator.Send(new GetSaleQuery(null, sale.TransactionId));
+		var result = await Mediator.Send(new GetSaleQuery(null, sale.TransactionId), CancellationToken);
 
 		result.Sale.Id.Should().Be(sale.Id);
 		result.Sale.TransactionId.Should().Be(sale.TransactionId);
@@ -46,19 +46,19 @@ public class GetSaleTests : IntegrationTest
 	public async Task GetSale_WhenSaleDoesNotExist_ThrowsSaleNotFoundException()
 	{
 		await Assert.ThrowsAsync<SaleNotFoundException>(() =>
-			Mediator.Send(new GetSaleQuery(Guid.NewGuid(), null)));
+			Mediator.Send(new GetSaleQuery(Guid.NewGuid(), null), CancellationToken));
 	}
 
 	[Fact]
 	public async Task GetSale_WhenTransactionDoesNotExist_ThrowsSaleNotFoundException()
 	{
 		await Assert.ThrowsAsync<SaleNotFoundException>(() =>
-			Mediator.Send(new GetSaleQuery(null, Guid.NewGuid())));
+			Mediator.Send(new GetSaleQuery(null, Guid.NewGuid()), CancellationToken));
 	}
 
 	[Fact]
 	public async Task GetSale_WhenSaleIdAndTransactionIdAreEmpty_ThrowsValidationException()
 	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(new GetSaleQuery(null, null)));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(new GetSaleQuery(null, null), CancellationToken));
 	}
 }

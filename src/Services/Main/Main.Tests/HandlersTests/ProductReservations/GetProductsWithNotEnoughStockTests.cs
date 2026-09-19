@@ -47,7 +47,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			product.Id,
 			5);
 
-		var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query, CancellationToken);
 
 		result.NotEnoughByStock.Should().BeEmpty();
 		result.NotEnoughByReservation.Should().BeEmpty();
@@ -69,7 +69,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			product.Id,
 			5);
 
-		var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query, CancellationToken);
 
 		result.NotEnoughByStock.Should().ContainKey(product.Id).WhoseValue.Should().Be(3);
 		result.NotEnoughByReservation.Should().BeEmpty();
@@ -97,7 +97,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			product.Id,
 			5);
 
-		var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query, CancellationToken);
 
 		result.NotEnoughByStock.Should().BeEmpty();
 		result.NotEnoughByReservation.Should().ContainKey(product.Id).WhoseValue.Should().Be(1);
@@ -130,7 +130,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			product.Id,
 			5);
 
-		var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query, CancellationToken);
 
 		result.NotEnoughByStock.Should().BeEmpty();
 		result.NotEnoughByReservation.Should().BeEmpty();
@@ -157,7 +157,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			product.Id,
 			5);
 
-		var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query, CancellationToken);
 
 		result.NotEnoughByStock.Should().ContainKey(product.Id).WhoseValue.Should().Be(3);
 		result.NotEnoughByReservation.Should().BeEmpty();
@@ -185,7 +185,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			5,
 			true);
 
-		var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query, CancellationToken);
 
 		result.NotEnoughByStock.Should().BeEmpty();
 		result.NotEnoughByReservation.Should().BeEmpty();
@@ -213,14 +213,14 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			3,
 			1);
 		canceled.Cancel();
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		var query = Query(
 			buyer.Id,
 			storage.Code,
 			product.Id,
 			5);
 
-		var result = await Mediator.Send(query);
+		var result = await Mediator.Send(query, CancellationToken);
 
 		result.NotEnoughByStock.Should().BeEmpty();
 		result.NotEnoughByReservation.Should().BeEmpty();
@@ -237,7 +237,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			product.Id,
 			1);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Fact]
@@ -249,7 +249,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			Product().Id,
 			1);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Theory]
@@ -263,7 +263,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			Product().Id,
 			neededCount);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Fact]
@@ -275,7 +275,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			Product().Id,
 			1);
 
-		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Fact]
@@ -287,7 +287,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
 			999999,
 			1);
 
-		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	private GetProductsWithNotEnoughStockQuery Query(

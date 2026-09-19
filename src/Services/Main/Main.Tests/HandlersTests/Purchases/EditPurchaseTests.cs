@@ -51,23 +51,23 @@ public class EditPurchaseTests : IntegrationTest
 			false,
 			null);
 
-		await Mediator.Send(editCommand);
+		await Mediator.Send(editCommand, CancellationToken);
 
-		var updatedPurchase = await Context.Purchases.Include(x => x.Contents).AsNoTracking().SingleAsync();
+		var updatedPurchase = await Context.Purchases.Include(x => x.Contents).AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
 		var updatedContent = updatedPurchase.Contents.Single();
 		var storageContent = await Context
 			.StorageContents
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == updatedContent.StorageContentId);
+			.SingleAsync(x => x.Id == updatedContent.StorageContentId, cancellationToken: CancellationToken);
 		var oldTransaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == oldTransactionId);
+			.SingleAsync(x => x.Id == oldTransactionId, cancellationToken: CancellationToken);
 		var newTransaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == updatedPurchase.TransactionId);
-		var updatedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id);
+			.SingleAsync(x => x.Id == updatedPurchase.TransactionId, cancellationToken: CancellationToken);
+		var updatedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id, cancellationToken: CancellationToken);
 
 		updatedPurchase.Comment.Should().Be(editCommand.Comment);
 		updatedPurchase.CurrencyId.Should().Be(currency.Id);
@@ -107,12 +107,12 @@ public class EditPurchaseTests : IntegrationTest
 			false,
 			null);
 
-		await Mediator.Send(editCommand);
+		await Mediator.Send(editCommand, CancellationToken);
 
-		var updatedPurchase = await Context.Purchases.Include(x => x.Contents).AsNoTracking().SingleAsync();
-		var contents = await Context.StorageContents.AsNoTracking().ToListAsync();
-		var removedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == products[0].Id);
-		var addedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == products[1].Id);
+		var updatedPurchase = await Context.Purchases.Include(x => x.Contents).AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
+		var contents = await Context.StorageContents.AsNoTracking().ToListAsync(cancellationToken: CancellationToken);
+		var removedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == products[0].Id, cancellationToken: CancellationToken);
+		var addedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == products[1].Id, cancellationToken: CancellationToken);
 
 		updatedPurchase.Contents.Should().ContainSingle(x => x.ProductId == products[1].Id);
 		contents.Single(x => x.Id == removedStorageContentId).Count.Should().Be(0);
@@ -133,16 +133,14 @@ public class EditPurchaseTests : IntegrationTest
 		content.SetCount(10);
 		PurchaseContext.StorageContent.IncreaseCount(8, StorageMovementType.PurchaseEditing);
 		product.IncreaseStock(8);
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 
-		await Mediator.Send(
-			new SubtractStorageContentsCommand(
+		await Mediator.Send(new SubtractStorageContentsCommand(
 				storageContentId,
 				5,
-				StorageMovementType.Sale));
+				StorageMovementType.Sale), CancellationToken);
 
-		await Mediator.Send(
-			new EditPurchaseCommand(
+		await Mediator.Send(new EditPurchaseCommand(
 				[
 					new EditPurchaseDto
 					{
@@ -157,14 +155,14 @@ public class EditPurchaseTests : IntegrationTest
 				null,
 				DateTime.UtcNow,
 				false,
-				null));
+				null), CancellationToken);
 
-		var updatedPurchaseContent = await Context.PurchaseContents.AsNoTracking().SingleAsync();
+		var updatedPurchaseContent = await Context.PurchaseContents.AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
 		var updatedStorageContent = await Context
 			.StorageContents
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == storageContentId);
-		var updatedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id);
+			.SingleAsync(x => x.Id == storageContentId, cancellationToken: CancellationToken);
+		var updatedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id, cancellationToken: CancellationToken);
 
 		updatedPurchaseContent.Count.Should().Be(8);
 		updatedStorageContent.Count.Should().Be(3);
@@ -199,7 +197,7 @@ public class EditPurchaseTests : IntegrationTest
 			true,
 			route.FromStorageCode);
 
-		await Mediator.Send(editCommand);
+		await Mediator.Send(editCommand, CancellationToken);
 
 		var updatedPurchase = await Context
 			.Purchases
@@ -207,7 +205,7 @@ public class EditPurchaseTests : IntegrationTest
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.PurchaseContentLogistic)
 			.AsNoTracking()
-			.SingleAsync();
+			.SingleAsync(cancellationToken: CancellationToken);
 
 		updatedPurchase.PurchaseLogistic.Should().NotBeNull();
 		updatedPurchase.PurchaseLogistic!.RouteId.Should().Be(route.Id);
@@ -218,7 +216,7 @@ public class EditPurchaseTests : IntegrationTest
 			var logisticsTransaction = await Context
 				.Transactions
 				.AsNoTracking()
-				.SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId);
+				.SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId, cancellationToken: CancellationToken);
 
 			logisticsTransaction.SourceType.Should().Be(TransactionSourceType.Logistic);
 		}
@@ -247,10 +245,9 @@ public class EditPurchaseTests : IntegrationTest
 			route.MinimumPrice,
 			null,
 			false);
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 
-		await Mediator.Send(
-			new EditPurchaseCommand(
+		await Mediator.Send(new EditPurchaseCommand(
 				[
 					new EditPurchaseDto
 					{
@@ -266,7 +263,7 @@ public class EditPurchaseTests : IntegrationTest
 				null,
 				DateTime.UtcNow,
 				false,
-				null));
+				null), CancellationToken);
 
 		var updatedPurchase = await Context
 			.Purchases
@@ -274,7 +271,7 @@ public class EditPurchaseTests : IntegrationTest
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.PurchaseContentLogistic)
 			.AsNoTracking()
-			.SingleAsync();
+			.SingleAsync(cancellationToken: CancellationToken);
 
 		updatedPurchase.PurchaseLogistic.Should().BeNull();
 		updatedPurchase.Contents.Single().PurchaseContentLogistic.Should().BeNull();
@@ -307,7 +304,7 @@ public class EditPurchaseTests : IntegrationTest
 			false,
 			null);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	private async Task AddStorageOwner(StorageRoute route, Guid supplierId)

@@ -43,14 +43,14 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 				MaxAttempts = 5,
 				Cron = "*/5 * * * *",
 				Enabled = true
-			}, TestContext.Current.CancellationToken);
+			}, CancellationToken);
 
 		Context.ChangeTracker.Clear();
 		var schedule = await Context.JobSchedules
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.Id == id,
-				TestContext.Current.CancellationToken);
+				CancellationToken);
 
 		schedule.Enabled.Should().BeTrue();
 		schedule.MaxAttempts.Should().Be(5);
@@ -77,12 +77,12 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 		await Service.UpdateScheduleAsync(schedule.Id, new PatchJobScheduleDto
 			{
 				Cron = PatchField<string>.From("*/5 * * * *")
-			}, TestContext.Current.CancellationToken);
+			}, CancellationToken);
 
 		Context.ChangeTracker.Clear();
 		var updated = await Context.JobSchedules
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == schedule.Id, TestContext.Current.CancellationToken);
+			.SingleAsync(x => x.Id == schedule.Id, CancellationToken);
 
 		updated.Cron.Should().Be("*/5 * * * *");
 		updated
@@ -107,14 +107,14 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 		await Service.UpdateScheduleAsync(schedule.Id, new PatchJobScheduleDto
 			{
 				Enabled = PatchField<bool>.From(false)
-			}, TestContext.Current.CancellationToken);
+			}, CancellationToken);
 
 		Context.ChangeTracker.Clear();
 		var updated = await Context.JobSchedules
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.Id == schedule.Id,
-				TestContext.Current.CancellationToken);
+				CancellationToken);
 
 		updated.Enabled.Should().BeFalse();
 	}
@@ -124,14 +124,14 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 	{
 		var schedule = await AddScheduleAsync();
 
-		await Service.RemoveScheduleAsync(schedule.Id, TestContext.Current.CancellationToken);
+		await Service.RemoveScheduleAsync(schedule.Id, CancellationToken);
 
 		Context.ChangeTracker.Clear();
 		(await Context.JobSchedules
 			.AsNoTracking()
 			.AnyAsync(
 				x => x.Id == schedule.Id,
-				TestContext.Current.CancellationToken)).Should().BeFalse();
+				CancellationToken)).Should().BeFalse();
 	}
 
 	[Fact]

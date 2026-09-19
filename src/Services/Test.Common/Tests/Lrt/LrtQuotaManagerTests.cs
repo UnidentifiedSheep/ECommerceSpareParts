@@ -139,12 +139,12 @@ public class LrtQuotaManagerTests
 		var acquiredQuota = manager.UseQuota(Guid.NewGuid());
 		var waitingHolderId = Guid.NewGuid();
 
-		var waitingTask = manager.UseQuotaAsync(waitingHolderId).AsTask();
+		var waitingTask = manager.UseQuotaAsync(waitingHolderId, TestContext.Current.CancellationToken).AsTask();
 
 		waitingTask.IsCompleted.Should().BeFalse();
 		acquiredQuota.Dispose();
 
-		using var quota = await waitingTask.WaitAsync(TimeSpan.FromSeconds(1));
+		using var quota = await waitingTask.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 		quota.HolderId.Should().Be(waitingHolderId);
 	}
 

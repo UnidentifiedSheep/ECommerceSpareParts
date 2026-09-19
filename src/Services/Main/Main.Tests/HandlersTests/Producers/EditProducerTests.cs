@@ -33,7 +33,7 @@ public class EditProducerTests : IntegrationTest
 			}
 		};
 		var command = new EditProducerCommand(GetFirstProducer().Id, model);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -47,7 +47,7 @@ public class EditProducerTests : IntegrationTest
 			}
 		};
 		var command = new EditProducerCommand(GetFirstProducer().Id, model);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -61,7 +61,7 @@ public class EditProducerTests : IntegrationTest
 			}
 		};
 		var command = new EditProducerCommand(GetFirstProducer().Id, model);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -73,7 +73,7 @@ public class EditProducerTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
+		var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id, cancellationToken: CancellationToken);
 		dbProducer.Should().NotBeNull();
 
 		dbProducer.Name.Should().Be(producer.Name);
@@ -96,9 +96,9 @@ public class EditProducerTests : IntegrationTest
 			}
 		};
 		var command = new EditProducerCommand(producer.Id, model);
-		var edited = await Mediator.Send(command);
+		var edited = await Mediator.Send(command, CancellationToken);
 
-		var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
+		var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id, cancellationToken: CancellationToken);
 		dbProducer.Should().NotBeNull();
 
 		edited.ProducerId.Should().Be(producer.Id);

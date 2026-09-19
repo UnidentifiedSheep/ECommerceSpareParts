@@ -36,9 +36,9 @@ public class EditStorageRouteTests : IntegrationTest
 
 		var command = new EditStorageRouteCommand(_testContext.ActiveRoute.Id, patchDto);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var updatedRoute = await Context.StorageRoutes.AsNoTracking().FirstAsync(x => x.Id == route.Id);
+		var updatedRoute = await Context.StorageRoutes.AsNoTracking().FirstAsync(x => x.Id == route.Id, cancellationToken: CancellationToken);
 		Assert.Equal(2000, updatedRoute.DistanceM);
 		Assert.Equal(15.5m, updatedRoute.PriceKg);
 		Assert.False(updatedRoute.IsActive);
@@ -58,7 +58,7 @@ public class EditStorageRouteTests : IntegrationTest
 		};
 		var command = new EditStorageRouteCommand(Guid.NewGuid(), patchDto);
 
-		await Assert.ThrowsAsync<StorageRouteNotFound>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<StorageRouteNotFound>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -71,7 +71,7 @@ public class EditStorageRouteTests : IntegrationTest
 
 		var command = new EditStorageRouteCommand(_testContext.ActiveRoute.Id, patchDto);
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -84,6 +84,6 @@ public class EditStorageRouteTests : IntegrationTest
 
 		var command = new EditStorageRouteCommand(_testContext.ActiveRoute.Id, patchDto);
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 }

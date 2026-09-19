@@ -35,13 +35,13 @@ public class OrganizationManagementTests : IntegrationTest
 			"  New organization  ",
 			$"  {systemName.ToUpperInvariant()}  ");
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		var organization = await Context
 			.Organizations
 			.Include(x => x.Members)
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.OrganizationId);
+			.SingleAsync(x => x.Id == result.OrganizationId, cancellationToken: CancellationToken);
 
 		organization.Name.Should().Be("New organization");
 		organization.SystemName.Should().Be(systemName);
@@ -60,7 +60,7 @@ public class OrganizationManagementTests : IntegrationTest
 			"New organization",
 			$"new-organization-{Guid.NewGuid():N}");
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.UsersNotFound);
 	}
@@ -74,7 +74,7 @@ public class OrganizationManagementTests : IntegrationTest
 			"Another organization",
 			$"  {existing.SystemName.ToUpperInvariant()}  ");
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception
 			.Failures
@@ -88,16 +88,15 @@ public class OrganizationManagementTests : IntegrationTest
 		var organization = await CreateOrganization();
 		var member = Users[1];
 
-		await Mediator.Send(
-			new AddOrganizationMemberCommand(
+		await Mediator.Send(new AddOrganizationMemberCommand(
 				organization.Id,
 				member.Id,
-				OrganizationRole.Manager));
+				OrganizationRole.Manager), CancellationToken);
 
 		var organizationMember = await Context
 			.Set<OrganizationMember>()
 			.AsNoTracking()
-			.SingleAsync(x => x.OrganizationId == organization.Id && x.UserId == member.Id);
+			.SingleAsync(x => x.OrganizationId == organization.Id && x.UserId == member.Id, cancellationToken: CancellationToken);
 		organizationMember.Role.Should().Be(OrganizationRole.Manager);
 	}
 
@@ -110,7 +109,7 @@ public class OrganizationManagementTests : IntegrationTest
 			Users[0].Id,
 			OrganizationRole.Member);
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception
 			.Failures
@@ -123,16 +122,15 @@ public class OrganizationManagementTests : IntegrationTest
 	{
 		var organization = await CreateOrganization(Users[1].Id);
 
-		await Mediator.Send(
-			new ChangeOrganizationMemberRoleCommand(
+		await Mediator.Send(new ChangeOrganizationMemberRoleCommand(
 				organization.Id,
 				Users[1].Id,
-				OrganizationRole.Admin));
+				OrganizationRole.Admin), CancellationToken);
 
 		var member = await Context
 			.Set<OrganizationMember>()
 			.AsNoTracking()
-			.SingleAsync(x => x.OrganizationId == organization.Id && x.UserId == Users[1].Id);
+			.SingleAsync(x => x.OrganizationId == organization.Id && x.UserId == Users[1].Id, cancellationToken: CancellationToken);
 		member.Role.Should().Be(OrganizationRole.Admin);
 	}
 
@@ -141,12 +139,12 @@ public class OrganizationManagementTests : IntegrationTest
 	{
 		var organization = await CreateOrganization(Users[1].Id);
 
-		await Mediator.Send(new RemoveOrganizationMemberCommand(organization.Id, Users[1].Id));
+		await Mediator.Send(new RemoveOrganizationMemberCommand(organization.Id, Users[1].Id), CancellationToken);
 
 		var exists = await Context
 			.Set<OrganizationMember>()
 			.AsNoTracking()
-			.AnyAsync(x => x.OrganizationId == organization.Id && x.UserId == Users[1].Id);
+			.AnyAsync(x => x.OrganizationId == organization.Id && x.UserId == Users[1].Id, cancellationToken: CancellationToken);
 		exists.Should().BeFalse();
 	}
 
@@ -156,7 +154,7 @@ public class OrganizationManagementTests : IntegrationTest
 		var organization = await CreateOrganization();
 
 		var exception = await Assert.ThrowsAsync<InvalidInputException>(() =>
-			Mediator.Send(new RemoveOrganizationMemberCommand(organization.Id, Users[0].Id)));
+			Mediator.Send(new RemoveOrganizationMemberCommand(organization.Id, Users[0].Id), CancellationToken));
 
 		exception.LocalizableMessage.MessageKey.Should().Be("organization.owner.cannot.be.removed");
 	}

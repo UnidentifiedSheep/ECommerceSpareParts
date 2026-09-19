@@ -28,7 +28,7 @@ public class AddAliasToProducerTests : IntegrationTest
 			alias = Faker.Lorem.Letter(200);
 		var producer = TestContext.Producers[0];
 		var command = new AddAliasCommand(producer.Id, alias);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -36,7 +36,7 @@ public class AddAliasToProducerTests : IntegrationTest
 	{
 		var command = new AddAliasCommand(int.MaxValue, Faker.Lorem.Letter(40));
 		var exception =
-			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command, CancellationToken));
 		Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
 	}
 
@@ -51,7 +51,7 @@ public class AddAliasToProducerTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var alias = await Context.ProducersAliases.AsNoTracking().FirstOrDefaultAsync();
+		var alias = await Context.ProducersAliases.AsNoTracking().FirstOrDefaultAsync(cancellationToken: CancellationToken);
 
 		alias.Should().NotBeNull();
 
@@ -69,7 +69,7 @@ public class AddAliasToProducerTests : IntegrationTest
 
 		var command = new AddAliasCommand(producer.Id, existing.Alias);
 		var exception =
-			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command, CancellationToken));
 		Assert.Equal(ApplicationErrors.ProducerAliasAlreadyTaken, exception.Failures[0].ErrorName);
 	}
 
@@ -83,7 +83,7 @@ public class AddAliasToProducerTests : IntegrationTest
 		var command = new AddAliasCommand(TestContext.Producers[1].Id, existing.Alias);
 
 		var exception =
-			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command, CancellationToken));
 
 		Assert.Equal(ApplicationErrors.ProducerAliasAlreadyTaken, exception.Failures[0].ErrorName);
 	}

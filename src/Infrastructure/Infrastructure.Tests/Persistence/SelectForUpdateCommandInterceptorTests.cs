@@ -314,10 +314,7 @@ public class SelectForUpdateCommandInterceptorTests
 			FROM public.purchase AS p
 			""");
 
-		await _interceptor.ReaderExecutingAsync(
-			command,
-			null!,
-			default);
+		await _interceptor.ReaderExecutingAsync(command, null!, default, TestContext.Current.CancellationToken);
 
 		Assert.EndsWith("FOR UPDATE OF p", command.CommandText);
 	}

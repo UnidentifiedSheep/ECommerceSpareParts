@@ -17,7 +17,7 @@ public class GetProducerByIdTests(CombinedContainerFixture fixture) : Integratio
 			.WithDescription("Requested description")
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(new GetProducersByIdsQuery(producer.Id));
+		var result = await Mediator.Send(new GetProducersByIdsQuery(producer.Id), CancellationToken);
 
 		result.Producer.Id.Should().Be(producer.Id);
 		result.Producer.Name.Should().Be(producer.Name);

@@ -34,6 +34,8 @@ public abstract class CommonLayerIntegrationTest : TestBase
 
 	protected override IServiceScope Scope => _scope;
 
+	protected CancellationToken CancellationToken => TestContext.Current.CancellationToken;
+
 	private protected DContext Context { get; private set; } = null!;
 
 	private protected IMediator Mediator { get; private set; } = null!;

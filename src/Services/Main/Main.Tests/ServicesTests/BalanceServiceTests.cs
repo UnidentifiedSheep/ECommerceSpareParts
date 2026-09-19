@@ -52,9 +52,9 @@ public class BalanceServiceTests : IntegrationTest
 		baseBalance.IncrementBalance(25m);
 		foreignBalance.IncrementBalance(100m * foreignRate);
 		await Context.AddRangeAsync(baseBalance, foreignBalance);
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 
-		var result = await _service.GetBalanceInBaseCurrencyAsync(organizationId);
+		var result = await _service.GetBalanceInBaseCurrencyAsync(organizationId, CancellationToken);
 
 		result.Should().Be(125m);
 	}
@@ -78,16 +78,16 @@ public class BalanceServiceTests : IntegrationTest
 			profile,
 			baseBalance,
 			foreignBalance);
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
-		await _service.RecalculateApproximateBalancesAsync([organizationId]);
-		await Context.SaveChangesAsync();
+		await _service.RecalculateApproximateBalancesAsync([organizationId], CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var updatedProfile = await Context
 			.Set<OrganizationFinancialProfile>()
-			.SingleAsync(x => x.OrganizationId == organizationId);
+			.SingleAsync(x => x.OrganizationId == organizationId, cancellationToken: CancellationToken);
 		updatedProfile.ApproximateBalance.Should().Be(125m);
 	}
 
@@ -106,7 +106,7 @@ public class BalanceServiceTests : IntegrationTest
 		receiverBalance.IncrementBalance(100m * foreignRate);
 		var receiverProfile = OrganizationFinancialProfile.Create(receiver.Id, -40m);
 		await Context.AddRangeAsync(receiverBalance, receiverProfile);
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		var transaction = new TransactionBuilder(Faker)
 			.WithSenderId(sender.Id)
 			.WithReceiverId(receiver.Id)
@@ -126,9 +126,8 @@ public class BalanceServiceTests : IntegrationTest
 		var sender = UsersContext.Users.ElementAt(0);
 		var receiver = UsersContext.Users.ElementAt(1);
 		var currency = CurrencyContext.Currencies[0];
-		await Context.AddAsync(
-			new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(sender.Id).Build());
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(sender.Id).Build(), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		var transaction = new TransactionBuilder(Faker)
 			.WithSenderId(sender.Id)
@@ -139,8 +138,8 @@ public class BalanceServiceTests : IntegrationTest
 			.Completed()
 			.Build();
 
-		await _service.ChangeSenderReceiverBalancesAsync(transaction, true);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, true, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		(await GetUserBalance(sender.Id, currency.Id)).Balance.Should().Be(700m);
 		(await GetUserBalance(receiver.Id, currency.Id)).Balance.Should().Be(-700m);
@@ -152,9 +151,8 @@ public class BalanceServiceTests : IntegrationTest
 		var user = UsersContext.Users.ElementAt(0);
 		var systemUser = UserContext.SystemUser;
 		var currency = CurrencyContext.Currencies[0];
-		await Context.AddAsync(
-			new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(user.Id).Build());
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(user.Id).Build(), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		var transaction = new TransactionBuilder(Faker)
 			.WithSenderId(user.Id)
@@ -165,8 +163,8 @@ public class BalanceServiceTests : IntegrationTest
 			.Completed()
 			.Build();
 
-		await _service.ChangeSenderReceiverBalancesAsync(transaction, true);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, true, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		(await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(250m);
 		(await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(-250m);
@@ -178,9 +176,8 @@ public class BalanceServiceTests : IntegrationTest
 		var user = UsersContext.Users.ElementAt(0);
 		var systemUser = UserContext.SystemUser;
 		var currency = CurrencyContext.Currencies[0];
-		await Context.AddAsync(
-			new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(user.Id).Build());
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(user.Id).Build(), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		var transaction = new TransactionBuilder(Faker)
 			.WithSenderId(systemUser.Id)
@@ -191,8 +188,8 @@ public class BalanceServiceTests : IntegrationTest
 			.Completed()
 			.Build();
 
-		await _service.ChangeSenderReceiverBalancesAsync(transaction, true);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, true, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		(await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(250m);
 		(await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(-250m);
@@ -207,9 +204,8 @@ public class BalanceServiceTests : IntegrationTest
 		var user = UsersContext.Users.ElementAt(0);
 		var systemUser = UserContext.SystemUser;
 		var currency = CurrencyContext.Currencies[0];
-		await Context.AddAsync(
-			new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(user.Id).Build());
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(user.Id).Build(), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		var transaction = new TransactionBuilder(Faker)
 			.WithSenderId(user.Id)
@@ -220,8 +216,8 @@ public class BalanceServiceTests : IntegrationTest
 			.Completed()
 			.Build();
 
-		await _service.ChangeSenderReceiverBalancesAsync(transaction, true);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, true, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		(await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(100m);
 	}
@@ -232,9 +228,8 @@ public class BalanceServiceTests : IntegrationTest
 		var buyer = UsersContext.Users.ElementAt(0);
 		var systemUser = UserContext.SystemUser;
 		var currency = CurrencyContext.Currencies[0];
-		await Context.AddAsync(
-			new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(buyer.Id).Build());
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(buyer.Id).Build(), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		var transaction = new TransactionBuilder(Faker)
 			.WithSenderId(systemUser.Id)
@@ -245,8 +240,8 @@ public class BalanceServiceTests : IntegrationTest
 			.Completed()
 			.Build();
 
-		await _service.ChangeSenderReceiverBalancesAsync(transaction, true);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, true, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		(await GetUserBalance(buyer.Id, currency.Id)).Balance.Should().Be(-100m);
 	}
@@ -257,9 +252,8 @@ public class BalanceServiceTests : IntegrationTest
 		var supplier = UsersContext.Users.ElementAt(0);
 		var systemUser = UserContext.SystemUser;
 		var currency = CurrencyContext.Currencies[0];
-		await Context.AddAsync(
-			new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(supplier.Id).Build());
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(supplier.Id).Build(), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var transaction = new TransactionBuilder(Faker)
@@ -271,13 +265,13 @@ public class BalanceServiceTests : IntegrationTest
 			.Completed()
 			.Build();
 
-		await _service.ChangeSenderReceiverBalancesAsync(transaction, true);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, true, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		transaction.Reverse(systemUser.Id);
-		await _service.ChangeSenderReceiverBalancesAsync(transaction);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken: CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		(await GetUserBalance(supplier.Id, currency.Id)).Balance.Should().Be(0m);
 		(await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(0m);
@@ -290,9 +284,8 @@ public class BalanceServiceTests : IntegrationTest
 		var receiver = UsersContext.Users.ElementAt(1);
 		var reversedBy = UsersContext.Users.ElementAt(2);
 		var currency = CurrencyContext.Currencies[0];
-		await Context.AddAsync(
-			new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(sender.Id).Build());
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(new OrganizationFinancialProfileBuilder(Faker).WithOrganizationId(sender.Id).Build(), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		var transaction = new TransactionBuilder(Faker)
 			.WithSenderId(sender.Id)
@@ -303,13 +296,13 @@ public class BalanceServiceTests : IntegrationTest
 			.Completed()
 			.Build();
 
-		await _service.ChangeSenderReceiverBalancesAsync(transaction, true);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, true, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		transaction.Reverse(reversedBy.Id);
-		await _service.ChangeSenderReceiverBalancesAsync(transaction);
-		await Context.SaveChangesAsync();
+		await _service.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken: CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
 		(await GetUserBalance(sender.Id, currency.Id)).Balance.Should().Be(0m);
 		(await GetUserBalance(receiver.Id, currency.Id)).Balance.Should().Be(0m);

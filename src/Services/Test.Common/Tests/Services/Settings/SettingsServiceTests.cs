@@ -41,7 +41,7 @@ public sealed class SettingsServiceTests
 			transactionService.Object,
 			settingsContainer.Object);
 
-		await service.SetSetting(replacement);
+		await service.SetSetting(replacement, TestContext.Current.CancellationToken);
 
 		existing.Json.Should().Be(replacement.Json);
 		transactionService.Verify(

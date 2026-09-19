@@ -39,7 +39,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
 		var option = await Context
 			.Set<ProductPriceOption>()
 			.AsNoTracking()
-			.SingleAsync(x => x.PriceOfferId == offer.Id);
+			.SingleAsync(x => x.PriceOfferId == offer.Id, cancellationToken: CancellationToken);
 		option.MarkupVersion.Should().Be("markup-v2");
 		option.AppliersVersion.Should().Be("appliers-v3");
 		option.PricingSettingsVersion.Should().Be(settingsVersion);
@@ -69,7 +69,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
 		var option = await Context
 			.Set<ProductPriceOption>()
 			.AsNoTracking()
-			.SingleAsync(x => x.PriceOfferId == offer.Id);
+			.SingleAsync(x => x.PriceOfferId == offer.Id, cancellationToken: CancellationToken);
 		option.MarkupVersion.Should().Be("markup-v2");
 		option.AppliersVersion.Should().Be("appliers-v2");
 		option.PricingSettingsVersion.Should().Be(updatedSettingsVersion);
@@ -99,7 +99,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
 		var option = await Context
 			.Set<ProductPriceOption>()
 			.AsNoTracking()
-			.SingleAsync(x => x.PriceOfferId == offer.Id);
+			.SingleAsync(x => x.PriceOfferId == offer.Id, cancellationToken: CancellationToken);
 		option.MarkupVersion.Should().Be("markup-v1");
 		option.AppliersVersion.Should().Be("appliers-v1");
 		option.PricingSettingsVersion.Should().Be(existingSettingsVersion);

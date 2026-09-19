@@ -46,12 +46,12 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 		var producer = CreateDto();
 		var command = new CreateProducerCommand(producer);
 
-		var created = await Mediator.Send(command);
+		var created = await Mediator.Send(command, CancellationToken);
 
 		var createdProducer = await Context
 			.Producers
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == created.ProducerId);
+			.SingleAsync(x => x.Id == created.ProducerId, cancellationToken: CancellationToken);
 
 		created.ProducerId.Should().BeGreaterThan(0);
 

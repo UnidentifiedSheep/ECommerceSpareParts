@@ -32,16 +32,16 @@ public class DeleteSaleTests : IntegrationTest
 		var storageCountBeforeDelete = await StorageContentCount(storageContentId);
 		var productStockBeforeDelete = await ProductStock(productId);
 
-		await Mediator.Send(new DeleteSaleCommand(sale.Id, sale.RowVersion));
+		await Mediator.Send(new DeleteSaleCommand(sale.Id, sale.RowVersion), CancellationToken);
 
 		var deletedSale = await ReloadSale();
 		var storageContent = await Context
 			.StorageContents
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == storageContentId);
-		var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == productId);
-		var transaction = await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == transactionId);
-		var movement = await Context.Events.OfType<StorageMovementEvent>().AsNoTracking().SingleAsync();
+			.SingleAsync(x => x.Id == storageContentId, cancellationToken: CancellationToken);
+		var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == productId, cancellationToken: CancellationToken);
+		var transaction = await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == transactionId, cancellationToken: CancellationToken);
+		var movement = await Context.Events.OfType<StorageMovementEvent>().AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
 
 		deletedSale.State.Should().Be(SaleState.Deleted);
 		storageContent.Count.Should().Be(storageCountBeforeDelete + soldCount);
@@ -61,7 +61,7 @@ public class DeleteSaleTests : IntegrationTest
 		var storageContentId = sale.Contents.Single().Details.Single().StorageContentId;
 		var productId = sale.Contents.Single().ProductId;
 
-		await Mediator.Send(new DeleteSaleCommand(sale.Id, sale.RowVersion));
+		await Mediator.Send(new DeleteSaleCommand(sale.Id, sale.RowVersion), CancellationToken);
 
 		var storageCountAfterFirstDelete = await StorageContentCount(storageContentId);
 		var productStockAfterFirstDelete = await ProductStock(productId);
@@ -69,20 +69,20 @@ public class DeleteSaleTests : IntegrationTest
 			.Events
 			.OfType<StorageMovementEvent>()
 			.AsNoTracking()
-			.CountAsync();
+			.CountAsync(cancellationToken: CancellationToken);
 
-		await Mediator.Send(new DeleteSaleCommand(sale.Id, sale.RowVersion));
+		await Mediator.Send(new DeleteSaleCommand(sale.Id, sale.RowVersion), CancellationToken);
 
 		var deletedSale = await ReloadSale();
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == sale.TransactionId);
+			.SingleAsync(x => x.Id == sale.TransactionId, cancellationToken: CancellationToken);
 		var movementsAfterSecondDelete = await Context
 			.Events
 			.OfType<StorageMovementEvent>()
 			.AsNoTracking()
-			.CountAsync();
+			.CountAsync(cancellationToken: CancellationToken);
 
 		deletedSale.State.Should().Be(SaleState.Deleted);
 		(await StorageContentCount(storageContentId)).Should().Be(storageCountAfterFirstDelete);
@@ -96,7 +96,7 @@ public class DeleteSaleTests : IntegrationTest
 	public async Task DeleteSale_WhenSaleDoesNotExist_ThrowsSaleNotFoundException()
 	{
 		await Assert.ThrowsAsync<SaleNotFoundException>(() =>
-			Mediator.Send(new DeleteSaleCommand(Guid.NewGuid(), 1)));
+			Mediator.Send(new DeleteSaleCommand(Guid.NewGuid(), 1), CancellationToken));
 	}
 
 	[Fact]
@@ -106,13 +106,13 @@ public class DeleteSaleTests : IntegrationTest
 		var invalidRowVersion = sale.RowVersion + 1;
 
 		await Assert.ThrowsAsync<InvalidRowVersionException>(() =>
-			Mediator.Send(new DeleteSaleCommand(sale.Id, invalidRowVersion)));
+			Mediator.Send(new DeleteSaleCommand(sale.Id, invalidRowVersion), CancellationToken));
 
 		var saleAfterFailedDelete = await ReloadSale();
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == sale.TransactionId);
+			.SingleAsync(x => x.Id == sale.TransactionId, cancellationToken: CancellationToken);
 
 		saleAfterFailedDelete.State.Should().Be(SaleState.Completed);
 		transaction.IsReversed.Should().BeFalse();

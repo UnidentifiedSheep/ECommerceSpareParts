@@ -33,7 +33,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 			producer.Name,
 			Supplier.Tmtr);
 
-		var execution = await ExecuteLrt();
+		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 		var state = execution.GetState<BuildCatalogueCandidatesState>();
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded);
@@ -42,7 +42,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		state.AssignedRows.Should().Be(2);
 		state.SkippedRows.Should().Be(0);
 
-		var candidate = await Context.CatalogueCandidates.AsNoTracking().SingleAsync();
+		var candidate = await Context.CatalogueCandidates.AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
 		candidate.ProducerId.Should().Be(producer.Id);
 		candidate.Sku.NormalizedValue.Should().Be("ABC123");
 
@@ -50,7 +50,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 			.SupplierProducts
 			.AsNoTracking()
 			.Select(x => x.CatalogueCandidateId)
-			.ToListAsync();
+			.ToListAsync(cancellationToken: CancellationToken);
 		candidateIds.Should().OnlyContain(x => x == candidate.Id);
 	}
 
@@ -67,18 +67,18 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 			producer.Name,
 			Supplier.Armtek);
 
-		var execution = await ExecuteLrt();
+		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 		var state = execution.GetState<BuildCatalogueCandidatesState>();
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded);
 		state.AssignedRows.Should().Be(1);
-		(await Context.CatalogueCandidates.CountAsync()).Should().Be(1);
+		(await Context.CatalogueCandidates.CountAsync(cancellationToken: CancellationToken)).Should().Be(1);
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
 			.SupplierProducts
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == supplierProduct.Id);
+			.SingleAsync(x => x.Id == supplierProduct.Id, cancellationToken: CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().Be(candidate.Id);
 	}
 
@@ -90,7 +90,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 			$"unknown-{Guid.NewGuid():N}",
 			Supplier.Armtek);
 
-		var execution = await ExecuteLrt();
+		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 		var state = execution.GetState<BuildCatalogueCandidatesState>();
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded);
@@ -98,13 +98,13 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		state.ProcessedRows.Should().Be(1);
 		state.AssignedRows.Should().Be(0);
 		state.SkippedRows.Should().Be(1);
-		(await Context.CatalogueCandidates.CountAsync()).Should().Be(0);
+		(await Context.CatalogueCandidates.CountAsync(cancellationToken: CancellationToken)).Should().Be(0);
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
 			.SupplierProducts
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == supplierProduct.Id);
+			.SingleAsync(x => x.Id == supplierProduct.Id, cancellationToken: CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().BeNull();
 	}
 

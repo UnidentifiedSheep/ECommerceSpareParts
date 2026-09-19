@@ -24,7 +24,7 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 		var supplierProduct = candidate.SupplierProducts.Should().ContainSingle().Subject;
 		Context.ChangeTracker.Clear();
 
-		var result = await Mediator.Send(CreateQuery(sku: candidate.Sku.Value));
+		var result = await Mediator.Send(CreateQuery(sku: candidate.Sku.Value), CancellationToken);
 
 		var projectedCandidate = result.Candidates.Should().ContainSingle().Subject;
 		projectedCandidate.Id.Should().Be(candidate.Id);
@@ -56,7 +56,7 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 			.WithProductId(requestedProduct.Id)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(CreateQuery(requestedProduct.Id));
+		var result = await Mediator.Send(CreateQuery(requestedProduct.Id), CancellationToken);
 
 		result.Candidates.Should().ContainSingle(x => x.Id == requestedCandidate.Id);
 	}
@@ -74,7 +74,7 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 			.WithProducerId(producerId)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(CreateQuery(sku: "ab_1234"));
+		var result = await Mediator.Send(CreateQuery(sku: "ab_1234"), CancellationToken);
 
 		result.Candidates.Should().ContainSingle(x => x.Id == requestedCandidate.Id);
 	}
@@ -92,7 +92,7 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 			.WithProductId(product.Id)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(CreateQuery(product.Id, "missing-sku"));
+		var result = await Mediator.Send(CreateQuery(product.Id, "missing-sku"), CancellationToken);
 
 		result.Candidates.Should().BeEmpty();
 	}

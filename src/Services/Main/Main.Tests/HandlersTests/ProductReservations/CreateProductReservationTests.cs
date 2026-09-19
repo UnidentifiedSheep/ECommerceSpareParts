@@ -34,14 +34,14 @@ public class CreateProductReservationTests : IntegrationTest
 		var dto = GetValidDto();
 		var command = new CreateProductReservationCommand(dto);
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		result.ReservationId.Should().BeGreaterThan(0);
 
 		var db = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.ReservationId);
+			.SingleAsync(x => x.Id == result.ReservationId, cancellationToken: CancellationToken);
 
 		db.Comment.Should().Be(dto.Comment);
 		db.ProductId.Should().Be(dto.ProductId);
@@ -62,7 +62,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -74,12 +74,12 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		var db = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.ReservationId);
+			.SingleAsync(x => x.Id == result.ReservationId, cancellationToken: CancellationToken);
 		db.Status.Should().Be(ProductReservationStatus.Done);
 	}
 
@@ -92,11 +92,11 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 		var reservation = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.ReservationId);
+			.SingleAsync(x => x.Id == result.ReservationId, cancellationToken: CancellationToken);
 
 		reservation.ProposedPrice.Should().BeNull();
 		reservation.ProposedCurrencyId.Should().BeNull();
@@ -113,7 +113,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -126,7 +126,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -140,7 +140,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -152,7 +152,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -164,7 +164,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -176,7 +176,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -188,7 +188,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 
 		await Assert.ThrowsAsync<DbValidationException>(() =>
-			Mediator.Send(new CreateProductReservationCommand(dto)));
+			Mediator.Send(new CreateProductReservationCommand(dto), CancellationToken));
 	}
 
 	[Fact]
@@ -200,7 +200,7 @@ public class CreateProductReservationTests : IntegrationTest
 		};
 		var command = new CreateProductReservationCommand(dto);
 
-		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	private NewProductReservationDto GetValidDto()

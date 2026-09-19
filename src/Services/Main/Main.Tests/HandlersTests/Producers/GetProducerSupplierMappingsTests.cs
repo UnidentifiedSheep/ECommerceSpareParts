@@ -33,11 +33,10 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 			.WithSupplier(Supplier.Armtek)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(
-			new GetProducerSupplierMappingsQuery(
+		var result = await Mediator.Send(new GetProducerSupplierMappingsQuery(
 				producer.Id,
 				[],
-				new Pagination(0, 10)));
+				new Pagination(0, 10)), CancellationToken);
 
 		result.Mappings.Should().ContainSingle();
 		result.Mappings[0].Id.Should().Be(expected.Id);
@@ -59,11 +58,10 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 			.WithSupplier(Supplier.FavoritParts)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(
-			new GetProducerSupplierMappingsQuery(
+		var result = await Mediator.Send(new GetProducerSupplierMappingsQuery(
 				producer.Id,
 				[Supplier.Armtek],
-				new Pagination(0, 10)));
+				new Pagination(0, 10)), CancellationToken);
 
 		result.Mappings.Should().ContainSingle();
 		result.Mappings[0].Id.Should().Be(expected.Id);
@@ -83,11 +81,10 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 			.WithSupplier(Supplier.FavoritParts)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(
-			new GetProducerSupplierMappingsQuery(
+		var result = await Mediator.Send(new GetProducerSupplierMappingsQuery(
 				producer.Id,
 				[],
-				new Pagination(0, 1)));
+				new Pagination(0, 1)), CancellationToken);
 
 		result.Mappings.Should().ContainSingle();
 	}
@@ -100,6 +97,6 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 			[],
 			new Pagination(-1, 10));
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(query));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(query, CancellationToken));
 	}
 }

@@ -31,7 +31,7 @@ public sealed class ProductRepositorySearchTests
 				SearchMatchType.Contains
 			});
 
-		var result = await repository.Search(criteria);
+		var result = await repository.Search(criteria, TestContext.Current.CancellationToken);
 
 		result.Total.Should().Be(0);
 		requestBody().Should().Contain("\"normalizedSku\"");
@@ -53,7 +53,7 @@ public sealed class ProductRepositorySearchTests
 				SearchMatchType.StartsWith
 			});
 
-		await repository.Search(criteria);
+		await repository.Search(criteria, TestContext.Current.CancellationToken);
 
 		requestBody().Should().Contain("\"prefix\"");
 		requestBody().Should().Contain("\"name.keyword\"");
@@ -73,7 +73,7 @@ public sealed class ProductRepositorySearchTests
 				SearchMatchType.Contains
 			});
 
-		await repository.Search(criteria);
+		await repository.Search(criteria, TestContext.Current.CancellationToken);
 
 		requestBody().Should().Contain("\"wildcard\"");
 		requestBody().Should().Contain("\"value\":\"*eko\\\\*01\\\\?213*\"");
@@ -92,7 +92,7 @@ public sealed class ProductRepositorySearchTests
 				SearchMatchType.Fuzzy
 			});
 
-		await repository.Search(criteria);
+		await repository.Search(criteria, TestContext.Current.CancellationToken);
 
 		requestBody().Should().Contain("\"fuzziness\":\"AUTO\"");
 		requestBody().Should().Contain("\"operator\":\"and\"");
@@ -113,7 +113,7 @@ public sealed class ProductRepositorySearchTests
 				SearchMatchType.Fuzzy
 			});
 
-		await repository.Search(criteria);
+		await repository.Search(criteria, TestContext.Current.CancellationToken);
 
 		requestBody().Should().Contain("\"match_none\"");
 		requestBody().Should().NotContain("\"fuzzy\"");
@@ -159,7 +159,7 @@ public sealed class ProductRepositorySearchTests
 				IncludeHighlights = true
 			};
 
-		var result = await repository.Search(criteria);
+		var result = await repository.Search(criteria, TestContext.Current.CancellationToken);
 
 		requestBody().Should().Contain("\"highlight\"");
 		requestBody().Should().Contain("\"pre_tags\":[\"[[[\"]");

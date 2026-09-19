@@ -37,10 +37,10 @@ public class ChangeCartItemCountTests : IntegrationTest
 			_cartItem.ProductId,
 			newCount);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var cartItem = await Context.Carts.FirstOrDefaultAsync(x =>
-			x.UserId == command.UserId && x.ProductId == command.ProductId);
+			x.UserId == command.UserId && x.ProductId == command.ProductId, cancellationToken: CancellationToken);
 		Assert.NotNull(cartItem);
 		Assert.Equal(newCount, cartItem.Count);
 	}
@@ -53,7 +53,7 @@ public class ChangeCartItemCountTests : IntegrationTest
 			999999,
 			10);
 
-		await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -66,6 +66,6 @@ public class ChangeCartItemCountTests : IntegrationTest
 			_cartItem.ProductId,
 			newCount);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 }

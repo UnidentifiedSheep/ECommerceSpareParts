@@ -60,9 +60,9 @@ public class AddStorageRouteTests : IntegrationTest
 			0,
 			_carrier.Id);
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
-		var route = await Context.StorageRoutes.FirstOrDefaultAsync(x => x.Id == result.RouteId);
+		var route = await Context.StorageRoutes.FirstOrDefaultAsync(x => x.Id == result.RouteId, cancellationToken: CancellationToken);
 		Assert.NotNull(route);
 		Assert.Equal(_toStorage.Code, route.FromStorageCode);
 		Assert.Equal(_fromStorage.Code, route.ToStorageCode);
@@ -87,7 +87,7 @@ public class AddStorageRouteTests : IntegrationTest
 			0,
 			_carrier.Id);
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -107,7 +107,7 @@ public class AddStorageRouteTests : IntegrationTest
 			0,
 			_carrier.Id);
 
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -127,7 +127,7 @@ public class AddStorageRouteTests : IntegrationTest
 			0,
 			_carrier.Id);
 
-		await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -148,7 +148,7 @@ public class AddStorageRouteTests : IntegrationTest
 			_carrier.Id);
 
 		var exception =
-			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+			await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command, CancellationToken));
 		Assert.Contains(exception.Failures, f => f.ErrorName == ApplicationErrors.StoragesNotFound);
 	}
 }

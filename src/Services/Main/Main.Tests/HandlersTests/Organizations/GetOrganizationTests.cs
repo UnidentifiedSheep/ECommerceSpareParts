@@ -23,7 +23,7 @@ public sealed class GetOrganizationTests : IntegrationTest
 		var organization = await CreateOrganization();
 		var owner = GetContext<UsersTestContext>().Users.First();
 
-		var result = await Mediator.Send(new GetOrganizationQuery(organization.Id));
+		var result = await Mediator.Send(new GetOrganizationQuery(organization.Id), CancellationToken);
 
 		result.Organization.Id.Should().Be(organization.Id);
 		result.Organization.Name.Should().Be(organization.Name);
@@ -39,8 +39,7 @@ public sealed class GetOrganizationTests : IntegrationTest
 	{
 		var organization = await CreateOrganization();
 
-		var result = await Mediator.Send(
-			new GetOrganizationQuery($"  {organization.SystemName.ToUpperInvariant()}  "));
+		var result = await Mediator.Send(new GetOrganizationQuery($"  {organization.SystemName.ToUpperInvariant()}  "), CancellationToken);
 
 		result.Organization.Id.Should().Be(organization.Id);
 	}
@@ -66,8 +65,8 @@ public sealed class GetOrganizationTests : IntegrationTest
 	{
 		var owner = GetContext<UsersTestContext>().Users.First();
 		var organization = Organization.CreateSystem(Guid.NewGuid(), owner.Id);
-		await Context.AddAsync(organization);
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(organization, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var act = () => Mediator.Send(new GetOrganizationQuery(organization.Id));

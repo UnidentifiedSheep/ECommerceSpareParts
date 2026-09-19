@@ -29,12 +29,12 @@ public class EditStorageTests : IntegrationTest
 			}
 		};
 		var command = new EditStorageCommand(storage.Code, model);
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
 			.Storages
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Code == storage.Code);
+			.FirstOrDefaultAsync(x => x.Code == storage.Code, cancellationToken: CancellationToken);
 		Assert.NotNull(dbStorage);
 
 		Assert.Equal(storage.Code, dbStorage.Code);
@@ -54,12 +54,12 @@ public class EditStorageTests : IntegrationTest
 			}
 		};
 		var command = new EditStorageCommand(storage.Code, model);
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
 			.Storages
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Code == storage.Code);
+			.FirstOrDefaultAsync(x => x.Code == storage.Code, cancellationToken: CancellationToken);
 
 		Assert.NotNull(dbStorage);
 
@@ -80,7 +80,7 @@ public class EditStorageTests : IntegrationTest
 			}
 		};
 		var command = new EditStorageCommand(storage.Code, model);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -95,7 +95,7 @@ public class EditStorageTests : IntegrationTest
 			}
 		};
 		var command = new EditStorageCommand(storage.Code, model);
-		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -118,12 +118,12 @@ public class EditStorageTests : IntegrationTest
 			}
 		};
 		var command = new EditStorageCommand(storage.Code, model);
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
 			.Storages
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Code == storage.Code);
+			.FirstOrDefaultAsync(x => x.Code == storage.Code, cancellationToken: CancellationToken);
 
 		Assert.NotNull(dbStorage);
 		Assert.Equal(dbStorage.Description, model.Description);
@@ -142,7 +142,7 @@ public class EditStorageTests : IntegrationTest
 			}
 		};
 		var command = new EditStorageCommand(Faker.Lorem.Letter(100), model);
-		await Assert.ThrowsAsync<StorageNotFoundException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<StorageNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	private Storage GetStorage()

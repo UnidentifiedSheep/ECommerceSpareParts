@@ -36,7 +36,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 		var command = new DeleteProducerSupplierMappingCommand(int.MaxValue);
 
 		await Assert.ThrowsAsync<ProducersSupplierMappingNotFoundException>(async () =>
-			await Mediator.Send(command));
+			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -48,7 +48,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var mappings = await Context.ProducerSupplierMappings.AsNoTracking().ToListAsync();
+		var mappings = await Context.ProducerSupplierMappings.AsNoTracking().ToListAsync(cancellationToken: CancellationToken);
 		mappings.Should().HaveCount(0);
 	}
 }

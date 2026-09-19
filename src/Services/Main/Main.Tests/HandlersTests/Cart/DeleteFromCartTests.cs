@@ -33,12 +33,12 @@ public class DeleteFromCartTests : IntegrationTest
 	{
 		var command = new DeleteFromCartCommand(_cartItem.UserId, _cartItem.ProductId);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var cartItem = await Context
 			.Carts
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.UserId == command.UserId && x.ProductId == command.ProductId);
+			.FirstOrDefaultAsync(x => x.UserId == command.UserId && x.ProductId == command.ProductId, cancellationToken: CancellationToken);
 		Assert.Null(cartItem);
 	}
 
@@ -47,6 +47,6 @@ public class DeleteFromCartTests : IntegrationTest
 	{
 		var command = new DeleteFromCartCommand(_cartItem.UserId, 999999);
 
-		await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
 }

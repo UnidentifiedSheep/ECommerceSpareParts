@@ -45,7 +45,7 @@ public class AddToCartTests : IntegrationTest
 		var cartItem = await Context
 			.Carts
 			.AsNoTracking()
-			.FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id);
+			.FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id, cancellationToken: CancellationToken);
 		Assert.NotNull(cartItem);
 		Assert.Equal(count, cartItem.Count);
 	}
@@ -58,9 +58,9 @@ public class AddToCartTests : IntegrationTest
 			user.Id,
 			product.Id,
 			5);
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 		Assert.Equal(ApplicationErrors.CartItemAlreadyExist, exception.Failures[0].ErrorName);
 	}
 
@@ -75,7 +75,7 @@ public class AddToCartTests : IntegrationTest
 			product.Id,
 			count);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -87,7 +87,7 @@ public class AddToCartTests : IntegrationTest
 			product.Id,
 			1);
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 		Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
 	}
 

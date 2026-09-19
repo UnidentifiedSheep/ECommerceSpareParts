@@ -24,7 +24,7 @@ public class GetOrganizationMembersTests : IntegrationTest
 		var users = GetContext<UsersTestContext>().Users.ToArray();
 		var organization = await CreateOrganization(users.Select(x => x.Id).ToArray());
 
-		var result = await Mediator.Send(CreateQuery(organization.Id));
+		var result = await Mediator.Send(CreateQuery(organization.Id), CancellationToken);
 
 		result.Members.Should().HaveCount(3);
 		result.Members.Should().OnlyContain(x => x.OrganizationId == organization.Id);
@@ -39,16 +39,14 @@ public class GetOrganizationMembersTests : IntegrationTest
 		var users = GetContext<UsersTestContext>().Users.ToArray();
 		var organization = await CreateOrganization(users.Select(x => x.Id).ToArray());
 
-		var firstPage = await Mediator.Send(
-			CreateQuery(
+		var firstPage = await Mediator.Send(CreateQuery(
 				organization.Id,
 				0,
-				2));
-		var secondPage = await Mediator.Send(
-			CreateQuery(
+				2), CancellationToken);
+		var secondPage = await Mediator.Send(CreateQuery(
 				organization.Id,
 				1,
-				2));
+				2), CancellationToken);
 
 		firstPage.Members.Should().HaveCount(2);
 		secondPage.Members.Should().ContainSingle();
@@ -64,7 +62,7 @@ public class GetOrganizationMembersTests : IntegrationTest
 	{
 		var query = CreateQuery(Guid.NewGuid(), -1);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Fact]
@@ -72,7 +70,7 @@ public class GetOrganizationMembersTests : IntegrationTest
 	{
 		var query = CreateQuery(Guid.NewGuid());
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationsNotFound);
 	}

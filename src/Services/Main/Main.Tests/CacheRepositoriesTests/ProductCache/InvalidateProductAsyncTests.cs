@@ -23,11 +23,11 @@ public class InvalidateProductAsyncTests : IntegrationTest
 		var productProvider = GetProductProvider();
 		var cacheInvalidator = GetCacheInvalidator();
 
-		await productProvider.GetProductOrSetAsync(product.Id);
+		await productProvider.GetProductOrSetAsync(product.Id, CancellationToken);
 
 		await cacheInvalidator.InvalidateProductAsync(product.Id);
 
-		var result = await productProvider.GetProductAsync(product.Id);
+		var result = await productProvider.GetProductAsync(product.Id, CancellationToken);
 
 		result.Should().BeNull();
 	}
@@ -39,15 +39,15 @@ public class InvalidateProductAsyncTests : IntegrationTest
 		var productProvider = GetProductProvider();
 		var cacheInvalidator = GetCacheInvalidator();
 
-		await productProvider.GetProductOrSetAsync(product.Id);
+		await productProvider.GetProductOrSetAsync(product.Id, CancellationToken);
 
 		product.SetName("Updated product name");
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		await cacheInvalidator.InvalidateProductAsync(product.Id);
 
-		var result = await productProvider.GetProductOrSetAsync(product.Id);
+		var result = await productProvider.GetProductOrSetAsync(product.Id, CancellationToken);
 
 		result.Name.Should().Be("Updated product name");
 	}
@@ -59,7 +59,7 @@ public class InvalidateProductAsyncTests : IntegrationTest
 		var productProvider = GetProductProvider();
 		var cacheInvalidator = GetCacheInvalidator();
 
-		await productProvider.GetProductsOrSetAsync(products.Select(x => x.Id));
+		await productProvider.GetProductsOrSetAsync(products.Select(x => x.Id), CancellationToken);
 
 		await cacheInvalidator.InvalidateProductsAsync(products.Select(x => x.Id));
 

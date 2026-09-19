@@ -36,19 +36,19 @@ public class DeletePurchaseTests : IntegrationTest
 		var productId = content.ProductId;
 		var transactionId = purchase.TransactionId;
 
-		await Mediator.Send(new DeletePurchaseCommand(purchase.Id));
+		await Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken);
 
-		var purchaseExists = await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id);
+		var purchaseExists = await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, cancellationToken: CancellationToken);
 		var purchaseContentExists = await Context
 			.PurchaseContents
 			.AsNoTracking()
-			.AnyAsync(x => x.PurchaseId == purchase.Id);
+			.AnyAsync(x => x.PurchaseId == purchase.Id, cancellationToken: CancellationToken);
 		var storageContent = await Context
 			.StorageContents
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == storageContentId);
-		var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == productId);
-		var transaction = await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == transactionId);
+			.SingleAsync(x => x.Id == storageContentId, cancellationToken: CancellationToken);
+		var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == productId, cancellationToken: CancellationToken);
+		var transaction = await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == transactionId, cancellationToken: CancellationToken);
 
 		purchaseExists.Should().BeFalse();
 		purchaseContentExists.Should().BeFalse();
@@ -69,9 +69,9 @@ public class DeletePurchaseTests : IntegrationTest
 		var originalStock = product.Stock.Value;
 
 		var supplierBalance = await Context.UserBalances.SingleAsync(x =>
-			x.OrganizationId == supplier.Id && x.CurrencyId == currencyId);
+			x.OrganizationId == supplier.Id && x.CurrencyId == currencyId, cancellationToken: CancellationToken);
 		var systemBalance = await Context.UserBalances.SingleAsync(x =>
-			x.OrganizationId == systemUserId && x.CurrencyId == currencyId);
+			x.OrganizationId == systemUserId && x.CurrencyId == currencyId, cancellationToken: CancellationToken);
 		var carrierBalance = new UserBalanceBuilder(Faker)
 			.WithUserId(route.CarrierId!.Value)
 			.WithCurrencyId(currencyId)
@@ -102,7 +102,7 @@ public class DeletePurchaseTests : IntegrationTest
 			carrierBalance,
 			purchaseTransaction,
 			logisticsTransaction);
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 
 		var storageContent = await new StorageContentBuilder(Faker)
 			.WithStorageCode(route.ToStorageCode)
@@ -134,18 +134,18 @@ public class DeletePurchaseTests : IntegrationTest
 			.WithLogistic(route, logisticsTransaction.Id)
 			.BuildAndAddToDb(Context);
 
-		await Mediator.Send(new DeletePurchaseCommand(purchase.Id));
+		await Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken);
 
-		var purchaseExists = await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id);
+		var purchaseExists = await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, cancellationToken: CancellationToken);
 		var purchaseTransactionAfterDelete = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == purchaseTransaction.Id);
+			.SingleAsync(x => x.Id == purchaseTransaction.Id, cancellationToken: CancellationToken);
 		var logisticsTransactionAfterDelete = await Context
 			.Transactions
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == logisticsTransaction.Id);
-		var productAfterDelete = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id);
+			.SingleAsync(x => x.Id == logisticsTransaction.Id, cancellationToken: CancellationToken);
+		var productAfterDelete = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id, cancellationToken: CancellationToken);
 
 		purchaseExists.Should().BeFalse();
 		purchaseTransactionAfterDelete.IsReversed.Should().BeTrue();
@@ -161,7 +161,7 @@ public class DeletePurchaseTests : IntegrationTest
 	public async Task DeletePurchase_WhenPurchaseIdIsEmpty_ThrowsValidationException()
 	{
 		await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(new DeletePurchaseCommand(Guid.Empty)));
+			Mediator.Send(new DeletePurchaseCommand(Guid.Empty), CancellationToken));
 	}
 
 	[Fact]
@@ -170,7 +170,7 @@ public class DeletePurchaseTests : IntegrationTest
 		var purchaseId = Guid.NewGuid();
 
 		await Assert.ThrowsAsync<PurchaseNotFoundException>(() =>
-			Mediator.Send(new DeletePurchaseCommand(purchaseId)));
+			Mediator.Send(new DeletePurchaseCommand(purchaseId), CancellationToken));
 	}
 
 	[Fact]
@@ -181,22 +181,21 @@ public class DeletePurchaseTests : IntegrationTest
 		var storageContentId = content.StorageContentId;
 		var transactionId = purchase.TransactionId;
 
-		await Mediator.Send(
-			new SubtractStorageContentsCommand(
+		await Mediator.Send(new SubtractStorageContentsCommand(
 				storageContentId,
 				1,
-				StorageMovementType.Sale));
+				StorageMovementType.Sale), CancellationToken);
 
 		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() =>
-			Mediator.Send(new DeletePurchaseCommand(purchase.Id)));
+			Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken));
 
-		var purchaseExists = await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id);
+		var purchaseExists = await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, cancellationToken: CancellationToken);
 		var storageContent = await Context
 			.StorageContents
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == storageContentId);
-		var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == content.ProductId);
-		var transaction = await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == transactionId);
+			.SingleAsync(x => x.Id == storageContentId, cancellationToken: CancellationToken);
+		var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == content.ProductId, cancellationToken: CancellationToken);
+		var transaction = await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == transactionId, cancellationToken: CancellationToken);
 
 		purchaseExists.Should().BeTrue();
 		storageContent.Count.Should().Be(1);

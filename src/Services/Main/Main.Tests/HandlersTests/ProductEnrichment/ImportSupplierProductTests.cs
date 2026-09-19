@@ -22,7 +22,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			"Bosch",
 			["Oil filter", "filter"]);
 
-		await Mediator.Send(new ImportSupplierProductCommand(Supplier.Armtek, [first, second]));
+		await Mediator.Send(new ImportSupplierProductCommand(Supplier.Armtek, [first, second]), CancellationToken);
 
 		var products = await GetProducts();
 		products.Should().ContainSingle();
@@ -33,25 +33,23 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 	[Fact]
 	public async Task Import_BrandWithOuterWhitespace_MatchesPersistedValue()
 	{
-		await Mediator.Send(
-			new ImportSupplierProductCommand(
+		await Mediator.Send(new ImportSupplierProductCommand(
 				Supplier.Armtek,
 				[
 					CreateProduct(
 						"ABC-123",
 						"Bosch",
 						["Filter"])
-				]));
+				]), CancellationToken);
 
-		await Mediator.Send(
-			new ImportSupplierProductCommand(
+		await Mediator.Send(new ImportSupplierProductCommand(
 				Supplier.Armtek,
 				[
 					CreateProduct(
 						"ABC123",
 						"  Bosch  ",
 						["Oil filter"])
-				]));
+				]), CancellationToken);
 
 		var products = await GetProducts();
 		products.Should().ContainSingle();
@@ -62,8 +60,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 	[Fact]
 	public async Task Import_DifferentSupplierBrandSpellings_RemainDistinct()
 	{
-		await Mediator.Send(
-			new ImportSupplierProductCommand(
+		await Mediator.Send(new ImportSupplierProductCommand(
 				Supplier.Armtek,
 				[
 					CreateProduct(
@@ -74,7 +71,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 						"ABC-123",
 						"BOSCH",
 						["Second"])
-				]));
+				]), CancellationToken);
 
 		var products = await GetProducts();
 		products.Should().HaveCount(2);
@@ -111,7 +108,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			["Product name"],
 			[analogue]);
 
-		await Mediator.Send(new ImportSupplierProductCommand(Supplier.Armtek, [product]));
+		await Mediator.Send(new ImportSupplierProductCommand(Supplier.Armtek, [product]), CancellationToken);
 
 		var products = await GetProducts();
 		products.Should().HaveCount(2);
@@ -128,7 +125,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			.Should()
 			.ContainSingle("Analogue name");
 
-		var cross = await Context.SupplierProductCrosses.AsNoTracking().SingleAsync();
+		var cross = await Context.SupplierProductCrosses.AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
 		cross.LeftId.Should().Be(Math.Min(products[0].Id, products[1].Id));
 		cross.RightId.Should().Be(Math.Max(products[0].Id, products[1].Id));
 	}
@@ -136,8 +133,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 	[Fact]
 	public async Task Import_ExistingAnalogue_AddsNamesWithoutDuplicatingCross()
 	{
-		await Mediator.Send(
-			new ImportSupplierProductCommand(
+		await Mediator.Send(new ImportSupplierProductCommand(
 				Supplier.Armtek,
 				[
 					CreateProduct(
@@ -150,10 +146,9 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 								"MANN",
 								["First analogue name"])
 						])
-				]));
+				]), CancellationToken);
 
-		await Mediator.Send(
-			new ImportSupplierProductCommand(
+		await Mediator.Send(new ImportSupplierProductCommand(
 				Supplier.Armtek,
 				[
 					CreateProduct(
@@ -166,7 +161,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 								"MANN",
 								["Second analogue name"])
 						])
-				]));
+				]), CancellationToken);
 
 		var products = await GetProducts();
 		products.Should().HaveCount(2);
@@ -177,7 +172,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			.Should()
 			.BeEquivalentTo("First analogue name", "Second analogue name");
 
-		var crossesCount = await Context.SupplierProductCrosses.AsNoTracking().CountAsync();
+		var crossesCount = await Context.SupplierProductCrosses.AsNoTracking().CountAsync(cancellationToken: CancellationToken);
 		crossesCount.Should().Be(1);
 	}
 

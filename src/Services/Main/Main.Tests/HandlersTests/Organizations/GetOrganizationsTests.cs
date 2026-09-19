@@ -25,7 +25,7 @@ public class GetOrganizationsTests : IntegrationTest
 		var expected = await CreateOrganization("Northern Parts", "northern-parts");
 		await CreateOrganization("Southern Logistics", "southern-logistics");
 
-		var result = await Mediator.Send(CreateQuery("nOrThErN"));
+		var result = await Mediator.Send(CreateQuery("nOrThErN"), CancellationToken);
 
 		result.Organizations.Should().ContainSingle();
 		result.Organizations[0].Id.Should().Be(expected.Id);
@@ -40,7 +40,7 @@ public class GetOrganizationsTests : IntegrationTest
 		var expected = await CreateOrganization("First organization", "unique-supplier-code");
 		await CreateOrganization("Unrelated warehouse", "warehouse-code");
 
-		var result = await Mediator.Send(CreateQuery("UNIQUE-SUPPLIER"));
+		var result = await Mediator.Send(CreateQuery("UNIQUE-SUPPLIER"), CancellationToken);
 
 		result.Organizations.Should().ContainSingle();
 		result.Organizations[0].Id.Should().Be(expected.Id);
@@ -62,7 +62,7 @@ public class GetOrganizationsTests : IntegrationTest
 			.WithMember(member.Id)
 			.BuildAndAddToDb(Context);
 
-		var result = await Mediator.Send(CreateQuery("Distinctive Membername"));
+		var result = await Mediator.Send(CreateQuery("Distinctive Membername"), CancellationToken);
 
 		result.Organizations.Should().Contain(x => x.Id == expected.Id);
 	}
@@ -73,7 +73,7 @@ public class GetOrganizationsTests : IntegrationTest
 		var expected = await CreateOrganization("Requested organization", "requested-organization");
 		await CreateOrganization("Skipped organization", "skipped-organization");
 
-		var result = await Mediator.Send(CreateQuery(ids: [expected.Id]));
+		var result = await Mediator.Send(CreateQuery(ids: [expected.Id]), CancellationToken);
 
 		result.Organizations.Should().ContainSingle();
 		result.Organizations[0].Id.Should().Be(expected.Id);
@@ -84,7 +84,7 @@ public class GetOrganizationsTests : IntegrationTest
 	{
 		await CreateOrganization("Business organization", "business-organization");
 
-		var result = await Mediator.Send(CreateQuery(types: [OrganizationType.Business]));
+		var result = await Mediator.Send(CreateQuery(types: [OrganizationType.Business]), CancellationToken);
 
 		result.Organizations.Should().NotBeEmpty();
 		result.Organizations.Should().OnlyContain(x => x.Type == OrganizationType.Business);
@@ -97,10 +97,10 @@ public class GetOrganizationsTests : IntegrationTest
 		var member = users[1];
 		var expected = await CreateOrganization("Member organization", "member-organization");
 		expected.AddMember(member.Id, OrganizationRole.Member);
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		var notExpected = await CreateOrganization("Other organization", "other-organization");
 
-		var result = await Mediator.Send(CreateQuery(userId: member.Id));
+		var result = await Mediator.Send(CreateQuery(userId: member.Id), CancellationToken);
 
 		result.Organizations.Should().Contain(x => x.Id == expected.Id);
 		result.Organizations.Should().Contain(x => x.Id == member.Id);
@@ -112,7 +112,7 @@ public class GetOrganizationsTests : IntegrationTest
 	{
 		var query = CreateQuery(userId: Guid.NewGuid());
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.UsersNotFound);
 	}
@@ -123,7 +123,7 @@ public class GetOrganizationsTests : IntegrationTest
 		await CreateOrganization("First organization", "first-organization");
 		await CreateOrganization("Second organization", "second-organization");
 
-		var result = await Mediator.Send(CreateQuery(size: 1));
+		var result = await Mediator.Send(CreateQuery(size: 1), CancellationToken);
 
 		result.Organizations.Should().ContainSingle();
 	}
@@ -134,7 +134,7 @@ public class GetOrganizationsTests : IntegrationTest
 		var first = await CreateOrganization("Alpha organization", "alpha-organization");
 		var second = await CreateOrganization("Zulu organization", "zulu-organization");
 
-		var result = await Mediator.Send(CreateQuery(ids: [first.Id, second.Id], sortBy: ["name_desc"]));
+		var result = await Mediator.Send(CreateQuery(ids: [first.Id, second.Id], sortBy: ["name_desc"]), CancellationToken);
 
 		result.Organizations.Select(x => x.Id).Should().Equal(second.Id, first.Id);
 	}
@@ -145,8 +145,7 @@ public class GetOrganizationsTests : IntegrationTest
 		var first = await CreateOrganization("Same organization", "zulu-organization");
 		var second = await CreateOrganization("Same organization", "alpha-organization");
 
-		var result = await Mediator.Send(
-			CreateQuery(ids: [first.Id, second.Id], sortBy: ["name", "systemName_desc"]));
+		var result = await Mediator.Send(CreateQuery(ids: [first.Id, second.Id], sortBy: ["name", "systemName_desc"]), CancellationToken);
 
 		result.Organizations.Select(x => x.Id).Should().Equal(first.Id, second.Id);
 	}
@@ -158,7 +157,7 @@ public class GetOrganizationsTests : IntegrationTest
 	{
 		var query = CreateQuery(sortBy: [sortBy]);
 
-		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Fact]
@@ -166,7 +165,7 @@ public class GetOrganizationsTests : IntegrationTest
 	{
 		var query = CreateQuery(page: -1);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Fact]

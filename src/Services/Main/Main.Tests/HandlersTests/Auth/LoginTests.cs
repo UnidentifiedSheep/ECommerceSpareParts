@@ -26,12 +26,11 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 	{
 		await CreateUser();
 
-		var result = await Mediator.Send(
-			new LoginCommand(
+		var result = await Mediator.Send(new LoginCommand(
 				login,
 				Password,
 				null,
-				null));
+				null), CancellationToken);
 
 		result.Token.Should().NotBeNullOrWhiteSpace();
 		result.RefreshToken.Should().NotBeNullOrWhiteSpace();

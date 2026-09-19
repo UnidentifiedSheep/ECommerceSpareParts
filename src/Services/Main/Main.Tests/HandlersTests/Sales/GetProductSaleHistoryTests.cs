@@ -23,7 +23,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		var content = sale.Contents.Single();
 		var expectedAverageBuyPrice = content.Details.Sum(x => x.BuyPrice * x.Count) / content.Count;
 
-		var result = await Mediator.Send(CreateQuery());
+		var result = await Mediator.Send(CreateQuery(), CancellationToken);
 
 		var history = result.History.Should().ContainSingle().Subject;
 		history.SaleContentId.Should().Be(content.Id);
@@ -64,10 +64,10 @@ public class GetProductSaleHistoryTests : IntegrationTest
 			.WithTransactionId(completedSale.TransactionId)
 			.Build();
 
-		await Context.AddAsync(draftSale);
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(draftSale, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
-		var result = await Mediator.Send(CreateQuery());
+		var result = await Mediator.Send(CreateQuery(), CancellationToken);
 
 		result.History.Should().ContainSingle().Which.SaleContentId.Should().Be(completedContent.Id);
 	}
@@ -77,13 +77,12 @@ public class GetProductSaleHistoryTests : IntegrationTest
 	{
 		var sale = SaleContext.Sale;
 
-		var result = await Mediator.Send(
-			CreateQuery(
+		var result = await Mediator.Send(CreateQuery(
 				sale.StorageCode,
 				sale.OrganizationId,
 				sale.OrganizationId,
 				sale.CurrencyId,
-				["averageBuyPrice_desc"]));
+				["averageBuyPrice_desc"]), CancellationToken);
 
 		result.History.Should().ContainSingle();
 	}
@@ -91,7 +90,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 	[Fact]
 	public async Task GetProductSaleHistory_WhenFilterDoesNotMatch_ReturnsEmptyHistory()
 	{
-		var result = await Mediator.Send(CreateQuery(organizationId: Guid.NewGuid()));
+		var result = await Mediator.Send(CreateQuery(organizationId: Guid.NewGuid()), CancellationToken);
 
 		result.History.Should().BeEmpty();
 	}
@@ -121,11 +120,10 @@ public class GetProductSaleHistoryTests : IntegrationTest
 			.Completed()
 			.Build();
 
-		await Context.AddAsync(fallbackSale);
-		await Context.SaveChangesAsync();
+		await Context.AddAsync(fallbackSale, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
 
-		var result = await Mediator.Send(
-			CreateQuery(preferredOrganizationId: preferredSale.OrganizationId, sortBy: ["saleDate_desc"]));
+		var result = await Mediator.Send(CreateQuery(preferredOrganizationId: preferredSale.OrganizationId, sortBy: ["saleDate_desc"]), CancellationToken);
 
 		result
 			.History

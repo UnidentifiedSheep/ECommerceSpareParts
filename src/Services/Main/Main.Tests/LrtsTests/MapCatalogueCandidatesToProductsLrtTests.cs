@@ -28,7 +28,7 @@ public sealed class
 			.WithProducerId(product.ProducerId)
 			.BuildAndAddToDb(Context);
 
-		var execution = await ExecuteLrt();
+		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 		var state = execution.GetState<MapCatalogueCandidatesToProductsState>();
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded);
@@ -41,7 +41,7 @@ public sealed class
 		var persistedCandidate = await Context
 			.CatalogueCandidates
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == candidate.Id);
+			.SingleAsync(x => x.Id == candidate.Id, cancellationToken: CancellationToken);
 		persistedCandidate.ProductId.Should().Be(product.Id);
 	}
 
@@ -53,7 +53,7 @@ public sealed class
 			.WithProducerId(TestContext.ProducerTestContext.Producers[0].Id)
 			.BuildAndAddToDb(Context);
 
-		var execution = await ExecuteLrt();
+		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 		var state = execution.GetState<MapCatalogueCandidatesToProductsState>();
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded);
@@ -66,7 +66,7 @@ public sealed class
 		var persistedCandidate = await Context
 			.CatalogueCandidates
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == candidate.Id);
+			.SingleAsync(x => x.Id == candidate.Id, cancellationToken: CancellationToken);
 		persistedCandidate.ProductId.Should().BeNull();
 	}
 }

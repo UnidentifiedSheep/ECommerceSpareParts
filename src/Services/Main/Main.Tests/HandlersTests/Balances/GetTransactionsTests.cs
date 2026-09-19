@@ -25,7 +25,7 @@ public class GetTransactionsTests : IntegrationTest
 	{
 		var senderId = TestContext.Users[0].Id;
 
-		var result = await Mediator.Send(GetQuery(senderId));
+		var result = await Mediator.Send(GetQuery(senderId), CancellationToken);
 
 		result.Transactions.Should().ContainSingle();
 		result.Transactions[0].Sender.Id.Should().Be(senderId);
@@ -36,7 +36,7 @@ public class GetTransactionsTests : IntegrationTest
 	{
 		var receiverId = TestContext.Users[1].Id;
 
-		var result = await Mediator.Send(GetQuery(receiverId: receiverId));
+		var result = await Mediator.Send(GetQuery(receiverId: receiverId), CancellationToken);
 
 		result.Transactions.Should().ContainSingle();
 		result.Transactions[0].Receiver.Id.Should().Be(receiverId);
@@ -48,7 +48,7 @@ public class GetTransactionsTests : IntegrationTest
 		var currencyId = TestContext.Currencies[0].Id;
 		var senderId = TestContext.Users[0].Id;
 
-		var result = await Mediator.Send(GetQuery(senderId, currencyId: currencyId));
+		var result = await Mediator.Send(GetQuery(senderId, currencyId: currencyId), CancellationToken);
 
 		result.Transactions.Should().OnlyContain(x => x.CurrencyId == currencyId);
 	}
@@ -58,7 +58,7 @@ public class GetTransactionsTests : IntegrationTest
 	{
 		var receiverId = TestContext.Users[1].Id;
 
-		var result = await Mediator.Send(GetQuery(receiverId: receiverId, size: 1));
+		var result = await Mediator.Send(GetQuery(receiverId: receiverId, size: 1), CancellationToken);
 
 		result.Transactions.Should().HaveCount(1);
 	}
@@ -75,24 +75,22 @@ public class GetTransactionsTests : IntegrationTest
 		var rangeStart = baseDate.AddHours(-3);
 		var rangeEnd = baseDate.AddHours(1);
 
-		var firstPage = await Mediator.Send(
-			GetQuery(
+		var firstPage = await Mediator.Send(GetQuery(
 				senderId,
 				size: 2,
 				rangeStart: rangeStart,
-				rangeEnd: rangeEnd));
+				rangeEnd: rangeEnd), CancellationToken);
 
 		firstPage.Transactions.Select(x => x.Id).Should().Equal(transactions[2].Id, transactions[1].Id);
 
 		var cursor = firstPage.Transactions[^1];
-		var secondPage = await Mediator.Send(
-			GetQuery(
+		var secondPage = await Mediator.Send(GetQuery(
 				senderId,
 				size: 2,
 				rangeStart: rangeStart,
 				rangeEnd: rangeEnd,
 				cursorId: cursor.Id,
-				cursorDate: cursor.TransactionDate));
+				cursorDate: cursor.TransactionDate), CancellationToken);
 
 		secondPage.Transactions.Should().ContainSingle().Which.Id.Should().Be(transactions[0].Id);
 		secondPage
@@ -111,11 +109,10 @@ public class GetTransactionsTests : IntegrationTest
 			boundary,
 			boundary.AddMilliseconds(1));
 
-		var result = await Mediator.Send(
-			GetQuery(
+		var result = await Mediator.Send(GetQuery(
 				transactions[0].SenderId,
 				rangeStart: boundary.AddHours(-1),
-				rangeEnd: boundary));
+				rangeEnd: boundary), CancellationToken);
 
 		result.Transactions.Select(x => x.Id).Should().Equal(transactions[1].Id, transactions[0].Id);
 		result.Transactions.Should().NotContain(x => x.Id == transactions[2].Id);
@@ -126,11 +123,10 @@ public class GetTransactionsTests : IntegrationTest
 	{
 		var userId = TestContext.Users[0].Id;
 
-		var result = await Mediator.Send(
-			GetQuery(
+		var result = await Mediator.Send(GetQuery(
 				userId,
 				userId,
-				logicalOperation: LogicalOperation.Or));
+				logicalOperation: LogicalOperation.Or), CancellationToken);
 
 		result.Transactions.Should().NotBeEmpty();
 		result.Transactions.Should().OnlyContain(x => x.Sender.Id == userId || x.Receiver.Id == userId);
@@ -141,7 +137,7 @@ public class GetTransactionsTests : IntegrationTest
 	{
 		var transaction = await ReverseSeedTransaction();
 
-		var result = await Mediator.Send(GetQuery(transaction.SenderId, skipReversed: false));
+		var result = await Mediator.Send(GetQuery(transaction.SenderId, skipReversed: false), CancellationToken);
 
 		result.Transactions.Should().Contain(x => x.Id == transaction.Id);
 	}
@@ -151,7 +147,7 @@ public class GetTransactionsTests : IntegrationTest
 	{
 		var transaction = await ReverseSeedTransaction();
 
-		var result = await Mediator.Send(GetQuery(transaction.SenderId, skipReversed: true));
+		var result = await Mediator.Send(GetQuery(transaction.SenderId, skipReversed: true), CancellationToken);
 
 		result.Transactions.Should().NotContain(x => x.Id == transaction.Id);
 	}
@@ -161,7 +157,7 @@ public class GetTransactionsTests : IntegrationTest
 	{
 		var transaction = await CreateCompletionProfileAppliedTransaction();
 
-		var result = await Mediator.Send(GetQuery(transaction.SenderId, skipReversed: true));
+		var result = await Mediator.Send(GetQuery(transaction.SenderId, skipReversed: true), CancellationToken);
 
 		result.Transactions.Should().Contain(x => x.Id == transaction.Id);
 	}
@@ -171,20 +167,20 @@ public class GetTransactionsTests : IntegrationTest
 	{
 		var userId = TestContext.Users[0].Id;
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(GetQuery(userId, userId)));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(GetQuery(userId, userId), CancellationToken));
 	}
 
 	[Fact]
 	public async Task GetTransactions_WithoutSenderAndReceiver_ThrowsValidationException()
 	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(GetQuery()));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(GetQuery(), CancellationToken));
 	}
 
 	[Fact]
 	public async Task GetTransactions_InvalidRange_ThrowsValidationException()
 	{
 		await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(GetQuery(rangeStart: DateTime.UtcNow, rangeEnd: DateTime.UtcNow.AddDays(-1))));
+			Mediator.Send(GetQuery(rangeStart: DateTime.UtcNow, rangeEnd: DateTime.UtcNow.AddDays(-1)), CancellationToken));
 	}
 
 	private GetTransactionsQuery GetQuery(

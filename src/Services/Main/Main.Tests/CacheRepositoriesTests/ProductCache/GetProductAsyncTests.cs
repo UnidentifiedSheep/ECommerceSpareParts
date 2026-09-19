@@ -25,13 +25,13 @@ public class GetProductAsyncTests : IntegrationTest
 
 		await RemoveCachedProduct(product.Id);
 
-		var cached = await repository.GetProductOrSetAsync(product.Id);
+		var cached = await repository.GetProductOrSetAsync(product.Id, CancellationToken);
 
 		product.SetName("Updated product name");
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
-		var result = await repository.GetProductAsync(product.Id);
+		var result = await repository.GetProductAsync(product.Id, CancellationToken);
 
 		result.Should().BeEquivalentTo(cached);
 		result!.Name.Should().NotBe("Updated product name");
@@ -45,7 +45,7 @@ public class GetProductAsyncTests : IntegrationTest
 
 		await RemoveCachedProduct(product.Id);
 
-		var result = await repository.GetProductAsync(product.Id);
+		var result = await repository.GetProductAsync(product.Id, CancellationToken);
 
 		result.Should().BeNull();
 	}

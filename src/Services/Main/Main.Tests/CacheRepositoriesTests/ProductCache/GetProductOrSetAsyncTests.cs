@@ -29,7 +29,7 @@ public class GetProductOrSetAsyncTests : IntegrationTest
 
 		await RemoveCachedProduct(product.Id);
 
-		var result = await repository.GetProductOrSetAsync(product.Id);
+		var result = await repository.GetProductOrSetAsync(product.Id, CancellationToken);
 
 		result.Id.Should().Be(product.Id);
 		result.Sku.Should().Be(product.Sku.Value);
@@ -49,13 +49,13 @@ public class GetProductOrSetAsyncTests : IntegrationTest
 
 		await RemoveCachedProduct(product.Id);
 
-		var cached = await repository.GetProductOrSetAsync(product.Id);
+		var cached = await repository.GetProductOrSetAsync(product.Id, CancellationToken);
 
 		product.SetName("Updated product name");
-		await Context.SaveChangesAsync();
+		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
-		var result = await repository.GetProductOrSetAsync(product.Id);
+		var result = await repository.GetProductOrSetAsync(product.Id, CancellationToken);
 
 		result.Should().BeEquivalentTo(cached);
 		result.Name.Should().NotBe("Updated product name");
@@ -73,7 +73,7 @@ public class GetProductOrSetAsyncTests : IntegrationTest
 
 		await RemoveCachedProduct(product.Id);
 
-		var result = await repository.GetProductOrSetAsync(product.Id);
+		var result = await repository.GetProductOrSetAsync(product.Id, CancellationToken);
 
 		result
 			.Images

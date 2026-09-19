@@ -35,13 +35,13 @@ public class CreateSaleTests : IntegrationTest
 		var product = await Context
 			.Products
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == storageContent.ProductId);
+			.SingleAsync(x => x.Id == storageContent.ProductId, cancellationToken: CancellationToken);
 		var originalContents = await Context
 			.StorageContents
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
-			.ToDictionaryAsync(x => x.Id);
+			.ToDictionaryAsync(x => x.Id, cancellationToken: CancellationToken);
 		var originalStock = product.Stock.Value;
 		var command = CreateCommand(
 			buyer.Id,
@@ -55,7 +55,7 @@ public class CreateSaleTests : IntegrationTest
 					80m)
 			]);
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		result.SaleId.Should().NotBeEmpty();
 
@@ -64,7 +64,7 @@ public class CreateSaleTests : IntegrationTest
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.SaleId);
+			.SingleAsync(x => x.Id == result.SaleId, cancellationToken: CancellationToken);
 		sale.UserId.Should().Be(buyer.Id);
 		sale.OrganizationId.Should().Be(buyer.Id);
 		sale.CurrencyId.Should().Be(storageContent.CurrencyId);
@@ -94,22 +94,22 @@ public class CreateSaleTests : IntegrationTest
 		var updatedContent = await Context
 			.StorageContents
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == detail.StorageContentId);
+			.SingleAsync(x => x.Id == detail.StorageContentId, cancellationToken: CancellationToken);
 		updatedContent.Count.Should().Be(affectedStorageContent.Count - 1);
 
 		var updatedProduct =
-			await Context.Products.AsNoTracking().SingleAsync(x => x.Id == storageContent.ProductId);
+			await Context.Products.AsNoTracking().SingleAsync(x => x.Id == storageContent.ProductId, cancellationToken: CancellationToken);
 		updatedProduct.Stock.Value.Should().Be(originalStock - 1);
 
 		var saleTransaction =
-			await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == sale.TransactionId);
+			await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == sale.TransactionId, cancellationToken: CancellationToken);
 		saleTransaction.SenderId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
 		saleTransaction.ReceiverId.Should().Be(buyer.Id);
 		saleTransaction.Amount.Should().Be(80m);
 		saleTransaction.CurrencyId.Should().Be(storageContent.CurrencyId);
 		saleTransaction.SourceType.Should().Be(TransactionSourceType.Sale);
 
-		var movement = await Context.Events.OfType<StorageMovementEvent>().AsNoTracking().SingleAsync();
+		var movement = await Context.Events.OfType<StorageMovementEvent>().AsNoTracking().SingleAsync(cancellationToken: CancellationToken);
 		movement.Data.ProductId.Should().Be(storageContent.ProductId);
 		movement.Data.StorageCode.Should().Be(storageContent.StorageCode);
 		movement.Data.Count.Should().Be(updatedContent.Count);
@@ -129,9 +129,9 @@ public class CreateSaleTests : IntegrationTest
 			[NewContent(storageContent.ProductId, 1)],
 			payedSum);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var transactions = await Context.Transactions.AsNoTracking().ToListAsync();
+		var transactions = await Context.Transactions.AsNoTracking().ToListAsync(cancellationToken: CancellationToken);
 		transactions.Should().HaveCount(2);
 
 		var payment = transactions.Single(x => x.SourceType == TransactionSourceType.Manual);
@@ -160,12 +160,12 @@ public class CreateSaleTests : IntegrationTest
 			1200m,
 			forcePayment: false);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var balance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.SingleAsync(x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId);
+			.SingleAsync(x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId, cancellationToken: CancellationToken);
 		balance.Balance.Should().Be(0m);
 	}
 
@@ -187,7 +187,7 @@ public class CreateSaleTests : IntegrationTest
 			],
 			forcePayment: false);
 
-		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -208,12 +208,12 @@ public class CreateSaleTests : IntegrationTest
 			],
 			1200m);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var balance = await Context
 			.UserBalances
 			.AsNoTracking()
-			.SingleAsync(x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId);
+			.SingleAsync(x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId, cancellationToken: CancellationToken);
 		balance.Balance.Should().Be(0m);
 	}
 
@@ -229,9 +229,9 @@ public class CreateSaleTests : IntegrationTest
 			[NewContent(storageContent.ProductId, 1)],
 			0m);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
-		var transactions = await Context.Transactions.AsNoTracking().ToListAsync();
+		var transactions = await Context.Transactions.AsNoTracking().ToListAsync(cancellationToken: CancellationToken);
 		transactions.Should().ContainSingle();
 		transactions.Single().SourceType.Should().Be(TransactionSourceType.Sale);
 	}
@@ -253,12 +253,12 @@ public class CreateSaleTests : IntegrationTest
 			storageContent.StorageCode,
 			[NewContent(storageContent.ProductId, 2)]);
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var updatedReservation = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == reservation.Id);
+			.SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
 		updatedReservation.CurrentCount.Should().Be(2);
 		updatedReservation.Status.Should().Be(ProductReservationStatus.Done);
 	}
@@ -286,12 +286,12 @@ public class CreateSaleTests : IntegrationTest
 				OrganizationId = organization.Id
 			};
 
-		await Mediator.Send(command);
+		await Mediator.Send(command, CancellationToken);
 
 		var updatedReservation = await Context
 			.ProductReservations
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == reservation.Id);
+			.SingleAsync(x => x.Id == reservation.Id, cancellationToken: CancellationToken);
 		updatedReservation.CurrentCount.Should().Be(1);
 		updatedReservation.Status.Should().Be(ProductReservationStatus.Done);
 	}
@@ -315,14 +315,14 @@ public class CreateSaleTests : IntegrationTest
 					180m)
 			]);
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		var sale = await Context
 			.Sales
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
-			.SingleAsync(x => x.Id == result.SaleId);
+			.SingleAsync(x => x.Id == result.SaleId, cancellationToken: CancellationToken);
 		sale.Contents.Sum(x => x.TotalSum).Should().Be(270m);
 		sale.Contents.Should().HaveCount(2);
 		sale.Contents.Sum(x => x.Count).Should().Be(2);
@@ -342,16 +342,16 @@ public class CreateSaleTests : IntegrationTest
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
-			.SumAsync(x => x.Count);
+			.SumAsync(x => x.Count, cancellationToken: CancellationToken);
 		var command = CreateCommand(
 			buyer.Id,
 			storageContent.CurrencyId,
 			storageContent.StorageCode,
 			[NewContent(storageContent.ProductId, countOnStorage + 1)]);
 
-		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(command, CancellationToken));
 
-		var salesCount = await Context.Sales.AsNoTracking().CountAsync();
+		var salesCount = await Context.Sales.AsNoTracking().CountAsync(cancellationToken: CancellationToken);
 		salesCount.Should().Be(0);
 	}
 
@@ -376,7 +376,7 @@ public class CreateSaleTests : IntegrationTest
 			storageContent.StorageCode,
 			[NewContent(storageContent.ProductId, 1)]);
 
-		await Assert.ThrowsAsync<SaleSoftConfirmationNeededException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<SaleSoftConfirmationNeededException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -399,7 +399,7 @@ public class CreateSaleTests : IntegrationTest
 			[NewContent(storageContent.ProductId, 1)]);
 
 		var exception = await Assert.ThrowsAsync<SaleSoftConfirmationNeededException>(() =>
-			Mediator.Send(commandWithoutConfirmation));
+			Mediator.Send(commandWithoutConfirmation, CancellationToken));
 		var confirmationCode = Assert.IsType<string>(
 			Assert.Single(exception.LocalizableMessage.Values).Value.Value);
 		var command = commandWithoutConfirmation with
@@ -407,10 +407,10 @@ public class CreateSaleTests : IntegrationTest
 			ConfirmationCode = confirmationCode
 		};
 
-		var result = await Mediator.Send(command);
+		var result = await Mediator.Send(command, CancellationToken);
 
 		result.SaleId.Should().NotBeEmpty();
-		var salesCount = await Context.Sales.AsNoTracking().CountAsync();
+		var salesCount = await Context.Sales.AsNoTracking().CountAsync(cancellationToken: CancellationToken);
 		salesCount.Should().Be(1);
 	}
 
@@ -425,7 +425,7 @@ public class CreateSaleTests : IntegrationTest
 			Contents = []
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Theory]
@@ -439,11 +439,10 @@ public class CreateSaleTests : IntegrationTest
 			Count = count
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with
 			{
 				Contents = [content]
-			}));
+			}, CancellationToken));
 	}
 
 	[Theory]
@@ -458,11 +457,10 @@ public class CreateSaleTests : IntegrationTest
 			Price = price
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with
 			{
 				Contents = [content]
-			}));
+			}, CancellationToken));
 	}
 
 	[Theory]
@@ -478,11 +476,10 @@ public class CreateSaleTests : IntegrationTest
 			PriceWithDiscount = priceWithDiscount
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with
 			{
 				Contents = [content]
-			}));
+			}, CancellationToken));
 	}
 
 	[Fact]
@@ -494,11 +491,10 @@ public class CreateSaleTests : IntegrationTest
 			Price = 100m, PriceWithDiscount = 101m
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with
 			{
 				Contents = [content]
-			}));
+			}, CancellationToken));
 	}
 
 	[Theory]
@@ -511,7 +507,7 @@ public class CreateSaleTests : IntegrationTest
 			PayedSum = payedSum
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -522,7 +518,7 @@ public class CreateSaleTests : IntegrationTest
 			UserId = Guid.Empty
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -533,7 +529,7 @@ public class CreateSaleTests : IntegrationTest
 			OrganizationId = Guid.Empty
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -544,7 +540,7 @@ public class CreateSaleTests : IntegrationTest
 			CurrencyId = int.MaxValue
 		};
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
 	}
@@ -557,7 +553,7 @@ public class CreateSaleTests : IntegrationTest
 			StorageCode = "missing-storage"
 		};
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.StoragesNotFound);
 	}
@@ -570,7 +566,7 @@ public class CreateSaleTests : IntegrationTest
 			UserId = Guid.NewGuid()
 		};
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.UsersNotFound);
 	}
@@ -583,7 +579,7 @@ public class CreateSaleTests : IntegrationTest
 			OrganizationId = Guid.NewGuid()
 		};
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationsNotFound);
 	}
@@ -597,7 +593,7 @@ public class CreateSaleTests : IntegrationTest
 			UserId = users[0].Id, OrganizationId = users[1].Id
 		};
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationMemberNotFound);
 	}
@@ -611,11 +607,10 @@ public class CreateSaleTests : IntegrationTest
 			ProductId = int.MaxValue
 		};
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
-			command with
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command with
 			{
 				Contents = [content]
-			}));
+			}, CancellationToken));
 
 		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.ArticlesNotFound);
 	}
