@@ -32,6 +32,14 @@ services:
       - archive_command=/usr/local/bin/wal-g --config /run/secrets/postgres-walg.json wal-push "%p"
       - -c
       - archive_timeout=60s
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready --quiet --host=localhost --port=5432 --username="$${POSTGRES_USER}" --dbname=postgres
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     networks:
       backend:
         aliases:
@@ -42,6 +50,17 @@ services:
       placement:
         constraints:
           - node.labels.infra.postgres == true
+      update_config:
+        parallelism: 1
+        order: stop-first
+        failure_action: rollback
+        monitor: 60s
+        max_failure_ratio: 0
+      rollback_config:
+        parallelism: 1
+        order: stop-first
+        failure_action: pause
+        monitor: 60s
       restart_policy:
         condition: on-failure
         delay: 10s

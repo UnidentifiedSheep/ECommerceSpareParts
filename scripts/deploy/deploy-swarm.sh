@@ -93,6 +93,8 @@ ACTIVE_MIGRATOR_SERVICE=""
 ACTIVE_DIRECTORY_SERVICE=""
 ACTIVE_WALG_PREFLIGHT_SERVICE=""
 ACTIVE_PORTAINER_PREFLIGHT_SERVICE=""
+FULL_DEPLOY_TRANSACTION_ACTIVE=false
+declare -A FULL_DEPLOY_SERVICE_SPEC_HASHES=()
 
 log() {
   echo
@@ -130,7 +132,21 @@ cleanup_temporary_services() {
   fi
 }
 
-trap cleanup_temporary_services EXIT
+handle_exit() {
+  local status=$?
+
+  trap - EXIT
+  set +e
+  cleanup_temporary_services
+
+  if [ "$status" -ne 0 ] && [ "$FULL_DEPLOY_TRANSACTION_ACTIVE" = true ]; then
+    rollback_full_deploy_services
+  fi
+
+  exit "$status"
+}
+
+trap handle_exit EXIT
 trap 'exit 130' INT TERM
 
 stack_name() {
@@ -141,6 +157,129 @@ service_name() {
   local stack_suffix="$1"
   local service="$2"
   echo "$(stack_name "$stack_suffix")_${service}"
+}
+
+snapshot_full_deploy_services() {
+  local stack
+  local name
+  local spec_hash
+
+  FULL_DEPLOY_SERVICE_SPEC_HASHES=()
+
+  for stack in "${STACK_FILES[@]}"; do
+    while IFS='|' read -r name spec_hash; do
+      [ -n "$name" ] || continue
+      FULL_DEPLOY_SERVICE_SPEC_HASHES["$name"]="$spec_hash"
+    done < <(
+      sudo docker service ls \
+        --filter "label=com.docker.stack.namespace=$(stack_name "$stack")" \
+        --format '{{.Name}}' |
+        while read -r name; do
+          [ -n "$name" ] || continue
+          spec_hash="$(
+            sudo docker service inspect "$name" --format '{{json .Spec}}' |
+              sha256sum |
+              cut -d ' ' -f 1
+          )"
+          printf '%s|%s\n' "$name" "$spec_hash"
+        done
+    )
+  done
+
+  FULL_DEPLOY_TRANSACTION_ACTIVE=true
+  echo "Captured ${#FULL_DEPLOY_SERVICE_SPEC_HASHES[@]} service spec(s) for deployment rollback."
+}
+
+rollback_full_deploy_services() {
+  local stack
+  local name
+  local current_spec_hash
+  local current_spec_json
+  local previous_spec_hash
+  local has_previous_spec
+  local rollback_spec_hash
+  local rollback_spec_json
+  local rollback_failed=false
+  local -a current_services=()
+  local -a rollback_services=()
+
+  FULL_DEPLOY_TRANSACTION_ACTIVE=false
+  log "Full deployment failed; roll back changed Swarm services"
+
+  for stack in "${STACK_FILES[@]}"; do
+    while read -r name; do
+      [ -n "$name" ] && current_services+=("$name")
+    done < <(
+      sudo docker service ls \
+        --filter "label=com.docker.stack.namespace=$(stack_name "$stack")" \
+        --format '{{.Name}}'
+    )
+  done
+
+  for name in "${current_services[@]}"; do
+    if [ -z "${FULL_DEPLOY_SERVICE_SPEC_HASHES[$name]+present}" ]; then
+      echo "Removing service created by the failed deployment: ${name}."
+      sudo docker service rm "$name" >/dev/null || rollback_failed=true
+      continue
+    fi
+
+    previous_spec_hash="${FULL_DEPLOY_SERVICE_SPEC_HASHES[$name]}"
+    if ! current_spec_json="$(
+      sudo docker service inspect "$name" --format '{{json .Spec}}' 2>/dev/null
+    )"; then
+      echo "Unable to inspect ${name} while preparing rollback." >&2
+      rollback_failed=true
+      continue
+    fi
+    current_spec_hash="$(printf '%s' "$current_spec_json" | sha256sum | cut -d ' ' -f 1)"
+    if [ "$current_spec_hash" = "$previous_spec_hash" ]; then
+      continue
+    fi
+
+    has_previous_spec="$(
+      sudo docker service inspect "$name" \
+        --format '{{if .PreviousSpec}}true{{else}}false{{end}}' 2>/dev/null || true
+    )"
+    if [ "$has_previous_spec" != true ]; then
+      echo "Unable to roll back ${name}: Docker has no previous service spec." >&2
+      rollback_failed=true
+      continue
+    fi
+
+    rollback_spec_json="$(
+      sudo docker service inspect "$name" --format '{{json .PreviousSpec}}' 2>/dev/null || true
+    )"
+    rollback_spec_hash="$(printf '%s' "$rollback_spec_json" | sha256sum | cut -d ' ' -f 1)"
+    if [ -z "$rollback_spec_json" ] || [ "$rollback_spec_hash" != "$previous_spec_hash" ]; then
+      echo "Unable to roll back ${name}: the previous Docker spec is not the pre-deploy spec." >&2
+      rollback_failed=true
+      continue
+    fi
+
+    echo "Starting rollback for ${name}."
+    if docker_sudo service rollback --detach=true "$name"; then
+      rollback_services+=("$name")
+    else
+      echo "Unable to start rollback for ${name}." >&2
+      rollback_failed=true
+    fi
+  done
+
+  for name in "${rollback_services[@]}"; do
+    wait_for_service_running "$name" 60 || rollback_failed=true
+  done
+
+  if [ "$rollback_failed" = true ]; then
+    echo "One or more services could not be restored automatically." >&2
+    return 1
+  fi
+
+  echo "Changed Swarm services were restored to their previous specs."
+}
+
+commit_full_deploy_transaction() {
+  FULL_DEPLOY_TRANSACTION_ACTIVE=false
+  FULL_DEPLOY_SERVICE_SPEC_HASHES=()
 }
 
 render_stack_file() {
@@ -1284,16 +1423,22 @@ deploy_selected_services() {
     local entry
     local priority
     local definition
+    local runtime_service
     local current_priority=""
     local -a wave=()
 
     for entry in "${RUNTIME_DEPLOY_PLAN[@]}"; do
       priority="${entry%%:*}"
       definition="${entry#*:}"
+      runtime_service="${definition##*:}"
 
       if ! [[ "$priority" =~ ^[0-9]+$ ]]; then
         echo "Invalid runtime deploy priority in ${entry}." >&2
         return 1
+      fi
+
+      if ! service_is_selected "$runtime_service"; then
+        continue
       fi
 
       if [ -n "$current_priority" ] &&
@@ -1349,6 +1494,10 @@ deploy_selected_services() {
   done
 
   for item in "${APP_SERVICES[@]}"; do
+    if ! service_is_selected "${item##*:}"; then
+      continue
+    fi
+
     swarm_service="$(service_name "${item%%:*}" "${item##*:}")"
     if ! sudo docker service inspect "$swarm_service" >/dev/null 2>&1; then
       echo "Swarm service ${swarm_service} does not exist." >&2
@@ -1564,6 +1713,7 @@ migrate_legacy_stack_if_needed
 
 log "[6/8] Deploy infrastructure and run migrations"
 cleanup_stale_migrators
+snapshot_full_deploy_services
 deploy_stack infra
 wait_for_infrastructure
 run_migrators
@@ -1581,6 +1731,7 @@ wait_for_services_running "${MONITORING_SERVICES[@]}"
 validate_portainer_agents
 wait_for_application_endpoints
 wait_for_monitoring_endpoints
+commit_full_deploy_transaction
 
 log "[8/8] Cleanup obsolete Docker configs"
 cleanup_legacy_portainer_network
