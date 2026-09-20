@@ -4,17 +4,23 @@ using Api.Common.Middleware;
 using Api.Common.OperationFilters;
 using Application.Common.Diagnostics;
 using Application.Common.Models;
+using Cache;
 using Common;
 using Locan.AspNetCore;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Persistence;
 
 namespace Api.Common.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
+	private static readonly string[] HealthCheckTags = ["dependency"];
+	private static readonly TimeSpan HealthCheckTimeout = TimeSpan.FromSeconds(5);
+
 	public static string AddServiceConfiguration(
 		this IHostApplicationBuilder builder,
 		string serviceName,
@@ -48,6 +54,7 @@ public static class WebApplicationBuilderExtensions
 		});
 		services.AddHttpContextAccessor();
 		services.AddBaseExceptionHandlers();
+		services.AddHealthChecks();
 		services.AddCors(options =>
 		{
 			options.AddDefaultPolicy(policy =>
@@ -68,6 +75,32 @@ public static class WebApplicationBuilderExtensions
 			options.DefaultCulture = "en";
 			options.SupportedCultures = ["en", "ru", "tr"];
 		});
+
+		return services;
+	}
+
+	public static IServiceCollection AddPostgresHealthCheck(this IServiceCollection services)
+	{
+		services
+			.AddHealthChecks()
+			.AddNpgSql(
+				sp => sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString,
+				name: "postgres",
+				tags: HealthCheckTags,
+				timeout: HealthCheckTimeout);
+
+		return services;
+	}
+
+	public static IServiceCollection AddRedisHealthCheck(this IServiceCollection services)
+	{
+		services
+			.AddHealthChecks()
+			.AddRedis(
+				sp => sp.GetRequiredService<IOptions<RedisOptions>>().Value.ConnectionString,
+				name: "redis",
+				tags: HealthCheckTags,
+				timeout: HealthCheckTimeout);
 
 		return services;
 	}

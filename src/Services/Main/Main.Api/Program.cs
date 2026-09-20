@@ -60,6 +60,7 @@ builder
 	.AddSecretEncryptionOptions();
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Main);
+builder.Services.AddPostgresHealthCheck().AddRedisHealthCheck();
 builder.Services.AddSignalR();
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";

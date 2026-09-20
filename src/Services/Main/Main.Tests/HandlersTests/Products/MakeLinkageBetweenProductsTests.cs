@@ -153,6 +153,37 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 			.Contain(x => x.LeftProductId == Math.Min(p1, p3) && x.RightProductId == Math.Max(p1, p3));
 	}
 
+	[Theory]
+	[InlineData(ProductLinkageType.FullLeftToRightCross)]
+	[InlineData(ProductLinkageType.FullRightToLeftCross)]
+	public async Task MakeLinkage_WhenProductsAlreadyLinked_DoesNotCreateSelfReference(
+		ProductLinkageType linkageType)
+	{
+		var p1 = TestContext.Products[0].Id;
+		var p2 = TestContext.Products[1].Id;
+
+		await Context.ProductCrosses.AddAsync(ProductCross.Create(p1, p2), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var command = new MakeLinkageBetweenProductsCommand(
+		[
+			new NewProductLinkageDto
+			{
+				ProductId = p1,
+				CrossProductId = p2,
+				LinkageType = linkageType
+			}
+		]);
+
+		var act = () => Mediator.Send(command, CancellationToken);
+
+		await act.Should().NotThrowAsync();
+		(await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken))
+			.Should()
+			.ContainSingle(x =>
+				x.LeftProductId == Math.Min(p1, p2) && x.RightProductId == Math.Max(p1, p2));
+	}
+
 	[Fact]
 	public async Task MakeLinkage_ProductNotFound_Throws()
 	{

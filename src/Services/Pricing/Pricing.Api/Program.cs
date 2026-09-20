@@ -51,6 +51,7 @@ builder
 	.AddSecretEncryptionOptions();
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Pricing);
+builder.Services.AddPostgresHealthCheck().AddRedisHealthCheck();
 builder.Services.AddGraphQlServices(serviceName);
 
 var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";

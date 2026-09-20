@@ -6,6 +6,12 @@
       dockerfile: src/Services/Main/Main.Api/Dockerfile
     expose:
       - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
@@ -46,6 +52,12 @@
       dockerfile: src/Services/Search/Search.Api/Dockerfile
     expose:
       - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
@@ -64,6 +76,12 @@
       dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
     expose:
       - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
@@ -114,6 +132,12 @@
       dockerfile: src/Services/Gateway/Gateway/Dockerfile
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     volumes:
       - ${CERTS_PATH:-./certs}:/app/certs:ro
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
@@ -138,6 +162,12 @@
       dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
     expose:
       - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:

@@ -87,14 +87,20 @@ public class MakeLinkageBetweenProductsHandler(
 				var leftCrossIds = await GetCrossIds(linkage.ProductId, cancellationToken);
 				leftCrossIds.Add(leftArticle.Id);
 				foreach (var l in leftCrossIds)
+				{
+					if (l == rightArticle.Id) continue;
 					toAdd.Add(ProductCross.Create(l, rightArticle.Id));
+				}
 				break;
 
 			case ProductLinkageType.FullRightToLeftCross:
 				var rightCrossIds = await GetCrossIds(linkage.CrossProductId, cancellationToken);
 				rightCrossIds.Add(rightArticle.Id);
 				foreach (var r in rightCrossIds)
+				{
+					if (r == leftArticle.Id) continue;
 					toAdd.Add(ProductCross.Create(leftArticle.Id, r));
+				}
 				break;
 
 			default:

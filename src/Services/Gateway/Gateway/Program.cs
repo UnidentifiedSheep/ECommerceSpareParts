@@ -39,6 +39,7 @@ builder
 		"/app/configs");
 
 builder.Services.AddRedisOptions().AddMessageBrokerOptions();
+builder.Services.AddRedisHealthCheck();
 
 builder.Host.AddLokiLogger(
 	builder.Configuration,
@@ -198,7 +199,7 @@ app.UseWebSockets();
 app.MapJobEndPoints();
 app.MapReverseProxy();
 
-app.MapGet("/health", () => Results.Ok());
+app.MapHealthChecks("/health");
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.MapGraphQL();
