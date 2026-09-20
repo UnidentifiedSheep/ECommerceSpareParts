@@ -28,6 +28,7 @@ builder.Host.AddLokiLogger(
 AddOpenSearchOptions(builder.Services).AddMessageBrokerOptions().AddHeaderSecretsOptions().AddRedisOptions();
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Search).AddGraphQlServices(serviceName);
+builder.Services.AddRedisHealthCheck();
 
 builder.Services.AddMassTransit(x =>
 {
@@ -65,7 +66,8 @@ builder
 	.AddMinimalSecurityLayer()
 	.AddIntegrationClients()
 	.AddApplicationLayer(builder.Configuration)
-	.AddPersistenceLayer();
+	.AddPersistenceLayer()
+	.AddOpenSearchHealthCheck();
 
 var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(

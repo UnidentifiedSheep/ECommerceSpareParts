@@ -36,6 +36,7 @@ builder.Host.AddLokiLogger(
 builder.Services.AddMessageBrokerOptions().AddHeaderSecretsOptions().AddRedisOptions().AddDatabaseOptions();
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Analytics);
+builder.Services.AddPostgresHealthCheck().AddRedisHealthCheck();
 builder.Services.AddGraphQlServices(serviceName);
 
 builder

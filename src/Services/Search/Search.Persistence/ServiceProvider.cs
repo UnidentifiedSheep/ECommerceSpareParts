@@ -8,6 +8,7 @@ using Search.Application.Interfaces.Producer;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
 using Search.Persistence.DocumentProviders;
+using Search.Persistence.HealthChecks;
 using Search.Persistence.IndexInitializers;
 using Search.Persistence.Interfaces;
 
@@ -43,6 +44,17 @@ public static class ServiceProvider
 		services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();
 		services.AddSingleton<IIndexInitializer<Producer>, ProducerIndexInitializer>();
 		services.AddSingleton<IIndexInitializer<CatalogueCandidate>, CatalogueCandidateIndexInitializer>();
+		return services;
+	}
+
+	public static IServiceCollection AddOpenSearchHealthCheck(this IServiceCollection services)
+	{
+		services
+			.AddHealthChecks()
+			.AddCheck<OpenSearchHealthCheck>(
+				"opensearch",
+				tags: ["dependency"],
+				timeout: TimeSpan.FromSeconds(5));
 
 		return services;
 	}
