@@ -24,6 +24,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Main\Internal.Integration.Main.csproj"/>
         <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
         <ProjectReference Include="..\Search.Application\Search.Application.csproj"/>
         <ProjectReference Include="..\Search.Entities\Search.Entities.csproj"/>

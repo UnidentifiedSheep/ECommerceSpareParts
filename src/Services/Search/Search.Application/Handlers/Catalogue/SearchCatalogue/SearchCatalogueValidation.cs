@@ -27,6 +27,9 @@ public sealed class SearchCatalogueValidation : AbstractValidator<SearchCatalogu
 		RuleForEach(x => x.NameModes)
 			.IsInEnum()
 			.WithLocalizableError(CatalogueSearchMatchModeInvalidMessage.Instance);
+		RuleFor(x => x.CandidateMappingStatus)
+			.IsInEnum()
+			.WithLocalizableError(CatalogueSearchCandidateMappingStatusInvalidMessage.Instance);
 
 		RuleFor(x => x)
 			.Must(x => string.IsNullOrWhiteSpace(x.Query) || x.SkuModes.Count > 0 || x.NameModes.Count > 0)

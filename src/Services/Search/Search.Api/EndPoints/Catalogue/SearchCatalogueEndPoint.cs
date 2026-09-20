@@ -36,6 +36,9 @@ public sealed record SearchCatalogueRequest
 	[JsonPropertyName("producerIds")]
 	public IReadOnlyCollection<int> ProducerIds { get; init; } = [];
 
+	[JsonPropertyName("candidateMappingStatus")]
+	public CandidateMappingStatus CandidateMappingStatus { get; init; } = CandidateMappingStatus.Unmapped;
+
 	[JsonPropertyName("page")]
 	public int Page { get; init; }
 
@@ -88,6 +91,7 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 							new Pagination(request.Page, request.Size),
 							request.SortBy?.Products ?? [],
 							request.SortBy?.CatalogueCandidates ?? [],
+							request.CandidateMappingStatus,
 							request.IncludeHighlights),
 						cancellationToken);
 
@@ -99,7 +103,7 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 				})
 			.WithTags("Catalogue")
 			.WithName("SearchCatalogue")
-			.WithSummary("Search products and unresolved catalogue candidates")
+			.WithSummary("Search products and catalogue candidates")
 			.Produces<SearchCatalogueResponse>()
 			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.RequireAllPermissions(

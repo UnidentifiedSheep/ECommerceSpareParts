@@ -22,11 +22,12 @@ public class UpsertCatalogueCandidatesHandlerTests
 			null,
 			[" First name ", "first NAME", "", "Second name"]);
 		List<CatalogueCandidateDocument> upsertedDocuments = [];
-		List<Guid> deletedIds = [];
-		SetupRepository(upsertedDocuments, deletedIds);
+		SetupRepository(upsertedDocuments);
 		var handler = new UpsertCatalogueCandidatesHandler(_repository.Object);
 
-		await handler.Handle(new UpsertCatalogueCandidatesCommand([@event]), CancellationToken.None);
+		await handler.Handle(
+			new UpsertCatalogueCandidatesCommand([@event]),
+			TestContext.Current.CancellationToken);
 
 		upsertedDocuments
 			.Should()
@@ -43,23 +44,27 @@ public class UpsertCatalogueCandidatesHandlerTests
 					MappedProductId = null,
 					Names = ["First name", "Second name"]
 				});
-		deletedIds.Should().BeEmpty();
+		_repository.Verify(
+			x => x.DeleteMany(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()),
+			Times.Never);
 	}
 
 	[Fact]
-	public async Task Handle_WhenCandidateIsMapped_ShouldDeleteCandidateDocument()
+	public async Task Handle_WhenCandidateIsMapped_ShouldUpsertCandidateDocument()
 	{
 		var candidateId = Guid.NewGuid();
 		var @event = CreateEvent(candidateId, mappedProductId: 123);
 		List<CatalogueCandidateDocument> upsertedDocuments = [];
-		List<Guid> deletedIds = [];
-		SetupRepository(upsertedDocuments, deletedIds);
+		SetupRepository(upsertedDocuments);
 		var handler = new UpsertCatalogueCandidatesHandler(_repository.Object);
 
-		await handler.Handle(new UpsertCatalogueCandidatesCommand([@event]), CancellationToken.None);
+		await handler.Handle(
+			new UpsertCatalogueCandidatesCommand([@event]),
+			TestContext.Current.CancellationToken);
 
-		deletedIds.Should().Equal(candidateId);
-		upsertedDocuments.Should().BeEmpty();
+		upsertedDocuments.Should().ContainSingle();
+		upsertedDocuments.Single().Id.Should().Be(candidateId);
+		upsertedDocuments.Single().MappedProductId.Should().Be(123);
 	}
 
 	[Fact]
@@ -89,21 +94,18 @@ public class UpsertCatalogueCandidatesHandlerTests
 				0,
 				DateTimeKind.Utc));
 		List<CatalogueCandidateDocument> upsertedDocuments = [];
-		List<Guid> deletedIds = [];
-		SetupRepository(upsertedDocuments, deletedIds);
+		SetupRepository(upsertedDocuments);
 		var handler = new UpsertCatalogueCandidatesHandler(_repository.Object);
 
 		await handler.Handle(
 			new UpsertCatalogueCandidatesCommand([olderEvent, newerEvent]),
-			CancellationToken.None);
+			TestContext.Current.CancellationToken);
 
-		deletedIds.Should().Equal(candidateId);
-		upsertedDocuments.Should().BeEmpty();
+		upsertedDocuments.Should().ContainSingle();
+		upsertedDocuments.Single().MappedProductId.Should().Be(123);
 	}
 
-	private void SetupRepository(
-		ICollection<CatalogueCandidateDocument> upsertedDocuments,
-		ICollection<Guid> deletedIds)
+	private void SetupRepository(ICollection<CatalogueCandidateDocument> upsertedDocuments)
 	{
 		_repository
 			.Setup(x => x.UpsertMany(
@@ -113,14 +115,6 @@ public class UpsertCatalogueCandidatesHandlerTests
 			{
 				foreach (var document in documents)
 					upsertedDocuments.Add(document);
-			})
-			.Returns(Task.CompletedTask);
-		_repository
-			.Setup(x => x.DeleteMany(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
-			.Callback<IEnumerable<Guid>, CancellationToken>((ids, _) =>
-			{
-				foreach (var id in ids)
-					deletedIds.Add(id);
 			})
 			.Returns(Task.CompletedTask);
 	}

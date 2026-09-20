@@ -24,6 +24,7 @@ public sealed class SearchCatalogueHandlerTests
 		var product = CreateProduct();
 		var candidate = CreateCandidate();
 		CatalogueSearchCriteria? receivedCriteria = null;
+		CatalogueSearchCriteria? receivedCandidateCriteria = null;
 		_productRepository
 			.Setup(x => x.Search(It.IsAny<CatalogueSearchCriteria>(), It.IsAny<CancellationToken>()))
 			.Callback<CatalogueSearchCriteria,
@@ -38,6 +39,8 @@ public sealed class SearchCatalogueHandlerTests
 					11));
 		_candidateRepository
 			.Setup(x => x.Search(It.IsAny<CatalogueSearchCriteria>(), It.IsAny<CancellationToken>()))
+			.Callback<CatalogueSearchCriteria,
+				CancellationToken>((criteria, _) => receivedCandidateCriteria = criteria)
 			.ReturnsAsync(
 				new SearchResult<CatalogueCandidateDocument>(
 					[
@@ -60,9 +63,12 @@ public sealed class SearchCatalogueHandlerTests
 		result.Products.Items.Should().ContainSingle().Which.Id.Should().Be(product.Id);
 		result.CatalogueCandidates.Total.Should().Be(7);
 		result.CatalogueCandidates.Items.Should().ContainSingle().Which.Id.Should().Be(candidate.Id);
+		result.CatalogueCandidates.Items.Single().MappedProductId.Should().Be(candidate.MappedProductId);
 		receivedCriteria.Should().NotBeNull();
 		receivedCriteria!.Query.Should().Be("bosch 123");
 		receivedCriteria.ProducerIds.Should().Equal(42);
+		receivedCandidateCriteria.Should().NotBeNull();
+		receivedCandidateCriteria!.CandidateMappingStatus.Should().Be(CandidateMappingStatus.Unmapped);
 	}
 
 	[Fact]
@@ -132,7 +138,8 @@ public sealed class SearchCatalogueHandlerTests
 
 	private static SearchCatalogueQuery CreateQuery(
 		IReadOnlySet<SearchTarget> targets,
-		bool includeHighlights = false)
+		bool includeHighlights = false,
+		CandidateMappingStatus candidateMappingStatus = CandidateMappingStatus.Unmapped)
 	{
 		return new SearchCatalogueQuery(
 			"  bosch 123  ",
@@ -149,6 +156,7 @@ public sealed class SearchCatalogueHandlerTests
 			new Pagination(0, 20),
 			[],
 			[],
+			candidateMappingStatus,
 			includeHighlights);
 	}
 
