@@ -61,6 +61,21 @@ public sealed class SearchCatalogueValidationTests
 		result.IsValid.Should().BeFalse();
 	}
 
+	[Fact]
+	public async Task Validate_WhenCandidateMappingStatusIsInvalid_ShouldFail()
+	{
+		var result = await _validator.ValidateAsync(
+			CreateQuery() with
+			{
+				CandidateMappingStatus = (CandidateMappingStatus)999
+			},
+			TestContext.Current.CancellationToken);
+
+		result.IsValid.Should().BeFalse();
+		result.Errors.Should().Contain(
+			error => error.PropertyName == nameof(SearchCatalogueQuery.CandidateMappingStatus));
+	}
+
 	private static SearchCatalogueQuery CreateQuery(
 		string? query = "bosch",
 		IReadOnlySet<SearchTarget>? targets = null,

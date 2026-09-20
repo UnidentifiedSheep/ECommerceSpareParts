@@ -38,6 +38,7 @@ public sealed class ProductRepositorySearchTests
 		requestBody().Should().Contain("\"wildcard\"");
 		requestBody().Should().Contain("\"name.keyword\"");
 		requestBody().Should().NotContain("\"name.prefix\"");
+		requestBody().Should().NotContain("\"mappedProductId\"");
 		requestBody().Should().NotContain("\"highlight\"");
 	}
 

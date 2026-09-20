@@ -13,6 +13,8 @@ public sealed record CatalogueSearchCriteria
 
 	public IReadOnlyCollection<int> ProducerIds { get; init; } = [];
 
+	public CandidateMappingStatus CandidateMappingStatus { get; init; } = CandidateMappingStatus.Unmapped;
+
 	public required Pagination Pagination { get; init; }
 
 	public string[] SortBy { get; init; } = [];

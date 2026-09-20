@@ -38,7 +38,8 @@ public sealed class CatalogueCandidateRepository(
 					criteria,
 					new Field("normalizedSku"),
 					new Field("names"),
-					new Field("producerId")))
+					new Field("producerId"),
+					new Field("mappedProductId")))
 				.AddCatalogueHighlights(
 					criteria.IncludeHighlights,
 					criteria.Query,

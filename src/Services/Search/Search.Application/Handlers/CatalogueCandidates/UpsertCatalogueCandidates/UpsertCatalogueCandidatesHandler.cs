@@ -23,16 +23,10 @@ public sealed class UpsertCatalogueCandidatesHandler(ICatalogueCandidateReposito
 			.Select(group => group.OrderByDescending(x => x.OccuredAt).First())
 			.ToList();
 
-		var mappedCandidateIds = latestEvents
-			.Where(x => x.Candidate.MappedProductId.HasValue)
-			.Select(x => x.Candidate.Id)
-			.ToList();
 		var documents = latestEvents
-			.Where(x => !x.Candidate.MappedProductId.HasValue)
 			.Select(MapDocument)
 			.ToList();
 
-		await repository.DeleteMany(mappedCandidateIds, cancellationToken);
 		await repository.UpsertMany(documents, cancellationToken);
 
 		return Unit.Value;

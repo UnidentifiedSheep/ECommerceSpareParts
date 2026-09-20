@@ -13,6 +13,9 @@ public sealed record CatalogueCandidateDto
 	[JsonPropertyName("producerId")]
 	public required int ProducerId { get; init; }
 
+	[JsonPropertyName("mappedProductId")]
+	public required int? MappedProductId { get; init; }
+
 	[JsonPropertyName("names")]
 	public required IReadOnlyCollection<string> Names { get; init; }
 

@@ -17,6 +17,7 @@ public sealed class
 			Id = candidate.Id,
 			Sku = candidate.Sku,
 			ProducerId = candidate.ProducerId,
+			MappedProductId = candidate.MappedProductId,
 			Names = candidate.Names
 		};
 }

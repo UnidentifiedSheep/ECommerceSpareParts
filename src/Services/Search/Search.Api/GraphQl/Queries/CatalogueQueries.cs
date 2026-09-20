@@ -6,6 +6,7 @@ using Search.Api.GraphQl.Types;
 using Search.Api.GraphQl.Types.Highlights;
 using Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
 using Search.Application.Handlers.Catalogue.SearchCatalogue;
+using Search.Enums;
 
 namespace Search.Api.GraphQl.Queries;
 
@@ -28,6 +29,7 @@ public sealed class CatalogueQueries
 				input.Pagination,
 				input.ProductSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
 				input.CatalogueCandidateSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
+				input.CandidateMappingStatus ?? CandidateMappingStatus.Unmapped,
 				input.IncludeHighlights ?? false),
 			ct);
 

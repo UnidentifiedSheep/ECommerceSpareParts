@@ -12,9 +12,10 @@ internal static class CatalogueSearchQueryBuilder
 		CatalogueSearchCriteria criteria,
 		Field normalizedSkuField,
 		Field nameField,
-		Field producerIdField) where TDocument : class
+		Field producerIdField,
+		Field? mappedProductIdField = null) where TDocument : class
 	{
-		var filters = BuildFilters<TDocument>(criteria, producerIdField);
+		var filters = BuildFilters<TDocument>(criteria, producerIdField, mappedProductIdField);
 		if (string.IsNullOrWhiteSpace(criteria.Query))
 			return filters.Count == 0 ? query.MatchAll() : query.Bool(boolean => boolean.Filter(filters));
 
@@ -145,15 +146,25 @@ internal static class CatalogueSearchQueryBuilder
 
 	private static List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>> BuildFilters<TDocument>(
 		CatalogueSearchCriteria criteria,
-		Field producerIdField) where TDocument : class
+		Field producerIdField,
+		Field? mappedProductIdField) where TDocument : class
 	{
 		var filters = new List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>>();
-		if (criteria.ProducerIds.Count == 0)
-			return filters;
+		if (criteria.ProducerIds.Count > 0)
+			filters.Add(descriptor => descriptor.Terms(terms => terms
+				.Field(producerIdField)
+				.Terms(criteria.ProducerIds.Select(id => (object)id))));
 
-		filters.Add(descriptor => descriptor.Terms(terms => terms
-			.Field(producerIdField)
-			.Terms(criteria.ProducerIds.Select(id => (object)id))));
+		if (mappedProductIdField is not null)
+		{
+			if (criteria.CandidateMappingStatus == CandidateMappingStatus.Mapped)
+				filters.Add(descriptor => descriptor.Exists(exists => exists.Field(mappedProductIdField)));
+			else if (criteria.CandidateMappingStatus == CandidateMappingStatus.Unmapped)
+				filters.Add(descriptor => descriptor.Bool(boolean =>
+					boolean.MustNot(mustNot =>
+						mustNot.Exists(exists => exists.Field(mappedProductIdField)))));
+		}
+
 		return filters;
 	}
 }

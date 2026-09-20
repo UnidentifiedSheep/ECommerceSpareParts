@@ -21,6 +21,7 @@ public sealed record SearchCatalogueQuery(
 	Pagination Pagination,
 	string[] ProductSortBy,
 	string[] CatalogueCandidateSortBy,
+	CandidateMappingStatus CandidateMappingStatus = CandidateMappingStatus.Unmapped,
 	bool IncludeHighlights = false) : IQuery<SearchCatalogueResult>;
 
 public sealed record SearchCatalogueSection<T>(IReadOnlyCollection<T> Items, long Total);
@@ -46,6 +47,7 @@ public sealed class SearchCatalogueHandler(
 			SkuModes = request.SkuModes,
 			NameModes = request.NameModes,
 			ProducerIds = request.ProducerIds.Distinct().ToArray(),
+			CandidateMappingStatus = request.CandidateMappingStatus,
 			Pagination = request.Pagination,
 			SortBy = [],
 			IncludeHighlights = request.IncludeHighlights
