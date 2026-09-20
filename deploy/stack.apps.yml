@@ -6,6 +6,12 @@ x-api-service: &api-service
     - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
     - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
     - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 40s
   networks:
     - backend
   deploy:
