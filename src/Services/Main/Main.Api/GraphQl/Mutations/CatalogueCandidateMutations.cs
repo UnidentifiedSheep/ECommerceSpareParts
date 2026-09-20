@@ -3,6 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.CatalogueCandidate;
 using Main.Api.GraphQl.Types.Product;
+using Main.Api.GraphQl.Types.ProductEnrichment;
 using Main.Application.Handlers.ProductEnrichment;
 using Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 using MediatR;
@@ -27,7 +28,7 @@ public sealed class CatalogueCandidateMutations
 
 	[RequireAllPermissions(PermissionCodes.CATALOGUE_CANDIDATES_REVIEW)]
 	[GraphQLName("mapCrosses")]
-	public async Task<bool> MapCandidateCrossesAsync(
+	public async Task<IReadOnlyList<GqlCatalogueCandidate>> MapCandidateCrossesAsync(
 		ISender sender,
 		GqlMaxCandidateCrossesInput input,
 		CancellationToken cancellationToken)
@@ -39,6 +40,11 @@ public sealed class CatalogueCandidateMutations
 				input.LinkageType),
 			cancellationToken);
 
-		return true;
+		var res = input.CrossCandidateIds
+			.Select(x => new GqlCatalogueCandidate(x))
+			.ToList();
+		res.Add(new GqlCatalogueCandidate(input.CandidateId));
+
+		return res;
 	}
 }

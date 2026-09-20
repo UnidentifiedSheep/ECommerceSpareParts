@@ -95,13 +95,13 @@ internal sealed class ProductNode(
 	private record GetFullProductsResponse
 	{
 		[JsonPropertyName("products")]
-		public IReadOnlyList<InternalFullProduct> Products { get; } = [];
+		public IReadOnlyList<InternalFullProduct> Products { get; init; } = [];
 	}
 
 	private record GetSupplierProductReferencesResponse
 	{
 		[JsonPropertyName("products")]
-		public IReadOnlyList<InternalSupplierProductResolvedReference> Products { get; } = [];
+		public IReadOnlyList<InternalSupplierProductResolvedReference> Products { get; init; } = [];
 	}
 
 	private record ResolveSupplierProductReferencesRequest
@@ -117,8 +117,10 @@ internal sealed class ProductNode(
 	private record ResolveSupplierProductReferencesResponse
 	{
 		[JsonPropertyName("products")]
-		public Dictionary<Supplier, IEnumerable<InternalSupplierProductResolvedReference>> Products { get; } =
-		[
-		];
+		public Dictionary<Supplier, IEnumerable<InternalSupplierProductResolvedReference>> Products
+		{
+			get;
+			init;
+		} = [];
 	}
 }
