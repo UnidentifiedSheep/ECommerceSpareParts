@@ -1,3 +1,6 @@
 namespace Notification.Core.Interfaces;
 
-public interface INotificationContent;
+public interface INotificationContent
+{
+	string Text { get; }
+}

@@ -6,10 +6,12 @@ namespace Notification.Core.Interfaces;
 public interface ISimpleNotification<out TModel>
 	: INotification<TModel> where TModel : ILocalizableMessage;
 
-public interface IRichNotification<out TModel> : INotification<TModel>;
+public interface INotification<out TModel> : INotification
+{
+	TModel Model { get; }
+}
 
-public interface INotification<out TModel>
+public interface INotification
 {
 	CultureInfo? SelectedCulture { get; }
-	TModel Model { get; }
 }
