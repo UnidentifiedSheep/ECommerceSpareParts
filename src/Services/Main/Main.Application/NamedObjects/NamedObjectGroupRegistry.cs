@@ -1,5 +1,5 @@
-using Application.Common.Abstractions.NamedObjects;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
+using NamedObject.Core.Base;
 
 namespace Main.Application.NamedObjects;
 

@@ -1,8 +1,8 @@
 using Application.Common.Extensions;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
+using NamedObject.Core.Interfaces;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Models.Pricing;

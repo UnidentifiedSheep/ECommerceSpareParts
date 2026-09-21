@@ -1,5 +1,5 @@
 using Analytics.Application.NamedObjects.Analyzers.Markup;
-using Application.Common.Abstractions.NamedObjects;
+using NamedObject.Core.Base;
 
 namespace Analytics.Application.NamedObjects.Analyzers;
 

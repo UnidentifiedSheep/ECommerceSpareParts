@@ -1,8 +1,8 @@
-﻿using Application.Common.Interfaces.NamedObject;
-using Locan.Core.Interfaces;
+﻿using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
+using NamedObject.Core.Interfaces;
 
-namespace Application.Common.Abstractions.NamedObjects;
+namespace NamedObject.Core.Base;
 
 public abstract class LocalizableNameObject : ILocalizableNamedObject
 {

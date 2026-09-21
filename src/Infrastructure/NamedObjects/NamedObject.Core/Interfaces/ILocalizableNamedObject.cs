@@ -1,6 +1,6 @@
 ﻿using Locan.Core.Interfaces;
 
-namespace Application.Common.Interfaces.NamedObject;
+namespace NamedObject.Core.Interfaces;
 
 public interface ILocalizableNamedObject : INamedObject
 {

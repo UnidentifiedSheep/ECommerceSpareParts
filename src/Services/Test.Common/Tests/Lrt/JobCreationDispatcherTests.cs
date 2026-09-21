@@ -1,6 +1,5 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -12,6 +11,7 @@ using Locan.Core.LocalizableMessages;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NamedObject.Core.Interfaces;
 
 namespace Tests.Tests.Lrt;
 

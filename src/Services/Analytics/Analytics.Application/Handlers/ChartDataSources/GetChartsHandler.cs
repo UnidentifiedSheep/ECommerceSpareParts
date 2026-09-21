@@ -1,8 +1,8 @@
 using Analytics.Application.Dtos.Charts;
 using Analytics.Application.NamedObjects.ChartDataSources;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.NamedObject;
 using Locan.Core.Interfaces.Localizers;
+using NamedObject.Core.Interfaces;
 
 namespace Analytics.Application.Handlers.ChartDataSources;
 

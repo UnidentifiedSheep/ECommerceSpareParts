@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Exceptions;
@@ -8,6 +7,7 @@ using Locan.Core.Interfaces;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities;
 using Main.Entities.Settings;
+using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 

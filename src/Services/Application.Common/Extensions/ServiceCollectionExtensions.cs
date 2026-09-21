@@ -5,12 +5,10 @@ using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Models;
-using Application.Common.NamedObject;
 using Application.Common.Services;
 using Application.Common.Services.Events;
 using Application.Common.Services.Persistence;
@@ -122,52 +120,6 @@ public static class ServiceCollectionExtensions
 	{
 		assembly ??= Assembly.GetExecutingAssembly();
 		services.AddValidatorsFromAssembly(assembly);
-
-		return services;
-	}
-
-	public static IServiceCollection RegisterNamedObject<TBaseObject>(
-		this IServiceCollection services,
-		Assembly? assembly = null,
-		ServiceLifetime objectsLifetime = ServiceLifetime.Scoped,
-		params Type[] objectsToExclude) where TBaseObject : class, INamedObject
-	{
-		assembly ??= typeof(TBaseObject).Assembly;
-		var excludedTypes = objectsToExclude.ToHashSet();
-
-		services.Scan(scan =>
-		{
-			var registration = scan
-				.FromAssemblies(assembly)
-				.AddClasses(classes => classes
-					.AssignableTo<TBaseObject>()
-					.Where(type => !excludedTypes.Contains(type)))
-				.As<TBaseObject>();
-
-			switch (objectsLifetime)
-			{
-				case ServiceLifetime.Singleton:
-					registration.WithSingletonLifetime();
-					break;
-
-				case ServiceLifetime.Scoped:
-					registration.WithScopedLifetime();
-					break;
-
-				case ServiceLifetime.Transient:
-					registration.WithTransientLifetime();
-					break;
-
-				default:
-					throw new ArgumentOutOfRangeException(
-						nameof(objectsLifetime),
-						objectsLifetime,
-						null);
-			}
-		});
-
-		services.TryAddScoped(typeof(INamedObjectRegistry<>), typeof(NamedObjectRegistry<>));
-		services.TryAddScoped<INamedObjectGroupResolver, NamedObjectGroupResolver>();
 
 		return services;
 	}

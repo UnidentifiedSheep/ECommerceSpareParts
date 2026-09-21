@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Interfaces.NamedObject;
+﻿namespace NamedObject.Core.Interfaces;
 
 public interface INamedObjectRegistry<TBaseObject> : INamedObjectRegistry where TBaseObject : INamedObject
 {

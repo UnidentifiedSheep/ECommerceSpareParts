@@ -1,5 +1,5 @@
-using Application.Common.Interfaces.NamedObject;
 using Locan.Core.Interfaces.Localizers;
+using NamedObject.Core.Interfaces;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;

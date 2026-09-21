@@ -17,6 +17,12 @@ public class Notification : Entity<Notification, int>, ILinqEntity<Notification,
 
 	public User.User User { get; private set; } = null!;
 
+	public void MarkAsSeen()
+	{
+		if (SeenAt == null) return;
+		SeenAt = DateTime.UtcNow;
+	}
+
 	public override int GetId() => Id;
 	public static Expression<Func<Notification, int>> GetKeySelector() => x => x.Id;
 	public static Expression<Func<Notification, bool>> GetEqualityExpression(int key) => x => x.Id == key;

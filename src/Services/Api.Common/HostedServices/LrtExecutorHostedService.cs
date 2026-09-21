@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Models.Options;
 using Domain.CommonEntities.Job;
 using Microsoft.Extensions.Options;
+using NamedObject.Core.Interfaces;
 
 namespace Api.Common.HostedServices;
 

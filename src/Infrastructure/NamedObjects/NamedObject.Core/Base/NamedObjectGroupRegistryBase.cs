@@ -1,6 +1,6 @@
-using Application.Common.Interfaces.NamedObject;
+using NamedObject.Core.Interfaces;
 
-namespace Application.Common.Abstractions.NamedObjects;
+namespace NamedObject.Core.Base;
 
 public abstract class NamedObjectGroupRegistryBase : INamedObjectGroupRegistry
 {

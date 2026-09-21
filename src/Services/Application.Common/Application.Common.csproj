@@ -35,11 +35,13 @@
         <ProjectReference Include="..\..\Core\Extensions\Extensions.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Integrations\Suppliers\Integrations.Supplier\Integrations.Supplier.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\NamedObjects\NamedObject.Core\NamedObject.Core.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\NamedObjects\NamedObject\NamedObject.csproj" />
         <ProjectReference Include="..\..\Infrastructure\SchemaGeneration\SchemaGeneration\SchemaGeneration.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="LRT\DataSlice\"/>
+        <Folder Include="Abstractions\NamedObjects\" />
     </ItemGroup>
 
     <ItemGroup>

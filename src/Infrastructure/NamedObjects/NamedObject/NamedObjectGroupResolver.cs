@@ -1,9 +1,11 @@
-using Application.Common.Interfaces.NamedObject;
 using Microsoft.Extensions.DependencyInjection;
+using NamedObject.Core.Interfaces;
 
-namespace Application.Common.NamedObject;
+namespace NamedObject;
 
-public class NamedObjectGroupResolver(INamedObjectGroupRegistry registry, IServiceProvider serviceProvider)
+internal class NamedObjectGroupResolver(
+	INamedObjectGroupRegistry registry,
+	IServiceProvider serviceProvider)
 	: INamedObjectGroupResolver
 {
 	public INamedObjectRegistry GetByGroupName(string groupName)

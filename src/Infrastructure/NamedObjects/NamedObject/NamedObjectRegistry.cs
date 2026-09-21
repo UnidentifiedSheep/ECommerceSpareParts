@@ -1,8 +1,8 @@
-﻿using Application.Common.Interfaces.NamedObject;
+﻿using NamedObject.Core.Interfaces;
 
-namespace Application.Common.NamedObject;
+namespace NamedObject;
 
-public class NamedObjectRegistry<TBaseObject> : INamedObjectRegistry<TBaseObject>
+internal class NamedObjectRegistry<TBaseObject> : INamedObjectRegistry<TBaseObject>
 	where TBaseObject : class, INamedObject
 {
 	private readonly IReadOnlyDictionary<string, TBaseObject> _objects;

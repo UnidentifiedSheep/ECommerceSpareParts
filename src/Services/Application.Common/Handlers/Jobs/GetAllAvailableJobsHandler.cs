@@ -1,8 +1,8 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.NamedObject;
 using Locan.Core.Interfaces.Localizers;
+using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions;
 
 namespace Application.Common.Handlers.Jobs;

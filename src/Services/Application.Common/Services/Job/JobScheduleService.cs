@@ -2,7 +2,6 @@ using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
@@ -11,6 +10,7 @@ using Attributes;
 using Cronos;
 using Domain.CommonEntities.Job;
 using FluentValidation;
+using NamedObject.Core.Interfaces;
 
 namespace Application.Common.Services.Job;
 

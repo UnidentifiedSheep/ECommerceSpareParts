@@ -1,10 +1,10 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions;
 using Microsoft.EntityFrameworkCore;
+using NamedObject.Core.Interfaces;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;

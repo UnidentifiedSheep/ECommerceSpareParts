@@ -1,7 +1,7 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.NamedObject;
 using Domain.CommonEntities.Job;
+using NamedObject.Core.Interfaces;
 
 namespace Application.Common.LRT;
 
