@@ -12,7 +12,7 @@ using ProductDocument = Search.Entities.Product;
 
 namespace Search.Tests.Handlers.Catalogue;
 
-public sealed class CatalogueHandlerTests
+public sealed class SearchInCatalogueHandlerTests
 {
 	private readonly Mock<ICatalogueCandidateRepository> _candidateRepository = new();
 
@@ -61,9 +61,9 @@ public sealed class CatalogueHandlerTests
 
 		result.Products.Total.Should().Be(11);
 		result.Products.Items.Should().ContainSingle().Which.Id.Should().Be(product.Id);
-		result.CatalogueCandidates.Total.Should().Be(7);
-		result.CatalogueCandidates.Items.Should().ContainSingle().Which.Id.Should().Be(candidate.Id);
-		result.CatalogueCandidates.Items.Single().MappedProductId.Should().Be(candidate.MappedProductId);
+		result.SearchInCatalogueCandidates.Total.Should().Be(7);
+		result.SearchInCatalogueCandidates.Items.Should().ContainSingle().Which.Id.Should().Be(candidate.Id);
+		result.SearchInCatalogueCandidates.Items.Single().MappedProductId.Should().Be(candidate.MappedProductId);
 		receivedCriteria.Should().NotBeNull();
 		receivedCriteria!.Query.Should().Be("bosch 123");
 		receivedCriteria.ProducerIds.Should().Equal(42);
@@ -123,25 +123,25 @@ public sealed class CatalogueHandlerTests
 			Times.Once);
 	}
 
-	private CatalogueHandler CreateHandler()
+	private SearchInCatalogueHandler CreateHandler()
 	{
 		var productProjection = new ProductDtoProjectionProvider(
 			new ProductDimensionsDtoProjectionProvider(),
 			new ProductWeightDtoProjectionProvider());
 
-		return new CatalogueHandler(
+		return new SearchInCatalogueHandler(
 			_productRepository.Object,
 			_candidateRepository.Object,
 			productProjection,
 			new CatalogueCandidateDtoProjectionProvider());
 	}
 
-	private static CatalogueQuery CreateQuery(
+	private static SearchInCatalogueQuery CreateQuery(
 		IReadOnlySet<SearchTarget> targets,
 		bool includeHighlights = false,
 		CandidateMappingStatus candidateMappingStatus = CandidateMappingStatus.Unmapped)
 	{
-		return new CatalogueQuery(
+		return new SearchInCatalogueQuery(
 			"  bosch 123  ",
 			targets,
 			new HashSet<SearchMatchType>

@@ -20,7 +20,7 @@ public sealed class CatalogueQueries
 		CancellationToken ct)
 	{
 		var result = await sender.Send(
-			new CatalogueQuery(
+			new SearchInCatalogueQuery(
 				input.Query,
 				input.Targets.ToHashSet(),
 				input.SkuModes.ToHashSet(),
@@ -49,9 +49,9 @@ public sealed class CatalogueQueries
 			},
 			Candidates = new GqlSearchCatalogueSection<GqlCatalogueCandidate>
 			{
-				Total = result.CatalogueCandidates.Total,
+				Total = result.SearchInCatalogueCandidates.Total,
 				Items = result
-					.CatalogueCandidates
+					.SearchInCatalogueCandidates
 					.Items
 					.Select(x => new GqlSearchCatalogueSectionItem<GqlCatalogueCandidate>
 					{

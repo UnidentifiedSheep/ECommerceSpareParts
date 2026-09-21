@@ -64,10 +64,10 @@ public sealed record CatalogueSearchSortRequest
 public sealed record SearchCatalogueResponse
 {
 	[JsonPropertyName("products")]
-	public required CatalogueSection<ProductDto> Products { get; init; }
+	public required SearchInCatalogueSection<ProductDto> Products { get; init; }
 
 	[JsonPropertyName("catalogueCandidates")]
-	public required CatalogueSection<CatalogueCandidateDto> CatalogueCandidates { get; init; }
+	public required SearchInCatalogueSection<CatalogueCandidateDto> SearchInCatalogueCandidates { get; init; }
 }
 
 public sealed class SearchCatalogueEndPoint : ICarterModule
@@ -82,7 +82,7 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 					CancellationToken cancellationToken) =>
 				{
 					var result = await sender.Send(
-						new CatalogueQuery(
+						new SearchInCatalogueQuery(
 							request.Query,
 							(request.Targets ?? CatalogueSearchDefaults.Targets).ToHashSet(),
 							(request.Fields?.Sku ?? CatalogueSearchDefaults.SkuModes).ToHashSet(),
@@ -98,7 +98,7 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 					return Results.Ok(
 						new SearchCatalogueResponse
 						{
-							Products = result.Products, CatalogueCandidates = result.CatalogueCandidates
+							Products = result.Products, SearchInCatalogueCandidates = result.SearchInCatalogueCandidates
 						});
 				})
 			.WithTags("Catalogue")

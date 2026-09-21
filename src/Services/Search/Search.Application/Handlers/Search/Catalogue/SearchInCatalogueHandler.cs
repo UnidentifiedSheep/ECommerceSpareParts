@@ -12,7 +12,7 @@ using ProductDocument = Search.Entities.Product;
 
 namespace Search.Application.Handlers.Search.Catalogue;
 
-public sealed record CatalogueQuery(
+public sealed record SearchInCatalogueQuery(
 	string? Query,
 	IReadOnlySet<SearchTarget> Targets,
 	IReadOnlySet<SearchMatchType> SkuModes,
@@ -22,23 +22,23 @@ public sealed record CatalogueQuery(
 	string[] ProductSortBy,
 	string[] CatalogueCandidateSortBy,
 	CandidateMappingStatus CandidateMappingStatus = CandidateMappingStatus.Unmapped,
-	bool IncludeHighlights = false) : IQuery<CatalogueResult>;
+	bool IncludeHighlights = false) : IQuery<SearchInCatalogueResult>;
 
-public sealed record CatalogueSection<T>(IReadOnlyCollection<T> Items, long Total);
+public sealed record SearchInCatalogueSection<T>(IReadOnlyCollection<T> Items, long Total);
 
-public sealed record CatalogueResult(
-	CatalogueSection<ProductDto> Products,
-	CatalogueSection<CatalogueCandidateDto> CatalogueCandidates);
+public sealed record SearchInCatalogueResult(
+	SearchInCatalogueSection<ProductDto> Products,
+	SearchInCatalogueSection<CatalogueCandidateDto> SearchInCatalogueCandidates);
 
-public sealed class CatalogueHandler(
+public sealed class SearchInCatalogueHandler(
 	IProductRepository productRepository,
 	ICatalogueCandidateRepository candidateRepository,
 	IProjectionProvider<ProductDocument, ProductDto> productProjection,
 	IProjectionProvider<CatalogueCandidateDocument, CatalogueCandidateDto> candidateProjection)
-	: IQueryHandler<CatalogueQuery, CatalogueResult>
+	: IQueryHandler<SearchInCatalogueQuery, SearchInCatalogueResult>
 {
-	public async Task<CatalogueResult> Handle(
-		CatalogueQuery request,
+	public async Task<SearchInCatalogueResult> Handle(
+		SearchInCatalogueQuery request,
 		CancellationToken cancellationToken)
 	{
 		var commonCriteria = new CatalogueSearchCriteria
@@ -74,8 +74,8 @@ public sealed class CatalogueHandler(
 		var products = await productTask;
 		var candidates = await candidateTask;
 
-		return new CatalogueResult(
-			new CatalogueSection<ProductDto>(
+		return new SearchInCatalogueResult(
+			new SearchInCatalogueSection<ProductDto>(
 				products
 					.Hits
 					.Select(hit => productProjection.ProjectionFunc(hit.Document) with
@@ -84,7 +84,7 @@ public sealed class CatalogueHandler(
 					})
 					.ToArray(),
 				products.Total),
-			new CatalogueSection<CatalogueCandidateDto>(
+			new SearchInCatalogueSection<CatalogueCandidateDto>(
 				candidates
 					.Hits
 					.Select(hit => candidateProjection.ProjectionFunc(hit.Document) with

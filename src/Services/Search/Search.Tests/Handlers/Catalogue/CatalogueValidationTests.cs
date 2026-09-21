@@ -17,7 +17,7 @@ public sealed class CatalogueValidationTests
 			TestContext.Current.CancellationToken);
 
 		result.IsValid.Should().BeFalse();
-		result.Errors.Should().Contain(error => error.PropertyName == nameof(CatalogueQuery.Targets));
+		result.Errors.Should().Contain(error => error.PropertyName == nameof(SearchInCatalogueQuery.Targets));
 	}
 
 	[Fact]
@@ -73,16 +73,16 @@ public sealed class CatalogueValidationTests
 
 		result.IsValid.Should().BeFalse();
 		result.Errors.Should().Contain(
-			error => error.PropertyName == nameof(CatalogueQuery.CandidateMappingStatus));
+			error => error.PropertyName == nameof(SearchInCatalogueQuery.CandidateMappingStatus));
 	}
 
-	private static CatalogueQuery CreateQuery(
+	private static SearchInCatalogueQuery CreateQuery(
 		string? query = "bosch",
 		IReadOnlySet<SearchTarget>? targets = null,
 		IReadOnlySet<SearchMatchType>? skuModes = null,
 		IReadOnlySet<SearchMatchType>? nameModes = null)
 	{
-		return new CatalogueQuery(
+		return new SearchInCatalogueQuery(
 			query,
 			targets ?? new HashSet<SearchTarget>
 			{

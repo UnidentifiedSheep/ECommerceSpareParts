@@ -6,7 +6,7 @@ using Search.Enums;
 
 namespace Search.Application.Handlers.Search.Catalogue;
 
-public sealed class CatalogueValidation : AbstractValidator<CatalogueQuery>
+public sealed class CatalogueValidation : AbstractValidator<SearchInCatalogueQuery>
 {
 	public CatalogueValidation()
 	{
@@ -46,7 +46,7 @@ public sealed class CatalogueValidation : AbstractValidator<CatalogueQuery>
 		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 	}
 
-	private static bool HasApplicableMode(CatalogueQuery query)
+	private static bool HasApplicableMode(SearchInCatalogueQuery query)
 	{
 		var length = query.Query?.Trim().Length ?? 0;
 		if (length is 0 or >= 4)
