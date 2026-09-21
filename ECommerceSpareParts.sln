@@ -183,13 +183,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Common", "src\Servi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifications", "Notifications", "{A8844AF9-9B3B-4BA2-B540-9819A713861C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Core", "src\Infrastructure\Notifications\Notifications.Core\Notifications.Core.csproj", "{8C99C173-8BB8-452C-AF94-CBFB8896AF4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Core", "src\Infrastructure\Notifications\Notification.Core\Notification.Core.csproj", "{8C99C173-8BB8-452C-AF94-CBFB8896AF4B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NamedObjects", "NamedObjects", "{2F6B2B7E-90FF-4D22-9D1A-3D5455B3E01C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NamedObject.Core", "src\Infrastructure\NamedObjects\NamedObject.Core\NamedObject.Core.csproj", "{417F17C1-854B-4C96-871D-8DB2D90D7EB3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NamedObject", "src\Infrastructure\NamedObjects\NamedObject\NamedObject.csproj", "{7CB9CF4F-A7CD-4CC1-BD4B-848C2325F02C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification", "src\Infrastructure\Notifications\Notification\Notification.csproj", "{0A65373D-4E15-4ECF-84C5-94715B983E8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -497,6 +499,10 @@ Global
 		{7CB9CF4F-A7CD-4CC1-BD4B-848C2325F02C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CB9CF4F-A7CD-4CC1-BD4B-848C2325F02C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CB9CF4F-A7CD-4CC1-BD4B-848C2325F02C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A65373D-4E15-4ECF-84C5-94715B983E8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A65373D-4E15-4ECF-84C5-94715B983E8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A65373D-4E15-4ECF-84C5-94715B983E8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A65373D-4E15-4ECF-84C5-94715B983E8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5111875-1112-406F-B3D1-EC119DBB23F6} = {3FC16924-68A6-4CDA-9961-0B0F589E671E}
@@ -587,5 +593,6 @@ Global
 		{2F6B2B7E-90FF-4D22-9D1A-3D5455B3E01C} = {F3A52BAB-BDFB-432B-940B-9CFBD752DA8E}
 		{417F17C1-854B-4C96-871D-8DB2D90D7EB3} = {2F6B2B7E-90FF-4D22-9D1A-3D5455B3E01C}
 		{7CB9CF4F-A7CD-4CC1-BD4B-848C2325F02C} = {2F6B2B7E-90FF-4D22-9D1A-3D5455B3E01C}
+		{0A65373D-4E15-4ECF-84C5-94715B983E8B} = {A8844AF9-9B3B-4BA2-B540-9819A713861C}
 	EndGlobalSection
 EndGlobal
