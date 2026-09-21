@@ -5,9 +5,9 @@ using Search.Enums;
 
 namespace Search.Tests.Handlers.Catalogue;
 
-public sealed class CatalogueValidationTests
+public sealed class SearchInCatalogueValidationTests
 {
-	private readonly CatalogueValidation _validator = new();
+	private readonly SearchInCatalogueValidation _validator = new();
 
 	[Fact]
 	public async Task Validate_WhenTargetsAreEmpty_ShouldFail()

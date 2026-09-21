@@ -6,9 +6,9 @@ using Search.Enums;
 
 namespace Search.Application.Handlers.Search.Catalogue;
 
-public sealed class CatalogueValidation : AbstractValidator<SearchInCatalogueQuery>
+public sealed class SearchInCatalogueValidation : AbstractValidator<SearchInCatalogueQuery>
 {
-	public CatalogueValidation()
+	public SearchInCatalogueValidation()
 	{
 		RuleFor(x => x.Query)
 			.MaximumLength(200)
