@@ -5,7 +5,7 @@ using MediatR;
 using Search.Api.GraphQl.Types;
 using Search.Api.GraphQl.Types.Highlights;
 using Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
-using Search.Application.Handlers.Catalogue.SearchCatalogue;
+using Search.Application.Handlers.Search.Catalogue;
 using Search.Enums;
 
 namespace Search.Api.GraphQl.Queries;
@@ -20,7 +20,7 @@ public sealed class CatalogueQueries
 		CancellationToken ct)
 	{
 		var result = await sender.Send(
-			new SearchCatalogueQuery(
+			new CatalogueQuery(
 				input.Query,
 				input.Targets.ToHashSet(),
 				input.SkuModes.ToHashSet(),

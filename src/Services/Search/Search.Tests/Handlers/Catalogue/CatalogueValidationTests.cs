@@ -1,13 +1,13 @@
 using Abstractions.Models;
 using FluentAssertions;
-using Search.Application.Handlers.Catalogue.SearchCatalogue;
+using Search.Application.Handlers.Search.Catalogue;
 using Search.Enums;
 
 namespace Search.Tests.Handlers.Catalogue;
 
-public sealed class SearchCatalogueValidationTests
+public sealed class CatalogueValidationTests
 {
-	private readonly SearchCatalogueValidation _validator = new();
+	private readonly CatalogueValidation _validator = new();
 
 	[Fact]
 	public async Task Validate_WhenTargetsAreEmpty_ShouldFail()
@@ -17,7 +17,7 @@ public sealed class SearchCatalogueValidationTests
 			TestContext.Current.CancellationToken);
 
 		result.IsValid.Should().BeFalse();
-		result.Errors.Should().Contain(error => error.PropertyName == nameof(SearchCatalogueQuery.Targets));
+		result.Errors.Should().Contain(error => error.PropertyName == nameof(CatalogueQuery.Targets));
 	}
 
 	[Fact]
@@ -73,16 +73,16 @@ public sealed class SearchCatalogueValidationTests
 
 		result.IsValid.Should().BeFalse();
 		result.Errors.Should().Contain(
-			error => error.PropertyName == nameof(SearchCatalogueQuery.CandidateMappingStatus));
+			error => error.PropertyName == nameof(CatalogueQuery.CandidateMappingStatus));
 	}
 
-	private static SearchCatalogueQuery CreateQuery(
+	private static CatalogueQuery CreateQuery(
 		string? query = "bosch",
 		IReadOnlySet<SearchTarget>? targets = null,
 		IReadOnlySet<SearchMatchType>? skuModes = null,
 		IReadOnlySet<SearchMatchType>? nameModes = null)
 	{
-		return new SearchCatalogueQuery(
+		return new CatalogueQuery(
 			query,
 			targets ?? new HashSet<SearchTarget>
 			{

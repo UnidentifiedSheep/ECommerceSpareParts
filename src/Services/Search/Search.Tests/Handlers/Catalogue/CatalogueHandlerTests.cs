@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using FluentAssertions;
 using Moq;
-using Search.Application.Handlers.Catalogue.SearchCatalogue;
+using Search.Application.Handlers.Search.Catalogue;
 using Search.Application.Interfaces.CatalogueCandidate;
 using Search.Application.Interfaces.Product;
 using Search.Application.Models.CatalogueSearch;
@@ -12,7 +12,7 @@ using ProductDocument = Search.Entities.Product;
 
 namespace Search.Tests.Handlers.Catalogue;
 
-public sealed class SearchCatalogueHandlerTests
+public sealed class CatalogueHandlerTests
 {
 	private readonly Mock<ICatalogueCandidateRepository> _candidateRepository = new();
 
@@ -123,25 +123,25 @@ public sealed class SearchCatalogueHandlerTests
 			Times.Once);
 	}
 
-	private SearchCatalogueHandler CreateHandler()
+	private CatalogueHandler CreateHandler()
 	{
 		var productProjection = new ProductDtoProjectionProvider(
 			new ProductDimensionsDtoProjectionProvider(),
 			new ProductWeightDtoProjectionProvider());
 
-		return new SearchCatalogueHandler(
+		return new CatalogueHandler(
 			_productRepository.Object,
 			_candidateRepository.Object,
 			productProjection,
 			new CatalogueCandidateDtoProjectionProvider());
 	}
 
-	private static SearchCatalogueQuery CreateQuery(
+	private static CatalogueQuery CreateQuery(
 		IReadOnlySet<SearchTarget> targets,
 		bool includeHighlights = false,
 		CandidateMappingStatus candidateMappingStatus = CandidateMappingStatus.Unmapped)
 	{
-		return new SearchCatalogueQuery(
+		return new CatalogueQuery(
 			"  bosch 123  ",
 			targets,
 			new HashSet<SearchMatchType>

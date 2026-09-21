@@ -4,11 +4,11 @@ using FluentValidation;
 using Search.Abstractions;
 using Search.Enums;
 
-namespace Search.Application.Handlers.Catalogue.SearchCatalogue;
+namespace Search.Application.Handlers.Search.Catalogue;
 
-public sealed class SearchCatalogueValidation : AbstractValidator<SearchCatalogueQuery>
+public sealed class CatalogueValidation : AbstractValidator<CatalogueQuery>
 {
-	public SearchCatalogueValidation()
+	public CatalogueValidation()
 	{
 		RuleFor(x => x.Query)
 			.MaximumLength(200)
@@ -46,7 +46,7 @@ public sealed class SearchCatalogueValidation : AbstractValidator<SearchCatalogu
 		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 	}
 
-	private static bool HasApplicableMode(SearchCatalogueQuery query)
+	private static bool HasApplicableMode(CatalogueQuery query)
 	{
 		var length = query.Query?.Trim().Length ?? 0;
 		if (length is 0 or >= 4)

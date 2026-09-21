@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Search.Application.Dtos.CatalogueCandidates;
 using Search.Application.Dtos.Products;
-using Search.Application.Handlers.Catalogue.SearchCatalogue;
+using Search.Application.Handlers.Search.Catalogue;
 using Search.Application.Models.CatalogueSearch;
 using Search.Enums;
 
@@ -64,10 +64,10 @@ public sealed record CatalogueSearchSortRequest
 public sealed record SearchCatalogueResponse
 {
 	[JsonPropertyName("products")]
-	public required SearchCatalogueSection<ProductDto> Products { get; init; }
+	public required CatalogueSection<ProductDto> Products { get; init; }
 
 	[JsonPropertyName("catalogueCandidates")]
-	public required SearchCatalogueSection<CatalogueCandidateDto> CatalogueCandidates { get; init; }
+	public required CatalogueSection<CatalogueCandidateDto> CatalogueCandidates { get; init; }
 }
 
 public sealed class SearchCatalogueEndPoint : ICarterModule
@@ -82,7 +82,7 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 					CancellationToken cancellationToken) =>
 				{
 					var result = await sender.Send(
-						new SearchCatalogueQuery(
+						new CatalogueQuery(
 							request.Query,
 							(request.Targets ?? CatalogueSearchDefaults.Targets).ToHashSet(),
 							(request.Fields?.Sku ?? CatalogueSearchDefaults.SkuModes).ToHashSet(),
