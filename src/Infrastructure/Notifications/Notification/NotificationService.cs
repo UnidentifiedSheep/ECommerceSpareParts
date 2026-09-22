@@ -1,3 +1,4 @@
+using Abstractions.Interfaces.Persistence;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
 using Notification.Core.Interfaces;
@@ -10,7 +11,7 @@ namespace Notification;
 public class NotificationService(
 	IRecipientResolver recipientResolver,
 	INamedObjectRegistry<INotificationDefinition> definitionRegistry,
-	INotificationStore store,
+	IUnitOfWork unitOfWork,
 	INamedObjectRegistry<INotificationChannel> channelsRegistry
 	) : INotificationService
 {
@@ -25,7 +26,7 @@ public class NotificationService(
 		var entity = Create(notification, recipients);
 
 		if (entity is not null)
-			await store.AddRangeAsync([entity], cancellationToken);
+			await unitOfWork.AddRangeAsync([entity], cancellationToken);
 	}
 
 	public async Task SendAsync(
@@ -54,7 +55,7 @@ public class NotificationService(
 		}
 
 		if (entities.Count != 0)
-			await store.AddRangeAsync(entities, cancellationToken);
+			await unitOfWork.AddRangeAsync(entities, cancellationToken);
 	}
 
 	private NotificationEntity? Create(

@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj" />
       <ProjectReference Include="..\..\NamedObjects\NamedObject\NamedObject.csproj" />
       <ProjectReference Include="..\Notification.Core\Notification.Core.csproj" />
     </ItemGroup>
