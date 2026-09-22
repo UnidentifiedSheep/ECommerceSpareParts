@@ -1,31 +1,61 @@
+using System.Runtime.ExceptionServices;
+using Microsoft.Extensions.Logging;
 using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Interfaces.Recipient;
 
-namespace Notification; //TODO: logger needed.
+namespace Notification;
 
 public abstract class NotificationChannelBase<TNotification, TDestination, TDestinationReceipt>(
-	IEnumerable<IChannelDeliveryObserver<TDestinationReceipt, TDestination>> observers)
+	IEnumerable<IChannelDeliveryObserver<TDestinationReceipt, TDestination>> observers,
+	ILogger logger)
 	: INotificationChannel<TNotification, TDestination>
 	where TNotification : INotification
 	where TDestination : INotificationRecipient
 	where TDestinationReceipt : IDeliveryReceipt<TDestination>
 {
 	private readonly IReadOnlyList<IChannelDeliveryObserver<TDestinationReceipt, TDestination>> _observers = observers.ToArray();
+	protected ILogger Logger => logger;
 
 	public abstract string SystemName { get; }
 
-	protected async Task NotifyObserversAsync( //TODO: need to try catch this sh... and log on error.
+	protected async Task NotifyObserversAsync(
 		IReadOnlyCollection<TDestinationReceipt> receipts,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default,
+		bool throwOnObserverError = false)
 	{
 		ArgumentNullException.ThrowIfNull(receipts);
 
 		if (receipts.Count == 0) return;
 
+		List<Exception>? failures = null;
 		foreach (var observer in _observers)
-			await observer.ObserveAsync(receipts, cancellationToken);
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			try
+			{
+				await observer.ObserveAsync(receipts, cancellationToken);
+			}
+			catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+			{
+				throw;
+			}
+			catch (Exception exception)
+			{
+				logger.LogError(exception,
+					"Notification delivery observer {ObserverType} failed for channel {ChannelSystemName}.",
+					observer.GetType().FullName,
+					SystemName);
+				if (throwOnObserverError)
+					(failures ??= []).Add(exception);
+			}
+		}
+
+		if (failures is { Count: 1 })
+			ExceptionDispatchInfo.Capture(failures[0]).Throw();
+		if (failures is { Count: > 1 })
+			throw new AggregateException("Multiple notification delivery observers failed.", failures);
 	}
 
 	public bool CanHandle(

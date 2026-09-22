@@ -1,4 +1,6 @@
+using Abstractions.Interfaces.Persistence;
 using Locan.Core.Interfaces;
+using Microsoft.Extensions.Logging;
 using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
@@ -10,8 +12,10 @@ namespace Notification.Channels.InApp;
 
 public class InAppChannel(
 	INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent> renderer,
-	IEnumerable<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>> observers
-	) : NotificationChannelBase<ISimpleNotification<ILocalizableMessage>, InAppRecipient, InAppReceipt>(observers)
+	IEnumerable<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>> observers,
+	IUnitOfWork unitOfWork,
+	ILogger<InAppChannel> logger
+	) : NotificationChannelBase<ISimpleNotification<ILocalizableMessage>, InAppRecipient, InAppReceipt>(observers, logger)
 {
 	public override string SystemName => InAppRecipient.ChannelName;
 
