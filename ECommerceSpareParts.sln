@@ -193,6 +193,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NamedObject", "src\Infrastr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification", "src\Infrastructure\Notifications\Notification\Notification.csproj", "{0A65373D-4E15-4ECF-84C5-94715B983E8B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Persistence", "src\Infrastructure\Notifications\Notification.Persistence\Notification.Persistence.csproj", "{CDDC94D5-AD8A-49D5-8662-AC1951EFDCF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -503,6 +505,10 @@ Global
 		{0A65373D-4E15-4ECF-84C5-94715B983E8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A65373D-4E15-4ECF-84C5-94715B983E8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A65373D-4E15-4ECF-84C5-94715B983E8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDDC94D5-AD8A-49D5-8662-AC1951EFDCF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDDC94D5-AD8A-49D5-8662-AC1951EFDCF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDDC94D5-AD8A-49D5-8662-AC1951EFDCF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDDC94D5-AD8A-49D5-8662-AC1951EFDCF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5111875-1112-406F-B3D1-EC119DBB23F6} = {3FC16924-68A6-4CDA-9961-0B0F589E671E}
@@ -594,5 +600,6 @@ Global
 		{417F17C1-854B-4C96-871D-8DB2D90D7EB3} = {2F6B2B7E-90FF-4D22-9D1A-3D5455B3E01C}
 		{7CB9CF4F-A7CD-4CC1-BD4B-848C2325F02C} = {2F6B2B7E-90FF-4D22-9D1A-3D5455B3E01C}
 		{0A65373D-4E15-4ECF-84C5-94715B983E8B} = {A8844AF9-9B3B-4BA2-B540-9819A713861C}
+		{CDDC94D5-AD8A-49D5-8662-AC1951EFDCF2} = {A8844AF9-9B3B-4BA2-B540-9819A713861C}
 	EndGlobalSection
 EndGlobal

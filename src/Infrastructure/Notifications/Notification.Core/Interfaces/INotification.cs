@@ -1,5 +1,6 @@
 using System.Globalization;
 using Locan.Core.Interfaces;
+using NamedObject.Core.Interfaces;
 
 namespace Notification.Core.Interfaces;
 
@@ -11,7 +12,7 @@ public interface INotification<out TModel> : INotification
 	TModel Model { get; }
 }
 
-public interface INotification
+public interface INotification : INamedObject
 {
 	CultureInfo? SelectedCulture { get; }
 }
