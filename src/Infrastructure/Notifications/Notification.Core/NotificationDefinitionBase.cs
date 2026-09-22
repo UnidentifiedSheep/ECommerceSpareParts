@@ -1,23 +1,34 @@
+using System.Globalization;
 using Notification.Core.Interfaces;
 
 namespace Notification.Core;
 
-public abstract class NotificationDefinitionBase<TNotification>(
-	INotificationSerializer serializer
-	) : INotificationDefinition<TNotification>
-	where TNotification : INotification
+public sealed class NotificationDefinitionBase<TNotification, TModel>(
+	string systemName,
+	INotificationSerializer serializer,
+	Func<TModel, CultureInfo?, TNotification> createNotification)
+	: INotificationDefinition<TNotification>
+	where TNotification : INotification<TModel>
 {
-	public abstract string SystemName { get; }
+	private readonly INotificationSerializer _serializer =
+		serializer ?? throw new ArgumentNullException(nameof(serializer));
+
+	private readonly Func<TModel, CultureInfo?, TNotification> _createNotification =
+		createNotification ?? throw new ArgumentNullException(nameof(createNotification));
+
+	public string SystemName { get; } =
+		!string.IsNullOrWhiteSpace(systemName)
+			? systemName
+			: throw new ArgumentException("Notification system name must not be empty.", nameof(systemName));
 
 	public TNotification FromEntity(Entities.Notification entity)
 	{
 		ArgumentNullException.ThrowIfNull(entity);
 		EnsureCanHandle(entity.NotificationSystemName);
 
-		return FromEntityCore(entity);
+		var model = _serializer.Deserialize<TModel>(entity.Model);
+		return _createNotification(model, entity.Culture);
 	}
-
-	protected abstract TNotification FromEntityCore(Entities.Notification entity);
 
 	public Entities.Notification ToEntity(Guid userId, TNotification notification)
 	{
@@ -27,16 +38,13 @@ public abstract class NotificationDefinitionBase<TNotification>(
 		return Entities.Notification.Create(
 			userId,
 			SystemName,
-			serializer.Serialize(notification),
+			_serializer.Serialize(notification),
 			notification.SelectedCulture);
 	}
 
-	INotification INotificationDefinition.FromEntity(Entities.Notification entity)
-		=> FromEntity(entity);
+	INotification INotificationDefinition.FromEntity(Entities.Notification entity) => FromEntity(entity);
 
-	Entities.Notification INotificationDefinition.ToEntity(
-		Guid userId,
-		INotification notification)
+	Entities.Notification INotificationDefinition.ToEntity(Guid userId, INotification notification)
 	{
 		ArgumentNullException.ThrowIfNull(notification);
 

@@ -1,8 +1,9 @@
-using System.Reflection;
+using System.Globalization;
 using Locan.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
+using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Channels;
 using Notification.Interfaces;
@@ -25,22 +26,21 @@ public static class ServiceCollectionExtensions
 		return services;
 	}
 
-	public static IServiceCollection AddNotificationDefinitions(
+	public static IServiceCollection AddNotification<TNotification, TModel>(
 		this IServiceCollection services,
-		params Assembly[] assemblies)
+		string systemName,
+		Func<TModel, CultureInfo?, TNotification> createNotification)
+		where TNotification : INotification<TModel>
 	{
-		ArgumentNullException.ThrowIfNull(assemblies);
+		ArgumentException.ThrowIfNullOrWhiteSpace(systemName);
+		ArgumentNullException.ThrowIfNull(createNotification);
 
-		if (assemblies.Length == 0)
-			throw new ArgumentException(
-				"At least one notification definitions assembly must be specified.",
-				nameof(assemblies));
-
-		foreach (var assembly in assemblies.Distinct())
-		{
-			ArgumentNullException.ThrowIfNull(assembly);
-			services.RegisterNamedObject<INotificationDefinition>(assembly);
-		}
+		services.AddNamedObjectRegistry();
+		services.AddSingleton<INotificationDefinition>(provider =>
+			new NotificationDefinitionBase<TNotification, TModel>(
+				systemName,
+				provider.GetRequiredService<INotificationSerializer>(),
+				createNotification));
 
 		return services;
 	}

@@ -47,6 +47,13 @@ public static class ServiceCollectionExtensions
 			}
 		});
 
+		services.AddNamedObjectRegistry();
+
+		return services;
+	}
+
+	public static IServiceCollection AddNamedObjectRegistry(this IServiceCollection services)
+	{
 		services.TryAddScoped(typeof(INamedObjectRegistry<>), typeof(NamedObjectRegistry<>));
 		services.TryAddScoped<INamedObjectGroupResolver, NamedObjectGroupResolver>();
 
