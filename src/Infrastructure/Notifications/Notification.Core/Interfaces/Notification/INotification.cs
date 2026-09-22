@@ -2,7 +2,7 @@ using System.Globalization;
 using Locan.Core.Interfaces;
 using NamedObject.Core.Interfaces;
 
-namespace Notification.Core.Interfaces;
+namespace Notification.Core.Interfaces.Notification;
 
 public interface ISimpleNotification<out TModel>
 	: INotification<TModel> where TModel : ILocalizableMessage;

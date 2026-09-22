@@ -1,6 +1,8 @@
 using NamedObject.Core.Interfaces;
 using Notification.Core;
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Notification;
+using Notification.Core.Interfaces.Recipient;
 using NotificationEntity = Notification.Core.Entities.Notification;
 
 namespace Notification;

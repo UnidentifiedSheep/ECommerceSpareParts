@@ -5,7 +5,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
 using Notification.Core;
 using Notification.Core.Interfaces;
-using Notification.Channels;
+using Notification.Channels.InApp;
+using Notification.Core.Interfaces.Notification;
 using Notification.Interfaces;
 using Notification.NotificationContents;
 using Notification.Renderers;
@@ -17,6 +18,7 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddNotificationServices(this IServiceCollection services)
 	{
 		services.RegisterNamedObject<INotificationChannel>(typeof(InAppChannel).Assembly);
+
 		services.TryAddScoped<
 			INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent>,
 			TextNotificationRenderer>();

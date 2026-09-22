@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Notification;
 
 namespace Notification.Persistence;
 

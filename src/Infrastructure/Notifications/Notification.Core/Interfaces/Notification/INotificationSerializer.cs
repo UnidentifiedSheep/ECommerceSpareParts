@@ -1,4 +1,4 @@
-namespace Notification.Core.Interfaces;
+namespace Notification.Core.Interfaces.Notification;
 
 public interface INotificationSerializer
 {

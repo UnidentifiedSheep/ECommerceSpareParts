@@ -1,13 +1,32 @@
 using Notification.Core;
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Notification;
+using Notification.Core.Interfaces.Recipient;
 
-namespace Notification;
+namespace Notification; //TODO: logger needed.
 
-public abstract class NotificationChannelBase<TNotification, TDestination> : INotificationChannel<TNotification, TDestination>
+public abstract class NotificationChannelBase<TNotification, TDestination, TDestinationReceipt>(
+	IEnumerable<IChannelDeliveryObserver<TDestinationReceipt, TDestination>> observers)
+	: INotificationChannel<TNotification, TDestination>
 	where TNotification : INotification
 	where TDestination : INotificationRecipient
+	where TDestinationReceipt : IDeliveryReceipt<TDestination>
 {
+	private readonly IReadOnlyList<IChannelDeliveryObserver<TDestinationReceipt, TDestination>> _observers = observers.ToArray();
+
 	public abstract string SystemName { get; }
+
+	protected async Task NotifyObserversAsync( //TODO: need to try catch this sh... and log on error.
+		IReadOnlyCollection<TDestinationReceipt> receipts,
+		CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(receipts);
+
+		if (receipts.Count == 0) return;
+
+		foreach (var observer in _observers)
+			await observer.ObserveAsync(receipts, cancellationToken);
+	}
 
 	public bool CanHandle(
 		INotification notification,

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Notification;
 
 namespace Notification.Interfaces;
 

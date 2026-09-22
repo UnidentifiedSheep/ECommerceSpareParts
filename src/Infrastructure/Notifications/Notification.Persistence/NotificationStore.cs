@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Persistence;
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Notification;
 using NotificationEntity = Notification.Core.Entities.Notification;
 
 namespace Notification.Persistence;

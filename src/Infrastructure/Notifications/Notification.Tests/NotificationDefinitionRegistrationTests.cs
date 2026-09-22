@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Notification;
 
 namespace Notification.Tests;
 

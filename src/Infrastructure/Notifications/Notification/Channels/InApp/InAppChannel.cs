@@ -1,15 +1,17 @@
 using Locan.Core.Interfaces;
 using Notification.Core;
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
 using Notification.Interfaces;
 using Notification.NotificationContents;
 
-namespace Notification.Channels;
+namespace Notification.Channels.InApp;
 
 public class InAppChannel(
-	INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent> renderer
-	) : NotificationChannelBase<ISimpleNotification<ILocalizableMessage>, InAppRecipient>
+	INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent> renderer,
+	IEnumerable<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>> observers
+	) : NotificationChannelBase<ISimpleNotification<ILocalizableMessage>, InAppRecipient, InAppReceipt>(observers)
 {
 	public override string SystemName => InAppRecipient.ChannelName;
 

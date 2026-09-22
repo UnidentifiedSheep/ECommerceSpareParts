@@ -1,6 +1,6 @@
 using NamedObject.Core.Interfaces;
 
-namespace Notification.Core.Interfaces;
+namespace Notification.Core.Interfaces.Notification;
 
 public interface INotificationDefinition : INamedObject
 {

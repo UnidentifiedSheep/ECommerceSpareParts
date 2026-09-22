@@ -1,6 +1,7 @@
 using NamedObject.Core.Interfaces;
+using Notification.Core.Interfaces.Recipient;
 
-namespace Notification.Core.Interfaces;
+namespace Notification.Core.Interfaces.Notification;
 
 public interface INotificationChannel<TNotification, TDestination> : INotificationChannel
 	where TNotification : INotification

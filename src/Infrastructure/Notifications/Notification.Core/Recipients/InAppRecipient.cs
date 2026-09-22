@@ -1,4 +1,5 @@
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Recipient;
 
 namespace Notification.Core.Recipients;
 

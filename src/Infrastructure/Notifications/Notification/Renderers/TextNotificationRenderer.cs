@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Notification.Core.Interfaces;
+using Notification.Core.Interfaces.Notification;
 using Notification.Interfaces;
 using Notification.NotificationContents;
 
