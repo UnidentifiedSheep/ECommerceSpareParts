@@ -1,3 +1,6 @@
 namespace Notification.Core.Interfaces;
 
-public interface INotificationRecipient;
+public interface INotificationRecipient
+{
+	string ChannelSystemName { get; }
+}

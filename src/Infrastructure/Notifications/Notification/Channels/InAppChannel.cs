@@ -11,15 +11,20 @@ public class InAppChannel(
 	INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent> renderer
 	) : NotificationChannelBase<ISimpleNotification<ILocalizableMessage>, InAppRecipient>
 {
-	public override string SystemName => "InApp";
-	public override async Task<IReadOnlyList<bool>> SendBatchAsync(
-		IEnumerable<NotificationDelivery<ISimpleNotification<ILocalizableMessage>, InAppRecipient>> notifications,
+	public override string SystemName => InAppRecipient.ChannelName;
+
+	public override async Task<IReadOnlyList<NotificationSendResult>> SendBatchAsync(
+		IReadOnlyCollection<NotificationDelivery<ISimpleNotification<ILocalizableMessage>, InAppRecipient>> notifications,
 		CancellationToken cancellationToken = default)
 	{
 		var rendered = await renderer.TryRenderAsync(
 			notifications.Select(x => x.Notification),
 			cancellationToken);
 
-		return rendered.Select(x => x != null).ToList();
+		return rendered
+			.Select(x => x is not null
+				? NotificationSendResult.Success()
+				: NotificationSendResult.Failure("Unable to render notification."))
+			.ToList();
 	}
 }

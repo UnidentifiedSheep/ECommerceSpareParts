@@ -10,9 +10,13 @@ public interface ISimpleNotification<out TModel>
 public interface INotification<out TModel> : INotification
 {
 	TModel Model { get; }
+
+	object INotification.GetModel() => Model!;
 }
 
 public interface INotification : INamedObject
 {
 	CultureInfo? SelectedCulture { get; }
+
+	object GetModel();
 }
