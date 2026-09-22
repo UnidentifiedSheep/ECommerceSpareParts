@@ -12,4 +12,13 @@ public sealed class NotificationSerializer : INotificationSerializer
 		var model = notification.GetModel();
 		return JsonSerializer.Serialize(model, model.GetType());
 	}
+
+	public TModel Deserialize<TModel>(string json)
+	{
+		ArgumentNullException.ThrowIfNull(json);
+
+		return JsonSerializer.Deserialize<TModel>(json)
+			?? throw new InvalidOperationException(
+				$"Notification model '{typeof(TModel).Name}' is empty.");
+	}
 }
