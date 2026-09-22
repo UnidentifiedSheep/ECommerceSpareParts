@@ -13,7 +13,7 @@ public class NotificationDefinitionRegistrationTests
 	{
 		var services = CreateServices();
 		services.AddNotification<TestNotification, TestNotificationData>(
-			"TestNotification",
+			TestNotification.Name,
 			(model, culture) => new TestNotification(model, culture));
 
 		using var provider = services.BuildServiceProvider(validateScopes: true);

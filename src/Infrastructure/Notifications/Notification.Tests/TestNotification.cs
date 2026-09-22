@@ -6,7 +6,8 @@ namespace Notification.Tests;
 
 public class TestNotification : INotification<TestNotificationData>
 {
-	public string SystemName => "TestNotification";
+	public const string Name = "TestNotification";
+	public string SystemName => Name;
 	public CultureInfo? SelectedCulture { get; }
 	public TestNotificationData Model { get; }
 
