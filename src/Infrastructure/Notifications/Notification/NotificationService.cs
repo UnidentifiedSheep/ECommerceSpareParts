@@ -7,7 +7,7 @@ namespace Notification;
 
 public class NotificationService(
 	IRecipientResolver recipientResolver,
-	INotificationSerializer serializer,
+	INamedObjectRegistry<INotificationDefinition> definitionRegistry,
 	INotificationStore store,
 	INamedObjectRegistry<INotificationChannel> channelsRegistry
 	) : INotificationService
@@ -75,11 +75,8 @@ public class NotificationService(
 
 		if (channelSystemNames.Count == 0) return null;
 
-		var notification = NotificationEntity.Create(
-			item.UserId,
-			item.Notification.SystemName,
-			serializer.Serialize(item.Notification),
-			item.Notification.SelectedCulture);
+		var definition = definitionRegistry.GetBySystemName(item.Notification.SystemName);
+		var notification = definition.ToEntity(item.UserId, item.Notification);
 
 		foreach (var channelSystemName in channelSystemNames)
 			notification.MakeDelivery(channelSystemName);

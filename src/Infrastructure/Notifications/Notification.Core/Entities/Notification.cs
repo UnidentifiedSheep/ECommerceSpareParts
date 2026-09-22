@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
+using Domain.Validation;
 
 namespace Notification.Core.Entities;
 
@@ -28,7 +29,8 @@ public sealed class Notification : Entity<Notification, int>, ILinqEntity<Notifi
 	{
 		UserId = userId;
 		NotificationSystemName = notificationSystemName;
-		Model = model;
+		Model = model.EnsureValidJson(
+			() => new InvalidOperationException("Model must be valid json value."));
 		Culture = culture;
 		CreateAt = DateTime.UtcNow;
 	}
