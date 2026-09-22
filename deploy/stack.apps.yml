@@ -42,7 +42,6 @@ services:
         aliases:
           - main-api
     deploy:
-      endpoint_mode: dnsrr
       replicas: ${MAIN_API_REPLICAS:-1}
       placement:
         constraints:
@@ -70,7 +69,6 @@ services:
         aliases:
           - analytics-api
     deploy:
-      endpoint_mode: dnsrr
       replicas: ${ANALYTICS_API_REPLICAS:-1}
       placement:
         constraints:
@@ -98,7 +96,6 @@ services:
         aliases:
           - pricing-api
     deploy:
-      endpoint_mode: dnsrr
       replicas: ${PRICING_API_REPLICAS:-1}
       placement:
         constraints:
@@ -126,7 +123,6 @@ services:
         aliases:
           - search-api
     deploy:
-      endpoint_mode: dnsrr
       replicas: ${SEARCH_API_REPLICAS:-1}
       placement:
         constraints:
