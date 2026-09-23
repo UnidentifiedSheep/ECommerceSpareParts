@@ -9,7 +9,7 @@ using Notification.Core.Recipients;
 using Notification.Interfaces;
 using Notification.NotificationContents;
 
-namespace Notification.Channels.InApp;
+namespace Notification.Channels;
 
 public class InAppChannel(
 	INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent> renderer,

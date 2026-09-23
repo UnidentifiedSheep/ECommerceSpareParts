@@ -2,7 +2,7 @@ using Abstractions.Interfaces.Persistence;
 using Locan.Core.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Notification.Channels.InApp;
+using Notification.Channels;
 using Notification.Core.Entities;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
