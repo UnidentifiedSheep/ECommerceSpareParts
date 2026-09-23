@@ -2,6 +2,7 @@ using Abstractions.Interfaces.Persistence;
 using Locan.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Notification.Core;
+using Notification.Core.Entities;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
@@ -23,14 +24,47 @@ public class InAppChannel(
 		IReadOnlyCollection<NotificationDelivery<ISimpleNotification<ILocalizableMessage>, InAppRecipient>> notifications,
 		CancellationToken cancellationToken = default)
 	{
+		ArgumentNullException.ThrowIfNull(notifications);
+		if (notifications.Count == 0) return [];
+
+		var deliveries = notifications.ToArray();
 		var rendered = await renderer.TryRenderAsync(
-			notifications.Select(x => x.Notification),
+			deliveries.Select(x => x.Notification),
 			cancellationToken);
 
-		return rendered
-			.Select(x => x is not null
-				? NotificationSendResult.Success()
-				: NotificationSendResult.Failure("Unable to render notification."))
-			.ToList();
+		if (rendered.Count != deliveries.Length)
+			throw new InvalidOperationException(
+				$"Channel '{SystemName}' received {rendered.Count} rendered contents for {deliveries.Length} deliveries.");
+
+		var results = new NotificationSendResult[deliveries.Length];
+		var rows = new List<InAppNotification>(deliveries.Length);
+		var recipients = new List<InAppRecipient>(deliveries.Length);
+		for (var i = 0; i < deliveries.Length; i++)
+		{
+			var content = rendered[i];
+			if (content is null)
+			{
+				results[i] = NotificationSendResult.Failure("Unable to render notification.");
+				continue;
+			}
+
+			var recipient = deliveries[i].Recipient;
+			rows.Add(InAppNotification.Create(recipient.UserId, content.Text));
+			recipients.Add(recipient);
+			results[i] = NotificationSendResult.Success();
+		}
+
+		if (rows.Count == 0) return results;
+
+		await unitOfWork.AddRangeAsync(rows, cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
+
+		var receipts = rows
+			.Select((row, i) => new InAppReceipt(recipients[i], row.Id))
+			.ToArray();
+
+		await NotifyObserversAsync(receipts, cancellationToken);
+
+		return results;
 	}
 }

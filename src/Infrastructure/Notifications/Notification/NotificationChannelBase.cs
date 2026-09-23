@@ -22,8 +22,7 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 
 	protected async Task NotifyObserversAsync(
 		IReadOnlyCollection<TDestinationReceipt> receipts,
-		CancellationToken cancellationToken = default,
-		bool throwOnObserverError = false)
+		CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(receipts);
 
@@ -47,7 +46,7 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 					"Notification delivery observer {ObserverType} failed for channel {ChannelSystemName}.",
 					observer.GetType().FullName,
 					SystemName);
-				if (throwOnObserverError)
+				if (observer.ThrowOnFailure)
 					(failures ??= []).Add(exception);
 			}
 		}
