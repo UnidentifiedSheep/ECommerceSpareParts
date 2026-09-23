@@ -15,7 +15,7 @@ public class NotificationService(
 	INamedObjectRegistry<INotificationChannel> channelsRegistry
 	) : INotificationService
 {
-	public async Task SendAsync(
+	public async Task QueueAsync(
 		NotificationItem notification,
 		CancellationToken cancellationToken = default)
 	{
@@ -29,7 +29,7 @@ public class NotificationService(
 			await unitOfWork.AddRangeAsync([entity], cancellationToken);
 	}
 
-	public async Task SendAsync(
+	public async Task QueueAsync(
 		IReadOnlyCollection<NotificationItem> notifications,
 		CancellationToken cancellationToken = default)
 	{

@@ -2,11 +2,11 @@ namespace Notification.Core.Interfaces.Notification;
 
 public interface INotificationService
 {
-	Task SendAsync(
+	Task QueueAsync(
 		NotificationItem notification,
 		CancellationToken cancellationToken = default);
 
-	Task SendAsync(
+	Task QueueAsync(
 		IReadOnlyCollection<NotificationItem> notifications,
 		CancellationToken cancellationToken = default);
 }
