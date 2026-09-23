@@ -7,8 +7,8 @@ using Notification.Channels;
 using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
+using Notification.Dequeuers;
 using Notification.Interfaces;
-using Notification.NotificationContents;
 using Notification.Renderers;
 
 namespace Notification;
@@ -18,10 +18,16 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddNotificationServices(this IServiceCollection services)
 	{
 		services.RegisterNamedObject<INotificationChannel>(typeof(InAppChannel).Assembly);
+		services.RegisterNamedObject<DequeuerBase>(typeof(DequeuerBase).Assembly, ServiceLifetime.Singleton);
 
 		services.TryAddScoped<
-			INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent>,
+			INotificationRenderer<ISimpleNotification<ILocalizableMessage>>,
 			TextNotificationRenderer>();
+
+		services.TryAddScoped<
+			INotificationRenderer<INotification>,
+			HtmlNotificationRenderer>();
+
 		services.TryAddSingleton<INotificationSerializer, NotificationSerializer>();
 		services.TryAddScoped<INotificationService, NotificationService>();
 

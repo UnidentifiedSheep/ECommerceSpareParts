@@ -30,6 +30,7 @@ public static class ServiceProvider
 			.UseFileSystemProject(templatesRoot)
 			.UseMemoryCachingProvider()
 			.Build());
+
 		collection.AddSingleton<IEmailMessageRenderer, EmailMessageRenderer>();
 
 		return collection;

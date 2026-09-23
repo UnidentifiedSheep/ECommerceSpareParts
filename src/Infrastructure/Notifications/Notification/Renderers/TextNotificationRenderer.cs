@@ -1,55 +1,37 @@
 using System.Diagnostics.CodeAnalysis;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Interfaces;
-using Notification.NotificationContents;
 
 namespace Notification.Renderers;
 
 public class TextNotificationRenderer(
 	ILocalizer localizer,
 	IContextualLocalizer contextualLocalizer
-	) : INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent>
+	) : INotificationRenderer<ISimpleNotification<ILocalizableMessage>>
 {
-	public Task<TextNotificationContent> TryRenderAsync(ISimpleNotification<ILocalizableMessage> notification)
-		=> Task.FromResult(new TextNotificationContent(notification.SelectedCulture == null
-			? contextualLocalizer.Get(notification.Model)
-			: localizer.Get(notification.Model, notification.SelectedCulture)));
-
-	public Task<bool> TryRenderAsync(
+	public Task<INotificationContent?> TryRenderAsync(
 		ISimpleNotification<ILocalizableMessage> notification,
-		CancellationToken cancellationToken,
-		[NotNullWhen(true)]
-		out TextNotificationContent? content)
-	{
-		content = null;
-		if (notification.SelectedCulture == null)
-		{
-			if (!contextualLocalizer.TryGet(notification.Model, out var value))
-				return Task.FromResult(false);
+		CancellationToken cancellationToken)
+		=> Task.FromResult(TryRenderCore(notification));
 
-			content = new TextNotificationContent(value);
-			return Task.FromResult(true);
-		}
-
-		if (!localizer.TryGet(notification.Model, notification.SelectedCulture, out var v))
-			return Task.FromResult(false);
-
-
-		content = new TextNotificationContent(v);
-		return Task.FromResult(true);
-	}
-
-	public Task<IReadOnlyList<TextNotificationContent?>> TryRenderAsync(
+	public Task<IReadOnlyList<INotificationContent?>> TryRenderAsync(
 		IEnumerable<ISimpleNotification<ILocalizableMessage>> notifications,
 		CancellationToken cancellationToken)
-		=> Task.FromResult<IReadOnlyList<TextNotificationContent?>>(notifications
-			.Select(x =>
-			{
-				TryRenderAsync(x, cancellationToken, out var content);
-				return content;
-			})
+		=> Task.FromResult<IReadOnlyList<INotificationContent?>>(notifications
+			.Select(TryRenderCore)
 			.ToList());
+
+	private INotificationContent? TryRenderCore(ISimpleNotification<ILocalizableMessage> notification)
+	{
+		if (notification.SelectedCulture == null)
+			return !contextualLocalizer.TryGet(notification.Model, out var value)
+				? null
+				: new NotificationContent(value);
+
+		return !localizer.TryGet(notification.Model, notification.SelectedCulture, out var v)
+			? null
+			: new NotificationContent(v);
+	}
 }

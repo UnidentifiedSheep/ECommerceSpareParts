@@ -1,19 +1,14 @@
-using System.Diagnostics.CodeAnalysis;
-using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 
 namespace Notification.Interfaces;
 
-public interface INotificationRenderer<in TNotification, TContent>
-	where TContent : INotificationContent
+public interface INotificationRenderer<in TNotification>
 {
-	Task<bool> TryRenderAsync(
+	Task<INotificationContent?> TryRenderAsync(
 		TNotification notification,
-		CancellationToken cancellationToken,
-		[NotNullWhen(true)]
-		out TContent? content);
+		CancellationToken cancellationToken);
 
-	Task<IReadOnlyList<TContent?>> TryRenderAsync(
+	Task<IReadOnlyList<INotificationContent?>> TryRenderAsync(
 		IEnumerable<TNotification> notifications,
 		CancellationToken cancellationToken);
 }

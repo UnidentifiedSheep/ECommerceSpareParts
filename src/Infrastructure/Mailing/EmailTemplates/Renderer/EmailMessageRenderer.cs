@@ -11,7 +11,8 @@ public class EmailMessageRenderer(IRazorLightEngine engine) : IEmailMessageRende
 		TTemplate templateData,
 		CancellationToken cancellationToken = default) where TTemplate : IEmailData
 	{
-		var body = await engine.CompileRenderAsync($"{templateData.TemplateName}.cshtml", templateData);
+		var body = await engine
+			.CompileRenderAsync($"{templateData.TemplateName}.cshtml", templateData);
 
 		if (string.IsNullOrWhiteSpace(body))
 			throw new InvalidOperationException(

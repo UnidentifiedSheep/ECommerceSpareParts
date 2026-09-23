@@ -8,7 +8,7 @@ using Notification.Core.Entities;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
 using Notification.Interfaces;
-using Notification.NotificationContents;
+using Notification.Renderers;
 using Notification.Tests.TestSupport;
 
 namespace Notification.Tests;
@@ -57,7 +57,7 @@ public class InAppChannelTests
 			Assert.Equal([100, 101], receipts.Select(x => x.CreatedRowId));
 		});
 		var channel = CreateChannel(
-			[new TextNotificationContent("First"), null, new TextNotificationContent("Third")],
+			[new NotificationContent("First"), null, new NotificationContent("Third")],
 			unitOfWork.Object,
 			observer);
 		var first = new InAppRecipient(Guid.NewGuid());
@@ -82,7 +82,7 @@ public class InAppChannelTests
 		var unitOfWork = CreateUnitOfWork();
 		var observer = new RecordingInAppObserver(
 			onObserve: _ => throw new InvalidOperationException("Observer failed."));
-		var channel = CreateChannel([new TextNotificationContent("Text")], unitOfWork.Object, observer);
+		var channel = CreateChannel([new NotificationContent("Text")], unitOfWork.Object, observer);
 
 		var result = await channel.SendAsync(
 			Delivery(new InAppRecipient(Guid.NewGuid())),
@@ -104,7 +104,7 @@ public class InAppChannelTests
 			.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
 			.ThrowsAsync(failure);
 		var observer = new RecordingInAppObserver();
-		var channel = CreateChannel([new TextNotificationContent("Text")], unitOfWork.Object, observer);
+		var channel = CreateChannel([new NotificationContent("Text")], unitOfWork.Object, observer);
 
 		var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => channel.SendBatchAsync(
 			[Delivery(new InAppRecipient(Guid.NewGuid()))],
@@ -131,12 +131,11 @@ public class InAppChannelTests
 	}
 
 	private static InAppChannel CreateChannel(
-		IReadOnlyList<TextNotificationContent?> contents,
+		IReadOnlyList<NotificationContent?> contents,
 		IUnitOfWork unitOfWork,
 		RecordingInAppObserver observer)
 	{
-		var renderer = new Mock<INotificationRenderer<
-			ISimpleNotification<ILocalizableMessage>, TextNotificationContent>>();
+		var renderer = new Mock<INotificationRenderer<ISimpleNotification<ILocalizableMessage>>>();
 		renderer
 			.Setup(x => x.TryRenderAsync(
 				It.IsAny<IEnumerable<ISimpleNotification<ILocalizableMessage>>>(),

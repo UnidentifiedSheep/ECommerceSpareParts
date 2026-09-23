@@ -8,12 +8,11 @@ using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
 using Notification.Interfaces;
-using Notification.NotificationContents;
 
 namespace Notification.Channels;
 
 public class InAppChannel(
-	INotificationRenderer<ISimpleNotification<ILocalizableMessage>, TextNotificationContent> renderer,
+	INotificationRenderer<ISimpleNotification<ILocalizableMessage>> renderer,
 	IEnumerable<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>> observers,
 	IUnitOfWork unitOfWork,
 	ILogger<InAppChannel> logger
