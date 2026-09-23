@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Persistence;
+using Attributes;
 using Locan.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Notification.Core;
@@ -56,14 +57,19 @@ public class InAppChannel(
 
 		if (rows.Count == 0) return results;
 
-		await unitOfWork.AddRangeAsync(rows, cancellationToken);
-		await unitOfWork.SaveChangesAsync(cancellationToken);
+		await unitOfWork.ExecuteWithTransaction(
+			new TransactionalAttribute(),
+			async () =>
+			{
+				await unitOfWork.AddRangeAsync(rows, cancellationToken);
+				await unitOfWork.SaveChangesAsync(cancellationToken);
 
-		var receipts = rows
-			.Select((row, i) => new InAppReceipt(recipients[i], row.Id))
-			.ToArray();
-
-		await NotifyObserversAsync(receipts, cancellationToken);
+				var receipts = rows
+					.Select((row, i) => new InAppReceipt(recipients[i], row.Id))
+					.ToArray();
+				await NotifyObserversAsync(receipts, cancellationToken);
+			},
+			cancellationToken);
 
 		return results;
 	}

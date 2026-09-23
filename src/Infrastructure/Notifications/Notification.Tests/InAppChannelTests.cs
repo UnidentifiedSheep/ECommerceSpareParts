@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Persistence;
+using Attributes;
 using Locan.Core.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -19,7 +20,18 @@ public class InAppChannelTests
 	{
 		var calls = new List<string>();
 		var rows = new List<InAppNotification>();
-		var unitOfWork = new Mock<IUnitOfWork>();
+		var unitOfWork = CreateUnitOfWork();
+		unitOfWork
+			.Setup(x => x.ExecuteWithTransaction(
+				It.IsAny<TransactionalAttribute>(),
+				It.IsAny<Func<Task>>(),
+				It.IsAny<CancellationToken>()))
+			.Returns<TransactionalAttribute, Func<Task>, CancellationToken>(async (_, action, _) =>
+			{
+				calls.Add("begin");
+				await action();
+				calls.Add("commit");
+			});
 		unitOfWork
 			.Setup(x => x.AddRangeAsync(It.IsAny<IEnumerable<InAppNotification>>(), It.IsAny<CancellationToken>()))
 			.Callback<IEnumerable<InAppNotification>, CancellationToken>((items, _) =>
@@ -58,7 +70,7 @@ public class InAppChannelTests
 
 		Assert.Equal([true, false, true], results.Select(x => x.Succeeded));
 		Assert.Equal("Unable to render notification.", results[1].Error);
-		Assert.Equal(["add", "save", "observe"], calls);
+		Assert.Equal(["begin", "add", "save", "observe", "commit"], calls);
 		Assert.Equal([first.UserId, third.UserId], rows.Select(x => x.UserId));
 		Assert.Equal(["First", "Third"], rows.Select(x => x.Text));
 		Assert.Equal([first, third], Assert.Single(observer.Received).Select(x => x.Recipient));
@@ -67,7 +79,7 @@ public class InAppChannelTests
 	[Fact]
 	public async Task SendBatchAsync_ObserverFailureDoesNotChangeSuccessfulResult()
 	{
-		var unitOfWork = new Mock<IUnitOfWork>();
+		var unitOfWork = CreateUnitOfWork();
 		var observer = new RecordingInAppObserver(
 			onObserve: _ => throw new InvalidOperationException("Observer failed."));
 		var channel = CreateChannel([new TextNotificationContent("Text")], unitOfWork.Object, observer);
@@ -84,27 +96,9 @@ public class InAppChannelTests
 	}
 
 	[Fact]
-	public async Task SendBatchAsync_RequiredObserverFailurePropagatesAfterSave()
-	{
-		var unitOfWork = new Mock<IUnitOfWork>();
-		var failure = new InvalidOperationException("Required observer failed.");
-		var observer = new RecordingInAppObserver(onObserve: _ => throw failure, throwOnFailure: true);
-		var channel = CreateChannel([new TextNotificationContent("Text")], unitOfWork.Object, observer);
-
-		var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => channel.SendBatchAsync(
-			[Delivery(new InAppRecipient(Guid.NewGuid()))],
-			TestContext.Current.CancellationToken));
-
-		Assert.Same(failure, thrown);
-		unitOfWork.Verify(x => x.SaveChangesAsync(
-			It.IsAny<CancellationToken>()),
-			Times.Once);
-	}
-
-	[Fact]
 	public async Task SendBatchAsync_WhenSaveFails_DoesNotNotifyObservers()
 	{
-		var unitOfWork = new Mock<IUnitOfWork>();
+		var unitOfWork = CreateUnitOfWork();
 		var failure = new InvalidOperationException("Save failed.");
 		unitOfWork
 			.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -123,7 +117,7 @@ public class InAppChannelTests
 	[Fact]
 	public async Task SendBatchAsync_WhenNothingRenders_DoesNotWriteOrNotify()
 	{
-		var unitOfWork = new Mock<IUnitOfWork>();
+		var unitOfWork = CreateUnitOfWork();
 		var observer = new RecordingInAppObserver();
 		var channel = CreateChannel([null], unitOfWork.Object, observer);
 
@@ -149,6 +143,18 @@ public class InAppChannelTests
 				It.IsAny<CancellationToken>()))
 			.ReturnsAsync(contents);
 		return new InAppChannel(renderer.Object, [observer], unitOfWork, NullLogger<InAppChannel>.Instance);
+	}
+
+	private static Mock<IUnitOfWork> CreateUnitOfWork()
+	{
+		var unitOfWork = new Mock<IUnitOfWork>();
+		unitOfWork
+			.Setup(x => x.ExecuteWithTransaction(
+				It.IsAny<TransactionalAttribute>(),
+				It.IsAny<Func<Task>>(),
+				It.IsAny<CancellationToken>()))
+			.Returns<TransactionalAttribute, Func<Task>, CancellationToken>((_, action, _) => action());
+		return unitOfWork;
 	}
 
 	private static Notification.Core.NotificationDelivery<ISimpleNotification<ILocalizableMessage>, InAppRecipient>

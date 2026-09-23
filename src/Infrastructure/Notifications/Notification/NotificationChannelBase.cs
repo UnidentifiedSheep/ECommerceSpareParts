@@ -1,4 +1,3 @@
-using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.Logging;
 using Notification.Core;
 using Notification.Core.Interfaces;
@@ -28,7 +27,6 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 
 		if (receipts.Count == 0) return;
 
-		List<Exception>? failures = null;
 		foreach (var observer in _observers)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
@@ -46,15 +44,8 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 					"Notification delivery observer {ObserverType} failed for channel {ChannelSystemName}.",
 					observer.GetType().FullName,
 					SystemName);
-				if (observer.ThrowOnFailure)
-					(failures ??= []).Add(exception);
 			}
 		}
-
-		if (failures is { Count: 1 })
-			ExceptionDispatchInfo.Capture(failures[0]).Throw();
-		if (failures is { Count: > 1 })
-			throw new AggregateException("Multiple notification delivery observers failed.", failures);
 	}
 
 	public bool CanHandle(

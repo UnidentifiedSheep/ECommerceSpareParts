@@ -51,7 +51,7 @@ public class NotificationChannelBaseObserverTests
 	}
 
 	[Fact]
-	public async Task NotifyObserversAsync_WhenObserverDoesNotThrowOnFailure_LogsErrorAndContinues()
+	public async Task NotifyObserversAsync_WhenObserverFails_LogsErrorAndContinues()
 	{
 		var failure = new InvalidOperationException("Observer failed.");
 		var first = new RecordingInAppObserver(failure);
@@ -69,43 +69,22 @@ public class NotificationChannelBaseObserverTests
 	}
 
 	[Fact]
-	public async Task NotifyObserversAsync_ThrowsOnlyRequiredFailuresAfterCallingEveryObserver()
+	public async Task NotifyObserversAsync_WhenSeveralObserversFail_LogsEachAndContinues()
 	{
 		var firstFailure = new InvalidOperationException("First failed.");
-		var optionalFailure = new InvalidOperationException("Optional failed.");
-		var secondFailure = new InvalidOperationException("Second required observer failed.");
-		var first = new RecordingInAppObserver(firstFailure, throwOnFailure: true);
-		var optional = new RecordingInAppObserver(optionalFailure);
-		var second = new RecordingInAppObserver(secondFailure, throwOnFailure: true);
+		var secondFailure = new InvalidOperationException("Second failed.");
+		var first = new RecordingInAppObserver(firstFailure);
+		var second = new RecordingInAppObserver(secondFailure);
 		var third = new RecordingInAppObserver();
 		var loggerFactory = new RecordingLoggerFactory();
-		var channel = new TestChannel([first, optional, second, third], loggerFactory.CreateLogger(nameof(TestChannel)));
+		var channel = new TestChannel([first, second, third], loggerFactory.CreateLogger(nameof(TestChannel)));
 		var receipts = new[] { new InAppReceipt(new InAppRecipient(Guid.NewGuid()), 1) };
 
-		var exception = await Assert.ThrowsAsync<AggregateException>(
-			() => channel.NotifyAsync(receipts, TestContext.Current.CancellationToken));
+		await channel.NotifyAsync(receipts, TestContext.Current.CancellationToken);
 
-		Assert.Equal([firstFailure, secondFailure], exception.InnerExceptions);
-		Assert.Single(optional.Received);
 		Assert.Single(third.Received);
-		Assert.Equal([firstFailure, optionalFailure, secondFailure], loggerFactory.Exceptions);
-		Assert.Equal([LogLevel.Error, LogLevel.Error, LogLevel.Error], loggerFactory.LogLevels);
-	}
-
-	[Fact]
-	public async Task NotifyObserversAsync_WhenOneObserverFails_RethrowsOriginalException()
-	{
-		var failure = new InvalidOperationException("Observer failed.");
-		var loggerFactory = new RecordingLoggerFactory();
-		var channel = new TestChannel(
-			[new RecordingInAppObserver(failure, throwOnFailure: true)],
-			loggerFactory.CreateLogger(nameof(TestChannel)));
-		var receipts = new[] { new InAppReceipt(new InAppRecipient(Guid.NewGuid()), 1) };
-
-		var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-			() => channel.NotifyAsync(receipts, TestContext.Current.CancellationToken));
-
-		Assert.Same(failure, exception);
+		Assert.Equal([firstFailure, secondFailure], loggerFactory.Exceptions);
+		Assert.Equal([LogLevel.Error, LogLevel.Error], loggerFactory.LogLevels);
 	}
 
 	[Fact]

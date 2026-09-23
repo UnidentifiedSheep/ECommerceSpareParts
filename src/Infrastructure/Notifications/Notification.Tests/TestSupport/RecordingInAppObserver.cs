@@ -5,10 +5,8 @@ namespace Notification.Tests.TestSupport;
 
 internal sealed class RecordingInAppObserver(
 	Exception? error = null,
-	Action<IReadOnlyCollection<InAppReceipt>>? onObserve = null,
-	bool throwOnFailure = false) : IChannelDeliveryObserver<InAppReceipt, InAppRecipient>
+	Action<IReadOnlyCollection<InAppReceipt>>? onObserve = null) : IChannelDeliveryObserver<InAppReceipt, InAppRecipient>
 {
-	public bool ThrowOnFailure => throwOnFailure;
 	public List<IReadOnlyCollection<InAppReceipt>> Received { get; } = [];
 	public CancellationToken CancellationToken { get; private set; }
 
