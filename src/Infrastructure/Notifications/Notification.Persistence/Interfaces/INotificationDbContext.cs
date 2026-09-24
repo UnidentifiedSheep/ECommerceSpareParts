@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Notification.Core.Entities;
-using NotificationDelivery = Notification.Core.NotificationDelivery;
 
 namespace Notification.Persistence.Interfaces;
 
