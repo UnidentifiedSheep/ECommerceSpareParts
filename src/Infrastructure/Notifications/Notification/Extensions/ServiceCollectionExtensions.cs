@@ -4,29 +4,26 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
 using Notification.Channels;
+using Notification.Channels.Email;
 using Notification.Core;
-using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Dequeuers;
 using Notification.Interfaces;
 using Notification.Renderers;
 
-namespace Notification;
+namespace Notification.Extensions;
 
 public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddNotificationServices(this IServiceCollection services)
 	{
-		services.RegisterNamedObject<INotificationChannel>(typeof(InAppChannel).Assembly);
+		services.RegisterNamedObject<INotificationChannel>(
+			typeof(InAppChannel).Assembly,
+			objectsToExclude: [typeof(EmailChannel)]);
+
 		services.RegisterNamedObject<DequeuerBase>(typeof(DequeuerBase).Assembly, ServiceLifetime.Singleton);
 
-		services.TryAddScoped<
-			INotificationRenderer<ISimpleNotification<ILocalizableMessage>>,
-			TextNotificationRenderer>();
-
-		services.TryAddScoped<
-			INotificationRenderer<INotification>,
-			HtmlNotificationRenderer>();
+		AddRenderers(services);
 
 		services.TryAddSingleton<INotificationSerializer, NotificationSerializer>();
 		services.TryAddScoped<INotificationService, NotificationService>();
@@ -51,5 +48,16 @@ public static class ServiceCollectionExtensions
 				createNotification));
 
 		return services;
+	}
+
+	private static void AddRenderers(this IServiceCollection services)
+	{
+		services.TryAddSingleton<
+			INotificationRenderer<ISimpleNotification<ILocalizableMessage>>,
+			TextNotificationRenderer>();
+
+		services.TryAddSingleton<
+			INotificationRenderer<INotification>,
+			HtmlNotificationRenderer>();
 	}
 }

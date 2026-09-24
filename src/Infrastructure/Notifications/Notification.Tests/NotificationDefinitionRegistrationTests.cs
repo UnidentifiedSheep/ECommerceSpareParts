@@ -4,6 +4,7 @@ using NamedObject.Core.Interfaces;
 using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
+using Notification.Extensions;
 
 namespace Notification.Tests;
 
