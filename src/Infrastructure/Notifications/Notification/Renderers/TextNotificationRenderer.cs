@@ -3,17 +3,17 @@ using Notification.Interfaces;
 
 namespace Notification.Renderers;
 
-public class TextNotificationRenderer : INotificationRenderer<ISimpleNotification>
+public class TextNotificationRenderer : INotificationRenderer<ITextNotification>
 {
 	public Task<INotificationContent?> TryRenderAsync(
-		ISimpleNotification notification,
+		ITextNotification notification,
 		CancellationToken cancellationToken)
-		=> Task.FromResult<INotificationContent?>(new NotificationContent(notification.Model));
+		=> Task.FromResult<INotificationContent?>(new NotificationContent(notification.GetModel().AsText));
 
 	public Task<IReadOnlyList<INotificationContent?>> TryRenderAsync(
-		IEnumerable<ISimpleNotification> notifications,
+		IEnumerable<ITextNotification> notifications,
 		CancellationToken cancellationToken)
 		=> Task.FromResult<IReadOnlyList<INotificationContent?>>(notifications
-			.Select(INotificationContent? (notification) => new NotificationContent(notification.Model))
+			.Select(INotificationContent? (notification) => new NotificationContent(notification.GetModel().AsText))
 			.ToList());
 }

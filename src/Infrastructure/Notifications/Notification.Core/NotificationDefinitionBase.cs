@@ -9,6 +9,7 @@ public sealed class NotificationDefinitionBase<TNotification, TModel>(
 	Func<TModel, TNotification> createNotification)
 	: INotificationDefinition<TNotification>
 	where TNotification : INotification<TModel>
+	where TModel : INotificationModel
 {
 	private readonly INotificationSerializer _serializer =
 		serializer ?? throw new ArgumentNullException(nameof(serializer));

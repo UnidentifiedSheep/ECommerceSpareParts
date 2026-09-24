@@ -5,7 +5,7 @@ using Notification.Core.Interfaces.Notification;
 
 namespace Main.Application.Notifications;
 
-public class UserLoggedInNotification : INotification<UserLoggedInNotificationData>
+public class UserLoggedInNotification : INotification<UserLoggedInNotificationData>, ITextNotification
 {
 	public UserLoggedInNotification(UserLoggedInNotificationData model)
 	{
@@ -16,7 +16,7 @@ public class UserLoggedInNotification : INotification<UserLoggedInNotificationDa
 	public UserLoggedInNotificationData Model { get; }
 }
 
-public record UserLoggedInNotificationData : INotificationModelWithTitle
+public record UserLoggedInNotificationData : INotificationModel, INotificationModelWithTitle
 {
 	public required string Title { get; init; }
 	public required string Heading { get; init; }
@@ -30,6 +30,7 @@ public record UserLoggedInNotificationData : INotificationModelWithTitle
 	public required string Device { get; init; }
 	public required string WasYou { get; init; }
 	public required string NotYou { get; init; }
+	public required string AsText { get; init; }
 
 	public UserLoggedInNotificationData() { }
 
@@ -55,6 +56,8 @@ public record UserLoggedInNotificationData : INotificationModelWithTitle
 		Device = FormatDevice(userAgent, unknown);
 		WasYou = localizer.Get(new NotificationsLoginNotificationWasYouMessage());
 		NotYou = localizer.Get(new NotificationsLoginNotificationNotYouMessage());
+		AsText = $"{Heading}. {Intro} {DateTimeLabel}: {OccurredAt}; " +
+			$"{IpAddressLabel}: {IpAddress}; {DeviceLabel}: {Device}. {NotYou}";
 	}
 
 	private static string FormatDevice(string? userAgent, string unknown)

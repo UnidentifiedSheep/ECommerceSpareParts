@@ -4,26 +4,37 @@ using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Extensions;
+using Notification.Renderers;
 
 namespace Notification.Tests;
 
 public class NotificationDefinitionRegistrationTests
 {
 	[Fact]
-	public void SimpleNotification_WithStringModel_RoundTripsThroughDefinition()
+	public async Task InAppNotification_WithConcreteModel_RoundTripsThroughDefinition()
 	{
-		var definition = new NotificationDefinitionBase<SimpleTestNotification, string>(
-			"SimpleTestNotification",
+		var definition = new NotificationDefinitionBase<TestInAppNotification, TestNotificationData>(
+			"TestInAppNotification",
 			new NotificationSerializer(),
-			model => new SimpleTestNotification(model));
-		var original = new SimpleTestNotification("Hello, Alice");
+			model => new TestInAppNotification(model));
+		var original = new TestInAppNotification(
+			new TestNotificationData
+			{
+				TestInt = 42,
+				TestString = "Other model data",
+				AsText = "Hello, Alice"
+			});
 
 		var entity = definition.ToEntity(Guid.NewGuid(), original);
 		var restored = definition.FromEntity(entity);
+		var rendered = await new TextNotificationRenderer().TryRenderAsync(restored, CancellationToken.None);
 
 		Assert.Equal(original.Model, restored.Model);
+		Assert.Contains("\"asText\":\"Hello, Alice\"", entity.Model);
+		Assert.Equal("Hello, Alice", ((INotification)restored).GetModel().AsText);
+		Assert.Equal("Hello, Alice", rendered?.Text);
 		Assert.Equal(entity.Model, new NotificationSerializer().Serialize(restored));
-		Assert.IsAssignableFrom<ISimpleNotification>(restored);
+		Assert.IsAssignableFrom<ITextNotification>(restored);
 	}
 
 	[Fact]
@@ -129,8 +140,9 @@ public class NotificationDefinitionRegistrationTests
 		public string SystemName => "OtherNotification";
 	}
 
-	private sealed record SimpleTestNotification(string Model) : ISimpleNotification
+	private sealed record TestInAppNotification(TestNotificationData Model)
+		: INotification<TestNotificationData>, ITextNotification
 	{
-		public string SystemName => "SimpleTestNotification";
+		public string SystemName => "TestInAppNotification";
 	}
 }

@@ -2,16 +2,17 @@ using NamedObject.Core.Interfaces;
 
 namespace Notification.Core.Interfaces.Notification;
 
-public interface ISimpleNotification : INotification<string>;
+public interface ITextNotification : INotification;
 
 public interface INotification<out TModel> : INotification
+	where TModel : INotificationModel
 {
 	TModel Model { get; }
 
-	object INotification.GetModel() => Model!;
+	INotificationModel INotification.GetModel() => Model;
 }
 
 public interface INotification : INamedObject
 {
-	object GetModel();
+	INotificationModel GetModel();
 }

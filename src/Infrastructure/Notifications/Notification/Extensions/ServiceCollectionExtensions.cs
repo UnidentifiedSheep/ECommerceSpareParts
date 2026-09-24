@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
 		string systemName,
 		Func<TModel, TNotification> createNotification)
 		where TNotification : INotification<TModel>
+		where TModel : INotificationModel
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(systemName);
 		ArgumentNullException.ThrowIfNull(createNotification);
@@ -59,7 +60,7 @@ public static class ServiceCollectionExtensions
 	private static void AddRenderers(this IServiceCollection services)
 	{
 		services.TryAddSingleton<
-			INotificationRenderer<ISimpleNotification>,
+			INotificationRenderer<ITextNotification>,
 			TextNotificationRenderer>();
 
 		services.TryAddSingleton<HtmlNotificationRenderer>();

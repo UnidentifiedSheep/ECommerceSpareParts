@@ -134,10 +134,10 @@ public class InAppChannelTests
 		IUnitOfWork unitOfWork,
 		RecordingInAppObserver observer)
 	{
-		var renderer = new Mock<INotificationRenderer<ISimpleNotification>>();
+		var renderer = new Mock<INotificationRenderer<ITextNotification>>();
 		renderer
 			.Setup(x => x.TryRenderAsync(
-				It.IsAny<IEnumerable<ISimpleNotification>>(),
+				It.IsAny<IEnumerable<ITextNotification>>(),
 				It.IsAny<CancellationToken>()))
 			.ReturnsAsync(contents);
 		return new InAppChannel(renderer.Object, [observer], unitOfWork, NullLogger<InAppChannel>.Instance);
@@ -155,7 +155,7 @@ public class InAppChannelTests
 		return unitOfWork;
 	}
 
-	private static Notification.Core.NotificationDelivery<ISimpleNotification, InAppRecipient>
-		Delivery(InAppRecipient recipient) => new(new Mock<ISimpleNotification>().Object, recipient);
+	private static Notification.Core.NotificationDelivery<ITextNotification, InAppRecipient>
+		Delivery(InAppRecipient recipient) => new(new Mock<ITextNotification>().Object, recipient);
 
 }

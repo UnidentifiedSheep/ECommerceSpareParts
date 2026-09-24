@@ -11,16 +11,16 @@ using Notification.Interfaces;
 namespace Notification.Channels;
 
 public class InAppChannel(
-	INotificationRenderer<ISimpleNotification> renderer,
+	INotificationRenderer<ITextNotification> renderer,
 	IEnumerable<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>> observers,
 	IUnitOfWork unitOfWork,
 	ILogger<InAppChannel> logger
-	) : NotificationChannelBase<ISimpleNotification, InAppRecipient, InAppReceipt>(observers, logger)
+	) : NotificationChannelBase<ITextNotification, InAppRecipient, InAppReceipt>(observers, logger)
 {
 	public override string SystemName => InAppRecipient.ChannelName;
 
 	public override async Task<IReadOnlyList<SendResult>> SendBatchAsync(
-		IReadOnlyCollection<NotificationDelivery<ISimpleNotification, InAppRecipient>> notifications,
+		IReadOnlyCollection<NotificationDelivery<ITextNotification, InAppRecipient>> notifications,
 		CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(notifications);
