@@ -181,7 +181,7 @@ public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 	{
 		var toSend = new MimeMessage
 		{
-			Subject = message.Subject,
+			Subject = message.Title,
 			Body = new BodyBuilder
 			{
 				HtmlBody = message.Body

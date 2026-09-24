@@ -1,8 +1,6 @@
 namespace Notification.Core.Interfaces.Notification;
 
-public interface INotificationContent
+public interface INotificationModelWithTitle
 {
 	string Title { get; }
-
-	string Text { get; }
 }

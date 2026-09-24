@@ -46,7 +46,7 @@ public class EmailChannel(
 			}
 
 			var recipient = deliveries[i].Recipient;
-			messages.Add(new EmailMessage(recipient.Subject, recipient.Email, content.Text));
+			messages.Add(new EmailMessage(content.Title, recipient.Email, content.Text));
 			messageIndexes.Add(i);
 		}
 

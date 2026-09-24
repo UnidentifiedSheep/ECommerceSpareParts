@@ -11,11 +11,16 @@ public class HtmlNotificationRenderer(
 		INotification notification,
 		CancellationToken cancellationToken)
 	{
+		var model = notification.GetModel();
 		var body = await engine.CompileRenderAsync(
 			key: $"{notification.SystemName}.cshtml",
-			model: notification.GetModel());
+			model: model);
 
-		return string.IsNullOrWhiteSpace(body) ? null : new NotificationContent(body);
+		return string.IsNullOrWhiteSpace(body)
+			? null
+			: new NotificationContent(
+				body,
+				model is INotificationModelWithTitle titled ? titled.Title : string.Empty);
 	}
 
 	public async Task<IReadOnlyList<INotificationContent?>> TryRenderAsync(

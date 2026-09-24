@@ -19,7 +19,7 @@ public class EmailChannelTests
 			.Select(_ => new Mock<INotification>().Object)
 			.ToArray();
 		var recipients = Enumerable.Range(0, 4)
-			.Select(i => new EmailRecipient($"user{i}@example.com", $"Subject {i}"))
+			.Select(i => new EmailRecipient($"user{i}@example.com"))
 			.ToArray();
 		var deliveries = notifications
 			.Zip(recipients, (notification, recipient) =>
@@ -35,9 +35,9 @@ public class EmailChannelTests
 			{
 				renderedNotifications = items.ToArray();
 				return Task.FromResult<IReadOnlyList<INotificationContent?>>([
-					new NotificationContent("Body 0"),
+					new NotificationContent("Body 0", "Subject 0"),
 					null,
-					new NotificationContent("Body 2"),
+					new NotificationContent("Body 2", "Subject 2"),
 					null
 				]);
 			});
@@ -204,7 +204,7 @@ public class EmailChannelTests
 
 	private static NotificationDelivery<INotification, EmailRecipient> Delivery(int index) =>
 		new(new Mock<INotification>().Object,
-			new EmailRecipient($"user{index}@example.com", $"Subject {index}"));
+			new EmailRecipient($"user{index}@example.com"));
 
 	private static void VerifyNotSentOrObserved(
 		Mock<IEmailSender> sender,
