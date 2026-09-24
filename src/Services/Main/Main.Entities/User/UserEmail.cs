@@ -58,11 +58,11 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
 		ConfirmedAt = confirmed ? DateTime.UtcNow : null;
 	}
 
-	public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnUpdated() => AddDomainEvent(new UserEmailUpdatedDomainEvent(UserId));
 
-	public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnDeleted() => AddDomainEvent(new UserEmailUpdatedDomainEvent(UserId));
 
-	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
+	public override void OnCreated() => AddDomainEvent(new UserEmailUpdatedDomainEvent(UserId));
 
 	public void ChangeType(EmailType emailType) => EmailType = emailType;
 
