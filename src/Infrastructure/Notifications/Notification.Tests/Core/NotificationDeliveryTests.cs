@@ -10,7 +10,7 @@ public class NotificationDeliveryTests
 	{
 		var delivery = CreateDelivery();
 
-		delivery.Fail("temporary error");
+		delivery.Fail("temporary error", 1);
 
 		Assert.Equal(DeliveryStatus.Failed, delivery.Status);
 		Assert.Equal(1, delivery.Attempts);
@@ -26,7 +26,7 @@ public class NotificationDeliveryTests
 	{
 		var delivery = CreateDelivery();
 
-		Assert.Throws<InvalidOperationException>(() => delivery.Fail(error));
+		Assert.Throws<InvalidOperationException>(() => delivery.Fail(error, 1));
 		Assert.Equal(DeliveryStatus.Pending, delivery.Status);
 		Assert.Equal(0, delivery.Attempts);
 	}
@@ -35,7 +35,7 @@ public class NotificationDeliveryTests
 	public void Retry_FromFailed_ReturnsDeliveryToPendingAndPreservesAttempts()
 	{
 		var delivery = CreateDelivery();
-		delivery.Fail("temporary error");
+		delivery.Fail("temporary error", 1);
 
 		delivery.Retry();
 
@@ -75,13 +75,13 @@ public class NotificationDeliveryTests
 	public void TerminalDelivery_CannotBeCompletedAgain()
 	{
 		var failed = CreateDelivery();
-		failed.Fail("error");
+		failed.Fail("error", 1);
 		var delivered = CreateDelivery();
 		delivered.MarkDelivered();
 
-		Assert.Throws<InvalidOperationException>(() => failed.Fail("again"));
+		Assert.Throws<InvalidOperationException>(() => failed.Fail("again", 1));
 		Assert.Throws<InvalidOperationException>(failed.MarkDelivered);
-		Assert.Throws<InvalidOperationException>(() => delivered.Fail("error"));
+		Assert.Throws<InvalidOperationException>(() => delivered.Fail("error", 1));
 		Assert.Throws<InvalidOperationException>(delivered.MarkDelivered);
 	}
 

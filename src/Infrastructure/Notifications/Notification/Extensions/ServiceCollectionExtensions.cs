@@ -21,8 +21,6 @@ public static class ServiceCollectionExtensions
 			typeof(InAppChannel).Assembly,
 			objectsToExclude: [typeof(EmailChannel)]);
 
-		services.RegisterNamedObject<DequeuerBase>(typeof(DequeuerBase).Assembly, ServiceLifetime.Singleton);
-
 		AddRenderers(services);
 
 		services.TryAddSingleton<INotificationSerializer, NotificationSerializer>();

@@ -43,8 +43,9 @@ public sealed class NotificationDelivery :
 		Status = DeliveryStatus.Pending;
 	}
 
-	public void Fail(string error)
+	public void Fail(string error, int maxAttempts)
 	{
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxAttempts);
 		if (IsTerminal)
 			throw new InvalidOperationException("Cannot fail notification in terminal state.");
 
@@ -54,6 +55,8 @@ public sealed class NotificationDelivery :
 		Attempts++;
 		Error = validatedError;
 		Status = DeliveryStatus.Failed;
+		if (Attempts < maxAttempts)
+			Retry();
 	}
 
 	public void MarkDelivered()
