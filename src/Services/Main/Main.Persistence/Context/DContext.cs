@@ -129,6 +129,8 @@ public partial class DContext : DbContext
 
 	public virtual DbSet<UserInfo> UserInfos { get; set; }
 
+	public virtual DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
+
 	public virtual DbSet<UserPermission> UserPermissions { get; set; }
 
 	public virtual DbSet<UserPhone> UserPhones { get; set; }

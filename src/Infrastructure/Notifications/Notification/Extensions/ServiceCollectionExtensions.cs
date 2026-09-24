@@ -7,6 +7,7 @@ using Notification.Channels;
 using Notification.Channels.Email;
 using Notification.Core;
 using Notification.Core.Interfaces.Notification;
+using Notification.Core.Interfaces.Recipient;
 using Notification.Dequeuers;
 using Notification.Interfaces;
 using Notification.Renderers;
@@ -15,7 +16,10 @@ namespace Notification.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-	public static IServiceCollection AddNotificationServices(this IServiceCollection services)
+	public static IServiceCollection AddNotificationServices<TRecipientResolver>(
+		this IServiceCollection services,
+		ServiceLifetime serviceLifetime = ServiceLifetime.Scoped
+		) where TRecipientResolver : IRecipientResolver
 	{
 		services.RegisterNamedObject<INotificationChannel>(
 			typeof(InAppChannel).Assembly,
@@ -25,6 +29,18 @@ public static class ServiceCollectionExtensions
 
 		services.TryAddSingleton<INotificationSerializer, NotificationSerializer>();
 		services.TryAddScoped<INotificationService, NotificationService>();
+
+		services.Add(
+			new ServiceDescriptor(
+				typeof(INotificationService),
+				typeof(NotificationService),
+				serviceLifetime));
+
+		services.Add(
+			new ServiceDescriptor(
+				typeof(IRecipientResolver),
+				typeof(TRecipientResolver),
+				serviceLifetime));
 
 		return services;
 	}
