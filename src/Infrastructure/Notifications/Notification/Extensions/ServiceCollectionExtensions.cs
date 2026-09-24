@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
 		services.RegisterNamedObject<INotificationChannel>(
 			typeof(InAppChannel).Assembly,
 			objectsToExclude: [typeof(EmailChannel)]);
+		services.UseInAppNotifications();
 
 		AddRenderers(services);
 

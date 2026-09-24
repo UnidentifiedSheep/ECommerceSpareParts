@@ -63,10 +63,6 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
-        <LocanResource Include="../../../Infrastructure/Mailing/Mailing.Core/Localization/**/*.json"
-                       GenerateMessages="false"
-                       CopyToOutput="true"/>
-
         <LocanResource Include="../../../Infrastructure/Security/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
@@ -74,7 +70,7 @@
 
     <ItemGroup>
       <None Include="Templates\Emails\EmailVerification.cshtml" />
-      <None Include="Templates\Emails\LoginNotification.cshtml" />
+      <None Include="Templates\Emails\UserLoggedIn.cshtml" />
       <None Include="Templates\Emails\PasswordReset.cshtml" />
     </ItemGroup>
 

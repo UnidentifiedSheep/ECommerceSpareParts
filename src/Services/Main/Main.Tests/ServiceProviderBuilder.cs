@@ -5,7 +5,6 @@ using Api.Common;
 using Application.Common.Models.Options.S3;
 using Cache;
 using Locan.Hosting;
-using Mailing.Core;
 using Main.Application.Configs;
 using Main.Application.Models;
 using Main.Cache;
@@ -109,7 +108,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 					ValidIssuer = "main-tests",
 					IssuerSigningKey = "main-tests-signing-key-at-least-32-characters"
 				}));
-		services.AddSingleton<IEmailMessageRenderer, EmailMessageRendererStub>();
+
 		services.AddScoped<S3StorageServiceStub>();
 		services.AddScoped<IS3StorageService>(sp => sp.GetRequiredService<S3StorageServiceStub>());
 		services.AddProjectJsonSerialization();

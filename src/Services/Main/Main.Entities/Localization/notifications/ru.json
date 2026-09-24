@@ -1,0 +1,28 @@
+{
+  "culture": "ru",
+  "messages": {
+    "notifications.password.reset.subject": "Восстановление пароля",
+    "notifications.password.reset.title": "Восстановление пароля",
+    "notifications.password.reset.intro": "Мы получили запрос на восстановление пароля для вашей учетной записи.",
+    "notifications.password.reset.description": "Нажмите на кнопку ниже, чтобы задать новый пароль. Ссылка действительна ограниченное время.",
+    "notifications.password.reset.button": "Восстановить пароль",
+    "notifications.password.reset.fallback": "Если кнопка не работает, скопируйте и вставьте эту ссылку в браузер:",
+    "notifications.password.reset.ignore": "Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.",
+    "notifications.email.verification.subject": "Подтверждение email",
+    "notifications.email.verification.title": "Подтвердите ваш email",
+    "notifications.email.verification.intro": "Для вашей учётной записи был добавлен этот email.",
+    "notifications.email.verification.description": "Нажмите на кнопку ниже, чтобы подтвердить, что адрес принадлежит вам. Ссылка действительна ограниченное время.",
+    "notifications.email.verification.button": "Подтвердить email",
+    "notifications.email.verification.fallback": "Если кнопка не работает, скопируйте и вставьте эту ссылку в браузер:",
+    "notifications.email.verification.ignore": "Если вы не добавляли этот email, просто проигнорируйте письмо.",
+    "notifications.login.notification.subject": "Выполнен вход в вашу учётную запись",
+    "notifications.login.notification.title": "Новый вход в аккаунт",
+    "notifications.login.notification.intro": "Мы зафиксировали вход в вашу учётную запись.",
+    "notifications.login.notification.date.time.label": "Дата и время",
+    "notifications.login.notification.ip.address.label": "IP-адрес",
+    "notifications.login.notification.device.label": "Устройство",
+    "notifications.login.notification.was.you": "Если это были вы, ничего делать не нужно.",
+    "notifications.login.notification.not.you": "Если вы не узнаёте этот вход, немедленно смените пароль и завершите активные сессии.",
+    "notifications.login.notification.unknown": "Неизвестно"
+  }
+}
