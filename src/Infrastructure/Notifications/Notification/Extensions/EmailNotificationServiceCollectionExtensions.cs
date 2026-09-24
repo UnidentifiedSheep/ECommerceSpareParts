@@ -10,15 +10,24 @@ using Notification.Dequeuers;
 using Notification.Interfaces;
 using Notification.Options;
 using Notification.Renderers;
+using RazorLight;
 
 namespace Notification.Extensions;
 
 public static class EmailNotificationServiceCollectionExtensions
 {
-	public static IServiceCollection UseEmailNotifications(this IServiceCollection services)
+	public static IServiceCollection UseEmailNotifications(
+		this IServiceCollection services,
+		string? templatesRoot = null)
 	{
+		templatesRoot ??= Path.Combine(AppContext.BaseDirectory, "Templates", "Emails");
+
 		services.AddNamedObjectRegistry();
 		services.TryAddEnumerable(ServiceDescriptor.Scoped<INotificationChannel, EmailChannel>());
+		services.TryAddSingleton<IRazorLightEngine>(_ => new RazorLightEngineBuilder()
+			.UseFileSystemProject(templatesRoot)
+			.UseMemoryCachingProvider()
+			.Build());
 
 		services.AddOptions<EmailChannelOptions>()
 			.BindConfiguration(EmailChannelOptions.SectionName)

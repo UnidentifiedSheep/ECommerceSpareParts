@@ -10,7 +10,7 @@ public interface IRecipientResolver
 		IReadOnlyCollection<Guid> userIds,
 		CancellationToken cancellationToken = default);
 
-	Task<IReadOnlyDictionary<Guid, IReadOnlyCollection<TRecipient>>> ResolveAsync<TRecipient>(
+	Task<IReadOnlyDictionary<Guid, TRecipient>> ResolveAsync<TRecipient>(
 		IReadOnlyCollection<Guid> userIds,
 		CancellationToken cancellationToken = default
 		) where TRecipient : INotificationRecipient;

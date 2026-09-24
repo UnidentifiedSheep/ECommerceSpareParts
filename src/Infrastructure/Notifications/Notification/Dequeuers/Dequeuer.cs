@@ -93,7 +93,7 @@ public class Dequeuer<TRecipient>(
 
 	private async Task ProcessAsync(
 		IReadOnlyList<DeliveryEntity> deliveries,
-		IReadOnlyDictionary<Guid, IReadOnlyCollection<TRecipient>> recipients,
+		IReadOnlyDictionary<Guid, TRecipient> recipients,
 		INamedObjectRegistry<INotificationDefinition> definitions,
 		INotificationChannel channel,
 		CancellationToken cancellationToken)
@@ -109,18 +109,14 @@ public class Dequeuer<TRecipient>(
 				var notification = definitions
 					.GetBySystemName(delivery.Notification.NotificationSystemName)
 					.FromEntity(delivery.Notification);
-				if (!recipients.TryGetValue(delivery.Notification.UserId, out var destinations) ||
-				    destinations.Count == 0)
+				if (!recipients.TryGetValue(delivery.Notification.UserId, out var destination))
 				{
 					RecordFailure(delivery, $"No recipient found for channel '{SystemName}'.");
 					continue;
 				}
 
-				foreach (var destination in destinations)
-				{
-					requests.Add(new NotificationRequest(notification, destination));
-					owners.Add(delivery);
-				}
+				requests.Add(new NotificationRequest(notification, destination));
+				owners.Add(delivery);
 			}
 			catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
 			{
@@ -151,7 +147,10 @@ public class Dequeuer<TRecipient>(
 		}
 		catch (Exception exception)
 		{
-			logger.LogError(exception, "Channel {ChannelSystemName} failed to send a batch.", SystemName);
+			logger.LogError(
+				exception,
+				"Channel {ChannelSystemName} failed to send a batch.",
+				SystemName);
 			foreach (var delivery in owners.Distinct())
 				RecordFailure(delivery, exception.Message);
 			return;
