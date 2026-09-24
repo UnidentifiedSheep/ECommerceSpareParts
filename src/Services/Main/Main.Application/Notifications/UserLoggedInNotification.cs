@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Locan.Core.Interfaces.Localizers;
+using Main.Entities;
 using Notification.Core.Interfaces.Notification;
 
 namespace Main.Application.Notifications;

@@ -77,7 +77,7 @@ public class Dequeuer<TRecipient>(
 						options.BatchSize,
 						cancellationToken);
 
-				if (batch.Count == 0) return (HasNext: false, Error: (Exception?)null);
+				if (batch.Count == 0) return (HasNext: false, Error: null);
 
 				var recipientsByUser =
 					await recipientResolver.ResolveAsync<TRecipient>(

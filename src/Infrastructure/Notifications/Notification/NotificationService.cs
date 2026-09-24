@@ -15,6 +15,26 @@ public class NotificationService(
 	INamedObjectRegistry<INotificationChannel> channelsRegistry
 	) : INotificationService
 {
+	public Task<SendResult> SendAsync(
+		INotificationRecipient recipient,
+		INotification notification,
+		CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(recipient);
+		ArgumentNullException.ThrowIfNull(notification);
+
+		var channel = channelsRegistry.TryGetBySystemName(recipient.ChannelSystemName) ??
+			throw new InvalidOperationException(
+				$"Notification channel '{recipient.ChannelSystemName}' is not registered.");
+
+		if (!channel.CanHandle(notification, recipient))
+			throw new InvalidOperationException(
+				$"Channel '{channel.SystemName}' cannot handle notification " +
+				$"'{notification.GetType().Name}' for recipient '{recipient.GetType().Name}'.");
+
+		return channel.SendAsync(new NotificationDelivery(notification, recipient), cancellationToken);
+	}
+
 	public async Task QueueAsync(
 		NotificationItem notification,
 		CancellationToken cancellationToken = default)
