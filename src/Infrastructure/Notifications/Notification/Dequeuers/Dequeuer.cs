@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Persistence;
 using Attributes;
+using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -66,7 +67,7 @@ public class Dequeuer<TRecipient>(
 			.GetRequiredService<INamedObjectRegistry<INotificationChannel>>()
 			.GetBySystemName(SystemName);
 
-		return await unitOfWork.ExecuteWithTransaction(
+		var (hasNext, processingError) = await unitOfWork.ExecuteWithTransaction(
 			TransactionalAttribute.ReadCommitted(0, 0),
 			async () =>
 			{
@@ -76,22 +77,27 @@ public class Dequeuer<TRecipient>(
 						options.BatchSize,
 						cancellationToken);
 
-				if (batch.Count == 0) return false;
+				if (batch.Count == 0) return (HasNext: false, Error: (Exception?)null);
 
 				var recipientsByUser =
 					await recipientResolver.ResolveAsync<TRecipient>(
 						batch.Select(delivery => delivery.Notification.UserId).Distinct().ToArray(),
 						cancellationToken);
 
-				await ProcessAsync(batch, recipientsByUser, definitions, channel, cancellationToken);
+				var error = await ProcessAsync(batch, recipientsByUser, definitions, channel, cancellationToken);
 				await unitOfWork.SaveChangesAsync(cancellationToken);
 
-				return await repository.HasNextAsync(SystemName, cancellationToken);
+				return (HasNext: await repository.HasNextAsync(SystemName, cancellationToken), Error: error);
 			},
 			cancellationToken);
+
+		if (processingError is not null)
+			ExceptionDispatchInfo.Capture(processingError).Throw();
+
+		return hasNext;
 	}
 
-	private async Task ProcessAsync(
+	private async Task<Exception?> ProcessAsync(
 		IReadOnlyList<DeliveryEntity> deliveries,
 		IReadOnlyDictionary<Guid, TRecipient> recipients,
 		INamedObjectRegistry<INotificationDefinition> definitions,
@@ -100,6 +106,7 @@ public class Dequeuer<TRecipient>(
 	{
 		var requests = new List<NotificationRequest>();
 		var owners = new List<DeliveryEntity>();
+		Exception? processingError = null;
 
 		foreach (var delivery in deliveries)
 		{
@@ -124,6 +131,7 @@ public class Dequeuer<TRecipient>(
 			}
 			catch (Exception exception)
 			{
+				processingError ??= exception;
 				logger.LogError(exception,
 					"Unable to prepare notification {NotificationId} for channel {ChannelSystemName}.",
 					delivery.NotificationId, SystemName);
@@ -131,7 +139,7 @@ public class Dequeuer<TRecipient>(
 			}
 		}
 
-		if (requests.Count == 0) return;
+		if (requests.Count == 0) return processingError;
 
 		IReadOnlyList<SendResult> results;
 		try
@@ -147,13 +155,14 @@ public class Dequeuer<TRecipient>(
 		}
 		catch (Exception exception)
 		{
+			processingError ??= exception;
 			logger.LogError(
 				exception,
 				"Channel {ChannelSystemName} failed to send a batch.",
 				SystemName);
 			foreach (var delivery in owners.Distinct())
 				RecordFailure(delivery, exception.Message);
-			return;
+			return processingError;
 		}
 
 		foreach (var group in owners
@@ -166,6 +175,8 @@ public class Dequeuer<TRecipient>(
 			else
 				RecordFailure(group.Key, failure.Error);
 		}
+
+		return processingError;
 	}
 
 	private void RecordFailure(DeliveryEntity delivery, string? error)
