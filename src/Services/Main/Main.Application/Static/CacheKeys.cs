@@ -30,6 +30,8 @@ public static class CacheKeys
 
 		public static string UserRolesAndPermissions(Guid userId) => $"user:{userId}:roles:permissions";
 
+		public static string NotificationRecipients(Guid userId) => $"user:{userId}:notification:recipients";
+
 		public static string RolesAndPermissionsRelations() => "users:roles:permissions:relations";
 	}
 

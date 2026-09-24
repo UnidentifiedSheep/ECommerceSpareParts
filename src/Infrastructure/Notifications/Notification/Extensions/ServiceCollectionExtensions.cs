@@ -8,7 +8,6 @@ using Notification.Channels.Email;
 using Notification.Core;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Interfaces.Recipient;
-using Notification.Dequeuers;
 using Notification.Interfaces;
 using Notification.Renderers;
 
@@ -34,12 +33,6 @@ public static class ServiceCollectionExtensions
 			new ServiceDescriptor(
 				typeof(INotificationService),
 				typeof(NotificationService),
-				serviceLifetime));
-
-		services.Add(
-			new ServiceDescriptor(
-				typeof(IRecipientResolver),
-				typeof(TRecipientResolver),
 				serviceLifetime));
 
 		return services;
