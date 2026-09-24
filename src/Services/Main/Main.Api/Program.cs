@@ -132,7 +132,8 @@ builder
 	.AddCommonLayer()
 	.AddS3()
 	.AddApplicationLayer(builder.Configuration)
-	.AddExchangeRates();
+	.AddExchangeRates()
+	.AddMainNotifications();
 
 builder.Services.AddCarter(
 	new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly, typeof(JobEndPoints).Assembly),

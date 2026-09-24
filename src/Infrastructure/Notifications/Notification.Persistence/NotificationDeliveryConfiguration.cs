@@ -26,7 +26,13 @@ public class NotificationDeliveryConfiguration : IEntityTypeConfiguration<Notifi
 			.HasMaxLength(128)
 			.ValueGeneratedNever();
 
-		builder.Property(e => e.Status).HasColumnName("status").HasConversion<string>();
+		builder.Property(e => e.Status)
+			.HasColumnName("status")
+			.HasConversion<string>();
+
+		builder.Property(e => e.RecipientJson)
+			.HasColumnName("recipient_json")
+			.HasColumnType("jsonb");
 
 		builder.Property(e => e.Attempts).HasColumnName("attempts");
 

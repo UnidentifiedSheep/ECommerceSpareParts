@@ -23,6 +23,11 @@ public static class InAppNotificationServiceCollectionExtensions
 			.ValidateDataAnnotations()
 			.ValidateOnStart();
 
+		return services;
+	}
+
+	public static IServiceCollection AddInAppNotificationHostedService(this IServiceCollection services)
+	{
 		services.AddSingleton<Dequeuer<InAppRecipient>>(sp =>
 			new Dequeuer<InAppRecipient>(
 				systemName: InAppRecipient.ChannelName,
@@ -31,7 +36,6 @@ public static class InAppNotificationServiceCollectionExtensions
 				scopeFactory: sp.GetRequiredService<IServiceScopeFactory>()));
 
 		services.AddHostedService(sp => sp.GetRequiredService<Dequeuer<InAppRecipient>>());
-
 		return services;
 	}
 }

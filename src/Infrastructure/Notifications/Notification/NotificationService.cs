@@ -1,7 +1,7 @@
+using System.Text.Json;
 using Abstractions.Interfaces.Persistence;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
-using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Interfaces.Recipient;
 using NotificationEntity = Notification.Core.Entities.Notification;
@@ -33,6 +33,38 @@ public class NotificationService(
 				$"'{notification.GetType().Name}' for recipient '{recipient.GetType().Name}'.");
 
 		return channel.SendAsync(new NotificationDelivery(notification, recipient), cancellationToken);
+	}
+
+	public async Task QueueAsync(
+		Guid userId,
+		INotification notification,
+		IReadOnlyCollection<INotificationRecipient> recipients,
+		CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(notification);
+		ArgumentNullException.ThrowIfNull(recipients);
+		if (recipients.Count == 0) return;
+
+		var deliveries = new List<(string Channel, string RecipientJson)>();
+		var channels = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+		foreach (var recipient in recipients)
+		{
+			ArgumentNullException.ThrowIfNull(recipient);
+			var channel = channelsRegistry.GetBySystemName(recipient.ChannelSystemName);
+			if (!channel.CanHandle(notification, recipient))
+				throw new InvalidOperationException(
+					$"Channel '{channel.SystemName}' cannot handle the recipient or notification.");
+			if (!channels.Add(channel.SystemName))
+				throw new InvalidOperationException(
+					$"Multiple recipients for channel '{channel.SystemName}' are not supported.");
+			deliveries.Add((channel.SystemName, JsonSerializer.Serialize(recipient)));
+		}
+
+		var definition = definitionRegistry.GetBySystemName(notification.SystemName);
+		var entity = definition.ToEntity(userId, notification);
+		foreach (var delivery in deliveries)
+			entity.MakeDelivery(delivery.Channel, delivery.RecipientJson);
+		await unitOfWork.AddRangeAsync([entity], cancellationToken);
 	}
 
 	public async Task QueueAsync(

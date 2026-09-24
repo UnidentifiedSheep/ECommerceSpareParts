@@ -7,9 +7,7 @@ using Notification.Channels.Email;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
 using Notification.Dequeuers;
-using Notification.Interfaces;
 using Notification.Options;
-using Notification.Renderers;
 using RazorLight;
 
 namespace Notification.Extensions;
@@ -35,6 +33,12 @@ public static class EmailNotificationServiceCollectionExtensions
 			.ValidateOnStart();
 
 		services.TryAddSingleton<IEmailSender, EmailSender>();
+
+		return services;
+	}
+
+	public static IServiceCollection AddEmailNotificationHostedService(this IServiceCollection services)
+	{
 		services.AddSingleton<Dequeuer<EmailRecipient>>(sp =>
 			new Dequeuer<EmailRecipient>(
 				systemName: EmailRecipient.ChannelName,
@@ -43,7 +47,6 @@ public static class EmailNotificationServiceCollectionExtensions
 				scopeFactory: sp.GetRequiredService<IServiceScopeFactory>()));
 
 		services.AddHostedService(sp => sp.GetRequiredService<Dequeuer<EmailRecipient>>());
-
 		return services;
 	}
 }

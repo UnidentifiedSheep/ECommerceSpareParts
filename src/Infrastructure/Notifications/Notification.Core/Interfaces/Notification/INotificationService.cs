@@ -14,6 +14,12 @@ public interface INotificationService
 		CancellationToken cancellationToken = default);
 
 	Task QueueAsync(
+		Guid userId,
+		INotification notification,
+		IReadOnlyCollection<INotificationRecipient> recipients,
+		CancellationToken cancellationToken = default);
+
+	Task QueueAsync(
 		IReadOnlyCollection<NotificationItem> notifications,
 		CancellationToken cancellationToken = default);
 }

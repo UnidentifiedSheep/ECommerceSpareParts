@@ -7,7 +7,6 @@ using Exceptions;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Notifications;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Entities;
 using Main.Entities.Settings;
@@ -51,13 +50,12 @@ public class SendEmailRecoveryHandler(
 		var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
 		var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
 
-		var sendResult = await notificationService.SendAsync(
-			new EmailRecipient(request.Email),
+		await notificationService.QueueAsync(
+			user.Id,
 			new PasswordResetNotification(
 				new PasswordResetNotificationData(localizer, resetUrl.ToString())),
+			[new EmailRecipient(request.Email)],
 			cancellationToken);
-		if (!sendResult.Succeeded)
-			throw new InvalidOperationException(sendResult.Error ?? "Failed to send password reset notification.");
 
 		return Unit.Value;
 	}

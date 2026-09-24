@@ -20,9 +20,8 @@ using Main.Application.Consumers;
 using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
-using Main.Worker;
-using Main.Worker.HostedServices;
 using MassTransit;
+using Notification.Extensions;
 using RabbitMQ.Client;
 using RabbitMq.Extensions;
 using S3;
@@ -70,25 +69,18 @@ builder
 	.AddApplicationLayer(builder.Configuration)
 	.AddWorkerSecurityLayer()
 	.AddFullSecurityLayer()
-	.AddExchangeRates();
+	.AddExchangeRates()
+	.AddMainNotifications()
+	.AddInAppNotificationHostedService()
+	.AddEmailNotificationHostedService();
 
-AddHostedServiceOptions(builder.Services);
-builder.Services.AddHostedService<EmailWorkHostedService>().AddLrtHostedServices();
+builder.Services.AddLrtHostedServices();
 
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
 var host = builder.Build();
 
 await host.RunAsync();
-
-void AddHostedServiceOptions(IServiceCollection collection)
-{
-	collection
-		.AddOptions<HostedServiceOptions>()
-		.BindConfiguration(HostedServiceOptions.SectionName)
-		.ValidateDataAnnotations()
-		.ValidateOnStart();
-}
 
 void AddMassTransit(IHostApplicationBuilder hostBuilder)
 {

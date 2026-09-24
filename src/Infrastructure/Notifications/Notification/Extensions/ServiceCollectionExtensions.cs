@@ -13,10 +13,9 @@ namespace Notification.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-	public static IServiceCollection AddNotificationServices<TRecipientResolver>(
+	public static IServiceCollection AddNotificationServices(
 		this IServiceCollection services,
-		ServiceLifetime serviceLifetime = ServiceLifetime.Scoped
-		) where TRecipientResolver : IRecipientResolver
+		ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
 	{
 		services.RegisterNamedObject<INotificationChannel>(
 			typeof(InAppChannel).Assembly,
@@ -63,6 +62,6 @@ public static class ServiceCollectionExtensions
 			INotificationRenderer<ITextNotification>,
 			TextNotificationRenderer>();
 
-		services.TryAddSingleton<HtmlNotificationRenderer>();
+		services.TryAddSingleton<INotificationRenderer<INotification>, HtmlNotificationRenderer>();
 	}
 }

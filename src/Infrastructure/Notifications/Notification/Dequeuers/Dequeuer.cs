@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Persistence;
+using System.Text.Json;
 using Attributes;
 using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,12 +80,22 @@ public class Dequeuer<TRecipient>(
 
 				if (batch.Count == 0) return (HasNext: false, Error: null);
 
-				var recipientsByUser =
-					await recipientResolver.ResolveAsync<TRecipient>(
-						batch.Select(delivery => delivery.Notification.UserId).Distinct().ToArray(),
-						cancellationToken);
+				var userIdsToResolve = batch
+					.Where(delivery => delivery.RecipientJson is null)
+					.Select(delivery => delivery.Notification.UserId)
+					.Distinct()
+					.ToArray();
+				var recipientsByUser = userIdsToResolve.Length == 0
+					? new Dictionary<Guid, TRecipient>()
+					: await recipientResolver.ResolveAsync<TRecipient>(userIdsToResolve, cancellationToken);
 
-				var error = await ProcessAsync(batch, recipientsByUser, definitions, channel, cancellationToken);
+				var error = await ProcessAsync(
+					batch,
+					recipientsByUser,
+					definitions,
+					channel,
+					cancellationToken);
+
 				await unitOfWork.SaveChangesAsync(cancellationToken);
 
 				return (HasNext: await repository.HasNextAsync(SystemName, cancellationToken), Error: error);
@@ -116,7 +127,14 @@ public class Dequeuer<TRecipient>(
 				var notification = definitions
 					.GetBySystemName(delivery.Notification.NotificationSystemName)
 					.FromEntity(delivery.Notification);
-				if (!recipients.TryGetValue(delivery.Notification.UserId, out var destination))
+				var destination = delivery.RecipientJson != null
+					? JsonSerializer.Deserialize<INotificationRecipient>(delivery.RecipientJson)
+					: recipients.GetValueOrDefault(delivery.Notification.UserId);
+
+				if (destination is not null && destination.ChannelSystemName != SystemName)
+					throw new InvalidOperationException("Stored recipient does not match delivery channel.");
+
+				if (destination is null)
 				{
 					RecordFailure(delivery, $"No recipient found for channel '{SystemName}'.");
 					continue;

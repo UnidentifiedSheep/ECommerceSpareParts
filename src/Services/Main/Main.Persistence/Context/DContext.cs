@@ -20,6 +20,9 @@ using Main.Entities.User;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
+using Notification.Persistence;
+using Notification.Persistence.Interfaces;
+using Notification.Core.Entities;
 using Persistence.Common;
 using Persistence.Common.BaseTableConfigurations;
 using Persistence.Interceptors;
@@ -27,7 +30,7 @@ using Event = Main.Entities.Event.Event;
 
 namespace Main.Persistence.Context;
 
-public partial class DContext : DbContext
+public partial class DContext : DbContext, INotificationDbContext
 {
 	public DContext()
 	{
@@ -131,6 +134,12 @@ public partial class DContext : DbContext
 
 	public virtual DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
 
+	public virtual DbSet<NotificationDelivery> NotificationDeliveries { get; set; }
+
+	public virtual DbSet<Notification.Core.Entities.Notification> Notifications { get; set; }
+
+	public virtual DbSet<InAppNotification> InAppNotifications { get; set; }
+
 	public virtual DbSet<UserPermission> UserPermissions { get; set; }
 
 	public virtual DbSet<UserPhone> UserPhones { get; set; }
@@ -176,7 +185,8 @@ public partial class DContext : DbContext
 		modelBuilder
 			.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
 			.ApplyConfiguration(new SettingConfiguration())
-			.ApplyJobConfigurations();
+			.ApplyJobConfigurations()
+			.AddNotifications();
 
 		modelBuilder
 			.Entity<Setting>()

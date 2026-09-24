@@ -60,13 +60,12 @@ public class RequestEmailVerificationHandler(
 		var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
 		var verificationUrl = new Uri(baseUri, $"verify-email?token={Uri.EscapeDataString(signed)}");
 
-		var sendResult = await notificationService.SendAsync(
-			new EmailRecipient(normalizedEmail),
+		await notificationService.QueueAsync(
+			request.UserId,
 			new EmailVerificationNotification(
 				new EmailVerificationNotificationData(localizer, verificationUrl.ToString())),
+			[new EmailRecipient(normalizedEmail)],
 			cancellationToken);
-		if (!sendResult.Succeeded)
-			throw new InvalidOperationException(sendResult.Error ?? "Failed to send email verification notification.");
 
 		return Unit.Value;
 	}

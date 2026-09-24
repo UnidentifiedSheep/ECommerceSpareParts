@@ -13,6 +13,7 @@ public sealed class NotificationDelivery :
 	public int NotificationId { get; private set; }
 	public Notification Notification { get; private set; } = null!;
 	public string ChannelSystemName { get; private set; } = null!;
+	public string? RecipientJson { get; private set; }
 	public DeliveryStatus Status { get; private set; }
 	public int Attempts { get; private set; }
 	public string? Error { get; private set; }
@@ -22,18 +23,19 @@ public sealed class NotificationDelivery :
 
 	private NotificationDelivery() { }
 
-	private NotificationDelivery(Notification notification, string channelSystemName)
+	private NotificationDelivery(Notification notification, string channelSystemName, string? recipientJson)
 	{
 		Notification = notification ?? throw new ArgumentNullException(nameof(notification));
 		ChannelSystemName = channelSystemName
 			.EnsureNotNullOrWhiteSpace(
 				() => new InvalidOperationException("Channel system name must not be null or empty."))
 			.Trim();
+		RecipientJson = recipientJson;
 		Status = DeliveryStatus.Pending;
 	}
 
-	internal static NotificationDelivery Create(Notification notification, string channelSystemName)
-		=> new(notification, channelSystemName);
+	internal static NotificationDelivery Create(Notification notification, string channelSystemName, string? recipientJson)
+		=> new(notification, channelSystemName, recipientJson);
 
 	public void Retry()
 	{
