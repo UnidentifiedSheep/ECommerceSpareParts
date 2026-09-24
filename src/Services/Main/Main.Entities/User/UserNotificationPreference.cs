@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
+using Main.Entities.DomainEvents.User;
 
 namespace Main.Entities.User;
 
@@ -27,6 +28,12 @@ public class UserNotificationPreference :
 
 	public void Enable() => Enabled = true;
 	public void Disable() => Enabled = false;
+
+	public override void OnCreated() => AddDomainEvent(new UserNotificationPreferenceUpdatedDomainEvent(UserId));
+
+	public override void OnUpdated() => OnCreated();
+
+	public override void OnDeleted() => OnCreated();
 
 	public override UserNotificationPreferenceKey GetId() => new(UserId, ChannelName);
 	public static Expression<Func<UserNotificationPreference, UserNotificationPreferenceKey>> GetKeySelector()
