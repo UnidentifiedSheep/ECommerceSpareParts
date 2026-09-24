@@ -119,11 +119,11 @@ public class NotificationChannelBaseObserverTests
 			CancellationToken cancellationToken = default) =>
 			NotifyObserversAsync(receipts, cancellationToken);
 
-		public override Task<IReadOnlyList<NotificationSendResult>> SendBatchAsync(
+		public override Task<IReadOnlyList<SendResult>> SendBatchAsync(
 			IReadOnlyCollection<NotificationDelivery<TestNotification, InAppRecipient>> notifications,
 			CancellationToken cancellationToken = default) =>
-			Task.FromResult<IReadOnlyList<NotificationSendResult>>(
-				notifications.Select(_ => NotificationSendResult.Success()).ToArray());
+			Task.FromResult<IReadOnlyList<SendResult>>(
+				notifications.Select(_ => SendResult.Success()).ToArray());
 	}
 
 }

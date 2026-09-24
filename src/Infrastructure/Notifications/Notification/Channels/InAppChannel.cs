@@ -20,7 +20,7 @@ public class InAppChannel(
 {
 	public override string SystemName => InAppRecipient.ChannelName;
 
-	public override async Task<IReadOnlyList<NotificationSendResult>> SendBatchAsync(
+	public override async Task<IReadOnlyList<SendResult>> SendBatchAsync(
 		IReadOnlyCollection<NotificationDelivery<ISimpleNotification<ILocalizableMessage>, InAppRecipient>> notifications,
 		CancellationToken cancellationToken = default)
 	{
@@ -36,7 +36,7 @@ public class InAppChannel(
 			throw new InvalidOperationException(
 				$"Channel '{SystemName}' received {rendered.Count} rendered contents for {deliveries.Length} deliveries.");
 
-		var results = new NotificationSendResult[deliveries.Length];
+		var results = new SendResult[deliveries.Length];
 		var rows = new List<InAppNotification>(deliveries.Length);
 		var recipients = new List<InAppRecipient>(deliveries.Length);
 		for (var i = 0; i < deliveries.Length; i++)
@@ -44,14 +44,14 @@ public class InAppChannel(
 			var content = rendered[i];
 			if (content is null)
 			{
-				results[i] = NotificationSendResult.Failure("Unable to render notification.");
+				results[i] = SendResult.Failure("Unable to render notification.");
 				continue;
 			}
 
 			var recipient = deliveries[i].Recipient;
 			rows.Add(InAppNotification.Create(recipient.UserId, content.Text));
 			recipients.Add(recipient);
-			results[i] = NotificationSendResult.Success();
+			results[i] = SendResult.Success();
 		}
 
 		if (rows.Count == 0) return results;

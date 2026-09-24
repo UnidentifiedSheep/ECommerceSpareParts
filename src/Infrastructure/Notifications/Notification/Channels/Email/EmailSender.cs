@@ -2,6 +2,7 @@ using System.Net.Sockets;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using Notification.Core;
 using Notification.Options;
 using Polly;
 using Polly.Retry;
@@ -10,57 +11,64 @@ namespace Notification.Channels.Email;
 
 public interface IEmailSender
 {
-	Task SendAsync(EmailMessage message, CancellationToken token = default);
+	Task<SendResult> SendAsync(EmailMessage message, CancellationToken token = default);
 
-	Task SendBatchAsync(IEnumerable<EmailMessage> messages, CancellationToken token = default);
+	Task<IReadOnlyList<SendResult>> SendBatchAsync(
+		IEnumerable<EmailMessage> messages,
+		CancellationToken token = default);
 }
 
 
 public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 {
-	public async Task SendAsync(EmailMessage message, CancellationToken token = default) =>
-		await SendBatchAsync([message], token);
-
-	public async Task SendBatchAsync(IEnumerable<EmailMessage> messages, CancellationToken token = default)
+	public async Task<SendResult> SendAsync(EmailMessage message, CancellationToken token = default)
 	{
-		var opt = options.Value;
-		var maxBatchSize = Math.Max(1, opt.MaxBatchSize);
-
-		var chunks = messages
-			.Chunk(maxBatchSize)
-			.Select(x => x.Select(z => BuildMessage(z, opt)).ToArray())
-			.ToList();
-
-		foreach (var chunk in chunks)
-		{
-			await WithRconAsync(
-				async client =>
-				{
-					foreach (var message in chunk)
-						await SendWithRetryAsync(
-							client,
-							message,
-							opt,
-							token);
-				},
-				token);
-
-			await Task.Delay(opt.BatchDelay, token);
-		}
+		ArgumentNullException.ThrowIfNull(message);
+		var results = await SendBatchAsync([message], token);
+		return results[0];
 	}
 
-	private async Task WithRconAsync(Func<SmtpClient, Task> func, CancellationToken token = default)
+	public async Task<IReadOnlyList<SendResult>> SendBatchAsync(
+		IEnumerable<EmailMessage> messages,
+		CancellationToken token = default)
 	{
-		using var client = new SmtpClient();
-		await EnsureConnectedAsync(
-			client,
-			options.Value,
-			token);
+		ArgumentNullException.ThrowIfNull(messages);
+		token.ThrowIfCancellationRequested();
 
-		await func(client);
+		var opt = options.Value;
+		var maxBatchSize = Math.Max(1, opt.MaxBatchSize);
+		var chunks = messages.Chunk(maxBatchSize).ToArray();
+		var results = new List<SendResult>();
 
-		if (client.IsConnected)
-			await client.DisconnectAsync(true, token);
+		for (var chunkIndex = 0; chunkIndex < chunks.Length; chunkIndex++)
+		{
+			if (chunkIndex > 0)
+				await Task.Delay(opt.BatchDelay, token);
+
+			using var client = new SmtpClient();
+			foreach (var message in chunks[chunkIndex])
+			{
+				token.ThrowIfCancellationRequested();
+				try
+				{
+					await SendWithRetryAsync(client, BuildMessage(message, opt), opt, token);
+					results.Add(SendResult.Success());
+				}
+				catch (OperationCanceledException) when (token.IsCancellationRequested)
+				{
+					throw;
+				}
+				catch (Exception ex)
+				{
+					results.Add(SendResult.Failure(
+						string.IsNullOrWhiteSpace(ex.Message) ? ex.GetType().Name : ex.Message));
+				}
+			}
+
+			await DisconnectSilentlyAsync(client);
+		}
+
+		return results;
 	}
 
 	private static async Task SendWithRetryAsync(

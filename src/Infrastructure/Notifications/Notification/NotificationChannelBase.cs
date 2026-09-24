@@ -53,7 +53,7 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 		INotificationRecipient recipient)
 		=> notification is TNotification && recipient is TDestination;
 
-	public virtual async Task<NotificationSendResult> SendAsync(
+	public virtual async Task<SendResult> SendAsync(
 		NotificationDelivery<TNotification, TDestination> notification,
 		CancellationToken cancellationToken = default)
 	{
@@ -66,11 +66,11 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 		return results[0];
 	}
 
-	public abstract Task<IReadOnlyList<NotificationSendResult>> SendBatchAsync(
+	public abstract Task<IReadOnlyList<SendResult>> SendBatchAsync(
 		IReadOnlyCollection<NotificationDelivery<TNotification, TDestination>> notifications,
 		CancellationToken cancellationToken = default);
 
-	async Task<NotificationSendResult> INotificationChannel.SendAsync(
+	async Task<SendResult> INotificationChannel.SendAsync(
 		NotificationDelivery notification,
 		CancellationToken cancellationToken)
 	{
@@ -78,7 +78,7 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 		return await SendAsync(typed, cancellationToken);
 	}
 
-	async Task<IReadOnlyList<NotificationSendResult>> INotificationChannel.SendBatchAsync(
+	async Task<IReadOnlyList<SendResult>> INotificationChannel.SendBatchAsync(
 		IReadOnlyCollection<NotificationDelivery> notifications,
 		CancellationToken cancellationToken)
 	{
