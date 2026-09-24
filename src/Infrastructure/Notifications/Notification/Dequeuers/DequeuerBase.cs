@@ -8,7 +8,7 @@ namespace Notification.Dequeuers;
 
 public abstract class DequeuerBase(
 	ILogger logger,
-	IOptions<ChannelOptionBase> options
+	IOptions<ChannelOptionsBase> options
 	) : BackgroundService, INamedObject
 {
 	private readonly SemaphoreSlim _wakeUp = new(0, 1);

@@ -9,3 +9,7 @@ public sealed record InAppRecipient(Guid UserId) : INotificationRecipient
 
 	public string ChannelSystemName => ChannelName;
 }
+
+public record InAppReceipt(
+	InAppRecipient Recipient,
+	int CreatedRowId) : IDeliveryReceipt<InAppRecipient>;
