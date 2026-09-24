@@ -8,4 +8,8 @@ public interface INotificationDeliveryRepository
 		string channelSystemName,
 		int batchSize,
 		CancellationToken cancellationToken = default);
+
+	Task<bool> HasNextAsync(
+		string channelSystemName,
+		CancellationToken cancellationToken = default);
 }

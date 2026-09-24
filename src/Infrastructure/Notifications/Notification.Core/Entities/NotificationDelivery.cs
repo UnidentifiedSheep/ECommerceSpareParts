@@ -11,6 +11,7 @@ public sealed class NotificationDelivery :
 	ILinqEntity<NotificationDelivery, NotificationDeliveryKey>
 {
 	public int NotificationId { get; private set; }
+	public Notification Notification { get; private set; } = null!;
 	public string ChannelSystemName { get; private set; } = null!;
 	public DeliveryStatus Status { get; private set; }
 	public int Attempts { get; private set; }
@@ -21,8 +22,9 @@ public sealed class NotificationDelivery :
 
 	private NotificationDelivery() { }
 
-	private NotificationDelivery(string channelSystemName)
+	private NotificationDelivery(Notification notification, string channelSystemName)
 	{
+		Notification = notification ?? throw new ArgumentNullException(nameof(notification));
 		ChannelSystemName = channelSystemName
 			.EnsureNotNullOrWhiteSpace(
 				() => new InvalidOperationException("Channel system name must not be null or empty."))
@@ -30,8 +32,8 @@ public sealed class NotificationDelivery :
 		Status = DeliveryStatus.Pending;
 	}
 
-	internal static NotificationDelivery Create(string channelSystemName)
-		=> new(channelSystemName);
+	internal static NotificationDelivery Create(Notification notification, string channelSystemName)
+		=> new(notification, channelSystemName);
 
 	public void Retry()
 	{

@@ -4,6 +4,7 @@ namespace Notification.Options;
 
 public abstract record ChannelOptionsBase
 {
-	[Required]
 	public required TimeSpan DelayBeforeBatch { get; init; } = TimeSpan.FromSeconds(30);
+
+	public required int MaxAttempts { get; init; } = 3;
 }

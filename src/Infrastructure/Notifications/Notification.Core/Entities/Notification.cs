@@ -44,7 +44,7 @@ public sealed class Notification : Entity<Notification, int>, ILinqEntity<Notifi
 
 	public NotificationDelivery MakeDelivery(string channelSystemName)
 	{
-		var delivery = NotificationDelivery.Create(channelSystemName);
+		var delivery = NotificationDelivery.Create(this, channelSystemName);
 
 		if (_deliveries.Any(x => string.Equals(
 				x.ChannelSystemName,

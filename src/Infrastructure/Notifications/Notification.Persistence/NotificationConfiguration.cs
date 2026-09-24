@@ -44,7 +44,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<NotificationEn
 
 		builder
 			.HasMany(e => e.Deliveries)
-			.WithOne()
+			.WithOne(e => e.Notification)
 			.HasForeignKey(e => e.NotificationId)
 			.OnDelete(DeleteBehavior.Cascade)
 			.HasConstraintName("notification_deliveries_notification_id_fk");
