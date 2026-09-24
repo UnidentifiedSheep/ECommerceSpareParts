@@ -1,6 +1,5 @@
 using Abstractions.Interfaces.Persistence;
 using Attributes;
-using Locan.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Notification.Core;
 using Notification.Core.Entities;
@@ -12,16 +11,16 @@ using Notification.Interfaces;
 namespace Notification.Channels;
 
 public class InAppChannel(
-	INotificationRenderer<ISimpleNotification<ILocalizableMessage>> renderer,
+	INotificationRenderer<ISimpleNotification> renderer,
 	IEnumerable<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>> observers,
 	IUnitOfWork unitOfWork,
 	ILogger<InAppChannel> logger
-	) : NotificationChannelBase<ISimpleNotification<ILocalizableMessage>, InAppRecipient, InAppReceipt>(observers, logger)
+	) : NotificationChannelBase<ISimpleNotification, InAppRecipient, InAppReceipt>(observers, logger)
 {
 	public override string SystemName => InAppRecipient.ChannelName;
 
 	public override async Task<IReadOnlyList<SendResult>> SendBatchAsync(
-		IReadOnlyCollection<NotificationDelivery<ISimpleNotification<ILocalizableMessage>, InAppRecipient>> notifications,
+		IReadOnlyCollection<NotificationDelivery<ISimpleNotification, InAppRecipient>> notifications,
 		CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(notifications);

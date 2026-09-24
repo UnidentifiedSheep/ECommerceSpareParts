@@ -1,4 +1,3 @@
-using System.Globalization;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 
@@ -7,14 +6,14 @@ namespace Notification.Core;
 public sealed class NotificationDefinitionBase<TNotification, TModel>(
 	string systemName,
 	INotificationSerializer serializer,
-	Func<TModel, CultureInfo?, TNotification> createNotification)
+	Func<TModel, TNotification> createNotification)
 	: INotificationDefinition<TNotification>
 	where TNotification : INotification<TModel>
 {
 	private readonly INotificationSerializer _serializer =
 		serializer ?? throw new ArgumentNullException(nameof(serializer));
 
-	private readonly Func<TModel, CultureInfo?, TNotification> _createNotification =
+	private readonly Func<TModel, TNotification> _createNotification =
 		createNotification ?? throw new ArgumentNullException(nameof(createNotification));
 
 	public string SystemName { get; } =
@@ -28,7 +27,7 @@ public sealed class NotificationDefinitionBase<TNotification, TModel>(
 		EnsureCanHandle(entity.NotificationSystemName);
 
 		var model = _serializer.Deserialize<TModel>(entity.Model);
-		return _createNotification(model, entity.Culture);
+		return _createNotification(model);
 	}
 
 	public Entities.Notification ToEntity(Guid userId, TNotification notification)
@@ -39,8 +38,7 @@ public sealed class NotificationDefinitionBase<TNotification, TModel>(
 		return Entities.Notification.Create(
 			userId,
 			SystemName,
-			_serializer.Serialize(notification),
-			notification.SelectedCulture);
+			_serializer.Serialize(notification));
 	}
 
 	INotification INotificationDefinition.FromEntity(Entities.Notification entity) => FromEntity(entity);

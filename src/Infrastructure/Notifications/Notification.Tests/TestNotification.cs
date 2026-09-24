@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json.Serialization;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
@@ -9,15 +8,11 @@ public class TestNotification : INotification<TestNotificationData>
 {
 	public const string Name = "TestNotification";
 	public string SystemName => Name;
-	public CultureInfo? SelectedCulture { get; }
 	public TestNotificationData Model { get; }
 
-	public TestNotification(
-		TestNotificationData model,
-		CultureInfo? selectedCulture = null)
+	public TestNotification(TestNotificationData model)
 	{
 		Model = model;
-		SelectedCulture = selectedCulture;
 	}
 }
 

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NotificationEntity = Notification.Core.Entities.Notification;
@@ -23,14 +22,6 @@ public class NotificationConfiguration : IEntityTypeConfiguration<NotificationEn
 			.HasMaxLength(128);
 
 		builder.Property(e => e.Model).HasColumnName("model").HasColumnType("jsonb");
-
-		builder
-			.Property(e => e.Culture)
-			.HasColumnName("culture")
-			.HasMaxLength(128)
-			.HasConversion(
-				culture => culture == null ? null : culture.Name,
-				name => name == null ? null : CultureInfo.GetCultureInfo(name));
 
 		builder.Property(e => e.CreateAt).HasColumnName("created_at");
 

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Notification.Core.Enums;
 using NotificationEntity = Notification.Core.Entities.Notification;
 
@@ -10,15 +9,13 @@ public class NotificationEntityTests
 	public void Create_WithValidValues_InitializesNotification()
 	{
 		var userId = Guid.NewGuid();
-		var culture = CultureInfo.GetCultureInfo("ru-RU");
 		var before = DateTime.UtcNow;
 
-		var notification = NotificationEntity.Create(userId, "order-created", "{\"id\":42}", culture);
+		var notification = NotificationEntity.Create(userId, "order-created", "{\"id\":42}");
 
 		Assert.Equal(userId, notification.UserId);
 		Assert.Equal("order-created", notification.NotificationSystemName);
 		Assert.Equal("{\"id\":42}", notification.Model);
-		Assert.Same(culture, notification.Culture);
 		Assert.InRange(notification.CreateAt, before, DateTime.UtcNow);
 		Assert.Empty(notification.Deliveries);
 	}
@@ -29,7 +26,7 @@ public class NotificationEntityTests
 	[InlineData("{broken}")]
 	public void Create_WithInvalidJson_Throws(string model)
 	{
-		var action = () => NotificationEntity.Create(Guid.NewGuid(), "test", model, null);
+		var action = () => NotificationEntity.Create(Guid.NewGuid(), "test", model);
 
 		var exception = Assert.Throws<InvalidOperationException>(action);
 		Assert.Equal("Model must be valid json value.", exception.Message);
@@ -71,5 +68,5 @@ public class NotificationEntityTests
 	}
 
 	private static NotificationEntity CreateNotification() =>
-		NotificationEntity.Create(Guid.NewGuid(), "test", "{}", null);
+		NotificationEntity.Create(Guid.NewGuid(), "test", "{}");
 }

@@ -87,6 +87,6 @@ public class NotificationDeliveryTests
 
 	private static Notification.Core.Entities.NotificationDelivery CreateDelivery() =>
 		NotificationEntity
-			.Create(Guid.NewGuid(), "test", "{}", null)
+			.Create(Guid.NewGuid(), "test", "{}")
 			.MakeDelivery("InApp");
 }

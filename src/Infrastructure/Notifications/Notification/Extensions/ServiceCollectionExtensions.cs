@@ -1,5 +1,3 @@
-using System.Globalization;
-using Locan.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
@@ -41,7 +39,7 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddNotification<TNotification, TModel>(
 		this IServiceCollection services,
 		string systemName,
-		Func<TModel, CultureInfo?, TNotification> createNotification)
+		Func<TModel, TNotification> createNotification)
 		where TNotification : INotification<TModel>
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(systemName);
@@ -60,7 +58,7 @@ public static class ServiceCollectionExtensions
 	private static void AddRenderers(this IServiceCollection services)
 	{
 		services.TryAddSingleton<
-			INotificationRenderer<ISimpleNotification<ILocalizableMessage>>,
+			INotificationRenderer<ISimpleNotification>,
 			TextNotificationRenderer>();
 
 		services.TryAddSingleton<HtmlNotificationRenderer>();

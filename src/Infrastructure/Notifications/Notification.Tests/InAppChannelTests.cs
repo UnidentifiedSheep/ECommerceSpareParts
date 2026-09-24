@@ -1,6 +1,5 @@
 using Abstractions.Interfaces.Persistence;
 using Attributes;
-using Locan.Core.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Notification.Channels;
@@ -135,10 +134,10 @@ public class InAppChannelTests
 		IUnitOfWork unitOfWork,
 		RecordingInAppObserver observer)
 	{
-		var renderer = new Mock<INotificationRenderer<ISimpleNotification<ILocalizableMessage>>>();
+		var renderer = new Mock<INotificationRenderer<ISimpleNotification>>();
 		renderer
 			.Setup(x => x.TryRenderAsync(
-				It.IsAny<IEnumerable<ISimpleNotification<ILocalizableMessage>>>(),
+				It.IsAny<IEnumerable<ISimpleNotification>>(),
 				It.IsAny<CancellationToken>()))
 			.ReturnsAsync(contents);
 		return new InAppChannel(renderer.Object, [observer], unitOfWork, NullLogger<InAppChannel>.Instance);
@@ -156,7 +155,7 @@ public class InAppChannelTests
 		return unitOfWork;
 	}
 
-	private static Notification.Core.NotificationDelivery<ISimpleNotification<ILocalizableMessage>, InAppRecipient>
-		Delivery(InAppRecipient recipient) => new(new Mock<ISimpleNotification<ILocalizableMessage>>().Object, recipient);
+	private static Notification.Core.NotificationDelivery<ISimpleNotification, InAppRecipient>
+		Delivery(InAppRecipient recipient) => new(new Mock<ISimpleNotification>().Object, recipient);
 
 }

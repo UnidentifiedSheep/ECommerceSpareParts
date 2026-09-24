@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
@@ -13,7 +12,6 @@ public sealed class Notification : Entity<Notification, int>, ILinqEntity<Notifi
 	public Guid UserId { get; private set; }
 	public string NotificationSystemName { get; private set; } = null!;
 	public string Model { get; private set; } = null!;
-	public CultureInfo? Culture { get; private set; }
 	public DateTime CreateAt { get; private set; }
 
 	private readonly List<NotificationDelivery> _deliveries = [];
@@ -24,23 +22,20 @@ public sealed class Notification : Entity<Notification, int>, ILinqEntity<Notifi
 	private Notification(
 		Guid userId,
 		string notificationSystemName,
-		string model,
-		CultureInfo? culture)
+		string model)
 	{
 		UserId = userId;
 		NotificationSystemName = notificationSystemName;
 		Model = model.EnsureValidJson(
 			() => new InvalidOperationException("Model must be valid json value."));
-		Culture = culture;
 		CreateAt = DateTime.UtcNow;
 	}
 
 	public static Notification Create(
 		Guid userId,
 		string notificationSystemName,
-		string model,
-		CultureInfo? culture)
-		=> new(userId, notificationSystemName, model, culture);
+		string model)
+		=> new(userId, notificationSystemName, model);
 
 	public NotificationDelivery MakeDelivery(string channelSystemName)
 	{

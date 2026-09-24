@@ -1,5 +1,3 @@
-using System.Globalization;
-using Locan.Core.LocalizableMessages;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
@@ -12,32 +10,20 @@ namespace Notification.Tests;
 public class NotificationDefinitionRegistrationTests
 {
 	[Fact]
-	public void SimpleNotification_WithConcreteModel_RoundTripsThroughDefinition()
+	public void SimpleNotification_WithStringModel_RoundTripsThroughDefinition()
 	{
-		var definition = new NotificationDefinitionBase<SimpleTestNotification, SimpleTestMessage>(
+		var definition = new NotificationDefinitionBase<SimpleTestNotification, string>(
 			"SimpleTestNotification",
 			new NotificationSerializer(),
-			(model, culture) => new SimpleTestNotification(model, culture));
-		var original = new SimpleTestNotification(
-			new SimpleTestMessage().WithName("Alice"),
-			CultureInfo.GetCultureInfo("ru-RU"));
+			model => new SimpleTestNotification(model));
+		var original = new SimpleTestNotification("Hello, Alice");
 
 		var entity = definition.ToEntity(Guid.NewGuid(), original);
 		var restored = definition.FromEntity(entity);
 
-		Assert.Equal(original.Model.MessageKey, restored.Model.MessageKey);
+		Assert.Equal(original.Model, restored.Model);
 		Assert.Equal(entity.Model, new NotificationSerializer().Serialize(restored));
-		Assert.Equal(original.SelectedCulture, restored.SelectedCulture);
-		Assert.IsAssignableFrom<ISimpleNotification<Locan.Core.Interfaces.ILocalizableMessage>>(restored);
-	}
-
-	[Fact]
-	public void LocalizableMessage_AsStoredModel_CannotBeDeserialized()
-	{
-		var serializer = new NotificationSerializer();
-		var json = serializer.Serialize(new BaseMessageNotification(new LocalizableMessage("notification.test")));
-
-		Assert.Throws<InvalidOperationException>(() => serializer.Deserialize<LocalizableMessage>(json));
+		Assert.IsAssignableFrom<ISimpleNotification>(restored);
 	}
 
 	[Fact]
@@ -46,7 +32,7 @@ public class NotificationDefinitionRegistrationTests
 		var services = CreateServices();
 		services.AddNotification<TestNotification, TestNotificationData>(
 			TestNotification.Name,
-			(model, culture) => new TestNotification(model, culture));
+			model => new TestNotification(model));
 
 		using var provider = services.BuildServiceProvider(validateScopes: true);
 		using var scope = provider.CreateScope();
@@ -55,8 +41,7 @@ public class NotificationDefinitionRegistrationTests
 		var definition = registry.GetBySystemName("testnotification");
 		var userId = Guid.NewGuid();
 		var original = new TestNotification(
-			new TestNotificationData { TestInt = 42, TestString = "message" },
-			CultureInfo.GetCultureInfo("ru-RU"));
+			new TestNotificationData { TestInt = 42, TestString = "message" });
 
 		var entity = definition.ToEntity(userId, original);
 		var restored = Assert.IsType<TestNotification>(definition.FromEntity(entity));
@@ -66,7 +51,6 @@ public class NotificationDefinitionRegistrationTests
 		Assert.Equal("TestNotification", entity.NotificationSystemName);
 		Assert.Equal(42, restored.Model.TestInt);
 		Assert.Equal("message", restored.Model.TestString);
-		Assert.Equal(original.SelectedCulture, restored.SelectedCulture);
 	}
 
 	[Fact]
@@ -75,7 +59,7 @@ public class NotificationDefinitionRegistrationTests
 		var services = CreateServices();
 		services.AddNotification<TestNotification, TestNotificationData>(
 			"TestNotification",
-			(model, culture) => new TestNotification(model, culture));
+			model => new TestNotification(model));
 		Assert.Equal(ServiceLifetime.Singleton, Assert.Single(services, descriptor =>
 			descriptor.ServiceType == typeof(INotificationDefinition)).Lifetime);
 
@@ -98,10 +82,10 @@ public class NotificationDefinitionRegistrationTests
 		var services = CreateServices();
 		services.AddNotification<TestNotification, TestNotificationData>(
 			"TestNotification",
-			(model, culture) => new TestNotification(model, culture));
+			model => new TestNotification(model));
 		services.AddNotification<OtherNotification, TestNotificationData>(
 			"OtherNotification",
-			(model, culture) => new OtherNotification(model, culture));
+			model => new OtherNotification(model));
 
 		using var provider = services.BuildServiceProvider(validateScopes: true);
 		using var scope = provider.CreateScope();
@@ -121,10 +105,10 @@ public class NotificationDefinitionRegistrationTests
 		var services = CreateServices();
 		services.AddNotification<TestNotification, TestNotificationData>(
 			"Duplicate",
-			(model, culture) => new TestNotification(model, culture));
+			model => new TestNotification(model));
 		services.AddNotification<OtherNotification, TestNotificationData>(
 			"Duplicate",
-			(model, culture) => new OtherNotification(model, culture));
+			model => new OtherNotification(model));
 
 		using var provider = services.BuildServiceProvider(validateScopes: true);
 		using var scope = provider.CreateScope();
@@ -140,33 +124,13 @@ public class NotificationDefinitionRegistrationTests
 		return services;
 	}
 
-	private sealed record OtherNotification(
-		TestNotificationData Model,
-		CultureInfo? SelectedCulture) : INotification<TestNotificationData>
+	private sealed record OtherNotification(TestNotificationData Model) : INotification<TestNotificationData>
 	{
 		public string SystemName => "OtherNotification";
 	}
 
-	private sealed record SimpleTestNotification(
-		SimpleTestMessage Model,
-		CultureInfo? SelectedCulture) : ISimpleNotification<SimpleTestMessage>
+	private sealed record SimpleTestNotification(string Model) : ISimpleNotification
 	{
 		public string SystemName => "SimpleTestNotification";
-	}
-
-	private sealed class SimpleTestMessage() : LocalizableMessage("notification.test")
-	{
-		public SimpleTestMessage WithName(string name)
-		{
-			WithValue("Name", name);
-			return this;
-		}
-	}
-
-	private sealed record BaseMessageNotification(LocalizableMessage Model)
-		: ISimpleNotification<LocalizableMessage>
-	{
-		public string SystemName => "BaseMessageNotification";
-		public CultureInfo? SelectedCulture => null;
 	}
 }
