@@ -6,6 +6,7 @@ namespace Notification.Core.Recipients;
 public sealed record InAppRecipient(Guid UserId) : INotificationRecipient
 {
 	public const string ChannelName = "InApp";
+	static string INotificationRecipient.StaticChannelSystemName => ChannelName;
 
 	public string ChannelSystemName => ChannelName;
 }

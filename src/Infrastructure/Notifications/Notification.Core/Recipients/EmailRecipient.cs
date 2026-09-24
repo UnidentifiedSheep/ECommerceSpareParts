@@ -8,6 +8,7 @@ public sealed record EmailRecipient(
 	string Subject) : INotificationRecipient
 {
 	public const string ChannelName = "Email";
+	static string INotificationRecipient.StaticChannelSystemName => ChannelName;
 	public string ChannelSystemName => ChannelName;
 }
 
