@@ -1,4 +1,5 @@
 using System.Globalization;
+using Locan.Core.LocalizableMessages;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
@@ -10,6 +11,35 @@ namespace Notification.Tests;
 
 public class NotificationDefinitionRegistrationTests
 {
+	[Fact]
+	public void SimpleNotification_WithConcreteModel_RoundTripsThroughDefinition()
+	{
+		var definition = new NotificationDefinitionBase<SimpleTestNotification, SimpleTestMessage>(
+			"SimpleTestNotification",
+			new NotificationSerializer(),
+			(model, culture) => new SimpleTestNotification(model, culture));
+		var original = new SimpleTestNotification(
+			new SimpleTestMessage().WithName("Alice"),
+			CultureInfo.GetCultureInfo("ru-RU"));
+
+		var entity = definition.ToEntity(Guid.NewGuid(), original);
+		var restored = definition.FromEntity(entity);
+
+		Assert.Equal(original.Model.MessageKey, restored.Model.MessageKey);
+		Assert.Equal(entity.Model, new NotificationSerializer().Serialize(restored));
+		Assert.Equal(original.SelectedCulture, restored.SelectedCulture);
+		Assert.IsAssignableFrom<ISimpleNotification<Locan.Core.Interfaces.ILocalizableMessage>>(restored);
+	}
+
+	[Fact]
+	public void LocalizableMessage_AsStoredModel_CannotBeDeserialized()
+	{
+		var serializer = new NotificationSerializer();
+		var json = serializer.Serialize(new BaseMessageNotification(new LocalizableMessage("notification.test")));
+
+		Assert.Throws<InvalidOperationException>(() => serializer.Deserialize<LocalizableMessage>(json));
+	}
+
 	[Fact]
 	public void RegisteredNotification_RoundTripsThroughRegistry()
 	{
@@ -115,5 +145,28 @@ public class NotificationDefinitionRegistrationTests
 		CultureInfo? SelectedCulture) : INotification<TestNotificationData>
 	{
 		public string SystemName => "OtherNotification";
+	}
+
+	private sealed record SimpleTestNotification(
+		SimpleTestMessage Model,
+		CultureInfo? SelectedCulture) : ISimpleNotification<SimpleTestMessage>
+	{
+		public string SystemName => "SimpleTestNotification";
+	}
+
+	private sealed class SimpleTestMessage() : LocalizableMessage("notification.test")
+	{
+		public SimpleTestMessage WithName(string name)
+		{
+			WithValue("Name", name);
+			return this;
+		}
+	}
+
+	private sealed record BaseMessageNotification(LocalizableMessage Model)
+		: ISimpleNotification<LocalizableMessage>
+	{
+		public string SystemName => "BaseMessageNotification";
+		public CultureInfo? SelectedCulture => null;
 	}
 }

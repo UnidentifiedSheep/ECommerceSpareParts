@@ -14,7 +14,6 @@ using Contracts.Settings;
 using Contracts.Supplier;
 using Contracts.User;
 using ExchangeRate;
-using Mail;
 using Main.Api;
 using Main.Application;
 using Main.Application.Consumers;
@@ -66,7 +65,6 @@ builder
 	.AddApplicationCache()
 	.AddJsonSigner()
 	.AddSecretEncryptor()
-	.AddMailLayer()
 	.AddCommonLayer()
 	.AddS3()
 	.AddApplicationLayer(builder.Configuration)

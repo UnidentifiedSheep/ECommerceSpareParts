@@ -27,7 +27,6 @@
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchangeRate\ExchangeRate.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Mailing\Mail\Mail.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\S3\S3.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
@@ -73,20 +72,10 @@
                        CopyToOutput="true"/>
     </ItemGroup>
 
-    <Target Name="CopyEmailTemplatesToOutput" AfterTargets="CopyFilesToOutputDirectory">
-        <Copy
-                SourceFiles="@(EmailTemplate)"
-                DestinationFiles="@(EmailTemplate->'$(OutDir)Templates\Emails\%(RecursiveDir)%(Filename)%(Extension)')"
-                SkipUnchangedFiles="true"/>
-    </Target>
-
-    <Target Name="AddEmailTemplatesToPublish" BeforeTargets="ComputeFilesToPublish">
-        <ItemGroup>
-            <ResolvedFileToPublish Include="@(EmailTemplate)">
-                <RelativePath>Templates\Emails\%(EmailTemplate.RecursiveDir)%(EmailTemplate.Filename)%(EmailTemplate.Extension)</RelativePath>
-                <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-            </ResolvedFileToPublish>
-        </ItemGroup>
-    </Target>
+    <ItemGroup>
+      <None Include="Templates\Emails\EmailVerification.cshtml" />
+      <None Include="Templates\Emails\LoginNotification.cshtml" />
+      <None Include="Templates\Emails\PasswordReset.cshtml" />
+    </ItemGroup>
 
 </Project>

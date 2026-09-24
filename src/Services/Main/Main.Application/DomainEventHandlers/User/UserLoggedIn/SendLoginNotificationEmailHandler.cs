@@ -3,20 +3,17 @@ using Application.Common.Abstractions;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Services.Events;
 using Locan.Core.Interfaces.Localizers;
-using Mailing.Core;
-using Mailing.Core.Models;
-using Main.Application.Interfaces.Services;
 using Main.Entities.DomainEvents.User;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Notification.Core.Interfaces.Notification;
 
 namespace Main.Application.DomainEventHandlers.User.UserLoggedIn;
 
 public class SendLoginNotificationEmailHandler(
 	IReadRepository<UserEmail, string> emailRepository,
-	IMailingService mailingService,
-	IEmailMessageRenderer emailRenderer,
+	INotificationService notificationService,
 	IContextualLocalizer localizer,
 	ILogger<SendLoginNotificationEmailHandler> logger) : BatchableDomainEventHandler<UserLoggedInDomainEvent>
 {

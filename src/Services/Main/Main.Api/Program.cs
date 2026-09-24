@@ -18,7 +18,6 @@ using Contracts.Settings;
 using Contracts.User;
 using ExchangeRate;
 using GraphQL.Common.Extensions;
-using Mail;
 using Main.Api;
 using Main.Api.EndPoints.Products;
 using Main.Api.GraphQl;
@@ -130,7 +129,6 @@ builder
 	.AddSecretEncryptor()
 	.AddFullSecurityLayer()
 	.AddEComAuth(builder.Configuration)
-	.AddMailLayer()
 	.AddCommonLayer()
 	.AddS3()
 	.AddApplicationLayer(builder.Configuration)

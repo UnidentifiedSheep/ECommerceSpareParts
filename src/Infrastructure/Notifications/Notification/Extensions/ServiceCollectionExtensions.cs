@@ -63,8 +63,6 @@ public static class ServiceCollectionExtensions
 			INotificationRenderer<ISimpleNotification<ILocalizableMessage>>,
 			TextNotificationRenderer>();
 
-		services.TryAddSingleton<
-			INotificationRenderer<INotification>,
-			HtmlNotificationRenderer>();
+		services.TryAddSingleton<HtmlNotificationRenderer>();
 	}
 }
