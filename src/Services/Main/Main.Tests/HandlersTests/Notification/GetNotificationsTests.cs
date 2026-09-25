@@ -1,10 +1,10 @@
 using Abstractions.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Users.GetNotifications;
+using Main.Application.Handlers.Notifications.GetNotifications;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
-namespace Tests.HandlersTests.Users;
+namespace Tests.HandlersTests.Notification;
 
 public class GetNotificationsTests : IntegrationTest
 {

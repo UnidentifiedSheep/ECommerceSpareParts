@@ -169,7 +169,9 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.JOBS_GET,
 				PermissionCodes.METRICS_CREATE,
 				PermissionCodes.METRICS_GET,
-				PermissionCodes.CHARTS_GET
+				PermissionCodes.CHARTS_GET,
+				PermissionCodes.NOTIFICATIONS_ME,
+				PermissionCodes.NOTIFICATIONS_ALL
 			],
 			[Role.Worker] =
 			[
@@ -248,7 +250,8 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.JOBS_CREATE,
 				PermissionCodes.JOBS_GET,
 				PermissionCodes.METRICS_GET,
-				PermissionCodes.CHARTS_GET
+				PermissionCodes.CHARTS_GET,
+				PermissionCodes.NOTIFICATIONS_ME
 			],
 			[Role.Member] =
 			[
@@ -262,9 +265,13 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.USERS_VEHICLES_CREATE_ME,
 				PermissionCodes.ARTICLES_GET_MAIN,
 				PermissionCodes.JOBS_CREATE,
-				PermissionCodes.JOBS_GET
+				PermissionCodes.JOBS_GET,
+				PermissionCodes.NOTIFICATIONS_ME
 			],
-			[Role.Supplier] = [],
+			[Role.Supplier] =
+			[
+				PermissionCodes.NOTIFICATIONS_ME
+			],
 			[Role.System] =
 			[
 				PermissionCodes.CREATE_HISTORICAL_RECORDS,
@@ -370,7 +377,9 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.JOBS_GET,
 				PermissionCodes.METRICS_CREATE,
 				PermissionCodes.METRICS_GET,
-				PermissionCodes.CHARTS_GET
+				PermissionCodes.CHARTS_GET,
+				PermissionCodes.NOTIFICATIONS_ME,
+				PermissionCodes.NOTIFICATIONS_ALL
 			]
 		};
 	}

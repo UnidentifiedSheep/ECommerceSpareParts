@@ -216,6 +216,10 @@
     "permissions.metrics.get.name": "View metrics",
     "permissions.metrics.get.description": "Permission to view metrics.",
     "permissions.charts.get.name": "View charts",
-    "permissions.charts.get.description": "Permission to view analytics charts."
+    "permissions.charts.get.description": "Permission to view analytics charts.",
+    "permissions.notifications.me.name": "Interact with own notifications",
+    "permissions.notifications.me.description": "Permission to interact with own notifications.",
+    "permissions.notifications.all.name": "Interact with all notifications",
+    "permissions.notifications.all.description": "Permission to interact with notifications of all users."
   }
 }

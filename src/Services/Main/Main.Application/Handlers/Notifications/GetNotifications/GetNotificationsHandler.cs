@@ -7,7 +7,7 @@ using Main.Application.Dtos.Users;
 using Microsoft.EntityFrameworkCore;
 using Notification.Core.Entities;
 
-namespace Main.Application.Handlers.Users.GetNotifications;
+namespace Main.Application.Handlers.Notifications.GetNotifications;
 
 public record GetNotificationsQuery(
 	Guid UserId,
