@@ -1,5 +1,5 @@
-using Abstractions.Interfaces.Persistence;
 using System.Text.Json;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,22 +61,22 @@ public class Dequeuer<TRecipient>(
 		await using var scope = scopeFactory.CreateAsyncScope();
 		var provider = scope.ServiceProvider;
 		var repository = provider.GetRequiredService<INotificationDeliveryRepository>();
-		var unitOfWork = provider.GetRequiredService<IUnitOfWork>();
+		var transactionService = provider.GetRequiredService<IApplicationTransactionService>();
 		var recipientResolver = provider.GetRequiredService<IRecipientResolver>();
 		var definitions = provider.GetRequiredService<INamedObjectRegistry<INotificationDefinition>>();
 		var channel = provider
 			.GetRequiredService<INamedObjectRegistry<INotificationChannel>>()
 			.GetBySystemName(SystemName);
 
-		var (hasNext, processingError) = await unitOfWork.ExecuteWithTransaction(
+		var (hasNext, processingError) = await transactionService.ExecuteAsync(
 			TransactionalAttribute.ReadCommitted(0, 0),
-			async () =>
+			async (transactionContext, ct) =>
 			{
 				var batch = await repository
 					.GetPendingBatchForUpdateAsync(
 						SystemName,
 						options.BatchSize,
-						cancellationToken);
+						ct);
 
 				if (batch.Count == 0) return (HasNext: false, Error: null);
 
@@ -87,18 +87,18 @@ public class Dequeuer<TRecipient>(
 					.ToArray();
 				var recipientsByUser = userIdsToResolve.Length == 0
 					? new Dictionary<Guid, TRecipient>()
-					: await recipientResolver.ResolveAsync<TRecipient>(userIdsToResolve, cancellationToken);
+					: await recipientResolver.ResolveAsync<TRecipient>(userIdsToResolve, ct);
 
 				var error = await ProcessAsync(
 					batch,
 					recipientsByUser,
 					definitions,
 					channel,
-					cancellationToken);
+					ct);
 
-				await unitOfWork.SaveChangesAsync(cancellationToken);
+				await transactionContext.UnitOfWork.SaveChangesAsync(ct);
 
-				return (HasNext: await repository.HasNextAsync(SystemName, cancellationToken), Error: error);
+				return (HasNext: await repository.HasNextAsync(SystemName, ct), Error: error);
 			},
 			cancellationToken);
 

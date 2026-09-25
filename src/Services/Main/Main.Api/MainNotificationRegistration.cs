@@ -1,4 +1,7 @@
 using Main.Application.Notifications;
+using Main.Application.Notifications.DeliveryObservers;
+using Notification.Core.Interfaces;
+using Notification.Core.Recipients;
 using Notification.Extensions;
 
 namespace Main.Api;
@@ -19,6 +22,9 @@ public static class MainNotificationRegistration
 		services.AddNotification<UserLoggedInNotification, UserLoggedInNotificationData>(
 			"UserLoggedIn",
 			model => new UserLoggedInNotification(model));
+
+		services.AddScoped<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>, InAppDeliveryObserver>();
+
 		return services;
 	}
 }
