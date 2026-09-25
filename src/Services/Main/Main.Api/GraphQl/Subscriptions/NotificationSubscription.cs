@@ -10,9 +10,13 @@ namespace Main.Api.GraphQl.Subscriptions;
 [SubscriptionType]
 public static partial class NotificationSubscription
 {
-	[EventStream("{ id }")]
+	[EventStream("notification { id }")]
 	[GraphQLName("onNotificationCreated")]
 	[RequireAllPermissions(PermissionCodes.NOTIFICATIONS_ME)]
-	public static GqlNotification OnNotificationCreated()
-		=> EventStream.Create<GqlNotification>();
+	public static NotificationCreated OnNotificationCreated()
+		=> EventStream.Create<NotificationCreated>();
 }
+
+public record NotificationCreated(
+	[property: GraphQLName("notification")]
+	GqlNotification Notification);

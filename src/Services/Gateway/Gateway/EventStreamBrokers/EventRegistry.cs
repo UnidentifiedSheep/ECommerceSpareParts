@@ -25,7 +25,7 @@ public sealed class EventRegistry : IEventRegistry
 			byType: byType,
 			byTopic: byTopic,
 			topic: "onNotificationCreated",
-			mapper: @event => new { id = @event.Id },
+			mapper: @event => new { notification = new { id = @event.Id } },
 			resolveAudience: @event => EventAudience.ForUser(@event.UserId));
 
 		ByTypeDescriptors = byType.ToFrozenDictionary();

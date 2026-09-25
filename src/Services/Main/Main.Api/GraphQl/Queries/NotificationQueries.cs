@@ -11,7 +11,7 @@ namespace Main.Api.GraphQl.Queries;
 public sealed class NotificationQueries
 {
 	[Lookup]
-	[GraphQLName("byId")] //lookup for auth user.
+	[GraphQLName("byId")]
 	[RequireAllPermissions(PermissionCodes.NOTIFICATIONS_ME)]
 	public async Task<GqlNotification?> GetByIdAsync(
 		INotificationByIdDataLoader loader,
