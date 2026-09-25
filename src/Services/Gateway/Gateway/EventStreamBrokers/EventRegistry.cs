@@ -3,12 +3,18 @@ using Contracts;
 
 namespace Gateway.EventStreamBrokers;
 
-public class FusionEventRegistry
+public interface IEventRegistry
+{
+	FusionEventDescriptor Get<TEvent>();
+	FusionEventDescriptor Get(string topic);
+}
+
+public class EventRegistry : IEventRegistry
 {
 	private readonly FrozenDictionary<Type, FusionEventDescriptor> _descriptors;
 	private readonly FrozenDictionary<string, FusionEventDescriptor> _byTopicDescriptors;
 
-	public FusionEventRegistry()
+	public EventRegistry()
 	{
 		var dict = new Dictionary<Type, FusionEventDescriptor>();
 		var byTopic = new Dictionary<string, FusionEventDescriptor>();
@@ -20,7 +26,8 @@ public class FusionEventRegistry
 			mapper: @event => new
 			{
 				id = @event.Id
-			});
+			},
+			extractUserId: @event => @event.UserId);
 
 		_descriptors = dict.ToFrozenDictionary();
 		_byTopicDescriptors = byTopic.ToFrozenDictionary();
@@ -30,12 +37,14 @@ public class FusionEventRegistry
 		Dictionary<Type, FusionEventDescriptor> byType,
 		Dictionary<string, FusionEventDescriptor> byTopic,
 		string topic,
-		Func<TEvent, object> mapper)
+		Func<TEvent, object> mapper,
+		Func<TEvent, Guid?> extractUserId)
 	{
 		var descriptor = new FusionEventDescriptor(
 			topic,
 			typeof(TEvent),
-			value => mapper((TEvent)value));
+			value => mapper((TEvent)value),
+			value => extractUserId((TEvent)value));
 
 		byType.Add(typeof(TEvent), descriptor);
 		byTopic.Add(topic, descriptor);

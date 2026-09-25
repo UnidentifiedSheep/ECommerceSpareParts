@@ -6,9 +6,12 @@ using Application.Common.Backplane;
 using Application.Common.Diagnostics;
 using Cache;
 using Common;
+using Contracts;
 using Gateway.Application;
 using Gateway.EndPoints;
+using Gateway.EventStreamBrokers;
 using Gateway.Extensions;
+using HotChocolate.Fusion.Subscriptions;
 using Internal.Integration.Di;
 using Locan.AspNetCore;
 using MassTransit;
@@ -40,6 +43,9 @@ builder
 
 builder.Services.AddRedisOptions().AddMessageBrokerOptions();
 builder.Services.AddRedisHealthCheck();
+builder.Services.AddSingleton<IEventRegistry, EventRegistry>();
+builder.Services.AddSingleton<IEventHub, EventHub>();
+builder.Services.AddKeyedSingleton<IEventStreamBrokerProvider, RabbitmqEventStreamBrokerProvider>("");
 
 builder.Host.AddLokiLogger(
 	builder.Configuration,
@@ -141,6 +147,7 @@ var uniqQueueName = $"queue-of-gateway-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
 	x.AddConsumer<BackplaneConsumer>();
+	x.AddConsumer<FusionEventConsumer<InAppNotificationCreatedEvent>>();
 
 	x.UsingRabbitMq((context, cfg) =>
 	{
@@ -164,6 +171,17 @@ builder.Services.AddMassTransit(x =>
 			ep =>
 			{
 				ep.Durable = true;
+			});
+
+		cfg.ReceiveEndpoint(
+			$"gateway-notifications-{Guid.NewGuid():N}",
+			ep =>
+			{
+				ep.AutoDelete = true;
+				ep.Durable = false;
+				ep.ConfigureConsumeTopology = false;
+				ep.ConfigureConsumer<FusionEventConsumer<InAppNotificationCreatedEvent>>(context);
+				ep.Bind<InAppNotificationCreatedEvent>();
 			});
 	});
 });
