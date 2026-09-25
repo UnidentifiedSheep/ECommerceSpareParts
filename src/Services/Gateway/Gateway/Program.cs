@@ -6,7 +6,6 @@ using Application.Common.Backplane;
 using Application.Common.Diagnostics;
 using Cache;
 using Common;
-using Contracts;
 using Gateway.Application;
 using Gateway.EndPoints;
 using Gateway.EventStreamBrokers;
@@ -43,7 +42,7 @@ builder
 
 builder.Services.AddRedisOptions().AddMessageBrokerOptions();
 builder.Services.AddRedisHealthCheck();
-builder.Services.AddSingleton<IEventRegistry, EventRegistry>();
+builder.Services.AddSingleton<IEventRegistry>(EventRegistry.Instance);
 builder.Services.AddSingleton<IEventHub, EventHub>();
 builder.Services.AddKeyedSingleton<IEventStreamBrokerProvider, RabbitmqEventStreamBrokerProvider>("");
 
@@ -147,7 +146,7 @@ var uniqQueueName = $"queue-of-gateway-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
 	x.AddConsumer<BackplaneConsumer>();
-	x.AddConsumer<FusionEventConsumer<InAppNotificationCreatedEvent>>();
+	EventConsumersRegistrator.RegisterConsumers(x);
 
 	x.UsingRabbitMq((context, cfg) =>
 	{
@@ -180,8 +179,8 @@ builder.Services.AddMassTransit(x =>
 				ep.AutoDelete = true;
 				ep.Durable = false;
 				ep.ConfigureConsumeTopology = false;
-				ep.ConfigureConsumer<FusionEventConsumer<InAppNotificationCreatedEvent>>(context);
-				ep.Bind<InAppNotificationCreatedEvent>();
+
+				EventConsumersRegistrator.BindConsumers(context, ep);
 			});
 	});
 });

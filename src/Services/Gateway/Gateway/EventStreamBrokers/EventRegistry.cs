@@ -11,26 +11,25 @@ public interface IEventRegistry
 
 public sealed class EventRegistry : IEventRegistry
 {
-	private readonly FrozenDictionary<Type, FusionEventDescriptor> _descriptors;
-	private readonly FrozenDictionary<string, FusionEventDescriptor> _byTopicDescriptors;
+	public static readonly EventRegistry Instance = new();
 
-	public EventRegistry()
+	public FrozenDictionary<Type, FusionEventDescriptor> ByTypeDescriptors { get; }
+	public FrozenDictionary<string, FusionEventDescriptor> ByTopicDescriptors { get; }
+
+	private EventRegistry()
 	{
-		var dict = new Dictionary<Type, FusionEventDescriptor>();
+		var byType = new Dictionary<Type, FusionEventDescriptor>();
 		var byTopic = new Dictionary<string, FusionEventDescriptor>();
 
 		Add<InAppNotificationCreatedEvent>(
-			byType: dict,
+			byType: byType,
 			byTopic: byTopic,
 			topic: "onNotificationCreated",
-			mapper: @event => new
-			{
-				id = @event.Id
-			},
-			extractAudience: @event => EventAudience.ForUser(@event.UserId));
+			mapper: @event => new { id = @event.Id },
+			resolveAudience: @event => EventAudience.ForUser(@event.UserId));
 
-		_descriptors = dict.ToFrozenDictionary();
-		_byTopicDescriptors = byTopic.ToFrozenDictionary();
+		ByTypeDescriptors = byType.ToFrozenDictionary();
+		ByTopicDescriptors = byTopic.ToFrozenDictionary();
 	}
 
 	private static void Add<TEvent>(
@@ -38,27 +37,25 @@ public sealed class EventRegistry : IEventRegistry
 		Dictionary<string, FusionEventDescriptor> byTopic,
 		string topic,
 		Func<TEvent, object> mapper,
-		Func<TEvent, EventAudience> extractAudience)
+		Func<TEvent, EventAudience> resolveAudience)
 	{
 		var descriptor = new FusionEventDescriptor(
 			topic,
 			typeof(TEvent),
-			value => mapper((TEvent)value),
-			value => extractAudience((TEvent)value));
+			Map: value => mapper((TEvent)value),
+			ResolveAudience: value => resolveAudience((TEvent)value));
 
 		byType.Add(typeof(TEvent), descriptor);
 		byTopic.Add(topic, descriptor);
 	}
 
 	public FusionEventDescriptor Get<TEvent>()
-		=> _descriptors.TryGetValue(typeof(TEvent), out var descriptor)
+		=> ByTypeDescriptors.TryGetValue(typeof(TEvent), out var descriptor)
 			? descriptor
-			: throw new InvalidOperationException(
-				$"Fusion event '{typeof(TEvent).FullName}' is not registered.");
+			: throw new InvalidOperationException($"Fusion event '{typeof(TEvent).FullName}' is not registered.");
 
 	public FusionEventDescriptor Get(string topic)
-		=> _byTopicDescriptors.TryGetValue(topic, out var descriptor)
+		=> ByTopicDescriptors.TryGetValue(topic, out var descriptor)
 			? descriptor
-			: throw new InvalidOperationException(
-				$"Fusion event topic '{topic}' is not registered.");
+			: throw new InvalidOperationException($"Fusion event topic '{topic}' is not registered.");
 }
