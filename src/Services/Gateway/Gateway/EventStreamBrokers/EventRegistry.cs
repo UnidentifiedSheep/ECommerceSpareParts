@@ -9,7 +9,7 @@ public interface IEventRegistry
 	FusionEventDescriptor Get(string topic);
 }
 
-public class EventRegistry : IEventRegistry
+public sealed class EventRegistry : IEventRegistry
 {
 	private readonly FrozenDictionary<Type, FusionEventDescriptor> _descriptors;
 	private readonly FrozenDictionary<string, FusionEventDescriptor> _byTopicDescriptors;
@@ -27,7 +27,7 @@ public class EventRegistry : IEventRegistry
 			{
 				id = @event.Id
 			},
-			extractUserId: @event => @event.UserId);
+			extractAudience: @event => EventAudience.ForUser(@event.UserId));
 
 		_descriptors = dict.ToFrozenDictionary();
 		_byTopicDescriptors = byTopic.ToFrozenDictionary();
@@ -38,18 +38,27 @@ public class EventRegistry : IEventRegistry
 		Dictionary<string, FusionEventDescriptor> byTopic,
 		string topic,
 		Func<TEvent, object> mapper,
-		Func<TEvent, Guid?> extractUserId)
+		Func<TEvent, EventAudience> extractAudience)
 	{
 		var descriptor = new FusionEventDescriptor(
 			topic,
 			typeof(TEvent),
 			value => mapper((TEvent)value),
-			value => extractUserId((TEvent)value));
+			value => extractAudience((TEvent)value));
 
 		byType.Add(typeof(TEvent), descriptor);
 		byTopic.Add(topic, descriptor);
 	}
 
-	public FusionEventDescriptor Get<TEvent>() => _descriptors[typeof(TEvent)];
-	public FusionEventDescriptor Get(string topic) => _byTopicDescriptors[topic];
+	public FusionEventDescriptor Get<TEvent>()
+		=> _descriptors.TryGetValue(typeof(TEvent), out var descriptor)
+			? descriptor
+			: throw new InvalidOperationException(
+				$"Fusion event '{typeof(TEvent).FullName}' is not registered.");
+
+	public FusionEventDescriptor Get(string topic)
+		=> _byTopicDescriptors.TryGetValue(topic, out var descriptor)
+			? descriptor
+			: throw new InvalidOperationException(
+				$"Fusion event topic '{topic}' is not registered.");
 }

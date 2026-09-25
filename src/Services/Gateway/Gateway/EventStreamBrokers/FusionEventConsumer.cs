@@ -9,11 +9,8 @@ public sealed class FusionEventConsumer<TEvent>(
 {
 	public Task Consume(ConsumeContext<TEvent> context)
 	{
-		var userId = registry.Get<TEvent>().ExtractUserId(context.Message);
-		var audience = userId == null ? EventAudience.Global : EventAudience.ForUser(userId.Value);
-
+		var audience = registry.Get<TEvent>().ExtractAudience(context.Message);
 		hub.Publish(context.Message, audience);
-
 		return Task.CompletedTask;
 	}
 }
