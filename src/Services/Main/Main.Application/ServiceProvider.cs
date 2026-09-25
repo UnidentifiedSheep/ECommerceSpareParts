@@ -79,6 +79,8 @@ public static class ServiceProvider
 		collection.AddSingleton<IEmailValidator, EmailValidator>();
 
 		ValidationConfiguration.Configure();
+		SortByConfig.Configure();
+		CursorConfig.Configure();
 
 		return collection;
 	}

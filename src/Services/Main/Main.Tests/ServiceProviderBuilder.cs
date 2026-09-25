@@ -29,8 +29,6 @@ namespace Tests;
 
 public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArguments>
 {
-	private static bool _staticsConfigured;
-
 	public IServiceProvider Build(ServiceProviderArguments args)
 	{
 		RegisterGlobalBasicContexts();
@@ -127,12 +125,6 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
 		services.RemoveAll<IFusionCacheBackplane>();
 		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
-
-		if (!_staticsConfigured)
-		{
-			_staticsConfigured = true;
-			SortByConfig.Configure();
-		}
 
 		var serviceProvider = services.BuildServiceProvider();
 		return serviceProvider;

@@ -145,8 +145,6 @@ builder.Services.AddHostedService<StartupTaskHostedService>();
 
 var app = builder.Build();
 
-SortByConfig.Configure();
-
 app.UseCommonApiPipeline();
 
 app.MapHub<JobHub>("/hubs/jobs");
