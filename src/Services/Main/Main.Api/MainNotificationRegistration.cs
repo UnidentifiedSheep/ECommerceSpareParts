@@ -12,7 +12,15 @@ public static class MainNotificationRegistration
 	{
 		services.AddNotificationServices();
 		services.UseEmailNotifications();
+		services.AddNotifications();
 
+		services.AddScoped<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>, InAppDeliveryObserver>();
+
+		return services;
+	}
+
+	public static IServiceCollection AddNotifications(this IServiceCollection services)
+	{
 		services.AddNotification<PasswordResetNotification, PasswordResetNotificationData>(
 			"PasswordReset",
 			model => new PasswordResetNotification(model));
@@ -22,8 +30,6 @@ public static class MainNotificationRegistration
 		services.AddNotification<UserLoggedInNotification, UserLoggedInNotificationData>(
 			"UserLoggedIn",
 			model => new UserLoggedInNotification(model));
-
-		services.AddScoped<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>, InAppDeliveryObserver>();
 
 		return services;
 	}

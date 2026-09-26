@@ -42,8 +42,10 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
 		var services = new ServiceCollection();
 
-		services.RegisterTestContexts()
-			.AddMainNotifications();
+		services.RegisterTestContexts();
+		services.AddNotifications()
+			.AddNotificationServices();
+
 
 		services.AddLogging();
 		Log.Logger = new LoggerConfiguration()
