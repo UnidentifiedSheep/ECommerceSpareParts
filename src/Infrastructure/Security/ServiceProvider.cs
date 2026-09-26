@@ -59,38 +59,56 @@ public static class ServiceProvider
 	}
 
 	public static IServiceCollection AddEComAuth(
-		this IServiceCollection collection,
+		this IServiceCollection services,
 		IConfiguration configuration)
 	{
-		collection
+		var issuer = configuration["JwtBearer:ValidIssuer"];
+
+		var tokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuer = true,
+			ValidateAudience = false,
+			ValidateLifetime = true,
+			ValidateIssuerSigningKey = true,
+			ValidIssuer = issuer,
+			IssuerSigningKey = new SymmetricSecurityKey(
+				Encoding.UTF8.GetBytes(
+					configuration["JwtBearer:IssuerSigningKey"]!))
+		};
+
+		services
 			.AddAuthentication(options =>
 			{
-				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-			})
-			.AddJwtBearer(options =>
-			{
-				var iss = configuration["JwtBearer:ValidIssuer"];
-				options.TokenValidationParameters = new TokenValidationParameters
-				{
-					ValidateIssuer = true,
-					ValidateAudience = false,
-					ValidateLifetime = true,
-					ValidateIssuerSigningKey = true,
-					ValidIssuer = iss,
-					IssuerSigningKey = new SymmetricSecurityKey(
-						Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!))
-				};
-			});
+				options.DefaultAuthenticateScheme =
+					JwtBearerDefaults.AuthenticationScheme;
 
-		collection
+				options.DefaultChallengeScheme =
+					JwtBearerDefaults.AuthenticationScheme;
+
+				options.DefaultScheme =
+					JwtBearerDefaults.AuthenticationScheme;
+			})
+			.AddJwtBearer(
+				JwtBearerDefaults.AuthenticationScheme,
+				options =>
+				{
+					options.TokenValidationParameters = tokenValidationParameters;
+				})
+			.AddJwtBearer(
+				AuthenticationSchemes.WebSocketBearer,
+				options =>
+				{
+					options.TokenValidationParameters = tokenValidationParameters;
+				});
+
+		services
 			.AddAuthorizationBuilder()
 			.SetDefaultPolicy(
-				new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+				new AuthorizationPolicyBuilder(
+						JwtBearerDefaults.AuthenticationScheme)
 					.RequireAuthenticatedUser()
 					.Build());
 
-		return collection;
+		return services;
 	}
 }

@@ -1,10 +1,10 @@
-﻿using Application.Common.Extensions;
-using Application.Common.Handlers.NamedObjects;
-using Application.Common.Interfaces.NamedObject;
+﻿using Application.Common.Handlers.NamedObjects;
 using Application.Common.NamedObject;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using NamedObject;
+using NamedObject.Core.Interfaces;
 using Pricing.Application.NamedObjects;
 using Pricing.Application.NamedObjects.SettingDefinitions;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;

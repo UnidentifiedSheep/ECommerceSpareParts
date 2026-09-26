@@ -1,7 +1,7 @@
-using Application.Common.Abstractions.NamedObjects;
 using Application.Common.Interfaces.Settings;
 using Domain.CommonEntities;
 using Domain.Interfaces;
+using NamedObject.Core.Base;
 
 namespace Application.Common.NamedObject;
 

@@ -1,12 +1,12 @@
 ﻿using Analytics.Application.NamedObjects;
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.ChartDataSources;
-using Application.Common.Extensions;
 using Application.Common.Handlers.NamedObjects;
-using Application.Common.Interfaces.NamedObject;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using NamedObject;
+using NamedObject.Core.Interfaces;
 
 namespace Analytics.Application;
 

@@ -1,6 +1,6 @@
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.ChartDataSources;
-using Application.Common.Abstractions.NamedObjects;
+using NamedObject.Core.Base;
 
 namespace Analytics.Application.NamedObjects;
 

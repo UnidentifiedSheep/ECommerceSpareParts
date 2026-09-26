@@ -18,6 +18,8 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 
 	private readonly List<UserEmail> _emails = [];
 
+	private readonly List<UserNotificationPreference> _notificationPreferences = [];
+
 	private readonly List<UserPermission> _permissions = [];
 
 	private readonly List<UserPhone> _phones = [];
@@ -57,6 +59,8 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 	public UserDiscount? Discount { get; private set; }
 
 	public IReadOnlyList<UserEmail> Emails => _emails;
+
+	public IReadOnlyList<UserNotificationPreference> NotificationPreferences => _notificationPreferences;
 
 	public IReadOnlyList<UserPermission> Permissions => _permissions;
 

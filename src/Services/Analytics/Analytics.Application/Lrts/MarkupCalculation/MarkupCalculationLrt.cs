@@ -2,7 +2,6 @@ using Abstractions.Interfaces.Persistence;
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
 using Analytics.Entities;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -12,6 +11,7 @@ using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using NamedObject.Core.Interfaces;
 
 namespace Analytics.Application.Lrts.MarkupCalculation;
 

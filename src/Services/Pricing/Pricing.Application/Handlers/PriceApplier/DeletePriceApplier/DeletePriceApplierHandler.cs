@@ -1,9 +1,9 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using MediatR;
+using NamedObject.Core.Interfaces;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Entities.Exceptions;
 

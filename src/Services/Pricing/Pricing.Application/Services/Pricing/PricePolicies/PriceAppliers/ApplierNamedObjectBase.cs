@@ -1,4 +1,4 @@
-using Application.Common.Abstractions.NamedObjects;
+using NamedObject.Core.Base;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Pricing;
 

@@ -54,6 +54,11 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
 		builder.Navigation(e => e.Emails).HasField("_emails").UsePropertyAccessMode(PropertyAccessMode.Field);
 
 		builder
+			.Navigation(e => e.NotificationPreferences)
+			.HasField("_notificationPreferences")
+			.UsePropertyAccessMode(PropertyAccessMode.Field);
+
+		builder
 			.Navigation(e => e.Permissions)
 			.HasField("_permissions")
 			.UsePropertyAccessMode(PropertyAccessMode.Field);

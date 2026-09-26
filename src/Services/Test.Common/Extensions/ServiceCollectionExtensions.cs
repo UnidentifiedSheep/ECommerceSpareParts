@@ -16,8 +16,11 @@ public static class ServiceCollectionExtensions
 		var implementations = AppDomain
 			.CurrentDomain
 			.GetAssemblies()
-			.SelectMany(a => a.GetTypes())
-			.Where(t => interfaceType.IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
+			.Where(x => !x.IsDynamic)
+			.SelectMany(x => x.GetTypes())
+			.Where(t =>
+				interfaceType.IsAssignableFrom(t) &&
+				t is { IsInterface: false, IsAbstract: false });
 
 		foreach (var impl in implementations)
 			services.AddScoped(impl);

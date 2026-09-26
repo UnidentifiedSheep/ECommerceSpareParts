@@ -1,12 +1,12 @@
-﻿using Application.Common.Extensions;
-using Application.Common.Handlers.NamedObjects;
-using Application.Common.Interfaces.NamedObject;
+﻿using Application.Common.Handlers.NamedObjects;
 using Application.Common.NamedObject;
 using Main.Application.NamedObjects;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using NamedObject;
+using NamedObject.Core.Interfaces;
 
 namespace Main.Application;
 

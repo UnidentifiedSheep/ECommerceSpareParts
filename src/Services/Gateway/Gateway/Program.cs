@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json.Nodes;
 using Abstractions;
 using Api.Common;
@@ -8,7 +9,10 @@ using Cache;
 using Common;
 using Gateway.Application;
 using Gateway.EndPoints;
+using Gateway.EventStreamBrokers;
 using Gateway.Extensions;
+using Gateway.Interceptors;
+using HotChocolate.Fusion.Subscriptions;
 using Internal.Integration.Di;
 using Locan.AspNetCore;
 using MassTransit;
@@ -40,6 +44,9 @@ builder
 
 builder.Services.AddRedisOptions().AddMessageBrokerOptions();
 builder.Services.AddRedisHealthCheck();
+builder.Services.AddSingleton<IEventRegistry>(EventRegistry.Instance);
+builder.Services.AddSingleton<IEventHub, EventHub>();
+builder.Services.AddSingleton<IEventStreamBrokerFactory, RabbitmqEventStreamBrokerFactory>();
 
 builder.Host.AddLokiLogger(
 	builder.Configuration,
@@ -141,6 +148,7 @@ var uniqQueueName = $"queue-of-gateway-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
 	x.AddConsumer<BackplaneConsumer>();
+	EventConsumersRegistrator.RegisterConsumers(x);
 
 	x.UsingRabbitMq((context, cfg) =>
 	{
@@ -165,6 +173,17 @@ builder.Services.AddMassTransit(x =>
 			{
 				ep.Durable = true;
 			});
+
+		cfg.ReceiveEndpoint(
+			$"gateway-notifications-{Guid.NewGuid():N}",
+			ep =>
+			{
+				ep.AutoDelete = true;
+				ep.Durable = false;
+				ep.ConfigureConsumeTopology = false;
+
+				EventConsumersRegistrator.BindConsumers(context, ep);
+			});
 	});
 });
 
@@ -175,6 +194,7 @@ var fusionArchivePath = builder.Configuration["Fusion:ArchivePath"] ?? "./gatewa
 builder
 	.AddGraphQLGateway()
 	.AddFileSystemConfiguration(fusionArchivePath)
+	.AddSocketSessionInterceptor<AuthSocketSessionInterceptor>()
 	.ModifyRequestOptions(o =>
 	{
 		o.CollectOperationPlanTelemetry = true;
@@ -192,6 +212,7 @@ app.UseExceptionHandler(_ =>
 });
 
 app.UseHeaderPropagation();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

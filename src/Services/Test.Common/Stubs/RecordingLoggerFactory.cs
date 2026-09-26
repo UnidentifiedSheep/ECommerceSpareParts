@@ -5,8 +5,9 @@ namespace Tests.Stubs;
 public sealed class RecordingLoggerFactory : ILoggerFactory
 {
 	public List<LogLevel> LogLevels { get; } = [];
+	public List<Exception> Exceptions { get; } = [];
 
-	public ILogger CreateLogger(string categoryName) => new RecordingLogger(LogLevels);
+	public ILogger CreateLogger(string categoryName) => new RecordingLogger(LogLevels, Exceptions);
 
 	public void AddProvider(ILoggerProvider provider)
 	{
@@ -16,7 +17,7 @@ public sealed class RecordingLoggerFactory : ILoggerFactory
 	{
 	}
 
-	private sealed class RecordingLogger(List<LogLevel> logLevels) : ILogger
+	private sealed class RecordingLogger(List<LogLevel> logLevels, List<Exception> exceptions) : ILogger
 	{
 		public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
 
@@ -27,6 +28,10 @@ public sealed class RecordingLoggerFactory : ILoggerFactory
 			EventId eventId,
 			TState state,
 			Exception? exception,
-			Func<TState, Exception?, string> formatter) => logLevels.Add(logLevel);
+			Func<TState, Exception?, string> formatter)
+		{
+			logLevels.Add(logLevel);
+			if (exception is not null) exceptions.Add(exception);
+		}
 	}
 }

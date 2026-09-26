@@ -7,6 +7,7 @@ using Main.Persistence.Repositories.Product;
 using Main.Persistence.Repositories.Sale;
 using Main.Persistence.Repositories.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Notification.Persistence;
 using Persistence.Common;
 using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
 using StorageContentRepository = Main.Persistence.Repositories.Storage.StorageContentRepository;
@@ -23,6 +24,7 @@ public static class ServiceProvider
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
 			typeof(Product).Assembly);
+		collection.AddNotificationPersistence<DContext>();
 
 		collection.AddScoped<IProductRepository, ProductRepository>();
 		collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();

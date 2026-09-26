@@ -6,6 +6,7 @@ using Application.Common.Interfaces.Currency;
 using Application.Common.Services.Currency;
 using Application.Common.Validators;
 using Main.Application.Configs;
+using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
@@ -21,6 +22,7 @@ using Main.Application.Services.PayloadProvider;
 using Main.Entities.Balance;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Notification.Core.Interfaces.Recipient;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application;
@@ -43,6 +45,7 @@ public static class ServiceProvider
 		collection.RegisterProjectionProviders<ProducerImportLrt>();
 
 		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
+		collection.AddScoped<IRecipientResolver>(provider => provider.GetRequiredService<IRecipientProvider>());
 
 		collection.RegisterSettingsService();
 
@@ -59,7 +62,6 @@ public static class ServiceProvider
 		collection.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();
 		collection.AddScoped<IVerificationPayloadProvider, VerificationPayloadProvider>();
 
-		collection.AddScoped<IMailingService, MailingService>();
 		collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
 		collection.AddScoped<IBalanceService, BalanceService>();
 		collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
@@ -77,6 +79,8 @@ public static class ServiceProvider
 		collection.AddSingleton<IEmailValidator, EmailValidator>();
 
 		ValidationConfiguration.Configure();
+		SortByConfig.Configure();
+		CursorConfig.Configure();
 
 		return collection;
 	}

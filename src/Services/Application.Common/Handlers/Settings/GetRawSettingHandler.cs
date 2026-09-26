@@ -1,7 +1,7 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
+using NamedObject.Core.Interfaces;
 
 namespace Application.Common.Handlers.Settings;
 

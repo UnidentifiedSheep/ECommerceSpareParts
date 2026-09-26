@@ -5,7 +5,7 @@ using Api.Common;
 using Application.Common.Models.Options.S3;
 using Cache;
 using Locan.Hosting;
-using Mailing.Core;
+using Main.Api;
 using Main.Application.Configs;
 using Main.Application.Models;
 using Main.Cache;
@@ -14,6 +14,7 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Notification.Extensions;
 using Npgsql;
 using Persistence;
 using Security;
@@ -30,8 +31,6 @@ namespace Tests;
 
 public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArguments>
 {
-	private static bool _staticsConfigured;
-
 	public IServiceProvider Build(ServiceProviderArguments args)
 	{
 		RegisterGlobalBasicContexts();
@@ -44,6 +43,9 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		var services = new ServiceCollection();
 
 		services.RegisterTestContexts();
+		services.AddNotifications()
+			.AddNotificationServices();
+
 
 		services.AddLogging();
 		Log.Logger = new LoggerConfiguration()
@@ -109,7 +111,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 					ValidIssuer = "main-tests",
 					IssuerSigningKey = "main-tests-signing-key-at-least-32-characters"
 				}));
-		services.AddSingleton<IEmailMessageRenderer, EmailMessageRendererStub>();
+
 		services.AddScoped<S3StorageServiceStub>();
 		services.AddScoped<IS3StorageService>(sp => sp.GetRequiredService<S3StorageServiceStub>());
 		services.AddProjectJsonSerialization();
@@ -128,12 +130,6 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
 		services.RemoveAll<IFusionCacheBackplane>();
 		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
-
-		if (!_staticsConfigured)
-		{
-			_staticsConfigured = true;
-			SortByConfig.Configure();
-		}
 
 		var serviceProvider = services.BuildServiceProvider();
 		return serviceProvider;

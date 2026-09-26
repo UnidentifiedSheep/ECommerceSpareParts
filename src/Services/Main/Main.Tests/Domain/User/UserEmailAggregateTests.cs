@@ -197,7 +197,7 @@ public class UserEmailAggregateTests
 	}
 
 	[Fact]
-	public void EmailLifecycle_PublishesUserUpdatedEvent()
+	public void EmailLifecycle_PublishesUserEmailUpdatedEvent()
 	{
 		var user = CreateUser();
 		user.AddEmail(
@@ -215,7 +215,7 @@ public class UserEmailAggregateTests
 			.ContainSingle()
 			.Which
 			.Should()
-			.BeOfType<UserUpdatedDomainEvent>()
+			.BeOfType<UserEmailUpdatedDomainEvent>()
 			.Which;
 		@event.UserId.Should().Be(user.Id);
 	}

@@ -5,15 +5,16 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Exceptions;
 using Locan.Core.Interfaces.Localizers;
-using Mailing.Core.Models;
+using Main.Application.Notifications;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Entities;
 using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Enums.Auth;
 using MediatR;
+using Notification.Core.Interfaces.Notification;
+using Notification.Core.Recipients;
 
 namespace Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 
@@ -24,7 +25,7 @@ public record SendEmailRecoveryCommand(string Email) : ICommand;
 public class SendEmailRecoveryHandler(
 	IJsonSigner jsonSigner,
 	IUserRepository userRepository,
-	IMailingService mailingService,
+	INotificationService notificationService,
 	IContextualLocalizer localizer,
 	ISettingsService settingsService,
 	IResetPayloadProvider payloadProvider) : ICommandHandler<SendEmailRecoveryCommand>
@@ -49,11 +50,11 @@ public class SendEmailRecoveryHandler(
 		var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
 		var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
 
-		await mailingService.QueueEmailAsync(
-			new ResetPasswordData(
-				localizer,
-				resetUrl.ToString(),
-				request.Email),
+		await notificationService.QueueAsync(
+			user.Id,
+			new PasswordResetNotification(
+				new PasswordResetNotificationData(localizer, resetUrl.ToString())),
+			[new EmailRecipient(request.Email)],
 			cancellationToken);
 
 		return Unit.Value;

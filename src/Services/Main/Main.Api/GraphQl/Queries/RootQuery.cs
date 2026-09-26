@@ -18,4 +18,7 @@ public sealed class RootQuery
 
 	[GraphQLName("storageContents")]
 	public StorageContentQueries StorageContent => new();
+
+	[GraphQLName("notifications")]
+	public NotificationQueries Notification => new();
 }

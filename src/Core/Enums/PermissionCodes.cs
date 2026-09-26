@@ -249,5 +249,9 @@ public enum PermissionCodes
 	METRICS_GET,
 
 	// ===== CHARTS =====
-	CHARTS_GET
+	CHARTS_GET,
+
+	// ===== NOTIFICATIONS =====
+	NOTIFICATIONS_ME,
+	NOTIFICATIONS_ALL
 }

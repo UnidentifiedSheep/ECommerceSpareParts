@@ -7,4 +7,7 @@ public sealed class RootMutation
 {
 	[GraphQLName("catalogueCandidates")]
 	public CatalogueCandidateMutations CatalogueCandidates => new();
+
+	[GraphQLName("notifications")]
+	public NotificationMutations Notifications => new();
 }

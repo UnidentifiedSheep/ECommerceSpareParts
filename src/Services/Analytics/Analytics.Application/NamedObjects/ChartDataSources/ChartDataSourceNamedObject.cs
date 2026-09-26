@@ -1,6 +1,6 @@
 using Analytics.Application.Interfaces.ChartData;
 using Analytics.Application.Models;
-using Application.Common.Abstractions.NamedObjects;
+using NamedObject.Core.Base;
 using SchemaGeneration.Abstractions;
 using SchemaGeneration.Abstractions.Models;
 

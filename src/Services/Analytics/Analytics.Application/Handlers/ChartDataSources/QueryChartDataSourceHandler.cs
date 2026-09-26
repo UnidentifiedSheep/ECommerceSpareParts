@@ -5,8 +5,8 @@ using Analytics.Application.NamedObjects.ChartDataSources;
 using Analytics.Entities;
 using Analytics.Entities.Exceptions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.NamedObject;
 using Exceptions;
+using NamedObject.Core.Interfaces;
 
 namespace Analytics.Application.Handlers.ChartDataSources;
 

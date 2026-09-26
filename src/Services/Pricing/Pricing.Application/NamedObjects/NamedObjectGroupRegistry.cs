@@ -1,4 +1,4 @@
-using Application.Common.Abstractions.NamedObjects;
+using NamedObject.Core.Base;
 
 namespace Pricing.Application.NamedObjects;
 

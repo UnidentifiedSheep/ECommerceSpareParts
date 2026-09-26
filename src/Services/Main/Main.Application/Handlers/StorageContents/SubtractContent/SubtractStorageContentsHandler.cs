@@ -1,7 +1,6 @@
 using System.Data;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Interfaces.Persistence;
@@ -11,6 +10,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Settings;
 using Main.Entities.Storage;
 using Main.Enums;
+using NamedObject.Core.Interfaces;
 
 namespace Main.Application.Handlers.StorageContents.SubtractContent;
 

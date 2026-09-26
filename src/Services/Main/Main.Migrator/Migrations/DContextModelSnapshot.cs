@@ -3001,6 +3001,27 @@ namespace Main.Migrator.Migrations
                     b.ToTable("user_info", "auth");
                 });
 
+            modelBuilder.Entity("Main.Entities.User.UserNotificationPreference", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("ChannelName")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("channel_name");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("enabled");
+
+                    b.HasKey("UserId", "ChannelName")
+                        .HasName("user_notification_preferences_pk");
+
+                    b.ToTable("user_notification_preferences", "auth");
+                });
+
             modelBuilder.Entity("Main.Entities.User.UserPhone", b =>
                 {
                     b.Property<string>("NormalizedPhone")
@@ -3361,6 +3382,116 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("Created");
 
                     b.ToTable("OutboxState", "msg");
+                });
+
+            modelBuilder.Entity("Notification.Core.Entities.InAppNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("SeenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("seen_at");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("in_app_notifications_pk");
+
+                    b.HasIndex(new[] { "UserId", "CreateAt" }, "in_app_notifications_user_id_created_at_idx");
+
+                    b.ToTable("in_app_notifications", "notification");
+                });
+
+            modelBuilder.Entity("Notification.Core.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("model");
+
+                    b.Property<string>("NotificationSystemName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("notification_system_name");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("notifications_pk");
+
+                    b.HasIndex(new[] { "UserId", "CreateAt" }, "notifications_user_id_created_at_idx");
+
+                    b.ToTable("notifications", "notification");
+                });
+
+            modelBuilder.Entity("Notification.Core.Entities.NotificationDelivery", b =>
+                {
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("notification_id");
+
+                    b.Property<string>("ChannelSystemName")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("channel_system_name");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("delivered_at");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<string>("RecipientJson")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("recipient_json");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.HasKey("NotificationId", "ChannelSystemName")
+                        .HasName("notification_deliveries_pk");
+
+                    b.HasIndex(new[] { "ChannelSystemName", "Status", "NotificationId" }, "notification_deliveries_channel_status_notification_id_idx");
+
+                    b.ToTable("notification_deliveries", "notification");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Job.MultiStepJob", b =>
@@ -4306,6 +4437,16 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("user_info_users_id_fk");
                 });
 
+            modelBuilder.Entity("Main.Entities.User.UserNotificationPreference", b =>
+                {
+                    b.HasOne("Main.Entities.User.User", null)
+                        .WithMany("NotificationPreferences")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("user_notification_preferences_users_id_fk");
+                });
+
             modelBuilder.Entity("Main.Entities.User.UserPhone", b =>
                 {
                     b.HasOne("Main.Entities.User.User", "User")
@@ -4350,6 +4491,18 @@ namespace Main.Migrator.Migrations
                         .WithMany()
                         .HasForeignKey("InboxMessageId", "InboxConsumerId")
                         .HasPrincipalKey("MessageId", "ConsumerId");
+                });
+
+            modelBuilder.Entity("Notification.Core.Entities.NotificationDelivery", b =>
+                {
+                    b.HasOne("Notification.Core.Entities.Notification", "Notification")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("notification_deliveries_notification_id_fk");
+
+                    b.Navigation("Notification");
                 });
 
             modelBuilder.Entity("Main.Entities.Event.ReservationManualChangeEvent", b =>
@@ -4463,6 +4616,8 @@ namespace Main.Migrator.Migrations
 
                     b.Navigation("Emails");
 
+                    b.Navigation("NotificationPreferences");
+
                     b.Navigation("Permissions");
 
                     b.Navigation("Phones");
@@ -4472,6 +4627,11 @@ namespace Main.Migrator.Migrations
                     b.Navigation("UserInfo");
 
                     b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("Notification.Core.Entities.Notification", b =>
+                {
+                    b.Navigation("Deliveries");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Job.MultiStepJob", b =>

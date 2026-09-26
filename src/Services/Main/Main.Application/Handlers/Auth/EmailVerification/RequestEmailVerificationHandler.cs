@@ -5,7 +5,7 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Exceptions;
 using Locan.Core.Interfaces.Localizers;
-using Mailing.Core.Models;
+using Main.Application.Notifications;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Entities;
@@ -15,6 +15,8 @@ using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
 using Main.Enums.Auth;
 using MediatR;
+using Notification.Core.Interfaces.Notification;
+using Notification.Core.Recipients;
 
 namespace Main.Application.Handlers.Auth.EmailVerification;
 
@@ -25,7 +27,7 @@ public record RequestEmailVerificationCommand(Guid UserId, string Email) : IComm
 public class RequestEmailVerificationHandler(
 	IRepository<UserEmail, string> repository,
 	IJsonSigner jsonSigner,
-	IMailingService mailingService,
+	INotificationService notificationService,
 	IVerificationPayloadProvider verificationPayloadProvider,
 	IContextualLocalizer localizer,
 	ISettingsService settingsService) : ICommandHandler<RequestEmailVerificationCommand>
@@ -58,11 +60,11 @@ public class RequestEmailVerificationHandler(
 		var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
 		var verificationUrl = new Uri(baseUri, $"verify-email?token={Uri.EscapeDataString(signed)}");
 
-		await mailingService.QueueEmailAsync(
-			new EmailVerificationData(
-				localizer,
-				verificationUrl.ToString(),
-				normalizedEmail),
+		await notificationService.QueueAsync(
+			request.UserId,
+			new EmailVerificationNotification(
+				new EmailVerificationNotificationData(localizer, verificationUrl.ToString())),
+			[new EmailRecipient(normalizedEmail)],
 			cancellationToken);
 
 		return Unit.Value;
