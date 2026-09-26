@@ -13,9 +13,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\..\..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
+		<Content Include="..\..\..\..\.dockerignore">
+		  <Link>.dockerignore</Link>
+		</Content>
 		<Content Include="..\Main.Api\Templates\Emails\*.cshtml">
 			<Link>Templates\Emails\%(Filename)%(Extension)</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
