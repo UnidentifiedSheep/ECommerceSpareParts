@@ -2,35 +2,25 @@
 USER $APP_UID
 WORKDIR /app
 
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS subset
+WORKDIR /src
+RUN dotnet tool install --tool-path /tools dotnet-subset --version 0.3.2
+ENV DOTNET_ROLL_FORWARD=Major
+COPY . .
+RUN /tools/dotnet-subset restore "src/Services/Pricing/Pricing.Migrator/Pricing.Migrator.csproj" --root-directory /src --output /subset
+
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Services/Pricing/Pricing.Migrator/Pricing.Migrator.csproj", "src/Services/Pricing/Pricing.Migrator/"]
-COPY ["src/Infrastructure/Common/Common.csproj", "src/Infrastructure/Common/"]
-COPY ["src/Services/Pricing/Pricing.Persistence/Pricing.Persistence.csproj", "src/Services/Pricing/Pricing.Persistence/"]
-COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/Persistence/"]
-COPY ["src/Core/Abstractions/Abstractions.csproj", "src/Core/Abstractions/"]
-COPY ["src/Core/Attributes/Attributes.csproj", "src/Core/Attributes/"]
-COPY ["src/Core/Enums/Enums.csproj", "src/Core/Enums/"]
-COPY ["src/Core/Domain/Domain.csproj", "src/Core/Domain/"]
-COPY ["src/Core/Exceptions/Exceptions.csproj", "src/Core/Exceptions/"]
-COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services/Application.Common/"]
-COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
-COPY ["src/Core/Extensions/Extensions.csproj", "src/Core/Extensions/"]
-COPY ["src/Services/Pricing/Pricing.Entities/Pricing.Entities.csproj", "src/Services/Pricing/Pricing.Entities/"]
-COPY ["src/Services/Pricing/Pricing.Enums/Pricing.Enums.csproj", "src/Services/Pricing/Pricing.Enums/"]
-COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
-COPY ["src/Infrastructure/Cache/Cache.csproj", "src/Infrastructure/Cache/"]
-COPY ["src/Infrastructure/RabbitMq/RabbitMq.csproj", "src/Infrastructure/RabbitMq/"]
-COPY ["src/Infrastructure/S3/S3.csproj", "src/Infrastructure/S3/"]
+COPY --from=subset /subset/ ./
 RUN dotnet restore "src/Services/Pricing/Pricing.Migrator/Pricing.Migrator.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Pricing/Pricing.Migrator"
-RUN dotnet build "./Pricing.Migrator.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./Pricing.Migrator.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Pricing.Migrator.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Pricing.Migrator.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
