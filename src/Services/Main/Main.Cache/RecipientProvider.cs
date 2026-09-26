@@ -102,7 +102,8 @@ public class RecipientProvider(
 				group => group.Key,
 				group => group
 					.Select(preference => preference.ChannelName)
-					.ToArray());
+					.ToList());
+
 		var emailsByUser = emails
 			.GroupBy(email => email.UserId)
 			.ToDictionary(
@@ -110,11 +111,21 @@ public class RecipientProvider(
 				group => group.First().Email.Value);
 
 		var result = new Dictionary<Guid, CachedNotificationRecipients>(missingIds.Count);
+
 		foreach (var userId in missingIds)
-			result.Add(userId, new CachedNotificationRecipients(
+		{
+			var channels = channelsByUser.GetValueOrDefault(userId) ?? [];
+
+			if (!channels.Contains(InAppRecipient.ChannelName))
+				channels.Add(InAppRecipient.ChannelName);
+
+			result.Add(
 				userId,
-				channelsByUser.GetValueOrDefault(userId) ?? [],
-				emailsByUser.GetValueOrDefault(userId)));
+				new CachedNotificationRecipients(
+					userId,
+					channels,
+					emailsByUser.GetValueOrDefault(userId)));
+		}
 
 		return result;
 	}
@@ -123,7 +134,7 @@ public class RecipientProvider(
 		Guid userId,
 		CachedNotificationRecipients entry)
 	{
-		var result = new List<INotificationRecipient>(entry.Channels.Length);
+		var result = new List<INotificationRecipient>(entry.Channels.Count);
 		foreach (var channelName in entry.Channels)
 			switch (channelName)
 			{
@@ -140,6 +151,6 @@ public class RecipientProvider(
 
 	private sealed record CachedNotificationRecipients(
 		Guid UserId,
-		string[] Channels,
+		List<string> Channels,
 		string? PrimaryEmail);
 }

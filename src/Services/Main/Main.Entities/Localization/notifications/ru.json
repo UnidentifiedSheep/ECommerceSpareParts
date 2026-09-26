@@ -23,6 +23,11 @@
     "notifications.login.notification.device.label": "Устройство",
     "notifications.login.notification.was.you": "Если это были вы, ничего делать не нужно.",
     "notifications.login.notification.not.you": "Если вы не узнаёте этот вход, немедленно смените пароль и завершите активные сессии.",
-    "notifications.login.notification.unknown": "Неизвестно"
+    "notifications.login.notification.unknown": "Неизвестно",
+    "EmailChannel": "Электронная почта",
+    "InAppChannel": "Внутри приложения",
+    "notifications.channel.not.found": "Канал \"{ChannelName|string}\" не найден.",
+    "notifications.channel.duplicate": "Каналы уведомлений не должны повторяться.",
+    "notifications.see.too.many": "За один раз можно отметить прочитанными не более 100 уведомлений."
   }
 }

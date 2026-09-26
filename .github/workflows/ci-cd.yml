@@ -329,6 +329,57 @@ jobs:
   build:
     uses: ./.github/workflows/build.yml
 
+  validate-dockerfiles:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Hadolint
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 3 \
+            https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64 \
+            -o "$RUNNER_TEMP/hadolint"
+          chmod +x "$RUNNER_TEMP/hadolint"
+
+      - name: Lint Dockerfiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Existing images use unpinned apt packages and .NET's APP_UID variable.
+          find . -type f -name Dockerfile -print0 |
+            xargs -0 -r "$RUNNER_TEMP/hadolint" --failure-threshold warning \
+              --ignore DL3008 --ignore DL3015 --ignore DL3066
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Check restore subsets
+        shell: bash
+        env:
+          DOTNET_ROLL_FORWARD: Major
+        run: |
+          set -euo pipefail
+          dotnet tool install --tool-path "$RUNNER_TEMP/dotnet-tools" \
+            dotnet-subset --version 0.3.2
+
+          while IFS= read -r -d '' dockerfile; do
+            project="$(sed -nE 's|^RUN /tools/dotnet-subset restore "([^"]+)".*|\1|p' "$dockerfile")"
+            if [ -z "$project" ] || [ ! -f "$project" ]; then
+              echo "Invalid project path in $dockerfile: $project" >&2
+              exit 1
+            fi
+
+            "$RUNNER_TEMP/dotnet-tools/dotnet-subset" restore "$project" \
+              --root-directory "$GITHUB_WORKSPACE" \
+              --output "$RUNNER_TEMP/subsets/$(basename "$(dirname "$dockerfile")")"
+          done < <(find src/Services -type f -name Dockerfile -print0)
+
   test:
     uses: ./.github/workflows/test.yml
 
@@ -340,7 +391,7 @@ jobs:
     uses: ./.github/workflows/coverage.yml
 
   publish-images:
-    needs: [build, test, graphql, discover-affected]
+    needs: [build, test, graphql, validate-dockerfiles, discover-affected]
     if: >-
       needs.discover-affected.outputs.should_publish == 'true' &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||

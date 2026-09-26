@@ -3,7 +3,10 @@ using Application.Common.Interfaces.Projections;
 using Attributes;
 using Enums;
 using LinqKit;
+using Locan.Core.Interfaces.Localizers;
+using Locan.Core.LocalizableMessages;
 using Main.Application.Dtos.Auth;
+using Main.Application.Dtos.NotificationPreference;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Entities.User;
@@ -102,4 +105,24 @@ public sealed class UserPartyTypeProjectionProvider : ProjectionProviderBase<Use
 
 	public override Expression<Func<User, UserPartyType>> Projection { get; } = x =>
 		x.Roles.Any(role => role.RoleName == SystemRole) ? UserPartyType.System : UserPartyType.User;
+}
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class UserNotificationPreferenceProjectionProvider(
+	IContextualLocalizer localizer
+	) : ProjectionProviderBase<UserNotificationPreference, UserNotificationPreferenceDto>
+{
+	public override Expression<Func<UserNotificationPreference, UserNotificationPreferenceDto>> Projection
+		{ get; } = x => new UserNotificationPreferenceDto
+		{
+				UserId = x.UserId,
+				ChannelName = x.ChannelName,
+				Enabled = x.Enabled,
+				LocalizableChannelName = GetLocalized(localizer, x.ChannelName)
+		};
+
+	private static string GetLocalized(IContextualLocalizer localizer, string channelName)
+		=> localizer.TryGet(new LocalizableMessage($"{channelName}Channel"), out var value)
+			? value
+			: channelName;
 }

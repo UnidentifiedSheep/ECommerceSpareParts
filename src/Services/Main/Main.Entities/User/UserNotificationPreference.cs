@@ -26,6 +26,7 @@ public class UserNotificationPreference :
 	public static UserNotificationPreference Create(Guid userId, string channelName)
 		=> new(userId, channelName);
 
+	public void SetEnabled(bool enabled) => Enabled = enabled;
 	public void Enable() => Enabled = true;
 	public void Disable() => Enabled = false;
 

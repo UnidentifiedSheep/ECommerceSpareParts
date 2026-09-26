@@ -4,6 +4,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.Types;
+using Main.Api.GraphQl.Types.Notification;
 
 namespace Main.Api.GraphQl.Subscriptions;
 

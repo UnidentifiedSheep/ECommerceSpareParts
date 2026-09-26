@@ -8,8 +8,5 @@ namespace Notification.Core.Interfaces.Recipient;
 [JsonDerivedType(typeof(InAppRecipient), InAppRecipient.ChannelName)]
 public interface INotificationRecipient
 {
-	static virtual string StaticChannelSystemName => throw new NotSupportedException(
-		"The notification recipient must define a channel name.");
-
 	string ChannelSystemName { get; }
 }
