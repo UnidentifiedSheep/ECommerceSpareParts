@@ -1,9 +1,10 @@
+using Gateway.MessageHandlers;
+
 namespace Gateway.Extensions;
 
 public static class FusionHttpClientExtensions
 {
 	private const string ClientName = "fusion";
-
 	private const string InternalTokenHeader = "X-Internal-Token";
 
 	public static IServiceCollection AddFusionHttpClient(
@@ -11,6 +12,10 @@ public static class FusionHttpClientExtensions
 		string internalToken)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(internalToken);
+
+		services.AddHttpContextAccessor();
+
+		services.AddTransient<AuthorizationPropagationHandler>();
 
 		services.AddHeaderPropagation(options =>
 		{
@@ -24,7 +29,8 @@ public static class FusionHttpClientExtensions
 				{
 					client.DefaultRequestHeaders.Add(InternalTokenHeader, internalToken);
 				})
-			.AddHeaderPropagation();
+			.AddHeaderPropagation()
+			.AddHttpMessageHandler<AuthorizationPropagationHandler>();
 
 		return services;
 	}

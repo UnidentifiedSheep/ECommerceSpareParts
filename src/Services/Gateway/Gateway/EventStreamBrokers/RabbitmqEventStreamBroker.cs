@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using HotChocolate.Fusion.Subscriptions;
 using Security.Extensions;
 
@@ -45,7 +46,8 @@ public sealed class RabbitmqEventStreamBroker(
 		string[] topics,
 		EventAudience audience,
 		CancellationToken lifetimeToken,
-		[System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+		[EnumeratorCancellation]
+		CancellationToken cancellationToken)
 	{
 		using var linked = CancellationTokenSource.CreateLinkedTokenSource(
 			lifetimeToken,
@@ -68,10 +70,11 @@ public sealed class RabbitmqEventStreamBroker(
 	}
 }
 
-public sealed class RabbitmqEventStreamBrokerProvider(
+public sealed class RabbitmqEventStreamBrokerFactory(
 	IEventHub hub,
 	IEventRegistry registry,
-	IHttpContextAccessor httpContextAccessor) : IEventStreamBrokerProvider
+	IHttpContextAccessor httpContextAccessor) : IEventStreamBrokerFactory
 {
-	public IEventStreamBroker Create() => new RabbitmqEventStreamBroker(hub, registry, httpContextAccessor);
+	public IEventStreamBroker Create(string? broker)
+		=> new RabbitmqEventStreamBroker(hub, registry, httpContextAccessor);
 }

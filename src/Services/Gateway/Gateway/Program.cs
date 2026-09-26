@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json.Nodes;
 using Abstractions;
 using Api.Common;
@@ -10,6 +11,7 @@ using Gateway.Application;
 using Gateway.EndPoints;
 using Gateway.EventStreamBrokers;
 using Gateway.Extensions;
+using Gateway.Interceptors;
 using HotChocolate.Fusion.Subscriptions;
 using Internal.Integration.Di;
 using Locan.AspNetCore;
@@ -44,7 +46,7 @@ builder.Services.AddRedisOptions().AddMessageBrokerOptions();
 builder.Services.AddRedisHealthCheck();
 builder.Services.AddSingleton<IEventRegistry>(EventRegistry.Instance);
 builder.Services.AddSingleton<IEventHub, EventHub>();
-builder.Services.AddKeyedSingleton<IEventStreamBrokerProvider, RabbitmqEventStreamBrokerProvider>("");
+builder.Services.AddSingleton<IEventStreamBrokerFactory, RabbitmqEventStreamBrokerFactory>();
 
 builder.Host.AddLokiLogger(
 	builder.Configuration,
@@ -192,6 +194,7 @@ var fusionArchivePath = builder.Configuration["Fusion:ArchivePath"] ?? "./gatewa
 builder
 	.AddGraphQLGateway()
 	.AddFileSystemConfiguration(fusionArchivePath)
+	.AddSocketSessionInterceptor<AuthSocketSessionInterceptor>()
 	.ModifyRequestOptions(o =>
 	{
 		o.CollectOperationPlanTelemetry = true;
@@ -209,6 +212,7 @@ app.UseExceptionHandler(_ =>
 });
 
 app.UseHeaderPropagation();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
