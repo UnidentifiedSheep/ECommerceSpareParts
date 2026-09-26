@@ -4,7 +4,6 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Notification;
 using Main.Api.GraphQl.Types.Notification;
 using Main.Application.Handlers.NotificationPreferences;
