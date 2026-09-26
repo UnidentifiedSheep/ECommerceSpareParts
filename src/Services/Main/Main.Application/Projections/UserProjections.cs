@@ -6,6 +6,7 @@ using LinqKit;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
 using Main.Application.Dtos.Auth;
+using Main.Application.Dtos.NotificationPreference;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Entities.User;

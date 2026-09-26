@@ -25,6 +25,7 @@
     "notifications.login.notification.not.you": "If you do not recognize this sign-in, change your password immediately and terminate active sessions.",
     "notifications.login.notification.unknown": "Unknown",
     "EmailChannel": "Email",
-    "InAppChannel": "In-app"
+    "InAppChannel": "In-app",
+    "notifications.channel.not.found": "Channel \"{ChannelName|string}\" not found."
   }
 }

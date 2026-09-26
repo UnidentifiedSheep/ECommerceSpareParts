@@ -25,6 +25,7 @@
     "notifications.login.notification.not.you": "Bu girişi tanımıyorsanız şifrenizi hemen değiştirin ve etkin oturumları sonlandırın.",
     "notifications.login.notification.unknown": "Bilinmiyor",
     "EmailChannel": "E-posta",
-    "InAppChannel": "Uygulama içi"
+    "InAppChannel": "Uygulama içi",
+    "notifications.channel.not.found": "\"{ChannelName|string}\" kanalı bulunamadı."
   }
 }

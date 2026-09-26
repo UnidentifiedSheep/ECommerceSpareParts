@@ -3,13 +3,14 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Locan.Core.Interfaces.Localizers;
+using Main.Application.Dtos.NotificationPreference;
 using Main.Application.Dtos.Users;
 using Main.Entities;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Notification.Core.Recipients;
 
-namespace Main.Application.Handlers.Users.NotificationPreferences;
+namespace Main.Application.Handlers.NotificationPreferences;
 
 public record GetNotificationPreferencesQuery(Guid UserId) : IQuery<GetNotificationPreferencesResult>;
 

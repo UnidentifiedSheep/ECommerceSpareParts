@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Users;
+namespace Main.Application.Dtos.NotificationPreference;
 
 public record UserNotificationPreferenceDto
 {

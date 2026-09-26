@@ -10,8 +10,23 @@ public static class RuleBuilderExtensions
 		ILocalizableMessage message)
 	{
 		ArgumentNullException.ThrowIfNull(message);
-		DefaultValidatorOptions.Configurable(rule).Current.ErrorCode = message.MessageKey;
-		DefaultValidatorOptions.Configurable(rule).Current.CustomStateProvider = (_, _) => message;
+		var configurable = DefaultValidatorOptions.Configurable(rule);
+		configurable.Current.ErrorCode = message.MessageKey;
+		configurable.Current.CustomStateProvider = (_, _) => message;
+		return rule;
+	}
+
+	public static IRuleBuilderOptions<T, TProperty> WithLocalizableError<T, TProperty>(
+		this IRuleBuilderOptions<T, TProperty> rule,
+		Func<TProperty, ILocalizableMessage> message,
+		string errorCode)
+	{
+		ArgumentNullException.ThrowIfNull(message);
+
+		var configurable = DefaultValidatorOptions.Configurable(rule);
+		configurable.Current.CustomStateProvider = (_, propertyValue) => message(propertyValue);
+		configurable.Current.ErrorCode = errorCode;
+
 		return rule;
 	}
 }

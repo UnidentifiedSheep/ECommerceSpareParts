@@ -25,6 +25,7 @@
     "notifications.login.notification.not.you": "Если вы не узнаёте этот вход, немедленно смените пароль и завершите активные сессии.",
     "notifications.login.notification.unknown": "Неизвестно",
     "EmailChannel": "Электронная почта",
-    "InAppChannel": "Внутри приложения"
+    "InAppChannel": "Внутри приложения",
+    "notifications.channel.not.found": "Канал \"{ChannelName|string}\" не найден."
   }
 }
