@@ -33,7 +33,7 @@ public sealed class AuthSocketSessionInterceptor : DefaultSocketSessionIntercept
 
 		httpContext.Request.Headers.Authorization = value;
 
-		//non default schema used cuz, default already worked and cached result.
+		//non default schema used cuz, default already worked and result is chached.
 		var result = await httpContext.AuthenticateAsync(AuthenticationSchemes.WebSocketBearer);
 
 		if (!result.Succeeded || result.Principal is null)
