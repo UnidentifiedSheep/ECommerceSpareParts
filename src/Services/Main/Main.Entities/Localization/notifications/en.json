@@ -23,6 +23,8 @@
     "notifications.login.notification.device.label": "Device",
     "notifications.login.notification.was.you": "If this was you, no action is required.",
     "notifications.login.notification.not.you": "If you do not recognize this sign-in, change your password immediately and terminate active sessions.",
-    "notifications.login.notification.unknown": "Unknown"
+    "notifications.login.notification.unknown": "Unknown",
+    "EmailChannel": "Email",
+    "InAppChannel": "In-app"
   }
 }

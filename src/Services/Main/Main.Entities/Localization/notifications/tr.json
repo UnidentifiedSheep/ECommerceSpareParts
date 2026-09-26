@@ -23,6 +23,8 @@
     "notifications.login.notification.device.label": "Cihaz",
     "notifications.login.notification.was.you": "Bu sizseniz herhangi bir işlem yapmanız gerekmez.",
     "notifications.login.notification.not.you": "Bu girişi tanımıyorsanız şifrenizi hemen değiştirin ve etkin oturumları sonlandırın.",
-    "notifications.login.notification.unknown": "Bilinmiyor"
+    "notifications.login.notification.unknown": "Bilinmiyor",
+    "EmailChannel": "E-posta",
+    "InAppChannel": "Uygulama içi"
   }
 }
