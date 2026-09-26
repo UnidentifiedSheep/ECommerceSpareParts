@@ -6,7 +6,6 @@ namespace Notification.Core.Recipients;
 public sealed record EmailRecipient(string Email) : INotificationRecipient
 {
 	public const string ChannelName = "Email";
-	static string INotificationRecipient.StaticChannelSystemName => ChannelName;
 	public string ChannelSystemName => ChannelName;
 }
 
