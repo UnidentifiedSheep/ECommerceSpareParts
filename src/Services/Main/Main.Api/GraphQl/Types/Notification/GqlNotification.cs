@@ -1,7 +1,7 @@
 using HotChocolate;
 using Main.Application.Dtos.Users;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Notification;
 
 [GraphQLName("Notification")]
 public record GqlNotification(

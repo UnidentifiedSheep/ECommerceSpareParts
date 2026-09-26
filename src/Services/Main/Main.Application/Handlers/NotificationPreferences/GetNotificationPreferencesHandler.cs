@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Locan.Core.Interfaces.Localizers;
+using Locan.Core.LocalizableMessages;
 using Main.Application.Dtos.NotificationPreference;
 using Main.Application.Dtos.Users;
 using Main.Entities;
@@ -40,6 +41,21 @@ public class GetNotificationPreferencesHandler(
 				LocalizableChannelName = localizer.Get(InAppChannelMessage.Instance),
 				UserId = request.UserId
 			});
+
+		if (userPreferences.Count == Recipients.All.Count)
+			return new GetNotificationPreferencesResult(userPreferences);
+
+		userPreferences.AddRange(Recipients
+			.All
+			.Keys
+			.Where(channelName => userPreferences.All(x => x.ChannelName != channelName))
+			.Select(channelToAdd => new UserNotificationPreferenceDto
+			{
+				ChannelName = channelToAdd,
+				Enabled = false,
+				UserId = request.UserId,
+				LocalizableChannelName = localizer.Get(new LocalizableMessage($"{channelToAdd}Channel"))
+			}));
 
 		return new GetNotificationPreferencesResult(userPreferences);
 	}
