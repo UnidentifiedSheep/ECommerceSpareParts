@@ -28,10 +28,12 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Notifications\Notification\Notification.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
+        <ProjectReference Include="..\Main.Api\Main.Api.csproj" />
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
         <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
@@ -49,6 +51,14 @@
         <LocanResource Include="../../../Infrastructure/Security/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Content Include="..\Main.Api\Templates\Emails\**\*">
+            <Link>Templates\Emails\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

@@ -5,6 +5,7 @@ using Api.Common;
 using Application.Common.Models.Options.S3;
 using Cache;
 using Locan.Hosting;
+using Main.Api;
 using Main.Application.Configs;
 using Main.Application.Models;
 using Main.Cache;
@@ -13,6 +14,7 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Notification.Extensions;
 using Npgsql;
 using Persistence;
 using Security;
@@ -40,7 +42,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
 		var services = new ServiceCollection();
 
-		services.RegisterTestContexts();
+		services.RegisterTestContexts()
+			.AddMainNotifications();
 
 		services.AddLogging();
 		Log.Logger = new LoggerConfiguration()
