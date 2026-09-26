@@ -27,6 +27,7 @@
     "EmailChannel": "E-posta",
     "InAppChannel": "Uygulama içi",
     "notifications.channel.not.found": "\"{ChannelName|string}\" kanalı bulunamadı.",
-    "notifications.channel.duplicate": "Bildirim kanalları tekrarlanmamalıdır."
+    "notifications.channel.duplicate": "Bildirim kanalları tekrarlanmamalıdır.",
+    "notifications.see.too.many": "Tek seferde en fazla 100 bildirimi okundu olarak işaretleyebilirsiniz."
   }
 }

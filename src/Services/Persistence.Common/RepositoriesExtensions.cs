@@ -24,7 +24,7 @@ public static class RepositoriesExtensions
 		Type repositoryType,
 		Type linqRepositoryType,
 		Type readRepositoryType,
-		Assembly entitiesAssembly) where TContext : DbContext
+		params Assembly[] entitiesAssemblies) where TContext : DbContext
 	{
 		services.AddScoped<AuditableEntitySaveChangesInterceptor>();
 		services.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
@@ -64,7 +64,7 @@ public static class RepositoriesExtensions
 			services,
 			repositoryType,
 			linqRepositoryType,
-			entitiesAssembly);
+			entitiesAssemblies);
 
 		services.AddJobRepositories<TContext>();
 
@@ -82,10 +82,11 @@ public static class RepositoriesExtensions
 		IServiceCollection services,
 		Type repositoryType,
 		Type linqRepositoryType,
-		Assembly entitiesAssembly)
+		Assembly[] entitiesAssemblies)
 	{
 		var registered = new HashSet<(Type EntityType, Type KeyType)>();
 
+		foreach (var entitiesAssembly in entitiesAssemblies)
 		foreach (var discoveredType in entitiesAssembly.GetTypes())
 		{
 			var entityBase = FindEntityBase(discoveredType);

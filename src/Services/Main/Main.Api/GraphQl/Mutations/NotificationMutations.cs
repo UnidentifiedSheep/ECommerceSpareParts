@@ -6,12 +6,24 @@ using Main.Api.GraphQl.Types.Inputs.Notification;
 using Main.Application.Dtos.NotificationPreference;
 using Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 using Main.Application.Handlers.Notifications;
+using Main.Application.Handlers.Notifications.SeeNotifications;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;
 
 public sealed class NotificationMutations
 {
+	[GraphQLName("see")]
+	[RequireAllPermissions(PermissionCodes.NOTIFICATIONS_ME)]
+	public async Task<bool> SeeAsync(
+		IUserContext userContext,
+		ISender sender,
+		IReadOnlyList<int> ids,
+		CancellationToken cancellationToken)
+		=> await sender.Send(
+			new SeeNotificationsCommand(userContext.UserId, ids),
+			cancellationToken) == Unit.Value;
+
 	[GraphQLName("send")]
 	[RequireAllPermissions(PermissionCodes.NOTIFICATIONS_ALL)]
 	public async Task<bool> SendAsync(

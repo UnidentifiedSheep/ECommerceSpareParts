@@ -27,6 +27,7 @@
     "EmailChannel": "Email",
     "InAppChannel": "In-app",
     "notifications.channel.not.found": "Channel \"{ChannelName|string}\" not found.",
-    "notifications.channel.duplicate": "Notification channels must not be repeated."
+    "notifications.channel.duplicate": "Notification channels must not be repeated.",
+    "notifications.see.too.many": "You can mark at most 100 notifications as read at once."
   }
 }
