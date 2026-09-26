@@ -26,6 +26,7 @@
     "notifications.login.notification.unknown": "Unknown",
     "EmailChannel": "Email",
     "InAppChannel": "In-app",
-    "notifications.channel.not.found": "Channel \"{ChannelName|string}\" not found."
+    "notifications.channel.not.found": "Channel \"{ChannelName|string}\" not found.",
+    "notifications.channel.duplicate": "Notification channels must not be repeated."
   }
 }

@@ -1,13 +1,12 @@
 using System.Text.Json.Serialization;
-using Abstractions.Models;
 
 namespace Main.Application.Dtos.NotificationPreference;
 
-public record UserNotificationPreferencePatchDto
+public record UpsertUserNotificationPreferenceDto
 {
 	[JsonPropertyName("channelName")]
 	public required string ChannelName { get; init; }
 
-	[JsonPropertyName("isEnable")]
-	public PatchField<bool> IsEnabled { get; init; } = PatchField<bool>.NotSet();
+	[JsonPropertyName("isEnabled")]
+	public required bool IsEnabled { get; init; }
 }

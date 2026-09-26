@@ -26,6 +26,7 @@
     "notifications.login.notification.unknown": "Bilinmiyor",
     "EmailChannel": "E-posta",
     "InAppChannel": "Uygulama içi",
-    "notifications.channel.not.found": "\"{ChannelName|string}\" kanalı bulunamadı."
+    "notifications.channel.not.found": "\"{ChannelName|string}\" kanalı bulunamadı.",
+    "notifications.channel.duplicate": "Bildirim kanalları tekrarlanmamalıdır."
   }
 }

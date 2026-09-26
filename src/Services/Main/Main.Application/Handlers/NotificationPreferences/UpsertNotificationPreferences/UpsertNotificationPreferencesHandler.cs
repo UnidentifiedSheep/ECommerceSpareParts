@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -8,20 +7,20 @@ using Main.Entities.User;
 using MediatR;
 using Notification.Core.Recipients;
 
-namespace Main.Application.Handlers.NotificationPreferences.UpdateNotificationPreferences;
+namespace Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 
 [Transactional, AutoSave]
-public record UpdateNotificationPreferencesCommand(
+public record UpsertNotificationPreferencesCommand(
 	Guid UserId,
-	IReadOnlyCollection<UserNotificationPreferencePatchDto> Preferences) : ICommand;
+	IReadOnlyCollection<UpsertUserNotificationPreferenceDto> Preferences) : ICommand;
 
-public class UpdateNotificationPreferencesHandler(
+public class UpsertNotificationPreferencesHandler(
 	IRepository<UserNotificationPreference, UserNotificationPreferenceKey> repository,
 	IUnitOfWork unitOfWork
-	) : ICommandHandler<UpdateNotificationPreferencesCommand>
+) : ICommandHandler<UpsertNotificationPreferencesCommand>
 {
 	public async Task<Unit> Handle(
-		UpdateNotificationPreferencesCommand request,
+		UpsertNotificationPreferencesCommand request,
 		CancellationToken cancellationToken)
 	{
 		if (request.Preferences.Count == 0) return Unit.Value;
@@ -30,7 +29,8 @@ public class UpdateNotificationPreferencesHandler(
 		var preferences = (await repository.ListAsync(
 			Criteria<UserNotificationPreference>
 				.New()
-				.Where(x => channels.Contains(x.ChannelName))
+				.Where(x => x.UserId == request.UserId)
+				.Where(x =>  channels.Contains(x.ChannelName))
 				.Track()
 				.Build(),
 			cancellationToken))
@@ -38,7 +38,7 @@ public class UpdateNotificationPreferencesHandler(
 
 		var toAdd = new List<UserNotificationPreference>();
 
-		foreach (var patch in request.Preferences.Where(x => x.IsEnabled.IsSet))
+		foreach (var patch in request.Preferences)
 		{
 			UserNotificationPreference preference;
 			if (preferences.TryGetValue(patch.ChannelName, out var value))
@@ -49,7 +49,7 @@ public class UpdateNotificationPreferencesHandler(
 				toAdd.Add(preference);
 			}
 
-			patch.IsEnabled.Apply(preference.SetEnabled);
+			preference.SetEnabled(patch.IsEnabled);
 
 			if (preference.ChannelName == InAppRecipient.ChannelName)
 				preference.Enable();

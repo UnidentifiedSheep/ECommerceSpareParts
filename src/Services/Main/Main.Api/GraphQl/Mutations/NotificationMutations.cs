@@ -4,7 +4,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Notification;
 using Main.Application.Dtos.NotificationPreference;
-using Main.Application.Handlers.NotificationPreferences.UpdateNotificationPreferences;
+using Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 using Main.Application.Handlers.Notifications;
 using MediatR;
 
@@ -23,16 +23,16 @@ public sealed class NotificationMutations
 			cancellationToken))
 			.Succeeded;
 
-	[GraphQLName("updatePreferences")]
+	[GraphQLName("upsertPreferences")]
 	[RequireAllPermissions(PermissionCodes.NOTIFICATIONS_ME)]
-	public async Task<bool> UpdatePreferencesAsync(
+	public async Task<bool> UpsertPreferencesAsync(
 		IUserContext userContext,
 		ISender sender,
-		GqlUpdateNotificationPreferencesInput input,
+		GqlUpsertNotificationPreferencesInput input,
 		CancellationToken cancellationToken)
 	{
 		var preferences = input.Preferences
-			.Select(x => new UserNotificationPreferencePatchDto
+			.Select(x => new UpsertUserNotificationPreferenceDto
 			{
 				ChannelName = x.ChannelName,
 				IsEnabled = x.IsEnabled
@@ -40,7 +40,7 @@ public sealed class NotificationMutations
 			.ToArray();
 
 		await sender.Send(
-			new UpdateNotificationPreferencesCommand(userContext.UserId, preferences),
+			new UpsertNotificationPreferencesCommand(userContext.UserId, preferences),
 			cancellationToken);
 		return true;
 	}

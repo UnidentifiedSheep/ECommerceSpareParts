@@ -26,6 +26,7 @@
     "notifications.login.notification.unknown": "Неизвестно",
     "EmailChannel": "Электронная почта",
     "InAppChannel": "Внутри приложения",
-    "notifications.channel.not.found": "Канал \"{ChannelName|string}\" не найден."
+    "notifications.channel.not.found": "Канал \"{ChannelName|string}\" не найден.",
+    "notifications.channel.duplicate": "Каналы уведомлений не должны повторяться."
   }
 }
