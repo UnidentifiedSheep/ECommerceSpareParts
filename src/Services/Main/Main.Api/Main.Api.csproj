@@ -70,9 +70,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="Templates\Emails\EmailVerification.cshtml" />
-      <None Include="Templates\Emails\UserLoggedIn.cshtml" />
-      <None Include="Templates\Emails\PasswordReset.cshtml" />
+      <Content Remove="Templates/Emails/**/*.cshtml" />
+      <None Include="Templates/Emails/**/*.cshtml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
