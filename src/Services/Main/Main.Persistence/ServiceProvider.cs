@@ -1,3 +1,4 @@
+using Domain.CommonEntities.Job;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
@@ -25,7 +26,8 @@ public static class ServiceProvider
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
 			typeof(Product).Assembly,
-			typeof(InAppNotification).Assembly);
+			typeof(InAppNotification).Assembly,
+			typeof(JobSchedule).Assembly);
 		collection.AddNotificationPersistence<DContext>();
 
 		collection.AddScoped<IProductRepository, ProductRepository>();

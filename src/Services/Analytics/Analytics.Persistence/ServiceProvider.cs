@@ -2,6 +2,7 @@ using Analytics.Application.Interfaces.Repositories;
 using Analytics.Entities;
 using Analytics.Persistence.Context;
 using Analytics.Persistence.Repositories;
+using Domain.CommonEntities.Job;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Common;
 
@@ -15,7 +16,8 @@ public static class ServiceProvider
 			typeof(BasicEfRepository<,>),
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
-			typeof(SalesFact).Assembly);
+			typeof(SalesFact).Assembly,
+			typeof(JobSchedule).Assembly);
 
 		collection.AddScoped<ISaleFactRepository, SaleFactRepository>();
 

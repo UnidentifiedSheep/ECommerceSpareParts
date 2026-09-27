@@ -1,3 +1,4 @@
+using Domain.CommonEntities.Job;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Common;
 using Pricing.Application.Interfaces.Persistence;
@@ -15,7 +16,8 @@ public static class ServiceProvider
 			typeof(BasicEfRepository<,>),
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
-			typeof(PriceOffer).Assembly);
+			typeof(PriceOffer).Assembly,
+			typeof(JobSchedule).Assembly);
 
 		collection.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
 		collection.AddScoped<IProductPriceOptionRepository, ProductPriceOptionRepository>();
