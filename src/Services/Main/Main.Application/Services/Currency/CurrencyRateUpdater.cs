@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Models.Currency;
 using Integrations.ExchangeRate.Interfaces;
-using Integrations.ExchangeRate.Models;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Models.Currency;
@@ -30,7 +30,10 @@ public class CurrencyRateUpdater(
 		if (!externalRates.Success || externalRates.Value == null)
 			throw new InvalidOperationException("Unable to get exchange rates");
 
-		var normalized = converter.ChangeBaseCurrency(externalRates.ValueOrThrow, baseCurrency.Code);
+		var sourceRates = externalRates.ValueOrThrow;
+		var normalized = converter.ChangeBaseCurrency(
+			new CurrencyRates(sourceRates.Base, sourceRates.Rates),
+			baseCurrency.Code);
 
 		var currencies = await currencyRepository.ListAsync(ct: ct);
 
@@ -50,7 +53,7 @@ public class CurrencyRateUpdater(
 	private UpdateRatesResult ApplyDiff(
 		List<Entities.Currency.Currency> currencies,
 		Entities.Currency.Currency baseCurrency,
-		ExchangeRates external,
+		CurrencyRates external,
 		Dictionary<(int, int), CurrencyRate> dbRates,
 		CancellationToken ct)
 	{

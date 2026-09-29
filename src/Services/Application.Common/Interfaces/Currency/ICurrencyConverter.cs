@@ -1,4 +1,4 @@
-using Abstractions.Models;
+using Application.Common.Models.Currency;
 
 namespace Application.Common.Interfaces.Currency;
 
@@ -29,5 +29,5 @@ public interface ICurrencyConverter
 		int fromCurrencyId,
 		CancellationToken cancellationToken = default);
 
-	ExchangeRates ChangeBaseCurrency(ExchangeRates data, string newBase);
+	CurrencyRates ChangeBaseCurrency(CurrencyRates data, string newBase);
 }

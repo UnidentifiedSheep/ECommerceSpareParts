@@ -1,5 +1,5 @@
-using Abstractions.Models;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Models.Currency;
 
 namespace Application.Common.Services.Currency;
 
@@ -37,9 +37,9 @@ public abstract class CurrencyConverterBase : ICurrencyConverter
 		int fromCurrencyId,
 		CancellationToken cancellationToken = default);
 
-	public ExchangeRates ChangeBaseCurrency(ExchangeRates data, string newBase)
+	public CurrencyRates ChangeBaseCurrency(CurrencyRates data, string newBase)
 	{
-		if (data.Base == newBase)
+		if (data.BaseCurrencyCode == newBase)
 			return data;
 
 		if (!data.Rates.TryGetValue(newBase, out var newBaseRate))
@@ -47,7 +47,7 @@ public abstract class CurrencyConverterBase : ICurrencyConverter
 
 		var newRates = new Dictionary<string, decimal>
 		{
-			[data.Base] = 1 / newBaseRate
+			[data.BaseCurrencyCode] = 1 / newBaseRate
 		};
 
 		foreach (var (currency, rate) in data.Rates)
@@ -57,6 +57,6 @@ public abstract class CurrencyConverterBase : ICurrencyConverter
 			newRates[currency] = rate / newBaseRate;
 		}
 
-		return new ExchangeRates(newBase, newRates);
+		return new CurrencyRates(newBase, newRates);
 	}
 }
