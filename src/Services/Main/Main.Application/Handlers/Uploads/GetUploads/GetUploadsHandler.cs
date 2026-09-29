@@ -1,6 +1,7 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Models;
 using Application.Common.Models.Options.S3;
 using Main.Application.Dtos.Uploads;
 using Microsoft.Extensions.Options;

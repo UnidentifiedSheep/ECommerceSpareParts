@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using Main.Application.Handlers.StorageContents.GetProductStorageContents;
 using Main.Entities.Storage;
 using Tests.DataBuilders.Storage;

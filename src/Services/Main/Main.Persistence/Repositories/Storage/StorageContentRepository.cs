@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Abstractions.Models;
+using Application.Common.Models;
 using Dapper;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Storage;

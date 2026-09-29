@@ -2,6 +2,7 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Models;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Markup;

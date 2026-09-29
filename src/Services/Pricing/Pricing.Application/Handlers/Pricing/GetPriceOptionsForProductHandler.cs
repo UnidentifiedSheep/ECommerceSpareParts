@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
+using Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;

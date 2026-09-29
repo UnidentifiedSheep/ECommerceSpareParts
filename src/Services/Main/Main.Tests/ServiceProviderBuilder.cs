@@ -18,6 +18,7 @@ using Notification.Extensions;
 using Npgsql;
 using Persistence;
 using Security;
+using Security.Models;
 using Serilog;
 using Tests.Abstractions.Test;
 using Tests.Extensions;

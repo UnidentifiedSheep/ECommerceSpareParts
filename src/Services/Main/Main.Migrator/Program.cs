@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Persistence;
 using Persistence.Extensions;
 using Persistence.Interfaces;
+using Security.Models;
 using Security.Services;
 
 var builder = Host

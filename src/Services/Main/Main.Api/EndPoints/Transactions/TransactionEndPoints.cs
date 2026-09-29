@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Abstractions.Models;
 using Api.Common.Extensions;
+using Application.Common.Models;
 using Enums;
 using Main.Application.Dtos.Balances;
 using Main.Application.Handlers.Balance;

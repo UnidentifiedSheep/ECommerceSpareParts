@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using FluentAssertions;
 using Main.Application.Handlers.Sales.GetProductSaleHistory;
 using Tests.DataBuilders.Sale;

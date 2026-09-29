@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.GetTransactions;

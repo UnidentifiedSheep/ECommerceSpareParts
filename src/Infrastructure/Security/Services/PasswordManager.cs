@@ -1,6 +1,7 @@
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
 using Locan.Core.Interfaces;
+using Security.Models;
 using static BCrypt.Net.BCrypt;
 
 namespace Security.Services;

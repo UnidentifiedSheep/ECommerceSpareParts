@@ -1,6 +1,7 @@
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Models;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Products;
 using Main.Application.Models.Product;

@@ -1,4 +1,4 @@
-namespace Abstractions.Models;
+namespace Application.Common.Models;
 
 public sealed record RangeModel<T>(T? Min = null, T? Max = null) where T : struct, IComparable<T>
 {

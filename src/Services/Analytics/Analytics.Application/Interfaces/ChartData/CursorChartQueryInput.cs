@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Abstractions.Models;
 using Application.Common;
+using Application.Common.Models;
 using Domain.Validation;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;

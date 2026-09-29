@@ -3,6 +3,7 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Models;
 using Enums;
 using Main.Application.Dtos.Balances;
 using Main.Entities.Balance;

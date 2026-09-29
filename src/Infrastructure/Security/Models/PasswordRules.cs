@@ -1,4 +1,4 @@
-namespace Abstractions.Models;
+namespace Security.Models;
 
 public class PasswordRules
 {

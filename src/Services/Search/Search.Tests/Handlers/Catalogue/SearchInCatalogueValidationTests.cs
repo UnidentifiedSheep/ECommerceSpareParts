@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using FluentAssertions;
 using Search.Application.Handlers.Search.Catalogue;
 using Search.Enums;

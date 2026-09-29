@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using FluentAssertions;
 using Moq;
 using Search.Application.Handlers.Search.Catalogue;
