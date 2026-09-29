@@ -13,7 +13,7 @@ using Contracts.Products;
 using Contracts.Settings;
 using Contracts.Supplier;
 using Contracts.User;
-using ExchangeRate;
+using Integrations.ExchangeRate.Di;
 using Main.Api;
 using Main.Application;
 using Main.Application.Consumers;

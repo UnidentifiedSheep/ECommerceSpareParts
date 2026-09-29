@@ -1,7 +1,7 @@
-﻿using Abstractions.Interfaces.Integrations.ExchangeRate;
 using Enums;
+using Integrations.ExchangeRate.Interfaces;
 
-namespace ExchangeRate.Factories;
+namespace Integrations.ExchangeRate;
 
 public class ExchangeRateClientFactory : IExchangeRateClientFactory
 {
@@ -13,9 +13,7 @@ public class ExchangeRateClientFactory : IExchangeRateClientFactory
 	}
 
 	public IExchangeRateClient GetClient(ExchangeRateProvider provider)
-	{
-		if (_clients.TryGetValue(provider, out var client))
-			return client;
-		throw new Exception($"Не удалось найти клиент для указанного провайдера: {provider}");
-	}
+		=> _clients.TryGetValue(provider, out var client)
+			? client
+			: throw new InvalidOperationException("Unable to find client for provider: " + provider);
 }

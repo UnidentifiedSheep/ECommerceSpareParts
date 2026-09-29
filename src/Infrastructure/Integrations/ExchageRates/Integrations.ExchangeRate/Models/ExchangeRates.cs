@@ -1,4 +1,4 @@
-﻿namespace Abstractions.Models;
+﻿namespace Integrations.ExchangeRate.Models;
 
 /// <summary>
 /// </summary>

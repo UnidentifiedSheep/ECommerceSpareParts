@@ -1,6 +1,6 @@
 ﻿using Enums;
 
-namespace Abstractions.Interfaces.Integrations.ExchangeRate;
+namespace Integrations.ExchangeRate.Interfaces;
 
 public interface IExchangeRateClientFactory
 {

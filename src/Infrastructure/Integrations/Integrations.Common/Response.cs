@@ -10,15 +10,15 @@ public record Response<T>
 
 	public T ValueOrThrow => Value ?? throw new InvalidOperationException("Value is null");
 
-	public HttpStatusCode? StatusCode { get; init; }
+	public HttpStatusCode StatusCode { get; init; }
 
 	public string? Error { get; init; }
 
-	public static Response<T> Ok(T? value)
+	public static Response<T> Ok(T? value, HttpStatusCode statusCode = HttpStatusCode.OK)
 	{
 		return new Response<T>
 		{
-			Success = true, Value = value
+			Success = true, Value = value, StatusCode = statusCode
 		};
 	}
 
@@ -31,4 +31,6 @@ public record Response<T>
 			Error = error
 		};
 	}
+
+	public static Response<T> FromFail<TOther>(Response<TOther> fail) => Fail(fail.StatusCode, fail.Error);
 }

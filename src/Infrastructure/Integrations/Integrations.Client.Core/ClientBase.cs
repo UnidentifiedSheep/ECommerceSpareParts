@@ -14,6 +14,11 @@ public abstract class ClientBase
 		_serializerOptions = jsonOptions.SerializerOptions;
 	}
 
+	protected ClientBase(JsonSerializerOptions serializerOptions)
+	{
+		_serializerOptions = serializerOptions;
+	}
+
 	protected async Task<Response<T>> ReadResponse<T>(
 		HttpResponseMessage response,
 		CancellationToken cancellationToken = default)
@@ -45,7 +50,7 @@ public abstract class ClientBase
 		var result = await ReadResponse<TResponse>(response, cancellationToken);
 
 		if (!result.Success)
-			return Response<TValue>.Fail(result.StatusCode ?? response.StatusCode, result.Error);
+			return Response<TValue>.FromFail(result);
 
 		return result.Value is null
 			? Response<TValue>.Fail(response.StatusCode, "Response body is null")

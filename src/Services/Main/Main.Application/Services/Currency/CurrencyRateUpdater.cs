@@ -1,8 +1,8 @@
-﻿using Abstractions.Interfaces.Integrations.ExchangeRate;
-using Abstractions.Models;
-using Application.Common.Interfaces.Currency;
+﻿using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Integrations.ExchangeRate.Interfaces;
+using Integrations.ExchangeRate.Models;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Models.Currency;
@@ -27,8 +27,10 @@ public class CurrencyRateUpdater(
 		var client = clientFactory.GetClient(setting.Data.RateProvider);
 
 		var externalRates = await client.GetRates(ct);
+		if (!externalRates.Success || externalRates.Value == null)
+			throw new InvalidOperationException("Unable to get exchange rates");
 
-		var normalized = converter.ChangeBaseCurrency(externalRates, baseCurrency.Code);
+		var normalized = converter.ChangeBaseCurrency(externalRates.ValueOrThrow, baseCurrency.Code);
 
 		var currencies = await currencyRepository.ListAsync(ct: ct);
 
