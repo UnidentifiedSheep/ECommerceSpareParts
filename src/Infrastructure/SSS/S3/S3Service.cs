@@ -38,14 +38,15 @@ public sealed class S3Service(
 		string keyName,
 		CancellationToken ct = default)
 	{
-		var request = new GetObjectRequest
-		{
-			BucketName = bucketName, Key = keyName
-		};
-
 		try
 		{
-			var response = await internalClient.GetObjectAsync(request, ct);
+			var response = await internalClient.GetObjectAsync(
+				new GetObjectRequest
+				{
+					BucketName = bucketName,
+					Key = keyName
+				},
+				ct);
 			return Response<IStreamResponse>.Success(new S3StreamResponse(response));
 		}
 		catch (AmazonS3Exception ex) when (ex is NoSuchKeyException || ex.ErrorCode == "NoSuchKey")
