@@ -1,8 +1,8 @@
 using Abstractions;
-using Abstractions.Interfaces.Validators;
 using Application.Common;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Validators;
 using Application.Common.Services.Currency;
 using Application.Common.Validators;
 using Main.Application.Configs;

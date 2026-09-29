@@ -1,5 +1,5 @@
-using Abstractions.Interfaces.Validators;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Validators;
 using FluentValidation;
 using Main.Application.Dtos.Emails;
 using Main.Entities;

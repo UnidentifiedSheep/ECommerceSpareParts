@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Validators;
+using Application.Common.Interfaces.Validators;
 using FluentAssertions;
 using Main.Application.Handlers.Auth;
 using Main.Entities.Exceptions;

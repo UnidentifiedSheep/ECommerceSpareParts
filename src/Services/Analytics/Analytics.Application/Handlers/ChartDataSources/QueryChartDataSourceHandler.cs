@@ -1,11 +1,13 @@
 using System.Text.Json;
 using Abstractions.Interfaces;
+using Abstractions.Models.Options;
 using Analytics.Application.Interfaces.ChartData;
 using Analytics.Application.NamedObjects.ChartDataSources;
 using Analytics.Entities;
 using Analytics.Entities.Exceptions;
 using Application.Common.Interfaces.Cqrs;
 using Exceptions;
+using Extensions;
 using NamedObject.Core.Interfaces;
 
 namespace Analytics.Application.Handlers.ChartDataSources;
@@ -17,7 +19,8 @@ public sealed record QueryChartDataSourceResult(IReadOnlyList<object> DataPoints
 
 public sealed class QueryChartDataSourceHandler(
 	INamedObjectRegistry<ChartDataSourceNamedObject> registry,
-	IJsonSerializer jsonSerializer) : IQueryHandler<QueryChartDataSourceQuery, QueryChartDataSourceResult>
+	ProjectJsonOptions jsonOptions
+	) : IQueryHandler<QueryChartDataSourceQuery, QueryChartDataSourceResult>
 {
 	public async Task<QueryChartDataSourceResult> Handle(
 		QueryChartDataSourceQuery request,
@@ -35,14 +38,10 @@ public sealed class QueryChartDataSourceHandler(
 
 	private IChartQueryInput DeserializeQueryInput(string json, Type queryInputType)
 	{
-		try
-		{
-			return jsonSerializer.Deserialize(json, queryInputType) as IChartQueryInput ??
-				throw new InvalidInputException(ChartDataSourceQueryInputInvalidMessage.Instance);
-		}
-		catch (JsonException)
-		{
-			throw new InvalidInputException(ChartDataSourceQueryInputInvalidMessage.Instance);
-		}
+		if (json.TryDeserializeJson(queryInputType, out var deserialized, jsonOptions.SerializerOptions) &&
+			deserialized is IChartQueryInput chartQueryInput)
+			return chartQueryInput;
+
+		throw new InvalidInputException(ChartDataSourceQueryInputInvalidMessage.Instance);
 	}
 }

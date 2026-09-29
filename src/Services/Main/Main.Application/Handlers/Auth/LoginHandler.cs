@@ -4,6 +4,7 @@ using Abstractions.Interfaces.Validators;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Validators;
 using Attributes;
 using Enums;
 using Exceptions.Base;

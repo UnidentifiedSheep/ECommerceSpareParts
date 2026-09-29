@@ -1,4 +1,4 @@
-namespace Abstractions.Interfaces.Validators;
+namespace Application.Common.Interfaces.Validators;
 
 public interface IEmailValidator
 {

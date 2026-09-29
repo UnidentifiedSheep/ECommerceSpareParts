@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models.Options;
+using Application.Common.Interfaces.Validators;
 using Extensions;
 using FluentValidation;
 using FluentValidation.Results;

@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using Abstractions.Interfaces.Validators;
+using Application.Common.Interfaces.Validators;
 
 namespace Application.Common.Validators;
 

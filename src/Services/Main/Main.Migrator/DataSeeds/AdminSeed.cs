@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Validators;
+using Application.Common.Interfaces.Validators;
 using Main.Entities.Auth;
 using Main.Entities.Organization;
 using Main.Entities.User;

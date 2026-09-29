@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.Validators;
+using Application.Common.Interfaces.Validators;
 using FluentValidation;
 using Main.Application.Handlers.BaseValidators;
 

@@ -1,7 +1,7 @@
 ﻿using BulkValidation.Core.Interfaces;
 using BulkValidation.Core.Models;
 
-namespace Abstractions.Interfaces;
+namespace Application.Common.Interfaces.Persistence;
 
 public interface IDbValidator
 {
