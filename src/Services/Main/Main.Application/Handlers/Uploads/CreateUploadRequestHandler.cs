@@ -2,6 +2,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Models.Options.S3;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Handlers.Uploads;
 
@@ -11,7 +12,7 @@ public record CreateUploadRequestCommand(string FileName, string ContentType)
 public record CreateUploadRequestResult(string UploadUrl);
 
 public class CreateUploadRequestHandler(
-	IS3StorageService storageService,
+	IS3Service storageService,
 	IOptions<S3BucketsOptions> bucketsOptions)
 	: ICommandHandler<CreateUploadRequestCommand, CreateUploadRequestResult>
 {

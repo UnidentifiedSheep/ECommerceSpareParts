@@ -1,4 +1,4 @@
-namespace Abstractions.Models.S3;
+namespace S3.Core.Models;
 
 public record S3ObjectListDto
 {

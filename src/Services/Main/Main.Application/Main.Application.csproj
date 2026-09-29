@@ -30,6 +30,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchageRates\Integrations.ExchangeRate\Integrations.ExchangeRate.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Notifications\Notification.Core\Notification.Core.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\SSS\S3.Core\S3.Core.csproj" />
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>

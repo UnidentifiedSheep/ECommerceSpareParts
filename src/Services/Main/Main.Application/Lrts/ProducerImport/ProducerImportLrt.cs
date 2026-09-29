@@ -15,13 +15,14 @@ using Main.Entities.Producer;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Lrts.ProducerImport;
 
 public class ProducerImportLrt(
 	IRepository<Job, Guid> jobRepository,
 	IUnitOfWork unitOfWork,
-	IS3StorageService s3Service,
+	IS3Service s3Service,
 	IProducerRepository producerRepository,
 	ILogger<ProducerImportLrt> logger,
 	IOptions<S3BucketsOptions> bucketsOptions,

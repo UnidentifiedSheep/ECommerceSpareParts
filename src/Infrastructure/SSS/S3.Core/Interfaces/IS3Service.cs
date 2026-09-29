@@ -1,14 +1,9 @@
-﻿using Abstractions.Models.S3;
+﻿using S3.Core.Models;
 
-namespace Abstractions.Interfaces;
+namespace S3.Core.Interfaces;
 
-public interface IS3StorageService
+public interface IS3Service
 {
-	Task<string> UploadFileAsync(
-		string bucketName,
-		IFile file,
-		string keyName);
-
 	Task<string> UploadFileAsync(
 		string bucketName,
 		Stream stream,

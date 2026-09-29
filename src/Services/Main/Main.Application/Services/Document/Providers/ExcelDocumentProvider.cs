@@ -1,13 +1,13 @@
-using Abstractions.Interfaces;
 using Application.Common.Models.Options.S3;
 using Main.Application.Interfaces.Services.Document;
 using Main.Enums.Documents;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Services.Document.Providers;
 
 public sealed class ExcelDocumentProvider(
-	IS3StorageService s3Storage,
+	IS3Service s3Storage,
 	IOptions<S3BucketsOptions> bucketsOptions
 	) : IDocumentProvider
 {

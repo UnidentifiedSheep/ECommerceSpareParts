@@ -15,13 +15,14 @@ using Main.Entities.Producer;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Lrts.ProducerAliasesImport;
 
 public class ProducerAliasImportLrt(
 	IRepository<Job, Guid> jobRepository,
 	IUnitOfWork unitOfWork,
-	IS3StorageService s3Service,
+	IS3Service s3Service,
 	IRepository<ProducerAlias, string> aliasRepository,
 	IProducerRepository producerRepository,
 	ILogger<ProducerAliasImportLrt> logger,

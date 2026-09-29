@@ -8,6 +8,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Handlers.Products;
 
@@ -16,7 +17,7 @@ namespace Main.Application.Handlers.Products;
 public record RemoveProductImageCommand(int ProductId, string ImagePath) : ICommand;
 
 public class RemoveProductImageHandler(
-	IS3StorageService s3Storage,
+	IS3Service s3Storage,
 	IUnitOfWork unitOfWork,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	IRepository<ProductImage, (int, string)> repository) : ICommandHandler<RemoveProductImageCommand>

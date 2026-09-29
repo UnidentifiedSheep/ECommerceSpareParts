@@ -1,5 +1,4 @@
 using System.Globalization;
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -13,6 +12,7 @@ using Locan.Core.Interfaces.Localizers;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Lrts.Base;
 
@@ -23,7 +23,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
 	ILogger logger,
-	IS3StorageService s3Service,
+	IS3Service s3Service,
 	IContextualLocalizer stringLocalizer) : LrtBase<TInputState, TState>(
 	jobRepository,
 	unitOfWork,

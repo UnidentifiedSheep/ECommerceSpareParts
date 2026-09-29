@@ -1,10 +1,11 @@
 using System.Text;
 using Abstractions.Interfaces;
-using Abstractions.Models.S3;
+using S3.Core.Interfaces;
+using S3.Core.Models;
 
 namespace Tests.Stubs;
 
-public sealed class S3StorageServiceStub : IS3StorageService
+public sealed class S3StorageServiceStub : IS3Service
 {
 	private readonly Dictionary<(string Bucket, string Key), byte[]> _files = [];
 

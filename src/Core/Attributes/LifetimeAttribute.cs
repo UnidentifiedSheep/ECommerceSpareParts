@@ -9,8 +9,6 @@ public class LifetimeAttribute(Lifetime lifetime) : Attribute
 public enum Lifetime
 {
 	Singleton,
-
 	Transient,
-
 	Scoped
 }

@@ -1,9 +1,8 @@
 ﻿namespace Attributes;
 
 /// <summary>
-///     Marks if command at the end of command should be executed savechanges automatically
+/// Saves changes automatically after the command handler completes successfully.
+/// Automatic saving can be suppressed for the current unit of work.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-public class AutoSaveAttribute : Attribute
-{
-}
+public class AutoSaveAttribute : Attribute;

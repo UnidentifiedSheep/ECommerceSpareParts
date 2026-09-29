@@ -1,5 +1,6 @@
 using System.Data;
 
+// ReSharper disable once CheckNamespace
 namespace Attributes;
 
 public partial class TransactionalAttribute

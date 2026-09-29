@@ -1,12 +1,10 @@
 using System.Globalization;
 using Abstractions.Interfaces;
-using Abstractions.Models;
 using Api.Common;
 using Application.Common.Models.Options.S3;
 using Cache;
 using Locan.Hosting;
 using Main.Api;
-using Main.Application.Configs;
 using Main.Application.Models;
 using Main.Cache;
 using Main.Persistence;
@@ -17,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Notification.Extensions;
 using Npgsql;
 using Persistence;
+using S3.Core.Interfaces;
 using Security;
 using Security.Models;
 using Serilog;
@@ -118,7 +117,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 				}));
 
 		services.AddScoped<S3StorageServiceStub>();
-		services.AddScoped<IS3StorageService>(sp => sp.GetRequiredService<S3StorageServiceStub>());
+		services.AddScoped<IS3Service>(sp => sp.GetRequiredService<S3StorageServiceStub>());
 		services.AddProjectJsonSerialization();
 
 		services

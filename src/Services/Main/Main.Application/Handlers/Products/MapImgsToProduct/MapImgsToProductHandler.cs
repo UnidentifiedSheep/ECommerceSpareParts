@@ -6,6 +6,7 @@ using Attributes;
 using Main.Entities.Product;
 using MediatR;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Handlers.Products.MapImgsToProduct;
 
@@ -14,7 +15,7 @@ namespace Main.Application.Handlers.Products.MapImgsToProduct;
 public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) : ICommand;
 
 public class MapImgsToProductHandler(
-	IS3StorageService s3Storage,
+	IS3Service s3Storage,
 	IUnitOfWork unitOfWork,
 	IOptions<S3BucketsOptions> bucketsOptions) : ICommandHandler<MapImgsToProductCommand, Unit>
 {

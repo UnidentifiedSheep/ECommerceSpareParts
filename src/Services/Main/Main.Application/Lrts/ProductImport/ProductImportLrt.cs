@@ -19,6 +19,7 @@ using Main.Entities.Product.ValueObjects;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Lrts.ProductImport;
 
@@ -27,7 +28,7 @@ public class ProductImportLrt(
 	IProducerLookupService producerLookupService,
 	IProductRepository productRepository,
 	IUnitOfWork unitOfWork,
-	IS3StorageService s3Service,
+	IS3Service s3Service,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,

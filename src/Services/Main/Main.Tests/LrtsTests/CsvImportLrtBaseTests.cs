@@ -18,6 +18,7 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 using SchemaGeneration.Abstractions.Attributes;
 using Tests.Abstractions.Test;
 using Tests.Stubs;
@@ -99,7 +100,7 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 	public sealed class TestCsvImportLrt(
 		IRepository<Job, Guid> jobRepository,
 		IUnitOfWork unitOfWork,
-		IS3StorageService s3Service,
+		IS3Service s3Service,
 		ILogger<TestCsvImportLrt> logger,
 		IOptions<S3BucketsOptions> bucketsOptions,
 		IPublishEndpoint publisher,
