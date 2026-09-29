@@ -1,5 +1,5 @@
 using System.Net;
-using Abstractions.Interfaces.Exceptions;
+using Exceptions.Interfaces;
 
 namespace Exceptions.Base;
 

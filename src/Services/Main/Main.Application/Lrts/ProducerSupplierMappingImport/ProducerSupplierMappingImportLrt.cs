@@ -1,5 +1,4 @@
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -9,6 +8,7 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
 using Domain.Extensions;
 using Enums;
+using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;

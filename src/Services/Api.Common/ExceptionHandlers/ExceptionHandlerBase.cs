@@ -1,4 +1,4 @@
-﻿using Abstractions.Interfaces.Exceptions;
+﻿using Exceptions.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;

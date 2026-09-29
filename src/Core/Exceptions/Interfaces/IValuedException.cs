@@ -1,4 +1,4 @@
-namespace Abstractions.Interfaces.Exceptions;
+namespace Exceptions.Interfaces;
 
 public interface IValuedException
 {

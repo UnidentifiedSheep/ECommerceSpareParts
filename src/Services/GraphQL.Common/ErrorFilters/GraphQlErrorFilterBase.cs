@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Abstractions.Interfaces.Exceptions;
+using Exceptions.Interfaces;
 using HotChocolate.Execution;
 using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Http;

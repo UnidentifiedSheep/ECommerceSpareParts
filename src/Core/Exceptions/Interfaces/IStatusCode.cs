@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Abstractions.Interfaces.Exceptions;
+namespace Exceptions.Interfaces;
 
 public interface IStatusCode
 {

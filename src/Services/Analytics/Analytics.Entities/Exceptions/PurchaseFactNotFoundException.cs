@@ -1,5 +1,5 @@
-﻿using Abstractions.Interfaces.Exceptions;
-using Exceptions.Base;
+﻿using Exceptions.Base;
+using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 
 namespace Analytics.Entities.Exceptions;
