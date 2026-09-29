@@ -2,6 +2,7 @@ using System.Data;
 using Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Persistence.Interfaces;
 
 namespace Persistence.TransactionBuilder;
 

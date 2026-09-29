@@ -1,6 +1,7 @@
 using System.Data;
 using Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Interfaces;
 
 namespace Persistence.TransactionBuilder;
 

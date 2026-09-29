@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace Abstractions.Interfaces;
+namespace Persistence.Interfaces;
 
 public interface ICustomTransaction
 {
