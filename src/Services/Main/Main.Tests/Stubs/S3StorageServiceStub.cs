@@ -8,7 +8,7 @@ public sealed class S3StorageServiceStub : IS3Service
 {
 	private readonly Dictionary<(string Bucket, string Key), byte[]> _files = [];
 
-	public Task<Stream> DownloadFileAsync(
+	public Task<IStreamResponse> DownloadFileAsync(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default)
@@ -18,7 +18,7 @@ public sealed class S3StorageServiceStub : IS3Service
 		if (!_files.TryGetValue((bucketName, keyName), out var content))
 			throw new FileNotFoundException($"Test S3 object '{bucketName}/{keyName}' was not found.");
 
-		return Task.FromResult<Stream>(new MemoryStream(content, false));
+		return Task.FromResult<IStreamResponse>(new MemoryStreamResponse(new MemoryStream(content, false)));
 	}
 
 	public Task<string> UploadFileAsync(
@@ -50,4 +50,11 @@ public sealed class S3StorageServiceStub : IS3Service
 		string bucketName,
 		string key,
 		string content) => _files[(bucketName, key)] = Encoding.UTF8.GetBytes(content);
+
+	private sealed class MemoryStreamResponse(Stream stream) : IStreamResponse
+	{
+		public Stream Stream { get; } = stream;
+
+		public void Dispose() => Stream.Dispose();
+	}
 }

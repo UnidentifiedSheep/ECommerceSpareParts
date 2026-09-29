@@ -18,4 +18,8 @@
       <ProjectReference Include="..\S3.Core\S3.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <InternalsVisibleTo Include="Infrastructure.Tests" />
+    </ItemGroup>
+
 </Project>

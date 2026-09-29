@@ -33,7 +33,7 @@ public sealed class S3Service(
 		return keyName;
 	}
 
-	public async Task<Stream> DownloadFileAsync(
+	public async Task<IStreamResponse> DownloadFileAsync(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default)
@@ -44,7 +44,7 @@ public sealed class S3Service(
 		};
 
 		var response = await internalClient.GetObjectAsync(request, ct);
-		return response.ResponseStream;
+		return new S3StreamResponse(response);
 	}
 
 	public async Task<bool> DeleteFileAsync(string bucketName, string keyName)

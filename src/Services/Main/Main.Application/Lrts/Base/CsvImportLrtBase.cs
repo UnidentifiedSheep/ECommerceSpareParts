@@ -48,12 +48,12 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 
 		await BeforeRead(state);
 
-		await using var stream = await s3Service.DownloadFileAsync(
+		using var response = await s3Service.DownloadFileAsync(
 			bucketsOptions.Value.Uploads.Name,
 			state.FileName,
 			CancellationToken);
 
-		using var reader = new StreamReader(stream);
+		using var reader = new StreamReader(response.Stream);
 		using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
 		var rowIdx = 0;

@@ -18,9 +18,11 @@ public sealed class ExcelDocumentProvider(
 		string? fallBackTemplateName = null,
 		CancellationToken token = default)
 	{
-		var requestedTemplate = await s3Storage.DownloadFileAsync(
+		using var requestedTemplate = await s3Storage.DownloadFileAsync(
 			bucketsOptions.Value.Documents.Name,
 			templateName,
 			token);
+
+		throw new NotImplementedException();
 	}
 }

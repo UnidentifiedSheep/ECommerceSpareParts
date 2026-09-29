@@ -24,6 +24,7 @@
         <ProjectReference Include="..\Integrations\Suppliers\Integrations.Tmtr\Integrations.Tmtr.csproj"/>
         <ProjectReference Include="..\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\Security\Security\Security.csproj" />
+        <ProjectReference Include="..\SSS\S3\S3.csproj" />
     </ItemGroup>
 
 </Project>
