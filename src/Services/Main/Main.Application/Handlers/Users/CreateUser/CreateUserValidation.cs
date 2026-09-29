@@ -1,4 +1,4 @@
-using Abstractions.Interfaces.Validators;
+using Security.Core.Interfaces;
 using Abstractions.Models.Options;
 using Application.Common.Interfaces.Validators;
 using Extensions;

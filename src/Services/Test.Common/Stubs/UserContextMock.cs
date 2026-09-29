@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces;
+﻿using Security.Core.Interfaces;
+using Abstractions.Interfaces;
 
 namespace Tests.Stubs;
 

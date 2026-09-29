@@ -9,6 +9,7 @@ using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Enums;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Auth;
 
@@ -23,14 +24,14 @@ public class RefreshTokenHandler(
 	IUnitOfWork unitOfWork,
 	IJwtGenerator tokenGenerator,
 	IUserTokenService userTokenService,
-	ITokenHasher tokenHasher,
+	IValueHasher valueHasher,
 	IUserCacheRepository userCache) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
 {
 	public async Task<RefreshTokenResult> Handle(
 		RefreshTokenCommand request,
 		CancellationToken cancellationToken)
 	{
-		var hashOfToken = tokenHasher.HashToken(request.RefreshToken);
+		var hashOfToken = valueHasher.Hash(request.RefreshToken);
 		var criteria = Criteria<UserToken>.New().Where(x => x.TokenHash == hashOfToken).Build();
 
 		var userToken = await repository.FirstOrDefaultAsync(criteria, cancellationToken) ??

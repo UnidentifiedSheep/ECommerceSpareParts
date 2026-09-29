@@ -1,6 +1,6 @@
+using Security.Core.Interfaces;
 using System.Net;
 using System.Security.Cryptography;
-using Abstractions.Interfaces.Validators;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;

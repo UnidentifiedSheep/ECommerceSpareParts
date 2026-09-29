@@ -1,6 +1,6 @@
-﻿using Abstractions.Interfaces;
-using Exceptions.Base;
+﻿using Exceptions.Base;
 using Microsoft.AspNetCore.Http;
+using Security.Core.Interfaces;
 using Security.Extensions;
 
 namespace Security.Services;

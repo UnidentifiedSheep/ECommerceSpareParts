@@ -13,6 +13,7 @@ using Internal.Integration.Di;
 using MassTransit;
 using RabbitMq.Extensions;
 using Security;
+using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var builder = Host.CreateApplicationBuilder(args);

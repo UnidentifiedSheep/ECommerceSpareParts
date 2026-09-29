@@ -14,6 +14,7 @@ using Search.Application.Consumers.Producer;
 using Search.Application.Consumers.Product;
 using Search.Persistence;
 using Security;
+using Security.Extensions;
 
 const string serviceName = "Search";
 

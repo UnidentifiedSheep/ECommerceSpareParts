@@ -1,3 +1,4 @@
+using Security.Core.Interfaces;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;

@@ -1,17 +1,15 @@
-using Abstractions.Interfaces.Validators;
-using Abstractions.Models;
 using Locan.Core.Interfaces;
+using Security.Core.Interfaces;
 using Security.Models;
-using static BCrypt.Net.BCrypt;
 
 namespace Security.Services;
 
-public class PasswordManager(PasswordRules rules) : IPasswordManager
+public class PasswordManager(IPasswordHasher passwordHasher, PasswordRules rules) : IPasswordManager
 {
-	public string GetHashOfPassword(string password) => HashPassword(password);
+	public string GetHashOfPassword(string password) => passwordHasher.HashPassword(password);
 
-	public bool VerifyHashedPassword(string hashedPassword, string providedPassword) =>
-		Verify(providedPassword, hashedPassword);
+	public bool VerifyHashedPassword(string hashedPassword, string providedPassword)
+		=> passwordHasher.VerifyPassword(providedPassword, hashedPassword);
 
 	public (bool isValid, IEnumerable<ILocalizableMessage> errors) IsPasswordMatchRules(string password)
 	{

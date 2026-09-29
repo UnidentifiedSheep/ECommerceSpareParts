@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces.Services;
-using Abstractions.Interfaces.Validators;
+﻿using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Validators;
 using Attributes;

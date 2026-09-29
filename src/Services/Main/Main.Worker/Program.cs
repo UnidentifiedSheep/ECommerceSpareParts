@@ -25,7 +25,7 @@ using Notification.Extensions;
 using RabbitMQ.Client;
 using RabbitMq.Extensions;
 using S3;
-using Security;
+using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -68,7 +68,7 @@ builder
 	.AddS3()
 	.AddApplicationLayer(builder.Configuration)
 	.AddWorkerSecurityLayer()
-	.AddFullSecurityLayer()
+	.AddPasswordServices()
 	.AddExchangeRates()
 	.AddMainNotifications()
 	.AddInAppNotificationHostedService()

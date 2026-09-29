@@ -1,3 +1,4 @@
+using Security.Core.Interfaces;
 using System.Reflection;
 using Abstractions.Interfaces;
 using GraphQL.Common.Attributes;

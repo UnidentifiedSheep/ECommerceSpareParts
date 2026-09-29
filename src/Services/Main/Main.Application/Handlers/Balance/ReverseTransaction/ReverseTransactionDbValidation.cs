@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces;
+﻿using Security.Core.Interfaces;
+using Abstractions.Interfaces;
 using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;

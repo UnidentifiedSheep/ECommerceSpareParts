@@ -1,3 +1,4 @@
+using Security.Core.Interfaces;
 using Abstractions.Interfaces;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;

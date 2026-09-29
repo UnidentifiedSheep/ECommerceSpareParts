@@ -2,10 +2,10 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Abstractions.Interfaces.Services;
 using Abstractions.Models.Options;
 using Extensions;
 using Microsoft.Extensions.Options;
+using Security.Core.Interfaces;
 
 namespace Security.Services;
 

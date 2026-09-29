@@ -20,7 +20,7 @@ public sealed class RoleRequirement : IAuthorizationRequirement
 		Match = match;
 	}
 
-	public RoleRequirement(IEnumerable<PermissionCodes> roles, AuthorizationMatch match) : this(
+	public RoleRequirement(IEnumerable<Role> roles, AuthorizationMatch match) : this(
 		roles.Select(x => x.ToString()),
 		match)
 	{

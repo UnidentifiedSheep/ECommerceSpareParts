@@ -23,7 +23,7 @@ using Pricing.Cache;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
-using Security;
+using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var builder = Host.CreateApplicationBuilder(args);

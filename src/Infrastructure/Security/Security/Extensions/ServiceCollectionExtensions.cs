@@ -1,8 +1,4 @@
 using System.Text;
-using Abstractions.Interfaces;
-using Abstractions.Interfaces.Services;
-using Abstractions.Interfaces.Validators;
-using Abstractions.Models;
 using Abstractions.Models.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -11,40 +7,51 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Security.Authorization;
+using Security.Core.Interfaces;
 using Security.Models;
 using Security.Services;
 
-namespace Security;
+namespace Security.Extensions;
 
-public static class ServiceProvider
+public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddFullSecurityLayer(
 		this IServiceCollection collection,
 		PasswordRules? passwordRules = null)
 	{
-		collection.AddSingleton<IPasswordManager, PasswordManager>();
-		collection.AddSingleton(passwordRules ?? new PasswordRules());
-		collection.AddSingleton<ITokenHasher, TokenHasher>();
-
+		collection.AddPasswordServices(passwordRules);
 		collection.AddMinimalSecurityLayer();
+		return collection;
+	}
+
+	public static IServiceCollection AddPasswordServices(
+		this IServiceCollection collection,
+		PasswordRules? passwordRules = null)
+	{
+		collection.TryAddSingleton(passwordRules ?? new PasswordRules());
+		collection.TryAddSingleton<Hasher>();
+		collection.TryAddSingleton<IValueHasher>(provider => provider.GetRequiredService<Hasher>());
+		collection.TryAddSingleton<IPasswordHasher>(provider => provider.GetRequiredService<Hasher>());
+		collection.TryAddSingleton<IPasswordManager, PasswordManager>();
 		return collection;
 	}
 
 	public static IServiceCollection AddJsonSigner(this IServiceCollection collection)
 	{
 		collection.TryAddSingleton<ProjectJsonOptions>();
-		collection.AddSingleton<IJsonSigner, JsonSigner>();
+		collection.TryAddSingleton<IJsonSigner, JsonSigner>();
 		return collection;
 	}
 
 	public static IServiceCollection AddSecretEncryptor(this IServiceCollection collection)
 	{
-		collection.AddSingleton<ISecretEncryptor, SecretEncryptor>();
+		collection.TryAddSingleton<ISecretEncryptor, SecretEncryptor>();
 		return collection;
 	}
 
 	public static IServiceCollection AddMinimalSecurityLayer(this IServiceCollection collection)
 	{
+		collection.AddHttpContextAccessor();
 		collection.TryAddScoped<IUserContext, UserContext>();
 		collection.TryAddEnumerable(
 			ServiceDescriptor.Scoped<IAuthorizationHandler, PermissionAuthorizationHandler>());

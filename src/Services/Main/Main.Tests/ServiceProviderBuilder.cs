@@ -1,3 +1,4 @@
+using Security.Core.Interfaces;
 using System.Globalization;
 using Abstractions.Interfaces;
 using Api.Common;
@@ -17,6 +18,7 @@ using Npgsql;
 using Persistence;
 using S3.Core.Interfaces;
 using Security;
+using Security.Extensions;
 using Security.Models;
 using Serilog;
 using Tests.Abstractions.Test;

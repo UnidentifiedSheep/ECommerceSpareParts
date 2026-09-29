@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Abstractions.Interfaces.Services;
+namespace Security.Core.Interfaces;
 
 public interface IJsonSigner
 {

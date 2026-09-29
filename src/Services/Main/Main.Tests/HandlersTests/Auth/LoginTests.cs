@@ -1,4 +1,4 @@
-using Abstractions.Interfaces.Validators;
+using Security.Core.Interfaces;
 using Application.Common.Interfaces.Validators;
 using FluentAssertions;
 using Main.Application.Handlers.Auth;

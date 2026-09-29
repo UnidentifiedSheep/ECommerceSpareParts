@@ -31,6 +31,7 @@ using MassTransit;
 using RabbitMq.Extensions;
 using S3;
 using Security;
+using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 using Global = Main.Application.Global;
 

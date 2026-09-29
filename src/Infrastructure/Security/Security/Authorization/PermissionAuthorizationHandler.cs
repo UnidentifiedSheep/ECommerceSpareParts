@@ -1,5 +1,5 @@
-using Abstractions.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Security.Core.Interfaces;
 
 namespace Security.Authorization;
 

@@ -14,7 +14,7 @@ public sealed class RequireAllRolesAttribute : RequireAuthorizationAttribute
 	{
 	}
 
-	public RequireAllRolesAttribute(params PermissionCodes[] roles) : base(
+	public RequireAllRolesAttribute(params Role[] roles) : base(
 		PolicyName,
 		new RoleRequirement(roles, AuthorizationMatch.All))
 	{

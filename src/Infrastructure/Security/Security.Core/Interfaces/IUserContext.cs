@@ -1,4 +1,4 @@
-﻿namespace Abstractions.Interfaces;
+﻿namespace Security.Core.Interfaces;
 
 public interface IUserContext
 {

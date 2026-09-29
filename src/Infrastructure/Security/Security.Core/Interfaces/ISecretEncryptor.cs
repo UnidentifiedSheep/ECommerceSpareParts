@@ -1,4 +1,4 @@
-namespace Abstractions.Interfaces.Services;
+namespace Security.Core.Interfaces;
 
 public interface ISecretEncryptor
 {

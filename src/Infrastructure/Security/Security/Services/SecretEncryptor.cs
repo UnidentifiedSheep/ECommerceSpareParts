@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
-using Abstractions.Interfaces.Services;
 using Microsoft.Extensions.Options;
+using Security.Core.Interfaces;
 
 namespace Security.Services;
 

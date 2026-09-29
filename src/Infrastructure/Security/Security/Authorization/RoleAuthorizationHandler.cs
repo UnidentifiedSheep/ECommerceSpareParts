@@ -1,9 +1,11 @@
 using Abstractions.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Security.Core.Interfaces;
 
 namespace Security.Authorization;
 
-public sealed class RoleAuthorizationHandler(IUserContext userContext) : AuthorizationHandler<RoleRequirement>
+public sealed class RoleAuthorizationHandler(
+	IUserContext userContext) : AuthorizationHandler<RoleRequirement>
 {
 	protected override Task HandleRequirementAsync(
 		AuthorizationHandlerContext context,

@@ -28,7 +28,7 @@ using Pricing.Cache;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
-using Security;
+using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
 const string serviceName = "Pricing";

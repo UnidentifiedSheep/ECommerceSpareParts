@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces;
+﻿using Security.Core.Interfaces;
+using Abstractions.Interfaces;
 using Application.Common.Interfaces.Settings;
 using Main.Persistence.Context;
 using Tests.Stubs;

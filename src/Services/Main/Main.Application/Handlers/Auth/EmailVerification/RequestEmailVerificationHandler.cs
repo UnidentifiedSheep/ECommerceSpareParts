@@ -1,4 +1,4 @@
-using Abstractions.Interfaces.Services;
+using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;

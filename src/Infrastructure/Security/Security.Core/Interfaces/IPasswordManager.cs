@@ -1,6 +1,6 @@
 using Locan.Core.Interfaces;
 
-namespace Abstractions.Interfaces.Validators;
+namespace Security.Core.Interfaces;
 
 public interface IPasswordManager
 {

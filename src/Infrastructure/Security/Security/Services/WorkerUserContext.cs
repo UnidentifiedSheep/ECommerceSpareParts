@@ -1,6 +1,6 @@
-﻿using Abstractions.Interfaces;
-using Abstractions.Models.Options;
+﻿using Abstractions.Models.Options;
 using Microsoft.Extensions.Options;
+using Security.Core.Interfaces;
 
 namespace Security.Services;
 
