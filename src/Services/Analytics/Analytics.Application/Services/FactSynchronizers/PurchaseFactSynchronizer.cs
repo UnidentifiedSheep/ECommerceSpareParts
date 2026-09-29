@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Entities;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Internal.Integration.Core.Interfaces.Main;

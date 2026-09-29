@@ -1,6 +1,6 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Main.Persistence.Context;
 using MediatR;

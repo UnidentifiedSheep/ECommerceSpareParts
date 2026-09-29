@@ -1,4 +1,4 @@
-using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Microsoft.Extensions.Logging;
 using Notification.Core;

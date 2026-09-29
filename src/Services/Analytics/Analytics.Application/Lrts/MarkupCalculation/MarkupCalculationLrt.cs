@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
 using Analytics.Entities;

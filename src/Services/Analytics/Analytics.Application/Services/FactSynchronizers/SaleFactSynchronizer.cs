@@ -1,7 +1,7 @@
-using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Entities;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Contracts.Sale;
 using Contracts.Sale.Model;

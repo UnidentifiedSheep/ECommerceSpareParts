@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;

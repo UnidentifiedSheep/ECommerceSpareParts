@@ -1,6 +1,6 @@
 using System.Net;
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Enums;

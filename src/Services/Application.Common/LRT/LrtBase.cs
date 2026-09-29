@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;

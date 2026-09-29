@@ -1,5 +1,5 @@
-using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Microsoft.EntityFrameworkCore;
 using Persistence.TransactionBuilder;

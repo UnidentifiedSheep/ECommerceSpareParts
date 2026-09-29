@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
 using Application.Common.Behaviors;
 using Application.Common.Interfaces.Persistence;

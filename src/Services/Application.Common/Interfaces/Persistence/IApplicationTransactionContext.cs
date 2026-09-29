@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 
 namespace Application.Common.Interfaces.Persistence;

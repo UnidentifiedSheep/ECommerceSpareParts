@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Integrations.ExchangeRate;
-using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Currency;

@@ -1,7 +1,7 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Contracts.Models.Supplier;
 using Enums;

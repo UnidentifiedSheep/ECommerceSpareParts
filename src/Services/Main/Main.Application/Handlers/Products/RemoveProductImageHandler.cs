@@ -1,6 +1,6 @@
 ﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;

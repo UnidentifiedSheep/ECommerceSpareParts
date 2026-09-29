@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Moq;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
