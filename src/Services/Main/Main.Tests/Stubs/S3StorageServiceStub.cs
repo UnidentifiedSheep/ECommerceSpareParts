@@ -1,5 +1,4 @@
 using System.Text;
-using Abstractions.Interfaces;
 using S3.Core.Interfaces;
 using S3.Core.Models;
 
@@ -21,11 +20,6 @@ public sealed class S3StorageServiceStub : IS3Service
 
 		return Task.FromResult<Stream>(new MemoryStream(content, false));
 	}
-
-	public Task<string> UploadFileAsync(
-		string bucketName,
-		IFile file,
-		string keyName) => throw new NotSupportedException();
 
 	public Task<string> UploadFileAsync(
 		string bucketName,

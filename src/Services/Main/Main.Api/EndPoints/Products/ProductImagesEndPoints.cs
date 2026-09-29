@@ -1,5 +1,4 @@
 using Api.Common.Extensions;
-using Api.Common.Models;
 using Enums;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.MapImgsToProduct;
@@ -19,7 +18,12 @@ public static class ProductImagesEndPoints
 					ISender sender, int productId,
 					IFormFileCollection files, CancellationToken token) =>
 				{
-					var command = new MapImgsToProductCommand(productId, FileModel.GetFileModels(files));
+					var images = files
+						.Select(file => new ProductImageUpload(
+							Path.GetExtension(file.FileName),
+							file.OpenReadStream))
+						.ToArray();
+					var command = new MapImgsToProductCommand(productId, images);
 					await sender.Send(command, token);
 					return Results.Ok();
 				})

@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces;
-using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Options.S3;
 using Attributes;
@@ -12,12 +11,16 @@ namespace Main.Application.Handlers.Products.MapImgsToProduct;
 
 [AutoSave]
 [Transactional]
-public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) : ICommand;
+public record MapImgsToProductCommand(
+	int ProductId,
+	IReadOnlyCollection<ProductImageUpload> Images) : ICommand;
+
+public record ProductImageUpload(string Extension, Func<Stream> OpenReadStream);
 
 public class MapImgsToProductHandler(
 	IS3Service s3Storage,
 	IUnitOfWork unitOfWork,
-	IOptions<S3BucketsOptions> bucketsOptions) : ICommandHandler<MapImgsToProductCommand, Unit>
+	IOptions<S3BucketsOptions> bucketsOptions) : ICommandHandler<MapImgsToProductCommand>
 {
 	public async Task<Unit> Handle(MapImgsToProductCommand request, CancellationToken cancellationToken)
 	{
