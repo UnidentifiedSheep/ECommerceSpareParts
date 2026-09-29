@@ -3,6 +3,7 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Models;
 using Attributes;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;

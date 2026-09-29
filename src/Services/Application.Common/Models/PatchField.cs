@@ -1,4 +1,4 @@
-namespace Abstractions.Models;
+namespace Application.Common.Models;
 
 public class PatchField<T>
 {

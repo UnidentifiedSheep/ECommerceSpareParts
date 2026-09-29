@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using FluentAssertions;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.PatchProduct;
