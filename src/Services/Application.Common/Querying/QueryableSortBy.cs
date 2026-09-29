@@ -1,8 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq.Expressions;
-using Abstractions.Models.SortyBy;
 
-namespace Abstractions;
+namespace Application.Common.Querying;
 
 public class QueryableSortBy
 {

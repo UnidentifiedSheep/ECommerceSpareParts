@@ -1,4 +1,5 @@
 using Abstractions;
+using Application.Common.Querying;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 

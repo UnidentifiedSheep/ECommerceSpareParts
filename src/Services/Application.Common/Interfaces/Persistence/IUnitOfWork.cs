@@ -1,11 +1,10 @@
-using Abstractions.Models;
 using Attributes;
 
 namespace Application.Common.Interfaces.Persistence;
 
 public interface IUnitOfWork
 {
-	UnitOfWorkContext Context { get; }
+	IUnitOfWorkContext Context { get; }
 
 	Task<T> ExecuteWithTransaction<T>(
 		TransactionalAttribute settings,

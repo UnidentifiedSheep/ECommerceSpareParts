@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Abstractions;
-using Abstractions.Models.SortyBy;
 using Application.Common;
+using Application.Common.Querying;
 using Exceptions;
 using OpenSearch.Client;
 

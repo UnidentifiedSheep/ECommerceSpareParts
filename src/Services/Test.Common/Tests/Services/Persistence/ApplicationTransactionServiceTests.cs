@@ -7,6 +7,7 @@ using Attributes;
 using FluentAssertions;
 using MassTransit;
 using Moq;
+using Persistence;
 
 namespace Tests.Tests.Services.Persistence;
 

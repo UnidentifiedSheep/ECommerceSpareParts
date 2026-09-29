@@ -13,6 +13,7 @@ using Locan.Core.LocalizableMessages;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Persistence;
 using Tests.Stubs;
 
 namespace Tests.Tests.Lrt;

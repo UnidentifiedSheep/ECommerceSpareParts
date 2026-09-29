@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using Abstractions.Models;
 
-namespace Abstractions;
+namespace Application.Common.Querying;
 
 public sealed class QueryableCursor
 {

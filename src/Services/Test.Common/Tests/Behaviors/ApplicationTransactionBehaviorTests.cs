@@ -5,6 +5,7 @@ using Attributes;
 using FluentAssertions;
 using MediatR;
 using Moq;
+using Persistence;
 
 namespace Tests.Tests.Behaviors;
 

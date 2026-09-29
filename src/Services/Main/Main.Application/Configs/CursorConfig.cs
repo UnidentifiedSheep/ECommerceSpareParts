@@ -1,4 +1,5 @@
 using Abstractions;
+using Application.Common.Querying;
 using Notification.Core.Entities;
 
 namespace Main.Application.Configs;
