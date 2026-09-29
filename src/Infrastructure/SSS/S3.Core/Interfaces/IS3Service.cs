@@ -10,7 +10,7 @@ public interface IS3Service
 		string keyName,
 		string contentType);
 
-	Task<IStreamResponse> DownloadFileAsync(
+	Task<Response<IStreamResponse>> DownloadFileAsync(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default);

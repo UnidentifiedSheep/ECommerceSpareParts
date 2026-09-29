@@ -8,7 +8,7 @@ public sealed class S3StorageServiceStub : IS3Service
 {
 	private readonly Dictionary<(string Bucket, string Key), byte[]> _files = [];
 
-	public Task<IStreamResponse> DownloadFileAsync(
+	public Task<Response<IStreamResponse>> DownloadFileAsync(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default)
@@ -16,9 +16,10 @@ public sealed class S3StorageServiceStub : IS3Service
 		ct.ThrowIfCancellationRequested();
 
 		if (!_files.TryGetValue((bucketName, keyName), out var content))
-			throw new FileNotFoundException($"Test S3 object '{bucketName}/{keyName}' was not found.");
+			return Task.FromResult(Response<IStreamResponse>.Failure(System.Net.HttpStatusCode.NotFound, "NoSuchKey"));
 
-		return Task.FromResult<IStreamResponse>(new MemoryStreamResponse(new MemoryStream(content, false)));
+		return Task.FromResult(Response<IStreamResponse>.Success(
+			new MemoryStreamResponse(new MemoryStream(content, false))));
 	}
 
 	public Task<string> UploadFileAsync(

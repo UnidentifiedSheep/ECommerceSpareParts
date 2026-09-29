@@ -53,7 +53,9 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 			state.FileName,
 			CancellationToken);
 
-		using var reader = new StreamReader(response.Stream);
+		var streamResponse = response.Value ??
+			throw new FileNotFoundException($"S3 object '{state.FileName}' was not found.");
+		using var reader = new StreamReader(streamResponse.Stream);
 		using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
 		var rowIdx = 0;

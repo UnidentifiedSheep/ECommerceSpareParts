@@ -33,7 +33,7 @@ public sealed class S3Service(
 		return keyName;
 	}
 
-	public async Task<IStreamResponse> DownloadFileAsync(
+	public async Task<Response<IStreamResponse>> DownloadFileAsync(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default)
@@ -43,8 +43,15 @@ public sealed class S3Service(
 			BucketName = bucketName, Key = keyName
 		};
 
-		var response = await internalClient.GetObjectAsync(request, ct);
-		return new S3StreamResponse(response);
+		try
+		{
+			var response = await internalClient.GetObjectAsync(request, ct);
+			return Response<IStreamResponse>.Success(new S3StreamResponse(response));
+		}
+		catch (AmazonS3Exception ex) when (ex is NoSuchKeyException || ex.ErrorCode == "NoSuchKey")
+		{
+			return Response<IStreamResponse>.Failure(HttpStatusCode.NotFound, "NoSuchKey");
+		}
 	}
 
 	public async Task<bool> DeleteFileAsync(string bucketName, string keyName)
