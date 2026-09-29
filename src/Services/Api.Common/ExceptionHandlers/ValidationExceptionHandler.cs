@@ -36,7 +36,7 @@ public class ValidationExceptionHandler(
 
 	private void AddValidationErrors(ProblemDetails problemDetails, ValidationException exception)
 	{
-		var errors = new List<ValidationErrorModel>();
+		var errors = new List<ValidationErrorResponse>();
 
 		foreach (var error in exception.Errors)
 		{
@@ -52,7 +52,7 @@ public class ValidationExceptionHandler(
 				!localizer.TryGet(localizableMessage, out var localizedMessage))
 			{
 				errors.Add(
-					new ValidationErrorModel(
+					new ValidationErrorResponse(
 						propertyName,
 						errorMessage,
 						attemptedValue));
@@ -60,7 +60,7 @@ public class ValidationExceptionHandler(
 			}
 
 			errors.Add(
-				new ValidationErrorModel(
+				new ValidationErrorResponse(
 					propertyName,
 					localizedMessage,
 					attemptedValue));
@@ -68,4 +68,9 @@ public class ValidationExceptionHandler(
 
 		problemDetails.Extensions["validationErrors"] = errors;
 	}
+
+	private sealed record ValidationErrorResponse(
+		string PropertyName,
+		string ErrorMessage,
+		object? AttemptedValue);
 }

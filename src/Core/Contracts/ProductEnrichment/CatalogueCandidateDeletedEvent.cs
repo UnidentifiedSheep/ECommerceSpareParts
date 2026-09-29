@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Abstractions.Interfaces.Events;
+using Contracts.Interfaces;
 
 namespace Contracts.ProductEnrichment;
 
