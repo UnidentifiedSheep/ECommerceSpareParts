@@ -1,4 +1,3 @@
-using Abstractions.Models.Validation;
 using FluentValidation;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
@@ -22,10 +21,6 @@ public sealed class ValidationErrorFilter(
 
 		foreach (var failure in exception.Errors)
 		{
-			var state = failure.CustomState as ValidationStateData;
-			if (!(state?.DisplayErrorToUser ?? true))
-				continue;
-
 			var message = failure.ErrorMessage;
 			if (failure.CustomState is ILocalizableMessage localizableMessage && Localizer.TryGet(
 					localizableMessage,

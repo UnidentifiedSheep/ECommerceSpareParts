@@ -1,5 +1,4 @@
-﻿using Abstractions.Models.Validation;
-using FluentValidation;
+﻿using FluentValidation;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Mvc;
@@ -40,10 +39,6 @@ public class ValidationExceptionHandler(
 
 		foreach (var error in exception.Errors)
 		{
-			var state = error.CustomState as ValidationStateData;
-			if (!(state?.DisplayErrorToUser ?? true))
-				continue;
-
 			var propertyName = error.PropertyName;
 			var errorMessage = error.ErrorMessage;
 			var attemptedValue = error.AttemptedValue;
