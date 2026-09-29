@@ -11,4 +11,7 @@ public record S3BucketsOptions
 
 	[Required]
 	public required BucketOptions Uploads { get; init; }
+
+	[Required]
+	public required BucketOptions Documents { get; init; }
 }

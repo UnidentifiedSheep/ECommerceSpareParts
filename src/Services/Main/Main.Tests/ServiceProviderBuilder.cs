@@ -81,6 +81,10 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 					Uploads = new BucketOptions
 					{
 						Name = "uploads", PublicBaseUrl = "https://images.example.com"
+					},
+					Documents = new BucketOptions
+					{
+						Name = "documents", PublicBaseUrl = "https://images.example.com"
 					}
 				}));
 
