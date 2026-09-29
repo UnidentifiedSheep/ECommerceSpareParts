@@ -5,6 +5,7 @@ using Attributes;
 using Enums;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Models.Options;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;

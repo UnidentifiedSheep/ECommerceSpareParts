@@ -1,4 +1,4 @@
-namespace Abstractions.Models.Options;
+namespace Main.Application.Models.Options;
 
 public class UserPhoneOptions
 {

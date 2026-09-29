@@ -6,6 +6,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Locan.Core.Interfaces;
 using Main.Application.Handlers.BaseValidators;
+using Main.Application.Models.Options;
 using Main.Entities;
 using Main.Entities.User;
 using Microsoft.Extensions.Options;

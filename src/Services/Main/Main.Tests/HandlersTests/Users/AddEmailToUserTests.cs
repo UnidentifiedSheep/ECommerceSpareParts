@@ -2,6 +2,7 @@ using Abstractions.Models.Options;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Users.AddEmailToUser;
+using Main.Application.Models.Options;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Enums;

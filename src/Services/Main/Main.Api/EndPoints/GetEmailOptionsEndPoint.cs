@@ -3,6 +3,7 @@ using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Handlers.Options.GetEmailOptions;
+using Main.Application.Models.Options;
 using MediatR;
 
 namespace Main.Api.EndPoints;
