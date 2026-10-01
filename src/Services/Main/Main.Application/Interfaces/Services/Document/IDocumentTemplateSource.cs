@@ -9,6 +9,6 @@ public interface IDocumentTemplateSource
 
 	Task<byte[]?> TryGetBytesAsync(
 		string templateName,
-		DocumentType documentType,
+		DocumentType templateType,
 		CancellationToken token = default);
 }

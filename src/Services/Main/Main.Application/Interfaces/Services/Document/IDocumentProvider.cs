@@ -4,7 +4,8 @@ namespace Main.Application.Interfaces.Services.Document;
 
 public interface IDocumentProvider
 {
-	DocumentType SupportedType { get; }
+	DocumentType OutputDocumentType { get; }
+	DocumentType InputTemplateType { get; }
 
 	IDocumentTemplate CreateDocument(byte[] bytes);
 }

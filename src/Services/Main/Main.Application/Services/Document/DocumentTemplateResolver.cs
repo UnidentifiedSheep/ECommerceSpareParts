@@ -9,22 +9,24 @@ public sealed class DocumentTemplateResolver(
 	IEnumerable<IDocumentTemplateSource> sources)
 	: IDocumentTemplateResolver
 {
-	private readonly FrozenDictionary<DocumentType, IDocumentProvider> _providers =
-		providers.ToFrozenDictionary(provider => provider.SupportedType);
+	private readonly FrozenDictionary<(DocumentType Output, DocumentType Input), IDocumentProvider>
+		_providers = providers.ToFrozenDictionary(provider => (provider.OutputDocumentType, provider.InputTemplateType));
 
 	private readonly IDocumentTemplateSource[] _sources = ValidateSources(sources);
 
 	public async Task<IDocumentTemplate?> TryResolveAsync(
 		string templateName,
 		DocumentType documentType,
+		DocumentType templateType,
 		CancellationToken token = default)
 	{
-		if (!_providers.TryGetValue(documentType, out var provider))
-			throw new NotSupportedException($"Document type '{documentType}' is not supported.");
+		if (!_providers.TryGetValue((documentType, templateType), out var provider))
+			throw new NotSupportedException(
+				$"Document type '{documentType}' with template type '{templateType}' is not supported.");
 
 		foreach (var source in _sources)
 		{
-			var bytes = await source.TryGetBytesAsync(templateName, documentType, token);
+			var bytes = await source.TryGetBytesAsync(templateName, templateType, token);
 			if (bytes is not null)
 				return provider.CreateDocument(bytes);
 		}

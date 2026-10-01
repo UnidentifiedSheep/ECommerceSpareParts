@@ -12,15 +12,15 @@ public sealed class CachedDocumentTemplateSource(
 
 	public async Task<byte[]?> TryGetBytesAsync(
 		string templateName,
-		DocumentType documentType,
+		DocumentType templateType,
 		CancellationToken token = default)
 	{
-		if (cache.TryGetTemplate(templateName, documentType, SourceType, out var bytes))
+		if (cache.TryGetTemplate(templateName, templateType, SourceType, out var bytes))
 			return bytes;
 
-		bytes = await source.TryGetBytesAsync(templateName, documentType, token);
+		bytes = await source.TryGetBytesAsync(templateName, templateType, token);
 		if (bytes is not null)
-			cache.TryAddTemplate(templateName, documentType, SourceType, bytes);
+			cache.TryAddTemplate(templateName, templateType, SourceType, bytes);
 		return bytes;
 	}
 }

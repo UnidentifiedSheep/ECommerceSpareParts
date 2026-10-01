@@ -10,7 +10,7 @@ public sealed class EmbeddedDocumentTemplateSource : IDocumentTemplateSource
 
 	public async Task<byte[]?> TryGetBytesAsync(
 		string templateName,
-		DocumentType documentType,
+		DocumentType templateType,
 		CancellationToken token = default)
 	{
 		var assembly = typeof(EmbeddedDocumentTemplateSource).Assembly;

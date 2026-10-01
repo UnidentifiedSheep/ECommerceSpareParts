@@ -3,5 +3,7 @@ namespace Main.Enums.Documents;
 public enum DocumentType
 {
 	Pdf,
-	Excel
+	Excel,
+	Html,
+	Docx
 }

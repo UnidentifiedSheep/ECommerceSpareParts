@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Document.Sales.SinglSale;
+namespace Main.Application.Document.Sales.SingleSale;
 
 public sealed record SingleSaleDocumentRequest : DocumentRequestBase
 {

@@ -17,7 +17,7 @@ public class S3DocumentTemplateSource(
 
 	public async Task<byte[]?> TryGetBytesAsync(
 		string templateName,
-		DocumentType documentType,
+		DocumentType templateType,
 		CancellationToken token = default)
 	{
 		var response = await GetResponseAsync(templateName, token);
