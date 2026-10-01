@@ -4,14 +4,14 @@ using Main.Enums.Documents;
 
 namespace Main.Application.Services.Document;
 
-public sealed class ExcelDocument : IDocument
+public sealed class ExcelDocumentTemplate : IDocumentTemplate
 {
 	public DocumentType Type => DocumentType.Excel;
 
 	private readonly XLTemplate _template;
 	private readonly Stream _templateStream;
 
-	internal ExcelDocument(Stream templateStream)
+	internal ExcelDocumentTemplate(Stream templateStream)
 	{
 		_templateStream = templateStream;
 		_template = new XLTemplate(templateStream);

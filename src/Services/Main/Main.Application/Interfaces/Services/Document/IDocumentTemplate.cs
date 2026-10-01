@@ -2,7 +2,7 @@ using Main.Enums.Documents;
 
 namespace Main.Application.Interfaces.Services.Document;
 
-public interface IDocument : IDisposable
+public interface IDocumentTemplate : IDisposable
 {
 	DocumentType Type { get; }
 
