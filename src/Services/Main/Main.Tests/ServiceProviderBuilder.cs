@@ -118,8 +118,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 					IssuerSigningKey = "main-tests-signing-key-at-least-32-characters"
 				}));
 
-		services.AddScoped<S3StorageServiceStub>();
-		services.AddScoped<IS3Service>(sp => sp.GetRequiredService<S3StorageServiceStub>());
+		services.AddSingleton<S3StorageServiceStub>();
+		services.AddSingleton<IS3Service>(sp => sp.GetRequiredService<S3StorageServiceStub>());
 		services.AddProjectJsonSerialization();
 
 		services

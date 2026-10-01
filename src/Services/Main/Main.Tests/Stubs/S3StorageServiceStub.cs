@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text;
 using S3.Core.Interfaces;
 using S3.Core.Models;
@@ -6,7 +7,7 @@ namespace Tests.Stubs;
 
 public sealed class S3StorageServiceStub : IS3Service
 {
-	private readonly Dictionary<(string Bucket, string Key), byte[]> _files = [];
+	private readonly ConcurrentDictionary<(string Bucket, string Key), byte[]> _files = new();
 
 	public Task<Response<IStreamResponse>> DownloadFileAsync(
 		string bucketName,

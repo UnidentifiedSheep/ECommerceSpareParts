@@ -26,6 +26,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <EmbeddedResource Include="Document/**/*.*" Exclude="Document/**/*.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchageRates\Integrations.ExchangeRate\Integrations.ExchangeRate.csproj" />

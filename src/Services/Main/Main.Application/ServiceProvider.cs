@@ -10,11 +10,15 @@ using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
+using Main.Application.Interfaces.Services.Document;
 using Main.Application.Interfaces.Services.Event;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.Lrts.ProducerImport;
 using Main.Application.Services;
 using Main.Application.Services.Currency;
+using Main.Application.Services.Document;
+using Main.Application.Services.Document.Providers;
+using Main.Application.Services.Document.Sources;
 using Main.Application.Services.Event;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
@@ -45,6 +49,16 @@ public static class ServiceProvider
 		collection.RegisterProjectionProviders<ProducerImportLrt>();
 
 		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
+
+		//order is important
+		collection.AddSingleton<IDocumentTemplateSource, S3DocumentTemplateSource>();
+		collection.AddSingleton<IDocumentTemplateSource, EmbeddedDocumentTemplateSource>();
+		collection.Decorate<IDocumentTemplateSource, CachedDocumentTemplateSource>();
+
+		collection.AddSingleton<IDocumentTemplateCache, DocumentTemplateCache>();
+		collection.AddSingleton<IDocumentProvider, ExcelDocumentProvider>();
+		collection.AddSingleton<IDocumentTemplateResolver, DocumentTemplateResolver>();
+
 		collection.AddScoped<IRecipientResolver>(provider => provider.GetRequiredService<IRecipientProvider>());
 
 		collection.RegisterSettingsService();

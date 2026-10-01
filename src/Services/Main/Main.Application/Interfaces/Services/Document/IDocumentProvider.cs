@@ -6,7 +6,5 @@ public interface IDocumentProvider
 {
 	DocumentType SupportedType { get; }
 
-	Task<IDocumentTemplate?> TryGetDocumentTemplate(
-		string templateName,
-		CancellationToken token = default);
+	IDocumentTemplate CreateDocument(byte[] bytes);
 }

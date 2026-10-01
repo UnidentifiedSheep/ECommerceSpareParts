@@ -1,27 +1,27 @@
 using System.Net;
 using Application.Common.Models.Options.S3;
 using Main.Application.Interfaces.Services.Document;
+using Main.Entities.Documents;
 using Main.Enums.Documents;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
 using S3.Core.Models;
 
-namespace Main.Application.Services.Document.Providers;
+namespace Main.Application.Services.Document.Sources;
 
-public abstract class S3DocumentProvider<TDocument>(
+public class S3DocumentTemplateSource(
 	IS3Service s3Storage,
-	IOptions<S3BucketsOptions> bucketsOptions
-	) : IDocumentProvider
-	where TDocument : IDocumentTemplate
+	IOptions<S3BucketsOptions> bucketsOptions) : IDocumentTemplateSource
 {
-	public abstract DocumentType SupportedType { get; }
+	public DocumentSourceType SourceType => DocumentSourceType.S3;
 
-	public virtual async Task<IDocumentTemplate?> TryGetDocumentTemplate(
+	public async Task<byte[]?> TryGetBytesAsync(
 		string templateName,
+		DocumentType documentType,
 		CancellationToken token = default)
 	{
-		var bytes = await GetTemplateBytesAsync(templateName, token);
-		return bytes is null ? null : CreateDocument(bytes);
+		var response = await GetResponseAsync(templateName, token);
+		return await ReadTemplateBytesAsync(response, templateName, token);
 	}
 
 	protected virtual Task<Response<IStreamResponse>> GetResponseAsync(
@@ -31,14 +31,6 @@ public abstract class S3DocumentProvider<TDocument>(
 			bucketsOptions.Value.Documents.Name,
 			templateName,
 			token);
-
-	protected async Task<byte[]?> GetTemplateBytesAsync(
-		string templateName,
-		CancellationToken token)
-	{
-		var response = await GetResponseAsync(templateName, token);
-		return await ReadTemplateBytesAsync(response, templateName, token);
-	}
 
 	protected virtual async Task<byte[]?> ReadTemplateBytesAsync(
 		Response<IStreamResponse> response,
@@ -62,20 +54,4 @@ public abstract class S3DocumentProvider<TDocument>(
 				$"{response.StatusCode} ({response.ErrorCode}).");
 		}
 	}
-
-	protected TDocument CreateDocument(byte[] bytes)
-	{
-		var stream = new MemoryStream(bytes, writable: false);
-		try
-		{
-			return GenDocument(stream);
-		}
-		catch
-		{
-			stream.Dispose();
-			throw;
-		}
-	}
-
-	protected abstract TDocument GenDocument(MemoryStream stream);
 }
