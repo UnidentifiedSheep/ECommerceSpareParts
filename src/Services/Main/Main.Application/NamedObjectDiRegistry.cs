@@ -1,5 +1,6 @@
 ﻿using Application.Common.Handlers.NamedObjects;
 using Application.Common.NamedObject;
+using Main.Application.Interfaces.Services.Document;
 using Main.Application.NamedObjects;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using MediatR;
@@ -21,6 +22,7 @@ public static class NamedObjectDiRegistry
 
 		return services
 			.RegisterNamedObject<StorageContentExtractPolicyBase>(objectsLifetime: ServiceLifetime.Singleton)
+			.RegisterNamedObject<IDocumentDefinition>(objectsLifetime: ServiceLifetime.Scoped)
 			.RegisterNamedObject<SettingDefinitionNamedObjectBase>(
 				typeof(StorageContentExtractPolicyBase).Assembly);
 	}

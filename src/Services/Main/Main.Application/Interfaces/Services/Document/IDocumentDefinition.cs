@@ -1,34 +1,23 @@
+using Main.Application.Document;
 using NamedObject.Core.Interfaces;
 
 namespace Main.Application.Interfaces.Services.Document;
 
-public interface IDocumentDefinition<in TRequest> : IDocumentDefinition
+public interface IDocumentDefinition<in TRequest, TResponse> : IDocumentDefinition
 	where TRequest : IDocumentRequest
+    where TResponse : IDocumentResponse
 {
-	Task GenerateAsync(
+	Task<TResponse> GenerateAsync(
 		TRequest request,
 		Stream destination,
 		CancellationToken token = default);
-
-	Task IDocumentDefinition.GenerateAsync(
-		IDocumentRequest data,
-		Stream destination,
-		CancellationToken token)
-	{
-		ArgumentNullException.ThrowIfNull(data);
-
-		if (data is not TRequest request)
-			throw new ArgumentException(
-				$"Expected '{typeof(TRequest).FullName}', " +
-				$"got '{data.GetType().FullName}'.");
-
-		return GenerateAsync(request, destination, token);
-	}
 }
 
 public interface IDocumentDefinition : INamedObject
 {
-	Task GenerateAsync(
+	Type SchemaType { get; }
+
+	Task<IDocumentResponse> GenerateAsync(
 		IDocumentRequest data,
 		Stream destination,
 		CancellationToken token = default);

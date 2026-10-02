@@ -3,10 +3,14 @@ using Main.Enums.Documents;
 
 namespace Main.Application.Document;
 
-public abstract class DocumentDefinitionBase<TRequest>(IDocumentTemplateResolver templateResolver) :
-	IDocumentDefinition<TRequest> where TRequest : IDocumentRequest
+public abstract class DocumentDefinitionBase<TRequest, TResponse>(
+	IDocumentTemplateResolver templateResolver
+	) : IDocumentDefinition<TRequest, TResponse>
+	where TRequest : IDocumentRequest
+	where TResponse : IDocumentResponse
 {
 	public abstract string SystemName { get; }
+	public abstract Type SchemaType { get; }
 
 	protected abstract string BaseTemplateKey { get; }
 	protected abstract DocumentTypePair[] SupportedTypePairs { get; }
@@ -34,10 +38,25 @@ public abstract class DocumentDefinitionBase<TRequest>(IDocumentTemplateResolver
 	private string GetFullTemplateKey(DocumentType templateType)
 		=> BaseTemplateKey + templateType.GetFileExtension();
 
-	public abstract Task GenerateAsync(
+	public abstract Task<TResponse> GenerateAsync(
 		TRequest request,
 		Stream destination,
 		CancellationToken token = default);
+
+	public async Task<IDocumentResponse> GenerateAsync(
+		IDocumentRequest data,
+		Stream destination,
+		CancellationToken token)
+	{
+		ArgumentNullException.ThrowIfNull(data);
+
+		if (data is not TRequest request)
+			throw new ArgumentException(
+				$"Expected '{typeof(TRequest).FullName}', " +
+				$"got '{data.GetType().FullName}'.");
+
+		return await GenerateAsync(request, destination, token);
+	}
 
 	protected readonly record struct DocumentTypePair(
 		DocumentType OutputDocumentType,
