@@ -10,4 +10,13 @@ public static class DocumentTypeExtensions
 		DocumentType.Docx => ".docx",
 		_ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
 	};
+
+	public static string GetContentType(this DocumentType type) => type switch
+	{
+		DocumentType.Pdf => "application/pdf",
+		DocumentType.Excel => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		DocumentType.Html => "text/html",
+		DocumentType.Docx => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		_ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+	};
 }

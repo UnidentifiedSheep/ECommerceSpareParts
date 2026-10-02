@@ -9,16 +9,15 @@ public interface IDocumentDefinition<in TRequest, TResponse> : IDocumentDefiniti
 {
 	Task<TResponse> GenerateAsync(
 		TRequest request,
-		Stream destination,
 		CancellationToken token = default);
 }
 
 public interface IDocumentDefinition : INamedObject
 {
+	string DocumentGroup { get; }
 	Type SchemaType { get; }
 
 	Task<IDocumentResponse> GenerateAsync(
 		IDocumentRequest data,
-		Stream destination,
 		CancellationToken token = default);
 }
