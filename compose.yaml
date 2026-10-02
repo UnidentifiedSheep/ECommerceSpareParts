@@ -315,6 +315,7 @@
       mc mb -p local/images;
       mc anonymous set public local/images;
       mc mb -p local/uploads;
+      mc mb -p local/documents;
       mc admin user add local ${MINIO_SERVICE_USER} ${MINIO_SERVICE_PASSWORD};
       mc admin policy attach local readwrite --user ${MINIO_SERVICE_USER};
       exit 0;
