@@ -107,6 +107,8 @@ public static class ServiceProvider
 
 		services.AddScoped<IRequestHandler<GetJobQuery, GetJobResult>, GetJobHandler>();
 
+		services.AddScoped<IRequestHandler<CreateJobCommand, CreateJobResult>, CreateJobHandler>();
+
 		services.AddScoped<IRequestHandler<GetJobStateQuery, GetJobStateResult>, GetJobStateHandler>();
 
 		services.AddScoped<IRequestHandler<GetScheduleQuery, GetScheduleResult>, GetScheduleHandler>();
