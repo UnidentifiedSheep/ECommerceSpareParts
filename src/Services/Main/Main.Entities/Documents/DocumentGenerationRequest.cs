@@ -14,7 +14,6 @@ public sealed class DocumentGenerationRequest
 	public Guid JobId { get; private set; }
 	public string DocumentSystemName { get; private set; } = null!;
 	public DocumentType DocumentType { get; private set; }
-	public string RequestJson { get; private set; } = null!;
 	public Guid? RequesterId { get; private set; }
 	public DateTime CreatedAtUtc { get; private set; }
 	public string? BucketName { get; private set; }
@@ -32,7 +31,6 @@ public sealed class DocumentGenerationRequest
 		Guid jobId,
 		string documentSystemName,
 		DocumentType documentType,
-		string requestJson,
 		Guid? requesterId)
 	{
 		RequestId = Guid.NewGuid();
@@ -47,12 +45,6 @@ public sealed class DocumentGenerationRequest
 		DocumentType = documentType.Ensure(
 			Enum.IsDefined,
 			() => new InvalidOperationException("Document type is not supported."));
-		RequestJson = requestJson
-			.EnsureNotNullOrWhiteSpace(() =>
-				new InvalidOperationException("Document request is required."))
-			.EnsureValidJson(() =>
-				new InvalidOperationException("Document request must be valid JSON."));
-
 
 		RequesterId = requesterId?.EnsureNotEqual(
 			Guid.Empty,
@@ -64,9 +56,8 @@ public sealed class DocumentGenerationRequest
 		Guid jobId,
 		string documentSystemName,
 		DocumentType documentType,
-		string requestJson,
 		Guid? requesterId = null)
-		=> new(jobId, documentSystemName, documentType, requestJson, requesterId);
+		=> new(jobId, documentSystemName, documentType, requesterId);
 
 	public void Complete(
 		string bucketName,

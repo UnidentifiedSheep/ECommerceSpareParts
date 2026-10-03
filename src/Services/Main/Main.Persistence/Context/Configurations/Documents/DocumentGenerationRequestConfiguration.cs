@@ -25,10 +25,7 @@ public sealed class DocumentGenerationRequestConfiguration
 			.HasColumnName("document_type")
 			.HasConversion<string>()
 			.HasMaxLength(32);
-		builder.Property(request => request.RequestJson)
-			.HasColumnName("request_json")
-			.HasColumnType("jsonb")
-			.IsRequired();
+
 		builder.Property(request => request.RequesterId).HasColumnName("requester_id");
 		builder.Property(request => request.CreatedAtUtc).HasColumnName("created_at_utc");
 		builder.Property(request => request.BucketName)
