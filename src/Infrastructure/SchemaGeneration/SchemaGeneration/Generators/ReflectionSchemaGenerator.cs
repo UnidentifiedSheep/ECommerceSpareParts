@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using SchemaGeneration.Abstractions;
 using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 using SchemaGeneration.Abstractions.Exceptions;
 using SchemaGeneration.Abstractions.Models;
 using SchemaGeneration.Extensions;
@@ -24,40 +25,50 @@ public sealed class ReflectionSchemaGenerator : ISchemaGenerator
 	public ObjectSchema Generate(Type type)
 	{
 		ArgumentNullException.ThrowIfNull(type);
-		return Cache.GetOrAdd(type, BuildSchema);
+		return Cache.GetOrAdd(type, static rootType => BuildSchema(rootType, []));
 	}
 
-	private static ObjectSchema BuildSchema(Type type)
+	private static ObjectSchema BuildSchema(Type type, HashSet<Type> ancestors)
 	{
-		var typeInfo = SerializerOptions.GetTypeInfo(type);
-		if (typeInfo.Kind != JsonTypeInfoKind.Object)
-			throw new SchemaGenerationException(type, "The root schema type must be a JSON object.");
-
-		var fields = typeInfo
-			.Properties
-			.Where(property =>
-				property.GetAttribute<JsonIgnoreAttribute>()?.Condition is not JsonIgnoreCondition.Always)
-			.Select(BuildFieldSchema)
-			.ToArray();
-
-		return new ObjectSchema
+		ancestors.Add(type);
+		try
 		{
-			Fields = fields, CsvSchema = CsvSchemaGenerator.Generate(type)
-		};
+			var typeInfo = SerializerOptions.GetTypeInfo(type);
+			if (typeInfo.Kind != JsonTypeInfoKind.Object)
+				throw new SchemaGenerationException(type, "The root schema type must be a JSON object.");
+
+			var fields = typeInfo
+				.Properties
+				.Where(property =>
+					property.GetAttribute<JsonIgnoreAttribute>()?.Condition is not JsonIgnoreCondition.Always)
+				.Select(property => BuildFieldSchema(property, ancestors))
+				.ToArray();
+
+			return new ObjectSchema
+			{
+				Fields = fields,
+				CsvSchema = CsvSchemaGenerator.Generate(type)
+			};
+		}
+		finally
+		{
+			ancestors.Remove(type);
+		}
 	}
 
-	private static FieldSchema BuildFieldSchema(JsonPropertyInfo property)
+	private static FieldSchema BuildFieldSchema(JsonPropertyInfo property, HashSet<Type> ancestors)
 	{
 		var inputControl = property.GetAttribute<SchemaInputControlAttribute>();
 		var dependency = property.GetAttribute<SchemaDependsOnEntityAttribute>();
+		var type = SchemaTypeMapper.GetValueType(property.PropertyType);
 
 		return new FieldSchema
 		{
 			Name = property.Name,
-			Type = SchemaTypeMapper.GetValueType(property.PropertyType),
+			Type = type,
 			LabelKey = property.GetAttribute<SchemaFieldLabelAttribute>()?.Key,
 			DescriptionKey = property.GetAttribute<SchemaFieldDescriptionAttribute>()?.Key,
-			Required = property.GetAttribute<RequiredSchemaFieldAttribute>() is not null,
+			Required = property.IsRequired || property.GetAttribute<RequiredSchemaFieldAttribute>() is not null,
 			Control = inputControl?.InputControl,
 			Accepts = property.GetAttribute<SchemaAcceptsAttribute>()?.Accepts ?? [],
 			Dependency = dependency is null
@@ -65,7 +76,40 @@ public sealed class ReflectionSchemaGenerator : ISchemaGenerator
 				: new SchemaDependency
 				{
 					EntityName = dependency.EntityName, FieldName = dependency.FieldName
-				}
+				},
+			NestedSchema = GetNestedSchema(property.PropertyType, type, ancestors)
 		};
+	}
+
+	private static ObjectSchema? GetNestedSchema(
+		Type propertyType,
+		SchemaValueType valueType,
+		HashSet<Type> ancestors)
+	{
+		var nestedType = valueType switch
+		{
+			SchemaValueType.Object => propertyType,
+			SchemaValueType.Array => GetArrayElementType(propertyType),
+			_ => null
+		};
+
+		if (nestedType is null ||
+		    SchemaTypeMapper.GetValueType(nestedType) != SchemaValueType.Object ||
+		    ancestors.Contains(nestedType) ||
+		    SerializerOptions.GetTypeInfo(nestedType).Kind != JsonTypeInfoKind.Object)
+			return null;
+
+		return BuildSchema(nestedType, ancestors);
+	}
+
+	private static Type? GetArrayElementType(Type type)
+	{
+		if (type.IsArray) return type.GetElementType();
+
+		return type.GetInterfaces()
+			.Append(type)
+			.FirstOrDefault(candidate => candidate.IsGenericType &&
+			                             candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+			?.GetGenericArguments()[0];
 	}
 }

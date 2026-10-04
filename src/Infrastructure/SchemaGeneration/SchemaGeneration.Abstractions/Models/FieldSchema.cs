@@ -23,4 +23,6 @@ public sealed record FieldSchema
 	public IReadOnlyList<string> Accepts { get; init; } = [];
 
 	public SchemaDependency? Dependency { get; init; }
+
+	public ObjectSchema? NestedSchema { get; init; }
 }
