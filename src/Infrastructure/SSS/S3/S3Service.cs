@@ -102,15 +102,32 @@ public sealed class S3Service(
 		string objectKey,
 		string contentType,
 		TimeSpan lifetime)
+		=> CreatePresignedUrl(bucketName, objectKey, HttpVerb.PUT, lifetime, contentType);
+
+	public Task<string> CreatePresignedDownloadUrl(
+		string bucketName,
+		string objectKey,
+		TimeSpan lifetime)
+		=> CreatePresignedUrl(bucketName, objectKey, HttpVerb.GET, lifetime);
+
+	private Task<string> CreatePresignedUrl(
+		string bucketName,
+		string objectKey,
+		HttpVerb verb,
+		TimeSpan lifetime,
+		string? contentType = null)
 	{
+		ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(lifetime,TimeSpan.Zero);
+
 		var request = new GetPreSignedUrlRequest
 		{
 			BucketName = bucketName,
 			Key = objectKey,
-			Verb = HttpVerb.PUT,
-			Expires = DateTime.UtcNow.Add(lifetime),
-			ContentType = contentType
+			Verb = verb,
+			Expires = DateTime.UtcNow.Add(lifetime)
 		};
+
+		if (contentType is not null) request.ContentType = contentType;
 
 		return externalClient.GetPreSignedURLAsync(request);
 	}

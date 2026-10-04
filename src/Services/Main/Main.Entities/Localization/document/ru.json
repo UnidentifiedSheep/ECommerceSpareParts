@@ -1,0 +1,9 @@
+{
+  "culture": "ru",
+  "messages": {
+    "document.generation.request.not.found": "Запрос на генерацию документа не найден.",
+    "document.not.ready": "Документ ещё генерируется.",
+    "document.generation.failed": "Не удалось сгенерировать документ.",
+    "document.generation.cancelled": "Генерация документа отменена."
+  }
+}

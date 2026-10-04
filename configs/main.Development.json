@@ -13,6 +13,11 @@
     "MaxPhoneCount": 5,
     "MinPhoneCount": 0
   },
+  "AppLinks": {
+    "PasswordReset": "reset?token={token}",
+    "EmailVerification": "verify-email?token={token}",
+    "Document": "documents/{requestId}"
+  },
   "System": {
     "SystemId": "f1b99096-d889-4c69-ad63-43ab7f877edf"
   },

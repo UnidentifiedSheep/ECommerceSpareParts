@@ -29,6 +29,11 @@ public interface IS3Service
 		string contentType,
 		TimeSpan lifetime);
 
+	Task<string> CreatePresignedDownloadUrl(
+		string bucketName,
+		string objectKey,
+		TimeSpan lifetime);
+
 	Task CompletePresignedUploadUrl(
 		string bucketName,
 		string objectKey,

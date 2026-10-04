@@ -5,9 +5,6 @@ namespace Main.Application.Lrts.GenerateDocument;
 
 public record GenerateDocumentState
 {
-	[JsonPropertyName("generatedFileLink")]
-	public string? GeneratedFileLink { get; init; }
-
 	[JsonPropertyName("bucketName")]
 	public string? BucketName { get; init; }
 

@@ -15,6 +15,7 @@ using Main.Application.Interfaces.Services.Event;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.JobProviders;
 using Main.Application.Lrts.ProducerImport;
+using Main.Application.Models.Options;
 using Main.Application.Services;
 using Main.Application.Services.Currency;
 using Main.Application.Services.Document;
@@ -38,6 +39,12 @@ public static class ServiceProvider
 		this IServiceCollection collection,
 		IConfiguration? configuration)
 	{
+		var appLinksOptions = collection.AddOptions<AppLinksOptions>()
+			.Validate(options => options.IsValid(), "App link templates must be relative and contain their required placeholders.")
+			.ValidateOnStart();
+		if (configuration is not null)
+			appLinksOptions.Bind(configuration.GetSection(AppLinksOptions.SectionName));
+
 		collection
 			.AddNamedObjects()
 			.AddLrtLayer(typeof(ProducerImportLrt).Assembly)
@@ -51,6 +58,7 @@ public static class ServiceProvider
 		collection.RegisterProjectionProviders<ProducerImportLrt>();
 
 		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
+		collection.AddScoped<IAppLinkProvider, AppLinkProvider>();
 
 		//order is important
 		collection.AddSingleton<IDocumentTemplateSource, S3DocumentTemplateSource>();

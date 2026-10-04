@@ -6,6 +6,7 @@ using Domain.CommonEntities.Job;
 using Extensions;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
+using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Document;
 using Main.Application.Notifications;
 using Main.Entities;
@@ -25,6 +26,7 @@ public class GenerateDocumentLrt(
 	IApplicationTransactionService transactionService,
 	INamedObjectRegistry<IDocumentDefinition> registry,
 	INotificationService notificationService,
+	IAppLinkProvider appLinkProvider,
 	IContextualLocalizer localizer,
 	ILogger<GenerateDocumentLrt> logger) : LrtBase<GenerateDocumentInputState, GenerateDocumentState>(
 	jobRepository,
@@ -67,7 +69,6 @@ public class GenerateDocumentLrt(
 	{
 		if (State is
 		    {
-			    GeneratedFileLink: not null,
 			    BucketName: not null,
 			    StorageKey: not null,
 			    GeneratedAtUtc: not null
@@ -86,14 +87,12 @@ public class GenerateDocumentLrt(
 
 		var result = await definition.GenerateAsync(request, CancellationToken);
 
-		if (string.IsNullOrWhiteSpace(result.GeneratedFileLink) ||
-		    string.IsNullOrWhiteSpace(result.BucketName) ||
+		if (string.IsNullOrWhiteSpace(result.BucketName) ||
 		    string.IsNullOrWhiteSpace(result.StorageKey))
 			throw new InvalidOperationException("Generated document response is missing storage details.");
 
 		await SaveStateAsync(new GenerateDocumentState
 		{
-			GeneratedFileLink = result.GeneratedFileLink,
 			BucketName = result.BucketName,
 			StorageKey = result.StorageKey,
 			GeneratedAtUtc = DateTime.UtcNow
@@ -102,13 +101,10 @@ public class GenerateDocumentLrt(
 
 	private async Task CompleteRequestAsync(IDocumentDefinition definition)
 	{
-		var generatedFileLink = State.GeneratedFileLink;
 		var bucketName = State.BucketName;
 		var storageKey = State.StorageKey;
 		var generatedAtUtc = State.GeneratedAtUtc;
 
-		if (string.IsNullOrWhiteSpace(generatedFileLink))
-			throw new InvalidOperationException("Generated document link is missing.");
 		if (string.IsNullOrWhiteSpace(bucketName) ||
 		    string.IsNullOrWhiteSpace(storageKey) ||
 		    generatedAtUtc is not { Kind: DateTimeKind.Utc })
@@ -133,7 +129,7 @@ public class GenerateDocumentLrt(
 						storageKey,
 						generatedAtUtc.Value,
 						generatedAtUtc.Value.Add(DocumentLifetime));
-					await QueueNotificationAsync(request, definition, generatedFileLink, ct);
+					await QueueNotificationAsync(request, definition, ct);
 				}
 
 				await SaveStateAsync(State with { NotificationProcessed = true });
@@ -144,10 +140,12 @@ public class GenerateDocumentLrt(
 	private async Task QueueNotificationAsync(
 		DocumentGenerationRequest request,
 		IDocumentDefinition definition,
-		string generatedFileLink,
 		CancellationToken token)
 	{
 		if (request.RequesterId == null) return;
+
+		var documentUrl = await appLinkProvider
+			.CreateDocumentUrlAsync(request.RequestId, token);
 
 		await notificationService.QueueAsync(
 			request.RequesterId.Value,
@@ -157,7 +155,7 @@ public class GenerateDocumentLrt(
 					definition.Name,
 					definition.Description,
 					request.RequestId,
-					generatedFileLink)),
+					documentUrl.AbsoluteUri)),
 			[new InAppRecipient(request.RequesterId.Value)],
 			token);
 	}

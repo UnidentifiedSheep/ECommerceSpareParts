@@ -21,7 +21,7 @@ public sealed record DocumentGeneratedNotificationData : INotificationModel, INo
 	public required Guid RequestId { get; init; }
 	public required string DocumentName { get; init; }
 	public required string DocumentDescription { get; init; }
-	public required string GeneratedFileLink { get; init; }
+	public required string DocumentUrl { get; init; }
 	public required string Title { get; init; }
 	public required string AsText { get; init; }
 
@@ -33,14 +33,14 @@ public sealed record DocumentGeneratedNotificationData : INotificationModel, INo
 		ILocalizableMessage documentName,
 		ILocalizableMessage documentDescription,
 		Guid requestId,
-		string generatedFileLink)
+		string documentUrl)
 	{
 		RequestId = requestId;
 		DocumentName = localizer.Get(documentName);
 		DocumentDescription = localizer.Get(documentDescription);
-		GeneratedFileLink = generatedFileLink;
+		DocumentUrl = documentUrl;
 		Title = localizer.Get(NotificationsDocumentGeneratedTitleMessage.Instance);
 		AsText = localizer.Get(
-			NotificationsDocumentGeneratedTextMessage.Create(DocumentName, generatedFileLink));
+			NotificationsDocumentGeneratedTextMessage.Create(DocumentName, documentUrl));
 	}
 }

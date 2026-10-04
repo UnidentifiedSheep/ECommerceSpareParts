@@ -1,15 +1,12 @@
 ﻿using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Settings;
 using Attributes;
-using Exceptions;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Notifications;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
-using Main.Entities;
-using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Enums.Auth;
 using MediatR;
@@ -27,8 +24,8 @@ public class SendEmailRecoveryHandler(
 	IUserRepository userRepository,
 	INotificationService notificationService,
 	IContextualLocalizer localizer,
-	ISettingsService settingsService,
-	IResetPayloadProvider payloadProvider) : ICommandHandler<SendEmailRecoveryCommand>
+	IResetPayloadProvider payloadProvider,
+	IAppLinkProvider appLinkProvider) : ICommandHandler<SendEmailRecoveryCommand>
 {
 	public async Task<Unit> Handle(SendEmailRecoveryCommand request, CancellationToken cancellationToken)
 	{
@@ -40,20 +37,13 @@ public class SendEmailRecoveryHandler(
 		if (user == null)
 			return Unit.Value;
 
-		var setting = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
-		var appServiceUrl = setting.AppServiceUrl ??
-			throw new InvalidInputException(
-				GlobalApplicationSettingAppServiceUrlNotConfiguredMessage.Instance);
-
 		var signed = jsonSigner.Sign(await payloadProvider.GetPayload(user.Id, ResetType.PasswordReset));
-
-		var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
-		var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
+		var resetUrl = await appLinkProvider.CreatePasswordResetUrlAsync(signed, cancellationToken);
 
 		await notificationService.QueueAsync(
 			user.Id,
 			new PasswordResetNotification(
-				new PasswordResetNotificationData(localizer, resetUrl.ToString())),
+				new PasswordResetNotificationData(localizer, resetUrl.AbsoluteUri)),
 			[new EmailRecipient(request.Email)],
 			cancellationToken);
 

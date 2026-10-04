@@ -5,9 +5,6 @@ namespace Main.Application.Document;
 
 public record DocumentResponse : IDocumentResponse
 {
-	[JsonPropertyName("generatedFileLink")]
-	public required string GeneratedFileLink { get; init; }
-
 	[JsonPropertyName("bucketName")]
 	public required string BucketName { get; init; }
 

@@ -95,7 +95,6 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 
 		return new DocumentResponse
 		{
-			GeneratedFileLink = $"{bucket.PublicBaseUrl.TrimEnd('/')}/{uploadedKey}",
 			BucketName = bucket.Name,
 			StorageKey = uploadedKey
 		};

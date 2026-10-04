@@ -43,6 +43,11 @@ public sealed class S3StorageServiceStub : IS3Service
 		string contentType,
 		TimeSpan lifetime) => throw new NotSupportedException();
 
+	public Task<string> CreatePresignedDownloadUrl(
+		string bucketName,
+		string objectKey,
+		TimeSpan lifetime) => throw new NotSupportedException();
+
 	public Task CompletePresignedUploadUrl(
 		string bucketName,
 		string objectKey,

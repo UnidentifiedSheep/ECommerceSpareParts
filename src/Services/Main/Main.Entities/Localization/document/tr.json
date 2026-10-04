@@ -1,0 +1,9 @@
+{
+  "culture": "tr",
+  "messages": {
+    "document.generation.request.not.found": "Belge oluşturma isteği bulunamadı.",
+    "document.not.ready": "Belge hâlâ oluşturuluyor.",
+    "document.generation.failed": "Belge oluşturulamadı.",
+    "document.generation.cancelled": "Belge oluşturma iptal edildi."
+  }
+}
