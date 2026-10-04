@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.LRT;
@@ -60,14 +59,7 @@ public sealed record LrtExecutionResult(Job Job)
 {
 	public TState GetState<TState>() where TState : class
 	{
-		using var document = JsonDocument.Parse(Job.State);
-		var root = document.RootElement;
-		var state = root.ValueKind == JsonValueKind.Object &&
-		            root.TryGetProperty("$lrtVersion", out _)
-			? root.GetProperty("state")
-			: root;
-
-		return state.Deserialize<TState>() ??
+		return LrtStateSerializer.DeserializeState<TState>(Job.State) ??
 			throw new InvalidOperationException(
 				$"LRT state could not be deserialized as '{typeof(TState).Name}'.");
 	}
