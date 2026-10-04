@@ -13,6 +13,7 @@ using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Interfaces.Services.Document;
 using Main.Application.Interfaces.Services.Event;
 using Main.Application.Interfaces.Services.PayloadProvider;
+using Main.Application.JobProviders;
 using Main.Application.Lrts.ProducerImport;
 using Main.Application.Services;
 using Main.Application.Services.Currency;
@@ -40,6 +41,7 @@ public static class ServiceProvider
 		collection
 			.AddNamedObjects()
 			.AddLrtLayer(typeof(ProducerImportLrt).Assembly)
+			.RegisterJobProviders<GenerateDocumentJobProvider>()
 			.AddFusionCache()
 			.WithRegisteredDistributedCache()
 			.WithRegisteredBackplane()

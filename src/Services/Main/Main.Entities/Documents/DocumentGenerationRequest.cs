@@ -3,7 +3,6 @@ using Domain;
 using Domain.CommonEntities.Job;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Enums.Documents;
 
 namespace Main.Entities.Documents;
 
@@ -13,7 +12,6 @@ public sealed class DocumentGenerationRequest
 	public Guid RequestId { get; private set; }
 	public Guid JobId { get; private set; }
 	public string DocumentSystemName { get; private set; } = null!;
-	public DocumentType DocumentType { get; private set; }
 	public Guid? RequesterId { get; private set; }
 	public DateTime CreatedAtUtc { get; private set; }
 	public string? BucketName { get; private set; }
@@ -30,7 +28,6 @@ public sealed class DocumentGenerationRequest
 	private DocumentGenerationRequest(
 		Guid jobId,
 		string documentSystemName,
-		DocumentType documentType,
 		Guid? requesterId)
 	{
 		RequestId = Guid.NewGuid();
@@ -42,9 +39,6 @@ public sealed class DocumentGenerationRequest
 				new InvalidOperationException("Document system name is required."))
 			.EnsureMaxLength(128, () =>
 				new InvalidOperationException("Document system name is too long."));
-		DocumentType = documentType.Ensure(
-			Enum.IsDefined,
-			() => new InvalidOperationException("Document type is not supported."));
 
 		RequesterId = requesterId?.EnsureNotEqual(
 			Guid.Empty,
@@ -55,9 +49,8 @@ public sealed class DocumentGenerationRequest
 	public static DocumentGenerationRequest Create(
 		Guid jobId,
 		string documentSystemName,
-		DocumentType documentType,
 		Guid? requesterId = null)
-		=> new(jobId, documentSystemName, documentType, requesterId);
+		=> new(jobId, documentSystemName, requesterId);
 
 	public void Complete(
 		string bucketName,

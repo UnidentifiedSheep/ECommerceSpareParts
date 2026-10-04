@@ -29,7 +29,11 @@
     "lrt.catalogue.enrichment.description": "Tedarikçi ürünlerinden adaylar oluşturur ve ardından bunları katalog ürünleriyle eşleştirir.",
     "lrt.document.generation.name": "Belge oluşturma",
     "lrt.document.generation.description": "İstenen şablon ve verilerden bir belge oluşturur.",
+    "lrt.document.generation.system.name.required": "Belge türü gereklidir.",
+    "lrt.document.generation.system.name.too.long": "Belge türü adı çok uzun.",
     "lrt.document.generation.unknown.system.name": "İstenen belge türü kullanılamıyor.",
+    "lrt.document.generation.request.required": "Belge oluşturma isteği gereklidir.",
+    "lrt.document.generation.invalid.requester.id": "İstek sahibi kimliği boş olamaz.",
     "lrt.document.generation.invalid.request": "Belge oluşturma isteği okunamadı."
   }
 }

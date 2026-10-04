@@ -21,10 +21,6 @@ public sealed class DocumentGenerationRequestConfiguration
 			.HasColumnName("document_system_name")
 			.HasMaxLength(128)
 			.IsRequired();
-		builder.Property(request => request.DocumentType)
-			.HasColumnName("document_type")
-			.HasConversion<string>()
-			.HasMaxLength(32);
 
 		builder.Property(request => request.RequesterId).HasColumnName("requester_id");
 		builder.Property(request => request.CreatedAtUtc).HasColumnName("created_at_utc");

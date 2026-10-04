@@ -34,8 +34,8 @@ public class GenerateDocumentLrt(
 	logger)
 {
 	private static readonly TimeSpan DocumentLifetime = TimeSpan.FromDays(30);
-
-	public override string SystemName => nameof(GenerateDocumentLrt);
+	public static string Name => nameof(GenerateDocumentLrt);
+	public override string SystemName => Name;
 
 	public override ILocalizableMessage NameLocalizationMessage =>
 		LrtDocumentGenerationNameMessage.Instance;

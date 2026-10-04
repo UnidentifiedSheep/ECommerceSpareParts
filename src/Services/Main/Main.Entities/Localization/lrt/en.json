@@ -29,7 +29,11 @@
     "lrt.catalogue.enrichment.description": "Builds candidates from supplier products and then maps them to catalogue products.",
     "lrt.document.generation.name": "Document generation",
     "lrt.document.generation.description": "Generates a document from the requested template and data.",
+    "lrt.document.generation.system.name.required": "Document type is required.",
+    "lrt.document.generation.system.name.too.long": "Document type name is too long.",
     "lrt.document.generation.unknown.system.name": "The requested document type is unavailable.",
+    "lrt.document.generation.request.required": "Document request is required.",
+    "lrt.document.generation.invalid.requester.id": "Requester ID cannot be empty.",
     "lrt.document.generation.invalid.request": "The document request could not be read."
   }
 }

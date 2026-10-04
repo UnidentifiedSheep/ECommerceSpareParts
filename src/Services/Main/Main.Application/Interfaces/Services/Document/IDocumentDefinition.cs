@@ -1,4 +1,5 @@
 using Locan.Core.Interfaces;
+using Main.Enums.Documents;
 using NamedObject.Core.Interfaces;
 
 namespace Main.Application.Interfaces.Services.Document;
@@ -17,6 +18,7 @@ public interface IDocumentDefinition : INamedObject
 	string DocumentGroup { get; }
 	Type SchemaType { get; }
 	Type RequestType { get; }
+	bool SupportsDocumentType(DocumentType documentType);
 
 	ILocalizableMessage Name { get; }
 	ILocalizableMessage Description { get; }

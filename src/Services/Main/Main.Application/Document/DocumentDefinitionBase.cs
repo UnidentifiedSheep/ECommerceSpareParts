@@ -35,6 +35,9 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 
 	protected abstract DocumentTypePair[] SupportedTypePairs { get; }
 
+	public bool SupportsDocumentType(DocumentType documentType) =>
+		SupportedTypePairs.Any(pair => pair.OutputDocumentType == documentType);
+
 	protected virtual DocumentType GetTemplateType(TRequest request)
 	{
 		foreach (var (outputDocumentType, inputTemplateType) in SupportedTypePairs)
