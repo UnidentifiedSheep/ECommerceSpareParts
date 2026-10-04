@@ -65,6 +65,8 @@
     "sale.document.single.item.total.sum.name": "Kalem toplamı",
     "sale.document.single.item.total.sum.description": "Bu satış kaleminin toplam tutarı.",
     "sale.document.single.item.comment.name": "Kalem yorumu",
-    "sale.document.single.item.comment.description": "Varsa bu satış kalemine ilişkin yorum."
+    "sale.document.single.item.comment.description": "Varsa bu satış kalemine ilişkin yorum.",
+    "sale.document.single.name": "Satış belgesi",
+    "sale.document.single.description": "Satış ayrıntılarını ve kalemlerini içeren belge."
   }
 }

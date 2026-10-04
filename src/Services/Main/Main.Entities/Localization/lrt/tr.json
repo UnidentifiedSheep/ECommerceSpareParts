@@ -26,6 +26,10 @@
     "lrt.catalogue.candidates.map.to.products.name": "Katalog adaylarını ürünlerle eşleştirme",
     "lrt.catalogue.candidates.map.to.products.description": "Katalog adaylarını normalleştirilmiş SKU ve üreticiye göre ürünlerle eşleştirir.",
     "lrt.catalogue.enrichment.name": "Katalog zenginleştirme",
-    "lrt.catalogue.enrichment.description": "Tedarikçi ürünlerinden adaylar oluşturur ve ardından bunları katalog ürünleriyle eşleştirir."
+    "lrt.catalogue.enrichment.description": "Tedarikçi ürünlerinden adaylar oluşturur ve ardından bunları katalog ürünleriyle eşleştirir.",
+    "lrt.document.generation.name": "Belge oluşturma",
+    "lrt.document.generation.description": "İstenen şablon ve verilerden bir belge oluşturur.",
+    "lrt.document.generation.unknown.system.name": "İstenen belge türü kullanılamıyor.",
+    "lrt.document.generation.invalid.request": "Belge oluşturma isteği okunamadı."
   }
 }

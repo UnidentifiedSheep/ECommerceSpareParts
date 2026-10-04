@@ -37,7 +37,7 @@ public class MapCatalogueCandidatesToProductsLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCatalogueCandidatesMapToProductsDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(NoneInputState inputState)
 	{
 		const int batchSize = 1000;
 

@@ -1,6 +1,8 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
+using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Services.Document;
+using Main.Entities;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 using Main.Enums.Documents;
@@ -17,8 +19,7 @@ public class SingleSaleDocumentDefinition(
 	IOptions<S3BucketsOptions> options
 	) : DocumentDefinitionBase<
 	SingleSaleDocumentRequest,
-	DocumentResponse,
-	SingleSaleDocumentSchema>(templateResolver)
+	SingleSaleDocumentSchema>(templateResolver, s3Service, options)
 {
 	private static readonly DocumentTypePair[] SupportedTypes =
 	[
@@ -27,48 +28,15 @@ public class SingleSaleDocumentDefinition(
 
 	public override string SystemName => "SingleSale";
 	public override string DocumentGroup => "Sales";
+	public override ILocalizableMessage Name => SaleDocumentSingleNameMessage.Instance;
+	public override ILocalizableMessage Description => SaleDocumentSingleDescriptionMessage.Instance;
 	protected override DocumentTypePair[] SupportedTypePairs => SupportedTypes;
 
-	public override async Task<DocumentResponse> GenerateAsync(
+	protected override async Task<SingleSaleDocumentSchema> GetSchemaDataAsync(
 		SingleSaleDocumentRequest request,
-		CancellationToken token = default)
+		CancellationToken token)
 	{
-		using var template = await GetTemplateAsync(request, token);
-		var data = await GetSchemaDataAsync(request.SaleId, token);
-		AddAllFields(template, data);
-
-		await using var output = new FileStream(
-			Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
-			new FileStreamOptions
-			{
-				Mode = FileMode.CreateNew,
-				Access = FileAccess.ReadWrite,
-				Share = FileShare.None,
-				Options = FileOptions.DeleteOnClose
-			});
-
-		await template.RenderAsync(output, token);
-		output.Position = 0;
-
-		var generatedAt = DateTimeOffset.UtcNow;
-		var key = $"Generated/{DocumentGroup}/{SystemName}/" +
-		          $"{generatedAt:yyyy/MM/dd}/{request.SaleId:N}-{Guid.NewGuid():N}" +
-		          template.Type.GetFileExtension();
-		var bucket = options.Value.Documents;
-		var uploadedKey = await s3Service.UploadFileAsync(
-			bucket.Name,
-			output,
-			key,
-			template.Type.GetContentType());
-
-		return new DocumentResponse
-		{
-			GeneratedFileLink = $"{bucket.PublicBaseUrl.TrimEnd('/')}/{uploadedKey}"
-		};
-	}
-
-	private async Task<SingleSaleDocumentSchema> GetSchemaDataAsync(Guid saleId, CancellationToken token)
-	{
+		var saleId = request.SaleId;
 		return await repository
 			.Query
 			.Select(x => new SingleSaleDocumentSchema

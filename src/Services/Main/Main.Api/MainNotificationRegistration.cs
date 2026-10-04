@@ -30,6 +30,9 @@ public static class MainNotificationRegistration
 		services.AddNotification<UserLoggedInNotification, UserLoggedInNotificationData>(
 			"UserLoggedIn",
 			model => new UserLoggedInNotification(model));
+		services.AddNotification<DocumentGeneratedNotification, DocumentGeneratedNotificationData>(
+			DocumentGeneratedNotification.NotificationSystemName,
+			model => new DocumentGeneratedNotification(model));
 
 		return services;
 	}

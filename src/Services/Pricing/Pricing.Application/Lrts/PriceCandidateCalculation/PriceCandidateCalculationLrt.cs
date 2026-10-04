@@ -33,10 +33,10 @@ public class PriceCandidateCalculationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtPriceCandidateCalculationDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(PriceCandidateCalculationState inputState)
 	{
 		await sender.Send(
-			new CalculateCandidatesCommand(State.ProductId, State.StorageCode),
+			new CalculateCandidatesCommand(inputState.ProductId, inputState.StorageCode),
 			CancellationToken);
 	}
 }

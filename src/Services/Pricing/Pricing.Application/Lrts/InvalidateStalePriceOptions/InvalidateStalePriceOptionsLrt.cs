@@ -48,7 +48,7 @@ public class InvalidateStalePriceOptionsLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtInvalidateStalePriceOptionsDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(NoneInputState inputState)
 	{
 		const int batchSize = 1000;
 

@@ -35,7 +35,7 @@ public sealed class ProductSynchronizationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtProductSynchronizationDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(NoneInputState inputState)
 	{
 		var lastId = -1;
 		const int batchSize = 1000;

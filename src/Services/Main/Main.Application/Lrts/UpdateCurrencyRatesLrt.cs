@@ -31,5 +31,5 @@ public class UpdateCurrencyRatesLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCurrencyRatesUpdateDescriptionMessage.Instance;
 
-	protected override Task DoWork() => sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
+	protected override Task DoWork(NoneInputState inputState) => sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
 }

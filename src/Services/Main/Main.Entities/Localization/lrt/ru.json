@@ -26,6 +26,10 @@
     "lrt.catalogue.candidates.map.to.products.name": "Сопоставление кандидатов с каталогом",
     "lrt.catalogue.candidates.map.to.products.description": "Сопоставляет кандидатов каталога с товарами по нормализованному артикулу и производителю.",
     "lrt.catalogue.enrichment.name": "Обогащение каталога",
-    "lrt.catalogue.enrichment.description": "Формирует кандидатов из товаров поставщиков и последовательно сопоставляет их с товарами каталога."
+    "lrt.catalogue.enrichment.description": "Формирует кандидатов из товаров поставщиков и последовательно сопоставляет их с товарами каталога.",
+    "lrt.document.generation.name": "Генерация документа",
+    "lrt.document.generation.description": "Создаёт документ из выбранного шаблона и данных запроса.",
+    "lrt.document.generation.unknown.system.name": "Запрошенный тип документа недоступен.",
+    "lrt.document.generation.invalid.request": "Не удалось прочитать запрос на генерацию документа."
   }
 }

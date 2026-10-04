@@ -1,15 +1,20 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Application.Common.Models.Options.S3;
+using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Services.Document;
 using Main.Enums.Documents;
+using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Document;
 
-public abstract class DocumentDefinitionBase<TRequest, TResponse, TSchema>(
-	IDocumentTemplateResolver templateResolver
-	) : IDocumentDefinition<TRequest, TResponse>
+public abstract class DocumentDefinitionBase<TRequest, TSchema>(
+	IDocumentTemplateResolver templateResolver,
+	IS3Service s3Service,
+	IOptions<S3BucketsOptions> options
+	) : IDocumentDefinition<TRequest, DocumentResponse>
 	where TRequest : IDocumentRequest
-	where TResponse : IDocumentResponse
 {
 	private static readonly FieldAccessor[] Fields = typeof(TSchema)
 		.GetProperties(BindingFlags.Instance | BindingFlags.Public)
@@ -23,7 +28,10 @@ public abstract class DocumentDefinitionBase<TRequest, TResponse, TSchema>(
 
 	public abstract string SystemName { get; }
 	public abstract string DocumentGroup { get; }
+	public abstract ILocalizableMessage Name { get; }
+	public abstract ILocalizableMessage Description { get; }
 	public Type SchemaType => typeof(TSchema);
+	public Type RequestType => typeof(TRequest);
 
 	protected abstract DocumentTypePair[] SupportedTypePairs { get; }
 
@@ -50,9 +58,49 @@ public abstract class DocumentDefinitionBase<TRequest, TResponse, TSchema>(
 	private string GetTemplatePath(DocumentType templateType)
 		=> $"{DocumentGroup}/{SystemName}{templateType.GetFileExtension()}";
 
-	public abstract Task<TResponse> GenerateAsync(
+	public async Task<DocumentResponse> GenerateAsync(
 		TRequest request,
-		CancellationToken token = default);
+		CancellationToken token = default)
+	{
+		using var template = await GetTemplateAsync(request, token);
+		var data = await GetSchemaDataAsync(request, token);
+		AddAllFields(template, data);
+
+		await using var output = new FileStream(
+			Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
+			new FileStreamOptions
+			{
+				Mode = FileMode.CreateNew,
+				Access = FileAccess.ReadWrite,
+				Share = FileShare.None,
+				Options = FileOptions.DeleteOnClose
+			});
+
+		await template.RenderAsync(output, token);
+		output.Position = 0;
+
+		var uploadStartedAtUtc = DateTime.UtcNow;
+		var key = $"Generated/{DocumentGroup}/{SystemName}/" +
+		          $"{uploadStartedAtUtc:yyyy/MM/dd}/{Guid.NewGuid():N}" +
+		          template.Type.GetFileExtension();
+		var bucket = options.Value.Documents;
+		var uploadedKey = await s3Service.UploadFileAsync(
+			bucket.Name,
+			output,
+			key,
+			template.Type.GetContentType());
+
+		return new DocumentResponse
+		{
+			GeneratedFileLink = $"{bucket.PublicBaseUrl.TrimEnd('/')}/{uploadedKey}",
+			BucketName = bucket.Name,
+			StorageKey = uploadedKey
+		};
+	}
+
+	protected abstract Task<TSchema> GetSchemaDataAsync(
+		TRequest request,
+		CancellationToken token);
 
 	public async Task<IDocumentResponse> GenerateAsync(
 		IDocumentRequest data,

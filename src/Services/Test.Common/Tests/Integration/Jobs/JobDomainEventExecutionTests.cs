@@ -128,6 +128,6 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 		public override ILocalizableMessage DescriptionLocalizationMessage =>
 			new LocalizableMessage("test-description");
 
-		protected override Task DoWork() => Task.CompletedTask;
+		protected override Task DoWork(NoneInputState inputState) => Task.CompletedTask;
 	}
 }

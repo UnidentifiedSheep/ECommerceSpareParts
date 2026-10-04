@@ -46,7 +46,7 @@ public class BuildCatalogueCandidatesLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCatalogueCandidatesBuildDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(NoneInputState inputState)
 	{
 		const int batchSize = 1000;
 		while (true)

@@ -18,10 +18,11 @@ public abstract class LrtBase<TInputState, TState>(
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
 	ILogger logger) : ILrtNamedObject<TInputState>
-	where TInputState : class, IInputState where TState : class, TInputState
+	where TInputState : class, IInputState where TState : class
 {
 	private Job? _job;
 
+	private TInputState? _inputState;
 	private TState? _state;
 
 	protected IUnitOfWork UnitOfWork => unitOfWork;
@@ -37,6 +38,8 @@ public abstract class LrtBase<TInputState, TState>(
 	protected CancellationToken CancellationToken { get; private set; }
 
 	protected Job Job => _job ?? throw new InvalidOperationException("Job is not initialized");
+
+	protected TInputState InputState => _inputState ?? throw new InvalidOperationException("LRT input state is not initialized");
 
 	protected TState State => _state ?? throw new InvalidOperationException("LRT state is not initialized");
 
@@ -67,6 +70,7 @@ public abstract class LrtBase<TInputState, TState>(
 		LeaseHolderId = leaseHolderId;
 		Initialized = false;
 		_job = null;
+		_inputState = null;
 		_state = null;
 
 		logger.LogInformation("LRT execution started. JobId: {JobId}", JobId);
@@ -81,7 +85,7 @@ public abstract class LrtBase<TInputState, TState>(
 					Initialized = true;
 				}
 
-				await DoWork();
+				await DoWork(InputState);
 				await SucceedJobAsync();
 				logger.LogInformation("LRT execution completed. JobId: {JobId}", JobId);
 				break;
@@ -149,15 +153,21 @@ public abstract class LrtBase<TInputState, TState>(
 	protected async Task ReloadStateAsync()
 	{
 		await GetJobAsync();
-		_state = string.IsNullOrWhiteSpace(Job.State)
-			? throw new InvalidOperationException($"LRT '{SystemName}' state is empty.")
-			: JsonSerializer.Deserialize<TState>(Job.State) ?? throw new InvalidOperationException(
-				$"LRT '{SystemName}' state could not be deserialized as '{StateType.Name}'.");
+		if (string.IsNullOrWhiteSpace(Job.State))
+			throw new InvalidOperationException($"LRT '{SystemName}' state is empty.");
+
+		var (input, state) = LrtStateSerializer.Deserialize<TInputState, TState>(Job.State);
+		_inputState = input;
+		_state = state ?? CreateInitialState(input);
 	}
+
+	protected virtual TState CreateInitialState(TInputState inputState) =>
+		JsonSerializer.Deserialize<TState>(JsonSerializer.Serialize(inputState)) ??
+		throw new InvalidOperationException($"LRT '{SystemName}' state could not be initialized as '{StateType.Name}'.");
 
 	protected async Task SaveStateAsync(TState state)
 	{
-		var json = JsonSerializer.Serialize(state);
+		var json = LrtStateSerializer.Serialize(InputState, state);
 		await transactionService.ExecuteAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
@@ -257,5 +267,5 @@ public abstract class LrtBase<TInputState, TState>(
 			CancellationToken);
 	}
 
-	protected abstract Task DoWork();
+	protected abstract Task DoWork(TInputState inputState);
 }

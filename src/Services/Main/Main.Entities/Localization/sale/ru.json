@@ -65,6 +65,8 @@
     "sale.document.single.item.total.sum.name": "Сумма позиции",
     "sale.document.single.item.total.sum.description": "Итоговая сумма этой позиции продажи.",
     "sale.document.single.item.comment.name": "Комментарий к позиции",
-    "sale.document.single.item.comment.description": "Комментарий к этой позиции продажи, если он указан."
+    "sale.document.single.item.comment.description": "Комментарий к этой позиции продажи, если он указан.",
+    "sale.document.single.name": "Документ продажи",
+    "sale.document.single.description": "Документ с данными продажи и её позициями."
   }
 }

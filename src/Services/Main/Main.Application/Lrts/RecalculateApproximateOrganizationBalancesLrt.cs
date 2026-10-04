@@ -37,7 +37,7 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtOrganizationApproximateBalanceRecalculateDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(NoneInputState inputState)
 	{
 		var lastOrganizationId = Guid.Empty;
 

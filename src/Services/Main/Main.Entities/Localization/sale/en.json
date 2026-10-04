@@ -65,6 +65,8 @@
     "sale.document.single.item.total.sum.name": "Item total",
     "sale.document.single.item.total.sum.description": "Total amount for this sale item.",
     "sale.document.single.item.comment.name": "Item comment",
-    "sale.document.single.item.comment.description": "Comment on this sale item, if provided."
+    "sale.document.single.item.comment.description": "Comment on this sale item, if provided.",
+    "sale.document.single.name": "Sale document",
+    "sale.document.single.description": "Document with sale details and items."
   }
 }

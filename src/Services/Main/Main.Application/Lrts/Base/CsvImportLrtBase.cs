@@ -31,7 +31,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 	transactionService,
 	logger)
 	where TInputState : class, IInputState, ICsvImportInputState
-	where TState : class, TInputState, ICsvImportState<TState>
+	where TState : class, ICsvImportState<TState>
 {
 	protected virtual int BatchSize => 1000;
 
@@ -42,7 +42,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 
 	protected IContextualLocalizer StringLocalizer => stringLocalizer;
 
-	protected sealed override async Task DoWork()
+	protected sealed override async Task DoWork(TInputState inputState)
 	{
 		var state = State;
 
@@ -50,11 +50,11 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 
 		using var response = await s3Service.DownloadFileAsync(
 			bucketsOptions.Value.Uploads.Name,
-			state.FileName,
+			inputState.FileName,
 			CancellationToken);
 
 		var streamResponse = response.Value ??
-			throw new FileNotFoundException($"S3 object '{state.FileName}' was not found.");
+			throw new FileNotFoundException($"S3 object '{inputState.FileName}' was not found.");
 		using var reader = new StreamReader(streamResponse.Stream);
 		using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
