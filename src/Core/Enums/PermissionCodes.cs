@@ -253,5 +253,9 @@ public enum PermissionCodes
 
 	// ===== NOTIFICATIONS =====
 	NOTIFICATIONS_ME,
-	NOTIFICATIONS_ALL
+	NOTIFICATIONS_ALL,
+
+	// ===== DOCUMENTS =====
+	DOCUMENTS_ME,
+	DOCUMENTS_ALL
 }

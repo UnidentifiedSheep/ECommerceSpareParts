@@ -10,4 +10,7 @@ public sealed class RootMutation
 
 	[GraphQLName("notifications")]
 	public NotificationMutations Notifications => new();
+
+	[GraphQLName("documents")]
+	public DocumentMutations Documents => new();
 }

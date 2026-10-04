@@ -220,6 +220,10 @@
     "permissions.notifications.me.name": "Взаимодействие со своими уведомлениями",
     "permissions.notifications.me.description": "Право на взаимодействие со своими уведомлениями.",
     "permissions.notifications.all.name": "Взаимодействие со всеми уведомлениями",
-    "permissions.notifications.all.description": "Право на взаимодействие с уведомлениями всех пользователей."
+    "permissions.notifications.all.description": "Право на взаимодействие с уведомлениями всех пользователей.",
+    "permissions.documents.me.name": "Свои документы",
+    "permissions.documents.me.description": "Право на создание запросов генерации документов и доступ к собственным запросам.",
+    "permissions.documents.all.name": "Все документы",
+    "permissions.documents.all.description": "Право на создание запросов генерации документов и доступ к запросам всех пользователей."
   }
 }
