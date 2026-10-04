@@ -60,7 +60,14 @@ public sealed record LrtExecutionResult(Job Job)
 {
 	public TState GetState<TState>() where TState : class
 	{
-		return JsonSerializer.Deserialize<TState>(Job.State) ??
+		using var document = JsonDocument.Parse(Job.State);
+		var root = document.RootElement;
+		var state = root.ValueKind == JsonValueKind.Object &&
+		            root.TryGetProperty("$lrtVersion", out _)
+			? root.GetProperty("state")
+			: root;
+
+		return state.Deserialize<TState>() ??
 			throw new InvalidOperationException(
 				$"LRT state could not be deserialized as '{typeof(TState).Name}'.");
 	}
