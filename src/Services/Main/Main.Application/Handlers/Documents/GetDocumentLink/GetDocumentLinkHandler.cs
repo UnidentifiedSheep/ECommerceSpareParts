@@ -1,10 +1,11 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Domain.CommonEnums;
+using Main.Application.Dtos.Documents;
+using Main.Application.Interfaces.Cache;
 using Main.Entities.Documents;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using S3.Core.Interfaces;
 
 namespace Main.Application.Handlers.Documents.GetDocumentLink;
 
@@ -13,17 +14,11 @@ public sealed record GetDocumentLinkQuery(
 	Guid CallerId,
 	bool CanAccessAll) : IQuery<GetDocumentLinkResult>;
 
-public sealed record GetDocumentLinkResult(
-	string Url,
-	DateTime UrlExpiresAtUtc);
-
 public sealed class GetDocumentLinkHandler(
 	IReadRepository<DocumentGenerationRequest, Guid> repository,
-	IS3Service s3Service)
+	IDocumentLinkProvider linkProvider)
 	: IQueryHandler<GetDocumentLinkQuery, GetDocumentLinkResult>
 {
-	private static readonly TimeSpan LinkLifetime = TimeSpan.FromMinutes(5);
-
 	public async Task<GetDocumentLinkResult> Handle(
 		GetDocumentLinkQuery request,
 		CancellationToken cancellationToken)
@@ -58,15 +53,10 @@ public sealed class GetDocumentLinkHandler(
 		if (document.ExpiresAtUtc is null)
 			throw new InvalidOperationException("Generated document expiration time is missing.");
 
-		var lifetime = document.ExpiresAtUtc.Value - now;
-		if (lifetime > LinkLifetime)
-			lifetime = LinkLifetime;
-
-		var url = await s3Service.CreatePresignedDownloadUrl(
+		return await linkProvider.GetOrCreateAsync(
+			request.RequestId,
 			document.BucketName,
 			document.StorageKey,
-			lifetime);
-
-		return new GetDocumentLinkResult(url, now.Add(lifetime));
+			document.ExpiresAtUtc.Value);
 	}
 }
