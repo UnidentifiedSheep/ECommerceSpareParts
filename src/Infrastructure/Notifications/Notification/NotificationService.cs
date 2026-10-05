@@ -57,7 +57,9 @@ public class NotificationService(
 			if (!channels.Add(channel.SystemName))
 				throw new InvalidOperationException(
 					$"Multiple recipients for channel '{channel.SystemName}' are not supported.");
-			deliveries.Add((channel.SystemName, JsonSerializer.Serialize(recipient)));
+			deliveries.Add((
+				channel.SystemName,
+				JsonSerializer.Serialize(recipient, recipient.GetType())));
 		}
 
 		var definition = definitionRegistry.GetBySystemName(notification.SystemName);
