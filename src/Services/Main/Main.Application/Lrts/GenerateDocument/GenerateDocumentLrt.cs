@@ -127,11 +127,17 @@ public class GenerateDocumentLrt(
 
 				if (request is not null)
 				{
-					request.Complete(
-						bucketName,
-						storageKey,
-						generatedAtUtc.Value,
-						generatedAtUtc.Value.Add(DocumentLifetime));
+					if (request.StorageKey is null)
+						request.Complete(
+							bucketName,
+							storageKey,
+							generatedAtUtc.Value,
+							generatedAtUtc.Value.Add(DocumentLifetime));
+					else if (request.BucketName != bucketName ||
+					         request.StorageKey != storageKey)
+						throw new InvalidOperationException(
+							"Document generation request is already completed with different storage details.");
+
 					await QueueNotificationAsync(request, definition, ct);
 				}
 
