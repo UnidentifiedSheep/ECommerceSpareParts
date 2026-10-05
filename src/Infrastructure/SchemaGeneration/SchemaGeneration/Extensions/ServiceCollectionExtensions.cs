@@ -9,16 +9,16 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddSchemaGeneration(this IServiceCollection services)
 	{
-		services.AddScoped<ISchemaLocalizer, SchemaLocalizer>();
+		services.AddSingleton<ISchemaLocalizer, SchemaLocalizer>();
 
 		services.AddKeyedSingleton<ISchemaGenerator, ReflectionSchemaGenerator>(SchemaGeneratorKind.Raw);
-		services.AddKeyedScoped<ISchemaGenerator>(
+		services.AddKeyedSingleton<ISchemaGenerator>(
 			SchemaGeneratorKind.Localized,
 			(provider, _) => new LocalizedSchemaGenerator(
 				provider.GetRequiredKeyedService<ISchemaGenerator>(SchemaGeneratorKind.Raw),
 				provider.GetRequiredService<ISchemaLocalizer>()));
 
-		services.AddScoped<ISchemaGenerator>(provider =>
+		services.AddSingleton<ISchemaGenerator>(provider =>
 			provider.GetRequiredKeyedService<ISchemaGenerator>(SchemaGeneratorKind.Localized));
 
 		return services;

@@ -20,6 +20,7 @@ public static class FusionHttpClientExtensions
 		services.AddHeaderPropagation(options =>
 		{
 			options.Headers.Add("Authorization");
+			options.Headers.Add("Accept-Language");
 		});
 
 		services
