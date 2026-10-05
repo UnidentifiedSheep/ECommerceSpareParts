@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Entities;
@@ -29,18 +30,19 @@ public sealed record DocumentGeneratedNotificationData : INotificationModel, INo
 
 	[SetsRequiredMembers]
 	public DocumentGeneratedNotificationData(
-		IContextualLocalizer localizer,
+		ILocalizer localizer,
+		CultureInfo culture,
 		ILocalizableMessage documentName,
 		ILocalizableMessage documentDescription,
 		Guid requestId,
 		string documentUrl)
 	{
 		RequestId = requestId;
-		DocumentName = localizer.Get(documentName);
-		DocumentDescription = localizer.Get(documentDescription);
+		DocumentName = localizer.Get(documentName, culture);
+		DocumentDescription = localizer.Get(documentDescription, culture);
 		DocumentUrl = documentUrl;
-		Title = localizer.Get(NotificationsDocumentGeneratedTitleMessage.Instance);
+		Title = localizer.Get(NotificationsDocumentGeneratedTitleMessage.Instance, culture);
 		AsText = localizer.Get(
-			NotificationsDocumentGeneratedTextMessage.Create(DocumentName, documentUrl));
+			NotificationsDocumentGeneratedTextMessage.Create(DocumentName, documentUrl), culture);
 	}
 }

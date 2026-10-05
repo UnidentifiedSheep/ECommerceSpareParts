@@ -15,4 +15,11 @@ public abstract record DocumentRequestBase : IDocumentRequest
 	[SchemaFieldLabel(DocumentRequestTypeNameMessage.Key)]
 	[SchemaFieldDescription(DocumentRequestTypeDescriptionMessage.Key)]
 	public required DocumentType DocumentType { get; init; }
+
+	[JsonPropertyName("culture")]
+	[SchemaInputControl(InputControlType.TextField)]
+	[RequiredSchemaField]
+	[SchemaFieldLabel(DocumentRequestCultureNameMessage.Key)]
+	[SchemaFieldDescription(DocumentRequestCultureDescriptionMessage.Key)]
+	public string Culture { get; init; } = "en";
 }

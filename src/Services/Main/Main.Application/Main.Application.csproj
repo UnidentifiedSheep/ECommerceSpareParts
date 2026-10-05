@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Document/**/*.*" Exclude="Document/**/*.cs" />
+        <EmbeddedResource Include="Document/**/*.*" Exclude="Document/**/*.cs" WithCulture="false" />
     </ItemGroup>
 
     <ItemGroup>

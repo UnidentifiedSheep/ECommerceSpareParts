@@ -69,6 +69,10 @@
     "sale.document.single.name": "Документ продажи",
     "sale.document.single.description": "Документ с данными продажи и её позициями.",
     "sale.document.single.request.sale.id.name": "Продажа",
-    "sale.document.single.request.sale.id.description": "Выберите продажу, данные которой нужно включить в документ."
+    "sale.document.single.request.sale.id.description": "Выберите продажу, данные которой нужно включить в документ.",
+    "sale.state.draft": "Черновик",
+    "sale.state.completed": "Завершена",
+    "sale.state.deleted": "Удалена",
+    "sale.state.unknown": "Неизвестно"
   }
 }

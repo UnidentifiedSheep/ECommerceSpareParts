@@ -1,10 +1,12 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Locan.Core.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Services.Document;
 using Main.Entities;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
+using Main.Enums;
 using Main.Enums.Documents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -16,6 +18,7 @@ public class SingleSaleDocumentDefinition(
 	IDocumentTemplateResolver templateResolver,
 	IS3Service s3Service,
 	IReadRepository<Sale, Guid> repository,
+	ILocalizer localizer,
 	IOptions<S3BucketsOptions> options
 	) : DocumentDefinitionBase<
 	SingleSaleDocumentRequest,
@@ -37,6 +40,12 @@ public class SingleSaleDocumentDefinition(
 		CancellationToken token)
 	{
 		var saleId = request.SaleId;
+		var culture = DocumentCulture.GetRequired(request.Culture);
+		var draft = localizer.Get(SaleStateDraftMessage.Instance, culture);
+		var completed = localizer.Get(SaleStateCompletedMessage.Instance, culture);
+		var deleted = localizer.Get(SaleStateDeletedMessage.Instance, culture);
+		var unknown = localizer.Get(SaleStateUnknownMessage.Instance, culture);
+
 		return await repository
 			.Query
 			.Select(x => new SingleSaleDocumentSchema
@@ -50,7 +59,9 @@ public class SingleSaleDocumentDefinition(
 				CurrencySign = x.Currency.CurrencySign,
 				OrganizationName = x.Organization.Name,
 				SaleDatetime = x.SaleDatetime,
-				State = x.State,
+				State = x.State == SaleState.Draft ? draft :
+					x.State == SaleState.Completed ? completed :
+					x.State == SaleState.Deleted ? deleted : unknown,
 				StorageCode = x.StorageCode,
 				Items = x
 					.Contents

@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Main.Entities;
-using Main.Enums;
 using SchemaGeneration.Abstractions.Attributes;
 
 namespace Main.Application.Document.Sales.SingleSale;
@@ -50,7 +49,7 @@ public sealed record SingleSaleDocumentSchema
 	[JsonPropertyName(nameof(State))]
 	[SchemaFieldLabel(SaleDocumentSingleStateNameMessage.Key)]
 	[SchemaFieldDescription(SaleDocumentSingleStateDescriptionMessage.Key)]
-	public required SaleState State { get; init; }
+	public required string State { get; init; }
 
 	[JsonPropertyName(nameof(TotalSum))]
 	[SchemaFieldLabel(SaleDocumentSingleTotalSumNameMessage.Key)]

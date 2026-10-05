@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -6,6 +8,7 @@ using Attributes;
 using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
+using Main.Application.Document;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Document;
 using Main.Application.Notifications;
@@ -28,6 +31,7 @@ public class GenerateDocumentLrt(
 	INotificationService notificationService,
 	IAppLinkProvider appLinkProvider,
 	IContextualLocalizer localizer,
+	ILocalizer notificationLocalizer,
 	IJsonSerializer jsonSerializer,
 	ILogger<GenerateDocumentLrt> logger) : LrtBase<GenerateDocumentInputState, GenerateDocumentState>(
 	jobRepository,
@@ -59,14 +63,37 @@ public class GenerateDocumentLrt(
 			return;
 		}
 
-		await GenerateIfNeededAsync(inputState, definition);
+		if (!TryDeserializeDocumentRequest(inputState, definition, out var request) ||
+		    !DocumentCulture.TryGetSupported(request.Culture, out var culture))
+		{
+			Interrupt(localizer.Get(
+				LrtDocumentGenerationInvalidRequestMessage.Instance));
+			return;
+		}
+
+		await GenerateIfNeededAsync(definition, request);
 		if (!State.NotificationProcessed)
-			await CompleteRequestAsync(definition);
+			await CompleteRequestAsync(definition, culture);
 	}
 
-	private async Task GenerateIfNeededAsync(
+	private bool TryDeserializeDocumentRequest(
 		GenerateDocumentInputState inputState,
-		IDocumentDefinition definition)
+		IDocumentDefinition definition,
+		[NotNullWhen(true)] out IDocumentRequest? request)
+	{
+		request = null;
+		if (string.IsNullOrWhiteSpace(inputState.DocumentRequest) ||
+		    !jsonSerializer.TryDeserialize(
+				inputState.DocumentRequest,
+				definition.RequestType,
+				out var deserializedRequest))
+			return false;
+
+		request = deserializedRequest as IDocumentRequest;
+		return request is not null;
+	}
+
+	private async Task GenerateIfNeededAsync(IDocumentDefinition definition, IDocumentRequest request)
 	{
 		if (State is
 		    {
@@ -75,17 +102,6 @@ public class GenerateDocumentLrt(
 			    GeneratedAtUtc: not null
 		    })
 			return;
-
-		if (string.IsNullOrWhiteSpace(inputState.DocumentRequest) ||
-		    !jsonSerializer.TryDeserialize(
-				inputState.DocumentRequest,
-				definition.RequestType,
-				out var deserializedRequest) ||
-		    deserializedRequest is not IDocumentRequest request)
-		{
-			Interrupt(localizer.Get(LrtDocumentGenerationInvalidRequestMessage.Instance));
-			return;
-		}
 
 		var result = await definition.GenerateAsync(request, CancellationToken);
 
@@ -101,7 +117,7 @@ public class GenerateDocumentLrt(
 		});
 	}
 
-	private async Task CompleteRequestAsync(IDocumentDefinition definition)
+	private async Task CompleteRequestAsync(IDocumentDefinition definition, CultureInfo culture)
 	{
 		var bucketName = State.BucketName;
 		var storageKey = State.StorageKey;
@@ -137,7 +153,7 @@ public class GenerateDocumentLrt(
 						throw new InvalidOperationException(
 							"Document generation request is already completed with different storage details.");
 
-					await QueueNotificationAsync(request, definition, ct);
+					await QueueNotificationAsync(request, definition, culture, ct);
 				}
 
 				await SaveStateAsync(State with { NotificationProcessed = true });
@@ -148,6 +164,7 @@ public class GenerateDocumentLrt(
 	private async Task QueueNotificationAsync(
 		DocumentGenerationRequest request,
 		IDocumentDefinition definition,
+		CultureInfo culture,
 		CancellationToken token)
 	{
 		if (request.RequesterId == null) return;
@@ -159,7 +176,8 @@ public class GenerateDocumentLrt(
 			request.RequesterId.Value,
 			new DocumentGeneratedNotification(
 				new DocumentGeneratedNotificationData(
-					localizer,
+					notificationLocalizer,
+					culture,
 					definition.Name,
 					definition.Description,
 					request.RequestId,

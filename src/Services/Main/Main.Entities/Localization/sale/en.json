@@ -69,6 +69,10 @@
     "sale.document.single.name": "Sale document",
     "sale.document.single.description": "Document with sale details and items.",
     "sale.document.single.request.sale.id.name": "Sale",
-    "sale.document.single.request.sale.id.description": "Select the sale to include in the document."
+    "sale.document.single.request.sale.id.description": "Select the sale to include in the document.",
+    "sale.state.draft": "Draft",
+    "sale.state.completed": "Completed",
+    "sale.state.deleted": "Deleted",
+    "sale.state.unknown": "Unknown"
   }
 }

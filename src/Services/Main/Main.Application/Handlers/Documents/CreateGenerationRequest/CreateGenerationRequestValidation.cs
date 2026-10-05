@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Domain.Validation;
 using Extensions;
 using FluentValidation;
+using Main.Application.Document;
 using Main.Application.Interfaces.Services.Document;
 using Main.Entities;
 using NamedObject.Core.Interfaces;
@@ -50,6 +51,7 @@ public class CreateGenerationRequestValidation : AbstractValidator<CreateGenerat
 
 		return jsonSerializer.TryDeserialize(json, definition.RequestType, out var value) &&
 		       value is IDocumentRequest request &&
+		       DocumentCulture.TryGetSupported(request.Culture, out _) &&
 		       definition.SupportsDocumentType(request.DocumentType);
 	}
 }

@@ -69,6 +69,10 @@
     "sale.document.single.name": "Satış belgesi",
     "sale.document.single.description": "Satış ayrıntılarını ve kalemlerini içeren belge.",
     "sale.document.single.request.sale.id.name": "Satış",
-    "sale.document.single.request.sale.id.description": "Belgeye eklenecek satışı seçin."
+    "sale.document.single.request.sale.id.description": "Belgeye eklenecek satışı seçin.",
+    "sale.state.draft": "Taslak",
+    "sale.state.completed": "Tamamlandı",
+    "sale.state.deleted": "Silindi",
+    "sale.state.unknown": "Bilinmiyor"
   }
 }

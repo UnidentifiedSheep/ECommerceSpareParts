@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Application.Common.Models.Options.S3;
@@ -52,14 +53,31 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 		CancellationToken token = default)
 	{
 		var templateType = GetTemplateType(request);
-		var fullKey = GetTemplatePath(templateType);
-		return await templateResolver.TryResolveAsync(fullKey, request.DocumentType, templateType, token)
+		var culture = DocumentCulture.GetRequired(request.Culture);
+		var baseKey = $"{DocumentGroup}/{SystemName}";
+		var extension = templateType.GetFileExtension();
+
+		foreach (var cultureName in GetTemplateCultureNames(culture))
+		{
+			var key = $"{baseKey}.{cultureName}{extension}";
+			var template = await templateResolver.TryResolveAsync(
+				key, request.DocumentType, templateType, token);
+			if (template is not null) return template;
+		}
+
+		var fallbackKey = $"{baseKey}{extension}";
+		return await templateResolver.TryResolveAsync(
+			fallbackKey, request.DocumentType, templateType, token)
 			?? throw new InvalidOperationException(
-				$"Unable to find template for '{SystemName}' and key '{fullKey}'");
+				$"Unable to find template for '{SystemName}' and culture '{culture.Name}'.");
 	}
 
-	private string GetTemplatePath(DocumentType templateType)
-		=> $"{DocumentGroup}/{SystemName}{templateType.GetFileExtension()}";
+	private static IEnumerable<string> GetTemplateCultureNames(CultureInfo culture)
+	{
+		yield return culture.Name;
+		if (!string.Equals(culture.Name, culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
+			yield return culture.TwoLetterISOLanguageName;
+	}
 
 	public async Task<DocumentResponse> GenerateAsync(
 		TRequest request,
