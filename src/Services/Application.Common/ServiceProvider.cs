@@ -5,6 +5,7 @@ using Application.Common.Behaviors;
 using Application.Common.DomainEventHandlers.Jobs;
 using Application.Common.Domains;
 using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
@@ -23,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
 using SchemaGeneration.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
+using ProjectJsonOptions = global::Abstractions.Models.Options.ProjectJsonOptions;
 
 namespace Application.Common;
 
@@ -48,6 +50,8 @@ public static class ServiceProvider
 
 		services.AddSingleton<IBackplaneDispatcher, BackplaneDispatcher>();
 		services.AddSingleton<IFusionCacheBackplane, MassTransitBackplane>();
+		services.TryAddSingleton<ProjectJsonOptions>();
+		services.TryAddSingleton<IJsonSerializer, ProjectJsonSerializer>();
 		services.AddSingleton(serviceDefinition);
 
 		var hs = behaviorsToExclude.ToHashSet();

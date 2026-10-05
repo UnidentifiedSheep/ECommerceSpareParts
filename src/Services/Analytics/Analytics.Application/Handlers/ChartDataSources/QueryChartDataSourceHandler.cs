@@ -1,10 +1,9 @@
-using System.Text.Json;
 using Abstractions.Interfaces;
-using Abstractions.Models.Options;
 using Analytics.Application.Interfaces.ChartData;
 using Analytics.Application.NamedObjects.ChartDataSources;
 using Analytics.Entities;
 using Analytics.Entities.Exceptions;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Exceptions;
 using Extensions;
@@ -19,7 +18,7 @@ public sealed record QueryChartDataSourceResult(IReadOnlyList<object> DataPoints
 
 public sealed class QueryChartDataSourceHandler(
 	INamedObjectRegistry<ChartDataSourceNamedObject> registry,
-	ProjectJsonOptions jsonOptions
+	IJsonSerializer jsonSerializer
 	) : IQueryHandler<QueryChartDataSourceQuery, QueryChartDataSourceResult>
 {
 	public async Task<QueryChartDataSourceResult> Handle(
@@ -38,7 +37,7 @@ public sealed class QueryChartDataSourceHandler(
 
 	private IChartQueryInput DeserializeQueryInput(string json, Type queryInputType)
 	{
-		if (json.TryDeserializeJson(queryInputType, out var deserialized, jsonOptions.SerializerOptions) &&
+		if (jsonSerializer.TryDeserialize(json, queryInputType, out var deserialized) &&
 			deserialized is IChartQueryInput chartQueryInput)
 			return chartQueryInput;
 

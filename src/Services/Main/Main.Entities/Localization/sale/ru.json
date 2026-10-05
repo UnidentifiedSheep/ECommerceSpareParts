@@ -67,6 +67,8 @@
     "sale.document.single.item.comment.name": "Комментарий к позиции",
     "sale.document.single.item.comment.description": "Комментарий к этой позиции продажи, если он указан.",
     "sale.document.single.name": "Документ продажи",
-    "sale.document.single.description": "Документ с данными продажи и её позициями."
+    "sale.document.single.description": "Документ с данными продажи и её позициями.",
+    "sale.document.single.request.sale.id.name": "Продажа",
+    "sale.document.single.request.sale.id.description": "Выберите продажу, данные которой нужно включить в документ."
   }
 }

@@ -1,4 +1,5 @@
 using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Domain.Validation;
 using Extensions;
 using FluentValidation;
@@ -10,7 +11,9 @@ namespace Main.Application.Handlers.Documents.CreateGenerationRequest;
 
 public class CreateGenerationRequestValidation : AbstractValidator<CreateGenerationRequestCommand>
 {
-	public CreateGenerationRequestValidation(INamedObjectRegistry<IDocumentDefinition> registry)
+	public CreateGenerationRequestValidation(
+		INamedObjectRegistry<IDocumentDefinition> registry,
+		IJsonSerializer jsonSerializer)
 	{
 		RuleFor(x => x.DocumentSystemName)
 			.Cascade(CascadeMode.Stop)
@@ -25,7 +28,7 @@ public class CreateGenerationRequestValidation : AbstractValidator<CreateGenerat
 			.Cascade(CascadeMode.Stop)
 			.NotEmpty()
 			.WithLocalizableError(LrtDocumentGenerationRequestRequiredMessage.Instance)
-			.Must((command, json) => IsValidRequest(command, json, registry))
+			.Must((command, json) => IsValidRequest(command, json, registry, jsonSerializer))
 			.WithLocalizableError(LrtDocumentGenerationInvalidRequestMessage.Instance);
 
 		RuleFor(x => x.RequesterId)
@@ -36,7 +39,8 @@ public class CreateGenerationRequestValidation : AbstractValidator<CreateGenerat
 	private static bool IsValidRequest(
 		CreateGenerationRequestCommand command,
 		string json,
-		INamedObjectRegistry<IDocumentDefinition> registry)
+		INamedObjectRegistry<IDocumentDefinition> registry,
+		IJsonSerializer jsonSerializer)
 	{
 		var definition = string.IsNullOrWhiteSpace(command.DocumentSystemName)
 			? null
@@ -44,7 +48,7 @@ public class CreateGenerationRequestValidation : AbstractValidator<CreateGenerat
 
 		if (definition is null) return json.IsValidJson();
 
-		return json.TryDeserializeJson(definition.RequestType, out var value) &&
+		return jsonSerializer.TryDeserialize(json, definition.RequestType, out var value) &&
 		       value is IDocumentRequest request &&
 		       definition.SupportsDocumentType(request.DocumentType);
 	}

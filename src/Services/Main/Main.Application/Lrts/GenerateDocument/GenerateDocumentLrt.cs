@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -28,6 +29,7 @@ public class GenerateDocumentLrt(
 	INotificationService notificationService,
 	IAppLinkProvider appLinkProvider,
 	IContextualLocalizer localizer,
+	IJsonSerializer jsonSerializer,
 	ILogger<GenerateDocumentLrt> logger) : LrtBase<GenerateDocumentInputState, GenerateDocumentState>(
 	jobRepository,
 	unitOfWork,
@@ -76,7 +78,8 @@ public class GenerateDocumentLrt(
 			return;
 
 		if (string.IsNullOrWhiteSpace(inputState.DocumentRequest) ||
-		    !inputState.DocumentRequest.TryDeserializeJson(
+		    !jsonSerializer.TryDeserialize(
+				inputState.DocumentRequest,
 				definition.RequestType,
 				out var deserializedRequest) ||
 		    deserializedRequest is not IDocumentRequest request)

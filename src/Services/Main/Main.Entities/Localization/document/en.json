@@ -4,6 +4,8 @@
     "document.generation.request.not.found": "The document request was not found.",
     "document.not.ready": "The document is still being generated.",
     "document.generation.failed": "Document generation failed.",
-    "document.generation.cancelled": "Document generation was cancelled."
+    "document.generation.cancelled": "Document generation was cancelled.",
+    "document.request.type.name": "Document format",
+    "document.request.type.description": "Choose the format of the generated document."
   }
 }

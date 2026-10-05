@@ -67,6 +67,8 @@
     "sale.document.single.item.comment.name": "Kalem yorumu",
     "sale.document.single.item.comment.description": "Varsa bu satış kalemine ilişkin yorum.",
     "sale.document.single.name": "Satış belgesi",
-    "sale.document.single.description": "Satış ayrıntılarını ve kalemlerini içeren belge."
+    "sale.document.single.description": "Satış ayrıntılarını ve kalemlerini içeren belge.",
+    "sale.document.single.request.sale.id.name": "Satış",
+    "sale.document.single.request.sale.id.description": "Belgeye eklenecek satışı seçin."
   }
 }

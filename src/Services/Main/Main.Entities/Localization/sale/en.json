@@ -67,6 +67,8 @@
     "sale.document.single.item.comment.name": "Item comment",
     "sale.document.single.item.comment.description": "Comment on this sale item, if provided.",
     "sale.document.single.name": "Sale document",
-    "sale.document.single.description": "Document with sale details and items."
+    "sale.document.single.description": "Document with sale details and items.",
+    "sale.document.single.request.sale.id.name": "Sale",
+    "sale.document.single.request.sale.id.description": "Select the sale to include in the document."
   }
 }
