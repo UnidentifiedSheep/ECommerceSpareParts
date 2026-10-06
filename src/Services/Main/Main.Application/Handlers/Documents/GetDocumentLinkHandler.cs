@@ -7,7 +7,7 @@ using Main.Entities.Documents;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Documents.GetDocumentLink;
+namespace Main.Application.Handlers.Documents;
 
 public sealed record GetDocumentLinkQuery(
 	Guid RequestId,

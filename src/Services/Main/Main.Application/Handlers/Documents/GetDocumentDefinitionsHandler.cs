@@ -1,4 +1,3 @@
-using System.Globalization;
 using Application.Common.Interfaces.Cqrs;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Dtos.Documents;
@@ -7,7 +6,7 @@ using Main.Enums.Documents;
 using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions;
 
-namespace Main.Application.Handlers.Documents.GetDocumentDefinitions;
+namespace Main.Application.Handlers.Documents;
 
 public sealed record GetDocumentDefinitionsQuery : IQuery<GetDocumentDefinitionsResult>;
 

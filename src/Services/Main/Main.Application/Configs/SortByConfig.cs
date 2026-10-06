@@ -1,6 +1,7 @@
 using Abstractions;
 using Application.Common.Extensions;
 using Application.Common.Querying;
+using Main.Entities.Documents;
 using Main.Entities.Organization;
 using Main.Entities.Producer;
 using Main.Entities.Product;
@@ -91,5 +92,16 @@ public static class SortByConfig
 			.Map<StorageContent, int>("currencyId", x => x.CurrencyId);
 
 		QueryableSortBy.Value.ConfigureForJob();
+
+		QueryableSortBy
+			.Value
+			.MapDefault<DocumentGenerationRequest, DateTime>(x => x.CreatedAtUtc, true)
+			.Map<DocumentGenerationRequest, Guid>("requestId", x => x.RequestId)
+			.Map<DocumentGenerationRequest, Guid>("jobId", x => x.JobId)
+			.Map<DocumentGenerationRequest, Guid?>("requesterId", x => x.RequesterId)
+			.Map<DocumentGenerationRequest, string>("documentSystemName", x => x.DocumentSystemName)
+			.Map<DocumentGenerationRequest, DateTime>("createdAtUtc", x => x.CreatedAtUtc)
+			.Map<DocumentGenerationRequest, DateTime?>("generatedAtUtc", x => x.GeneratedAtUtc)
+			.Map<DocumentGenerationRequest, DateTime?>("expiresAtUtc", x => x.ExpiresAtUtc);
 	}
 }
