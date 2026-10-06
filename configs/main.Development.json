@@ -21,12 +21,6 @@
   "System": {
     "SystemId": "f1b99096-d889-4c69-ad63-43ab7f877edf"
   },
-  "HostedServiceOptions": {
-    "EmailWork": {
-      "Delay": "00:00:30",
-      "ScheduleAtOnce": 100
-    }
-  },
   "LrtExecutor": {
     "MaxParallelPerWorker": 1
   }

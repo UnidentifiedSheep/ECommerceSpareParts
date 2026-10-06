@@ -52,7 +52,7 @@ public class SingleSaleDocumentDefinition(
 			{
 				Id = x.Id,
 				BuyerName = x.User.UserInfo == null
-					? ""
+					? "—"
 					: x.User.UserInfo.Name + " " + x.User.UserInfo.Surname,
 				Comment = x.Comment,
 				CurrencyCode = x.Currency.Code,
