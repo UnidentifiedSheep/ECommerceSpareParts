@@ -1,8 +1,13 @@
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
+using HotChocolate.Types.Composite;
+using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Document;
+using Main.Api.GraphQl.Types.Inputs.Document;
+using Main.Application.Dtos.Documents;
 using Main.Application.Handlers.Documents;
+using Main.Application.Handlers.Documents.SearchDocuments;
 using MediatR;
 using Security.Authorization;
 using Security.Core.Interfaces;
@@ -24,21 +29,49 @@ public sealed class DocumentQueries
 		return result.Definitions.Select(definition => new GqlDocumentDefinition(definition)).ToArray();
 	}
 
-	[GraphQLName("link")]
+	[GraphQLName("byId")]
+	[Lookup]
 	[RequireAnyPermission(PermissionCodes.DOCUMENTS_ME, PermissionCodes.DOCUMENTS_ALL)]
-	public async Task<GqlDocumentLink> GetLinkAsync(
+	public async Task<GqlDocumentGenerationRequest?> GetByIdAsync(
 		Guid requestId,
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var document = await loader.LoadAsync(requestId, cancellationToken);
+		return document is null ? null : new GqlDocumentGenerationRequest(document);
+	}
+
+	[GraphQLName("byIds")]
+	[RequireAnyPermission(PermissionCodes.DOCUMENTS_ME, PermissionCodes.DOCUMENTS_ALL)]
+	public async Task<IReadOnlyList<GqlDocumentGenerationRequest>> GetByIdsAsync(
+		IReadOnlyCollection<Guid> requestIds,
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(requestIds, cancellationToken))
+			.OfType<DocumentGenerationRequestDto>()
+			.Select(document => new GqlDocumentGenerationRequest(document))
+			.ToArray();
+
+	[GraphQLName("search")]
+	[RequireAnyPermission(PermissionCodes.DOCUMENTS_ME, PermissionCodes.DOCUMENTS_ALL)]
+	public async Task<IReadOnlyList<GqlDocumentGenerationRequest>> SearchAsync(
+		GqlSearchDocumentsInput input,
 		IUserContext userContext,
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new GetDocumentLinkQuery(
-				requestId,
+			new SearchDocumentsQuery(
+				input.RequesterId,
 				userContext.UserId,
-				userContext.Permissions.Contains(AllDocumentsPermission)),
+				input.DocumentSystemName,
+				userContext.Permissions.Contains(AllDocumentsPermission),
+				input.Pagination,
+				input.SortBy?.Select(sort => sort.ToSortExpression()).ToArray()),
 			cancellationToken);
 
-		return new GqlDocumentLink(result.Url, result.UrlExpiresAtUtc);
+		return result.Requests
+			.Select(document => new GqlDocumentGenerationRequest(document))
+			.ToArray();
 	}
 }

@@ -8,6 +8,10 @@
     "document.request.type.name": "Document format",
     "document.request.type.description": "Choose the format of the generated document.",
     "document.request.culture.name": "Document language",
-    "document.request.culture.description": "Language of the generated document (en, ru or tr)."
+    "document.request.culture.description": "Language of the generated document (en, ru or tr).",
+    "document.search.pagination.required": "Pagination is required to search documents.",
+    "document.search.caller.id.required": "Caller ID is required to search personal documents.",
+    "document.search.system.name.too.long": "Document type name must not exceed 128 characters.",
+    "document.read.caller.id.required": "Caller ID is required to read personal documents."
   }
 }

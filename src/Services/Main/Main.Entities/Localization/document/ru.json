@@ -8,6 +8,10 @@
     "document.request.type.name": "Формат документа",
     "document.request.type.description": "Выберите формат создаваемого документа.",
     "document.request.culture.name": "Язык документа",
-    "document.request.culture.description": "Язык создаваемого документа (en, ru или tr)."
+    "document.request.culture.description": "Язык создаваемого документа (en, ru или tr).",
+    "document.search.pagination.required": "Для поиска документов требуется указать параметры пагинации.",
+    "document.search.caller.id.required": "Для поиска своих документов требуется идентификатор пользователя.",
+    "document.search.system.name.too.long": "Название типа документа не должно превышать 128 символов.",
+    "document.read.caller.id.required": "Для просмотра своих документов требуется идентификатор пользователя."
   }
 }

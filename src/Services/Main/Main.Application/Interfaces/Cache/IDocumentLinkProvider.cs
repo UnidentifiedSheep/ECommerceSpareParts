@@ -1,10 +1,10 @@
-using Main.Application.Dtos.Documents;
+using Main.Application.Models.Documents;
 
 namespace Main.Application.Interfaces.Cache;
 
 public interface IDocumentLinkProvider
 {
-	Task<GetDocumentLinkResult> GetOrCreateAsync(
+	Task<DocumentLink> GetOrCreateAsync(
 		Guid requestId,
 		string bucketName,
 		string storageKey,

@@ -8,6 +8,10 @@
     "document.request.type.name": "Belge biçimi",
     "document.request.type.description": "Oluşturulacak belgenin biçimini seçin.",
     "document.request.culture.name": "Belge dili",
-    "document.request.culture.description": "Oluşturulacak belgenin dili (en, ru veya tr)."
+    "document.request.culture.description": "Oluşturulacak belgenin dili (en, ru veya tr).",
+    "document.search.pagination.required": "Belgeleri aramak için sayfalama bilgisi gereklidir.",
+    "document.search.caller.id.required": "Kişisel belgeleri aramak için kullanıcı kimliği gereklidir.",
+    "document.search.system.name.too.long": "Belge türü adı 128 karakteri aşamaz.",
+    "document.read.caller.id.required": "Kişisel belgeleri görüntülemek için kullanıcı kimliği gereklidir."
   }
 }

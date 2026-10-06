@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cache;
 using Cache.Extensions;
-using Main.Application.Dtos.Documents;
 using Main.Application.Interfaces.Cache;
+using Main.Application.Models.Documents;
 using Main.Application.Static;
 using Main.Entities.Exceptions;
 using S3.Core.Interfaces;
@@ -12,7 +12,7 @@ public sealed class DocumentLinkProvider(ICache cache, IS3Service s3Service) : I
 {
 	private static readonly TimeSpan LinkLifetime = TimeSpan.FromMinutes(5);
 
-	public async Task<GetDocumentLinkResult> GetOrCreateAsync(
+	public async Task<DocumentLink> GetOrCreateAsync(
 		Guid requestId,
 		string bucketName,
 		string storageKey,
@@ -32,7 +32,7 @@ public sealed class DocumentLinkProvider(ICache cache, IS3Service s3Service) : I
 			async () =>
 			{
 				var url = await s3Service.CreatePresignedDownloadUrl(bucketName, storageKey, lifetime);
-				return new GetDocumentLinkResult(url, signedAtUtc.Add(lifetime));
+				return new DocumentLink(url, signedAtUtc.Add(lifetime));
 			},
 			cacheTtl) ?? throw new InvalidOperationException("Document link could not be created.");
 	}
