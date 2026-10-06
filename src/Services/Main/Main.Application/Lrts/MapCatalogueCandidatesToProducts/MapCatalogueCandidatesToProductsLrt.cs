@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -38,7 +37,7 @@ public class MapCatalogueCandidatesToProductsLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCatalogueCandidatesMapToProductsDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(NoneInputState inputState)
 	{
 		const int batchSize = 1000;
 

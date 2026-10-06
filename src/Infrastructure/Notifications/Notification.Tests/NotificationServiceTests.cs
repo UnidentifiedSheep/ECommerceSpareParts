@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Moq;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
@@ -12,30 +12,24 @@ namespace Notification.Tests;
 
 public class NotificationServiceTests
 {
-	[Fact]
-	public void RecipientJson_RoundTripsInAppRecipient()
+	[Theory]
+	[InlineData(true)]
+	[InlineData(false)]
+	public async Task QueueAsync_StoresExplicitRecipientOnDelivery(bool inApp)
 	{
-		INotificationRecipient recipient = new InAppRecipient(Guid.NewGuid());
-
-		var json = JsonSerializer.Serialize(recipient);
-
-		Assert.Equal(recipient, JsonSerializer.Deserialize<INotificationRecipient>(json));
-	}
-
-	[Fact]
-	public async Task QueueAsync_StoresExplicitRecipientOnDelivery()
-	{
-		var recipient = new EmailRecipient("unconfirmed@example.com");
+		INotificationRecipient recipient = inApp
+			? new InAppRecipient(Guid.NewGuid())
+			: new EmailRecipient("unconfirmed@example.com");
 		var notification = new TestNotification(new TestNotificationData
 		{
 			TestInt = 1,
 			TestString = "Verify email"
 		});
 		var channel = new Mock<INotificationChannel>();
-		channel.SetupGet(x => x.SystemName).Returns(EmailRecipient.ChannelName);
+		channel.SetupGet(x => x.SystemName).Returns(recipient.ChannelSystemName);
 		channel.Setup(x => x.CanHandle(notification, recipient)).Returns(true);
 		var channels = new Mock<INamedObjectRegistry<INotificationChannel>>();
-		channels.Setup(x => x.GetBySystemName(EmailRecipient.ChannelName)).Returns(channel.Object);
+		channels.Setup(x => x.GetBySystemName(recipient.ChannelSystemName)).Returns(channel.Object);
 		var definition = new NotificationDefinitionBase<TestNotification, TestNotificationData>(
 			notification.SystemName, new NotificationSerializer(), model => new TestNotification(model));
 		var definitions = new Mock<INamedObjectRegistry<INotificationDefinition>>();
@@ -55,7 +49,11 @@ public class NotificationServiceTests
 		await service.QueueAsync(Guid.NewGuid(), notification, [recipient], TestContext.Current.CancellationToken);
 
 		var delivery = Assert.Single(Assert.IsType<Notification.Core.Entities.Notification>(stored).Deliveries);
-		Assert.Equal(recipient, JsonSerializer.Deserialize<INotificationRecipient>(delivery.RecipientJson!));
+		Assert.DoesNotContain("$recipient", delivery.RecipientJson);
+		var deserialized = inApp
+			? (INotificationRecipient?)JsonSerializer.Deserialize<InAppRecipient>(delivery.RecipientJson!)
+			: JsonSerializer.Deserialize<EmailRecipient>(delivery.RecipientJson!);
+		Assert.Equal(recipient, deserialized);
 		resolver.VerifyNoOtherCalls();
 	}
 

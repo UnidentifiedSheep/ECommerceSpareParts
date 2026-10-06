@@ -1,4 +1,5 @@
 using Abstractions;
+using Application.Common.Querying;
 
 namespace GraphQL.Common.Types;
 

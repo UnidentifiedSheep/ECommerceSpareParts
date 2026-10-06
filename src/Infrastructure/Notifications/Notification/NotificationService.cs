@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
 using Notification.Core.Interfaces.Notification;
@@ -57,7 +57,9 @@ public class NotificationService(
 			if (!channels.Add(channel.SystemName))
 				throw new InvalidOperationException(
 					$"Multiple recipients for channel '{channel.SystemName}' are not supported.");
-			deliveries.Add((channel.SystemName, JsonSerializer.Serialize(recipient)));
+			deliveries.Add((
+				channel.SystemName,
+				JsonSerializer.Serialize(recipient, recipient.GetType())));
 		}
 
 		var definition = definitionRegistry.GetBySystemName(notification.SystemName);

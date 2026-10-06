@@ -1,3 +1,4 @@
+using Security.Core.Interfaces;
 using Abstractions.Interfaces;
 using Enums;
 using GraphQL.Common.Attributes;

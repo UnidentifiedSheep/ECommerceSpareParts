@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -49,7 +48,7 @@ public class InvalidateStalePriceOptionsLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtInvalidateStalePriceOptionsDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(NoneInputState inputState)
 	{
 		const int batchSize = 1000;
 

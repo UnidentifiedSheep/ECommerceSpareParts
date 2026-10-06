@@ -1,8 +1,8 @@
 using System.Data;
-using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Domain.Extensions;
 using Main.Application.Dtos.Sale;

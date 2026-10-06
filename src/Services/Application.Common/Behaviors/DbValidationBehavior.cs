@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces;
 using Application.Common.Abstractions;
+using Application.Common.Interfaces.Persistence;
 using BulkValidation.Core.Plan;
 using MediatR;
 

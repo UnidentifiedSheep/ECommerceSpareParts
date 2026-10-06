@@ -5,6 +5,7 @@ using Api.Common.Models.Requests;
 using Application.Common.Dtos;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
 using Application.Common.Interfaces.Services;
+using Application.Common.Models;
 using Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

@@ -1,5 +1,5 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Main.Application.Dtos.Product;
 using Main.Entities.Product;

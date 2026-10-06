@@ -1,16 +1,12 @@
-using Abstractions.Interfaces.Services;
+using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Settings;
 using Attributes;
-using Exceptions;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Notifications;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
-using Main.Entities;
 using Main.Entities.Exceptions;
-using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
 using Main.Enums.Auth;
@@ -30,7 +26,7 @@ public class RequestEmailVerificationHandler(
 	INotificationService notificationService,
 	IVerificationPayloadProvider verificationPayloadProvider,
 	IContextualLocalizer localizer,
-	ISettingsService settingsService) : ICommandHandler<RequestEmailVerificationCommand>
+	IAppLinkProvider appLinkProvider) : ICommandHandler<RequestEmailVerificationCommand>
 {
 	public async Task<Unit> Handle(
 		RequestEmailVerificationCommand request,
@@ -46,24 +42,18 @@ public class RequestEmailVerificationHandler(
 		if (userMail.Confirmed)
 			return Unit.Value;
 
-		var setting = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
-		var appServiceUrl = setting.AppServiceUrl ??
-			throw new InvalidInputException(
-				GlobalApplicationSettingAppServiceUrlNotConfiguredMessage.Instance);
-
 		var signed = jsonSigner.Sign(
 			await verificationPayloadProvider.GetPayload(
 				request.UserId,
 				VerificationType.EmailVerification,
 				normalizedEmail));
 
-		var baseUri = new Uri(appServiceUrl.TrimEnd('/') + "/");
-		var verificationUrl = new Uri(baseUri, $"verify-email?token={Uri.EscapeDataString(signed)}");
+		var verificationUrl = await appLinkProvider.CreateEmailVerificationUrlAsync(signed, cancellationToken);
 
 		await notificationService.QueueAsync(
 			request.UserId,
 			new EmailVerificationNotification(
-				new EmailVerificationNotificationData(localizer, verificationUrl.ToString())),
+				new EmailVerificationNotificationData(localizer, verificationUrl.AbsoluteUri)),
 			[new EmailRecipient(normalizedEmail)],
 			cancellationToken);
 

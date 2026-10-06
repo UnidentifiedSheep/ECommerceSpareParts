@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces;
+using Application.Common.Interfaces.Persistence;
 using BulkValidation.Base.Interfaces;
 using BulkValidation.Core.Interfaces;
 using BulkValidation.Core.Models;

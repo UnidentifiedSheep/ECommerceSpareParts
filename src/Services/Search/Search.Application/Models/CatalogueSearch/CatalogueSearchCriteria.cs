@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using Search.Enums;
 
 namespace Search.Application.Models.CatalogueSearch;

@@ -6,6 +6,7 @@ using Main.Entities.Auth;
 using Main.Entities.Balance;
 using Main.Entities.Cart;
 using Main.Entities.Currency;
+using Main.Entities.Documents;
 using Main.Entities.Order;
 using Main.Entities.Organization;
 using Main.Entities.Producer;
@@ -153,6 +154,8 @@ public partial class DContext : DbContext, INotificationDbContext
 	public virtual DbSet<UserVehicle> UserVehicles { get; set; }
 
 	public virtual DbSet<Job> Jobs { get; set; }
+
+	public virtual DbSet<DocumentGenerationRequest> DocumentGenerationRequests { get; set; }
 
 	public virtual DbSet<JobSchedule> JobSchedules { get; set; }
 

@@ -1,0 +1,13 @@
+{
+  "culture": "tr",
+  "messages": {
+    "document.generation.request.not.found": "Belge oluşturma isteği bulunamadı.",
+    "document.not.ready": "Belge hâlâ oluşturuluyor.",
+    "document.generation.failed": "Belge oluşturulamadı.",
+    "document.generation.cancelled": "Belge oluşturma iptal edildi.",
+    "document.request.type.name": "Belge biçimi",
+    "document.request.type.description": "Oluşturulacak belgenin biçimini seçin.",
+    "document.request.culture.name": "Belge dili",
+    "document.request.culture.description": "Oluşturulacak belgenin dili (en, ru veya tr)."
+  }
+}

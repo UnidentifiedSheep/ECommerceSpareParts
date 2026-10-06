@@ -1,5 +1,4 @@
-using Abstractions.Interfaces.Persistence;
-using Abstractions.Models;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Microsoft.EntityFrameworkCore;
 using Persistence.TransactionBuilder;
@@ -8,7 +7,7 @@ namespace Persistence.Services.UnitOfWork;
 
 public class EfUnitOfWorkBase(DbContext context) : IUnitOfWork
 {
-	public UnitOfWorkContext Context { get; } = new();
+	public IUnitOfWorkContext Context { get; } = new UnitOfWorkContext();
 
 	public async Task<T> ExecuteWithTransaction<T>(
 		TransactionalAttribute settings,

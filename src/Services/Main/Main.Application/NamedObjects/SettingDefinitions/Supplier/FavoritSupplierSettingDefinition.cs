@@ -1,6 +1,6 @@
+using Security.Core.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Exceptions;

@@ -1,6 +1,7 @@
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
+using Application.Common.Models;
 using Search.Application.Dtos.Producers;
 using Search.Application.Interfaces.Producer;
 using Search.Entities;

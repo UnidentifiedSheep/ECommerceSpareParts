@@ -220,6 +220,10 @@
     "permissions.notifications.me.name": "Interact with own notifications",
     "permissions.notifications.me.description": "Permission to interact with own notifications.",
     "permissions.notifications.all.name": "Interact with all notifications",
-    "permissions.notifications.all.description": "Permission to interact with notifications of all users."
+    "permissions.notifications.all.description": "Permission to interact with notifications of all users.",
+    "permissions.documents.me.name": "Own documents",
+    "permissions.documents.me.description": "Permission to request document generation and access own requests.",
+    "permissions.documents.all.name": "All documents",
+    "permissions.documents.all.description": "Permission to request document generation and access all users' requests."
   }
 }

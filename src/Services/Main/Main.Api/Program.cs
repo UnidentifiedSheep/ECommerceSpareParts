@@ -16,8 +16,8 @@ using Contracts.Job;
 using Contracts.Products;
 using Contracts.Settings;
 using Contracts.User;
-using ExchangeRate;
 using GraphQL.Common.Extensions;
+using Integrations.ExchangeRate.Di;
 using Main.Api;
 using Main.Api.EndPoints.Products;
 using Main.Api.GraphQl;
@@ -31,6 +31,7 @@ using MassTransit;
 using RabbitMq.Extensions;
 using S3;
 using Security;
+using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 using Global = Main.Application.Global;
 

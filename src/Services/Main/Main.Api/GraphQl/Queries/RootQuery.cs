@@ -21,4 +21,7 @@ public sealed class RootQuery
 
 	[GraphQLName("notifications")]
 	public NotificationQueries Notification => new();
+
+	[GraphQLName("documents")]
+	public DocumentQueries Documents => new();
 }

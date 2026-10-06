@@ -1,12 +1,11 @@
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Exceptions;
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
+using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Dtos.Product;
@@ -20,6 +19,7 @@ using Main.Entities.Product.ValueObjects;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Lrts.ProductImport;
 
@@ -28,7 +28,7 @@ public class ProductImportLrt(
 	IProducerLookupService producerLookupService,
 	IProductRepository productRepository,
 	IUnitOfWork unitOfWork,
-	IS3StorageService s3Service,
+	IS3Service s3Service,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,

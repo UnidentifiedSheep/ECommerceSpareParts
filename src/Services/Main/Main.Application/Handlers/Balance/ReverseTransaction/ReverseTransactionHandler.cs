@@ -1,3 +1,4 @@
+using Security.Core.Interfaces;
 using System.Data;
 using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;

@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -21,14 +20,14 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
 		publisher,
 		transactionService,
 		logger),
-	IMultiStepLrt where TInputState : class, IInputState where TState : class, TInputState
+	IMultiStepLrt where TInputState : class, IInputState where TState : class
 {
 
 	void IMultiStepLrt.ConfigureSteps(IMultiStepJobBuilder builder, string initialState) =>
 		ConfigureSteps(builder, initialState);
 	protected internal abstract void ConfigureSteps(IMultiStepJobBuilder builder, string initialState);
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(TInputState inputState)
 	{
 		var failure = await TransactionService.ExecuteAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),

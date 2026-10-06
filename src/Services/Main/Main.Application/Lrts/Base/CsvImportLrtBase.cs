@@ -1,6 +1,4 @@
 using System.Globalization;
-using Abstractions.Interfaces;
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -14,6 +12,7 @@ using Locan.Core.Interfaces.Localizers;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Lrts.Base;
 
@@ -24,7 +23,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
 	ILogger logger,
-	IS3StorageService s3Service,
+	IS3Service s3Service,
 	IContextualLocalizer stringLocalizer) : LrtBase<TInputState, TState>(
 	jobRepository,
 	unitOfWork,
@@ -32,7 +31,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 	transactionService,
 	logger)
 	where TInputState : class, IInputState, ICsvImportInputState
-	where TState : class, TInputState, ICsvImportState<TState>
+	where TState : class, ICsvImportState<TState>
 {
 	protected virtual int BatchSize => 1000;
 
@@ -43,18 +42,20 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 
 	protected IContextualLocalizer StringLocalizer => stringLocalizer;
 
-	protected sealed override async Task DoWork()
+	protected sealed override async Task DoWork(TInputState inputState)
 	{
 		var state = State;
 
 		await BeforeRead(state);
 
-		await using var stream = await s3Service.DownloadFileAsync(
+		using var response = await s3Service.DownloadFileAsync(
 			bucketsOptions.Value.Uploads.Name,
-			state.FileName,
+			inputState.FileName,
 			CancellationToken);
 
-		using var reader = new StreamReader(stream);
+		var streamResponse = response.Value ??
+			throw new FileNotFoundException($"S3 object '{inputState.FileName}' was not found.");
+		using var reader = new StreamReader(streamResponse.Stream);
 		using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
 		var rowIdx = 0;

@@ -1,6 +1,4 @@
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Exceptions;
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
@@ -9,6 +7,7 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
 using Domain.Extensions;
 using Enums;
+using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
@@ -20,13 +19,14 @@ using Main.Entities.Producer;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Lrts.ProducerSupplierMappingImport;
 
 public class ProducerSupplierMappingImportLrt(
 	IRepository<Job, Guid> jobRepository,
 	IUnitOfWork unitOfWork,
-	IS3StorageService s3Service,
+	IS3Service s3Service,
 	IProducerRepository producerRepository,
 	IProducerLookupService producerLookupService,
 	ILogger<ProducerSupplierMappingImportLrt> logger,

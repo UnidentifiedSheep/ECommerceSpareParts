@@ -1,6 +1,6 @@
-﻿using Abstractions.Interfaces.Exceptions;
-using Exceptions.Base;
+﻿using Exceptions.Base;
 using Locan.Core.Interfaces;
+using ILocalizableException = Exceptions.Interfaces.ILocalizableException;
 
 namespace Exceptions;
 

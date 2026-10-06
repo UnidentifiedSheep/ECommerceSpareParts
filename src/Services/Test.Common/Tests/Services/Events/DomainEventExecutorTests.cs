@@ -1,10 +1,11 @@
-using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Services.Events;
 using Domain.Interfaces.Events;
 using FluentAssertions;
 using MediatR;
 using Moq;
+using Persistence;
 
 namespace Tests.Tests.Services.Events;
 

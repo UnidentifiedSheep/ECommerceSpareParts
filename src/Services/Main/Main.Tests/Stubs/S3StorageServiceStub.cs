@@ -1,14 +1,15 @@
+using System.Collections.Concurrent;
 using System.Text;
-using Abstractions.Interfaces;
-using Abstractions.Models.S3;
+using S3.Core.Interfaces;
+using S3.Core.Models;
 
 namespace Tests.Stubs;
 
-public sealed class S3StorageServiceStub : IS3StorageService
+public sealed class S3StorageServiceStub : IS3Service
 {
-	private readonly Dictionary<(string Bucket, string Key), byte[]> _files = [];
+	private readonly ConcurrentDictionary<(string Bucket, string Key), byte[]> _files = new();
 
-	public Task<Stream> DownloadFileAsync(
+	public Task<Response<IStreamResponse>> DownloadFileAsync(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default)
@@ -16,15 +17,11 @@ public sealed class S3StorageServiceStub : IS3StorageService
 		ct.ThrowIfCancellationRequested();
 
 		if (!_files.TryGetValue((bucketName, keyName), out var content))
-			throw new FileNotFoundException($"Test S3 object '{bucketName}/{keyName}' was not found.");
+			return Task.FromResult(Response<IStreamResponse>.Failure(System.Net.HttpStatusCode.NotFound, "NoSuchKey"));
 
-		return Task.FromResult<Stream>(new MemoryStream(content, false));
+		return Task.FromResult(Response<IStreamResponse>.Success(
+			new MemoryStreamResponse(new MemoryStream(content, false))));
 	}
-
-	public Task<string> UploadFileAsync(
-		string bucketName,
-		IFile file,
-		string keyName) => throw new NotSupportedException();
 
 	public Task<string> UploadFileAsync(
 		string bucketName,
@@ -46,6 +43,11 @@ public sealed class S3StorageServiceStub : IS3StorageService
 		string contentType,
 		TimeSpan lifetime) => throw new NotSupportedException();
 
+	public Task<string> CreatePresignedDownloadUrl(
+		string bucketName,
+		string objectKey,
+		TimeSpan lifetime) => throw new NotSupportedException();
+
 	public Task CompletePresignedUploadUrl(
 		string bucketName,
 		string objectKey,
@@ -55,4 +57,11 @@ public sealed class S3StorageServiceStub : IS3StorageService
 		string bucketName,
 		string key,
 		string content) => _files[(bucketName, key)] = Encoding.UTF8.GetBytes(content);
+
+	private sealed class MemoryStreamResponse(Stream stream) : IStreamResponse
+	{
+		public Stream Stream { get; } = stream;
+
+		public void Dispose() => Stream.Dispose();
+	}
 }

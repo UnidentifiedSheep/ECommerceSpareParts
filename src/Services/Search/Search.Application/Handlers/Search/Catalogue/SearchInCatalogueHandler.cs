@@ -1,6 +1,7 @@
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
+using Application.Common.Models;
 using Search.Application.Dtos.CatalogueCandidates;
 using Search.Application.Dtos.Products;
 using Search.Application.Interfaces.CatalogueCandidate;

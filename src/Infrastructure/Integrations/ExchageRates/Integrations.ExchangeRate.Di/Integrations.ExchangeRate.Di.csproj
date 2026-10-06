@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj" />
+      <ProjectReference Include="..\Integrations.ExchangeRate.Cbr\Integrations.ExchangeRate.Cbr.csproj" />
+      <ProjectReference Include="..\Integrations.ExchangeRate.MoneyConvert\Integrations.ExchangeRate.MoneyConvert.csproj" />
+      <ProjectReference Include="..\Integrations.ExchangeRate\Integrations.ExchangeRate.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -2,6 +2,7 @@ using Abstractions.Models;
 using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces.Services;
+using Application.Common.Models;
 using Domain.CommonEntities.Job;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;

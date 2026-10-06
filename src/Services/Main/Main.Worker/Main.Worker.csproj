@@ -45,13 +45,12 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
-        <LocanResource Include="../../../Infrastructure/Security/Localization/**/*.json"
+        <LocanResource Include="../../../Infrastructure/Security/Security.Core/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\Main.Api\Main.Api.csproj"/>
         <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>

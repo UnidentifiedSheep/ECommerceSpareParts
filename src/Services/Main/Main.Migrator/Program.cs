@@ -1,6 +1,7 @@
-﻿using Abstractions.Interfaces.Validators;
+﻿using Security.Core.Interfaces;
 using Abstractions.Models;
 using Api.Common;
+using Application.Common.Interfaces.Validators;
 using Common;
 using Main.Migrator;
 using Main.Migrator.DataSeeds;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Persistence;
 using Persistence.Extensions;
 using Persistence.Interfaces;
+using Security.Models;
 using Security.Services;
 
 var builder = Host
@@ -39,7 +41,11 @@ builder.ConfigureServices((context, services) =>
 	});
 
 	//used for password hash etc
-	services.AddSingleton<IPasswordManager, PasswordManager>(_ => new PasswordManager(new PasswordRules()));
+	services.AddSingleton(new Hasher());
+	services.AddSingleton<IPasswordHasher>(sp => sp.GetRequiredService<Hasher>());
+	services.AddSingleton<IValueHasher>(sp => sp.GetRequiredService<Hasher>());
+	services.AddSingleton(new PasswordRules());
+	services.AddSingleton<IPasswordManager, PasswordManager>();
 
 	services
 		.AddOptions<ServiceSecrets>()

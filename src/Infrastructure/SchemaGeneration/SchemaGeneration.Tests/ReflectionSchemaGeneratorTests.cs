@@ -51,6 +51,27 @@ public sealed class ReflectionSchemaGeneratorTests
 	}
 
 	[Fact]
+	public void Generate_ShouldDescribeRequiredFieldsAndArrayItems()
+	{
+		var schema = _generator.Generate<DocumentRequest>();
+
+		schema.Fields.Single(field => field.Name == "documentType").Required.Should().BeTrue();
+		var items = schema.Fields.Single(field => field.Name == "items");
+		items.Type.Should().Be(SchemaValueType.Array);
+		items.NestedSchema.Should().NotBeNull();
+		items.NestedSchema!.Fields.Single(field => field.Name == "productId")
+			.Required.Should().BeTrue();
+	}
+
+	[Fact]
+	public void Generate_ShouldStopAtRecursiveProperty()
+	{
+		var schema = _generator.Generate<RecursiveInput>();
+
+		schema.Fields.Single(field => field.Name == "next").NestedSchema.Should().BeNull();
+	}
+
+	[Fact]
 	public void Generate_ShouldBuildCsvSchema()
 	{
 		var schema = _generator.Generate<CsvInput>();
@@ -190,6 +211,26 @@ public sealed class ReflectionSchemaGeneratorTests
 	}
 
 	private sealed record TestNested;
+
+	private sealed record DocumentRequest
+	{
+		[JsonPropertyName("documentType")]
+		public required string DocumentType { get; init; }
+
+		[JsonPropertyName("items")]
+		public required IReadOnlyList<DocumentItem> Items { get; init; }
+	}
+
+	private sealed record DocumentItem
+	{
+		[JsonPropertyName("productId")]
+		public required Guid ProductId { get; init; }
+	}
+
+	private sealed record RecursiveInput
+	{
+		public RecursiveInput? Next { get; init; }
+	}
 
 	private sealed class TestEntity;
 

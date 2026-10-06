@@ -9,6 +9,7 @@ using Pricing.Application.Lrts.PriceCandidateCalculation;
 namespace Pricing.Application.Handlers.Pricing;
 
 [Transactional]
+[AutoSave]
 public record RequestPriceCandidateRecalculationCommand(
 	IEnumerable<PriceRecalculationRequestDto> RecalculationRequests) : ICommand;
 

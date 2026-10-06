@@ -49,12 +49,7 @@ public class JobService(
 			async (ctx, ct) =>
 			{
 				var repository = ctx.Repositories.Get<IJobRepository>();
-				var addedIds = await repository.InsertJobsAsync(toAdd, ct);
-
-				if (addedIds.Count != 0)
-					await ctx.UnitOfWork.SaveChangesAsync(ct);
-
-				return addedIds;
+				return await repository.InsertJobsAsync(toAdd, ct);
 			},
 			token);
 	}

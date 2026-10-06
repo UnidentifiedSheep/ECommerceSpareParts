@@ -22,6 +22,7 @@ using OpenTelemetry.Trace;
 using RabbitMq.Extensions;
 using Scalar.AspNetCore;
 using Security;
+using Security.Extensions;
 using Yarp.ReverseProxy.Transforms;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 

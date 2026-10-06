@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces;
+﻿using Security.Core.Interfaces;
+using Abstractions.Interfaces;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Abstractions.Interfaces;
 using Abstractions.Models.Options;
 using Api.Common.Middleware;
@@ -109,12 +110,16 @@ public static class WebApplicationBuilderExtensions
 		this IServiceCollection services,
 		IServiceDefinition serviceDefinition)
 	{
+		var defaultCulture = CultureInfo.GetCultureInfo("en");
+		CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
+		CultureInfo.CurrentUICulture = defaultCulture;
+
 		services.AddProjectJsonSerialization();
 		services.AddOpenTelemetry(serviceDefinition, "worker");
 
 		services.AddLocanAspNetCore(options =>
 		{
-			options.DefaultCulture = "en";
+			options.DefaultCulture = defaultCulture.Name;
 			options.SupportedCultures = ["en", "ru", "tr"];
 		});
 

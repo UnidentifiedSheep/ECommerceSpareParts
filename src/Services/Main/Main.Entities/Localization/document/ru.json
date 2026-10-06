@@ -1,0 +1,13 @@
+{
+  "culture": "ru",
+  "messages": {
+    "document.generation.request.not.found": "Запрос на генерацию документа не найден.",
+    "document.not.ready": "Документ ещё генерируется.",
+    "document.generation.failed": "Не удалось сгенерировать документ.",
+    "document.generation.cancelled": "Генерация документа отменена.",
+    "document.request.type.name": "Формат документа",
+    "document.request.type.description": "Выберите формат создаваемого документа.",
+    "document.request.culture.name": "Язык документа",
+    "document.request.culture.description": "Язык создаваемого документа (en, ru или tr)."
+  }
+}

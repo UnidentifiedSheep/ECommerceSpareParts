@@ -1,6 +1,6 @@
-﻿using Abstractions.Interfaces.Events;
-using Application.Common.Interfaces.Events;
+﻿using Application.Common.Interfaces.Events;
 using Application.Common.Models;
+using Contracts.Interfaces;
 
 namespace Application.Common.Services.Events;
 

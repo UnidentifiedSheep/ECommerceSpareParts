@@ -1,10 +1,12 @@
-using Abstractions.Interfaces.Validators;
+using Security.Core.Interfaces;
 using Abstractions.Models.Options;
+using Application.Common.Interfaces.Validators;
 using Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Locan.Core.Interfaces;
 using Main.Application.Handlers.BaseValidators;
+using Main.Application.Models.Options;
 using Main.Entities;
 using Main.Entities.User;
 using Microsoft.Extensions.Options;

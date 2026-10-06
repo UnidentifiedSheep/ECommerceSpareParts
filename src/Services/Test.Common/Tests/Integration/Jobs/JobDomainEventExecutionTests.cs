@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -129,6 +128,6 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 		public override ILocalizableMessage DescriptionLocalizationMessage =>
 			new LocalizableMessage("test-description");
 
-		protected override Task DoWork() => Task.CompletedTask;
+		protected override Task DoWork(NoneInputState inputState) => Task.CompletedTask;
 	}
 }

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Abstractions.Models;
+using Application.Common.Models;
 using Main.Enums;
 
 namespace Main.Application.Dtos.Storage;

@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Organizations.GetOrganizations;

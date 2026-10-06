@@ -1,8 +1,8 @@
 using Abstractions;
-using Abstractions.Interfaces.Validators;
 using Application.Common;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Validators;
 using Application.Common.Services.Currency;
 using Application.Common.Validators;
 using Main.Application.Configs;
@@ -10,11 +10,17 @@ using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
+using Main.Application.Interfaces.Services.Document;
 using Main.Application.Interfaces.Services.Event;
 using Main.Application.Interfaces.Services.PayloadProvider;
+using Main.Application.JobProviders;
 using Main.Application.Lrts.ProducerImport;
+using Main.Application.Models.Options;
 using Main.Application.Services;
 using Main.Application.Services.Currency;
+using Main.Application.Services.Document;
+using Main.Application.Services.Document.Providers;
+using Main.Application.Services.Document.Sources;
 using Main.Application.Services.Event;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
@@ -33,9 +39,16 @@ public static class ServiceProvider
 		this IServiceCollection collection,
 		IConfiguration? configuration)
 	{
+		var appLinksOptions = collection.AddOptions<AppLinksOptions>()
+			.Validate(options => options.IsValid(), "App link templates must be relative and contain their required placeholders.")
+			.ValidateOnStart();
+		if (configuration is not null)
+			appLinksOptions.Bind(configuration.GetSection(AppLinksOptions.SectionName));
+
 		collection
 			.AddNamedObjects()
 			.AddLrtLayer(typeof(ProducerImportLrt).Assembly)
+			.RegisterJobProviders<GenerateDocumentJobProvider>()
 			.AddFusionCache()
 			.WithRegisteredDistributedCache()
 			.WithRegisteredBackplane()
@@ -45,6 +58,17 @@ public static class ServiceProvider
 		collection.RegisterProjectionProviders<ProducerImportLrt>();
 
 		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
+		collection.AddScoped<IAppLinkProvider, AppLinkProvider>();
+
+		//order is important
+		collection.AddSingleton<IDocumentTemplateSource, S3DocumentTemplateSource>();
+		collection.AddSingleton<IDocumentTemplateSource, EmbeddedDocumentTemplateSource>();
+		collection.Decorate<IDocumentTemplateSource, CachedDocumentTemplateSource>();
+
+		collection.AddSingleton<IDocumentTemplateCache, DocumentTemplateCache>();
+		collection.AddSingleton<IDocumentProvider, ExcelDocumentProvider>();
+		collection.AddSingleton<IDocumentTemplateResolver, DocumentTemplateResolver>();
+
 		collection.AddScoped<IRecipientResolver>(provider => provider.GetRequiredService<IRecipientProvider>());
 
 		collection.RegisterSettingsService();

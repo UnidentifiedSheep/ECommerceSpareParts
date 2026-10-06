@@ -128,7 +128,7 @@ public class Dequeuer<TRecipient>(
 					.GetBySystemName(delivery.Notification.NotificationSystemName)
 					.FromEntity(delivery.Notification);
 				var destination = delivery.RecipientJson != null
-					? JsonSerializer.Deserialize<INotificationRecipient>(delivery.RecipientJson)
+					? JsonSerializer.Deserialize<TRecipient>(delivery.RecipientJson)
 					: recipients.GetValueOrDefault(delivery.Notification.UserId);
 
 				if (destination is not null && destination.ChannelSystemName != SystemName)

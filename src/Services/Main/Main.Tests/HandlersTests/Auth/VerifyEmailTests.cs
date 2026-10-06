@@ -1,4 +1,4 @@
-using Abstractions.Interfaces.Services;
+using Security.Core.Interfaces;
 using FluentAssertions;
 using Main.Application.Handlers.Auth.EmailVerification;
 using Main.Application.Interfaces.Services.PayloadProvider;

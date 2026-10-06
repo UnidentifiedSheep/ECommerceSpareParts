@@ -1,5 +1,5 @@
-using Abstractions.Interfaces.Persistence;
 using Analytics.Persistence.Context;
+using Application.Common.Interfaces.Persistence;
 using Attributes;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

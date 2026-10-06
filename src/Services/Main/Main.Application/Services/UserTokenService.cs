@@ -1,13 +1,14 @@
 using System.Net;
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Persistence;
+using Application.Common.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Enums;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Services;
 
-public class UserTokenService(IUnitOfWork unitOfWork, ITokenHasher tokenHasher) : IUserTokenService
+public class UserTokenService(IUnitOfWork unitOfWork, IValueHasher valueHasher) : IUserTokenService
 {
 	public async Task AddToken(
 		string token,
@@ -22,7 +23,7 @@ public class UserTokenService(IUnitOfWork unitOfWork, ITokenHasher tokenHasher) 
 	{
 		var tokenModel = new UserToken
 		{
-			TokenHash = tokenHasher.HashToken(token),
+			TokenHash = valueHasher.Hash(token),
 			UserId = userId,
 			Type = type,
 			Permissions = permissions.ToList(),

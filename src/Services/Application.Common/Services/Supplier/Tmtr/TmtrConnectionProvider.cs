@@ -1,4 +1,4 @@
-using Abstractions.Interfaces.Services;
+using Security.Core.Interfaces;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;

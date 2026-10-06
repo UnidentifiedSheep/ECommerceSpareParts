@@ -1,6 +1,6 @@
-﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Models;
+﻿using Abstractions.Models;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -14,6 +14,7 @@ using Locan.Core.LocalizableMessages;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Persistence;
 using Tests.Stubs;
 
 namespace Tests.Tests.Lrt;
@@ -172,11 +173,40 @@ public class LrtBaseTests
 			fixture.LeaseHolderId,
 			TestContext.Current.CancellationToken);
 
-		fixture.Job.State.Should().Be("""{"Value":42}""");
+		using var saved = System.Text.Json.JsonDocument.Parse(fixture.Job.State);
+		saved.RootElement.GetProperty("$lrtVersion").GetInt32().Should().Be(1);
+		saved.RootElement.GetProperty("state").GetProperty("Value").GetInt32().Should().Be(42);
 		lrt.CapturedState!.Value.Should().Be(42);
 		renewedLeaseExpiresAt.Should().NotBeNull();
 		fixture.Job.Status.Should().Be(JobStatus.Succeeded);
 		fixture.UnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Exactly(3));
+	}
+
+	[Fact]
+	public async Task ExecuteAsync_RetryAfterCheckpoint_PreservesInputAndIndependentState()
+	{
+		var fixture = CreateFixture("""{"Source":"original"}""");
+		var lrt = fixture.CreateLrt();
+		lrt.Work = async x =>
+		{
+			if (x.DoWorkCalls == 1)
+			{
+				await x.UpdateStateForTest(new TestState { Value = 42 });
+				throw new InvalidOperationException("retry");
+			}
+
+			await x.CaptureStateForTest();
+		};
+
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
+
+		lrt.DoWorkCalls.Should().Be(2);
+		lrt.CapturedInput!.Source.Should().Be("original");
+		lrt.CapturedState!.Value.Should().Be(42);
+		fixture.Job.Status.Should().Be(JobStatus.Succeeded);
 	}
 
 	[Fact]
@@ -193,6 +223,23 @@ public class LrtBaseTests
 
 		lrt.CapturedState.Should().NotBeNull();
 		lrt.CapturedState!.Value.Should().Be(7);
+	}
+
+	[Fact]
+	public async Task ExecuteAsync_EnvelopeWithoutState_InitializesStateFromInput()
+	{
+		var fixture = CreateFixture(
+			"""{"$lrtVersion":1,"input":{"Source":"original"},"state":null}""");
+		var lrt = fixture.CreateLrt();
+		lrt.Work = x => x.CaptureStateForTest();
+
+		await lrt.ExecuteAsync(
+			fixture.JobId,
+			fixture.LeaseHolderId,
+			TestContext.Current.CancellationToken);
+
+		lrt.CapturedInput!.Source.Should().Be("original");
+		lrt.CapturedState!.Value.Should().Be(0);
 	}
 
 	[Fact]
@@ -324,7 +371,10 @@ public class LrtBaseTests
 				JobRepository.Object,
 				UnitOfWork.Object,
 				Publisher,
-				new ApplicationTransactionServiceStub(UnitOfWork.Object, Mock.Of<IRepositoryProvider>()),
+				new ApplicationTransactionServiceStub(
+					UnitOfWork.Object,
+					Mock.Of<IRepositoryProvider>(),
+					Mock.Of<IIntegrationEventScope>()),
 				Logger.Object);
 		}
 	}
@@ -346,6 +396,8 @@ public class LrtBaseTests
 		public int DoWorkCalls { get; private set; }
 
 		public TestState? CapturedState { get; private set; }
+
+		public TestInput? CapturedInput { get; private set; }
 
 		public DateTime? CapturedLeaseExpiresAt { get; set; }
 
@@ -375,9 +427,10 @@ public class LrtBaseTests
 		public override ILocalizableMessage DescriptionLocalizationMessage =>
 			new LocalizableMessage("test-lrt-description");
 
-		protected override Task DoWork()
+		protected override Task DoWork(TestInput inputState)
 		{
 			DoWorkCalls++;
+			CapturedInput = inputState;
 			return Work(this);
 		}
 
@@ -398,12 +451,14 @@ public class LrtBaseTests
 
 	private class TestInput : IInputState
 	{
+		public string? Source { get; set; }
+
 		public void ValidateState()
 		{
 		}
 	}
 
-	private sealed class TestState : TestInput
+	private sealed class TestState
 	{
 		public int Value { get; set; }
 	}

@@ -1,5 +1,5 @@
-using Abstractions.Interfaces.Exceptions;
 using Locan.Core.Interfaces;
+using ILocalizableException = Exceptions.Interfaces.ILocalizableException;
 
 namespace Exceptions.Base.Localized;
 

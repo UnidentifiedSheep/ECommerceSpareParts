@@ -1,9 +1,11 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Models;
 using Application.Common.Models.Options.S3;
 using Main.Application.Dtos.Uploads;
 using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
 
 namespace Main.Application.Handlers.Uploads.GetUploads;
 
@@ -11,7 +13,9 @@ public record GetUploadsQuery(Cursor<string?> Cursor) : IQuery<GetUploadsResult>
 
 public record GetUploadsResult(IReadOnlyList<FileDto> Files, string? NextContinuationToken, bool HasMore);
 
-public class GetUploadsHandler(IS3StorageService s3StorageService, IOptions<S3BucketsOptions> bucketsOptions)
+public class GetUploadsHandler(
+	IS3Service s3StorageService,
+	IOptions<S3BucketsOptions> bucketsOptions)
 	: IQueryHandler<GetUploadsQuery, GetUploadsResult>
 {
 	public async Task<GetUploadsResult> Handle(GetUploadsQuery request, CancellationToken cancellationToken)

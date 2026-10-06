@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -38,7 +37,7 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtOrganizationApproximateBalanceRecalculateDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(NoneInputState inputState)
 	{
 		var lastOrganizationId = Guid.Empty;
 

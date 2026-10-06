@@ -51,14 +51,15 @@
 
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
         <ProjectReference Include="..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\..\Core\Extensions\Extensions.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Cache\Cache.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Common\Common.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\S3\S3.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Security\Security.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\Security\Security\Security.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\SSS\S3\S3.csproj" />
         <ProjectReference Include="..\Application.Common\Application.Common.csproj"/>
     </ItemGroup>
 

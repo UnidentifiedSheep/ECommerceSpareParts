@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
+        <PackageReference Include="ClosedXML.Report" Version="0.2.12" />
         <PackageReference Include="CsvHelper" Version="33.1.0"/>
         <PackageReference Include="MassTransit" Version="8.5.8"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9"/>
@@ -25,9 +26,16 @@
     </ItemGroup>
 
     <ItemGroup>
+        <EmbeddedResource Include="Document/**/*.*" Exclude="Document/**/*.cs" WithCulture="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchageRates\Integrations.ExchangeRate\Integrations.ExchangeRate.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Notifications\Notification.Core\Notification.Core.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\SSS\S3.Core\S3.Core.csproj" />
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>

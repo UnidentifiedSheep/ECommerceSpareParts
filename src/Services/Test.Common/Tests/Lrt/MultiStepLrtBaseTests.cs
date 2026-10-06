@@ -1,6 +1,6 @@
-using Abstractions.Interfaces.Persistence;
 using Abstractions.Models;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -14,6 +14,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NamedObject.Core.Interfaces;
+using Persistence;
 using Tests.Stubs;
 
 namespace Tests.Tests.Lrt;
@@ -121,7 +122,10 @@ public sealed class MultiStepLrtBaseTests
 			Lrt = new TestMultiStepLrt(
 				JobRepository.Object,
 				UnitOfWork.Object,
-				new ApplicationTransactionServiceStub(UnitOfWork.Object, Mock.Of<IRepositoryProvider>()),
+				new ApplicationTransactionServiceStub(
+					UnitOfWork.Object,
+					Mock.Of<IRepositoryProvider>(),
+					Mock.Of<IIntegrationEventScope>()),
 				Publisher,
 				Logger.Object);
 

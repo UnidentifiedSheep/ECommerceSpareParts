@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -32,5 +31,5 @@ public class UpdateCurrencyRatesLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCurrencyRatesUpdateDescriptionMessage.Instance;
 
-	protected override Task DoWork() => sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
+	protected override Task DoWork(NoneInputState inputState) => sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
 }

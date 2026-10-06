@@ -1,5 +1,6 @@
 using System.Reflection;
 using Abstractions.Interfaces;
+using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using BulkValidation.Pgsql.Extensions;
 using Domain;

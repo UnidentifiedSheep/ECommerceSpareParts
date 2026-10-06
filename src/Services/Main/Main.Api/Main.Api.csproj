@@ -14,7 +14,7 @@
     <ItemGroup>
         <PackageReference Include="Carter" Version="10.0.0"/>
         <PackageReference Include="Locan.Generator" Version="1.0.6"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>
         <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1"/>
         <PackageReference Include="Serilog.Sinks.Loki" Version="4.0.0-beta3"/>
@@ -24,13 +24,13 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchageRates\Integrations.ExchangeRate.Di\Integrations.ExchangeRate.Di.csproj" />
 		<ProjectReference Include="..\..\..\Infrastructure\Notifications\Notification\Notification.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchangeRate\ExchangeRate.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\S3\S3.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Security\Security\Security.csproj" />
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\..\GraphQL.Common\GraphQL.Common.csproj"/>
@@ -64,7 +64,7 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
-        <LocanResource Include="../../../Infrastructure/Security/Localization/**/*.json"
+        <LocanResource Include="../../../Infrastructure/Security/Security.Core/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
     </ItemGroup>

@@ -1,5 +1,6 @@
 using Abstractions;
 using Analytics.Application.NamedObjects.ChartDataSources.SalesProfitOverTime;
+using Application.Common.Querying;
 
 namespace Analytics.Application.Configs;
 

@@ -30,7 +30,8 @@ public class GetFullSaleHandler(
 			.AsExpandable()
 			.Select(x => new
 			{
-				sale = saleToDto.Invoke(x), contents = x.Contents.Select(z => saleContentToDto.Invoke(z))
+				sale = saleToDto.Invoke(x),
+				contents = x.Contents.Select(z => saleContentToDto.Invoke(z))
 			})
 			.FirstOrDefaultAsync(cancellationToken) ?? throw new SaleNotFoundException(request.SaleId);
 

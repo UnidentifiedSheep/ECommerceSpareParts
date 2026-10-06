@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Application.Common.Models;
 using FluentAssertions;
 using Main.Application.Dtos.Organizations;
 using Main.Application.Handlers.Organizations.UpdateOrganization;

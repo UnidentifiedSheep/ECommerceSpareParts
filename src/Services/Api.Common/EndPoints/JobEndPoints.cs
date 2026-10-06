@@ -6,7 +6,6 @@ using Application.Common.Dtos;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
 using Application.Common.Interfaces.Services;
-using Application.Common.Models;
 using Carter;
 using Domain.CommonEnums;
 using Enums;
@@ -170,21 +169,19 @@ public class JobEndPoints : ICarterModule
 			.MapPost(
 				"",
 				async (
-					ISender sender, IJobService jobService,
+					ISender sender,
 					CreateJobRequest request, CancellationToken ct) =>
 				{
-					var jobIds = await jobService.TryEnqueueJobsAsync(
-						[
-							new JobItem(
-								request.SystemName,
-								request.InputState,
-								request.MaxAttempts)
-						],
+					var created = await sender.Send(
+						new CreateJobCommand(
+							request.SystemName,
+							request.InputState,
+							request.MaxAttempts),
 						ct);
-					var job = await sender.Send(new GetJobQuery(jobIds[0]), ct);
+					var job = await sender.Send(new GetJobQuery(created.JobId), ct);
 
 					return Results.Created(
-						$"/jobs/{jobIds[0]}",
+						$"/jobs/{created.JobId}",
 						new CreateJobResponse
 						{
 							Job = job.Job

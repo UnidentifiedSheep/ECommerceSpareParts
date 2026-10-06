@@ -192,7 +192,7 @@ public class TmtrSupplier(
 		failResponse = response.Success
 			? null
 			: Response<IReadOnlyList<SupplierProduct>>.Fail(
-				response.StatusCode ?? HttpStatusCode.InternalServerError,
+				response.StatusCode,
 				response.Error);
 
 		return !response.Success;

@@ -981,6 +981,62 @@ namespace Main.Migrator.Migrations
                     b.ToTable("currency_rate_history", "public");
                 });
 
+            modelBuilder.Entity("Main.Entities.Documents.DocumentGenerationRequest", b =>
+                {
+                    b.Property<Guid>("RequestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("request_id");
+
+                    b.Property<string>("BucketName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("bucket_name");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("DocumentSystemName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("document_system_name");
+
+                    b.Property<DateTime?>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at_utc");
+
+                    b.Property<DateTime?>("GeneratedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("generated_at_utc");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id");
+
+                    b.Property<Guid?>("RequesterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("requester_id");
+
+                    b.Property<string>("StorageKey")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnName("storage_key");
+
+                    b.HasKey("RequestId")
+                        .HasName("document_generation_requests_pk");
+
+                    b.HasIndex(new[] { "ExpiresAtUtc" }, "document_generation_requests_expires_at_idx")
+                        .HasFilter("expires_at_utc IS NOT NULL");
+
+                    b.HasIndex(new[] { "JobId" }, "document_generation_requests_job_id_uq")
+                        .IsUnique();
+
+                    b.HasIndex(new[] { "RequesterId", "CreatedAtUtc" }, "document_generation_requests_requester_created_idx");
+
+                    b.ToTable("document_generation_requests", "public");
+                });
+
             modelBuilder.Entity("Main.Entities.Event.Event", b =>
                 {
                     b.Property<int>("Id")
@@ -3791,6 +3847,24 @@ namespace Main.Migrator.Migrations
                         .IsRequired();
 
                     b.Navigation("CurrencyRate");
+                });
+
+            modelBuilder.Entity("Main.Entities.Documents.DocumentGenerationRequest", b =>
+                {
+                    b.HasOne("Domain.CommonEntities.Job.Job", "Job")
+                        .WithOne()
+                        .HasForeignKey("Main.Entities.Documents.DocumentGenerationRequest", "JobId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("document_generation_requests_job_fk");
+
+                    b.HasOne("Main.Entities.User.User", null)
+                        .WithMany()
+                        .HasForeignKey("RequesterId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("document_generation_requests_requester_fk");
+
+                    b.Navigation("Job");
                 });
 
             modelBuilder.Entity("Main.Entities.Order.Order", b =>

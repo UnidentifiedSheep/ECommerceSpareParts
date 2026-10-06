@@ -1,0 +1,41 @@
+﻿using S3.Core.Models;
+
+namespace S3.Core.Interfaces;
+
+public interface IS3Service
+{
+	Task<string> UploadFileAsync(
+		string bucketName,
+		Stream stream,
+		string keyName,
+		string contentType);
+
+	Task<Response<IStreamResponse>> DownloadFileAsync(
+		string bucketName,
+		string keyName,
+		CancellationToken ct = default);
+
+	Task<bool> DeleteFileAsync(string bucketName, string keyName);
+
+	Task<S3ObjectListDto> ListFilesAsync(
+		string bucketName,
+		string? continuationToken,
+		int size,
+		CancellationToken ct = default);
+
+	Task<string> CreatePresignedUploadUrl(
+		string bucketName,
+		string objectKey,
+		string contentType,
+		TimeSpan lifetime);
+
+	Task<string> CreatePresignedDownloadUrl(
+		string bucketName,
+		string objectKey,
+		TimeSpan lifetime);
+
+	Task CompletePresignedUploadUrl(
+		string bucketName,
+		string objectKey,
+		CancellationToken ct = default);
+}

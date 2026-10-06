@@ -1,4 +1,3 @@
-using Abstractions.Models.Validation;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -15,7 +14,7 @@ namespace Tests.Tests.GraphQl.ErrorFilters;
 public class ValidationErrorFilterTests
 {
 	[Fact]
-	public void OnError_ShouldReturnLocalizedVisibleFailures()
+	public void OnError_ShouldReturnLocalizedAndFallbackFailures()
 	{
 		var visibleFailure = new ValidationFailure("Name", "fallback")
 		{
@@ -23,11 +22,8 @@ public class ValidationErrorFilterTests
 			AttemptedValue = "value",
 			CustomState = new LocalizableMessage("Validation.Required")
 		};
-		var hiddenFailure = new ValidationFailure("Secret", "hidden")
-		{
-			CustomState = ValidationStateData.DontDisplay
-		};
-		var exception = new ValidationException([visibleFailure, hiddenFailure]);
+		var fallbackFailure = new ValidationFailure("Secret", "fallback secret");
+		var exception = new ValidationException([visibleFailure, fallbackFailure]);
 		var loggerFactory = new RecordingLoggerFactory();
 		var filter = CreateFilter(loggerFactory);
 
@@ -45,10 +41,14 @@ public class ValidationErrorFilterTests
 			.Should()
 			.BeAssignableTo<IReadOnlyCollection<IReadOnlyDictionary<string, object?>>>()
 			.Subject;
-		var validationError = errors.Should().ContainSingle().Subject;
+		errors.Should().HaveCount(2);
+		var validationError = errors.First();
 		validationError["propertyName"].Should().Be("Name");
 		validationError["errorMessage"].Should().Be("Localized validation for Name");
 		validationError["attemptedValue"].Should().Be("value");
+		var fallbackError = errors.Last();
+		fallbackError["propertyName"].Should().Be("Secret");
+		fallbackError["errorMessage"].Should().Be("fallback secret");
 		loggerFactory.LogLevels.Should().ContainSingle().Which.Should().Be(LogLevel.Information);
 	}
 

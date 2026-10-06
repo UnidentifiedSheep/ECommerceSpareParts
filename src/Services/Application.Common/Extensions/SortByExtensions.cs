@@ -1,6 +1,6 @@
 ﻿using Abstractions;
-using Abstractions.Models.SortyBy;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Querying;
 using Exceptions;
 
 namespace Application.Common.Extensions;

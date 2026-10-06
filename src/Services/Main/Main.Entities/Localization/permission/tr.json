@@ -220,6 +220,10 @@
     "permissions.notifications.me.name": "Kendi bildirimleriyle etkileşim",
     "permissions.notifications.me.description": "Kendi bildirimleriyle etkileşim kurma izni.",
     "permissions.notifications.all.name": "Tüm bildirimlerle etkileşim",
-    "permissions.notifications.all.description": "Tüm kullanıcıların bildirimleriyle etkileşim kurma izni."
+    "permissions.notifications.all.description": "Tüm kullanıcıların bildirimleriyle etkileşim kurma izni.",
+    "permissions.documents.me.name": "Kendi belgeleri",
+    "permissions.documents.me.description": "Belge oluşturma isteği gönderme ve kendi isteklerine erişme izni.",
+    "permissions.documents.all.name": "Tüm belgeler",
+    "permissions.documents.all.description": "Belge oluşturma isteği gönderme ve tüm kullanıcıların isteklerine erişme izni."
   }
 }

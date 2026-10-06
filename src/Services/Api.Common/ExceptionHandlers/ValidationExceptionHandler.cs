@@ -1,5 +1,4 @@
-﻿using Abstractions.Models.Validation;
-using FluentValidation;
+﻿using FluentValidation;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Mvc;
@@ -36,14 +35,10 @@ public class ValidationExceptionHandler(
 
 	private void AddValidationErrors(ProblemDetails problemDetails, ValidationException exception)
 	{
-		var errors = new List<ValidationErrorModel>();
+		var errors = new List<ValidationErrorResponse>();
 
 		foreach (var error in exception.Errors)
 		{
-			var state = error.CustomState as ValidationStateData;
-			if (!(state?.DisplayErrorToUser ?? true))
-				continue;
-
 			var propertyName = error.PropertyName;
 			var errorMessage = error.ErrorMessage;
 			var attemptedValue = error.AttemptedValue;
@@ -52,7 +47,7 @@ public class ValidationExceptionHandler(
 				!localizer.TryGet(localizableMessage, out var localizedMessage))
 			{
 				errors.Add(
-					new ValidationErrorModel(
+					new ValidationErrorResponse(
 						propertyName,
 						errorMessage,
 						attemptedValue));
@@ -60,7 +55,7 @@ public class ValidationExceptionHandler(
 			}
 
 			errors.Add(
-				new ValidationErrorModel(
+				new ValidationErrorResponse(
 					propertyName,
 					localizedMessage,
 					attemptedValue));
@@ -68,4 +63,9 @@ public class ValidationExceptionHandler(
 
 		problemDetails.Extensions["validationErrors"] = errors;
 	}
+
+	private sealed record ValidationErrorResponse(
+		string PropertyName,
+		string ErrorMessage,
+		object? AttemptedValue);
 }

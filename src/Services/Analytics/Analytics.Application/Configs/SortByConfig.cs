@@ -1,5 +1,6 @@
 ﻿using Abstractions;
 using Application.Common.Extensions;
+using Application.Common.Querying;
 
 namespace Analytics.Application.Configs;
 

@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Persistence;
 using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
 using Analytics.Entities;
@@ -35,13 +34,13 @@ public class MarkupCalculationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		MarkupCalculationLrtDescriptionMessage.Instance;
 
-	protected override async Task DoWork()
+	protected override async Task DoWork(MarkupCalculationInputState inputState)
 	{
 		var analyzer = registry.GetBySystemName(MarkupRangeAnalyzer.AnalyzerSystemName);
 		var result = await analyzer.AnalyzeAsync(
 			new MarkupAnalyzerInput
 			{
-				StartDate = State.RangeStart, EndDate = State.RangeEnd
+				StartDate = inputState.RangeStart, EndDate = inputState.RangeEnd
 			},
 			CancellationToken);
 

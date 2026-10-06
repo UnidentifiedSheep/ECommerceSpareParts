@@ -1,3 +1,4 @@
+using Security.Core.Interfaces;
 using Abstractions.Interfaces;
 using FluentAssertions;
 using GraphQL.Common.Extensions;

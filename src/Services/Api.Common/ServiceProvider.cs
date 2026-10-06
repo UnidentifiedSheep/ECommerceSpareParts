@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
 using Api.Common.HostedServices;
@@ -20,6 +21,8 @@ public static class ServiceProvider
 	public static IServiceCollection AddProjectJsonSerialization(this IServiceCollection collection)
 	{
 		collection.TryAddSingleton<ProjectJsonOptions>();
+		collection.TryAddSingleton<JsonSerializerOptions>(
+			sp => sp.GetRequiredService<ProjectJsonOptions>().SerializerOptions);
 
 		return collection;
 	}

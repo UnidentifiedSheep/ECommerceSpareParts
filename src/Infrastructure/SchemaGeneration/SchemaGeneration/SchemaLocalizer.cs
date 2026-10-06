@@ -30,7 +30,8 @@ public sealed class SchemaLocalizer(IContextualLocalizer localizer) : ISchemaLoc
 			Label = GetLocalizedOrDefault(field.LabelKey),
 			Description = GetLocalizedOrDefault(field.DescriptionKey),
 			LabelKey = null,
-			DescriptionKey = null
+			DescriptionKey = null,
+			NestedSchema = field.NestedSchema is null ? null : Localize(field.NestedSchema)
 		};
 	}
 

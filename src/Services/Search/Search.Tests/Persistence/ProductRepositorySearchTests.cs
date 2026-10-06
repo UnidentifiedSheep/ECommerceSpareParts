@@ -1,5 +1,6 @@
 using System.Text;
 using Abstractions.Models;
+using Application.Common.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;

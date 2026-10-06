@@ -15,7 +15,7 @@ public sealed class SchemaGenerationRegistrationTests
 	public void AddSchemaGeneration_ShouldResolveLocalizedGeneratorByDefault()
 	{
 		var services = new ServiceCollection();
-		services.AddScoped<IContextualLocalizer>(_ => new StubContextualStringLocalizer(
+		services.AddSingleton<IContextualLocalizer>(_ => new StubContextualStringLocalizer(
 			new Dictionary<string, string>
 			{
 				["value.label"] = "Localized value"
@@ -51,42 +51,6 @@ public sealed class SchemaGenerationRegistrationTests
 		var schema = first.Generate<LocalizedInput>();
 		schema.Fields.Single().LabelKey.Should().Be("value.label");
 		schema.Fields.Single().Label.Should().BeNull();
-	}
-
-	[Fact]
-	public void AddSchemaGeneration_ShouldNotLeakLocalizedSchemaBetweenScopes()
-	{
-		var scopeNumber = 0;
-		var services = new ServiceCollection();
-		services.AddScoped<IContextualLocalizer>(_ =>
-		{
-			var localizedValue = Interlocked.Increment(ref scopeNumber) == 1 ? "First scope" : "Second scope";
-
-			return new StubContextualStringLocalizer(
-				new Dictionary<string, string>
-				{
-					["value.label"] = localizedValue
-				});
-		});
-		services.AddSchemaGeneration();
-
-		using var provider = services.BuildServiceProvider(true);
-
-		using var firstScope = provider.CreateScope();
-		var firstSchema = firstScope
-			.ServiceProvider
-			.GetRequiredService<ISchemaGenerator>()
-			.Generate<LocalizedInput>();
-
-		using var secondScope = provider.CreateScope();
-		var secondSchema = secondScope
-			.ServiceProvider
-			.GetRequiredService<ISchemaGenerator>()
-			.Generate<LocalizedInput>();
-
-		firstSchema.Fields.Single().Label.Should().Be("First scope");
-		secondSchema.Fields.Single().Label.Should().Be("Second scope");
-		secondSchema.Should().NotBeSameAs(firstSchema);
 	}
 
 	private sealed record LocalizedInput

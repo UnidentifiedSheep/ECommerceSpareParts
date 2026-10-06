@@ -1,5 +1,6 @@
 ﻿using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
+using Main.Application.Models.Options;
 using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Options.GetEmailOptions;
