@@ -1,51 +1,95 @@
 using Domain.CommonEnums;
 using HotChocolate;
+using Main.Api.GraphQl.DataLoaders;
 using Main.Application.Dtos.Documents;
 using Main.Application.Interfaces.Cache;
+using Main.Entities.Exceptions;
 
 namespace Main.Api.GraphQl.Types.Document;
 
 [GraphQLName("DocumentGenerationRequest")]
-public record GqlDocumentGenerationRequest(
-	[property: GraphQLIgnore] DocumentGenerationRequestDto Dto)
+public record GqlDocumentGenerationRequest
 {
+	private readonly DocumentGenerationRequestDto? _document;
+
+	public GqlDocumentGenerationRequest(Guid requestId)
+	{
+		RequestId = requestId;
+	}
+
+	public GqlDocumentGenerationRequest(
+		DocumentGenerationRequestDto document) : this(document.RequestId)
+	{
+		_document = document;
+	}
+
 	[GraphQLName("requestId")]
-	public Guid RequestId => Dto.RequestId;
+	public Guid RequestId { get; }
 
 	[GraphQLName("jobId")]
-	public Guid JobId => Dto.JobId;
+	public async Task<Guid> GetJobIdAsync(
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetDocumentAsync(loader, cancellationToken)).JobId;
 
 	[GraphQLName("status")]
-	public JobStatus Status => Dto.Status;
+	public async Task<JobStatus> GetStatusAsync(
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetDocumentAsync(loader, cancellationToken)).Status;
 
 	[GraphQLName("documentSystemName")]
-	public string DocumentSystemName => Dto.DocumentSystemName;
+	public async Task<string> GetDocumentSystemNameAsync(
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetDocumentAsync(loader, cancellationToken)).DocumentSystemName;
 
 	[GraphQLName("requesterId")]
-	public Guid? RequesterId => Dto.RequesterId;
+	public async Task<Guid?> GetRequesterIdAsync(
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetDocumentAsync(loader, cancellationToken)).RequesterId;
 
 	[GraphQLName("createdAt")]
-	public DateTime CreatedAt => Dto.CreatedAt;
+	public async Task<DateTime> GetCreatedAtAsync(
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetDocumentAsync(loader, cancellationToken)).CreatedAt;
 
 	[GraphQLName("generatedAt")]
-	public DateTime? GeneratedAt => Dto.GeneratedAt;
+	public async Task<DateTime?> GetGeneratedAtAsync(
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetDocumentAsync(loader, cancellationToken)).GeneratedAt;
 
 	[GraphQLName("expiresAt")]
-	public DateTime? ExpiresAt => Dto.ExpiresAt;
+	public async Task<DateTime?> GetExpiresAtAsync(
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetDocumentAsync(loader, cancellationToken)).ExpiresAt;
 
 	[GraphQLName("fileLink")]
 	public async Task<GqlDocumentLink?> GetFileLinkAsync(
-		IDocumentLinkProvider linkProvider)
+		IDocumentGenerationRequestsDataLoader loader,
+		IDocumentLinkProvider linkProvider,
+		CancellationToken cancellationToken)
 	{
-		if (Dto.BucketName == null || Dto.StorageKey == null || ExpiresAt == null)
+		var document = await GetDocumentAsync(loader, cancellationToken);
+		if (document.BucketName is null || document.StorageKey is null || document.ExpiresAt is null)
 			return null;
 
-		var res = await linkProvider.GetOrCreateAsync(
+		var link = await linkProvider.GetOrCreateAsync(
 			RequestId,
-			Dto.BucketName,
-			Dto.StorageKey,
-			ExpiresAt.Value);
+			document.BucketName,
+			document.StorageKey,
+			document.ExpiresAt.Value);
 
-		return new GqlDocumentLink(res.Url, res.UrlExpiresAtUtc);
+		return new GqlDocumentLink(link.Url, link.UrlExpiresAtUtc);
 	}
+
+	private async Task<DocumentGenerationRequestDto> GetDocumentAsync(
+		IDocumentGenerationRequestsDataLoader loader,
+		CancellationToken cancellationToken) =>
+		_document ?? await loader.LoadAsync(RequestId, cancellationToken) ??
+		throw new DocumentGenerationRequestNotFoundException(RequestId);
 }
