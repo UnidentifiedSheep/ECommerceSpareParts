@@ -18,9 +18,9 @@ public sealed class DocumentGenerationRequestDtoProjectionProvider
 			Status = request.Job.Status,
 			DocumentSystemName = request.DocumentSystemName,
 			RequesterId = request.RequesterId,
-			CreatedAtUtc = request.CreatedAtUtc,
-			GeneratedAtUtc = request.GeneratedAtUtc,
-			ExpiresAtUtc = request.ExpiresAtUtc,
+			CreatedAt = request.CreatedAt,
+			GeneratedAt = request.GeneratedAt,
+			ExpiresAt = request.ExpiresAt,
 			StorageKey = request.StorageKey,
 			BucketName = request.BucketName
 		};

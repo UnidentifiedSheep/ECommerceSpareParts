@@ -992,7 +992,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("bucket_name");
 
-                    b.Property<DateTime>("CreatedAtUtc")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
@@ -1002,11 +1002,11 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("document_system_name");
 
-                    b.Property<DateTime?>("ExpiresAtUtc")
+                    b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at_utc");
 
-                    b.Property<DateTime?>("GeneratedAtUtc")
+                    b.Property<DateTime?>("GeneratedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("generated_at_utc");
 
@@ -1026,13 +1026,13 @@ namespace Main.Migrator.Migrations
                     b.HasKey("RequestId")
                         .HasName("document_generation_requests_pk");
 
-                    b.HasIndex(new[] { "ExpiresAtUtc" }, "document_generation_requests_expires_at_idx")
+                    b.HasIndex(new[] { "ExpiresAt" }, "document_generation_requests_expires_at_idx")
                         .HasFilter("expires_at_utc IS NOT NULL");
 
                     b.HasIndex(new[] { "JobId" }, "document_generation_requests_job_id_uq")
                         .IsUnique();
 
-                    b.HasIndex(new[] { "RequesterId", "CreatedAtUtc" }, "document_generation_requests_requester_created_idx");
+                    b.HasIndex(new[] { "RequesterId", "CreatedAt" }, "document_generation_requests_requester_created_idx");
 
                     b.ToTable("document_generation_requests", "public");
                 });

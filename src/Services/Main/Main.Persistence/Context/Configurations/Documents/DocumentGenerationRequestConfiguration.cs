@@ -23,25 +23,25 @@ public sealed class DocumentGenerationRequestConfiguration
 			.IsRequired();
 
 		builder.Property(request => request.RequesterId).HasColumnName("requester_id");
-		builder.Property(request => request.CreatedAtUtc).HasColumnName("created_at_utc");
+		builder.Property(request => request.CreatedAt).HasColumnName("created_at_utc");
 		builder.Property(request => request.BucketName)
 			.HasColumnName("bucket_name")
 			.HasMaxLength(255);
 		builder.Property(request => request.StorageKey)
 			.HasColumnName("storage_key")
 			.HasMaxLength(1024);
-		builder.Property(request => request.GeneratedAtUtc).HasColumnName("generated_at_utc");
-		builder.Property(request => request.ExpiresAtUtc).HasColumnName("expires_at_utc");
+		builder.Property(request => request.GeneratedAt).HasColumnName("generated_at_utc");
+		builder.Property(request => request.ExpiresAt).HasColumnName("expires_at_utc");
 
 		builder.HasIndex(
-			request => new { request.RequesterId, request.CreatedAtUtc },
+			request => new { request.RequesterId, CreatedAtUtc = request.CreatedAt },
 			"document_generation_requests_requester_created_idx");
 		builder.HasIndex(
 			request => request.JobId,
 			"document_generation_requests_job_id_uq")
 			.IsUnique();
 		builder.HasIndex(
-			request => request.ExpiresAtUtc,
+			request => request.ExpiresAt,
 			"document_generation_requests_expires_at_idx")
 			.HasFilter("expires_at_utc IS NOT NULL");
 

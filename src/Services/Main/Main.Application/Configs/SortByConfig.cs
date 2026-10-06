@@ -95,13 +95,13 @@ public static class SortByConfig
 
 		QueryableSortBy
 			.Value
-			.MapDefault<DocumentGenerationRequest, DateTime>(x => x.CreatedAtUtc, true)
+			.MapDefault<DocumentGenerationRequest, DateTime>(x => x.CreatedAt, true)
 			.Map<DocumentGenerationRequest, Guid>("requestId", x => x.RequestId)
 			.Map<DocumentGenerationRequest, Guid>("jobId", x => x.JobId)
 			.Map<DocumentGenerationRequest, Guid?>("requesterId", x => x.RequesterId)
 			.Map<DocumentGenerationRequest, string>("documentSystemName", x => x.DocumentSystemName)
-			.Map<DocumentGenerationRequest, DateTime>("createdAtUtc", x => x.CreatedAtUtc)
-			.Map<DocumentGenerationRequest, DateTime?>("generatedAtUtc", x => x.GeneratedAtUtc)
-			.Map<DocumentGenerationRequest, DateTime?>("expiresAtUtc", x => x.ExpiresAtUtc);
+			.Map<DocumentGenerationRequest, DateTime>("createdAt", x => x.CreatedAt)
+			.Map<DocumentGenerationRequest, DateTime?>("generatedAt", x => x.GeneratedAt)
+			.Map<DocumentGenerationRequest, DateTime?>("expiresAt", x => x.ExpiresAt);
 	}
 }

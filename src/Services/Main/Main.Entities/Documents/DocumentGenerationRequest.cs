@@ -13,11 +13,11 @@ public sealed class DocumentGenerationRequest
 	public Guid JobId { get; private set; }
 	public string DocumentSystemName { get; private set; } = null!;
 	public Guid? RequesterId { get; private set; }
-	public DateTime CreatedAtUtc { get; private set; }
+	public DateTime CreatedAt { get; private set; }
 	public string? BucketName { get; private set; }
 	public string? StorageKey { get; private set; }
-	public DateTime? GeneratedAtUtc { get; private set; }
-	public DateTime? ExpiresAtUtc { get; private set; }
+	public DateTime? GeneratedAt { get; private set; }
+	public DateTime? ExpiresAt { get; private set; }
 
 	public Job Job { get; private set; } = null!;
 
@@ -43,7 +43,7 @@ public sealed class DocumentGenerationRequest
 		RequesterId = requesterId?.EnsureNotEqual(
 			Guid.Empty,
 			() => new InvalidOperationException("Requester ID cannot be empty."));
-		CreatedAtUtc = DateTime.UtcNow;
+		CreatedAt = DateTime.UtcNow;
 	}
 
 	public static DocumentGenerationRequest Create(
@@ -55,8 +55,8 @@ public sealed class DocumentGenerationRequest
 	public void Complete(
 		string bucketName,
 		string storageKey,
-		DateTime generatedAtUtc,
-		DateTime expiresAtUtc)
+		DateTime generatedAt,
+		DateTime expiresAt)
 	{
 		if (StorageKey is not null)
 			throw new InvalidOperationException("Document generation is already completed.");
@@ -71,17 +71,17 @@ public sealed class DocumentGenerationRequest
 				new InvalidOperationException("Storage key is required."))
 			.EnsureMaxLength(1024, () =>
 				new InvalidOperationException("Storage key is too long."));
-		generatedAtUtc.Ensure(
+		generatedAt.Ensure(
 			value => value.Kind == DateTimeKind.Utc,
 			() => new InvalidOperationException("Generation time must be UTC."));
-		expiresAtUtc.Ensure(
-			value => value.Kind == DateTimeKind.Utc && value > generatedAtUtc,
+		expiresAt.Ensure(
+			value => value.Kind == DateTimeKind.Utc && value > generatedAt,
 			() => new InvalidOperationException("Expiration time must be UTC and after generation."));
 
 		BucketName = validatedBucketName;
 		StorageKey = validatedStorageKey;
-		GeneratedAtUtc = generatedAtUtc;
-		ExpiresAtUtc = expiresAtUtc;
+		GeneratedAt = generatedAt;
+		ExpiresAt = expiresAt;
 	}
 
 	public override Guid GetId() => RequestId;

@@ -21,14 +21,14 @@ public record DocumentGenerationRequestDto
 	[JsonPropertyName("requesterId")]
 	public Guid? RequesterId { get; init; }
 
-	[JsonPropertyName("createdAtUtc")]
-	public required DateTime CreatedAtUtc { get; init; }
+	[JsonPropertyName("createdAt")]
+	public required DateTime CreatedAt { get; init; }
 
-	[JsonPropertyName("generatedAtUtc")]
-	public DateTime? GeneratedAtUtc { get; init; }
+	[JsonPropertyName("generatedAt")]
+	public DateTime? GeneratedAt { get; init; }
 
-	[JsonPropertyName("expiresAtUtc")]
-	public DateTime? ExpiresAtUtc { get; init; }
+	[JsonPropertyName("expiresAt")]
+	public DateTime? ExpiresAt { get; init; }
 
 	[JsonPropertyName("bucketName")]
 	public string? BucketName { get; init; }

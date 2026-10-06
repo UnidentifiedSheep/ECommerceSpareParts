@@ -24,27 +24,27 @@ public record GqlDocumentGenerationRequest(
 	[GraphQLName("requesterId")]
 	public Guid? RequesterId => Dto.RequesterId;
 
-	[GraphQLName("createdAtUtc")]
-	public DateTime CreatedAtUtc => Dto.CreatedAtUtc;
+	[GraphQLName("createdAt")]
+	public DateTime CreatedAt => Dto.CreatedAt;
 
-	[GraphQLName("generatedAtUtc")]
-	public DateTime? GeneratedAtUtc => Dto.GeneratedAtUtc;
+	[GraphQLName("generatedAt")]
+	public DateTime? GeneratedAt => Dto.GeneratedAt;
 
-	[GraphQLName("expiresAtUtc")]
-	public DateTime? ExpiresAtUtc => Dto.ExpiresAtUtc;
+	[GraphQLName("expiresAt")]
+	public DateTime? ExpiresAt => Dto.ExpiresAt;
 
 	[GraphQLName("fileLink")]
 	public async Task<GqlDocumentLink?> GetFileLinkAsync(
 		IDocumentLinkProvider linkProvider)
 	{
-		if (Dto.BucketName == null || Dto.StorageKey == null || ExpiresAtUtc == null)
+		if (Dto.BucketName == null || Dto.StorageKey == null || ExpiresAt == null)
 			return null;
 
 		var res = await linkProvider.GetOrCreateAsync(
 			RequestId,
 			Dto.BucketName,
 			Dto.StorageKey,
-			ExpiresAtUtc.Value);
+			ExpiresAt.Value);
 
 		return new GqlDocumentLink(res.Url, res.UrlExpiresAtUtc);
 	}
