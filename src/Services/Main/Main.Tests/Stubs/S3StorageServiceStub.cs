@@ -29,7 +29,15 @@ public sealed class S3StorageServiceStub : IS3Service
 		string keyName,
 		string contentType) => throw new NotSupportedException();
 
-	public Task<bool> DeleteFileAsync(string bucketName, string keyName) => throw new NotSupportedException();
+	public Task<DeleteObjectResult> DeleteFileAsync(
+		string bucketName,
+		string keyName,
+		CancellationToken ct = default) => throw new NotSupportedException();
+
+	public Task<IReadOnlyList<DeleteObjectResult>> TryDeleteFilesAsync(
+		string bucketName,
+		IEnumerable<string> keys,
+		CancellationToken ct = default) => throw new NotSupportedException();
 
 	public Task<S3ObjectListDto> ListFilesAsync(
 		string bucketName,

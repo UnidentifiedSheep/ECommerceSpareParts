@@ -1,4 +1,5 @@
 using System.Net;
+using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Enums;
@@ -55,15 +56,81 @@ public sealed class S3Service(
 		}
 	}
 
-	public async Task<bool> DeleteFileAsync(string bucketName, string keyName)
-	{
-		var request = new DeleteObjectRequest
-		{
-			BucketName = bucketName, Key = keyName
-		};
+	public async Task<DeleteObjectResult> DeleteFileAsync(
+		string bucketName,
+		string keyName,
+		CancellationToken ct = default)
+		=> (await TryDeleteFilesAsync(bucketName, [keyName], ct))[0];
 
-		var response = await internalClient.DeleteObjectAsync(request);
-		return response.HttpStatusCode == HttpStatusCode.NoContent;
+	public async Task<IReadOnlyList<DeleteObjectResult>> TryDeleteFilesAsync(
+		string bucketName,
+		IEnumerable<string> keys,
+		CancellationToken ct)
+	{
+		ArgumentNullException.ThrowIfNull(keys);
+		var results = new List<DeleteObjectResult>();
+
+		foreach (var batch in keys.Chunk(1000))
+		{
+			var request = new DeleteObjectsRequest
+			{
+				BucketName = bucketName,
+				Objects = batch.Select(key => new KeyVersion { Key = key }).ToList(),
+				Quiet = true
+			};
+
+			try
+			{
+				var response = await internalClient.DeleteObjectsAsync(request, ct);
+				AddBatchResults(batch, response.DeleteErrors, results);
+			}
+			catch (DeleteObjectsException ex)
+			{
+				if (ex.Response?.DeleteErrors is { Count: > 0 } errors)
+					AddBatchResults(batch, errors, results);
+				else
+					AddBatchFailure(batch, ex.ErrorCode, ex.Message, results);
+			}
+			catch (AmazonServiceException ex)
+			{
+				AddBatchFailure(batch, ex.ErrorCode, ex.Message, results);
+			}
+		}
+
+		return results;
+	}
+
+	private static void AddBatchResults(
+		string[] batch,
+		IEnumerable<DeleteError>? errors,
+		List<DeleteObjectResult> results)
+	{
+		var errorsByKey = new Dictionary<string, DeleteError>(StringComparer.Ordinal);
+		foreach (var error in errors ?? [])
+		{
+			if (error.Key is null)
+			{
+				AddBatchFailure(batch, error.Code, error.Message, results);
+				return;
+			}
+
+			errorsByKey.TryAdd(error.Key, error);
+		}
+
+		foreach (var key in batch)
+			results.Add(errorsByKey.TryGetValue(key, out var error)
+				? DeleteObjectResult.Fail(key, error.Code, error.Message)
+				: DeleteObjectResult.Success(key));
+	}
+
+	private static void AddBatchFailure(
+		IEnumerable<string> batch,
+		string? errorCode,
+		string errorMessage,
+		List<DeleteObjectResult> results)
+	{
+		foreach (var key in batch)
+			results.Add(DeleteObjectResult.Fail(key, errorCode, errorMessage));
 	}
 
 	public async Task<S3ObjectListDto> ListFilesAsync(

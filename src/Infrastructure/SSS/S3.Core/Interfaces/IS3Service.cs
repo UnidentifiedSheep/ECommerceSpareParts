@@ -15,7 +15,15 @@ public interface IS3Service
 		string keyName,
 		CancellationToken ct = default);
 
-	Task<bool> DeleteFileAsync(string bucketName, string keyName);
+	Task<DeleteObjectResult> DeleteFileAsync(
+		string bucketName,
+		string keyName,
+		CancellationToken ct = default);
+
+	Task<IReadOnlyList<DeleteObjectResult>> TryDeleteFilesAsync(
+		string bucketName,
+		IEnumerable<string> keys,
+		CancellationToken ct = default);
 
 	Task<S3ObjectListDto> ListFilesAsync(
 		string bucketName,
