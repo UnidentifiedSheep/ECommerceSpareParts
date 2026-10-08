@@ -63,6 +63,7 @@ builder.ConfigureServices((_, services) =>
 	services.AddScoped<ISeed<DContext>, SystemOrganizationSeed>();
 	services.AddScoped<ISeed<DContext>, CurrencySeed>();
 	services.AddScoped<ISeed<DContext>, AdminSeed>();
+	services.AddScoped<ISeed<DContext>, ScheduledLrtSeed>();
 });
 
 var host = builder.Build();

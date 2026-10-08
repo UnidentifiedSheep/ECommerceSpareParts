@@ -24,12 +24,14 @@ public class UpdateCurrencyRatesLrt(
 	transactionService,
 	logger)
 {
-	public override string SystemName => nameof(UpdateCurrencyRatesLrt);
+	public const string Name = nameof(UpdateCurrencyRatesLrt);
+	public override string SystemName => Name;
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtCurrencyRatesUpdateNameMessage.Instance;
 
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCurrencyRatesUpdateDescriptionMessage.Instance;
 
-	protected override Task DoWork(NoneInputState inputState) => sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
+	protected override Task DoWork(NoneInputState inputState)
+		=> sender.Send(new UpdateCurrenciesRatesCommand(), CancellationToken);
 }
