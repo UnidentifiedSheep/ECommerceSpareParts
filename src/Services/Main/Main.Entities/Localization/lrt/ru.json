@@ -34,6 +34,8 @@
     "lrt.document.generation.unknown.system.name": "Запрошенный тип документа недоступен.",
     "lrt.document.generation.request.required": "Необходимо указать запрос на генерацию документа.",
     "lrt.document.generation.invalid.requester.id": "Идентификатор инициатора не может быть пустым.",
-    "lrt.document.generation.invalid.request": "Не удалось прочитать запрос на генерацию документа."
+    "lrt.document.generation.invalid.request": "Не удалось прочитать запрос на генерацию документа.",
+    "lrt.expired.documents.removal.name": "Удаление просроченных документов",
+    "lrt.expired.documents.removal.description": "Удаляет просроченные созданные документы из хранилища и их записи запросов."
   }
 }

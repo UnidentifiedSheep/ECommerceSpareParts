@@ -8,6 +8,7 @@ namespace Tests.Stubs;
 public sealed class S3StorageServiceStub : IS3Service
 {
 	private readonly ConcurrentDictionary<(string Bucket, string Key), byte[]> _files = new();
+	private readonly ConcurrentDictionary<(string Bucket, string Key), byte> _deleteFailures = new();
 
 	public Task<Response<IStreamResponse>> DownloadFileAsync(
 		string bucketName,
@@ -29,15 +30,28 @@ public sealed class S3StorageServiceStub : IS3Service
 		string keyName,
 		string contentType) => throw new NotSupportedException();
 
-	public Task<DeleteObjectResult> DeleteFileAsync(
+	public async Task<DeleteObjectResult> DeleteFileAsync(
 		string bucketName,
 		string keyName,
-		CancellationToken ct = default) => throw new NotSupportedException();
+		CancellationToken ct = default)
+		=> (await TryDeleteFilesAsync(bucketName, [keyName], ct))[0];
 
 	public Task<IReadOnlyList<DeleteObjectResult>> TryDeleteFilesAsync(
 		string bucketName,
 		IEnumerable<string> keys,
-		CancellationToken ct = default) => throw new NotSupportedException();
+		CancellationToken ct = default)
+	{
+		ct.ThrowIfCancellationRequested();
+		IReadOnlyList<DeleteObjectResult> results = keys.Select(key =>
+		{
+			if (_deleteFailures.ContainsKey((bucketName, key)))
+				return DeleteObjectResult.Fail(key, "AccessDenied", "Deletion denied by test stub.");
+
+			_files.TryRemove((bucketName, key), out _);
+			return DeleteObjectResult.Success(key);
+		}).ToArray();
+		return Task.FromResult(results);
+	}
 
 	public Task<S3ObjectListDto> ListFilesAsync(
 		string bucketName,
@@ -65,6 +79,9 @@ public sealed class S3StorageServiceStub : IS3Service
 		string bucketName,
 		string key,
 		string content) => _files[(bucketName, key)] = Encoding.UTF8.GetBytes(content);
+
+	public void FailDeletion(string bucketName, string key) =>
+		_deleteFailures[(bucketName, key)] = 0;
 
 	private sealed class MemoryStreamResponse(Stream stream) : IStreamResponse
 	{

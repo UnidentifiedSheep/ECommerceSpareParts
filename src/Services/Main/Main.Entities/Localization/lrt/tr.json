@@ -34,6 +34,8 @@
     "lrt.document.generation.unknown.system.name": "İstenen belge türü kullanılamıyor.",
     "lrt.document.generation.request.required": "Belge oluşturma isteği gereklidir.",
     "lrt.document.generation.invalid.requester.id": "İstek sahibi kimliği boş olamaz.",
-    "lrt.document.generation.invalid.request": "Belge oluşturma isteği okunamadı."
+    "lrt.document.generation.invalid.request": "Belge oluşturma isteği okunamadı.",
+    "lrt.expired.documents.removal.name": "Süresi dolmuş belgeleri kaldırma",
+    "lrt.expired.documents.removal.description": "Süresi dolmuş oluşturulmuş belgeleri depolamadan ve bunlara ait istek kayıtlarını siler."
   }
 }

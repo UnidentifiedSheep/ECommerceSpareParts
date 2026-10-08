@@ -34,6 +34,8 @@
     "lrt.document.generation.unknown.system.name": "The requested document type is unavailable.",
     "lrt.document.generation.request.required": "Document request is required.",
     "lrt.document.generation.invalid.requester.id": "Requester ID cannot be empty.",
-    "lrt.document.generation.invalid.request": "The document request could not be read."
+    "lrt.document.generation.invalid.request": "The document request could not be read.",
+    "lrt.expired.documents.removal.name": "Expired document removal",
+    "lrt.expired.documents.removal.description": "Removes expired generated documents from storage and deletes their request records."
   }
 }
