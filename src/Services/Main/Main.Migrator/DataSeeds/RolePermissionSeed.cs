@@ -58,7 +58,7 @@ public class RolePermissionSeed : ISeed<DContext>
 		await context.SaveChangesAsync();
 	}
 
-	public int GetPriority() => 1;
+	public int ExecutionOrder => 1;
 
 	private static IReadOnlyDictionary<Role, PermissionCodes[]> BuildRolePermissions()
 	{

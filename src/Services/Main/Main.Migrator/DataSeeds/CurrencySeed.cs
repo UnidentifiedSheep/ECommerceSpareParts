@@ -22,5 +22,5 @@ public class CurrencySeed : ISeed<DContext>
 		await context.SaveChangesAsync();
 	}
 
-	public int GetPriority() => 0;
+	public int ExecutionOrder => 0;
 }

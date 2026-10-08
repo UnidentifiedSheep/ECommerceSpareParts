@@ -20,7 +20,7 @@ public class PermissionSeed : ISeed<DContext>
 		await context.SaveChangesAsync();
 	}
 
-	public int GetPriority() => 0;
+	public int ExecutionOrder => 0;
 
 	private Permission[] GetPermissions() =>
 		Enum.GetValues<PermissionCodes>().Select(x => new Permission(x)).ToArray();
