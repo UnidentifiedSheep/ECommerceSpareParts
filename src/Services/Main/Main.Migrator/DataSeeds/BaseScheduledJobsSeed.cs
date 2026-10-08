@@ -8,5 +8,5 @@ public class BaseScheduledJobsSeed : ISeed<DContext>
 	public Task SeedAsync(DContext context) =>
 		Task.CompletedTask; //TODO: we need to seed basic lrts like balances recalculation.
 
-	public int GetPriority() => int.MaxValue;
+	public int ExecutionOrder => int.MaxValue;
 }

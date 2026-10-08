@@ -50,7 +50,7 @@ public class SystemOrganizationSeed : ISeed<DContext>
 		await context.SaveChangesAsync();
 	}
 
-	public int GetPriority() => 2;
+	public int ExecutionOrder => 2;
 
 	private static void EnsureSystemOrganizationIsValid(Organization organization, Guid systemId)
 	{

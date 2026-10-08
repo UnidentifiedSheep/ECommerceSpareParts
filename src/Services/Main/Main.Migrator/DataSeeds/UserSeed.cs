@@ -49,7 +49,7 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 		await context.SaveChangesAsync();
 	}
 
-	public int GetPriority() => 1;
+	public int ExecutionOrder => 1;
 
 	private string GetServiceSecret(string service)
 	{

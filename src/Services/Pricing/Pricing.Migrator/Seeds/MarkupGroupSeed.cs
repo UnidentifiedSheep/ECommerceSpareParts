@@ -7,7 +7,7 @@ namespace Pricing.Migrator.Seeds;
 
 public class MarkupGroupSeed : ISeed<DContext>
 {
-	public int GetPriority() => 0;
+	public int ExecutionOrder => 0;
 
 	public async Task SeedAsync(DContext context)
 	{

@@ -11,5 +11,5 @@ public interface ISeed<in TContext> where TContext : DbContext
 	/// Seeds with lower priority will be executed first.
 	/// </summary>
 	/// <returns>Priority</returns>
-	int GetPriority();
+	int ExecutionOrder { get; }
 }

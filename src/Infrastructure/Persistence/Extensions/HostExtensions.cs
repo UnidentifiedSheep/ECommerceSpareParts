@@ -32,7 +32,7 @@ public static class HostExtensions
 		var seeds = scope
 			.ServiceProvider
 			.GetServices<ISeed<TContext>>()
-			.OrderBy(x => x.GetPriority())
+			.OrderBy(x => x.ExecutionOrder)
 			.ToList();
 		if (seeds.Count == 0)
 		{

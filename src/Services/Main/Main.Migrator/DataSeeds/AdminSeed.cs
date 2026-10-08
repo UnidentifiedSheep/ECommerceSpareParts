@@ -47,5 +47,5 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
 		await context.SaveChangesAsync();
 	}
 
-	public int GetPriority() => 1;
+	public int ExecutionOrder => 1;
 }

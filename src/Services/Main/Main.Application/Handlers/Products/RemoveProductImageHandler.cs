@@ -32,7 +32,11 @@ public class RemoveProductImageHandler(
 
 		unitOfWork.Remove(imageEntity);
 
-		await s3Storage.DeleteFileAsync(bucket.Name, storageKey);
+		var deleteResult = await s3Storage.DeleteFileAsync(bucket.Name, storageKey, cancellationToken);
+		if (!deleteResult.IsSuccess)
+			throw new InvalidOperationException(
+				$"Failed to delete image '{deleteResult.Key}' from S3: " +
+				$"{deleteResult.ErrorCode}: {deleteResult.ErrorMessage}");
 
 		return Unit.Value;
 	}

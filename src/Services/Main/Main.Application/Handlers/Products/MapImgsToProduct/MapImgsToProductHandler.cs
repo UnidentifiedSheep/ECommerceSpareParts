@@ -4,6 +4,7 @@ using Application.Common.Models.Options.S3;
 using Attributes;
 using Main.Entities.Product;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
 
@@ -20,7 +21,8 @@ public record ProductImageUpload(string Extension, Func<Stream> OpenReadStream);
 public class MapImgsToProductHandler(
 	IS3Service s3Storage,
 	IUnitOfWork unitOfWork,
-	IOptions<S3BucketsOptions> bucketsOptions) : ICommandHandler<MapImgsToProductCommand>
+	IOptions<S3BucketsOptions> bucketsOptions,
+	ILogger<MapImgsToProductHandler> logger) : ICommandHandler<MapImgsToProductCommand>
 {
 	public async Task<Unit> Handle(MapImgsToProductCommand request, CancellationToken cancellationToken)
 	{
@@ -47,8 +49,18 @@ public class MapImgsToProductHandler(
 		}
 		catch (Exception)
 		{
-			foreach (var key in keys)
-				await s3Storage.DeleteFileAsync(opt.Name, key);
+			if (keys.Count != 0)
+			{
+				var deleteResults = await s3Storage
+					.TryDeleteFilesAsync(opt.Name, keys, cancellationToken);
+
+				foreach (var failure in deleteResults.Where(result => !result.IsSuccess))
+					logger.LogWarning(
+						"Failed to clean up uploaded image {Key} from S3: {ErrorCode}: {ErrorMessage}",
+						failure.Key,
+						failure.ErrorCode,
+						failure.ErrorMessage);
+			}
 			throw;
 		}
 
