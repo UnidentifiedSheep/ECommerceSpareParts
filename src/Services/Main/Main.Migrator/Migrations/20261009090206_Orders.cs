@@ -12,6 +12,16 @@ namespace Main.Migrator.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("""
+                DO $$
+                BEGIN
+                    IF EXISTS (SELECT 1 FROM public.orders)
+                        OR EXISTS (SELECT 1 FROM public.order_items) THEN
+                        RAISE EXCEPTION 'Orders migration requires empty legacy orders and order_items; existing orders need an explicit data migration.';
+                    END IF;
+                END $$;
+                """);
+
             migrationBuilder.DropForeignKey(
                 name: "order_items_articles_id_fk",
                 schema: "public",
@@ -57,11 +67,10 @@ namespace Main.Migrator.Migrations
                 schema: "public",
                 table: "orders");
 
-            migrationBuilder.RenameColumn(
+            migrationBuilder.DropColumn(
                 name: "signed_total_price",
                 schema: "public",
-                table: "orders",
-                newName: "source");
+                table: "orders");
 
             migrationBuilder.RenameColumn(
                 name: "article_id",
@@ -113,16 +122,21 @@ namespace Main.Migrator.Migrations
                 schema: "public",
                 table: "orders",
                 type: "text",
-                nullable: false,
-                defaultValue: "");
+                nullable: false);
 
             migrationBuilder.AddColumn<Guid>(
                 name: "organization_id",
                 schema: "public",
                 table: "orders",
                 type: "uuid",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+                nullable: false);
+
+            migrationBuilder.AddColumn<string>(
+                name: "source",
+                schema: "public",
+                table: "orders",
+                type: "text",
+                nullable: false);
 
             migrationBuilder.AlterColumn<string>(
                 name: "signed_price",
@@ -133,24 +147,36 @@ namespace Main.Migrator.Migrations
                 oldClrType: typeof(string),
                 oldType: "text");
 
-            migrationBuilder.AlterColumn<int>(
+            migrationBuilder.DropPrimaryKey(
+                name: "order_items_pk",
+                schema: "public",
+                table: "order_items");
+
+            migrationBuilder.DropColumn(
+                name: "id",
+                schema: "public",
+                table: "order_items");
+
+            migrationBuilder.AddColumn<int>(
                 name: "id",
                 schema: "public",
                 table: "order_items",
                 type: "integer",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "uuid",
-                oldDefaultValueSql: "gen_random_uuid()")
+                nullable: false)
                 .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            migrationBuilder.AddPrimaryKey(
+                name: "order_items_pk",
+                schema: "public",
+                table: "order_items",
+                column: "id");
 
             migrationBuilder.AddColumn<string>(
                 name: "price_origin",
                 schema: "public",
                 table: "order_items",
                 type: "text",
-                nullable: false,
-                defaultValue: "");
+                nullable: false);
 
             migrationBuilder.CreateIndex(
                 name: "orders_confirmed_by_user_id_index",
@@ -220,6 +246,16 @@ namespace Main.Migrator.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("""
+                DO $$
+                BEGIN
+                    IF EXISTS (SELECT 1 FROM public.orders)
+                        OR EXISTS (SELECT 1 FROM public.order_items) THEN
+                        RAISE EXCEPTION 'Orders migration cannot be reversed while orders or order_items contain data.';
+                    END IF;
+                END $$;
+                """);
+
             migrationBuilder.DropForeignKey(
                 name: "order_items_products_id_fk",
                 schema: "public",
@@ -285,11 +321,10 @@ namespace Main.Migrator.Migrations
                 schema: "public",
                 table: "order_items");
 
-            migrationBuilder.RenameColumn(
+            migrationBuilder.DropColumn(
                 name: "source",
                 schema: "public",
-                table: "orders",
-                newName: "signed_total_price");
+                table: "orders");
 
             migrationBuilder.RenameColumn(
                 name: "product_id",
@@ -309,10 +344,16 @@ namespace Main.Migrator.Migrations
                 table: "orders",
                 type: "uuid",
                 nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
                 oldClrType: typeof(Guid),
                 oldType: "uuid",
                 oldNullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "signed_total_price",
+                schema: "public",
+                table: "orders",
+                type: "text",
+                nullable: false);
 
             migrationBuilder.AlterColumn<Guid>(
                 name: "id",
@@ -354,21 +395,33 @@ namespace Main.Migrator.Migrations
                 table: "order_items",
                 type: "text",
                 nullable: false,
-                defaultValue: "",
                 oldClrType: typeof(string),
                 oldType: "text",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<Guid>(
+            migrationBuilder.DropPrimaryKey(
+                name: "order_items_pk",
+                schema: "public",
+                table: "order_items");
+
+            migrationBuilder.DropColumn(
+                name: "id",
+                schema: "public",
+                table: "order_items");
+
+            migrationBuilder.AddColumn<Guid>(
                 name: "id",
                 schema: "public",
                 table: "order_items",
                 type: "uuid",
                 nullable: false,
-                defaultValueSql: "gen_random_uuid()",
-                oldClrType: typeof(int),
-                oldType: "integer")
-                .OldAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                defaultValueSql: "gen_random_uuid()");
+
+            migrationBuilder.AddPrimaryKey(
+                name: "order_items_pk",
+                schema: "public",
+                table: "order_items",
+                column: "id");
 
             migrationBuilder.CreateIndex(
                 name: "orders_buyer_approved_index",

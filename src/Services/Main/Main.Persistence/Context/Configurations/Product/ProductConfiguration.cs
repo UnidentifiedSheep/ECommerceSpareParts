@@ -22,6 +22,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 
 		builder.HasIndex(e => e.ProducerId, "products_producer_id_index");
 
+		builder.HasIndex(e => e.ProductGroupId, "products_product_group_id_index");
+
 		builder.HasComplexCompositeIndex(
 			x => new
 			{
@@ -80,6 +82,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 
 		builder.Property(e => e.ProducerId).HasColumnName("producer_id");
 
+		builder.Property(e => e.ProductGroupId).HasColumnName("product_group_id");
+
 		builder.Property(e => e.RowVersion).HasColumnName("xmin").IsRowVersion();
 
 		builder
@@ -88,6 +92,13 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 			.HasForeignKey(d => d.ProducerId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("producer_id_fk");
+
+		builder
+			.HasOne(e => e.ProductGroup)
+			.WithMany()
+			.HasForeignKey(e => e.ProductGroupId)
+			.OnDelete(DeleteBehavior.SetNull)
+			.HasConstraintName("products_product_group_id_fk");
 
 		builder
 			.HasOne(p => p.Pair)

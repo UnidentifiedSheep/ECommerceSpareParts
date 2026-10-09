@@ -53,6 +53,8 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
 	public int? CategoryId { get; private set; }
 
+	public int? ProductGroupId { get; private set; }
+
 	public long Popularity { get; private set; }
 
 	public uint RowVersion { get; private set; }
@@ -68,6 +70,8 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 	public ProductWeight? ProductWeight { get; private set; }
 
 	public Product? Pair { get; private set; }
+
+	public ProductGroup? ProductGroup { get; private set; }
 
 	public Producer.Producer Producer { get; private set; } = null!;
 
@@ -116,6 +120,8 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 	public void SetIndicator(Indicator indicator) => Indicator = indicator;
 
 	public void SetCategory(int? categoryId) => CategoryId = categoryId;
+
+	public void SetProductGroup(int? productGroupId) => ProductGroupId = productGroupId;
 
 	public void SetPopularity(long popularity)
 	{

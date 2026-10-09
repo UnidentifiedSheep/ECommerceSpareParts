@@ -1,0 +1,10 @@
+{
+  "culture": "en",
+  "messages": {
+    "product.group.name.required": "Product group name must not be empty.",
+    "product.group.name.min.length": "Product group name must be at least 3 characters long.",
+    "product.group.name.max.length": "Product group name must not exceed 256 characters.",
+    "product.group.normalized.name.required": "Product group name must contain letters or digits.",
+    "product.group.normalized.name.max.length": "Normalized product group name must not exceed 256 characters."
+  }
+}

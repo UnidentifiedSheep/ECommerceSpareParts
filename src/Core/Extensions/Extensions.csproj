@@ -11,4 +11,8 @@
         <ProjectReference Include="..\Enums\Enums.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Slugify.Core" Version="5.1.1" />
+    </ItemGroup>
+
 </Project>

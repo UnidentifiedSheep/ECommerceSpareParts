@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Slugify;
 
 namespace Extensions;
 
@@ -9,6 +10,8 @@ public static partial class NormalizationExtensions
 
 	[GeneratedRegex(@"\D")]
 	public static partial Regex OnlyDigitsRegex();
+
+	private static readonly SlugHelper Helper = new SlugHelperForNonAsciiLanguages();
 
 	public static string ToNormalizedEmail(this string email) => email.Trim().ToUpperInvariant();
 
@@ -29,4 +32,6 @@ public static partial class NormalizationExtensions
 
 	public static string OnlyCharacterToLower(this string source) =>
 		OnlyCharacter().Replace(source, "").ToLowerInvariant();
+
+	public static string ToSlug(this string value) => Helper.GenerateSlug(value);
 }
