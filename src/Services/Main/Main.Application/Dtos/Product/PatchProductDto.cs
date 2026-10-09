@@ -24,8 +24,8 @@ public record PatchProductDto
 	[JsonPropertyName("indicator")]
 	public PatchField<string?> Indicator { get; set; } = PatchField<string?>.NotSet();
 
-	[JsonPropertyName("categoryId")]
-	public PatchField<int?> CategoryId { get; set; } = PatchField<int?>.NotSet();
+	[JsonPropertyName("groupId")]
+	public PatchField<int?> GroupId { get; set; } = PatchField<int?>.NotSet();
 
 	[JsonPropertyName("pairId")]
 	public PatchField<int?> PairId { get; set; } = PatchField<int?>.NotSet();

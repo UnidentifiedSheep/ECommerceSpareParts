@@ -104,7 +104,7 @@ public class ProductImportLrt(
 				producerId.Value,
 				row.Description);
 			product.SetIndicator(row.Indicator);
-			product.SetCategory(row.CategoryId);
+			product.SetProductGroup(row.GroupId);
 
 			return new CreateProductDto
 			{
@@ -113,7 +113,7 @@ public class ProductImportLrt(
 				ProducerId = product.ProducerId,
 				Description = product.Description,
 				Indicator = product.Indicator,
-				CategoryId = product.CategoryId
+				GroupId = product.ProductGroupId
 			};
 		}
 		catch (Exception ex)
@@ -205,7 +205,7 @@ public class ProductImportLrt(
 			item.ProducerId,
 			item.Description);
 		product.SetIndicator(item.Indicator);
-		product.SetCategory(item.CategoryId);
+		product.SetProductGroup(item.GroupId);
 		return product;
 	}
 
@@ -242,7 +242,7 @@ public class ProductImportLrt(
 		public string? Indicator { get; init; }
 
 		[Optional]
-		[Name("CategoryId")]
-		public int? CategoryId { get; init; }
+		[Name("GroupId")]
+		public int? GroupId { get; init; }
 	}
 }

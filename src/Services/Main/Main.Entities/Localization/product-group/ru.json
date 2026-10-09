@@ -5,6 +5,7 @@
     "product.group.name.min.length": "Название группы товаров должно содержать минимум 3 символа.",
     "product.group.name.max.length": "Название группы товаров не должно превышать 256 символов.",
     "product.group.normalized.name.required": "Название группы товаров должно содержать буквы или цифры.",
-    "product.group.normalized.name.max.length": "Нормализованное название группы товаров не должно превышать 256 символов."
+    "product.group.normalized.name.max.length": "Нормализованное название группы товаров не должно превышать 256 символов.",
+    "product.group.normalized.name.already.exists": "Группа товаров с таким названием уже существует."
   }
 }

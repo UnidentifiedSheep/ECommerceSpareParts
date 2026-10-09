@@ -19,6 +19,6 @@ public record CreateProductDto
 	[JsonPropertyName("indicator")]
 	public string? Indicator { get; init; }
 
-	[JsonPropertyName("categoryId")]
-	public int? CategoryId { get; init; }
+	[JsonPropertyName("groupId")]
+	public int? GroupId { get; init; }
 }

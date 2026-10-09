@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
@@ -11,6 +12,8 @@ public class ProductGroup : Entity<ProductGroup, int>, ILinqEntity<ProductGroup,
 {
 	public int Id { get; private set; }
 	public string Name { get; private set; } = null!;
+
+	[Validate]
 	public string NormalizedName { get; private set; } = null!;
 
 	private ProductGroup() {}
