@@ -71,3 +71,6 @@ public class ProductCrossSelfReferenceException()
 public class ProductGroupNotFoundException(int id) : LocalizedNotFoundException(
 	ProductGroupNotFoundMessage.Instance,
 	new { Id = id });
+
+public class ProductGroupNameAlreadyExistsException() : LocalizedConflictException(
+	ProductGroupNormalizedNameAlreadyExistsMessage.Instance);

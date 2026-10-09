@@ -3,11 +3,11 @@ using FluentValidation;
 using Main.Entities;
 using Main.Entities.Product;
 
-namespace Main.Application.Handlers.ProductGroups.CreateProductGroup;
+namespace Main.Application.Handlers.ProductGroups.UpsertProductGroup;
 
-public class CreateProductGroupValidation : AbstractValidator<CreateProductGroupCommand>
+public class UpsertProductGroupValidation : AbstractValidator<UpsertProductGroupCommand>
 {
-	public CreateProductGroupValidation()
+	public UpsertProductGroupValidation()
 	{
 		RuleFor(command => command.Name)
 			.Cascade(CascadeMode.Stop)
