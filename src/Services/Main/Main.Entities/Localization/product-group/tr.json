@@ -6,6 +6,7 @@
     "product.group.name.max.length": "Ürün grubu adı 256 karakteri aşmamalıdır.",
     "product.group.normalized.name.required": "Ürün grubu adı harf veya rakam içermelidir.",
     "product.group.normalized.name.max.length": "Normalleştirilmiş ürün grubu adı 256 karakteri aşmamalıdır.",
-    "product.group.normalized.name.already.exists": "Bu ada sahip bir ürün grubu zaten mevcut."
+    "product.group.normalized.name.already.exists": "Bu ada sahip bir ürün grubu zaten mevcut.",
+    "product.group.not.found": "Aradığınız ürün grubunu bulamadık."
   }
 }

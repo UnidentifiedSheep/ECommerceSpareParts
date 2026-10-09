@@ -72,6 +72,15 @@ public record GqlProduct
 		return new GqlProducer(product.ProducerId);
 	}
 
+	[GraphQLName("group")]
+	public async Task<GqlProductGroup?> GetGroupAsync(
+		IProductByIdDataLoader productLoader,
+		CancellationToken cancellationToken)
+	{
+		var product = await GetProductAsync(productLoader, cancellationToken);
+		return product.GroupId == null ? null : new GqlProductGroup(product.GroupId.Value);
+	}
+
 	[GraphQLName("size")]
 	public async Task<GqlProductSize?> GetSizeAsync(
 		IProductSizeByIdDataLoader loader,

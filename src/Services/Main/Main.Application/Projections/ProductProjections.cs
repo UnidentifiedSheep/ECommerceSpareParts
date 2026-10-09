@@ -29,6 +29,7 @@ public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Produc
 			Stock = x.Stock,
 			ProducerId = x.ProducerId,
 			ProducerName = x.Producer.Name,
+			GroupId = x.ProductGroupId,
 			Indicator = x.Indicator,
 			Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList()
 		};
@@ -58,6 +59,7 @@ public sealed class FullProductDtoProjectionProvider : ProjectionProviderBase<Pr
 			Stock = x.Stock,
 			ProducerId = x.ProducerId,
 			ProducerName = x.Producer.Name,
+			GroupId = x.ProductGroupId,
 			Indicator = x.Indicator,
 			Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList(),
 			ProductWeight = x.ProductWeight == null ? null : weightToDto.Invoke(x.ProductWeight),

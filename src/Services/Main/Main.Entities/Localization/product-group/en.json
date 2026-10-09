@@ -6,6 +6,7 @@
     "product.group.name.max.length": "Product group name must not exceed 256 characters.",
     "product.group.normalized.name.required": "Product group name must contain letters or digits.",
     "product.group.normalized.name.max.length": "Normalized product group name must not exceed 256 characters.",
-    "product.group.normalized.name.already.exists": "A product group with this name already exists."
+    "product.group.normalized.name.already.exists": "A product group with this name already exists.",
+    "product.group.not.found": "We couldn't find the product group you were looking for."
   }
 }

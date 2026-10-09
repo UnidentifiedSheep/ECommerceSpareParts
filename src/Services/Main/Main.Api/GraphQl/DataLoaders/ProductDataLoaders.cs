@@ -1,6 +1,7 @@
 using GreenDonut;
 using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Storage;
+using Main.Application.Handlers.ProductGroups;
 using Main.Application.Handlers.ProductCharacteristics.GetCharacteristicsBatch;
 using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.Products;
@@ -14,6 +15,13 @@ namespace Main.Api.GraphQl.DataLoaders;
 
 public static class ProductDataLoaders
 {
+	[DataLoader]
+	public static async Task<IReadOnlyDictionary<int, ProductGroupDto>> GetProductGroupByIdAsync(
+		IReadOnlyList<int> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetProductGroupsByIdsQuery(keys), cancellationToken)).Groups;
+
 	[DataLoader]
 	public static async Task<Dictionary<int, ProductDto>> GetProductByIdAsync(
 		IReadOnlyList<int> keys,
