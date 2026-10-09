@@ -18,15 +18,15 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 
 		builder
 			.Property(e => e.Id)
-			.HasDefaultValueSql("gen_random_uuid()")
-			.HasColumnName("id")
-			.ValueGeneratedOnAdd();
+			.HasColumnName("id");
 
-		builder.Property(e => e.ProductId).HasColumnName("article_id");
+		builder.Property(e => e.ProductId).HasColumnName("product_id");
 
 		builder.Property(e => e.Count).HasColumnName("count");
 
-		builder.Property(e => e.LockedPrice).HasColumnName("locked_price");
+		builder.Property(e => e.UnitPrice).HasColumnName("unit_price");
+
+		builder.Property(e => e.PriceOrigin).HasColumnName("price_origin");
 
 		builder.Property(e => e.OrderId).HasColumnName("order_id");
 
@@ -37,12 +37,13 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 			.WithMany()
 			.HasForeignKey(d => d.ProductId)
 			.OnDelete(DeleteBehavior.Restrict)
-			.HasConstraintName("order_items_articles_id_fk");
+			.HasConstraintName("order_items_products_id_fk");
 
 		builder
 			.HasOne<Entities.Order.Order>()
-			.WithMany()
+			.WithMany(e => e.Items)
 			.HasForeignKey(d => d.OrderId)
+			.OnDelete(DeleteBehavior.Cascade)
 			.HasConstraintName("order_items_orders_id_fk");
 	}
 }

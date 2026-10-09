@@ -1,26 +1,73 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
+using Main.Enums.Orders;
 
 namespace Main.Entities.Order;
 
 public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>
 {
-	public Guid Id { get; set; }
+	public Guid Id { get; private set; }
+	public Guid OrganizationId { get; private set; }
+	public Guid? UserId { get; private set; }
+	public int CurrencyId { get; private set; }
+	public OrderSource Source { get; private set; }
+	public OrderStatus Status { get; private set; }
+	public OrderFulfillmentStatus FulfillmentStatus { get; private set; }
 
-	public Guid UserId { get; set; }
+	public Guid? ConfirmedByUserId { get; private set; }
+	public DateTimeOffset? ConfirmedAt { get; private set; }
 
-	public int CurrencyId { get; set; }
+	private readonly List<OrderItem> _items = [];
+	public IReadOnlyList<OrderItem> Items => _items;
 
-	public string Status { get; set; } = null!;
+	private Order() {}
 
-	public bool BuyerApproved { get; set; }
+	private Order(
+		Guid organizationId,
+		Guid? userId,
+		int currencyId,
+		OrderSource source)
+	{
+		Id = Guid.NewGuid();
+		OrganizationId = organizationId;
+		UserId = userId;
+		CurrencyId = currencyId;
+		Source = source;
+		Status = OrderStatus.Pending;
+		FulfillmentStatus = OrderFulfillmentStatus.NotAvailable;
+	}
 
-	public bool SellerApproved { get; set; }
+	public static Order CreateManual(
+		Guid organizationId,
+		Guid? userId,
+		int currencyId)
+	{
+		var order = new Order(
+			organizationId,
+			userId,
+			currencyId,
+			OrderSource.Manual);
 
-	public string SignedTotalPrice { get; set; } = null!;
+		order.UpdateStatus(OrderStatus.Confirmed);
+		return order;
+	}
 
-	public bool IsCanceled { get; set; }
+	public static Order CreateOnline(Guid organizationId, Guid userId, int currencyId)
+		=> new(organizationId, userId, currencyId, OrderSource.Online);
+
+	public void AddItem(OrderItem item)
+	{
+		if (item.OrderId != Id)
+			throw new InvalidOperationException("Order id miss match");
+
+		_items.Add(item);
+	}
+
+	private void UpdateStatus(OrderStatus status)
+	{
+		Status = status;
+	}
 
 	public static Expression<Func<Order, Guid>> GetKeySelector() => x => x.Id;
 

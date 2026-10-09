@@ -1,4 +1,4 @@
-namespace Main.Entities.Documents;
+namespace Main.Enums.Documents;
 
 public enum DocumentSourceType
 {

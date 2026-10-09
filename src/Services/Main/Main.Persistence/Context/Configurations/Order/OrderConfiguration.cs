@@ -11,42 +11,45 @@ public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
 
 		builder.HasKey(e => e.Id).HasName("orders_pk");
 
-		builder.HasIndex(e => e.BuyerApproved, "orders_buyer_approved_index");
-
 		builder.HasIndex(e => e.CurrencyId, "orders_currency_id_index");
 
-		builder.HasIndex(e => e.IsCanceled, "orders_is_canceled_index");
-
-		builder.HasIndex(e => e.SellerApproved, "orders_seller_approved_index");
+		builder.HasIndex(e => e.OrganizationId, "orders_organization_id_index");
 
 		builder.HasIndex(e => e.Status, "orders_status_index");
 
-		builder.HasIndex(
-			e => new
-			{
-				e.UserId, e.IsCanceled
-			},
-			"orders_user_id_is_canceled_index");
+		builder.HasIndex(e => e.FulfillmentStatus, "orders_fulfillment_status_index");
+
+		builder.HasIndex(e => e.UserId, "orders_user_id_index");
+
+		builder.HasIndex(e => e.ConfirmedByUserId, "orders_confirmed_by_user_id_index");
 
 		builder
 			.Property(e => e.Id)
-			.HasDefaultValueSql("gen_random_uuid()")
 			.HasColumnName("id")
-			.ValueGeneratedOnAdd();
-
-		builder.Property(e => e.BuyerApproved).HasColumnName("buyer_approved");
+			.ValueGeneratedNever();
 
 		builder.Property(e => e.CurrencyId).HasColumnName("currency_id");
 
-		builder.Property(e => e.IsCanceled).HasColumnName("is_canceled");
+		builder.Property(e => e.ConfirmedAt).HasColumnName("confirmed_at");
 
-		builder.Property(e => e.SellerApproved).HasColumnName("seller_approved");
+		builder.Property(e => e.ConfirmedByUserId).HasColumnName("confirmed_by_user_id");
 
-		builder.Property(e => e.SignedTotalPrice).HasColumnName("signed_total_price");
+		builder.Property(e => e.FulfillmentStatus).HasColumnName("fulfillment_status");
+
+		builder.Property(e => e.OrganizationId).HasColumnName("organization_id");
+
+		builder.Property(e => e.Source).HasColumnName("source");
 
 		builder.Property(e => e.Status).HasColumnName("status");
 
 		builder.Property(e => e.UserId).HasColumnName("user_id");
+
+		builder
+			.HasOne<Entities.Organization.Organization>()
+			.WithMany()
+			.HasForeignKey(e => e.OrganizationId)
+			.OnDelete(DeleteBehavior.Restrict)
+			.HasConstraintName("orders_organization_id_fk");
 
 		builder
 			.HasOne<Entities.Currency.Currency>()
@@ -59,6 +62,19 @@ public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
 			.HasOne<Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(d => d.UserId)
+			.OnDelete(DeleteBehavior.SetNull)
 			.HasConstraintName("orders_users_id_fk");
+
+		builder
+			.HasOne<Entities.User.User>()
+			.WithMany()
+			.HasForeignKey(e => e.ConfirmedByUserId)
+			.OnDelete(DeleteBehavior.SetNull)
+			.HasConstraintName("orders_confirmed_by_user_id_fk");
+
+		builder
+			.Navigation(e => e.Items)
+			.HasField("_items")
+			.UsePropertyAccessMode(PropertyAccessMode.Field);
 	}
 }
