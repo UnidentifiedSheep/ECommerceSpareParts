@@ -11,7 +11,7 @@ namespace Main.Application.Handlers.Sales;
 
 public record GetFullSaleQuery(Guid SaleId) : IQuery<GetFullSaleResult>;
 
-public record GetFullSaleResult(SaleDto Sale, IEnumerable<SaleContentDto> Contents);
+public record GetFullSaleResult(SaleDto Sale, IReadOnlyCollection<SaleContentDto> Contents);
 
 public class GetFullSaleHandler(
 	IReadRepository<Sale, Guid> readRepository,
@@ -31,7 +31,7 @@ public class GetFullSaleHandler(
 			.Select(x => new
 			{
 				sale = saleToDto.Invoke(x),
-				contents = x.Contents.Select(z => saleContentToDto.Invoke(z))
+				contents = x.Contents.Select(z => saleContentToDto.Invoke(z)).ToList()
 			})
 			.FirstOrDefaultAsync(cancellationToken) ?? throw new SaleNotFoundException(request.SaleId);
 

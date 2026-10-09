@@ -10,10 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Producers.GetProducers;
 
-public record GetProducersQuery(string? SearchTerm, IEnumerable<int> Ids, Pagination Pagination)
+public record GetProducersQuery(string? SearchTerm, IReadOnlyCollection<int> Ids, Pagination Pagination)
 	: IQuery<GetProducersResult>;
 
-public record GetProducersResult(IEnumerable<ProducerDto> Producers);
+public record GetProducersResult(IReadOnlyCollection<ProducerDto> Producers);
 
 public class GetProducersHandler(
 	IReadRepository<Producer, int> repository,

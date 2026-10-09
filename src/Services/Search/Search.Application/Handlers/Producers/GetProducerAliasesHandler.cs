@@ -8,7 +8,7 @@ namespace Search.Application.Handlers.Producers;
 
 public record GetProducerAliasesQuery(int ProducerId) : IQuery<GetProducerAliasesResult>;
 
-public record GetProducerAliasesResult(IEnumerable<ProducerAlias> Aliases);
+public record GetProducerAliasesResult(IReadOnlyCollection<ProducerAlias> Aliases);
 
 public class GetProducerAliasesHandler(
 	IProducerRepository producerRepository,
@@ -21,6 +21,6 @@ public class GetProducerAliasesHandler(
 	{
 		var producer = await producerRepository.GetById(request.ProducerId, cancellationToken);
 
-		return new GetProducerAliasesResult(producer?.Aliases.Select(projection.ProjectionFunc) ?? []);
+		return new GetProducerAliasesResult(producer?.Aliases.Select(projection.ProjectionFunc).ToArray() ?? []);
 	}
 }

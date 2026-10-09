@@ -16,7 +16,7 @@ namespace Main.Application.Handlers.StorageContents.RestoreContent;
 	20,
 	2)]
 public record RestoreContentCommand(
-	IEnumerable<RestoreContentItem> ContentDetails,
+	IReadOnlyCollection<RestoreContentItem> ContentDetails,
 	StorageMovementType MovementType) : ICommand;
 
 public class RestoreContentHandler(IStorageContentRepository contentRepository)

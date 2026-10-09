@@ -26,7 +26,7 @@ public record CreateSaleCommand(
 	int CurrencyId,
 	string StorageCode,
 	DateTime SaleDateTime,
-	IEnumerable<NewSaleContentDto> Contents,
+	IReadOnlyCollection<NewSaleContentDto> Contents,
 	string? Comment,
 	decimal? PayedSum,
 	string? ConfirmationCode,

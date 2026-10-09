@@ -67,12 +67,12 @@ public class ApplySupplierProductsHandler(IOfferRefreshService refreshService, I
 		Dictionary<ProductKey, List<SupplierPosition>> dict,
 		CancellationToken cancellationToken)
 	{
-		var requestDict = new Dictionary<Supplier, IEnumerable<InternalSupplierProductReferenceLookup>>
+		var requestDict = new Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductReferenceLookup>>
 		{
 			[supplier] = dict.Keys.Select(x => new InternalSupplierProductReferenceLookup
 			{
 				Sku = x.Number, SupplierProducerName = x.Brand
-			})
+			}).ToArray()
 		};
 
 		var response =

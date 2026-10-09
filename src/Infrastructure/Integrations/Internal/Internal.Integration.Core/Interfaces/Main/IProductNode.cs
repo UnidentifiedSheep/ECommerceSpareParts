@@ -17,6 +17,6 @@ public interface IProductNode
 
 	Task<Response<Dictionary<Supplier, IReadOnlyList<InternalSupplierProductResolvedReference>>>>
 		ResolveSupplierProductReferences(
-			Dictionary<Supplier, IEnumerable<InternalSupplierProductReferenceLookup>> references,
+			Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductReferenceLookup>> references,
 			CancellationToken cancellationToken = default);
 }

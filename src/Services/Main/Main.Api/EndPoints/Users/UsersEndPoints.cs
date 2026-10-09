@@ -28,13 +28,13 @@ public record CreateUserRequest
 	public required UserInfoDto UserInfo { get; init; }
 
 	[JsonPropertyName("emails")]
-	public required IEnumerable<EmailDto> Emails { get; init; }
+	public required IReadOnlyCollection<EmailDto> Emails { get; init; }
 
 	[JsonPropertyName("phones")]
-	public required IEnumerable<UserPhoneDto> Phones { get; init; }
+	public required IReadOnlyCollection<UserPhoneDto> Phones { get; init; }
 
 	[JsonPropertyName("roles")]
-	public required IEnumerable<string> Roles { get; init; }
+	public required IReadOnlyCollection<string> Roles { get; init; }
 }
 
 public record CreateUserResponse(UserDto User);

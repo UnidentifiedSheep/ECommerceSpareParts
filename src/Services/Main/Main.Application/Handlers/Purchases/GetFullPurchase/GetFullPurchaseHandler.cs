@@ -11,7 +11,7 @@ namespace Main.Application.Handlers.Purchases.GetFullPurchase;
 
 public record GetFullPurchaseQuery(Guid PurchaseId) : IQuery<GetFullPurchaseResult>;
 
-public record GetFullPurchaseResult(PurchaseDto Purchase, IEnumerable<PurchaseContentDto> Contents);
+public record GetFullPurchaseResult(PurchaseDto Purchase, IReadOnlyCollection<PurchaseContentDto> Contents);
 
 public class GetFullPurchaseHandler(
 	IReadRepository<Purchase, Guid> readRepository,
@@ -32,7 +32,7 @@ public class GetFullPurchaseHandler(
 			.AsExpandable()
 			.Select(x => new
 			{
-				purchase = purchaseToDto.Invoke(x), contents = x.Contents.Select(z => contentToDto.Invoke(z))
+				purchase = purchaseToDto.Invoke(x), contents = x.Contents.Select(z => contentToDto.Invoke(z)).ToList()
 			})
 			.FirstOrDefaultAsync(cancellationToken) ??
 		throw new PurchaseNotFoundException(request.PurchaseId);

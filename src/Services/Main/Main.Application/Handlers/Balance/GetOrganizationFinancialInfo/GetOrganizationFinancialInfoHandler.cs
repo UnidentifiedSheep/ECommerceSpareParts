@@ -17,7 +17,7 @@ public record GetOrganizationFinancialInfoResult
 {
 	public required OrganizationFinancialProfileDto? FinancialProfile { get; init; }
 
-	public required IEnumerable<OrganizationBalanceDto> Balances { get; init; }
+	public required IReadOnlyCollection<OrganizationBalanceDto> Balances { get; init; }
 }
 
 public class GetOrganizationFinancialInfoHandler(
@@ -46,7 +46,7 @@ public class GetOrganizationFinancialInfoHandler(
 			FinancialProfile = organization.FinancialProfile is null
 				? null
 				: OrganizationFinancialProfileDtoFactory.Create(organization.FinancialProfile, netPosition),
-			Balances = organization.Balances.Select(balanceProjection.ProjectionFunc)
+			Balances = organization.Balances.Select(balanceProjection.ProjectionFunc).ToArray()
 		};
 	}
 }

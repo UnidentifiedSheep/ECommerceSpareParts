@@ -99,7 +99,7 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 	}
 
 	private static GetProducersQuery CreateQuery(
-		IEnumerable<int> ids,
+		IReadOnlyCollection<int> ids,
 		string? searchTerm = null,
 		int page = 0,
 		int size = 100)

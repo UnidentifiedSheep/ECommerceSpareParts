@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.ProducerSupplierMappings.GetProducerSupplier
 
 public record GetProducerSupplierMappingsQuery(
 	int ProducerId,
-	IEnumerable<Supplier> Suppliers,
+	IReadOnlyCollection<Supplier> Suppliers,
 	Pagination Pagination) : IQuery<GetProducerSupplierMappingsResult>;
 
 public record GetProducerSupplierMappingsResult(IReadOnlyList<ProducerSupplierMappingDto> Mappings);

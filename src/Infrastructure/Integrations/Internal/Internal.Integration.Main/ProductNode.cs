@@ -66,7 +66,7 @@ internal sealed class ProductNode(
 
 	public async Task<Response<Dictionary<Supplier, IReadOnlyList<InternalSupplierProductResolvedReference>>>>
 		ResolveSupplierProductReferences(
-			Dictionary<Supplier, IEnumerable<InternalSupplierProductReferenceLookup>> references,
+			Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductReferenceLookup>> references,
 			CancellationToken cancellationToken = default)
 	{
 		using var request = await GetRequest(
@@ -107,7 +107,7 @@ internal sealed class ProductNode(
 	private record ResolveSupplierProductReferencesRequest
 	{
 		[JsonPropertyName("references")]
-		public required Dictionary<Supplier, IEnumerable<InternalSupplierProductReferenceLookup>> References
+		public required Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductReferenceLookup>> References
 		{
 			get;
 			init;
@@ -117,7 +117,7 @@ internal sealed class ProductNode(
 	private record ResolveSupplierProductReferencesResponse
 	{
 		[JsonPropertyName("products")]
-		public Dictionary<Supplier, IEnumerable<InternalSupplierProductResolvedReference>> Products
+		public Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductResolvedReference>> Products
 		{
 			get;
 			init;

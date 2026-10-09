@@ -5,5 +5,5 @@ namespace Main.Application.Dtos.Producer;
 public record ProducerFullDto : ProducerDto
 {
 	[JsonPropertyName("aliases")]
-	public required IEnumerable<string> Aliases { get; init; }
+	public required IReadOnlyCollection<string> Aliases { get; init; }
 }

@@ -46,7 +46,7 @@ public record EditStorageRequest
 public record GetStoragesResponse
 {
 	[JsonPropertyName("storages")]
-	public required IEnumerable<StorageDto> Storages { get; init; }
+	public required IReadOnlyCollection<StorageDto> Storages { get; init; }
 }
 
 public record GetStorageByCodeResponse

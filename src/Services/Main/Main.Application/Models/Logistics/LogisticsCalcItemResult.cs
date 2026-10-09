@@ -12,4 +12,4 @@ public record LogisticsCalcItemResult(
 	decimal WeightPerItem,
 	WeightUnit WeightUnit,
 	bool Skipped,
-	IEnumerable<string>? Reasons);
+	IReadOnlyCollection<string>? Reasons);

@@ -27,7 +27,7 @@ public sealed class ProducerFullDtoProjectionProvider : ProjectionProviderBase<P
 		Id = x.Id,
 		Name = x.Name,
 		Description = x.Description,
-		Aliases = x.Aliases.Select(z => z.Alias)
+		Aliases = x.Aliases.Select(z => z.Alias).ToList()
 	};
 }
 

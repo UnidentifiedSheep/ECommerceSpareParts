@@ -28,7 +28,7 @@ public record GetUsersQuery(
 	string? UserName,
 	Guid? Id,
 	string? Description,
-	IEnumerable<string>? Roles,
+	IReadOnlyCollection<string>? Roles,
 	GeneralSearchStrategy SearchStrategy) : IQuery<GetUsersResult>;
 
 public record GetUsersResult(IReadOnlyList<UserDto> Users);

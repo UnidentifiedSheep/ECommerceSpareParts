@@ -15,7 +15,7 @@ public record GetOrganizationFinancialInfoResponse
 	public required OrganizationFinancialProfileDto? FinancialProfile { get; init; }
 
 	[JsonPropertyName("balances")]
-	public required IEnumerable<OrganizationBalanceDto> Balances { get; init; }
+	public required IReadOnlyCollection<OrganizationBalanceDto> Balances { get; init; }
 }
 
 public record UpdateOrganizationFinancialInfoRequest

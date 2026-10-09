@@ -13,7 +13,7 @@ public record InternalGetFullSaleResponse
 	public required SaleDto Sale { get; init; }
 
 	[JsonPropertyName("contents")]
-	public required IEnumerable<SaleContentDto> Contents { get; init; }
+	public required IReadOnlyCollection<SaleContentDto> Contents { get; init; }
 }
 
 public static class InternalSaleEndPoints

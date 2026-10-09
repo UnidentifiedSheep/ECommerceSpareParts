@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProducerSupplierMappings;
 
-public record GetProducersSupplierMappingsQuery(IEnumerable<int> ProducerIds)
+public record GetProducersSupplierMappingsQuery(IReadOnlyCollection<int> ProducerIds)
 	: IQuery<GetProducersSupplierMappingsResult>;
 
 public record GetProducersSupplierMappingsResult(Dictionary<int, List<ProducerSupplierMappingDto>> Mappings);
