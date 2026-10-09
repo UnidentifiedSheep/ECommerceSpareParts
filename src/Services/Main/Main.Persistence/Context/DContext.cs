@@ -69,8 +69,6 @@ public partial class DContext : DbContext, INotificationDbContext
 
 	public virtual DbSet<Cart> Carts { get; set; }
 
-	public virtual DbSet<Category> Categories { get; set; }
-
 	public virtual DbSet<Currency> Currencies { get; set; }
 
 	public virtual DbSet<CurrencyRateHistory> CurrencyRateHistories { get; set; }

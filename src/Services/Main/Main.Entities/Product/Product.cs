@@ -69,8 +69,6 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
 	public Product? Pair { get; private set; }
 
-	public Category? Category { get; private set; }
-
 	public Producer.Producer Producer { get; private set; } = null!;
 
 	public static Expression<Func<Product, int>> GetKeySelector() => x => x.Id;

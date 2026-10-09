@@ -83,13 +83,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 		builder.Property(e => e.RowVersion).HasColumnName("xmin").IsRowVersion();
 
 		builder
-			.HasOne(d => d.Category)
-			.WithMany(p => p.Articles)
-			.HasForeignKey(d => d.CategoryId)
-			.OnDelete(DeleteBehavior.Restrict)
-			.HasConstraintName("products_categories_id_fk");
-
-		builder
 			.HasOne(d => d.Producer)
 			.WithMany()
 			.HasForeignKey(d => d.ProducerId)
