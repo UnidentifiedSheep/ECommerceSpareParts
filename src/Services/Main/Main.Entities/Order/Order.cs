@@ -16,7 +16,7 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>
 	public OrderFulfillmentStatus FulfillmentStatus { get; private set; }
 
 	public Guid? ConfirmedByUserId { get; private set; }
-	public DateTimeOffset? ConfirmedAt { get; private set; }
+	public DateTime? ConfirmedAt { get; private set; }
 
 	private readonly List<OrderItem> _items = [];
 	public IReadOnlyList<OrderItem> Items => _items;
@@ -38,35 +38,56 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>
 		FulfillmentStatus = OrderFulfillmentStatus.NotAvailable;
 	}
 
-	public static Order CreateManual(
-		Guid organizationId,
-		Guid? userId,
-		int currencyId)
-	{
-		var order = new Order(
-			organizationId,
-			userId,
-			currencyId,
-			OrderSource.Manual);
-
-		order.UpdateStatus(OrderStatus.Confirmed);
-		return order;
-	}
+	public static Order CreateManual(Guid organizationId, Guid? userId, int currencyId)
+		=> new(organizationId, userId, currencyId, OrderSource.Manual);
 
 	public static Order CreateOnline(Guid organizationId, Guid userId, int currencyId)
 		=> new(organizationId, userId, currencyId, OrderSource.Online);
 
 	public void AddItem(OrderItem item)
 	{
+		if (Status != OrderStatus.Pending)
+			throw new InvalidOperationException($"Cannot add items to an order in '{Status}' status.");
+
 		if (item.OrderId != Id)
 			throw new InvalidOperationException("Order id miss match");
 
 		_items.Add(item);
 	}
 
-	private void UpdateStatus(OrderStatus status)
+	public void Confirm(Guid? confirmedBy)
 	{
-		Status = status;
+		if (Status != OrderStatus.Pending)
+			throw new InvalidOperationException($"Cannot confirm an order in '{Status}' status.");
+
+		Status = OrderStatus.Confirmed;
+		ConfirmedAt = DateTime.UtcNow;
+		ConfirmedByUserId = confirmedBy;
+	}
+
+	public void Complete()
+	{
+		if (Status != OrderStatus.Confirmed)
+			throw new InvalidOperationException($"Cannot complete an order in '{Status}' status.");
+
+		Status = OrderStatus.Completed;
+	}
+
+	public void Cancel()
+	{
+		if (Status is not (OrderStatus.Pending or OrderStatus.Confirmed))
+			throw new InvalidOperationException($"Cannot cancel an order in '{Status}' status.");
+
+		Status = OrderStatus.Cancelled;
+	}
+
+	public void SetFulfillmentStatus(OrderFulfillmentStatus status)
+	{
+		if (Status is OrderStatus.Completed or OrderStatus.Cancelled)
+			throw new InvalidOperationException(
+				$"Cannot update fulfillment status of an order in '{Status}' status.");
+
+		FulfillmentStatus = status;
 	}
 
 	public static Expression<Func<Order, Guid>> GetKeySelector() => x => x.Id;
