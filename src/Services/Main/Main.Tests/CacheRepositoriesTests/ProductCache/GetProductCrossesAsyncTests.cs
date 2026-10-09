@@ -224,7 +224,7 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 			.First();
 	}
 
-	private async Task RemoveCachedCrosses(int productId, string[]? sortBy)
+	private async Task RemoveCachedCrosses(int productId, IReadOnlyCollection<string>? sortBy)
 	{
 		var cache = Scope.ServiceProvider.GetRequiredService<ICache>();
 		var cacheKey = CacheKeys.ProductCache.ProductCrosses(productId, sortBy);

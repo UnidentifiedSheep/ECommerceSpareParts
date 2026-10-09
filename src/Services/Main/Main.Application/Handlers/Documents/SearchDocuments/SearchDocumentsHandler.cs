@@ -15,7 +15,7 @@ public record SearchDocumentsQuery(
 	string? DocumentSystemName,
 	bool CanAccessAll,
 	Pagination Pagination,
-	string[]? SortBy) : IQuery<SearchDocumentsResult>;
+	IReadOnlyCollection<string>? SortBy) : IQuery<SearchDocumentsResult>;
 public record SearchDocumentsResult(IReadOnlyList<DocumentGenerationRequestDto> Requests);
 
 public class SearchDocumentsHandler(

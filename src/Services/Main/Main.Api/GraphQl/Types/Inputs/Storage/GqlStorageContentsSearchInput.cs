@@ -13,7 +13,7 @@ public sealed record GqlStorageContentsSearchInput
 	public string? StorageCode { get; init; }
 
 	[GraphQLName("sortBy")]
-	public IReadOnlyList<GqlSortBy>? SortBy { get; init; }
+	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 
 	[GraphQLName("pagination")]
 	public required GqlPagination Pagination { get; init; }

@@ -8,7 +8,7 @@ using Main.Application.Models.Product;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
-public sealed record GetProductCrossesItem(int ProductId, Pagination Pagination, string[]? SortBy);
+public sealed record GetProductCrossesItem(int ProductId, Pagination Pagination, IReadOnlyCollection<string>? SortBy);
 
 public record GetProductCrossesQuery(IReadOnlyCollection<GetProductCrossesItem> Items)
 	: IQuery<GetProductCrossesResult>;

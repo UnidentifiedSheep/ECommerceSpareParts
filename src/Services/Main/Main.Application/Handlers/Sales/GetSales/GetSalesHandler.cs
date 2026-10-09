@@ -18,7 +18,7 @@ public record GetSalesQuery(
 	IEnumerable<int> CurrencyIds,
 	IEnumerable<int> ProductIds,
 	IEnumerable<SaleState> States,
-	string[] SortBy,
+	IReadOnlyCollection<string> SortBy,
 	string? SearchTerm) : IQuery<GetSalesResult>;
 
 public record GetSalesResult(IReadOnlyList<SaleDto> Sales);

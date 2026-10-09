@@ -18,7 +18,7 @@ public sealed record CatalogueSearchCriteria
 
 	public required Pagination Pagination { get; init; }
 
-	public string[] SortBy { get; init; } = [];
+	public IReadOnlyCollection<string> SortBy { get; init; } = [];
 
 	public bool IncludeHighlights { get; init; }
 }

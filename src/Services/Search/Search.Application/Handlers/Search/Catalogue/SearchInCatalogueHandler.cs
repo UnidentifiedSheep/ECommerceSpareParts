@@ -20,8 +20,8 @@ public sealed record SearchInCatalogueQuery(
 	IReadOnlySet<SearchMatchType> NameModes,
 	IReadOnlyCollection<int> ProducerIds,
 	Pagination Pagination,
-	string[] ProductSortBy,
-	string[] CatalogueCandidateSortBy,
+	IReadOnlyCollection<string> ProductSortBy,
+	IReadOnlyCollection<string> CatalogueCandidateSortBy,
 	CandidateMappingStatus CandidateMappingStatus = CandidateMappingStatus.Unmapped,
 	bool IncludeHighlights = false) : IQuery<SearchInCatalogueResult>;
 

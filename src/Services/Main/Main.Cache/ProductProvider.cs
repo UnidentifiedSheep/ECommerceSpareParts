@@ -59,7 +59,7 @@ public class ProductProvider(
 
 	public async Task<IReadOnlyList<int>> GetProductCrossesAsync(
 		int productId,
-		string[]? sortBy,
+		IReadOnlyCollection<string>? sortBy,
 		CancellationToken cancellationToken = default)
 	{
 		var request = new ProductCrossesRequestItem(productId, sortBy);
@@ -151,7 +151,7 @@ public class ProductProvider(
 			var orderedCrossProductIds = await productReadRepository
 				.Query
 				.Where(x => crossProductIds.Contains(x.Id))
-				.SortBy(group.Key.ToArray())
+				.SortBy(group.Key)
 				.Select(x => x.Id)
 				.ToListAsync(cancellationToken);
 
@@ -173,17 +173,17 @@ public class ProductProvider(
 			cancellationToken) ?? throw new ProductNotFoundException(id);
 	}
 
-	private sealed class SortByComparer : IEqualityComparer<IReadOnlyList<string>>
+	private sealed class SortByComparer : IEqualityComparer<IReadOnlyCollection<string>>
 	{
 		public static readonly SortByComparer Instance = new();
 
-		public bool Equals(IReadOnlyList<string>? x, IReadOnlyList<string>? y)
+		public bool Equals(IReadOnlyCollection<string>? x, IReadOnlyCollection<string>? y)
 		{
 			return ReferenceEquals(x, y) ||
 				x is not null && y is not null && x.SequenceEqual(y, StringComparer.Ordinal);
 		}
 
-		public int GetHashCode(IReadOnlyList<string> value)
+		public int GetHashCode(IReadOnlyCollection<string> value)
 		{
 			var hash = new HashCode();
 			foreach (var item in value)

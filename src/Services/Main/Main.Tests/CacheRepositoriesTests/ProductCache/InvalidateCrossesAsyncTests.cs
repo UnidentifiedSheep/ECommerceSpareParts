@@ -134,7 +134,7 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
 			.First();
 	}
 
-	private async Task RemoveCrossesCache(int productId, string[]? sortBy)
+	private async Task RemoveCrossesCache(int productId, IReadOnlyCollection<string>? sortBy)
 	{
 		await Scope
 			.ServiceProvider

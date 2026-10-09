@@ -56,10 +56,10 @@ public sealed record SearchCatalogueRequest
 public sealed record CatalogueSearchSortRequest
 {
 	[JsonPropertyName("products")]
-	public string[] Products { get; init; } = [];
+	public IReadOnlyCollection<string> Products { get; init; } = [];
 
 	[JsonPropertyName("catalogueCandidates")]
-	public string[] CatalogueCandidates { get; init; } = [];
+	public IReadOnlyCollection<string> CatalogueCandidates { get; init; } = [];
 }
 
 public sealed record SearchCatalogueResponse

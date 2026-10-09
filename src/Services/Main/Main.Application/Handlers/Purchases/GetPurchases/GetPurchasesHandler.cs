@@ -16,7 +16,7 @@ public record GetPurchasesQuery(
 	IEnumerable<Guid> SupplierOrganizationIds,
 	IEnumerable<int> CurrencyIds,
 	IEnumerable<int> ProductIds,
-	string[] SortBy,
+	IReadOnlyCollection<string> SortBy,
 	string? SearchTerm) : IQuery<GetPurchasesResult>;
 
 public record GetPurchasesResult(IEnumerable<PurchaseDto> Purchases);

@@ -13,7 +13,7 @@ public interface IProductProvider
 
 	Task<IReadOnlyList<int>> GetProductCrossesAsync(
 		int productId,
-		string[]? sortBy,
+		IReadOnlyCollection<string>? sortBy,
 		CancellationToken cancellationToken = default);
 
 	Task<IReadOnlyDictionary<ProductCrossesRequestItem, IReadOnlyList<int>>> GetProductsCrossesAsync(

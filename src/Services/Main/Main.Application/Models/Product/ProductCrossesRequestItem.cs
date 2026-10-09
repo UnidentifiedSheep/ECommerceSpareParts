@@ -3,7 +3,7 @@ namespace Main.Application.Models.Product;
 public sealed record ProductCrossesRequestItem
 {
 
-	public ProductCrossesRequestItem(int productId, IEnumerable<string>? sortBy)
+	public ProductCrossesRequestItem(int productId, IReadOnlyCollection<string>? sortBy)
 	{
 		ProductId = productId;
 		SortBy = Array.AsReadOnly(sortBy?.ToArray() ?? []);
@@ -11,7 +11,7 @@ public sealed record ProductCrossesRequestItem
 
 	public int ProductId { get; }
 
-	public IReadOnlyList<string> SortBy { get; }
+	public IReadOnlyCollection<string> SortBy { get; }
 
 	public bool Equals(ProductCrossesRequestItem? other)
 	{

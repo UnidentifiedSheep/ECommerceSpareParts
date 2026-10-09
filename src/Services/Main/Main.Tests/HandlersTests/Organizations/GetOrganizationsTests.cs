@@ -222,7 +222,7 @@ public class GetOrganizationsTests : IntegrationTest
 		Guid? userId = null,
 		IReadOnlyCollection<Guid>? ids = null,
 		IReadOnlyCollection<OrganizationType>? types = null,
-		string[]? sortBy = null,
+		IReadOnlyCollection<string>? sortBy = null,
 		int page = 0,
 		int size = 20,
 		bool showHidden = false)
