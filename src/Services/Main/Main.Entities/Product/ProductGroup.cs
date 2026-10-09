@@ -3,7 +3,6 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Exceptions;
 using Extensions;
 
 namespace Main.Entities.Product;
@@ -16,7 +15,10 @@ public class ProductGroup : Entity<ProductGroup, int>, ILinqEntity<ProductGroup,
 
 	private ProductGroup() {}
 
-	private ProductGroup(string name) => SetName(name);
+	private ProductGroup(string name)
+	{
+		SetName(name);
+	}
 
 	public static ProductGroup Create(string name) => new(name);
 
@@ -27,6 +29,7 @@ public class ProductGroup : Entity<ProductGroup, int>, ILinqEntity<ProductGroup,
 			.EnsureNotNullOrWhiteSpace(ProductGroupNameRequiredMessage.Instance)
 			.EnsureMinLength(3, ProductGroupNameMinLengthMessage.Instance)
 			.EnsureMaxLength(256, ProductGroupNameMaxLengthMessage.Instance);
+
 		var normalizedName = NormalizeName(value)
 			.EnsureNotNullOrWhiteSpace(ProductGroupNormalizedNameRequiredMessage.Instance)
 			.EnsureMaxLength(256, ProductGroupNormalizedNameMaxLengthMessage.Instance);
