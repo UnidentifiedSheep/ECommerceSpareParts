@@ -23,6 +23,7 @@
     <ItemGroup>
         <Folder Include="Handlers\Auth\RemoveRoleFromUser\"/>
         <Folder Include="Handlers\Logistics\"/>
+        <Folder Include="Handlers\ProductGroups\GetProductGroups\" />
     </ItemGroup>
 
     <ItemGroup>
