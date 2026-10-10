@@ -58,7 +58,7 @@ public class DeletePurchaseHandler(
 	private async Task SubtractStock(Purchase purchase, CancellationToken token)
 	{
 		var items =
-			purchase.Contents.Select(x => new SubtractStorageContentItem(x.StorageContentId, x.Count));
+			purchase.Contents.Select(x => new SubtractStorageContentItem(x.StorageContentId, x.Count)).ToArray();
 		var command = new SubtractStorageContentsCommand(items, StorageMovementType.PurchaseDeletion);
 		await sender.Send(command, token);
 	}

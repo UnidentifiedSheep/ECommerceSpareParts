@@ -10,7 +10,7 @@ namespace Search.Application.Handlers.Producers.SearchProducers;
 
 public record SearchProducersQuery(string? Query, Pagination Pagination) : IQuery<SearchProducersResult>;
 
-public record SearchProducersResult(IEnumerable<ProducerSearchDto> Producers);
+public record SearchProducersResult(IReadOnlyCollection<ProducerSearchDto> Producers);
 
 public class SearchProducersHandler(
 	IProducerRepository producerRepository,
@@ -26,6 +26,6 @@ public class SearchProducersHandler(
 			request.Pagination,
 			cancellationToken);
 
-		return new SearchProducersResult(producers.Select(projection.ProjectionFunc));
+		return new SearchProducersResult(producers.Select(projection.ProjectionFunc).ToArray());
 	}
 }

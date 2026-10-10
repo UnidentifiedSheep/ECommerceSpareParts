@@ -35,7 +35,7 @@ namespace Main.Application.Handlers.Purchases.EditPurchase;
 	20,
 	2)]
 public record EditPurchaseCommand(
-	IEnumerable<EditPurchaseDto> Content,
+	IReadOnlyCollection<EditPurchaseDto> Content,
 	Guid PurchaseId,
 	int CurrencyId,
 	string? Comment,

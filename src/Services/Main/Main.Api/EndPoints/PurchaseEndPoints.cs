@@ -35,7 +35,7 @@ public record CreatePurchaseRequest
 	public required DateTime PurchaseDate { get; init; }
 
 	[JsonPropertyName("purchaseContent")]
-	public required IEnumerable<NewPurchaseContentDto> PurchaseContent { get; init; }
+	public required IReadOnlyCollection<NewPurchaseContentDto> PurchaseContent { get; init; }
 
 	[JsonPropertyName("withLogistics")]
 	public required bool WithLogistics { get; init; }
@@ -60,7 +60,7 @@ public record CreatePurchaseResponse
 }
 
 public record EditPurchaseRequest(
-	IEnumerable<EditPurchaseDto> Content,
+	IReadOnlyCollection<EditPurchaseDto> Content,
 	int CurrencyId,
 	string? Comment,
 	DateTime PurchaseDateTime,
@@ -76,7 +76,7 @@ public record GetPurchaseLogisticResponse(PurchaseLogisticDto PurchaseLogistic);
 
 public record GetPurchaseResponse(PurchaseDto Purchase);
 
-public record GetPurchasesResponse(IEnumerable<PurchaseDto> Purchases);
+public record GetPurchasesResponse(IReadOnlyCollection<PurchaseDto> Purchases);
 
 public record GetPurchasesRequest : SortablePaginationQueryModel
 {

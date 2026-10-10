@@ -30,7 +30,7 @@ public record CreatePurchaseCommand(
 	int CurrencyId,
 	string StorageCode,
 	DateTime PurchaseDate,
-	IEnumerable<NewPurchaseContentDto> PurchaseContent,
+	IReadOnlyCollection<NewPurchaseContentDto> PurchaseContent,
 	string? Comment,
 	decimal? PayedSum,
 	bool WithLogistics,
@@ -115,7 +115,7 @@ public class CreatePurchaseHandler(
 				CurrencyId = request.CurrencyId,
 				PurchaseDate = request.PurchaseDate,
 				ProductId = x.ProductId
-			}),
+			}).ToArray(),
 			request.StorageCode,
 			StorageMovementType.Purchase);
 

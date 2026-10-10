@@ -22,7 +22,7 @@ public record CalculateDeliveryCostRequest
 	public required LogisticsCalculationMode Mode { get; init; }
 
 	[JsonPropertyName("items")]
-	public required IEnumerable<LogisticsItemDto> Items { get; init; }
+	public required IReadOnlyCollection<LogisticsItemDto> Items { get; init; }
 }
 
 public record CalculateDeliveryCostResponse(DeliveryCostDto DeliveryCost, StorageRouteDto UsedRoute);

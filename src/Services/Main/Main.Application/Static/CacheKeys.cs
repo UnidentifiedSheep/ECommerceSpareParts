@@ -15,7 +15,7 @@ public static class CacheKeys
 
 		public static string Product(int id) => $"product:{id}";
 
-		public static string ProductCrosses(int id, IEnumerable<string>? sortBy) =>
+		public static string ProductCrosses(int id, IReadOnlyCollection<string>? sortBy) =>
 			$"product:{id}:crosses:{string.Join(',', sortBy ?? [])}";
 
 		public static string ProductCrossRelations(int id) => $"product:{id}:crosses:relations";

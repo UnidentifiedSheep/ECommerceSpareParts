@@ -14,5 +14,5 @@ public record ProducerDto
 	public string? Description { get; init; }
 
 	[JsonPropertyName("aliases")]
-	public required IEnumerable<ProducerAlias> Aliases { get; init; }
+	public required IReadOnlyCollection<ProducerAlias> Aliases { get; init; }
 }

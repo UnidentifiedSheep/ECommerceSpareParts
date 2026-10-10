@@ -22,7 +22,7 @@ namespace Main.Application.Handlers.StorageContents.AddContent;
 	20,
 	2)]
 public record AddContentCommand(
-	IEnumerable<NewStorageContentDto> StorageContent,
+	IReadOnlyCollection<NewStorageContentDto> StorageContent,
 	string StorageCode,
 	StorageMovementType MovementType) : ICommand<AddContentResult>;
 

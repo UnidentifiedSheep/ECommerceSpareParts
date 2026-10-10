@@ -14,11 +14,11 @@ namespace Main.Application.Handlers.Sales.GetSales;
 public record GetSalesQuery(
 	RangeModel<DateTime> DateRange,
 	Pagination Pagination,
-	IEnumerable<Guid> OrganizationIds,
-	IEnumerable<int> CurrencyIds,
-	IEnumerable<int> ProductIds,
-	IEnumerable<SaleState> States,
-	string[] SortBy,
+	IReadOnlyCollection<Guid> OrganizationIds,
+	IReadOnlyCollection<int> CurrencyIds,
+	IReadOnlyCollection<int> ProductIds,
+	IReadOnlyCollection<SaleState> States,
+	IReadOnlyCollection<string> SortBy,
 	string? SearchTerm) : IQuery<GetSalesResult>;
 
 public record GetSalesResult(IReadOnlyList<SaleDto> Sales);

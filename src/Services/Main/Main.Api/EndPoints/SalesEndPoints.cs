@@ -36,7 +36,7 @@ public record CreateSaleRequest
 	public required DateTime SaleDateTime { get; init; }
 
 	[JsonPropertyName("contents")]
-	public required IEnumerable<NewSaleContentDto> Contents { get; init; }
+	public required IReadOnlyCollection<NewSaleContentDto> Contents { get; init; }
 
 	[JsonPropertyName("comment")]
 	public string? Comment { get; init; }
@@ -96,7 +96,7 @@ public record GetSaleResponse
 public record EditSaleRequest
 {
 	[JsonPropertyName("content")]
-	public required IEnumerable<EditSaleContentDto> Content { get; init; }
+	public required IReadOnlyCollection<EditSaleContentDto> Content { get; init; }
 
 	[JsonPropertyName("currencyId")]
 	public required int CurrencyId { get; init; }

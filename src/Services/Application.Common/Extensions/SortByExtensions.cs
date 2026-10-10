@@ -9,7 +9,7 @@ public static class SortByExtensions
 {
 	public static IOrderedQueryable<TEntity> SortBy<TEntity>(
 		this IQueryable<TEntity> query,
-		string[]? sortParams)
+		IReadOnlyCollection<string>? sortParams)
 	{
 		var sorts = ParseSorts<TEntity>(sortParams);
 		var first = sorts[0];
@@ -28,7 +28,7 @@ public static class SortByExtensions
 
 	public static IOrderedQueryable<TEntity> ThenSortBy<TEntity>(
 		this IOrderedQueryable<TEntity> query,
-		string[]? sortParams)
+		IReadOnlyCollection<string>? sortParams)
 	{
 		return ParseSorts<TEntity>(sortParams)
 			.Aggregate(
@@ -40,7 +40,7 @@ public static class SortByExtensions
 
 	public static CriteriaBuilder<TEntity> WithSorting<TEntity>(
 		this CriteriaBuilder<TEntity> builder,
-		string[]? sortParams) where TEntity : class
+		IReadOnlyCollection<string>? sortParams) where TEntity : class
 	{
 		foreach (var sort in ParseSorts<TEntity>(sortParams))
 			if (sort.Desc)
@@ -51,7 +51,8 @@ public static class SortByExtensions
 		return builder;
 	}
 
-	private static IReadOnlyList<KeySelectorSortDefinition<TEntity>> ParseSorts<TEntity>(string[]? sortParams)
+	private static IReadOnlyList<KeySelectorSortDefinition<TEntity>> ParseSorts<TEntity>(
+		IReadOnlyCollection<string>? sortParams)
 	{
 		try
 		{

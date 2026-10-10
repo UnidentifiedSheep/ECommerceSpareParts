@@ -13,4 +13,10 @@ public sealed class RootMutation
 
 	[GraphQLName("documents")]
 	public DocumentMutations Documents => new();
+
+	[GraphQLName("productGroups")]
+	public ProductGroupMutations ProductGroups => new();
+
+	[GraphQLName("products")]
+	public ProductMutations Products => new();
 }

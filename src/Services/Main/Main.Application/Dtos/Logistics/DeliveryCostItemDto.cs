@@ -33,5 +33,5 @@ public record DeliveryCostItemDto
 	public required bool Skipped { get; init; }
 
 	[JsonPropertyName("reasons")]
-	public required IEnumerable<string>? Reasons { get; init; }
+	public required IReadOnlyCollection<string>? Reasons { get; init; }
 }

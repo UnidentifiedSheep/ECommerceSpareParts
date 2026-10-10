@@ -142,7 +142,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		Guid? organizationId = null,
 		Guid? preferredOrganizationId = null,
 		int? currencyId = null,
-		string[]? sortBy = null)
+		IReadOnlyCollection<string>? sortBy = null)
 	{
 		return new GetProductSaleHistoryQuery(
 			SaleContext.Product.Id,

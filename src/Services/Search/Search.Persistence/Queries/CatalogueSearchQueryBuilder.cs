@@ -13,9 +13,10 @@ internal static class CatalogueSearchQueryBuilder
 		Field normalizedSkuField,
 		Field nameField,
 		Field producerIdField,
-		Field? mappedProductIdField = null) where TDocument : class
+		Field? mappedProductIdField = null,
+		Field? productGroupIdField = null) where TDocument : class
 	{
-		var filters = BuildFilters<TDocument>(criteria, producerIdField, mappedProductIdField);
+		var filters = BuildFilters<TDocument>(criteria, producerIdField, mappedProductIdField, productGroupIdField);
 		if (string.IsNullOrWhiteSpace(criteria.Query))
 			return filters.Count == 0 ? query.MatchAll() : query.Bool(boolean => boolean.Filter(filters));
 
@@ -147,13 +148,19 @@ internal static class CatalogueSearchQueryBuilder
 	private static List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>> BuildFilters<TDocument>(
 		CatalogueSearchCriteria criteria,
 		Field producerIdField,
-		Field? mappedProductIdField) where TDocument : class
+		Field? mappedProductIdField,
+		Field? productGroupIdField) where TDocument : class
 	{
 		var filters = new List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>>();
 		if (criteria.ProducerIds.Count > 0)
 			filters.Add(descriptor => descriptor.Terms(terms => terms
 				.Field(producerIdField)
 				.Terms(criteria.ProducerIds.Select(id => (object)id))));
+
+		if (productGroupIdField is not null && criteria.ProductGroupIds.Count > 0)
+			filters.Add(descriptor => descriptor.Terms(terms => terms
+				.Field(productGroupIdField)
+				.Terms(criteria.ProductGroupIds.Select(id => (object)id))));
 
 		if (mappedProductIdField is not null)
 		{

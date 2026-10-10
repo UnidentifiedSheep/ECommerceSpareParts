@@ -20,9 +20,9 @@ public record GetPriceOptionsForProductQuery(
 	int ProductId,
 	int CurrencyId,
 	string StorageCode,
-	IEnumerable<PriceOfferSource> Sources,
+	IReadOnlyCollection<PriceOfferSource> Sources,
 	Pagination Pagination,
-	string[] SortBy) : IQuery<GetPriceOptionsForProductResult>;
+	IReadOnlyCollection<string> SortBy) : IQuery<GetPriceOptionsForProductResult>;
 
 public record GetPriceOptionsForProductResult(IReadOnlyCollection<PriceOptionDto> PriceOptions);
 

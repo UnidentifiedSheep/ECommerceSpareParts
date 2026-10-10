@@ -13,13 +13,13 @@ namespace Main.Application.Handlers.Purchases.GetPurchases;
 public record GetPurchasesQuery(
 	RangeModel<DateTime> DateRange,
 	Pagination Pagination,
-	IEnumerable<Guid> SupplierOrganizationIds,
-	IEnumerable<int> CurrencyIds,
-	IEnumerable<int> ProductIds,
-	string[] SortBy,
+	IReadOnlyCollection<Guid> SupplierOrganizationIds,
+	IReadOnlyCollection<int> CurrencyIds,
+	IReadOnlyCollection<int> ProductIds,
+	IReadOnlyCollection<string> SortBy,
 	string? SearchTerm) : IQuery<GetPurchasesResult>;
 
-public record GetPurchasesResult(IEnumerable<PurchaseDto> Purchases);
+public record GetPurchasesResult(IReadOnlyCollection<PurchaseDto> Purchases);
 
 public class GetPurchasesHandler(
 	IReadRepository<Purchase, Guid> repository,

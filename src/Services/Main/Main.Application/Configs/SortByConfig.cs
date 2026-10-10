@@ -36,6 +36,13 @@ public static class SortByConfig
 
 		QueryableSortBy
 			.Value
+			.MapDefault<ProductGroup, int>(x => x.Id)
+			.Map<ProductGroup, int>("id", x => x.Id)
+			.Map<ProductGroup, string>("name", x => x.Name)
+			.Map<ProductGroup, string>("normalizedName", x => x.NormalizedName);
+
+		QueryableSortBy
+			.Value
 			.MapDefault<Organization, string>(x => x.Name)
 			.Map<Organization, Guid>("id", x => x.Id)
 			.Map<Organization, string>("name", x => x.Name)

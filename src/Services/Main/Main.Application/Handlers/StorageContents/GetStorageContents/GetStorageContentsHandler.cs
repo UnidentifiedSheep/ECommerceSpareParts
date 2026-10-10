@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.StorageContents.GetStorageContents;
 public sealed record GetStorageContentsQuery(
 	int? ProductId,
 	string? StorageCode,
-	string[] SortBy,
+	IReadOnlyCollection<string> SortBy,
 	Pagination Pagination,
 	bool ShowZeroCount) : IQuery<GetStorageContentsResult>;
 

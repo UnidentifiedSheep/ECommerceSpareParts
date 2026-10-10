@@ -18,7 +18,7 @@ public record SearchProducersRequest : PaginationQueryModel
 public record SearchProducersResult
 {
 	[JsonPropertyName("producers")]
-	public required IEnumerable<ProducerSearchDto> Producers { get; init; }
+	public required IReadOnlyCollection<ProducerSearchDto> Producers { get; init; }
 }
 
 public static class SearchProducersEndPoint

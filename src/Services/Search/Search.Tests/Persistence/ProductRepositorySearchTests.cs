@@ -18,6 +18,23 @@ namespace Search.Tests.Persistence;
 public sealed class ProductRepositorySearchTests
 {
 	[Fact]
+	public async Task Search_WithProductGroupIds_ShouldFilterProductsByGroup()
+	{
+		var (repository, requestBody) = CreateRepository();
+		var criteria = CreateCriteria("", new HashSet<SearchMatchType>(), new HashSet<SearchMatchType>()) with
+		{
+			ProducerIds = [42],
+			ProductGroupIds = [7, 8]
+		};
+
+		await repository.Search(criteria, TestContext.Current.CancellationToken);
+
+		requestBody().Should().Contain("\"producerId\"");
+		requestBody().Should().Contain("\"productGroupId\"");
+		requestBody().Should().Contain("[7,8]");
+	}
+
+	[Fact]
 	public async Task Search_ShouldBuildRequestedSkuAndNameModes()
 	{
 		var (repository, requestBody) = CreateRepository();
@@ -40,6 +57,7 @@ public sealed class ProductRepositorySearchTests
 		requestBody().Should().Contain("\"name.keyword\"");
 		requestBody().Should().NotContain("\"name.prefix\"");
 		requestBody().Should().NotContain("\"mappedProductId\"");
+		requestBody().Should().NotContain("\"productGroupId\"");
 		requestBody().Should().NotContain("\"highlight\"");
 	}
 
@@ -130,7 +148,7 @@ public sealed class ProductRepositorySearchTests
 								    "total": { "value": 1, "relation": "eq" },
 								    "hits": [
 								      {
-								        "_index": "products-v2",
+								        "_index": "products-v3",
 								        "_id": "123",
 								        "_source": {
 								          "id": 123,
@@ -138,6 +156,7 @@ public sealed class ProductRepositorySearchTests
 								          "normalizedSku": "bosch123",
 								          "name": "Bosch product",
 								          "producerId": 42,
+								          "productGroupId": 7,
 								          "stock": 0
 								        },
 								        "highlight": { "name": ["[[[Bosch]]] product"] }
@@ -167,6 +186,7 @@ public sealed class ProductRepositorySearchTests
 		requestBody().Should().Contain("\"pre_tags\":[\"[[[\"]");
 		requestBody().Should().Contain("\"matched_fields\"");
 		result.Hits.Single().Highlights["name"].Should().Equal("[[[Bosch]]] product");
+		result.Hits.Single().Document.ProductGroupId.Should().Be(7);
 	}
 
 	private static CatalogueSearchCriteria CreateCriteria(
@@ -209,7 +229,7 @@ public sealed class ProductRepositorySearchTests
 					Uri = "http://localhost:9200",
 					IndexOptions = new OpenSearchIndexOptions
 					{
-						Products = "products-v2",
+						Products = "products-v3",
 						Producers = "producers-v1",
 						CatalogueCandidates = "catalogue-candidates-v2"
 					}

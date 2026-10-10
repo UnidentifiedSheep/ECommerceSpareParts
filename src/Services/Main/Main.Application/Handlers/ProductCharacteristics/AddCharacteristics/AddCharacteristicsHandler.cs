@@ -9,7 +9,7 @@ namespace Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 
 [AutoSave]
 [Transactional]
-public record AddCharacteristicsCommand(IEnumerable<NewCharacteristicsDto> Characteristics) : ICommand;
+public record AddCharacteristicsCommand(IReadOnlyCollection<NewCharacteristicsDto> Characteristics) : ICommand;
 
 public class AddCharacteristicsHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddCharacteristicsCommand>
 {

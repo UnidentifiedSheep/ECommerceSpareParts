@@ -15,7 +15,7 @@ public record GetJobsQuery(
 	Pagination Pagination,
 	IEnumerable<string> SystemNames,
 	IEnumerable<JobStatus> Statuses,
-	string[] SortBy) : IQuery<GetJobsResult>;
+	IReadOnlyCollection<string> SortBy) : IQuery<GetJobsResult>;
 
 public record GetJobsResult(IReadOnlyList<JobDto> Jobs);
 

@@ -11,7 +11,7 @@ namespace Pricing.Application.Handlers.Pricing;
 [Transactional]
 [AutoSave]
 public record RequestPriceCandidateRecalculationCommand(
-	IEnumerable<PriceRecalculationRequestDto> RecalculationRequests) : ICommand;
+	IReadOnlyCollection<PriceRecalculationRequestDto> RecalculationRequests) : ICommand;
 
 public class RequestPriceCandidateRecalculationHandler(
 	IJobService jobService,

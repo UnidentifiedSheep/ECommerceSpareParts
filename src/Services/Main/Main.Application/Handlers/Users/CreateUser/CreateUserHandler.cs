@@ -19,9 +19,9 @@ public record CreateUserCommand(
 	string UserName,
 	string Password,
 	UserInfoDto UserInfo,
-	IEnumerable<EmailDto> Emails,
-	IEnumerable<UserPhoneDto> Phones,
-	IEnumerable<string> Roles) : ICommand<CreateUserResult>;
+	IReadOnlyCollection<EmailDto> Emails,
+	IReadOnlyCollection<UserPhoneDto> Phones,
+	IReadOnlyCollection<string> Roles) : ICommand<CreateUserResult>;
 
 public record CreateUserResult(Guid UserId);
 

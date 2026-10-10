@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Products;
 
-public record GetSupplierProductReferencesQuery(IEnumerable<int> ProductIds, Supplier Supplier)
+public record GetSupplierProductReferencesQuery(IReadOnlyCollection<int> ProductIds, Supplier Supplier)
 	: IQuery<GetSupplierProductReferencesResult>;
 
 public record GetSupplierProductReferencesResult(IReadOnlyList<ResolvedSupplierProductReferenceDto> Products);

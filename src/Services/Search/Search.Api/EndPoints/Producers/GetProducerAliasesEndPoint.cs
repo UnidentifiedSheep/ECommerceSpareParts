@@ -10,7 +10,7 @@ namespace Search.Api.EndPoints.Producers;
 public record GetProducerAliasesResponse
 {
 	[JsonPropertyName("aliases")]
-	public required IEnumerable<ProducerAlias> Aliases { get; init; }
+	public required IReadOnlyCollection<ProducerAlias> Aliases { get; init; }
 }
 
 public static class GetProducerAliasesEndPoint

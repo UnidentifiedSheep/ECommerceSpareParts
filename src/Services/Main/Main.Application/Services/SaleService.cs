@@ -284,7 +284,7 @@ public class SaleService(ISender sender, IProductRepository productRepository) :
 					x.ProductId,
 					storageCode,
 					x.Count,
-					takeFromOtherStorages)),
+					takeFromOtherStorages)).ToArray(),
 				movementType),
 			cancellationToken);
 	}

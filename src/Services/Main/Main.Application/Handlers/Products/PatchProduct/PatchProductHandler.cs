@@ -21,7 +21,7 @@ public class PatchProductHandler(IProductRepository productRepository) : IComman
 			throw new ProductNotFoundException(request.ProductId);
 
 		patch.Description.Apply(product.SetDescription);
-		patch.CategoryId.Apply(product.SetCategory);
+		patch.GroupId.Apply(product.SetProductGroup);
 		patch.Sku.Apply(x => product.SetSku(x));
 		patch.ProducerId.Apply(product.SetProducerId);
 		patch.Indicator.Apply(x => product.SetIndicator(x));

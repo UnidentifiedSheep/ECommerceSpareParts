@@ -42,7 +42,7 @@ public class PurchaseLogisticsService(ISender sender, IUserRepository userReposi
 				selectedItems.Select(x => new LogisticsItemDto
 				{
 					ProductId = x.ProductId, Quantity = x.Quantity
-				}),
+				}).ToArray(),
 				LogisticsCalculationMode.Strict),
 			cancellationToken);
 

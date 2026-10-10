@@ -16,5 +16,5 @@ public sealed record GqlSearchDocumentsInput
 	public required GqlPagination Pagination { get; init; }
 
 	[GraphQLName("sortBy")]
-	public IReadOnlyList<GqlSortBy>? SortBy { get; init; }
+	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 }

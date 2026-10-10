@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.Products;
 
 public record ResolveSupplierProductReferencesQuery(
-	Dictionary<Supplier, IEnumerable<SupplierProductReferenceDto>> References)
+	Dictionary<Supplier, IReadOnlyCollection<SupplierProductReferenceDto>> References)
 	: IQuery<ResolveSupplierProductReferencesResult>;
 
 public record ResolveSupplierProductReferencesResult(
-	Dictionary<Supplier, IEnumerable<ResolvedSupplierProductReferenceDto>> Products);
+	Dictionary<Supplier, IReadOnlyCollection<ResolvedSupplierProductReferenceDto>> Products);
 
 public class ResolveSupplierProductReferencesHandler(IReadRepository<Product, int> repository)
 	: IQueryHandler<ResolveSupplierProductReferencesQuery, ResolveSupplierProductReferencesResult>
@@ -96,7 +96,7 @@ public class ResolveSupplierProductReferencesHandler(IReadRepository<Product, in
 					}
 				}))
 			.GroupBy(x => x.Supplier)
-			.ToDictionary(x => x.Key, x => x.Select(z => z.Product).AsEnumerable());
+			.ToDictionary(x => x.Key, x => (IReadOnlyCollection<ResolvedSupplierProductReferenceDto>)x.Select(z => z.Product).ToArray());
 
 		return new ResolveSupplierProductReferencesResult(result);
 	}

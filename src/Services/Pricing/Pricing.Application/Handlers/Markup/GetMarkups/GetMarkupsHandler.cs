@@ -34,7 +34,7 @@ public class GetMarkupsHandler(IReadRepository<MarkupGroup, int> repository)
 					Id = z.Id,
 					RangeStart = z.RangeStart,
 					RangeEnd = z.RangeEnd
-				})
+				}).ToList()
 			})
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);

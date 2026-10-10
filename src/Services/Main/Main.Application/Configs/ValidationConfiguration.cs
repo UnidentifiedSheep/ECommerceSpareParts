@@ -13,6 +13,7 @@ public static class ValidationConfiguration
 	public static void Configure()
 	{
 		ConfigureArticles();
+		ConfigureProductGroups();
 		ConfigureProducer();
 		ConfigureUser();
 		ConfigureOrganization();
@@ -436,6 +437,18 @@ public static class ValidationConfiguration
 				.WithMessageTemplate("articles.not.found")
 				.WithErrorType(typeof(NotFoundException))
 				.WithErrorCode((int)HttpStatusCode.NotFound));
+	}
+
+	private static void ConfigureProductGroups()
+	{
+		ConfigureDbValidation.AddConfig(
+			ValidationFunctions.ValidateProductGroupNotExistsNormalizedName,
+			KeyValueType.Single,
+			config => config
+				.WithErrorName(ApplicationErrors.ProductGroupNameAlreadyTaken)
+				.WithMessageTemplate(ProductGroupNormalizedNameAlreadyExistsMessage.Key)
+				.WithErrorType(typeof(ConflictException))
+				.WithErrorCode((int)HttpStatusCode.Conflict));
 	}
 
 	private static void ConfigureProducer()

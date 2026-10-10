@@ -14,7 +14,7 @@ public record CreateProducerSupplierMappingRequest(Supplier Supplier, string Sup
 
 public record CreateProducerSupplierMappingResponse(ProducerSupplierMappingDto ProducerSupplierMapping);
 
-public record GetProducerSupplierMappingsResponse(IEnumerable<ProducerSupplierMappingDto> Mappings);
+public record GetProducerSupplierMappingsResponse(IReadOnlyCollection<ProducerSupplierMappingDto> Mappings);
 
 public record GetProducerSupplierMappingsRequest : PaginationQueryModel
 {

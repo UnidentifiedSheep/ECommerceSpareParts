@@ -126,7 +126,7 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
 		return result;
 	}
 
-	private static (bool skipped, IEnumerable<string>? reason) ValidatePerItemData(
+	private static (bool skipped, IReadOnlyCollection<string>? reason) ValidatePerItemData(
 		decimal weight,
 		decimal area,
 		LogisticsDataRequirements requirements)

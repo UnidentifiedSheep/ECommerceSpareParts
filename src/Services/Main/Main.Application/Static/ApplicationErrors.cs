@@ -4,6 +4,8 @@ public static class ApplicationErrors
 {
 	public const string ArticlesNotFound = "ArticlesNotFound";
 
+	public const string ProductGroupNameAlreadyTaken = "ProductGroupNameAlreadyTaken";
+
 	public const string ProducersNotFound = "ProducersNotFound";
 
 	public const string StoragesNotFound = "StoragesNotFound";

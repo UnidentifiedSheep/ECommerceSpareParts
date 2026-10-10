@@ -6,7 +6,7 @@ using Main.Entities;
 
 namespace Main.Application.Handlers.Sales.BaseValidators;
 
-public class NewSaleContentValidator : AbstractValidator<IEnumerable<NewSaleContentDto>>
+public class NewSaleContentValidator : AbstractValidator<IReadOnlyCollection<NewSaleContentDto>>
 {
 	public NewSaleContentValidator()
 	{

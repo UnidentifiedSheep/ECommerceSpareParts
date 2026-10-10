@@ -1,0 +1,13 @@
+{
+  "culture": "tr",
+  "messages": {
+    "product.group.name.required": "Ürün grubu adı boş olmamalıdır.",
+    "product.group.name.min.length": "Ürün grubu adı en az 3 karakter uzunluğunda olmalıdır.",
+    "product.group.name.max.length": "Ürün grubu adı 256 karakteri aşmamalıdır.",
+    "product.group.normalized.name.required": "Ürün grubu adı harf veya rakam içermelidir.",
+    "product.group.normalized.name.max.length": "Normalleştirilmiş ürün grubu adı 256 karakteri aşmamalıdır.",
+    "product.group.normalized.name.already.exists": "Bu ada sahip bir ürün grubu zaten mevcut.",
+    "product.group.not.found": "Aradığınız ürün grubunu bulamadık.",
+    "product.group.import.too.many.errors": "Ürün grupları içe aktarılırken çok fazla hata oluştu."
+  }
+}

@@ -77,6 +77,17 @@ public sealed class SearchInCatalogueValidationTests
 			error => error.PropertyName == nameof(SearchInCatalogueQuery.CandidateMappingStatus));
 	}
 
+	[Fact]
+	public async Task Validate_WhenTooManyProductGroupsAreSpecified_ShouldFail()
+	{
+		var result = await _validator.ValidateAsync(
+			CreateQuery() with { ProductGroupIds = Enumerable.Range(1, 101).ToArray() },
+			TestContext.Current.CancellationToken);
+
+		result.Errors.Should().Contain(
+			error => error.PropertyName == nameof(SearchInCatalogueQuery.ProductGroupIds));
+	}
+
 	private static SearchInCatalogueQuery CreateQuery(
 		string? query = "bosch",
 		IReadOnlySet<SearchTarget>? targets = null,

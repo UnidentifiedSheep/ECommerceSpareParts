@@ -6,7 +6,7 @@ using Main.Entities;
 
 namespace Main.Application.Handlers.Purchases.BaseValidators;
 
-public class EditPurchaseDtoValidation : AbstractValidator<IEnumerable<EditPurchaseDto>>
+public class EditPurchaseDtoValidation : AbstractValidator<IReadOnlyCollection<EditPurchaseDto>>
 {
 	public EditPurchaseDtoValidation()
 	{

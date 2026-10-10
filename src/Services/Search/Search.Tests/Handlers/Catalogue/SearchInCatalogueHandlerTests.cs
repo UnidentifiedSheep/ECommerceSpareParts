@@ -62,12 +62,14 @@ public sealed class SearchInCatalogueHandlerTests
 
 		result.Products.Total.Should().Be(11);
 		result.Products.Items.Should().ContainSingle().Which.Id.Should().Be(product.Id);
+		result.Products.Items.Single().ProductGroupId.Should().Be(product.ProductGroupId);
 		result.SearchInCatalogueCandidates.Total.Should().Be(7);
 		result.SearchInCatalogueCandidates.Items.Should().ContainSingle().Which.Id.Should().Be(candidate.Id);
 		result.SearchInCatalogueCandidates.Items.Single().MappedProductId.Should().Be(candidate.MappedProductId);
 		receivedCriteria.Should().NotBeNull();
 		receivedCriteria!.Query.Should().Be("bosch 123");
 		receivedCriteria.ProducerIds.Should().Equal(42);
+		receivedCriteria.ProductGroupIds.Should().Equal(7, 8);
 		receivedCandidateCriteria.Should().NotBeNull();
 		receivedCandidateCriteria!.CandidateMappingStatus.Should().Be(CandidateMappingStatus.Unmapped);
 	}
@@ -158,7 +160,8 @@ public sealed class SearchInCatalogueHandlerTests
 			[],
 			[],
 			candidateMappingStatus,
-			includeHighlights);
+			includeHighlights,
+			[7, 7, 8]);
 	}
 
 	private static ProductDocument CreateProduct()
@@ -170,6 +173,7 @@ public sealed class SearchInCatalogueHandlerTests
 			NormalizedSku = "bosch123",
 			Name = "Product name",
 			ProducerId = 42,
+			ProductGroupId = 7,
 			Stock = 5,
 			Indicator = null
 		};

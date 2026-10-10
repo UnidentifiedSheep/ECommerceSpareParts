@@ -11,7 +11,7 @@ namespace Main.Api.EndPoints.Producers;
 
 public record AddAliasToProducerRequest(string Alias);
 
-public record GetProducerAliasesResponse(IEnumerable<ProducerAliasDto> Aliases);
+public record GetProducerAliasesResponse(IReadOnlyCollection<ProducerAliasDto> Aliases);
 
 public static class ProducerAliasEndPoints
 {

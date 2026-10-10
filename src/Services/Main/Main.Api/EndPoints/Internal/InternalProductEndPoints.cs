@@ -39,13 +39,13 @@ public record InternalGetSupplierProductReferencesRequest
 public record InternalResolveSupplierProductReferencesRequest
 {
 	[JsonPropertyName("references")]
-	public required Dictionary<Supplier, IEnumerable<SupplierProductReferenceDto>> References { get; init; }
+	public required Dictionary<Supplier, IReadOnlyCollection<SupplierProductReferenceDto>> References { get; init; }
 }
 
 public record InternalResolveSupplierProductReferencesResponse
 {
 	[JsonPropertyName("products")]
-	public required Dictionary<Supplier, IEnumerable<ResolvedSupplierProductReferenceDto>> Products
+	public required Dictionary<Supplier, IReadOnlyCollection<ResolvedSupplierProductReferenceDto>> Products
 	{
 		get;
 		init;

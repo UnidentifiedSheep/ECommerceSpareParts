@@ -20,7 +20,7 @@ namespace Main.Application.Handlers.StorageContents.SubtractContent;
 	20,
 	2)]
 public record SubtractStorageContentsCommand(
-	IEnumerable<ISubtractStorageContentItem> Items,
+	IReadOnlyCollection<ISubtractStorageContentItem> Items,
 	StorageMovementType MovementType) : ICommand<SubtractStorageContentsResult>
 {
 	public SubtractStorageContentsCommand(

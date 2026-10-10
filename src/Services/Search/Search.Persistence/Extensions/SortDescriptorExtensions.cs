@@ -11,7 +11,7 @@ public static class SortDescriptorExtensions
 {
 	public static SearchDescriptor<TEntity> SortBySearchRelevance<TEntity, TKey>(
 		this SearchDescriptor<TEntity> search,
-		string[]? sortBy,
+		IReadOnlyCollection<string>? sortBy,
 		Expression<Func<TEntity, TKey>> idSelector) where TEntity : class
 	{
 		if (sortBy is not null && sortBy.Any(x => !string.IsNullOrWhiteSpace(x)))
@@ -22,7 +22,7 @@ public static class SortDescriptorExtensions
 
 	public static SearchDescriptor<TEntity> SortBy<TEntity>(
 		this SearchDescriptor<TEntity> search,
-		string[]? sortBy,
+		IReadOnlyCollection<string>? sortBy,
 		bool useDefault = true) where TEntity : class
 	{
 		if (!useDefault && (sortBy is null || sortBy.All(string.IsNullOrWhiteSpace)))
@@ -31,7 +31,9 @@ public static class SortDescriptorExtensions
 		return search.Sort(sort => sort.SortBy(sortBy));
 	}
 
-	public static IPromise<IList<ISort>> SortBy<TEntity>(this SortDescriptor<TEntity> sort, string[]? sortBy)
+	public static IPromise<IList<ISort>> SortBy<TEntity>(
+		this SortDescriptor<TEntity> sort,
+		IReadOnlyCollection<string>? sortBy)
 		where TEntity : class
 	{
 		IReadOnlyList<KeySelectorSortDefinition<TEntity>> definitions;

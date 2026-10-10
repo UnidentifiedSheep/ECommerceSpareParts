@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Main.Api.EndPoints.Storages;
 
 public record AddContentToStorageRequest(
-	IEnumerable<NewStorageContentDto> StorageContent,
+	IReadOnlyCollection<NewStorageContentDto> StorageContent,
 	string StorageCode);
 
 public record EditStorageContentRequest(
@@ -33,7 +33,7 @@ public record GetStorageContentRequest : SortablePaginationQueryModel
 	public bool ShowZeroCount { get; init; } = true;
 }
 
-public record GetStorageContentResponse(IEnumerable<StorageContentDto> Content);
+public record GetStorageContentResponse(IReadOnlyCollection<StorageContentDto> Content);
 
 public static class StorageContentEndPoints
 {

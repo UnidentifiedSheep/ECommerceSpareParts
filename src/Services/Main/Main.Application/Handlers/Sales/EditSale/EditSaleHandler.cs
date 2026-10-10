@@ -29,7 +29,7 @@ namespace Main.Application.Handlers.Sales.EditSale;
 public record EditSaleCommand(
 	Guid SaleId,
 	uint RowVersion,
-	IEnumerable<EditSaleContentDto> Content,
+	IReadOnlyCollection<EditSaleContentDto> Content,
 	int CurrencyId,
 	DateTime SaleDateTime,
 	string? Comment,

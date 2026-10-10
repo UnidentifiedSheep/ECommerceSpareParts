@@ -18,7 +18,7 @@ public record CreateProducerResponse(ProducerDto Producer);
 
 public record EditProducerRequest(PatchProducerDto EditProducer);
 
-public record GetProducersResponse(IEnumerable<ProducerDto> Producers);
+public record GetProducersResponse(IReadOnlyCollection<ProducerDto> Producers);
 
 public record GetProducerByIdResponse(ProducerDto Producer);
 

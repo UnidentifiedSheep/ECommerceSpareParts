@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Organizations.GetOrganizations;
 
 public record GetOrganizationsQuery(
 	Pagination Pagination,
-	string[] SortBy,
+	IReadOnlyCollection<string> SortBy,
 	string? SearchTerm,
 	Guid? UserId,
 	IReadOnlyCollection<Guid> Ids,

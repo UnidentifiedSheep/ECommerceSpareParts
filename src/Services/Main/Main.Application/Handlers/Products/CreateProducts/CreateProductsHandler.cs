@@ -41,7 +41,7 @@ public class CreateProductsHandler(IProductRepository productRepository, IUnitOf
 				@new.ProducerId,
 				@new.Description);
 			product.SetIndicator(@new.Indicator);
-			product.SetCategory(@new.CategoryId);
+			product.SetProductGroup(@new.GroupId);
 			products.Add(product);
 		}
 

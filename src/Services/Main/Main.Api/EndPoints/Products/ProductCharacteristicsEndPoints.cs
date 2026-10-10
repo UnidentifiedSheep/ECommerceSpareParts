@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Products;
 
-public record AddCharacteristicsRequest(IEnumerable<NewCharacteristicsDto> Characteristics);
+public record AddCharacteristicsRequest(IReadOnlyCollection<NewCharacteristicsDto> Characteristics);
 
 public record EditCharacteristicsRequest(PatchCharacteristicsDto Value);
 

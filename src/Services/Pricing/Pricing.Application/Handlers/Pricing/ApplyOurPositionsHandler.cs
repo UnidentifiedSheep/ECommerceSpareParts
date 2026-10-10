@@ -12,7 +12,7 @@ namespace Pricing.Application.Handlers.Pricing;
 
 [Transactional]
 [AutoSave]
-public record ApplyOurPositionsCommand(IEnumerable<StorageContentUpdatedEvent> Events) : ICommand;
+public record ApplyOurPositionsCommand(IReadOnlyCollection<StorageContentUpdatedEvent> Events) : ICommand;
 
 public class ApplyOurPositionsHandler(
 	IPriceOfferRepository offerRepository,

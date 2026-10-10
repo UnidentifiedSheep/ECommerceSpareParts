@@ -44,7 +44,7 @@ public sealed class ProducerDtoProjectionProvider : ProjectionProviderBase<Produ
 			Id = producer.Id,
 			Name = producer.Name,
 			Description = producer.Description,
-			Aliases = producer.Aliases.Select(x => aliasToDto.Invoke(x))
+			Aliases = producer.Aliases.Select(x => aliasToDto.Invoke(x)).ToList()
 		};
 	}
 

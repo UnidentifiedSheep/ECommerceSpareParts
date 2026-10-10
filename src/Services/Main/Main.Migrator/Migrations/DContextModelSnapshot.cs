@@ -807,30 +807,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("cart", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id")
-                        .HasName("categories_pk");
-
-                    b.HasIndex("Name")
-                        .HasDatabaseName("categories_name_index");
-
-                    b.ToTable("categories", "public");
-                });
-
             modelBuilder.Entity("Main.Entities.Currency.Currency", b =>
                 {
                     b.Property<int>("Id")
@@ -1798,6 +1774,10 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("producer_id");
 
+                    b.Property<int?>("ProductGroupId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_group_id");
+
                     b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
@@ -1864,6 +1844,8 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "Popularity" }, "products_popularity_index");
 
                     b.HasIndex(new[] { "ProducerId" }, "products_producer_id_index");
+
+                    b.HasIndex(new[] { "ProductGroupId" }, "products_product_group_id_index");
 
                     b.ToTable("products", "public");
 
@@ -1956,6 +1938,36 @@ namespace Main.Migrator.Migrations
                         .HasName("product_eans_pk");
 
                     b.ToTable("product_eans", "public");
+                });
+
+            modelBuilder.Entity("Main.Entities.Product.ProductGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("normalized_name");
+
+                    b.HasKey("Id")
+                        .HasName("product_groups_pk");
+
+                    b.HasIndex(new[] { "NormalizedName" }, "product_groups_normalized_name_uindex")
+                        .IsUnique();
+
+                    b.ToTable("product_groups", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.ProductImage", b =>
@@ -4038,12 +4050,6 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Product.Product", b =>
                 {
-                    b.HasOne("Main.Entities.Category", "Category")
-                        .WithMany("Articles")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("products_categories_id_fk");
-
                     b.HasOne("Main.Entities.Product.Product", "Pair")
                         .WithOne()
                         .HasForeignKey("Main.Entities.Product.Product", "PairId")
@@ -4055,6 +4061,12 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("producer_id_fk");
+
+                    b.HasOne("Main.Entities.Product.ProductGroup", "ProductGroup")
+                        .WithMany()
+                        .HasForeignKey("ProductGroupId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("products_product_group_id_fk");
 
                     b.OwnsOne("Main.Entities.Product.ValueObjects.Name", "Name", b1 =>
                         {
@@ -4075,14 +4087,14 @@ namespace Main.Migrator.Migrations
                                 .HasForeignKey("ProductId");
                         });
 
-                    b.Navigation("Category");
-
                     b.Navigation("Name")
                         .IsRequired();
 
                     b.Navigation("Pair");
 
                     b.Navigation("Producer");
+
+                    b.Navigation("ProductGroup");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.ProductCharacteristic", b =>
@@ -4617,11 +4629,6 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Auth.Role", b =>
                 {
                     b.Navigation("RolePermissions");
-                });
-
-            modelBuilder.Entity("Main.Entities.Category", b =>
-                {
-                    b.Navigation("Articles");
                 });
 
             modelBuilder.Entity("Main.Entities.Currency.Currency", b =>

@@ -4,7 +4,7 @@ using Main.Application.Interfaces.Products;
 
 namespace Main.Application.Handlers.Products;
 
-public record GetProductByIdsQuery(IEnumerable<int> Ids) : IQuery<GetProductByIdsResult>;
+public record GetProductByIdsQuery(IReadOnlyCollection<int> Ids) : IQuery<GetProductByIdsResult>;
 
 public record GetProductByIdsResult(IReadOnlyList<ProductDto> Products);
 

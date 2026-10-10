@@ -18,7 +18,7 @@ namespace Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 public record CalculateDeliveryCostQuery(
 	string StorageFrom,
 	string StorageTo,
-	IEnumerable<LogisticsItemDto> Items,
+	IReadOnlyCollection<LogisticsItemDto> Items,
 	LogisticsCalculationMode Mode) : IQuery<CalculateDeliveryCostResult>;
 
 public record CalculateDeliveryCostResult(StorageRouteDto Route, DeliveryCostDto DeliveryCost);

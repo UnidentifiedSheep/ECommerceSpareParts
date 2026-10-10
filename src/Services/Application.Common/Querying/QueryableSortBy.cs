@@ -81,7 +81,7 @@ public class QueryableSortBy
 	}
 
 	public static IReadOnlyList<KeySelectorSortDefinition<TEntity>> ParseToKeySelectors<TEntity>(
-		IEnumerable<string>? sortParams)
+		IReadOnlyCollection<string>? sortParams)
 	{
 		var values = sortParams?.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray() ?? [];
 

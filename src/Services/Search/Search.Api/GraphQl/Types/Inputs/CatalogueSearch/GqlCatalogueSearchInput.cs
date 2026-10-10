@@ -22,6 +22,9 @@ public record GqlCatalogueSearchInput
 	[GraphQLName("producerIds")]
 	public IReadOnlyCollection<int>? ProducerIds { get; init; } = [];
 
+	[GraphQLName("productGroupIds")]
+	public IReadOnlyCollection<int>? ProductGroupIds { get; init; } = [];
+
 	[GraphQLName("candidateMappingStatus")]
 	public CandidateMappingStatus? CandidateMappingStatus { get; init; }
 

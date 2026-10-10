@@ -22,6 +22,9 @@ public record ProductDto
 	[JsonPropertyName("producerName")]
 	public required string ProducerName { get; init; }
 
+	[JsonPropertyName("groupId")]
+	public int? GroupId { get; init; }
+
 	[JsonPropertyName("indicator")]
 	public required string? Indicator { get; init; }
 

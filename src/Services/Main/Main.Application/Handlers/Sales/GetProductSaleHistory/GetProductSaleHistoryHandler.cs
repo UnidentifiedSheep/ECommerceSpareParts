@@ -18,7 +18,7 @@ public record GetProductSaleHistoryQuery(
 	Guid? OrganizationId,
 	Guid? PreferredOrganizationId,
 	int? CurrencyId,
-	string[] SortBy) : IQuery<GetProductSaleHistoryResult>;
+	IReadOnlyCollection<string> SortBy) : IQuery<GetProductSaleHistoryResult>;
 
 public record GetProductSaleHistoryResult(IReadOnlyList<ProductSaleHistoryDto> History);
 

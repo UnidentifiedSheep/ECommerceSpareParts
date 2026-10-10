@@ -42,6 +42,9 @@ public sealed class SearchInCatalogueValidation : AbstractValidator<SearchInCata
 		RuleFor(x => x.ProducerIds)
 			.Must(ids => ids.Count <= 100)
 			.WithLocalizableError(new CatalogueSearchProducerCountMaxMessage().WithCount(100));
+		RuleFor(x => x.ProductGroupIds)
+			.Must(ids => ids is null || ids.Count <= 100)
+			.WithLocalizableError(new CatalogueSearchProductGroupCountMaxMessage().WithCount(100));
 
 		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 	}
