@@ -10,7 +10,6 @@ namespace Main.Application.Handlers.Products;
 
 public record GetFullProductsQuery : IQuery<GetFullProductsResult>
 {
-
 	public GetFullProductsQuery(IEnumerable<int> ids)
 	{
 		ProductIds = ids.Distinct().ToList();

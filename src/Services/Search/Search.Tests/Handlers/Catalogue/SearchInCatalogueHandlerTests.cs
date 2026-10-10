@@ -62,6 +62,7 @@ public sealed class SearchInCatalogueHandlerTests
 
 		result.Products.Total.Should().Be(11);
 		result.Products.Items.Should().ContainSingle().Which.Id.Should().Be(product.Id);
+		result.Products.Items.Single().ProductGroupId.Should().Be(product.ProductGroupId);
 		result.SearchInCatalogueCandidates.Total.Should().Be(7);
 		result.SearchInCatalogueCandidates.Items.Should().ContainSingle().Which.Id.Should().Be(candidate.Id);
 		result.SearchInCatalogueCandidates.Items.Single().MappedProductId.Should().Be(candidate.MappedProductId);
@@ -170,6 +171,7 @@ public sealed class SearchInCatalogueHandlerTests
 			NormalizedSku = "bosch123",
 			Name = "Product name",
 			ProducerId = 42,
+			ProductGroupId = 7,
 			Stock = 5,
 			Indicator = null
 		};

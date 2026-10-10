@@ -22,6 +22,9 @@ public record InternalProduct
 	[JsonPropertyName("producerName")]
 	public required string ProducerName { get; init; }
 
+	[JsonPropertyName("groupId")]
+	public int? ProductGroupId { get; init; }
+
 	[JsonPropertyName("indicator")]
 	public required string? Indicator { get; init; }
 

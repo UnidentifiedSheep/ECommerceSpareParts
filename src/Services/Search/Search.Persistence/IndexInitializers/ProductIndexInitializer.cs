@@ -54,6 +54,7 @@ public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSear
 										.Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
 										.SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))))
 							.Number(n => n.Name(x => x.ProducerId).Type(NumberType.Integer))
+							.Number(n => n.Name(x => x.ProductGroupId).Type(NumberType.Integer))
 							.Text(t => t.Name(x => x.Indicator).Index(false))
 							.Number(n => n.Name(x => x.Stock).Type(NumberType.Integer))
 							.Object<ProductDimensions>(o => o

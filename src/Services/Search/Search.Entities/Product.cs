@@ -12,6 +12,8 @@ public class Product
 
 	public required int ProducerId { get; init; }
 
+	public int? ProductGroupId { get; init; }
+
 	public required int Stock { get; init; }
 
 	public required string? Indicator { get; init; }

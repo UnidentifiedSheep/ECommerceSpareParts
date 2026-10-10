@@ -33,6 +33,7 @@ public class MainProductSearchDocumentProvider(IMainClient mainClient) : IProduc
 					NormalizedSku = product.Sku.OnlyCharacterToLower(),
 					Name = product.Name,
 					ProducerId = product.ProducerId,
+					ProductGroupId = product.ProductGroupId,
 					Dimensions = MapDimensions(product.ProductSize),
 					Weight = MapWeight(product.ProductWeight),
 					Stock = product.Stock,
