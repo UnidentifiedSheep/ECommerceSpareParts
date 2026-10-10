@@ -30,7 +30,8 @@ public sealed class CatalogueQueries
 				input.ProductSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
 				input.CatalogueCandidateSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
 				input.CandidateMappingStatus ?? CandidateMappingStatus.Unmapped,
-				input.IncludeHighlights ?? false),
+				input.IncludeHighlights ?? false,
+				input.ProductGroupIds ?? []),
 			ct);
 
 		return new GqlCatalogueSearchResult

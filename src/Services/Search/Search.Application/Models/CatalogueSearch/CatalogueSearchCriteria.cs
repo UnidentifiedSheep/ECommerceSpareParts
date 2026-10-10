@@ -14,6 +14,8 @@ public sealed record CatalogueSearchCriteria
 
 	public IReadOnlyCollection<int> ProducerIds { get; init; } = [];
 
+	public IReadOnlyCollection<int> ProductGroupIds { get; init; } = [];
+
 	public CandidateMappingStatus CandidateMappingStatus { get; init; } = CandidateMappingStatus.Unmapped;
 
 	public required Pagination Pagination { get; init; }

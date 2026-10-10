@@ -23,7 +23,8 @@ public sealed record SearchInCatalogueQuery(
 	IReadOnlyCollection<string> ProductSortBy,
 	IReadOnlyCollection<string> CatalogueCandidateSortBy,
 	CandidateMappingStatus CandidateMappingStatus = CandidateMappingStatus.Unmapped,
-	bool IncludeHighlights = false) : IQuery<SearchInCatalogueResult>;
+	bool IncludeHighlights = false,
+	IReadOnlyCollection<int>? ProductGroupIds = null) : IQuery<SearchInCatalogueResult>;
 
 public sealed record SearchInCatalogueSection<T>(IReadOnlyCollection<T> Items, long Total);
 
@@ -48,6 +49,7 @@ public sealed class SearchInCatalogueHandler(
 			SkuModes = request.SkuModes,
 			NameModes = request.NameModes,
 			ProducerIds = request.ProducerIds.Distinct().ToArray(),
+			ProductGroupIds = request.ProductGroupIds?.Distinct().ToArray() ?? [],
 			CandidateMappingStatus = request.CandidateMappingStatus,
 			Pagination = request.Pagination,
 			SortBy = [],

@@ -69,6 +69,7 @@ public sealed class SearchInCatalogueHandlerTests
 		receivedCriteria.Should().NotBeNull();
 		receivedCriteria!.Query.Should().Be("bosch 123");
 		receivedCriteria.ProducerIds.Should().Equal(42);
+		receivedCriteria.ProductGroupIds.Should().Equal(7, 8);
 		receivedCandidateCriteria.Should().NotBeNull();
 		receivedCandidateCriteria!.CandidateMappingStatus.Should().Be(CandidateMappingStatus.Unmapped);
 	}
@@ -159,7 +160,8 @@ public sealed class SearchInCatalogueHandlerTests
 			[],
 			[],
 			candidateMappingStatus,
-			includeHighlights);
+			includeHighlights,
+			[7, 7, 8]);
 	}
 
 	private static ProductDocument CreateProduct()

@@ -40,7 +40,8 @@ public class ProductRepository(
 					criteria,
 					new Field("normalizedSku"),
 					new Field("name"),
-					new Field("producerId")))
+					new Field("producerId"),
+					productGroupIdField: new Field("productGroupId")))
 				.AddCatalogueHighlights(
 					criteria.IncludeHighlights,
 					criteria.Query,

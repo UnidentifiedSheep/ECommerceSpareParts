@@ -18,6 +18,23 @@ namespace Search.Tests.Persistence;
 public sealed class ProductRepositorySearchTests
 {
 	[Fact]
+	public async Task Search_WithProductGroupIds_ShouldFilterProductsByGroup()
+	{
+		var (repository, requestBody) = CreateRepository();
+		var criteria = CreateCriteria("", new HashSet<SearchMatchType>(), new HashSet<SearchMatchType>()) with
+		{
+			ProducerIds = [42],
+			ProductGroupIds = [7, 8]
+		};
+
+		await repository.Search(criteria, TestContext.Current.CancellationToken);
+
+		requestBody().Should().Contain("\"producerId\"");
+		requestBody().Should().Contain("\"productGroupId\"");
+		requestBody().Should().Contain("[7,8]");
+	}
+
+	[Fact]
 	public async Task Search_ShouldBuildRequestedSkuAndNameModes()
 	{
 		var (repository, requestBody) = CreateRepository();
@@ -40,6 +57,7 @@ public sealed class ProductRepositorySearchTests
 		requestBody().Should().Contain("\"name.keyword\"");
 		requestBody().Should().NotContain("\"name.prefix\"");
 		requestBody().Should().NotContain("\"mappedProductId\"");
+		requestBody().Should().NotContain("\"productGroupId\"");
 		requestBody().Should().NotContain("\"highlight\"");
 	}
 

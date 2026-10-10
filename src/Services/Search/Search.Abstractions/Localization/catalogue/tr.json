@@ -8,6 +8,7 @@
     "catalogue.search.text.mode.required": "Metin sorgusu için en az bir ürün kodu veya ad arama modu gereklidir.",
     "catalogue.search.fuzzy.query.min.length": "Bulanık arama için sorgu en az {Count} karakter olmalıdır.",
     "catalogue.search.producer.count.max": "En fazla {Count} üretici belirtilebilir.",
+    "catalogue.search.product.group.count.max": "En fazla {Count} ürün grubu belirtilebilir.",
     "catalogue.search.candidate.mapping.status.invalid": "Belirtilen aday eşleme durumu geçersizdir."
   }
 }

@@ -37,6 +37,9 @@ public sealed record SearchCatalogueRequest
 	[JsonPropertyName("producerIds")]
 	public IReadOnlyCollection<int> ProducerIds { get; init; } = [];
 
+	[JsonPropertyName("productGroupIds")]
+	public IReadOnlyCollection<int> ProductGroupIds { get; init; } = [];
+
 	[JsonPropertyName("candidateMappingStatus")]
 	public CandidateMappingStatus CandidateMappingStatus { get; init; } = CandidateMappingStatus.Unmapped;
 
@@ -93,7 +96,8 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 							request.SortBy?.Products ?? [],
 							request.SortBy?.CatalogueCandidates ?? [],
 							request.CandidateMappingStatus,
-							request.IncludeHighlights),
+							request.IncludeHighlights,
+							request.ProductGroupIds),
 						cancellationToken);
 
 					return Results.Ok(
