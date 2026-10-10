@@ -9,6 +9,8 @@
     "lrt.producer.supplier.mapping.import.description": "Загружает названия производителей у поставщиков из файла, проверяет данные и связывает их с существующими производителями.",
     "lrt.product.import.name": "Импорт товаров",
     "lrt.product.import.description": "Загружает список товаров из файла, проверяет данные и добавляет новые записи, пропуская уже существующие.",
+    "lrt.product.group.import.name": "Импорт групп товаров",
+    "lrt.product.group.import.description": "Загружает группы товаров из CSV-файла, проверяет названия и добавляет новые группы, пропуская существующие.",
     "lrt.product.crosses.import.name": "Импорт кроссов товаров",
     "lrt.product.crosses.import.description": "Загружает кроссы товаров из CSV-файла, находит товары по артикулу и производителю и создаёт связи между ними.",
     "lrt.producer.synchronization.name": "Синхронизация производителей",
