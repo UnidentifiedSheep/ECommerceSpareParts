@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json.Nodes;
 using Abstractions;
+using Abstractions.Models.Options;
 using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
@@ -142,6 +143,9 @@ builder.Services.AddCors(options =>
 		else
 			policy.SetIsOriginAllowed(_ => true);
 	});
+}).ConfigureHttpJsonOptions(options =>
+{
+	ProjectJsonOptions.Configure(options.SerializerOptions);
 });
 
 var uniqQueueName = $"queue-of-gateway-{Environment.MachineName}";
