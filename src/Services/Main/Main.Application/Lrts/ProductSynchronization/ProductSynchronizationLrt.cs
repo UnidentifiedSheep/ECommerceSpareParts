@@ -11,7 +11,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts;
+namespace Main.Application.Lrts.ProductSynchronization;
 
 public sealed class ProductSynchronizationLrt(
 	IRepository<Job, Guid> jobRepository,
