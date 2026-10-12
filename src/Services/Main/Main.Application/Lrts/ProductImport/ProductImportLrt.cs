@@ -44,7 +44,7 @@ public class ProductImportLrt(
 {
 	private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
-	protected override int BatchSize => 1000;
+	protected override int BatchSize => 10_000;
 
 	public override string SystemName => nameof(ProductImportLrt);
 
