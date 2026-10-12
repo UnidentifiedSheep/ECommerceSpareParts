@@ -44,6 +44,8 @@
     "article.name.max.length.255": "Ürün adı 255 karakteri aşmamalıdır.",
     "article.description.max.length.255": "Ürün açıklaması 255 karakteri aşmamalıdır.",
     "article.indicator.max.length.24": "Ürün göstergesi 24 karakteri aşmamalıdır.",
+    "article.ean.required": "EAN boş olmamalıdır.",
+    "article.ean.max.length": "EAN 14 karakteri aşmamalıdır.",
     "article.linkage.article.cannot.equal.cross.article": "Ürün, çapraz ürünle aynı olamaz.",
     "article.size.height.must.be.greater.than.zero": "Yükseklik 0'dan büyük olmalıdır.",
     "article.size.height.max.two.decimals": "Yükseklik en fazla 2 ondalık basamak içerebilir.",

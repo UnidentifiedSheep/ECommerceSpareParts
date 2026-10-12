@@ -123,6 +123,15 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
 	public void SetProductGroup(int? productGroupId) => ProductGroupId = productGroupId;
 
+	public void AddEan(string ean)
+	{
+		var productEan = ProductEan.Create(Id, ean);
+		if (_eans.All(x => x.Ean != productEan.Ean))
+			_eans.Add(productEan);
+	}
+
+	public void RemoveEan(string ean) => _eans.RemoveAll(x => x.Ean == ean);
+
 	public void SetPopularity(long popularity)
 	{
 		ArgumentOutOfRangeException.ThrowIfNegative(popularity);
