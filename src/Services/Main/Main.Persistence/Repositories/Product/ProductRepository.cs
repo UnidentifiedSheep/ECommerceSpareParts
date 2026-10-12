@@ -139,6 +139,19 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 		}
 	}
 
+	public Task InsertProductEansOnConflictDoNothingAsync(
+		IReadOnlyCollection<ProductEan> eans,
+		CancellationToken cancellationToken = default)
+	{
+		if (eans.Count == 0) return Task.CompletedTask;
+
+		var items = eans.DistinctBy(x => (x.ProductId, x.Ean)).ToList();
+		return Context.BulkInsertOrUpdateAsync(
+			items,
+			new BulkConfig { PropertiesToIncludeOnUpdate = [""] },
+			cancellationToken: cancellationToken);
+	}
+
 	public async Task UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default)

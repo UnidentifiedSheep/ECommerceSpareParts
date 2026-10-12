@@ -27,6 +27,10 @@ public interface IProductRepository : IRepository<Product, int>
 		IReadOnlyCollection<Product> products,
 		CancellationToken cancellationToken = default);
 
+	Task InsertProductEansOnConflictDoNothingAsync(
+		IReadOnlyCollection<ProductEan> eans,
+		CancellationToken cancellationToken = default);
+
 	Task UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default);

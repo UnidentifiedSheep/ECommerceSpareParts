@@ -11,6 +11,8 @@
     "lrt.product.import.description": "Imports products from an uploaded file, then publishes update events for all products.",
     "lrt.product.import.step.name": "Product import step",
     "lrt.product.import.step.description": "Imports products from an uploaded file, validates the data, and adds new records while skipping existing ones.",
+    "lrt.product.ean.import.name": "Product EAN import",
+    "lrt.product.ean.import.description": "Imports product EANs from a CSV file using product IDs and skips existing entries.",
     "lrt.product.group.import.name": "Product group import",
     "lrt.product.group.import.description": "Imports product groups from an uploaded CSV file, validates names, and adds new groups while skipping existing ones.",
     "lrt.map.group.to.product.name": "Assign product groups",
