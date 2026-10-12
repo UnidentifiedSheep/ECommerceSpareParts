@@ -139,7 +139,7 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 		}
 	}
 
-	public async Task BulkUpdateProductGroupsAsync(
+	public async Task UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default)
 	{

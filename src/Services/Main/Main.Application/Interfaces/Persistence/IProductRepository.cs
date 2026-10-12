@@ -27,7 +27,7 @@ public interface IProductRepository : IRepository<Product, int>
 		IReadOnlyCollection<Product> products,
 		CancellationToken cancellationToken = default);
 
-	Task BulkUpdateProductGroupsAsync(
+	Task UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default);
 }

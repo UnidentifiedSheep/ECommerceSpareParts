@@ -1,4 +1,3 @@
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
@@ -13,7 +12,6 @@ using Main.Application.Lrts.Base;
 using Main.Application.Models.Product;
 using Main.Application.Models.Producer;
 using Main.Entities;
-using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using MassTransit;
@@ -31,7 +29,6 @@ public class MapGroupToProductLrtStep(
 	IProductRepository productRepository,
 	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IDomainEventScope domainEventScope,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
@@ -90,9 +87,7 @@ public class MapGroupToProductLrtStep(
 			item = new ProductGroupAssignment(
 				normalizedSku,
 				producerId.Value,
-				groupId,
-				row.Sku,
-				row.Producer);
+				groupId);
 
 			return true;
 		}
@@ -110,39 +105,20 @@ public class MapGroupToProductLrtStep(
 	{
 		if (items.Count == 0) return;
 
-		var productIds = await productRepository.GetProductIdsByKeys(
-			items.Select(x => (x.item.NormalizedSku, x.item.ProducerId)), CancellationToken);
-
 		var assignments = new Dictionary<(string NormalizedSku, int ProducerId), ProductGroupAssignment>();
-		foreach (var (idx, item) in items)
-		{
-			var key = (item.NormalizedSku, item.ProducerId);
-			if (!productIds.ContainsKey(key))
-			{
-				errors.Add(CreateError(idx, StringLocalizer.Get(
-					new ArticleCrossImportProductNotFoundMessage()
-						.WithArticleNumber(item.Sku).WithProducer(item.Producer))));
-				continue;
-			}
-
-			assignments[key] = item;
-		}
-
-		if (assignments.Count == 0) return;
+		foreach (var (_, item) in items)
+			assignments[(item.NormalizedSku, item.ProducerId)] = item;
 
 		await TransactionService.ExecuteAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			async (_, cancellationToken) =>
-			{
-				await productRepository.BulkUpdateProductGroupsAsync(
-					assignments.Values.ToArray(), cancellationToken);
-				domainEventScope.AddRange(assignments.Keys
-					.Select(key => new ProductUpdatedDomainEvent(productIds[key])));
-			},
+			(_, cancellationToken) => productRepository
+				.UpdateProductGroupsAsync(
+					assignments.Values,
+					cancellationToken),
 			CancellationToken);
 
 		Logger.LogInformation(
-			"Product groups mapped to products. JobId: {JobId}, BatchStartRow: {BatchStartRow}, Updated: {Updated}",
+			"Product group mapping batch processed. JobId: {JobId}, BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}",
 			JobId, items[0].idx, assignments.Count);
 	}
 
