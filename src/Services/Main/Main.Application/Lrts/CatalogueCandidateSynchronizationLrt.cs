@@ -52,12 +52,9 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 			.Project(projection)
 			.ToListAsync(cancellationToken);
 
-		if (candidates.Count == 0)
-			return new SynchronizationPage<Guid, CatalogueCandidateUpdatedEvent>(null, []);
-
 		var occurredAt = DateTime.UtcNow;
 		return new SynchronizationPage<Guid, CatalogueCandidateUpdatedEvent>(
-			candidates[^1].Id,
+			candidates.Select(candidate => candidate.Id).ToList(),
 			candidates.Select(candidate => new CatalogueCandidateUpdatedEvent
 			{
 				Candidate = candidate with

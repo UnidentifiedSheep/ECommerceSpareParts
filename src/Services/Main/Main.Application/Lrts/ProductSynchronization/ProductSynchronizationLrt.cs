@@ -49,11 +49,8 @@ public sealed class ProductSynchronizationLrt(
 			.Take(batchSize)
 			.ToListAsync(cancellationToken);
 
-		if (ids.Count == 0)
-			return new SynchronizationPage<int, ProductsUpdatedEvent>(null, []);
-
 		return new SynchronizationPage<int, ProductsUpdatedEvent>(
-			ids[^1],
-			[new ProductsUpdatedEvent { Ids = ids }]);
+			ids,
+			ids.Count == 0 ? [] : [new ProductsUpdatedEvent { Ids = ids }]);
 	}
 }

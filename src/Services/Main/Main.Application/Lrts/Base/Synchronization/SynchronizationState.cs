@@ -7,4 +7,7 @@ public sealed record SynchronizationState<TId> : NoneInputState where TId : stru
 {
 	[JsonPropertyName("lastProcessedId")]
 	public TId? LastProcessedId { get; init; }
+
+	[JsonPropertyName("processedCount")]
+	public long ProcessedCount { get; init; }
 }

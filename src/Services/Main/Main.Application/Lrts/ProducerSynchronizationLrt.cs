@@ -49,11 +49,8 @@ public class ProducerSynchronizationLrt(
 			.Take(batchSize)
 			.ToListAsync(cancellationToken);
 
-		if (ids.Count == 0)
-			return new SynchronizationPage<int, ProducerUpdatedEvent>(null, []);
-
 		return new SynchronizationPage<int, ProducerUpdatedEvent>(
-			ids[^1],
+			ids,
 			ids.Select(x => new ProducerUpdatedEvent { Id = x }).ToList());
 	}
 }

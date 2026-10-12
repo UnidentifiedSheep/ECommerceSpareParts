@@ -35,7 +35,7 @@ public abstract class SynchronizationLrtBase<TId, TEvent>(
 				BatchSize,
 				CancellationToken);
 
-			if (page.LastId == null) break;
+			if (page.Ids.Count == 0) break;
 			if (page.Events.Count == 0)
 				throw new InvalidOperationException("A nonempty synchronization page must contain events.");
 
@@ -52,11 +52,16 @@ public abstract class SynchronizationLrtBase<TId, TEvent>(
 
 			await SaveStateAsync(new SynchronizationState<TId>
 			{
-				LastProcessedId = page.LastId.Value
+				LastProcessedId = page.Ids[^1],
+				ProcessedCount = State.ProcessedCount + page.Ids.Count
 			});
+
+			if (page.Ids.Count < BatchSize)
+				break;
 		}
 	}
 }
 
-public sealed record SynchronizationPage<TId, TEvent>(TId? LastId, IReadOnlyList<TEvent> Events)
-	where TId : struct;
+public sealed record SynchronizationPage<TId, TEvent>(
+	IReadOnlyList<TId> Ids,
+	IReadOnlyList<TEvent> Events);
