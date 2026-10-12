@@ -83,7 +83,6 @@ public class ProductCrossesImportLrt(
 						rowIdx,
 						StringLocalizer.Get(
 							new ArticleImportProducerNotFoundMessage().WithProducer(row.Producer))));
-				state.SkippedLines.Add(rowIdx);
 				return false;
 			}
 
@@ -95,24 +94,18 @@ public class ProductCrossesImportLrt(
 						rowIdx,
 						StringLocalizer.Get(
 							new ArticleImportProducerNotFoundMessage().WithProducer(row.CrossProducer))));
-				state.SkippedLines.Add(rowIdx);
 				return false;
 			}
 
 			item = new ProductCrossBatchItem(
-				new ProductKey(new Sku(row.Sku).NormalizedValue, producerId.Value),
-				new ProductKey(new Sku(row.CrossSku).NormalizedValue, crossProducerId.Value),
-				row.Sku,
-				row.Producer,
-				row.CrossSku,
-				row.CrossProducer);
+				new ProductKey(row.Sku, producerId.Value, row.Producer),
+				new ProductKey(row.CrossSku, crossProducerId.Value, row.CrossProducer));
 
 			return true;
 		}
 		catch (Exception ex)
 		{
 			errors.Add(CreateError(rowIdx, GetErrorMessage(ex)));
-			state.SkippedLines.Add(rowIdx);
 			return false;
 		}
 	}
@@ -130,7 +123,8 @@ public class ProductCrossesImportLrt(
 		var productIds = await productRepository.GetProductIdsByKeys(
 			items.SelectMany(x => new[]
 			{
-				x.item.Product.ToTuple(), x.item.CrossProduct.ToTuple()
+				x.item.Product.ToTuple(),
+				x.item.CrossProduct.ToTuple()
 			}),
 			CancellationToken);
 
@@ -145,9 +139,8 @@ public class ProductCrossesImportLrt(
 						idx,
 						StringLocalizer.Get(
 							new ArticleCrossImportProductNotFoundMessage()
-								.WithArticleNumber(item.Sku)
-								.WithProducer(item.Producer))));
-				state.SkippedLines.Add(idx);
+								.WithArticleNumber(item.Product.Sku)
+								.WithProducer(item.Product.Producer))));
 				continue;
 			}
 
@@ -158,9 +151,8 @@ public class ProductCrossesImportLrt(
 						idx,
 						StringLocalizer.Get(
 							new ArticleCrossImportProductNotFoundMessage()
-								.WithArticleNumber(item.CrossSku)
-								.WithProducer(item.CrossProducer))));
-				state.SkippedLines.Add(idx);
+								.WithArticleNumber(item.CrossProduct.Sku)
+								.WithProducer(item.CrossProduct.Producer))));
 				continue;
 			}
 
@@ -170,7 +162,6 @@ public class ProductCrossesImportLrt(
 					CreateError(
 						idx,
 						StringLocalizer.Get(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance)));
-				state.SkippedLines.Add(idx);
 				continue;
 			}
 
@@ -178,8 +169,7 @@ public class ProductCrossesImportLrt(
 				? (productId, crossProductId)
 				: (crossProductId, productId);
 
-			if (!crosses.Add(cross))
-				state.SkippedLines.Add(idx);
+			crosses.Add(cross);
 		}
 
 		if (crosses.Count > 0)
@@ -213,18 +203,14 @@ public class ProductCrossesImportLrt(
 			errors.Count - errorsBeforeBatch);
 	}
 
-	public sealed record ProductKey(string NormalizedSku, int ProducerId)
+	public sealed record ProductKey(string Sku, int ProducerId, string Producer)
 	{
+		public string NormalizedSku { get; } = new Sku(Sku).NormalizedValue;
+
 		public (string NormalizedSku, int ProducerId) ToTuple() => (NormalizedSku, ProducerId);
 	}
 
-	public sealed record ProductCrossBatchItem(
-		ProductKey Product,
-		ProductKey CrossProduct,
-		string Sku,
-		string Producer,
-		string CrossSku,
-		string CrossProducer);
+	public sealed record ProductCrossBatchItem(ProductKey Product, ProductKey CrossProduct);
 
 	public sealed record ProductCrossCsvDto
 	{
