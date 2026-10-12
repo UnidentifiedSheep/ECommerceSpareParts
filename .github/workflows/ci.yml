@@ -1,4 +1,4 @@
-name: CI-CD
+name: CI
 
 on:
   push:
@@ -14,7 +14,7 @@ on:
         type: string
 
 concurrency:
-  group: ci-cd-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -25,6 +25,7 @@ jobs:
       has_images: ${{ steps.discover.outputs.has_images }}
       should_publish: ${{ steps.discover.outputs.should_publish }}
       should_deploy: ${{ steps.discover.outputs.should_deploy }}
+      promote_only: ${{ steps.discover.outputs.promote_only }}
       full_deploy: ${{ steps.discover.outputs.full_deploy }}
       matrix: ${{ steps.discover.outputs.matrix }}
       services: ${{ steps.discover.outputs.services }}
@@ -211,6 +212,7 @@ jobs:
                       "init/",
                       "scripts/deploy/",
                   )) or path in {
+                      ".github/workflows/cd.yml",
                       ".github/workflows/deploy.yml",
                       "prometheus.yml",
                   }
@@ -313,6 +315,7 @@ jobs:
               stream.write(f"has_images={'true' if services else 'false'}\n")
               stream.write(f"should_publish={'true' if should_publish else 'false'}\n")
               stream.write(f"should_deploy={'true' if should_deploy else 'false'}\n")
+              stream.write(f"promote_only={'true' if republish_mode else 'false'}\n")
               stream.write(f"full_deploy={'true' if full_deploy else 'false'}\n")
               stream.write(f"matrix={matrix}\n")
               stream.write(f"services={names}\n")
@@ -403,16 +406,51 @@ jobs:
       fusion_artifact: ${{ needs.graphql.outputs.fusion_artifact }}
     secrets: inherit
 
-  deploy:
-    needs: [publish-images, discover-affected]
+  release-manifest:
+    runs-on: ubuntu-latest
+    needs: [discover-affected, publish-images]
     if: >-
-      needs.publish-images.result == 'success' &&
-      needs.discover-affected.outputs.should_deploy == 'true' &&
+      always() &&
       ((github.event_name == 'push' && github.ref == 'refs/heads/master') ||
-       github.event_name == 'workflow_dispatch')
-    uses: ./.github/workflows/deploy.yml
-    with:
-      registry_kind: ${{ needs.publish-images.outputs.registry_kind }}
-      services: ${{ needs.discover-affected.outputs.services }}
-      full_deploy: ${{ needs.discover-affected.outputs.full_deploy == 'true' }}
-    secrets: inherit
+       github.event_name == 'workflow_dispatch') &&
+      needs.discover-affected.result == 'success' &&
+      ((needs.discover-affected.outputs.should_deploy != 'true' &&
+        needs.discover-affected.outputs.promote_only != 'true') ||
+       needs.publish-images.result == 'success')
+
+    steps:
+      - name: Write release manifest
+        shell: bash
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+          SHOULD_DEPLOY: ${{ needs.discover-affected.outputs.should_deploy }}
+          PROMOTE_ONLY: ${{ needs.discover-affected.outputs.promote_only }}
+          HAS_IMAGES: ${{ needs.discover-affected.outputs.has_images }}
+          IMAGE_MATRIX: ${{ needs.discover-affected.outputs.matrix }}
+          SERVICES: ${{ needs.discover-affected.outputs.services }}
+          FULL_DEPLOY: ${{ needs.discover-affected.outputs.full_deploy }}
+          REGISTRY_KIND: ${{ needs.publish-images.outputs.registry_kind }}
+        run: |
+          set -euo pipefail
+          jq -n \
+            --arg sha "$RELEASE_SHA" \
+            --argjson should_deploy "$SHOULD_DEPLOY" \
+            --argjson promote_only "$PROMOTE_ONLY" \
+            --argjson has_images "$HAS_IMAGES" \
+            --argjson matrix "$IMAGE_MATRIX" \
+            --arg services "$SERVICES" \
+            --argjson full_deploy "$FULL_DEPLOY" \
+            --arg registry_kind "$REGISTRY_KIND" \
+            '{sha: $sha, should_deploy: $should_deploy, promote_only: $promote_only,
+              has_images: $has_images,
+              matrix: $matrix, services: $services, full_deploy: $full_deploy,
+              registry_kind: $registry_kind}' > release-manifest.json
+          cat release-manifest.json
+
+      - name: Upload release manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-manifest
+          path: release-manifest.json
+          if-no-files-found: error
+          retention-days: 30
