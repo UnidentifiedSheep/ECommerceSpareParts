@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Models.Product;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -131,6 +132,38 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 					PropertiesToIncludeOnUpdate = [""]
 				},
 				cancellationToken: cancellation);
+		}
+		finally
+		{
+			await bulkContext.Database.UseTransactionAsync(null, CancellationToken.None);
+		}
+	}
+
+	public async Task BulkUpdateProductGroupsAsync(
+		IReadOnlyCollection<ProductGroupAssignment> assignments,
+		CancellationToken cancellationToken = default)
+	{
+		if (assignments.Count == 0) return;
+
+		var items = assignments.Select(x => new BulkProduct
+		{
+			Sku = string.Empty,
+			NormalizedSku = x.NormalizedSku,
+			Name = string.Empty,
+			ProducerId = x.ProducerId,
+			ProductGroupId = x.ProductGroupId
+		}).ToList();
+
+		var ambientTransaction = Context.Database.CurrentTransaction
+			?? throw new InvalidOperationException("Product group bulk update requires an active transaction.");
+		await bulkContext.Database.UseTransactionAsync(ambientTransaction.GetDbTransaction(), cancellationToken);
+
+		try
+		{
+			await bulkContext.BulkUpdateAsync(
+				items,
+				new BulkConfig { PropertiesToIncludeOnUpdate = [nameof(BulkProduct.ProductGroupId)] },
+				cancellationToken: cancellationToken);
 		}
 		finally
 		{

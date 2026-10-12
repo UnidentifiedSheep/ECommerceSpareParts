@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Main.Application.Models.Product;
 using Main.Entities.Product;
 
 namespace Main.Application.Interfaces.Persistence;
@@ -24,5 +25,9 @@ public interface IProductRepository : IRepository<Product, int>
 
 	Task InsertProductsOnConflictDoNothingAsync(
 		IReadOnlyCollection<Product> products,
+		CancellationToken cancellationToken = default);
+
+	Task BulkUpdateProductGroupsAsync(
+		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default);
 }
