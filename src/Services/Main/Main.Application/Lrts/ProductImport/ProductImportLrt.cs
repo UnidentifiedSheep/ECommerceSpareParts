@@ -105,45 +105,19 @@ public class ProductImportLrt(
 			return;
 
 		var firstIdx = products[0].idx;
-		var uniqueKeys = new HashSet<(string NormalizedSku, int ProducerId)>();
-		var uniqueProducts = new List<Product>();
-		foreach (var (_, product) in products)
-		{
-			if (uniqueKeys.Add(GetProductKey(product)))
-				uniqueProducts.Add(product);
-		}
-
-		var result = await TransactionService.ExecuteAsync(
+		await TransactionService.ExecuteAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			async (context, cancellationToken) =>
-			{
-				var existingKeys = await productRepository.GetExistingProductKeys(
-					uniqueKeys,
-					cancellationToken);
-				var toCreate = uniqueProducts
-					.Where(product => !existingKeys.Contains(GetProductKey(product)))
-					.ToList();
-
-				await context.UnitOfWork.AddRangeAsync(toCreate, cancellationToken);
-				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-
-				return toCreate.Count;
-			},
+			(_, cancellationToken) => productRepository.InsertProductsOnConflictDoNothingAsync(
+				products.Select(product => product.item).ToArray(), cancellationToken),
 			CancellationToken);
 
 		Logger.LogInformation(
 			"Product import batch processed. JobId: {JobId}, " +
-			"BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}, " +
-			"Created: {Created}, Skipped: {Skipped}",
+			"BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}",
 			JobId,
 			firstIdx,
-			products.Count,
-			result,
-			products.Count - result);
+			products.Count);
 	}
-
-	private static (string NormalizedSku, int ProducerId) GetProductKey(Product product) =>
-		(product.Sku.NormalizedValue, product.ProducerId);
 
 	public record NewProductCsvDto
 	{
