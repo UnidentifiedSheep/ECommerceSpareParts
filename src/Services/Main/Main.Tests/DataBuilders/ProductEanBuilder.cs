@@ -6,6 +6,8 @@ namespace Tests.DataBuilders;
 
 public class ProductEanBuilder(Faker faker) : BuilderBase<ProductEan>(faker)
 {
+	private static long _nextEan;
+
 	public int? ProductId { get; private set; }
 
 	public string? Ean { get; private set; }
@@ -24,5 +26,5 @@ public class ProductEanBuilder(Faker faker) : BuilderBase<ProductEan>(faker)
 
 	public override ProductEan Build() => ProductEan.Create(
 		ProductId ?? Faker.Random.Int(1),
-		Ean ?? $"460{Faker.GlobalUniqueIndex:D10}");
+		Ean ?? Interlocked.Increment(ref _nextEan).ToString("D13"));
 }

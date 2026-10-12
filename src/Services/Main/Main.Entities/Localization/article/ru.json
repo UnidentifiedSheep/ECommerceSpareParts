@@ -46,6 +46,8 @@
     "article.indicator.max.length.24": "Индикатор не должен превышать 24 символа.",
     "article.ean.required": "EAN не может быть пустым.",
     "article.ean.max.length": "EAN не должен превышать 14 символов.",
+    "article.ean.not.found": "EAN не найден у товара.",
+    "article.ean.already.exists": "EAN уже добавлен к товару.",
     "article.linkage.article.cannot.equal.cross.article": "Артикул не может совпадать с кросс-артикулом.",
     "article.size.height.must.be.greater.than.zero": "Высота должна быть больше 0.",
     "article.size.height.max.two.decimals": "Высота может содержать не более двух знаков после запятой.",

@@ -23,6 +23,14 @@ public class ProductImageNotFoundException(int productId, string path) : Localiz
 		ProductId = productId, ImagePath = path
 	});
 
+public class ProductEanNotFoundException(int productId, string ean) : LocalizedNotFoundException(
+	ArticleEanNotFoundMessage.Instance,
+	new { ProductId = productId, Ean = ean });
+
+public class ProductEanAlreadyExistsException(int productId, string ean) : LocalizedConflictException(
+	ArticleEanAlreadyExistsMessage.Instance,
+	new { ProductId = productId, Ean = ean });
+
 public class ProductNotFoundException : LocalizedNotFoundException
 {
 	public ProductNotFoundException(int id) : base(

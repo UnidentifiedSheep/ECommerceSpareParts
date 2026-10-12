@@ -46,6 +46,8 @@
     "article.indicator.max.length.24": "Article indicator must not exceed 24 characters.",
     "article.ean.required": "EAN must not be empty.",
     "article.ean.max.length": "EAN must not exceed 14 characters.",
+    "article.ean.not.found": "EAN was not found for the product.",
+    "article.ean.already.exists": "EAN already exists for the product.",
     "article.linkage.article.cannot.equal.cross.article": "Article cannot be the same as cross article.",
     "article.size.height.must.be.greater.than.zero": "Height must be greater than 0.",
     "article.size.height.max.two.decimals": "Height can have at most 2 decimal places.",
