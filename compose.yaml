@@ -223,6 +223,11 @@
     ports:
       - "5432:5432"
     restart: unless-stopped
+    logging: &bounded-logging
+      driver: json-file
+      options:
+        max-size: "15m"
+        max-file: "3"
 
   redis:
     image: redis/redis-stack:latest
@@ -232,6 +237,8 @@
       - allkeys-lru
       - --active-expire-effort
       - "10"
+      - --loglevel
+      - warning
       - --requirepass
       - ${REDIS_PASSWORD}
     volumes:
@@ -241,6 +248,7 @@
     ports:
       - "6379:6379"
     restart: unless-stopped
+    logging: *bounded-logging
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -255,6 +263,7 @@
     networks:
       - backend-network
     restart: unless-stopped
+    logging: *bounded-logging
 
   opensearch:
     image: opensearchproject/opensearch:latest
@@ -262,6 +271,7 @@
       - discovery.type=single-node
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD}
       - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - logger.level=WARN
     ports:
       - "9200:9200"
       - "9600:9600"
@@ -270,6 +280,7 @@
     networks:
       - backend-network
     restart: unless-stopped
+    logging: *bounded-logging
 
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:latest
@@ -285,6 +296,7 @@
     networks:
       - backend-network
     restart: unless-stopped
+    logging: *bounded-logging
 
   minio:
     image: quay.io/minio/minio:latest
@@ -302,6 +314,7 @@
     restart: unless-stopped
     networks:
       - backend-network
+    logging: *bounded-logging
 
   minio-init:
     image: minio/mc:latest
@@ -322,21 +335,26 @@
       "
     networks:
       - backend-network
+    logging: *bounded-logging
 
   loki:
     image: grafana/loki:latest
     container_name: loki
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./deploy/loki/loki.yml:/etc/loki/loki.yml:ro
+      - loki_data:/loki
     networks:
       - backend-network
     restart: unless-stopped
+    logging: *bounded-logging
 
   tempo:
     image: grafana/tempo:3.0.0
     container_name: tempo
-    command: -config.file=/etc/tempo/tempo.yml
+    command: -config.file=/etc/tempo/tempo.yml -log.level=warn
     volumes:
       - ./deploy/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
       - tempo_data:/var/tempo
@@ -347,6 +365,7 @@
     networks:
       - backend-network
     restart: unless-stopped
+    logging: *bounded-logging
 
   prometheus:
     image: prom/prometheus:latest
@@ -355,11 +374,13 @@
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--log.level=warn"
     ports:
       - "9090"
     networks:
       - backend-network
     restart: unless-stopped
+    logging: *bounded-logging
 
   grafana:
     image: grafana/grafana:latest
@@ -376,6 +397,7 @@
       - GF_SERVER_CERT_KEY=${CERT_KEYPATH}
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_LOG_LEVEL=warn
     networks:
       - backend-network
     depends_on:
@@ -383,6 +405,7 @@
       - prometheus
       - tempo
     restart: unless-stopped
+    logging: *bounded-logging
 
 
 
@@ -398,4 +421,5 @@ volumes:
   minio_data:
   grafana_data:
   opensearch_data:
+  loki_data:
   tempo_data:

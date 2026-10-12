@@ -428,6 +428,11 @@ prepare_versioned_configs() {
       "${STACK_NAME}_prometheus_config" \
       prometheus.yml
   )"
+  LOKI_CONFIG="$(
+    ensure_versioned_config \
+      "${STACK_NAME}_loki_config" \
+      deploy/loki/loki.yml
+  )"
   TEMPO_CONFIG="$(
     ensure_versioned_config \
       "${STACK_NAME}_tempo_config" \
@@ -453,6 +458,7 @@ prepare_versioned_configs() {
   export POSTGRES_INIT_SQL_CONFIG
   export POSTGRES_INIT_SCRIPT_CONFIG
   export PROMETHEUS_CONFIG
+  export LOKI_CONFIG
   export TEMPO_CONFIG
   export GRAFANA_DATASOURCES_CONFIG
   export GRAFANA_DASHBOARDS_CONFIG
@@ -1570,6 +1576,7 @@ cleanup_unused_versioned_configs() {
       "$POSTGRES_INIT_SQL_CONFIG" \
       "$POSTGRES_INIT_SCRIPT_CONFIG" \
       "$PROMETHEUS_CONFIG" \
+      "$LOKI_CONFIG" \
       "$TEMPO_CONFIG" \
       "$GRAFANA_DATASOURCES_CONFIG" \
       "$GRAFANA_DASHBOARDS_CONFIG" \
@@ -1581,6 +1588,7 @@ cleanup_unused_versioned_configs() {
     "${STACK_NAME}_postgres_init_sql_" \
     "${STACK_NAME}_postgres_init_script_" \
     "${STACK_NAME}_prometheus_config_" \
+    "${STACK_NAME}_loki_config_" \
     "${STACK_NAME}_tempo_config_" \
     "${STACK_NAME}_grafana_datasources_" \
     "${STACK_NAME}_grafana_dashboards_" \

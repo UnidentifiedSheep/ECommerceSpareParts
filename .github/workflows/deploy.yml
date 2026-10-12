@@ -41,6 +41,7 @@ jobs:
 
           cp deploy/stack.*.yml deploy-payload/deploy/
           cp -R deploy/grafana deploy-payload/deploy/
+          cp -R deploy/loki deploy-payload/deploy/
           cp -R deploy/tempo deploy-payload/deploy/
           cp prometheus.yml deploy-payload/prometheus.yml
           cp scripts/deploy/deploy-swarm.sh deploy-payload/scripts/deploy/deploy-swarm.sh
@@ -54,6 +55,7 @@ jobs:
             deploy/stack.workers.yml
             deploy/stack.infra.yml
             deploy/stack.monitoring.yml
+            deploy/loki/loki.yml
             deploy/tempo/tempo.yml
             deploy/grafana/provisioning/datasources/datasources.yml
             deploy/grafana/provisioning/dashboards/swarm.yml
@@ -102,6 +104,7 @@ jobs:
           export POSTGRES_INIT_SQL_CONFIG=validation_postgres_sql
           export POSTGRES_INIT_SCRIPT_CONFIG=validation_postgres_script
           export PROMETHEUS_CONFIG=validation_prometheus
+          export LOKI_CONFIG=validation_loki
           export TEMPO_CONFIG=validation_tempo
           export GRAFANA_DATASOURCES_CONFIG=validation_grafana_datasources
           export GRAFANA_DASHBOARDS_CONFIG=validation_grafana_dashboards
