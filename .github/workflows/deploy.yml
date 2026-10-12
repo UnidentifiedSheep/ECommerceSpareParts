@@ -3,6 +3,10 @@ name: Deploy
 on:
   workflow_call:
     inputs:
+      release_sha:
+        description: Commit used to produce the published images and deployment payload
+        required: true
+        type: string
       registry_kind:
         description: Artifact Registry selected by the publish workflow
         required: true
@@ -28,6 +32,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_sha }}
 
       - name: Prepare deploy payload
         run: |
