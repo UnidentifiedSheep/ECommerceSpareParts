@@ -1,10 +1,9 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.LRT;
-using Attributes;
 using Contracts.Products;
 using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
+using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities;
 using Main.Entities.Product;
 using MassTransit;
@@ -19,7 +18,7 @@ public sealed class ProductSynchronizationLrt(
 	IUnitOfWork unitOfWork,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	ILogger<ProductSynchronizationLrt> logger) : LrtBase<NoneInputState, NoneInputState>(
+	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<int, ProductUpdatedEvent>(
 	jobRepository,
 	unitOfWork,
 	publisher,
@@ -35,46 +34,22 @@ public sealed class ProductSynchronizationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtProductSynchronizationDescriptionMessage.Instance;
 
-	protected override async Task DoWork(NoneInputState inputState)
+	protected override async Task<IReadOnlyList<SynchronizationEvent<int, ProductUpdatedEvent>>> GetEventsAsync(
+		int? lastProcessedId,
+		int batchSize,
+		CancellationToken cancellationToken)
 	{
-		var lastId = -1;
-		const int batchSize = 1000;
+		var query = productRepository.Query.AsNoTracking();
+		if (lastProcessedId is { } id)
+			query = query.Where(x => x.Id > id);
 
-		while (true)
-		{
-			var ids = await GetIdsAsync(lastId, batchSize);
-			if (ids.Count == 0)
-				break;
+		var ids = await query
+			.OrderBy(x => x.Id)
+			.Select(x => x.Id)
+			.Take(batchSize)
+			.ToListAsync(cancellationToken);
 
-			lastId = ids[^1];
-			await PublishEventsAsync(ids);
-
-			if (ids.Count < batchSize)
-				break;
-		}
+		return ids.Select(id => new SynchronizationEvent<int, ProductUpdatedEvent>(
+			id, new ProductUpdatedEvent { Id = id })).ToList();
 	}
-
-	private async Task<IReadOnlyList<int>> GetIdsAsync(int lastId, int batchSize) => await productRepository
-		.Query
-		.Where(x => x.Id > lastId)
-		.OrderBy(x => x.Id)
-		.Select(x => x.Id)
-		.Take(batchSize)
-		.ToListAsync(CancellationToken);
-
-	private Task PublishEventsAsync(IReadOnlyList<int> ids) => TransactionService.ExecuteAsync(
-		TransactionalAttribute.ReadCommitted(20, 2),
-		async (context, cancellationToken) =>
-		{
-			foreach (var id in ids)
-				await Publisher.Publish(
-					new ProductUpdatedEvent
-					{
-						Id = id
-					},
-					cancellationToken);
-
-			await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-		},
-		CancellationToken);
 }
