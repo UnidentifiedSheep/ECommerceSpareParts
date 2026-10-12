@@ -257,5 +257,9 @@ public enum PermissionCodes
 
 	// ===== DOCUMENTS =====
 	DOCUMENTS_ME,
-	DOCUMENTS_ALL
+	DOCUMENTS_ALL,
+
+	// ===== ARTICLE / EANS =====
+	ARTICLE_EANS_GET,
+	ARTICLE_EANS_EDIT
 }
