@@ -1,8 +1,13 @@
+using Enums;
+using GraphQL.Common.Attributes;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Product;
+using Main.Application.Handlers.ProductEans.GetProductsByEan;
+using MediatR;
 
 namespace Main.Api.GraphQl.Queries;
 
@@ -27,4 +32,18 @@ public sealed class ProductQueries
 		.OfType<ProductDto>()
 		.Select(x => new GqlProduct(x))
 		.ToList();
+
+	[GraphQLName("byEan")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_EANS_GET)]
+	public async Task<IReadOnlyList<GqlProduct>> GetProductsByEanAsync(
+		GqlProductsByEanInput input,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var result = await sender.Send(
+			new GetProductsByEanQuery(input.Ean, input.Pagination),
+			cancellationToken);
+
+		return result.Products.Select(product => new GqlProduct(product)).ToArray();
+	}
 }
