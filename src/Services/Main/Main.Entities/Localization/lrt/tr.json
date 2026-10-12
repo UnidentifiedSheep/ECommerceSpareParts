@@ -11,6 +11,8 @@
     "lrt.product.import.description": "Ürünleri yüklenen dosyadan içe aktarır, ardından tüm ürünler için güncelleme olayları yayınlar.",
     "lrt.product.import.step.name": "Ürün içe aktarma adımı",
     "lrt.product.import.step.description": "Ürünleri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler.",
+    "lrt.product.ean.import.name": "Ürün EAN içe aktarma",
+    "lrt.product.ean.import.description": "Ürün EAN kodlarını ürün kimlikleriyle CSV dosyasından içe aktarır ve mevcut kayıtları atlar.",
     "lrt.product.group.import.name": "Ürün grubu içe aktarma",
     "lrt.product.group.import.description": "Ürün gruplarını yüklenen CSV dosyasından içe aktarır, adları doğrular ve mevcut grupları atlayarak yenilerini ekler.",
     "lrt.map.group.to.product.name": "Ürün gruplarını atama",

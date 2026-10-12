@@ -18,6 +18,7 @@ public class ProductEan : Entity<ProductEan, ProductEanKey>, ILinqEntity<Product
 	{
 		ProductId = productId;
 		Ean = ean
+			.Trim()
 			.EnsureNotNullOrWhiteSpace(ArticleEanRequiredMessage.Instance)
 			.EnsureMaxLength(14, ArticleEanMaxLengthMessage.Instance);
 	}
