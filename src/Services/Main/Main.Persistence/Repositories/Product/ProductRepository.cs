@@ -4,15 +4,18 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Persistence.Repository;
+
 using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
+using ProductEntity = Main.Entities.Product.Product;
 
 namespace Main.Persistence.Repositories.Product;
 
-public class ProductRepository(DContext context, QueryExtensions extensions)
-	: LinqRepositoryBase<DContext, Entities.Product.Product, int>(context, extensions), IProductRepository
+internal class ProductRepository(DContext context, BulkProductContext bulkContext, QueryExtensions extensions)
+	: LinqRepositoryBase<DContext, ProductEntity, int>(context, extensions), IProductRepository
 {
-	public async Task<IReadOnlyList<Entities.Product.Product>> GetProductCrosses(
+	public async Task<IReadOnlyList<ProductEntity>> GetProductCrosses(
 		int productId,
 		Criteria<Entities.Product.Product> criteria,
 		CancellationToken cancellationToken = default)
@@ -102,5 +105,36 @@ public class ProductRepository(DContext context, QueryExtensions extensions)
 				UpdateByProperties = [nameof(ProductCross.LeftProductId), nameof(ProductCross.RightProductId)]
 			},
 			cancellationToken: cancellationToken);
+	}
+
+	public async Task InsertProductsOnConflictDoNothingAsync(
+		IReadOnlyCollection<ProductEntity> products,
+		CancellationToken cancellation = default)
+	{
+		if (products.Count == 0) return;
+
+		var items = products
+			.Select(BulkProduct.FromProduct)
+			.DistinctBy(x => (x.NormalizedSku, x.ProducerId))
+			.ToList();
+
+		var ambientTransaction = Context.Database.CurrentTransaction
+			?? throw new InvalidOperationException("Product bulk insert requires an active transaction.");
+		await bulkContext.Database.UseTransactionAsync(ambientTransaction.GetDbTransaction(), cancellation);
+
+		try
+		{
+			await bulkContext.BulkInsertOrUpdateAsync(
+				items,
+				new BulkConfig
+				{
+					PropertiesToIncludeOnUpdate = [""]
+				},
+				cancellationToken: cancellation);
+		}
+		finally
+		{
+			await bulkContext.Database.UseTransactionAsync(null, CancellationToken.None);
+		}
 	}
 }

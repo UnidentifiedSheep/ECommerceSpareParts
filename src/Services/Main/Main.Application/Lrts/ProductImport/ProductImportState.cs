@@ -8,10 +8,6 @@ namespace Main.Application.Lrts.ProductImport;
 
 public record ProductImportState : ProductImportInputState, ICsvImportState<ProductImportState>
 {
-
-	[JsonPropertyName("skippedLines")]
-	public List<int> SkippedLines { get; init; } = [];
-
 	[JsonPropertyName("currentLine")]
 	public int CurrentLine { get; init; }
 

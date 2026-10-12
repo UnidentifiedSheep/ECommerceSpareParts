@@ -1762,7 +1762,8 @@ namespace Main.Migrator.Migrations
                         .HasColumnName("packing_unit");
 
                     b.Property<int?>("PairId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("pair_id");
 
                     b.Property<long>("Popularity")
                         .ValueGeneratedOnAdd()

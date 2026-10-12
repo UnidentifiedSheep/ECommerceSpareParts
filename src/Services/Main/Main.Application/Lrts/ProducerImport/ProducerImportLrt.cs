@@ -5,7 +5,6 @@ using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
-using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
@@ -65,11 +64,7 @@ public class ProducerImportLrt(
 		}
 		catch (Exception ex)
 		{
-			var message = ex is ILocalizableException localizableException
-				? StringLocalizer.Get(localizableException.LocalizableMessage)
-				: ex.Message;
-
-			errors.Add(CreateError(rowIdx, message));
+			errors.Add(CreateError(rowIdx, GetErrorMessage(ex)));
 			return false;
 		}
 	}

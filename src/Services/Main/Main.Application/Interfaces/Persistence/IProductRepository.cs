@@ -21,4 +21,8 @@ public interface IProductRepository : IRepository<Product, int>
 	Task UpsertProductCrosses(
 		IEnumerable<ProductCross> crosses,
 		CancellationToken cancellationToken = default);
+
+	Task InsertProductsOnConflictDoNothingAsync(
+		IReadOnlyCollection<Product> products,
+		CancellationToken cancellationToken = default);
 }

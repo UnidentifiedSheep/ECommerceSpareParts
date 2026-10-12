@@ -7,7 +7,6 @@ using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
 using Domain.Extensions;
 using Enums;
-using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
@@ -81,11 +80,7 @@ public class ProducerSupplierMappingImportLrt(
 		}
 		catch (Exception ex)
 		{
-			var message = ex is ILocalizableException localizableException
-				? StringLocalizer.Get(localizableException.LocalizableMessage)
-				: ex.Message;
-
-			errors.Add(CreateError(rowIdx, message));
+			errors.Add(CreateError(rowIdx, GetErrorMessage(ex)));
 			return false;
 		}
 	}

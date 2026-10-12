@@ -33,6 +33,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 			isUnique: true);
 
 		builder.Property(e => e.Id).HasColumnName("id");
+		builder.Property(e => e.PairId).HasColumnName("pair_id");
 
 		builder.ComplexProperty(
 			x => x.Sku,

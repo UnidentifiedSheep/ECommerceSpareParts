@@ -7,6 +7,7 @@ using Main.Persistence.Repositories.Currency;
 using Main.Persistence.Repositories.Product;
 using Main.Persistence.Repositories.Sale;
 using Main.Persistence.Repositories.Storage;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Notification.Core.Entities;
 using Notification.Persistence;
@@ -29,6 +30,9 @@ public static class ServiceProvider
 			typeof(InAppNotification).Assembly,
 			typeof(JobSchedule).Assembly);
 		collection.AddNotificationPersistence<DContext>();
+
+		collection.AddDbContext<BulkProductContext>((serviceProvider, options) =>
+			options.UseNpgsql(serviceProvider.GetRequiredService<DContext>().Database.GetDbConnection()));
 
 		collection.AddScoped<IProductRepository, ProductRepository>();
 		collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();
