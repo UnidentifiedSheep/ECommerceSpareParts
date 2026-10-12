@@ -57,7 +57,7 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductImportState>();
 		state.Errors.Should().BeEmpty();
-		state.SkippedLines.Should().BeEquivalentTo([1, 3]);
+		state.CurrentLine.Should().Be(4);
 
 		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
 		products.Should().HaveCount(3);
@@ -71,5 +71,35 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 			.ContainSingle(x =>
 				x.Sku.NormalizedValue == new Sku("ABC123").NormalizedValue &&
 				x.ProducerId == secondProducer.Id);
+	}
+
+	[Fact]
+	public async Task InvalidRows_DoNotPreventValidProductWithOptionalFieldsFromBeingImported()
+	{
+		var producer = TestContext.Producers[0];
+		var group = await new ProductGroupBuilder(Faker)
+			.WithName("Brake Pads")
+			.BuildAndAddToDb(Context);
+
+		var execution = await ExecuteCsv(
+			"Sku,Name,Producer,Description,Indicator,GroupId",
+			[
+				CsvRow("AB", "Too short", producer.Name, "", "", ""),
+				CsvRow("VALID-123", "Valid product", "Unknown producer", "", "", ""),
+				CsvRow("VALID-123", "Valid product", producer.Name, "  Description  ", "  New  ", group.Id)
+			],
+			fileName => new ProductImportInputState { FileName = fileName });
+
+		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
+		var state = execution.GetState<ProductImportState>();
+		state.CurrentLine.Should().Be(3);
+		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2);
+
+		var product = await Context.Products.AsNoTracking().SingleAsync(CancellationToken);
+		product.Sku.Value.Should().Be("VALID-123");
+		product.ProducerId.Should().Be(producer.Id);
+		product.Description.Should().Be("  Description  ");
+		product.Indicator!.Value.Should().Be("New");
+		product.ProductGroupId.Should().Be(group.Id);
 	}
 }

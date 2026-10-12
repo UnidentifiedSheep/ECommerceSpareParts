@@ -7,6 +7,7 @@ using Application.Common.Models.Options.S3;
 using CsvHelper;
 using CsvHelper.TypeConversion;
 using Domain.CommonEntities.Job;
+using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using MassTransit;
@@ -137,6 +138,11 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 			RowIdx = rowIdx, Message = message
 		};
 	}
+
+	protected string GetErrorMessage(Exception ex) =>
+		ex is ILocalizableException localizableException
+			? stringLocalizer.Get(localizableException.LocalizableMessage)
+			: ex.Message;
 
 	private async Task<TState> ProcessBatchAndSaveState(
 		List<(int idx, TBatchItem item)> items,

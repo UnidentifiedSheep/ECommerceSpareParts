@@ -6,7 +6,6 @@ using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities.Job;
-using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
@@ -48,6 +47,8 @@ public class ProductCrossesImportLrt(
 		stringLocalizer)
 {
 	private IProducerLookup _producerLookup = ProducerLookup.Empty;
+
+	protected override int BatchSize => 10_000;
 
 	public override string SystemName => nameof(ProductCrossesImportLrt);
 
@@ -210,14 +211,6 @@ public class ProductCrossesImportLrt(
 			items.Count,
 			crosses.Count,
 			errors.Count - errorsBeforeBatch);
-	}
-
-	private string GetErrorMessage(Exception ex)
-	{
-		if (ex is ILocalizableException localizableException)
-			return StringLocalizer.Get(localizableException.LocalizableMessage);
-
-		return ex.Message;
 	}
 
 	public sealed record ProductKey(string NormalizedSku, int ProducerId)
