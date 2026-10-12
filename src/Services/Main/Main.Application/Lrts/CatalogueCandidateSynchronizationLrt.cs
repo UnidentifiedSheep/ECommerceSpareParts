@@ -2,12 +2,11 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.LRT;
-using Attributes;
 using Contracts.Models.CatalogueCandidate;
 using Contracts.ProductEnrichment;
 using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
+using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities;
 using Main.Entities.Product.Enrichment;
 using MassTransit;
@@ -23,7 +22,7 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 	IUnitOfWork unitOfWork,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	ILogger<CatalogueCandidateSynchronizationLrt> logger) : LrtBase<NoneInputState, NoneInputState>(
+	ILogger<CatalogueCandidateSynchronizationLrt> logger) : SynchronizationLrtBase<Guid, CatalogueCandidateUpdatedEvent>(
 	jobRepository,
 	unitOfWork,
 	publisher,
@@ -38,59 +37,31 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCatalogueCandidatesSynchronizationDescriptionMessage.Instance;
 
-	protected override async Task DoWork(NoneInputState inputState)
+	protected override async Task<IReadOnlyList<SynchronizationEvent<Guid, CatalogueCandidateUpdatedEvent>>> GetEventsAsync(
+		Guid? lastProcessedId,
+		int batchSize,
+		CancellationToken cancellationToken)
 	{
-		var lastId = Guid.Empty;
-		const int batchSize = 1000;
+		var query = candidateRepository.Query.AsNoTracking();
+		if (lastProcessedId is { } id)
+			query = query.Where(candidate => candidate.Id > id);
 
-		while (true)
-		{
-			var candidates = await GetCandidatesAsync(lastId, batchSize);
-			if (candidates.Count == 0)
-				break;
-
-			lastId = candidates[^1].Id;
-			await PublishEventsAsync(candidates);
-
-			if (candidates.Count < batchSize)
-				break;
-		}
-	}
-
-	private async Task<IReadOnlyList<CatalogueCandidateContractDto>> GetCandidatesAsync(
-		Guid lastId,
-		int batchSize)
-	{
-		return await candidateRepository
-			.Query
-			.Where(candidate => candidate.Id > lastId)
+		var candidates = await query
 			.OrderBy(candidate => candidate.Id)
 			.Take(batchSize)
 			.Project(projection)
-			.ToListAsync(CancellationToken);
-	}
+			.ToListAsync(cancellationToken);
 
-	private Task PublishEventsAsync(IReadOnlyList<CatalogueCandidateContractDto> candidates)
-	{
-		return TransactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(20, 2),
-			async (context, cancellationToken) =>
+		var occurredAt = DateTime.UtcNow;
+		return candidates.Select(candidate => new SynchronizationEvent<Guid, CatalogueCandidateUpdatedEvent>(
+			candidate.Id,
+			new CatalogueCandidateUpdatedEvent
 			{
-				var occurredAt = DateTime.UtcNow;
-				foreach (var candidate in candidates)
-					await Publisher.Publish(
-						new CatalogueCandidateUpdatedEvent
-						{
-							Candidate = candidate with
-							{
-								Names = candidate.Names.Distinct(StringComparer.OrdinalIgnoreCase).ToList()
-							},
-							OccuredAt = occurredAt
-						},
-						cancellationToken);
-
-				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-			},
-			CancellationToken);
+				Candidate = candidate with
+				{
+					Names = candidate.Names.Distinct(StringComparer.OrdinalIgnoreCase).ToList()
+				},
+				OccuredAt = occurredAt
+			})).ToList();
 	}
 }

@@ -1931,8 +1931,8 @@ namespace Main.Migrator.Migrations
                         .HasColumnName("product_id");
 
                     b.Property<string>("Ean")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
+                        .HasMaxLength(14)
+                        .HasColumnType("character varying(14)")
                         .HasColumnName("ean");
 
                     b.HasKey("ProductId", "Ean")

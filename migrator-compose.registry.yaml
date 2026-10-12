@@ -7,7 +7,7 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-migrator:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-migrator:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-migrator:buildcache,mode=max
 
   main.migrator:
     image: ${ARTIFACT_REGISTRY_HOST}/main-migrator:${IMAGE_TAG}
@@ -17,7 +17,7 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-migrator:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-migrator:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-migrator:buildcache,mode=max
 
   pricing.migrator:
     image: ${ARTIFACT_REGISTRY_HOST}/pricing-migrator:${IMAGE_TAG}
@@ -27,4 +27,4 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-migrator:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-migrator:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-migrator:buildcache,mode=max

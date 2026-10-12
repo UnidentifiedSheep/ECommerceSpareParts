@@ -19,7 +19,7 @@ public class ProductEanConfiguration : IEntityTypeConfiguration<ProductEan>
 
 		builder.Property(e => e.ProductId).HasColumnName("product_id");
 
-		builder.Property(e => e.Ean).HasColumnName("ean").HasMaxLength(30);
+		builder.Property(e => e.Ean).HasColumnName("ean").HasMaxLength(14).IsRequired();
 
 		builder
 			.HasOne<Entities.Product.Product>()

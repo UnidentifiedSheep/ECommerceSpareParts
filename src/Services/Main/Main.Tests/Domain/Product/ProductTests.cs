@@ -43,6 +43,21 @@ public class ProductTests
 	}
 
 	[Fact]
+	public void AddAndRemoveEan_UpdatesCollectionWithoutDuplicates()
+	{
+		var product = Create();
+
+		product.AddEan("1234567890123");
+		product.AddEan("1234567890123");
+		product.AddEan("1234567890124");
+
+		product.Eans.Select(x => x.Ean).Should().BeEquivalentTo(["1234567890123", "1234567890124"]);
+
+		product.RemoveEan("1234567890123");
+		product.Eans.Select(x => x.Ean).Should().Equal("1234567890124");
+	}
+
+	[Fact]
 	public void IncreaseStock_AddsValue()
 	{
 		var product = Create();
