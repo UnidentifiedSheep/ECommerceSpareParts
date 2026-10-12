@@ -13,12 +13,9 @@ public class ProductSizeUpdatedHandler(IIntegrationEventScope integrationEventSc
 		Batch<ProductSizeUpdatedDomainEvent> notification,
 		CancellationToken cancellationToken)
 	{
-		foreach (var @event in notification.Items)
-			integrationEventScope.Add(
-				new ProductUpdatedEvent
-				{
-					Id = @event.ProductId
-				});
+		var ids = notification.Items.Select(x => x.ProductId).Distinct().ToList();
+		if (ids.Count > 0)
+			integrationEventScope.Add(new ProductsUpdatedEvent { Ids = ids });
 
 		return Task.CompletedTask;
 	}

@@ -5,26 +5,16 @@ using Search.Application.Interfaces;
 namespace Search.Application.Consumers.Product;
 
 public class ProductUpdatedConsumer(IIndexSynchronizer<Entities.Product, int> productIndexSynchronizer)
-	: IConsumer<Batch<ProductUpdatedEvent>>
+	: IConsumer<ProductsUpdatedEvent>
 {
-	public Task Consume(ConsumeContext<Batch<ProductUpdatedEvent>> context)
+	public async Task Consume(ConsumeContext<ProductsUpdatedEvent> context)
 	{
-		return productIndexSynchronizer.Reindex(
-			context.Message.Select(x => x.Message.Id),
-			context.CancellationToken);
+		foreach (var ids in context.Message.Ids.Distinct().Chunk(100))
+			await productIndexSynchronizer.Reindex(ids, context.CancellationToken);
 	}
 }
 
 public class ProductUpdatedConsumerDefinition : ConsumerDefinition<ProductUpdatedConsumer>
 {
-	protected override void ConfigureConsumer(
-		IReceiveEndpointConfigurator endpointConfigurator,
-		IConsumerConfigurator<ProductUpdatedConsumer> consumerConfigurator,
-		IRegistrationContext context)
-	{
-		consumerConfigurator.Options<BatchOptions>(options => options
-			.SetMessageLimit(100)
-			.SetTimeLimit(TimeSpan.FromSeconds(1))
-			.SetConcurrencyLimit(1));
-	}
+	public ProductUpdatedConsumerDefinition() => ConcurrentMessageLimit = 1;
 }

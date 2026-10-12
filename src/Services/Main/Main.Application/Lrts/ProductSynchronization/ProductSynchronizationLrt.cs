@@ -18,7 +18,7 @@ public sealed class ProductSynchronizationLrt(
 	IUnitOfWork unitOfWork,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<int, ProductUpdatedEvent>(
+	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<int, ProductsUpdatedEvent>(
 	jobRepository,
 	unitOfWork,
 	publisher,
@@ -34,7 +34,7 @@ public sealed class ProductSynchronizationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtProductSynchronizationDescriptionMessage.Instance;
 
-	protected override async Task<IReadOnlyList<SynchronizationEvent<int, ProductUpdatedEvent>>> GetEventsAsync(
+	protected override async Task<SynchronizationPage<int, ProductsUpdatedEvent>> GetPageAsync(
 		int? lastProcessedId,
 		int batchSize,
 		CancellationToken cancellationToken)
@@ -49,7 +49,11 @@ public sealed class ProductSynchronizationLrt(
 			.Take(batchSize)
 			.ToListAsync(cancellationToken);
 
-		return ids.Select(id => new SynchronizationEvent<int, ProductUpdatedEvent>(
-			id, new ProductUpdatedEvent { Id = id })).ToList();
+		if (ids.Count == 0)
+			return new SynchronizationPage<int, ProductsUpdatedEvent>(null, []);
+
+		return new SynchronizationPage<int, ProductsUpdatedEvent>(
+			ids[^1],
+			[new ProductsUpdatedEvent { Ids = ids }]);
 	}
 }

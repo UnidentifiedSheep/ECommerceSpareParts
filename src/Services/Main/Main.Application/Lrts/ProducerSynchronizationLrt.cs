@@ -34,12 +34,12 @@ public class ProducerSynchronizationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtProducerSynchronizationDescriptionMessage.Instance;
 
-	protected override async Task<IReadOnlyList<SynchronizationEvent<int, ProducerUpdatedEvent>>> GetEventsAsync(
+	protected override async Task<SynchronizationPage<int, ProducerUpdatedEvent>> GetPageAsync(
 		int? lastProcessedId,
 		int batchSize,
 		CancellationToken cancellationToken)
 	{
-		var query = producerRepository.Query.AsNoTracking();
+		var query = producerRepository.Query;
 		if (lastProcessedId is { } id)
 			query = query.Where(x => x.Id > id);
 
@@ -49,7 +49,11 @@ public class ProducerSynchronizationLrt(
 			.Take(batchSize)
 			.ToListAsync(cancellationToken);
 
-		return ids.Select(id => new SynchronizationEvent<int, ProducerUpdatedEvent>(
-			id, new ProducerUpdatedEvent { Id = id })).ToList();
+		if (ids.Count == 0)
+			return new SynchronizationPage<int, ProducerUpdatedEvent>(null, []);
+
+		return new SynchronizationPage<int, ProducerUpdatedEvent>(
+			ids[^1],
+			ids.Select(x => new ProducerUpdatedEvent { Id = x }).ToList());
 	}
 }

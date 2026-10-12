@@ -20,8 +20,8 @@ public abstract class SynchronizationLrtBase<TId, TEvent>(
 {
 	protected virtual int BatchSize => 1000;
 
-	// Items must be ordered by ID. A null cursor means that no items have been processed yet.
-	protected abstract Task<IReadOnlyList<SynchronizationEvent<TId, TEvent>>> GetEventsAsync(
+	// A null cursor means that no items have been processed yet.
+	protected abstract Task<SynchronizationPage<TId, TEvent>> GetPageAsync(
 		TId? lastProcessedId,
 		int batchSize,
 		CancellationToken cancellationToken);
@@ -30,19 +30,21 @@ public abstract class SynchronizationLrtBase<TId, TEvent>(
 	{
 		while (true)
 		{
-			var events = await GetEventsAsync(
+			var page = await GetPageAsync(
 				State.LastProcessedId,
 				BatchSize,
 				CancellationToken);
 
-			if (events.Count == 0) break;
+			if (page.LastId == null) break;
+			if (page.Events.Count == 0)
+				throw new InvalidOperationException("A nonempty synchronization page must contain events.");
 
 			await TransactionService.ExecuteAsync(
 				TransactionalAttribute.ReadCommitted(20, 2),
 				async (context, cancellationToken) =>
 				{
-					foreach (var item in events)
-						await Publisher.Publish(item.Event, cancellationToken);
+					foreach (var @event in page.Events)
+						await Publisher.Publish(@event, cancellationToken);
 
 					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
 				},
@@ -50,14 +52,11 @@ public abstract class SynchronizationLrtBase<TId, TEvent>(
 
 			await SaveStateAsync(new SynchronizationState<TId>
 			{
-				LastProcessedId = events[^1].Id,
-				ProcessedCount = State.ProcessedCount + events.Count
+				LastProcessedId = page.LastId.Value
 			});
-
-			if (events.Count < BatchSize)
-				break;
 		}
 	}
 }
 
-public sealed record SynchronizationEvent<TId, TEvent>(TId Id, TEvent Event);
+public sealed record SynchronizationPage<TId, TEvent>(TId? LastId, IReadOnlyList<TEvent> Events)
+	where TId : struct;

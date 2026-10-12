@@ -15,16 +15,9 @@ public class ProductUpdatedHandler(
 		Batch<ProductUpdatedDomainEvent> notification,
 		CancellationToken cancellationToken)
 	{
-		var ids = new List<int>(notification.Items.Count);
-		foreach (var @event in notification.Items)
-		{
-			integrationEventScope.Add(
-				new ProductUpdatedEvent
-				{
-					Id = @event.Id
-				});
-			ids.Add(@event.Id);
-		}
+		var ids = notification.Items.Select(x => x.Id).Distinct().ToList();
+		if (ids.Count > 0)
+			integrationEventScope.Add(new ProductsUpdatedEvent { Ids = ids });
 
 		await productCacheInvalidator.InvalidateProductsAsync(ids);
 	}

@@ -139,7 +139,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
 					ep.Bind<SupplierProductsRequestedEvent>();
 					ep.Bind<CurrencyCreatedEvent>();
-					ep.Bind<ProductUpdatedEvent>();
+					ep.Bind<ProductsUpdatedEvent>();
 					ep.Bind<RoleUpdatedEvent>();
 					ep.Bind<UserDiscountUpdatedEvent>();
 					ep.Bind<CurrencyRateChangedEvent>();

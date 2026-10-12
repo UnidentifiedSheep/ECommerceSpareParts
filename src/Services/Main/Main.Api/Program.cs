@@ -113,7 +113,7 @@ builder.Services.AddMassTransit(x =>
 				ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
 
 				ep.Bind<CurrencyCreatedEvent>();
-				ep.Bind<ProductUpdatedEvent>();
+				ep.Bind<ProductsUpdatedEvent>();
 				ep.Bind<RoleUpdatedEvent>();
 				ep.Bind<UserDiscountUpdatedEvent>();
 				ep.Bind<CurrencyRateChangedEvent>();

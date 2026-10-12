@@ -37,7 +37,7 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCatalogueCandidatesSynchronizationDescriptionMessage.Instance;
 
-	protected override async Task<IReadOnlyList<SynchronizationEvent<Guid, CatalogueCandidateUpdatedEvent>>> GetEventsAsync(
+	protected override async Task<SynchronizationPage<Guid, CatalogueCandidateUpdatedEvent>> GetPageAsync(
 		Guid? lastProcessedId,
 		int batchSize,
 		CancellationToken cancellationToken)
@@ -52,16 +52,19 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 			.Project(projection)
 			.ToListAsync(cancellationToken);
 
+		if (candidates.Count == 0)
+			return new SynchronizationPage<Guid, CatalogueCandidateUpdatedEvent>(null, []);
+
 		var occurredAt = DateTime.UtcNow;
-		return candidates.Select(candidate => new SynchronizationEvent<Guid, CatalogueCandidateUpdatedEvent>(
-			candidate.Id,
-			new CatalogueCandidateUpdatedEvent
+		return new SynchronizationPage<Guid, CatalogueCandidateUpdatedEvent>(
+			candidates[^1].Id,
+			candidates.Select(candidate => new CatalogueCandidateUpdatedEvent
 			{
 				Candidate = candidate with
 				{
 					Names = candidate.Names.Distinct(StringComparer.OrdinalIgnoreCase).ToList()
 				},
 				OccuredAt = occurredAt
-			})).ToList();
+			}).ToList());
 	}
 }

@@ -13,7 +13,7 @@ public class ProductCreatedHandler(IIntegrationEventScope integrationEventScope)
 		Batch<ProductCreatedDomainEvent> notification,
 		CancellationToken cancellationToken)
 	{
-		var events = notification
+		var ids = notification
 			.Items
 			.Select(x => x.Product.Id)
 			.Distinct()
@@ -21,13 +21,11 @@ public class ProductCreatedHandler(IIntegrationEventScope integrationEventScope)
 				? throw new InvalidOperationException(
 					"Product must have an Id before integration " +
 					"events are created. Call save changes before.")
-				: new ProductUpdatedEvent
-				{
-					Id = x
-				})
+				: x)
 			.ToList();
 
-		integrationEventScope.AddRange(events);
+		if (ids.Count > 0)
+			integrationEventScope.Add(new ProductsUpdatedEvent { Ids = ids });
 		return Task.CompletedTask;
 	}
 }
