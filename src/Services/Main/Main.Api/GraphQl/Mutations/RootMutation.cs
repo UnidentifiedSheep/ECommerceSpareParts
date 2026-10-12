@@ -19,4 +19,7 @@ public sealed class RootMutation
 
 	[GraphQLName("products")]
 	public ProductMutations Products => new();
+
+	[GraphQLName("productEans")]
+	public ProductEanMutation ProductEans => new();
 }
