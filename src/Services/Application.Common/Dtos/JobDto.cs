@@ -8,6 +8,12 @@ public record JobDto
 	[JsonPropertyName("id")]
 	public required Guid Id { get; init; }
 
+	[JsonPropertyName("isStep")]
+	public required bool IsStep { get; init; }
+
+	[JsonPropertyName("multiStepJobId")]
+	public required Guid? MultiStepJobId { get; init; }
+
 	[JsonPropertyName("systemName")]
 	public required string SystemName { get; init; }
 

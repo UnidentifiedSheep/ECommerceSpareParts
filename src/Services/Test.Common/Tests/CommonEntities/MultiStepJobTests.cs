@@ -15,12 +15,11 @@ public class MultiStepJobTests
 		var job = MultiStepJob.CreateUnique(
 			" workflow:42 ",
 			"multi-step",
-			"{}",
-			5);
+			"{}");
 
 		job.NaturalKey.Should().Be("workflow:42");
 		job.SystemName.Should().Be("multi-step");
-		job.MaxAttempts.Should().Be(5);
+		job.MaxAttempts.Should().Be(1);
 		job.Status.Should().Be(JobStatus.Pending);
 	}
 

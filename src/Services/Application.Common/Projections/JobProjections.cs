@@ -20,6 +20,8 @@ public sealed class JobDtoProjectionProvider : ProjectionProviderBase<Job, JobDt
 		ErrorMessage = job.ErrorMessage,
 		MaxAttempts = job.MaxAttempts,
 		Id = job.Id,
+		IsStep = job.MultiStepJobId != null,
+		MultiStepJobId = job.MultiStepJobId,
 		LockedAt = job.LockedAt,
 		Status = job.Status,
 		UpdatedAt = job.UpdatedAt

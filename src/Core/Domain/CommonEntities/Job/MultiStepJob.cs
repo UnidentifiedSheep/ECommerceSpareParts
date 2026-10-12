@@ -29,30 +29,26 @@ public sealed class MultiStepJob : Job
 
 	public IReadOnlyList<JobStepDependency> Dependencies => _dependencies;
 
-	public static MultiStepJob Create(
-		string systemName,
-		string initialState,
-		int maxAttempts = 3)
+	public static MultiStepJob Create(string systemName, string initialState)
 	{
 		return new MultiStepJob(
 			systemName,
 			initialState,
-			maxAttempts,
+			1,
 			null);
 	}
 
 	public static MultiStepJob CreateUnique(
 		string naturalKey,
 		string systemName,
-		string initialState,
-		int maxAttempts = 3)
+		string initialState)
 	{
 		ArgumentNullException.ThrowIfNull(naturalKey);
 
 		return new MultiStepJob(
 			systemName,
 			initialState,
-			maxAttempts,
+			1,
 			naturalKey);
 	}
 

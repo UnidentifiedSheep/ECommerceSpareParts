@@ -65,8 +65,9 @@ public sealed class JobCreationDispatcherTests
 			4);
 
 		var multiStepJob = job.Should().BeOfType<MultiStepJob>().Subject;
-		multiStepJob.MaxAttempts.Should().Be(4);
+		multiStepJob.MaxAttempts.Should().Be(1);
 		multiStepJob.Steps.Should().ContainSingle().Which.Status.Should().Be(JobStatus.Blocked);
+		multiStepJob.Steps.Single().MaxAttempts.Should().Be(4);
 	}
 
 	[Fact]
@@ -113,6 +114,8 @@ public sealed class JobCreationDispatcherTests
 			.BeOfType<MultiStepJob>()
 			.Subject;
 		innerJob.Status.Should().Be(JobStatus.Blocked);
+		outerJob.MaxAttempts.Should().Be(1);
+		innerJob.MaxAttempts.Should().Be(1);
 		innerJob
 			.Steps
 			.Should()
@@ -121,9 +124,9 @@ public sealed class JobCreationDispatcherTests
 			.Should()
 			.BeOfType<SingleRunJob>()
 			.Which
-			.Status
+			.MaxAttempts
 			.Should()
-			.Be(JobStatus.Blocked);
+			.Be(3);
 	}
 
 	[Fact]

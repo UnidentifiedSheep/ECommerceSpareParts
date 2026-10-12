@@ -3,15 +3,16 @@ using Domain.CommonEntities.Job;
 
 namespace Application.Common.LRT;
 
-internal sealed class MultiStepJobBuilder(Func<string, string, int, Job> stepFactory) : IMultiStepJobBuilder
+internal sealed class MultiStepJobBuilder(int defaultMaxAttempts, Func<string, string, int, Job> stepFactory)
+	: IMultiStepJobBuilder
 {
 	public Job AddStep(
 		string systemName,
 		string inputState,
-		int maxAttempts = 3) => stepFactory(
+		int? maxAttempts = null) => stepFactory(
 		systemName,
 		inputState,
-		maxAttempts);
+		maxAttempts ?? defaultMaxAttempts);
 
 	public void AddDependency(Job job, Job dependsOn)
 	{

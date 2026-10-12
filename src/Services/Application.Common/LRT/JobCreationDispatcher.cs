@@ -53,14 +53,12 @@ public sealed class JobCreationDispatcher(INamedObjectRegistry<ILrtNamedObject> 
 			var job = naturalKey is null
 				? MultiStepJob.Create(
 					lrt.SystemName,
-					state,
-					maxAttempts)
+					state)
 				: MultiStepJob.CreateUnique(
 					naturalKey,
 					lrt.SystemName,
-					state,
-					maxAttempts);
-			var builder = new MultiStepJobBuilder((
+					state);
+			var builder = new MultiStepJobBuilder(maxAttempts, (
 				childSystemName, childState,
 				childMaxAttempts) => Create(
 				job,

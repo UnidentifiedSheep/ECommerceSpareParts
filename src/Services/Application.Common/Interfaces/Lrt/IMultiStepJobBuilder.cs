@@ -7,7 +7,7 @@ public interface IMultiStepJobBuilder
 	Job AddStep(
 		string systemName,
 		string inputState,
-		int maxAttempts = 3);
+		int? maxAttempts = null);
 
 	void AddDependency(Job job, Job dependsOn);
 }

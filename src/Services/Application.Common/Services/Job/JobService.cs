@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
 using Application.Common.Models;
 using Attributes;
+using Domain.CommonEntities.Job;
 using JobEntity = Domain.CommonEntities.Job.Job;
 
 namespace Application.Common.Services.Job;
@@ -31,6 +32,26 @@ public class JobService(
 					throw new JobNotFoundException(jobId);
 
 				job.RequestCancellation();
+				if (job is MultiStepJob multiStepJob)
+				{
+					var parents = new[] { multiStepJob };
+					while (parents.Length > 0)
+					{
+						var parentIds = parents.Select(x => x.Id).ToList();
+						var stepCriteria = Criteria<JobEntity>
+							.New()
+							.Where(x => x.MultiStepJobId.HasValue && parentIds.Contains(x.MultiStepJobId.Value))
+							.Track()
+							.ForUpdate()
+							.Build();
+						var steps = await repository.ListAsync(stepCriteria, ct);
+						var parentsById = parents.ToDictionary(x => x.Id);
+						foreach (var group in steps.GroupBy(x => x.MultiStepJobId))
+							parentsById[group.Key!.Value].CancelUnfinishedSteps(group);
+
+						parents = steps.OfType<MultiStepJob>().ToArray();
+					}
+				}
 
 				await ctx.UnitOfWork.SaveChangesAsync(ct);
 			},
