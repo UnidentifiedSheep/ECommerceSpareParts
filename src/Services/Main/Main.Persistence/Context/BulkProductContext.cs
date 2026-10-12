@@ -10,7 +10,9 @@ internal sealed class BulkProductContext(DbContextOptions<BulkProductContext> op
 	{
 		var product = modelBuilder.Entity<BulkProduct>();
 		product.ToTable("products", "public");
-		product.HasKey(x => x.Id);
+		// The bulk-only model uses the conflict columns as its key so BulkExtensions
+		// does not attempt to create an index inside the import transaction.
+		product.HasKey(x => new { x.NormalizedSku, x.ProducerId });
 		product.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
 		product.Property(x => x.PairId).HasColumnName("pair_id");
 		product.Property(x => x.Sku).HasColumnName("sku");
@@ -29,8 +31,5 @@ internal sealed class BulkProductContext(DbContextOptions<BulkProductContext> op
 		product.Property(x => x.UpdatedAt).HasColumnName("updated_at");
 		product.Property(x => x.WhoCreated).HasColumnName("who_created");
 		product.Property(x => x.WhoUpdated).HasColumnName("who_updated");
-		product.HasIndex(x => new { x.NormalizedSku, x.ProducerId })
-			.IsUnique()
-			.HasDatabaseName("products_normalized_sku_producer_id_index");
 	}
 }

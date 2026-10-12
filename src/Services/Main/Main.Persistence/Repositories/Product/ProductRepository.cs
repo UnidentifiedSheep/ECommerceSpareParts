@@ -128,7 +128,6 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 				items,
 				new BulkConfig
 				{
-					UpdateByProperties = [nameof(BulkProduct.NormalizedSku), nameof(BulkProduct.ProducerId)],
 					PropertiesToIncludeOnUpdate = [""]
 				},
 				cancellationToken: cancellation);
