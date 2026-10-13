@@ -261,6 +261,18 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 		ClearLease();
 	}
 
+	public bool CanBeCancelledByExpiredLease(DateTime now) =>
+		IsCancellationRequested && LeaseExpiresAt is not null && LeaseExpiresAt <= now;
+
+	public void CancelByExpiredLease(DateTime now)
+	{
+		if (!CanBeCancelledByExpiredLease(now))
+			throw new InvalidOperationException("Job cannot be cancelled by expired lease.");
+
+		SetStatus(JobStatus.Cancelled);
+		ClearLease();
+	}
+
 	public void EnsureActiveLease(Guid leaseHolderId)
 	{
 		if (LeaseHolderId != leaseHolderId)

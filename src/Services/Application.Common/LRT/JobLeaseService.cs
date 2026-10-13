@@ -61,6 +61,27 @@ public class JobLeaseService(IApplicationTransactionService transactionService) 
 			},
 			ct);
 
+	public async Task<List<Job>> CancelExpiredJobs(int maxBatchSize, CancellationToken ct) =>
+		await transactionService.ExecuteAsync(
+			TransactionalAttribute.ReadCommitted(30, 3),
+			async (context, cancellationToken) =>
+			{
+				var repository = context.Repositories.Get<Job, Guid>();
+				var now = DateTime.UtcNow;
+				var criteria = GetCriteriaBase(maxBatchSize)
+					.Where(x => x.Status == JobStatus.CancellationRequested &&
+						x.LeaseExpiresAt != null && x.LeaseExpiresAt <= now)
+					.Build();
+				var jobs = await repository.ListAsync(criteria, cancellationToken);
+
+				foreach (var job in jobs)
+					job.CancelByExpiredLease(now);
+
+				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+				return jobs;
+			},
+			ct);
+
 	private static CriteriaBuilder<Job> GetCriteriaBase(int maxBatchSize) => Criteria<Job>
 		.New()
 		.OrderByAsc(job => job.Id)

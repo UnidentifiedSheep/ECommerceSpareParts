@@ -733,6 +733,44 @@ public class JobTests
 	}
 
 	[Fact]
+	public void CancelByExpiredLease_ExpiredCancellationRequest_CancelsAndPreservesReason()
+	{
+		var job = Create();
+		job.AcquireLease(Guid.NewGuid(), TimeSpan.FromSeconds(-1));
+		job.RequestCancellation("stop requested");
+
+		job.CancelByExpiredLease(DateTime.UtcNow);
+
+		job.Status.Should().Be(JobStatus.Cancelled);
+		job.ErrorMessage.Should().Be("stop requested");
+		job.LeaseHolderId.Should().BeNull();
+		job.LeaseExpiresAt.Should().BeNull();
+	}
+
+	[Fact]
+	public void CancelByExpiredLease_ActiveLease_Throws()
+	{
+		var job = CreateLockedJob(Guid.NewGuid());
+		job.RequestCancellation();
+
+		var act = () => job.CancelByExpiredLease(DateTime.UtcNow);
+
+		act.Should().Throw<InvalidOperationException>();
+		job.Status.Should().Be(JobStatus.CancellationRequested);
+	}
+
+	[Fact]
+	public void CancelByExpiredLease_WithoutCancellationRequest_Throws()
+	{
+		var job = Create();
+		job.AcquireLease(Guid.NewGuid(), TimeSpan.FromSeconds(-1));
+
+		var act = () => job.CancelByExpiredLease(DateTime.UtcNow);
+
+		act.Should().Throw<InvalidOperationException>();
+	}
+
+	[Fact]
 	public void EnsureStatus_WhenStatusMatches_DoesNotThrow()
 	{
 		var job = Create();
