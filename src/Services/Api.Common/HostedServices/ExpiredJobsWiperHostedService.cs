@@ -27,6 +27,14 @@ public class ExpiredJobsWiperHostedService(
 		{
 			await using var scope = scopeFactory.CreateAsyncScope();
 			var leaseService = scope.ServiceProvider.GetRequiredService<IJobLeaseService>();
+			var cancelledJobs = await leaseService.CancelExpiredJobs(
+				opt.MaxExpiredLeaseFailBatchSize,
+				ct);
+
+			if (cancelledJobs.Count > 0)
+				logger.LogInformation(
+					"Jobs with expired leases and cancellation requests are made 'Cancelled'. Count: {Count}",
+					cancelledJobs.Count);
 
 			var jobs = await leaseService.FailExpiredJobsWithoutAttempts(
 				opt.MaxExpiredLeaseFailBatchSize,
@@ -37,7 +45,8 @@ public class ExpiredJobsWiperHostedService(
 					"Jobs with expired leases are made 'Failed'. Count: {Count}",
 					jobs.Count);
 
-			return jobs.Count == opt.MaxExpiredLeaseFailBatchSize;
+			return cancelledJobs.Count == opt.MaxExpiredLeaseFailBatchSize ||
+				jobs.Count == opt.MaxExpiredLeaseFailBatchSize;
 		}
 		catch (OperationCanceledException) when (ct.IsCancellationRequested)
 		{

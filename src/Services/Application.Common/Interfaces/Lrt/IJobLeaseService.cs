@@ -10,4 +10,6 @@ public interface IJobLeaseService
 		CancellationToken ct);
 
 	Task<List<Job>> FailExpiredJobsWithoutAttempts(int maxBatchSize, CancellationToken ct);
+
+	Task<List<Job>> CancelExpiredJobs(int maxBatchSize, CancellationToken ct);
 }

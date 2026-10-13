@@ -153,6 +153,7 @@ used when `grafana_data` is initialized; an existing Grafana instance keeps its 
 
 ```dotenv
 PORTAINER_HOST=portainer.example.com
+RABBITMQ_HOST=rabbitmq.example.com
 ```
 
 WAL-G scheduling values may also be placed in `SWARM_ENV`:

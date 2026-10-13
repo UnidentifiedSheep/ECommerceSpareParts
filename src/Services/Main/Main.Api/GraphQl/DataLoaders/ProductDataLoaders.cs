@@ -4,6 +4,7 @@ using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.ProductGroups;
 using Main.Application.Handlers.ProductCharacteristics.GetCharacteristicsBatch;
 using Main.Application.Handlers.ProductContent;
+using Main.Application.Handlers.ProductEans.GetProductsEans;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.ProductSizes;
@@ -15,6 +16,13 @@ namespace Main.Api.GraphQl.DataLoaders;
 
 public static class ProductDataLoaders
 {
+	[DataLoader]
+	public static async Task<IReadOnlyDictionary<int, IReadOnlyList<string>>> GetProductEansByIdAsync(
+		IReadOnlyList<int> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetProductsEansQuery(keys), cancellationToken)).Eans;
+
 	[DataLoader]
 	public static async Task<IReadOnlyDictionary<int, ProductGroupDto>> GetProductGroupByIdAsync(
 		IReadOnlyList<int> keys,

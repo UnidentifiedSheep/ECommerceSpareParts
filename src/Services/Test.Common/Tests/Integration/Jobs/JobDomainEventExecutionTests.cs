@@ -109,6 +109,36 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 		jobs[step.Id].Status.Should().Be(JobStatus.Failed);
 	}
 
+	[Fact]
+	public async Task CancellationRequestedJobWithExpiredLease_IsCancelled()
+	{
+		var job = SingleRunJob.Create("job", "{}", 3);
+		job.AcquireLease(Guid.NewGuid(), TimeSpan.FromSeconds(-1));
+		job.RequestCancellation("stop requested");
+		var activeJob = SingleRunJob.Create("active-job", "{}", 3);
+		activeJob.AcquireLease(Guid.NewGuid(), TimeSpan.FromMinutes(5));
+		activeJob.RequestCancellation();
+
+		await Context.AddAsync(job, CancellationToken);
+		await Context.AddAsync(activeJob, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
+		Context.ChangeTracker.Clear();
+
+		var leaseService = Scope.ServiceProvider.GetRequiredService<IJobLeaseService>();
+		var cancelledJobs = await leaseService.CancelExpiredJobs(10, CancellationToken.None);
+
+		cancelledJobs.Should().ContainSingle(x => x.Id == job.Id);
+		Context.ChangeTracker.Clear();
+		var persisted = await Context.Jobs.AsNoTracking()
+			.SingleAsync(x => x.Id == job.Id, CancellationToken);
+		persisted.Status.Should().Be(JobStatus.Cancelled);
+		persisted.ErrorMessage.Should().Be("stop requested");
+		persisted.LeaseHolderId.Should().BeNull();
+		persisted.LeaseExpiresAt.Should().BeNull();
+		(await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == activeJob.Id, CancellationToken))
+			.Status.Should().Be(JobStatus.CancellationRequested);
+	}
+
 	private sealed class SucceedingTestLrt(
 		IRepository<Job, Guid> jobRepository,
 		IUnitOfWork unitOfWork,

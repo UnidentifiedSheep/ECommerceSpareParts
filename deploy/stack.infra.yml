@@ -144,21 +144,31 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
+    hostname: rabbitmq
     logging: *bounded-logging
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_NODENAME: rabbit@rabbitmq
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       backend:
         aliases:
           - rabbitmq
+      public:
     deploy:
       replicas: 1
       placement:
         constraints:
           - node.labels.infra.rabbitmq == true
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=${PUBLIC_NETWORK:-public}
+        - traefik.http.routers.rabbitmq.rule=Host(`${RABBITMQ_HOST:?RABBITMQ_HOST is required}`)
+        - traefik.http.routers.rabbitmq.entrypoints=websecure
+        - traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt
+        - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
       restart_policy:
         condition: on-failure
         delay: 10s
@@ -169,6 +179,7 @@ services:
     logging: *bounded-logging
     environment:
       - discovery.type=single-node
+      - node.name=opensearch
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD}
       - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
       - logger.level=WARN
@@ -191,6 +202,9 @@ services:
 networks:
   backend:
     name: ${BACKEND_NETWORK:-backend}
+    external: true
+  public:
+    name: ${PUBLIC_NETWORK:-public}
     external: true
 
 configs:

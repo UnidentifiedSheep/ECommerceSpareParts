@@ -180,7 +180,7 @@ public class ProductCrossesImportLrt(
 					var entities = crosses
 						.Select(x => ProductCross.Create(x.ProductId, x.CrossProductId))
 						.ToList();
-					await productRepository.UpsertProductCrosses(entities, cancellationToken);
+					await productRepository.InsertProductCrossesOnConflictDoNothingAsync(entities, cancellationToken);
 					domainEventScope.AddRange(
 						entities
 							.SelectMany(x => new[]

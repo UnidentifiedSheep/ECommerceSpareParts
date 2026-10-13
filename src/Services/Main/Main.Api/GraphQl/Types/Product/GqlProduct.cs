@@ -58,6 +58,13 @@ public record GqlProduct
 		IProductByIdDataLoader loader,
 		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Images;
 
+	[GraphQLName("eans")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_EANS_GET)]
+	public async Task<IReadOnlyList<string>> GetEansAsync(
+		IProductEansByIdDataLoader loader,
+		CancellationToken cancellationToken)
+		=> await loader.LoadAsync(Id, cancellationToken) ?? [];
+
 	[GraphQLName("stock")]
 	public async Task<int> GetStockAsync(
 		IProductByIdDataLoader loader,

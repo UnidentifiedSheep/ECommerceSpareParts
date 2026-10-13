@@ -107,7 +107,7 @@ public class MakeLinkageBetweenProductsHandler(
 				throw new ArgumentOutOfRangeException();
 		}
 
-		await repository.UpsertProductCrosses(toAdd, cancellationToken);
+		await repository.InsertProductCrossesOnConflictDoNothingAsync(toAdd, cancellationToken);
 		var ids = new HashSet<int>();
 		foreach (var cross in toAdd)
 		{
