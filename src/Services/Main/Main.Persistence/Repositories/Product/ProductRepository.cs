@@ -95,16 +95,19 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 			.ToDictionary(x => (x.NormalizedValue, x.ProducerId), x => x.Id);
 	}
 
-	public Task UpsertProductCrosses(
+	public Task InsertProductCrossesOnConflictDoNothingAsync(
 		IEnumerable<ProductCross> crosses,
 		CancellationToken cancellationToken = default)
 	{
+		var items = crosses
+			.DistinctBy(x => (x.LeftProductId, x.RightProductId))
+			.ToList();
+
+		if (items.Count == 0) return Task.CompletedTask;
+
 		return Context.BulkInsertOrUpdateAsync(
-			crosses,
-			new BulkConfig
-			{
-				UpdateByProperties = [nameof(ProductCross.LeftProductId), nameof(ProductCross.RightProductId)]
-			},
+			items,
+			new BulkConfig { PropertiesToIncludeOnUpdate = [""] },
 			cancellationToken: cancellationToken);
 	}
 
