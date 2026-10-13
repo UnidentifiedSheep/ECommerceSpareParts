@@ -41,12 +41,12 @@ public static class ProductCharacteristicsEndPoints
 
 		products
 			.MapDelete(
-				"/{productId:int}/characteristics/{name}",
+				"/{productId:int}/characteristics/{characteristicId:int}",
 				async (
 					ISender sender, int productId,
-					string name, CancellationToken token) =>
+					int characteristicId, CancellationToken token) =>
 				{
-					await sender.Send(new DeleteCharacteristicsCommand(productId, name), token);
+					await sender.Send(new DeleteCharacteristicsCommand(productId, characteristicId), token);
 					return Results.Ok();
 				})
 			.WithName("DeleteProductCharacteristic")
@@ -59,16 +59,16 @@ public static class ProductCharacteristicsEndPoints
 
 		products
 			.MapPatch(
-				"/{productId:int}/characteristics/{name}",
+				"/{productId:int}/characteristics/{characteristicId:int}",
 				async (
 					ISender sender, int productId,
-					string name, EditCharacteristicsRequest request,
+					int characteristicId, EditCharacteristicsRequest request,
 					CancellationToken token) =>
 				{
 					await sender.Send(
 						new PatchCharacteristicsCommand(
 							productId,
-							name,
+							characteristicId,
 							request.Value),
 						token);
 					return Results.Ok();

@@ -7,8 +7,8 @@ public record ProductCharacteristicDto
 	[JsonPropertyName("productId")]
 	public required int ProductId { get; init; }
 
-	[JsonPropertyName("name")]
-	public required string Name { get; init; }
+	[JsonPropertyName("characteristic")]
+	public required CharacteristicDto Characteristic { get; init; }
 
 	[JsonPropertyName("value")]
 	public required string Value { get; init; }

@@ -21,7 +21,7 @@ public record GetCharacteristicsBatchQuery : IQuery<GetCharacteristicsBatchResul
 public record GetCharacteristicsBatchResult(Dictionary<int, List<ProductCharacteristicDto>> Characteristics);
 
 public class GetCharacteristicsBatchHandler(
-	IReadRepository<ProductCharacteristic, (int, string)> repository,
+	IReadRepository<ProductCharacteristic, (int, int)> repository,
 	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection)
 	: IQueryHandler<GetCharacteristicsBatchQuery, GetCharacteristicsBatchResult>
 {

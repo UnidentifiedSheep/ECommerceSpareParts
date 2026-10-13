@@ -1,0 +1,8 @@
+{
+  "culture": "tr",
+  "messages": {
+    "characteristic.name.required": "Özellik adı boş olmamalıdır.",
+    "characteristic.normalized.name.required": "Özellik adı harf veya rakam içermelidir.",
+    "characteristic.normalized.name.max.length": "Normalleştirilmiş özellik adı 128 karakteri aşmamalıdır."
+  }
+}

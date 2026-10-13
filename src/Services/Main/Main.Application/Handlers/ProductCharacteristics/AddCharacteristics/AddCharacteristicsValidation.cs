@@ -27,9 +27,8 @@ public class AddCharacteristicsValidation : AbstractValidator<AddCharacteristics
 					.WithLocalizableError(ArticleCharacteristicValueMaxLengthMessage.Instance);
 
 				z
-					.RuleFor(x => x.Name)
-					.MaximumLength(128)
-					.WithLocalizableError(ArticleCharacteristicNameMaxLengthMessage.Instance);
+					.RuleFor(x => x.CharacteristicId)
+					.GreaterThan(0);
 			});
 	}
 }

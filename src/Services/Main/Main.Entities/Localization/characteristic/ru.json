@@ -1,0 +1,8 @@
+{
+  "culture": "ru",
+  "messages": {
+    "characteristic.name.required": "Название характеристики не может быть пустым.",
+    "characteristic.normalized.name.required": "Название характеристики должно содержать буквы или цифры.",
+    "characteristic.normalized.name.max.length": "Нормализованное название характеристики не должно превышать 128 символов."
+  }
+}

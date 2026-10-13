@@ -16,7 +16,7 @@ public record GetCharacteristicsQuery(int ProductId, Pagination Pagination)
 public record GetCharacteristicsResult(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 
 public class GetCharacteristicsHandler(
-	IReadRepository<ProductCharacteristic, (int, string)> repository,
+	IReadRepository<ProductCharacteristic, (int, int)> repository,
 	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection)
 	: IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
 {

@@ -7,46 +7,21 @@ namespace Tests.Domain.Product;
 public class ProductCharacteristicTests
 {
 	[Theory]
-	[InlineData(
-		1,
-		"Color",
-		"Red")]
-	[InlineData(
-		2,
-		"Size",
-		"Large")]
-	[InlineData(
-		3,
-		"Weight",
-		"100g")]
-	public void Create_ValidData_Succeeds(
-		int productId,
-		string name,
-		string value)
+	[InlineData(1, 10, "Red")]
+	[InlineData(2, 20, "  Large  ")]
+	public void Create_UsesProductAndCharacteristicIds(int productId, int characteristicId, string value)
 	{
-		var act = () => ProductCharacteristic.Create(
-			productId,
-			name,
-			value);
+		var model = ProductCharacteristic.Create(productId, characteristicId, value);
 
-		var model = act.Should().NotThrow().Subject;
-
-		Validate(
-			model,
-			productId,
-			name.Trim(),
-			value.Trim());
-	}
-
-	[Fact]
-	public void Create_EmptyName_Throws_InvalidOperationException()
-	{
-		var act = () => ProductCharacteristic.Create(
-			1,
-			"   ",
-			"value");
-
-		act.Should().Throw<InvalidOperationException>();
+		model.ProductId.Should().Be(productId);
+		model.CharacteristicId.Should().Be(characteristicId);
+		model.Value.Should().Be(value.Trim());
+		model.GetId().Should().Be((productId, characteristicId));
+		ProductCharacteristic.GetKeySelector().Compile()(model).Should().Be(model.GetId());
+		var matches = ProductCharacteristic.GetEqualityExpression(model.GetId()).Compile();
+		matches(model).Should().BeTrue();
+		matches(ProductCharacteristic.Create(productId + 1, characteristicId, value)).Should().BeFalse();
+		matches(ProductCharacteristic.Create(productId, characteristicId + 1, value)).Should().BeFalse();
 	}
 
 	[Theory]
@@ -54,10 +29,7 @@ public class ProductCharacteristicTests
 	[InlineData("ab")]
 	public void Create_ValueTooShort_Throws(string value)
 	{
-		var act = () => ProductCharacteristic.Create(
-			1,
-			"Name",
-			value);
+		var act = () => ProductCharacteristic.Create(1, 10, value);
 
 		act.Should().Throw<InvalidInputException>();
 	}
@@ -65,85 +37,31 @@ public class ProductCharacteristicTests
 	[Fact]
 	public void Create_ValueTooLong_Throws()
 	{
-		string longValue = new('x', 200);
-
-		var act = () => ProductCharacteristic.Create(
-			1,
-			"Name",
-			longValue);
+		var act = () => ProductCharacteristic.Create(1, 10, new string('x', 129));
 
 		act.Should().Throw<InvalidInputException>();
 	}
 
 	[Fact]
-	public void SetName_Valid_Succeeds()
+	public void SetValue_UpdatesValueAndPreservesKey()
 	{
-		var model = ProductCharacteristic.Create(
-			1,
-			"Name",
-			"Value");
+		var model = ProductCharacteristic.Create(1, 10, "Value");
 
-		var act = () => model.SetName("NewName");
-
-		act.Should().NotThrow();
-
-		model.Name.Should().Be("NewName");
-	}
-
-	[Fact]
-	public void SetName_Empty_Throws()
-	{
-		var model = ProductCharacteristic.Create(
-			1,
-			"Name",
-			"Value");
-
-		var act = () => model.SetName("   ");
-
-		act.Should().Throw<InvalidOperationException>();
-	}
-
-	[Fact]
-	public void SetValue_Valid_Succeeds()
-	{
-		var model = ProductCharacteristic.Create(
-			1,
-			"Name",
-			"Value");
-
-		var act = () => model.SetValue("NewValue");
-
-		act.Should().NotThrow();
+		model.SetValue("  NewValue  ");
 
 		model.Value.Should().Be("NewValue");
+		model.GetId().Should().Be((1, 10));
 	}
 
 	[Theory]
 	[InlineData("ab")]
-	public void SetValue_TooShort_Throws(string value)
+	[InlineData("   ")]
+	public void SetValue_InvalidValue_PreservesExistingValue(string value)
 	{
-		var model = ProductCharacteristic.Create(
-			1,
-			"Name",
-			"Value");
-
+		var model = ProductCharacteristic.Create(1, 10, "Value");
 		var act = () => model.SetValue(value);
 
 		act.Should().Throw<InvalidInputException>();
-	}
-
-	private static void Validate(
-		ProductCharacteristic model,
-		int productId,
-		string name,
-		string value)
-	{
-		model.Should().NotBeNull();
-
-		model.ProductId.Should().Be(productId);
-		model.Name.Should().Be(name);
-		model.Value.Should().Be(value);
-
-		model.GetId().Should().Be((productId, name));
+		model.Value.Should().Be("Value");
 	}
 }

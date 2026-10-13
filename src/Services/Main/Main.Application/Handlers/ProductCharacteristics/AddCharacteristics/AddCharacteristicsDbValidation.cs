@@ -7,5 +7,6 @@ namespace Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 public class AddCharacteristicsDbValidation : AbstractDbValidation<AddCharacteristicsCommand>
 {
 	public override void Build(IValidationPlan plan, AddCharacteristicsCommand request) =>
-		plan.ValidateProductExistsId(request.Characteristics.Select(x => x.ProductId));
+		plan.ValidateProductExistsId(request.Characteristics.Select(x => x.ProductId))
+			.ValidateCharacteristicExistsId(request.Characteristics.Select(x => x.CharacteristicId));
 }

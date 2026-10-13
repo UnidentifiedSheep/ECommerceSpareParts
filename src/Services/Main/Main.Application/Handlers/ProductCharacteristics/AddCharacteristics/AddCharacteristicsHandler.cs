@@ -20,7 +20,7 @@ public class AddCharacteristicsHandler(IUnitOfWork unitOfWork) : ICommandHandler
 			toAdd.Add(
 				ProductCharacteristic.Create(
 					@new.ProductId,
-					@new.Name,
+					@new.CharacteristicId,
 					@new.Value));
 
 		await unitOfWork.AddRangeAsync(toAdd, cancellationToken);

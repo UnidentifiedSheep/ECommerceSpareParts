@@ -1,0 +1,8 @@
+{
+  "culture": "en",
+  "messages": {
+    "characteristic.name.required": "Characteristic name must not be empty.",
+    "characteristic.normalized.name.required": "Characteristic name must contain letters or digits.",
+    "characteristic.normalized.name.max.length": "Normalized characteristic name must not exceed 128 characters."
+  }
+}

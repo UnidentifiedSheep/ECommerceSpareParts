@@ -8,8 +8,8 @@ public record GqlProductCharacteristic(
 	[property: GraphQLIgnore]
 	ProductCharacteristicDto CharacteristicDto)
 {
-	[GraphQLName("name")]
-	public string Name => CharacteristicDto.Name;
+	[GraphQLName("characteristic")]
+	public GqlCharacteristic Characteristic => new(CharacteristicDto.Characteristic);
 
 	[GraphQLName("value")]
 	public string Value => CharacteristicDto.Value;
