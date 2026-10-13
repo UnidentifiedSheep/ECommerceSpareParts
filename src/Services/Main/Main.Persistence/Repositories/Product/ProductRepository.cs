@@ -111,6 +111,19 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 			cancellationToken: cancellationToken);
 	}
 
+	public Task DeleteProductCrossesAsync(
+		IEnumerable<ProductCross> crosses,
+		CancellationToken cancellationToken = default)
+	{
+		var items = crosses
+			.DistinctBy(x => (x.LeftProductId, x.RightProductId))
+			.ToList();
+
+		return items.Count == 0
+			? Task.CompletedTask
+			: Context.BulkDeleteAsync(items, cancellationToken: cancellationToken);
+	}
+
 	public async Task InsertProductsOnConflictDoNothingAsync(
 		IReadOnlyCollection<ProductEntity> products,
 		CancellationToken cancellation = default)
