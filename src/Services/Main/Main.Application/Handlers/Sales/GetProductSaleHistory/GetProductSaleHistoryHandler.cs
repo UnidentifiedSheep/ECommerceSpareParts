@@ -6,6 +6,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Main.Application.Dtos.Sale;
 using Main.Application.Extensions.QueryExtensions;
+using Main.Application.Interfaces.Products;
 using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,20 +19,28 @@ public record GetProductSaleHistoryQuery(
 	Guid? OrganizationId,
 	Guid? PreferredOrganizationId,
 	int? CurrencyId,
-	IReadOnlyCollection<string> SortBy) : IQuery<GetProductSaleHistoryResult>;
+	IReadOnlyCollection<string> SortBy,
+	bool ShowCrosses = false) : IQuery<GetProductSaleHistoryResult>;
 
 public record GetProductSaleHistoryResult(IReadOnlyList<ProductSaleHistoryDto> History);
 
 public class GetProductSaleHistoryHandler(
 	IReadRepository<SaleContent, int> repository,
-	IProjectionProvider<SaleContent, ProductSaleHistoryDto> projectionProvider)
+	IProjectionProvider<SaleContent, ProductSaleHistoryDto> projectionProvider,
+	IProductProvider productProvider)
 	: IQueryHandler<GetProductSaleHistoryQuery, GetProductSaleHistoryResult>
 {
 	public async Task<GetProductSaleHistoryResult> Handle(
 		GetProductSaleHistoryQuery request,
 		CancellationToken cancellationToken)
 	{
-		var query = repository.Query.CompletedSales().Where(x => x.ProductId == request.ProductId);
+		var productIds = new List<int> { request.ProductId };
+		if (request.ShowCrosses)
+			productIds.AddRange(await productProvider.GetProductCrossesAsync(request.ProductId, null, cancellationToken));
+
+		var query = repository.Query
+			.CompletedSales()
+			.Where(x => productIds.Contains(x.ProductId));
 
 		if (!string.IsNullOrWhiteSpace(request.StorageCode))
 			query = query.Where(x => x.Sale.StorageCode == request.StorageCode);

@@ -24,6 +24,8 @@
     "lrt.product.crosses.by.ids.import.name": "Kimliğe göre ürün çaprazlarını içe aktarma",
     "lrt.product.crosses.by.ids.import.description": "Ürün kimliklerini içeren CSV dosyasından ürün çaprazlarını içe aktarır.",
     "lrt.product.crosses.by.ids.import.invalid.id": "Id ve CrossId pozitif ürün kimlikleri olmalıdır.",
+    "lrt.product.crosses.by.ids.delete.name": "Kimliğe göre ürün çaprazlarını silme",
+    "lrt.product.crosses.by.ids.delete.description": "CSV dosyasındaki ürün kimliklerine göre mevcut ürün çaprazlarını siler; bulunmayan bağlantıları atlar.",
     "lrt.producer.synchronization.name": "Üretici senkronizasyonu",
     "lrt.producer.synchronization.description": "İlgili servislerin üretici verilerini yenileyebilmesi için tüm üreticiler için güncelleme olayları yayınlar.",
     "lrt.product.synchronization.name": "Ürün senkronizasyonu",

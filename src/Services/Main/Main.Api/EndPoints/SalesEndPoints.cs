@@ -129,6 +129,9 @@ public record GetProductSaleHistoryRequest : SortablePaginationQueryModel
 
 	[FromQuery(Name = "currencyId")]
 	public int? CurrencyId { get; init; }
+
+	[FromQuery(Name = "showCrosses")]
+	public bool ShowCrosses { get; init; }
 }
 
 public record GetProductSaleHistoryResponse(IReadOnlyList<ProductSaleHistoryDto> History);
@@ -287,7 +290,8 @@ public class SalesEndPoints : ICarterModule
 							request.OrganizationId,
 							request.PreferredOrganizationId,
 							request.CurrencyId,
-							request.SortBy),
+							request.SortBy,
+							request.ShowCrosses),
 						cancellationToken);
 
 					return Results.Ok(new GetProductSaleHistoryResponse(result.History));

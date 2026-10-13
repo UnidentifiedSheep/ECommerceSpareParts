@@ -23,6 +23,10 @@ public interface IProductRepository : IRepository<Product, int>
 		IEnumerable<ProductCross> crosses,
 		CancellationToken cancellationToken = default);
 
+	Task DeleteProductCrossesAsync(
+		IEnumerable<ProductCross> crosses,
+		CancellationToken cancellationToken = default);
+
 	Task InsertProductsOnConflictDoNothingAsync(
 		IReadOnlyCollection<Product> products,
 		CancellationToken cancellationToken = default);

@@ -24,6 +24,8 @@
     "lrt.product.crosses.by.ids.import.name": "Импорт кроссов товаров по ID",
     "lrt.product.crosses.by.ids.import.description": "Загружает кроссы товаров из CSV-файла с ID товаров.",
     "lrt.product.crosses.by.ids.import.invalid.id": "Id и CrossId должны быть положительными ID товаров.",
+    "lrt.product.crosses.by.ids.delete.name": "Удаление кроссов товаров по ID",
+    "lrt.product.crosses.by.ids.delete.description": "Удаляет существующие кроссы товаров из CSV-файла с ID товаров; отсутствующие связи пропускает.",
     "lrt.producer.synchronization.name": "Синхронизация производителей",
     "lrt.producer.synchronization.description": "Публикует события обновления для всех производителей, чтобы связанные сервисы могли обновить данные о производителях.",
     "lrt.product.synchronization.name": "Синхронизация товаров",
