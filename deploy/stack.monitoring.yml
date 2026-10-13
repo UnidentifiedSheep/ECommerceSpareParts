@@ -67,11 +67,13 @@ services:
   loki:
     image: grafana/loki:latest
     logging: *bounded-logging
-    command: -config.file=/etc/loki/loki.yml
-    configs:
-      - source: loki_config
-        target: /etc/loki/loki.yml
-        mode: 0444
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+      - -log.level=warn
+      - -compactor.working-directory=/loki/compactor
+      - -compactor.retention-enabled=true
+      - -compactor.delete-request-store=filesystem
+      - -store.retention=168h
     volumes:
       - loki_data:/loki
     networks:
@@ -216,9 +218,6 @@ configs:
   prometheus_config:
     external: true
     name: ${PROMETHEUS_CONFIG:?PROMETHEUS_CONFIG is required}
-  loki_config:
-    external: true
-    name: ${LOKI_CONFIG:?LOKI_CONFIG is required}
   tempo_config:
     external: true
     name: ${TEMPO_CONFIG:?TEMPO_CONFIG is required}
