@@ -97,6 +97,7 @@ jobs:
           export PORTAINER_HOST=portainer.example.invalid
           export GRAFANA_HOST=grafana.example.invalid
           export OPENSEARCH_DASHBOARDS_HOST=opensearch.example.invalid
+          export RABBITMQ_HOST=rabbitmq.example.invalid
           export CLOUD_RU_SECRET_PROJECT_ID=validation
           export CLOUDRU_SECRETS_SCRIPT_CONFIG=validation_cloudru
           export POSTGRES_INIT_SQL_CONFIG=validation_postgres_sql

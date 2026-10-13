@@ -66,6 +66,7 @@ services:
 
   loki:
     image: grafana/loki:latest
+    hostname: loki
     logging: *bounded-logging
     command:
       - -config.file=/etc/loki/local-config.yaml
@@ -95,6 +96,7 @@ services:
 
   tempo:
     image: grafana/tempo:3.0.0
+    hostname: tempo
     logging: *bounded-logging
     command: -config.file=/etc/tempo/tempo.yml -log.level=warn
     configs:

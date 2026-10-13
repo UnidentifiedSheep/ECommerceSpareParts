@@ -252,9 +252,11 @@
 
   rabbitmq:
     image: rabbitmq:3-management
+    hostname: rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_NODENAME: rabbit@rabbitmq
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -269,6 +271,7 @@
     image: opensearchproject/opensearch:latest
     environment:
       - discovery.type=single-node
+      - node.name=opensearch
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD}
       - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
       - logger.level=WARN
@@ -340,6 +343,7 @@
   loki:
     image: grafana/loki:latest
     container_name: loki
+    hostname: loki
     ports:
       - "3100:3100"
     command:
@@ -359,6 +363,7 @@
   tempo:
     image: grafana/tempo:3.0.0
     container_name: tempo
+    hostname: tempo
     command: -config.file=/etc/tempo/tempo.yml -log.level=warn
     volumes:
       - ./deploy/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
