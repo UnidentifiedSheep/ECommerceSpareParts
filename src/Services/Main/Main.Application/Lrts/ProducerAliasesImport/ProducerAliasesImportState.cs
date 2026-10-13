@@ -9,15 +9,15 @@ namespace Main.Application.Lrts.ProducerAliasesImport;
 public record ProducerAliasesImportState : ProducerAliasesImportInputState,
 	ICsvImportState<ProducerAliasesImportState>
 {
-	[JsonPropertyName("currentLine")]
-	public int CurrentLine { get; init; }
-
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
 
-	public ProducerAliasesImportState WithCurrentLine(int currentLine) => this with
+	[JsonPropertyName("checkpoint")]
+	public CsvImportCheckpoint? Checkpoint { get; init; }
+
+	public ProducerAliasesImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
 	{
-		CurrentLine = currentLine
+		Checkpoint = checkpoint
 	};
 }
 

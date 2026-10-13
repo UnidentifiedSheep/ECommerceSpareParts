@@ -15,6 +15,13 @@ public interface IS3Service
 		string keyName,
 		CancellationToken ct = default);
 
+	Task<Response<IStreamResponse>> DownloadFileAsync(
+		string bucketName,
+		string keyName,
+		long offset,
+		string? expectedETag,
+		CancellationToken ct = default);
+
 	Task<DeleteObjectResult> DeleteFileAsync(
 		string bucketName,
 		string keyName,

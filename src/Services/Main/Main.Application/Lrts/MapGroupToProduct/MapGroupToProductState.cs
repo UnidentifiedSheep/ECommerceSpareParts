@@ -8,15 +8,15 @@ namespace Main.Application.Lrts.MapGroupToProduct;
 
 public record MapGroupToProductState : MapGroupToProductInputState, ICsvImportState<MapGroupToProductState>
 {
-	[JsonPropertyName("currentLine")]
-	public int CurrentLine { get; init; }
-
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
 
-	public MapGroupToProductState WithCurrentLine(int currentLine) => this with
+	[JsonPropertyName("checkpoint")]
+	public CsvImportCheckpoint? Checkpoint { get; init; }
+
+	public MapGroupToProductState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
 	{
-		CurrentLine = currentLine
+		Checkpoint = checkpoint
 	};
 }
 

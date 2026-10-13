@@ -33,7 +33,7 @@ public sealed class ProductCrossesByIdsImportLrtTests : CsvLrtIntegrationTest<Pr
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductCrossesByIdsImportState>();
-		state.CurrentLine.Should().Be(3);
+		state.Checkpoint!.CurrentLine.Should().Be(3);
 		state.Errors.Should().BeEmpty();
 		var crosses = await Context.ProductCrosses.AsNoTracking()
 			.Select(x => new { x.LeftProductId, x.RightProductId })

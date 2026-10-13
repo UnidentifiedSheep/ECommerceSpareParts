@@ -8,15 +8,15 @@ namespace Main.Application.Lrts.ProducerImport;
 
 public record ProducerImportState : ProducerImportInputState, ICsvImportState<ProducerImportState>
 {
-	[JsonPropertyName("currentLine")]
-	public int CurrentLine { get; init; }
-
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
 
-	public ProducerImportState WithCurrentLine(int currentLine) => this with
+	[JsonPropertyName("checkpoint")]
+	public CsvImportCheckpoint? Checkpoint { get; init; }
+
+	public ProducerImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
 	{
-		CurrentLine = currentLine
+		Checkpoint = checkpoint
 	};
 }
 

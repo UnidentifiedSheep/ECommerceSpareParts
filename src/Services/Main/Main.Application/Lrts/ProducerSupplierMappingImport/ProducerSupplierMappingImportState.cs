@@ -9,15 +9,15 @@ namespace Main.Application.Lrts.ProducerSupplierMappingImport;
 public record ProducerSupplierMappingImportState : ProducerSupplierMappingImportInputState,
 	ICsvImportState<ProducerSupplierMappingImportState>
 {
-	[JsonPropertyName("currentLine")]
-	public int CurrentLine { get; init; }
-
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
 
-	public ProducerSupplierMappingImportState WithCurrentLine(int currentLine) => this with
+	[JsonPropertyName("checkpoint")]
+	public CsvImportCheckpoint? Checkpoint { get; init; }
+
+	public ProducerSupplierMappingImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
 	{
-		CurrentLine = currentLine
+		Checkpoint = checkpoint
 	};
 }
 

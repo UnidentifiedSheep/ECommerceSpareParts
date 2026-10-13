@@ -8,15 +8,15 @@ namespace Main.Application.Lrts.ProductEanImport;
 
 public record ProductEanImportState : ProductEanImportInputState, ICsvImportState<ProductEanImportState>
 {
-	[JsonPropertyName("currentLine")]
-	public int CurrentLine { get; init; }
-
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
 
-	public ProductEanImportState WithCurrentLine(int currentLine) => this with
+	[JsonPropertyName("checkpoint")]
+	public CsvImportCheckpoint? Checkpoint { get; init; }
+
+	public ProductEanImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
 	{
-		CurrentLine = currentLine
+		Checkpoint = checkpoint
 	};
 }
 

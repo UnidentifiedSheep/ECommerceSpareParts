@@ -9,11 +9,26 @@ public interface ICsvImportInputState
 
 public interface ICsvImportState<TState> : ICsvImportInputState
 {
-	int CurrentLine { get; }
+	CsvImportCheckpoint? Checkpoint { get; }
 
 	List<CsvImportError> Errors { get; }
 
-	TState WithCurrentLine(int currentLine);
+	TState WithCheckpoint(CsvImportCheckpoint checkpoint);
+}
+
+public sealed record CsvImportCheckpoint
+{
+	[JsonPropertyName("offset")]
+	public required long Offset { get; init; }
+
+	[JsonPropertyName("rawHeader")]
+	public required string RawHeader { get; init; }
+
+	[JsonPropertyName("eTag")]
+	public required string ETag { get; init; }
+
+	[JsonPropertyName("currentLine")]
+	public required int CurrentLine { get; init; }
 }
 
 public sealed record CsvImportError

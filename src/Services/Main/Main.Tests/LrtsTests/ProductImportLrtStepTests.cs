@@ -67,7 +67,7 @@ public sealed class ProductImportLrtStepTests : CsvLrtIntegrationTest<ProductImp
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductImportState>();
 		state.Errors.Should().BeEmpty();
-		state.CurrentLine.Should().Be(4);
+		state.Checkpoint!.CurrentLine.Should().Be(4);
 
 		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
 		products.Should().HaveCount(3);
@@ -103,7 +103,7 @@ public sealed class ProductImportLrtStepTests : CsvLrtIntegrationTest<ProductImp
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductImportState>();
 		state.Errors.Should().BeEmpty();
-		state.CurrentLine.Should().Be(1002);
+		state.Checkpoint!.CurrentLine.Should().Be(1002);
 
 		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
 		products.Should().HaveCount(1001);
@@ -132,7 +132,7 @@ public sealed class ProductImportLrtStepTests : CsvLrtIntegrationTest<ProductImp
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductImportState>();
-		state.CurrentLine.Should().Be(3);
+		state.Checkpoint!.CurrentLine.Should().Be(3);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2);
 
 		var product = await Context.Products.AsNoTracking().SingleAsync(CancellationToken);

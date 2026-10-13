@@ -10,5 +10,7 @@ internal sealed class S3StreamResponse(GetObjectResponse response) : IStreamResp
 	public Stream Stream => _response?.ResponseStream ??
 		throw new ObjectDisposedException(nameof(S3StreamResponse));
 
+	public string? ETag => _response?.ETag;
+
 	public void Dispose() => Interlocked.Exchange(ref _response, null)?.Dispose();
 }

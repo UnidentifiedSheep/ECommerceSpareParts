@@ -34,26 +34,55 @@ public sealed class S3Service(
 		return keyName;
 	}
 
-	public async Task<Response<IStreamResponse>> DownloadFileAsync(
+	public Task<Response<IStreamResponse>> DownloadFileAsync(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default)
+		=> DownloadFileAsync(bucketName, keyName, 0, null, ct);
+
+	public async Task<Response<IStreamResponse>> DownloadFileAsync(
+		string bucketName,
+		string keyName,
+		long offset,
+		string? expectedETag,
+		CancellationToken ct = default)
 	{
+		ArgumentOutOfRangeException.ThrowIfNegative(offset);
+		var request = new GetObjectRequest
+		{
+			BucketName = bucketName,
+			Key = keyName
+		};
+		if (expectedETag != null)
+			request.EtagToMatch = expectedETag;
+		if (offset > 0)
+			request.ByteRange = new ByteRange($"bytes={offset}-");
+
 		try
 		{
-			var response = await internalClient.GetObjectAsync(
-				new GetObjectRequest
-				{
-					BucketName = bucketName,
-					Key = keyName
-				},
-				ct);
+			var response = await internalClient.GetObjectAsync(request, ct);
 			return Response<IStreamResponse>.Success(new S3StreamResponse(response));
 		}
 		catch (AmazonS3Exception ex) when (ex is NoSuchKeyException || ex.ErrorCode == "NoSuchKey")
 		{
 			return Response<IStreamResponse>.Failure(HttpStatusCode.NotFound, "NoSuchKey");
 		}
+		catch (AmazonS3Exception ex) when (ex.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable && offset > 0)
+		{
+			var metadata = await internalClient.GetObjectMetadataAsync(
+				new GetObjectMetadataRequest { BucketName = bucketName, Key = keyName }, ct);
+			if (metadata.ContentLength != offset ||
+			    expectedETag is not null && metadata.ETag != expectedETag)
+				throw;
+			return Response<IStreamResponse>.Success(new EmptyStreamResponse(metadata.ETag));
+		}
+	}
+
+	private sealed class EmptyStreamResponse(string? eTag) : IStreamResponse
+	{
+		public Stream Stream { get; } = Stream.Null;
+		public string? ETag => eTag;
+		public void Dispose() { }
 	}
 
 	public async Task<DeleteObjectResult> DeleteFileAsync(

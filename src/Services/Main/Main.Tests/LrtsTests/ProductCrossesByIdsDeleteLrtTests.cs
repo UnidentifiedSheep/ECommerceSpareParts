@@ -42,7 +42,7 @@ public sealed class ProductCrossesByIdsDeleteLrtTests : CsvLrtIntegrationTest<Pr
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductCrossesByIdsDeleteState>();
-		state.CurrentLine.Should().Be(4);
+		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Errors.Should().BeEmpty();
 		var crosses = await Context.ProductCrosses.AsNoTracking()
 			.Select(x => new { x.LeftProductId, x.RightProductId })

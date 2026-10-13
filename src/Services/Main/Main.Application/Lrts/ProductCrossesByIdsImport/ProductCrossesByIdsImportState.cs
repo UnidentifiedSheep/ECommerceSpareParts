@@ -9,15 +9,15 @@ namespace Main.Application.Lrts.ProductCrossesByIdsImport;
 public record ProductCrossesByIdsImportState : ProductCrossesByIdsImportInputState,
 	ICsvImportState<ProductCrossesByIdsImportState>
 {
-	[JsonPropertyName("currentLine")]
-	public int CurrentLine { get; init; }
-
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
 
-	public ProductCrossesByIdsImportState WithCurrentLine(int currentLine) => this with
+	[JsonPropertyName("checkpoint")]
+	public CsvImportCheckpoint? Checkpoint { get; init; }
+
+	public ProductCrossesByIdsImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
 	{
-		CurrentLine = currentLine
+		Checkpoint = checkpoint
 	};
 }
 

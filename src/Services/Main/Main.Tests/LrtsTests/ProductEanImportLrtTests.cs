@@ -37,7 +37,7 @@ public sealed class ProductEanImportLrtTests : CsvLrtIntegrationTest<ProductEanI
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductEanImportState>();
-		state.CurrentLine.Should().Be(4);
+		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Errors.Should().ContainSingle(error => error.RowIdx == 4);
 		var eans = await Context.ProductEans.AsNoTracking()
 			.Where(x => x.ProductId == product.Id)

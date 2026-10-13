@@ -35,7 +35,7 @@ public sealed class ProductSizesImportLrtTests : CsvLrtIntegrationTest<ProductSi
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductSizesImportState>();
-		state.CurrentLine.Should().Be(4);
+		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Errors.Should().BeEmpty();
 
 		var sizes = await Context.ProductSizes.AsNoTracking()
