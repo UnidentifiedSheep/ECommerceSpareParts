@@ -3,6 +3,9 @@
   "messages": {
     "characteristic.name.required": "Название характеристики не может быть пустым.",
     "characteristic.normalized.name.required": "Название характеристики должно содержать буквы или цифры.",
-    "characteristic.normalized.name.max.length": "Нормализованное название характеристики не должно превышать 128 символов."
+    "characteristic.normalized.name.max.length": "Нормализованное название характеристики не должно превышать 128 символов.",
+    "characteristic.not.found": "Характеристика не найдена.",
+    "characteristic.normalized.name.already.exists": "Характеристика с таким названием уже существует.",
+    "characteristic.in.use": "Нельзя удалить характеристику, используемую продуктами."
   }
 }

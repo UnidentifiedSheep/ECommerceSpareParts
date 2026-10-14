@@ -3,6 +3,9 @@
   "messages": {
     "characteristic.name.required": "Özellik adı boş olmamalıdır.",
     "characteristic.normalized.name.required": "Özellik adı harf veya rakam içermelidir.",
-    "characteristic.normalized.name.max.length": "Normalleştirilmiş özellik adı 128 karakteri aşmamalıdır."
+    "characteristic.normalized.name.max.length": "Normalleştirilmiş özellik adı 128 karakteri aşmamalıdır.",
+    "characteristic.not.found": "Özellik bulunamadı.",
+    "characteristic.normalized.name.already.exists": "Bu ada sahip bir özellik zaten var.",
+    "characteristic.in.use": "Ürünler tarafından kullanılan bir özellik silinemez."
   }
 }

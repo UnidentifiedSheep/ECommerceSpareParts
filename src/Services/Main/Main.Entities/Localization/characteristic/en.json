@@ -3,6 +3,9 @@
   "messages": {
     "characteristic.name.required": "Characteristic name must not be empty.",
     "characteristic.normalized.name.required": "Characteristic name must contain letters or digits.",
-    "characteristic.normalized.name.max.length": "Normalized characteristic name must not exceed 128 characters."
+    "characteristic.normalized.name.max.length": "Normalized characteristic name must not exceed 128 characters.",
+    "characteristic.not.found": "We could not find the characteristic you were looking for.",
+    "characteristic.normalized.name.already.exists": "A characteristic with this name already exists.",
+    "characteristic.in.use": "A characteristic used by products cannot be deleted."
   }
 }
