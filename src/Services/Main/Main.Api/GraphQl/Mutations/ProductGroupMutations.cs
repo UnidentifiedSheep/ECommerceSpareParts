@@ -11,7 +11,7 @@ namespace Main.Api.GraphQl.Mutations;
 public sealed class ProductGroupMutations
 {
 	[GraphQLName("upsert")]
-	[RequireAllPermissions(PermissionCodes.ARTICLES_EDIT)]
+	[RequireAllPermissions(PermissionCodes.ARTICLES_DETAILS_EDIT)]
 	public async Task<GqlProductGroup> UpsertAsync(
 		ISender sender,
 		GqlUpsertProductGroupInput input,
