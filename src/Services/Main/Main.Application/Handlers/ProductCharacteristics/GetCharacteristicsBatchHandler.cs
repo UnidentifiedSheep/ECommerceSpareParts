@@ -6,7 +6,7 @@ using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ProductCharacteristics.GetCharacteristicsBatch;
+namespace Main.Application.Handlers.ProductCharacteristics;
 
 public record GetCharacteristicsBatchQuery : IQuery<GetCharacteristicsBatchResult>
 {

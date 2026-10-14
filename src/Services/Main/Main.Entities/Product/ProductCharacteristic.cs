@@ -6,7 +6,7 @@ using Domain.Validation;
 namespace Main.Entities.Product;
 
 public class ProductCharacteristic : Entity<ProductCharacteristic, (int, int)>,
-	ILinqEntity<ProductCharacteristic, (int, int)>
+	ILinqEntity<ProductCharacteristic, (int, int)>, IGenerateAutomaticDomainEvents
 {
 	private ProductCharacteristic() {}
 

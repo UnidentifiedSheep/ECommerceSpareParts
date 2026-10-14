@@ -6,7 +6,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics;
+namespace Main.Application.Handlers.ProductCharacteristics;
 
 [AutoSave]
 [Transactional]

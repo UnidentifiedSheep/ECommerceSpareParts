@@ -2,7 +2,7 @@ using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Enums;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics;
+using Main.Application.Handlers.ProductCharacteristics;
 using Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
 using Main.Application.Handlers.ProductCharacteristics.UpsertCharacteristics;
 using MediatR;
