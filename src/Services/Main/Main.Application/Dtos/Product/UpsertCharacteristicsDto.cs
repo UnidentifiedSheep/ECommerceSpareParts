@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Main.Application.Dtos.Product;
 
-public record NewCharacteristicsDto
+public record UpsertCharacteristicsDto
 {
 	[JsonPropertyName("productId")]
 	public required int ProductId { get; init; }

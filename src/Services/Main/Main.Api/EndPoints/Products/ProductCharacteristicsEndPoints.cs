@@ -2,17 +2,16 @@ using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Enums;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 using Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics;
 using Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
-using Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
+using Main.Application.Handlers.ProductCharacteristics.UpsertCharacteristics;
 using MediatR;
 
 namespace Main.Api.EndPoints.Products;
 
-public record AddCharacteristicsRequest(IReadOnlyCollection<NewCharacteristicsDto> Characteristics);
+public record UpsertCharacteristicsRequest(IReadOnlyCollection<UpsertCharacteristicsDto> Characteristics);
 
-public record EditCharacteristicsRequest(PatchCharacteristicsDto Value);
+public record EditCharacteristicsRequest(string Value);
 
 public record GetProductCharacteristicsResponse(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 
@@ -21,23 +20,23 @@ public static class ProductCharacteristicsEndPoints
 	public static RouteGroupBuilder MapProductCharacteristicsEndPoints(this RouteGroupBuilder products)
 	{
 		products
-			.MapPost(
+			.MapPut(
 				"/characteristics/",
 				async (
-					ISender sender, AddCharacteristicsRequest request,
+					ISender sender, UpsertCharacteristicsRequest request,
 					CancellationToken token) =>
 				{
-					await sender.Send(new AddCharacteristicsCommand(request.Characteristics), token);
-					return Results.Created();
+					await sender.Send(new UpsertCharacteristicsCommand(request.Characteristics), token);
+					return Results.Ok();
 				})
-			.WithName("CreateProductCharacteristics")
-			.WithDescription("Создание характеристик артикула")
-			.Accepts<AddCharacteristicsRequest>(false, "application/json")
-			.Produces(StatusCodes.Status201Created)
+			.WithName("UpsertProductCharacteristics")
+			.WithDescription("Создание или обновление характеристик артикула")
+			.Accepts<UpsertCharacteristicsRequest>(false, "application/json")
+			.Produces(StatusCodes.Status200OK)
 			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
-			.WithSummary("Создать характеристики продуктов")
-			.RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE);
+			.WithSummary("Создать или обновить характеристики продуктов")
+			.RequireAllPermissions(PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE, PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
 
 		products
 			.MapDelete(
@@ -58,7 +57,7 @@ public static class ProductCharacteristicsEndPoints
 			.RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE);
 
 		products
-			.MapPatch(
+			.MapPut(
 				"/{productId:int}/characteristics/{characteristicId:int}",
 				async (
 					ISender sender, int productId,
@@ -66,21 +65,26 @@ public static class ProductCharacteristicsEndPoints
 					CancellationToken token) =>
 				{
 					await sender.Send(
-						new PatchCharacteristicsCommand(
-							productId,
-							characteristicId,
-							request.Value),
+						new UpsertCharacteristicsCommand(
+						[
+							new UpsertCharacteristicsDto
+							{
+								ProductId = productId,
+								CharacteristicId = characteristicId,
+								Value = request.Value
+							}
+						]),
 						token);
 					return Results.Ok();
 				})
-			.WithName("EditProductCharacteristic")
-			.WithDescription("Редактирование характеристики")
+			.WithName("UpsertProductCharacteristic")
+			.WithDescription("Создание или обновление характеристики")
 			.Accepts<EditCharacteristicsRequest>(false, "application/json")
 			.Produces(StatusCodes.Status200OK)
 			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
-			.WithSummary("Редактировать характеристику продукта")
-			.RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
+			.WithSummary("Создать или обновить характеристику продукта")
+			.RequireAllPermissions(PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE, PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
 
 		products
 			.MapGet(
