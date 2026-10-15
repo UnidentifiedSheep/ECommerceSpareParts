@@ -1,0 +1,7 @@
+{
+  "culture": "ru",
+  "messages": {
+    "lrt.deleted.products.removal.name": "Очистка удалённых документов товаров",
+    "lrt.deleted.products.removal.description": "Удаляет документы удалённых товаров из поискового индекса после истечения срока хранения."
+  }
+}

@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using Application.Common.Models;
 using Microsoft.Extensions.Options;
 using OpenSearch.Client;
+using OpenSearch.Net;
 using Search.Abstractions.Options;
 using Search.Application.Interfaces.Product;
 using Search.Application.Models.CatalogueSearch;
@@ -69,6 +70,26 @@ public class ProductRepository(
 			throw new InvalidOperationException(
 				string.Join("; ",
 					response.ItemsWithErrors.Select(x => $"{x.Id}: {x.Error?.Reason}")));
+	}
+
+	public async Task<long> DeleteDeletedBefore(DateTime deletedBefore, int batchSize, CancellationToken cancellationToken = default)
+	{
+		if (deletedBefore.Kind != DateTimeKind.Utc)
+			throw new ArgumentException("Deletion cutoff must be UTC.", nameof(deletedBefore));
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
+		var index = await GetIndex(cancellationToken);
+		var response = await Client.DeleteByQueryAsync<Product>(request => request
+			.Index(index)
+			.MaximumDocuments(batchSize)
+			.Conflicts(Conflicts.Proceed)
+			.WaitForCompletion()
+			.Refresh()
+			.Query(query => query.Bool(boolean => boolean.Filter(
+				filter => filter.Term(term => term.Field(product => product.ReadinessStatus).Value((int)ProductReadinessStatus.Deleted)),
+				filter => filter.DateRange(range => range.Field(product => product.ProductUpdatedAt).LessThanOrEquals(deletedBefore))))),
+			cancellationToken);
+		EnsureDeleteByQuerySucceeded(response);
+		return response.Deleted;
 	}
 
 	public async Task<SearchResult<Product>> Search(

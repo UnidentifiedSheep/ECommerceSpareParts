@@ -1,10 +1,12 @@
 using System.Text.Json;
+using Abstractions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.LRT;
 using Cronos;
 using Domain.CommonEntities.Job;
 using Main.Application.Lrts;
 using Main.Application.Lrts.RemoveExpiredDocuments;
+using Main.Application.Lrts.RunServiceTask;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
@@ -30,21 +32,31 @@ public class ScheduledLrtSeed : ISeed<DContext>
 				"Removes expired generated documents once a day.",
 				RemoveExpiredDocumentsLrt.Name,
 				"0 4 * * *",
-				new NoneInputState())
+				new NoneInputState()),
+			DefaultSchedule.Create(
+				"Remove deleted search products",
+				"Removes deleted product documents from the search index once a day.",
+				RunServiceTaskLrt.Name,
+				"0 0 * * *",
+				new RunServiceTaskInputState
+				{
+					ServiceName = ServicesDefinitions.Search.ServiceName,
+					TaskSystemName = "RemoveDeletedProductsLrt"
+				})
 		];
 
 		var systemNames = defaults
 			.Select(x => x.JobSystemName)
 			.ToList();
 
-		var existingSystemNames = await context.JobSchedules
+		var existingSchedules = await context.JobSchedules
 			.AsNoTracking()
 			.Where(schedule => systemNames.Contains(schedule.JobSystemName))
-			.Select(schedule => schedule.JobSystemName)
+			.Select(schedule => new { schedule.JobSystemName, schedule.InputState })
 			.ToHashSetAsync();
 
 		var missingSchedules = defaults
-			.Where(schedule => !existingSystemNames.Contains(schedule.JobSystemName))
+			.Where(schedule => !existingSchedules.Contains(new { schedule.JobSystemName, schedule.InputState }))
 			.ToArray();
 
 		if (missingSchedules.Length == 0) return;

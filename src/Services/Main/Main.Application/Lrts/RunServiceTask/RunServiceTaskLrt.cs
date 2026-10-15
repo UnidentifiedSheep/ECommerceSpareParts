@@ -25,7 +25,9 @@ public sealed class RunServiceTaskLrt(
 	transactionService,
 	logger)
 {
-	public override string SystemName => nameof(RunServiceTaskLrt);
+	public const string Name = nameof(RunServiceTaskLrt);
+
+	public override string SystemName => Name;
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtServiceTaskRunNameMessage.Instance;
 
