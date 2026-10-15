@@ -56,6 +56,8 @@
     "lrt.document.generation.invalid.requester.id": "Идентификатор инициатора не может быть пустым.",
     "lrt.document.generation.invalid.request": "Не удалось прочитать запрос на генерацию документа.",
     "lrt.expired.documents.removal.name": "Удаление просроченных документов",
-    "lrt.expired.documents.removal.description": "Удаляет просроченные созданные документы из хранилища и их записи запросов."
+    "lrt.expired.documents.removal.description": "Удаляет просроченные созданные документы из хранилища и их записи запросов.",
+    "lrt.service.task.run.name": "Запуск задачи сервиса",
+    "lrt.service.task.run.description": "Отправляет запрос на выполнение задачи в указанном сервисе."
   }
 }

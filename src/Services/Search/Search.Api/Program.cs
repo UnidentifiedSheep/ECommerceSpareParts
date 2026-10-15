@@ -1,8 +1,10 @@
 using System.Reflection;
 using Abstractions;
+using Application.Common.Consumer;
 using Api.Common;
 using Api.Common.Extensions;
 using Carter;
+using Contracts.Tasks;
 using Internal.Integration.Di;
 using MassTransit;
 using RabbitMq.Extensions;
@@ -40,12 +42,22 @@ builder.Services.AddMassTransit(x =>
 	x.AddConsumer<ProductCharacteristicsUpdatedConsumer, ProductCharacteristicsUpdatedConsumerDefinition>();
 	x.AddConsumer<CatalogueCandidateUpdatedConsumer, CatalogueCandidateUpdatedConsumerDefinition>();
 	x.AddConsumer<CatalogueCandidateDeletedConsumer, CatalogueCandidateDeletedConsumerDefinition>();
+	x.AddConsumer<ServiceTaskRequestedConsumer>();
 
 	x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
 
 	x.UsingRabbitMq((context, cfg) =>
 	{
 		cfg.ConfigureRabbitMq(context);
+
+		cfg.ReceiveEndpoint("search-tasks", ep =>
+		{
+			ep.ConfigureConsumeTopology = false;
+			ep.ConcurrentMessageLimit = 1;
+			ep.PrefetchCount = 1;
+			ep.BindForService<ServiceTaskRequestedEvent>(ServicesDefinitions.Search);
+			ep.ConfigureConsumer<ServiceTaskRequestedConsumer>(context);
+		});
 
 		cfg.ReceiveEndpoint(
 			"search-queue",

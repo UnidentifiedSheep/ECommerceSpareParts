@@ -2,8 +2,10 @@ using Abstractions;
 using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Lrt;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NamedObject;
 using Search.Application.Configs;
 using Search.Application.Interfaces;
 using Search.Application.Services.IndexSynchronizers;
@@ -28,6 +30,7 @@ public static class ServiceProvider
 			typeof(CacheBehavior<,>));
 
 		services.RegisterProjectionProviders<ProducerIndexSynchronizer>();
+		services.RegisterNamedObject<ILrtNamedObject>(typeof(ServiceProvider).Assembly);
 		services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
 
 		return services;

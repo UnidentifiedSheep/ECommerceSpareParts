@@ -56,6 +56,8 @@
     "lrt.document.generation.invalid.requester.id": "İstek sahibi kimliği boş olamaz.",
     "lrt.document.generation.invalid.request": "Belge oluşturma isteği okunamadı.",
     "lrt.expired.documents.removal.name": "Süresi dolmuş belgeleri kaldırma",
-    "lrt.expired.documents.removal.description": "Süresi dolmuş oluşturulmuş belgeleri depolamadan ve bunlara ait istek kayıtlarını siler."
+    "lrt.expired.documents.removal.description": "Süresi dolmuş oluşturulmuş belgeleri depolamadan ve bunlara ait istek kayıtlarını siler.",
+    "lrt.service.task.run.name": "Servis görevi başlatma",
+    "lrt.service.task.run.description": "Belirtilen serviste bir görevin yürütülmesini ister."
   }
 }
