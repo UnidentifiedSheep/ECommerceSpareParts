@@ -7,9 +7,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
+using NamedObject.Core.Interfaces;
 using Search.Abstractions.Options;
 using Search.Application.Configs;
 using Search.Application.Interfaces;
+using Search.Application.NamedObjects;
 using Search.Application.Services.IndexSynchronizers;
 using Search.Entities;
 
@@ -38,6 +40,7 @@ public static class ServiceProvider
 			typeof(CacheBehavior<,>));
 
 		services.RegisterProjectionProviders<ProducerIndexSynchronizer>();
+		services.AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>();
 		services.RegisterNamedObject<ILrtNamedObject>(typeof(ServiceProvider).Assembly);
 		services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
 
