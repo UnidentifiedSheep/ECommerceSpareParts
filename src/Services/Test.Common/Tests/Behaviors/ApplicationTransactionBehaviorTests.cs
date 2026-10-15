@@ -6,6 +6,7 @@ using FluentAssertions;
 using MediatR;
 using Moq;
 using Persistence;
+using Tests.Stubs;
 
 namespace Tests.Tests.Behaviors;
 
@@ -75,6 +76,8 @@ public sealed class ApplicationTransactionBehaviorTests
 		public int Calls { get; private set; }
 
 		public TransactionalAttribute? Settings { get; private set; }
+
+		public IApplicationTransaction Create(TransactionalAttribute? settings = null) => new ApplicationTransactionStub(this, settings);
 
 		public async Task ExecuteAsync(
 			TransactionalAttribute? settings,

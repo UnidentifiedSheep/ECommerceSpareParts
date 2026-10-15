@@ -20,15 +20,16 @@ public sealed class ProductSynchronizationLrt(
 	IUnitOfWork unitOfWork,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<int, object>(
+	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<ProductSynchronizationInputState, int, object>(
 	jobRepository,
 	unitOfWork,
 	publisher,
 	transactionService,
 	logger)
 {
+	public const string Name = nameof(ProductSynchronizationLrt);
 
-	public override string SystemName => nameof(ProductSynchronizationLrt);
+	public override string SystemName => Name;
 
 	public override ILocalizableMessage NameLocalizationMessage =>
 		LrtProductSynchronizationNameMessage.Instance;
@@ -41,7 +42,7 @@ public sealed class ProductSynchronizationLrt(
 		int batchSize,
 		CancellationToken cancellationToken)
 	{
-		var query = productRepository.Query.AsNoTracking();
+		var query = productRepository.Query;
 		if (lastProcessedId is { } id)
 			query = query.Where(x => x.Id > id);
 
@@ -53,6 +54,6 @@ public sealed class ProductSynchronizationLrt(
 
 		return new SynchronizationPage<int, object>(
 			ids,
-			await eventProvider.GetEventsAsync(ids, ProductEventParts.All, cancellationToken));
+			await eventProvider.GetEventsAsync(ids, InputState.Parts, cancellationToken));
 	}
 }

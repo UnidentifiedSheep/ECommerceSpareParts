@@ -7,6 +7,8 @@ namespace Persistence.Services.UnitOfWork;
 
 public class EfUnitOfWorkBase(DbContext context) : IUnitOfWork
 {
+	public bool HasActiveTransaction => context.Database.CurrentTransaction is not null;
+
 	public IUnitOfWorkContext Context { get; } = new UnitOfWorkContext();
 
 	public async Task<T> ExecuteWithTransaction<T>(

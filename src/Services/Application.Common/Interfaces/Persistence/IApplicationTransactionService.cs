@@ -4,6 +4,8 @@ namespace Application.Common.Interfaces.Persistence;
 
 public interface IApplicationTransactionService
 {
+	IApplicationTransaction Create(TransactionalAttribute? settings = null);
+
 	Task ExecuteAsync(
 		TransactionalAttribute? settings,
 		Func<IApplicationTransactionContext, CancellationToken, Task> action,

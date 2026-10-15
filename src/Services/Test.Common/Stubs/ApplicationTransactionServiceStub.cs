@@ -13,6 +13,8 @@ public sealed class ApplicationTransactionServiceStub(
 	private readonly IApplicationTransactionContext _context =
 		new TestApplicationTransactionContext(unitOfWork, repositories, integrationEventScope);
 
+	public IApplicationTransaction Create(TransactionalAttribute? settings = null) => new ApplicationTransactionStub(this, settings);
+
 	public Task ExecuteAsync(
 		TransactionalAttribute? settings,
 		Func<IApplicationTransactionContext, CancellationToken, Task> action,

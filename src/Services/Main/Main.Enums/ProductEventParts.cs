@@ -1,4 +1,4 @@
-namespace Main.Application.Interfaces.Products;
+namespace Main.Enums;
 
 [Flags]
 public enum ProductEventParts
