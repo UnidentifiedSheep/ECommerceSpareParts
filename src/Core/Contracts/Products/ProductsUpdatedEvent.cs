@@ -1,6 +1,7 @@
-﻿namespace Contracts.Products;
+namespace Contracts.Products;
 
 public record ProductsUpdatedEvent
 {
-	public required IReadOnlyList<int> Ids { get; init; }
+	public required DateTime UpdatedAt { get; init; }
+	public required IReadOnlyList<ProductSnapshot> Products { get; init; }
 }

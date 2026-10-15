@@ -27,8 +27,7 @@ public static class ServiceProvider
 			typeof(DbValidationBehavior<,>),
 			typeof(CacheBehavior<,>));
 
-		services.RegisterProjectionProviders<ProductIndexSynchronizer>();
-		services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
+		services.RegisterProjectionProviders<ProducerIndexSynchronizer>();
 		services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
 
 		return services;

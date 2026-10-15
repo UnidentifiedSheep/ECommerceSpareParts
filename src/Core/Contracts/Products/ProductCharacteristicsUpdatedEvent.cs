@@ -2,5 +2,6 @@ namespace Contracts.Products;
 
 public record ProductCharacteristicsUpdatedEvent
 {
-	public required IReadOnlyList<int> Ids { get; init; }
+	public required DateTime UpdatedAt { get; init; }
+	public required IReadOnlyList<ProductCharacteristicsSnapshot> Products { get; init; }
 }

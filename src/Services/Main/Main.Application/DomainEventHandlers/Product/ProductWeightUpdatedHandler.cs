@@ -1,22 +1,19 @@
 using Application.Common.Abstractions;
-using Application.Common.Interfaces.Events;
+using Main.Application.Interfaces.Products;
 using Application.Common.Services.Events;
-using Contracts.Products;
 using Main.Entities.DomainEvents.Product;
 
 namespace Main.Application.DomainEventHandlers.Product;
 
-public class ProductWeightUpdatedHandler(IIntegrationEventScope integrationEventScope)
+public class ProductWeightUpdatedHandler(IProductEventPublisher eventPublisher)
 	: BatchableDomainEventHandler<ProductWeightUpdatedDomainEvent>
 {
-	public override Task Handle(
+	public override async Task Handle(
 		Batch<ProductWeightUpdatedDomainEvent> notification,
 		CancellationToken cancellationToken)
 	{
 		var ids = notification.Items.Select(x => x.ProductId).Distinct().ToList();
 		if (ids.Count > 0)
-			integrationEventScope.Add(new ProductsUpdatedEvent { Ids = ids });
-
-		return Task.CompletedTask;
+			await eventPublisher.PublishAsync(ids, ProductEventParts.Weight, cancellationToken);
 	}
 }

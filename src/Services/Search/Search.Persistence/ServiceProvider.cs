@@ -38,7 +38,6 @@ public static class ServiceProvider
 		services.AddSingleton<IProductRepository, ProductRepository>();
 		services.AddSingleton<IProducerRepository, ProducerRepository>();
 		services.AddSingleton<ICatalogueCandidateRepository, CatalogueCandidateRepository>();
-		services.AddSingleton<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();
 		services.AddSingleton<IProducerSearchDocumentProvider, MainProducerSearchDocumentProvider>();
 
 		services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();

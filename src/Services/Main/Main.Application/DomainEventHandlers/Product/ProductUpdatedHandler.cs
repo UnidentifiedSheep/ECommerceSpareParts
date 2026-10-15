@@ -1,14 +1,14 @@
 using Application.Common.Abstractions;
-using Application.Common.Interfaces.Events;
+using Main.Application.Interfaces.Products;
 using Application.Common.Services.Events;
-using Contracts.Products;
 using Main.Application.Interfaces.Cache;
 using Main.Entities.DomainEvents.Product;
+using Main.Enums;
 
 namespace Main.Application.DomainEventHandlers.Product;
 
 public class ProductUpdatedHandler(
-	IIntegrationEventScope integrationEventScope,
+	IProductEventPublisher eventPublisher,
 	IProductCacheInvalidator productCacheInvalidator) : BatchableDomainEventHandler<ProductUpdatedDomainEvent>
 {
 	public override async Task Handle(
@@ -17,7 +17,7 @@ public class ProductUpdatedHandler(
 	{
 		var ids = notification.Items.Select(x => x.Id).Distinct().ToList();
 		if (ids.Count > 0)
-			integrationEventScope.Add(new ProductsUpdatedEvent { Ids = ids });
+			await eventPublisher.PublishAsync(ids, ProductEventParts.Core, cancellationToken);
 
 		await productCacheInvalidator.InvalidateProductsAsync(ids);
 	}

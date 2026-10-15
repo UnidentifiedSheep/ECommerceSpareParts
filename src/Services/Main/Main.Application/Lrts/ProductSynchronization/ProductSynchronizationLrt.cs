@@ -1,11 +1,12 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Contracts.Products;
+using Main.Application.Interfaces.Products;
 using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities;
 using Main.Entities.Product;
+using Main.Enums;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,10 +16,11 @@ namespace Main.Application.Lrts.ProductSynchronization;
 public sealed class ProductSynchronizationLrt(
 	IRepository<Job, Guid> jobRepository,
 	IReadRepository<Product, int> productRepository,
+	IProductEventProvider eventProvider,
 	IUnitOfWork unitOfWork,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<int, ProductsUpdatedEvent>(
+	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<int, object>(
 	jobRepository,
 	unitOfWork,
 	publisher,
@@ -34,7 +36,7 @@ public sealed class ProductSynchronizationLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtProductSynchronizationDescriptionMessage.Instance;
 
-	protected override async Task<SynchronizationPage<int, ProductsUpdatedEvent>> GetPageAsync(
+	protected override async Task<SynchronizationPage<int, object>> GetPageAsync(
 		int? lastProcessedId,
 		int batchSize,
 		CancellationToken cancellationToken)
@@ -49,8 +51,8 @@ public sealed class ProductSynchronizationLrt(
 			.Take(batchSize)
 			.ToListAsync(cancellationToken);
 
-		return new SynchronizationPage<int, ProductsUpdatedEvent>(
+		return new SynchronizationPage<int, object>(
 			ids,
-			ids.Count == 0 ? [] : [new ProductsUpdatedEvent { Ids = ids }]);
+			await eventProvider.GetEventsAsync(ids, ProductEventParts.All, cancellationToken));
 	}
 }

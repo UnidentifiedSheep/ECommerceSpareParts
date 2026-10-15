@@ -42,7 +42,7 @@ public sealed class ProductRepositorySearchTests
 			"bosch123",
 			new HashSet<SearchMatchType>
 			{
-				SearchMatchType.Exact
+				SearchMatchType.Exact, SearchMatchType.StartsWith, SearchMatchType.Contains
 			},
 			new HashSet<SearchMatchType>
 			{
@@ -53,6 +53,8 @@ public sealed class ProductRepositorySearchTests
 
 		result.Total.Should().Be(0);
 		requestBody().Should().Contain("\"normalizedSku\"");
+		requestBody().Should().Contain("\"normalizedSku.prefix\"");
+		requestBody().Should().Contain("\"normalizedSku.contains\"");
 		requestBody().Should().Contain("\"wildcard\"");
 		requestBody().Should().Contain("\"name.keyword\"");
 		requestBody().Should().NotContain("\"name.prefix\"");

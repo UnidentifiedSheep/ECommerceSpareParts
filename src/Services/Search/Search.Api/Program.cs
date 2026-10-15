@@ -35,7 +35,9 @@ builder.Services.AddMassTransit(x =>
 {
 	x.AddConsumer<ProducerUpdatedConsumer, ProducerUpdatedConsumerDefinition>();
 	x.AddConsumer<ProductUpdatedConsumer, ProductUpdatedConsumerDefinition>();
-	x.AddConsumer<ProductDeletedConsumer, ProductDeletedConsumerDefinition>();
+	x.AddConsumer<ProductWeightUpdatedConsumer, ProductWeightUpdatedConsumerDefinition>();
+	x.AddConsumer<ProductDimensionsUpdatedConsumer, ProductDimensionsUpdatedConsumerDefinition>();
+	x.AddConsumer<ProductCharacteristicsUpdatedConsumer, ProductCharacteristicsUpdatedConsumerDefinition>();
 	x.AddConsumer<CatalogueCandidateUpdatedConsumer, CatalogueCandidateUpdatedConsumerDefinition>();
 	x.AddConsumer<CatalogueCandidateDeletedConsumer, CatalogueCandidateDeletedConsumerDefinition>();
 
@@ -52,7 +54,9 @@ builder.Services.AddMassTransit(x =>
 				ep.Durable = true;
 
 				ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
-				ep.ConfigureConsumer<ProductDeletedConsumer>(context);
+				ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
+				ep.ConfigureConsumer<ProductDimensionsUpdatedConsumer>(context);
+				ep.ConfigureConsumer<ProductCharacteristicsUpdatedConsumer>(context);
 				ep.ConfigureConsumer<CatalogueCandidateUpdatedConsumer>(context);
 				ep.ConfigureConsumer<CatalogueCandidateDeletedConsumer>(context);
 
