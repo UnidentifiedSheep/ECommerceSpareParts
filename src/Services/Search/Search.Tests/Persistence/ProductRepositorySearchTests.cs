@@ -242,6 +242,7 @@ public sealed class ProductRepositorySearchTests
 		return (new ProductRepository(
 			options.Object,
 			client,
-			initializer.Object), () => requestBody);
+			initializer.Object,
+			System.Array.Empty<Search.Persistence.Interfaces.IProductSearchFilterProvider>()), () => requestBody);
 	}
 }

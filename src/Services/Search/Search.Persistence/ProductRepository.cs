@@ -20,7 +20,8 @@ namespace Search.Persistence;
 public class ProductRepository(
 	IOptionsMonitor<OpenSearchOptions> options,
 	IOpenSearchClient client,
-	IIndexInitializer<Product> idxInitializer) : OpenSearchRepository<Product, int>(
+	IIndexInitializer<Product> idxInitializer,
+	IEnumerable<IProductSearchFilterProvider> filterProviders) : OpenSearchRepository<Product, int>(
 		client,
 		idxInitializer,
 		() => options.CurrentValue.IndexOptions.Products,
@@ -65,7 +66,9 @@ public class ProductRepository(
 		}, cancellationToken);
 		EnsureResponseSucceeded(response, "update product fields in");
 		if (response.Errors)
-			throw new InvalidOperationException(string.Join("; ", response.ItemsWithErrors.Select(x => $"{x.Id}: {x.Error?.Reason}")));
+			throw new InvalidOperationException(
+				string.Join("; ",
+					response.ItemsWithErrors.Select(x => $"{x.Id}: {x.Error?.Reason}")));
 	}
 
 	public async Task<SearchResult<Product>> Search(
@@ -73,6 +76,15 @@ public class ProductRepository(
 		CancellationToken cancellationToken = default)
 	{
 		var index = await GetIndex(cancellationToken);
+		var filters = new List<QueryContainer>
+		{
+			new QueryContainerDescriptor<Product>()
+				.Term(term => term
+					.Field(product => product.ReadinessStatus)
+					.Value((int)ProductReadinessStatus.Ready))
+		};
+		if (criteria.ProductCriteria is { } productCriteria)
+			filters.AddRange(filterProviders.SelectMany(provider => provider.Build(productCriteria)));
 		Field normalizedSkuField = Client.Infer.Field(Infer.Field<Product>(product => product.NormalizedSku));
 		Field nameField = Client.Infer.Field(Infer.Field<Product>(product => product.Name));
 		var response = await Client.SearchAsync<Product>(
@@ -83,7 +95,7 @@ public class ProductRepository(
 				.TrackTotalHits()
 				.SortBySearchRelevance(criteria.SortBy, product => product.Id)
 				.Query(query => query.Bool(boolean => boolean
-					.Filter(filter => filter.Term(term => term.Field(product => product.ReadinessStatus).Value((int)ProductReadinessStatus.Ready)))
+					.Filter(filters.ToArray())
 					.Must(filter => CatalogueSearchQueryBuilder.Build(
 					filter,
 					criteria,

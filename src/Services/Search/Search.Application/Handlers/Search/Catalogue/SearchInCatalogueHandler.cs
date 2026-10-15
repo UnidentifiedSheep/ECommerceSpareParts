@@ -7,6 +7,7 @@ using Search.Application.Dtos.Products;
 using Search.Application.Interfaces.CatalogueCandidate;
 using Search.Application.Interfaces.Product;
 using Search.Application.Models.CatalogueSearch;
+using Search.Application.Models.CatalogueSearch.Criteria;
 using Search.Enums;
 using CatalogueCandidateDocument = Search.Entities.CatalogueCandidate;
 using ProductDocument = Search.Entities.Product;
@@ -24,7 +25,8 @@ public sealed record SearchInCatalogueQuery(
 	IReadOnlyCollection<string> CatalogueCandidateSortBy,
 	CandidateMappingStatus CandidateMappingStatus = CandidateMappingStatus.Unmapped,
 	bool IncludeHighlights = false,
-	IReadOnlyCollection<int>? ProductGroupIds = null) : IQuery<SearchInCatalogueResult>;
+	IReadOnlyCollection<int>? ProductGroupIds = null,
+	ProductSearchCriteria? ProductCriteria = null) : IQuery<SearchInCatalogueResult>;
 
 public sealed record SearchInCatalogueSection<T>(IReadOnlyCollection<T> Items, long Total);
 
@@ -60,7 +62,8 @@ public sealed class SearchInCatalogueHandler(
 			? productRepository.Search(
 				commonCriteria with
 				{
-					SortBy = request.ProductSortBy
+					SortBy = request.ProductSortBy,
+					ProductCriteria = request.ProductCriteria
 				},
 				cancellationToken)
 			: Task.FromResult(new SearchResult<ProductDocument>([], 0));

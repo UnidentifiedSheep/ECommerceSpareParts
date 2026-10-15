@@ -3,6 +3,7 @@ using Application.Common.Validators;
 using FluentValidation;
 using Search.Abstractions;
 using Search.Enums;
+using Search.Application.Validators.CatalogueSearch;
 
 namespace Search.Application.Handlers.Search.Catalogue;
 
@@ -45,6 +46,14 @@ public sealed class SearchInCatalogueValidation : AbstractValidator<SearchInCata
 		RuleFor(x => x.ProductGroupIds)
 			.Must(ids => ids is null || ids.Count <= 100)
 			.WithLocalizableError(new CatalogueSearchProductGroupCountMaxMessage().WithCount(100));
+
+		RuleFor(x => x.ProductCriteria!)
+			.SetValidator(new ProductSearchCriteriaValidator())
+			.When(x => x.ProductCriteria is not null);
+
+		RuleFor(x => x)
+			.Must(x => x.ProductCriteria is null || x.Targets.Contains(SearchTarget.Products))
+			.WithLocalizableError(CatalogueSearchCriteriaProductTargetRequiredMessage.Instance);
 
 		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 	}

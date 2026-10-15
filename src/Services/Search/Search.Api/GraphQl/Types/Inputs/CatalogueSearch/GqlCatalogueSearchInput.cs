@@ -1,6 +1,7 @@
 using GraphQL.Common.Types;
 using HotChocolate;
 using Search.Enums;
+using Search.Api.GraphQl.Types.Inputs.CatalogueSearch.Criteria;
 
 namespace Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
 
@@ -14,10 +15,10 @@ public record GqlCatalogueSearchInput
 	public required IReadOnlyCollection<SearchTarget> Targets { get; init; }
 
 	[GraphQLName("skuModes")]
-	public required IReadOnlyCollection<SearchMatchType> SkuModes { get; init; }
+	public IReadOnlyCollection<SearchMatchType>? SkuModes { get; init; }
 
 	[GraphQLName("nameModes")]
-	public required IReadOnlyCollection<SearchMatchType> NameModes { get; init; }
+	public IReadOnlyCollection<SearchMatchType>? NameModes { get; init; }
 
 	[GraphQLName("producerIds")]
 	public IReadOnlyCollection<int>? ProducerIds { get; init; } = [];
@@ -36,6 +37,9 @@ public record GqlCatalogueSearchInput
 
 	[GraphQLName("catalogueCandidateSortBy")]
 	public IReadOnlyCollection<GqlSortBy>? CatalogueCandidateSortBy { get; init; }
+
+	[GraphQLName("productCriteria")]
+	public GqlProductSearchCriteriaInput? ProductCriteria { get; init; }
 
 	[GraphQLName("includeHighlights")]
 	public bool? IncludeHighlights { get; init; }

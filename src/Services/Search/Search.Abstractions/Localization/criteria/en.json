@@ -1,0 +1,16 @@
+{
+  "culture": "en",
+  "messages": {
+    "catalogue.search.criteria.product.target.required": "Product criteria require the Products search target.",
+    "catalogue.search.criteria.range.invalid": "Specify at least one range bound, without conflicting or reversed bounds.",
+    "catalogue.search.criteria.unit.invalid": "The measurement unit is invalid.",
+    "catalogue.search.criteria.dimensions.required": "Specify at least one length, width, height or volume range.",
+    "catalogue.search.criteria.characteristic.id.invalid": "Characteristic id must be positive.",
+    "catalogue.search.criteria.characteristic.operation.required": "Specify exactly one of values, numericRange or exists for each characteristic.",
+    "catalogue.search.criteria.characteristic.count.max": "No more than {Count|int} characteristic criteria can be specified.",
+    "catalogue.search.criteria.characteristic.duplicate": "Each characteristic may be specified only once.",
+    "catalogue.search.criteria.values.count.invalid": "Specify between one and {Count|int} characteristic values.",
+    "catalogue.search.criteria.value.required": "A characteristic filter value must not be empty.",
+    "catalogue.search.criteria.value.max.length": "A characteristic filter value must not exceed {Count|int} characters."
+  }
+}

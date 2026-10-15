@@ -1,0 +1,16 @@
+{
+  "culture": "tr",
+  "messages": {
+    "catalogue.search.criteria.product.target.required": "Ürün ölçütleri Products arama hedefini gerektirir.",
+    "catalogue.search.criteria.range.invalid": "Çakışan veya ters sınırlar olmadan en az bir aralık sınırı belirtin.",
+    "catalogue.search.criteria.unit.invalid": "Ölçü birimi geçersiz.",
+    "catalogue.search.criteria.dimensions.required": "En az bir uzunluk, genişlik, yükseklik veya hacim aralığı belirtin.",
+    "catalogue.search.criteria.characteristic.id.invalid": "Özellik kimliği pozitif olmalıdır.",
+    "catalogue.search.criteria.characteristic.operation.required": "Her özellik için values, numericRange veya exists koşullarından yalnızca birini belirtin.",
+    "catalogue.search.criteria.characteristic.count.max": "En fazla {Count|int} özellik ölçütü belirtilebilir.",
+    "catalogue.search.criteria.characteristic.duplicate": "Her özellik yalnızca bir kez belirtilebilir.",
+    "catalogue.search.criteria.values.count.invalid": "Bir ile {Count|int} arasında özellik değeri belirtin.",
+    "catalogue.search.criteria.value.required": "Özellik filtresi değeri boş olamaz.",
+    "catalogue.search.criteria.value.max.length": "Özellik filtresi değeri {Count|int} karakteri aşmamalıdır."
+  }
+}

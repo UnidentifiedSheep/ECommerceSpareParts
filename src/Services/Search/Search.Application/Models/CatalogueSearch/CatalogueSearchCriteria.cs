@@ -1,6 +1,7 @@
 using Abstractions.Models;
 using Application.Common.Models;
 using Search.Enums;
+using Search.Application.Models.CatalogueSearch.Criteria;
 
 namespace Search.Application.Models.CatalogueSearch;
 
@@ -23,4 +24,6 @@ public sealed record CatalogueSearchCriteria
 	public IReadOnlyCollection<string> SortBy { get; init; } = [];
 
 	public bool IncludeHighlights { get; init; }
+
+	public ProductSearchCriteria? ProductCriteria { get; init; }
 }

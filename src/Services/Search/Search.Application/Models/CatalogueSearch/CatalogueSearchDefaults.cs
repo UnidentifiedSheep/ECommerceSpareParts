@@ -20,6 +20,7 @@ public static class CatalogueSearchDefaults
 
 	public static readonly IReadOnlySet<SearchTarget> Targets = new HashSet<SearchTarget>
 	{
-		SearchTarget.Products, SearchTarget.CatalogueCandidates
+		SearchTarget.Products,
+		SearchTarget.CatalogueCandidates
 	};
 }
