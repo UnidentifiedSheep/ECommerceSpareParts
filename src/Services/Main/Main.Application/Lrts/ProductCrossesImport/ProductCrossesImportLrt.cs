@@ -48,8 +48,6 @@ public class ProductCrossesImportLrt(
 {
 	private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
-	protected override int BatchSize => 10_000;
-
 	public override string SystemName => nameof(ProductCrossesImportLrt);
 
 	public override ILocalizableMessage NameLocalizationMessage =>
