@@ -19,6 +19,7 @@ internal sealed class PostgresTransactionExceptionClassifier : ITransactionExcep
 			PostgresErrorCodes.CheckViolation => TransactionErrorKind.CheckConstraintViolation,
 			PostgresErrorCodes.SerializationFailure => TransactionErrorKind.ConcurrencyConflict,
 			PostgresErrorCodes.DeadlockDetected => TransactionErrorKind.Deadlock,
+			PostgresErrorCodes.LockNotAvailable => TransactionErrorKind.LockUnavailable,
 			_ when FindException<DbUpdateConcurrencyException>(exception) is not null => TransactionErrorKind.ConcurrencyConflict,
 			_ => TransactionErrorKind.Unknown
 		};

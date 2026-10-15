@@ -13,7 +13,9 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddUnitOfWork<T>(this IServiceCollection collection) where T : DbContext
 	{
-		collection.TryAddSingleton<ITransactionExceptionClassifier, PostgresTransactionExceptionClassifier>();
+		collection.TryAddSingleton<PostgresTransactionExceptionClassifier>();
+		collection.TryAddSingleton<ITransactionExceptionClassifier>(provider =>
+			provider.GetRequiredService<PostgresTransactionExceptionClassifier>());
 		collection.AddScoped<IUnitOfWork, EfUnitOfWork<T>>();
 		collection.AddScoped<IContextMetadata, ContextMetadata<T>>();
 		collection.AddScoped<IQueryableExtensions, QueryableExtensions>();

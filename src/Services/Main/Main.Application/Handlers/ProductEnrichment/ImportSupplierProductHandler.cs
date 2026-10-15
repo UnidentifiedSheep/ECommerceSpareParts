@@ -18,7 +18,7 @@ namespace Main.Application.Handlers.ProductEnrichment;
 	IsolationLevel.ReadCommitted,
 	40,
 	3,
-	"23505")]
+	TransactionalAttribute.DefaultRetryErrors | TransactionErrorKind.UniqueConstraintViolation)]
 public record ImportSupplierProductCommand(
 	Supplier Supplier,
 	IReadOnlyCollection<ContractSupplierProductDto> Products) : ICommand;

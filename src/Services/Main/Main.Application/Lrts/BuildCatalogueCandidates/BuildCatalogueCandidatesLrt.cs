@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
 using Domain.CommonEntities.Job;
+using Enums;
 using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
@@ -36,7 +37,7 @@ public class BuildCatalogueCandidatesLrt(
 		IsolationLevel.ReadCommitted,
 		20,
 		2,
-		"23505");
+		TransactionalAttribute.DefaultRetryErrors | TransactionErrorKind.UniqueConstraintViolation);
 
 	public override string SystemName => LrtSystemName;
 

@@ -1,11 +1,13 @@
 using System.Data;
+using Enums;
 
 namespace Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
 public partial class TransactionalAttribute : Attribute
 {
-	private static readonly string[] DefaultPgqlErrors = ["40001", "40P01", "55P03"];
+	public const TransactionErrorKind DefaultRetryErrors =
+		TransactionErrorKind.ConcurrencyConflict | TransactionErrorKind.Deadlock | TransactionErrorKind.LockUnavailable;
 
 	/// <param name="isolationLevel">Уровень изоляции транзакции</param>
 	/// <param name="retryDelayMs">Задержка перед повторением не удавшейся транзакции</param>
@@ -15,12 +17,12 @@ public partial class TransactionalAttribute : Attribute
 		IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
 		int retryDelayMs = 0,
 		int retryCount = 0,
-		params string[] retryErrors)
+		TransactionErrorKind retryErrors = DefaultRetryErrors)
 	{
 		IsolationLevel = isolationLevel;
 		RetryDelayMs = retryDelayMs;
 		RetryCount = retryCount;
-		RetryErrors = retryErrors.Length == 0 ? DefaultPgqlErrors : retryErrors.Union(DefaultPgqlErrors);
+		RetryErrors = retryErrors;
 	}
 
 	public IsolationLevel IsolationLevel { get; }
@@ -29,7 +31,7 @@ public partial class TransactionalAttribute : Attribute
 
 	public int RetryCount { get; }
 
-	public IEnumerable<string> RetryErrors { get; }
+	public TransactionErrorKind RetryErrors { get; }
 
 	public static TransactionalAttribute ReadCommitted(int delay, int retryCount)
 	{

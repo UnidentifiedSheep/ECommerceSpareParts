@@ -10,5 +10,6 @@ public enum TransactionErrorKind
 	NotNullViolation = 1 << 3,
 	CheckConstraintViolation = 1 << 4,
 	ConcurrencyConflict = 1 << 5,
-	Deadlock = 1 << 6
+	Deadlock = 1 << 6,
+	LockUnavailable = 1 << 7
 }

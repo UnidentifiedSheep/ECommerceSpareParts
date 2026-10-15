@@ -5,7 +5,7 @@ using Persistence.TransactionBuilder;
 
 namespace Persistence.Services.UnitOfWork;
 
-public class EfUnitOfWorkBase(DbContext context) : IUnitOfWork
+public class EfUnitOfWorkBase(DbContext context, ITransactionExceptionClassifier exceptionClassifier) : IUnitOfWork
 {
 	public bool HasActiveTransaction => context.Database.CurrentTransaction is not null;
 
@@ -17,9 +17,9 @@ public class EfUnitOfWorkBase(DbContext context) : IUnitOfWork
 		CancellationToken cancellationToken = default)
 	{
 		return await context
-			.WithIsolationLevel(settings.IsolationLevel)
+			.WithIsolationLevel(settings.IsolationLevel, exceptionClassifier)
 			.WithRetries(settings.RetryCount)
-			.AddRetryPgErrorKey(settings.RetryErrors)
+			.WithRetryOn(settings.RetryErrors)
 			.WithRetryDelay(TimeSpan.FromMilliseconds(settings.RetryDelayMs))
 			.ExecuteWithTransaction(action, cancellationToken);
 	}
@@ -30,8 +30,8 @@ public class EfUnitOfWorkBase(DbContext context) : IUnitOfWork
 		CancellationToken cancellationToken = default)
 	{
 		await context
-			.WithIsolationLevel(settings.IsolationLevel)
-			.AddRetryPgErrorKey(settings.RetryErrors)
+			.WithIsolationLevel(settings.IsolationLevel, exceptionClassifier)
+			.WithRetryOn(settings.RetryErrors)
 			.WithRetries(settings.RetryCount)
 			.WithRetryDelay(TimeSpan.FromMilliseconds(settings.RetryDelayMs))
 			.ExecuteWithTransaction(action, cancellationToken);

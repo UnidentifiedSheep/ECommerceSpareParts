@@ -1,15 +1,18 @@
 using System.Data;
 using Abstractions.Interfaces;
+using Application.Common.Interfaces.Persistence;
+using Attributes;
+using Enums;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
 namespace Persistence.TransactionBuilder;
 
-public class TransactionConfig(DbContext context) : ICustomTransaction
+public class TransactionConfig(DbContext context, ITransactionExceptionClassifier exceptionClassifier) : ICustomTransaction
 {
 	private static readonly Dictionary<string, TransactionDefaultSettings> DefaultSettings = new();
 
-	private readonly HashSet<string> _retryOn = [];
+	private TransactionErrorKind _retryOn = TransactionalAttribute.DefaultRetryErrors;
 
 	public int RetriesCount { get; private set; }
 
@@ -45,13 +48,13 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
 		WithRetryDelay(defaultSettings.RetryDelay)
 			.WithIsolationLevel(defaultSettings.IsolationLevel)
 			.WithRetries(defaultSettings.RetriesCount)
-			.AddRetryPgErrorKey(defaultSettings.RetryOn);
+			.WithRetryOn(defaultSettings.RetryOn);
 		return this;
 	}
 
-	public ICustomTransaction AddRetryPgErrorKey(IEnumerable<string> keys)
+	public ICustomTransaction WithRetryOn(TransactionErrorKind errors)
 	{
-		_retryOn.UnionWith(keys);
+		_retryOn = errors;
 		return this;
 	}
 
@@ -101,8 +104,7 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
 	}
 
 	private bool IsRetryable(Exception exception) =>
-		exception is DbUpdateConcurrencyException ||
-		PostgresTransactionExceptionClassifier.FindPostgresException(exception) is { } postgres && _retryOn.Contains(postgres.SqlState);
+		(_retryOn & exceptionClassifier.Classify(exception).Kind) != TransactionErrorKind.None;
 
 	public static void AddDefaultSettings(string variant, TransactionDefaultSettings defaultSettings) =>
 		DefaultSettings.Add(variant, defaultSettings);

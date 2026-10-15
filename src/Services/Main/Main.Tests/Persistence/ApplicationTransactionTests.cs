@@ -1,17 +1,56 @@
 using Application.Common.Interfaces.Persistence;
+using Application.Common.Models.Persistence;
 using Attributes;
 using Enums;
 using FluentAssertions;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Npgsql;
+using Persistence.Services.UnitOfWork;
 using Tests.TestContainers.Combined;
 
 namespace Tests.Persistence;
 
 public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
+	[Fact]
+	public void Classifier_ConcreteTypeAndInterfaceResolveToTheSameSingleton()
+	{
+		var classifier = Scope.ServiceProvider.GetRequiredService<ITransactionExceptionClassifier>();
+		var concrete = Scope.ServiceProvider.GetRequiredService(classifier.GetType());
+		using var otherScope = Sp.CreateScope();
+
+		concrete.Should().BeSameAs(classifier);
+		otherScope.ServiceProvider.GetRequiredService<ITransactionExceptionClassifier>().Should().BeSameAs(classifier);
+		otherScope.ServiceProvider.GetRequiredService(classifier.GetType()).Should().BeSameAs(classifier);
+	}
+
+	[Fact]
+	public async Task UnitOfWork_RetriesUsingTheInjectedClassifier()
+	{
+		var failure = new InvalidOperationException("custom classified failure");
+		var classifier = new Mock<ITransactionExceptionClassifier>();
+		classifier.Setup(value => value.Classify(failure))
+			.Returns(new TransactionError(failure, TransactionErrorKind.ConcurrencyConflict));
+		var unitOfWork = new EfUnitOfWorkBase(Context, classifier.Object);
+		var attempts = 0;
+
+		var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => unitOfWork.ExecuteWithTransaction<int>(
+			new TransactionalAttribute(retryCount: 2, retryErrors: TransactionErrorKind.ConcurrencyConflict),
+			() =>
+			{
+				attempts++;
+				return Task.FromException<int>(failure);
+			}, CancellationToken));
+
+		exception.Should().BeSameAs(failure);
+		attempts.Should().Be(3);
+		classifier.Verify(value => value.Classify(failure), Times.Exactly(2));
+		Context.Database.CurrentTransaction.Should().BeNull();
+	}
+
 	[Theory]
 	[InlineData(false)]
 	[InlineData(true)]
@@ -100,6 +139,63 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 		await Context.Database.ExecuteSqlRawAsync("SELECT 1", CancellationToken);
 	}
 
+	[Theory]
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict, PostgresErrorCodes.UniqueViolation, 3)]
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict, PostgresErrorCodes.SerializationFailure, 3)]
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict, PostgresErrorCodes.ForeignKeyViolation, 1)]
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict, PostgresErrorCodes.DeadlockDetected, 1)]
+	[InlineData(TransactionErrorKind.None, PostgresErrorCodes.SerializationFailure, 1)]
+	[InlineData(TransactionalAttribute.DefaultRetryErrors, PostgresErrorCodes.DeadlockDetected, 3)]
+	[InlineData(TransactionalAttribute.DefaultRetryErrors, PostgresErrorCodes.LockNotAvailable, 3)]
+	[InlineData(TransactionalAttribute.DefaultRetryErrors, PostgresErrorCodes.UniqueViolation, 1)]
+	public async Task RetryMask_OnlyRetriesMatchingProviderErrors(TransactionErrorKind retryErrors, string sqlState, int expectedAttempts)
+	{
+		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var settings = new TransactionalAttribute(retryCount: 2, retryErrors: retryErrors);
+		var failure = new PostgresException("failed", "ERROR", "ERROR", sqlState);
+		var attempts = 0;
+		var handled = 0;
+
+		var exception = await Assert.ThrowsAsync<PostgresException>(() => service.Create(settings)
+			.OnException(_ =>
+			{
+				Context.Database.CurrentTransaction.Should().BeNull();
+				handled++;
+			})
+			.ExecuteAsync<int>(async (_, ct) =>
+			{
+				attempts++;
+				await Context.Database.ExecuteSqlRawAsync("SELECT 1", ct);
+				throw failure;
+			}, CancellationToken));
+
+		exception.Should().BeSameAs(failure);
+		attempts.Should().Be(expectedAttempts);
+		handled.Should().Be(1);
+	}
+
+	[Theory]
+	[InlineData(TransactionErrorKind.ConcurrencyConflict, 3)]
+	[InlineData(TransactionErrorKind.None, 1)]
+	public async Task RetryMask_ControlsEfConcurrencyRetries(TransactionErrorKind retryErrors, int expectedAttempts)
+	{
+		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var settings = new TransactionalAttribute(retryCount: 2, retryErrors: retryErrors);
+		var failure = new DbUpdateConcurrencyException("conflict");
+		var attempts = 0;
+
+		var exception = await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => service.Create(settings)
+			.ExecuteAsync<int>((_, _) =>
+			{
+				attempts++;
+				return Task.FromException<int>(failure);
+			}, CancellationToken));
+
+		exception.Should().BeSameAs(failure);
+		attempts.Should().Be(expectedAttempts);
+		Context.Database.CurrentTransaction.Should().BeNull();
+	}
+
 	[Fact]
 	public async Task Cancellation_RollsBackDatabaseWritesWithoutInvokingTheErrorHandler()
 	{
@@ -129,6 +225,7 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	[InlineData(PostgresErrorCodes.CheckViolation, TransactionErrorKind.CheckConstraintViolation)]
 	[InlineData(PostgresErrorCodes.SerializationFailure, TransactionErrorKind.ConcurrencyConflict)]
 	[InlineData(PostgresErrorCodes.DeadlockDetected, TransactionErrorKind.Deadlock)]
+	[InlineData(PostgresErrorCodes.LockNotAvailable, TransactionErrorKind.LockUnavailable)]
 	[InlineData(PostgresErrorCodes.DivisionByZero, TransactionErrorKind.Unknown)]
 	[InlineData("ZZ000", TransactionErrorKind.Unknown)]
 	public void Classifier_FindsWrappedProviderErrorsAndKeepsTheOriginalException(string sqlState, TransactionErrorKind expected)

@@ -1,4 +1,5 @@
 using System.Data;
+using Enums;
 
 namespace Persistence.Interfaces;
 
@@ -12,7 +13,7 @@ public interface ICustomTransaction
 
 	ICustomTransaction WithDefaultSettings(string variant);
 
-	ICustomTransaction AddRetryPgErrorKey(IEnumerable<string> keys);
+	ICustomTransaction WithRetryOn(TransactionErrorKind errors);
 
 	Task<T> ExecuteWithTransaction<T>(Func<Task<T>> action, CancellationToken cancellationToken = default);
 
