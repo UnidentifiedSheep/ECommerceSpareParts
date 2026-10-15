@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -8,13 +9,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.Base.Synchronization;
 
-public abstract class SynchronizationLrtBase<TId, TEvent>(
+public abstract class SynchronizationLrtBase<TInputState, TId, TEvent>(
 	IRepository<Job, Guid> jobRepository,
 	IUnitOfWork unitOfWork,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	ILogger logger) : LrtBase<NoneInputState, SynchronizationState<TId>>(
+	ILogger logger) : LrtBase<TInputState, SynchronizationState<TId>>(
 	jobRepository, unitOfWork, publisher, transactionService, logger)
+	where TInputState : class, IInputState
 	where TId : struct
 	where TEvent : class
 {
@@ -26,7 +28,7 @@ public abstract class SynchronizationLrtBase<TId, TEvent>(
 		int batchSize,
 		CancellationToken cancellationToken);
 
-	protected override async Task DoWork(NoneInputState inputState)
+	protected override async Task DoWork(TInputState inputState)
 	{
 		while (true)
 		{

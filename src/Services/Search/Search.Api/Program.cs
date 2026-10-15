@@ -1,8 +1,10 @@
 using System.Reflection;
 using Abstractions;
+using Application.Common.Consumer;
 using Api.Common;
 using Api.Common.Extensions;
 using Carter;
+using Contracts.Tasks;
 using Internal.Integration.Di;
 using MassTransit;
 using RabbitMq.Extensions;
@@ -35,15 +37,27 @@ builder.Services.AddMassTransit(x =>
 {
 	x.AddConsumer<ProducerUpdatedConsumer, ProducerUpdatedConsumerDefinition>();
 	x.AddConsumer<ProductUpdatedConsumer, ProductUpdatedConsumerDefinition>();
-	x.AddConsumer<ProductDeletedConsumer, ProductDeletedConsumerDefinition>();
+	x.AddConsumer<ProductWeightUpdatedConsumer, ProductWeightUpdatedConsumerDefinition>();
+	x.AddConsumer<ProductDimensionsUpdatedConsumer, ProductDimensionsUpdatedConsumerDefinition>();
+	x.AddConsumer<ProductCharacteristicsUpdatedConsumer, ProductCharacteristicsUpdatedConsumerDefinition>();
 	x.AddConsumer<CatalogueCandidateUpdatedConsumer, CatalogueCandidateUpdatedConsumerDefinition>();
 	x.AddConsumer<CatalogueCandidateDeletedConsumer, CatalogueCandidateDeletedConsumerDefinition>();
+	x.AddConsumer<ServiceTaskRequestedConsumer>();
 
 	x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
 
 	x.UsingRabbitMq((context, cfg) =>
 	{
 		cfg.ConfigureRabbitMq(context);
+
+		cfg.ReceiveEndpoint("search-tasks", ep =>
+		{
+			ep.ConfigureConsumeTopology = false;
+			ep.ConcurrentMessageLimit = 1;
+			ep.PrefetchCount = 1;
+			ep.BindForService<ServiceTaskRequestedEvent>(ServicesDefinitions.Search);
+			ep.ConfigureConsumer<ServiceTaskRequestedConsumer>(context);
+		});
 
 		cfg.ReceiveEndpoint(
 			"search-queue",
@@ -52,7 +66,9 @@ builder.Services.AddMassTransit(x =>
 				ep.Durable = true;
 
 				ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
-				ep.ConfigureConsumer<ProductDeletedConsumer>(context);
+				ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
+				ep.ConfigureConsumer<ProductDimensionsUpdatedConsumer>(context);
+				ep.ConfigureConsumer<ProductCharacteristicsUpdatedConsumer>(context);
 				ep.ConfigureConsumer<CatalogueCandidateUpdatedConsumer>(context);
 				ep.ConfigureConsumer<CatalogueCandidateDeletedConsumer>(context);
 

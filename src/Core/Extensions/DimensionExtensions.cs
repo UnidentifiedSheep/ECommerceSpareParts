@@ -15,17 +15,17 @@ public static class DimensionExtensions
 		decimal width,
 		decimal height) => length * width * height;
 
-	public static decimal ToMeters(this decimal value, DimensionUnit unit)
-	{
-		return unit switch
+	public static decimal ToMeters(this decimal value, DimensionUnit unit) => value * unit.GetMetersScale();
+
+	public static decimal GetMetersScale(this DimensionUnit unit) =>
+		unit switch
 		{
-			DimensionUnit.Millimeter => value / 1000,
-			DimensionUnit.Centimeter => value / 100,
-			DimensionUnit.Meter => value,
+			DimensionUnit.Millimeter => 0.001m,
+			DimensionUnit.Centimeter => 0.01m,
+			DimensionUnit.Meter => 1m,
 			_ => throw new ArgumentOutOfRangeException(
 				nameof(unit),
 				unit,
 				null)
 		};
-	}
 }

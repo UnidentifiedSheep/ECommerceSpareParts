@@ -47,6 +47,8 @@ public partial class DContext : DbContext, INotificationDbContext
 
 	public virtual DbSet<ProductCross> ProductCrosses { get; set; }
 
+	public virtual DbSet<Characteristic> Characteristics { get; set; }
+
 	public virtual DbSet<ProductCharacteristic> ProductCharacteristics { get; set; }
 
 	public virtual DbSet<ProductEan> ProductEans { get; set; }

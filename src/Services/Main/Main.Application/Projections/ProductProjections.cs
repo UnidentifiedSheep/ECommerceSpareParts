@@ -103,13 +103,20 @@ public sealed class
 	ProductCharacteristicDtoProjectionProvider : ProjectionProviderBase<ProductCharacteristic,
 	ProductCharacteristicDto>
 {
-	public override Expression<Func<ProductCharacteristic, ProductCharacteristicDto>> Projection { get; } =
-		x => new ProductCharacteristicDto
+	public ProductCharacteristicDtoProjectionProvider(
+		IProjectionProvider<Characteristic, CharacteristicDto> characteristicProjection)
+	{
+		var characteristicToDto = characteristicProjection.Projection;
+
+		Projection = x => new ProductCharacteristicDto
 		{
 			ProductId = x.ProductId,
-			Name = x.Name,
+			Characteristic = characteristicToDto.Invoke(x.Characteristic),
 			Value = x.Value
 		};
+	}
+
+	public override Expression<Func<ProductCharacteristic, ProductCharacteristicDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]

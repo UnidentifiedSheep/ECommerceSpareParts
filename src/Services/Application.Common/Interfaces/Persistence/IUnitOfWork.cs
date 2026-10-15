@@ -4,6 +4,8 @@ namespace Application.Common.Interfaces.Persistence;
 
 public interface IUnitOfWork
 {
+	bool HasActiveTransaction { get; }
+
 	IUnitOfWorkContext Context { get; }
 
 	Task<T> ExecuteWithTransaction<T>(

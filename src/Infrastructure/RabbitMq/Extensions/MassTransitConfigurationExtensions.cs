@@ -1,6 +1,7 @@
 ﻿using Abstractions.Interfaces;
 using Contracts.Job;
 using Contracts.Settings;
+using Contracts.Tasks;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -29,6 +30,10 @@ public static class MassTransitConfigurationExtensions
 			p.ExchangeType = ExchangeType.Direct;
 		});
 		cfg.Publish<SettingUpdatedEvent>(p =>
+		{
+			p.ExchangeType = ExchangeType.Direct;
+		});
+		cfg.Publish<ServiceTaskRequestedEvent>(p =>
 		{
 			p.ExchangeType = ExchangeType.Direct;
 		});

@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "messages": {
+    "lrt.deleted.products.removal.name": "Silinmiş ürün belgelerini kaldırma",
+    "lrt.deleted.products.removal.description": "Saklama süresi dolan silinmiş ürün belgelerini arama indeksinden kaldırır."
+  }
+}

@@ -2,9 +2,11 @@ using System.Text.Json;
 using Application.Common.Interfaces.Lrt;
 using Domain.CommonEntities.Job;
 using FluentAssertions;
+using Main.Application.Interfaces.Products;
 using Main.Application.Lrts;
 using Main.Application.Lrts.ProductImport;
 using Main.Application.Lrts.ProductSynchronization;
+using Main.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 
@@ -26,7 +28,8 @@ public sealed class ProductImportLrtTests(CombinedContainerFixture fixture)
 		job.Steps.Select(x => x.SystemName).Should()
 			.Equal(nameof(ProductImportLrtStep), nameof(ProductSynchronizationLrt));
 		job.Steps[0].State.Should().Be(input);
-		job.Steps[1].State.Should().Be("{}");
+		JsonSerializer.Deserialize<ProductSynchronizationInputState>(job.Steps[1].State)!.Parts
+			.Should().Be(ProductEventParts.All);
 		job.Dependencies.Should().ContainSingle()
 			.Which.StepId.Should().Be(job.Steps[1].Id);
 		job.Dependencies[0].DependsOnStepId.Should().Be(job.Steps[0].Id);

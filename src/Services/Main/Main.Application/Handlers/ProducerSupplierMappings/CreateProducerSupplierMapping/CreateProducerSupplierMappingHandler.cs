@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
 
 [AutoSave]
-[Transactional(retryCount: 2, retryDelayMs: 20)]
+[Transactional(retryDelayMs: 20, retryCount: 2)]
 public record CreateProducerSupplierMappingCommand(NewProducerSupplierMapping ProducerSupplierMapping)
 	: ICommand<CreateProducerSupplierMappingResult>;
 

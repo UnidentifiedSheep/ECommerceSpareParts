@@ -1,10 +1,12 @@
 using System.Data;
+using Attributes;
+using Enums;
 
 namespace Persistence.TransactionBuilder;
 
 public class TransactionDefaultSettings
 {
-	public HashSet<string> RetryOn { get; } = [];
+	public TransactionErrorKind RetryOn { get; private set; } = TransactionalAttribute.DefaultRetryErrors;
 
 	public int RetriesCount { get; private set; }
 
@@ -34,10 +36,9 @@ public class TransactionDefaultSettings
 		return this;
 	}
 
-	public TransactionDefaultSettings SetPgErrorKeys(IEnumerable<string> keys)
+	public TransactionDefaultSettings SetRetryOn(TransactionErrorKind errors)
 	{
-		RetryOn.Clear();
-		RetryOn.UnionWith(keys);
+		RetryOn = errors;
 		return this;
 	}
 }

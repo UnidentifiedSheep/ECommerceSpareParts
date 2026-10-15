@@ -1,3 +1,4 @@
+using Search.Enums;
 ﻿using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using Search.Abstractions.Options;
@@ -23,6 +24,15 @@ public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSear
 						.Analysis(a => a.ConfigureCatalogueSearch()))
 					.Map<Product>(m => m.Properties(p =>
 						p
+							.Number(number => number.Name(x => x.ReadinessStatus).Type(NumberType.Integer))
+							.Date(d => d.Name(x => x.ProductUpdatedAt))
+							.Date(d => d.Name(x => x.CharacteristicsUpdatedAt))
+							.Date(d => d.Name(x => x.DimensionsUpdatedAt))
+							.Date(d => d.Name(x => x.WeightUpdatedAt))
+							.Nested<ProductCharacteristic>(n => n.Name(x => x.Characteristics).Properties(cp => cp
+								.Number(k => k.Name(x => x.CharacteristicId).Type(NumberType.Integer))
+								.Keyword(k => k.Name(x => x.Value))
+								.Number(k => k.Name(x => x.NumericValue).Type(NumberType.Double))))
 							.Keyword(k => k.Name(x => x.Id))
 							.Text(t => t
 								.Name(x => x.Name)

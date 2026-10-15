@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.LRT;
 using Contracts.Producer;
 using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
@@ -18,7 +19,10 @@ public class ProducerSynchronizationLrt(
 	IUnitOfWork unitOfWork,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	ILogger<ProducerSynchronizationLrt> logger) : SynchronizationLrtBase<int, ProducerUpdatedEvent>(
+	ILogger<ProducerSynchronizationLrt> logger) : SynchronizationLrtBase<
+	NoneInputState,
+	int,
+	ProducerUpdatedEvent>(
 	jobRepository,
 	unitOfWork,
 	publisher,

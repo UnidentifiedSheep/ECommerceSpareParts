@@ -7,6 +7,7 @@ using Application.Common.Services.Currency;
 using Application.Common.Validators;
 using Main.Application.Configs;
 using Main.Application.Interfaces.Cache;
+using Main.Application.Interfaces.Products;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
@@ -17,6 +18,7 @@ using Main.Application.JobProviders;
 using Main.Application.Lrts.ProducerImport;
 using Main.Application.Models.Options;
 using Main.Application.Services;
+using Main.Application.Services.Products.EventParts;
 using Main.Application.Services.Currency;
 using Main.Application.Services.Document;
 using Main.Application.Services.Document.Providers;
@@ -25,6 +27,7 @@ using Main.Application.Services.Event;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Application.Services.PayloadProvider;
+using Main.Application.Services.Products;
 using Main.Entities.Balance;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +62,12 @@ public static class ServiceProvider
 
 		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 		collection.AddScoped<IAppLinkProvider, AppLinkProvider>();
+		collection.AddScoped<IProductEventPublisher, ProductEventPublisher>();
+		collection.AddScoped<IProductEventProvider, ProductEventProvider>();
+		collection.AddScoped<IProductEventPartProvider, ProductCoreEventPartProvider>();
+		collection.AddScoped<IProductEventPartProvider, ProductCharacteristicsEventPartProvider>();
+		collection.AddScoped<IProductEventPartProvider, ProductDimensionsEventPartProvider>();
+		collection.AddScoped<IProductEventPartProvider, ProductWeightEventPartProvider>();
 
 		//order is important
 		collection.AddSingleton<IDocumentTemplateSource, S3DocumentTemplateSource>();

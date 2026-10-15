@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Search.Enums\Search.Enums.csproj"/>
         <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj"/>
     </ItemGroup>
 

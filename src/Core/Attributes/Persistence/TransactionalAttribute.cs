@@ -1,4 +1,5 @@
 using System.Data;
+using Enums;
 
 // ReSharper disable once CheckNamespace
 namespace Attributes;
@@ -11,6 +12,6 @@ public partial class TransactionalAttribute
 			IsolationLevel.ReadCommitted,
 			delay,
 			retryCount,
-			"23505");
+			DefaultRetryErrors | TransactionErrorKind.UniqueConstraintViolation);
 	}
 }

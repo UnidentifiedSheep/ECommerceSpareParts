@@ -12,6 +12,9 @@ public sealed class RootQuery
 	[GraphQLName("productGroups")]
 	public ProductGroupQueries ProductGroups => new();
 
+	[GraphQLName("characteristics")]
+	public CharacteristicQueries Characteristics => new();
+
 	[GraphQLName("catalogueCandidates")]
 	public CatalogueCandidateQueries CatalogueCandidate => new();
 

@@ -120,6 +120,15 @@ public abstract class OpenSearchRepository<TDocument, TKey>(
 			$"Failed to {operation} OpenSearch index '{indexProvider()}'. {details}");
 	}
 
+	protected void EnsureDeleteByQuerySucceeded(DeleteByQueryResponse response)
+	{
+		EnsureResponseSucceeded(response, "delete from");
+		if (response.TimedOut)
+			throw new TimeoutException("OpenSearch timed out while deleting documents.");
+		if (response.Failures.Count > 0)
+			throw new InvalidOperationException(string.Join("; ", response.Failures.Select(failure => failure.Cause.Reason)));
+	}
+
 	protected void EnsureResponseSucceeded(IResponse response, string operation)
 	{
 		if (response.IsValid)

@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
 using Moq;
@@ -6,6 +5,7 @@ using Search.Application.Handlers.Search.Catalogue;
 using Search.Application.Interfaces.CatalogueCandidate;
 using Search.Application.Interfaces.Product;
 using Search.Application.Models.CatalogueSearch;
+using Search.Application.Models.CatalogueSearch.Criteria;
 using Search.Application.Projections;
 using Search.Enums;
 using CatalogueCandidateDocument = Search.Entities.CatalogueCandidate;
@@ -51,13 +51,14 @@ public sealed class SearchInCatalogueHandlerTests
 					],
 					7));
 		var handler = CreateHandler();
+		var productCriteria = new ProductSearchCriteria { Stock = new() { Gt = 0 } };
 
 		var result = await handler.Handle(
 			CreateQuery(
 				new HashSet<SearchTarget>
 				{
 					SearchTarget.Products, SearchTarget.CatalogueCandidates
-				}),
+				}) with { ProductCriteria = productCriteria },
 			CancellationToken.None);
 
 		result.Products.Total.Should().Be(11);
@@ -72,6 +73,8 @@ public sealed class SearchInCatalogueHandlerTests
 		receivedCriteria.ProductGroupIds.Should().Equal(7, 8);
 		receivedCandidateCriteria.Should().NotBeNull();
 		receivedCandidateCriteria!.CandidateMappingStatus.Should().Be(CandidateMappingStatus.Unmapped);
+		receivedCriteria!.ProductCriteria.Should().BeSameAs(productCriteria);
+		receivedCandidateCriteria.ProductCriteria.Should().BeNull();
 	}
 
 	[Fact]

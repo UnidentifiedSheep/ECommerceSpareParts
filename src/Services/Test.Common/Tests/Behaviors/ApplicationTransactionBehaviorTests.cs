@@ -2,10 +2,12 @@ using Abstractions.Models;
 using Application.Common.Behaviors;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
+using Enums;
 using FluentAssertions;
 using MediatR;
 using Moq;
 using Persistence;
+using Tests.Stubs;
 
 namespace Tests.Tests.Behaviors;
 
@@ -40,6 +42,23 @@ public sealed class ApplicationTransactionBehaviorTests
 
 		service.Calls.Should().Be(1);
 		service.Settings.Should().NotBeNull();
+		service.Settings!.RetryErrors.Should().Be(TransactionalAttribute.DefaultRetryErrors);
+	}
+
+	[Fact]
+	public async Task Handle_TransactionalRequest_PreservesTheExplicitRetryMask()
+	{
+		var service = new RecordingApplicationTransactionService();
+		var behavior = new ApplicationTransactionBehavior<CustomRetryRequest, Unit>(service);
+
+		await behavior.Handle(
+			new CustomRetryRequest(),
+			_ => Task.FromResult(Unit.Value),
+			CancellationToken.None);
+
+		service.Settings!.RetryErrors.Should().Be(
+			TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict);
+		service.Settings.RetryCount.Should().Be(2);
 	}
 
 	[Fact]
@@ -66,6 +85,9 @@ public sealed class ApplicationTransactionBehaviorTests
 	[Transactional]
 	private sealed record TransactionalRequest : IRequest<Unit>;
 
+	[Transactional(retryCount: 2, retryErrors: TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict)]
+	private sealed record CustomRetryRequest : IRequest<Unit>;
+
 	[AutoSave]
 	private sealed record AutoSaveRequest : IRequest<Unit>;
 
@@ -75,6 +97,8 @@ public sealed class ApplicationTransactionBehaviorTests
 		public int Calls { get; private set; }
 
 		public TransactionalAttribute? Settings { get; private set; }
+
+		public IApplicationTransaction Create(TransactionalAttribute? settings = null) => new ApplicationTransactionStub(this, settings);
 
 		public async Task ExecuteAsync(
 			TransactionalAttribute? settings,

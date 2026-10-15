@@ -2,6 +2,7 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.LRT;
 using Contracts.Models.CatalogueCandidate;
 using Contracts.ProductEnrichment;
 using Domain.CommonEntities.Job;
@@ -22,7 +23,7 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 	IUnitOfWork unitOfWork,
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
-	ILogger<CatalogueCandidateSynchronizationLrt> logger) : SynchronizationLrtBase<Guid, CatalogueCandidateUpdatedEvent>(
+	ILogger<CatalogueCandidateSynchronizationLrt> logger) : SynchronizationLrtBase<NoneInputState, Guid, CatalogueCandidateUpdatedEvent>(
 	jobRepository,
 	unitOfWork,
 	publisher,

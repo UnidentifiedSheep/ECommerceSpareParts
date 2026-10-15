@@ -11,6 +11,7 @@ using Search.Persistence.DocumentProviders;
 using Search.Persistence.HealthChecks;
 using Search.Persistence.IndexInitializers;
 using Search.Persistence.Interfaces;
+using Search.Persistence.Queries.ProductFilters;
 
 namespace Search.Persistence;
 
@@ -35,10 +36,13 @@ public static class ServiceProvider
 			return new OpenSearchClient(connectionSettings);
 		});
 
+		services.AddSingleton<IProductSearchFilterProvider, ProductStockFilterProvider>();
+		services.AddSingleton<IProductSearchFilterProvider, ProductWeightFilterProvider>();
+		services.AddSingleton<IProductSearchFilterProvider, ProductDimensionsFilterProvider>();
+		services.AddSingleton<IProductSearchFilterProvider, ProductCharacteristicsFilterProvider>();
 		services.AddSingleton<IProductRepository, ProductRepository>();
 		services.AddSingleton<IProducerRepository, ProducerRepository>();
 		services.AddSingleton<ICatalogueCandidateRepository, CatalogueCandidateRepository>();
-		services.AddSingleton<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();
 		services.AddSingleton<IProducerSearchDocumentProvider, MainProducerSearchDocumentProvider>();
 
 		services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();

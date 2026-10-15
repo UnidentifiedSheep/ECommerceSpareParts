@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "messages": {
+    "lrt.deleted.products.removal.name": "Deleted product document removal",
+    "lrt.deleted.products.removal.description": "Removes deleted product documents from the search index after their retention period."
+  }
+}

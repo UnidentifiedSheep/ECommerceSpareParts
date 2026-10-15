@@ -1,0 +1,16 @@
+{
+  "culture": "ru",
+  "messages": {
+    "catalogue.search.criteria.product.target.required": "Критерии продукта требуют поиска по Products.",
+    "catalogue.search.criteria.range.invalid": "Задайте хотя бы одну границу диапазона без противоречивых или обратных границ.",
+    "catalogue.search.criteria.unit.invalid": "Недопустимая единица измерения.",
+    "catalogue.search.criteria.dimensions.required": "Задайте хотя бы один диапазон длины, ширины, высоты или объёма.",
+    "catalogue.search.criteria.characteristic.id.invalid": "Идентификатор характеристики должен быть положительным.",
+    "catalogue.search.criteria.characteristic.operation.required": "Для каждой характеристики задайте ровно одно условие: values, numericRange или exists.",
+    "catalogue.search.criteria.characteristic.count.max": "Допускается не более {Count|int} критериев характеристик.",
+    "catalogue.search.criteria.characteristic.duplicate": "Каждую характеристику можно указать только один раз.",
+    "catalogue.search.criteria.values.count.invalid": "Укажите от одного до {Count|int} значений характеристики.",
+    "catalogue.search.criteria.value.required": "Значение фильтра характеристики не должно быть пустым.",
+    "catalogue.search.criteria.value.max.length": "Значение фильтра характеристики не должно превышать {Count|int} символов."
+  }
+}

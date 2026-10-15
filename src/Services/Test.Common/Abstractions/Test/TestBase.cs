@@ -64,11 +64,17 @@ public abstract class TestBase : IAsyncLifetime, ITest
 		}
 	}
 
-	public static void RegisterGlobalBasicContext<TContext>() where TContext : class, ITestContext =>
-		GlobalBasicContexts.Add(typeof(TContext));
+	public static void RegisterGlobalBasicContext<TContext>() where TContext : class, ITestContext
+	{
+		lock (GlobalBasicContexts)
+			GlobalBasicContexts.Add(typeof(TContext));
+	}
 
-	public static void RemoveGlobalBasicContext<TContext>() where TContext : class, ITestContext =>
-		GlobalBasicContexts.Remove(typeof(TContext));
+	public static void RemoveGlobalBasicContext<TContext>() where TContext : class, ITestContext
+	{
+		lock (GlobalBasicContexts)
+			GlobalBasicContexts.Remove(typeof(TContext));
+	}
 
 	protected T GetContext<T>() where T : class, ITestContext
 	{
@@ -79,7 +85,9 @@ public abstract class TestBase : IAsyncLifetime, ITest
 
 	protected virtual async Task InitializeBasicContexts()
 	{
-		var merged = GlobalBasicContexts.ToHashSet();
+		HashSet<Type> merged;
+		lock (GlobalBasicContexts)
+			merged = GlobalBasicContexts.ToHashSet();
 		merged.UnionWith(_basicContexts);
 		foreach (var context in merged)
 		{

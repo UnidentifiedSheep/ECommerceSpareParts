@@ -2,10 +2,16 @@ using Abstractions;
 using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Lrt;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using NamedObject;
+using NamedObject.Core.Interfaces;
+using Search.Abstractions.Options;
 using Search.Application.Configs;
 using Search.Application.Interfaces;
+using Search.Application.NamedObjects;
 using Search.Application.Services.IndexSynchronizers;
 using Search.Entities;
 
@@ -18,6 +24,12 @@ public static class ServiceProvider
 		IConfiguration configuration)
 	{
 		SortByConfig.Configure();
+		services.AddOptions<DeletedProductsCleanupOptions>()
+			.Bind(configuration.GetSection(DeletedProductsCleanupOptions.SectionName))
+			.Validate(settings => settings.RetentionDays is >= 0 and <= 36500, "RetentionDays must be between 0 and 36500.")
+			.Validate(settings => settings.BatchSize > 0, "BatchSize must be positive.")
+			.ValidateOnStart();
+		services.TryAddSingleton(TimeProvider.System);
 
 		services.AddApplicationBase(
 			ServicesDefinitions.Search,
@@ -27,8 +39,9 @@ public static class ServiceProvider
 			typeof(DbValidationBehavior<,>),
 			typeof(CacheBehavior<,>));
 
-		services.RegisterProjectionProviders<ProductIndexSynchronizer>();
-		services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
+		services.RegisterProjectionProviders<ProducerIndexSynchronizer>();
+		services.AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>();
+		services.RegisterNamedObject<ILrtNamedObject>(typeof(ServiceProvider).Assembly);
 		services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
 
 		return services;

@@ -10,30 +10,28 @@ public sealed class ApplicationTransactionService(
 	IDomainEventExecutor domainEventExecutor,
 	IIntegrationEventScope integrationEventScope,
 	IPublishEndpoint publisher,
-	IApplicationTransactionContext context) : IApplicationTransactionService
+	IApplicationTransactionContext context,
+	ITransactionExceptionClassifier exceptionClassifier) : IApplicationTransactionService
 {
-	//TODO it should work also in services with out db.
+	public IApplicationTransaction Create(TransactionalAttribute? settings = null) =>
+		new ApplicationTransaction(this, unitOfWork, exceptionClassifier, settings);
+
 	public Task ExecuteAsync(
 		TransactionalAttribute? settings,
 		Func<IApplicationTransactionContext, CancellationToken, Task> action,
 		CancellationToken cancellationToken = default)
-	{
-		ArgumentNullException.ThrowIfNull(action);
-
-		return ExecuteAsync(
-			settings,
-			async (transactionContext, ct) =>
-			{
-				await action(transactionContext, ct);
-				return true;
-			},
-			cancellationToken);
-	}
+		=> Create(settings).ExecuteAsync(action, cancellationToken);
 
 	public Task<TResult> ExecuteAsync<TResult>(
 		TransactionalAttribute? settings,
 		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
 		CancellationToken cancellationToken = default)
+		=> Create(settings).ExecuteAsync(action, cancellationToken);
+
+	internal Task<TResult> ExecuteTransactionAsync<TResult>(
+		TransactionalAttribute? settings,
+		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
+		CancellationToken cancellationToken)
 	{
 		ArgumentNullException.ThrowIfNull(action);
 

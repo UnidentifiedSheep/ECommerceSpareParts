@@ -31,6 +31,15 @@
     "lrt.product.sizes.import.invalid.product.id": "ProductId must be a positive product ID.",
     "lrt.product.sizes.import.invalid.unit": "Unit must be Millimeter, Centimeter or Meter.",
     "lrt.product.sizes.import.product.not.found": "Product was not found.",
+    "lrt.product.weight.import.name": "Product weight import",
+    "lrt.product.weight.import.description": "Creates or updates product weights from a CSV file with ProductId, Unit and Weight columns.",
+    "lrt.product.weight.import.invalid.unit": "Unit must be Gram, Kilogram or Tonne.",
+    "lrt.product.weight.import.product.not.found": "Product was not found.",
+    "lrt.product.characteristics.import.name": "Product characteristics import",
+    "lrt.product.characteristics.import.description": "Imports product characteristic values from CSV, then publishes characteristics update events for all products.",
+    "lrt.product.characteristics.import.step.name": "Product characteristics import step",
+    "lrt.product.characteristics.import.missing.reference": "Import interrupted: a referenced product or characteristic is missing. Batch rows: {StartRow|int}–{EndRow|int}. Constraint: {ConstraintName|string}.",
+    "lrt.product.characteristics.import.step.description": "Creates or updates product characteristic values from a CSV file with ProductId, Characteristic and Value columns, matching existing characteristics by normalized name.",
     "lrt.producer.synchronization.name": "Producer synchronization",
     "lrt.producer.synchronization.description": "Publishes update events for all producers so related services can refresh their producer data.",
     "lrt.product.synchronization.name": "Product synchronization",
@@ -56,6 +65,8 @@
     "lrt.document.generation.invalid.requester.id": "Requester ID cannot be empty.",
     "lrt.document.generation.invalid.request": "The document request could not be read.",
     "lrt.expired.documents.removal.name": "Expired document removal",
-    "lrt.expired.documents.removal.description": "Removes expired generated documents from storage and deletes their request records."
+    "lrt.expired.documents.removal.description": "Removes expired generated documents from storage and deletes their request records.",
+    "lrt.service.task.run.name": "Service task dispatch",
+    "lrt.service.task.run.description": "Requests execution of a task in the specified service."
   }
 }

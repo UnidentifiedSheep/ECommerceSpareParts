@@ -31,6 +31,15 @@
     "lrt.product.sizes.import.invalid.product.id": "ProductId должен быть положительным ID товара.",
     "lrt.product.sizes.import.invalid.unit": "Unit должен быть Millimeter, Centimeter или Meter.",
     "lrt.product.sizes.import.product.not.found": "Товар не найден.",
+    "lrt.product.weight.import.name": "Импорт веса товаров",
+    "lrt.product.weight.import.description": "Создаёт или обновляет вес товаров из CSV-файла с колонками ProductId, Unit и Weight.",
+    "lrt.product.weight.import.invalid.unit": "Unit должен быть Gram, Kilogram или Tonne.",
+    "lrt.product.weight.import.product.not.found": "Товар не найден.",
+    "lrt.product.characteristics.import.name": "Импорт характеристик товаров",
+    "lrt.product.characteristics.import.description": "Загружает значения характеристик товаров из CSV-файла, затем публикует события обновления характеристик для всех товаров.",
+    "lrt.product.characteristics.import.step.name": "Шаг импорта характеристик товаров",
+    "lrt.product.characteristics.import.missing.reference": "Импорт прерван: отсутствует связанный товар или характеристика. Строки батча: {StartRow|int}–{EndRow|int}. Ограничение: {ConstraintName|string}.",
+    "lrt.product.characteristics.import.step.description": "Создаёт или обновляет значения характеристик товаров из CSV-файла с колонками ProductId, Characteristic и Value, находя существующие характеристики по нормализованному названию.",
     "lrt.producer.synchronization.name": "Синхронизация производителей",
     "lrt.producer.synchronization.description": "Публикует события обновления для всех производителей, чтобы связанные сервисы могли обновить данные о производителях.",
     "lrt.product.synchronization.name": "Синхронизация товаров",
@@ -56,6 +65,8 @@
     "lrt.document.generation.invalid.requester.id": "Идентификатор инициатора не может быть пустым.",
     "lrt.document.generation.invalid.request": "Не удалось прочитать запрос на генерацию документа.",
     "lrt.expired.documents.removal.name": "Удаление просроченных документов",
-    "lrt.expired.documents.removal.description": "Удаляет просроченные созданные документы из хранилища и их записи запросов."
+    "lrt.expired.documents.removal.description": "Удаляет просроченные созданные документы из хранилища и их записи запросов.",
+    "lrt.service.task.run.name": "Запуск задачи сервиса",
+    "lrt.service.task.run.description": "Отправляет запрос на выполнение задачи в указанном сервисе."
   }
 }

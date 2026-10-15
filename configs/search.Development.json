@@ -5,7 +5,7 @@
     "Password": "N9v#Qp7!Lm2@Rz5$",
     "AllowInvalidCertificate": true,
     "IndexOptions": {
-      "Products": "products-v3",
+      "Products": "products-v4",
       "Producers": "producers-v1",
       "CatalogueCandidates": "catalogue-candidates-v2"
     }

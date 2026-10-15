@@ -168,6 +168,21 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 			cancellationToken: cancellationToken);
 	}
 
+	public Task UpsertProductCharacteristicsAsync(
+		IReadOnlyCollection<ProductCharacteristic> characteristics,
+		CancellationToken cancellationToken = default)
+	{
+		var items = characteristics.GroupBy(characteristic => characteristic.GetId())
+			.Select(group => group.Last())
+			.ToList();
+		if (items.Count == 0) return Task.CompletedTask;
+
+		return Context.BulkInsertOrUpdateAsync(
+			items,
+			new BulkConfig { PropertiesToIncludeOnUpdate = [nameof(ProductCharacteristic.Value)] },
+			cancellationToken: cancellationToken);
+	}
+
 	public async Task UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default)

@@ -1,5 +1,4 @@
-﻿using Abstractions.Models;
-using Application.Common.Extensions;
+﻿using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
@@ -16,7 +15,7 @@ public record GetCharacteristicsQuery(int ProductId, Pagination Pagination)
 public record GetCharacteristicsResult(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 
 public class GetCharacteristicsHandler(
-	IReadRepository<ProductCharacteristic, (int, string)> repository,
+	IReadRepository<ProductCharacteristic, (int, int)> repository,
 	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection)
 	: IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
 {
@@ -27,6 +26,7 @@ public class GetCharacteristicsHandler(
 		var result = await repository
 			.Query
 			.Where(x => x.ProductId == request.ProductId)
+			.OrderBy(x => x.CharacteristicId)
 			.Project(projection)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);

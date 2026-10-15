@@ -2,11 +2,11 @@ using Exceptions.Base.Localized;
 
 namespace Main.Entities.Exceptions;
 
-public class ProductCharacteristicsNotFoundException(int id, string name) : LocalizedNotFoundException(
+public class ProductCharacteristicsNotFoundException(int id, int characteristicId) : LocalizedNotFoundException(
 	ArticleCharacteristicsNotFoundMessage.Instance,
 	new
 	{
-		Id = id, Name = name
+		Id = id, CharacteristicId = characteristicId
 	});
 
 public class ProductContentNotFoundException(int articleId, int insideArticleId) : LocalizedNotFoundException(

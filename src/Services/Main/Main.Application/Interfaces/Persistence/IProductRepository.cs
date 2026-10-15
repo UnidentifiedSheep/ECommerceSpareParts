@@ -35,6 +35,10 @@ public interface IProductRepository : IRepository<Product, int>
 		IReadOnlyCollection<ProductEan> eans,
 		CancellationToken cancellationToken = default);
 
+	Task UpsertProductCharacteristicsAsync(
+		IReadOnlyCollection<ProductCharacteristic> characteristics,
+		CancellationToken cancellationToken = default);
+
 	Task UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default);

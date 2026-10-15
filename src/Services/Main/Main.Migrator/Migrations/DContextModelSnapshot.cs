@@ -1535,6 +1535,36 @@ namespace Main.Migrator.Migrations
                     b.ToTable("producer_supplier_mappings", "public");
                 });
 
+            modelBuilder.Entity("Main.Entities.Product.Characteristic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("normalized_name");
+
+                    b.HasKey("Id")
+                        .HasName("characteristics_pk");
+
+                    b.HasIndex(new[] { "NormalizedName" }, "characteristics_normalized_name_uindex")
+                        .IsUnique();
+
+                    b.ToTable("characteristics", "public");
+                });
+
             modelBuilder.Entity("Main.Entities.Product.Enrichment.CatalogueCandidate", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1859,10 +1889,9 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("product_id");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("name");
+                    b.Property<int>("CharacteristicId")
+                        .HasColumnType("integer")
+                        .HasColumnName("characteristic_id");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -1870,14 +1899,14 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("value");
 
-                    b.HasKey("ProductId", "Name")
+                    b.HasKey("ProductId", "CharacteristicId")
                         .HasName("product_characteristics_pk");
 
                     b.HasIndex("ProductId")
                         .HasDatabaseName("product_characteristics_id_index");
 
-                    b.HasIndex("Name", "Value")
-                        .HasDatabaseName("product_characteristics_name_value_index");
+                    b.HasIndex("CharacteristicId", "Value")
+                        .HasDatabaseName("product_characteristics_characteristic_id_value_index");
 
                     b.ToTable("product_characteristics", "public");
                 });
@@ -4100,12 +4129,21 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Product.ProductCharacteristic", b =>
                 {
+                    b.HasOne("Main.Entities.Product.Characteristic", "Characteristic")
+                        .WithMany()
+                        .HasForeignKey("CharacteristicId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("product_characteristics_characteristic_id_fk");
+
                     b.HasOne("Main.Entities.Product.Product", null)
                         .WithMany("Characteristics")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("product_characteristics_product_id_fk");
+
+                    b.Navigation("Characteristic");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.ProductContent", b =>
