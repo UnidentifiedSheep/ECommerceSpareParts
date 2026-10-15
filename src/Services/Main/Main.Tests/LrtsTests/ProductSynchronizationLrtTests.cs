@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 using Application.Common.Extensions;
 using Application.Common.LRT;
@@ -10,6 +11,7 @@ using Main.Application.Lrts.Base.Synchronization;
 using Main.Application.Lrts.ProductSynchronization;
 using Main.Entities.Product;
 using Main.Enums;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Stubs;
@@ -24,6 +26,35 @@ public sealed class ProductSynchronizationLrtTests : IntegrationTest
 		RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
+
+	[Fact]
+	public async Task Synchronization_WithMassTransit_PublishesConcreteEventTypesAndPersistsTheCursor()
+	{
+		var bus = Bus.Factory.CreateUsingInMemory(_ => { });
+		var observer = new PublishObserver();
+		using var observerHandle = bus.ConnectPublishObserver(observer);
+		await bus.StartAsync(CancellationToken);
+		try
+		{
+			var job = await ExecuteSynchronization("{}", bus);
+
+			job.Status.Should().Be(JobStatus.Succeeded, job.ErrorMessage);
+			observer.MessageTypes.Should().BeEquivalentTo(new[]
+			{
+				typeof(ProductsUpdatedEvent),
+				typeof(ProductCharacteristicsUpdatedEvent),
+				typeof(ProductDimensionsUpdatedEvent),
+				typeof(ProductWeightUpdatedEvent)
+			});
+			var (_, state) = LrtStateSerializer.Deserialize<ProductSynchronizationInputState, SynchronizationState<int>>(job.State);
+			state!.LastProcessedId.Should().Be(TestContext.Products.Max(product => product.Id));
+			state.ProcessedCount.Should().Be(TestContext.Products.Count);
+		}
+		finally
+		{
+			await bus.StopAsync(CancellationToken);
+		}
+	}
 
 	[Fact]
 	public async Task EmptyInput_PublishesAllSectionsAndPersistsTheCursor()
@@ -77,7 +108,7 @@ public sealed class ProductSynchronizationLrtTests : IntegrationTest
 
 	private async Task<Job> ExecuteSynchronization(
 		string input,
-		MessageBrokerStub broker,
+		IPublishEndpoint broker,
 		SynchronizationState<int>? checkpoint = null)
 	{
 		var lrt = ActivatorUtilities.CreateInstance<ProductSynchronizationLrt>(Scope.ServiceProvider, broker);
@@ -95,5 +126,20 @@ public sealed class ProductSynchronizationLrtTests : IntegrationTest
 
 		await Context.Entry(job).ReloadAsync(CancellationToken);
 		return job;
+	}
+
+	private sealed class PublishObserver : IPublishObserver
+	{
+		public ConcurrentBag<Type> MessageTypes { get; } = [];
+
+		public Task PrePublish<T>(PublishContext<T> context) where T : class => Task.CompletedTask;
+
+		public Task PostPublish<T>(PublishContext<T> context) where T : class
+		{
+			MessageTypes.Add(typeof(T));
+			return Task.CompletedTask;
+		}
+
+		public Task PublishFault<T>(PublishContext<T> context, Exception exception) where T : class => Task.CompletedTask;
 	}
 }

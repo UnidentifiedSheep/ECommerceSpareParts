@@ -46,7 +46,7 @@ public abstract class SynchronizationLrtBase<TInputState, TId, TEvent>(
 				async (context, cancellationToken) =>
 				{
 					foreach (var @event in page.Events)
-						await Publisher.Publish(@event, cancellationToken);
+						await Publisher.Publish(@event, @event.GetType(), cancellationToken);
 
 					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
 				},
