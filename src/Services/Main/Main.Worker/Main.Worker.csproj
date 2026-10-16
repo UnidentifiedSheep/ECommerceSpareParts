@@ -4,6 +4,8 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <!-- RazorLight compiles email templates at runtime in this executable. -->
+        <PreserveCompilationContext>true</PreserveCompilationContext>
         <UserSecretsId>dotnet-Main.Worker-ecb3b657-acdf-477a-96f2-2565685d4040</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
