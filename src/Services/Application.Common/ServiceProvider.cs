@@ -88,7 +88,6 @@ public static class ServiceProvider
 			.RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly)
 			.RegisterProjectionProviders<JobDtoProjectionProvider>();
 
-
 		services.TryAddSingleton(TimeProvider.System);
 		services.TryAddScoped<IOperationDatePolicy, OperationDatePolicy>();
 
