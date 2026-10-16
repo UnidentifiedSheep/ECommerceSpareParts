@@ -98,7 +98,7 @@ environments.
 - `compose.yaml` — local stack built from source;
 - `migrator-compose.yaml` — local database migrators;
 - `compose.registry.yaml` — registry image builds;
-- [`deploy/`](docs/SWARM_DEPLOYMENT.md) — split Docker Swarm stacks for secrets sync, gateway, applications, workers,
+- [`deploy/`](docs/SWARM_DEPLOYMENT.md) — Docker Swarm stacks for secrets sync, gateway, applications, workers,
   infrastructure, and monitoring.
 
 ## Documentation

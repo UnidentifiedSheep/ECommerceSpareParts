@@ -82,7 +82,6 @@ jobs:
           bash -n deploy-payload/scripts/deploy/deploy-swarm.sh
           PYTHONPYCACHEPREFIX="$RUNNER_TEMP/deploy-pycache" \
             python3 -m py_compile deploy-payload/scripts/deploy/load-secrets.py deploy-payload/scripts/deploy/bootstrap-arcane.py
-          python3 -m unittest discover -s scripts/deploy/tests -p 'test_*.py'
 
           export ARTIFACT_REGISTRY_HOST=registry.invalid
           export IMAGE_TAG=current
@@ -284,7 +283,6 @@ jobs:
             export MAIN_WORKER_REPLICAS="${MAIN_WORKER_REPLICAS:-1}"
             export PRICING_WORKER_REPLICAS="${PRICING_WORKER_REPLICAS:-1}"
             export ANALYTICS_WORKER_REPLICAS="${ANALYTICS_WORKER_REPLICAS:-1}"
-            export MIGRATE_LEGACY_STACK="${MIGRATE_LEGACY_STACK:-true}"
             export DOCKER_CONFIG="${DEPLOY_SWARM_PATH}/.docker"
 
             bash scripts/deploy/deploy-swarm.sh

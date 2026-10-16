@@ -80,7 +80,7 @@ docker node update --label-add monitoring.opensearch-dashboards=true <dashboards
 
 `workload.traefik=true` must be assigned to a manager because Traefik reads the local Docker socket to discover Swarm services. `workload.gateway=true` belongs to Gateway/YARP and may be assigned to a worker node.
 
-Exactly one active, ready manager must carry `management.arcane=true`. Arcane keeps its database in the node-local external `arcane_data` volume, so the label gives it a stable placement. The deploy script copies the old `management.portainer=true` placement automatically when no Arcane label exists and exactly one eligible Portainer manager is found. Node agents do not need labels: bootstrap creates a service constrained to each eligible node ID.
+Exactly one active, ready manager must carry `management.arcane=true`. Arcane keeps its database in the node-local external `arcane_data` volume, so the label gives it a stable placement. Node agents do not need labels: bootstrap creates a service constrained to each eligible node ID.
 
 Generic workload labels are kept only for services that can be freely distributed within a class of nodes. Infrastructure and monitoring use specialized labels because their services are stateful or comparatively heavy. Migrators run on the node labeled `infra.postgres=true`.
 
@@ -165,13 +165,7 @@ WAL-G scheduling values may also be placed in `SWARM_ENV`:
 - `WALG_CREATE_INITIAL_BACKUP`, default `true`;
 - `POSTGRES_WALG_SECRET`, default `postgres_walg_config`.
 
-The following old GitHub Secrets are no longer needed:
-
-- `SWARM_WORKER_HOSTS`;
-- Cloud.ru key ID and key secret, if they were stored in GitHub;
-- `CLOUD_RU_SECRET_PROJECT_ID`, `CLOUD_RU_SECRET_PREFIX`, `CLOUD_RU_SECRET_DEPTH`, `CLOUD_RU_SECRET_NAMES`, and `CLOUD_RU_SECRET_VERSION` after the non-secret values are moved to GitHub Variables.
-
-Per-worker SSH credentials are no longer used. Cloud.ru credentials are no longer passed through GitHub Actions.
+Deployment uses SSH access to the manager only. Cloud.ru credentials are stored in Swarm secrets.
 
 Before building images, the publish workflow tries the primary Artifact Registry. It tries the backup only when primary
 login fails. Images are built, promoted to `current`, and deployed from the selected registry only; the release is not
@@ -250,9 +244,9 @@ Arcane Manager and Agent are pinned to `v2.16.1`. Manager runs on the node label
 
 Agents use outbound WebSocket connections to `http://arcane:3552` over `arcane_agent_network`. No agent or manager ports are published on hosts. Only the manager UI is exposed through Traefik at `https://${ARCANE_HOST}`. `TRUSTED_PROXIES` is derived from the public overlay subnet; `ARCANE_TRUSTED_PROXIES` can override it when another trusted proxy is present. Physical node traffic uses Tailscale, as with the other overlays.
 
-### First deployment and migration from Portainer
+### First deployment
 
-1. For an existing cluster, keep `PORTAINER_HOST` in `SWARM_ENV` to reuse its domain, or set `ARCANE_HOST` to the desired domain. `ARCANE_HOST` takes precedence. A new domain must resolve to the Traefik host. For a new cluster, label one manager `management.arcane=true`.
+1. Set `ARCANE_HOST` in `SWARM_ENV` to the desired domain and point its DNS record to the Traefik host. Label one manager `management.arcane=true`.
 2. Run a **full deployment** through the existing CI/CD workflow. Changes under `deploy/` and `scripts/deploy/` already select full deployment. The SSH manager needs `openssl` for one-time key generation. No manual Arcane installation, worker SSH, new GitHub credential, or additional host port is needed. Nodes must be able to pull `ghcr.io/getarcaneapp/manager:v2.16.1` and `ghcr.io/getarcaneapp/agent:v2.16.1`.
 3. On the SSH manager used by deployment, read the initial password (default deployment directory shown):
 
@@ -260,13 +254,13 @@ Agents use outbound WebSocket connections to `http://arcane:3552` over `arcane_a
    sudo cat /opt/ecommerce/.arcane-initial-password
    ```
 
-4. Open the configured HTTPS domain and sign in as `arcane` with that password. Set your own password in the account settings. Repeated deployments preserve it. Portainer accounts, settings, and registry credentials are not imported.
+4. Open the configured HTTPS domain and sign in as `arcane` with that password. Set your own password in the account settings. Repeated deployments preserve it.
 5. Check **Swarm → Nodes**: the manager is covered locally and other eligible nodes should show connected agents. Bootstrap waits for this before completing. After adding a Swarm node or reactivating a drained node, run another full deployment to install its agent. Offline, paused, drained, and non-Linux nodes are skipped with a log message; removed-node registrations/services are not automatically deleted.
 6. Add the Cloud.ru registry in Arcane's registry settings: server = the existing `ARTIFACT_REGISTRY_HOST` (without an image path), username = service-account **Key ID**, password = **Key Secret**. Use a registry-scoped service account with pull access; add delete permissions only if needed. Deleting a manifest by digest can remove multiple tags pointing to it, including `current` and `previous`, so keep these digests protected.
 
 The deploy script creates three immutable Swarm secrets once: `${STACK_NAME}_arcane_encryption_key`, `${STACK_NAME}_arcane_admin_api_key`, and `${STACK_NAME}_arcane_initial_password`. The initial password is also saved in `.arcane-initial-password` with root-only permissions on the deployment manager; it is never printed in CI logs. Manager and agents read keys through `_FILE` variables, and per-node agent tokens have separate Swarm secrets. Keep the manager database and encryption key together in backups; losing or replacing the key makes saved registry credentials and agent tokens unreadable. Custom secret names can be set with `ARCANE_ENCRYPTION_SECRET`, `ARCANE_ADMIN_API_KEY_SECRET`, and `ARCANE_INITIAL_PASSWORD_SECRET`.
 
-On a fresh installation the Traefik route stays disabled until bootstrap replaces Arcane's built-in default password and verifies agents. During migration Portainer remains running until all full-deployment checks pass. A failed deployment rolls back changed services and removes newly created Arcane agents. On success only the old Portainer services and unused stack-owned agent networks are removed; `${VOLUME_PREFIX}_portainer_data` is retained. Reverting to Portainer requires deploying the old gateway definition and stopping Arcane's public router to avoid two UIs sharing the same host.
+On a fresh installation the Traefik route stays disabled until bootstrap replaces Arcane's built-in default password and verifies agents. A failed deployment rolls back changed services and removes newly created Arcane agents.
 
 Application stacks remain managed by this repository's deployment workflow. Use Arcane to inspect and operate the existing Swarm resources; saving a different stack definition in the UI can be overwritten by the next deployment.
 
@@ -296,27 +290,13 @@ See [PostgreSQL backup and recovery](POSTGRES_BACKUP.md) for S3 configuration, c
 6. Configure the GitHub Secrets and Variables above.
 7. Run the production workflow. It creates `CONFIGS_PATH` automatically on eligible nodes.
 
-For the one-time transition from the old monolithic `${STACK_NAME}` stack, `MIGRATE_LEGACY_STACK=true` lets the script remove it only after configuration sync and placement validation succeed. The new infra stack then reuses the explicitly named external volumes. Back up stateful volumes before this transition.
-
 ## Deployment flow
-
-Old flow:
-
-```text
-GitHub runner -> Cloud.ru -> generated JSON
-GitHub runner -> SCP manager
-GitHub runner -> SSH/SCP every worker
-manager -> deploy stacks
-```
-
-New flow:
 
 ```text
 GitHub runner -> check primary and backup registry login
-GitHub runner -> build/push all images to every available registry
+GitHub runner -> build/push images to the selected registry
 GitHub runner -> SSH/SCP manager (stack, script and static deployment files)
-manager -> primary registry login
-           └─ on failure, if release was mirrored -> backup registry login
+manager -> selected registry login
 manager -> validate Swarm, secrets, networks and versioned configs
 Swarm global initializer -> mkdir -p CONFIGS_PATH on each eligible node
 Swarm global secrets-sync -> Cloud.ru -> each eligible node CONFIGS_PATH

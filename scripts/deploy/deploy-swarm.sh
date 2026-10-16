@@ -347,22 +347,6 @@ prepare_arcane() {
   require_env ARCANE_HOST
   ensure_overlay_network "$ARCANE_AGENT_NETWORK"
 
-  # Keep Arcane on the node that held Portainer's local management data.
-  local node_id
-  local -a legacy_nodes=()
-  if [ -z "$(sudo docker node ls --filter node.label=management.arcane=true --format '{{.ID}}')" ]; then
-    while read -r node_id; do
-      [ -n "$node_id" ] || continue
-      if [ "$(sudo docker node inspect "$node_id" --format '{{.Spec.Role}}|{{.Status.State}}|{{.Spec.Availability}}')" = 'manager|ready|active' ]; then
-        legacy_nodes+=("$node_id")
-      fi
-    done < <(sudo docker node ls --filter node.label=management.portainer=true --format '{{.ID}}')
-    if [ "${#legacy_nodes[@]}" -eq 1 ]; then
-      sudo docker node update --label-add management.arcane=true "${legacy_nodes[0]}" >/dev/null
-      echo "Reused Portainer manager placement for Arcane."
-    fi
-  fi
-
   # Secrets are immutable. Never replace a missing encryption key on an existing installation.
   local secret generated_secret
   for secret in "$ARCANE_ENCRYPTION_SECRET" "$ARCANE_ADMIN_API_KEY_SECRET"; do
@@ -843,44 +827,6 @@ print_service_diagnostics() {
   sudo docker service logs "$name" --raw --tail 200 || true
 }
 
-wait_for_stack_removed() {
-  local name="$1"
-
-  for _ in $(seq 1 60); do
-    if [ -z "$(sudo docker service ls \
-      --filter "label=com.docker.stack.namespace=${name}" \
-      --format '{{.ID}}')" ]; then
-      return 0
-    fi
-
-    sleep 2
-  done
-
-  echo "Stack ${name} services were not removed in time."
-  return 1
-}
-
-migrate_legacy_stack_if_needed() {
-  local legacy_postgres="${STACK_NAME}_pgql"
-  local split_postgres
-  split_postgres="$(service_name infra postgres)"
-
-  if sudo docker service inspect "$split_postgres" >/dev/null 2>&1 ||
-    ! sudo docker service inspect "$legacy_postgres" >/dev/null 2>&1; then
-    return
-  fi
-
-  if [ "$MIGRATE_LEGACY_STACK" != "true" ]; then
-    echo "Legacy stack ${STACK_NAME} is still deployed."
-    echo "Set MIGRATE_LEGACY_STACK=true for the one-time split-stack migration."
-    exit 1
-  fi
-
-  log "Remove legacy monolithic stack"
-  sudo docker stack rm "$STACK_NAME"
-  wait_for_stack_removed "$STACK_NAME"
-}
-
 wait_for_postgres() {
   log "Wait for PostgreSQL"
 
@@ -1085,31 +1031,6 @@ enable_arcane_public_access() {
   fi
 }
 
-cleanup_legacy_portainer() {
-  local name owner network
-  local gateway_stack
-  gateway_stack="$(stack_name gateway)"
-  for name in "$(service_name gateway portainer)" "$(service_name gateway portainer-agent)"; do
-    if ! sudo docker service inspect "$name" >/dev/null 2>&1; then
-      continue
-    fi
-    owner="$(sudo docker service inspect "$name" --format '{{index .Spec.Labels "com.docker.stack.namespace"}}')"
-    if [ "$owner" = "$gateway_stack" ]; then
-      sudo docker service rm "$name" >/dev/null
-      echo "Removed legacy Portainer service ${name}; its data volume is retained."
-    fi
-  done
-  for network in "$PORTAINER_AGENT_NETWORK" "${STACK_NAME}-gateway-portainer-agent"; do
-    if ! sudo docker network inspect "$network" >/dev/null 2>&1; then
-      continue
-    fi
-    owner="$(sudo docker network inspect "$network" --format '{{index .Labels "com.docker.stack.namespace"}}')"
-    if [ "$owner" = "$gateway_stack" ]; then
-      sudo docker network rm "$network" >/dev/null 2>&1 || true
-    fi
-  done
-}
-
 wait_for_http() {
   local display_name="$1"
   local network="$2"
@@ -1302,14 +1223,9 @@ deploy_stack() {
   local stack="$1"
 
   log "Deploy ${stack} stack"
-  local -a prune_args=(--prune)
-  # Keep the old UI and agents available until Arcane bootstrap succeeds.
-  if [ "$stack" = gateway ] && sudo docker service inspect "$(service_name gateway portainer)" >/dev/null 2>&1; then
-    prune_args=()
-  fi
   docker_sudo stack deploy \
     --detach=true \
-    "${prune_args[@]}" \
+    --prune \
     -c "deploy/stack.${stack}.rendered.yml" \
     "$(stack_name "$stack")" \
     --with-registry-auth
@@ -1652,16 +1568,13 @@ require_env DOCKER_CONFIG
 PUBLIC_NETWORK="${PUBLIC_NETWORK:-public}"
 BACKEND_NETWORK="${BACKEND_NETWORK:-backend}"
 MONITORING_NETWORK="${MONITORING_NETWORK:-monitoring}"
-PORTAINER_AGENT_NETWORK="${PORTAINER_AGENT_NETWORK:-portainer_agent_network}"
 ARCANE_AGENT_NETWORK="${ARCANE_AGENT_NETWORK:-arcane_agent_network}"
-ARCANE_HOST="${ARCANE_HOST:-${PORTAINER_HOST:-}}"
 ARCANE_ENCRYPTION_SECRET="${ARCANE_ENCRYPTION_SECRET:-${STACK_NAME}_arcane_encryption_key}"
 ARCANE_ADMIN_API_KEY_SECRET="${ARCANE_ADMIN_API_KEY_SECRET:-${STACK_NAME}_arcane_admin_api_key}"
 ARCANE_INITIAL_PASSWORD_SECRET="${ARCANE_INITIAL_PASSWORD_SECRET:-${STACK_NAME}_arcane_initial_password}"
 ARCANE_INITIAL_PASSWORD_FILE="${PWD}/.arcane-initial-password"
 VOLUME_PREFIX="${VOLUME_PREFIX:-$STACK_NAME}"
 MIGRATOR_NODE_CONSTRAINT="${MIGRATOR_NODE_CONSTRAINT:-node.labels.infra.postgres == true}"
-MIGRATE_LEGACY_STACK="${MIGRATE_LEGACY_STACK:-false}"
 CURL_IMAGE="${CURL_IMAGE:-curlimages/curl:8.12.1}"
 CLOUD_RU_SECRET_PREFIX="${CLOUD_RU_SECRET_PREFIX:-/appsettings}"
 CLOUD_RU_SECRET_DEPTH="${CLOUD_RU_SECRET_DEPTH:--1}"
@@ -1741,7 +1654,6 @@ sync_application_configs
 log "[5/8] Validate Swarm placement"
 validate_node_labels
 validate_walg_storage
-migrate_legacy_stack_if_needed
 
 log "[6/8] Deploy infrastructure and run migrations"
 cleanup_stale_migrators
@@ -1767,6 +1679,5 @@ enable_arcane_public_access
 commit_full_deploy_transaction
 
 log "[8/8] Cleanup obsolete Docker configs"
-cleanup_legacy_portainer
 cleanup_unused_versioned_configs
 show_stack_services
