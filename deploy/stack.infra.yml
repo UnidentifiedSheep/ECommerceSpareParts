@@ -128,9 +128,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      backend:
-        aliases:
-          - redis
+      - backend
     deploy:
       replicas: 1
       placement:
@@ -152,10 +150,8 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
-      backend:
-        aliases:
-          - rabbitmq
-      public:
+      - backend
+      - public
     deploy:
       replicas: 1
       placement:
@@ -185,9 +181,7 @@ services:
     volumes:
       - opensearch_data:/usr/share/opensearch/data
     networks:
-      backend:
-        aliases:
-          - opensearch
+      - backend
     deploy:
       replicas: 1
       placement:

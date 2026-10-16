@@ -27,9 +27,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik_letsencrypt:/letsencrypt
     networks:
-      public:
-        aliases:
-          - traefik
+      - public
     deploy:
       replicas: 1
       placement:
@@ -56,12 +54,8 @@ services:
       - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
     networks:
-      public:
-        aliases:
-          - gateway
-      backend:
-        aliases:
-          - gateway
+      - public
+      - backend
     deploy:
       replicas: 1
       placement:
@@ -118,12 +112,8 @@ services:
         gid: "65532"
         mode: 0400
     networks:
-      public:
-        aliases:
-          - arcane
-      arcane-agent:
-        aliases:
-          - arcane
+      - public
+      - arcane-agent
     deploy:
       replicas: 1
       placement:

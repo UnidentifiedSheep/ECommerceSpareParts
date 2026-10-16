@@ -38,9 +38,7 @@ services:
     <<: *api-service
     image: ${ARTIFACT_REGISTRY_HOST}/main-api:${IMAGE_TAG}
     networks:
-      backend:
-        aliases:
-          - main-api
+      - backend
     deploy:
       replicas: ${MAIN_API_REPLICAS:-1}
       placement:
@@ -65,9 +63,7 @@ services:
     <<: *api-service
     image: ${ARTIFACT_REGISTRY_HOST}/analytics-api:${IMAGE_TAG}
     networks:
-      backend:
-        aliases:
-          - analytics-api
+      - backend
     deploy:
       replicas: ${ANALYTICS_API_REPLICAS:-1}
       placement:
@@ -92,9 +88,7 @@ services:
     <<: *api-service
     image: ${ARTIFACT_REGISTRY_HOST}/pricing-api:${IMAGE_TAG}
     networks:
-      backend:
-        aliases:
-          - pricing-api
+      - backend
     deploy:
       replicas: ${PRICING_API_REPLICAS:-1}
       placement:
@@ -119,9 +113,7 @@ services:
     <<: *api-service
     image: ${ARTIFACT_REGISTRY_HOST}/search-api:${IMAGE_TAG}
     networks:
-      backend:
-        aliases:
-          - search-api
+      - backend
     deploy:
       replicas: ${SEARCH_API_REPLICAS:-1}
       placement:

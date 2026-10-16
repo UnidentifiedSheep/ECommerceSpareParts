@@ -18,12 +18,8 @@ services:
     volumes:
       - prometheus_data:/prometheus
     networks:
-      backend:
-        aliases:
-          - prometheus
-      monitoring:
-        aliases:
-          - prometheus
+      - backend
+      - monitoring
     deploy:
       replicas: 1
       placement:
@@ -51,9 +47,7 @@ services:
         bind:
           propagation: rslave
     networks:
-      monitoring:
-        aliases:
-          - node-exporter
+      - monitoring
     deploy:
       mode: global
       placement:
@@ -78,12 +72,8 @@ services:
     volumes:
       - loki_data:/loki
     networks:
-      backend:
-        aliases:
-          - loki
-      monitoring:
-        aliases:
-          - loki
+      - backend
+      - monitoring
     deploy:
       replicas: 1
       placement:
@@ -106,12 +96,8 @@ services:
     volumes:
       - tempo_data:/var/tempo
     networks:
-      backend:
-        aliases:
-          - tempo
-      monitoring:
-        aliases:
-          - tempo
+      - backend
+      - monitoring
     deploy:
       replicas: 1
       placement:
@@ -143,15 +129,9 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
       - GF_LOG_LEVEL=warn
     networks:
-      backend:
-        aliases:
-          - grafana
-      monitoring:
-        aliases:
-          - grafana
-      public:
-        aliases:
-          - grafana
+      - backend
+      - monitoring
+      - public
     deploy:
       replicas: 1
       placement:
@@ -179,15 +159,9 @@ services:
       - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}
       - OPENSEARCH_SSL_VERIFICATIONMODE=none
     networks:
-      backend:
-        aliases:
-          - opensearch-dashboards
-      monitoring:
-        aliases:
-          - opensearch-dashboards
-      public:
-        aliases:
-          - opensearch-dashboards
+      - backend
+      - monitoring
+      - public
     deploy:
       replicas: 1
       placement:
