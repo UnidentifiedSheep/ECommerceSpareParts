@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-Analytics.Worker-04705b45-eb58-4513-b3e0-3603db44821f</UserSecretsId>
