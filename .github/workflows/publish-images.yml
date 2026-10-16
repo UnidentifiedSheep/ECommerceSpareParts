@@ -41,24 +41,29 @@ jobs:
       registry_kind: ${{ steps.select.outputs.registry_kind }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Login to primary Artifact Registry
         id: primary_login
         continue-on-error: true
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
-          username: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
-          password: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
+        shell: bash
+        env:
+          ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
+          ARTIFACT_REGISTRY_USERNAME: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
+          ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
+        run: bash scripts/ci/login-registry.sh
 
       - name: Login to backup Artifact Registry
         id: backup_login
         if: steps.primary_login.outcome != 'success'
         continue-on-error: true
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}
-          username: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME }}
-          password: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}
+        shell: bash
+        env:
+          ARTIFACT_REGISTRY_HOST: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}
+          ARTIFACT_REGISTRY_USERNAME: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME }}
+          ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}
+        run: bash scripts/ci/login-registry.sh
 
       - name: Select Artifact Registry
         id: select
@@ -81,6 +86,16 @@ jobs:
 
           echo 'Unable to log in to either primary or backup Artifact Registry.' >&2
           exit 1
+
+      - name: Log out of Artifact Registries
+        if: always()
+        shell: bash
+        env:
+          PRIMARY_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
+          BACKUP_REGISTRY: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}
+        run: |
+          docker logout "$PRIMARY_REGISTRY" >/dev/null 2>&1 || true
+          docker logout "$BACKUP_REGISTRY" >/dev/null 2>&1 || true
 
   publish-images:
     if: inputs.has_images
@@ -123,11 +138,8 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to selected Artifact Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.ARTIFACT_REGISTRY_HOST }}
-          username: ${{ env.ARTIFACT_REGISTRY_USERNAME }}
-          password: ${{ env.ARTIFACT_REGISTRY_PASSWORD }}
+        shell: bash
+        run: bash scripts/ci/login-registry.sh
 
       - name: Build and push ${{ matrix.service }}
         id: build_push
@@ -155,3 +167,8 @@ jobs:
           provenance: false
           sbom: false
           tags: ${{ env.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:${{ env.IMAGE_TAG }}
+
+      - name: Log out of Artifact Registry
+        if: always()
+        shell: bash
+        run: docker logout "$ARTIFACT_REGISTRY_HOST" >/dev/null 2>&1 || true

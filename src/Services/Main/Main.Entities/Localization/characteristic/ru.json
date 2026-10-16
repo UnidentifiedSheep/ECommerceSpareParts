@@ -6,6 +6,7 @@
     "characteristic.normalized.name.max.length": "Нормализованное название характеристики не должно превышать 128 символов.",
     "characteristic.not.found": "Характеристика не найдена.",
     "characteristic.normalized.name.already.exists": "Характеристика с таким названием уже существует.",
-    "characteristic.in.use": "Нельзя удалить характеристику, используемую продуктами."
+    "characteristic.in.use": "Нельзя удалить характеристику, используемую продуктами.",
+    "characteristic.import.too.many.errors": "При импорте характеристик произошло слишком много ошибок."
   }
 }

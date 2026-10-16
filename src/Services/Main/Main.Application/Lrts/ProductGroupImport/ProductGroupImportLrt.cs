@@ -27,7 +27,7 @@ public class ProductGroupImportLrt(
 	ILogger<ProductGroupImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductGroupImportInputState, ProductGroupImportState,
-		ProductGroupImportLrt.NewProductGroupCsvDto, ProductGroup>(
+		ProductGroupImportLrt.ProductGroupCsvDto, ProductGroup>(
 		jobRepository,
 		bucketsOptions,
 		unitOfWork,
@@ -50,7 +50,7 @@ public class ProductGroupImportLrt(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		NewProductGroupCsvDto row,
+		ProductGroupCsvDto row,
 		ProductGroupImportState state,
 		List<CsvImportError> errors,
 		out ProductGroup item)
@@ -77,17 +77,13 @@ public class ProductGroupImportLrt(
 			return;
 
 		var firstIdx = groups[0].idx;
-		var uniqueNames = new HashSet<string>();
-		var uniqueGroups = new List<(int idx, ProductGroup item)>();
-		foreach (var group in groups)
-		{
-			if (uniqueNames.Add(group.item.NormalizedName))
-				uniqueGroups.Add(group);
-			else
-				state.SkippedLines.Add(group.idx);
-		}
+		var uniqueGroups = groups
+			.Select(group => group.item)
+			.DistinctBy(group => group.NormalizedName)
+			.ToList();
+		var uniqueNames = uniqueGroups.Select(group => group.NormalizedName).ToArray();
 
-		var result = await TransactionService.ExecuteAsync(
+		var created = await TransactionService.ExecuteAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{
@@ -100,24 +96,15 @@ public class ProductGroupImportLrt(
 					.ToHashSet();
 
 				var toCreate = uniqueGroups
-					.Where(group => !existingNames.Contains(group.item.NormalizedName))
+					.Where(group => !existingNames.Contains(group.NormalizedName))
 					.ToList();
 
-				await context.UnitOfWork.AddRangeAsync(
-					toCreate.Select(group => group.item).ToList(),
-					cancellationToken);
-
+				await context.UnitOfWork.AddRangeAsync(toCreate, cancellationToken);
 				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
 
-				return new ProductGroupImportBatchResult(
-					toCreate.Count,
-					uniqueGroups
-						.Where(group => existingNames.Contains(group.item.NormalizedName))
-						.Select(group => group.idx)
-						.ToList());
+				return toCreate.Count;
 			},
 			CancellationToken);
-		state.SkippedLines.AddRange(result.SkippedLines);
 
 		Logger.LogInformation(
 			"Product group import batch processed. JobId: {JobId}, " +
@@ -126,13 +113,11 @@ public class ProductGroupImportLrt(
 			JobId,
 			firstIdx,
 			groups.Count,
-			result.Created,
-			groups.Count - result.Created);
+			created,
+			groups.Count - created);
 	}
 
-	private sealed record ProductGroupImportBatchResult(int Created, IReadOnlyList<int> SkippedLines);
-
-	public record NewProductGroupCsvDto
+	public record ProductGroupCsvDto
 	{
 		[Name("Name")]
 		public required string Name { get; init; }

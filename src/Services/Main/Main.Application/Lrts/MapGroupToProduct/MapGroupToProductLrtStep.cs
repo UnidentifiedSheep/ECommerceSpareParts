@@ -35,7 +35,7 @@ public class MapGroupToProductLrtStep(
 	ILogger<MapGroupToProductLrtStep> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<MapGroupToProductInputState, MapGroupToProductState,
-		MapGroupToProductLrtStep.CsvRow, ProductGroupAssignment>(
+		MapGroupToProductLrtStep.ProductGroupMappingCsvDto, ProductGroupAssignment>(
 		jobRepository, bucketsOptions, unitOfWork, publisher, transactionService,
 		logger, s3Service, stringLocalizer)
 {
@@ -60,7 +60,7 @@ public class MapGroupToProductLrtStep(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		CsvRow row,
+		ProductGroupMappingCsvDto row,
 		MapGroupToProductState state,
 		List<CsvImportError> errors,
 		out ProductGroupAssignment item)
@@ -122,7 +122,7 @@ public class MapGroupToProductLrtStep(
 			JobId, items[0].idx, assignments.Count);
 	}
 
-	public sealed record CsvRow
+	public sealed record ProductGroupMappingCsvDto
 	{
 		[Name("Sku")]
 		public required string Sku { get; init; }

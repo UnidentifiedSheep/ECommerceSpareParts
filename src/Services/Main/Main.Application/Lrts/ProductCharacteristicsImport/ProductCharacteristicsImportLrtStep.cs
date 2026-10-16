@@ -32,7 +32,7 @@ public class ProductCharacteristicsImportLrtStep(
 	ILogger<ProductCharacteristicsImportLrtStep> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductCharacteristicsImportInputState, ProductCharacteristicsImportState,
-		ProductCharacteristicsImportLrtStep.CsvRow, ProductCharacteristic>(
+		ProductCharacteristicsImportLrtStep.ProductCharacteristicCsvDto, ProductCharacteristic>(
 		jobRepository, bucketsOptions, unitOfWork, publisher, transactionService,
 		logger, s3Service, stringLocalizer)
 {
@@ -55,7 +55,7 @@ public class ProductCharacteristicsImportLrtStep(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		CsvRow row,
+		ProductCharacteristicCsvDto row,
 		ProductCharacteristicsImportState state,
 		List<CsvImportError> errors,
 		out ProductCharacteristic item)
@@ -118,7 +118,7 @@ public class ProductCharacteristicsImportLrtStep(
 			JobId, items[0].idx, items.Count, errors.Count);
 	}
 
-	public sealed record CsvRow
+	public sealed record ProductCharacteristicCsvDto
 	{
 		[Name("ProductId")]
 		public int ProductId { get; init; }

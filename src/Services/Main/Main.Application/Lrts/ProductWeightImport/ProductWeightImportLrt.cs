@@ -28,7 +28,7 @@ public class ProductWeightImportLrt(
 	ILogger<ProductWeightImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductWeightImportInputState, ProductWeightImportState,
-		ProductWeightImportLrt.CsvRow, ProductWeight>(
+		ProductWeightImportLrt.ProductWeightCsvDto, ProductWeight>(
 		jobRepository,
 		bucketsOptions,
 		unitOfWork,
@@ -51,7 +51,7 @@ public class ProductWeightImportLrt(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		CsvRow row,
+		ProductWeightCsvDto row,
 		ProductWeightImportState state,
 		List<CsvImportError> errors,
 		out ProductWeight item)
@@ -130,7 +130,7 @@ public class ProductWeightImportLrt(
 
 	private sealed record ProductWeightImportBatchResult(int Created, IReadOnlyList<CsvImportError> Errors);
 
-	public sealed record CsvRow
+	public sealed record ProductWeightCsvDto
 	{
 		[Name("ProductId")]
 		public int ProductId { get; init; }

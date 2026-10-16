@@ -31,7 +31,7 @@ public class ProductImportLrtStep(
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductImportLrtStep> logger,
 	IContextualLocalizer stringLocalizer)
-	: CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportLrtStep.NewProductCsvDto,
+	: CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportLrtStep.ProductCsvDto,
 		Product>(
 		jobRepository,
 		bucketsOptions,
@@ -61,7 +61,7 @@ public class ProductImportLrtStep(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		NewProductCsvDto row,
+		ProductCsvDto row,
 		ProductImportState state,
 		List<CsvImportError> errors,
 		out Product item)
@@ -119,7 +119,7 @@ public class ProductImportLrtStep(
 			products.Count);
 	}
 
-	public record NewProductCsvDto
+	public record ProductCsvDto
 	{
 		[Name("Sku")]
 		public required string Sku { get; init; }

@@ -28,7 +28,7 @@ public class ProductEanImportLrt(
 	ILogger<ProductEanImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductEanImportInputState, ProductEanImportState,
-		ProductEanImportLrt.CsvRow, ProductEan>(
+		ProductEanImportLrt.ProductEanCsvDto, ProductEan>(
 		jobRepository, bucketsOptions, unitOfWork, publisher, transactionService,
 		logger, s3Service, stringLocalizer)
 {
@@ -43,7 +43,7 @@ public class ProductEanImportLrt(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		CsvRow row,
+		ProductEanCsvDto row,
 		ProductEanImportState state,
 		List<CsvImportError> errors,
 		out ProductEan item)
@@ -79,7 +79,7 @@ public class ProductEanImportLrt(
 			JobId, items[0].idx, items.Count);
 	}
 
-	public sealed record CsvRow
+	public sealed record ProductEanCsvDto
 	{
 		[Name("ProductId")]
 		public int ProductId { get; init; }

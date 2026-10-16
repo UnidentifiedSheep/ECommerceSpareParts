@@ -20,7 +20,7 @@ public record ProductEanImportState : ProductEanImportInputState, ICsvImportStat
 	};
 }
 
-[CsvSchema(typeof(ProductEanImportLrt.CsvRow))]
+[CsvSchema(typeof(ProductEanImportLrt.ProductEanCsvDto))]
 public record ProductEanImportInputState : IInputState, ICsvImportInputState
 {
 	[SchemaAccepts(".csv")]

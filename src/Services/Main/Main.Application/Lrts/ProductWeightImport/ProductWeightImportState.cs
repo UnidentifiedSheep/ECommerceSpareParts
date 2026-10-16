@@ -20,7 +20,7 @@ public record ProductWeightImportState : ProductWeightImportInputState, ICsvImpo
 	};
 }
 
-[CsvSchema(typeof(ProductWeightImportLrt.CsvRow))]
+[CsvSchema(typeof(ProductWeightImportLrt.ProductWeightCsvDto))]
 public record ProductWeightImportInputState : IInputState, ICsvImportInputState
 {
 	[SchemaAccepts(".csv")]

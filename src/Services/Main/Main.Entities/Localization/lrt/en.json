@@ -15,6 +15,8 @@
     "lrt.product.ean.import.description": "Imports product EANs from a CSV file using product IDs and skips existing entries.",
     "lrt.product.group.import.name": "Product group import",
     "lrt.product.group.import.description": "Imports product groups from an uploaded CSV file, validates names, and adds new groups while skipping existing ones.",
+    "lrt.characteristic.import.name": "Characteristic import",
+    "lrt.characteristic.import.description": "Imports characteristics from a CSV file with a Name column, validates names, and skips existing characteristics by normalized name.",
     "lrt.map.group.to.product.name": "Assign product groups",
     "lrt.map.group.to.product.description": "Assigns product groups from a CSV file, then publishes update events for all products.",
     "lrt.map.group.to.product.step.name": "Assign product groups step",

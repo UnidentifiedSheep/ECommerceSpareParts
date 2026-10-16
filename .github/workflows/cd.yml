@@ -231,3 +231,24 @@ jobs:
       services: ${{ needs.prepare-release.outputs.services }}
       full_deploy: ${{ needs.prepare-release.outputs.full_deploy == 'true' }}
     secrets: inherit
+
+  record-deployment:
+    needs: [prepare-release, deploy]
+    if: ${{ !cancelled() && needs.deploy.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout deployed release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-release.outputs.sha }}
+
+      - name: Record last successful deployment
+        shell: bash
+        env:
+          RELEASE_SHA: ${{ needs.prepare-release.outputs.sha }}
+        run: |
+          set -euo pipefail
+          git push --force origin "${RELEASE_SHA}:refs/tags/deployed/production"

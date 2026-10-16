@@ -21,7 +21,7 @@ public record ProductCrossesByIdsDeleteState : ProductCrossesByIdsDeleteInputSta
 	};
 }
 
-[CsvSchema(typeof(ProductCrossesByIdsDeleteLrt.CsvRow))]
+[CsvSchema(typeof(ProductCrossesByIdsDeleteLrt.ProductCrossByIdsCsvDto))]
 public record ProductCrossesByIdsDeleteInputState : IInputState, ICsvImportInputState
 {
 	[SchemaAccepts(".csv")]

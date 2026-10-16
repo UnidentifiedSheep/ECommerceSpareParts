@@ -32,7 +32,7 @@ public class ProductCrossesByIdsImportLrt(
 	ILogger<ProductCrossesByIdsImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductCrossesByIdsImportInputState, ProductCrossesByIdsImportState,
-		ProductCrossesByIdsImportLrt.CsvRow, ProductCross>(
+		ProductCrossesByIdsImportLrt.ProductCrossByIdsCsvDto, ProductCross>(
 		jobRepository,
 		bucketsOptions,
 		unitOfWork,
@@ -57,7 +57,7 @@ public class ProductCrossesByIdsImportLrt(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		CsvRow row,
+		ProductCrossByIdsCsvDto row,
 		ProductCrossesByIdsImportState state,
 		List<CsvImportError> errors,
 		out ProductCross item)
@@ -119,7 +119,7 @@ public class ProductCrossesByIdsImportLrt(
 			errors.Count);
 	}
 
-	public sealed record CsvRow
+	public sealed record ProductCrossByIdsCsvDto
 	{
 		[Name("Id")]
 		public int Id { get; init; }

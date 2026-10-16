@@ -21,7 +21,7 @@ public record ProductCrossesByIdsImportState : ProductCrossesByIdsImportInputSta
 	};
 }
 
-[CsvSchema(typeof(ProductCrossesByIdsImportLrt.CsvRow))]
+[CsvSchema(typeof(ProductCrossesByIdsImportLrt.ProductCrossByIdsCsvDto))]
 public record ProductCrossesByIdsImportInputState : IInputState, ICsvImportInputState
 {
 	[SchemaAccepts(".csv")]

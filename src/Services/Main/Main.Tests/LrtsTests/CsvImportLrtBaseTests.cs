@@ -170,7 +170,7 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		IPublishEndpoint publisher,
 		IApplicationTransactionService transactionService,
 		IContextualLocalizer stringLocalizer)
-		: CsvImportLrtBase<TestCsvImportInputState, TestCsvImportState, TestCsvRow, string>(
+		: CsvImportLrtBase<TestCsvImportInputState, TestCsvImportState, TestCsvDto, string>(
 			jobRepository,
 			bucketsOptions,
 			unitOfWork,
@@ -203,7 +203,7 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 
 		protected override bool TryProcessRow(
 			int rowIdx,
-			TestCsvRow row,
+			TestCsvDto row,
 			TestCsvImportState state,
 			List<CsvImportError> errors,
 			out string item)
@@ -243,7 +243,7 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		}
 	}
 
-	public sealed record TestCsvRow
+	public sealed record TestCsvDto
 	{
 		[Name("Value", "Val,ue")]
 		public required string Value { get; init; }
@@ -267,7 +267,7 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		};
 	}
 
-	[CsvSchema(typeof(TestCsvRow))]
+	[CsvSchema(typeof(TestCsvDto))]
 	public record TestCsvImportInputState : IInputState, ICsvImportInputState
 	{
 

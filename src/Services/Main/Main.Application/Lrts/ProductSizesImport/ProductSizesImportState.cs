@@ -21,7 +21,7 @@ public record ProductSizesImportState : ProductSizesImportInputState,
 	};
 }
 
-[CsvSchema(typeof(ProductSizesImportLrt.CsvRow))]
+[CsvSchema(typeof(ProductSizesImportLrt.ProductSizeCsvDto))]
 public record ProductSizesImportInputState : IInputState, ICsvImportInputState
 {
 	[SchemaAccepts(".csv")]

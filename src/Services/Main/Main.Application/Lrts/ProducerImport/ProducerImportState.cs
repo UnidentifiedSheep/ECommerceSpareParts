@@ -20,7 +20,7 @@ public record ProducerImportState : ProducerImportInputState, ICsvImportState<Pr
 	};
 }
 
-[CsvSchema(typeof(ProducerImportLrt.NewProducerCsvDto))]
+[CsvSchema(typeof(ProducerImportLrt.ProducerCsvDto))]
 public record ProducerImportInputState : IInputState, ICsvImportInputState
 {
 	[SchemaAccepts(".csv")]

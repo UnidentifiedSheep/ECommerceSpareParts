@@ -8,9 +8,6 @@ namespace Main.Application.Lrts.ProductGroupImport;
 
 public record ProductGroupImportState : ProductGroupImportInputState, ICsvImportState<ProductGroupImportState>
 {
-	[JsonPropertyName("skippedLines")]
-	public List<int> SkippedLines { get; init; } = [];
-
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
 
@@ -23,7 +20,7 @@ public record ProductGroupImportState : ProductGroupImportInputState, ICsvImport
 	};
 }
 
-[CsvSchema(typeof(ProductGroupImportLrt.NewProductGroupCsvDto))]
+[CsvSchema(typeof(ProductGroupImportLrt.ProductGroupCsvDto))]
 public record ProductGroupImportInputState : IInputState, ICsvImportInputState
 {
 	[SchemaAccepts(".csv")]

@@ -32,7 +32,7 @@ public class ProductCrossesByIdsDeleteLrt(
 	ILogger<ProductCrossesByIdsDeleteLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductCrossesByIdsDeleteInputState, ProductCrossesByIdsDeleteState,
-		ProductCrossesByIdsDeleteLrt.CsvRow, ProductCross>(
+		ProductCrossesByIdsDeleteLrt.ProductCrossByIdsCsvDto, ProductCross>(
 		jobRepository,
 		bucketsOptions,
 		unitOfWork,
@@ -57,7 +57,7 @@ public class ProductCrossesByIdsDeleteLrt(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		CsvRow row,
+		ProductCrossByIdsCsvDto row,
 		ProductCrossesByIdsDeleteState state,
 		List<CsvImportError> errors,
 		out ProductCross item)
@@ -118,7 +118,7 @@ public class ProductCrossesByIdsDeleteLrt(
 			errors.Count);
 	}
 
-	public sealed record CsvRow
+	public sealed record ProductCrossByIdsCsvDto
 	{
 		[Name("Id")]
 		public int Id { get; init; }

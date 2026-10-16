@@ -28,7 +28,7 @@ public class ProductSizesImportLrt(
 	ILogger<ProductSizesImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductSizesImportInputState, ProductSizesImportState,
-		ProductSizesImportLrt.CsvRow, ProductSize>(
+		ProductSizesImportLrt.ProductSizeCsvDto, ProductSize>(
 		jobRepository,
 		bucketsOptions,
 		unitOfWork,
@@ -51,7 +51,7 @@ public class ProductSizesImportLrt(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		CsvRow row,
+		ProductSizeCsvDto row,
 		ProductSizesImportState state,
 		List<CsvImportError> errors,
 		out ProductSize item)
@@ -157,7 +157,7 @@ public class ProductSizesImportLrt(
 
 	private sealed record ProductSizesImportBatchResult(int Created, IReadOnlyList<CsvImportError> Errors);
 
-	public sealed record CsvRow
+	public sealed record ProductSizeCsvDto
 	{
 		[Name("ProductId")]
 		public int ProductId { get; init; }

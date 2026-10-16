@@ -28,7 +28,7 @@ public class ProducerImportLrt(
 	IPublishEndpoint publisher,
 	IApplicationTransactionService transactionService,
 	IContextualLocalizer stringLocalizer)
-	: CsvImportLrtBase<ProducerImportInputState, ProducerImportState, ProducerImportLrt.NewProducerCsvDto,
+	: CsvImportLrtBase<ProducerImportInputState, ProducerImportState, ProducerImportLrt.ProducerCsvDto,
 		Producer>(
 		jobRepository,
 		bucketsOptions,
@@ -51,7 +51,7 @@ public class ProducerImportLrt(
 
 	protected override bool TryProcessRow(
 		int rowIdx,
-		NewProducerCsvDto row,
+		ProducerCsvDto row,
 		ProducerImportState state,
 		List<CsvImportError> errors,
 		out Producer item)
@@ -126,7 +126,7 @@ public class ProducerImportLrt(
 			errors.Count - errorsBeforeBatch);
 	}
 
-	public record NewProducerCsvDto
+	public record ProducerCsvDto
 	{
 		[Name("Name")]
 		public required string Name { get; init; }

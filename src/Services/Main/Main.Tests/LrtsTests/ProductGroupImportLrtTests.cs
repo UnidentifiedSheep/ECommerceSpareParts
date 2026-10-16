@@ -32,7 +32,6 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductGroupImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(5);
-		state.SkippedLines.Should().BeEquivalentTo([1, 3]);
 		state.Errors.Should().ContainSingle(error => error.RowIdx == 4);
 
 		var groups = await Context.ProductGroups.AsNoTracking().ToListAsync(CancellationToken);
@@ -61,7 +60,6 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		state.Checkpoint!.CurrentLine.Should().Be(5);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2, 3);
 		state.Errors.Should().OnlyContain(error => !string.IsNullOrWhiteSpace(error.Message));
-		state.SkippedLines.Should().BeEmpty();
 
 		var groups = await Context.ProductGroups.AsNoTracking().ToListAsync(CancellationToken);
 		groups.Should().HaveCount(2);
@@ -82,7 +80,6 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		var state = execution.GetState<ProductGroupImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(1001);
 		state.Errors.Should().BeEmpty();
-		state.SkippedLines.Should().BeEquivalentTo(Enumerable.Range(2, 1000));
 		(await Context.ProductGroups.AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle(group => group.Name == "Brake Pads");
 	}
@@ -99,7 +96,6 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		var state = execution.GetState<ProductGroupImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(2);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2);
-		state.SkippedLines.Should().BeEmpty();
 		(await Context.ProductGroups.CountAsync(CancellationToken)).Should().Be(0);
 	}
 }

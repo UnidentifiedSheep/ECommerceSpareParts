@@ -20,7 +20,7 @@ public record MapGroupToProductState : MapGroupToProductInputState, ICsvImportSt
 	};
 }
 
-[CsvSchema(typeof(MapGroupToProductLrtStep.CsvRow))]
+[CsvSchema(typeof(MapGroupToProductLrtStep.ProductGroupMappingCsvDto))]
 public record MapGroupToProductInputState : IInputState, ICsvImportInputState
 {
 	[SchemaAccepts(".csv")]
