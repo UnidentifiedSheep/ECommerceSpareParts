@@ -13,7 +13,6 @@ using Carter;
 using Contracts.Auth;
 using Contracts.Currency;
 using Contracts.Job;
-using Contracts.Products;
 using Contracts.Settings;
 using Contracts.User;
 using GraphQL.Common.Extensions;
@@ -113,7 +112,6 @@ builder.Services.AddMassTransit(x =>
 				ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
 
 				ep.Bind<CurrencyCreatedEvent>();
-				ep.Bind<ProductsUpdatedEvent>();
 				ep.Bind<RoleUpdatedEvent>();
 				ep.Bind<UserDiscountUpdatedEvent>();
 				ep.Bind<CurrencyRateChangedEvent>();

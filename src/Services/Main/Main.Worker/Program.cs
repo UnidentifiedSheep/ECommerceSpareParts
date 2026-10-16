@@ -9,7 +9,6 @@ using Cache;
 using Contracts.Auth;
 using Contracts.Currency;
 using Contracts.Job;
-using Contracts.Products;
 using Contracts.Settings;
 using Contracts.Supplier;
 using Contracts.User;
@@ -139,7 +138,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
 					ep.Bind<SupplierProductsRequestedEvent>();
 					ep.Bind<CurrencyCreatedEvent>();
-					ep.Bind<ProductsUpdatedEvent>();
 					ep.Bind<RoleUpdatedEvent>();
 					ep.Bind<UserDiscountUpdatedEvent>();
 					ep.Bind<CurrencyRateChangedEvent>();
