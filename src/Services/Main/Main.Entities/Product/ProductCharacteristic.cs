@@ -35,7 +35,7 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, int)>,
 	{
 		Value = value
 			.Trim()
-			.EnsureMinLength(3, ArticleCharacteristicValueMinLengthMessage.Instance)
+			.EnsureNotNullOrWhiteSpace(ArticleCharacteristicValueMustNotBeEmptyMessage.Instance)
 			.EnsureMaxLength(128, ArticleCharacteristicValueMaxLengthMessage.Instance);
 	}
 

@@ -22,8 +22,6 @@ public class UpsertCharacteristicsValidation : AbstractValidator<UpsertCharacter
 					.Cascade(CascadeMode.Stop)
 					.NotEmpty()
 					.WithLocalizableError(ArticleCharacteristicValueMustNotBeEmptyMessage.Instance)
-					.Must(x => x.Trim().Length >= 3)
-					.WithLocalizableError(ArticleCharacteristicValueMinLengthMessage.Instance)
 					.Must(x => x.Trim().Length <= 128)
 					.WithLocalizableError(ArticleCharacteristicValueMaxLengthMessage.Instance);
 

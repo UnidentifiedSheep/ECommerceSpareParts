@@ -39,7 +39,7 @@ public sealed class ProductCharacteristicsImportLrtStepTests : CsvLrtIntegration
 			CsvRow(products[1].Id, "Размер детали", " 200 mm "),
 			CsvRow(products[0].Id, "brake-color", "Green"),
 			CsvRow(products[1].Id, "РАЗМЕР ДЕТАЛИ", "300 mm"),
-			CsvRow(products[0].Id, "Brake Color", "x")
+			CsvRow(products[0].Id, "Brake Color", " x ")
 		];
 
 		for (var attempt = 0; attempt < 2; attempt++)
@@ -50,13 +50,13 @@ public sealed class ProductCharacteristicsImportLrtStepTests : CsvLrtIntegration
 			execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 			var state = execution.GetState<ProductCharacteristicsImportState>();
 			state.Checkpoint!.CurrentLine.Should().Be(7);
-			state.Errors.Should().ContainSingle(error => error.RowIdx == 7);
+			state.Errors.Should().BeEmpty();
 		}
 
 		var values = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
 			.ToDictionary(x => x.GetId(), x => x.Value);
 		values.Should().HaveCount(5);
-		values[(products[0].Id, color.Id)].Should().Be("Green");
+		values[(products[0].Id, color.Id)].Should().Be("x");
 		values[(products[1].Id, color.Id)].Should().Be("Blue");
 		values[(products[0].Id, size.Id)].Should().Be("100 mm");
 		values[(products[1].Id, size.Id)].Should().Be("300 mm");
@@ -68,6 +68,7 @@ public sealed class ProductCharacteristicsImportLrtStepTests : CsvLrtIntegration
 	public async Task InvalidRows_AreReportedWithoutDiscardingValidValues()
 	{
 		var productId = TestContext.Products[0].Id;
+		var secondProductId = TestContext.Products[1].Id;
 		var characteristic = Characteristic.Create("Color");
 		Context.Characteristics.Add(characteristic);
 		await Context.SaveChangesAsync(CancellationToken);
@@ -79,21 +80,22 @@ public sealed class ProductCharacteristicsImportLrtStepTests : CsvLrtIntegration
 				CsvRow(productId, "", "Red"),
 				CsvRow("invalid", "Color", "Red"),
 				CsvRow(productId, "Color", ""),
-				CsvRow(productId, "Color", "ab"),
+				CsvRow(productId, "Color", "   "),
 				CsvRow(productId, "Color", new string('x', 129)),
-				CsvRow(productId, "Color", "  Valid  ")
+				CsvRow(productId, "Color", " x "),
+				CsvRow(secondProductId, "Color", " ab ")
 			],
 			fileName => new ProductCharacteristicsImportInputState { FileName = fileName });
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductCharacteristicsImportState>();
-		state.Checkpoint!.CurrentLine.Should().Be(7);
+		state.Checkpoint!.CurrentLine.Should().Be(8);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(Enumerable.Range(1, 6));
-		var value = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
-			.Should().ContainSingle().Which;
-		value.ProductId.Should().Be(productId);
-		value.CharacteristicId.Should().Be(characteristic.Id);
-		value.Value.Should().Be("Valid");
+		var values = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
+			.ToDictionary(x => x.GetId(), x => x.Value);
+		values.Should().HaveCount(2);
+		values[(productId, characteristic.Id)].Should().Be("x");
+		values[(secondProductId, characteristic.Id)].Should().Be("ab");
 		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(1);
 	}
 

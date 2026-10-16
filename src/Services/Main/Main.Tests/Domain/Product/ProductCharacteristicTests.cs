@@ -1,5 +1,6 @@
 ﻿using Exceptions;
 using FluentAssertions;
+using Main.Entities;
 using Main.Entities.Product;
 
 namespace Tests.Domain.Product;
@@ -9,6 +10,8 @@ public class ProductCharacteristicTests
 	[Theory]
 	[InlineData(1, 10, "Red")]
 	[InlineData(2, 20, "  Large  ")]
+	[InlineData(1, 10, " a ")]
+	[InlineData(2, 20, " ab ")]
 	public void Create_UsesProductAndCharacteristicIds(int productId, int characteristicId, string value)
 	{
 		var model = ProductCharacteristic.Create(productId, characteristicId, value);
@@ -25,36 +28,44 @@ public class ProductCharacteristicTests
 	}
 
 	[Theory]
-	[InlineData("a")]
-	[InlineData("ab")]
-	public void Create_ValueTooShort_Throws(string value)
+	[InlineData("")]
+	[InlineData("   ")]
+	[InlineData("\t\r\n")]
+	public void Create_EmptyOrWhitespaceValue_Throws(string value)
 	{
 		var act = () => ProductCharacteristic.Create(1, 10, value);
 
-		act.Should().Throw<InvalidInputException>();
+		act.Should().Throw<InvalidInputException>()
+			.Which.LocalizableMessage.MessageKey.Should().Be(ArticleCharacteristicValueMustNotBeEmptyMessage.Key);
 	}
 
 	[Fact]
-	public void Create_ValueTooLong_Throws()
+	public void Create_ValueLengthBoundary()
 	{
+		var value = new string('x', 128);
+		ProductCharacteristic.Create(1, 10, $"  {value}  ").Value.Should().Be(value);
 		var act = () => ProductCharacteristic.Create(1, 10, new string('x', 129));
 
-		act.Should().Throw<InvalidInputException>();
+		act.Should().Throw<InvalidInputException>()
+			.Which.LocalizableMessage.MessageKey.Should().Be(ArticleCharacteristicValueMaxLengthMessage.Key);
 	}
 
-	[Fact]
-	public void SetValue_UpdatesValueAndPreservesKey()
+	[Theory]
+	[InlineData("  NewValue  ", "NewValue")]
+	[InlineData(" a ", "a")]
+	[InlineData(" ab ", "ab")]
+	public void SetValue_UpdatesValueAndPreservesKey(string input, string expected)
 	{
 		var model = ProductCharacteristic.Create(1, 10, "Value");
 
-		model.SetValue("  NewValue  ");
+		model.SetValue(input);
 
-		model.Value.Should().Be("NewValue");
+		model.Value.Should().Be(expected);
 		model.GetId().Should().Be((1, 10));
 	}
 
 	[Theory]
-	[InlineData("ab")]
+	[InlineData("")]
 	[InlineData("   ")]
 	public void SetValue_InvalidValue_PreservesExistingValue(string value)
 	{

@@ -60,7 +60,7 @@ public class UpsertProductCharacteristicsTests
 	[InlineData(null, false)]
 	[InlineData("", false)]
 	[InlineData("   ", false)]
-	[InlineData("  ab  ", false)]
+	[InlineData("  ab  ", true)]
 	[InlineData("  Red  ", true)]
 	public void ValueValidation_HandlesMissingAndTrimmedValues(string? value, bool expected)
 	{
