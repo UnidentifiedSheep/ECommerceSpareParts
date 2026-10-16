@@ -101,6 +101,9 @@ environments.
 - [`deploy/`](docs/SWARM_DEPLOYMENT.md) — Docker Swarm stacks for secrets sync, gateway, applications, workers,
   infrastructure, and monitoring.
 
+CD also [cleans up old registry images](docs/SWARM_DEPLOYMENT.md#registry-cleanup) after successful deployments,
+preserving `current`, `previous`, pending releases, and images less than 7 days old.
+
 ## Documentation
 
 - [Main service](docs/MAIN.md)

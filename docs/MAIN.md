@@ -49,5 +49,23 @@ facts, and Pricing rebuilds internal offers from these events.
 Main Worker processes email and long-running jobs. Current import jobs accept CSV data for catalog and supplier mapping
 operations, while currency-rate and catalog synchronization jobs support scheduled maintenance.
 
-See [TODO.md](TODO.md) for planned supplier-driven catalog enrichment and automatic suggestions.
+`ProductSynchronizationLrt` accepts an optional `parts` field. Omit it (send `{}`) to synchronize all sections, or send
+`"All"`, `"Core"`, `"Characteristics"`, `"Dimensions"`, `"Weight"`, or a comma-separated combination such as
+`"Characteristics, Weight"`. Numeric flag values are also accepted: Core = 1, Characteristics = 2, Dimensions = 4,
+Weight = 8, All = 15. Combine numeric values with bitwise OR; zero and unsupported bits are rejected.
 
+The job creation endpoint takes `inputState` as a JSON string:
+
+```json
+{
+  "systemName": "ProductSynchronizationLrt",
+  "inputState": "{\"parts\":\"Characteristics, Weight\"}",
+  "maxAttempts": 3
+}
+```
+
+In `/jobs/available`, `initStateSchema.fields` describes `parts` as an enum with the `EnumSelector` control and
+`dependency.entityName = "ProductEventParts"`, plus a localized label and description. For multiple selections, join the
+enum names with `", "` before serializing `inputState`; `parts` is a single string or number, not a JSON array.
+
+See [TODO.md](TODO.md) for planned supplier-driven catalog enrichment and automatic suggestions.

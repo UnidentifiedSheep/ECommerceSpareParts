@@ -46,6 +46,8 @@
     "lrt.producer.synchronization.description": "Publishes update events for all producers so related services can refresh their producer data.",
     "lrt.product.synchronization.name": "Product synchronization",
     "lrt.product.synchronization.description": "Publishes update events for all products so related services can refresh their product data.",
+    "lrt.product.synchronization.parts.name": "Product data sections",
+    "lrt.product.synchronization.parts.description": "Select Core (basic data), Characteristics, Dimensions, Weight or All (all sections, the default). Send multiple sections as one comma-separated string, for example Characteristics, Weight.",
     "lrt.catalogue.candidates.synchronization.name": "Catalogue candidate synchronization",
     "lrt.catalogue.candidates.synchronization.description": "Publishes update events for all candidates so the search service can fully rebuild the catalogue candidate index.",
     "lrt.currency.rates.update.name": "Currency rate update",

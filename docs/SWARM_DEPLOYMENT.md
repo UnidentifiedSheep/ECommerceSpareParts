@@ -177,6 +177,27 @@ credentials are never placed in workflow outputs.
 
 Compose and Swarm files continue to use `${ARTIFACT_REGISTRY_HOST}`. The workflow assigns that variable to the selected primary or backup host, so separate copies of stack and migrator compose files are not required.
 
+## Registry cleanup
+
+After a successful deployment and recording `deployed/production`, CD runs `scripts/ci/cleanup-registry.py` against the registry selected for that release. The primary and backup registries use their existing `ARTIFACT_REGISTRY_*` and `BACKUP_ARTIFACT_REGISTRY_*` credentials. The selected account needs manifest-delete permission; in Cloud.ru this requires `ar.admin` on the target registry. A cleanup failure marks the cleanup job as failed and leaves the completed deployment in place.
+
+The script derives its repository allowlist from `compose.registry.yaml` and `migrator-compose.registry.yaml`. It does not scan the registry catalog or touch repositories outside this project. Only full commit-SHA tags from the deployed commit's Git history are eligible for deletion. It preserves:
+
+- `current`, `previous`, and all child/subject manifests they reference, even when an old SHA tag points to the same digest;
+- the deployed release SHA, newer or unknown commits, manually named tags, and `buildcache`;
+- images created less than 7 days ago, and images with an unknown creation time.
+
+Cleanup is deferred when another GitHub workflow is queued, running, or waiting for approval. The script periodically rechecks workflow activity, verifies that the repository's tag snapshot has not changed before applying its plan, and rechecks protected tags before each deletion. Registry or GitHub API errors stop cleanup rather than weakening these checks. The existing CD concurrency group serializes deployment, promotion, and cleanup.
+
+Optional GitHub Variables:
+
+- `REGISTRY_CLEANUP_MIN_AGE_HOURS`, default `168` (7 days), minimum `1`;
+- `REGISTRY_CLEANUP_DRY_RUN`, default `false`; set `true` to print the deletion plan without changing the registry.
+
+No additional scheduling service or Cloud.ru Premium retention policy is needed. Cleanup runs after successful deployments, so an image retained by the age limit is reconsidered on the next successful deployment. The script deletes tagged manifests by digest, never blobs or layers directly. Untagged manifests are not enumerated by Registry V2's tag API, and reclaiming storage remains the registry's garbage-collection responsibility. The other registry is not cleaned during that release.
+
+When run directly, the script defaults to preview and deletes only with `--apply`. It reads credentials from environment variables and never prints registry passwords, bearer tokens, or authentication response bodies.
+
 ## Deployment modes
 
 Application-only changes use the ordered runtime deployment plan: affected images and migrators are updated, while the

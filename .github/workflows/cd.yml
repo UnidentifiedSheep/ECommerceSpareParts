@@ -252,3 +252,40 @@ jobs:
         run: |
           set -euo pipefail
           git push --force origin "${RELEASE_SHA}:refs/tags/deployed/production"
+
+  cleanup-registry:
+    name: Clean old registry images
+    needs: [prepare-release, deploy, record-deployment]
+    if: >-
+      !cancelled() &&
+      needs.deploy.result == 'success' &&
+      needs.record-deployment.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ARTIFACT_REGISTRY_HOST: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_HOST || secrets.ARTIFACT_REGISTRY_HOST }}
+      ARTIFACT_REGISTRY_USERNAME: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME || secrets.ARTIFACT_REGISTRY_USERNAME }}
+      ARTIFACT_REGISTRY_PASSWORD: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}
+      GITHUB_TOKEN: ${{ github.token }}
+      DEPLOYED_SHA: ${{ needs.prepare-release.outputs.sha }}
+      CLEANUP_MIN_AGE_HOURS: ${{ vars.REGISTRY_CLEANUP_MIN_AGE_HOURS || '168' }}
+      CLEANUP_DRY_RUN: ${{ vars.REGISTRY_CLEANUP_DRY_RUN || 'false' }}
+
+    steps:
+      - name: Checkout registry cleanup code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          fetch-depth: 0
+
+      - name: Remove obsolete project images
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--deployed-sha "$DEPLOYED_SHA" --min-age-hours "$CLEANUP_MIN_AGE_HOURS")
+          case "$CLEANUP_DRY_RUN" in
+            true) ;;
+            false) args+=(--apply) ;;
+            *) echo 'REGISTRY_CLEANUP_DRY_RUN must be true or false.' >&2; exit 1 ;;
+          esac
+          python3 scripts/ci/cleanup-registry.py "${args[@]}"

@@ -46,6 +46,8 @@
     "lrt.producer.synchronization.description": "İlgili servislerin üretici verilerini yenileyebilmesi için tüm üreticiler için güncelleme olayları yayınlar.",
     "lrt.product.synchronization.name": "Ürün senkronizasyonu",
     "lrt.product.synchronization.description": "İlgili servislerin ürün verilerini yenileyebilmesi için tüm ürünler için güncelleme olayları yayınlar.",
+    "lrt.product.synchronization.parts.name": "Ürün veri bölümleri",
+    "lrt.product.synchronization.parts.description": "Core (temel veriler), Characteristics (özellikler), Dimensions (ölçüler), Weight (ağırlık) veya All (tüm bölümler, varsayılan) seçin. Birden fazla bölümü Characteristics, Weight örneğindeki gibi virgülle ayrılmış tek bir metin olarak gönderin.",
     "lrt.catalogue.candidates.synchronization.name": "Katalog adayı senkronizasyonu",
     "lrt.catalogue.candidates.synchronization.description": "Arama servisinin katalog adayı dizinini tamamen yeniden oluşturabilmesi için tüm adaylara ait güncelleme olaylarını yayınlar.",
     "lrt.currency.rates.update.name": "Döviz kuru güncelleme",
