@@ -48,7 +48,6 @@ services:
     networks:
       backend:
         aliases:
-          - postgres
           - pgql
     deploy:
       replicas: 1
