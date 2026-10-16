@@ -45,6 +45,7 @@ jobs:
           cp prometheus.yml deploy-payload/prometheus.yml
           cp scripts/deploy/deploy-swarm.sh deploy-payload/scripts/deploy/deploy-swarm.sh
           cp scripts/deploy/load-secrets.py deploy-payload/scripts/deploy/load-secrets.py
+          cp scripts/deploy/bootstrap-arcane.py deploy-payload/scripts/deploy/bootstrap-arcane.py
           cp -R init/. deploy-payload/init/
 
           required_files=(
@@ -62,6 +63,7 @@ jobs:
             init/create-multiple-postgresql-databases.sh
             scripts/deploy/deploy-swarm.sh
             scripts/deploy/load-secrets.py
+            scripts/deploy/bootstrap-arcane.py
             prometheus.yml
           )
 
@@ -79,7 +81,8 @@ jobs:
 
           bash -n deploy-payload/scripts/deploy/deploy-swarm.sh
           PYTHONPYCACHEPREFIX="$RUNNER_TEMP/deploy-pycache" \
-            python3 -m py_compile deploy-payload/scripts/deploy/load-secrets.py
+            python3 -m py_compile deploy-payload/scripts/deploy/load-secrets.py deploy-payload/scripts/deploy/bootstrap-arcane.py
+          python3 -m unittest discover -s scripts/deploy/tests -p 'test_*.py'
 
           export ARTIFACT_REGISTRY_HOST=registry.invalid
           export IMAGE_TAG=current
@@ -94,7 +97,8 @@ jobs:
           export GRAFANA_ADMIN_PASSWORD=validation
           export TRAEFIK_ACME_EMAIL=validation@example.invalid
           export GATEWAY_HOST=gateway.example.invalid
-          export PORTAINER_HOST=portainer.example.invalid
+          export ARCANE_HOST=arcane.example.invalid
+          export ARCANE_TRUSTED_PROXIES=10.0.0.0/24
           export GRAFANA_HOST=grafana.example.invalid
           export OPENSEARCH_DASHBOARDS_HOST=opensearch.example.invalid
           export RABBITMQ_HOST=rabbitmq.example.invalid

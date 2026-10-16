@@ -8,3 +8,5 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 **/.obsidian/
+.arcane-initial-password
+scripts/deploy/**/__pycache__/

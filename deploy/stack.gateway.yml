@@ -89,51 +89,57 @@ services:
         condition: any
         delay: 5s
 
-  portainer-agent:
-    image: portainer/agent:lts
+  arcane:
+    image: ghcr.io/getarcaneapp/manager:v2.16.1
     environment:
-      AGENT_CLUSTER_ADDR: tasks.portainer-agent
+      APP_URL: https://${ARCANE_HOST:?ARCANE_HOST is required}
+      PORT: "3552"
+      ENCRYPTION_KEY_FILE: /run/secrets/arcane_encryption_key
+      ADMIN_STATIC_API_KEY_FILE: /run/secrets/arcane_admin_api_key
+      TRUSTED_PROXIES: ${ARCANE_TRUSTED_PROXIES:?ARCANE_TRUSTED_PROXIES is required}
+    healthcheck:
+      test: ["CMD", "/app/arcane", "health", "--timeout", "2s"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes:/var/lib/docker/volumes
-    networks:
-      - portainer-agent
-    deploy:
-      mode: global
-      placement:
-        constraints:
-          - node.platform.os == linux
-      restart_policy:
-        condition: any
-        delay: 5s
-
-  portainer:
-    image: portainer/portainer-ce:lts
-    command:
-      - -H
-      - tcp://tasks.portainer-agent:9001
-      - --tlsskipverify
-    volumes:
-      - portainer_data:/data
+      - arcane_data:/app/data
+    secrets:
+      - source: arcane_encryption_key
+        target: arcane_encryption_key
+        uid: "65532"
+        gid: "65532"
+        mode: 0400
+      - source: arcane_admin_api_key
+        target: arcane_admin_api_key
+        uid: "65532"
+        gid: "65532"
+        mode: 0400
     networks:
       public:
         aliases:
-          - portainer
-      portainer-agent:
+          - arcane
+      arcane-agent:
+        aliases:
+          - arcane
     deploy:
       replicas: 1
       placement:
         constraints:
           - node.role == manager
-          - node.labels.management.portainer == true
+          - node.labels.management.arcane == true
       labels:
-        - traefik.enable=true
+        # First installation stays private until bootstrap changes the default password.
+        - traefik.enable=${ARCANE_PUBLIC_ENABLED:-false}
         - traefik.swarm.network=${PUBLIC_NETWORK:-public}
-        - traefik.http.routers.portainer.rule=Host(`${PORTAINER_HOST:?PORTAINER_HOST is required}`)
-        - traefik.http.routers.portainer.entrypoints=websecure
-        - traefik.http.routers.portainer.tls.certresolver=letsencrypt
-        - traefik.http.services.portainer.loadbalancer.server.port=9000
-        - traefik.http.services.portainer.loadbalancer.server.scheme=http
+        - traefik.http.routers.arcane.rule=Host(`${ARCANE_HOST}`)
+        - traefik.http.routers.arcane.entrypoints=websecure
+        - traefik.http.routers.arcane.tls.certresolver=letsencrypt
+        - traefik.http.routers.arcane.priority=100
+        - traefik.http.services.arcane.loadbalancer.server.port=3552
+        - traefik.http.services.arcane.loadbalancer.server.scheme=http
       update_config:
         parallelism: 1
         order: stop-first
@@ -148,15 +154,22 @@ networks:
   backend:
     name: ${BACKEND_NETWORK:-backend}
     external: true
-  portainer-agent:
-    name: ${PORTAINER_AGENT_NETWORK:-portainer_agent_network}
-    driver: overlay
-    attachable: true
+  arcane-agent:
+    name: ${ARCANE_AGENT_NETWORK:-arcane_agent_network}
+    external: true
 
 volumes:
   traefik_letsencrypt:
     name: ${VOLUME_PREFIX:-ecommerce}_traefik_letsencrypt
     external: true
-  portainer_data:
-    name: ${VOLUME_PREFIX:-ecommerce}_portainer_data
+  arcane_data:
+    name: ${VOLUME_PREFIX:-ecommerce}_arcane_data
+    external: true
+
+secrets:
+  arcane_encryption_key:
+    name: ${ARCANE_ENCRYPTION_SECRET:-arcane_encryption_key}
+    external: true
+  arcane_admin_api_key:
+    name: ${ARCANE_ADMIN_API_KEY_SECRET:-arcane_admin_api_key}
     external: true

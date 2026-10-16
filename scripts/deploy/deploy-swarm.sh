@@ -49,8 +49,7 @@ MONITORING_SERVICES=(
 GATEWAY_SERVICES=(
   "gateway:traefik"
   "gateway:gateway"
-  "gateway:portainer-agent"
-  "gateway:portainer"
+  "gateway:arcane"
 )
 
 MIGRATORS=(
@@ -61,7 +60,7 @@ MIGRATORS=(
 
 PERSISTENT_VOLUMES=(
   traefik_letsencrypt
-  portainer_data
+  arcane_data
   pg_data
   redis_data
   rabbitmq_data
@@ -75,7 +74,7 @@ PERSISTENT_VOLUMES=(
 REQUIRED_NODE_LABELS=(
   workload.traefik=true
   workload.gateway=true
-  management.portainer=true
+  management.arcane=true
   workload.api=true
   workload.worker=true
   infra.postgres=true
@@ -92,7 +91,7 @@ REQUIRED_NODE_LABELS=(
 ACTIVE_MIGRATOR_SERVICE=""
 ACTIVE_DIRECTORY_SERVICE=""
 ACTIVE_WALG_PREFLIGHT_SERVICE=""
-ACTIVE_PORTAINER_PREFLIGHT_SERVICE=""
+ACTIVE_ARCANE_BOOTSTRAP_SERVICE=""
 FULL_DEPLOY_TRANSACTION_ACTIVE=false
 declare -A FULL_DEPLOY_SERVICE_SPEC_HASHES=()
 
@@ -127,8 +126,8 @@ cleanup_temporary_services() {
     sudo docker service rm "$ACTIVE_WALG_PREFLIGHT_SERVICE" >/dev/null 2>&1 || true
   fi
 
-  if [ -n "$ACTIVE_PORTAINER_PREFLIGHT_SERVICE" ]; then
-    sudo docker service rm "$ACTIVE_PORTAINER_PREFLIGHT_SERVICE" >/dev/null 2>&1 || true
+  if [ -n "$ACTIVE_ARCANE_BOOTSTRAP_SERVICE" ]; then
+    sudo docker service rm "$ACTIVE_ARCANE_BOOTSTRAP_SERVICE" >/dev/null 2>&1 || true
   fi
 }
 
@@ -186,6 +185,12 @@ snapshot_full_deploy_services() {
     )
   done
 
+  while read -r name; do
+    [ -n "$name" ] || continue
+    spec_hash="$(sudo docker service inspect "$name" --format '{{json .Spec}}' | sha256sum | cut -d ' ' -f 1)"
+    FULL_DEPLOY_SERVICE_SPEC_HASHES["$name"]="$spec_hash"
+  done < <(sudo docker service ls --filter "label=ecommerce.arcane.stack=${STACK_NAME}" --format '{{.Name}}')
+
   FULL_DEPLOY_TRANSACTION_ACTIVE=true
   echo "Captured ${#FULL_DEPLOY_SERVICE_SPEC_HASHES[@]} service spec(s) for deployment rollback."
 }
@@ -215,6 +220,10 @@ rollback_full_deploy_services() {
         --format '{{.Name}}'
     )
   done
+
+  while read -r name; do
+    [ -n "$name" ] && current_services+=("$name")
+  done < <(sudo docker service ls --filter "label=ecommerce.arcane.stack=${STACK_NAME}" --format '{{.Name}}')
 
   for name in "${current_services[@]}"; do
     if [ -z "${FULL_DEPLOY_SERVICE_SPEC_HASHES[$name]+present}" ]; then
@@ -334,6 +343,64 @@ ensure_external_networks() {
   ensure_overlay_network "$MONITORING_NETWORK"
 }
 
+prepare_arcane() {
+  require_env ARCANE_HOST
+  ensure_overlay_network "$ARCANE_AGENT_NETWORK"
+
+  # Keep Arcane on the node that held Portainer's local management data.
+  local node_id
+  local -a legacy_nodes=()
+  if [ -z "$(sudo docker node ls --filter node.label=management.arcane=true --format '{{.ID}}')" ]; then
+    while read -r node_id; do
+      [ -n "$node_id" ] || continue
+      if [ "$(sudo docker node inspect "$node_id" --format '{{.Spec.Role}}|{{.Status.State}}|{{.Spec.Availability}}')" = 'manager|ready|active' ]; then
+        legacy_nodes+=("$node_id")
+      fi
+    done < <(sudo docker node ls --filter node.label=management.portainer=true --format '{{.ID}}')
+    if [ "${#legacy_nodes[@]}" -eq 1 ]; then
+      sudo docker node update --label-add management.arcane=true "${legacy_nodes[0]}" >/dev/null
+      echo "Reused Portainer manager placement for Arcane."
+    fi
+  fi
+
+  # Secrets are immutable. Never replace a missing encryption key on an existing installation.
+  local secret generated_secret
+  for secret in "$ARCANE_ENCRYPTION_SECRET" "$ARCANE_ADMIN_API_KEY_SECRET"; do
+    if ! sudo docker secret inspect "$secret" >/dev/null 2>&1; then
+      if sudo docker service inspect "$(service_name gateway arcane)" >/dev/null 2>&1 ||
+        { [ "$secret" = "$ARCANE_ENCRYPTION_SECRET" ] && sudo docker volume inspect "${VOLUME_PREFIX}_arcane_data" >/dev/null 2>&1; }; then
+        echo "Arcane secret ${secret} is missing on an existing installation; restore it before deploying." >&2
+        return 1
+      fi
+      if ! generated_secret="$(openssl rand -hex 32)"; then
+        echo "Unable to generate Arcane keys; install OpenSSL on the deployment manager." >&2
+        return 1
+      fi
+      if [ "$secret" = "$ARCANE_ADMIN_API_KEY_SECRET" ]; then
+        generated_secret="arc_${generated_secret}"
+      fi
+      printf '%s' "$generated_secret" | sudo docker secret create "$secret" - >/dev/null
+    fi
+  done
+
+  if ! sudo docker secret inspect "$ARCANE_INITIAL_PASSWORD_SECRET" >/dev/null 2>&1; then
+    # Keep the first generated password across an interrupted deployment.
+    if ! sudo test -s "$ARCANE_INITIAL_PASSWORD_FILE"; then
+      generated_secret="$(openssl rand -hex 24)"
+      printf 'Arcane-1-%s\n' "$generated_secret" | sudo install -m 600 /dev/stdin "$ARCANE_INITIAL_PASSWORD_FILE"
+    fi
+    sudo cat "$ARCANE_INITIAL_PASSWORD_FILE" |
+      sudo docker secret create "$ARCANE_INITIAL_PASSWORD_SECRET" - >/dev/null
+    echo "Initial Arcane password saved to ${ARCANE_INITIAL_PASSWORD_FILE} (root only)."
+  fi
+
+  ARCANE_TRUSTED_PROXIES="${ARCANE_TRUSTED_PROXIES:-$(sudo docker network inspect "$PUBLIC_NETWORK" --format '{{range .IPAM.Config}}{{println .Subnet}}{{end}}' | sed '/^$/d' | paste -sd, -)}"
+  require_env ARCANE_TRUSTED_PROXIES
+  ARCANE_PUBLIC_ENABLED="$(sudo docker service inspect "$(service_name gateway arcane)" --format '{{index .Spec.Labels "traefik.enable"}}' 2>/dev/null || true)"
+  [ "$ARCANE_PUBLIC_ENABLED" = true ] || ARCANE_PUBLIC_ENABLED=false
+  export ARCANE_HOST ARCANE_TRUSTED_PROXIES ARCANE_PUBLIC_ENABLED
+}
+
 ensure_persistent_volumes() {
   log "Ensure persistent volumes"
 
@@ -408,6 +475,9 @@ ensure_versioned_config() {
 }
 
 prepare_versioned_configs() {
+  ARCANE_BOOTSTRAP_CONFIG="$(
+    ensure_versioned_config "${STACK_NAME}_arcane_bootstrap" scripts/deploy/bootstrap-arcane.py
+  )"
   CLOUDRU_SECRETS_SCRIPT_CONFIG="$(
     ensure_versioned_config \
       cloudru_secrets_script \
@@ -449,7 +519,7 @@ prepare_versioned_configs() {
       deploy/grafana/dashboards/swarm-nodes.json
   )"
 
-  export CLOUDRU_SECRETS_SCRIPT_CONFIG
+  export ARCANE_BOOTSTRAP_CONFIG CLOUDRU_SECRETS_SCRIPT_CONFIG
   export POSTGRES_INIT_SQL_CONFIG
   export POSTGRES_INIT_SCRIPT_CONFIG
   export PROMETHEUS_CONFIG
@@ -490,19 +560,19 @@ validate_node_labels() {
     exit 1
   fi
 
-  local portainer_manager_count=0
+  local arcane_manager_count=0
   for node_id in $(sudo docker node ls \
-    --filter "node.label=management.portainer=true" \
+    --filter "node.label=management.arcane=true" \
     --format '{{.ID}}'); do
     if [ "$(sudo docker node inspect "$node_id" --format '{{.Spec.Role}}')" = "manager" ] &&
       [ "$(sudo docker node inspect "$node_id" --format '{{.Status.State}}')" = "ready" ] &&
       [ "$(sudo docker node inspect "$node_id" --format '{{.Spec.Availability}}')" = "active" ]; then
-      portainer_manager_count=$((portainer_manager_count + 1))
+      arcane_manager_count=$((arcane_manager_count + 1))
     fi
   done
 
-  if [ "$portainer_manager_count" -ne 1 ]; then
-    echo "Exactly one active ready Swarm manager must have label management.portainer=true."
+  if [ "$arcane_manager_count" -ne 1 ]; then
+    echo "Exactly one active ready Swarm manager must have label management.arcane=true."
     exit 1
   fi
 
@@ -953,145 +1023,91 @@ wait_for_services_running() {
   done
 }
 
-validate_portainer_agents() {
-  log "Validate connectivity to every Portainer Agent task"
+bootstrap_arcane() {
+  log "Initialize Arcane and connect Swarm node agents"
 
-  local agent_service
-  local expected_agents
-  local service
-  agent_service="$(service_name gateway portainer-agent)"
-  expected_agents="$(sudo docker service ps "$agent_service" \
-    --filter desired-state=running \
-    --format '{{.ID}}' |
-    wc -l)"
-  service="${STACK_NAME}-portainer-agent-preflight-${DEPLOY_RUN_ID}"
+  local service="${STACK_NAME}-arcane-bootstrap-${DEPLOY_RUN_ID}"
+  local manager_node
+  local node_id
+  for node_id in $(sudo docker node ls --filter node.label=management.arcane=true --format '{{.ID}}'); do
+    if [ "$(sudo docker node inspect "$node_id" --format '{{.Spec.Role}}|{{.Status.State}}|{{.Spec.Availability}}')" = 'manager|ready|active' ]; then
+      manager_node="$node_id"
+    fi
+  done
+  [ -n "${manager_node:-}" ] || return 1
+  ACTIVE_ARCANE_BOOTSTRAP_SERVICE="$service"
 
-  if [ "$expected_agents" -eq 0 ]; then
-    echo "No running Portainer Agent tasks were found."
-    return 1
-  fi
-
-  sudo docker service rm "$service" >/dev/null 2>&1 || true
-  ACTIVE_PORTAINER_PREFLIGHT_SERVICE="$service"
-
-  sudo docker service create \
+  docker_sudo service create \
     --name "$service" \
     --detach=true \
     --restart-condition none \
-    --constraint "node.labels.management.portainer == true" \
-    --network "$PORTAINER_AGENT_NETWORK" \
-    --env EXPECTED_AGENTS="$expected_agents" \
+    --constraint "node.id == ${manager_node}" \
+    --network "$ARCANE_AGENT_NETWORK" \
+    --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+    --config "source=${ARCANE_BOOTSTRAP_CONFIG},target=/bootstrap-arcane.py" \
+    --secret "source=${ARCANE_ADMIN_API_KEY_SECRET},target=arcane_admin_api_key" \
+    --secret "source=${ARCANE_INITIAL_PASSWORD_SECRET},target=arcane_initial_password" \
+    --env STACK_NAME="$STACK_NAME" \
+    --env VOLUME_PREFIX="$VOLUME_PREFIX" \
+    --env ARCANE_MANAGER_NODE="$manager_node" \
+    --env ARCANE_ENCRYPTION_SECRET="$ARCANE_ENCRYPTION_SECRET" \
+    --env ARCANE_AGENT_NETWORK="$ARCANE_AGENT_NETWORK" \
+    --env ARCANE_AGENT_IMAGE=ghcr.io/getarcaneapp/agent:v2.16.1 \
     --entrypoint python \
-    "$CONFIGS_PATH_INIT_IMAGE" \
-    -c \
-    'import http.client
-import os
-import socket
-import ssl
-import sys
-import time
+    "$CONFIGS_PATH_INIT_IMAGE" /bootstrap-arcane.py >/dev/null
 
-host = "tasks.portainer-agent"
-port = 9001
-expected = int(os.environ["EXPECTED_AGENTS"])
-context = ssl._create_unverified_context()
-deadline = time.monotonic() + 60
-
-while True:
-    addresses = sorted({
-        item[4][0]
-        for item in socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
-    })
-    failed = []
-
-    if len(addresses) != expected:
-        failed.append(
-            f"expected {expected} address(es), resolved {len(addresses)}: "
-            + ", ".join(addresses)
-        )
-    else:
-        for address in addresses:
-            try:
-                connection = http.client.HTTPSConnection(
-                    address,
-                    port,
-                    timeout=5,
-                    context=context,
-                )
-                connection.request("GET", "/ping", headers={"Host": host})
-                response = connection.getresponse()
-                response.read()
-                connection.close()
-                if response.status != 204:
-                    failed.append(f"{address}: HTTP {response.status}")
-            except Exception as error:
-                failed.append(f"{address}: {error}")
-
-    if not failed:
-        print(f"All {len(addresses)} Portainer Agent task(s) are reachable.")
-        sys.exit(0)
-
-    if time.monotonic() >= deadline:
-        print(
-            "Unreachable Portainer Agent task(s): " + "; ".join(failed),
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    time.sleep(2)' >/dev/null
-
-  for _ in $(seq 1 60); do
+  for _ in $(seq 1 240); do
     local state
-    state="$(sudo docker service ps "$service" \
-      --no-trunc \
-      --format '{{.CurrentState}}|{{.Error}}' |
-      head -n 1)"
-
+    state="$(sudo docker service ps "$service" --no-trunc --format '{{.CurrentState}}|{{.Error}}' | head -n 1)"
     case "$state" in
       Complete*)
-        sudo docker service logs "$service" --raw --tail 20 || true
+        sudo docker service logs "$service" --raw --tail 30 || true
         sudo docker service rm "$service" >/dev/null
-        ACTIVE_PORTAINER_PREFLIGHT_SERVICE=""
+        ACTIVE_ARCANE_BOOTSTRAP_SERVICE=""
         return 0
         ;;
-      Failed*|Rejected*|Shutdown*non-zero\ exit*|*non-zero\ exit*|*exit\ \(*)
-        echo "$state"
+      Failed*|Rejected*|*non-zero\ exit*|*exit\ \(*)
         print_service_diagnostics "$service"
         return 1
         ;;
     esac
-
     sleep 2
   done
-
-  echo "Portainer Agent connectivity preflight did not complete in time."
+  echo "Arcane bootstrap did not complete in time."
   print_service_diagnostics "$service"
   return 1
 }
 
-cleanup_legacy_portainer_network() {
-  local legacy_network="${STACK_NAME}-gateway-portainer-agent"
+enable_arcane_public_access() {
+  if [ "$ARCANE_PUBLIC_ENABLED" != true ]; then
+    docker_sudo service update --detach=true --label-add traefik.enable=true "$(service_name gateway arcane)" >/dev/null
+    wait_for_service_running "$(service_name gateway arcane)" 60
+  fi
+}
+
+cleanup_legacy_portainer() {
+  local name owner network
   local gateway_stack
-  local owner
   gateway_stack="$(stack_name gateway)"
-
-  if [ "$legacy_network" = "$PORTAINER_AGENT_NETWORK" ] ||
-    ! sudo docker network inspect "$legacy_network" >/dev/null 2>&1; then
-    return
-  fi
-
-  owner="$(sudo docker network inspect "$legacy_network" \
-    --format '{{index .Labels "com.docker.stack.namespace"}}')"
-  if [ "$owner" != "$gateway_stack" ]; then
-    echo "Legacy network ${legacy_network} was not removed because it is not owned by stack ${gateway_stack}."
-    return
-  fi
-
-  if sudo docker network rm "$legacy_network" >/dev/null 2>&1; then
-    echo "Removed unused legacy Portainer network ${legacy_network}."
-  else
-    echo "Legacy network ${legacy_network} is still in use and was left unchanged."
-  fi
+  for name in "$(service_name gateway portainer)" "$(service_name gateway portainer-agent)"; do
+    if ! sudo docker service inspect "$name" >/dev/null 2>&1; then
+      continue
+    fi
+    owner="$(sudo docker service inspect "$name" --format '{{index .Spec.Labels "com.docker.stack.namespace"}}')"
+    if [ "$owner" = "$gateway_stack" ]; then
+      sudo docker service rm "$name" >/dev/null
+      echo "Removed legacy Portainer service ${name}; its data volume is retained."
+    fi
+  done
+  for network in "$PORTAINER_AGENT_NETWORK" "${STACK_NAME}-gateway-portainer-agent"; do
+    if ! sudo docker network inspect "$network" >/dev/null 2>&1; then
+      continue
+    fi
+    owner="$(sudo docker network inspect "$network" --format '{{index .Labels "com.docker.stack.namespace"}}')"
+    if [ "$owner" = "$gateway_stack" ]; then
+      sudo docker network rm "$network" >/dev/null 2>&1 || true
+    fi
+  done
 }
 
 wait_for_http() {
@@ -1192,7 +1208,7 @@ wait_for_infrastructure() {
 wait_for_application_endpoints() {
   log "Wait for application health endpoints"
   wait_for_http Traefik "$PUBLIC_NETWORK" "http://traefik:8080/ping"
-  wait_for_http Portainer "$PUBLIC_NETWORK" "http://portainer:9000/api/status"
+  wait_for_http Arcane "$ARCANE_AGENT_NETWORK" "http://arcane:3552/api/health"
   wait_for_http Gateway "$BACKEND_NETWORK" "http://gateway:8080/health"
   wait_for_http "Main API" "$BACKEND_NETWORK" "http://main-api:8080/health"
   wait_for_http "Analytics API" "$BACKEND_NETWORK" "http://analytics-api:8080/health"
@@ -1286,9 +1302,14 @@ deploy_stack() {
   local stack="$1"
 
   log "Deploy ${stack} stack"
+  local -a prune_args=(--prune)
+  # Keep the old UI and agents available until Arcane bootstrap succeeds.
+  if [ "$stack" = gateway ] && sudo docker service inspect "$(service_name gateway portainer)" >/dev/null 2>&1; then
+    prune_args=()
+  fi
   docker_sudo stack deploy \
     --detach=true \
-    --prune \
+    "${prune_args[@]}" \
     -c "deploy/stack.${stack}.rendered.yml" \
     "$(stack_name "$stack")" \
     --with-registry-auth
@@ -1566,6 +1587,7 @@ cleanup_unused_versioned_configs() {
 
   current_configs="$(
     printf '%s\n' \
+      "$ARCANE_BOOTSTRAP_CONFIG" \
       "$CLOUDRU_SECRETS_SCRIPT_CONFIG" \
       "$POSTGRES_INIT_SQL_CONFIG" \
       "$POSTGRES_INIT_SCRIPT_CONFIG" \
@@ -1578,6 +1600,7 @@ cleanup_unused_versioned_configs() {
 
   # Include the old Loki config prefix so a successful deploy removes unused versions.
   for prefix in \
+    "${STACK_NAME}_arcane_bootstrap_" \
     cloudru_secrets_script_ \
     "${STACK_NAME}_postgres_init_sql_" \
     "${STACK_NAME}_postgres_init_script_" \
@@ -1630,6 +1653,12 @@ PUBLIC_NETWORK="${PUBLIC_NETWORK:-public}"
 BACKEND_NETWORK="${BACKEND_NETWORK:-backend}"
 MONITORING_NETWORK="${MONITORING_NETWORK:-monitoring}"
 PORTAINER_AGENT_NETWORK="${PORTAINER_AGENT_NETWORK:-portainer_agent_network}"
+ARCANE_AGENT_NETWORK="${ARCANE_AGENT_NETWORK:-arcane_agent_network}"
+ARCANE_HOST="${ARCANE_HOST:-${PORTAINER_HOST:-}}"
+ARCANE_ENCRYPTION_SECRET="${ARCANE_ENCRYPTION_SECRET:-${STACK_NAME}_arcane_encryption_key}"
+ARCANE_ADMIN_API_KEY_SECRET="${ARCANE_ADMIN_API_KEY_SECRET:-${STACK_NAME}_arcane_admin_api_key}"
+ARCANE_INITIAL_PASSWORD_SECRET="${ARCANE_INITIAL_PASSWORD_SECRET:-${STACK_NAME}_arcane_initial_password}"
+ARCANE_INITIAL_PASSWORD_FILE="${PWD}/.arcane-initial-password"
 VOLUME_PREFIX="${VOLUME_PREFIX:-$STACK_NAME}"
 MIGRATOR_NODE_CONSTRAINT="${MIGRATOR_NODE_CONSTRAINT:-node.labels.infra.postgres == true}"
 MIGRATE_LEGACY_STACK="${MIGRATE_LEGACY_STACK:-false}"
@@ -1642,7 +1671,7 @@ CONFIGS_PATH_INIT_IMAGE="${CONFIGS_PATH_INIT_IMAGE:-python:3.13-slim}"
 POSTGRES_WALG_SECRET="${POSTGRES_WALG_SECRET:-postgres_walg_config}"
 
 export PUBLIC_NETWORK BACKEND_NETWORK MONITORING_NETWORK
-export PORTAINER_AGENT_NETWORK VOLUME_PREFIX
+export ARCANE_AGENT_NETWORK ARCANE_ENCRYPTION_SECRET ARCANE_ADMIN_API_KEY_SECRET VOLUME_PREFIX
 export CLOUD_RU_SECRET_PREFIX CLOUD_RU_SECRET_DEPTH
 export CLOUD_RU_SECRET_NAMES CLOUD_RU_SECRET_VERSION
 export POSTGRES_WALG_SECRET
@@ -1700,6 +1729,7 @@ validate_required_swarm_secrets
 
 log "[3/8] Prepare networks, volumes and versioned Docker configs"
 ensure_external_networks
+prepare_arcane
 ensure_persistent_volumes
 ensure_configs_path_on_nodes
 prepare_versioned_configs
@@ -1730,12 +1760,13 @@ deploy_stack monitoring
 wait_for_services_running "${GATEWAY_SERVICES[@]}"
 wait_for_services_running "${APP_SERVICES[@]}"
 wait_for_services_running "${MONITORING_SERVICES[@]}"
-validate_portainer_agents
+bootstrap_arcane
 wait_for_application_endpoints
 wait_for_monitoring_endpoints
+enable_arcane_public_access
 commit_full_deploy_transaction
 
 log "[8/8] Cleanup obsolete Docker configs"
-cleanup_legacy_portainer_network
+cleanup_legacy_portainer
 cleanup_unused_versioned_configs
 show_stack_services

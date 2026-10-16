@@ -9,7 +9,7 @@ Production uses one Docker Swarm cluster and six independently deployed stacks:
 | `${STACK_NAME}-apps` | Main, Analytics, Pricing and Search APIs |
 | `${STACK_NAME}-workers` | Main, Analytics and Pricing workers |
 | `${STACK_NAME}-monitoring` | Prometheus, Grafana, Loki, Tempo and OpenSearch Dashboards |
-| `${STACK_NAME}-gateway` | Traefik, Gateway/YARP, Portainer CE and global Portainer agents |
+| `${STACK_NAME}-gateway` | Traefik, Gateway/YARP and Arcane Manager |
 
 MinIO is intentionally not deployed. Applications must use the configured external S3-compatible storage.
 
@@ -48,6 +48,7 @@ Create the networks once on the manager:
 docker network create --driver overlay --attachable public
 docker network create --driver overlay --attachable backend
 docker network create --driver overlay --attachable monitoring
+docker network create --driver overlay --attachable arcane_agent_network
 ```
 
 The deployment script also creates missing networks idempotently and rejects an existing network if it is not a Swarm overlay network.
@@ -63,7 +64,7 @@ docker node update --label-add workload.traefik=true <manager-node>
 docker node update --label-add workload.gateway=true <gateway-node>
 docker node update --label-add workload.api=true <api-node>
 docker node update --label-add workload.worker=true <worker-node>
-docker node update --label-add management.portainer=true <portainer-manager-node>
+docker node update --label-add management.arcane=true <arcane-manager-node>
 
 docker node update --label-add infra.postgres=true <postgres-node>
 docker node update --label-add infra.redis=true <redis-node>
@@ -79,7 +80,7 @@ docker node update --label-add monitoring.opensearch-dashboards=true <dashboards
 
 `workload.traefik=true` must be assigned to a manager because Traefik reads the local Docker socket to discover Swarm services. `workload.gateway=true` belongs to Gateway/YARP and may be assigned to a worker node.
 
-Exactly one active, ready manager must carry `management.portainer=true`. Portainer Server keeps its state in a node-local external volume, so the label gives it a stable placement. Portainer Agent does not need a label: its global service runs on every Linux Swarm node.
+Exactly one active, ready manager must carry `management.arcane=true`. Arcane keeps its database in the node-local external `arcane_data` volume, so the label gives it a stable placement. The deploy script copies the old `management.portainer=true` placement automatically when no Arcane label exists and exactly one eligible Portainer manager is found. Node agents do not need labels: bootstrap creates a service constrained to each eligible node ID.
 
 Generic workload labels are kept only for services that can be freely distributed within a class of nodes. Infrastructure and monitoring use specialized labels because their services are stateful or comparatively heavy. Migrators run on the node labeled `infra.postgres=true`.
 
@@ -152,7 +153,7 @@ Traefik ACME email, and optional replica/network/volume settings. Grafana admini
 used when `grafana_data` is initialized; an existing Grafana instance keeps its administrator in its database. For example:
 
 ```dotenv
-PORTAINER_HOST=portainer.example.com
+ARCANE_HOST=arcane.example.com
 RABBITMQ_HOST=rabbitmq.example.com
 ```
 
@@ -191,7 +192,7 @@ affect a deployable image or deployment infrastructure do not start a production
 Changes under `deploy/stack.*`, `deploy/grafana`, `deploy/tempo`, `scripts/deploy`, `init`, `prometheus.yml`, or the
 PostgreSQL image directory require a full deployment. A manual `workflow_dispatch` does the same. Full deployment
 reconciles all six Swarm stacks, applies versioned Docker configs, runs all migrators, and executes infrastructure,
-application, Portainer, and monitoring health checks.
+application, Arcane, and monitoring health checks.
 
 ## Configuration synchronization
 
@@ -221,7 +222,7 @@ Stateful data uses external volumes named with `VOLUME_PREFIX`, which defaults t
 
 ```text
 ecommerce_traefik_letsencrypt
-ecommerce_portainer_data
+ecommerce_arcane_data
 ecommerce_pg_data
 ecommerce_redis_data
 ecommerce_rabbitmq_data
@@ -234,7 +235,7 @@ ecommerce_tempo_data
 
 The default `local` volume driver stores data on one node. Before moving a stateful placement label, migrate its volume data or configure shared storage. Stack removal does not delete these external volumes.
 
-Exactly one active ready node must carry `infra.postgres=true`. PostgreSQL and its backup service share the node-local `pg_data` volume, so allowing multiple eligible PostgreSQL nodes could place them over different local volumes. Portainer has the same node-local storage consideration: migrate `portainer_data` before moving `management.portainer=true` to another manager.
+Exactly one active ready node must carry `infra.postgres=true`. PostgreSQL and its backup service share the node-local `pg_data` volume, so allowing multiple eligible PostgreSQL nodes could place them over different local volumes. Arcane has the same node-local storage consideration: migrate `arcane_data` and preserve the encryption secret before moving `management.arcane=true` to another manager.
 
 Prometheus retains metrics for 30 days in `prometheus_data`. Tempo retains
 traces for seven days in `tempo_data`. The monitoring
@@ -243,25 +244,33 @@ stack runs `node-exporter` as a global service and discovers its tasks through
 automatically provisions the Prometheus, Loki, and Tempo data sources and the
 **Swarm / Node resources** dashboard from versioned Docker configs.
 
-## Portainer CE
+## Arcane
 
-`portainer-agent` runs in global mode on every Linux Swarm node and connects to Portainer Server through the dedicated overlay network `portainer_agent_network`. Portainer Server runs as one replica on the manager labeled `management.portainer=true`.
+Arcane Manager and Agent are pinned to `v2.16.1`. Manager runs on the node labeled `management.arcane=true`; its local Docker socket provides the Swarm view and access to that node's resources. Bootstrap creates `${STACK_NAME}-arcane-agent-<node-id>` services for the other active, ready Linux nodes. These services live outside the gateway stack so stack pruning cannot remove them.
 
-The Portainer network intentionally does not enable Docker overlay IPsec encryption. Physical Swarm-node traffic already travels through Tailscale, while another encryption layer can make task addresses unreachable on only part of the cluster. The network name can be overridden with `PORTAINER_AGENT_NETWORK`, but the production default should normally be retained.
+Agents use outbound WebSocket connections to `http://arcane:3552` over `arcane_agent_network`. No agent or manager ports are published on hosts. Only the manager UI is exposed through Traefik at `https://${ARCANE_HOST}`. `TRUSTED_PROXIES` is derived from the public overlay subnet; `ARCANE_TRUSTED_PROXIES` can override it when another trusted proxy is present. Physical node traffic uses Tailscale, as with the other overlays.
 
-The Portainer UI is available only through Traefik at `https://${PORTAINER_HOST}`. The stack does not publish Portainer ports `9000`, `9443`, `9001`, or `8000` on host nodes. Edge Agent features that require port `8000` are therefore not enabled.
+### First deployment and migration from Portainer
 
-On the first launch, open the UI and create the initial administrator promptly. If Portainer expires the initial setup session, restart only its service:
+1. For an existing cluster, keep `PORTAINER_HOST` in `SWARM_ENV` to reuse its domain, or set `ARCANE_HOST` to the desired domain. `ARCANE_HOST` takes precedence. A new domain must resolve to the Traefik host. For a new cluster, label one manager `management.arcane=true`.
+2. Run a **full deployment** through the existing CI/CD workflow. Changes under `deploy/` and `scripts/deploy/` already select full deployment. The SSH manager needs `openssl` for one-time key generation. No manual Arcane installation, worker SSH, new GitHub credential, or additional host port is needed. Nodes must be able to pull `ghcr.io/getarcaneapp/manager:v2.16.1` and `ghcr.io/getarcaneapp/agent:v2.16.1`.
+3. On the SSH manager used by deployment, read the initial password (default deployment directory shown):
 
-```bash
-docker service update --force ecommerce-gateway_portainer
-```
+   ```bash
+   sudo cat /opt/ecommerce/.arcane-initial-password
+   ```
 
-The global agents mount the Docker socket and Docker volume directory, which gives Portainer administrative access to every Swarm node. Protect the public hostname and administrator account accordingly.
+4. Open the configured HTTPS domain and sign in as `arcane` with that password. Set your own password in the account settings. Repeated deployments preserve it. Portainer accounts, settings, and registry credentials are not imported.
+5. Check **Swarm → Nodes**: the manager is covered locally and other eligible nodes should show connected agents. Bootstrap waits for this before completing. After adding a Swarm node or reactivating a drained node, run another full deployment to install its agent. Offline, paused, drained, and non-Linux nodes are skipped with a log message; removed-node registrations/services are not automatically deleted.
+6. Add the Cloud.ru registry in Arcane's registry settings: server = the existing `ARTIFACT_REGISTRY_HOST` (without an image path), username = service-account **Key ID**, password = **Key Secret**. Use a registry-scoped service account with pull access; add delete permissions only if needed. Deleting a manifest by digest can remove multiple tags pointing to it, including `current` and `previous`, so keep these digests protected.
 
-After deploying the gateway stack, the deployment script resolves every `tasks.portainer-agent` address and calls its HTTPS `/ping` endpoint from the node hosting Portainer Server. Deployment fails and reports the unreachable task IPs if even one Agent cannot be reached. After a successful transition, the old `${STACK_NAME}-gateway-portainer-agent` network is removed only when it belongs to the gateway stack and is no longer used.
+The deploy script creates three immutable Swarm secrets once: `${STACK_NAME}_arcane_encryption_key`, `${STACK_NAME}_arcane_admin_api_key`, and `${STACK_NAME}_arcane_initial_password`. The initial password is also saved in `.arcane-initial-password` with root-only permissions on the deployment manager; it is never printed in CI logs. Manager and agents read keys through `_FILE` variables, and per-node agent tokens have separate Swarm secrets. Keep the manager database and encryption key together in backups; losing or replacing the key makes saved registry credentials and agent tokens unreadable. Custom secret names can be set with `ARCANE_ENCRYPTION_SECRET`, `ARCANE_ADMIN_API_KEY_SECRET`, and `ARCANE_INITIAL_PASSWORD_SECRET`.
 
-See the official [Portainer CE Swarm installation](https://docs.portainer.io/2.33-lts/start/install-ce/server/swarm/linux) and [Traefik reverse proxy](https://docs.portainer.io/2.33-lts/advanced/reverse-proxy/traefik) documentation.
+On a fresh installation the Traefik route stays disabled until bootstrap replaces Arcane's built-in default password and verifies agents. During migration Portainer remains running until all full-deployment checks pass. A failed deployment rolls back changed services and removes newly created Arcane agents. On success only the old Portainer services and unused stack-owned agent networks are removed; `${VOLUME_PREFIX}_portainer_data` is retained. Reverting to Portainer requires deploying the old gateway definition and stopping Arcane's public router to avoid two UIs sharing the same host.
+
+Application stacks remain managed by this repository's deployment workflow. Use Arcane to inspect and operate the existing Swarm resources; saving a different stack definition in the UI can be overwritten by the next deployment.
+
+See the official [Arcane installation](https://getarcane.app/docs/get-started/installation), [Swarm nodes and agents](https://getarcane.app/docs/remote/swarm-nodes-agents), and [reverse proxy](https://getarcane.app/docs/networking/reverse-proxy) documentation.
 
 ## PostgreSQL backups
 
@@ -282,7 +291,7 @@ See [PostgreSQL backup and recovery](POSTGRES_BACKUP.md) for S3 configuration, c
 1. Initialize the Swarm and join workers.
 2. Apply all workload and specialized labels.
 3. Create the required `postgres_walg_config` secret. Create `cloudru_key_id` and `cloudru_key_secret` when Cloud.ru synchronization is enabled.
-4. Create the three overlay networks, or let the deploy script create them.
+4. Create the overlay networks, or let the deploy script create them.
 5. Create/verify the external persistent volumes, or let the deploy script create missing volumes.
 6. Configure the GitHub Secrets and Variables above.
 7. Run the production workflow. It creates `CONFIGS_PATH` automatically on eligible nodes.
@@ -325,4 +334,4 @@ The deploy script uses `set -euo pipefail`, checks real task states rather than 
 - Node-local persistent volumes do not follow a label to another physical node.
 - A completed one-shot `secrets-sync` service showing zero running tasks is expected.
 - A credentials-related sync failure intentionally suppresses raw Python output; inspect Cloud.ru credentials by rotating the Swarm secrets rather than printing them.
-- Traefik is the only service publishing ports `80` and `443`. Portainer agents, Portainer Server, PostgreSQL, Redis, RabbitMQ internal ports, OpenSearch API, Prometheus, and Loki remain private behind overlay networks.
+- Traefik is the only service publishing ports `80` and `443`. Arcane agents, Arcane Manager, PostgreSQL, Redis, RabbitMQ internal ports, OpenSearch API, Prometheus, and Loki remain private behind overlay networks.
