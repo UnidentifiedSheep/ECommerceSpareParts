@@ -254,7 +254,7 @@ jobs:
           git push --force origin "${RELEASE_SHA}:refs/tags/deployed/production"
 
   cleanup-registry:
-    name: Clean old registry images
+    name: Remove obsolete registry tags
     needs: [prepare-release, deploy, record-deployment]
     if: >-
       !cancelled() &&
@@ -268,11 +268,10 @@ jobs:
       ARTIFACT_REGISTRY_PASSWORD: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}
       GITHUB_TOKEN: ${{ github.token }}
       DEPLOYED_SHA: ${{ needs.prepare-release.outputs.sha }}
-      CLEANUP_MIN_AGE_HOURS: ${{ vars.REGISTRY_CLEANUP_MIN_AGE_HOURS || '168' }}
       CLEANUP_DRY_RUN: ${{ vars.REGISTRY_CLEANUP_DRY_RUN || 'false' }}
       CLEANUP_WORKERS: ${{ vars.REGISTRY_CLEANUP_WORKERS || '8' }}
       CLEANUP_MAX_RUNTIME_SECONDS: ${{ vars.REGISTRY_CLEANUP_MAX_RUNTIME_SECONDS || '1200' }}
-      CLEANUP_MAX_DELETIONS: ${{ vars.REGISTRY_CLEANUP_MAX_DELETIONS || '0' }}
+      CLEANUP_MAX_TAGS: ${{ vars.REGISTRY_CLEANUP_MAX_TAGS || vars.REGISTRY_CLEANUP_MAX_DELETIONS || '0' }}
 
     steps:
       - name: Checkout registry cleanup code
@@ -281,13 +280,13 @@ jobs:
           ref: ${{ github.workflow_sha }}
           fetch-depth: 0
 
-      - name: Remove obsolete project images
+      - name: Remove obsolete project SHA tags
         shell: bash
         run: |
           set -euo pipefail
-          args=(--deployed-sha "$DEPLOYED_SHA" --min-age-hours "$CLEANUP_MIN_AGE_HOURS")
+          args=(--deployed-sha "$DEPLOYED_SHA")
           args+=(--workers "$CLEANUP_WORKERS" --max-runtime-seconds "$CLEANUP_MAX_RUNTIME_SECONDS")
-          args+=(--max-deletions "$CLEANUP_MAX_DELETIONS" --report registry-cleanup-report.json)
+          args+=(--max-tags "$CLEANUP_MAX_TAGS" --report registry-cleanup-report.json)
           case "$CLEANUP_DRY_RUN" in
             true) ;;
             false) args+=(--apply) ;;

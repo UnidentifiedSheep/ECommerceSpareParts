@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Remove old CI images through Registry V2; preview unless --apply is given."""
+"""Untag obsolete CI images; Cloud.ru Premium controls untagged image retention."""
 
 import argparse
 import base64
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from functools import lru_cache
+import getpass
 import hashlib
 from http.client import HTTPException
 import json
@@ -48,7 +49,7 @@ class Budget:
 
     def check(self):
         if time.monotonic() >= self.deadline:
-            raise CleanupDeferred("Time budget reached; remaining images will be reconsidered on the next run.")
+            raise CleanupDeferred("Time budget reached; remaining tags will be reconsidered on the next run.")
 
 
 def log(message):
@@ -67,7 +68,7 @@ def safe_error(error):
 class Report:
     def __init__(self, path=None, apply=False):
         self.path = Path(path) if path else None
-        self.data = {"mode": "apply" if apply else "preview", "status": "running", "deleted": 0,
+        self.data = {"mode": "apply" if apply else "preview", "status": "running", "untagged": 0,
                      "already_absent": 0, "repositories": [], "error": None}
 
     def save(self):
@@ -79,13 +80,13 @@ class Report:
         self.save()
         if summary := os.environ.get("GITHUB_STEP_SUMMARY"):
             lines = ["## Registry cleanup", "", f"Status: **{status}**; mode: **{self.data['mode']}**; "
-                     f"deleted: **{self.data['deleted']}**; already absent: **{self.data['already_absent']}**.", "",
-                     "| Repository | Eligible | Protected manifests | Deleted |", "| --- | ---: | ---: | ---: |"]
+                     f"tags removed: **{self.data['untagged']}**; already absent: **{self.data['already_absent']}**.", "",
+                     "| Repository | Eligible tags | Protected manifests | Tags removed |", "| --- | ---: | ---: | ---: |"]
             for row in self.data["repositories"]:
-                lines.append(f"| {row['name']} | {row.get('eligible', '—')} | {row.get('protected', '—')} | {row['deleted']} |")
+                lines.append(f"| {row['name']} | {row.get('eligible', '—')} | {row.get('protected', '—')} | {row['untagged']} |")
             if error:
                 lines.extend(["", "Reason: " + error.replace("`", "'").replace("\n", " ")])
-            if reference := self.data.get("last_delete"):
+            if reference := self.data.get("last_untag"):
                 lines.extend(["", f"Last DELETE request: `{reference}`."])
             with open(summary, "a") as stream:
                 stream.write("\n".join(lines) + "\n")
@@ -108,7 +109,7 @@ def request_error(method, url, status, headers, body=b""):
     if re.fullmatch(r"[a-zA-Z0-9._:-]{1,128}", request_id):
         detail += f"; request ID: {request_id}"
     if status in (401, 403):
-        detail += "; verify registry credentials and manifest-delete permission (Cloud.ru: ar.admin)"
+        detail += "; verify registry credentials and tag-removal permission (Cloud.ru: ar.admin)"
     if status == 405:
         detail += "; registry endpoint does not allow this HTTP method"
     return CleanupError(f"{method} {urlsplit(url).path}: HTTP {status}{detail}", status=status)
@@ -213,11 +214,11 @@ class Registry:
                 future.set_exception(error)
         return future.result()
 
-    def request(self, method, path, repository, allow_missing=False, allow_redirect=False, accept=ACCEPT):
+    def request(self, method, path, repository, allow_missing=False):
         url = urljoin(self.base + "/", path)
         if urlsplit(url).netloc != urlsplit(self.base).netloc or urlsplit(url).scheme != urlsplit(self.base).scheme:
             raise CleanupError("Registry returned a link outside its own origin")
-        headers = {"Accept": accept, "Authorization": self.tokens.get(repository, self.basic)}
+        headers = {"Accept": ACCEPT, "Authorization": self.tokens.get(repository, self.basic)}
         status, response_headers, body = http(method, url, headers, allow_missing, self.budget)
         if status == 401:
             challenge = response_headers.get("WWW-Authenticate", "")
@@ -244,7 +245,7 @@ class Registry:
                     self.tokens[repository] = "Bearer " + token
                 headers["Authorization"] = self.tokens[repository]
             status, response_headers, body = http(method, url, headers, allow_missing, self.budget)
-        if status != 404 and not 200 <= status < 300 and not (allow_redirect and status in (301, 302, 303, 307, 308)):
+        if status != 404 and not 200 <= status < 300:
             raise request_error(method, url, status, response_headers)
         return status, response_headers, body
 
@@ -306,39 +307,11 @@ class Registry:
         resolved = self._manifest(repository, reference, allow_missing=allow_missing)
         return resolved[0] if resolved else None
 
-    def created(self, repository, config_digest):
-        if not DIGEST.fullmatch(config_digest):
-            raise CleanupError("Registry returned an invalid config digest")
-        return self.cached(("created", repository, config_digest), lambda: self._created(repository, config_digest))
-
-    def _created(self, repository, config_digest):
-        path = f"/v2/{quote(repository, safe='/')}/blobs/{config_digest}"
-        status, headers, body = self.request("GET", path, repository, allow_redirect=True,
-                                             accept="application/octet-stream, application/json")
-        location = self.base + path
-        for _ in range(5):
-            if status not in (301, 302, 303, 307, 308):
-                break
-            # Blob storage may redirect to a signed URL. Send no registry credentials.
-            location = urljoin(location, headers.get("Location", ""))
-            if urlsplit(location).scheme != "https":
-                raise CleanupError("Registry blob redirect must use HTTPS")
-            status, headers, body = http("GET", location, budget=self.budget)
-        if status != 200:
-            raise CleanupError("Unable to read image creation time")
-        if "sha256:" + hashlib.sha256(body).hexdigest() != config_digest:
-            raise CleanupError("Image config digest does not match its content")
-        try:
-            value = document(body).get("created", "")
-            created = datetime.fromisoformat(value.replace("Z", "+00:00"))
-            return created if created.tzinfo else None
-        except (ValueError, TypeError, AttributeError):
-            return None
-
-    def delete(self, repository, digest):
-        if not DIGEST.fullmatch(digest):
-            raise CleanupError("Deletion requires a sha256 manifest digest")
-        status, _, _ = self.request("DELETE", f"/v2/{quote(repository, safe='/')}/manifests/{digest}", repository, allow_missing=True)
+    def untag(self, repository, tag):
+        if not SHA.fullmatch(tag):
+            raise CleanupError("Tag removal requires a full commit SHA tag")
+        # OCI tag deletion removes a name only. Never fall back to deleting a digest.
+        status, _, _ = self.request("DELETE", f"/v2/{quote(repository, safe='/')}/manifests/{tag}", repository, allow_missing=True)
         return status
 
 
@@ -404,7 +377,7 @@ def snapshot(registry, repository, workers=8):
                     f"{repository}: verify tags", registry.budget)
 
 
-def plan(registry, repository, root, deployed, cutoff, workers=8):
+def plan(registry, repository, root, deployed, workers=8):
     tags = registry.tags(repository)
     if "current" not in tags:
         print(f"{repository}: skipped (no current tag).", flush=True)
@@ -441,116 +414,104 @@ def plan(registry, repository, root, deployed, cutoff, workers=8):
         if not SHA.fullmatch(tag) or not ancestor(root, tag, deployed) or tag == deployed:
             protected.update(graphs[digest])
         else:
-            candidates.add(digest)
+            candidates.add(tag)
 
-    config_digests = {manifests[child]["config"]["digest"] for digest in candidates for child in graphs[digest]
-                      if manifests[child].get("config", {}).get("mediaType") in
-                      ("application/vnd.oci.image.config.v1+json", "application/vnd.docker.container.image.v1+json")}
-    dates_by_config = parallel(config_digests, lambda digest: registry.created(repository, digest), workers,
-                               f"{repository}: read image dates", registry.budget)
-    for digest in candidates.copy():
-        dates = []
-        for child in graphs[digest]:
-            payload = manifests[child]
-            if "manifests" not in payload:
-                config = payload.get("config", {})
-                if config.get("mediaType") not in ("application/vnd.oci.image.config.v1+json",
-                                                   "application/vnd.docker.container.image.v1+json"):
-                    dates.append(None)
-                else:
-                    dates.append(dates_by_config[config["digest"]])
-        if not dates or any(date is None or date > cutoff for date in dates):
-            protected.update(graphs[digest])
-
-    # Delete tagged roots only. Never directly delete layers, configs, or untagged children.
-    return mapping, sorted(candidates - protected), protected
+    return mapping, sorted(tag for tag in candidates if mapping[tag] not in protected), protected
 
 
-def cleanup(registry, github, repositories, root, deployed, min_age_hours, apply=False,
-            workers=8, max_deletions=0, report=None):
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=min_age_hours)
+def cleanup(registry, github, repositories, root, deployed, apply=False,
+            workers=8, max_tags=0, report=None):
+    if apply and github is None:
+        raise CleanupError("GitHub workflow checks are required before removing tags")
     report = report or Report(apply=apply)
-    deleted = 0
-    if github.busy():
+    untagged = 0
+    if github and github.busy():
         raise CleanupDeferred("Another GitHub workflow is queued or running.")
     for repository in repositories:
         if registry.budget:
             registry.budget.check()
-        row = {"name": repository, "deleted": 0}
+        row = {"name": repository, "untagged": 0}
         report.data["repositories"].append(row)
         report.save()
         started = time.monotonic()
-        mapping, candidates, protected = plan(registry, repository, root, deployed, cutoff, workers)
+        mapping, candidates, protected = plan(registry, repository, root, deployed, workers)
         row.update(eligible=len(candidates), protected=len(protected))
         report.save()
-        log(f"{repository}: {len(candidates)} old manifest(s) eligible; {len(protected)} protected; "
+        log(f"{repository}: {len(candidates)} obsolete tag(s) eligible; {len(protected)} manifest(s) protected; "
             f"planning took {time.monotonic() - started:.1f}s.")
         if not candidates:
             continue
         if snapshot(registry, repository, workers) != mapping:
-            raise CleanupError(f"Tags changed in {repository}; cleanup stopped before deletion")
-        aliases = {}
-        for tag, digest in mapping.items():
-            aliases.setdefault(digest, []).append(tag)
-        for index, digest in enumerate(candidates, 1):
+            raise CleanupError(f"Tags changed in {repository}; cleanup stopped before removing tags")
+        for index, tag in enumerate(candidates, 1):
             if registry.budget:
                 registry.budget.check()
-            if max_deletions and deleted >= max_deletions:
-                raise CleanupDeferred(f"Deletion limit of {max_deletions} reached; remaining images will be reconsidered on the next run.")
-            if github.busy():
+            if max_tags and untagged >= max_tags:
+                raise CleanupDeferred(f"Tag removal limit of {max_tags} reached; remaining tags will be reconsidered on the next run.")
+            if github and github.busy():
                 raise CleanupDeferred("Another GitHub workflow started.")
             # CD uses one concurrency group. Also detect out-of-band promotion in Arcane.
             if apply:
-                for tag in ("current", "previous"):
-                    if registry.reference_digest(repository, tag, allow_missing=True) != mapping.get(tag):
+                for protected_tag in ("current", "previous"):
+                    if registry.reference_digest(repository, protected_tag, allow_missing=True) != mapping.get(protected_tag):
                         raise CleanupError(f"Protected tag changed in {repository}; cleanup stopped")
-            reference = f"{repository}@{digest}"
+                actual = registry.reference_digest(repository, tag, allow_missing=True)
+                if actual is not None and actual != mapping[tag]:
+                    raise CleanupError(f"Candidate tag changed in {repository}; cleanup stopped")
+            reference = f"{repository}:{tag}"
             if apply:
-                report.data["last_delete"] = reference
+                report.data["last_untag"] = reference
                 report.save()
-                log(f"DELETE {index}/{len(candidates)} {reference} ({', '.join(aliases[digest])})")
+                log(f"UNTAG {index}/{len(candidates)} {reference} ({mapping[tag]})")
                 started = time.monotonic()
-                status = registry.delete(repository, digest)
+                status = registry.untag(repository, tag) if actual is not None else 404
                 if status == 404:
                     report.data["already_absent"] += 1
                 else:
-                    deleted += 1
-                    row["deleted"] += 1
-                    report.data["deleted"] = deleted
+                    untagged += 1
+                    row["untagged"] += 1
+                    report.data["untagged"] = untagged
                 report.save()
-                log(f"{'ALREADY ABSENT' if status == 404 else 'DELETED'} {reference}: HTTP {status}, "
-                    f"{time.monotonic() - started:.1f}s; deleted this run: {deleted}.")
+                if registry.reference_digest(repository, tag, allow_missing=True) is not None:
+                    raise CleanupError(f"Tag still resolves after removal in {repository}; cleanup stopped")
+                log(f"{'ALREADY ABSENT' if status == 404 else 'UNTAGGED'} {reference}: HTTP {status}, "
+                    f"{time.monotonic() - started:.1f}s; tags removed this run: {untagged}.")
             else:
-                log(f"WOULD DELETE {index}/{len(candidates)} {reference} ({', '.join(aliases[digest])})")
-    log(f"Cleanup complete: {deleted} manifest(s) deleted." if apply else "Preview complete; registry was not modified.")
-    return deleted
+                log(f"WOULD UNTAG {index}/{len(candidates)} {reference} ({mapping[tag]})")
+    log(f"Cleanup complete: {untagged} tag(s) removed; image retention is managed by Cloud.ru Premium."
+        if apply else "Preview complete; registry was not modified.")
+    return untagged
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--deployed-sha", required=True)
-    parser.add_argument("--min-age-hours", type=int, default=168)
-    parser.add_argument("--apply", action="store_true", help="Delete eligible manifests; default is preview")
-    parser.add_argument("--workers", type=int, default=8, help="Concurrent read requests (1-32); deletions stay sequential")
+    parser.add_argument("--deployed-sha", required=True, help="Full SHA of the successfully deployed release")
+    parser.add_argument("--local", action="store_true", help="Prompt for missing registry credentials; preview needs no GitHub token")
+    parser.add_argument("--repository", action="append", help="Limit cleanup to this project image repository; repeatable")
+    parser.add_argument("--apply", action="store_true", help="Remove eligible SHA tags; default is preview")
+    parser.add_argument("--workers", type=int, default=8, help="Concurrent read requests (1-32); tag removals stay sequential")
     parser.add_argument("--max-runtime-seconds", type=int, default=1200, help="Stop cleanly after this time budget")
-    parser.add_argument("--max-deletions", type=int, default=0, help="Maximum deletions per run; 0 means no count limit")
+    parser.add_argument("--max-tags", "--max-deletions", dest="max_tags", type=int,
+                        help="Maximum tags to remove; default: 1 locally, unlimited in CI; 0 means unlimited")
     parser.add_argument("--report", help="Write a progress/error report as JSON")
     args = parser.parse_args()
-    if not SHA.fullmatch(args.deployed_sha) or args.min_age_hours < 1:
-        parser.error("Use a full deployed commit SHA and a minimum age of at least one hour")
-    if not 1 <= args.workers <= 32 or args.max_runtime_seconds < 1 or args.max_deletions < 0:
-        parser.error("Use 1-32 workers, a positive runtime, and a nonnegative deletion limit")
+    if args.max_tags is None:
+        args.max_tags = 1 if args.local else 0
+    if not SHA.fullmatch(args.deployed_sha):
+        parser.error("Use a full deployed commit SHA")
+    if not 1 <= args.workers <= 32 or args.max_runtime_seconds < 1 or args.max_tags < 0:
+        parser.error("Use 1-32 workers, a positive runtime, and a nonnegative tag removal limit")
     report = Report(args.report, args.apply)
     try:
         report.save()
         return run_cleanup(args, report)
     except CleanupDeferred as error:
-        log(f"Cleanup deferred: {error} Deleted this run: {report.data['deleted']}.")
+        log(f"Cleanup deferred: {error} Tags removed this run: {report.data['untagged']}.")
         report.finish("deferred", str(error))
         return 0
     except Exception as error:
         message = safe_error(error)
-        log(f"Registry cleanup stopped: {message}; deleted before failure: {report.data['deleted']}.")
+        log(f"Registry cleanup stopped: {message}; tags removed before failure: {report.data['untagged']}.")
         if os.environ.get("GITHUB_ACTIONS") == "true":
             escaped = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
             print(f"::error title=Registry cleanup failed::{escaped}", flush=True)
@@ -558,26 +519,85 @@ def main():
         return 1
 
 
-def run_cleanup(args, report):
-    required = ("ARTIFACT_REGISTRY_HOST", "ARTIFACT_REGISTRY_USERNAME", "ARTIFACT_REGISTRY_PASSWORD",
-                "GITHUB_REPOSITORY", "GITHUB_TOKEN", "GITHUB_RUN_ID")
-    for key in required:
-        if not os.environ.get(key):
+def required_environment(*keys):
+    values = []
+    for key in keys:
+        value = os.environ.get(key)
+        if not value:
             raise CleanupError(f"{key} is required")
+        values.append(value)
+    return values
+
+
+def registry_credentials(local):
+    required = ("ARTIFACT_REGISTRY_HOST", "ARTIFACT_REGISTRY_USERNAME", "ARTIFACT_REGISTRY_PASSWORD")
+    if not local:
+        return required_environment(*required)
+    prompts = ("Registry host (without https://): ", "Registry username: ", "Registry password: ")
+    values = []
+    for key, prompt in zip(required, prompts):
+        value = os.environ.get(key)
+        if not value:
+            if not sys.stdin.isatty():
+                raise CleanupError(f"{key} is required; run --local in a terminal or set this environment variable")
+            try:
+                value = getpass.getpass(prompt) if key.endswith("PASSWORD") else input(prompt).strip()
+            except (EOFError, KeyboardInterrupt):
+                raise CleanupError("Registry credential input cancelled") from None
+        if not value:
+            raise CleanupError(f"{key} must not be empty")
+        values.append(value)
+    return values
+
+
+def gh_output(root, arguments, failure):
+    try:
+        result = subprocess.run(["gh", *arguments], cwd=root, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.TimeoutExpired):
+        raise CleanupError(failure) from None
+    if result.returncode or not result.stdout.strip():
+        raise CleanupError(failure)
+    return result.stdout.strip()
+
+
+def github_client(root, local, apply, budget):
+    if not local:
+        return GitHub(*required_environment("GITHUB_REPOSITORY", "GITHUB_TOKEN", "GITHUB_RUN_ID"), budget=budget)
+    if not apply:
+        log("Local preview: workflow checks skipped; no DELETE requests will be sent.")
+        return None
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if not token:
+        token = gh_output(root, ["auth", "token", "--hostname", "github.com"],
+                          "Local tag removal requires GitHub access: run 'gh auth login' or set GITHUB_TOKEN")
+    repository = os.environ.get("GITHUB_REPOSITORY")
+    if not repository:
+        repository = gh_output(root, ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"],
+                               "Unable to detect GitHub repository; set GITHUB_REPOSITORY=owner/repo")
+    # Local invocations must consider every active workflow, even if CI variables are present.
+    return GitHub(repository, token, run_id="", budget=budget)
+
+
+def run_cleanup(args, report):
     root = Path(__file__).resolve().parents[2]
+    repositories = project_repositories(root)
+    if args.repository:
+        if not set(args.repository) <= set(repositories):
+            raise CleanupError("--repository must name an image repository from the project's compose files")
+        repositories = sorted(set(args.repository))
     result = subprocess.run(["git", "cat-file", "-e", args.deployed_sha + "^{commit}"], cwd=root,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if result.returncode:
         raise CleanupError("Deployed commit is unavailable; checkout must fetch the full history")
+    credentials = registry_credentials(args.local)
     budget = Budget(args.max_runtime_seconds)
-    registry = Registry(*(os.environ[key] for key in required[:3]), budget=budget)
-    github = GitHub(*(os.environ[key] for key in required[3:]), budget=budget)
-    repositories = project_repositories(root)
+    github = github_client(root, args.local, args.apply, budget)
+    registry = Registry(*credentials, budget=budget)
     log(f"Starting registry cleanup: mode={'apply' if args.apply else 'preview'}, repositories={len(repositories)}, "
-        f"read workers={args.workers}, minimum age={args.min_age_hours}h, time budget={args.max_runtime_seconds}s, "
-        f"deletion limit={args.max_deletions or 'unlimited'}.")
-    cleanup(registry, github, repositories, root, args.deployed_sha, args.min_age_hours, args.apply,
-            args.workers, args.max_deletions, report)
+        f"read workers={args.workers}, time budget={args.max_runtime_seconds}s, "
+        f"tag removal limit={args.max_tags or 'unlimited'}.")
+    cleanup(registry, github, repositories, root, args.deployed_sha, args.apply,
+            args.workers, args.max_tags, report)
     report.finish("complete" if args.apply else "preview")
     return 0
 
