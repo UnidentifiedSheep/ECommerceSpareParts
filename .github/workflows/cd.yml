@@ -270,6 +270,9 @@ jobs:
       DEPLOYED_SHA: ${{ needs.prepare-release.outputs.sha }}
       CLEANUP_MIN_AGE_HOURS: ${{ vars.REGISTRY_CLEANUP_MIN_AGE_HOURS || '168' }}
       CLEANUP_DRY_RUN: ${{ vars.REGISTRY_CLEANUP_DRY_RUN || 'false' }}
+      CLEANUP_WORKERS: ${{ vars.REGISTRY_CLEANUP_WORKERS || '8' }}
+      CLEANUP_MAX_RUNTIME_SECONDS: ${{ vars.REGISTRY_CLEANUP_MAX_RUNTIME_SECONDS || '1200' }}
+      CLEANUP_MAX_DELETIONS: ${{ vars.REGISTRY_CLEANUP_MAX_DELETIONS || '0' }}
 
     steps:
       - name: Checkout registry cleanup code
@@ -283,9 +286,22 @@ jobs:
         run: |
           set -euo pipefail
           args=(--deployed-sha "$DEPLOYED_SHA" --min-age-hours "$CLEANUP_MIN_AGE_HOURS")
+          args+=(--workers "$CLEANUP_WORKERS" --max-runtime-seconds "$CLEANUP_MAX_RUNTIME_SECONDS")
+          args+=(--max-deletions "$CLEANUP_MAX_DELETIONS" --report registry-cleanup-report.json)
           case "$CLEANUP_DRY_RUN" in
             true) ;;
             false) args+=(--apply) ;;
             *) echo 'REGISTRY_CLEANUP_DRY_RUN must be true or false.' >&2; exit 1 ;;
           esac
-          python3 scripts/ci/cleanup-registry.py "${args[@]}"
+          python3 -u scripts/ci/cleanup-registry.py "${args[@]}" 2>&1 | tee registry-cleanup.log
+
+      - name: Save registry cleanup diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-cleanup-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            registry-cleanup.log
+            registry-cleanup-report.json
+          if-no-files-found: ignore
+          retention-days: 7
