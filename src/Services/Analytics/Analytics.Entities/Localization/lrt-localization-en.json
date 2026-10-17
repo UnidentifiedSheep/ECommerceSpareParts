@@ -2,7 +2,7 @@
   "culture": "en",
   "messages": {
     "markup_calculation_lrt_name": "Markup calculation",
-    "markup_calculation_lrt_description": "Analyzes markup data and generates recommended markup ranges for pricing.",
+    "markup_calculation_lrt_description": "Calculates recommended markup ranges.",
     "markup.calculation.input.invalid": "Invalid markup calculation input data was provided.",
     "markup.calculation.range.start.must.be.before.or.equal.end": "The markup calculation time range start must be less than or equal to the time range end."
   }

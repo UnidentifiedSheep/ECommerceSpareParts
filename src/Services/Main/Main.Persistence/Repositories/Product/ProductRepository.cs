@@ -183,6 +183,21 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 			cancellationToken: cancellationToken);
 	}
 
+	public Task UpsertProductContentsAsync(
+		IReadOnlyCollection<ProductContent> contents,
+		CancellationToken cancellationToken = default)
+	{
+		var items = contents.GroupBy(content => content.GetId())
+			.Select(group => group.Last())
+			.ToList();
+		if (items.Count == 0) return Task.CompletedTask;
+
+		return Context.BulkInsertOrUpdateAsync(
+			items,
+			new BulkConfig { PropertiesToIncludeOnUpdate = [nameof(ProductContent.Quantity)] },
+			cancellationToken: cancellationToken);
+	}
+
 	public async Task UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default)

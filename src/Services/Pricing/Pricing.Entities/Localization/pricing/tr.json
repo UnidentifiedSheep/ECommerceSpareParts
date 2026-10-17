@@ -37,12 +37,12 @@
     "pricing.setting.uniq.product.additional.markup.name": "Benzersiz ürün ek kâr marjı",
     "pricing.setting.uniq.product.additional.markup.description": "Karşılaştırılabilir piyasa teklifi olmayan ürünlere uygulanan ek kâr marjı.",
     "lrt.price.candidate.calculation.name": "Fiyat adayı hesaplama",
-    "lrt.price.candidate.calculation.description": "Seçilen ürün ve depo için fiyat adaylarını hesaplar ve kaydeder.",
+    "lrt.price.candidate.calculation.description": "Seçilen ürün ve depo için fiyat adaylarını hesaplar.",
     "lrt.price.candidate.calculation.product.id.name": "Ürün",
     "lrt.price.candidate.calculation.product.id.description": "Fiyat adayları hesaplanacak ürün.",
     "lrt.price.candidate.calculation.storage.code.name": "Depo kodu",
     "lrt.price.candidate.calculation.storage.code.description": "Fiyat adaylarının hesaplanacağı depo kodu.",
-    "lrt.invalidate.stale.price.options.name": "Eski fiyat seçeneklerini geçersiz kıl",
-    "lrt.invalidate.stale.price.options.description": "Eski fiyatlandırma yapılandırmasıyla hesaplanan fiyat seçeneklerini siler ve yeniden hesaplama işleri kuyruğa alır."
+    "lrt.invalidate.stale.price.options.name": "Eski fiyat seçeneklerini güncelleme",
+    "lrt.invalidate.stale.price.options.description": "Eski fiyat seçeneklerini günceller."
   }
 }

@@ -37,12 +37,12 @@
     "pricing.setting.uniq.product.additional.markup.name": "Дополнительная наценка для уникального товара",
     "pricing.setting.uniq.product.additional.markup.description": "Дополнительная наценка, применяемая к товарам без сопоставимых рыночных предложений.",
     "lrt.price.candidate.calculation.name": "Расчет вариантов цены",
-    "lrt.price.candidate.calculation.description": "Рассчитывает и сохраняет варианты цены для выбранного товара и склада.",
+    "lrt.price.candidate.calculation.description": "Рассчитывает варианты цены для выбранного товара и склада.",
     "lrt.price.candidate.calculation.product.id.name": "Товар",
     "lrt.price.candidate.calculation.product.id.description": "Товар, для которого нужно рассчитать варианты цены.",
     "lrt.price.candidate.calculation.storage.code.name": "Код склада",
     "lrt.price.candidate.calculation.storage.code.description": "Код склада, для которого нужно рассчитать варианты цены.",
-    "lrt.invalidate.stale.price.options.name": "Инвалидация устаревших вариантов цены",
-    "lrt.invalidate.stale.price.options.description": "Удаляет варианты цены, рассчитанные с устаревшей конфигурацией ценообразования, и ставит задачи на перерасчет."
+    "lrt.invalidate.stale.price.options.name": "Обновление устаревших вариантов цены",
+    "lrt.invalidate.stale.price.options.description": "Обновляет устаревшие варианты цены."
   }
 }

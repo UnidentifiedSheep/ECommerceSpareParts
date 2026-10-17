@@ -37,12 +37,12 @@
     "pricing.setting.uniq.product.additional.markup.name": "Unique product additional markup",
     "pricing.setting.uniq.product.additional.markup.description": "Additional markup applied to products that have no comparable market offers.",
     "lrt.price.candidate.calculation.name": "Price candidate calculation",
-    "lrt.price.candidate.calculation.description": "Calculates and stores price candidates for the selected product and storage.",
+    "lrt.price.candidate.calculation.description": "Calculates price candidates for the selected product and storage.",
     "lrt.price.candidate.calculation.product.id.name": "Product",
     "lrt.price.candidate.calculation.product.id.description": "Product for which price candidates should be calculated.",
     "lrt.price.candidate.calculation.storage.code.name": "Storage code",
     "lrt.price.candidate.calculation.storage.code.description": "Code of the storage for which price candidates should be calculated.",
-    "lrt.invalidate.stale.price.options.name": "Invalidate stale price options",
-    "lrt.invalidate.stale.price.options.description": "Removes price options calculated with an outdated pricing configuration and enqueues recalculation jobs."
+    "lrt.invalidate.stale.price.options.name": "Update stale price options",
+    "lrt.invalidate.stale.price.options.description": "Updates stale price options."
   }
 }
