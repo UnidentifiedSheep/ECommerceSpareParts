@@ -42,13 +42,13 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 		IsSupportedExtension(extension, out var normalizedExtension)
 			.EnsureTrue(ArticleImageInvalidExtensionMessage.Instance);
 
-		return new ProductImage(productId, $"products/{productId}_{Guid.NewGuid():N}{normalizedExtension}");
+		return new ProductImage(productId, $"products/{productId}/{Guid.NewGuid():N}{normalizedExtension}");
 	}
 
 	public static ProductImage CreateFromStorageKey(int productId, string storageKey)
 	{
 		storageKey.EnsureNotNullOrWhiteSpace(ArticleImageInvalidStorageKeyMessage.Instance);
-		var fullStorageKey = $"products/{storageKey}"
+		var fullStorageKey = $"products/{productId}/{storageKey}"
 			.EnsureMaxLength(255, ArticleImageInvalidStorageKeyMessage.Instance);
 
 		(!storageKey.Contains('\\')

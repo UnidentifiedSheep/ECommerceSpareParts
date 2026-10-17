@@ -17,7 +17,7 @@
     "article.content.self.reference.not.allowed": "Ürün kendi içeriği olarak referans verilemez.",
     "article.content.count.must.be.non.negative": "Miktar 0 veya daha büyük olmalıdır.",
     "article.image.invalid.extension": "Dosya geçerli bir resim olmalıdır.",
-    "article.image.invalid.storage.key": "Geçerli bir resim dosyası adı veya göreli yol belirtin. products/ dahil uzunluk 255 karakteri geçmemelidir.",
+    "article.image.invalid.storage.key": "Geçerli bir resim dosyası adı veya göreli yol belirtin. Ürün klasörü öneki dahil uzunluk 255 karakteri geçmemelidir.",
     "article.images.must.not.be.empty": "Resim listesi boş olmamalıdır.",
     "article.pair.self.reference.not.allowed": "Ürün kendisiyle eşleştirilemez.",
     "article.reservation.max.count.exceeded": "Tek seferde en fazla 100 rezervasyon eklenebilir.",

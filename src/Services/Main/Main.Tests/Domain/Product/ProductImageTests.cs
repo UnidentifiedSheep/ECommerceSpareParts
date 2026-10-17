@@ -20,7 +20,7 @@ public class ProductImageTests
 		image
 			.StorageKey
 			.Should()
-			.MatchRegex($@"^products/42_[0-9a-f]{{32}}{Regex.Escape(expectedExtension)}$");
+			.MatchRegex($@"^products/42/[0-9a-f]{{32}}{Regex.Escape(expectedExtension)}$");
 	}
 
 	[Theory]
@@ -61,8 +61,8 @@ public class ProductImageTests
 		var image = ProductImage.CreateFromStorageKey(42, storageKey);
 
 		image.ProductId.Should().Be(42);
-		image.StorageKey.Should().Be($"products/{storageKey}");
-		image.GetId().Should().Be((42, $"products/{storageKey}"));
+		image.StorageKey.Should().Be($"products/42/{storageKey}");
+		image.GetId().Should().Be((42, $"products/42/{storageKey}"));
 	}
 
 	[Theory]
@@ -87,7 +87,7 @@ public class ProductImageTests
 	[Fact]
 	public void CreateFromStorageKey_EnforcesTheDatabaseKeyLength()
 	{
-		var longestKey = $"{new string('a', 242)}.jpg";
+		var longestKey = $"{new string('a', 239)}.jpg";
 		ProductImage.CreateFromStorageKey(42, longestKey).StorageKey.Should().HaveLength(255);
 
 		var act = () => ProductImage.CreateFromStorageKey(42, longestKey + "x");

@@ -17,7 +17,7 @@
     "article.content.self.reference.not.allowed": "Article cannot reference itself as content.",
     "article.content.count.must.be.non.negative": "Quantity must be greater than or equal to 0.",
     "article.image.invalid.extension": "File must be a valid image.",
-    "article.image.invalid.storage.key": "Specify a valid image file name or relative path. The length including products/ must not exceed 255 characters.",
+    "article.image.invalid.storage.key": "Specify a valid image file name or relative path. The length including the product folder prefix must not exceed 255 characters.",
     "article.images.must.not.be.empty": "Image list must not be empty.",
     "article.pair.self.reference.not.allowed": "Article cannot be paired with itself.",
     "article.reservation.max.count.exceeded": "Maximum 100 reservations can be added at once.",
