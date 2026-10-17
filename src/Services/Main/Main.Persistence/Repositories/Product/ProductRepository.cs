@@ -168,6 +168,19 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 			cancellationToken: cancellationToken);
 	}
 
+	public Task InsertProductImagesOnConflictDoNothingAsync(
+		IReadOnlyCollection<ProductImage> images,
+		CancellationToken cancellationToken = default)
+	{
+		if (images.Count == 0) return Task.CompletedTask;
+
+		var items = images.DistinctBy(image => image.GetId()).ToList();
+		return Context.BulkInsertOrUpdateAsync(
+			items,
+			new BulkConfig { PropertiesToIncludeOnUpdate = [""] },
+			cancellationToken: cancellationToken);
+	}
+
 	public Task UpsertProductCharacteristicsAsync(
 		IReadOnlyCollection<ProductCharacteristic> characteristics,
 		CancellationToken cancellationToken = default)

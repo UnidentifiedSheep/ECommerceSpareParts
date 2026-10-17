@@ -21,10 +21,10 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 	{
 	}
 
-	private ProductImage(int productId, string extension)
+	private ProductImage(int productId, string storageKey)
 	{
 		ProductId = productId;
-		SetPath(extension);
+		StorageKey = storageKey;
 	}
 
 	public int ProductId { get; }
@@ -37,14 +37,28 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 	public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key) => x =>
 		x.ProductId == key.Item1 && x.StorageKey == key.Item2;
 
-	public static ProductImage Create(int productId, string extension) => new(productId, extension);
-
-	private void SetPath(string extension)
+	public static ProductImage Create(int productId, string extension)
 	{
 		IsSupportedExtension(extension, out var normalizedExtension)
 			.EnsureTrue(ArticleImageInvalidExtensionMessage.Instance);
 
-		StorageKey = $"products/{ProductId}_{Guid.NewGuid():N}{normalizedExtension}";
+		return new ProductImage(productId, $"products/{productId}_{Guid.NewGuid():N}{normalizedExtension}");
+	}
+
+	public static ProductImage CreateFromStorageKey(int productId, string storageKey)
+	{
+		storageKey.EnsureNotNullOrWhiteSpace(ArticleImageInvalidStorageKeyMessage.Instance);
+		var fullStorageKey = $"products/{storageKey}"
+			.EnsureMaxLength(255, ArticleImageInvalidStorageKeyMessage.Instance);
+
+		(!storageKey.Contains('\\')
+		 && !storageKey.Any(char.IsControl)
+		 && storageKey.Split('/').All(segment => !string.IsNullOrWhiteSpace(segment) && segment is not "." and not ".."))
+			.EnsureTrue(ArticleImageInvalidStorageKeyMessage.Instance);
+		IsSupportedExtension(Path.GetExtension(storageKey), out _)
+			.EnsureTrue(ArticleImageInvalidExtensionMessage.Instance);
+
+		return new ProductImage(productId, fullStorageKey);
 	}
 
 	public override void OnCreated() => AddDomainEvent(new ProductImageUpdatedDomainEvent(ProductId));
