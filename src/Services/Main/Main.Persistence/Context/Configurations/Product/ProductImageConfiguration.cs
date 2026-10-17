@@ -17,6 +17,8 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
 			})
 			.HasName("product_images_pk");
 
+		builder.HasIndex(e => e.StorageKey, "product_images_storage_key_uindex").IsUnique();
+
 		builder.Property(e => e.ProductId).HasColumnName("product_id");
 
 		builder.Property(e => e.StorageKey).HasColumnName("storage_key").HasMaxLength(255);

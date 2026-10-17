@@ -32,7 +32,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		[
 			CsvRow(products[0].Id, "Photo.JPG"),
 			CsvRow(products[0].Id, "Photo.JPG"),
-			CsvRow(products[1].Id, "Photo.JPG"),
+			CsvRow(products[1].Id, "Other.JPG"),
 			CsvRow(products[0].Id, "supplier/Фото товара.webp")
 		];
 
@@ -53,7 +53,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		{
 			existingImage.GetId(),
 			(products[0].Id, "products/Photo.JPG"),
-			(products[1].Id, "products/Photo.JPG"),
+			(products[1].Id, "products/Other.JPG"),
 			(products[0].Id, "products/supplier/Фото товара.webp")
 		});
 	}
@@ -126,31 +126,62 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 	}
 
 	[Fact]
-	public async Task SharedImage_IsDeletedFromStorageOnlyAfterTheLastProductRemovesIt()
+	public async Task RemoveImage_DeletesItsObjectAndPreservesOtherImages()
 	{
-		var products = TestContext.Products.Take(2).ToArray();
-		const string storageKey = "products/shared.jpg";
+		var productId = TestContext.Products[0].Id;
+		const string storageKey = "products/first.jpg";
+		const string otherStorageKey = "products/second.jpg";
 		var storage = Scope.ServiceProvider.GetRequiredService<S3StorageServiceStub>();
 		storage.SetFile("images", storageKey, "uploaded image");
+		storage.SetFile("images", otherStorageKey, "another image");
 		var execution = await ExecuteCsv(
 			"ProductId,FileName",
-			products.Select(product => CsvRow(product.Id, "shared.jpg")),
+			[CsvRow(productId, "first.jpg"), CsvRow(productId, "second.jpg")],
 			fileName => new ProductImageImportInputState { FileName = fileName });
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 
-		await Mediator.Send(new RemoveProductImageCommand(products[0].Id, storageKey), CancellationToken);
+		await Mediator.Send(new RemoveProductImageCommand(productId, $"https://images.example.com/{storageKey}"),
+			CancellationToken);
 
 		var remaining = (await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
-		remaining.GetId().Should().Be((products[1].Id, storageKey));
-		using (var response = await storage.DownloadFileAsync("images", storageKey, CancellationToken))
-			response.IsSuccess.Should().BeTrue();
-
-		await Mediator.Send(new RemoveProductImageCommand(products[1].Id, storageKey), CancellationToken);
-
-		(await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken)).Should().BeEmpty();
+		remaining.GetId().Should().Be((productId, otherStorageKey));
+		using var preserved = await storage.DownloadFileAsync("images", otherStorageKey, CancellationToken);
+		preserved.IsSuccess.Should().BeTrue();
 		using var deleted = await storage.DownloadFileAsync("images", storageKey, CancellationToken);
 		deleted.IsSuccess.Should().BeFalse();
+	}
+
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task ImageAssignedToDifferentProducts_FailsAndRollsBackTheBatch(bool imageAlreadyAssigned)
+	{
+		var products = TestContext.Products.Take(3).ToArray();
+		if (imageAlreadyAssigned)
+		{
+			Context.ProductImages.Add(ProductImage.CreateFromStorageKey(products[0].Id, "owned.jpg"));
+			await Context.SaveChangesAsync(CancellationToken);
+		}
+
+		var rows = new List<string>();
+		if (!imageAlreadyAssigned)
+			rows.Add(CsvRow(products[0].Id, "owned.jpg"));
+		rows.Add(CsvRow(products[2].Id, "fresh.jpg"));
+		rows.Add(CsvRow(products[1].Id, "owned.jpg"));
+
+		var execution = await ExecuteCsv("ProductId,FileName", rows,
+			fileName => new ProductImageImportInputState { FileName = fileName });
+
+		execution.Job.Status.Should().Be(JobStatus.Failed);
+		execution.Job.Attempts.Should().Be(1);
+		execution.Job.ErrorMessage.Should().Contain("product_images_storage_key_uindex");
+		execution.GetState<ProductImageImportState>().Checkpoint.Should().BeNull();
+		var images = await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken);
+		if (imageAlreadyAssigned)
+			images.Should().ContainSingle().Which.GetId().Should().Be((products[0].Id, "products/owned.jpg"));
+		else
+			images.Should().BeEmpty();
 	}
 
 	[Fact]

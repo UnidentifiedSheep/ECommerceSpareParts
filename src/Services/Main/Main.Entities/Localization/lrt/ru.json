@@ -45,6 +45,7 @@
     "lrt.product.image.import.description": "Добавляет изображения к товарам.",
     "lrt.product.image.import.invalid.product.id": "ProductId должен быть положительным ID товара.",
     "lrt.product.image.import.missing.reference": "Импорт прерван: связанный товар не найден. Строки батча: {StartRow|int}–{EndRow|int}. Ограничение: {ConstraintName|string}.",
+    "lrt.product.image.import.storage.key.already.assigned": "Импорт прерван: изображение уже привязано к другому товару. Строки батча: {StartRow|int}–{EndRow|int}. Ограничение: {ConstraintName|string}.",
     "lrt.product.characteristics.import.name": "Импорт характеристик товаров",
     "lrt.product.characteristics.import.description": "Загружает характеристики товаров.",
     "lrt.product.characteristics.import.step.name": "Загрузка характеристик товаров",

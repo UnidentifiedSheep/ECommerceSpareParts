@@ -97,6 +97,22 @@ public class ProductImageImportLrt(
 								.WithEndRow(items[^1].idx)
 								.WithConstraintName(error.ConstraintName ?? string.Empty)));
 				})
+			.OnException(
+				TransactionErrorKind.UniqueConstraintViolation,
+				error =>
+				{
+					Logger.LogWarning(
+						error.Exception,
+						"Image is already assigned to another product. StartRow: {StartRow}, EndRow: {EndRow}",
+						items[0].idx,
+						items[^1].idx);
+					Interrupt(
+						StringLocalizer.Get(
+							new LrtProductImageImportStorageKeyAlreadyAssignedMessage()
+								.WithStartRow(items[0].idx)
+								.WithEndRow(items[^1].idx)
+								.WithConstraintName(error.ConstraintName ?? string.Empty)));
+				})
 			.ExecuteAsync(
 				async (_, cancellationToken) =>
 				{

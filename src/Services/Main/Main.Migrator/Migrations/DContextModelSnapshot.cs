@@ -2014,6 +2014,9 @@ namespace Main.Migrator.Migrations
                     b.HasKey("ProductId", "StorageKey")
                         .HasName("product_images_pk");
 
+                    b.HasIndex(new[] { "StorageKey" }, "product_images_storage_key_uindex")
+                        .IsUnique();
+
                     b.ToTable("product_images", "public");
                 });
 
