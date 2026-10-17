@@ -17,6 +17,7 @@
     "article.content.self.reference.not.allowed": "Артикул не может ссылаться сам на себя.",
     "article.content.count.must.be.non.negative": "Количество должно быть больше или равно 0.",
     "article.image.invalid.extension": "Файл должен быть изображением.",
+    "article.image.invalid.storage.key": "Укажите корректное имя файла или относительный путь к изображению. Длина вместе с products/ — не более 255 символов.",
     "article.images.must.not.be.empty": "Список изображений не может быть пустым.",
     "article.pair.self.reference.not.allowed": "Артикул не может быть парой самому себе.",
     "article.reservation.max.count.exceeded": "Нельзя добавить более 100 резерваций за раз.",
