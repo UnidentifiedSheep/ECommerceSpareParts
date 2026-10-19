@@ -2,11 +2,9 @@ using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
 using Analytics.Entities;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
 using Contracts.Analytics;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -15,15 +13,8 @@ using NamedObject.Core.Interfaces;
 namespace Analytics.Application.Lrts.MarkupCalculation;
 
 public class MarkupCalculationLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
-	INamedObjectRegistry<MarkupAnalyzerNamedObjectBase> registry,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	ILogger<MarkupCalculationLrt> logger) : LrtBase<MarkupCalculationInputState, MarkupCalculationState>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 {
@@ -36,30 +27,29 @@ public class MarkupCalculationLrt(
 
 	protected override async Task DoWork(MarkupCalculationInputState inputState)
 	{
-		var analyzer = registry.GetBySystemName(MarkupRangeAnalyzer.AnalyzerSystemName);
-		var result = await analyzer.AnalyzeAsync(
-			new MarkupAnalyzerInput
+		var ranges = await ExecuteInScopeAsync(async (context, ct) =>
+		{
+			var analyzer = context.GetRequiredService<INamedObjectRegistry<MarkupAnalyzerNamedObjectBase>>()
+				.GetBySystemName(MarkupRangeAnalyzer.AnalyzerSystemName);
+			var result = await analyzer.AnalyzeAsync(new MarkupAnalyzerInput
 			{
 				StartDate = inputState.RangeStart, EndDate = inputState.RangeEnd
-			},
-			CancellationToken);
-
-		var ranges = result
-			.Select(x => new MarkupRangeItem
+			}, ct);
+			return result.Select(x => new MarkupRangeItem
 			{
 				Count = x.Count,
 				FromCost = x.FromCost,
 				MeanMarkup = x.MeanMarkup,
 				StdDevMarkup = x.StdDevMarkup,
 				ToCost = x.ToCost
-			})
-			.ToList();
+			}).ToList();
+		}, CancellationToken);
 
-		await TransactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(20, 2),
 			async (context, cancellationToken) =>
 			{
-				await Publisher.Publish(
+				await context.Publisher.Publish(
 					new MarkupAnalyzedEvent
 					{
 						Ranges = ranges

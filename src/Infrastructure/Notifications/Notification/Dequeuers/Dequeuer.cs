@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using System.Text.Json;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
@@ -61,15 +62,14 @@ public class Dequeuer<TRecipient>(
 		await using var scope = scopeFactory.CreateAsyncScope();
 		var provider = scope.ServiceProvider;
 		var repository = provider.GetRequiredService<INotificationDeliveryRepository>();
-		var transactionService = provider.GetRequiredService<IApplicationTransactionService>();
+		var transactionService = provider.GetRequiredService<IApplicationTransaction>();
 		var recipientResolver = provider.GetRequiredService<IRecipientResolver>();
 		var definitions = provider.GetRequiredService<INamedObjectRegistry<INotificationDefinition>>();
 		var channel = provider
 			.GetRequiredService<INamedObjectRegistry<INotificationChannel>>()
 			.GetBySystemName(SystemName);
 
-		var (hasNext, processingError) = await transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(0, 0),
+		var (hasNext, processingError) = await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(
 			async (transactionContext, ct) =>
 			{
 				var batch = await repository

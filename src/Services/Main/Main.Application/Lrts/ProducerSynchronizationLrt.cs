@@ -1,31 +1,21 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Contracts.Producer;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities;
 using Main.Entities.Producer;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts;
 
 public class ProducerSynchronizationLrt(
-	IRepository<Job, Guid> jobRepository,
-	IReadRepository<Producer, int> producerRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	ILogger<ProducerSynchronizationLrt> logger) : SynchronizationLrtBase<
 	NoneInputState,
 	int,
 	ProducerUpdatedEvent>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 {
@@ -43,7 +33,7 @@ public class ProducerSynchronizationLrt(
 		int batchSize,
 		CancellationToken cancellationToken)
 	{
-		var query = producerRepository.Query;
+		var query = TransactionContext.Repositories.GetForRead<Producer, int>().Query;
 		if (lastProcessedId is { } id)
 			query = query.Where(x => x.Id > id);
 

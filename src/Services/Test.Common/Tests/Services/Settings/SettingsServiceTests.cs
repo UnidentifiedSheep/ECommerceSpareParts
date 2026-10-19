@@ -24,15 +24,15 @@ public sealed class SettingsServiceTests
 		unitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 		var transactionContext = new Mock<IApplicationTransactionContext>();
 		transactionContext.SetupGet(x => x.UnitOfWork).Returns(unitOfWork.Object);
-		var transactionService = new Mock<IApplicationTransactionService>();
+		var transactionService = new Mock<IApplicationTransaction>();
+		transactionService.Setup(x => x.WithSettings(It.IsAny<TransactionalAttribute?>())).Returns(transactionService.Object);
 		transactionService
 			.Setup(x => x.ExecuteAsync(
-				It.IsAny<TransactionalAttribute?>(),
 				It.IsAny<Func<IApplicationTransactionContext, CancellationToken, Task>>(),
 				It.IsAny<CancellationToken>()))
-			.Returns<TransactionalAttribute?, Func<IApplicationTransactionContext, CancellationToken, Task>,
+			.Returns<Func<IApplicationTransactionContext, CancellationToken, Task>,
 				CancellationToken>((
-				_, action,
+				action,
 				ct) => action(transactionContext.Object, ct));
 		var settingsContainer = new Mock<ISettingsContainer>();
 		var service = new SettingsService(
@@ -45,7 +45,6 @@ public sealed class SettingsServiceTests
 		existing.Json.Should().Be(replacement.Json);
 		transactionService.Verify(
 			x => x.ExecuteAsync(
-				It.IsAny<TransactionalAttribute?>(),
 				It.IsAny<Func<IApplicationTransactionContext, CancellationToken, Task>>(),
 				It.IsAny<CancellationToken>()),
 			Times.Once);

@@ -1,29 +1,18 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Products;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities;
 using Main.Entities.Product;
 using Main.Enums;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.ProductSynchronization;
 
 public sealed class ProductSynchronizationLrt(
-	IRepository<Job, Guid> jobRepository,
-	IReadRepository<Product, int> productRepository,
-	IProductEventProvider eventProvider,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<ProductSynchronizationInputState, int, object>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 {
@@ -42,7 +31,7 @@ public sealed class ProductSynchronizationLrt(
 		int batchSize,
 		CancellationToken cancellationToken)
 	{
-		var query = productRepository.Query;
+		var query = TransactionContext.Repositories.GetForRead<Product, int>().Query;
 		if (lastProcessedId is { } id)
 			query = query.Where(x => x.Id > id);
 
@@ -54,6 +43,6 @@ public sealed class ProductSynchronizationLrt(
 
 		return new SynchronizationPage<int, object>(
 			ids,
-			await eventProvider.GetEventsAsync(ids, InputState.Parts, cancellationToken));
+			await TransactionContext.GetRequiredService<IProductEventProvider>().GetEventsAsync(ids, InputState.Parts, cancellationToken));
 	}
 }

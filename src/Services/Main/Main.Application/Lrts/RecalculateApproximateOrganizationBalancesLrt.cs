@@ -1,29 +1,18 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Services;
 using Main.Entities;
 using Main.Entities.Organization;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts;
 
 public sealed class RecalculateApproximateOrganizationBalancesLrt(
-	IRepository<Job, Guid> jobRepository,
-	IReadRepository<OrganizationFinancialProfile, Guid> financialProfileRepository,
-	IBalanceService balanceService,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	ILogger<RecalculateApproximateOrganizationBalancesLrt> logger) : LrtBase<NoneInputState, NoneInputState>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 {
@@ -44,22 +33,23 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 		while (true)
 		{
 			var id = lastOrganizationId;
-			var organizationIds = await financialProfileRepository
+			var organizationIds = await ExecuteInScopeAsync((context, ct) =>
+				context.Repositories.GetForRead<OrganizationFinancialProfile, Guid>()
 				.Query
 				.Where(x => x.OrganizationId > id)
 				.OrderBy(x => x.OrganizationId)
 				.Select(x => x.OrganizationId)
 				.Take(BatchSize)
-				.ToListAsync(CancellationToken);
+				.ToListAsync(ct), CancellationToken);
 
 			if (organizationIds.Count == 0)
 				break;
 
-			await TransactionService.ExecuteAsync(
+			await ExecuteInTransactionAsync(
 				TransactionalAttribute.ReadCommitted(20, 3),
 				async (context, cancellationToken) =>
 				{
-					await balanceService.RecalculateApproximateBalancesAsync(
+					await context.GetRequiredService<IBalanceService>().RecalculateApproximateBalancesAsync(
 						organizationIds,
 						cancellationToken);
 					await context.UnitOfWork.SaveChangesAsync(cancellationToken);

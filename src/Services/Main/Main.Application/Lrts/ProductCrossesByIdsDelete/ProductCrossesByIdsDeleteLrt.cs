@@ -1,11 +1,9 @@
 using Abstractions.Interfaces;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
@@ -13,7 +11,6 @@ using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -21,22 +18,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProductCrossesByIdsDelete;
 
 public class ProductCrossesByIdsDeleteLrt(
-	IRepository<Job, Guid> jobRepository,
-	IProductRepository productRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IDomainEventScope domainEventScope,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductCrossesByIdsDeleteLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductCrossesByIdsDeleteInputState, ProductCrossesByIdsDeleteState,
 		ProductCrossesByIdsDeleteLrt.ProductCrossByIdsCsvDto, ProductCross>(
-		jobRepository,
 		bucketsOptions,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger,
 		s3Service,
@@ -95,12 +84,12 @@ public class ProductCrossesByIdsDeleteLrt(
 			.DistinctBy(x => (x.LeftProductId, x.RightProductId))
 			.ToArray();
 
-		await TransactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(20, 2),
-			async (_, cancellationToken) =>
+			async (context, cancellationToken) =>
 			{
-				await productRepository.DeleteProductCrossesAsync(crosses, cancellationToken);
-				domainEventScope.AddRange(crosses
+				await context.GetRequiredService<IProductRepository>().DeleteProductCrossesAsync(crosses, cancellationToken);
+				context.GetRequiredService<IDomainEventScope>().AddRange(crosses
 					.SelectMany(x => new[] { x.LeftProductId, x.RightProductId })
 					.Distinct()
 					.Select(id => new ProductLinkageUpdatedDomainEvent(id)));

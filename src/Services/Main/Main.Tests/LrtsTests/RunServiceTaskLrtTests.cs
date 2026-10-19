@@ -28,9 +28,7 @@ public sealed class RunServiceTaskLrtTests
 		var unitOfWork = new Mock<IUnitOfWork>();
 		unitOfWork.Setup(value => value.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 		unitOfWork.Setup(value => value.ReloadAsync(It.IsAny<Job>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-		var lrt = new RunServiceTaskLrt(repositories.Object, unitOfWork.Object, Mock.Of<IPublishEndpoint>(),
-			new ApplicationTransactionServiceStub(unitOfWork.Object, Mock.Of<IRepositoryProvider>(), events),
-			events, NullLogger<RunServiceTaskLrt>.Instance);
+		var lrt = new RunServiceTaskLrt(new ApplicationTransactionFactoryStub(unitOfWork.Object, Mock.Of<IRepositoryProvider>(provider => provider.Get<Job, Guid>() == repositories.Object), events), NullLogger<RunServiceTaskLrt>.Instance);
 		var input = new RunServiceTaskInputState { ServiceName = serviceName, TaskSystemName = "CleanupProductIndex" };
 		var job = SingleRunJob.Create(lrt.SystemName, lrt.ValidateState(JsonSerializer.Serialize(input)), 1);
 		var leaseHolderId = Guid.NewGuid();

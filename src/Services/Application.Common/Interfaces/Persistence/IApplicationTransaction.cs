@@ -1,9 +1,16 @@
 using Application.Common.Models.Persistence;
+using Attributes;
 
 namespace Application.Common.Interfaces.Persistence;
 
-public interface IApplicationTransaction
+public interface IApplicationTransaction : IDisposable, IAsyncDisposable
 {
+	IApplicationTransactionContext Context { get; }
+
+	bool IsExecuting { get; }
+
+	IApplicationTransaction WithSettings(TransactionalAttribute? settings);
+
 	/// <summary>
 	/// Registers a handler for a failed operation after rollback and retries.
 	/// Enclosing database transactions defer error handling to their owner.

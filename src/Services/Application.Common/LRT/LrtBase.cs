@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
@@ -13,27 +13,28 @@ using Microsoft.Extensions.Logging;
 namespace Application.Common.LRT;
 
 public abstract class LrtBase<TInputState, TState>(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	ILogger logger) : ILrtNamedObject<TInputState>
 	where TInputState : class, IInputState where TState : class
 {
 	private Job? _job;
+	private IApplicationTransactionContext? _activeTransactionContext;
 
 	private TInputState? _inputState;
 	private TState? _state;
 
-	protected IUnitOfWork UnitOfWork => unitOfWork;
+	protected IUnitOfWork UnitOfWork => TransactionContext.UnitOfWork;
 
-	protected IApplicationTransactionService TransactionService => transactionService;
+	protected IApplicationTransactionFactory TransactionFactory => transactionService;
 
-	protected IRepository<Job, Guid> JobRepository => jobRepository;
+	protected IApplicationTransactionContext TransactionContext => _activeTransactionContext ??
+		throw new InvalidOperationException("No LRT transaction is executing.");
+
+	protected IRepository<Job, Guid> JobRepository => TransactionContext.Repositories.Get<Job, Guid>();
 
 	protected ILogger Logger => logger;
 
-	protected IPublishEndpoint Publisher => publisher;
+	protected IPublishEndpoint Publisher => TransactionContext.Publisher;
 
 	protected CancellationToken CancellationToken { get; private set; }
 
@@ -168,7 +169,7 @@ public abstract class LrtBase<TInputState, TState>(
 	protected async Task SaveStateAsync(TState state)
 	{
 		var json = LrtStateSerializer.Serialize(InputState, state);
-		await transactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -184,16 +185,87 @@ public abstract class LrtBase<TInputState, TState>(
 
 	protected async Task GetJobAsync()
 	{
-		if (_job != null)
-			await unitOfWork.ReloadAsync(_job, CancellationToken);
-		else
-			_job = await jobRepository.GetById(JobId, CancellationToken) ??
-				throw new InvalidOperationException($"Job with id {JobId} not found");
+		if (_activeTransactionContext is null)
+		{
+			await ExecuteInTransactionAsync(null, (_, _) => GetJobAsync(), CancellationToken);
+			return;
+		}
+
+		var reload = _job is not null;
+		_job = await JobRepository.GetById(JobId, CancellationToken) ??
+			throw new InvalidOperationException($"Job with id {JobId} not found");
+		if (reload)
+			await UnitOfWork.ReloadAsync(_job, CancellationToken);
+	}
+
+	protected async Task ExecuteInScopeAsync(
+		Func<IApplicationTransactionContext, CancellationToken, Task> action,
+		CancellationToken cancellationToken = default)
+	{
+		await using var transaction = TransactionFactory.Create();
+		await action(transaction.Context, cancellationToken);
+	}
+
+	protected async Task<TResult> ExecuteInScopeAsync<TResult>(
+		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
+		CancellationToken cancellationToken = default)
+	{
+		await using var transaction = TransactionFactory.Create();
+		return await action(transaction.Context, cancellationToken);
+	}
+
+	protected Task ExecuteInTransactionAsync(
+		TransactionalAttribute? settings,
+		Func<IApplicationTransactionContext, CancellationToken, Task> action,
+		CancellationToken cancellationToken = default) =>
+		ExecuteInTransactionAsync(async (context, ct) =>
+		{
+			await action(context, ct);
+			return true;
+		}, settings, cancellationToken);
+
+	protected Task<TResult> ExecuteInTransactionAsync<TResult>(
+		TransactionalAttribute? settings,
+		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
+		CancellationToken cancellationToken = default) =>
+		ExecuteInTransactionAsync(action, settings, cancellationToken);
+
+	private async Task<TResult> ExecuteInTransactionAsync<TResult>(
+		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
+		TransactionalAttribute? settings,
+		CancellationToken cancellationToken)
+	{
+		if (_activeTransactionContext is { } active)
+			return await action(active, cancellationToken);
+
+		await using var transaction = TransactionFactory.Create();
+		var previousState = _state;
+		try
+		{
+			return await transaction.WithSettings(settings).ExecuteAsync(async (context, ct) =>
+			{
+				_state = previousState;
+				_activeTransactionContext = context;
+				try
+				{
+					return await action(context, ct);
+				}
+				finally
+				{
+					_activeTransactionContext = null;
+				}
+			}, cancellationToken);
+		}
+		catch
+		{
+			_state = previousState;
+			throw;
+		}
 	}
 
 	protected virtual async Task ProcessingJobAsync()
 	{
-		await transactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -208,7 +280,7 @@ public abstract class LrtBase<TInputState, TState>(
 
 	protected virtual async Task<bool> AttemptOrFailJobAsync(Exception exception, bool forceFail = false)
 	{
-		return await transactionService.ExecuteAsync(
+		return await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -230,7 +302,7 @@ public abstract class LrtBase<TInputState, TState>(
 
 	protected virtual async Task SucceedJobAsync()
 	{
-		await transactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -243,7 +315,7 @@ public abstract class LrtBase<TInputState, TState>(
 
 	protected virtual async Task CancelJobAsync()
 	{
-		await transactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -256,7 +328,7 @@ public abstract class LrtBase<TInputState, TState>(
 
 	protected async Task RenewLeaseAsync(TimeSpan leaseDuration)
 	{
-		await transactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{

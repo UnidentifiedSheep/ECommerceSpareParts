@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
@@ -11,13 +12,12 @@ using JobEntity = Domain.CommonEntities.Job.Job;
 namespace Application.Common.Services.Job;
 
 public class JobService(
-	IApplicationTransactionService transactionService,
+	IApplicationTransaction transactionService,
 	Func<IJobCreationDispatcher> jobCreationDispatcherFactory) : IJobService
 {
 	public Task CancelJobAsync(Guid jobId, CancellationToken token = default)
 	{
-		return transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 2),
+		return transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
 			async (ctx, ct) =>
 			{
 				var repository = ctx.Repositories.Get<IJobRepository>();
@@ -65,8 +65,7 @@ public class JobService(
 		ArgumentNullException.ThrowIfNull(jobs);
 		var toAdd = jobs.ToList();
 
-		return transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 3),
+		return transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3)).ExecuteAsync(
 			async (ctx, ct) =>
 			{
 				var repository = ctx.Repositories.Get<IJobRepository>();

@@ -162,19 +162,13 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 	}
 
 	public sealed class TestCsvImportLrt(
-		IRepository<Job, Guid> jobRepository,
-		IUnitOfWork unitOfWork,
 		IS3Service s3Service,
 		ILogger<TestCsvImportLrt> logger,
 		IOptions<S3BucketsOptions> bucketsOptions,
-		IPublishEndpoint publisher,
-		IApplicationTransactionService transactionService,
+		IApplicationTransactionFactory transactionService,
 		IContextualLocalizer stringLocalizer)
 		: CsvImportLrtBase<TestCsvImportInputState, TestCsvImportState, TestCsvDto, string>(
-			jobRepository,
 			bucketsOptions,
-			unitOfWork,
-			publisher,
 			transactionService,
 			logger,
 			s3Service,

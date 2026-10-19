@@ -1,16 +1,13 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.Product;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -18,18 +15,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProductEanImport;
 
 public class ProductEanImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IProductRepository productRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductEanImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductEanImportInputState, ProductEanImportState,
 		ProductEanImportLrt.ProductEanCsvDto, ProductEan>(
-		jobRepository, bucketsOptions, unitOfWork, publisher, transactionService,
+		bucketsOptions, transactionService,
 		logger, s3Service, stringLocalizer)
 {
 	protected override int BatchSize => 10_000;
@@ -68,9 +61,9 @@ public class ProductEanImportLrt(
 	{
 		if (items.Count == 0) return;
 
-		await TransactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(_, cancellationToken) => productRepository.InsertProductEansOnConflictDoNothingAsync(
+			(context, cancellationToken) => context.GetRequiredService<IProductRepository>().InsertProductEansOnConflictDoNothingAsync(
 				items.Select(x => x.item).ToArray(), cancellationToken),
 			CancellationToken);
 

@@ -1,10 +1,8 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Enums;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
@@ -12,7 +10,6 @@ using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.Product;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -20,18 +17,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProductContentImport;
 
 public class ProductContentImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IProductRepository productRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductContentImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductContentImportInputState, ProductContentImportState,
 		ProductContentImportLrt.ProductContentCsvDto, ProductContent>(
-		jobRepository, bucketsOptions, unitOfWork, publisher, transactionService,
+		bucketsOptions, transactionService,
 		logger, s3Service, stringLocalizer)
 {
 	public const string Name = nameof(ProductContentImportLrt);
@@ -75,8 +68,8 @@ public class ProductContentImportLrt(
 	{
 		if (items.Count == 0) return;
 
-		await TransactionService
-			.Create(TransactionalAttribute.RetryOnConflict(20, 2))
+		await using var transaction = TransactionFactory.Create();
+		await transaction.WithSettings(TransactionalAttribute.RetryOnConflict(20, 2))
 			.OnException(
 				TransactionErrorKind.ForeignKeyViolation,
 				error =>
@@ -94,8 +87,8 @@ public class ProductContentImportLrt(
 								.WithConstraintName(error.ConstraintName ?? string.Empty)));
 				})
 			.ExecuteAsync(
-				(_, cancellationToken) =>
-					productRepository.UpsertProductContentsAsync(
+				(context, cancellationToken) =>
+					context.GetRequiredService<IProductRepository>().UpsertProductContentsAsync(
 						items.Select(x => x.item).ToArray(),
 						cancellationToken),
 				CancellationToken);

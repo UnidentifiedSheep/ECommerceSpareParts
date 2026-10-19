@@ -1,10 +1,8 @@
 using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Domain.Extensions;
 using Enums;
 using Locan.Core.Interfaces;
@@ -15,7 +13,6 @@ using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
 using Main.Entities;
 using Main.Entities.Producer;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -23,23 +20,15 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProducerSupplierMappingImport;
 
 public class ProducerSupplierMappingImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IProducerRepository producerRepository,
-	IProducerLookupService producerLookupService,
 	ILogger<ProducerSupplierMappingImportLrt> logger,
 	IOptions<S3BucketsOptions> bucketsOptions,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProducerSupplierMappingImportInputState, ProducerSupplierMappingImportState,
 		ProducerSupplierMappingImportLrt.ProducerSupplierMappingCsvDto,
 		ProducerSupplierMappingImportLrt.ProducerSupplierMappingBatchItem>(
-		jobRepository,
 		bucketsOptions,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger,
 		s3Service,
@@ -59,7 +48,8 @@ public class ProducerSupplierMappingImportLrt(
 		ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override async Task BeforeRead(ProducerSupplierMappingImportState state) =>
-		_producerLookup = await producerLookupService.Load(CancellationToken);
+		_producerLookup = await ExecuteInScopeAsync((context, ct) =>
+			context.GetRequiredService<IProducerLookupService>().Load(ct), CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -149,10 +139,10 @@ public class ProducerSupplierMappingImportLrt(
 			return;
 		}
 
-		await TransactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(_, cancellationToken) =>
-				producerRepository.AddSupplierMappingsOnConflictDoNothingAsync(toAdd, cancellationToken),
+			(context, cancellationToken) =>
+				context.GetRequiredService<IProducerRepository>().AddSupplierMappingsOnConflictDoNothingAsync(toAdd, cancellationToken),
 			CancellationToken);
 
 		Logger.LogInformation(

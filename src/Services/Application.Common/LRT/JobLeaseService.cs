@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -7,13 +8,12 @@ using Domain.CommonEnums;
 
 namespace Application.Common.LRT;
 
-public class JobLeaseService(IApplicationTransactionService transactionService) : IJobLeaseService
+public class JobLeaseService(IApplicationTransaction transactionService) : IJobLeaseService
 {
 	public async Task<Job?> TryAcquireJobAsync(
 		Guid holderId,
 		TimeSpan leaseDuration,
-		CancellationToken ct) => await transactionService.ExecuteAsync(
-		TransactionalAttribute.ReadCommitted(30, 3),
+		CancellationToken ct) => await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3)).ExecuteAsync(
 		async (context, cancellationToken) =>
 		{
 			var repository = context.Repositories.Get<Job, Guid>();
@@ -38,8 +38,7 @@ public class JobLeaseService(IApplicationTransactionService transactionService) 
 		ct);
 
 	public async Task<List<Job>> FailExpiredJobsWithoutAttempts(int maxBatchSize, CancellationToken ct) =>
-		await transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 3),
+		await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3)).ExecuteAsync(
 			async (context, cancellationToken) =>
 			{
 				var repository = context.Repositories.Get<Job, Guid>();
@@ -62,8 +61,7 @@ public class JobLeaseService(IApplicationTransactionService transactionService) 
 			ct);
 
 	public async Task<List<Job>> CancelExpiredJobs(int maxBatchSize, CancellationToken ct) =>
-		await transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 3),
+		await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3)).ExecuteAsync(
 			async (context, cancellationToken) =>
 			{
 				var repository = context.Repositories.Get<Job, Guid>();

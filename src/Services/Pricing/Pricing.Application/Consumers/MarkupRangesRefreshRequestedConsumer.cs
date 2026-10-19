@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Services;
@@ -12,7 +13,7 @@ namespace Pricing.Application.Consumers;
 
 public class MarkupRangesRefreshRequestedConsumer(
 	IMarkupInitializer markupInitializer,
-	IApplicationTransactionService transactionService,
+	IApplicationTransaction transactionService,
 	IJobService jobService,
 	IJobProvider<InvalidateStalePriceOptionsLrt, NoneInputState> jobProvider)
 	: IConsumer<MarkupRangesRefreshRequestedEvent>
@@ -21,8 +22,7 @@ public class MarkupRangesRefreshRequestedConsumer(
 	{
 		await markupInitializer.Initialize(context.CancellationToken);
 
-		await transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 3),
+		await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3)).ExecuteAsync(
 			async (transactionContext, ct) =>
 			{
 				var job = jobProvider.Create(new NoneInputState());

@@ -120,13 +120,10 @@ public sealed class MultiStepLrtBaseTests
 				.Returns(Task.CompletedTask);
 
 			Lrt = new TestMultiStepLrt(
-				JobRepository.Object,
-				UnitOfWork.Object,
-				new ApplicationTransactionServiceStub(
+				new ApplicationTransactionFactoryStub(
 					UnitOfWork.Object,
-					Mock.Of<IRepositoryProvider>(),
+					Mock.Of<IRepositoryProvider>(provider => provider.Get<Job, Guid>() == JobRepository.Object),
 					Mock.Of<IIntegrationEventScope>()),
-				Publisher,
 				Logger.Object);
 
 			var registry = new Mock<INamedObjectRegistry<ILrtNamedObject>>();
@@ -199,15 +196,7 @@ public sealed class MultiStepLrtBaseTests
 		}
 	}
 
-	private sealed class TestMultiStepLrt(
-		IRepository<Job, Guid> jobRepository,
-		IUnitOfWork unitOfWork,
-		IApplicationTransactionService transactionService,
-		IPublishEndpoint publisher,
-		ILogger logger) : MultiStepLrtBase<NoneInputState, NoneInputState>(
-		jobRepository,
-		unitOfWork,
-		publisher,
+	private sealed class TestMultiStepLrt(IApplicationTransactionFactory transactionService, ILogger logger) : MultiStepLrtBase<NoneInputState, NoneInputState>(
 		transactionService,
 		logger)
 	{

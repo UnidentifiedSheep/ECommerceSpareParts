@@ -14,7 +14,6 @@ using Main.Application.Interfaces.Services.Document;
 using Main.Application.Notifications;
 using Main.Entities;
 using Main.Entities.Documents;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using NamedObject.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
@@ -23,20 +22,11 @@ using Notification.Core.Recipients;
 namespace Main.Application.Lrts.GenerateDocument;
 
 public class GenerateDocumentLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
-	INamedObjectRegistry<IDocumentDefinition> registry,
-	INotificationService notificationService,
-	IAppLinkProvider appLinkProvider,
+	IApplicationTransactionFactory transactionService,
 	IContextualLocalizer localizer,
 	ILocalizer notificationLocalizer,
 	IJsonSerializer jsonSerializer,
 	ILogger<GenerateDocumentLrt> logger) : LrtBase<GenerateDocumentInputState, GenerateDocumentState>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 {
@@ -52,9 +42,11 @@ public class GenerateDocumentLrt(
 
 	protected override async Task DoWork(GenerateDocumentInputState inputState)
 	{
+		await using var operation = TransactionFactory.Create();
 		var definition = string.IsNullOrWhiteSpace(inputState.DocumentSystemName)
 			? null
-			: registry.TryGetBySystemName(inputState.DocumentSystemName);
+			: operation.Context.GetRequiredService<INamedObjectRegistry<IDocumentDefinition>>()
+				.TryGetBySystemName(inputState.DocumentSystemName);
 
 		if (definition == null)
 		{
@@ -128,11 +120,11 @@ public class GenerateDocumentLrt(
 		    generatedAtUtc is not { Kind: DateTimeKind.Utc })
 			throw new InvalidOperationException("Generated document storage details are missing.");
 
-		await TransactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			settings: TransactionalAttribute.ReadCommitted(30, 3),
-			action: async (ctx, ct) =>
+			action: async (context, ct) =>
 			{
-				var request = await ctx.Repositories.Get<DocumentGenerationRequest, Guid>()
+				var request = await context.Repositories.Get<DocumentGenerationRequest, Guid>()
 					.FirstOrDefaultAsync(
 						Criteria<DocumentGenerationRequest>.New()
 							.Track()
@@ -169,10 +161,10 @@ public class GenerateDocumentLrt(
 	{
 		if (request.RequesterId == null) return;
 
-		var documentUrl = await appLinkProvider
+		var documentUrl = await TransactionContext.GetRequiredService<IAppLinkProvider>()
 			.CreateDocumentUrlAsync(request.RequestId, token);
 
-		await notificationService.QueueAsync(
+		await TransactionContext.GetRequiredService<INotificationService>().QueueAsync(
 			request.RequesterId.Value,
 			new DocumentGeneratedNotification(
 				new DocumentGeneratedNotificationData(

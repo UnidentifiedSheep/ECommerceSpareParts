@@ -203,10 +203,7 @@ public sealed class JobCreationDispatcherTests
 	private sealed class TestMultiStepLrt : MultiStepLrtBase<NoneInputState, NoneInputState>
 	{
 		public TestMultiStepLrt() : base(
-			Mock.Of<IRepository<Job, Guid>>(),
-			Mock.Of<IUnitOfWork>(),
-			Mock.Of<IPublishEndpoint>(),
-			Mock.Of<IApplicationTransactionService>(),
+			Mock.Of<IApplicationTransactionFactory>(),
 			Mock.Of<ILogger>())
 		{
 		}
@@ -224,10 +221,7 @@ public sealed class JobCreationDispatcherTests
 
 	private sealed class NestedMultiStepLrt(string systemName, string childSystemName)
 		: MultiStepLrtBase<NoneInputState, NoneInputState>(
-			Mock.Of<IRepository<Job, Guid>>(),
-			Mock.Of<IUnitOfWork>(),
-			Mock.Of<IPublishEndpoint>(),
-			Mock.Of<IApplicationTransactionService>(),
+			Mock.Of<IApplicationTransactionFactory>(),
 			Mock.Of<ILogger>())
 	{
 		public override string SystemName => systemName;

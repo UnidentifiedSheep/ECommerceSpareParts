@@ -1,4 +1,5 @@
-﻿using System.Data;
+using Application.Common.Extensions;
+using System.Data;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
@@ -10,7 +11,7 @@ namespace Application.Common.Services.Settings;
 
 public class SettingsService(
 	IRepository<Setting, string> repository,
-	IApplicationTransactionService transactionService,
+	IApplicationTransaction transactionService,
 	ISettingsContainer settingsContainer) : ISettingsService
 {
 	private static readonly TransactionalAttribute TransactionSettings = new(
@@ -28,8 +29,7 @@ public class SettingsService(
 
 	public async Task SetSetting<T>(T value, CancellationToken cancellationToken = default) where T : Setting
 	{
-		await transactionService.ExecuteAsync(
-			TransactionSettings,
+		await transactionService.WithSettingsIfIdle(TransactionSettings).ExecuteAsync(
 			async (context, ct) =>
 			{
 				var criteria = Criteria<Setting>

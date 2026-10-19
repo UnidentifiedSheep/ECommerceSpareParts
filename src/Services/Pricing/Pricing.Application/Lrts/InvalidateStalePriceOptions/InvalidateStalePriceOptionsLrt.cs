@@ -6,7 +6,6 @@ using Application.Common.Interfaces.Settings;
 using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Interfaces.Markup;
@@ -20,21 +19,8 @@ using Pricing.Entities.Settings;
 namespace Pricing.Application.Lrts.InvalidateStalePriceOptions;
 
 public class InvalidateStalePriceOptionsLrt(
-	IJobRepository jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
-	ILogger<InvalidateStalePriceOptionsLrt> logger,
-	IReadRepository<ProductPriceOption, Guid> readRepository,
-	IProductPriceOptionRepository productPriceOptionRepository,
-	IJobService jobService,
-	IJobProvider<PriceCandidateCalculationLrt, PriceCandidateCalculationState> jobProvider,
-	IMarkupContainer markupContainer,
-	IPriceApplierService priceApplierService,
-	ISettingsService settingsService) : LrtBase<NoneInputState, InvalidateStalePriceOptionsState>(
-	jobRepository,
-	unitOfWork,
-	publisher,
+	IApplicationTransactionFactory transactionService,
+	ILogger<InvalidateStalePriceOptionsLrt> logger) : LrtBase<NoneInputState, InvalidateStalePriceOptionsState>(
 	transactionService,
 	logger)
 {
@@ -54,17 +40,17 @@ public class InvalidateStalePriceOptionsLrt(
 
 		while (true)
 		{
-			var processedCount = await TransactionService.ExecuteAsync(
+			var processedCount = await ExecuteInTransactionAsync(
 				TransactionalAttribute.ReadCommitted(30, 3),
-				async (_, cancellationToken) =>
+				async (context, cancellationToken) =>
 				{
-					var currentVersion = markupContainer.CurrentVersion;
+					var currentVersion = context.GetRequiredService<IMarkupContainer>().CurrentVersion;
 					var currentAppliersVersion =
-						await priceApplierService.GetCurrentConfigurationVersionAsync(cancellationToken);
+						await context.GetRequiredService<IPriceApplierService>().GetCurrentConfigurationVersionAsync(cancellationToken);
 					var currentPricingSettingsVersion =
-						(await settingsService.GetOrDefault<PricingSetting>(cancellationToken)).Data.Version;
+						(await context.GetRequiredService<ISettingsService>().GetOrDefault<PricingSetting>(cancellationToken)).Data.Version;
 
-					var items = await readRepository
+					var items = await context.GetRequiredService<IReadRepository<ProductPriceOption, Guid>>()
 						.Query
 						.Where(x =>
 							x.MarkupVersion != currentVersion ||
@@ -83,7 +69,7 @@ public class InvalidateStalePriceOptionsLrt(
 						return 0;
 
 					var jobItems = items
-						.Select(x => jobProvider.Create(
+						.Select(x => context.GetRequiredService<IJobProvider<PriceCandidateCalculationLrt, PriceCandidateCalculationState>>().Create(
 							new PriceCandidateCalculationState
 							{
 								ProductId = x.ProductId, StorageCode = x.OfferForStorage
@@ -91,9 +77,9 @@ public class InvalidateStalePriceOptionsLrt(
 						.DistinctBy(x => x.NaturalKey)
 						.ToList();
 
-					await jobService.TryEnqueueJobsAsync(jobItems, cancellationToken);
+					await context.GetRequiredService<IJobService>().TryEnqueueJobsAsync(jobItems, cancellationToken);
 
-					await productPriceOptionRepository.DeleteManyAsync(
+					await context.GetRequiredService<IProductPriceOptionRepository>().DeleteManyAsync(
 						items.Select(x => x.PriceOfferId),
 						cancellationToken);
 

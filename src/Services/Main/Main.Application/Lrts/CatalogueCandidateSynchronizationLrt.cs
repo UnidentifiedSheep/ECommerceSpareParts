@@ -1,32 +1,21 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Projections;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Contracts.Models.CatalogueCandidate;
 using Contracts.ProductEnrichment;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities;
 using Main.Entities.Product.Enrichment;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts;
 
 public sealed class CatalogueCandidateSynchronizationLrt(
-	IRepository<Job, Guid> jobRepository,
-	IReadRepository<CatalogueCandidate, Guid> candidateRepository,
-	IProjectionProvider<CatalogueCandidate, CatalogueCandidateContractDto> projection,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	ILogger<CatalogueCandidateSynchronizationLrt> logger) : SynchronizationLrtBase<NoneInputState, Guid, CatalogueCandidateUpdatedEvent>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 {
@@ -43,14 +32,14 @@ public sealed class CatalogueCandidateSynchronizationLrt(
 		int batchSize,
 		CancellationToken cancellationToken)
 	{
-		var query = candidateRepository.Query.AsNoTracking();
+		var query = TransactionContext.Repositories.GetForRead<CatalogueCandidate, Guid>().Query.AsNoTracking();
 		if (lastProcessedId is { } id)
 			query = query.Where(candidate => candidate.Id > id);
 
 		var candidates = await query
 			.OrderBy(candidate => candidate.Id)
 			.Take(batchSize)
-			.Project(projection)
+			.Project(TransactionContext.GetRequiredService<IProjectionProvider<CatalogueCandidate, CatalogueCandidateContractDto>>())
 			.ToListAsync(cancellationToken);
 
 		var occurredAt = DateTime.UtcNow;

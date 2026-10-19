@@ -4,14 +4,12 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Enums.Units;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.Product;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -19,20 +17,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProductSizesImport;
 
 public class ProductSizesImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductSizesImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductSizesImportInputState, ProductSizesImportState,
 		ProductSizesImportLrt.ProductSizeCsvDto, ProductSize>(
-		jobRepository,
 		bucketsOptions,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger,
 		s3Service,
@@ -99,7 +91,7 @@ public class ProductSizesImportLrt(
 			return;
 
 		var productIds = items.Select(x => x.item.ProductId).Distinct().ToList();
-		var result = await TransactionService.ExecuteAsync(
+		var result = await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{

@@ -3,30 +3,19 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
-using Domain.CommonEntities.Job;
 using Enums;
 using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities;
 using Main.Entities.Product.Enrichment;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.BuildCatalogueCandidates;
 
 public class BuildCatalogueCandidatesLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
-	ISupplierProductRepository supplierProductRepository,
-	IRepository<CatalogueCandidate, Guid> catalogueCandidateRepository,
-	IProducerLookupService producerLookupService,
+	IApplicationTransactionFactory transactionService,
 	ILogger<BuildCatalogueCandidatesLrt> logger) : LrtBase<NoneInputState, BuildCatalogueCandidatesState>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 {
@@ -76,11 +65,11 @@ public class BuildCatalogueCandidatesLrt(
 		ArgumentOutOfRangeException.ThrowIfNegative(lastProcessedId);
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
 
-		return TransactionService.ExecuteAsync(
+		return ExecuteInTransactionAsync(
 			BatchTransactionSettings,
 			async (context, cancellationToken) =>
 			{
-				var supplierProducts = await supplierProductRepository.ListAsync(
+				var supplierProducts = await context.GetRequiredService<ISupplierProductRepository>().ListAsync(
 					Criteria<SupplierProduct>
 						.New()
 						.Where(x => x.CatalogueCandidateId == null)
@@ -99,7 +88,7 @@ public class BuildCatalogueCandidatesLrt(
 						0,
 						false);
 
-				var producerLookup = await producerLookupService.Load(cancellationToken);
+				var producerLookup = await context.GetRequiredService<IProducerLookupService>().Load(cancellationToken);
 				var resolvedProducts = supplierProducts
 					.Select(x => new ResolvedSupplierProduct(
 						x,
@@ -114,7 +103,7 @@ public class BuildCatalogueCandidatesLrt(
 				var normalizedSkus = candidateGroups.Keys.Select(x => x.NormalizedValue).Distinct().ToList();
 				var producerIds = candidateGroups.Keys.Select(x => x.ProducerId).Distinct().ToList();
 
-				var persistedCandidates = (await catalogueCandidateRepository.ListAsync(
+				var persistedCandidates = (await context.GetRequiredService<IRepository<CatalogueCandidate, Guid>>().ListAsync(
 						Criteria<CatalogueCandidate>
 							.New()
 							.Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))

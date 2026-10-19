@@ -3,6 +3,7 @@ using System.Text.Json;
 using Application.Common.Extensions;
 using Application.Common.LRT;
 using Contracts.Products;
+using Contracts.Job;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
@@ -39,7 +40,7 @@ public sealed class ProductSynchronizationLrtTests : IntegrationTest
 			var job = await ExecuteSynchronization("{}", bus);
 
 			job.Status.Should().Be(JobStatus.Succeeded, job.ErrorMessage);
-			observer.MessageTypes.Should().BeEquivalentTo(new[]
+			observer.MessageTypes.Where(type => type != typeof(JobStatusUpdatedEvent)).Should().BeEquivalentTo(new[]
 			{
 				typeof(ProductsUpdatedEvent),
 				typeof(ProductCharacteristicsUpdatedEvent),
@@ -64,7 +65,7 @@ public sealed class ProductSynchronizationLrtTests : IntegrationTest
 		var job = await ExecuteSynchronization("{}", broker);
 
 		job.Status.Should().Be(JobStatus.Succeeded, job.ErrorMessage);
-		broker.PublishedMessages.Should().HaveCount(4);
+		broker.PublishedMessages.Where(message => message is not JobStatusUpdatedEvent).Should().HaveCount(4);
 		broker.PublishedMessagesOfType<ProductsUpdatedEvent>().Should().ContainSingle().Which.Products
 			.Should().HaveCount(TestContext.Products.Count);
 		broker.PublishedMessagesOfType<ProductCharacteristicsUpdatedEvent>().Should().ContainSingle();
@@ -94,7 +95,7 @@ public sealed class ProductSynchronizationLrtTests : IntegrationTest
 			new SynchronizationState<int> { LastProcessedId = products[0].Id, ProcessedCount = 1 });
 
 		job.Status.Should().Be(JobStatus.Succeeded, job.ErrorMessage);
-		var notification = broker.PublishedMessages.Should().ContainSingle().Which.Should()
+		var notification = broker.PublishedMessages.Where(message => message is not JobStatusUpdatedEvent).Should().ContainSingle().Which.Should()
 			.BeOfType<ProductCharacteristicsUpdatedEvent>().Which;
 		notification.Products.Select(product => product.ProductId).Should().Equal(products.Skip(1).Select(product => product.Id));
 		notification.Products.Single(product => product.ProductId == products[1].Id).Characteristics
@@ -111,7 +112,8 @@ public sealed class ProductSynchronizationLrtTests : IntegrationTest
 		IPublishEndpoint broker,
 		SynchronizationState<int>? checkpoint = null)
 	{
-		var lrt = ActivatorUtilities.CreateInstance<ProductSynchronizationLrt>(Scope.ServiceProvider, broker);
+		Scope.ServiceProvider.GetRequiredService<PublishEndpointAccessor>().Publisher = broker;
+		var lrt = ActivatorUtilities.CreateInstance<ProductSynchronizationLrt>(Scope.ServiceProvider);
 		var validatedInput = lrt.ValidateState(input);
 		var jobState = checkpoint is null
 			? validatedInput
