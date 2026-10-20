@@ -2,7 +2,6 @@
 """Validate CI artifacts and move registry aliases after a successful deployment."""
 
 import argparse
-import base64
 import json
 import os
 from pathlib import Path
@@ -16,7 +15,11 @@ from image_catalog import catalog
 
 SHA = re.compile(r"[0-9a-f]{40}")
 DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
-HOST = re.compile(r"[a-zA-Z0-9.-]+(?::[0-9]{1,5})?")
+
+def registry_prefix():
+    owner = os.environ.get("GITHUB_REPOSITORY_OWNER") or os.environ.get("GITHUB_REPOSITORY", "").split("/")[0]
+    require(re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9-]*", owner), "GitHub repository owner is required")
+    return "ghcr.io/" + owner.lower()
 
 
 class ReleaseError(RuntimeError):
@@ -65,9 +68,9 @@ def command(args, *, input=None, timeout=120, missing=False):
 
 
 def validate(manifest, sha=None):
-    require(isinstance(manifest, dict) and manifest.get("version") == 2,
+    require(isinstance(manifest, dict) and manifest.get("version") == 3,
             "Unsupported release artifact; run the updated CI workflow first")
-    require(set(manifest) <= {"version", "sha", "should_deploy", "registry_kind", "images"}, "Unexpected release artifact fields")
+    require(set(manifest) <= {"version", "sha", "should_deploy", "registry", "images"}, "Unexpected release artifact fields")
     require(isinstance(manifest.get("sha"), str) and SHA.fullmatch(manifest["sha"]), "Invalid release SHA")
     require(sha is None or manifest["sha"] == sha, "CI SHA does not match the release artifact")
     require(type(manifest.get("should_deploy")) is bool, "Invalid deployment flag")
@@ -84,40 +87,26 @@ def validate(manifest, sha=None):
         require(isinstance(item.get("digest"), str) and DIGEST.fullmatch(item["digest"]), "Invalid image digest")
         seen.add(service)
     require(not manifest["should_deploy"] or images, "Deployment has no images")
-    require(not images or manifest.get("registry_kind") in ("primary", "backup"), "Invalid registry selection")
+    require(manifest.get("registry") == registry_prefix(), "Release registry does not match this GitHub owner")
     return manifest
 
 
 class Registries:
+    """Runner-only GHCR access. Never forward the job token to Swarm."""
+
     def __init__(self):
-        self.profiles = {}
-        self.logged_in = set()
-        for kind, prefix in (("primary", ""), ("backup", "BACKUP_")):
-            host = os.environ.get(prefix + "ARTIFACT_REGISTRY_HOST", "")
-            if host:
-                require(HOST.fullmatch(host), "Registry host must be a hostname and optional port")
-                self.profiles[kind] = dict(host=host, username=os.getenv(prefix + "ARTIFACT_REGISTRY_USERNAME", ""),
-                                           password=os.getenv(prefix + "ARTIFACT_REGISTRY_PASSWORD", ""))
-
-    def profile(self, kind=None, image=None):
-        profiles = ([self.profiles[kind]] if kind in self.profiles else []) if kind else list({
-            p["host"]: p for p in self.profiles.values() if image.split("/", 1)[0] == p["host"]}.values())
-        require(len(profiles) == 1 and profiles[0]["username"] and profiles[0]["password"],
-                "Registry credentials are missing for the selected image")
-        return profiles[0]
-
-    def auth(self, image):
-        p = self.profile(image=image)
-        return base64.urlsafe_b64encode(json.dumps({"username": p["username"], "password": p["password"],
-                                                     "serveraddress": p["host"]}).encode()).decode()
+        self.prefix = registry_prefix()
+        self.logged_in = False
 
     def login(self, image):
-        p = self.profile(image=image)
-        if p["host"] not in self.logged_in:
+        require(image.startswith(self.prefix + "/"), "Image is outside this project's GHCR namespace")
+        if not self.logged_in:
+            token = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN", "")
+            require(token, "GITHUB_TOKEN is required for GHCR")
+            username = os.getenv("GITHUB_ACTOR") or self.prefix.split("/")[1]
             Path(os.environ["DOCKER_CONFIG"]).mkdir(mode=0o700, parents=True, exist_ok=True)
-            command(["docker", "login", p["host"], "--username", p["username"], "--password-stdin"],
-                    input=p["password"] + "\n")
-            self.logged_in.add(p["host"])
+            command(["docker", "login", "ghcr.io", "--username", username, "--password-stdin"], input=token + "\n")
+            self.logged_in = True
 
     def digest(self, image, missing=False):
         self.login(image)
@@ -125,7 +114,7 @@ class Registries:
         if output is None:
             return None
         match = re.search(r"^Digest:\s*(sha256:[0-9a-f]{64})\s*$", output, re.M)
-        require(match is not None, "Registry did not return a valid image digest")
+        require(match is not None, "GHCR did not return a valid image digest")
         return match[1]
 
     def tag(self, image, digest, tag):
@@ -133,7 +122,7 @@ class Registries:
         self.login(image)
         command(["docker", "buildx", "imagetools", "create", "--prefer-index=false",
                  "--tag", image + ":" + tag, image + "@" + digest])
-        require(self.digest(image + ":" + tag) == digest, "Registry alias does not match the expected digest")
+        require(self.digest(image + ":" + tag) == digest, "GHCR alias does not match the expected digest")
 
 
 def prepare_source(operation, run_id, output_file):
@@ -160,7 +149,7 @@ def prepare_source(operation, run_id, output_file):
     filename = "deployment-report.json" if operation == "rollback" else "release-manifest.json"
     data = json.loads((directory / filename).read_text())
     if operation == "rollback":
-        require(data.get("version") == 1 and str(data.get("run_id")) == run_id
+        require(data.get("version") == 2 and str(data.get("run_id")) == run_id
                 and data.get("repository") == repository and data.get("status") == "deployed",
                 "Source report is not a completed deployment from the selected run")
         require(data.get("operation") == "deploy", "A rollback report cannot be rolled back again")
@@ -194,7 +183,7 @@ def prepare_source(operation, run_id, output_file):
             ancestor = subprocess.run(["git", "merge-base", "--is-ancestor", previous, manifest["sha"]], capture_output=True).returncode
             require(ancestor == 0, "Release history diverged from the deployed commit")
     with open(output_file, "a") as stream:
-        for key, value in {"sha": manifest["sha"], "registry_kind": manifest.get("registry_kind", ""),
+        for key, value in {"sha": manifest["sha"],
                            "should_deploy": str(should_deploy).lower(), "previous_sha": previous}.items():
             stream.write(f"{key}={value}\n")
     print(f"Verified {expected} run {run_id}; release {manifest['sha']}; {len(manifest['images'])} image(s).")
@@ -252,16 +241,16 @@ def main():
     args = parser.parse_args()
     if args.command == "image":
         row = {"service": os.environ["RELEASE_SERVICE"], "image": os.environ["RELEASE_SERVICE"], "digest": os.environ["IMAGE_DIGEST"]}
-        validate({"version": 2, "sha": os.environ["GITHUB_SHA"], "should_deploy": False, "registry_kind": "primary", "images": [row]})
+        validate({"version": 3, "sha": os.environ["GITHUB_SHA"], "should_deploy": False, "registry": registry_prefix(), "images": [row]})
         save(args.output, row)
     elif args.command == "manifest":
         matrix = json.loads(os.environ["IMAGE_MATRIX"])["include"]
         images = [json.loads(p.read_text()) for p in Path(args.images_dir).rglob("image-digest.json")]
         require({i["service"] for i in images} == {i["service"] for i in matrix} and len(images) == len(matrix),
                 "Published image digests do not match the build matrix")
-        result = validate({"version": 2, "sha": os.environ["GITHUB_SHA"],
+        result = validate({"version": 3, "sha": os.environ["GITHUB_SHA"],
                            "should_deploy": os.environ["SHOULD_DEPLOY"] == "true",
-                           "registry_kind": os.getenv("REGISTRY_KIND", ""), "images": sorted(images, key=lambda i: i["service"])})
+                           "registry": registry_prefix(), "images": sorted(images, key=lambda i: i["service"])})
         save(args.output, result)
         print(f"Release manifest contains {len(images)} published image digest(s).")
     elif args.command == "source":
@@ -277,8 +266,7 @@ def main():
         with open(args.outputs, "a") as stream:
             stream.write(f"sha={sha}\n")
     else:
-        for p in Registries().profiles.values():
-            subprocess.run(["docker", "logout", p["host"]], capture_output=True)
+        subprocess.run(["docker", "logout", "ghcr.io"], capture_output=True)
 
 
 if __name__ == "__main__":

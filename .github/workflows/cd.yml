@@ -20,6 +20,7 @@ on:
 permissions:
   actions: read
   contents: write
+  packages: write
 
 concurrency:
   group: production-deploy

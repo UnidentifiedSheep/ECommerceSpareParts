@@ -12,6 +12,8 @@ import re
 import signal
 import sys
 import time
+
+import yaml
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit, urlencode
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -64,15 +66,16 @@ class Arcane:
         self.url, self.key, self.environment = url.rstrip("/"), key, environment
         self.opener = build_opener(NoRedirect())
 
-    def request(self, method, path, body=None, *, environment=None):
+    def request(self, method, path, body=None, *, environment=None, global_api=False):
         env = self.environment if environment is None else environment
-        url = f"{self.url}/api/environments/{quote(env, safe='')}/{path}"
+        prefix = f"{self.url}/api" if global_api else f"{self.url}/api/environments/{quote(env, safe='')}"
+        url = f"{prefix}/{path}"
         data = json.dumps(body).encode() if body is not None else None
         for attempt in range(4):
             try:
                 request = Request(url, data=data, method=method,
                                   headers={"X-Api-Key": self.key, "Content-Type": "application/json", "Accept": "application/json"})
-                with self.opener.open(request, timeout=20) as response:
+                with self.opener.open(request, timeout=90 if method == "POST" else 20) as response:
                     result = json.load(response)
                 require(isinstance(result, dict) and result.get("success") is True, "Arcane returned an unsuccessful response")
                 require(not result.get("failedEnvironments"), "Arcane returned incomplete environment results")
@@ -91,10 +94,10 @@ class Arcane:
     def get(self, path, **kwargs):
         return self.request("GET", path, **kwargs)["data"]
 
-    def listing(self, path):
+    def listing(self, path, **kwargs):
         rows, seen = [], set()
         for _ in range(1000):
-            page = self.request("GET", path + ("&" if "?" in path else "?") + urlencode({"start": len(rows), "limit": 100}))
+            page = self.request("GET", path + ("&" if "?" in path else "?") + urlencode({"start": len(rows), "limit": 100}), **kwargs)
             items = page.get("data") or []
             require(isinstance(items, list), "Arcane returned an invalid list")
             for item in items:
@@ -125,10 +128,12 @@ class Deployment:
         self.deadline = time.monotonic() + setting("DEPLOY_TIMEOUT_SECONDS", 3600, 60)
         self.nodes, self.services, self.before, self.journal = {}, {}, {}, []
         self.active_migrator = None
-        self.report = {"version": 1, "operation": operation, "run_id": self.run_id, "attempt": self.attempt,
+        self.migrator_stack = None
+        self.plans = []
+        self.report = {"version": 2, "operation": operation, "run_id": self.run_id, "attempt": self.attempt,
                        "repository": self.repository, "arcane_url": api.url, "environment_id": api.environment,
                        "release": release, "previous_sha": os.getenv("PREVIOUS_DEPLOYED_SHA", ""),
-                       "status": "preparing", "services": [], "images": [], "migrators": [],
+                       "status": "preparing", "services": [], "stacks": [], "images": [], "migrators": [],
                        "started_at": datetime.now(timezone.utc).isoformat()}
 
     def checkpoint(self):
@@ -173,14 +178,60 @@ class Deployment:
             require(node["status"] == "ready" and node["availability"] == "active", f"Placement node {node['hostname']} is unavailable")
             self.node_environment(node["id"])
 
+    def stack_source(self, name):
+        source = self.api.get(f"swarm/stacks/{name}/source")
+        require(source.get("name") == name and source.get("composeContent"), "Arcane has no saved source for the application stack")
+        return {"name": name, "composeContent": source["composeContent"],
+                "overrideContent": source.get("overrideContent") or "", "envContent": source.get("envContent") or "",
+                "files": source.get("files") or []}
+
+    def stack_payload(self, source, images):
+        try:
+            overlay = yaml.safe_load(source["overrideContent"]) or {}
+        except yaml.YAMLError:
+            raise ReleaseError("Unsupported Compose override in Arcane; apply the infrastructure stack first") from None
+        require(isinstance(overlay, dict), "Invalid Compose override")
+        services = overlay.setdefault("services", {})
+        require(isinstance(services, dict), "Invalid services in Compose override")
+        for name, image in images.items():
+            prefix = source["name"] + "_"
+            require(name.startswith(prefix) and "@sha256:" in image, "Stack deployment requires immutable images")
+            item = services.setdefault(name[len(prefix):], {})
+            require(isinstance(item, dict), "Invalid service in Compose override")
+            item["image"] = image
+        result = dict(source, overrideContent=json.dumps(overlay, sort_keys=True))
+        return dict(result, withRegistryAuth=True, resolveImage="never", prune=False)
+
+    @staticmethod
+    def source_hash(source):
+        return fingerprint({k: source.get(k) or ([] if k == "files" else "")
+                            for k in ("name", "composeContent", "overrideContent", "envContent", "files")})
+
+    def render(self, payload, expected):
+        result = self.api.request("POST", "swarm/stacks/config/render",
+                                  {k: payload[k] for k in ("name", "composeContent", "overrideContent", "envContent")})["data"]
+        require(set(result["services"]) == set(expected), "Saved stack source does not match live application services")
+
+    def check_registry(self):
+        matches = []
+        for registry in self.api.listing("container-registries", global_api=True):
+            url = registry.get("url", "")
+            parsed = urlsplit(url if "://" in url else "https://" + url)
+            if parsed.hostname == "ghcr.io" and registry.get("enabled"):
+                matches.append(registry)
+        require(len(matches) == 1 and matches[0].get("username"), "Add one enabled GHCR registry with a read:packages PAT to Arcane")
+        if self.operation != "plan":
+            self.api.request("POST", f"container-registries/{matches[0]['id']}/test", global_api=True)
+        log("Using GHCR credentials stored in Arcane.")
+
     def prepare(self):
+        self.check_registry()
         self.nodes = {n["id"]: n for n in self.api.listing("swarm/nodes")}
         managers = [n for n in self.nodes.values() if n["role"] == "manager"]
         require(any(n.get("managerStatus") == "leader" for n in managers), "Swarm has no leader")
         require(sum(n.get("reachability") == "reachable" and n["status"] == "ready" for n in managers) > len(managers) // 2,
                 "Swarm manager quorum is unavailable")
-        syncs = self.api.listing("gitops-syncs")
-        for sync in syncs:
+        for sync in self.api.listing("gitops-syncs"):
             if (sync.get("projectName") or sync.get("name")) not in STACKS or not sync.get("autoSync"):
                 continue
             require(self.operation != "plan", f"Disable Auto Sync for {sync.get('name')} before deployment")
@@ -188,46 +239,55 @@ class Deployment:
             require(self.api.get(f"gitops-syncs/{sync['id']}")["autoSync"] is False, "Failed to disable application Auto Sync")
             log(f"Disabled Auto Sync for {sync.get('name')}.")
         summaries = self.api.listing("swarm/services")
-        self.services = {s["name"]: s for s in summaries}
+        self.services = {row["name"]: row for row in summaries}
         require(len(self.services) == len(summaries), "Duplicate Swarm service names")
+        replacements = {}
         for row in self.release["images"]:
-            service = row["service"]
-            if service not in RUNTIME:
-                require(service.endswith("-migrator"), "Unsupported release service")
-                continue
-            name = RUNTIME[service][1]
-            require(name in self.services, f"Deploy the {name.split('_')[0]} stack from the infrastructure repository first: {name} is missing")
-            inspected = self.inspect(self.services[name]["id"])
-            spec = inspected["spec"]
-            require(spec.get("Mode", {}).get("Replicated", {}).get("Replicas", 0) > 0, f"{name} is scaled to zero")
-            require("@sha256:" in spec["TaskTemplate"]["ContainerSpec"]["Image"], f"{name} has no pinned image for rollback")
-            self.registries.auth(spec["TaskTemplate"]["ContainerSpec"]["Image"])
-            old_image = spec["TaskTemplate"]["ContainerSpec"]["Image"]
-            require(self.registries.digest(old_image) == old_image.rsplit("@", 1)[1], "Previous application image is unavailable for rollback")
-            self.eligible(spec)
-            if not service.endswith("-worker"):
-                health = spec["TaskTemplate"]["ContainerSpec"].get("Healthcheck", {}).get("Test", [])
-                require(health and health[0] != "NONE", f"{name} requires a Docker healthcheck")
-            self.before[service] = inspected
-        profile = self.registries.profile(kind=self.release["registry_kind"])
-        for row in self.release["images"]:
-            reference = profile["host"] + "/" + row["image"]
-            require(self.registries.digest(reference + "@" + row["digest"]) == row["digest"], "Published image digest is unavailable")
+            reference = self.release["registry"] + "/" + row["image"]
+            require(self.registries.digest(reference + "@" + row["digest"]) == row["digest"], "Published GHCR digest is unavailable")
             self.report["images"].append(dict(row, reference=reference,
                                                before_current=self.registries.digest(reference + ":current", missing=True)))
-        if any(i["service"].endswith("-migrator") for i in self.release["images"]):
-            network = [n for n in self.api.listing("networks") if n["name"] == "backend"]
-            require(len(network) == 1 and network[0].get("driver") == "overlay", "The backend overlay network is missing")
-            self.backend = network[0]["id"]
-            self.secrets = {s["spec"]["Name"]: s["id"] for s in self.api.get("swarm/secrets")}
+            if row["service"] in RUNTIME:
+                replacements[RUNTIME[row["service"]][1]] = reference + "@" + row["digest"]
+        affected = {name.split("_", 1)[0] for name in replacements}
+        for stack in sorted(affected, key=lambda name: min(v[0] for v in RUNTIME.values() if v[1].startswith(name + "_"))):
+            names = {v[1] for v in RUNTIME.values() if v[1].startswith(stack + "_")}
+            require(names <= self.services.keys(), f"Apply the {stack} stack from the infrastructure repository first")
+            source = self.stack_source(stack)
+            snapshots, images = {}, {}
+            for name in sorted(names):
+                inspected = self.inspect(self.services[name]["id"])
+                spec = inspected["spec"]
+                image = spec["TaskTemplate"]["ContainerSpec"]["Image"]
+                require("@sha256:" in image, f"{name} has no immutable image for rollback")
+                if image.startswith(self.registries.prefix + "/"):
+                    require(self.registries.digest(image) == image.rsplit("@", 1)[1], "Previous GHCR image is unavailable for rollback")
+                self.eligible(spec)
+                if name in replacements:
+                    require(spec.get("Mode", {}).get("Replicated", {}).get("Replicas", 0) > 0, f"{name} is scaled to zero")
+                    if not name.endswith("-worker"):
+                        health = spec["TaskTemplate"]["ContainerSpec"].get("Healthcheck", {}).get("Test", [])
+                        require(health and health[0] != "NONE", f"{name} requires a Docker healthcheck")
+                snapshots[name], images[name] = inspected, image
+            target = {name: replacements.get(name, image) for name, image in images.items()}
+            payload = self.stack_payload(source, target)
+            self.render(payload, names)
+            self.plans.append(dict(name=stack, source=source, before=snapshots, images=target,
+                                   payload=payload, rollback=self.stack_payload(source, images), after={}))
+        if any(i["service"].endswith("-migrator") for i in self.report["images"]):
+            networks = [n for n in self.api.listing("networks") if n["name"] == "backend"]
+            require(len(networks) == 1 and networks[0].get("driver") == "overlay", "The backend overlay network is missing")
+            self.backend = networks[0]["id"]
+            self.secrets = {item["spec"]["Name"]: item["id"] for item in self.api.get("swarm/secrets")}
             self.secret_names = json.loads(os.getenv("MIGRATOR_SECRET_NAMES", "{}"))
             require(isinstance(self.secret_names, dict), "MIGRATOR_SECRET_NAMES must be a JSON object")
             for row in self.report["images"]:
                 if row["service"].endswith("-migrator"):
-                    self.migrator_spec(row)  # Validate every dependency before starting the first migration.
+                    payload = self.migrator_payload(row)
+                    self.render(payload, {payload["name"] + "_run"})
         self.report["status"] = "planned"
         self.checkpoint()
-        log(f"Preflight passed: {len(self.before)} application service(s), {len(self.report['images'])} image(s).")
+        log(f"Preflight passed: {len(self.plans)} stack(s), {len(self.report['images'])} GHCR image(s).")
 
     def migrator_spec(self, row):
         prefix = row["service"].removesuffix("-migrator")
@@ -256,11 +316,10 @@ class Deployment:
             require(fingerprint(current["spec"]) == fingerprint(previous), "Service configuration changed during deployment")
         if fingerprint(current["spec"]) == fingerprint(spec):
             return
-        image = spec["TaskTemplate"]["ContainerSpec"]["Image"]
         try:
             self.api.request("PUT", f"swarm/services/{service_id}",
                              {"version": current["version"]["Index"], "spec": spec,
-                              "options": {"encodedRegistryAuth": self.registries.auth(image), "queryRegistry": False}})
+                              "options": {"registryAuthFrom": "spec", "queryRegistry": False}})
         except ReleaseError:
             # A lost response is not a reason to blindly issue a second mutation.
             if fingerprint(self.inspect(service_id)["spec"]) != fingerprint(spec):
@@ -312,59 +371,82 @@ class Deployment:
                 last_log = time.monotonic()
             time.sleep(3)
 
+    def migrator_payload(self, row):
+        spec = self.migrator_spec(row)
+        prefix = row["service"].removesuffix("-migrator")
+        secret = self.secret_names.get(prefix, prefix + ".migrator_v1")
+        labels = {LABEL + ".run": self.run_id + "-" + self.attempt, LABEL + ".repository": self.repository}
+        compose = {"services": {"run": {"image": row["reference"] + "@" + row["digest"],
+            "environment": {"DOTNET_ENVIRONMENT": self.environment, "ASPNETCORE_ENVIRONMENT": self.environment},
+            "networks": ["backend"], "stop_grace_period": "30s", "ulimits": {"core": 0},
+            "secrets": [{"source": "database", "target": f"/app/configs/migrator.{prefix}.settings.json"}],
+            "labels": {"com.getarcaneapp.arcane.updater": "false"},
+            "logging": {"driver": "json-file", "options": {"max-size": "15m", "max-file": "3"}},
+            "deploy": {"mode": "replicated", "replicas": 1, "labels": labels,
+                "restart_policy": {"condition": "none"}, "placement": {"constraints": ["node.labels.infra.postgres == true"]},
+                "resources": {"limits": {"memory": str(self.memory), "cpus": "1.0", "pids": 256}}}}},
+            "networks": {"backend": {"external": True, "name": "backend"}},
+            "secrets": {"database": {"external": True, "name": secret}}}
+        return {"name": spec["Name"], "composeContent": json.dumps(compose), "overrideContent": "", "envContent": "",
+                "withRegistryAuth": True, "resolveImage": "never", "prune": False}
+
     def clean_migrator(self):
-        if self.active_migrator is None:
+        if self.migrator_stack is None:
             return
-        service_id = self.active_migrator
+        payload = self.migrator_stack
+        members = [s for s in self.api.listing("swarm/services") if s["name"].startswith(payload["name"] + "_")]
+        for member in members:
+            current = self.inspect(member["id"])
+            require(current["spec"].get("Labels", {}).get(LABEL + ".run") == self.run_id + "-" + self.attempt,
+                    "Refusing to remove a migrator owned by another deployment")
+            if any(t["currentState"] in ("running", "starting", "preparing") for t in self.tasks(member["id"])):
+                spec = copy.deepcopy(current["spec"])
+                spec["Mode"] = {"Replicated": {"Replicas": 0}}
+                self.update(member["id"], spec, previous=current["spec"])
+                deadline = time.monotonic() + 90
+                while any(t["currentState"] in ("running", "starting", "preparing") for t in self.tasks(member["id"])):
+                    require(time.monotonic() < deadline, "Migrator did not stop; inspect it in Arcane before retrying")
+                    time.sleep(2)
         try:
-            current = self.inspect(service_id)
+            source = self.stack_source(payload["name"])
         except APIError as error:
             if error.status != 404:
                 raise
-            self.active_migrator = None
-            return
-        require(current["spec"].get("Labels", {}).get(LABEL + ".run") == self.run_id + "-" + self.attempt,
-                "Refusing to remove a migrator owned by another deployment")
-        tasks = self.tasks(service_id)
-        if any(t["currentState"] in ("running", "starting", "preparing") for t in tasks):
-            spec = copy.deepcopy(current["spec"])
-            spec["Mode"] = {"Replicated": {"Replicas": 0}}
-            self.update(service_id, spec, previous=current["spec"])
-            deadline = time.monotonic() + 90
-            while any(t["currentState"] in ("running", "starting", "preparing") for t in self.tasks(service_id)):
-                require(time.monotonic() < deadline, "Migrator did not stop; inspect it in Arcane before retrying")
-                time.sleep(2)
-        try:
-            self.api.request("DELETE", f"swarm/services/{service_id}")
-        except APIError as error:
-            if error.status != 404:
-                raise
-        self.active_migrator = None
+            source = None
+        if source is not None:
+            require(self.source_hash(source) == self.source_hash(payload), "Migrator stack source changed; cleanup stopped")
+        if members or source is not None:
+            try:
+                self.api.request("DELETE", f"swarm/stacks/{payload['name']}")
+            except APIError as error:
+                if error.status != 404:
+                    raise
+        self.active_migrator, self.migrator_stack = None, None
 
     def migrate(self, row):
-        spec = self.migrator_spec(row)
-        log(f"Starting {row['service']} (one replica, {self.memory // 1024 // 1024} MiB, one CPU).")
-        existing = [s for s in self.api.listing("swarm/services") if s["name"] == spec["Name"]]
-        require(not existing, "This deployment already has a migrator service; inspect it before retrying")
+        payload = self.migrator_payload(row)
+        name = payload["name"] + "_run"
+        require(not any(s["name"] == name for s in self.api.listing("swarm/services")), "This deployment already has a migrator; inspect it before retrying")
+        self.migrator_stack = payload
+        log(f"Starting {row['service']} through Arcane (one replica, {self.memory // 1024 // 1024} MiB, one CPU).")
         try:
-            result = self.api.request("POST", "swarm/services", {"spec": spec,
-                                      "options": {"encodedRegistryAuth": self.registries.auth(spec["TaskTemplate"]["ContainerSpec"]["Image"]),
-                                                  "queryRegistry": False}})
-            self.active_migrator = result["data"]["id"]
-        except ReleaseError:
-            created = [s for s in self.api.listing("swarm/services") if s["name"] == spec["Name"]]
-            if len(created) != 1:
-                raise
-            inspected = self.inspect(created[0]["id"])
-            require(inspected["spec"].get("Labels", {}).get(LABEL + ".run") == self.run_id + "-" + self.attempt
-                    and inspected["spec"]["TaskTemplate"]["ContainerSpec"]["Image"] == spec["TaskTemplate"]["ContainerSpec"]["Image"],
-                    "Cannot reconcile migrator creation")
+            try:
+                self.api.request("POST", "swarm/stacks", payload)
+            except ReleaseError:
+                created = [s for s in self.api.listing("swarm/services") if s["name"] == name]
+                if len(created) != 1:
+                    raise
+                current = self.inspect(created[0]["id"])
+                require(current["spec"].get("Labels", {}).get(LABEL + ".run") == self.run_id + "-" + self.attempt
+                        and current["spec"]["TaskTemplate"]["ContainerSpec"]["Image"] == row["reference"] + "@" + row["digest"],
+                        "Cannot reconcile migrator stack creation")
+            created = [s for s in self.api.listing("swarm/services") if s["name"] == name]
+            require(len(created) == 1, "Arcane did not create exactly one migrator service")
             self.active_migrator = created[0]["id"]
-        record = {"service": row["service"], "id": self.active_migrator, "status": "running"}
-        self.report["migrators"].append(record)
-        self.checkpoint()
-        deadline = time.monotonic() + self.migration_timeout
-        try:
+            record = {"service": row["service"], "id": self.active_migrator, "stack": payload["name"], "status": "running"}
+            self.report["migrators"].append(record)
+            self.checkpoint()
+            deadline = time.monotonic() + self.migration_timeout
             while True:
                 self.check_time(deadline)
                 tasks = self.tasks(self.active_migrator)
@@ -372,8 +454,7 @@ class Deployment:
                 if tasks:
                     task = tasks[0]
                     record["task_id"] = task["id"]
-                    require(task["currentState"] not in ("failed", "rejected", "orphaned", "shutdown"),
-                            f"{row['service']} failed; inspect its task logs in Arcane")
+                    require(task["currentState"] not in ("failed", "rejected", "orphaned", "shutdown"), f"{row['service']} failed; inspect its task logs in Arcane")
                     if task["currentState"] == "complete":
                         state = self.container(task)["state"]
                         require(not state.get("running") and state.get("exitCode", 0) == 0, "Migrator exited unsuccessfully")
@@ -385,82 +466,142 @@ class Deployment:
         finally:
             self.clean_migrator()
 
-    def deploy_runtime(self, row):
-        before = self.inspect(self.before[row["service"]]["id"])
-        require(fingerprint(before["spec"]) == fingerprint(self.before[row["service"]]["spec"]), "Service changed since preflight")
-        spec = copy.deepcopy(before["spec"])
-        spec["TaskTemplate"]["ContainerSpec"]["Image"] = row["reference"] + "@" + row["digest"]
-        labels = spec["TaskTemplate"]["ContainerSpec"].setdefault("Labels", {})
-        if labels is None:
-            labels = spec["TaskTemplate"]["ContainerSpec"]["Labels"] = {}
-        labels["com.getarcaneapp.arcane.updater"] = "false"
-        record = {"service": row["service"], "id": before["id"], "name": spec["Name"],
-                  "before_image": before["spec"]["TaskTemplate"]["ContainerSpec"]["Image"],
-                  "image": spec["TaskTemplate"]["ContainerSpec"]["Image"],
-                  "before_hash": fingerprint(before["spec"]), "applied_hash": fingerprint(spec), "status": "updating"}
-        record["check"] = "healthcheck" if spec["TaskTemplate"]["ContainerSpec"].get("Healthcheck", {}).get("Test") else "stable_process"
-        rollback_spec = copy.deepcopy(spec)
-        rollback_spec["TaskTemplate"]["ContainerSpec"]["Image"] = record["before_image"]
-        record["rollback_hash"] = fingerprint(rollback_spec)
-        self.report["services"].append(record)
-        if record["before_hash"] != record["applied_hash"]:
-            self.journal.append((before, spec, record))
-        self.checkpoint()  # The public journal contains image refs and hashes, never full specs or credentials.
-        log(f"Updating {spec['Name']} to {row['digest']}.")
-        self.update(before["id"], spec, previous=before["spec"])
-        record["tasks"] = list(self.wait(before["id"], spec))
+    def capture(self, plan):
+        for name, before in plan["before"].items():
+            plan["after"][name] = self.inspect(before["id"])
+
+    def deploy_stack(self, plan):
+        require(self.source_hash(self.stack_source(plan["name"])) == self.source_hash(plan["source"]), "Stack source changed since preflight")
+        for before in plan["before"].values():
+            require(fingerprint(self.inspect(before["id"])["spec"]) == fingerprint(before["spec"]), "Service changed since preflight")
+        record = {"name": plan["name"], "before_source_hash": self.source_hash(plan["source"]),
+                  "applied_source_hash": self.source_hash(plan["payload"]), "rollback_source_hash": self.source_hash(plan["rollback"]),
+                  "before_images": {name: row["spec"]["TaskTemplate"]["ContainerSpec"]["Image"] for name, row in plan["before"].items()},
+                  "images": plan["images"], "status": "updating"}
+        plan["record"] = record
+        self.journal.append(plan)
+        self.report["stacks"].append(record)
+        self.checkpoint()
+        # Keep per-service rollout order even though credentials are applied through the stack API.
+        images = dict(record["before_images"])
+        changed = sorted((name for name in plan["images"] if images[name] != plan["images"][name]),
+                         key=lambda name: RUNTIME[name.split("_", 1)[1]])
+        rows = {}
+        for name in changed or [None]:
+            if name is not None:
+                images[name] = plan["images"][name]
+            if plan["after"]:
+                require(self.source_hash(self.stack_source(plan["name"])) == self.source_hash(plan["payload"]), "Stack source changed between service updates")
+                for previous in plan["after"].values():
+                    require(fingerprint(self.inspect(previous["id"])["spec"]) == fingerprint(previous["spec"]), "Service changed between rollout steps")
+            plan["payload"] = self.stack_payload(plan["source"], images)
+            record["applied_source_hash"] = self.source_hash(plan["payload"])
+            self.checkpoint()
+            log(f"Updating {name or plan['name']} using the registry saved in Arcane.")
+            try:
+                self.api.request("POST", "swarm/stacks", plan["payload"])
+            except ReleaseError:
+                self.capture(plan)
+                raise
+            self.capture(plan)
+            for full, after in plan["after"].items():
+                before, spec = plan["before"][full], after["spec"]
+                require(spec["TaskTemplate"]["ContainerSpec"]["Image"] == images[full], "Stack image differs from the requested digest")
+                if full not in rows:
+                    rows[full] = {"service": full.split("_", 1)[1], "id": before["id"], "name": full, "stack": plan["name"],
+                                  "before_image": record["before_images"][full], "before_hash": fingerprint(before["spec"]), "status": "updating"}
+                    self.report["services"].append(rows[full])
+                row = rows[full]
+                rollback_spec = copy.deepcopy(spec)
+                rollback_spec["TaskTemplate"]["ContainerSpec"]["Image"] = row["before_image"]
+                row.update(image=images[full], applied_hash=fingerprint(spec), rollback_hash=fingerprint(rollback_spec))
+                row["check"] = "healthcheck" if spec["TaskTemplate"]["ContainerSpec"].get("Healthcheck", {}).get("Test") else "stable_process"
+            self.checkpoint()
+            targets = [name] if name is not None else list(rows)
+            for full in targets:
+                current = plan["after"][full]
+                rows[full]["tasks"] = list(self.wait(current["id"], current["spec"], restoring=rows[full]["before_hash"] == rows[full]["applied_hash"]))
+                rows[full]["status"] = "healthy"
+                self.checkpoint()
+        for full, row in rows.items():
+            if row["status"] == "healthy":
+                continue
+            current = plan["after"][full]
+            row["tasks"] = list(self.wait(current["id"], current["spec"], restoring=True))
+            row["status"] = "healthy"
+            self.checkpoint()
         record["status"] = "healthy"
         self.checkpoint()
 
     def revert(self):
         self.deadline = time.monotonic() + 900
         errors = []
-        for before, applied, record in reversed(self.journal):
+        for plan in reversed(self.journal):
             try:
-                current = self.inspect(before["id"])
-                if fingerprint(current["spec"]) != fingerprint(before["spec"]):
-                    require(fingerprint(current["spec"]) == fingerprint(applied), "Service was modified by another deployment; automatic rollback stopped")
-                    self.update(before["id"], before["spec"], previous=applied)
-                self.wait(before["id"], before["spec"], stable=10, timeout=180, restoring=True)
-                record["status"] = "rolled_back"
-                log(f"Restored {before['spec']['Name']}.")
+                require(self.source_hash(self.stack_source(plan["name"])) in {self.source_hash(plan[k]) for k in ("source", "payload", "rollback")},
+                        "Stack source was modified by another deployment; automatic rollback stopped")
+                for name, before in plan["before"].items():
+                    current = self.inspect(before["id"])
+                    allowed = {fingerprint(before["spec"])}
+                    if name in plan["after"]:
+                        allowed.add(fingerprint(plan["after"][name]["spec"]))
+                    require(fingerprint(current["spec"]) in allowed, "Service was modified by another deployment; automatic rollback stopped")
+                self.api.request("POST", "swarm/stacks", plan["rollback"])
+                for before in plan["before"].values():
+                    current = self.inspect(before["id"])
+                    require(current["spec"]["TaskTemplate"]["ContainerSpec"]["Image"] == before["spec"]["TaskTemplate"]["ContainerSpec"]["Image"], "Rollback image mismatch")
+                    self.wait(before["id"], current["spec"], stable=10, timeout=180, restoring=True)
+                    for row in self.report["services"]:
+                        if row["id"] == before["id"]:
+                            row.update(status="rolled_back", rollback_hash=fingerprint(current["spec"]))
+                plan["record"]["status"] = "rolled_back"
+                log(f"Restored {plan['name']}.")
             except ReleaseError as error:
                 errors.append(str(error))
-                record["status"] = "rollback_failed"
+                plan["record"]["status"] = "rollback_failed"
             self.checkpoint()
         require(not errors, "Rollback needs attention: " + "; ".join(errors))
 
     def rollback(self):
+        self.check_registry()
         source = self.source
-        require(source["arcane_url"] == self.api.url and source["environment_id"] == self.api.environment,
-                "Rollback report belongs to another Arcane environment")
+        require(source.get("version") == 2 and source["arcane_url"] == self.api.url and source["environment_id"] == self.api.environment,
+                "Rollback requires a deployment report from this Arcane environment and deployment version")
         self.nodes = {n["id"]: n for n in self.api.listing("swarm/nodes")}
         self.report["images"] = copy.deepcopy(source["images"])
         self.report["previous_sha"] = source.get("previous_sha", "")
-        planned = []
-        for row in source["services"]:
-            current = self.inspect(row["id"])
-            require(current["spec"]["Name"] == RUNTIME[row["service"]][1], "Unexpected rollback service")
-            current_hash = fingerprint(current["spec"])
-            require(current_hash in (row["before_hash"], row["applied_hash"], row.get("rollback_hash")), "A service changed after this release; refusing stale rollback")
-            spec = copy.deepcopy(current["spec"])
-            spec["TaskTemplate"]["ContainerSpec"]["Image"] = row["before_image"]
-            require("@sha256:" in row["before_image"], "Rollback requires an immutable image")
-            self.registries.auth(row["before_image"])
-            require(self.registries.digest(row["before_image"]) == row["before_image"].rsplit("@", 1)[1], "Rollback image is unavailable")
-            self.eligible(spec)
-            planned.append((row, current, spec))
+        plans = []
+        for record in source["stacks"]:
+            name = record["name"]
+            require(name in STACKS - {"migrators"}, "Unexpected rollback stack")
+            current_source = self.stack_source(name)
+            require(self.source_hash(current_source) in {record[k] for k in ("applied_source_hash", "rollback_source_hash")}, "Stack source changed after this release; refusing stale rollback")
+            rows = [row for row in source["services"] if row["stack"] == name]
+            require({row["name"] for row in rows} == set(record["before_images"]), "Incomplete rollback service report")
+            for row in rows:
+                current = self.inspect(row["id"])
+                require(current["spec"]["Name"] == RUNTIME[row["service"]][1], "Unexpected rollback service")
+                require(fingerprint(current["spec"]) in {row["before_hash"], row["applied_hash"], row.get("rollback_hash")}, "Service changed after this release; refusing stale rollback")
+                self.eligible(current["spec"])
+                image = row["before_image"]
+                if image.startswith(self.registries.prefix + "/"):
+                    require(self.registries.digest(image) == image.rsplit("@", 1)[1], "Rollback GHCR image is unavailable")
+            plans.append((record, rows, self.stack_payload(current_source, record["before_images"])))
         self.report["status"] = "rolling_back"
         self.checkpoint()
         errors = []
-        for row, current, spec in reversed(planned):
+        for record, rows, payload in reversed(plans):
             try:
-                self.update(current["id"], spec, previous=current["spec"])
-                tasks = self.wait(current["id"], spec, restoring=True)
-                self.report["services"].append(dict(row, status="rolled_back", tasks=list(tasks)))
+                self.api.request("POST", "swarm/stacks", payload)
+                for row in rows:
+                    current = self.inspect(row["id"])
+                    require(current["spec"]["TaskTemplate"]["ContainerSpec"]["Image"] == row["before_image"], "Rollback image mismatch")
+                    tasks = self.wait(row["id"], current["spec"], restoring=True)
+                    self.report["services"].append(dict(row, status="rolled_back", tasks=list(tasks), rollback_hash=fingerprint(current["spec"])))
+                self.report["stacks"].append(dict(record, status="rolled_back"))
             except ReleaseError as error:
                 errors.append(str(error))
-                self.report["services"].append(dict(row, status="rollback_failed", tasks=[]))
+                self.report["stacks"].append(dict(record, status="rollback_failed"))
             self.checkpoint()
         self.report["status"] = "rollback_failed" if errors else "rolled_back"
         self.checkpoint()
@@ -485,8 +626,8 @@ class Deployment:
             for row in self.report["images"]:
                 if row["service"].endswith("-migrator"):
                     self.migrate(row)
-            for row in sorted((r for r in self.report["images"] if r["service"] in RUNTIME), key=lambda r: RUNTIME[r["service"]]):
-                self.deploy_runtime(row)
+            for plan in self.plans:
+                self.deploy_stack(plan)
             self.report["status"] = "deployed"
             self.checkpoint()
             log("All selected services passed rollout checks. Registry aliases can now be promoted.")

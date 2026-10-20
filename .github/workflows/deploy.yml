@@ -13,6 +13,7 @@ on:
 permissions:
   actions: read
   contents: write
+  packages: write
 
 jobs:
   deploy:
@@ -31,12 +32,6 @@ jobs:
       MIGRATOR_TIMEOUT_SECONDS: ${{ vars.MIGRATOR_TIMEOUT_SECONDS || '1200' }}
       ROLLOUT_TIMEOUT_SECONDS: ${{ vars.ROLLOUT_TIMEOUT_SECONDS || '600' }}
       DEPLOY_STABILITY_SECONDS: ${{ vars.DEPLOY_STABILITY_SECONDS || '45' }}
-      ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
-      ARTIFACT_REGISTRY_USERNAME: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
-      ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
-      BACKUP_ARTIFACT_REGISTRY_HOST: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}
-      BACKUP_ARTIFACT_REGISTRY_USERNAME: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME }}
-      BACKUP_ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}
       DOCKER_CONFIG: /tmp/ecommerce-registry-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
@@ -53,6 +48,10 @@ jobs:
       - name: Set up Docker Buildx
         if: steps.source.outputs.should_deploy == 'true'
         uses: docker/setup-buildx-action@v3
+
+      - name: Install Compose parser
+        if: steps.source.outputs.should_deploy == 'true'
+        run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
 
       - name: Deploy or roll back through Arcane
         if: steps.source.outputs.should_deploy == 'true'

@@ -13,6 +13,9 @@ on:
         default: ""
         type: string
 
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -222,6 +225,9 @@ jobs:
     uses: ./.github/workflows/coverage.yml
 
   publish-images:
+    permissions:
+      contents: read
+      packages: write
     needs: [build, test, graphql, validate-dockerfiles, discover-affected]
     if: >-
       needs.discover-affected.outputs.should_publish == 'true' &&
@@ -232,7 +238,6 @@ jobs:
       matrix: ${{ needs.discover-affected.outputs.matrix }}
       has_images: ${{ needs.discover-affected.outputs.has_images == 'true' }}
       fusion_artifact: ${{ needs.graphql.outputs.fusion_artifact }}
-    secrets: inherit
 
   release-manifest:
     runs-on: ubuntu-latest
@@ -263,7 +268,6 @@ jobs:
         env:
           SHOULD_DEPLOY: ${{ needs.discover-affected.outputs.should_deploy }}
           IMAGE_MATRIX: ${{ needs.discover-affected.outputs.matrix }}
-          REGISTRY_KIND: ${{ needs.publish-images.outputs.registry_kind }}
         run: python3 scripts/ci/release.py manifest --images-dir image-digests --output release-manifest.json
 
       - name: Upload release manifest

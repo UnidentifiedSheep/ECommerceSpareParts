@@ -5,17 +5,13 @@ on:
     workflows: [CD]
     types: [completed]
   workflow_dispatch:
-    inputs:
-      registry_kind:
-        description: Registry to clean
-        type: choice
-        required: true
-        default: primary
-        options: [primary, backup]
+  schedule:
+    - cron: '20 3 * * *'
 
 permissions:
   actions: read
   contents: read
+  packages: write
 
 concurrency:
   group: registry-cleanup
@@ -24,7 +20,7 @@ concurrency:
 jobs:
   cleanup:
     if: >-
-      github.event_name == 'workflow_dispatch' ||
+      github.event_name != 'workflow_run' ||
       (github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
@@ -34,7 +30,6 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
       EVENT_NAME: ${{ github.event_name }}
-      MANUAL_REGISTRY_KIND: ${{ inputs.registry_kind }}
 
     steps:
       - name: Checkout cleanup tooling
@@ -57,7 +52,6 @@ jobs:
               with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
                   stream.write('eligible=false\n')
               raise SystemExit(0)
-          kind = os.environ['MANUAL_REGISTRY_KIND']
           report = None
           if os.environ['EVENT_NAME'] == 'workflow_run':
               source = os.environ['SOURCE_RUN_ID']
@@ -75,11 +69,12 @@ jobs:
               run('gh', 'run', 'download', source, '--repo', repository,
                   '--name', 'arcane-deployment', '--dir', 'deployment-input')
               report = json.loads(Path('deployment-input/deployment-report.json').read_text())
-              if not (report.get('status') == 'deployed' and report.get('aliases_updated') is True
+              if not (report.get('version') == 2 and report.get('release', {}).get('version') == 3
+                      and report.get('release', {}).get('registry') == 'ghcr.io/' + repository.split('/')[0].lower()
+                      and report.get('status') == 'deployed' and report.get('aliases_updated') is True
                       and report.get('operation') == 'deploy' and str(report.get('run_id')) == source
                       and report.get('repository') == repository):
                   skip('CD did not finalize an application release; cleanup skipped.')
-              kind = report['release']['registry_kind']
           marker = run('git', 'ls-remote', '--refs', 'origin', 'refs/tags/deployed/production')
           if not marker:
               raise SystemExit('No successful deployment marker exists.')
@@ -88,38 +83,24 @@ jobs:
               raise SystemExit('Invalid deployment marker.')
           if report is not None and report['release']['sha'] != sha:
               skip('A newer release is already deployed; cleanup skipped.')
-          if kind not in ('primary', 'backup'):
-              raise SystemExit('Invalid registry selection.')
           run('git', 'fetch', '--no-tags', 'origin', sha)
           with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
-              stream.write(f'sha={sha}\nregistry_kind={kind}\neligible=true\n')
+              stream.write(f'sha={sha}\neligible=true\n')
           PYTHON
 
-      - name: Remove obsolete application SHA tags
+      - name: Remove obsolete GHCR versions
         if: steps.release.outputs.eligible == 'true'
         env:
-          REGISTRY_KIND: ${{ steps.release.outputs.registry_kind }}
-          ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
-          ARTIFACT_REGISTRY_USERNAME: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
-          ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
-          BACKUP_ARTIFACT_REGISTRY_HOST: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}
-          BACKUP_ARTIFACT_REGISTRY_USERNAME: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME }}
-          BACKUP_ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}
           DEPLOYED_SHA: ${{ steps.release.outputs.sha }}
           CLEANUP_DRY_RUN: ${{ vars.REGISTRY_CLEANUP_DRY_RUN || 'false' }}
           CLEANUP_WORKERS: ${{ vars.REGISTRY_CLEANUP_WORKERS || '8' }}
           CLEANUP_MAX_RUNTIME_SECONDS: ${{ vars.REGISTRY_CLEANUP_MAX_RUNTIME_SECONDS || '1200' }}
-          CLEANUP_MAX_TAGS: ${{ vars.REGISTRY_CLEANUP_MAX_TAGS || '0' }}
+          CLEANUP_MAX_VERSIONS: ${{ vars.REGISTRY_CLEANUP_MAX_VERSIONS || '0' }}
         shell: bash
         run: |
           set -euo pipefail
-          if [ "$REGISTRY_KIND" = backup ]; then
-            export ARTIFACT_REGISTRY_HOST="$BACKUP_ARTIFACT_REGISTRY_HOST"
-            export ARTIFACT_REGISTRY_USERNAME="$BACKUP_ARTIFACT_REGISTRY_USERNAME"
-            export ARTIFACT_REGISTRY_PASSWORD="$BACKUP_ARTIFACT_REGISTRY_PASSWORD"
-          fi
           args=(--deployed-sha "$DEPLOYED_SHA" --workers "$CLEANUP_WORKERS")
-          args+=(--max-runtime-seconds "$CLEANUP_MAX_RUNTIME_SECONDS" --max-tags "$CLEANUP_MAX_TAGS")
+          args+=(--max-runtime-seconds "$CLEANUP_MAX_RUNTIME_SECONDS" --max-versions "$CLEANUP_MAX_VERSIONS")
           args+=(--report registry-cleanup-report.json)
           case "$CLEANUP_DRY_RUN" in
             true) ;;
