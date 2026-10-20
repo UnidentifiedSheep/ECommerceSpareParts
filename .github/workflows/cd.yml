@@ -6,301 +6,35 @@ on:
     types: [completed]
   workflow_dispatch:
     inputs:
-      ci_run_id:
-        description: Successful CI run ID to deploy again
+      operation:
+        description: Deploy a CI release, preview it, or roll back a CD run
+        type: choice
         required: true
+        default: deploy
+        options: [deploy, plan, rollback]
+      run_id:
+        description: CI run ID for deploy/plan, CD run ID for rollback
         type: string
+        required: true
 
 permissions:
   actions: read
-  contents: read
+  contents: write
 
 concurrency:
   group: production-deploy
   cancel-in-progress: false
 
 jobs:
-  prepare-release:
+  release:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
-       ((github.event.workflow_run.event == 'push' &&
-         github.event.workflow_run.head_branch == 'master') ||
-        github.event.workflow_run.event == 'workflow_dispatch') &&
+       github.event.workflow_run.head_branch == 'master' &&
+       (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch') &&
        github.event.workflow_run.head_repository.full_name == github.repository)
-    runs-on: ubuntu-latest
-    outputs:
-      sha: ${{ steps.manifest.outputs.sha }}
-      should_deploy: ${{ steps.manifest.outputs.should_deploy }}
-      promote_only: ${{ steps.manifest.outputs.promote_only }}
-      has_images: ${{ steps.manifest.outputs.has_images }}
-      promotion_matrix: ${{ steps.manifest.outputs.promotion_matrix }}
-      services: ${{ steps.manifest.outputs.services }}
-      full_deploy: ${{ steps.manifest.outputs.full_deploy }}
-      registry_kind: ${{ steps.manifest.outputs.registry_kind }}
-
-    steps:
-      - name: Verify CI run
-        id: ci-run
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CI_RUN_ID: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.id || inputs.ci_run_id }}
-        run: |
-          set -euo pipefail
-          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${CI_RUN_ID}" > ci-run.json
-          jq -e --arg repository "$GITHUB_REPOSITORY" '
-            .name == "CI" and
-            .conclusion == "success" and
-            .head_repository.full_name == $repository and
-            ((.event == "push" and .head_branch == "master") or
-             .event == "workflow_dispatch")
-          ' ci-run.json > /dev/null
-          echo "run_id=$CI_RUN_ID" >> "$GITHUB_OUTPUT"
-          echo "sha=$(jq -r '.head_sha' ci-run.json)" >> "$GITHUB_OUTPUT"
-
-      - name: Download release manifest
-        uses: actions/download-artifact@v4
-        with:
-          name: release-manifest
-          run-id: ${{ steps.ci-run.outputs.run_id }}
-          github-token: ${{ github.token }}
-
-      - name: Verify release manifest
-        id: manifest
-        shell: bash
-        env:
-          CI_SHA: ${{ steps.ci-run.outputs.sha }}
-        run: |
-          set -euo pipefail
-          jq -e --arg sha "$CI_SHA" '
-            .sha == $sha and
-            (.should_deploy | type == "boolean") and
-            (.promote_only | type == "boolean") and
-            (.has_images | type == "boolean") and
-            (.full_deploy | type == "boolean") and
-            ((.should_deploy and .promote_only) | not) and
-            (.promote_only == false or .has_images) and
-            (.services | type == "string") and
-            (.matrix.include | type == "array") and
-            (.has_images == (.matrix.include | length > 0)) and
-            all(.matrix.include[]; .image | type == "string" and length > 0) and
-            ((.should_deploy == false and .promote_only == false) or
-              (.registry_kind == "primary" or .registry_kind == "backup"))
-          ' release-manifest.json > /dev/null
-          echo "sha=$CI_SHA" >> "$GITHUB_OUTPUT"
-          for field in should_deploy promote_only has_images full_deploy registry_kind services; do
-            echo "${field}=$(jq -r ".$field" release-manifest.json)" >> "$GITHUB_OUTPUT"
-          done
-          echo "promotion_matrix=$(jq -c '{include: (.matrix.include | map({image}) | unique_by(.image))}' release-manifest.json)" >> "$GITHUB_OUTPUT"
-
-  promote-images:
-    name: Promote ${{ matrix.image }}
-    needs: prepare-release
-    if: >-
-      needs.prepare-release.outputs.has_images == 'true' &&
-      (needs.prepare-release.outputs.should_deploy == 'true' ||
-       needs.prepare-release.outputs.promote_only == 'true')
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      max-parallel: 6
-      matrix: ${{ fromJson(needs.prepare-release.outputs.promotion_matrix) }}
-    timeout-minutes: 20
-    env:
-      ARTIFACT_REGISTRY_HOST: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_HOST || secrets.ARTIFACT_REGISTRY_HOST }}
-      ARTIFACT_REGISTRY_USERNAME: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME || secrets.ARTIFACT_REGISTRY_USERNAME }}
-      ARTIFACT_REGISTRY_PASSWORD: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}
-      IMAGE_TAG: ${{ needs.prepare-release.outputs.sha }}
-      IMAGE_NAME: ${{ matrix.image }}
-
-    steps:
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Promote image
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          retry() {
-            local operation="$1"
-            shift
-            local attempt status wait_seconds delay=5
-            local max_attempts=5 max_delay=30
-
-            for ((attempt = 1; attempt <= max_attempts; attempt++)); do
-              if "$@"; then
-                return 0
-              else
-                status=$?
-              fi
-
-              if ((attempt == max_attempts)); then
-                echo "${operation} failed after ${max_attempts} attempts (exit ${status})." >&2
-                return "$status"
-              fi
-
-              wait_seconds=$((1 + RANDOM % delay))
-              echo "${operation} failed (exit ${status}), attempt ${attempt}/${max_attempts}; retrying in ${wait_seconds}s." >&2
-              sleep "$wait_seconds"
-              delay=$((delay * 2))
-              if ((delay > max_delay)); then
-                delay=$max_delay
-              fi
-            done
-          }
-
-          login_registry() {
-            printf '%s' "$ARTIFACT_REGISTRY_PASSWORD" |
-              docker login "$ARTIFACT_REGISTRY_HOST" \
-                --username "$ARTIFACT_REGISTRY_USERNAME" \
-                --password-stdin
-          }
-
-          inspect_digest() {
-            local reference="$1" allow_missing="${2:-false}"
-            local output status digest
-
-            if output="$(docker buildx imagetools inspect "$reference" 2>&1)"; then
-              digest="$(awk '$1 == "Digest:" { print $2; exit }' <<< "$output")"
-              if [ -z "$digest" ]; then
-                echo "Unable to resolve digest for ${reference}." >&2
-                return 1
-              fi
-              printf '%s\n' "$digest"
-              return 0
-            else
-              status=$?
-            fi
-
-            if [[ "$allow_missing" == 'true' &&
-                  "$output" != *"failed to authorize"* &&
-                  "$output" != *"failed to fetch oauth token"* ]] &&
-               [[ "$output" == *"${reference}: not found"* ||
-                  "$output" == *"404 Not Found"* ||
-                  "$output" == *"MANIFEST_UNKNOWN"* ||
-                  "$output" == *"manifest unknown"* ||
-                  "$output" == *"no such manifest"* ]]; then
-              return 0
-            fi
-
-            printf '%s\n' "$output" >&2
-            return "$status"
-          }
-
-          trap 'docker logout "$ARTIFACT_REGISTRY_HOST" >/dev/null 2>&1 || true' EXIT
-          retry "Registry login" login_registry
-
-          image="${ARTIFACT_REGISTRY_HOST}/${IMAGE_NAME}"
-          release_digest="$(retry "Inspect release" inspect_digest "${image}:${IMAGE_TAG}")"
-          current_digest="$(retry "Inspect current" inspect_digest "${image}:current" true)"
-
-          if [ "$current_digest" = "$release_digest" ]; then
-            echo "${image}:${IMAGE_TAG} is already current; previous tag was preserved."
-            exit 0
-          fi
-
-          if [ -n "$current_digest" ]; then
-            retry "Preserve previous image" docker buildx imagetools create \
-              --prefer-index=false \
-              --tag "${image}:previous" \
-              "${image}@${current_digest}"
-          else
-            echo "${image}:current does not exist yet; previous tag was not created."
-          fi
-
-          retry "Promote current image" docker buildx imagetools create \
-            --prefer-index=false \
-            --tag "${image}:current" \
-            "${image}@${release_digest}"
-
-  deploy:
-    needs: [prepare-release, promote-images]
-    if: >-
-      !cancelled() &&
-      needs.prepare-release.result == 'success' &&
-      needs.prepare-release.outputs.should_deploy == 'true' &&
-      (needs.promote-images.result == 'success' ||
-       (needs.prepare-release.outputs.has_images == 'false' &&
-        needs.promote-images.result == 'skipped'))
     uses: ./.github/workflows/deploy.yml
     with:
-      release_sha: ${{ needs.prepare-release.outputs.sha }}
-      registry_kind: ${{ needs.prepare-release.outputs.registry_kind }}
-      services: ${{ needs.prepare-release.outputs.services }}
-      full_deploy: ${{ needs.prepare-release.outputs.full_deploy == 'true' }}
+      operation: ${{ inputs.operation || 'deploy' }}
+      run_id: ${{ github.event_name == 'workflow_run' && format('{0}', github.event.workflow_run.id) || inputs.run_id }}
     secrets: inherit
-
-  record-deployment:
-    needs: [prepare-release, deploy]
-    if: ${{ !cancelled() && needs.deploy.result == 'success' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout deployed release
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare-release.outputs.sha }}
-
-      - name: Record last successful deployment
-        shell: bash
-        env:
-          RELEASE_SHA: ${{ needs.prepare-release.outputs.sha }}
-        run: |
-          set -euo pipefail
-          git push --force origin "${RELEASE_SHA}:refs/tags/deployed/production"
-
-  cleanup-registry:
-    name: Remove obsolete registry tags
-    needs: [prepare-release, deploy, record-deployment]
-    if: >-
-      !cancelled() &&
-      needs.deploy.result == 'success' &&
-      needs.record-deployment.result == 'success'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      ARTIFACT_REGISTRY_HOST: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_HOST || secrets.ARTIFACT_REGISTRY_HOST }}
-      ARTIFACT_REGISTRY_USERNAME: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME || secrets.ARTIFACT_REGISTRY_USERNAME }}
-      ARTIFACT_REGISTRY_PASSWORD: ${{ needs.prepare-release.outputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}
-      GITHUB_TOKEN: ${{ github.token }}
-      DEPLOYED_SHA: ${{ needs.prepare-release.outputs.sha }}
-      CLEANUP_DRY_RUN: ${{ vars.REGISTRY_CLEANUP_DRY_RUN || 'false' }}
-      CLEANUP_WORKERS: ${{ vars.REGISTRY_CLEANUP_WORKERS || '8' }}
-      CLEANUP_MAX_RUNTIME_SECONDS: ${{ vars.REGISTRY_CLEANUP_MAX_RUNTIME_SECONDS || '1200' }}
-      CLEANUP_MAX_TAGS: ${{ vars.REGISTRY_CLEANUP_MAX_TAGS || vars.REGISTRY_CLEANUP_MAX_DELETIONS || '0' }}
-
-    steps:
-      - name: Checkout registry cleanup code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.workflow_sha }}
-          fetch-depth: 0
-
-      - name: Remove obsolete project SHA tags
-        shell: bash
-        run: |
-          set -euo pipefail
-          args=(--deployed-sha "$DEPLOYED_SHA")
-          args+=(--workers "$CLEANUP_WORKERS" --max-runtime-seconds "$CLEANUP_MAX_RUNTIME_SECONDS")
-          args+=(--max-tags "$CLEANUP_MAX_TAGS" --report registry-cleanup-report.json)
-          case "$CLEANUP_DRY_RUN" in
-            true) ;;
-            false) args+=(--apply) ;;
-            *) echo 'REGISTRY_CLEANUP_DRY_RUN must be true or false.' >&2; exit 1 ;;
-          esac
-          python3 -u scripts/ci/cleanup-registry.py "${args[@]}" 2>&1 | tee registry-cleanup.log
-
-      - name: Save registry cleanup diagnostics
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: registry-cleanup-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            registry-cleanup.log
-            registry-cleanup-report.json
-          if-no-files-found: ignore
-          retention-days: 7
