@@ -316,18 +316,8 @@ class Registry:
 
 
 def project_repositories(root):
-    repositories = set()
-    pattern = re.compile(r"\s*image:\s*\$\{ARTIFACT_REGISTRY_HOST\}/([a-z0-9][a-z0-9._/-]*):\$\{IMAGE_TAG\}\s*")
-    for filename in ("compose.registry.yaml", "migrator-compose.registry.yaml"):
-        for line in (root / filename).read_text().splitlines():
-            if re.match(r"\s*image:", line):
-                match = pattern.fullmatch(line)
-                if not match:
-                    raise CleanupError(f"Unsupported project image declaration in {filename}")
-                repositories.add(match[1])
-    if not repositories:
-        raise CleanupError("No project repositories found; refusing cleanup")
-    return sorted(repositories)
+    from image_catalog import catalog
+    return sorted(item["image"] for item in catalog(root))
 
 
 @lru_cache(maxsize=4)
@@ -583,7 +573,7 @@ def run_cleanup(args, report):
     repositories = project_repositories(root)
     if args.repository:
         if not set(args.repository) <= set(repositories):
-            raise CleanupError("--repository must name an image repository from the project's compose files")
+            raise CleanupError("--repository must name an application image")
         repositories = sorted(set(args.repository))
     result = subprocess.run(["git", "cat-file", "-e", args.deployed_sha + "^{commit}"], cwd=root,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

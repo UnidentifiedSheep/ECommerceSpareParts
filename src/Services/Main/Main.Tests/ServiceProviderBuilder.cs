@@ -133,7 +133,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddScoped<IUserContext, UserContextMock>();
 		services.AddSystemOptionsForTests();
 
-		services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
+		services.AddSingleton<PublishEndpointAccessor>();
+		services.AddScoped<IPublishEndpoint>(sp => sp.GetRequiredService<PublishEndpointAccessor>().Publisher);
 		services.RemoveAll<IFusionCacheBackplane>();
 		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 

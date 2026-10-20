@@ -1,10 +1,8 @@
 using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
@@ -13,7 +11,6 @@ using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
 using Main.Entities;
 using Main.Entities.Product;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -21,22 +18,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProductImport;
 
 public class ProductImportLrtStep(
-	IRepository<Job, Guid> jobRepository,
-	IProducerLookupService producerLookupService,
-	IProductRepository productRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductImportLrtStep> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportLrtStep.ProductCsvDto,
 		Product>(
-		jobRepository,
 		bucketsOptions,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger,
 		s3Service,
@@ -57,7 +46,8 @@ public class ProductImportLrtStep(
 		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override async Task BeforeRead(ProductImportState state) =>
-		_producerLookup = await producerLookupService.Load(CancellationToken);
+		_producerLookup = await ExecuteInScopeAsync((context, ct) =>
+			context.GetRequiredService<IProducerLookupService>().Load(ct), CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -105,9 +95,9 @@ public class ProductImportLrtStep(
 			return;
 
 		var firstIdx = products[0].idx;
-		await TransactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(_, cancellationToken) => productRepository.InsertProductsOnConflictDoNothingAsync(
+			(context, cancellationToken) => context.GetRequiredService<IProductRepository>().InsertProductsOnConflictDoNothingAsync(
 				products.Select(product => product.item).ToArray(), cancellationToken),
 			CancellationToken);
 

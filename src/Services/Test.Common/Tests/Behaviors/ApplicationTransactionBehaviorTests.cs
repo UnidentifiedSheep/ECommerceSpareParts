@@ -14,9 +14,9 @@ namespace Tests.Tests.Behaviors;
 public sealed class ApplicationTransactionBehaviorTests
 {
 	[Fact]
-	public async Task Handle_RequestWithoutTransaction_DelegatesWithoutSettings()
+	public async Task Handle_UnannotatedRequest_DelegatesWithoutAnOuterBoundary()
 	{
-		var service = new RecordingApplicationTransactionService();
+		var service = new RecordingApplicationTransaction();
 		var behavior = new ApplicationTransactionBehavior<TestRequest, Unit>(service);
 
 		var result = await behavior.Handle(
@@ -25,14 +25,14 @@ public sealed class ApplicationTransactionBehaviorTests
 			CancellationToken.None);
 
 		result.Should().Be(Unit.Value);
-		service.Calls.Should().Be(1);
+		service.Calls.Should().Be(0);
 		service.Settings.Should().BeNull();
 	}
 
 	[Fact]
 	public async Task Handle_TransactionalRequest_PassesSettingsToService()
 	{
-		var service = new RecordingApplicationTransactionService();
+		var service = new RecordingApplicationTransaction();
 		var behavior = new ApplicationTransactionBehavior<TransactionalRequest, Unit>(service);
 
 		await behavior.Handle(
@@ -48,7 +48,7 @@ public sealed class ApplicationTransactionBehaviorTests
 	[Fact]
 	public async Task Handle_TransactionalRequest_PreservesTheExplicitRetryMask()
 	{
-		var service = new RecordingApplicationTransactionService();
+		var service = new RecordingApplicationTransaction();
 		var behavior = new ApplicationTransactionBehavior<CustomRetryRequest, Unit>(service);
 
 		await behavior.Handle(
@@ -69,7 +69,7 @@ public sealed class ApplicationTransactionBehaviorTests
 		unitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 		var context = new Mock<IApplicationTransactionContext>();
 		context.SetupGet(x => x.UnitOfWork).Returns(unitOfWork.Object);
-		var service = new RecordingApplicationTransactionService(context.Object);
+		var service = new RecordingApplicationTransaction(context.Object);
 		var behavior = new ApplicationTransactionBehavior<AutoSaveRequest, Unit>(service);
 
 		await behavior.Handle(
@@ -79,6 +79,20 @@ public sealed class ApplicationTransactionBehaviorTests
 
 		unitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
 	}
+
+    [Fact]
+    public async Task Handle_UnannotatedRequest_LetsTheServiceConfigureItsTransaction()
+    {
+        var transaction = new RecordingApplicationTransaction();
+        var settings = TransactionalAttribute.ReadCommitted(20, 3);
+        var behavior = new ApplicationTransactionBehavior<TestRequest, Unit>(transaction);
+
+        await behavior.Handle(new TestRequest(), ct => transaction.WithSettings(settings)
+            .ExecuteAsync((_, _) => Task.FromResult(Unit.Value), ct), TestContext.Current.CancellationToken);
+
+        transaction.Calls.Should().Be(1);
+        transaction.Settings.Should().BeSameAs(settings);
+    }
 
 	private sealed record TestRequest : IRequest<Unit>;
 
@@ -91,33 +105,6 @@ public sealed class ApplicationTransactionBehaviorTests
 	[AutoSave]
 	private sealed record AutoSaveRequest : IRequest<Unit>;
 
-	private sealed class RecordingApplicationTransactionService(
-		IApplicationTransactionContext? context = null) : IApplicationTransactionService
-	{
-		public int Calls { get; private set; }
-
-		public TransactionalAttribute? Settings { get; private set; }
-
-		public IApplicationTransaction Create(TransactionalAttribute? settings = null) => new ApplicationTransactionStub(this, settings);
-
-		public async Task ExecuteAsync(
-			TransactionalAttribute? settings,
-			Func<IApplicationTransactionContext, CancellationToken, Task> action,
-			CancellationToken cancellationToken = default)
-		{
-			Calls++;
-			Settings = settings;
-			await action(context!, cancellationToken);
-		}
-
-		public async Task<TResult> ExecuteAsync<TResult>(
-			TransactionalAttribute? settings,
-			Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
-			CancellationToken cancellationToken = default)
-		{
-			Calls++;
-			Settings = settings;
-			return await action(context!, cancellationToken);
-		}
-	}
+	private sealed class RecordingApplicationTransaction(
+		IApplicationTransactionContext? context = null) : ApplicationTransactionStub(context!);
 }

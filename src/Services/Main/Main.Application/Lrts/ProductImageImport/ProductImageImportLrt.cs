@@ -1,11 +1,9 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Enums;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
@@ -14,7 +12,6 @@ using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -22,19 +19,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProductImageImport;
 
 public class ProductImageImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IProductRepository productRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IDomainEventScope domainEventScope,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductImageImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductImageImportInputState, ProductImageImportState,
 		ProductImageImportLrt.ProductImageCsvDto, ProductImage>(
-		jobRepository, bucketsOptions, unitOfWork, publisher, transactionService,
+		bucketsOptions, transactionService,
 		logger, s3Service, stringLocalizer)
 {
 	public const string Name = nameof(ProductImageImportLrt);
@@ -79,8 +71,8 @@ public class ProductImageImportLrt(
 		if (items.Count == 0) return;
 
 		var images = items.Select(x => x.item).DistinctBy(image => image.GetId()).ToArray();
-		await TransactionService
-			.Create(TransactionalAttribute.RetryOnConflict(20, 2))
+		await using var transaction = TransactionFactory.Create();
+		await transaction.WithSettings(TransactionalAttribute.RetryOnConflict(20, 2))
 			.OnException(
 				TransactionErrorKind.ForeignKeyViolation,
 				error =>
@@ -114,10 +106,10 @@ public class ProductImageImportLrt(
 								.WithConstraintName(error.ConstraintName ?? string.Empty)));
 				})
 			.ExecuteAsync(
-				async (_, cancellationToken) =>
+				async (context, cancellationToken) =>
 				{
-					await productRepository.InsertProductImagesOnConflictDoNothingAsync(images, cancellationToken);
-					domainEventScope.AddRange(images.Select(image => image.ProductId)
+					await context.GetRequiredService<IProductRepository>().InsertProductImagesOnConflictDoNothingAsync(images, cancellationToken);
+					context.GetRequiredService<IDomainEventScope>().AddRange(images.Select(image => image.ProductId)
 						.Distinct()
 						.Select(id => new ProductImageUpdatedDomainEvent(id)));
 				},

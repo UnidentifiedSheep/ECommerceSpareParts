@@ -1,4 +1,4 @@
-﻿using Abstractions.Models;
+using Abstractions.Models;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
@@ -368,26 +368,15 @@ public class LrtBaseTests
 		public TestLrt CreateLrt()
 		{
 			return new TestLrt(
-				JobRepository.Object,
-				UnitOfWork.Object,
-				Publisher,
-				new ApplicationTransactionServiceStub(
+				new ApplicationTransactionFactoryStub(
 					UnitOfWork.Object,
-					Mock.Of<IRepositoryProvider>(),
+					Mock.Of<IRepositoryProvider>(provider => provider.Get<Job, Guid>() == JobRepository.Object),
 					Mock.Of<IIntegrationEventScope>()),
 				Logger.Object);
 		}
 	}
 
-	private sealed class TestLrt(
-		IRepository<Job, Guid> jobRepository,
-		IUnitOfWork unitOfWork,
-		IPublishEndpoint publisher,
-		IApplicationTransactionService transactionService,
-		ILogger logger) : LrtBase<TestInput, TestState>(
-		jobRepository,
-		unitOfWork,
-		publisher,
+	private sealed class TestLrt(IApplicationTransactionFactory transactionService, ILogger logger) : LrtBase<TestInput, TestState>(
 		transactionService,
 		logger)
 	{

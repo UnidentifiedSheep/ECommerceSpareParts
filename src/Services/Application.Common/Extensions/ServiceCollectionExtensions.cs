@@ -110,7 +110,9 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddScoped<IRepositoryProvider, RepositoryProvider>();
 		services.AddScoped<IApplicationTransactionContext, ApplicationTransactionContext>();
-		services.AddScoped<IApplicationTransactionService, ApplicationTransactionService>();
+		services.AddScoped<ApplicationTransaction>();
+		services.AddScoped<IApplicationTransaction>(provider => provider.GetRequiredService<ApplicationTransaction>());
+		services.AddSingleton<IApplicationTransactionFactory, ApplicationTransactionFactory>();
 		return services;
 	}
 

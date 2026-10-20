@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -191,10 +192,9 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 		IServiceProvider serviceProvider,
 		IEnumerable<Job> jobs)
 	{
-		var transactionService = serviceProvider.GetRequiredService<IApplicationTransactionService>();
+		var transactionService = serviceProvider.GetRequiredService<IApplicationTransaction>();
 
-		return await transactionService.ExecuteAsync(
-			new TransactionalAttribute(),
+		return await transactionService.WithSettingsIfIdle(new TransactionalAttribute()).ExecuteAsync(
 			async (context, cancellationToken) =>
 			{
 				var repository = context.Repositories.Get<IJobRepository>();

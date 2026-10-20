@@ -1,11 +1,9 @@
 using Abstractions.Interfaces;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
@@ -16,7 +14,6 @@ using Main.Entities;
 using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -24,23 +21,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProductCrossesImport;
 
 public class ProductCrossesImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IProducerLookupService producerLookupService,
-	IProductRepository productRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IDomainEventScope domainEventScope,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<ProductCrossesImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductCrossesImportInputState, ProductCrossesImportState,
 		ProductCrossesImportLrt.ProductCrossCsvDto, ProductCrossesImportLrt.ProductCrossBatchItem>(
-		jobRepository,
 		bucketsOptions,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger,
 		s3Service,
@@ -60,7 +48,8 @@ public class ProductCrossesImportLrt(
 		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override async Task BeforeRead(ProductCrossesImportState state) =>
-		_producerLookup = await producerLookupService.Load(CancellationToken);
+		_producerLookup = await ExecuteInScopeAsync((context, ct) =>
+			context.GetRequiredService<IProducerLookupService>().Load(ct), CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -118,13 +107,13 @@ public class ProductCrossesImportLrt(
 
 		var firstIdx = items[0].idx;
 		var errorsBeforeBatch = errors.Count;
-		var productIds = await productRepository.GetProductIdsByKeys(
+		var productIds = await ExecuteInScopeAsync((context, ct) =>
+			context.GetRequiredService<IProductRepository>().GetProductIdsByKeys(
 			items.SelectMany(x => new[]
 			{
 				x.item.Product.ToTuple(),
 				x.item.CrossProduct.ToTuple()
-			}),
-			CancellationToken);
+			}), ct), CancellationToken);
 
 		var crosses = new HashSet<(int ProductId, int CrossProductId)>();
 
@@ -171,15 +160,15 @@ public class ProductCrossesImportLrt(
 		}
 
 		if (crosses.Count > 0)
-			await TransactionService.ExecuteAsync(
+			await ExecuteInTransactionAsync(
 				TransactionalAttribute.ReadCommitted(20, 2),
-				async (_, cancellationToken) =>
+				async (context, cancellationToken) =>
 				{
 					var entities = crosses
 						.Select(x => ProductCross.Create(x.ProductId, x.CrossProductId))
 						.ToList();
-					await productRepository.InsertProductCrossesOnConflictDoNothingAsync(entities, cancellationToken);
-					domainEventScope.AddRange(
+					await context.GetRequiredService<IProductRepository>().InsertProductCrossesOnConflictDoNothingAsync(entities, cancellationToken);
+					context.GetRequiredService<IDomainEventScope>().AddRange(
 						entities
 							.SelectMany(x => new[]
 							{

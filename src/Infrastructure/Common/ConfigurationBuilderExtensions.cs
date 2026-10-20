@@ -32,6 +32,19 @@ public static class ConfigurationBuilderExtensions
 	public static IConfigurationBuilder AddConfigsFromJsons(
 		this IConfigurationBuilder configuration,
 		string nameStart,
+		string purpose,
+		string? contour,
+		string? path)
+	{
+		return configuration.AddConfigsFromJsons(
+			$"{nameStart}.{purpose}",
+			contour,
+			path);
+	}
+
+	public static IConfigurationBuilder AddConfigsFromJsons(
+		this IConfigurationBuilder configuration,
+		string nameStart,
 		string? contour,
 		string? path = null)
 	{

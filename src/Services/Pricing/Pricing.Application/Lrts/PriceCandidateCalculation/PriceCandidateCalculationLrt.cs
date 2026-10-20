@@ -1,8 +1,6 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Locan.Core.Interfaces;
-using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Handlers.Pricing;
@@ -11,15 +9,8 @@ using Pricing.Entities;
 namespace Pricing.Application.Lrts.PriceCandidateCalculation;
 
 public class PriceCandidateCalculationLrt(
-	IJobRepository jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
-	ILogger<PriceCandidateCalculationLrt> logger,
-	ISender sender) : LrtBase<PriceCandidateCalculationState, PriceCandidateCalculationState>(
-	jobRepository,
-	unitOfWork,
-	publisher,
+	IApplicationTransactionFactory transactionService,
+	ILogger<PriceCandidateCalculationLrt> logger) : LrtBase<PriceCandidateCalculationState, PriceCandidateCalculationState>(
 	transactionService,
 	logger)
 {
@@ -35,8 +26,7 @@ public class PriceCandidateCalculationLrt(
 
 	protected override async Task DoWork(PriceCandidateCalculationState inputState)
 	{
-		await sender.Send(
-			new CalculateCandidatesCommand(inputState.ProductId, inputState.StorageCode),
-			CancellationToken);
+		await ExecuteInScopeAsync((context, ct) => context.GetRequiredService<ISender>().Send(
+			new CalculateCandidatesCommand(inputState.ProductId, inputState.StorageCode), ct), CancellationToken);
 	}
 }

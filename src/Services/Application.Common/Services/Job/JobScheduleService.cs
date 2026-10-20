@@ -15,7 +15,7 @@ using NamedObject.Core.Interfaces;
 namespace Application.Common.Services.Job;
 
 public class JobScheduleService(
-	IApplicationTransactionService transactionService,
+	IApplicationTransaction transactionService,
 	INamedObjectRegistry<ILrtNamedObject> registry,
 	IJobService jobService,
 	IValidator<NewJobScheduleDto> newScheduleValidator,
@@ -29,8 +29,7 @@ public class JobScheduleService(
 		ArgumentNullException.ThrowIfNull(newSchedule);
 		await newScheduleValidator.ValidateAndThrowAsync(newSchedule, token);
 
-		return await transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 2),
+		return await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
 			async (ctx, ct) =>
 			{
 				var lrt = registry.GetBySystemName(newSchedule.JobSystemName);
@@ -69,8 +68,7 @@ public class JobScheduleService(
 		ArgumentNullException.ThrowIfNull(patch);
 		await patchScheduleValidator.ValidateAndThrowAsync(patch, token);
 
-		return await transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 2),
+		return await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
 			async (ctx, ct) =>
 			{
 				var repository = ctx.Repositories.Get<JobSchedule, Guid>();
@@ -121,8 +119,7 @@ public class JobScheduleService(
 
 	public Task RemoveScheduleAsync(Guid scheduleId, CancellationToken token = default)
 	{
-		return transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 2),
+		return transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
 			async (ctx, ct) =>
 			{
 				var repository = ctx.Repositories.Get<JobSchedule, Guid>();
@@ -142,8 +139,7 @@ public class JobScheduleService(
 		if (batchSize <= 0)
 			return Task.FromResult(0);
 
-		return transactionService.ExecuteAsync(
-			TransactionalAttribute.ReadCommitted(30, 2),
+		return transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
 			async (ctx, ct) =>
 			{
 				var utcNow = GetUtcNow();

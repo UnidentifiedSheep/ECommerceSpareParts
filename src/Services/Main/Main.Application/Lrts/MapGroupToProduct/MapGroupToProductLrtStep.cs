@@ -1,9 +1,7 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
@@ -14,7 +12,6 @@ using Main.Application.Models.Producer;
 using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,20 +20,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.MapGroupToProduct;
 
 public class MapGroupToProductLrtStep(
-	IRepository<Job, Guid> jobRepository,
-	IProducerLookupService producerLookupService,
-	IReadRepository<ProductGroup, int> groupRepository,
-	IProductRepository productRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<MapGroupToProductLrtStep> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<MapGroupToProductInputState, MapGroupToProductState,
 		MapGroupToProductLrtStep.ProductGroupMappingCsvDto, ProductGroupAssignment>(
-		jobRepository, bucketsOptions, unitOfWork, publisher, transactionService,
+		bucketsOptions, transactionService,
 		logger, s3Service, stringLocalizer)
 {
 	private IProducerLookup _producerLookup = ProducerLookup.Empty;
@@ -52,10 +43,14 @@ public class MapGroupToProductLrtStep(
 
 	protected override async Task BeforeRead(MapGroupToProductState state)
 	{
-		_producerLookup = await producerLookupService.Load(CancellationToken);
-		_groupIds = await groupRepository.Query.AsNoTracking()
-			.Select(x => new { x.NormalizedName, x.Id })
-			.ToDictionaryAsync(x => x.NormalizedName, x => x.Id, CancellationToken);
+		(_producerLookup, _groupIds) = await ExecuteInScopeAsync(async (context, ct) =>
+		{
+			var lookup = await context.GetRequiredService<IProducerLookupService>().Load(ct);
+			var groups = await context.Repositories.GetForRead<ProductGroup, int>().Query
+				.Select(x => new { x.NormalizedName, x.Id })
+				.ToDictionaryAsync(x => x.NormalizedName, x => x.Id, ct);
+			return (lookup, groups);
+		}, CancellationToken);
 	}
 
 	protected override bool TryProcessRow(
@@ -109,9 +104,9 @@ public class MapGroupToProductLrtStep(
 		foreach (var (_, item) in items)
 			assignments[(item.NormalizedSku, item.ProducerId)] = item;
 
-		await TransactionService.ExecuteAsync(
+		await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(_, cancellationToken) => productRepository
+			(context, cancellationToken) => context.GetRequiredService<IProductRepository>()
 				.UpdateProductGroupsAsync(
 					assignments.Values,
 					cancellationToken),

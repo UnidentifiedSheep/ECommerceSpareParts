@@ -1,15 +1,12 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.Product;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,20 +15,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.CharacteristicImport;
 
 public sealed class CharacteristicImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	ILogger<CharacteristicImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<CharacteristicImportInputState, CharacteristicImportState,
 		CharacteristicImportLrt.CharacteristicCsvDto, Characteristic>(
-		jobRepository,
 		bucketsOptions,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger,
 		s3Service,
@@ -81,7 +72,7 @@ public sealed class CharacteristicImportLrt(
 			.ToList();
 		var uniqueNames = uniqueCharacteristics.Select(characteristic => characteristic.NormalizedName).ToArray();
 
-		var created = await TransactionService.ExecuteAsync(
+		var created = await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{

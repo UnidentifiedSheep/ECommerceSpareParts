@@ -1,288 +1,107 @@
-name: Deploy
+name: Deploy through Arcane
 
 on:
   workflow_call:
     inputs:
-      release_sha:
-        description: Commit used to produce the published images and deployment payload
+      operation:
         required: true
         type: string
-      registry_kind:
-        description: Artifact Registry selected by the publish workflow
+      run_id:
         required: true
         type: string
-      services:
-        description: Comma-separated affected API, Worker and Migrator service names
-        required: true
-        type: string
-      full_deploy:
-        description: Apply every Swarm stack and run the complete deployment validation
-        required: true
-        type: boolean
+
+permissions:
+  actions: read
+  contents: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 90
     env:
-      SWARM_PATH: ${{ secrets.SWARM_PATH || '/opt/ecommerce' }}
-      STACK_NAME: ${{ secrets.SWARM_STACK_NAME || 'ecommerce' }}
+      OPERATION: ${{ inputs.operation }}
+      SOURCE_RUN_ID: ${{ inputs.run_id }}
+      GH_TOKEN: ${{ github.token }}
+      ARCANE_URL: ${{ vars.ARCANE_URL || 'https://arcane.all-vp-n.ru' }}
+      ARCANE_ENVIRONMENT_ID: ${{ vars.ARCANE_ENVIRONMENT_ID || '0' }}
+      ARCANE_API_KEY: ${{ secrets.ARCANE_API_KEY }}
       DEPLOY_ENVIRONMENT: ${{ vars.DEPLOY_ENVIRONMENT || 'Production' }}
+      MIGRATOR_SECRET_NAMES: ${{ vars.MIGRATOR_SECRET_NAMES || '{}' }}
+      MIGRATOR_MEMORY_MB: ${{ vars.MIGRATOR_MEMORY_MB || '768' }}
+      MIGRATOR_TIMEOUT_SECONDS: ${{ vars.MIGRATOR_TIMEOUT_SECONDS || '1200' }}
+      ROLLOUT_TIMEOUT_SECONDS: ${{ vars.ROLLOUT_TIMEOUT_SECONDS || '600' }}
+      DEPLOY_STABILITY_SECONDS: ${{ vars.DEPLOY_STABILITY_SECONDS || '45' }}
+      ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
+      ARTIFACT_REGISTRY_USERNAME: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
+      ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
+      BACKUP_ARTIFACT_REGISTRY_HOST: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_HOST }}
+      BACKUP_ARTIFACT_REGISTRY_USERNAME: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME }}
+      BACKUP_ARTIFACT_REGISTRY_PASSWORD: ${{ secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD }}
+      DOCKER_CONFIG: /tmp/ecommerce-registry-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
-      - name: Checkout
+      - name: Checkout deployment tooling
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.release_sha }}
+          ref: ${{ github.workflow_sha }}
+          fetch-depth: 0
 
-      - name: Prepare deploy payload
-        run: |
-          mkdir -p deploy-payload/deploy deploy-payload/init deploy-payload/scripts/deploy
+      - name: Verify source workflow and release artifact
+        id: source
+        run: python3 scripts/ci/release.py source --operation "$OPERATION" --run-id "$SOURCE_RUN_ID" --outputs "$GITHUB_OUTPUT"
 
-          cp deploy/stack.*.yml deploy-payload/deploy/
-          cp -R deploy/grafana deploy-payload/deploy/
-          cp -R deploy/tempo deploy-payload/deploy/
-          cp prometheus.yml deploy-payload/prometheus.yml
-          cp scripts/deploy/deploy-swarm.sh deploy-payload/scripts/deploy/deploy-swarm.sh
-          cp scripts/deploy/load-secrets.py deploy-payload/scripts/deploy/load-secrets.py
-          cp scripts/deploy/bootstrap-arcane.py deploy-payload/scripts/deploy/bootstrap-arcane.py
-          cp -R init/. deploy-payload/init/
+      - name: Set up Docker Buildx
+        if: steps.source.outputs.should_deploy == 'true'
+        uses: docker/setup-buildx-action@v3
 
-          required_files=(
-            deploy/stack.secrets.yml
-            deploy/stack.gateway.yml
-            deploy/stack.apps.yml
-            deploy/stack.workers.yml
-            deploy/stack.infra.yml
-            deploy/stack.monitoring.yml
-            deploy/tempo/tempo.yml
-            deploy/grafana/provisioning/datasources/datasources.yml
-            deploy/grafana/provisioning/dashboards/swarm.yml
-            deploy/grafana/dashboards/swarm-nodes.json
-            init/clear-expired-coef.sql
-            init/create-multiple-postgresql-databases.sh
-            scripts/deploy/deploy-swarm.sh
-            scripts/deploy/load-secrets.py
-            scripts/deploy/bootstrap-arcane.py
-            prometheus.yml
-          )
-
-          for required_file in "${required_files[@]}"; do
-            test -s "deploy-payload/${required_file}" || {
-              echo "Required deploy payload file ${required_file} is missing or empty." >&2
-              exit 1
-            }
-          done
-
-      - name: Validate deploy scripts and Swarm stacks
+      - name: Deploy or roll back through Arcane
+        if: steps.source.outputs.should_deploy == 'true'
+        env:
+          PREVIOUS_DEPLOYED_SHA: ${{ steps.source.outputs.previous_sha }}
         shell: bash
         run: |
           set -euo pipefail
+          input=release-input/release-manifest.json
+          if [ "$OPERATION" = rollback ]; then input=release-input/deployment-report.json; fi
+          python3 -u scripts/deploy/arcane.py --operation "$OPERATION" --input "$input" \
+            --report deployment-report.json 2>&1 | tee deployment.log
 
-          bash -n deploy-payload/scripts/deploy/deploy-swarm.sh
-          PYTHONPYCACHEPREFIX="$RUNNER_TEMP/deploy-pycache" \
-            python3 -m py_compile deploy-payload/scripts/deploy/load-secrets.py deploy-payload/scripts/deploy/bootstrap-arcane.py
-
-          export ARTIFACT_REGISTRY_HOST=registry.invalid
-          export IMAGE_TAG=current
-          export DEPLOY_RUN_ID=validation
-          export PGQL_USER=validation
-          export PGQL_PASSWORD=validation
-          export REDIS_PASSWORD=validation
-          export RABBITMQ_DEFAULT_USER=validation
-          export RABBITMQ_DEFAULT_PASS=validation
-          export OPENSEARCH_PASSWORD=validation
-          export GRAFANA_ADMIN_USER=validation
-          export GRAFANA_ADMIN_PASSWORD=validation
-          export TRAEFIK_ACME_EMAIL=validation@example.invalid
-          export GATEWAY_HOST=gateway.example.invalid
-          export ARCANE_HOST=arcane.example.invalid
-          export ARCANE_TRUSTED_PROXIES=10.0.0.0/24
-          export GRAFANA_HOST=grafana.example.invalid
-          export OPENSEARCH_DASHBOARDS_HOST=opensearch.example.invalid
-          export RABBITMQ_HOST=rabbitmq.example.invalid
-          export CLOUD_RU_SECRET_PROJECT_ID=validation
-          export CLOUDRU_SECRETS_SCRIPT_CONFIG=validation_cloudru
-          export POSTGRES_INIT_SQL_CONFIG=validation_postgres_sql
-          export POSTGRES_INIT_SCRIPT_CONFIG=validation_postgres_script
-          export PROMETHEUS_CONFIG=validation_prometheus
-          export TEMPO_CONFIG=validation_tempo
-          export GRAFANA_DATASOURCES_CONFIG=validation_grafana_datasources
-          export GRAFANA_DASHBOARDS_CONFIG=validation_grafana_dashboards
-          export GRAFANA_SWARM_NODES_DASHBOARD_CONFIG=validation_swarm_dashboard
-
-          for stack_file in deploy-payload/deploy/stack.*.yml; do
-            docker compose -f "$stack_file" config |
-              sed '/^name:/d' |
-              sed -E \
-                -e 's/^([[:space:]]+published: )"([0-9]+)"$/\1\2/' \
-                -e 's/^([[:space:]]+mode: )"([0-9]+)"$/\1\2/' |
-              docker stack config --compose-file - > /dev/null
-          done
-
-          loki_service="$(docker compose -f deploy-payload/deploy/stack.monitoring.yml config --format json | jq -c '.services.loki')"
-          loki_image="$(jq -r '.image' <<< "$loki_service")"
-          mapfile -t loki_command < <(jq -r '.command[]' <<< "$loki_service")
-          docker run --rm "$loki_image" "${loki_command[@]}" -verify-config
-
-      - name: Prepare leader directory
-        uses: appleboy/ssh-action@v1.2.5
-        env:
-          DEPLOY_SWARM_PATH: ${{ env.SWARM_PATH }}
-        with:
-          host: ${{ secrets.SWARM_LEADER_HOST }}
-          username: ${{ secrets.SWARM_SSH_USER }}
-          key: ${{ secrets.SWARM_SSH_KEY }}
-          envs: DEPLOY_SWARM_PATH
-          script: |
-            set -e
-
-            case "$DEPLOY_SWARM_PATH" in
-              /|*'/../'*|*'/..'|'')
-                echo "SWARM_PATH must be a safe absolute path other than /." >&2
-                exit 1
-                ;;
-              /*) ;;
-              *)
-                echo "SWARM_PATH must be a safe absolute path other than /." >&2
-                exit 1
-                ;;
-            esac
-
-            mkdir -p "$DEPLOY_SWARM_PATH"
-            cd "$DEPLOY_SWARM_PATH"
-
-            rm -rf release configs.next configs.old
-            mkdir -p release configs
-
-      - name: Upload stack files to leader
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SWARM_LEADER_HOST }}
-          username: ${{ secrets.SWARM_SSH_USER }}
-          key: ${{ secrets.SWARM_SSH_KEY }}
-          source: "deploy-payload/*"
-          target: ${{ env.SWARM_PATH }}/release
-          strip_components: 1
-          overwrite: true
-
-      - name: Activate leader payload
-        uses: appleboy/ssh-action@v1.2.5
-        env:
-          DEPLOY_SWARM_PATH: ${{ env.SWARM_PATH }}
-        with:
-          host: ${{ secrets.SWARM_LEADER_HOST }}
-          username: ${{ secrets.SWARM_SSH_USER }}
-          key: ${{ secrets.SWARM_SSH_KEY }}
-          envs: DEPLOY_SWARM_PATH
-          script: |
-            set -e
-
-            case "$DEPLOY_SWARM_PATH" in
-              /|*'/../'*|*'/..'|'')
-                echo "SWARM_PATH must be a safe absolute path other than /." >&2
-                exit 1
-                ;;
-              /*) ;;
-              *)
-                echo "SWARM_PATH must be a safe absolute path other than /." >&2
-                exit 1
-                ;;
-            esac
-
-            cd "$DEPLOY_SWARM_PATH"
-
-            rm -rf init
-            mv release/init init
-
-            rm -rf deploy
-            mv release/deploy deploy
-            cp release/prometheus.yml prometheus.yml
-            rm -rf scripts
-            mv release/scripts scripts
-            rm -rf release
-
-      - name: Encode Swarm environment
+      - name: Update registry aliases after health checks
+        if: steps.source.outputs.should_deploy == 'true' && inputs.operation != 'plan'
         shell: bash
-        env:
-          SWARM_ENV_CONTENT: ${{ secrets.SWARM_ENV }}
         run: |
           set -euo pipefail
+          args=(--report deployment-report.json)
+          if [ "$OPERATION" = rollback ]; then args+=(--rollback); fi
+          python3 -u scripts/ci/release.py promote "${args[@]}"
 
-          SWARM_ENV_BASE64="$(printf '%s' "$SWARM_ENV_CONTENT" | base64 --wrap=0)"
-          echo "::add-mask::$SWARM_ENV_BASE64"
-          printf 'SWARM_ENV_BASE64=%s\n' "$SWARM_ENV_BASE64" >> "$GITHUB_ENV"
+      - name: Resolve deployment marker
+        if: steps.source.outputs.should_deploy == 'true' && inputs.operation != 'plan'
+        id: marker
+        run: python3 scripts/ci/release.py marker --report deployment-report.json --outputs "$GITHUB_OUTPUT"
 
-      - name: Deploy stack
-        uses: appleboy/ssh-action@v1.2.5
+      - name: Record successful deployment
+        if: steps.source.outputs.should_deploy == 'true' && inputs.operation != 'plan'
         env:
-          SWARM_ENV_BASE64: ${{ env.SWARM_ENV_BASE64 }}
-          DEPLOY_SWARM_PATH: ${{ env.SWARM_PATH }}
-          DEPLOY_REGISTRY_HOST: ${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_HOST || secrets.ARTIFACT_REGISTRY_HOST }}
-          DEPLOY_REGISTRY_USERNAME: ${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_USERNAME || secrets.ARTIFACT_REGISTRY_USERNAME }}
-          DEPLOY_REGISTRY_PASSWORD: ${{ inputs.registry_kind == 'backup' && secrets.BACKUP_ARTIFACT_REGISTRY_PASSWORD || secrets.ARTIFACT_REGISTRY_PASSWORD }}
+          EXPECTED_SHA: ${{ steps.source.outputs.previous_sha }}
+          MARKER_SHA: ${{ steps.marker.outputs.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git push "--force-with-lease=refs/tags/deployed/production:${EXPECTED_SHA}" \
+            origin "${MARKER_SHA}:refs/tags/deployed/production"
+
+      - name: Save deployment report
+        if: ${{ always() && hashFiles('deployment-report.json') != '' }}
+        uses: actions/upload-artifact@v4
         with:
-          host: ${{ secrets.SWARM_LEADER_HOST }}
-          username: ${{ secrets.SWARM_SSH_USER }}
-          key: ${{ secrets.SWARM_SSH_KEY }}
-          envs: SWARM_ENV_BASE64,DEPLOY_SWARM_PATH,DEPLOY_REGISTRY_HOST,DEPLOY_REGISTRY_USERNAME,DEPLOY_REGISTRY_PASSWORD
-          script: |
-            set -euo pipefail
+          name: arcane-deployment
+          path: |
+            deployment-report.json
+            deployment.log
+          if-no-files-found: error
+          retention-days: 90
 
-            case "$DEPLOY_SWARM_PATH" in
-              /|*'/../'*|*'/..'|'')
-                echo "SWARM_PATH must be a safe absolute path other than /." >&2
-                exit 1
-                ;;
-              /*) ;;
-              *)
-                echo "SWARM_PATH must be a safe absolute path other than /." >&2
-                exit 1
-                ;;
-            esac
-
-            cd "$DEPLOY_SWARM_PATH"
-
-            if [ -z "${SWARM_ENV_BASE64:-}" ]; then
-              echo "SWARM_ENV is empty."
-              exit 1
-            fi
-
-            printf '%s' "$SWARM_ENV_BASE64" | base64 --decode > .env
-            chmod 600 .env
-
-            set -a
-            . ./.env
-            set +a
-
-            export STACK_NAME='${{ env.STACK_NAME }}'
-            export ARTIFACT_REGISTRY_HOST="$DEPLOY_REGISTRY_HOST"
-            export ARTIFACT_REGISTRY_USERNAME="$DEPLOY_REGISTRY_USERNAME"
-            export ARTIFACT_REGISTRY_PASSWORD="$DEPLOY_REGISTRY_PASSWORD"
-            export ARTIFACT_REGISTRY_FALLBACK_ENABLED=false
-            export IMAGE_TAG='current'
-            export DEPLOY_RUNTIME='${{ inputs.full_deploy && 'false' || 'true' }}'
-            export DEPLOY_SERVICES='${{ inputs.services }}'
-            export DEPLOY_RUN_ID='${{ github.run_id }}-${{ github.run_attempt }}'
-            export CLOUD_RU_SECRET_PROJECT_ID='${{ vars.CLOUD_RU_SECRET_PROJECT_ID }}'
-            export CLOUD_RU_SECRET_PREFIX='${{ vars.CLOUD_RU_SECRET_PREFIX || '/appsettings' }}'
-            export CLOUD_RU_SECRET_DEPTH='${{ vars.CLOUD_RU_SECRET_DEPTH || '-1' }}'
-            export CLOUD_RU_SECRET_NAMES='${{ vars.CLOUD_RU_SECRET_NAMES }}'
-            export CLOUD_RU_SECRET_VERSION='${{ vars.CLOUD_RU_SECRET_VERSION }}'
-            export DOTNET_ENVIRONMENT='${{ env.DEPLOY_ENVIRONMENT }}'
-            export ASPNETCORE_ENVIRONMENT='${{ env.DEPLOY_ENVIRONMENT }}'
-            export CONFIGS_PATH="${CONFIGS_PATH:-${DEPLOY_SWARM_PATH}/configs}"
-            export PUBLIC_NETWORK="${PUBLIC_NETWORK:-public}"
-            export BACKEND_NETWORK="${BACKEND_NETWORK:-backend}"
-            export MONITORING_NETWORK="${MONITORING_NETWORK:-monitoring}"
-            export VOLUME_PREFIX="${VOLUME_PREFIX:-${STACK_NAME}}"
-            export MAIN_API_REPLICAS="${MAIN_API_REPLICAS:-1}"
-            export SEARCH_API_REPLICAS="${SEARCH_API_REPLICAS:-1}"
-            export PRICING_API_REPLICAS="${PRICING_API_REPLICAS:-1}"
-            export ANALYTICS_API_REPLICAS="${ANALYTICS_API_REPLICAS:-1}"
-            export MAIN_WORKER_REPLICAS="${MAIN_WORKER_REPLICAS:-1}"
-            export PRICING_WORKER_REPLICAS="${PRICING_WORKER_REPLICAS:-1}"
-            export ANALYTICS_WORKER_REPLICAS="${ANALYTICS_WORKER_REPLICAS:-1}"
-            export DOCKER_CONFIG="${DEPLOY_SWARM_PATH}/.docker"
-
-            bash scripts/deploy/deploy-swarm.sh
+      - name: Log out of registries
+        if: always()
+        run: python3 scripts/ci/release.py logout

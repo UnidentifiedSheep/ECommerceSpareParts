@@ -1,21 +1,15 @@
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
-using Domain.CommonEntities.Job;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.Base.Synchronization;
 
 public abstract class SynchronizationLrtBase<TInputState, TId, TEvent>(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
-	ILogger logger) : LrtBase<TInputState, SynchronizationState<TId>>(
-	jobRepository, unitOfWork, publisher, transactionService, logger)
+	IApplicationTransactionFactory transactionService,
+	ILogger logger) : LrtBase<TInputState, SynchronizationState<TId>>(transactionService, logger)
 	where TInputState : class, IInputState
 	where TId : struct
 	where TEvent : class
@@ -32,34 +26,28 @@ public abstract class SynchronizationLrtBase<TInputState, TId, TEvent>(
 	{
 		while (true)
 		{
-			var page = await GetPageAsync(
-				State.LastProcessedId,
-				BatchSize,
-				CancellationToken);
-
-			if (page.Ids.Count == 0) break;
-			if (page.Events.Count == 0)
-				throw new InvalidOperationException("A nonempty synchronization page must contain events.");
-
-			await TransactionService.ExecuteAsync(
+			var processed = await ExecuteInTransactionAsync(
 				TransactionalAttribute.ReadCommitted(20, 2),
 				async (context, cancellationToken) =>
 				{
+					var page = await GetPageAsync(State.LastProcessedId, BatchSize, cancellationToken);
+					if (page.Ids.Count == 0) return 0;
+					if (page.Events.Count == 0)
+						throw new InvalidOperationException("A nonempty synchronization page must contain events.");
+
 					foreach (var @event in page.Events)
-						await Publisher.Publish(@event, @event.GetType(), cancellationToken);
+						await context.Publisher.Publish(@event, @event.GetType(), cancellationToken);
 
 					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-				},
-				CancellationToken);
+					await SaveStateAsync(new SynchronizationState<TId>
+					{
+						LastProcessedId = page.Ids[^1],
+						ProcessedCount = State.ProcessedCount + page.Ids.Count
+					});
+					return page.Ids.Count;
+				}, CancellationToken);
 
-			await SaveStateAsync(new SynchronizationState<TId>
-			{
-				LastProcessedId = page.Ids[^1],
-				ProcessedCount = State.ProcessedCount + page.Ids.Count
-			});
-
-			if (page.Ids.Count < BatchSize)
-				break;
+			if (processed < BatchSize) break;
 		}
 	}
 }

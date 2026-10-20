@@ -1,12 +1,9 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Documents;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using S3.Core.Interfaces;
@@ -14,16 +11,9 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.RemoveExpiredDocuments;
 
 public class RemoveExpiredDocumentsLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
-	IReadRepository<DocumentGenerationRequest, Guid> documentRepository,
+	IApplicationTransactionFactory transactionService,
 	IS3Service s3Service,
 	ILogger<RemoveExpiredDocumentsLrt> logger) : LrtBase<NoneInputState, RemoveExpiredDocumentsState>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 {
@@ -44,7 +34,8 @@ public class RemoveExpiredDocumentsLrt(
 		while (true)
 		{
 			var lastProcessedId = State.LastProcessedId;
-			var batch = await documentRepository.Query
+			var batch = await ExecuteInScopeAsync((context, ct) =>
+				context.Repositories.GetForRead<DocumentGenerationRequest, Guid>().Query
 				.Where(request => request.BucketName != null && request.StorageKey != null)
 				.Where(request => request.ExpiresAt <= expiredBefore)
 				.Where(request => lastProcessedId == null || request.RequestId > lastProcessedId)
@@ -54,14 +45,14 @@ public class RemoveExpiredDocumentsLrt(
 					request.BucketName!,
 					request.StorageKey!))
 				.Take(batchSize)
-				.ToListAsync(CancellationToken);
+				.ToListAsync(ct), CancellationToken);
 
 			if (batch.Count == 0) return;
 
 			var (deletedIds, failedCount) = await DeleteFilesAsync(batch);
 
 			if (deletedIds.Count != 0)
-				await TransactionService.ExecuteAsync(
+				await ExecuteInTransactionAsync(
 					TransactionalAttribute.ReadCommitted(30, 3),
 					async (context, ct) =>
 						await context.Repositories.Get<DocumentGenerationRequest, Guid>()

@@ -2,17 +2,14 @@ using System.Globalization;
 using System.Text;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Application.Common.Models.Options.S3;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
-using Domain.CommonEntities.Job;
 using Exceptions.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -20,17 +17,11 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.Base;
 
 public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>(
-	IRepository<Job, Guid> jobRepository,
 	IOptions<S3BucketsOptions> bucketsOptions,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	ILogger logger,
 	IS3Service s3Service,
 	IContextualLocalizer stringLocalizer) : LrtBase<TInputState, TState>(
-	jobRepository,
-	unitOfWork,
-	publisher,
 	transactionService,
 	logger)
 	where TInputState : class, IInputState, ICsvImportInputState

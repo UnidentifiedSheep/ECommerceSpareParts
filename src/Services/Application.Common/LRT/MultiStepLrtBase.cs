@@ -4,20 +4,13 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Common.LRT;
 
 public abstract class MultiStepLrtBase<TInputState, TState>(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	ILogger logger) : LrtBase<TInputState, TState>(
-		jobRepository,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger),
 	IMultiStepLrt where TInputState : class, IInputState where TState : class
@@ -29,7 +22,7 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
 
 	protected override async Task DoWork(TInputState inputState)
 	{
-		var failure = await TransactionService.ExecuteAsync(
+		var failure = await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			(_, _) => ReconcileAsync(),
 			CancellationToken);
@@ -43,6 +36,7 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
 
 	private async Task<string?> ReconcileAsync()
 	{
+		await GetJobAsync();
 		var parentCriteria = Criteria<Job>
 			.New()
 			.Where(x => x.Id == JobId && x is MultiStepJob)

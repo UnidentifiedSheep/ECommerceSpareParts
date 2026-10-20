@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using System.Reflection;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
@@ -6,7 +7,7 @@ using MediatR;
 namespace Application.Common.Behaviors;
 
 public sealed class ApplicationTransactionBehavior<TRequest, TResponse>(
-	IApplicationTransactionService transactionService) : IPipelineBehavior<TRequest, TResponse>
+	IApplicationTransaction transactionService) : IPipelineBehavior<TRequest, TResponse>
 	where TRequest : IRequest<TResponse> where TResponse : notnull
 {
 	private static readonly TransactionalAttribute? Settings =
@@ -20,8 +21,11 @@ public sealed class ApplicationTransactionBehavior<TRequest, TResponse>(
 		RequestHandlerDelegate<TResponse> next,
 		CancellationToken cancellationToken)
 	{
-		return transactionService.ExecuteAsync(
-			Settings,
+        // Unannotated requests let their transactional services own the boundary.
+        if (Settings is null && AutoSave is null)
+            return next(cancellationToken);
+
+		return transactionService.WithSettingsIfIdle(Settings).ExecuteAsync(
 			async (context, ct) =>
 			{
 				var response = await next(ct);

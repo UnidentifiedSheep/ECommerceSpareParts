@@ -4,14 +4,12 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.Producer;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -19,22 +17,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProducerAliasesImport;
 
 public class ProducerAliasImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IRepository<ProducerAlias, string> aliasRepository,
-	IProducerRepository producerRepository,
 	ILogger<ProducerAliasImportLrt> logger,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProducerAliasesImportInputState, ProducerAliasesImportState,
 		ProducerAliasImportLrt.ProducerAliasCsvDto, ProducerAliasImportLrt.ProducerAliasBatchItem>(
-		jobRepository,
 		bucketsOptions,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger,
 		s3Service,
@@ -98,11 +88,11 @@ public class ProducerAliasImportLrt(
 					StringLocalizer.Get(ProducerOtherNameDuplicateInBatchMessage.Instance)));
 		}
 
-		var result = await TransactionService.ExecuteAsync(
+		var result = await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{
-				var existingAliases = (await aliasRepository.ListAsync(
+				var existingAliases = (await context.GetRequiredService<IRepository<ProducerAlias, string>>().ListAsync(
 						Criteria<ProducerAlias>
 							.New()
 							.Where(x => uniqueAliases.Contains(x.Alias))
@@ -112,7 +102,7 @@ public class ProducerAliasImportLrt(
 					.Select(x => x.Alias)
 					.ToHashSet();
 				var producerNames = uniqueItems.Select(x => x.item.OriginalName).Distinct().ToList();
-				var producers = (await producerRepository.ListAsync(
+				var producers = (await context.GetRequiredService<IProducerRepository>().ListAsync(
 					Criteria<Producer>.New().Where(x => producerNames.Contains(x.Name)).Track(false).Build(),
 					cancellationToken)).ToDictionary(x => x.Name);
 

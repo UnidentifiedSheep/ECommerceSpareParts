@@ -4,14 +4,12 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.Producer;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -19,21 +17,14 @@ using S3.Core.Interfaces;
 namespace Main.Application.Lrts.ProducerImport;
 
 public class ProducerImportLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
 	IS3Service s3Service,
-	IProducerRepository producerRepository,
 	ILogger<ProducerImportLrt> logger,
 	IOptions<S3BucketsOptions> bucketsOptions,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
+	IApplicationTransactionFactory transactionService,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProducerImportInputState, ProducerImportState, ProducerImportLrt.ProducerCsvDto,
 		Producer>(
-		jobRepository,
 		bucketsOptions,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger,
 		s3Service,
@@ -93,11 +84,11 @@ public class ProducerImportLrt(
 			errors.Add(CreateError(idx, StringLocalizer.Get(ProducerDuplicateNameInBatchMessage.Instance)));
 		}
 
-		var created = await TransactionService.ExecuteAsync(
+		var created = await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{
-				var existingNames = (await producerRepository.ListAsync(
+				var existingNames = (await context.GetRequiredService<IProducerRepository>().ListAsync(
 						Criteria<Producer>
 							.New()
 							.Where(x => uniqueNames.Contains(x.Name))

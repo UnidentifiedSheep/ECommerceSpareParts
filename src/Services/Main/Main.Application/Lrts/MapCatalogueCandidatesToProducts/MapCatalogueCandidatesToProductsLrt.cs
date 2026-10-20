@@ -2,28 +2,18 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities;
 using Main.Entities.Product.Enrichment;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.MapCatalogueCandidatesToProducts;
 
 public class MapCatalogueCandidatesToProductsLrt(
-	IRepository<Job, Guid> jobRepository,
-	IUnitOfWork unitOfWork,
-	IPublishEndpoint publisher,
-	IApplicationTransactionService transactionService,
-	IRepository<CatalogueCandidate, Guid> catalogueCandidateRepository,
-	IProductRepository productRepository,
+	IApplicationTransactionFactory transactionService,
 	ILogger<MapCatalogueCandidatesToProductsLrt> logger)
 	: LrtBase<NoneInputState, MapCatalogueCandidatesToProductsState>(
-		jobRepository,
-		unitOfWork,
-		publisher,
 		transactionService,
 		logger)
 {
@@ -66,11 +56,11 @@ public class MapCatalogueCandidatesToProductsLrt(
 	{
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
 
-		return TransactionService.ExecuteAsync(
+		return ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
-				var candidates = await catalogueCandidateRepository.ListAsync(
+				var candidates = await context.GetRequiredService<IRepository<CatalogueCandidate, Guid>>().ListAsync(
 					Criteria<CatalogueCandidate>
 						.New()
 						.Where(x => x.ProductId == null)
@@ -89,7 +79,7 @@ public class MapCatalogueCandidatesToProductsLrt(
 						0,
 						false);
 
-				var productIds = await productRepository.GetProductIdsByKeys(
+				var productIds = await context.GetRequiredService<IProductRepository>().GetProductIdsByKeys(
 					candidates.Select(x => (NormalizedSku: x.Sku.NormalizedValue, x.ProducerId)),
 					cancellationToken);
 

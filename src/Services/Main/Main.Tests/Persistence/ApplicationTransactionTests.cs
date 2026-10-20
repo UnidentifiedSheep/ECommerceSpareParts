@@ -4,6 +4,8 @@ using Attributes;
 using Enums;
 using FluentAssertions;
 using Main.Entities.Product;
+using Main.Entities.Producer;
+using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -15,6 +17,38 @@ namespace Tests.Persistence;
 
 public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
+	[Fact]
+	public async Task Factory_EachBatchStartsWithAnEmptyTrackerAndDisposesItsContext()
+	{
+		var factory = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionFactory>();
+		var contexts = new List<DContext>();
+		var initialTracked = Context.ChangeTracker.Entries().Count();
+		for (var batch = 0; batch < 10; batch++)
+		{
+			await using var transaction = factory.Create();
+			await transaction.ExecuteAsync((context, _) =>
+			{
+				context.GetRequiredService<IApplicationTransaction>().Should().BeSameAs(transaction);
+				var db = context.GetRequiredService<DContext>();
+				db.Should().NotBeSameAs(Context);
+				db.ChangeTracker.Entries().Should().BeEmpty();
+				contexts.Add(db);
+				for (var item = 0; item < 100; item++)
+					db.Producers.Add(Producer.Create($"batch-{batch}-{item}"));
+				db.ChangeTracker.Entries().Should().HaveCount(100);
+				return Task.CompletedTask;
+			}, CancellationToken);
+		}
+
+		contexts.Distinct().Should().HaveCount(10);
+		Context.ChangeTracker.Entries().Should().HaveCount(initialTracked);
+		foreach (var db in contexts)
+		{
+			var accessDisposedContext = () => db.Set<Producer>();
+			accessDisposedContext.Should().Throw<ObjectDisposedException>();
+		}
+	}
+
 	[Fact]
 	public void Classifier_ConcreteTypeAndInterfaceResolveToTheSameSingleton()
 	{
@@ -56,12 +90,12 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	[InlineData(true)]
 	public async Task ExhaustedRetries_RethrowTheOriginalErrorAndHandleItOnceAfterRollback(bool returnsResult)
 	{
-		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 		var failure = new PostgresException("retry", "ERROR", "ERROR", PostgresErrorCodes.SerializationFailure);
 		var attempts = 0;
 		var handlers = 0;
 		var transactionIds = new List<Guid>();
-		var transaction = service.Create(TransactionalAttribute.RetryOnConflict(0, 2)).OnException(error =>
+		var transaction = service.WithSettings(TransactionalAttribute.RetryOnConflict(0, 2)).OnException(error =>
 		{
 			Context.Database.CurrentTransaction.Should().BeNull();
 			error.Exception.Should().BeSameAs(failure);
@@ -93,11 +127,11 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	[Fact]
 	public async Task SuccessfulRetry_ReturnsTheValueWithoutCallingTheErrorHandler()
 	{
-		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 		var attempts = 0;
 		var handled = false;
 
-		var value = await service.Create(TransactionalAttribute.RetryOnConflict(0, 2))
+		var value = await service.WithSettings(TransactionalAttribute.RetryOnConflict(0, 2))
 			.OnException(_ => handled = true)
 			.ExecuteAsync((_, _) =>
 			{
@@ -115,11 +149,11 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	[Fact]
 	public async Task NestedFailure_IsHandledByTheOwnerAfterTheDatabaseTransactionIsDisposed()
 	{
-		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 		var innerHandlers = 0;
 		var outerHandlers = 0;
 		var settings = TransactionalAttribute.ReadCommitted(0, 2);
-		var outer = service.Create(settings).OnException(error =>
+		var outer = service.WithSettings(settings).OnException(error =>
 		{
 			Context.Database.CurrentTransaction.Should().BeNull();
 			error.Kind.Should().Be(TransactionErrorKind.Unknown);
@@ -127,7 +161,7 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 		});
 
 		await Assert.ThrowsAsync<PostgresException>(() => outer.ExecuteAsync((_, _) =>
-			service.Create(settings).OnException(_ => innerHandlers++)
+			service.OnException(_ => innerHandlers++)
 				.ExecuteAsync(async (_, ct) =>
 				{
 					await Context.Database.ExecuteSqlRawAsync("SELECT 1 / 0", ct);
@@ -135,7 +169,7 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 				}, CancellationToken), CancellationToken));
 
 		outerHandlers.Should().Be(1);
-		innerHandlers.Should().Be(0);
+		innerHandlers.Should().Be(1);
 		await Context.Database.ExecuteSqlRawAsync("SELECT 1", CancellationToken);
 	}
 
@@ -150,13 +184,13 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	[InlineData(TransactionalAttribute.DefaultRetryErrors, PostgresErrorCodes.UniqueViolation, 1)]
 	public async Task RetryMask_OnlyRetriesMatchingProviderErrors(TransactionErrorKind retryErrors, string sqlState, int expectedAttempts)
 	{
-		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 		var settings = new TransactionalAttribute(retryCount: 2, retryErrors: retryErrors);
 		var failure = new PostgresException("failed", "ERROR", "ERROR", sqlState);
 		var attempts = 0;
 		var handled = 0;
 
-		var exception = await Assert.ThrowsAsync<PostgresException>(() => service.Create(settings)
+		var exception = await Assert.ThrowsAsync<PostgresException>(() => service.WithSettings(settings)
 			.OnException(_ =>
 			{
 				Context.Database.CurrentTransaction.Should().BeNull();
@@ -179,12 +213,12 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	[InlineData(TransactionErrorKind.None, 1)]
 	public async Task RetryMask_ControlsEfConcurrencyRetries(TransactionErrorKind retryErrors, int expectedAttempts)
 	{
-		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 		var settings = new TransactionalAttribute(retryCount: 2, retryErrors: retryErrors);
 		var failure = new DbUpdateConcurrencyException("conflict");
 		var attempts = 0;
 
-		var exception = await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => service.Create(settings)
+		var exception = await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => service.WithSettings(settings)
 			.ExecuteAsync<int>((_, _) =>
 			{
 				attempts++;
@@ -199,10 +233,10 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	[Fact]
 	public async Task Cancellation_RollsBackDatabaseWritesWithoutInvokingTheErrorHandler()
 	{
-		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 		using var cancellation = new CancellationTokenSource();
 		var handled = false;
-		var transaction = service.Create(TransactionalAttribute.ReadCommitted(0, 2)).OnException(_ => handled = true);
+		var transaction = service.WithSettings(TransactionalAttribute.ReadCommitted(0, 2)).OnException(_ => handled = true);
 
 		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => transaction.ExecuteAsync(async (_, ct) =>
 		{

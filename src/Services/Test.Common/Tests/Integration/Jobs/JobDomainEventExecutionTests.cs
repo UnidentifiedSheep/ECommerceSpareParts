@@ -49,11 +49,8 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 
 		var repository = Scope.ServiceProvider.GetRequiredService<IRepository<Job, Guid>>();
 		var unitOfWork = Scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-		var executor = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionService>();
+		var executor = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionFactory>();
 		var lrt = new SucceedingTestLrt(
-			repository,
-			unitOfWork,
-			new MessageBrokerStub(),
 			executor,
 			Mock.Of<ILogger>());
 
@@ -139,15 +136,7 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 			.Status.Should().Be(JobStatus.CancellationRequested);
 	}
 
-	private sealed class SucceedingTestLrt(
-		IRepository<Job, Guid> jobRepository,
-		IUnitOfWork unitOfWork,
-		IPublishEndpoint publisher,
-		IApplicationTransactionService transactionService,
-		ILogger logger) : LrtBase<NoneInputState, NoneInputState>(
-		jobRepository,
-		unitOfWork,
-		publisher,
+	private sealed class SucceedingTestLrt(IApplicationTransactionFactory transactionService, ILogger logger) : LrtBase<NoneInputState, NoneInputState>(
 		transactionService,
 		logger)
 	{
