@@ -98,6 +98,7 @@ jobs:
           path: |
             deployment-report.json
             deployment.log
+            deployment-diagnostics/
           if-no-files-found: error
           retention-days: 90
 

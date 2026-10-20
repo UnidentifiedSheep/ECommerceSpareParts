@@ -43,6 +43,19 @@ def fingerprint(spec):
     return hashlib.sha256(json.dumps(spec, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def redact(value):
+    for name in ("ARCANE_API_KEY", "GH_TOKEN", "GITHUB_TOKEN"):
+        secret = os.getenv(name, "")
+        if secret:
+            value = value.replace(secret, "[REDACTED]")
+    value = re.sub(r"(?i)([a-z][a-z0-9+.-]*://)[^\s/@:]+:[^\s/@]+@", r"\1[REDACTED]@", value)
+    value = re.sub(r"(?i)(\b(?:Bearer|Basic)\s+)[a-zA-Z0-9._~+/-]+=*", r"\1[REDACTED]", value)
+    return re.sub(
+        r'''(?ix)(["']?(?:password|pwd|secret|client_secret|access_token|api_key|authorization|IssuerSigningKey|InternalToken)["']?\s*[:=]\s*)
+        ("[^"\n]*"|'[^'\n]*'|[^;\s,}]+)''',
+        r"\1[REDACTED]", value)
+
+
 class APIError(ReleaseError):
     def __init__(self, method, path, status):
         super().__init__(f"Arcane {method} {path.split('?')[0]} failed (HTTP {status})")
@@ -93,6 +106,22 @@ class Arcane:
 
     def get(self, path, **kwargs):
         return self.request("GET", path, **kwargs)["data"]
+
+    def download_logs(self, container_id, *, environment):
+        path = f"containers/{quote(container_id, safe='')}/logs/download"
+        url = f"{self.url}/api/environments/{quote(environment, safe='')}/{path}"
+        maximum = 4 * 1024 * 1024
+        try:
+            request = Request(url, headers={"X-Api-Key": self.key, "Accept": "text/plain"})
+            with self.opener.open(request, timeout=20) as response:
+                data = response.read(maximum + 1)
+            return data[:maximum].decode("utf-8", errors="replace"), len(data) > maximum
+        except HTTPError as error:
+            status = error.code
+            error.close()
+            raise APIError("GET", path, status) from None
+        except (OSError, URLError) as error:
+            raise ReleaseError(f"Arcane log download failed ({type(error).__name__})") from None
 
     def listing(self, path, **kwargs):
         rows, seen = [], set()
@@ -423,11 +452,57 @@ class Deployment:
                     raise
         self.active_migrator, self.migrator_stack = None, None
 
+    def migration_diagnostics(self, row, record, task, error):
+        """Capture diagnostics while the failed task still exists, before cleanup."""
+        try:
+            if task is None and self.active_migrator:
+                tasks = self.tasks(self.active_migrator)
+                task = tasks[-1] if tasks else None
+            details = [f"{row['service']}: {error if isinstance(error, ReleaseError) else type(error).__name__}"]
+            if record is not None:
+                record["status"] = "failed"
+            if task:
+                details.append(f"Task: {task['id']}; state: {task.get('currentState', 'unknown')}; node: {task.get('nodeId', 'unassigned')}")
+                if task.get("error"):
+                    details.append("Task error: " + task["error"])
+                if record is not None:
+                    record.update(task_id=task["id"], node_id=task.get("nodeId"), container_id=task.get("containerId"),
+                                  task_state=task.get("currentState"), task_error=redact(task.get("error", "")))
+                if task.get("containerId"):
+                    try:
+                        text, truncated = self.api.download_logs(task["containerId"], environment=self.node_environment(task["nodeId"]))
+                        details.extend(["", "Container logs:", text])
+                        if truncated:
+                            details.append("[Log download truncated at 4 MiB]")
+                    except Exception as log_error:
+                        details.append(f"Container logs unavailable: {log_error if isinstance(log_error, ReleaseError) else type(log_error).__name__}")
+                else:
+                    details.append("No container was created; use the task error above.")
+            else:
+                details.append("No migration task was available.")
+            text = redact("\n".join(details))
+            directory = Path(self.report_file).parent / "deployment-diagnostics"
+            directory.mkdir(parents=True, exist_ok=True)
+            filename = directory / f"{row['service']}.log"
+            fd = os.open(filename, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+            with os.fdopen(fd, "w") as stream:
+                stream.write(text + "\n")
+            if record is not None:
+                record["log_file"] = str(filename)
+            self.checkpoint()
+            log(f"Migration diagnostics saved to {filename}. Last log lines:")
+            for line in text[-24_000:].splitlines()[-100:]:
+                # Prevent application output from being interpreted as Actions workflow commands.
+                print("[migrator] " + line, flush=True)
+        except Exception as diagnostic_error:
+            log(f"Could not collect migration diagnostics ({type(diagnostic_error).__name__}).")
+
     def migrate(self, row):
         payload = self.migrator_payload(row)
         name = payload["name"] + "_run"
         require(not any(s["name"] == name for s in self.api.listing("swarm/services")), "This deployment already has a migrator; inspect it before retrying")
         self.migrator_stack = payload
+        record, task = None, None
         log(f"Starting {row['service']} through Arcane (one replica, {self.memory // 1024 // 1024} MiB, one CPU).")
         try:
             try:
@@ -454,7 +529,8 @@ class Deployment:
                 if tasks:
                     task = tasks[0]
                     record["task_id"] = task["id"]
-                    require(task["currentState"] not in ("failed", "rejected", "orphaned", "shutdown"), f"{row['service']} failed; inspect its task logs in Arcane")
+                    require(task["currentState"] not in ("failed", "rejected", "orphaned", "shutdown"),
+                            f"{row['service']} failed; see migration diagnostics in this CD run")
                     if task["currentState"] == "complete":
                         state = self.container(task)["state"]
                         require(not state.get("running") and state.get("exitCode", 0) == 0, "Migrator exited unsuccessfully")
@@ -463,6 +539,9 @@ class Deployment:
                         log(f"{row['service']} completed successfully.")
                         return
                 time.sleep(3)
+        except BaseException as error:
+            self.migration_diagnostics(row, record, task, error)
+            raise
         finally:
             self.clean_migrator()
 
