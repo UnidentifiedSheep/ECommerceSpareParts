@@ -29,20 +29,7 @@ using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
-
-builder
-	.Configuration
-	.AddAppSettingsFromJsons(env)
-	.AddAppSettingsFromJsons(env, "/app/configs")
-	.AddConfigsFromJsons(
-		"gateway",
-		null,
-		"/app/configs")
-	.AddConfigsFromJsons(
-		"gateway",
-		env,
-		"/app/configs");
+var env = builder.AddServiceConfiguration("gateway");
 
 builder.Services.AddRedisOptions().AddMessageBrokerOptions();
 builder.Services.AddRedisHealthCheck();

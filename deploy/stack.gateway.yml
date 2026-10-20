@@ -83,60 +83,6 @@ services:
         condition: any
         delay: 5s
 
-  arcane:
-    image: ghcr.io/getarcaneapp/manager:v2.16.1
-    environment:
-      APP_URL: https://${ARCANE_HOST:?ARCANE_HOST is required}
-      PORT: "3552"
-      ENCRYPTION_KEY_FILE: /run/secrets/arcane_encryption_key
-      ADMIN_STATIC_API_KEY_FILE: /run/secrets/arcane_admin_api_key
-      TRUSTED_PROXIES: ${ARCANE_TRUSTED_PROXIES:?ARCANE_TRUSTED_PROXIES is required}
-    healthcheck:
-      test: ["CMD", "/app/arcane", "health", "--timeout", "2s"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 40s
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - arcane_data:/app/data
-    secrets:
-      - source: arcane_encryption_key
-        target: arcane_encryption_key
-        uid: "65532"
-        gid: "65532"
-        mode: 0400
-      - source: arcane_admin_api_key
-        target: arcane_admin_api_key
-        uid: "65532"
-        gid: "65532"
-        mode: 0400
-    networks:
-      - public
-      - arcane-agent
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-          - node.labels.management.arcane == true
-      labels:
-        # First installation stays private until bootstrap changes the default password.
-        - traefik.enable=${ARCANE_PUBLIC_ENABLED:-false}
-        - traefik.swarm.network=${PUBLIC_NETWORK:-public}
-        - traefik.http.routers.arcane.rule=Host(`${ARCANE_HOST}`)
-        - traefik.http.routers.arcane.entrypoints=websecure
-        - traefik.http.routers.arcane.tls.certresolver=letsencrypt
-        - traefik.http.routers.arcane.priority=100
-        - traefik.http.services.arcane.loadbalancer.server.port=3552
-        - traefik.http.services.arcane.loadbalancer.server.scheme=http
-      update_config:
-        parallelism: 1
-        order: stop-first
-      restart_policy:
-        condition: any
-        delay: 5s
-
 networks:
   public:
     name: ${PUBLIC_NETWORK:-public}
@@ -144,22 +90,8 @@ networks:
   backend:
     name: ${BACKEND_NETWORK:-backend}
     external: true
-  arcane-agent:
-    name: ${ARCANE_AGENT_NETWORK:-arcane_agent_network}
-    external: true
 
 volumes:
   traefik_letsencrypt:
     name: ${VOLUME_PREFIX:-ecommerce}_traefik_letsencrypt
-    external: true
-  arcane_data:
-    name: ${VOLUME_PREFIX:-ecommerce}_arcane_data
-    external: true
-
-secrets:
-  arcane_encryption_key:
-    name: ${ARCANE_ENCRYPTION_SECRET:-arcane_encryption_key}
-    external: true
-  arcane_admin_api_key:
-    name: ${ARCANE_ADMIN_API_KEY_SECRET:-arcane_admin_api_key}
     external: true
