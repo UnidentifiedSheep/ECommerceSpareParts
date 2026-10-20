@@ -6,6 +6,8 @@ namespace Common;
 public static class ConfigurationBuilderExtensions
 {
 	private const string Appsettings = "appsettings";
+	private static readonly string DefaultConfigsPath =
+		Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "configs");
 
 	public static IConfigurationBuilder AddAppSettingsFromJsons(
 		this IConfigurationBuilder configuration,
@@ -26,7 +28,7 @@ public static class ConfigurationBuilderExtensions
 		return configuration.AddConfigsFromJsons(
 			"migrator",
 			contour,
-			path);
+			path ?? Path.Combine(DefaultConfigsPath, "migrator"));
 	}
 
 	public static IConfigurationBuilder AddConfigsFromJsons(
@@ -48,48 +50,22 @@ public static class ConfigurationBuilderExtensions
 		string? contour,
 		string? path = null)
 	{
-		path ??= Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "configs");
+		path ??= DefaultConfigsPath;
 
 		if (!Directory.Exists(path))
 			return configuration;
 
-		var files = Directory
-			.GetFiles(
-				path,
-				"*.json",
-				SearchOption.AllDirectories)
-			.OrderBy(f => f);
+		configuration.AddJsonFile(
+			Path.Combine(path, $"{nameStart}.json"),
+			true,
+			false);
 
-		foreach (var file in files)
-		{
-			var fileName = Path.GetFileName(file);
-			if (!ShouldLoad(
-					fileName,
-					nameStart,
-					contour))
-				continue;
-
+		if (!string.IsNullOrWhiteSpace(contour))
 			configuration.AddJsonFile(
-				file,
+				Path.Combine(path, $"{nameStart}.{contour}.json"),
 				true,
 				false);
-		}
 
 		return configuration;
-	}
-
-	private static bool ShouldLoad(
-		string fileName,
-		string nameStart,
-		string? contour)
-	{
-		var additionalName = string.IsNullOrWhiteSpace(contour) ? null : $".{contour}";
-		return string.Equals(
-			fileName,
-			$"{nameStart}.json",
-			StringComparison.OrdinalIgnoreCase) || string.Equals(
-			fileName,
-			$"{nameStart}{additionalName}.json",
-			StringComparison.OrdinalIgnoreCase);
 	}
 }
