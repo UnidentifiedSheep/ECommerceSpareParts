@@ -117,20 +117,7 @@ builder
 		});
 	});
 
-builder.Services.AddCors(options =>
-{
-	options.AddDefaultPolicy(policy =>
-	{
-		var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
-
-		policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-
-		if (allowedOrigins.Length > 0)
-			policy.WithOrigins(allowedOrigins);
-		else
-			policy.SetIsOriginAllowed(_ => true);
-	});
-}).ConfigureHttpJsonOptions(options =>
+builder.Services.AddConfiguredCors().ConfigureHttpJsonOptions(options =>
 {
 	ProjectJsonOptions.Configure(options.SerializerOptions);
 });

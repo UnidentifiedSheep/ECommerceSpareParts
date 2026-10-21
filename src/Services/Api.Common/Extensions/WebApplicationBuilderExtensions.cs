@@ -60,13 +60,7 @@ public static class WebApplicationBuilderExtensions
 		services.AddHttpContextAccessor();
 		services.AddBaseExceptionHandlers();
 		services.AddHealthChecks();
-		services.AddCors(options =>
-		{
-			options.AddDefaultPolicy(policy =>
-			{
-				policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-			});
-		});
+		services.AddConfiguredCors();
 		services.AddOpenTelemetry(
 			serviceDefinition,
 			"api",
