@@ -80,6 +80,8 @@
     "lrt.expired.documents.removal.name": "Expired document removal",
     "lrt.expired.documents.removal.description": "Removes documents whose retention period has expired.",
     "lrt.service.task.run.name": "Service task dispatch",
-    "lrt.service.task.run.description": "Runs a task in the selected service."
+    "lrt.service.task.run.description": "Runs a task in the selected service.",
+    "lrt.user.tokens.clear.expired.name": "Clear expired tokens",
+    "lrt.user.tokens.clear.expired.description": "Deletes user tokens that have expired."
   }
 }

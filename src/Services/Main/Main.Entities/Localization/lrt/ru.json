@@ -80,6 +80,8 @@
     "lrt.expired.documents.removal.name": "Удаление просроченных документов",
     "lrt.expired.documents.removal.description": "Удаляет документы с истёкшим сроком хранения.",
     "lrt.service.task.run.name": "Запуск задачи сервиса",
-    "lrt.service.task.run.description": "Запускает задачу в выбранном сервисе."
+    "lrt.service.task.run.description": "Запускает задачу в выбранном сервисе.",
+    "lrt.user.tokens.clear.expired.name": "Очистка просроченных токенов",
+    "lrt.user.tokens.clear.expired.description": "Удаляет токены пользователей с истёкшим сроком действия."
   }
 }

@@ -34,6 +34,12 @@ public class ScheduledLrtSeed : ISeed<DContext>
 				"0 4 * * *",
 				new NoneInputState()),
 			DefaultSchedule.Create(
+				"Remove expired user tokens",
+				"Removes expired user tokens once a week.",
+				ClearExpiredTokensLrt.Name,
+				"0 3 * * 0",
+				new NoneInputState()),
+			DefaultSchedule.Create(
 				"Remove deleted search products",
 				"Removes deleted product documents from the search index once a day.",
 				RunServiceTaskLrt.Name,
