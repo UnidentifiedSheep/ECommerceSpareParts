@@ -1,3 +1,4 @@
+using System.Net;
 using FluentAssertions;
 using Main.Entities.DomainEvents.User;
 
@@ -9,7 +10,7 @@ public class UserLoginTests
 	public void Login_UpdatesLastLoginAndAddsEventWithRequestContext()
 	{
 		var user = Main.Entities.User.User.Create("test-user", "password-hash");
-		const string ipAddress = "192.0.2.15";
+		var ipAddress = new IPAddress([192,0,2,15]);
 		const string userAgent = "Mozilla/5.0 Chrome/138.0.0.0 Windows";
 		var before = DateTime.UtcNow;
 

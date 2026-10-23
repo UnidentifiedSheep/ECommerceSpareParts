@@ -9,7 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts;
 
-public class ClearExpiredTokensLrt(IApplicationTransactionFactory transactionService, ILogger logger)
+public class ClearExpiredTokensLrt(
+	IApplicationTransactionFactory transactionService,
+	ILogger<ClearExpiredTokensLrt> logger)
 	: LrtBase<NoneInputState, NoneInputState>(transactionService, logger)
 {
 	public static string Name => nameof(ClearExpiredTokensLrt);

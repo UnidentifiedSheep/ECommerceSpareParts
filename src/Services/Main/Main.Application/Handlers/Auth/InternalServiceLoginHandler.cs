@@ -50,7 +50,6 @@ public class InternalServiceLoginHandler(
 		var userDto = userProjection.ProjectionFunc(user);
 		var token = tokenGenerator.CreateToken(
 			userDto,
-			request.Service,
 			roles,
 			permissions,
 			AdditionalValidDuration);

@@ -26,6 +26,8 @@ public class UserToken : AuditableEntity<UserToken, Guid>, ILinqEntity<UserToken
 	public bool IsActive => ExpiresAt < DateTime.UtcNow && !Revoked;
 	public User.User User { get; private set; } = null!;
 
+	private UserToken() {}
+
 	private UserToken(
 		Guid userId,
 		string token,

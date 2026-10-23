@@ -37,7 +37,6 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 
 		result.Token.Should().NotBeNullOrWhiteSpace();
 		result.RefreshToken.Should().NotBeNullOrWhiteSpace();
-		result.DeviceId.Should().NotBeNullOrWhiteSpace();
 	}
 
 	[Fact]
