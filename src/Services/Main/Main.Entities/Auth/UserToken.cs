@@ -23,7 +23,7 @@ public class UserToken : AuditableEntity<UserToken, Guid>, ILinqEntity<UserToken
 	public string? RevokeReason { get; private set; }
 	public uint RowVersion { get; private set; }
 
-	public bool IsActive => ExpiresAt < DateTime.UtcNow && !Revoked;
+	public bool IsActive => ExpiresAt > DateTime.UtcNow && !Revoked;
 	public User.User User { get; private set; } = null!;
 
 	private UserToken() {}

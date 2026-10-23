@@ -96,7 +96,10 @@ namespace Main.Migrator.Migrations
                 schema: "auth",
                 table: "user_tokens",
                 type: "text[]",
-                nullable: false);
+                nullable: false,
+                defaultValue: new List<string>());
+
+            migrationBuilder.Sql("ALTER TABLE auth.user_tokens ALTER COLUMN permissions DROP DEFAULT;");
 
             migrationBuilder.AddColumn<string>(
                 name: "user_agent",

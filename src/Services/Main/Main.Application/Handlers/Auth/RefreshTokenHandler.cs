@@ -29,15 +29,19 @@ public class RefreshTokenHandler(
 		RefreshTokenCommand request,
 		CancellationToken cancellationToken)
 	{
+		if (string.IsNullOrWhiteSpace(request.RefreshToken))
+			throw new InvalidTokenException(request.RefreshToken);
+
+		var tokenHash = valueHasher.Hash(request.RefreshToken);
 		var userToken = await repository.FirstOrDefaultAsync(
 				Criteria<UserToken>.New()
-					.Where(x => x.TokenHash == valueHasher.Hash(request.RefreshToken))
+					.Where(x => x.TokenHash == tokenHash)
 					.Track()
 					.Build(),
 				cancellationToken) ??
 			throw new InvalidTokenException(request.RefreshToken);
 
-		if (userToken.IsActive)
+		if (!userToken.IsActive || userToken.Type != TokenType.RefreshToken)
 			throw new InvalidTokenException(request.RefreshToken);
 
 		var user = await userCache.TryGetUserAsync(userToken.UserId, cancellationToken) ??
