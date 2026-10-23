@@ -7,7 +7,6 @@ public interface IJwtGenerator
 {
 	string CreateToken(
 		UserDto user,
-		string deviceId,
 		IEnumerable<string> roles,
 		IEnumerable<string> permissions,
 		TimeSpan? additionalValidDuration = null);

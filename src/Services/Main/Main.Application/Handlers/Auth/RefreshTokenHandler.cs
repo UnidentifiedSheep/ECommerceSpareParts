@@ -13,17 +13,15 @@ using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Auth;
 
-[Transactional]
+[Transactional(retryDelayMs: 10, retryCount: 2)]
 [AutoSave]
-public record RefreshTokenCommand(string RefreshToken, string DeviceId) : ICommand<RefreshTokenResult>;
+public record RefreshTokenCommand(string RefreshToken) : ICommand<RefreshTokenResult>;
 
 public record RefreshTokenResult(string Token, string RefreshToken);
 
 public class RefreshTokenHandler(
 	IRepository<UserToken, Guid> repository,
-	IUnitOfWork unitOfWork,
 	IJwtGenerator tokenGenerator,
-	IUserTokenService userTokenService,
 	IValueHasher valueHasher,
 	IUserCacheRepository userCache) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
 {
@@ -31,12 +29,15 @@ public class RefreshTokenHandler(
 		RefreshTokenCommand request,
 		CancellationToken cancellationToken)
 	{
-		var hashOfToken = valueHasher.Hash(request.RefreshToken);
-		var criteria = Criteria<UserToken>.New().Where(x => x.TokenHash == hashOfToken).Build();
-
-		var userToken = await repository.FirstOrDefaultAsync(criteria, cancellationToken) ??
+		var userToken = await repository.FirstOrDefaultAsync(
+				Criteria<UserToken>.New()
+					.Where(x => x.TokenHash == valueHasher.Hash(request.RefreshToken))
+					.Track()
+					.Build(),
+				cancellationToken) ??
 			throw new InvalidTokenException(request.RefreshToken);
-		if (userToken.ExpiresAt < DateTime.UtcNow || userToken.DeviceId != request.DeviceId)
+
+		if (userToken.IsActive)
 			throw new InvalidTokenException(request.RefreshToken);
 
 		var user = await userCache.TryGetUserAsync(userToken.UserId, cancellationToken) ??
@@ -49,25 +50,14 @@ public class RefreshTokenHandler(
 			await userCache.GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken) ??
 			throw new UserNotFoundException(userToken.UserId);
 
+		var refreshToken = tokenGenerator.CreateRefreshToken();
+		userToken.RotateToken(valueHasher.Hash(refreshToken));
+
 		var token = tokenGenerator.CreateToken(
 			user,
-			request.DeviceId,
 			roles,
 			permissions);
-		var refreshToken = tokenGenerator.CreateRefreshToken();
 
-		await userTokenService.AddToken(
-			refreshToken,
-			user.Id,
-			TokenType.RefreshToken,
-			DateTime.UtcNow.AddMonths(1),
-			userToken.IpAddress,
-			userToken.UserAgent,
-			request.DeviceId,
-			[],
-			cancellationToken);
-
-		unitOfWork.Remove(userToken);
 		return new RefreshTokenResult(token, refreshToken);
 	}
 }

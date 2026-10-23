@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Net;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
@@ -237,7 +238,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 			new InvalidOperationException("Password hash must not be null or empty."));
 	}
 
-	public void Login(string? ipAddress, string? userAgent)
+	public void Login(IPAddress? ipAddress, string? userAgent)
 	{
 		LastLoginAt = DateTime.UtcNow;
 		AddDomainEvent(
