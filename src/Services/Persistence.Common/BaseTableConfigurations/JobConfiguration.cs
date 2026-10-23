@@ -1,4 +1,4 @@
-﻿using Domain.CommonEntities.Job;
+using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -34,6 +34,12 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 
 		builder.Property(e => e.State).HasColumnName("state");
 
+		builder.Property(e => e.InputInitialized).HasColumnName("input_initialized").HasDefaultValue(false);
+
+		builder.Property(e => e.Output).HasColumnName("output");
+
+		builder.Property(e => e.StepKey).HasColumnName("step_key").HasMaxLength(128);
+
 		builder.Property(e => e.MultiStepJobId).HasColumnName("multi_step_job_id");
 
 		builder.HasIndex(e => e.SystemName, "jobs_system_name_idx");
@@ -45,6 +51,8 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 			"jobs_status_id_idx");
 		builder.HasIndex(e => e.LockedAt, "jobs_locked_at_idx");
 		builder.HasIndex(e => e.MultiStepJobId, "jobs_multi_step_job_id_idx");
+		builder.HasIndex(e => new { e.MultiStepJobId, e.StepKey }, "jobs_multi_step_job_id_step_key_uq")
+			.IsUnique().HasFilter("step_key IS NOT NULL");
 		builder
 			.HasIndex(
 				e => new

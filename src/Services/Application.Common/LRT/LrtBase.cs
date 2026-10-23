@@ -61,6 +61,8 @@ public abstract class LrtBase<TInputState, TState>(
 
 	public Type StateType => typeof(TState);
 
+	public virtual Type? OutputType => null;
+
 	public async Task ExecuteAsync(
 		Guid jobId,
 		Guid leaseHolderId,
@@ -127,7 +129,8 @@ public abstract class LrtBase<TInputState, TState>(
 			{
 				if (await AttemptOrFailJobAsync(e))
 				{
-					await ReloadStateAsync();
+					if (Initialized)
+						await ReloadStateAsync();
 					logger.LogWarning(
 						e,
 						"LRT execution attempt failed. JobId: {JobId}, Attempts: {Attempts}/{MaxAttempts}",
@@ -147,7 +150,24 @@ public abstract class LrtBase<TInputState, TState>(
 			}
 	}
 
-	protected virtual Task InitJobAsync() => ReloadStateAsync();
+	protected virtual async Task InitJobAsync()
+	{
+		await GetJobAsync();
+		if (!Job.InputInitialized)
+		{
+			await ExecuteInTransactionAsync(
+				TransactionalAttribute.ReadCommitted(30, 3),
+				async (context, ct) =>
+			{
+				_job = await context.GetRequiredService<IJobStepInputInitializer>()
+					.InitializeAsync(Job, LeaseHolderId, context, ct);
+				await context.UnitOfWork.SaveChangesAsync(ct);
+			}, CancellationToken);
+
+			Job.EnsureActiveLease(LeaseHolderId);
+		}
+		await ReloadStateAsync();
+	}
 
 	protected void Interrupt(string reason) => throw new LrtInterruptedException(reason);
 
@@ -302,12 +322,13 @@ public abstract class LrtBase<TInputState, TState>(
 
 	protected virtual async Task SucceedJobAsync()
 	{
+		var output = await SerializeOutputAsync();
 		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
 				await GetJobAsync();
-				Job.Succeed(LeaseHolderId);
+				Job.Succeed(LeaseHolderId, output);
 				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
 			},
 			CancellationToken);
@@ -340,4 +361,6 @@ public abstract class LrtBase<TInputState, TState>(
 	}
 
 	protected abstract Task DoWork(TInputState inputState);
+
+	protected virtual Task<string?> SerializeOutputAsync() => Task.FromResult<string?>(null);
 }

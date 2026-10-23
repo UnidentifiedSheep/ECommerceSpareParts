@@ -16,9 +16,8 @@ public abstract class MultiStepLrtBase<TInputState, TState>(
 	IMultiStepLrt where TInputState : class, IInputState where TState : class
 {
 
-	void IMultiStepLrt.ConfigureSteps(IMultiStepJobBuilder builder, string initialState) =>
-		ConfigureSteps(builder, initialState);
-	protected internal abstract void ConfigureSteps(IMultiStepJobBuilder builder, string initialState);
+	void IMultiStepLrt.ConfigureSteps(IMultiStepJobBuilder builder) => ConfigureSteps(builder);
+	protected internal abstract void ConfigureSteps(IMultiStepJobBuilder builder);
 
 	protected override async Task DoWork(TInputState inputState)
 	{

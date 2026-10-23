@@ -8,7 +8,7 @@ public sealed class SingleRunJob : Job
 
 	private SingleRunJob(
 		string systemName,
-		string initialState,
+		string? initialState,
 		int maxAttempts) : base(
 		systemName,
 		initialState,
@@ -38,6 +38,9 @@ public sealed class SingleRunJob : Job
 			initialState,
 			maxAttempts);
 	}
+
+	public static SingleRunJob CreateDeferred(string systemName, int maxAttempts = 3) =>
+		new(systemName, null, maxAttempts);
 
 	public static SingleRunJob CreateUnique(
 		string naturalKey,

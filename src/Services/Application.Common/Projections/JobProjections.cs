@@ -22,6 +22,8 @@ public sealed class JobDtoProjectionProvider : ProjectionProviderBase<Job, JobDt
 		Id = job.Id,
 		IsStep = job.MultiStepJobId != null,
 		MultiStepJobId = job.MultiStepJobId,
+		StepKey = job.StepKey,
+		InputInitialized = job.InputInitialized,
 		LockedAt = job.LockedAt,
 		Status = job.Status,
 		UpdatedAt = job.UpdatedAt

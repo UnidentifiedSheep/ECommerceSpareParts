@@ -21,10 +21,12 @@ public sealed class MapGroupToProductLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtMapGroupToProductDescriptionMessage.Instance;
 
-	protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState)
+	protected override void ConfigureSteps(IMultiStepJobBuilder builder)
 	{
-		var mapping = builder.AddStep(nameof(MapGroupToProductLrtStep), initialState);
-		var synchronization = builder.AddStep(nameof(ProductSynchronizationLrt), NoneInputState.Json);
+		var mapping = builder.AddStep(
+			nameof(MapGroupToProductLrtStep),
+			context => context.GetParentInput<MapGroupToProductInputState>());
+		var synchronization = builder.AddStep(nameof(ProductSynchronizationLrt), new ProductSynchronizationInputState());
 		builder.AddDependency(synchronization, mapping);
 	}
 }
