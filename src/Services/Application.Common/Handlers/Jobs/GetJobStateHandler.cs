@@ -8,7 +8,7 @@ namespace Application.Common.Handlers.Jobs;
 
 public record GetJobStateQuery(Guid JobId) : IQuery<GetJobStateResult>;
 
-public record GetJobStateResult(string State);
+public record GetJobStateResult(string State, bool InputInitialized, string? Output);
 
 public class GetJobStateHandler(IReadRepository<Job, Guid> repository)
 	: IQueryHandler<GetJobStateQuery, GetJobStateResult>
@@ -18,9 +18,9 @@ public class GetJobStateHandler(IReadRepository<Job, Guid> repository)
 		var result = await repository
 			.Query
 			.Where(x => x.Id == request.JobId)
-			.Select(x => x.State)
+			.Select(x => new GetJobStateResult(x.State, x.InputInitialized, x.Output))
 			.FirstOrDefaultAsync(cancellationToken) ?? throw new JobNotFoundException(request.JobId);
 
-		return new GetJobStateResult(result);
+		return result;
 	}
 }

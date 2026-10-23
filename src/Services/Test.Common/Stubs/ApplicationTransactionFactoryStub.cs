@@ -8,15 +8,17 @@ namespace Tests.Stubs;
 public sealed class ApplicationTransactionFactoryStub(
 	IUnitOfWork unitOfWork,
 	IRepositoryProvider repositories,
-	IIntegrationEventScope integrationEventScope) : IApplicationTransactionFactory
+	IIntegrationEventScope integrationEventScope,
+	IServiceProvider? services = null) : IApplicationTransactionFactory
 {
 	public IApplicationTransaction Create() => new ApplicationTransactionStub(
-		new TestApplicationTransactionContext(unitOfWork, repositories, integrationEventScope));
+		new TestApplicationTransactionContext(unitOfWork, repositories, integrationEventScope, services));
 
 	private sealed class TestApplicationTransactionContext(
 		IUnitOfWork unitOfWork,
 		IRepositoryProvider repositories,
-		IIntegrationEventScope integrationEventScope) : IApplicationTransactionContext
+		IIntegrationEventScope integrationEventScope,
+		IServiceProvider? services) : IApplicationTransactionContext
 	{
 		public IUnitOfWork UnitOfWork => unitOfWork;
 		public IRepositoryProvider Repositories => repositories;
@@ -33,7 +35,8 @@ public sealed class ApplicationTransactionFactoryStub(
 			var type when type == typeof(IPublishEndpoint) => (T)(object)Publisher,
 			var type when type == typeof(IDomainEventExecutor) => (T)(object)DomainEventExecutor,
 			var type when type == typeof(ITransactionExceptionClassifier) => (T)(object)ExceptionClassifier,
-			_ => throw new InvalidOperationException($"Test service {typeof(T)} is not registered.")
+			_ => services?.GetService(typeof(T)) is T service ? service :
+				throw new InvalidOperationException($"Test service {typeof(T)} is not registered.")
 		};
 
 		public void Dispose() { }

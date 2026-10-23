@@ -80,6 +80,8 @@
     "lrt.expired.documents.removal.name": "Süresi dolmuş belgeleri kaldırma",
     "lrt.expired.documents.removal.description": "Saklama süresi dolan belgeleri siler.",
     "lrt.service.task.run.name": "Servis görevi başlatma",
-    "lrt.service.task.run.description": "Seçilen serviste bir görev çalıştırır."
+    "lrt.service.task.run.description": "Seçilen serviste bir görev çalıştırır.",
+    "lrt.user.tokens.clear.expired.name": "Süresi dolmuş tokenları temizleme",
+    "lrt.user.tokens.clear.expired.description": "Geçerlilik süresi dolmuş kullanıcı tokenlarını siler."
   }
 }

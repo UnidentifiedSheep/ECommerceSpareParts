@@ -1,5 +1,6 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.Models.Lrt;
 using Domain.CommonEntities.Job;
 using NamedObject.Core.Interfaces;
 
@@ -16,96 +17,69 @@ public sealed class JobCreationDispatcher(INamedObjectRegistry<ILrtNamedObject> 
 	{
 		var lrt = registry.GetBySystemName(systemName);
 		var state = lrt.ValidateState(inputState);
+		if (lrt is IMultiStepLrt multiStep)
+			return CreateMultiStepJob(
+				multiStep,
+				state,
+				maxAttempts,
+				naturalKey,
+				new HashSet<string>(StringComparer.OrdinalIgnoreCase));
 
-		if (lrt is not IMultiStepLrt multiStepLrt)
-			return naturalKey is null
-				? SingleRunJob.Create(
-					lrt.SystemName,
-					state,
-					maxAttempts)
-				: SingleRunJob.CreateUnique(
-					naturalKey,
-					lrt.SystemName,
-					state,
-					maxAttempts);
-
-		return CreateMultiStepJob(
-			multiStepLrt,
-			state,
-			maxAttempts,
-			naturalKey,
-			new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+		return naturalKey is null
+			? SingleRunJob.Create(
+				lrt.SystemName,
+				state,
+				maxAttempts)
+			: SingleRunJob.CreateUnique(
+				naturalKey,
+				lrt.SystemName,
+				state,
+				maxAttempts);
 	}
 
 	private MultiStepJob CreateMultiStepJob(
 		IMultiStepLrt lrt,
-		string state,
+		string? state,
 		int maxAttempts,
 		string? naturalKey,
 		HashSet<string> compositionPath)
 	{
 		if (!compositionPath.Add(lrt.SystemName))
-			throw new InvalidOperationException(
-				$"Multi-step LRT composition contains a cycle at '{lrt.SystemName}'.");
-
+			throw new InvalidOperationException($"Multi-step LRT composition contains a cycle at '{lrt.SystemName}'.");
 		try
 		{
-			var job = naturalKey is null
-				? MultiStepJob.Create(
-					lrt.SystemName,
-					state)
-				: MultiStepJob.CreateUnique(
-					naturalKey,
-					lrt.SystemName,
-					state);
-			var builder = new MultiStepJobBuilder(maxAttempts, (
-				childSystemName, childState,
-				childMaxAttempts) => Create(
-				job,
-				childSystemName,
-				childState,
-				childMaxAttempts,
-				compositionPath));
+			var job = state is null
+				? MultiStepJob.CreateDeferred(lrt.SystemName, maxAttempts)
+				: naturalKey is null
+					? MultiStepJob.Create(lrt.SystemName, state)
+					: MultiStepJob.CreateUnique(naturalKey, lrt.SystemName, state);
 
-			lrt.ConfigureSteps(builder, state);
+			var builder = new MultiStepJobBuilder();
+			lrt.ConfigureSteps(builder);
+			if (builder.Steps.Count == 0)
+				throw new InvalidOperationException($"Multi-step LRT '{lrt.SystemName}' must contain at least one step.");
 
-			if (job.Steps.Count == 0)
-				throw new InvalidOperationException(
-					$"Multi-step LRT '{lrt.SystemName}' must contain at least one step.");
-
+			var steps = new Dictionary<LrtStepDefinition, Job>();
+			foreach (var definition in builder.Steps)
+			{
+				var child = registry.GetBySystemName(definition.SystemName);
+				if (definition.InputType != child.InputType)
+					throw new InvalidOperationException($"Input factory for '{definition.Key}' must return '{child.InputType.Name}'.");
+				var attempts = definition.MaxAttempts ?? maxAttempts;
+				Job step = child is IMultiStepLrt multiStep
+					? CreateMultiStepJob(multiStep, null, attempts, null, compositionPath)
+					: SingleRunJob.CreateDeferred(child.SystemName, attempts);
+				job.AddStep(step, definition.Key);
+				steps.Add(definition, step);
+			}
+			foreach (var definition in builder.Steps)
+				foreach (var dependency in definition.Dependencies)
+					job.AddDependency(steps[definition], steps[dependency]);
 			return job;
 		}
 		finally
 		{
 			compositionPath.Remove(lrt.SystemName);
 		}
-	}
-
-	private Job Create(
-		MultiStepJob parent,
-		string systemName,
-		string inputState,
-		int maxAttempts,
-		HashSet<string> compositionPath)
-	{
-		var lrt = registry.GetBySystemName(systemName);
-		var state = lrt.ValidateState(inputState);
-
-		Job step;
-		if (lrt is not IMultiStepLrt multiStepLrt)
-			step = SingleRunJob.Create(
-				lrt.SystemName,
-				state,
-				maxAttempts);
-		else
-			step = CreateMultiStepJob(
-				multiStepLrt,
-				state,
-				maxAttempts,
-				null,
-				compositionPath);
-
-		parent.AddStep(step);
-		return step;
 	}
 }

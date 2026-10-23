@@ -35,6 +35,20 @@ public static class LrtStateSerializer
 		return state.Deserialize<TState>();
 	}
 
+	public static TInputState DeserializeInput<TInputState>(string json) where TInputState : class
+	{
+		using var document = JsonDocument.Parse(json);
+		var root = document.RootElement;
+		var input = IsEnvelope(root) ? root.GetProperty("input") : root;
+		return input.Deserialize<TInputState>() ?? throw new JsonException("LRT input state is empty.");
+	}
+
+	public static string SerializeInput(string input)
+	{
+		using var document = JsonDocument.Parse(input);
+		return JsonSerializer.Serialize(new Envelope<JsonElement, object>(CurrentVersion, document.RootElement, null));
+	}
+
 	public static string Serialize<TInputState, TState>(TInputState input, TState? state)
 		where TInputState : class
 		where TState : class

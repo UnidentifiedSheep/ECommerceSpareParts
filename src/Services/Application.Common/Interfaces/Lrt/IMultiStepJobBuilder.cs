@@ -1,13 +1,26 @@
-using Domain.CommonEntities.Job;
+using Application.Common.Models.Lrt;
 
 namespace Application.Common.Interfaces.Lrt;
 
 public interface IMultiStepJobBuilder
 {
-	Job AddStep(
+	LrtStepDefinition AddStep<TInputState>(
 		string systemName,
-		string inputState,
-		int? maxAttempts = null);
+		TInputState inputState,
+		int? maxAttempts = null,
+		string? key = null) where TInputState : class, IInputState;
 
-	void AddDependency(Job job, Job dependsOn);
+	LrtStepDefinition AddStep<TInputState>(
+		string systemName,
+		Func<LrtStepInputContext, TInputState> inputFactory,
+		int? maxAttempts = null,
+		string? key = null) where TInputState : class, IInputState;
+
+	LrtStepDefinition AddStep<TInputState>(
+		string systemName,
+		Func<LrtStepInputContext, CancellationToken, Task<TInputState>> inputFactory,
+		int? maxAttempts = null,
+		string? key = null) where TInputState : class, IInputState;
+
+	void AddDependency(LrtStepDefinition step, LrtStepDefinition dependsOn);
 }

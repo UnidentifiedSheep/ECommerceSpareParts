@@ -14,6 +14,12 @@ public record JobDto
 	[JsonPropertyName("multiStepJobId")]
 	public required Guid? MultiStepJobId { get; init; }
 
+	[JsonPropertyName("stepKey")]
+	public string? StepKey { get; init; }
+
+	[JsonPropertyName("inputInitialized")]
+	public required bool InputInitialized { get; init; }
+
 	[JsonPropertyName("systemName")]
 	public required string SystemName { get; init; }
 

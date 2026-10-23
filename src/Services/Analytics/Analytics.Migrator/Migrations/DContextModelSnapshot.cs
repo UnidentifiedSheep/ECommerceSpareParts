@@ -266,6 +266,12 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("text")
                         .HasColumnName("error_message");
 
+                    b.Property<bool>("InputInitialized")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("input_initialized");
+
                     b.Property<DateTime?>("LeaseExpiresAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("lease_expires_at");
@@ -291,6 +297,10 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("natural_key");
 
+                    b.Property<string>("Output")
+                        .HasColumnType("text")
+                        .HasColumnName("output");
+
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("text")
@@ -300,6 +310,11 @@ namespace Analytics.Migrator.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("status");
+
+                    b.Property<string>("StepKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("step_key");
 
                     b.Property<string>("SystemName")
                         .IsRequired()
@@ -336,6 +351,10 @@ namespace Analytics.Migrator.Migrations
                     b.HasIndex(new[] { "LockedAt" }, "jobs_locked_at_idx");
 
                     b.HasIndex(new[] { "MultiStepJobId" }, "jobs_multi_step_job_id_idx");
+
+                    b.HasIndex(new[] { "MultiStepJobId", "StepKey" }, "jobs_multi_step_job_id_step_key_uq")
+                        .IsUnique()
+                        .HasFilter("step_key IS NOT NULL");
 
                     b.HasIndex(new[] { "SystemName", "NaturalKey" }, "jobs_pending_system_name_natural_key_uq")
                         .IsUnique()

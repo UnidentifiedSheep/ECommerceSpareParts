@@ -183,6 +183,7 @@ public sealed class MultiStepLrtBaseTests
 		{
 			var leaseHolderId = Guid.NewGuid();
 			step.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
+			step.InitializeInput(LrtStateSerializer.SerializeInput("{}"), leaseHolderId);
 			step.Start(leaseHolderId);
 			step.Succeed(leaseHolderId);
 		}
@@ -191,6 +192,7 @@ public sealed class MultiStepLrtBaseTests
 		{
 			var leaseHolderId = Guid.NewGuid();
 			step.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
+			step.InitializeInput(LrtStateSerializer.SerializeInput("{}"), leaseHolderId);
 			step.Start(leaseHolderId);
 			step.Fail(leaseHolderId, "step failed");
 		}
@@ -208,11 +210,11 @@ public sealed class MultiStepLrtBaseTests
 		public override ILocalizableMessage DescriptionLocalizationMessage =>
 			new LocalizableMessage("test-multi-step-lrt-description");
 
-		protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState)
+		protected override void ConfigureSteps(IMultiStepJobBuilder builder)
 		{
-			var firstRoot = builder.AddStep("first-root", initialState);
-			var secondRoot = builder.AddStep("second-root", initialState);
-			var child = builder.AddStep("child", initialState);
+			var firstRoot = builder.AddStep("first-root", new NoneInputState());
+			var secondRoot = builder.AddStep("second-root", new NoneInputState());
+			var child = builder.AddStep("child", new NoneInputState());
 			builder.AddDependency(child, firstRoot);
 			builder.AddDependency(child, secondRoot);
 		}

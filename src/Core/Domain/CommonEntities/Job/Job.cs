@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain.CommonEntities.Job.Events;
 using Domain.CommonEnums;
 using Domain.Exceptions;
@@ -17,7 +17,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
 	protected Job(
 		string systemName,
-		string initialState,
+		string? initialState,
 		int maxAttempts,
 		string? naturalKey = null)
 	{
@@ -26,7 +26,8 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 		SetNaturalKey(naturalKey);
 		Attempts = 1;
 		SetMaxAttempts(maxAttempts);
-		State = initialState;
+		State = initialState ?? "{}";
+		InputInitialized = initialState is not null;
 		SetStatus(JobStatus.Pending);
 	}
 
@@ -37,6 +38,12 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 	public string? NaturalKey { get; private set; }
 
 	public string State { get; protected set; } = string.Empty;
+
+	public bool InputInitialized { get; private set; }
+
+	public string? Output { get; private set; }
+
+	public string? StepKey { get; private set; }
 
 	public JobStatus Status { get; private set; }
 
@@ -97,6 +104,21 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 		State = state;
 	}
 
+	public void InitializeInput(string state, Guid leaseHolderId)
+	{
+		EnsureActiveLease(leaseHolderId);
+		if (IsCancellationRequested)
+			throw new JobCancellationRequestedException(Id);
+		EnsureStatus(JobStatus.Locked);
+		if (InputInitialized)
+			throw new InvalidOperationException("Job input has already been initialized.");
+		if (string.IsNullOrWhiteSpace(state))
+			throw new ArgumentException("Job input cannot be empty.", nameof(state));
+
+		State = state;
+		InputInitialized = true;
+	}
+
 	public void EnsureStatus(JobStatus expected)
 	{
 		if (Status != expected)
@@ -129,12 +151,14 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 			throw new JobCancellationRequestedException(Id);
 
 		EnsureStatus(JobStatus.Locked);
+		if (!InputInitialized)
+			throw new InvalidOperationException("Job input must be initialized before execution.");
 
 		ErrorMessage = null;
 		SetStatus(JobStatus.Processing);
 	}
 
-	public virtual void Succeed(Guid leaseHolderId)
+	public virtual void Succeed(Guid leaseHolderId, string? output = null)
 	{
 		EnsureActiveLease(leaseHolderId);
 
@@ -143,6 +167,7 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
 		EnsureStatus(JobStatus.Processing);
 
+		Output = output;
 		ErrorMessage = null;
 		SetStatus(JobStatus.Succeeded);
 		ClearLease();
@@ -288,16 +313,19 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 		LeaseExpiresAt = null;
 	}
 
-	internal void AttachTo(MultiStepJob parent)
+	internal void AttachTo(MultiStepJob parent, string? stepKey = null)
 	{
 		ArgumentNullException.ThrowIfNull(parent);
 		EnsureStatus(JobStatus.Pending);
 
 		if (IsStep)
 			throw new InvalidOperationException("Job already belongs to a multi-step job.");
+		if (stepKey is not null && (string.IsNullOrWhiteSpace(stepKey) || stepKey.Length > 128))
+			throw new ArgumentException("Step key must contain between 1 and 128 characters.", nameof(stepKey));
 
 		MultiStepJobId = parent.Id;
 		MultiStepJob = parent;
+		StepKey = stepKey;
 		SetStatus(JobStatus.Blocked);
 	}
 

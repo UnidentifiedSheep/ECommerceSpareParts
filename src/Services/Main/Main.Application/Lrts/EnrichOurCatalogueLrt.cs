@@ -23,15 +23,15 @@ public class EnrichOurCatalogueLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtCatalogueEnrichmentDescriptionMessage.Instance;
 
-	protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState)
+	protected override void ConfigureSteps(IMultiStepJobBuilder builder)
 	{
 		var buildCandidatesStep = builder.AddStep(
 			BuildCatalogueCandidatesLrt.LrtSystemName,
-			NoneInputState.Json);
+			new NoneInputState());
 
 		var mapToCatalogueStep = builder.AddStep(
 			MapCatalogueCandidatesToProductsLrt.LrtSystemName,
-			NoneInputState.Json);
+			new NoneInputState());
 
 		builder.AddDependency(mapToCatalogueStep, buildCandidatesStep);
 	}

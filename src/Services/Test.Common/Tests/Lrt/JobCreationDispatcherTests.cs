@@ -115,7 +115,7 @@ public sealed class JobCreationDispatcherTests
 			.Subject;
 		innerJob.Status.Should().Be(JobStatus.Blocked);
 		outerJob.MaxAttempts.Should().Be(1);
-		innerJob.MaxAttempts.Should().Be(1);
+		innerJob.MaxAttempts.Should().Be(3);
 		innerJob
 			.Steps
 			.Should()
@@ -176,6 +176,79 @@ public sealed class JobCreationDispatcherTests
 		act.Should().Throw<InvalidOperationException>().WithMessage("*cycle*first*");
 	}
 
+	[Fact]
+	public void Create_DeferredInput_DoesNotEvaluateFactory()
+	{
+		var calls = 0;
+		var workflow = CreateWorkflow(builder => builder.AddStep("step", _ =>
+		{
+			calls++;
+			return new NoneInputState();
+		}));
+		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
+
+		var job = (MultiStepJob)dispatcher.Create(workflow.SystemName, "{}", 3);
+
+		calls.Should().Be(0);
+		job.Steps.Should().ContainSingle().Which.InputInitialized.Should().BeFalse();
+	}
+
+	[Fact]
+	public void Create_RepeatedLrtWithExplicitKeys_CreatesDistinctSteps()
+	{
+		var workflow = CreateWorkflow(builder =>
+		{
+			builder.AddStep("step", new NoneInputState(), key: "first");
+			builder.AddStep("step", new NoneInputState(), key: "second");
+		});
+		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
+
+		var job = (MultiStepJob)dispatcher.Create(workflow.SystemName, "{}", 3);
+
+		job.Steps.Select(x => x.StepKey).Should().Equal("first", "second");
+	}
+
+	[Fact]
+	public void Create_DuplicateStepKey_ThrowsBeforePersistingTopology()
+	{
+		var workflow = CreateWorkflow(builder =>
+		{
+			builder.AddStep("step", new NoneInputState(), key: "same");
+			builder.AddStep("step", new NoneInputState(), key: "same");
+		});
+		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
+
+		var action = () => dispatcher.Create(workflow.SystemName, "{}", 3);
+
+		action.Should().Throw<InvalidOperationException>().WithMessage("*Duplicate*same*");
+	}
+
+	[Fact]
+	public void Create_CyclicDependencies_Throws()
+	{
+		var workflow = CreateWorkflow(builder =>
+		{
+			var first = builder.AddStep("step", new NoneInputState(), key: "first");
+			var second = builder.AddStep("step", new NoneInputState(), key: "second");
+			builder.AddDependency(first, second);
+			builder.AddDependency(second, first);
+		});
+		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
+
+		var action = () => dispatcher.Create(workflow.SystemName, "{}", 3);
+
+		action.Should().Throw<InvalidOperationException>().WithMessage("*cycle*");
+	}
+
+	private static IMultiStepLrt CreateWorkflow(Action<IMultiStepJobBuilder> configure)
+	{
+		var lrt = new Mock<IMultiStepLrt>();
+		lrt.SetupGet(x => x.SystemName).Returns("workflow");
+		lrt.SetupGet(x => x.InputType).Returns(typeof(NoneInputState));
+		lrt.Setup(x => x.ConfigureSteps(It.IsAny<IMultiStepJobBuilder>())).Callback(configure);
+		return lrt.Object;
+	}
+
 	private static JobCreationDispatcher CreateDispatcher(string systemName, ILrtNamedObject lrt)
 	{
 		var registry = new Mock<INamedObjectRegistry<ILrtNamedObject>>();
@@ -215,8 +288,8 @@ public sealed class JobCreationDispatcherTests
 		public override ILocalizableMessage DescriptionLocalizationMessage =>
 			new LocalizableMessage("test-description");
 
-		protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState) =>
-			builder.AddStep("step", initialState);
+		protected override void ConfigureSteps(IMultiStepJobBuilder builder) =>
+			builder.AddStep("step", new NoneInputState());
 	}
 
 	private sealed class NestedMultiStepLrt(string systemName, string childSystemName)
@@ -231,7 +304,7 @@ public sealed class JobCreationDispatcherTests
 		public override ILocalizableMessage DescriptionLocalizationMessage =>
 			new LocalizableMessage("test-description");
 
-		protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState) =>
-			builder.AddStep(childSystemName, initialState);
+		protected override void ConfigureSteps(IMultiStepJobBuilder builder) =>
+			builder.AddStep(childSystemName, new NoneInputState());
 	}
 }

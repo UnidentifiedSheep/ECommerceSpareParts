@@ -21,10 +21,16 @@ public sealed class ProductImportLrt(
 	public override ILocalizableMessage DescriptionLocalizationMessage =>
 		LrtProductImportDescriptionMessage.Instance;
 
-	protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState)
+	protected override void ConfigureSteps(IMultiStepJobBuilder builder)
 	{
-		var import = builder.AddStep(nameof(ProductImportLrtStep), initialState);
-		var synchronization = builder.AddStep(nameof(ProductSynchronizationLrt), NoneInputState.Json);
+		var import = builder.AddStep(
+			nameof(ProductImportLrtStep),
+			context => context.GetParentInput<ProductImportInputState>());
+
+		var synchronization = builder.AddStep(
+			nameof(ProductSynchronizationLrt),
+			new ProductSynchronizationInputState());
+
 		builder.AddDependency(synchronization, import);
 	}
 }

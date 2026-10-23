@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
@@ -22,16 +21,16 @@ public sealed class ProductCharacteristicsImportLrt(
 	public override ILocalizableMessage NameLocalizationMessage => LrtProductCharacteristicsImportNameMessage.Instance;
 	public override ILocalizableMessage DescriptionLocalizationMessage => LrtProductCharacteristicsImportDescriptionMessage.Instance;
 
-	protected override void ConfigureSteps(IMultiStepJobBuilder builder, string initialState)
+	protected override void ConfigureSteps(IMultiStepJobBuilder builder)
 	{
-		var import = builder.AddStep(ProductCharacteristicsImportLrtStep.Name, initialState);
+		var import = builder.AddStep(
+			ProductCharacteristicsImportLrtStep.Name,
+			context => context.GetParentInput<ProductCharacteristicsImportInputState>());
+
 		var synchronization = builder.AddStep(
 			ProductSynchronizationLrt.Name,
-			JsonSerializer.Serialize(
-				new ProductSynchronizationInputState
-				{
-					Parts = ProductEventParts.Characteristics
-				}));
+			new ProductSynchronizationInputState { Parts = ProductEventParts.Characteristics });
+
 		builder.AddDependency(synchronization, import);
 	}
 }

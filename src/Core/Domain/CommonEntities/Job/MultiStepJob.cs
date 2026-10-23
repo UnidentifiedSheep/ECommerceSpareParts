@@ -15,7 +15,7 @@ public sealed class MultiStepJob : Job
 
 	private MultiStepJob(
 		string systemName,
-		string initialState,
+		string? initialState,
 		int maxAttempts,
 		string? naturalKey) : base(
 		systemName,
@@ -38,6 +38,9 @@ public sealed class MultiStepJob : Job
 			null);
 	}
 
+	public static MultiStepJob CreateDeferred(string systemName, int maxAttempts = 3) =>
+		new(systemName, null, maxAttempts, null);
+
 	public static MultiStepJob CreateUnique(
 		string naturalKey,
 		string systemName,
@@ -52,7 +55,7 @@ public sealed class MultiStepJob : Job
 			naturalKey);
 	}
 
-	public void AddStep(Job step)
+	public void AddStep(Job step, string? stepKey = null)
 	{
 		ArgumentNullException.ThrowIfNull(step);
 		EnsureTopologyMutable();
@@ -60,7 +63,10 @@ public sealed class MultiStepJob : Job
 		if (_steps.Any(x => x.Id == step.Id))
 			return;
 
-		step.AttachTo(this);
+		if (stepKey is not null && _steps.Any(x => x.StepKey == stepKey))
+			throw new InvalidOperationException($"Duplicate job step key '{stepKey}'.");
+
+		step.AttachTo(this, stepKey);
 		_steps.Add(step);
 	}
 

@@ -1,3 +1,4 @@
+using System.Net;
 using Domain.Interfaces.Events;
 
 namespace Main.Entities.DomainEvents.User;
@@ -7,7 +8,7 @@ public record UserLoggedInDomainEvent : IKeyedDomainEvent, IBatchableDomainEvent
 	public UserLoggedInDomainEvent(
 		Guid userId,
 		DateTime occurredAtUtc,
-		string? ipAddress,
+		IPAddress? ipAddress,
 		string? userAgent)
 	{
 		UserId = userId;
@@ -20,7 +21,7 @@ public record UserLoggedInDomainEvent : IKeyedDomainEvent, IBatchableDomainEvent
 
 	public DateTime OccurredAtUtc { get; }
 
-	public string? IpAddress { get; }
+	public IPAddress? IpAddress { get; }
 
 	public string? UserAgent { get; }
 

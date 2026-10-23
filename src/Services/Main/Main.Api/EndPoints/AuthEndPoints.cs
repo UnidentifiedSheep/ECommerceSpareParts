@@ -20,9 +20,9 @@ public record LoginRequest(string Login, string Password);
 
 public record IsUserNameAvailableResponse(bool IsAvailable);
 
-public record LoginResponse(string Token, string RefreshToken, string DeviceId);
+public record LoginResponse(string Token, string RefreshToken);
 
-public record RefreshTokenRequest(string RefreshToken, string DeviceId);
+public record RefreshTokenRequest(string RefreshToken);
 
 public record RefreshTokenResponse(string Token, string RefreshToken);
 
@@ -123,7 +123,7 @@ public class AuthEndPoints : ICarterModule
 					LoginRequest request, ISender sender,
 					HttpContext context, CancellationToken cancellationToken) =>
 				{
-					var userAgent = context.Request.Headers["User-Agent"].FirstOrDefault();
+					var userAgent = context.Request.Headers.UserAgent;
 					var ipAddress = context.Connection.RemoteIpAddress;
 					var result = await sender.Send(
 						new LoginCommand(
@@ -132,11 +132,7 @@ public class AuthEndPoints : ICarterModule
 							ipAddress,
 							userAgent),
 						cancellationToken);
-					return Results.Ok(
-						new LoginResponse(
-							result.Token,
-							result.RefreshToken,
-							result.DeviceId));
+					return Results.Ok(new LoginResponse(result.Token, result.RefreshToken));
 				})
 			.WithName("Login")
 			.WithDisplayName("Вход пользователя")
@@ -154,9 +150,7 @@ public class AuthEndPoints : ICarterModule
 					ISender sender, RefreshTokenRequest request,
 					CancellationToken ct) =>
 				{
-					var result = await sender.Send(
-						new RefreshTokenCommand(request.RefreshToken, request.DeviceId),
-						ct);
+					var result = await sender.Send(new RefreshTokenCommand(request.RefreshToken), ct);
 					return Results.Ok(new RefreshTokenResponse(result.Token, result.RefreshToken));
 				})
 			.WithName("RefreshToken")

@@ -93,6 +93,7 @@ public static class ServiceProvider
 
 		services.AddScoped<IJobLeaseService, JobLeaseService>();
 		services.AddScoped<IJobCreationDispatcher, JobCreationDispatcher>();
+		services.AddScoped<IJobStepInputInitializer, JobStepInputInitializer>();
 		services.AddScoped<Func<IJobCreationDispatcher>>(serviceProvider =>
 			serviceProvider.GetRequiredService<IJobCreationDispatcher>);
 		services.AddScoped<IJobService, JobService>();

@@ -26,7 +26,7 @@ public class SendLoginNotificationEmailHandler(
 					new UserLoggedInNotificationData(
 						localizer,
 						@event.OccurredAtUtc,
-						@event.IpAddress,
+						@event.IpAddress?.ToString(),
 						@event.UserAgent))))
 			.ToList();
 

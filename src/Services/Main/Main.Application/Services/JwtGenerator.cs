@@ -15,7 +15,6 @@ public class JwtGenerator(IOptions<JwtOptions> options) : IJwtGenerator
 
 	public string CreateToken(
 		UserDto user,
-		string deviceId,
 		IEnumerable<string> roles,
 		IEnumerable<string> permissions,
 		TimeSpan? additionalValidDuration = null)
@@ -28,7 +27,6 @@ public class JwtGenerator(IOptions<JwtOptions> options) : IJwtGenerator
 			Expires = DateTime.UtcNow.Add(validDuration),
 			Subject = GetClaims(
 				user,
-				deviceId,
 				roles,
 				permissions)
 		};
@@ -63,14 +61,12 @@ public class JwtGenerator(IOptions<JwtOptions> options) : IJwtGenerator
 
 	private ClaimsIdentity GetClaims(
 		UserDto user,
-		string deviceId,
 		IEnumerable<string> roles,
 		IEnumerable<string> permissions)
 	{
 		var claims = new ClaimsIdentity();
 		claims.AddClaim(new Claim(ClaimTypes.GivenName, user.UserInfo?.Name + " " + user.UserInfo?.Surname));
 		claims.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
-		claims.AddClaim(new Claim("device_id", deviceId));
 		claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
 		foreach (var role in roles)
 			claims.AddClaim(new Claim(ClaimTypes.Role, role));
