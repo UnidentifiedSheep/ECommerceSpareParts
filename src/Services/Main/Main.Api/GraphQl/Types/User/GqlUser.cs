@@ -29,63 +29,62 @@ public record GqlUser
 	public async Task<string> GetUserNameAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await GetUserAsync(this, loader, cancellationToken)).UserName;
+		(await GetUserAsync(loader, cancellationToken)).UserName;
 
 	[GraphQLName("normalizedUserName")]
 	public async Task<string> GetNormalizedUserNameAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await GetUserAsync(this, loader, cancellationToken)).NormalizedUserName;
+		(await GetUserAsync(loader, cancellationToken)).NormalizedUserName;
 
 	[GraphQLName("createdAt")]
 	public async Task<DateTime> GetCreatedAtAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await GetUserAsync(this, loader, cancellationToken)).CreatedAt;
+		(await GetUserAsync(loader, cancellationToken)).CreatedAt;
 
 	[GraphQLName("updatedAt")]
 	public async Task<DateTime> GetUpdatedAtAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await GetUserAsync(this, loader, cancellationToken)).UpdatedAt;
+		(await GetUserAsync(loader, cancellationToken)).UpdatedAt;
 
 	[GraphQLName("twoFactorEnabled")]
 	public async Task<bool> GetTwoFactorEnabledAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await GetUserAsync(this, loader, cancellationToken)).TwoFactorEnabled;
+		(await GetUserAsync(loader, cancellationToken)).TwoFactorEnabled;
 
 	[GraphQLName("lockoutEnd")]
 	public async Task<DateTime?> GetLockoutEndAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await GetUserAsync(this, loader, cancellationToken)).LockoutEnd;
+		(await GetUserAsync(loader, cancellationToken)).LockoutEnd;
 
 	[GraphQLName("accessFailedCount")]
 	public async Task<int> GetAccessFailedCountAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await GetUserAsync(this, loader, cancellationToken)).AccessFailedCount;
+		(await GetUserAsync(loader, cancellationToken)).AccessFailedCount;
 
 	[GraphQLName("lastLoginAt")]
 	public async Task<DateTime?> GetLastLoginAtAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await GetUserAsync(this, loader, cancellationToken)).LastLoginAt;
+		(await GetUserAsync(loader, cancellationToken)).LastLoginAt;
 
 	[GraphQLName("info")]
 	public async Task<GqlUserInfo?> GetInfoAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken)
 	{
-		var user = await GetUserAsync(this, loader, cancellationToken);
+		var user = await GetUserAsync(loader, cancellationToken);
 		return user.UserInfo is null ? null : new GqlUserInfo(user.UserInfo);
 	}
 
-	private static async Task<UserDto> GetUserAsync(
-		GqlUser user,
+	private async Task<UserDto> GetUserAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> user._dto ?? await loader.LoadAsync(user.Id, cancellationToken)
-			?? throw new UserNotFoundException(user.Id);
+		=> _dto ?? await loader.LoadAsync(Id, cancellationToken)
+			?? throw new UserNotFoundException(Id);
 }
