@@ -20,4 +20,12 @@ public static class UserDataLoaders
 		ISender sender,
 		CancellationToken cancellationToken)
 		=> (await sender.Send(new GetUsersRolesAndPermissionsQuery(keys), cancellationToken)).Users;
+
+	[DataLoader]
+	public static async Task<IReadOnlyDictionary<Guid, IReadOnlyList<UserEmailDto>>> GetUserEmailsByIdAsync(
+		IReadOnlyList<Guid> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetUsersEmailsByIdsQuery(keys), cancellationToken)).Emails;
+
 }

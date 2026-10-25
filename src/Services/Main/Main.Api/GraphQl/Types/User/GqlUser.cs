@@ -85,6 +85,15 @@ public record GqlUser
 		return user.UserInfo is null ? null : new GqlUserInfo(user.UserInfo);
 	}
 
+	[GraphQLName("emails")]
+	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
+	public async Task<IReadOnlyList<GqlUserEmail>> GetEmailsAsync(
+		IUserEmailsByIdDataLoader loader,
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
+			.Select(email => new GqlUserEmail(email))
+			.ToArray();
+
 	[GraphQLName("roles")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<IReadOnlyList<GqlRole>> GetRolesAsync(
