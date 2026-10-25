@@ -57,8 +57,6 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 
 	public UserInfo? UserInfo { get; private set; }
 
-	public UserDiscount? Discount { get; private set; }
-
 	public IReadOnlyList<UserEmail> Emails => _emails;
 
 	public IReadOnlyList<UserNotificationPreference> NotificationPreferences => _notificationPreferences;
@@ -222,14 +220,6 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 			currentPrimary.MakePrimary(false);
 
 		userEmail.MakePrimary();
-	}
-
-	public void SetDiscount(decimal discount)
-	{
-		if (Discount == null)
-			Discount = UserDiscount.Create(Id, discount);
-		else
-			Discount.SetDiscount(discount);
 	}
 
 	public void SetPasswordHash(string passwordHash)

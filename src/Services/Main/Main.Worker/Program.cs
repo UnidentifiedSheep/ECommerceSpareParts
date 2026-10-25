@@ -6,12 +6,8 @@ using Api.Common.HostedServices;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Cache;
-using Contracts.Auth;
-using Contracts.Currency;
 using Contracts.Job;
 using Contracts.Settings;
-using Contracts.Supplier;
-using Contracts.User;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
 using Main.Application;
@@ -115,7 +111,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
 					ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
-					ep.Bind<SettingUpdatedEvent>();
+					ep.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
 
 					ep.ConfigureConsumer<BackplaneConsumer>(context);
 					ep.Bind<BackplaneMessage>();
@@ -131,16 +127,8 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 					ep.PrefetchCount = 1;
 
 					ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
-					ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
-					ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
 					ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 					ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
-
-					ep.Bind<SupplierProductsRequestedEvent>();
-					ep.Bind<CurrencyCreatedEvent>();
-					ep.Bind<RoleUpdatedEvent>();
-					ep.Bind<UserDiscountUpdatedEvent>();
-					ep.Bind<CurrencyRateChangedEvent>();
 				});
 		});
 	});

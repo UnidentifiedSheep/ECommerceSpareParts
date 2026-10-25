@@ -13,4 +13,11 @@ public static class UserDataLoaders
 		ISender sender,
 		CancellationToken cancellationToken)
 		=> (await sender.Send(new GetUsersByIdsQuery(keys), cancellationToken)).Users;
+
+	[DataLoader]
+	public static async Task<IReadOnlyDictionary<Guid, UserRolesAndPermissions>> GetUserRolesAndPermissionsByIdAsync(
+		IReadOnlyList<Guid> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetUsersRolesAndPermissionsQuery(keys), cancellationToken)).Users;
 }

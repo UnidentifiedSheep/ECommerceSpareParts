@@ -8,7 +8,6 @@ using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Application.Common.Backplane;
 using Cache;
-using Contracts.Job;
 using Internal.Integration.Di;
 using MassTransit;
 using RabbitMq.Extensions;
@@ -76,12 +75,12 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 				{
 					ep.AutoDelete = true;
 					ep.Durable = false;
+					ep.ConfigureConsumeTopology = false;
 
 					ep.ConfigureConsumer<BackplaneConsumer>(context);
 
 					ep.Bind<BackplaneMessage>();
 
-					ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics);
 				});
 
 			cfg.ReceiveEndpoint(

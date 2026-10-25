@@ -2,7 +2,6 @@ namespace Internal.Integration.Core.Interfaces.Main;
 
 public interface IMainClient
 {
-	IUserNode UserNode { get; }
 
 	ICurrencyNode CurrencyNode { get; }
 

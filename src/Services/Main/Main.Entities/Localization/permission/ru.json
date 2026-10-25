@@ -1,4 +1,4 @@
-﻿{
+{
   "culture": "ru",
   "messages": {
     "permissions.create.historical.records.name": "Создание исторических записей",
@@ -167,10 +167,6 @@
     "permissions.users.permissions.create.description": "Право на добавление прав доступа пользователю.",
     "permissions.users.roles.create.name": "Добавление роли пользователю",
     "permissions.users.roles.create.description": "Право на добавление ролей пользователю.",
-    "permissions.users.discount.create.name": "Редактирование скидки пользователя",
-    "permissions.users.discount.create.description": "Право на редактирование скидки пользователя.",
-    "permissions.users.discount.get.name": "Просмотр скидки пользователя",
-    "permissions.users.discount.get.description": "Право на получение скидки пользователя.",
     "permissions.users.mails.create.name": "Создание корпоративной почты",
     "permissions.users.mails.create.description": "Право на создание корпоративной эл. почты для пользователя.",
     "permissions.users.vehicles.create.me.name": "Добавление ТС в свой гараж",

@@ -1,4 +1,4 @@
-﻿using Main.Enums;
+﻿﻿using Main.Enums;
 
 namespace Main.Application.Static;
 
@@ -29,15 +29,8 @@ public static class CacheKeys
 	{
 		public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
 
-		public static string User(Guid userId) => $"user:{userId}";
-
-		public static string UserDiscount(Guid userId) => $"user:{userId}:discount";
-
-		public static string UserRolesAndPermissions(Guid userId) => $"user:{userId}:roles:permissions";
-
 		public static string NotificationRecipients(Guid userId) => $"user:{userId}:notification:recipients";
 
-		public static string RolesAndPermissionsRelations() => "users:roles:permissions:relations";
 	}
 
 	public static class CurrencyCache

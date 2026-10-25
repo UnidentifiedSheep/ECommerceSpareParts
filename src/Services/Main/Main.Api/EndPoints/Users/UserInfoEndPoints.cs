@@ -8,8 +8,6 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Users;
 
-public record GetUserDiscountResponse(decimal Discount);
-
 public record GetUserFullInfoResponse(
 	UserDto User,
 	IReadOnlyList<UserEmailDto> Emails,

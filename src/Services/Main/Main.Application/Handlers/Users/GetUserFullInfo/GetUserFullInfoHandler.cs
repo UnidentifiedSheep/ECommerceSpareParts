@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Users;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Extensions.QueryExtensions;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +21,6 @@ public record GetUserFullInfoResult(
 
 public class GetUserFullInfoHandler(
 	IReadRepository<User, Guid> repository,
-	IUserCacheRepository userCache,
 	IProjectionProvider<User, UserDto> userProjection,
 	IProjectionProvider<UserEmail, UserEmailDto> emailProjection,
 	IProjectionProvider<UserPhone, UserPhoneDto> phoneProjection)
@@ -48,7 +47,7 @@ public class GetUserFullInfoHandler(
 			.FirstOrDefaultAsync(cancellationToken) ?? throw new UserNotFoundException(request.UserId);
 
 		var (roles, permissions) =
-			await userCache.GetUserRolesAndPermissionsAsync(request.UserId, cancellationToken) ??
+			await repository.GetUserRolesAndPermissionsAsync(request.UserId, cancellationToken) ??
 			throw new UserNotFoundException(request.UserId);
 
 		return new GetUserFullInfoResult(

@@ -129,8 +129,6 @@ public partial class DContext : DbContext, INotificationDbContext
 
 	public virtual DbSet<OrganizationBalance> UserBalances { get; set; }
 
-	public virtual DbSet<UserDiscount> UserDiscounts { get; set; }
-
 	public virtual DbSet<UserEmail> UserEmails { get; set; }
 
 	public virtual DbSet<UserInfo> UserInfos { get; set; }

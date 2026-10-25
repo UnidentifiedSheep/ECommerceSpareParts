@@ -10,7 +10,7 @@ using Attributes;
 using Exceptions.Base;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Extensions.QueryExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
@@ -38,7 +38,7 @@ public class LoginHandler(
 	IJwtGenerator tokenGenerator,
 	IUnitOfWork unitOfWork,
 	IValueHasher hasher,
-	IUserCacheRepository userCache,
+	IReadRepository<User, Guid> userReadRepository,
 	IProjectionProvider<User, UserDto> userProjection) : ICommandHandler<LoginCommand, LoginResult>
 {
 	public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -60,7 +60,7 @@ public class LoginHandler(
 			throw new WrongCredentialsException(null, null);
 
 		var (roles, permissions) =
-			await userCache.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken) ??
+			await userReadRepository.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken) ??
 			throw new UserNotFoundException(user.Id);
 
 		var userDto = userProjection.ProjectionFunc(user);

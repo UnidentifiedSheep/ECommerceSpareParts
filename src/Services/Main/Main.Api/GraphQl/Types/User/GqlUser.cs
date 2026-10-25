@@ -1,3 +1,5 @@
+using Enums;
+using GraphQL.Common.Attributes;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
@@ -81,6 +83,20 @@ public record GqlUser
 		var user = await GetUserAsync(loader, cancellationToken);
 		return user.UserInfo is null ? null : new GqlUserInfo(user.UserInfo);
 	}
+
+	[GraphQLName("roles")]
+	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
+	public async Task<IReadOnlyList<string>> GetRolesAsync(
+		IUserRolesAndPermissionsByIdDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Roles;
+
+	[GraphQLName("permissions")]
+	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
+	public async Task<IReadOnlyList<string>> GetPermissionsAsync(
+		IUserRolesAndPermissionsByIdDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Permissions;
 
 	private async Task<UserDto> GetUserAsync(
 		IUserByIdDataLoader loader,

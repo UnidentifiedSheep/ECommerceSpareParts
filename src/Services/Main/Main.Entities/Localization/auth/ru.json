@@ -1,4 +1,4 @@
-﻿{
+{
   "culture": "ru",
   "messages": {
     "invalid.token": "Неверный токен.",
@@ -22,7 +22,6 @@
     "role.description.max.length": "Описание роли не должно превышать 255 символов.",
     "user.id.not.empty": "ID пользователя не должно быть пустым.",
     "user.similarity.level.range": "Уровень схожести должен быть от 0 до 1.",
-    "user.discount.range": "Скидка должна быть от 0 до 0.99.",
     "user.vehicle.id.not.empty": "ID транспортного средства не должен быть пустым.",
     "user.vehicle.plate.number.not.empty": "Номер автомобиля не должен быть пустым.",
     "user.vehicle.plate.number.max.length": "Номер автомобиля не должен превышать 32 символа.",
