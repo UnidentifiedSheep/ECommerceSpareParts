@@ -11,7 +11,6 @@ using Application.Common.Services.Supplier.Favorite;
 using Application.Common.Services.Supplier.Tmtr;
 using Cache;
 using Contracts.Analytics;
-using Contracts.Job;
 using Contracts.Settings;
 using Integrations.Supplier.DI;
 using Internal.Integration.Di;
@@ -105,9 +104,7 @@ builder.Services.AddMassTransit(x =>
 				ep.Bind<BackplaneMessage>();
 				ep.Bind<MarkupRangesRefreshRequestedEvent>();
 
-				ep
-					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Pricing)
-					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Pricing);
+				ep.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Pricing);
 			});
 
 		cfg.ReceiveEndpoint(

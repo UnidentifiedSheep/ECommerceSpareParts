@@ -1,9 +1,10 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities.Auth;
+using Main.Application.Models.Users;
+using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
 using Main.Persistence.Context;
+using Main.Persistence.ReadModels;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 using Persistence.Repository;
@@ -13,52 +14,33 @@ namespace Main.Persistence.Repositories.User;
 public class UserRepository(DContext context, IQueryableExtensions extensions)
 	: LinqRepositoryBase<DContext, Entities.User.User, Guid>(context, extensions), IUserRepository
 {
-	public async Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
-		Guid userId,
-		CancellationToken cancellationToken)
+	public IQueryable<Entities.User.User> Search(
+		IQueryable<Entities.User.User> query,
+		string searchTerm) =>
+		SearchWithRank(query, searchTerm)
+			.Select(match => match.User);
+
+	public IQueryable<UserSearchMatch> SearchWithRank(
+		IQueryable<Entities.User.User> query,
+		string searchTerm)
 	{
-		var userExists = await Context.Users.AsNoTracking().AnyAsync(u => u.Id == userId, cancellationToken);
+		var normalized = searchTerm.Trim();
+		if (normalized.Any(char.IsDigit) &&
+			normalized.All(character => char.IsDigit(character) || char.IsWhiteSpace(character) ||
+				character is '+' or '-' or '(' or ')'))
+			normalized = UserPhone.ToNormalizedPhone(normalized);
 
-		if (!userExists)
-			return null;
-
-		var roles = await Context
-			.UserRoles
-			.AsNoTracking()
-			.Where(r => r.UserId == userId)
-			.Select(r => r.RoleName)
-			.ToListAsync(cancellationToken);
-
-		var directPermissions = Context
-			.UserPermissions
-			.AsNoTracking()
-			.Where(p => p.UserId == userId)
-			.Select(p => p.Permission);
-
-		var rolePermissions = from userRole in Context.UserRoles.AsNoTracking()
-			join rolePermission in Context.Set<RolePermission>().AsNoTracking() on userRole.RoleName equals
-				rolePermission.RoleName
-			where userRole.UserId == userId
-			select rolePermission.PermissionName;
-
-		var permissions = await directPermissions.Union(rolePermissions).ToListAsync(cancellationToken);
-
-		return new UserRolesAndPermissions
-		{
-			Roles = roles, Permissions = permissions
-		};
-	}
-
-	public async Task<decimal?> GetUsersDiscountAsync(
-		Guid userId,
-		CancellationToken cancellationToken = default)
-	{
-		return await Context
-			.UserDiscounts
-			.AsNoTracking()
-			.Where(x => x.UserId == userId)
-			.Select(x => x.Discount)
-			.FirstOrDefaultAsync(cancellationToken);
+		return query.AsNoTracking()
+			.Join(Context.Set<UserSearchDocument>(), user => user.Id, document => document.UserId,
+				(user, document) => new { User = user, Document = document })
+			.Where(match => match.Document.SearchVector.Matches(DContext.ToUserSearchQuery(normalized)))
+			.Select(match => new UserSearchMatch
+			{
+				User = match.User,
+				Rank = match.Document.SearchVector.Rank(DContext.ToUserSearchQuery(normalized))
+			})
+			.OrderByDescending(match => match.Rank)
+			.ThenBy(match => match.User.Id);
 	}
 
 	public Task<Entities.User.User?> GetUserByPrimaryEmailAsync(

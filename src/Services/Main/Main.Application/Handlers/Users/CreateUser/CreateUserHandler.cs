@@ -39,9 +39,10 @@ public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager password
 
 		foreach (var role in request.Roles)
 		{
-			if (role == RoleNames.Normalize(nameof(Role.System)))
+			var normalizedRole = RoleNames.Normalize(role);
+			if (normalizedRole == RoleNames.Normalize(nameof(Role.System)))
 				throw new CantCreateSystemUserException();
-			user.AddRole(role);
+			user.AddRole(normalizedRole);
 		}
 
 		foreach (var email in request.Emails)

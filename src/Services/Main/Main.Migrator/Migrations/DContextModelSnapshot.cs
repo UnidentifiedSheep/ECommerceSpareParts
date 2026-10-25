@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 
 #nullable disable
 
@@ -2969,22 +2970,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("users", "auth");
                 });
 
-            modelBuilder.Entity("Main.Entities.User.UserDiscount", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("discount");
-
-                    b.HasKey("UserId")
-                        .HasName("user_discounts_pk");
-
-                    b.ToTable("user_discounts", "public");
-                });
-
             modelBuilder.Entity("Main.Entities.User.UserEmail", b =>
                 {
                     b.Property<string>("Email")
@@ -3070,11 +3055,6 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<string>("SearchColumn")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("search_column");
-
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("text")
@@ -3094,12 +3074,6 @@ namespace Main.Migrator.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Name"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Name"), new[] { "gin_trgm_ops" });
-
-                    b.HasIndex("SearchColumn")
-                        .HasDatabaseName("user_info_search_column_index");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchColumn"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("SearchColumn"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex("Surname")
                         .HasDatabaseName("user_info_surname_index");
@@ -3184,6 +3158,9 @@ namespace Main.Migrator.Migrations
 
                     b.HasKey("NormalizedPhone")
                         .HasName("user_phones_pk");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("user_phones_user_id_index");
 
                     b.HasIndex("WhoCreated")
                         .HasDatabaseName("main.entities.user.userphone_who_created_idx");
@@ -3323,6 +3300,28 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("main.entities.user.uservehicle_who_updated_idx");
 
                     b.ToTable("user_vehicles", "public");
+                });
+
+            modelBuilder.Entity("Main.Persistence.ReadModels.UserSearchDocument", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .IsRequired()
+                        .HasColumnType("tsvector")
+                        .HasColumnName("search_vector");
+
+                    b.HasKey("UserId")
+                        .HasName("user_search_pk");
+
+                    b.HasIndex("SearchVector")
+                        .HasDatabaseName("user_search_vector_index");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "gin");
+
+                    b.ToTable("user_search", "auth");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
@@ -4553,16 +4552,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Currency");
                 });
 
-            modelBuilder.Entity("Main.Entities.User.UserDiscount", b =>
-                {
-                    b.HasOne("Main.Entities.User.User", null)
-                        .WithOne("Discount")
-                        .HasForeignKey("Main.Entities.User.UserDiscount", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("user_discounts_users_id_fk");
-                });
-
             modelBuilder.Entity("Main.Entities.User.UserEmail", b =>
                 {
                     b.HasOne("Main.Entities.User.User", "User")
@@ -4625,6 +4614,18 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("user_vehicles_users_id_fk");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Main.Persistence.ReadModels.UserSearchDocument", b =>
+                {
+                    b.HasOne("Main.Entities.User.User", "User")
+                        .WithOne()
+                        .HasForeignKey("Main.Persistence.ReadModels.UserSearchDocument", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("user_search_users_id_fk");
 
                     b.Navigation("User");
                 });
@@ -4759,8 +4760,6 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.User.User", b =>
                 {
                     b.Navigation("CartItems");
-
-                    b.Navigation("Discount");
 
                     b.Navigation("Emails");
 

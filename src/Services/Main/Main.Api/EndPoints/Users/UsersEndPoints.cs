@@ -1,6 +1,4 @@
-using Security.Core.Interfaces;
 using System.Text.Json.Serialization;
-using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
@@ -10,7 +8,6 @@ using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Application.Handlers.Users.GetUserFullInfo;
 using Main.Application.Handlers.Users.GetUsers;
-using Main.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,9 +38,6 @@ public record CreateUserResponse(UserDto User);
 
 public record GetUsersRequest : PaginationQueryModel
 {
-	[FromQuery(Name = "searchTerm")]
-	public string? SearchTerm { get; init; }
-
 	[FromQuery(Name = "id")]
 	public Guid? Id { get; init; }
 
@@ -61,21 +55,10 @@ public record GetUsersRequest : PaginationQueryModel
 
 	[FromQuery(Name = "userName")]
 	public string? UserName { get; init; }
-
-	[FromQuery(Name = "isSupplier")]
-	public bool? IsSupplier { get; init; }
-
 	[FromQuery(Name = "description")]
 	public string? Description { get; init; }
-
-	[FromQuery(Name = "similarityLevel")]
-	public double? SimilarityLevel { get; init; }
-
 	[FromQuery(Name = "roles")]
 	public string[]? Roles { get; init; }
-
-	[FromQuery(Name = "searchMethod")]
-	public GeneralSearchStrategy SearchMethod { get; init; }
 }
 
 public record GetUsersResponse(IReadOnlyList<UserDto> Users);
@@ -88,7 +71,6 @@ public class UsersEndPoints : ICarterModule
 
 		users.MapUserInfoEndPoints();
 		users.MapUserStorageEndPoints();
-		users.MapUserDiscountEndPoints();
 		users.MapUserPermissionEndPoints();
 		users.MapUserEmailEndPoints();
 		users.MapUserRoleEndPoints();
@@ -128,13 +110,10 @@ public class UsersEndPoints : ICarterModule
 				"/",
 				async (
 					ISender sender, [AsParameters] GetUsersRequest request,
-					IUserContext userContext, CancellationToken token) =>
+					CancellationToken token) =>
 				{
 					var query = new GetUsersQuery(
 						request,
-						request.SearchTerm,
-						request.SimilarityLevel,
-						userContext.UserId,
 						request.Name,
 						request.Surname,
 						request.Email,
@@ -142,8 +121,7 @@ public class UsersEndPoints : ICarterModule
 						request.UserName,
 						request.Id,
 						request.Description,
-						request.Roles,
-						request.SearchMethod);
+						request.Roles);
 					var result = await sender.Send(query, token);
 					return Results.Ok(new GetUsersResponse(result.Users));
 				})

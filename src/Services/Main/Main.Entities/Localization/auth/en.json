@@ -1,4 +1,4 @@
-﻿{
+{
   "culture": "en",
   "messages": {
     "invalid.token": "Invalid token.",
@@ -22,7 +22,6 @@
     "role.description.max.length": "Role description must be not exceed 255 characters",
     "user.id.not.empty": "User ID must not be empty.",
     "user.similarity.level.range": "Similarity level must be between 0 and 1.",
-    "user.discount.range": "Discount must be between 0 and 0.99.",
     "user.vehicle.id.not.empty": "Vehicle ID must not be empty.",
     "user.vehicle.plate.number.not.empty": "Vehicle plate number must not be empty.",
     "user.vehicle.plate.number.max.length": "Vehicle plate number must not exceed 32 characters.",

@@ -1,4 +1,4 @@
-﻿using Enums;
+﻿﻿using Enums;
 using Main.Entities.Auth;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -81,8 +81,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.USERS_CREATE,
 				PermissionCodes.USERS_GET,
 				PermissionCodes.USERS_INFO_GET,
-				PermissionCodes.USERS_DISCOUNT_CREATE,
-				PermissionCodes.USERS_DISCOUNT_GET,
 				PermissionCodes.ORGANIZATIONS_CREATE,
 				PermissionCodes.ORGANIZATIONS_EDIT,
 				PermissionCodes.ORGANIZATIONS_GET,
@@ -239,7 +237,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.USERS_VEHICLES_CREATE_ME,
 				PermissionCodes.USERS_VEHICLES_CREATE_ALL,
 				PermissionCodes.USERS_GET,
-				PermissionCodes.USERS_DISCOUNT_GET,
 				PermissionCodes.USERS_INFO_GET,
 				PermissionCodes.USERS_STORAGES_GET,
 				PermissionCodes.ORGANIZATIONS_GET,
@@ -302,8 +299,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.USERS_CREATE,
 				PermissionCodes.USERS_GET,
 				PermissionCodes.USERS_INFO_GET,
-				PermissionCodes.USERS_DISCOUNT_CREATE,
-				PermissionCodes.USERS_DISCOUNT_GET,
 				PermissionCodes.ORGANIZATIONS_CREATE,
 				PermissionCodes.ORGANIZATIONS_EDIT,
 				PermissionCodes.ORGANIZATIONS_GET,

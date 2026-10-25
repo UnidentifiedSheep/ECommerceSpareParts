@@ -1,7 +1,6 @@
 {
   "culture": "tr",
   "messages": {
-    "catalogue.search.query.max.length": "Arama sorgusu {Count} karakteri aşmamalıdır.",
     "catalogue.search.targets.required": "En az bir arama hedefi belirtilmelidir.",
     "catalogue.search.target.invalid": "Belirtilen arama hedefi geçersizdir.",
     "catalogue.search.match.mode.invalid": "Belirtilen arama eşleştirme modu geçersizdir.",

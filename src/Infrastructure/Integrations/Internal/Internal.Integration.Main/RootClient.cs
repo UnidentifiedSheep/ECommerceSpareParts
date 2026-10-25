@@ -46,14 +46,6 @@ public class RootClient(
 		optionsMonitor,
 		jsonOptions);
 
-	private readonly UserNode _userNode = new(
-		httpClient,
-		authClient,
-		optionsMonitor,
-		jsonOptions);
-
-	public IUserNode UserNode => _userNode;
-
 	public IProductNode ProductNode => _productNode;
 
 	public IProducerNode ProducerNode => _producerNode;

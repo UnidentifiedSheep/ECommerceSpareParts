@@ -3,7 +3,6 @@ using Application.Common.Interfaces.Persistence;
 using Attributes;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Extensions;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 
@@ -26,8 +25,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 			});
 		Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
-		await ResetDataStoresAsync();
-		await SeedDb();
+		await InitializeDatabaseAsync();
 		await LoadLocales();
 		await InitializeBasicContexts();
 	}
@@ -42,14 +40,9 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 
 	public override async ValueTask DisposeAsync()
 	{
+		await using var lease = _environmentLease;
+		using var scope = Scope;
 		await ResetDataStoresAsync();
-		await _environmentLease.DisposeAsync();
-		Scope.Dispose();
 	}
 
-	private async Task SeedDb()
-	{
-		using var scope = Sp.CreateScope();
-		await scope.SeedAsync<DContext>();
-	}
 }

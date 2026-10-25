@@ -10,11 +10,8 @@ using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Cache;
 using Carter;
-using Contracts.Auth;
-using Contracts.Currency;
 using Contracts.Job;
 using Contracts.Settings;
-using Contracts.User;
 using GraphQL.Common.Extensions;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
@@ -108,13 +105,6 @@ builder.Services.AddMassTransit(x =>
 
 				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 				ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
-				ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
-				ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
-
-				ep.Bind<CurrencyCreatedEvent>();
-				ep.Bind<RoleUpdatedEvent>();
-				ep.Bind<UserDiscountUpdatedEvent>();
-				ep.Bind<CurrencyRateChangedEvent>();
 			});
 	});
 });

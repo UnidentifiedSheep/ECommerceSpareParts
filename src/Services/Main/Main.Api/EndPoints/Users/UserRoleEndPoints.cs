@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
-using Main.Application.Handlers.Auth.AddRoleToUser;
-using Main.Application.Handlers.Auth.RemoveRoleFromUser;
+using Main.Application.Handlers.Auth.AddRolesToUser;
+using Main.Application.Handlers.Auth.RemoveRolesFromUser;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
@@ -24,7 +24,7 @@ public static class UserRoleEndPoints
 					ISender sender, Guid userId,
 					AddRoleToUserRequest request, CancellationToken ct) =>
 				{
-					await sender.Send(new AddRoleToUserCommand(userId, request.RoleName), ct);
+					await sender.Send(new AddRolesToUserCommand(userId, [request.RoleName]), ct);
 					return Results.NoContent();
 				})
 			.WithName("AddRoleToUser")
@@ -44,7 +44,7 @@ public static class UserRoleEndPoints
 					ISender sender, Guid userId,
 					string roleName, CancellationToken ct) =>
 				{
-					await sender.Send(new RemoveRoleFromUserCommand(userId, roleName), ct);
+					await sender.Send(new RemoveRolesFromUserCommand(userId, [roleName]), ct);
 					return Results.NoContent();
 				})
 			.WithName("RemoveRoleFromUser")

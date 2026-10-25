@@ -1,16 +1,12 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using Enums;
 using LinqKit;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
-using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.NotificationPreference;
 using Main.Application.Dtos.Users;
-using Main.Application.Extensions;
 using Main.Entities.User;
-using Main.Enums.Auth;
 
 namespace Main.Application.Projections;
 
@@ -37,27 +33,6 @@ public sealed class UserDtoProjectionProvider : ProjectionProviderBase<User, Use
 	}
 
 	public override Expression<Func<User, UserDto>> Projection { get; }
-}
-
-[Lifetime(Lifetime.Singleton)]
-public sealed class UserPartyDtoProjectionProvider : ProjectionProviderBase<User, UserPartyDto>
-{
-	public UserPartyDtoProjectionProvider(
-		IProjectionProvider<User, UserDto> userProjection,
-		IProjectionProvider<User, UserPartyType> partyTypeProjection)
-	{
-		var userToDto = userProjection.Projection;
-		var userToPartyType = partyTypeProjection.Projection;
-		var systemRole = Role.System.ToNormalizedRole();
-
-		Projection = x => new UserPartyDto
-		{
-			PartyType = userToPartyType.Invoke(x),
-			User = x.Roles.Any(role => role.RoleName == systemRole) ? null : userToDto.Invoke(x)
-		};
-	}
-
-	public override Expression<Func<User, UserPartyDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
@@ -96,15 +71,6 @@ public sealed class UserPhoneDtoProjectionProvider : ProjectionProviderBase<User
 		Number = x.PhoneNumber,
 		Type = x.PhoneType
 	};
-}
-
-[Lifetime(Lifetime.Singleton)]
-public sealed class UserPartyTypeProjectionProvider : ProjectionProviderBase<User, UserPartyType>
-{
-	private static readonly string SystemRole = Role.System.ToNormalizedRole();
-
-	public override Expression<Func<User, UserPartyType>> Projection { get; } = x =>
-		x.Roles.Any(role => role.RoleName == SystemRole) ? UserPartyType.System : UserPartyType.User;
 }
 
 [Lifetime(Lifetime.Singleton)]

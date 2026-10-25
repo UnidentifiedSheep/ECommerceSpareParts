@@ -1,3 +1,4 @@
+using Analytics.Persistence.Context;
 using Security.Core.Interfaces;
 using System.Globalization;
 using Abstractions.Interfaces;
@@ -8,6 +9,7 @@ using Api.Common;
 using Cache;
 using Locan.Hosting;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -53,6 +55,9 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 				{
 					Url = args.CacheConnectionString, Password = null
 				}));
+
+		services.ConfigureDbContext<DContext>(options =>
+			options.UseNpgsql(pgsql => pgsql.MigrationsAssembly("Analytics.Migrator")));
 
 		var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
 

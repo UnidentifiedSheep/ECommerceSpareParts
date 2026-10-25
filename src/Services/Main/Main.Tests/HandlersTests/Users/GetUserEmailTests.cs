@@ -10,20 +10,23 @@ public class GetUserEmailTests : IntegrationTest
 {
 	public GetUserEmailTests(CombinedContainerFixture fixture) : base(fixture)
 	{
-		RegisterBasicContext<UserEmailTestContext>();
+		RegisterBasicContext<UserContactsTestContext>();
 	}
 
-	private UserEmailTestContext TestContext => GetContext<UserEmailTestContext>();
+	private UserContactsTestContext TestContext => GetContext<UserContactsTestContext>();
 
 	[Fact]
 	public async Task ExistingEmail_ReturnsProjectedEmail()
 	{
+		var user = TestContext.FirstUser;
+		var email = user.Emails.Single(x => x.IsPrimary);
+
 		var result = await Mediator.Send(
-			new GetUserEmailQuery(TestContext.User.Id, TestContext.Email.GetId()),
+			new GetUserEmailQuery(user.Id, email.GetId()),
 			CancellationToken);
 
-		result.Email.Email.Should().Be(TestContext.Email.GetId());
-		result.Email.EmailType.Should().Be(TestContext.Email.EmailType);
+		result.Email.Email.Should().Be(email.GetId());
+		result.Email.EmailType.Should().Be(email.EmailType);
 		result.Email.IsPrimary.Should().BeTrue();
 		result.Email.Confirmed.Should().BeTrue();
 	}
@@ -31,7 +34,8 @@ public class GetUserEmailTests : IntegrationTest
 	[Fact]
 	public async Task EmailBelongsToAnotherUser_ThrowsNotFoundException()
 	{
-		var act = () => Mediator.Send(new GetUserEmailQuery(Guid.NewGuid(), TestContext.Email.GetId()));
+		var email = TestContext.FirstUser.Emails.Single(x => x.IsPrimary);
+		var act = () => Mediator.Send(new GetUserEmailQuery(TestContext.SecondUser.Id, email.GetId()));
 
 		await act.Should().ThrowAsync<UserEmailNotFoundException>();
 	}

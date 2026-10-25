@@ -1,4 +1,4 @@
-﻿using Main.Application.Interfaces.Cache;
+﻿﻿﻿using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Products;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +10,6 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddScoped<IProductProvider, ProductProvider>();
 		services.AddScoped<IProductCacheInvalidator, ProductCacheInvalidator>();
-		services.AddScoped<IUserCacheRepository, UserCacheRepository>();
 		services.AddScoped<IDocumentLinkProvider, DocumentLinkProvider>();
 		services.AddScoped<ICurrencyCacheRepository, CurrencyCacheRepository>();
 		services.AddScoped<IOneTimeTokenStore, OneTimeTokenStore>();

@@ -2,6 +2,8 @@
   "culture": "ru",
   "messages": {
     "empty": "",
+    "search.string.required": "Строка поиска не должна быть пустой.",
+    "search.string.max.length": "Строка поиска должна быть не длиннее {Length} символов.",
     "pagination.page.min.default": "Страница должна быть не меньше 0.",
     "pagination.page.min": "Страница должна быть не меньше {Count}.",
     "pagination.cursor.name": "Курсор",

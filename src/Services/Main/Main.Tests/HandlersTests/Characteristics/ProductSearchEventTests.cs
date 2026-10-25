@@ -1,5 +1,4 @@
 using FluentAssertions;
-using System.Data.Common;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Contracts.Products;
@@ -12,12 +11,13 @@ using Main.Entities.Product;
 using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
+
+using Tests.Persistence.Interceptors;
 
 namespace Tests.HandlersTests.Characteristics;
 
@@ -165,16 +165,4 @@ public class ProductSearchEventTests : IntegrationTest
 	private static TEvent GetEvent<TEvent>(IReadOnlyList<object> events) =>
 		events.OfType<TEvent>().Should().ContainSingle().Which;
 
-	private sealed class QueryCounter : DbCommandInterceptor
-	{
-		public int Reads { get; private set; }
-
-		public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
-			DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result,
-			CancellationToken cancellationToken = default)
-		{
-			Reads++;
-			return ValueTask.FromResult(result);
-		}
-	}
 }

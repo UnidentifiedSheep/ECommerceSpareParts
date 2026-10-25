@@ -2,6 +2,8 @@
   "culture": "tr",
   "messages": {
     "empty": "",
+    "search.string.required": "Arama metni boş olmamalıdır.",
+    "search.string.max.length": "Arama metni {Length} karakterden uzun olmamalıdır.",
     "pagination.page.min.default": "Sayfa 0 veya daha büyük olmalıdır.",
     "pagination.page.min": "Sayfa {Count} veya daha büyük olmalıdır.",
     "pagination.cursor.name": "İmleç",

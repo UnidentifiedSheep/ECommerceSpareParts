@@ -19,7 +19,7 @@ public sealed class RoleDtoProjectionProvider(IContextualLocalizer localizer)
 		Description = x.Description,
 		WhoCreated = x.WhoCreated,
 		WhoUpdated = x.WhoUpdated,
-		CreatedAt = x.UpdatedAt,
+		CreatedAt = x.CreatedAt,
 		UpdatedAt = x.UpdatedAt
 	};
 

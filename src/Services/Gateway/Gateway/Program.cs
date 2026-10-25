@@ -146,12 +146,6 @@ builder.Services.AddMassTransit(x =>
 				ep.Bind<BackplaneMessage>();
 			});
 
-		cfg.ReceiveEndpoint(
-			"gateway-queue",
-			ep =>
-			{
-				ep.Durable = true;
-			});
 
 		cfg.ReceiveEndpoint(
 			$"gateway-notifications-{Guid.NewGuid():N}",

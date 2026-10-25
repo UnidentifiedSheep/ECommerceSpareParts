@@ -22,7 +22,6 @@
     "role.description.max.length": "Rol açıklaması 255 karakteri aşmamalıdır.",
     "user.id.not.empty": "Kullanıcı kimliği boş olmamalıdır.",
     "user.similarity.level.range": "Benzerlik seviyesi 0 ile 1 arasında olmalıdır.",
-    "user.discount.range": "İndirim 0 ile 0,99 arasında olmalıdır.",
     "user.vehicle.id.not.empty": "Araç kimliği boş olmamalıdır.",
     "user.vehicle.plate.number.not.empty": "Araç plaka numarası boş olmamalıdır.",
     "user.vehicle.plate.number.max.length": "Araç plaka numarası 32 karakteri aşmamalıdır.",

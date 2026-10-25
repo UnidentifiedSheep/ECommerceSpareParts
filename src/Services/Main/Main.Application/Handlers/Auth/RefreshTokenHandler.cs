@@ -1,13 +1,18 @@
 using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Projections;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions.Base;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Dtos.Users;
+using Main.Application.Dtos.Users;
+using Main.Application.Extensions.QueryExtensions;
+using Main.Entities.User;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
+using Main.Entities.User;
 using Main.Enums;
 using Security.Core.Interfaces;
 
@@ -23,7 +28,8 @@ public class RefreshTokenHandler(
 	IRepository<UserToken, Guid> repository,
 	IJwtGenerator tokenGenerator,
 	IValueHasher valueHasher,
-	IUserCacheRepository userCache) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
+	IReadRepository<User, Guid> userRepository,
+	IProjectionProvider<User, UserDto> userProjection) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
 {
 	public async Task<RefreshTokenResult> Handle(
 		RefreshTokenCommand request,
@@ -44,23 +50,21 @@ public class RefreshTokenHandler(
 		if (!userToken.IsActive || userToken.Type != TokenType.RefreshToken)
 			throw new InvalidTokenException(request.RefreshToken);
 
-		var user = await userCache.TryGetUserAsync(userToken.UserId, cancellationToken) ??
-			throw new UserNotFoundException(userToken.UserId);
+		var authorization = await userRepository.GetUserAuthorizationAsync(
+			userToken.UserId,
+			userProjection,
+			cancellationToken) ?? throw new UserNotFoundException(userToken.UserId);
 
-		if (user.UserInfo == null)
+		if (authorization.User.UserInfo == null)
 			throw new InternalServerException("User exists, but unable to get user info.");
-
-		var (roles, permissions) =
-			await userCache.GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken) ??
-			throw new UserNotFoundException(userToken.UserId);
 
 		var refreshToken = tokenGenerator.CreateRefreshToken();
 		userToken.RotateToken(valueHasher.Hash(refreshToken));
 
 		var token = tokenGenerator.CreateToken(
-			user,
-			roles,
-			permissions);
+			authorization.User,
+			authorization.Roles,
+			authorization.Permissions);
 
 		return new RefreshTokenResult(token, refreshToken);
 	}

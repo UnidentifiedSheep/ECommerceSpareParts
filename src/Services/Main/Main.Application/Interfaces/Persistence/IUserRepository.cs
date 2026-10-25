@@ -1,16 +1,14 @@
 ﻿using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Users;
+using Main.Application.Models.Users;
 using Main.Entities.User;
 
 namespace Main.Application.Interfaces.Persistence;
 
 public interface IUserRepository : IRepository<User, Guid>
 {
-	Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
-		Guid userId,
-		CancellationToken cancellationToken);
+	IQueryable<User> Search(IQueryable<User> query, string searchTerm);
 
-	Task<decimal?> GetUsersDiscountAsync(Guid userId, CancellationToken cancellationToken = default);
+	IQueryable<UserSearchMatch> SearchWithRank(IQueryable<User> query, string searchTerm);
 
 	Task<User?> GetUserByPrimaryEmailAsync(
 		string email,

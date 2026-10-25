@@ -19,15 +19,6 @@ public sealed class ProductImportLrtStepTests : CsvLrtIntegrationTest<ProductImp
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
-	public override async ValueTask InitializeAsync()
-	{
-		await base.InitializeAsync();
-		// EnsureCreated does not create the index configured through HasComplexCompositeIndex.
-		await Context.Database.ExecuteSqlRawAsync(
-			"CREATE UNIQUE INDEX IF NOT EXISTS products_normalized_sku_producer_id_index " +
-			"ON public.products (normalized_sku, producer_id)");
-	}
-
 	[Fact]
 	public async Task ExistingAndBatchDuplicates_AreSkipped_WithoutMixingProducers()
 	{

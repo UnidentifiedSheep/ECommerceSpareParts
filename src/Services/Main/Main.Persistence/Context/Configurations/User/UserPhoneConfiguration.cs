@@ -12,6 +12,8 @@ public class UserPhoneConfiguration : IEntityTypeConfiguration<UserPhone>
 
 		builder.HasKey(e => e.NormalizedPhone).HasName("user_phones_pk");
 
+		builder.HasIndex(e => e.UserId).HasDatabaseName("user_phones_user_id_index");
+
 		builder
 			.HasIndex(e => e.NormalizedPhone, "user_phones_normalized_phone_index")
 			.HasMethod("gin")

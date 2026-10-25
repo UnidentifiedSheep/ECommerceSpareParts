@@ -33,8 +33,6 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 
 	public string? Description { get; private set; }
 
-	public string SearchColumn { get; private set; } = null!;
-
 	public static Expression<Func<UserInfo, Guid>> GetKeySelector() => x => x.UserId;
 
 	public static Expression<Func<UserInfo, bool>> GetEqualityExpression(Guid key) => x => x.UserId == key;
@@ -60,7 +58,6 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 			.EnsureMinLength(3, UserNameMinLengthMessage.Instance)
 			.Ensure(x => x.All(c => !char.IsSymbol(c)), UserNameNoSpecialCharsMessage.Instance)
 			.EnsureMaxLength(30, UserNameMaxLengthMessage.Instance);
-		UpdateSearchColumn();
 	}
 
 	public void SetSurname(string surname)
@@ -71,7 +68,6 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 			.EnsureMinLength(3, UserSurnameMinLengthMessage.Instance)
 			.Ensure(x => x.All(c => !char.IsSymbol(c)), UserSurnameNoSpecialCharsMessage.Instance)
 			.EnsureMaxLength(30, UserSurnameMaxLengthMessage.Instance);
-		UpdateSearchColumn();
 	}
 
 	public void SetDescription(string? description)
@@ -79,7 +75,6 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 		Description = description
 			.NullIfWhiteSpace()
 			?.EnsureMaxLength(300, UserDescriptionMaxLengthMessage.Instance);
-		UpdateSearchColumn();
 	}
 
 	internal void Update(
@@ -91,8 +86,6 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 		SetSurname(surname);
 		SetDescription(description);
 	}
-
-	private void UpdateSearchColumn() => SearchColumn = $"{Name} {Surname} {Description}".ToUpperInvariant();
 
 	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 

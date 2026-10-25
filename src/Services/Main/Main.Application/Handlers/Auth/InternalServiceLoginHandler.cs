@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Validators;
 using Main.Application.Dtos.Users;
-using Main.Application.Interfaces.Cache;
+using Main.Application.Extensions.QueryExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Exceptions;
@@ -22,7 +22,7 @@ public class InternalServiceLoginHandler(
 	IPasswordManager passwordManager,
 	IUserRepository userRepository,
 	IJwtGenerator tokenGenerator,
-	IUserCacheRepository userCache,
+	IReadRepository<User, Guid> userReadRepository,
 	IProjectionProvider<User, UserDto> userProjection)
 	: ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
 {
@@ -44,7 +44,7 @@ public class InternalServiceLoginHandler(
 			throw new WrongCredentialsException(request.Service, request.ServiceSecret);
 
 		var (roles, permissions) =
-			await userCache.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken) ??
+			await userReadRepository.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken) ??
 			throw new UserNotFoundException(user.Id);
 
 		var userDto = userProjection.ProjectionFunc(user);

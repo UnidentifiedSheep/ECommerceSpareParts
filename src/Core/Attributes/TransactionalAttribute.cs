@@ -12,17 +12,17 @@ public partial class TransactionalAttribute : Attribute
 	/// <param name="isolationLevel">Уровень изоляции транзакции</param>
 	/// <param name="retryDelayMs">Задержка перед повторением не удавшейся транзакции</param>
 	/// <param name="retryCount">Количество повторных попыток</param>
-	/// <param name="retryErrors">Ошибки при которых транзакция будет перезапускаться.</param>
+	/// <param name="retryErrors">Дополнительные ошибки для повторения транзакции. Стандартные ошибки включаются всегда.</param>
 	public TransactionalAttribute(
 		IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
 		int retryDelayMs = 0,
 		int retryCount = 0,
-		TransactionErrorKind retryErrors = DefaultRetryErrors)
+		TransactionErrorKind retryErrors = TransactionErrorKind.None)
 	{
 		IsolationLevel = isolationLevel;
 		RetryDelayMs = retryDelayMs;
 		RetryCount = retryCount;
-		RetryErrors = retryErrors;
+		RetryErrors = DefaultRetryErrors | retryErrors;
 	}
 
 	public IsolationLevel IsolationLevel { get; }

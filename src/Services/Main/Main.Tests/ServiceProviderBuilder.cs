@@ -1,3 +1,4 @@
+using Main.Persistence.Context;
 using Security.Core.Interfaces;
 using System.Globalization;
 using Abstractions.Interfaces;
@@ -10,6 +11,7 @@ using Main.Application.Models;
 using Main.Cache;
 using Main.Persistence;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -89,6 +91,9 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 						Name = "documents", PublicBaseUrl = "https://images.example.com"
 					}
 				}));
+
+		services.ConfigureDbContext<DContext>(options =>
+			options.UseNpgsql(pgsql => pgsql.MigrationsAssembly("Main.Migrator")));
 
 		var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
 

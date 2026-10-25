@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using FluentAssertions;
 using Main.Application.Handlers.Auth;
+using Enums;
+using Role = Main.Entities.Auth.Role;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
@@ -131,6 +133,39 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 		await action.Should().ThrowAsync<DbUpdateConcurrencyException>();
 		var saved = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
 		saved.TokenHash.Should().Be(Hasher.Hash("winner"));
+	}
+
+	[Fact]
+	public async Task Refresh_UsesCurrentProfileAndPermissionsWithoutCacheInvalidation()
+	{
+		var stored = await CreateTokenAsync(DateTime.UtcNow.AddDays(1));
+		Context.AddRange(new Permission(PermissionCodes.USERS_INFO_GET), new Permission(PermissionCodes.USERS_GET));
+		var role = Role.Create("refresh-access");
+		role.AddPermission(Permission.ToNormalizedPermission(PermissionCodes.USERS_INFO_GET));
+		Context.Add(role);
+		Context.Add(UserRole.Create(stored.UserId, role.Name));
+		var direct = UserPermission.Create(stored.UserId, Permission.ToNormalizedPermission(PermissionCodes.USERS_GET));
+		Context.Add(direct);
+		await Context.SaveChangesAsync(CancellationToken);
+		var generator = Scope.ServiceProvider.GetRequiredService<IJwtGenerator>();
+		var first = await RefreshAsync(RawToken);
+		var firstClaims = generator.GetClaimsPrincipal(first.Token);
+		firstClaims.IsInRole(role.Name).Should().BeTrue();
+		firstClaims.FindAll("permission").Select(claim => claim.Value).Should().BeEquivalentTo([
+			Permission.ToNormalizedPermission(PermissionCodes.USERS_INFO_GET),
+			Permission.ToNormalizedPermission(PermissionCodes.USERS_GET)]);
+
+		role.RemovePermission(Permission.ToNormalizedPermission(PermissionCodes.USERS_INFO_GET));
+		Context.Remove(direct);
+		var user = await Context.Users.Include(user => user.UserInfo)
+			.SingleAsync(user => user.Id == stored.UserId, CancellationToken);
+		user.SetUserInfo("New", "Profile", null);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var second = await RefreshAsync(first.RefreshToken);
+		var secondClaims = generator.GetClaimsPrincipal(second.Token);
+		secondClaims.FindAll("permission").Should().BeEmpty();
+		secondClaims.FindFirstValue(ClaimTypes.GivenName).Should().Be("New Profile");
 	}
 
 	private IValueHasher Hasher => Scope.ServiceProvider.GetRequiredService<IValueHasher>();

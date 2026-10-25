@@ -37,6 +37,7 @@
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
         <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
+        <ProjectReference Include="..\Main.Migrator\Main.Migrator.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -5,7 +5,9 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Main.Application.Dtos.Organizations;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Organization;
+using Main.Entities.User;
 using Main.Enums.Organization;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +26,8 @@ public record GetOrganizationsResult(IReadOnlyList<OrganizationListItemDto> Orga
 
 public class GetOrganizationsHandler(
 	IReadRepository<Organization, Guid> repository,
+	IUserRepository userRepository,
+	IReadRepository<User, Guid> userReadRepository,
 	IProjectionProvider<Organization, OrganizationListItemDto> projection)
 	: IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
 {
@@ -49,6 +53,7 @@ public class GetOrganizationsHandler(
 		if (!string.IsNullOrWhiteSpace(searchTerm))
 		{
 			var pattern = $"%{searchTerm}%";
+			var matchingUsers = userRepository.SearchWithRank(userReadRepository.Query, searchTerm);
 			query = query
 				.Select(x => new
 				{
@@ -56,28 +61,24 @@ public class GetOrganizationsHandler(
 					OrganizationRank =
 						EF.Functions.TrigramsSimilarity(x.Name, searchTerm) +
 						EF.Functions.TrigramsSimilarity(x.SystemName, searchTerm),
-					MemberRank = x
-						.Members
-						.Where(member => member.User.UserInfo != null)
-						.Select(member =>
-							EF.Functions.TrigramsSimilarity(member.User.UserInfo!.SearchColumn, searchTerm) +
-							EF.Functions.TrigramsWordSimilarity(
-								member.User.UserInfo!.SearchColumn,
-								searchTerm) *
-							0.7)
-						.OrderByDescending(rank => rank)
-						.FirstOrDefault()
+					MemberRank = matchingUsers
+						.Where(match => x.Members.Any(member => member.UserId == match.User.Id))
+						.Select(match => (float?)match.Rank)
+						.Max()
 				})
 				.Where(x =>
 					EF.Functions.ILike(x.Organization.Name, pattern) ||
-					EF.Functions.ILike(x.Organization.SystemName, pattern) || x.MemberRank >= 0.3 ||
+					EF.Functions.ILike(x.Organization.SystemName, pattern) || x.MemberRank.HasValue ||
 					x.OrganizationRank >= 0.3)
-				.OrderByDescending(x => x.OrganizationRank + x.MemberRank)
+				.OrderByDescending(x => x.OrganizationRank + (x.MemberRank ?? 0))
+				.ThenBy(x => x.Organization.Id)
 				.Select(x => x.Organization);
 		}
 
+		if (request.SortBy.Count > 0 || string.IsNullOrWhiteSpace(searchTerm))
+			query = query.SortBy(request.SortBy);
+
 		var organizations = await query
-			.SortBy(request.SortBy)
 			.Project(projection)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);
