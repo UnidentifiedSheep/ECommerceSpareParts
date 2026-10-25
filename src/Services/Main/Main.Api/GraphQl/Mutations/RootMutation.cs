@@ -5,6 +5,9 @@ namespace Main.Api.GraphQl.Mutations;
 [GraphQLName("Mutation")]
 public sealed class RootMutation
 {
+	[GraphQLName("users")]
+	public UserMutations Users => new();
+
 	[GraphQLName("catalogueCandidates")]
 	public CatalogueCandidateMutations CatalogueCandidates => new();
 
