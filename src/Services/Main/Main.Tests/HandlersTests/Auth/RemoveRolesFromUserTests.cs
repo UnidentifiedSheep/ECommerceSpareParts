@@ -13,10 +13,10 @@ public class RemoveRolesFromUserTests : IntegrationTest
 {
 	public RemoveRolesFromUserTests(CombinedContainerFixture fixture) : base(fixture)
 	{
-		RegisterBasicContext<UserAccessTestContext>();
+		RegisterBasicContext<UsersTestContext>();
 	}
 
-	private UserAccessTestContext TestContext => GetContext<UserAccessTestContext>();
+	private UsersTestContext TestContext => GetContext<UsersTestContext>();
 
 	[Fact]
 	public async Task RemoveRoles_RemovesOnlyRequestedAssignmentsAndReturnsTheirNames()

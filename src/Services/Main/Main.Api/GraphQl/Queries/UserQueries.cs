@@ -57,6 +57,7 @@ public sealed class UserQueries
 		var result = await sender.Send(
 			new SearchUsersQuery(
 				input.SearchTerm,
+				input.Roles,
 				input.Pagination),
 			cancellationToken);
 		return result.Users.Select(user => new GqlUser(user)).ToArray();

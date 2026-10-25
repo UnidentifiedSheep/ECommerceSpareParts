@@ -1,6 +1,4 @@
-using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Users.SearchUsers;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.DatabaseObjects;
@@ -21,7 +19,7 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		user.AddEmail("original-contact@contacts.example", EmailType.Unknown, false, false);
 		user.AddUserPhone("79994445566", PhoneType.Unknown, false, false);
 		await Context.SaveChangesAsync(CancellationToken);
-		(await Search("Уникальноеимя")).Users.Should().ContainSingle();
+		(await FindDocumentUserIds("Уникальноеимя")).Should().ContainSingle();
 
 		user.SetUserInfo("Обновленноеимя", "Новаяфамилия", null);
 		await Context.SaveChangesAsync(CancellationToken);
@@ -32,25 +30,25 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		await Context.Database.ExecuteSqlInterpolatedAsync(
 			$"UPDATE auth.user_phones SET normalized_phone = '79995556677', phone_number = '79995556677' WHERE user_id = {user.Id}", CancellationToken);
 
-		(await Search("Уникальноеимя")).Users.Should().BeEmpty();
-		(await Search("original-contact@contacts.example")).Users.Should().BeEmpty();
-		(await Search("79994445566")).Users.Should().BeEmpty();
-		(await Search("Обновленноеимя")).Users.Select(result => result.Id).Should().Equal(user.Id);
-		(await Search("changed-login")).Users.Select(result => result.Id).Should().Equal(user.Id);
-		(await Search("changed-contact@contacts.example")).Users.Select(result => result.Id).Should().Equal(user.Id);
-		(await Search("79995556677")).Users.Select(result => result.Id).Should().Equal(user.Id);
+		(await FindDocumentUserIds("Уникальноеимя")).Should().BeEmpty();
+		(await FindDocumentUserIds("original-contact@contacts.example")).Should().BeEmpty();
+		(await FindDocumentUserIds("79994445566")).Should().BeEmpty();
+		(await FindDocumentUserIds("Обновленноеимя")).Should().Equal(user.Id);
+		(await FindDocumentUserIds("changed-login")).Should().Equal(user.Id);
+		(await FindDocumentUserIds("changed-contact@contacts.example")).Should().Equal(user.Id);
+		(await FindDocumentUserIds("79995556677")).Should().Equal(user.Id);
 
 		await Context.Database.ExecuteSqlInterpolatedAsync(
 			$"DELETE FROM auth.user_emails WHERE user_id = {user.Id}", CancellationToken);
 		await Context.Database.ExecuteSqlInterpolatedAsync(
 			$"DELETE FROM auth.user_phones WHERE user_id = {user.Id}", CancellationToken);
-		(await Search("changed-contact@contacts.example")).Users.Should().BeEmpty();
-		(await Search("79995556677")).Users.Should().BeEmpty();
+		(await FindDocumentUserIds("changed-contact@contacts.example")).Should().BeEmpty();
+		(await FindDocumentUserIds("79995556677")).Should().BeEmpty();
 
 		await Context.Database.ExecuteSqlInterpolatedAsync(
 			$"DELETE FROM auth.user_info WHERE user_id = {user.Id}", CancellationToken);
-		(await Search("Обновленноеимя")).Users.Should().BeEmpty();
-		(await Search("changed-login")).Users.Should().ContainSingle();
+		(await FindDocumentUserIds("Обновленноеимя")).Should().BeEmpty();
+		(await FindDocumentUserIds("changed-login")).Should().ContainSingle();
 
 		await Context.Database.ExecuteSqlInterpolatedAsync(
 			$"DELETE FROM auth.organization_members WHERE user_id = {user.Id}", CancellationToken);
@@ -68,12 +66,12 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		await using var transaction = await Context.Database.BeginTransactionAsync(CancellationToken);
 		await Context.Database.ExecuteSqlInterpolatedAsync(
 			$"UPDATE auth.users SET normalized_user_name = 'ROLLBACK-TEMPORARY' WHERE id = {user.Id}", CancellationToken);
-		(await Search("rollback-temporary")).Users.Should().ContainSingle();
+		(await FindDocumentUserIds("rollback-temporary")).Should().ContainSingle();
 
 		await transaction.RollbackAsync(CancellationToken);
 
-		(await Search("rollback-temporary")).Users.Should().BeEmpty();
-		(await Search("rollback-original")).Users.Should().ContainSingle();
+		(await FindDocumentUserIds("rollback-temporary")).Should().BeEmpty();
+		(await FindDocumentUserIds("rollback-original")).Should().ContainSingle();
 	}
 
 	[Fact]
@@ -90,14 +88,14 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 			UserSearchSql.V1.CreateTriggers,
 			UserSearchSql.V1.Backfill);
 
-		(await Search("Миграционный")).Users.Select(result => result.Id).Should().Equal(user.Id);
-		(await Search("migration.contact@contacts.example")).Users.Select(result => result.Id).Should().Equal(user.Id);
+		(await FindDocumentUserIds("Миграционный")).Should().Equal(user.Id);
+		(await FindDocumentUserIds("migration.contact@contacts.example")).Should().Equal(user.Id);
 		await ExecuteStatements(UserSearchSql.V1.DropTriggers, UserSearchSql.V1.DropFunctions);
 		await ExecuteStatements(
 			UserSearchSql.V1.CreateFunctions,
 			UserSearchSql.V1.CreateTriggers,
 			UserSearchSql.V1.Backfill);
-		(await Search("Миграционный")).Users.Should().ContainSingle();
+		(await FindDocumentUserIds("Миграционный")).Should().ContainSingle();
 	}
 
 	[Fact]
@@ -139,13 +137,15 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		await secondTransaction.CommitAsync(CancellationToken);
 
 		waiting.Should().BeTrue("updates to one user's search document must be serialized");
-		(await Search("Параллельноеимя")).Users.Select(result => result.Id).Should().Equal(user.Id);
-		(await Search("concurrent.new@contacts.example")).Users.Select(result => result.Id).Should().Equal(user.Id);
-		(await Search("concurrent.old@contacts.example")).Users.Should().BeEmpty();
+		(await FindDocumentUserIds("Параллельноеимя")).Should().Equal(user.Id);
+		(await FindDocumentUserIds("concurrent.new@contacts.example")).Should().Equal(user.Id);
+		(await FindDocumentUserIds("concurrent.old@contacts.example")).Should().BeEmpty();
 	}
 
-	private Task<SearchUsersResult> Search(string term, Pagination? pagination = null) =>
-		Mediator.Send(new SearchUsersQuery(term, pagination ?? new Pagination(0, 25)), CancellationToken);
+	private Task<Guid[]> FindDocumentUserIds(string term) =>
+		Context.Database.SqlQuery<Guid>(
+			$"SELECT user_id AS \"Value\" FROM auth.user_search WHERE search_vector @@ plainto_tsquery('simple', {term})")
+			.ToArrayAsync(CancellationToken);
 
 	private Task<User> CreateUser(string login, string name, string surname, string? description = null) =>
 		new UserBuilder(Faker).WithUserName(login).WithUserInfo(name, surname, description)

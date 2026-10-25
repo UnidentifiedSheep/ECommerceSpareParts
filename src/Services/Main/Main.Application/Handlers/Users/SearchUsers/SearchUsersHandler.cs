@@ -12,7 +12,10 @@ using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Users.SearchUsers;
 
-public sealed record SearchUsersQuery(string SearchTerm, Pagination Pagination) : IQuery<SearchUsersResult>;
+public sealed record SearchUsersQuery(
+	string SearchTerm,
+	IReadOnlyCollection<string>? Roles,
+	Pagination Pagination) : IQuery<SearchUsersResult>;
 
 public sealed record SearchUsersResult(IReadOnlyList<UserDto> Users);
 
@@ -27,6 +30,7 @@ public sealed class SearchUsersHandler(
 		var users = await userRepository
 			.Search(readRepository.Query, request.SearchTerm)
 			.ExcludeUsersWithRole(Role.System)
+			.IncludeUsersWithRoles(request.Roles ?? [])
 			.Project(projection)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);

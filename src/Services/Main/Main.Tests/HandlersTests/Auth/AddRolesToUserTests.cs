@@ -13,10 +13,10 @@ public class AddRolesToUserTests : IntegrationTest
 {
 	public AddRolesToUserTests(CombinedContainerFixture fixture) : base(fixture)
 	{
-		RegisterBasicContext<UserAccessTestContext>();
+		RegisterBasicContext<UsersTestContext>();
 	}
 
-	private UserAccessTestContext TestContext => GetContext<UserAccessTestContext>();
+	private UsersTestContext TestContext => GetContext<UsersTestContext>();
 
 	[Fact]
 	public async Task AddRoles_NormalizesAndDeduplicatesNamesAndReturnsOnlyAddedRoles()
