@@ -174,18 +174,20 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	}
 
 	[Theory]
-	[InlineData(TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict, PostgresErrorCodes.UniqueViolation, 3)]
-	[InlineData(TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict, PostgresErrorCodes.SerializationFailure, 3)]
-	[InlineData(TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict, PostgresErrorCodes.ForeignKeyViolation, 1)]
-	[InlineData(TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict, PostgresErrorCodes.DeadlockDetected, 1)]
-	[InlineData(TransactionErrorKind.None, PostgresErrorCodes.SerializationFailure, 1)]
-	[InlineData(TransactionalAttribute.DefaultRetryErrors, PostgresErrorCodes.DeadlockDetected, 3)]
-	[InlineData(TransactionalAttribute.DefaultRetryErrors, PostgresErrorCodes.LockNotAvailable, 3)]
-	[InlineData(TransactionalAttribute.DefaultRetryErrors, PostgresErrorCodes.UniqueViolation, 1)]
-	public async Task RetryMask_OnlyRetriesMatchingProviderErrors(TransactionErrorKind retryErrors, string sqlState, int expectedAttempts)
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation, PostgresErrorCodes.UniqueViolation, 3, 2)]
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation, PostgresErrorCodes.SerializationFailure, 3, 2)]
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation, PostgresErrorCodes.ForeignKeyViolation, 1, 2)]
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation, PostgresErrorCodes.DeadlockDetected, 3, 2)]
+	[InlineData(TransactionErrorKind.None, PostgresErrorCodes.SerializationFailure, 3, 2)]
+	[InlineData(TransactionErrorKind.None, PostgresErrorCodes.DeadlockDetected, 3, 2)]
+	[InlineData(TransactionErrorKind.None, PostgresErrorCodes.LockNotAvailable, 3, 2)]
+	[InlineData(TransactionErrorKind.None, PostgresErrorCodes.UniqueViolation, 1, 2)]
+	[InlineData(TransactionErrorKind.None, PostgresErrorCodes.SerializationFailure, 1, 0)]
+	public async Task RetryErrors_IncludeDefaultsAndAdditionalProviderErrors(
+		TransactionErrorKind retryErrors, string sqlState, int expectedAttempts, int retryCount)
 	{
 		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
-		var settings = new TransactionalAttribute(retryCount: 2, retryErrors: retryErrors);
+		var settings = new TransactionalAttribute(retryCount: retryCount, retryErrors: retryErrors);
 		var failure = new PostgresException("failed", "ERROR", "ERROR", sqlState);
 		var attempts = 0;
 		var handled = 0;
@@ -209,12 +211,14 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	}
 
 	[Theory]
-	[InlineData(TransactionErrorKind.ConcurrencyConflict, 3)]
-	[InlineData(TransactionErrorKind.None, 1)]
-	public async Task RetryMask_ControlsEfConcurrencyRetries(TransactionErrorKind retryErrors, int expectedAttempts)
+	[InlineData(TransactionErrorKind.None, 2, 3)]
+	[InlineData(TransactionErrorKind.UniqueConstraintViolation, 2, 3)]
+	[InlineData(TransactionErrorKind.None, 0, 1)]
+	public async Task RetryErrors_AlwaysIncludeEfConcurrencyUnlessRetriesAreDisabled(
+		TransactionErrorKind retryErrors, int retryCount, int expectedAttempts)
 	{
 		var service = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
-		var settings = new TransactionalAttribute(retryCount: 2, retryErrors: retryErrors);
+		var settings = new TransactionalAttribute(retryCount: retryCount, retryErrors: retryErrors);
 		var failure = new DbUpdateConcurrencyException("conflict");
 		var attempts = 0;
 

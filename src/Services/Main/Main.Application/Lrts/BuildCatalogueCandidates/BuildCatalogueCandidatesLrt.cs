@@ -26,7 +26,7 @@ public class BuildCatalogueCandidatesLrt(
 		IsolationLevel.ReadCommitted,
 		20,
 		2,
-		TransactionalAttribute.DefaultRetryErrors | TransactionErrorKind.UniqueConstraintViolation);
+		TransactionErrorKind.UniqueConstraintViolation);
 
 	public override string SystemName => LrtSystemName;
 

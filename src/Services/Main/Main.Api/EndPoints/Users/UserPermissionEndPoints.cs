@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
-using Main.Application.Handlers.Auth;
-using Main.Application.Handlers.Auth.AddPermissionToUser;
+using Main.Application.Handlers.Auth.RemovePermissionsFromUser;
+using Main.Application.Handlers.Auth.AddPermissionsToUser;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
@@ -24,7 +24,7 @@ public static class UserPermissionEndPoints
 					ISender sender, Guid userId,
 					AddPermissionToUserRequest request, CancellationToken ct) =>
 				{
-					await sender.Send(new AddPermissionToUserCommand(userId, request.Permission), ct);
+					await sender.Send(new AddPermissionsToUserCommand(userId, [request.Permission]), ct);
 					return Results.NoContent();
 				})
 			.WithName("AddPermissionToUser")
@@ -43,7 +43,7 @@ public static class UserPermissionEndPoints
 					ISender sender, Guid userId,
 					string permission, CancellationToken ct) =>
 				{
-					await sender.Send(new RemovePermissionFromUserCommand(userId, permission), ct);
+					await sender.Send(new RemovePermissionsFromUserCommand(userId, [permission]), ct);
 					return Results.Ok();
 				})
 			.WithName("RemovePermissionFromUser")

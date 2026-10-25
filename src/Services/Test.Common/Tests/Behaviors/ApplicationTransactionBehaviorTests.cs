@@ -46,7 +46,7 @@ public sealed class ApplicationTransactionBehaviorTests
 	}
 
 	[Fact]
-	public async Task Handle_TransactionalRequest_PreservesTheExplicitRetryMask()
+	public async Task Handle_TransactionalRequest_CombinesDefaultAndAdditionalRetryErrors()
 	{
 		var service = new RecordingApplicationTransaction();
 		var behavior = new ApplicationTransactionBehavior<CustomRetryRequest, Unit>(service);
@@ -57,7 +57,7 @@ public sealed class ApplicationTransactionBehaviorTests
 			CancellationToken.None);
 
 		service.Settings!.RetryErrors.Should().Be(
-			TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict);
+			TransactionalAttribute.DefaultRetryErrors | TransactionErrorKind.UniqueConstraintViolation);
 		service.Settings.RetryCount.Should().Be(2);
 	}
 
@@ -99,7 +99,7 @@ public sealed class ApplicationTransactionBehaviorTests
 	[Transactional]
 	private sealed record TransactionalRequest : IRequest<Unit>;
 
-	[Transactional(retryCount: 2, retryErrors: TransactionErrorKind.UniqueConstraintViolation | TransactionErrorKind.ConcurrencyConflict)]
+	[Transactional(retryCount: 2, retryErrors: TransactionErrorKind.UniqueConstraintViolation)]
 	private sealed record CustomRetryRequest : IRequest<Unit>;
 
 	[AutoSave]

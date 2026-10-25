@@ -12,6 +12,6 @@ public partial class TransactionalAttribute
 			IsolationLevel.ReadCommitted,
 			delay,
 			retryCount,
-			DefaultRetryErrors | TransactionErrorKind.UniqueConstraintViolation);
+			TransactionErrorKind.UniqueConstraintViolation);
 	}
 }
