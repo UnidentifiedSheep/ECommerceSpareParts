@@ -3,6 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Types.Auth;
 using Main.Application.Dtos.Users;
 using Main.Entities.Exceptions;
 
@@ -86,17 +87,19 @@ public record GqlUser
 
 	[GraphQLName("roles")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
-	public async Task<IReadOnlyList<string>> GetRolesAsync(
+	public async Task<IReadOnlyList<GqlRole>> GetRolesAsync(
 		IUserRolesAndPermissionsByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Roles;
+		(await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Roles
+			.Select(role => new GqlRole(role)).ToArray();
 
 	[GraphQLName("permissions")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
-	public async Task<IReadOnlyList<string>> GetPermissionsAsync(
+	public async Task<IReadOnlyList<GqlPermission>> GetPermissionsAsync(
 		IUserRolesAndPermissionsByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
-		(await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Permissions;
+		(await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Permissions
+			.Select(permission => new GqlPermission(permission)).ToArray();
 
 	private async Task<UserDto> GetUserAsync(
 		IUserByIdDataLoader loader,
