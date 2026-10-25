@@ -1,7 +1,13 @@
+using Enums;
+using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.User;
 using Main.Application.Dtos.Organizations;
+using Main.Api.GraphQl.Types.Inputs.Organization;
+using Main.Application.Handlers.Organizations.GetOrganizationMembers;
+using Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
+using MediatR;
 using Main.Entities.Exceptions;
 using Main.Enums.Organization;
 
@@ -60,6 +66,33 @@ public sealed record GqlOrganization
 		IOrganizationByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
 		(await GetOrganizationAsync(loader, cancellationToken)).ApproximateBalanceInBaseCurrency;
+
+	[GraphQLName("members")]
+	[RequireAllPermissions(PermissionCodes.ORGANIZATIONS_GET)]
+	public async Task<IReadOnlyList<GqlOrganizationMember>> GetMembersAsync(
+		GqlOrganizationMembersInput input,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var result = await sender.Send(
+			new GetOrganizationMembersQuery(Id, input.Pagination),
+			cancellationToken);
+
+		return result.Members.Select(member => new GqlOrganizationMember(member)).ToArray();
+	}
+
+	[GraphQLName("finances")]
+	[RequireAllPermissions(PermissionCodes.BALANCES_FINANCES_GET)]
+	public async Task<GqlOrganizationFinances> GetFinancesAsync(
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var result = await sender.Send(
+			new GetOrganizationFinancialInfoQuery(Id),
+			cancellationToken);
+
+		return new GqlOrganizationFinances(result.FinancialProfile, result.Balances);
+	}
 
 	private async Task<OrganizationListItemDto> GetOrganizationAsync(
 		IOrganizationByIdDataLoader loader,
