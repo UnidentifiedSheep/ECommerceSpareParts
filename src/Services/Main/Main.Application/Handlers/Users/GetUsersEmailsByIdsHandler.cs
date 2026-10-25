@@ -1,10 +1,8 @@
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Users;
-using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,8 +31,6 @@ public sealed class GetUsersEmailsByIdsHandler(
 		GetUsersEmailsByIdsQuery request,
 		CancellationToken cancellationToken)
 	{
-		cancellationToken.ThrowIfCancellationRequested();
-
 		if (request.Ids.Count == 0)
 			return new GetUsersEmailsByIdsResult(new Dictionary<Guid, IReadOnlyList<UserEmailDto>>());
 
@@ -52,9 +48,6 @@ public sealed class GetUsersEmailsByIdsHandler(
 			.ToDictionary(
 				x => x.Key,
 				IReadOnlyList<UserEmailDto> (x) => x.OrderByDescending(z => z.IsPrimary).ToList());
-
-		if (request.Ids.Count == 1 && !emails.ContainsKey(request.Ids[0]))
-			throw new UserNotFoundException(request.Ids[0]);
 
 		return new GetUsersEmailsByIdsResult(emails);
 	}

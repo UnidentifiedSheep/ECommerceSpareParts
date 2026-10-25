@@ -28,4 +28,11 @@ public static class UserDataLoaders
 		CancellationToken cancellationToken)
 		=> (await sender.Send(new GetUsersEmailsByIdsQuery(keys), cancellationToken)).Emails;
 
+
+	[DataLoader]
+	public static async Task<IReadOnlyDictionary<Guid, IReadOnlyList<UserPhoneDto>>> GetUserPhonesByIdAsync(
+		IReadOnlyList<Guid> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetUsersPhonesByIdsQuery(keys), cancellationToken)).Phones;
 }

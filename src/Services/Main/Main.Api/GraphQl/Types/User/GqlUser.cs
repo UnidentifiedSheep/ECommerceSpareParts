@@ -94,6 +94,16 @@ public record GqlUser
 			.Select(email => new GqlUserEmail(email))
 			.ToArray();
 
+	[GraphQLName("phones")]
+	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
+	public async Task<IReadOnlyList<GqlUserPhone>> GetPhonesAsync(
+		IUserPhonesByIdDataLoader loader,
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
+			.Select(phone => new GqlUserPhone(phone))
+			.ToArray();
+
+
 	[GraphQLName("roles")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<IReadOnlyList<GqlRole>> GetRolesAsync(

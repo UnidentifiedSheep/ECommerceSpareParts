@@ -9,6 +9,8 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
 {
 	private readonly List<UserEmailData> _emails = [];
 
+	private readonly List<UserPhoneData> _phones = [];
+
 	private readonly List<string> _roles = [];
 
 	public UserName? UserName { get; private set; }
@@ -58,6 +60,16 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
 		return this;
 	}
 
+	public UserBuilder WithPhone(
+		string phone,
+		PhoneType type = PhoneType.Mobile,
+		bool isPrimary = false,
+		bool isConfirmed = true)
+	{
+		_phones.Add(new UserPhoneData(phone, type, isPrimary, isConfirmed));
+		return this;
+	}
+
 	public UserBuilder WithUserInfo()
 	{
 		UserInfoSet = true;
@@ -97,8 +109,21 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
 				email.IsPrimary,
 				email.IsConfirmed);
 
+		foreach (var phone in _phones)
+			user.AddUserPhone(
+				phone.Value,
+				phone.Type,
+				phone.IsPrimary,
+				phone.IsConfirmed);
+
 		return user;
 	}
+
+	private sealed record UserPhoneData(
+		string Value,
+		PhoneType Type,
+		bool IsPrimary,
+		bool IsConfirmed);
 
 	private sealed record UserEmailData(
 		string Value,
