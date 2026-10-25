@@ -127,13 +127,12 @@ public class UsersEndPoints : ICarterModule
 				"/",
 				async (
 					ISender sender, [AsParameters] GetUsersRequest request,
-					IUserContext userContext, CancellationToken token) =>
+					CancellationToken token) =>
 				{
 					var query = new GetUsersQuery(
 						request,
 						request.SearchTerm,
 						request.SimilarityLevel,
-						userContext.UserId,
 						request.Name,
 						request.Surname,
 						request.Email,

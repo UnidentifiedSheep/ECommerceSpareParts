@@ -20,7 +20,6 @@ public record GetUsersQuery(
 	Pagination Pagination,
 	string? SearchColumn,
 	double? SimilarityLevel,
-	Guid? WhoSearchedUserId,
 	string? Name,
 	string? Surname,
 	string? Email,
