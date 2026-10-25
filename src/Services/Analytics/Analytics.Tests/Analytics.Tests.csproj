@@ -30,6 +30,7 @@
         <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj"/>
         <ProjectReference Include="..\Analytics.Cache\Analytics.Cache.csproj"/>
         <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj"/>
+        <ProjectReference Include="..\Analytics.Migrator\Analytics.Migrator.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

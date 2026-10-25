@@ -1,3 +1,4 @@
+using Application.Common;
 using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
@@ -13,7 +14,7 @@ public sealed class SearchInCatalogueValidation : AbstractValidator<SearchInCata
 	{
 		RuleFor(x => x.Query)
 			.MaximumLength(200)
-			.WithLocalizableError(new CatalogueSearchQueryMaxLengthMessage().WithCount(200));
+			.WithLocalizableError(SearchStringMaxLengthMessage.Create(200));
 
 		RuleFor(x => x.Targets)
 			.NotEmpty()

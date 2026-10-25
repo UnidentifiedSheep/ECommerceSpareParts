@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Persistence.Interfaces;
 using StackExchange.Redis;
 using Tests.Extensions;
 using Tests.Interfaces.ServiceProvider;
@@ -30,6 +31,18 @@ public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
 		_sp = new TSp().Build(args);
 		_scope = Sp.CreateScope();
 		Context = _scope.ServiceProvider.GetRequiredService<TContext>();
+	}
+
+	protected async Task InitializeDatabaseAsync()
+	{
+		await Context.Database.MigrateAsync(CancellationToken);
+		await ResetDataStoresAsync(CancellationToken);
+
+		await using var scope = Sp.CreateAsyncScope();
+		var context = scope.ServiceProvider.GetRequiredService<TContext>();
+		var seeds = scope.ServiceProvider.GetServices<ISeed<TContext>>().OrderBy(seed => seed.ExecutionOrder);
+		foreach (var seed in seeds)
+			await seed.SeedAsync(context);
 	}
 
 	protected async Task LoadLocales()

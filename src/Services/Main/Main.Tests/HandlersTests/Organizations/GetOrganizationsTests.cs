@@ -6,7 +6,9 @@ using Main.Application.Handlers.Organizations.GetOrganizations;
 using Main.Application.Static;
 using Main.Entities.Organization;
 using Main.Enums.Organization;
+using Main.Enums;
 using Tests.DataBuilders.Organization;
+using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -47,15 +49,17 @@ public class GetOrganizationsTests : IntegrationTest
 		result.Organizations[0].Id.Should().Be(expected.Id);
 	}
 
-	[Fact]
-	public async Task GetOrganizations_ByMemberSearchColumn_ReturnsMemberOrganizations()
+	[Theory]
+	[InlineData(null)]
+	[InlineData("Organization contact")]
+	public async Task GetOrganizations_ByMemberProfile_ReturnsMemberOrganizations(string? description)
 	{
 		var users = GetContext<UsersTestContext>().Users.ToArray();
 		var member = users[1];
 		member.SetUserInfo(
 			"Distinctive",
 			"Membername",
-			"Organization contact");
+			description);
 
 		var expected = await new OrganizationBuilder(Faker)
 			.WithOwnerId(users[0].Id)
@@ -66,6 +70,61 @@ public class GetOrganizationsTests : IntegrationTest
 		var result = await Mediator.Send(CreateQuery("Distinctive Membername"), CancellationToken);
 
 		result.Organizations.Should().Contain(x => x.Id == expected.Id);
+	}
+
+	[Theory]
+	[InlineData("preview-member-login")]
+	[InlineData("organization.contact@contacts.example")]
+	[InlineData("+7 (999) 123-45-67")]
+	public async Task GetOrganizations_ByMemberContactWithoutProfile_ReturnsMatchingOrganization(string term)
+	{
+		var member = new UserBuilder(Faker).WithUserName("preview-member-login")
+			.WithEmail("organization.contact@contacts.example").Build();
+		member.AddUserPhone("+7 (999) 123-45-67", PhoneType.Unknown, false, false);
+		Context.Add(member);
+		var expected = await CreateOrganization("First warehouse", "first-warehouse");
+		expected.AddMember(member.Id, OrganizationRole.Member);
+		await Context.SaveChangesAsync(CancellationToken);
+		var unrelated = await CreateOrganization("Second warehouse", "second-warehouse");
+
+		var result = await Mediator.Send(CreateQuery(term, ids: [expected.Id, unrelated.Id]), CancellationToken);
+
+		result.Organizations.Select(organization => organization.Id).Should().Equal(expected.Id);
+	}
+
+	[Fact]
+	public async Task GetOrganizations_SearchRanksByBestMemberAndPaginatesWithoutDuplicates()
+	{
+		var strongMember = await new UserBuilder(Faker).WithUserName("organization-strong-member")
+			.WithUserInfo("Космонавтов", "Петров", null).BuildAndAddToDb(Context);
+		var weakMember = await new UserBuilder(Faker).WithUserName("organization-weak-member")
+			.WithUserInfo("Николай", "Иванов", "Космонавтов").BuildAndAddToDb(Context);
+		var first = await CreateOrganization("Alpha warehouse", "alpha-warehouse");
+		var second = await CreateOrganization("Beta warehouse", "beta-warehouse");
+		var weak = await CreateOrganization("Gamma warehouse", "gamma-warehouse");
+		var unrelated = await CreateOrganization("Delta warehouse", "delta-warehouse");
+		first.AddMember(strongMember.Id, OrganizationRole.Member);
+		second.AddMember(strongMember.Id, OrganizationRole.Member);
+		weak.AddMember(weakMember.Id, OrganizationRole.Member);
+		var strongOrganizations = new[] { first, second }.OrderBy(organization => organization.Id).ToArray();
+		strongOrganizations[1].AddMember(weakMember.Id, OrganizationRole.Member);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var ids = new[] { first.Id, second.Id, weak.Id, unrelated.Id };
+		var organizations = new List<Guid>();
+		for (var page = 0; page < 3; page++)
+		{
+			var result = await Mediator.Send(CreateQuery("космонавтов", ids: ids, page: page, size: 1), CancellationToken);
+			organizations.Add(result.Organizations.Should().ContainSingle().Which.Id);
+		}
+
+		organizations.Should().Equal(strongOrganizations[0].Id, strongOrganizations[1].Id, weak.Id);
+		var last = await Mediator.Send(CreateQuery("космонавтов", ids: ids, page: 3, size: 1), CancellationToken);
+		last.Organizations.Should().BeEmpty();
+
+		var customSort = await Mediator.Send(
+			CreateQuery("космонавтов", ids: ids, sortBy: ["name_desc"]), CancellationToken);
+		customSort.Organizations.Select(organization => organization.Id).Should().Equal(weak.Id, second.Id, first.Id);
 	}
 
 	[Fact]

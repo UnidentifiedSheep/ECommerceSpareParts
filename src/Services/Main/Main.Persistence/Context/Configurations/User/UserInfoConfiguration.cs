@@ -25,12 +25,6 @@ public class UserInfoConfiguration : IEntityTypeConfiguration<UserInfo>
 			.HasOperators("gin_trgm_ops");
 
 		builder
-			.HasIndex(e => e.SearchColumn)
-			.HasDatabaseName("user_info_search_column_index")
-			.HasMethod("gin")
-			.HasOperators("gin_trgm_ops");
-
-		builder
 			.HasIndex(e => e.Surname)
 			.HasDatabaseName("user_info_surname_index")
 			.HasMethod("gin")
@@ -41,8 +35,6 @@ public class UserInfoConfiguration : IEntityTypeConfiguration<UserInfo>
 		builder.Property(e => e.Description).HasColumnName("description");
 
 		builder.Property(e => e.Name).HasColumnName("name");
-
-		builder.Property(e => e.SearchColumn).HasColumnName("search_column");
 
 		builder.Property(e => e.Surname).HasColumnName("surname");
 

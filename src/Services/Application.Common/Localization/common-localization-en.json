@@ -2,6 +2,8 @@
   "culture": "en",
   "messages": {
     "empty": "",
+    "search.string.required": "Search string must not be empty.",
+    "search.string.max.length": "Search string must not exceed {Length|int} characters.",
     "pagination.page.min.default": "Page must be greater than or equal to 0.",
     "pagination.page.min": "Page must be greater than or equal to {Count|int}.",
     "pagination.cursor.name": "Cursor",

@@ -31,6 +31,7 @@
         <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj"/>
         <ProjectReference Include="..\Pricing.Cache\Pricing.Cache.csproj"/>
         <ProjectReference Include="..\Pricing.Persistence\Pricing.Persistence.csproj"/>
+        <ProjectReference Include="..\Pricing.Migrator\Pricing.Migrator.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

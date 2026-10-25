@@ -24,6 +24,7 @@ using Microsoft.EntityFrameworkCore;
 using Notification.Persistence;
 using Notification.Persistence.Interfaces;
 using Notification.Core.Entities;
+using NpgsqlTypes;
 using Persistence.Common;
 using Persistence.Common.BaseTableConfigurations;
 using Persistence.Interceptors;
@@ -33,6 +34,10 @@ namespace Main.Persistence.Context;
 
 public partial class DContext : DbContext, INotificationDbContext
 {
+	[DbFunction("user_search_query", "auth")]
+	public static NpgsqlTsQuery ToUserSearchQuery(string searchTerm) =>
+		throw new NotSupportedException("This function can only be used in database queries.");
+
 	public DContext()
 	{
 	}

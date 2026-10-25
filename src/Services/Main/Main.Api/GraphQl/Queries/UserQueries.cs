@@ -6,9 +6,8 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.User;
 using Main.Api.GraphQl.Types.User;
 using Main.Application.Handlers.Users.GetUsers;
-using Main.Enums;
+using Main.Application.Handlers.Users.SearchUsers;
 using MediatR;
-using Security.Core.Interfaces;
 
 namespace Main.Api.GraphQl.Queries;
 
@@ -26,6 +25,28 @@ public sealed class UserQueries
 		return user is null ? null : new GqlUser(user);
 	}
 
+	[GraphQLName("list")]
+	[RequireAllPermissions(PermissionCodes.USERS_GET)]
+	public async Task<IReadOnlyList<GqlUser>> ListAsync(
+		GqlGetUsersInput input,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var result = await sender.Send(
+			new GetUsersQuery(
+				input.Pagination,
+				input.Name,
+				input.Surname,
+				input.Email,
+				input.Phone,
+				input.UserName,
+				input.Id,
+				input.Description,
+				input.Roles),
+			cancellationToken);
+		return result.Users.Select(user => new GqlUser(user)).ToArray();
+	}
+
 	[GraphQLName("search")]
 	[RequireAllPermissions(PermissionCodes.USERS_GET)]
 	public async Task<IReadOnlyList<GqlUser>> SearchAsync(
@@ -34,21 +55,10 @@ public sealed class UserQueries
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new GetUsersQuery(
-				input.Pagination,
+			new SearchUsersQuery(
 				input.SearchTerm,
-				input.SimilarityLevel,
-				input.Name,
-				input.Surname,
-				input.Email,
-				input.Phone,
-				input.UserName,
-				input.Id,
-				input.Description,
-				input.Roles,
-				input.SearchMethod ?? GeneralSearchStrategy.General),
+				input.Pagination),
 			cancellationToken);
-
 		return result.Users.Select(user => new GqlUser(user)).ToArray();
 	}
 }
