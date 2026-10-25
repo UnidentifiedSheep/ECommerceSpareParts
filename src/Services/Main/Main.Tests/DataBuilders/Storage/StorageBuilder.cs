@@ -6,6 +6,8 @@ namespace Tests.DataBuilders.Storage;
 
 public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Storage>(faker)
 {
+	private readonly List<Guid> _owners = [];
+
 	public string? Code { get; private set; }
 
 	public StorageType? Type { get; private set; }
@@ -38,6 +40,12 @@ public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Sto
 		return this;
 	}
 
+	public StorageBuilder WithOwner(Guid userId)
+	{
+		_owners.Add(userId);
+		return this;
+	}
+
 	public override Main.Entities.Storage.Storage Build()
 	{
 		var storage = Main.Entities.Storage.Storage.Create(
@@ -46,6 +54,9 @@ public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Sto
 
 		storage.SetDescription(Description);
 		storage.SetLocation(Location);
+
+		foreach (var ownerId in _owners)
+			storage.AddOwner(ownerId);
 
 		return storage;
 	}

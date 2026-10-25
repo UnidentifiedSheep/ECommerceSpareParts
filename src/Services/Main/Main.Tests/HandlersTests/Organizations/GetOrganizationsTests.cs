@@ -276,6 +276,71 @@ public class GetOrganizationsTests : IntegrationTest
 		result.Which.Organizations.Should().Contain(x => x.Id == notHiddenOrg.Id);
 	}
 
+	[Fact]
+	public async Task GetOrganizations_ByUserId_AppliesSearchFiltersSortingAndPaginationTogether()
+	{
+		var member = GetContext<UsersTestContext>().Users.ElementAt(1);
+		var first = await CreateOrganization("First organization", "first-organization");
+		var shared = await CreateOrganization("Shared organization", "shared-organization");
+		var other = await CreateOrganization("Other organization", "other-organization");
+		first.AddMember(member.Id, OrganizationRole.Member);
+		shared.AddMember(member.Id, OrganizationRole.Manager);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var query = CreateQuery(
+			searchTerm: "organization",
+			userId: member.Id,
+			ids: [first.Id, shared.Id, other.Id],
+			types: [OrganizationType.Business],
+			sortBy: ["name_desc"],
+			size: 1);
+
+		var firstPage = await Mediator.Send(query, CancellationToken);
+		var secondPage = await Mediator.Send(query with { Pagination = new Pagination(1, 1) }, CancellationToken);
+		var lastPage = await Mediator.Send(query with { Pagination = new Pagination(2, 1) }, CancellationToken);
+
+		firstPage.Organizations.Should().ContainSingle().Which.Id.Should().Be(shared.Id);
+		secondPage.Organizations.Should().ContainSingle().Which.Id.Should().Be(first.Id);
+		lastPage.Organizations.Should().BeEmpty();
+	}
+
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task GetOrganizations_ByUserId_ShowHiddenControlsHiddenMemberships(bool showHidden)
+	{
+		var member = GetContext<UsersTestContext>().Users.ElementAt(1);
+		var hidden = await CreateOrganization("Hidden organization", "hidden-organization", true);
+		var other = await CreateOrganization("Other hidden organization", "other-hidden-organization", true);
+		hidden.AddMember(member.Id, OrganizationRole.Member);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var query = CreateQuery(
+			userId: member.Id, ids: [hidden.Id, other.Id], showHidden: showHidden);
+
+		var result = await Mediator.Send(query, CancellationToken);
+
+		if (showHidden)
+			result.Organizations.Should().ContainSingle().Which.Id.Should().Be(hidden.Id);
+		else
+			result.Organizations.Should().BeEmpty();
+	}
+
+	[Fact]
+	public async Task GetOrganizations_ByUserIdAndIndividualType_ReturnsOnlyOwnOrganization()
+	{
+		var users = GetContext<UsersTestContext>().Users.ToArray();
+		var business = await CreateOrganization("Business organization", "business-organization");
+		var query = CreateQuery(
+			userId: users[0].Id,
+			ids: [users[0].Id, users[1].Id, business.Id],
+			types: [OrganizationType.Individual]);
+
+		var result = await Mediator.Send(query, CancellationToken);
+
+		result.Organizations.Should().ContainSingle().Which.Id.Should().Be(users[0].Id);
+	}
+
 	private GetOrganizationsQuery CreateQuery(
 		string? searchTerm = null,
 		Guid? userId = null,

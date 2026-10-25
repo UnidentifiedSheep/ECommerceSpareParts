@@ -4,6 +4,9 @@ using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Auth;
+using Main.Api.GraphQl.Types.Inputs.User;
+using Main.Application.Handlers.Organizations.GetOrganizations;
+using MediatR;
 using Main.Application.Dtos.Users;
 using Main.Entities.Exceptions;
 
@@ -103,6 +106,36 @@ public record GqlUser
 			.Select(phone => new GqlUserPhone(phone))
 			.ToArray();
 
+
+	[GraphQLName("storages")]
+	[RequireAllPermissions(PermissionCodes.USERS_STORAGES_GET)]
+	public async Task<IReadOnlyList<GqlStorage>> GetStoragesAsync(
+		IUserStoragesByIdDataLoader loader,
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
+			.Select(storage => new GqlStorage(storage))
+			.ToArray();
+
+	[GraphQLName("organizations")]
+	[RequireAllPermissions(PermissionCodes.ORGANIZATIONS_GET)]
+	public async Task<IReadOnlyList<GqlOrganization>> GetOrganizationsAsync(
+		GqlUserOrganizationsInput input,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var result = await sender.Send(
+			new GetOrganizationsQuery(
+				input.Pagination,
+				input.SortBy?.Select(sort => sort.ToSortExpression()).ToArray() ?? [],
+				input.SearchTerm,
+				Id,
+				input.Ids ?? [],
+				input.Types ?? [],
+				input.ShowHidden ?? false),
+			cancellationToken);
+
+		return result.Organizations.Select(organization => new GqlOrganization(organization)).ToArray();
+	}
 
 	[GraphQLName("roles")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
