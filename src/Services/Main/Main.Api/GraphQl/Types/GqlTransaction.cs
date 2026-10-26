@@ -113,6 +113,16 @@ public sealed record GqlTransaction
 		return sale is null ? null : new GqlSale(sale);
 	}
 
+	[GraphQLName("purchase")]
+	[RequireAllPermissions(PermissionCodes.PURCHASE_GET)]
+	public async Task<GqlPurchase?> GetPurchaseAsync(
+		IPurchaseByTransactionIdDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var purchase = await loader.LoadAsync(Id, cancellationToken);
+		return purchase is null ? null : new GqlPurchase(purchase);
+	}
+
 	private async Task<TransactionDto> GetTransactionAsync(
 		ITransactionByIdDataLoader loader,
 		CancellationToken cancellationToken) =>

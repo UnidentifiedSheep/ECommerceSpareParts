@@ -14,6 +14,9 @@ public sealed class RootMutation
 	[GraphQLName("transactions")]
 	public TransactionMutations Transactions => new();
 
+	[GraphQLName("purchases")]
+	public PurchaseMutations Purchases => new();
+
 	[GraphQLName("sales")]
 	public SaleMutations Sales => new();
 

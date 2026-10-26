@@ -1,6 +1,7 @@
 using Application.Common.Models;
 using Enums;
 using GraphQL.Common.Attributes;
+using GraphQL.Common.Extensions;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
@@ -52,7 +53,7 @@ public sealed class SaleQueries
 				input.CurrencyIds ?? [],
 				input.ProductIds ?? [],
 				input.States ?? [],
-				input.SortBy?.Select(sort => sort.ToSortExpression()).ToArray() ?? [],
+				input.SortBy.ToSortExpressions(),
 				input.SearchTerm),
 			cancellationToken);
 

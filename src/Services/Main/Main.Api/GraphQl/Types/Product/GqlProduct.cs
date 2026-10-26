@@ -1,5 +1,6 @@
 using Enums;
 using GraphQL.Common.Attributes;
+using GraphQL.Common.Extensions;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
@@ -144,7 +145,7 @@ public record GqlProduct
 		var item = new GetProductCrossesItem(
 			Id,
 			input.Pagination,
-			input.SortBy?.Select(x => x.ToSortExpression()).ToArray());
+			input.SortBy.ToSortExpressions());
 
 		var crosses = await loader.LoadAsync(item, cancellationToken);
 		return crosses?.Select(x => new GqlProduct(x)).ToArray() ?? [];
@@ -190,7 +191,7 @@ public record GqlProduct
 				input.OrganizationId,
 				input.PreferredOrganizationId,
 				input.CurrencyId,
-				input.SortBy?.Select(sort => sort.ToSortExpression()).ToArray() ?? [],
+				input.SortBy.ToSortExpressions(),
 				input.ShowCrosses ?? false),
 			cancellationToken);
 

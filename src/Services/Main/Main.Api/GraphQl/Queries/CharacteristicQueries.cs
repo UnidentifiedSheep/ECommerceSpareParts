@@ -1,5 +1,6 @@
 using Enums;
 using GraphQL.Common.Attributes;
+using GraphQL.Common.Extensions;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
@@ -33,7 +34,7 @@ public sealed class CharacteristicQueries
 		var result = await sender.Send(
 			new GetCharacteristicsQuery(
 				input.SearchTerm,
-				input.SortBy?.Select(sort => sort.ToSortExpression()).ToArray(),
+				input.SortBy.ToSortExpressions(),
 				input.Pagination),
 			cancellationToken);
 

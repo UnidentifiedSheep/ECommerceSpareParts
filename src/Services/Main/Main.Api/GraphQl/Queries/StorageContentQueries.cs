@@ -1,5 +1,6 @@
 using Enums;
 using GraphQL.Common.Attributes;
+using GraphQL.Common.Extensions;
 using HotChocolate;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Storage;
@@ -21,7 +22,7 @@ public sealed class StorageContentQueries
 			new GetStorageContentsQuery(
 				input.ProductId,
 				input.StorageCode,
-				input.SortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
+				input.SortBy.ToSortExpressions(),
 				input.Pagination,
 				input.ShowZeroCount),
 			cancellationToken);

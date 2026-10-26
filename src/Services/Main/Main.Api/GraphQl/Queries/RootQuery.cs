@@ -15,6 +15,9 @@ public sealed class RootQuery
 	[GraphQLName("transactions")]
 	public TransactionQueries Transactions => new();
 
+	[GraphQLName("purchases")]
+	public PurchaseQueries Purchases => new();
+
 	[GraphQLName("sales")]
 	public SaleQueries Sales => new();
 
