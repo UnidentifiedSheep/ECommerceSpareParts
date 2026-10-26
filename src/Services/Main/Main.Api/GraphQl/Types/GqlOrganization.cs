@@ -1,3 +1,5 @@
+using Abstractions.Models;
+using Application.Common.Models;
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
@@ -7,6 +9,7 @@ using Main.Application.Dtos.Organizations;
 using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Application.Handlers.Organizations.GetOrganizationMembers;
 using Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
+using Main.Application.Handlers.Balance.GetTransactions;
 using MediatR;
 using Main.Entities.Exceptions;
 using Main.Enums.Organization;
@@ -79,6 +82,30 @@ public sealed record GqlOrganization
 			cancellationToken);
 
 		return result.Members.Select(member => new GqlOrganizationMember(member)).ToArray();
+	}
+
+	[GraphQLName("transactions")]
+	[RequireAllPermissions(PermissionCodes.BALANCES_TRANSACTION_GET_ALL)]
+	public async Task<IReadOnlyList<GqlTransaction>> GetTransactionsAsync(
+		GqlOrganizationTransactionsInput input,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var cursor = input.Cursor.Value;
+		var result = await sender.Send(
+			new GetTransactionsQuery(
+				new RangeModel<DateTime>(input.RangeStart, input.RangeEnd),
+				input.CurrencyId,
+				Id,
+				Id,
+				LogicalOperation.Or,
+				new Cursor<(Guid id, DateTime dt)>(
+					cursor is null ? (Guid.Empty, DateTime.MinValue) : (cursor.Value.Id, cursor.Value.TransactionDate),
+					input.Cursor.Size),
+				input.SkipReversed ?? false),
+			cancellationToken);
+
+		return result.Transactions.Select(transaction => new GqlTransaction(transaction)).ToArray();
 	}
 
 	[GraphQLName("finances")]
