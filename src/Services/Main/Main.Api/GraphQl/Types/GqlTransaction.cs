@@ -1,3 +1,5 @@
+using Enums;
+using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.User;
@@ -99,6 +101,16 @@ public sealed record GqlTransaction
 	{
 		var userId = (await GetTransactionAsync(loader, cancellationToken)).ReversedBy;
 		return userId.HasValue ? new GqlUser(userId.Value) : null;
+	}
+
+	[GraphQLName("sale")]
+	[RequireAllPermissions(PermissionCodes.SALES_GET)]
+	public async Task<GqlSale?> GetSaleAsync(
+		ISaleByTransactionIdDataLoader loader,
+		CancellationToken cancellationToken)
+	{
+		var sale = await loader.LoadAsync(Id, cancellationToken);
+		return sale is null ? null : new GqlSale(sale);
 	}
 
 	private async Task<TransactionDto> GetTransactionAsync(

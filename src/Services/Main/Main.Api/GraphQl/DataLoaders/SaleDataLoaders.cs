@@ -15,6 +15,13 @@ public static class SaleDataLoaders
 		(await sender.Send(new GetSalesByIdsQuery(keys), cancellationToken)).Sales;
 
 	[DataLoader]
+	public static async Task<IReadOnlyDictionary<Guid, SaleDto>> GetSaleByTransactionIdAsync(
+		IReadOnlyList<Guid> keys,
+		ISender sender,
+		CancellationToken cancellationToken) =>
+		(await sender.Send(new GetSalesByTransactionIdsQuery(keys), cancellationToken)).Sales;
+
+	[DataLoader]
 	public static async Task<IReadOnlyDictionary<Guid, IReadOnlyList<SaleContentDto>>> GetSaleContentsByIdAsync(
 		IReadOnlyList<Guid> keys,
 		ISender sender,
