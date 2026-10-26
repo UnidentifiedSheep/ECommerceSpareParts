@@ -1,5 +1,6 @@
 using GraphQL.Common.Types;
 using HotChocolate;
+using Main.Api.GraphQl.Types.Inputs.Transaction;
 
 namespace Main.Api.GraphQl.Types.Inputs.Organization;
 
@@ -20,14 +21,4 @@ public sealed record GqlOrganizationTransactionsInput
 
 	[GraphQLName("skipReversed")]
 	public bool? SkipReversed { get; init; }
-}
-
-[GraphQLName("TransactionCursorValueInput")]
-public readonly record struct GqlTransactionCursorValueInput
-{
-	[GraphQLName("id")]
-	public required Guid Id { get; init; }
-
-	[GraphQLName("transactionDate")]
-	public required DateTime TransactionDate { get; init; }
 }
