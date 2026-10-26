@@ -88,6 +88,14 @@ public sealed record GqlSale
 		CancellationToken cancellationToken) =>
 		new((await GetSaleAsync(loader, cancellationToken)).Currency);
 
+	[GraphQLName("contents")]
+	[RequireAllPermissions(PermissionCodes.SALES_GET)]
+	public async Task<IReadOnlyList<GqlSaleContent>> GetContentsAsync(
+		ISaleContentsByIdDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await loader.LoadAsync(Id, cancellationToken) ?? [])
+			.Select(content => new GqlSaleContent(content)).ToArray();
+
 	private async Task<SaleDto> GetSaleAsync(
 		ISaleByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
