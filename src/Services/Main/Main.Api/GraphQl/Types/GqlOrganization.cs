@@ -16,14 +16,14 @@ namespace Main.Api.GraphQl.Types;
 [GraphQLName("Organization")]
 public sealed record GqlOrganization
 {
-	private readonly OrganizationListItemDto? _dto;
+	private readonly OrganizationDto? _dto;
 
 	public GqlOrganization(Guid id)
 	{
 		Id = id;
 	}
 
-	public GqlOrganization(OrganizationListItemDto organization) : this(organization.Id)
+	public GqlOrganization(OrganizationDto organization) : this(organization.Id)
 	{
 		_dto = organization;
 	}
@@ -94,7 +94,7 @@ public sealed record GqlOrganization
 		return new GqlOrganizationFinances(result.FinancialProfile, result.Balances);
 	}
 
-	private async Task<OrganizationListItemDto> GetOrganizationAsync(
+	private async Task<OrganizationDto> GetOrganizationAsync(
 		IOrganizationByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
 		_dto ?? await loader.LoadAsync(Id, cancellationToken)

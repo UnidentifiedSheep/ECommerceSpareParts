@@ -26,7 +26,7 @@ public record GetUserOrganizationsRequest : SortablePaginationQueryModel
 	public bool? ShowHidden { get; init; }
 }
 
-public record GetUserOrganizationsResponse(IReadOnlyList<OrganizationListItemDto> Organizations);
+public record GetUserOrganizationsResponse(IReadOnlyList<OrganizationDto> Organizations);
 
 public record CreateOrganizationRequest(string Name, string SystemName);
 

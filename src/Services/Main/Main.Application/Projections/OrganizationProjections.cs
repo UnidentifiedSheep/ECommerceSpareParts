@@ -46,30 +46,6 @@ public sealed class OrganizationDtoProjectionProvider : ProjectionProviderBase<O
 			SystemName = organization.SystemName,
 			IsHidden = organization.IsHidden,
 			Owner = memberToDto.Invoke(
-				organization.Members.Single(member => member.Role == OrganizationRole.Owner))
-		};
-	}
-
-	public override Expression<Func<Organization, OrganizationDto>> Projection { get; }
-}
-
-[Lifetime(Lifetime.Singleton)]
-public sealed class
-	OrganizationListItemProjectionProvider : ProjectionProviderBase<Organization, OrganizationListItemDto>
-{
-	public OrganizationListItemProjectionProvider(
-		IProjectionProvider<OrganizationMember, OrganizationMemberDto> memberProjection)
-	{
-		var memberToDto = memberProjection.Projection;
-
-		Projection = organization => new OrganizationListItemDto
-		{
-			Id = organization.Id,
-			Type = organization.Type,
-			Name = organization.Name,
-			SystemName = organization.SystemName,
-			IsHidden = organization.IsHidden,
-			Owner = memberToDto.Invoke(
 				organization.Members.Single(member => member.Role == OrganizationRole.Owner)),
 			ApproximateBalanceInBaseCurrency = organization.FinancialProfile == null
 				? null
@@ -77,5 +53,5 @@ public sealed class
 		};
 	}
 
-	public override Expression<Func<Organization, OrganizationListItemDto>> Projection { get; }
+	public override Expression<Func<Organization, OrganizationDto>> Projection { get; }
 }

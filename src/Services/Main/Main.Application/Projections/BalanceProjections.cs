@@ -29,7 +29,9 @@ public sealed class TransactionDtoProjectionProvider : ProjectionProviderBase<Tr
 			Status = x.Status,
 			Type = x.Type,
 			TransactionDate = x.TransactionDatetime,
-			SourceType = x.SourceType
+			SourceType = x.SourceType,
+			ReversedAt = x.ReversedAt,
+			ReversedBy = x.ReversedBy
 		};
 	}
 
