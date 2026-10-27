@@ -22,13 +22,13 @@ public record GetOrganizationsQuery(
 	IReadOnlyCollection<OrganizationType> Types,
 	bool ShowHidden) : IQuery<GetOrganizationsResult>;
 
-public record GetOrganizationsResult(IReadOnlyList<OrganizationListItemDto> Organizations);
+public record GetOrganizationsResult(IReadOnlyList<OrganizationDto> Organizations);
 
 public class GetOrganizationsHandler(
 	IReadRepository<Organization, Guid> repository,
 	IUserRepository userRepository,
 	IReadRepository<User, Guid> userReadRepository,
-	IProjectionProvider<Organization, OrganizationListItemDto> projection)
+	IProjectionProvider<Organization, OrganizationDto> projection)
 	: IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
 {
 	public async Task<GetOrganizationsResult> Handle(

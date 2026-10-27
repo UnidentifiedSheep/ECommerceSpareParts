@@ -1828,6 +1828,17 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Name", "Main.Entities.Product.Product.Name#Name", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)")
+                                .HasColumnName("name");
+                        });
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Sku", "Main.Entities.Product.Product.Sku#Sku", b1 =>
                         {
                             b1.IsRequired();
@@ -4099,28 +4110,6 @@ namespace Main.Migrator.Migrations
                         .HasForeignKey("ProductGroupId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("products_product_group_id_fk");
-
-                    b.OwnsOne("Main.Entities.Product.ValueObjects.Name", "Name", b1 =>
-                        {
-                            b1.Property<int>("ProductId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("character varying(255)")
-                                .HasColumnName("name");
-
-                            b1.HasKey("ProductId");
-
-                            b1.ToTable("products", "public");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ProductId");
-                        });
-
-                    b.Navigation("Name")
-                        .IsRequired();
 
                     b.Navigation("Pair");
 

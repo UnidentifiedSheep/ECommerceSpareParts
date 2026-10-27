@@ -50,7 +50,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 					});
 			});
 
-		builder.OwnsOne(
+		builder.ComplexProperty(
 			e => e.Name,
 			b =>
 			{

@@ -30,6 +30,12 @@ public record TransactionDto
 	[JsonPropertyName("status")]
 	public required TransactionStatus Status { get; init; }
 
+	[JsonPropertyName("reversedAt")]
+	public DateTime? ReversedAt { get; init; }
+
+	[JsonPropertyName("reversedBy")]
+	public Guid? ReversedBy { get; init; }
+
 	[JsonPropertyName("sourceType")]
 	public required TransactionSourceType SourceType { get; init; }
 }

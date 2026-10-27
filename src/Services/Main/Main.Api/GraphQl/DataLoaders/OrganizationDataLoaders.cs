@@ -8,7 +8,7 @@ namespace Main.Api.GraphQl.DataLoaders;
 public static class OrganizationDataLoaders
 {
 	[DataLoader]
-	public static async Task<IReadOnlyDictionary<Guid, OrganizationListItemDto>> GetOrganizationByIdAsync(
+	public static async Task<IReadOnlyDictionary<Guid, OrganizationDto>> GetOrganizationByIdAsync(
 		IReadOnlyList<Guid> keys,
 		ISender sender,
 		CancellationToken cancellationToken)

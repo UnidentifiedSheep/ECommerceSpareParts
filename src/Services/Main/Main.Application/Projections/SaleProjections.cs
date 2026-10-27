@@ -50,11 +50,9 @@ public sealed class SaleDtoProjectionProvider : ProjectionProviderBase<Sale, Sal
 public sealed class SaleContentDtoProjectionProvider : ProjectionProviderBase<SaleContent, SaleContentDto>
 {
 	public SaleContentDtoProjectionProvider(
-		IProjectionProvider<Product, ProductDto> productProjection,
-		IProjectionProvider<SaleContentDetail, SaleContentDetailDto> detailProjection)
+		IProjectionProvider<Product, ProductDto> productProjection)
 	{
 		var productToDto = productProjection.Projection;
-		var detailToDto = detailProjection.Projection;
 
 		Projection = x => new SaleContentDto
 		{
@@ -64,8 +62,7 @@ public sealed class SaleContentDtoProjectionProvider : ProjectionProviderBase<Sa
 			TotalSum = x.TotalSum,
 			Discount = x.Discount,
 			Comment = x.Comment,
-			Product = productToDto.Invoke(x.Product),
-			Details = x.Details.Select(z => detailToDto.Invoke(z)).ToList()
+			Product = productToDto.Invoke(x.Product)
 		};
 	}
 

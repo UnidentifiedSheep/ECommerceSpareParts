@@ -1,5 +1,6 @@
 using Enums;
 using GraphQL.Common.Attributes;
+using GraphQL.Common.Extensions;
 using HotChocolate;
 using MediatR;
 using Search.Api.GraphQl.Types;
@@ -28,8 +29,8 @@ public sealed class CatalogueQueries
 				(input.NameModes ?? CatalogueSearchDefaults.NameModes).ToHashSet(),
 				input.ProducerIds ?? [],
 				input.Pagination,
-				input.ProductSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
-				input.CatalogueCandidateSortBy?.Select(x => x.ToSortExpression()).ToArray() ?? [],
+				input.ProductSortBy.ToSortExpressions(),
+				input.CatalogueCandidateSortBy.ToSortExpressions(),
 				input.CandidateMappingStatus ?? CandidateMappingStatus.Unmapped,
 				input.IncludeHighlights ?? false,
 				input.ProductGroupIds ?? [],

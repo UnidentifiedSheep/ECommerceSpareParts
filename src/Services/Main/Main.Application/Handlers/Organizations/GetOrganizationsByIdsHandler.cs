@@ -22,11 +22,11 @@ public sealed record GetOrganizationsByIdsQuery : IQuery<GetOrganizationsByIdsRe
 }
 
 public sealed record GetOrganizationsByIdsResult(
-	IReadOnlyDictionary<Guid, OrganizationListItemDto> Organizations);
+	IReadOnlyDictionary<Guid, OrganizationDto> Organizations);
 
 public sealed class GetOrganizationsByIdsHandler(
 	IReadRepository<Organization, Guid> repository,
-	IProjectionProvider<Organization, OrganizationListItemDto> projection)
+	IProjectionProvider<Organization, OrganizationDto> projection)
 	: IQueryHandler<GetOrganizationsByIdsQuery, GetOrganizationsByIdsResult>
 {
 	public async Task<GetOrganizationsByIdsResult> Handle(
@@ -34,7 +34,7 @@ public sealed class GetOrganizationsByIdsHandler(
 		CancellationToken cancellationToken)
 	{
 		if (request.Ids.Count == 0)
-			return new GetOrganizationsByIdsResult(new Dictionary<Guid, OrganizationListItemDto>());
+			return new GetOrganizationsByIdsResult(new Dictionary<Guid, OrganizationDto>());
 
 		var organizations = await repository.Query
 			.Where(x => request.Ids.Contains(x.Id) && x.Type != OrganizationType.System)

@@ -1,5 +1,6 @@
 using Enums;
 using GraphQL.Common.Attributes;
+using GraphQL.Common.Extensions;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
@@ -126,7 +127,7 @@ public record GqlUser
 		var result = await sender.Send(
 			new GetOrganizationsQuery(
 				input.Pagination,
-				input.SortBy?.Select(sort => sort.ToSortExpression()).ToArray() ?? [],
+				input.SortBy.ToSortExpressions(),
 				input.SearchTerm,
 				Id,
 				input.Ids ?? [],

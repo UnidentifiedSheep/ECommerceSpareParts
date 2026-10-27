@@ -1,5 +1,6 @@
 using Enums;
 using GraphQL.Common.Attributes;
+using GraphQL.Common.Extensions;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
@@ -8,6 +9,8 @@ using Main.Api.GraphQl.Types.Producer;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
+using Main.Application.Handlers.Sales.GetProductSaleHistory;
+using MediatR;
 using Main.Application.Handlers.StorageContents.GetProductStorageContents;
 using Main.Entities.Exceptions;
 
@@ -142,7 +145,7 @@ public record GqlProduct
 		var item = new GetProductCrossesItem(
 			Id,
 			input.Pagination,
-			input.SortBy?.Select(x => x.ToSortExpression()).ToArray());
+			input.SortBy.ToSortExpressions());
 
 		var crosses = await loader.LoadAsync(item, cancellationToken);
 		return crosses?.Select(x => new GqlProduct(x)).ToArray() ?? [];
@@ -172,6 +175,28 @@ public record GqlProduct
 		CancellationToken cancellationToken) => await loader.LoadAsync(
 		new GetAvailableProductsStockItem(Id, input.StorageCode),
 		cancellationToken);
+
+	[GraphQLName("saleHistory")]
+	[RequireAllPermissions(PermissionCodes.SALES_GET)]
+	public async Task<IReadOnlyList<GqlProductSaleHistory>> GetSaleHistoryAsync(
+		GqlProductSaleHistoryInput input,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var result = await sender.Send(
+			new GetProductSaleHistoryQuery(
+				Id,
+				input.Pagination,
+				input.StorageCode,
+				input.OrganizationId,
+				input.PreferredOrganizationId,
+				input.CurrencyId,
+				input.SortBy.ToSortExpressions(),
+				input.ShowCrosses ?? false),
+			cancellationToken);
+
+		return result.History.Select(history => new GqlProductSaleHistory(history)).ToArray();
+	}
 
 	private async Task<ProductDto> GetProductAsync(
 		IProductByIdDataLoader loader,

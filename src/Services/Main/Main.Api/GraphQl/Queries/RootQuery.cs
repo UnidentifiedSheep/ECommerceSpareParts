@@ -12,6 +12,15 @@ public sealed class RootQuery
 	[GraphQLName("organizations")]
 	public OrganizationQueries Organizations => new();
 
+	[GraphQLName("transactions")]
+	public TransactionQueries Transactions => new();
+
+	[GraphQLName("purchases")]
+	public PurchaseQueries Purchases => new();
+
+	[GraphQLName("sales")]
+	public SaleQueries Sales => new();
+
 	[GraphQLName("products")]
 	public ProductQueries Product => new();
 
