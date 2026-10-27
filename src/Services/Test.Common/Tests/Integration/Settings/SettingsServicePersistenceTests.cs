@@ -113,6 +113,49 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		AssertPublishedEvent(TestSetting.Default.Data.Value);
 	}
 
+	[Fact]
+	public async Task GetOrDefault_DirectRead_BypassesCachedAndTrackedValuesWithoutUpdatingCache()
+	{
+		var stale = await new TestSettingBuilder(Faker).WithValue(10).BuildAndAddToDb(Context);
+		SettingsContainer.Set(stale);
+		var replacement = new TestSettingBuilder(Faker).WithValue(20).Build();
+		await Context.Set<TestSetting>()
+			.ExecuteUpdateAsync(update => update.SetProperty(x => x.Json, replacement.Json), CancellationToken);
+
+		var result = await SettingsService.GetOrDefault<TestSetting>(directRead: true, CancellationToken);
+
+		result.Data.Value.Should().Be(20);
+		result.Should().NotBeSameAs(stale);
+		stale.Data.Value.Should().Be(10);
+		SettingsContainer.Get<TestSetting>().Should().BeSameAs(stale);
+		MessageBroker.PublishedMessages.Should().BeEmpty();
+	}
+
+	[Fact]
+	public async Task GetOrDefault_DirectRead_WhenSettingExistsOnlyInCache_ReturnsDefault()
+	{
+		var cached = new TestSettingBuilder(Faker).WithValue(30).Build();
+		SettingsContainer.Set(cached);
+
+		var result = await SettingsService.GetOrDefault<TestSetting>(directRead: true, CancellationToken);
+
+		result.Data.Should().Be(TestSetting.Default.Data);
+		SettingsContainer.Get<TestSetting>().Should().BeSameAs(cached);
+		(await Context.Set<TestSetting>().CountAsync(CancellationToken)).Should().Be(0);
+		MessageBroker.PublishedMessages.Should().BeEmpty();
+	}
+
+	[Fact]
+	public async Task GetOrDefault_DirectRead_MissingSetting_ReturnsDefaultWithoutSavingOrCaching()
+	{
+		var result = await SettingsService.GetOrDefault<TestSetting>(directRead: true, CancellationToken);
+
+		result.Data.Should().Be(TestSetting.Default.Data);
+		SettingsContainer.TryGet<TestSetting>(out _).Should().BeFalse();
+		(await Context.Set<TestSetting>().CountAsync(CancellationToken)).Should().Be(0);
+		MessageBroker.PublishedMessages.Should().BeEmpty();
+	}
+
 	private void AssertPublishedEvent(int expectedValue)
 	{
 		var @event = MessageBroker

@@ -87,7 +87,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddScoped<IUserContext, UserContextMock>();
 		services.AddSystemOptionsForTests();
 
-		services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
+		services.AddScoped<IPublishEndpoint, MessageBrokerStub>();
 		services.RemoveAll<IFusionCacheBackplane>();
 		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 

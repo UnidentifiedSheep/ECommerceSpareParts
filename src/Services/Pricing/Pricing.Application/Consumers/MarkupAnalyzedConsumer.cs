@@ -15,28 +15,22 @@ public class MarkupAnalyzedConsumer(ISender sender, ICachedCurrencyProvider cach
 		if (context.Message.Ranges.Count == 0)
 			return;
 
+		var messageId = context.MessageId
+			?? throw new InvalidOperationException("MarkupAnalyzedEvent requires a MessageId.");
 		var baseCurrencyId = await cachedCurrencyProvider.GetBaseCurrencyIdAsync(context.CancellationToken);
+		var ranges = context.Message.Ranges.Select(x => new UpsertMarkupRangeDto
+		{
+			RangeStart = x.FromCost,
+			RangeEnd = x.ToCost,
+			Markup = x.MeanMarkup
+		}).ToArray();
 
-		await sender.Send(
-			new UpsertMarkupGroupCommand(
-				new UpsertMarkupGroupDto
-				{
-					Name = "Auto Generated Markup",
-					CurrencyId = baseCurrencyId,
-					Ranges = context
-						.Message
-						.Ranges
-						.Select(x => new UpsertMarkupRangeDto
-						{
-							RangeStart = x.FromCost,
-							RangeEnd = x.ToCost,
-							Markup = x.MeanMarkup
-						})
-						.ToList()
-				},
-				true),
+		await sender.Send(new UpsertMarkupGroupCommand(new UpsertMarkupGroupDto
+		{
+			Name = "Auto Generated Markup",
+			CurrencyId = baseCurrencyId,
+			Ranges = ranges
+		}, messageId),
 			context.CancellationToken);
-
-		await context.Publish(new MarkupRangesRefreshRequestedEvent(), context.CancellationToken);
 	}
 }

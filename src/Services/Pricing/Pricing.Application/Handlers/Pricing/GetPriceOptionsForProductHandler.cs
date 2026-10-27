@@ -53,7 +53,8 @@ public class GetPriceOptionsForProductHandler(
 			.Data.Version;
 
 		if (options.Count == 0 || options.Any(x =>
-				x.MarkupVersion != markupContainer.CurrentVersion || x.AppliersVersion != appliersVersion ||
+				x.MarkupVersion != markupContainer.CurrentVersion ||
+				x.AppliersVersion != appliersVersion ||
 				x.PricingSettingsVersion != pricingSettingsVersion))
 		{
 			await CalculateCandidates(request, cancellationToken);
