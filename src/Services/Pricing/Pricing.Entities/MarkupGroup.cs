@@ -2,6 +2,7 @@
 using Domain;
 using Domain.Extensions;
 using Domain.Validation;
+using Exceptions;
 using Pricing.Entities.DomainEvents;
 
 namespace Pricing.Entities;
@@ -73,9 +74,9 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
 		int currencyId,
 		IEnumerable<MarkupRange> markupRanges)
 	{
+		ReplaceRanges(markupRanges);
 		SetName(name);
 		SetCurrencyId(currencyId);
-		ReplaceRanges(markupRanges);
 	}
 
 	public void ReplaceRanges(IEnumerable<MarkupRange> markupRanges)
@@ -83,6 +84,9 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
 		ArgumentNullException.ThrowIfNull(markupRanges);
 		var ranges = markupRanges.ToList();
 		ranges.EnsureNotEmpty(() => new InvalidOperationException("Markup ranges are not empty"));
+
+		(!MarkupRange.HasOverlaps(ranges.Select(range => (range.RangeStart, range.RangeEnd))))
+			.EnsureTrue(() => new InvalidInputException(MarkupGroupRangesMustNotOverlapMessage.Instance));
 
 		_markupRanges.Clear();
 		_markupRanges.AddRange(ranges);

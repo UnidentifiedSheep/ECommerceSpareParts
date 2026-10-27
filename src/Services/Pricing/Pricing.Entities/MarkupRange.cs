@@ -28,6 +28,20 @@ public class MarkupRange
 
 	public MarkupGroup Group { get; private set; } = null!;
 
+	public static bool HasOverlaps(IEnumerable<(decimal Start, decimal End)> ranges)
+	{
+		var ordered = ranges.OrderBy(range => range.Start).ThenBy(range => range.End).ToArray();
+		for (var index = 1; index < ordered.Length; index++)
+		{
+			var previous = ordered[index - 1];
+			var current = ordered[index];
+			if (current.Start < previous.End || current.Start == previous.Start)
+				return true;
+		}
+
+		return false;
+	}
+
 	public static MarkupRange Create(
 		decimal rangeStart,
 		decimal rangeEnd,

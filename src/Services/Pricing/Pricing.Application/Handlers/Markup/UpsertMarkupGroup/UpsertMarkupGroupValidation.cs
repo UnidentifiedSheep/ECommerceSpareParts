@@ -36,6 +36,11 @@ public class UpsertMarkupGroupDtoValidation : AbstractValidator<UpsertMarkupGrou
 		RuleFor(x => x.Ranges).NotEmpty().WithLocalizableError(MarkupGroupRangesRequiredMessage.Instance);
 
 		RuleForEach(x => x.Ranges).SetValidator(new UpsertMarkupRangeDtoValidation());
+
+		RuleFor(x => x.Ranges)
+			.Must(ranges => ranges is null || !MarkupRange.HasOverlaps(
+				ranges.Select(range => (range.RangeStart, range.RangeEnd))))
+			.WithLocalizableError(MarkupGroupRangesMustNotOverlapMessage.Instance);
 	}
 }
 
