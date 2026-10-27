@@ -3,6 +3,7 @@
   "messages": {
     "markup.group.not.found": "Markup group not found.",
     "current.markup.group.can.not.be.deleted": "Currently used markup group can not be deleted. Firstly select other group.",
+    "last.markup.group.can.not.be.deleted": "The last markup group cannot be deleted.",
     "markup.group.required": "Markup group data is required.",
     "markup.group.id.must.be.positive": "Markup group id must be greater than 0.",
     "markup.group.name.max.length": "Markup group name must not exceed 128 characters.",

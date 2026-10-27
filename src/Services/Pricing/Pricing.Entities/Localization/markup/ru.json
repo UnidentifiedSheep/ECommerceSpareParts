@@ -3,6 +3,7 @@
   "messages": {
     "markup.group.not.found": "Не удалось найти группу наценок.",
     "current.markup.group.can.not.be.deleted": "Используемая группа наценок не может быть удалена. Для начала выберите другую группу.",
+    "last.markup.group.can.not.be.deleted": "Нельзя удалить последнюю группу наценок.",
     "markup.group.required": "Данные группы наценок обязательны.",
     "markup.group.id.must.be.positive": "Идентификатор группы наценок должен быть больше 0.",
     "markup.group.name.max.length": "Название группы наценок не должно превышать 128 символов.",

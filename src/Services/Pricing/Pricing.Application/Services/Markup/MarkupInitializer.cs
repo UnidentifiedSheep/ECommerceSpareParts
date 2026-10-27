@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Internal.Integration.Core.Interfaces.Main;
 using Microsoft.EntityFrameworkCore;
+using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
@@ -15,7 +16,8 @@ public class MarkupInitializer(
 	ISettingsService settingsService,
 	IMainClient mainClient,
 	ICurrencyConverter currencyConverter,
-	ICurrencyRatesProvider ratesProvider) : IMarkupInitializer
+	ICurrencyRatesProvider ratesProvider,
+	ICachedCurrencyProvider cachedCurrencyProvider) : IMarkupInitializer
 {
 	public async Task Initialize(CancellationToken cancellationToken = default)
 	{
@@ -25,8 +27,19 @@ public class MarkupInitializer(
 			? repository.Query.Where(x => x.SourceMessageId != null).OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
 			: repository.Query.Where(x => x.Id == pricingSettings.Data.SelectedMarkupId);
 
-		var defaultGroup = await query.Include(x => x.MarkupRanges).FirstOrDefaultAsync(cancellationToken) ??
-			throw new InvalidOperationException("Unable initialize markup service, Markup group not found.");
+		var defaultGroup = await query
+			.Include(x => x.MarkupRanges)
+			.FirstOrDefaultAsync(cancellationToken);
+
+		if (defaultGroup is null)
+		{
+			if (pricingSettings.Data.SelectedMarkupId is not null)
+				throw new InvalidOperationException("Unable initialize markup service, Markup group not found.");
+
+			var baseCurrencyId = await cachedCurrencyProvider.GetBaseCurrencyIdAsync(cancellationToken);
+			container.Initialize(baseCurrencyId, new Models.Markup(pricingSettings.Data.DefaultMarkup), [], []);
+			return;
+		}
 
 		var allCurrencies = await mainClient.CurrencyNode.GetCurrencies(cancellationToken);
 

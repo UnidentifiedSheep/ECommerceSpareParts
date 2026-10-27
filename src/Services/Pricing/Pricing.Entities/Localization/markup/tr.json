@@ -3,6 +3,7 @@
   "messages": {
     "markup.group.not.found": "Kâr marjı grubu bulunamadı.",
     "current.markup.group.can.not.be.deleted": "Şu anda kullanılan kâr marjı grubu silinemez. Önce başka bir grup seçin.",
+    "last.markup.group.can.not.be.deleted": "Son kâr marjı grubu silinemez.",
     "markup.group.required": "Kâr marjı grubu verisi zorunludur.",
     "markup.group.id.must.be.positive": "Kâr marjı grubu kimliği 0'dan büyük olmalıdır.",
     "markup.group.name.max.length": "Kâr marjı grubu adı 128 karakteri aşmamalıdır.",

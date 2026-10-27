@@ -1,9 +1,11 @@
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
+using Contracts.Analytics;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Entities;
@@ -20,7 +22,8 @@ public sealed class DeleteMarkupHandler(
 	IRepository<MarkupGroup, int> repository,
 	IReadRepository<MarkupGroup, int> readRepository,
 	ISettingsService settingsService,
-	IUnitOfWork unitOfWork) : ICommandHandler<DeleteMarkupCommand>
+	IUnitOfWork unitOfWork,
+	IIntegrationEventScope integrationEvents) : ICommandHandler<DeleteMarkupCommand>
 {
 	public async Task<Unit> Handle(DeleteMarkupCommand request, CancellationToken cancellationToken)
 	{
@@ -28,17 +31,14 @@ public sealed class DeleteMarkupHandler(
 			?? throw new MarkupGroupNotFoundException(request.Id);
 
 		var settings = await settingsService.GetOrDefault<PricingSetting>(directRead: true, cancellationToken);
-		var currentId = settings.Data.SelectedMarkupId ?? await readRepository.Query
-			.Where(x => x.SourceMessageId != null)
-			.OrderByDescending(x => x.CreatedAt)
-			.ThenByDescending(x => x.Id)
-			.Select(x => (int?)x.Id)
-			.FirstOrDefaultAsync(cancellationToken);
-
-		if (currentId == group.Id)
+		if (settings.Data.SelectedMarkupId == group.Id)
 			throw new CurrenMarkupGroupCanNotBeDeletedException();
 
+		if (!await readRepository.Query.AnyAsync(x => x.Id != group.Id, cancellationToken))
+			throw new LastMarkupGroupCanNotBeDeletedException();
+
 		unitOfWork.Remove(group);
+		integrationEvents.Add(new MarkupRangesRefreshRequestedEvent());
 		return Unit.Value;
 	}
 }
