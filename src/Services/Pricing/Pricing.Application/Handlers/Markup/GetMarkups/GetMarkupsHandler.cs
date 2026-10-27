@@ -1,9 +1,8 @@
-using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Markup;
 using Pricing.Entities;
@@ -14,28 +13,17 @@ public record GetMarkupsQuery(Pagination Pagination) : IQuery<GetMarkupsResult>;
 
 public record GetMarkupsResult(IReadOnlyList<MarkupGroupDto> Groups);
 
-public class GetMarkupsHandler(IReadRepository<MarkupGroup, int> repository)
+public class GetMarkupsHandler(
+	IReadRepository<MarkupGroup, int> repository,
+	IProjectionProvider<MarkupGroup, MarkupGroupDto> projection)
 	: IQueryHandler<GetMarkupsQuery, GetMarkupsResult>
 {
 	public async Task<GetMarkupsResult> Handle(GetMarkupsQuery request, CancellationToken cancellationToken)
 	{
 		var result = await repository
 			.Query
-			.AsExpandable()
-			.Select(x => new MarkupGroupDto
-			{
-				Id = x.Id,
-				CurrencyId = x.CurrencyId,
-				Name = x.Name,
-				SourceMessageId = x.SourceMessageId,
-				Ranges = x.MarkupRanges.Select(z => new MarkupRangeDto
-				{
-					Markup = z.Markup,
-					Id = z.Id,
-					RangeStart = z.RangeStart,
-					RangeEnd = z.RangeEnd
-				}).ToList()
-			})
+			.OrderBy(x => x.Id)
+			.Project(projection)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);
 

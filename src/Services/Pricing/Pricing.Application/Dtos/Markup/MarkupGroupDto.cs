@@ -15,7 +15,4 @@ public record MarkupGroupDto
 
 	[JsonPropertyName("sourceMessageId")]
 	public required Guid? SourceMessageId { get; init; }
-
-	[JsonPropertyName("ranges")]
-	public required IReadOnlyCollection<MarkupRangeDto> Ranges { get; init; }
 }
