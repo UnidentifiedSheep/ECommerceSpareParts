@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Types.Composite;
 
 namespace Pricing.Api.GraphQl.Queries.Root;
 
@@ -7,4 +8,8 @@ public sealed class Query
 {
 	[GraphQLName("markupGroups")]
 	public MarkupGroupQueries MarkupGroups => new();
+
+	[GraphQLName("products")]
+	[Shareable]
+	public ProductQueries Products => new();
 }
