@@ -354,7 +354,7 @@ class Deployment:
             if fingerprint(self.inspect(service_id)["spec"]) != fingerprint(spec):
                 raise
 
-    def wait(self, service_id, spec, *, stable=None, timeout=None, restoring=False):
+    def wait(self, service_id, spec, *, stable=None, timeout=None, restoring=False, once=False):
         deadline = time.monotonic() + (timeout or self.runtime_timeout)
         stable_since, last_ids = None, None
         target = spec["TaskTemplate"]["ContainerSpec"]["Image"]
@@ -393,8 +393,9 @@ class Deployment:
             last_ids = identities
             if ready:
                 stable_since = stable_since or time.monotonic()
-                if time.monotonic() - stable_since >= (self.stability if stable is None else stable):
+                if once or time.monotonic() - stable_since >= (self.stability if stable is None else stable):
                     return identities
+            require(not once, f"Unchanged service {spec['Name']} is not ready")
             if time.monotonic() - last_log >= 15:
                 log(f"Waiting for {spec['Name']}: {sum(t['currentState'] == 'running' for t in active)}/{replicas} running; update={state or 'none'}.")
                 last_log = time.monotonic()
@@ -599,14 +600,16 @@ class Deployment:
             targets = [name] if name is not None else list(rows)
             for full in targets:
                 current = plan["after"][full]
-                rows[full]["tasks"] = list(self.wait(current["id"], current["spec"], restoring=rows[full]["before_hash"] == rows[full]["applied_hash"]))
+                unchanged = rows[full]["before_hash"] == rows[full]["applied_hash"]
+                rows[full]["tasks"] = list(self.wait(current["id"], current["spec"], restoring=unchanged, once=unchanged))
                 rows[full]["status"] = "healthy"
                 self.checkpoint()
         for full, row in rows.items():
             if row["status"] == "healthy":
                 continue
             current = plan["after"][full]
-            row["tasks"] = list(self.wait(current["id"], current["spec"], restoring=True))
+            unchanged = row["before_hash"] == row["applied_hash"]
+            row["tasks"] = list(self.wait(current["id"], current["spec"], restoring=True, once=unchanged))
             row["status"] = "healthy"
             self.checkpoint()
         record["status"] = "healthy"
