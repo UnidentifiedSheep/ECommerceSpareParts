@@ -34,7 +34,7 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 	{
 		var existing = await new CharacteristicBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var result = await Mediator.Send(
@@ -57,7 +57,7 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 	{
 		var existing = await new CharacteristicBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var result = await Mediator.Send(
@@ -75,7 +75,7 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 	{
 		await new CharacteristicBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var act = () => Mediator.Send(
 			new UpsertCharacteristicCommand(null, "  BRAKE PADS  "),
@@ -92,10 +92,10 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 	{
 		var existing = await new CharacteristicBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var other = await new CharacteristicBuilder(Faker)
 			.WithName("Oil Filters")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var act = () => Mediator.Send(

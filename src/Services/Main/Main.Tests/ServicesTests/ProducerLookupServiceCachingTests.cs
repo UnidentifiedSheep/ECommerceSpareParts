@@ -36,7 +36,7 @@ public sealed class ProducerLookupServiceCachingTests : IntegrationTest
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.Armtek)
 			.WithSupplierProducerName(supplierProducerName)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var service = Scope.ServiceProvider.GetRequiredService<IProducerLookupService>();
 

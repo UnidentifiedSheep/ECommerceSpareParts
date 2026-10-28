@@ -21,7 +21,7 @@ public sealed class ProductEanImportLrtTests : CsvLrtIntegrationTest<ProductEanI
 		var producerId = GetContext<ProducerTestContext>().Producers[0].Id;
 		var product = await new ProductBuilder(Faker)
 			.WithProducerId(producerId)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		Context.ProductEans.Add(ProductEan.Create(product.Id, "4601234567890"));
 		await Context.SaveChangesAsync(CancellationToken);
 

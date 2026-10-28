@@ -16,7 +16,7 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 	{
 		await new ProductGroupBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var execution = await ExecuteCsv(
 			"Name",

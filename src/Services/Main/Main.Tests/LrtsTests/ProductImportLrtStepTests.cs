@@ -27,7 +27,7 @@ public sealed class ProductImportLrtStepTests : CsvLrtIntegrationTest<ProductImp
 		var existingProduct = await new ProductBuilder(Faker)
 			.WithProducerId(firstProducer.Id)
 			.WithSku(new Sku("ABC-123"))
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var existingName = existingProduct.Name.Value;
 
 		var execution = await ExecuteCsv(
@@ -110,7 +110,7 @@ public sealed class ProductImportLrtStepTests : CsvLrtIntegrationTest<ProductImp
 		var producer = TestContext.Producers[0];
 		var group = await new ProductGroupBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var execution = await ExecuteCsv(
 			"Sku,Name,Producer,Description,Indicator,GroupId",

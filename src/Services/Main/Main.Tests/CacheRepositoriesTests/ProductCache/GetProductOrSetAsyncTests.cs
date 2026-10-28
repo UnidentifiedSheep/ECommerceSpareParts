@@ -68,7 +68,7 @@ public class GetProductOrSetAsyncTests : IntegrationTest
 		var image = await new ProductImageBuilder(Faker)
 			.WithProductId(product.Id)
 			.WithExtension(".png")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var repository = GetRepository();
 
 		await RemoveCachedProduct(product.Id);

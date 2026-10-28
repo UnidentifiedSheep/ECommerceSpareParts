@@ -57,7 +57,7 @@ public sealed class
 			.WithProducerId(TestContext.Producers[0].Id)
 			.WithSupplier(Supplier.Armtek)
 			.WithSupplierProducerName("Bosch")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var execution = await ExecuteCsv(
 			CsvRow(

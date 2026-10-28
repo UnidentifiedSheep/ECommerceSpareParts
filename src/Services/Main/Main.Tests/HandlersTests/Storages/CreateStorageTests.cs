@@ -45,7 +45,7 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 	[Fact]
 	public async Task CreateStorage_ExistingCode_ThrowsStorageCodeIsTaken()
 	{
-		var storageModel = await new StorageBuilder(Faker).BuildAndAddToDb(Context);
+		var storageModel = await new StorageBuilder(Faker).BuildAndAddToDb(Context, CancellationToken);
 
 		var command = new CreateStorageCommand(
 			storageModel.Code,

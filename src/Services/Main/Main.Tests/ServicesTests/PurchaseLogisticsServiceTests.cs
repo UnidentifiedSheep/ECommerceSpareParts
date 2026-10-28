@@ -155,7 +155,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 			.WithCurrencyId(GetContext<CurrencyTestContext>().Currencies[0].Id)
 			.WithCount(1)
 			.WithBuyPrice(10m)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var secondContent = new PurchaseContentBuilder(Faker)
 			.WithProductId(secondProduct.Id)
 			.WithCount(1)

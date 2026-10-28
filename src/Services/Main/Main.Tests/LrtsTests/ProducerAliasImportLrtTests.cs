@@ -25,7 +25,7 @@ public sealed class ProducerAliasImportLrtTests : CsvLrtIntegrationTest<Producer
 		var existing = await new ProducerAliasBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithAlias("Existing alias")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var execution = await ExecuteCsv(
 			"OriginalName,Alias",

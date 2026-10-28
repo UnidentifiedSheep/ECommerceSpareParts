@@ -257,7 +257,7 @@ public class CreateSaleTests : IntegrationTest
 			.WithOrganizationId(buyer.Id)
 			.WithProductId(storageContent.ProductId)
 			.WithReservedCount(2)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = CreateCommand(
 			buyer.Id,
@@ -282,13 +282,13 @@ public class CreateSaleTests : IntegrationTest
 		var organization = await new OrganizationBuilder(Faker)
 			.WithOwnerId(users[0].Id)
 			.WithMember(users[1].Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var storageContent = StorageContent();
 		var reservation = await new ProductReservationBuilder(Faker)
 			.WithOrganizationId(organization.Id)
 			.WithProductId(storageContent.ProductId)
 			.WithReservedCount(1)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var command = CreateCommand(
 				users[1].Id,
 				storageContent.CurrencyId,
@@ -382,7 +382,7 @@ public class CreateSaleTests : IntegrationTest
 			.WithProductId(storageContent.ProductId)
 			.WithReservedCount(countOnStorage + 1)
 			.WithCurrentCount(countOnStorage)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = CreateCommand(
 			buyer.Id,
@@ -406,7 +406,7 @@ public class CreateSaleTests : IntegrationTest
 			.WithProductId(storageContent.ProductId)
 			.WithReservedCount(countOnStorage + 1)
 			.WithCurrentCount(countOnStorage)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var commandWithoutConfirmation = CreateCommand(
 			buyer.Id,
 			storageContent.CurrencyId,

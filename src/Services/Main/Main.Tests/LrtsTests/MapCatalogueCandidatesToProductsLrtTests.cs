@@ -26,7 +26,7 @@ public sealed class
 		var candidate = await new CatalogueCandidateBuilder(Faker)
 			.WithSku(product.Sku.Value.Insert(3, "-"))
 			.WithProducerId(product.ProducerId)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 		var state = execution.GetState<MapCatalogueCandidatesToProductsState>();
@@ -51,7 +51,7 @@ public sealed class
 		var candidate = await new CatalogueCandidateBuilder(Faker)
 			.WithSku($"UNMATCHED-{Guid.NewGuid():N}")
 			.WithProducerId(TestContext.ProducerTestContext.Producers[0].Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 		var state = execution.GetState<MapCatalogueCandidatesToProductsState>();

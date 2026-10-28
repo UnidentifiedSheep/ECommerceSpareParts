@@ -61,7 +61,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		var candidate = await new CatalogueCandidateBuilder(Faker)
 			.WithSku("ABC-123")
 			.WithProducerId(producer.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var supplierProduct = await AddSupplierProduct(
 			"ABC123",
 			producer.Name,
@@ -117,6 +117,6 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 			.WithSku(sku)
 			.WithProducer(producer)
 			.WithSupplier(supplier)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 	}
 }

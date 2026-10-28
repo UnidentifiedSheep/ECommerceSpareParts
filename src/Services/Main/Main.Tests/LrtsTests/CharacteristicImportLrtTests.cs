@@ -16,7 +16,7 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 	{
 		await new CharacteristicBuilder(Faker)
 			.WithName("Brake Color")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		string[] rows =
 		[
