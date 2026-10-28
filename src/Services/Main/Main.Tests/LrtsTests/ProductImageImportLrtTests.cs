@@ -1,7 +1,6 @@
 using Application.Common.Interfaces.Cache;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Handlers.Products;
 using Main.Application.Interfaces.Products;
 using Main.Application.Lrts.ProductImageImport;
 using Main.Application.Static;
@@ -123,33 +122,6 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var updated = await provider.GetProductOrSetAsync(productId, CancellationToken);
 		updated.Images.Should().ContainSingle().Which.Should().Be($"https://images.example.com/products/{productId}/Photo.JPG");
-	}
-
-	[Fact]
-	public async Task RemoveImage_DeletesItsObjectAndPreservesOtherImages()
-	{
-		var productId = TestContext.Products[0].Id;
-		var storageKey = $"products/{productId}/first.jpg";
-		var otherStorageKey = $"products/{productId}/second.jpg";
-		var storage = Scope.ServiceProvider.GetRequiredService<S3StorageServiceStub>();
-		storage.SetFile("images", storageKey, "uploaded image");
-		storage.SetFile("images", otherStorageKey, "another image");
-		var execution = await ExecuteCsv(
-			"ProductId,FileName",
-			[CsvRow(productId, "first.jpg"), CsvRow(productId, "second.jpg")],
-			fileName => new ProductImageImportInputState { FileName = fileName });
-		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
-
-		await Mediator.Send(new RemoveProductImageCommand(productId, $"https://images.example.com/{storageKey}"),
-			CancellationToken);
-
-		var remaining = (await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken))
-			.Should().ContainSingle().Which;
-		remaining.GetId().Should().Be((productId, otherStorageKey));
-		using var preserved = await storage.DownloadFileAsync("images", otherStorageKey, CancellationToken);
-		preserved.IsSuccess.Should().BeTrue();
-		using var deleted = await storage.DownloadFileAsync("images", storageKey, CancellationToken);
-		deleted.IsSuccess.Should().BeFalse();
 	}
 
 	[Theory]

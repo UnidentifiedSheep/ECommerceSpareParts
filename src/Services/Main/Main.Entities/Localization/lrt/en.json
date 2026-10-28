@@ -82,6 +82,8 @@
     "lrt.service.task.run.name": "Service task dispatch",
     "lrt.service.task.run.description": "Runs a task in the selected service.",
     "lrt.user.tokens.clear.expired.name": "Clear expired tokens",
-    "lrt.user.tokens.clear.expired.description": "Deletes user tokens that have expired."
+    "lrt.user.tokens.clear.expired.description": "Deletes user tokens that have expired.",
+    "lrt.product.images.deletion.name": "Product image deletion",
+    "lrt.product.images.deletion.description": "Removes images of a deleted product from storage."
   }
 }

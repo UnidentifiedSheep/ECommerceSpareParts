@@ -5,13 +5,13 @@ namespace Tests.Extensions;
 
 public static class BuilderExtensions
 {
-	public static async Task<T> BuildAndAddToDb<T>(this IBuilder<T> builder, DbContext context)
+	public static async Task<T> BuildAndAddToDb<T>(this IBuilder<T> builder, DbContext context, CancellationToken cancellationToken = default)
 	{
 		var entity = builder.Build();
 		ArgumentNullException.ThrowIfNull(entity);
 
-		await context.AddAsync(entity);
-		await context.SaveChangesAsync();
+		await context.AddAsync(entity, cancellationToken);
+		await context.SaveChangesAsync(cancellationToken);
 		return entity;
 	}
 

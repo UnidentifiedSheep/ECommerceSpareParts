@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces;
-using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
@@ -8,7 +7,6 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;
 using Microsoft.Extensions.Options;
-using S3.Core.Interfaces;
 
 namespace Main.Application.Handlers.Products;
 
@@ -17,7 +15,6 @@ namespace Main.Application.Handlers.Products;
 public record RemoveProductImageCommand(int ProductId, string ImagePath) : ICommand;
 
 public class RemoveProductImageHandler(
-	IS3Service s3Storage,
 	IUnitOfWork unitOfWork,
 	IOptions<S3BucketsOptions> bucketsOptions,
 	IRepository<ProductImage, (int, string)> repository) : ICommandHandler<RemoveProductImageCommand>
@@ -31,12 +28,6 @@ public class RemoveProductImageHandler(
 			throw new ProductImageNotFoundException(request.ProductId, storageKey);
 
 		unitOfWork.Remove(imageEntity);
-
-		var deleteResult = await s3Storage.DeleteFileAsync(bucket.Name, storageKey, cancellationToken);
-		if (!deleteResult.IsSuccess)
-			throw new InvalidOperationException(
-				$"Failed to delete image '{deleteResult.Key}' from S3: " +
-				$"{deleteResult.ErrorCode}: {deleteResult.ErrorMessage}");
 
 		return Unit.Value;
 	}

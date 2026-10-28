@@ -63,6 +63,13 @@
     "article.image.not.found": "Belirtilen ürün resmi bulunamadı.",
     "article.import.too.many.errors.while.processing.batch": "Ürün içe aktarma paketi işlenirken çok fazla hata oluştu.",
     "article.import.producer.not.found": "Üretici veya üretici takma adı '{Producer}' bulunamadı.",
-    "article.cross.import.product.not.found": "'{ArticleNumber}' SKU ve '{Producer}' üreticisine sahip ürün bulunamadı."
+    "article.cross.import.product.not.found": "'{ArticleNumber}' SKU ve '{Producer}' üreticisine sahip ürün bulunamadı.",
+    "article.deletion.stock": "Ürün silinemiyor: stok sıfır değil.",
+    "article.deletion.storage.content": "Ürün silinemiyor: depo kayıtları var.",
+    "article.deletion.sale": "Ürün silinemiyor: satış kayıtları var.",
+    "article.deletion.purchase": "Ürün silinemiyor: satın alma kayıtları var.",
+    "article.deletion.order": "Ürün silinemiyor: sipariş kayıtları var.",
+    "article.deletion.reservation": "Ürün silinemiyor: rezervasyon kayıtları var.",
+    "article.deletion.composition": "Ürün silinemiyor: başka bir ürünün bileşenidir."
   }
 }

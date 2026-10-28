@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
-using Application.Common.DomainEventHandlers.Settings;
+using Application.Common.DomainEventHandlers.Settings.SettingUpdated;
 using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;

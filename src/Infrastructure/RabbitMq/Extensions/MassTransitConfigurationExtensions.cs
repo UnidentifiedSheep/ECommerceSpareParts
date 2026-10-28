@@ -24,7 +24,9 @@ public static class MassTransitConfigurationExtensions
 				h.Password(options.Password);
 			});
 
+		cfg.UseDelayedRedelivery(r => r.Intervals(TimeSpan.FromMinutes(5)));
 		cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+
 		cfg.Publish<JobStatusUpdatedEvent>(p =>
 		{
 			p.ExchangeType = ExchangeType.Direct;

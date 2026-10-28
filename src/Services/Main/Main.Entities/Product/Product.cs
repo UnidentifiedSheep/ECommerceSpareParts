@@ -7,7 +7,7 @@ using Main.Entities.Product.ValueObjects;
 
 namespace Main.Entities.Product;
 
-public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
+public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>, IVersionable<uint>
 {
 	private readonly List<ProductCharacteristic> _characteristics = [];
 
@@ -144,7 +144,7 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
 	public override void OnUpdated() => AddDomainEvent(new ProductUpdatedDomainEvent(Id));
 
-	public override void OnDeleted() => OnUpdated();
+	public override void OnDeleted() => AddDomainEvent(new ProductDeletedDomainEvent(Id));
 
 	public override int GetId() => Id;
 }
