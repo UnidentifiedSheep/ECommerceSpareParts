@@ -12,4 +12,7 @@ public sealed class Query
 	[GraphQLName("products")]
 	[Shareable]
 	public ProductQueries Products => new();
+
+	[GraphQLName("priceAppliers")]
+	public PriceApplierQueries PriceAppliers => new();
 }

@@ -6,7 +6,6 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Analytics;
 using Enums;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Markup;
 using Pricing.Entities;
@@ -17,32 +16,42 @@ namespace Pricing.Application.Handlers.Markup.UpsertMarkupGroup;
 [Transactional(IsolationLevel.Serializable, 20, 3, TransactionErrorKind.UniqueConstraintViolation)]
 [AutoSave]
 public record UpsertMarkupGroupCommand(UpsertMarkupGroupDto MarkupGroup, Guid? SourceMessageId = null)
-	: ICommand;
+	: ICommand<UpsertMarkupGroupResult>;
+
+public record UpsertMarkupGroupResult(int Id);
 
 public class UpsertMarkupGroupHandler(
 	IRepository<MarkupGroup, int> repository,
 	IReadRepository<MarkupGroup, int> readRepository,
 	IUnitOfWork unitOfWork,
-	IIntegrationEventScope integrationEvents) : ICommandHandler<UpsertMarkupGroupCommand>
+	IIntegrationEventScope integrationEvents) : ICommandHandler<UpsertMarkupGroupCommand, UpsertMarkupGroupResult>
 {
-	public async Task<Unit> Handle(UpsertMarkupGroupCommand request, CancellationToken cancellationToken)
+	public async Task<UpsertMarkupGroupResult> Handle(UpsertMarkupGroupCommand request, CancellationToken cancellationToken)
 	{
-		if (request.MarkupGroup.Id is null && request.SourceMessageId is { } messageId &&
-			await readRepository.Query.AnyAsync(x => x.SourceMessageId == messageId, cancellationToken))
-			return Unit.Value;
+		if (request.MarkupGroup.Id is null && request.SourceMessageId is { } messageId)
+		{
+			var existingId = await readRepository.Query
+				.Where(x => x.SourceMessageId == messageId)
+				.Select(x => (int?)x.Id)
+				.SingleOrDefaultAsync(cancellationToken);
+			if (existingId is { } id)
+				return new UpsertMarkupGroupResult(id);
+		}
 
 		var ranges = request.MarkupGroup.Ranges
 			.Select(x => MarkupRange.Create(x.RangeStart, x.RangeEnd, x.Markup))
 			.ToList();
 
+		MarkupGroup group;
 		if (request.MarkupGroup.Id is null)
-			await unitOfWork.AddAsync(
-				MarkupGroup.Create(
+		{
+			group = MarkupGroup.Create(
 					request.MarkupGroup.Name,
 					request.MarkupGroup.CurrencyId,
 					ranges,
-					request.SourceMessageId),
-				cancellationToken);
+					request.SourceMessageId);
+			await unitOfWork.AddAsync(group, cancellationToken);
+		}
 		else
 		{
 			var criteria = Criteria<MarkupGroup>
@@ -52,13 +61,14 @@ public class UpsertMarkupGroupHandler(
 				.Track()
 				.Build();
 
-			var group = await repository.FirstOrDefaultAsync(criteria, cancellationToken) ??
+			group = await repository.FirstOrDefaultAsync(criteria, cancellationToken) ??
 				throw new MarkupGroupNotFoundException(request.MarkupGroup.Id.Value);
 
 			group.Update(request.MarkupGroup.Name, request.MarkupGroup.CurrencyId, ranges);
 		}
 
 		integrationEvents.Add(new MarkupRangesRefreshRequestedEvent());
-		return Unit.Value;
+		await unitOfWork.SaveChangesAsync(cancellationToken);
+		return new UpsertMarkupGroupResult(group.Id);
 	}
 }

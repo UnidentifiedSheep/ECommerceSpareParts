@@ -229,6 +229,41 @@ public sealed class UpsertMarkupGroupTests(CombinedContainerFixture fixture) : I
 		(await Context.Set<MarkupRange>().CountAsync(CancellationToken)).Should().Be(2);
 	}
 
+	[Fact]
+	public async Task CreatingGroup_ReturnsPersistedGroupId()
+	{
+		var result = await Mediator.Send(new UpsertMarkupGroupCommand(Group()), CancellationToken);
+
+		result.Id.Should().BeGreaterThan(0);
+		(await Context.Set<MarkupGroup>().AsNoTracking().Select(x => x.Id).SingleAsync(CancellationToken))
+			.Should().Be(result.Id);
+	}
+
+	[Fact]
+	public async Task UpdatingGroup_ReturnsSameGroupId()
+	{
+		var group = await new MarkupGroupDataBuilder(Faker).BuildAndAddToDb(Context, CancellationToken);
+
+		var result = await Mediator.Send(new UpsertMarkupGroupCommand(Group(group.Id)), CancellationToken);
+
+		result.Id.Should().Be(group.Id);
+		(await Context.Set<MarkupGroup>().AsNoTracking().SingleAsync(CancellationToken))
+			.Name.Should().Be("Updated markup");
+	}
+
+	[Fact]
+	public async Task RepeatedMessage_ReturnsExistingGroupId()
+	{
+		var command = Command(Guid.NewGuid());
+		var created = await Mediator.Send(command, CancellationToken);
+
+		await using var scope = Scope.ServiceProvider.CreateAsyncScope();
+		var repeated = await scope.ServiceProvider.GetRequiredService<ISender>().Send(command, CancellationToken);
+
+		repeated.Id.Should().Be(created.Id);
+		(await Context.Set<MarkupGroup>().CountAsync(CancellationToken)).Should().Be(1);
+	}
+
 	private static UpsertMarkupGroupDto Group(int? id = null) => new()
 	{
 		Id = id,
