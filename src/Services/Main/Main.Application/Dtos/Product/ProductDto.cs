@@ -33,4 +33,7 @@ public record ProductDto
 
 	[JsonPropertyName("stock")]
 	public required int Stock { get; init; }
+
+	[JsonPropertyName("rowVersion")]
+	public required uint RowVersion { get; init; }
 }

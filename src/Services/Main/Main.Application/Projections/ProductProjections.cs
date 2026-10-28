@@ -31,7 +31,8 @@ public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Produc
 			ProducerName = x.Producer.Name,
 			GroupId = x.ProductGroupId,
 			Indicator = x.Indicator,
-			Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList()
+			Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList(),
+			RowVersion = x.RowVersion
 		};
 	}
 
@@ -61,6 +62,7 @@ public sealed class FullProductDtoProjectionProvider : ProjectionProviderBase<Pr
 			ProducerName = x.Producer.Name,
 			GroupId = x.ProductGroupId,
 			Indicator = x.Indicator,
+			RowVersion = x.RowVersion,
 			Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList(),
 			ProductWeight = x.ProductWeight == null ? null : weightToDto.Invoke(x.ProductWeight),
 			ProductSize = x.ProductSize == null ? null : sizeToDto.Invoke(x.ProductSize)

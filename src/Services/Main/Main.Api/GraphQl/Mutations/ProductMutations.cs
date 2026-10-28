@@ -3,6 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
+using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Handlers.Products.PatchProduct;
 using MediatR;
@@ -38,5 +39,18 @@ public sealed class ProductMutations
 			cancellationToken);
 
 		return new GqlProduct(productId);
+	}
+
+	[GraphQLName("delete")]
+	[RequireAllPermissions(PermissionCodes.ARTICLES_DELETE)]
+	public async Task<bool> DeleteAsync(
+		ISender sender,
+		GqlDeleteProductInput input,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(
+			new DeleteProductCommand(input.ProductId, input.RowVersion),
+			cancellationToken);
+		return true;
 	}
 }
