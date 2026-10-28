@@ -10,4 +10,7 @@ public interface ISettingsService
 	Task SetSetting<T>(T value, CancellationToken cancellationToken = default) where T : Setting;
 
 	Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default) where T : Setting, ISetting<T>;
+
+	Task<T> GetOrDefault<T>(bool directRead, CancellationToken cancellationToken = default)
+		where T : Setting, ISetting<T>;
 }

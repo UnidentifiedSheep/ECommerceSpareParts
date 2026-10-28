@@ -52,25 +52,34 @@ public class SettingsService(
 		settingsContainer.Set(value);
 	}
 
-	public async Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default)
+	public Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default)
+		where T : Setting, ISetting<T> => GetOrDefault<T>(false, cancellationToken);
+
+	public async Task<T> GetOrDefault<T>(bool directRead, CancellationToken cancellationToken = default)
 		where T : Setting, ISetting<T>
 	{
-		if (settingsContainer.TryGet<T>(out var setting))
+		if (!directRead && settingsContainer.TryGet<T>(out var setting))
 			return setting!;
 
-		var dbSetting = await repository.GetById(T.SettingName, cancellationToken);
+		var settingName = T.SettingName;
+		var dbSetting = directRead
+			? await repository.FirstOrDefaultAsync(Criteria<Setting>.New()
+				.Where(x => x.Key == settingName).Track(false).Build(), cancellationToken)
+			: await repository.GetById(settingName, cancellationToken);
 
 		if (dbSetting != null)
 		{
 			var typed = dbSetting as T ?? throw new InvalidOperationException(
 				$"Setting '{dbSetting.Key}' was materialized as " +
 				$"'{dbSetting.GetType().Name}' instead of '{typeof(T).Name}'.");
-			settingsContainer.Set(typed);
+			if (!directRead)
+				settingsContainer.Set(typed);
 			return typed;
 		}
 
 		var defaultSetting = T.Default;
-		await SetSetting(defaultSetting, cancellationToken);
+		if (!directRead)
+			await SetSetting(defaultSetting, cancellationToken);
 		return defaultSetting;
 	}
 }

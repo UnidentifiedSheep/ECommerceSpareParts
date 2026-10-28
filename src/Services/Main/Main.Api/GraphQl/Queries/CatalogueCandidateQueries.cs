@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
 using GraphQL.Common.Attributes;

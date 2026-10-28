@@ -65,7 +65,7 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 
 	public override void OnUpdated() => OnCreated();
 
-	public override void OnDeleted() => OnCreated();
+	public override void OnDeleted() => AddDomainEvent(new ProductImageDeletedDomainEvent(ProductId, StorageKey));
 
 	public override (int, string) GetId() => (ProductId, StorageKey);
 

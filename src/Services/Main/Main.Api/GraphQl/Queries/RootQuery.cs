@@ -22,6 +22,7 @@ public sealed class RootQuery
 	public SaleQueries Sales => new();
 
 	[GraphQLName("products")]
+	[Shareable]
 	public ProductQueries Product => new();
 
 	[GraphQLName("productGroups")]
@@ -45,4 +46,7 @@ public sealed class RootQuery
 
 	[GraphQLName("documents")]
 	public DocumentQueries Documents => new();
+
+	[GraphQLName("currencies")]
+	public CurrencyQueries Currencies => new();
 }

@@ -82,6 +82,8 @@
     "lrt.service.task.run.name": "Запуск задачи сервиса",
     "lrt.service.task.run.description": "Запускает задачу в выбранном сервисе.",
     "lrt.user.tokens.clear.expired.name": "Очистка просроченных токенов",
-    "lrt.user.tokens.clear.expired.description": "Удаляет токены пользователей с истёкшим сроком действия."
+    "lrt.user.tokens.clear.expired.description": "Удаляет токены пользователей с истёкшим сроком действия.",
+    "lrt.product.images.deletion.name": "Удаление изображений товара",
+    "lrt.product.images.deletion.description": "Удаляет из хранилища изображения удалённого товара."
   }
 }

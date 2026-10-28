@@ -63,6 +63,13 @@
     "article.image.not.found": "Не удалось найти указанное изображение продукта.",
     "article.import.too.many.errors.while.processing.batch": "Произошло слишком много ошибок при обработке товаров.",
     "article.import.producer.not.found": "Производитель или алиас производителя '{Producer}' не найден.",
-    "article.cross.import.product.not.found": "Товар с артикулом '{ArticleNumber}' и производителем '{Producer}' не найден."
+    "article.cross.import.product.not.found": "Товар с артикулом '{ArticleNumber}' и производителем '{Producer}' не найден.",
+    "article.deletion.stock": "Нельзя удалить товар: остаток не равен нулю.",
+    "article.deletion.storage.content": "Нельзя удалить товар: существуют складские записи.",
+    "article.deletion.sale": "Нельзя удалить товар: товар используется в продажах.",
+    "article.deletion.purchase": "Нельзя удалить товар: товар используется в закупках.",
+    "article.deletion.order": "Нельзя удалить товар: товар используется в заказах.",
+    "article.deletion.reservation": "Нельзя удалить товар: существуют записи резервирования.",
+    "article.deletion.composition": "Нельзя удалить товар: товар входит в состав другого товара."
   }
 }

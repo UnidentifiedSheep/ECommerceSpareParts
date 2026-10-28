@@ -1,4 +1,5 @@
 using Exceptions.Base.Localized;
+using Main.Enums.Products;
 
 namespace Main.Entities.Exceptions;
 
@@ -82,3 +83,19 @@ public class ProductGroupNotFoundException(int id) : LocalizedNotFoundException(
 
 public class ProductGroupNameAlreadyExistsException() : LocalizedConflictException(
 	ProductGroupNormalizedNameAlreadyExistsMessage.Instance);
+
+public class ProductDeletionNotAllowedException(ProductDeletionBlocker blocker) : LocalizedConflictException(
+	blocker switch
+	{
+		ProductDeletionBlocker.Stock => ArticleDeletionStockMessage.Instance,
+		ProductDeletionBlocker.StorageContent => ArticleDeletionStorageContentMessage.Instance,
+		ProductDeletionBlocker.Sale => ArticleDeletionSaleMessage.Instance,
+		ProductDeletionBlocker.Purchase => ArticleDeletionPurchaseMessage.Instance,
+		ProductDeletionBlocker.Order => ArticleDeletionOrderMessage.Instance,
+		ProductDeletionBlocker.Reservation => ArticleDeletionReservationMessage.Instance,
+		ProductDeletionBlocker.Composition => ArticleDeletionCompositionMessage.Instance,
+		_ => throw new ArgumentOutOfRangeException(nameof(blocker))
+	})
+{
+	public ProductDeletionBlocker Blocker { get; } = blocker;
+}

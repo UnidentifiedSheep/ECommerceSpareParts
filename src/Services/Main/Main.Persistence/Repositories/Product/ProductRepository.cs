@@ -3,6 +3,7 @@ using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Product;
 using Main.Entities.Product;
+using Main.Enums.Products;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -16,6 +17,20 @@ namespace Main.Persistence.Repositories.Product;
 internal class ProductRepository(DContext context, BulkProductContext bulkContext, QueryExtensions extensions)
 	: LinqRepositoryBase<DContext, ProductEntity, int>(context, extensions), IProductRepository
 {
+	public Task<ProductDeletionBlocker?> GetDeletionBlockerAsync(int productId, CancellationToken cancellationToken = default)
+		=> Context.Products
+			.AsNoTracking()
+			.Where(product => product.Id == productId)
+			.Select(product => product.Stock.Value != 0 ? (ProductDeletionBlocker?)ProductDeletionBlocker.Stock
+				: Context.StorageContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.StorageContent
+				: Context.SaleContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Sale
+				: Context.PurchaseContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Purchase
+				: Context.OrderItems.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Order
+				: Context.ProductReservations.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Reservation
+				: Context.ProductContents.Any(item => item.ChildProductId == productId) ? ProductDeletionBlocker.Composition
+				: null)
+			.SingleAsync(cancellationToken);
+
 	public async Task<IReadOnlyList<ProductEntity>> GetProductCrosses(
 		int productId,
 		Criteria<Entities.Product.Product> criteria,

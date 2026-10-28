@@ -2,7 +2,8 @@
 using Abstractions.Interfaces;
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
-using Application.Common.DomainEventHandlers.Jobs;
+using Application.Common.DomainEventHandlers.Jobs.JobStepFinished;
+using Application.Common.DomainEventHandlers.Jobs.JobStatusUpdated;
 using Application.Common.Domains;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;

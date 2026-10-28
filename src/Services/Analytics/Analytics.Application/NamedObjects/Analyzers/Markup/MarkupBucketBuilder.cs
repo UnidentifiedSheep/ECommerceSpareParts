@@ -29,6 +29,22 @@ public sealed class MarkupBucketBuilder
 		_m2 += delta * delta2;
 	}
 
+	public void Merge(MarkupBucketBuilder other)
+	{
+		if (other.Count == 0)
+			return;
+
+		if (Count == 0)
+			FromCost = other.FromCost;
+
+		var combinedCount = Count + other.Count;
+		var delta = other.Mean - Mean;
+		_m2 += other._m2 + delta * delta * Count * other.Count / combinedCount;
+		Mean += delta * other.Count / combinedCount;
+		Count = combinedCount;
+		ToCost = other.ToCost;
+	}
+
 	public MarkupBucketBuilder Copy()
 	{
 		return new MarkupBucketBuilder

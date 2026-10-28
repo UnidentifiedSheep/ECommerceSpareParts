@@ -12,11 +12,11 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 
 	private const int DecimalScale = 10;
 
-	private const int MinBucketSampleSize = 20;
+	private const int MinBucketSampleSize = 100;
 
 	private const double MaxStdDev = 0.08;
 
-	private const decimal MaxCostRatio = 1.5m;
+	private const decimal MaxCostRatio = 2m;
 
 	private const decimal MinAllowedMarkup = 0.01m;
 
@@ -35,7 +35,7 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 		MarkupAnalyzerInput input,
 		CancellationToken cancellationToken = default)
 	{
-		var ranges = new List<MarkupRangeDraft>();
+		var buckets = new List<MarkupBucketBuilder>();
 		var currentBucket = new MarkupBucketBuilder();
 		MarkupRangeCursor? cursor = null;
 
@@ -50,16 +50,40 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 				break;
 
 			foreach (var row in result)
-				TryAddToRanges(
+				TryAddToBuckets(
 					row,
-					ranges,
+					buckets,
 					ref currentBucket);
 
 			cursor = MarkupRangeCursor.From(result[^1]);
 		}
 
 		if (currentBucket.Count > 0)
-			ranges.Add(currentBucket.Build());
+		{
+			if (currentBucket.Count < MinBucketSampleSize && buckets.Count > 0)
+				buckets[^1].Merge(currentBucket);
+			else
+				buckets.Add(currentBucket);
+		}
+
+		return BuildRanges(buckets);
+	}
+
+	private static IReadOnlyList<MarkupRangeDraft> BuildRanges(IReadOnlyList<MarkupBucketBuilder> buckets)
+	{
+		var ranges = new List<MarkupRangeDraft>(buckets.Count);
+		for (var index = 0; index < buckets.Count; index++)
+		{
+			var bucket = buckets[index];
+			var fromCost = index == 0
+				? bucket.FromCost
+				: ranges[^1].ToCost;
+			var toCost = index == buckets.Count - 1
+				? bucket.ToCost
+				: bucket.ToCost + (buckets[index + 1].FromCost - bucket.ToCost) / 2;
+
+			ranges.Add(bucket.Build() with { FromCost = fromCost, ToCost = toCost });
+		}
 
 		return ranges;
 	}
@@ -103,9 +127,9 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 		});
 	}
 
-	private static void TryAddToRanges(
+	private static void TryAddToBuckets(
 		SaleContentMarkupRow row,
-		List<MarkupRangeDraft> ranges,
+		List<MarkupBucketBuilder> buckets,
 		ref MarkupBucketBuilder currentBucket)
 	{
 		if (!TryCalculateMarkup(row, out var markup))
@@ -123,13 +147,13 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 		if (!ShouldStartNewBucket(
 				row,
 				currentBucket,
-				testBucket) || currentBucket.Count <= 1)
+				testBucket))
 		{
 			currentBucket = testBucket;
 			return;
 		}
 
-		ranges.Add(currentBucket.Build());
+		buckets.Add(currentBucket);
 
 		currentBucket = new MarkupBucketBuilder();
 		currentBucket.Add(row.AvgBuyPriceBase, markup);
@@ -151,14 +175,13 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 		MarkupBucketBuilder currentBucket,
 		MarkupBucketBuilder testBucket)
 	{
-		if (row.AvgBuyPriceBase == currentBucket.ToCost)
+		if (currentBucket.Count < MinBucketSampleSize || row.AvgBuyPriceBase == currentBucket.ToCost)
 			return false;
 
 		var costRatioExceeded = currentBucket.FromCost > 0 &&
 			row.AvgBuyPriceBase / currentBucket.FromCost > MaxCostRatio;
 
-		var stdDevExceeded = currentBucket.Count >= MinBucketSampleSize &&
-			testBucket is { Count: > 1, StdDev: > MaxStdDev };
+		var stdDevExceeded = testBucket.StdDev > MaxStdDev;
 
 		return stdDevExceeded || costRatioExceeded;
 	}

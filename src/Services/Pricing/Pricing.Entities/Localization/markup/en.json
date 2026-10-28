@@ -3,11 +3,13 @@
   "messages": {
     "markup.group.not.found": "Markup group not found.",
     "current.markup.group.can.not.be.deleted": "Currently used markup group can not be deleted. Firstly select other group.",
+    "last.markup.group.can.not.be.deleted": "The last markup group cannot be deleted.",
     "markup.group.required": "Markup group data is required.",
     "markup.group.id.must.be.positive": "Markup group id must be greater than 0.",
     "markup.group.name.max.length": "Markup group name must not exceed 128 characters.",
     "markup.group.currency.id.must.be.positive": "Markup group currency id must be greater than 0.",
     "markup.group.ranges.required": "Markup group must contain at least one range.",
+    "markup.group.ranges.must.not.overlap": "Markup ranges within a group must not overlap.",
     "markup.range.start.must.not.be.negative": "Markup range start must not be negative.",
     "markup.range.end.must.not.be.negative": "Markup range end must not be negative.",
     "markup.range.end.must.not.be.less.than.start": "Markup range end must not be less than range start.",

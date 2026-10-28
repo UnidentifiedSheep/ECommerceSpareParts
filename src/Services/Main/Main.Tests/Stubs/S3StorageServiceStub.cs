@@ -106,6 +106,9 @@ public sealed class S3StorageServiceStub : IS3Service
 	public void FailDeletion(string bucketName, string key) =>
 		_deleteFailures[(bucketName, key)] = 0;
 
+	public void AllowDeletion(string bucketName, string key) =>
+		_deleteFailures.TryRemove((bucketName, key), out _);
+
 	private sealed class MemoryStreamResponse(Stream stream, string eTag) : IStreamResponse
 	{
 		public Stream Stream { get; } = stream;

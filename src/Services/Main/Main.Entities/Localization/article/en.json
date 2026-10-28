@@ -63,6 +63,13 @@
     "article.image.not.found": "Unable to find specified image of product.",
     "article.import.too.many.errors.while.processing.batch": "Too many errors happened while product import batch was processing.",
     "article.import.producer.not.found": "Producer or producer alias '{Producer|string}' was not found.",
-    "article.cross.import.product.not.found": "Product with SKU '{ArticleNumber|string}' and producer '{Producer|string}' was not found."
+    "article.cross.import.product.not.found": "Product with SKU '{ArticleNumber|string}' and producer '{Producer|string}' was not found.",
+    "article.deletion.stock": "Cannot delete product: stock is not zero.",
+    "article.deletion.storage.content": "Cannot delete product: storage records exist.",
+    "article.deletion.sale": "Cannot delete product: sales reference the product.",
+    "article.deletion.purchase": "Cannot delete product: purchases reference the product.",
+    "article.deletion.order": "Cannot delete product: orders reference the product.",
+    "article.deletion.reservation": "Cannot delete product: reservation records exist.",
+    "article.deletion.composition": "Cannot delete product: another product contains it."
   }
 }
