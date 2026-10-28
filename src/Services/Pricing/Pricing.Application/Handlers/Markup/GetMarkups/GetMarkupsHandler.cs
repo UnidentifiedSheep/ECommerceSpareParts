@@ -9,7 +9,7 @@ using Pricing.Entities;
 
 namespace Pricing.Application.Handlers.Markup.GetMarkups;
 
-public record GetMarkupsQuery(Pagination Pagination) : IQuery<GetMarkupsResult>;
+public record GetMarkupsQuery(Pagination Pagination, string? SearchTerm = null) : IQuery<GetMarkupsResult>;
 
 public record GetMarkupsResult(IReadOnlyList<MarkupGroupDto> Groups);
 
@@ -20,8 +20,15 @@ public class GetMarkupsHandler(
 {
 	public async Task<GetMarkupsResult> Handle(GetMarkupsQuery request, CancellationToken cancellationToken)
 	{
-		var result = await repository
-			.Query
+		var query = repository.Query;
+		var term = request.SearchTerm?.Trim();
+		if (!string.IsNullOrEmpty(term))
+		{
+			var normalizedTerm = term.ToUpperInvariant();
+			query = query.Where(group => group.Name != null && group.Name.ToUpper().Contains(normalizedTerm));
+		}
+
+		var result = await query
 			.OrderBy(x => x.Id)
 			.Project(projection)
 			.ApplyPagination(request.Pagination)

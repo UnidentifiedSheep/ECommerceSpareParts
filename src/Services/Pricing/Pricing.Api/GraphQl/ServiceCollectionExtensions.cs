@@ -10,11 +10,8 @@ public static class ServiceCollectionExtensions
 	{
 		services
 			.AddCommonGraphQl(name)
-			.AddQueryType<Query>(descriptor =>
-				descriptor
-					.Field("_pricing")
-					.Type<NonNullType<BooleanType>>()
-					.Resolve(_ => new ValueTask<object?>(true)));
+			.AddQueryType<Query>()
+			.AddPricingGraphQL();
 
 		return services;
 	}

@@ -45,4 +45,7 @@ public sealed class RootQuery
 
 	[GraphQLName("documents")]
 	public DocumentQueries Documents => new();
+
+	[GraphQLName("currencies")]
+	public CurrencyQueries Currencies => new();
 }

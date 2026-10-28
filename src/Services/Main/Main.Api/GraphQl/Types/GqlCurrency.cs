@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Types.Composite;
 using Main.Application.Dtos.Currencies;
 
 namespace Main.Api.GraphQl.Types;
@@ -9,6 +10,7 @@ public sealed record GqlCurrency(
 	CurrencyDto Currency)
 {
 	[GraphQLName("id")]
+	[Shareable]
 	public int Id => Currency.Id;
 
 	[GraphQLName("shortName")]
