@@ -30,7 +30,7 @@ public interface IProductRepository : IRepository<Product, int>
 		IEnumerable<ProductCross> crosses,
 		CancellationToken cancellationToken = default);
 
-	Task InsertProductsOnConflictDoNothingAsync(
+	Task<IReadOnlyList<int>> InsertProductsOnConflictDoNothingAsync(
 		IReadOnlyCollection<Product> products,
 		CancellationToken cancellationToken = default);
 

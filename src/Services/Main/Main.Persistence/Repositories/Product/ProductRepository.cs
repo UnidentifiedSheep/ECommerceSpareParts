@@ -139,11 +139,11 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 			: Context.BulkDeleteAsync(items, cancellationToken: cancellationToken);
 	}
 
-	public async Task InsertProductsOnConflictDoNothingAsync(
+	public async Task<IReadOnlyList<int>> InsertProductsOnConflictDoNothingAsync(
 		IReadOnlyCollection<ProductEntity> products,
 		CancellationToken cancellation = default)
 	{
-		if (products.Count == 0) return;
+		if (products.Count == 0) return [];
 
 		var items = products
 			.Select(BulkProduct.FromProduct)
@@ -160,9 +160,12 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 				items,
 				new BulkConfig
 				{
-					PropertiesToIncludeOnUpdate = [""]
+					PropertiesToIncludeOnUpdate = [""],
+					SetOutputIdentity = true
 				},
 				cancellationToken: cancellation);
+
+			return items.Where(item => item.Id != 0).Select(item => item.Id).ToArray();
 		}
 		finally
 		{

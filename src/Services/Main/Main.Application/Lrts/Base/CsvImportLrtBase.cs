@@ -156,6 +156,18 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 		TState state,
 		List<CsvImportError> errors);
 
+	protected virtual async Task SaveBatchAsync(
+		IReadOnlyList<(int idx, TBatchItem item)> items,
+		TState state,
+		CsvImportCheckpoint checkpoint,
+		List<CsvImportError> errors)
+	{
+		if (items.Count > 0)
+			await ProcessBatch(items, state, errors);
+
+		await SaveStateAsync(state.WithCheckpoint(checkpoint));
+	}
+
 	protected static CsvImportError CreateError(int rowIdx, string message)
 	{
 		return new CsvImportError
@@ -178,22 +190,15 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 		string eTag,
 		List<CsvImportError> errors)
 	{
-		if (items.Count > 0)
-			await ProcessBatch(
-				items,
-				state,
-				errors);
-
-		items.Clear();
-		var updatedState = state.WithCheckpoint(new CsvImportCheckpoint
+		await SaveBatchAsync(items, state, new CsvImportCheckpoint
 		{
 			CurrentLine = currentLine,
 			Offset = offset,
 			RawHeader = rawHeader,
 			ETag = eTag
-		});
-		await SaveStateAsync(updatedState);
-		return updatedState;
+		}, errors);
+		items.Clear();
+		return State;
 	}
 
 	private static int CountSurrogatePairs(string rawRecord)

@@ -9,8 +9,6 @@
     "lrt.producer.supplier.mapping.import.description": "Matches supplier producer names to the producer directory.",
     "lrt.product.import.name": "Product import",
     "lrt.product.import.description": "Imports products into the catalogue.",
-    "lrt.product.import.step.name": "Load products",
-    "lrt.product.import.step.description": "Adds products to the catalogue.",
     "lrt.product.ean.import.name": "Product EAN import",
     "lrt.product.ean.import.description": "Adds product EAN barcodes.",
     "lrt.product.group.import.name": "Product group import",

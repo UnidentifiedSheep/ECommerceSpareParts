@@ -26,7 +26,6 @@ internal sealed class BulkProduct
 
 	public static BulkProduct FromProduct(Product product) => new()
 	{
-		Id = product.Id,
 		PairId = product.PairId,
 		Sku = product.Sku.Value,
 		NormalizedSku = product.Sku.NormalizedValue,
