@@ -19,14 +19,19 @@ public class ProducerSupplierMappingConfiguration : IEntityTypeConfiguration<Pro
 		builder.Property(e => e.ProducerId).HasColumnName("producer_id");
 
 		builder
-			.Property(e => e.SupplierProducerName)
+			.Property(e => e.Name)
 			.HasColumnName("producer_supplier_name")
+			.HasMaxLength(128);
+
+		builder
+			.Property(e => e.NormalizedName)
+			.HasColumnName("normalized_producer_supplier_name")
 			.HasMaxLength(128);
 
 		builder
 			.HasAlternateKey(e => new
 			{
-				e.SupplierProducerName, e.Supplier
+				e.NormalizedName, e.Supplier
 			})
 			.HasName("producer_supplier_mappings_supplier_name_key");
 

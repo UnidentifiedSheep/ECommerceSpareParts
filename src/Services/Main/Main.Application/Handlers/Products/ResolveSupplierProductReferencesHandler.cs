@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Repositories;
 using Enums;
 using Main.Application.Dtos.Product.SupplierReferences;
 using Main.Entities.Product;
+using Main.Entities.Producer;
 using Main.Entities.Product.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,14 +51,14 @@ public class ResolveSupplierProductReferencesHandler(IReadRepository<Product, in
 		{
 			suppliers.Add(@ref.Supplier);
 			normalizedSkus.Add(@ref.Sku);
-			producerNames.Add(@ref.SupplierProducerName);
+			producerNames.Add(@ref.NormalizedName);
 		}
 
 		var referenceKeys = references
 			.Select(x => new SupplierProductReferenceKey(
 				x.Supplier,
 				x.Sku,
-				x.SupplierProducerName))
+				x.NormalizedName))
 			.ToHashSet();
 
 		var candidates = await repository
@@ -65,13 +66,13 @@ public class ResolveSupplierProductReferencesHandler(IReadRepository<Product, in
 			.Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))
 			.SelectMany(
 				x => x.Producer.SupplierMappings.Where(z =>
-					suppliers.Contains(z.Supplier) && producerNames.Contains(z.SupplierProducerName)),
+					suppliers.Contains(z.Supplier) && producerNames.Contains(z.NormalizedName)),
 				(p, m) => new
 				{
 					m.Supplier,
 					ProductId = p.Id,
 					Sku = p.Sku.NormalizedValue,
-					m.SupplierProducerName
+					m.NormalizedName
 				})
 			.ToListAsync(cancellationToken);
 
@@ -80,11 +81,11 @@ public class ResolveSupplierProductReferencesHandler(IReadRepository<Product, in
 				new SupplierProductReferenceKey(
 					x.Supplier,
 					x.Sku,
-					x.SupplierProducerName)))
+					x.NormalizedName)))
 			.SelectMany(candidate => references
 				.Where(reference => reference.Supplier == candidate.Supplier &&
 					reference.Sku == candidate.Sku &&
-					reference.SupplierProducerName == candidate.SupplierProducerName)
+					reference.NormalizedName == candidate.NormalizedName)
 				.Select(reference => new
 				{
 					candidate.Supplier,
@@ -104,11 +105,14 @@ public class ResolveSupplierProductReferencesHandler(IReadRepository<Product, in
 	private readonly record struct SupplierProductReferenceKey(
 		Supplier Supplier,
 		string Sku,
-		string SupplierProducerName);
+		string NormalizedName);
 
 	private readonly record struct SupplierProductReference(
 		Supplier Supplier,
 		string Sku,
 		string SupplierProducerName,
-		string? OriginalSku);
+		string? OriginalSku)
+	{
+		public string NormalizedName => Producer.ToNormalizedName(SupplierProducerName);
+	}
 }

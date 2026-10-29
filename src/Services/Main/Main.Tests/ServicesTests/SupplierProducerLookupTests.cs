@@ -7,18 +7,21 @@ namespace Tests.ServicesTests;
 
 public class ProducerLookupSupplierResolutionTests
 {
-	[Fact]
-	public void ResolveId_PrefersExactSupplierMapping()
+	[Theory]
+	[InlineData(" Bosch ")]
+	[InlineData("bosch")]
+	[InlineData("BOSCH")]
+	public void ResolveId_PrefersNormalizedSupplierMapping(string name)
 	{
-		var lookup = CreateLookup(new ProducerSupplierLookupKey(Supplier.Armtek, "Bosch"), 2);
+		var lookup = CreateLookup(new ProducerSupplierLookupKey(Supplier.Armtek, "BOSCH"), 2);
 
-		lookup.ResolveId(" Bosch ", Supplier.Armtek).Should().Be(2);
+		lookup.ResolveId(name, Supplier.Armtek).Should().Be(2);
 	}
 
 	[Fact]
 	public void ResolveId_DoesNotUseMappingFromAnotherSupplier()
 	{
-		var lookup = CreateLookup(new ProducerSupplierLookupKey(Supplier.Armtek, "Bosch"), 2);
+		var lookup = CreateLookup(new ProducerSupplierLookupKey(Supplier.Armtek, "BOSCH"), 2);
 
 		lookup.ResolveId("Bosch", Supplier.Tmtr).Should().Be(1);
 	}

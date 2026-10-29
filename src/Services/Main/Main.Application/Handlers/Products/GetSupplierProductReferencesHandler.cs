@@ -32,7 +32,7 @@ public class GetSupplierProductReferencesHandler(IReadRepository<Product, int> r
 				{
 					ProductId = p.Id,
 					Sku = p.Sku.NormalizedValue,
-					SupplierProducerName = m.SupplierProducerName
+					SupplierProducerName = m.Name
 				})
 			.ToListAsync(cancellationToken);
 

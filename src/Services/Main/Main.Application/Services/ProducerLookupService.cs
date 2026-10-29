@@ -71,13 +71,13 @@ public class ProducerLookupService(
 			.Select(x => new
 			{
 				x.Supplier,
-				x.SupplierProducerName,
+				x.NormalizedName,
 				x.ProducerId
 			})
 			.ToListAsync(cancellationToken);
 
 		var supplierMappings = supplierMappingItems.ToDictionary(
-			x => new ProducerSupplierLookupKey(x.Supplier, x.SupplierProducerName),
+			x => new ProducerSupplierLookupKey(x.Supplier, x.NormalizedName),
 			x => x.ProducerId);
 
 		IProducerLookup lookup = new ProducerLookup(producerNamesToIds, aliasesToIds);

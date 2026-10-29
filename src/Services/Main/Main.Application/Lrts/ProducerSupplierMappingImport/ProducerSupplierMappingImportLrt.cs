@@ -86,7 +86,7 @@ public class ProducerSupplierMappingImportLrt(
 		var firstIdx = mappings[0].idx;
 		var errorsBeforeBatch = errors.Count;
 		var toAdd = new List<ProducerSupplierMapping>();
-		var uniqueMappings = new HashSet<( string SupplierProducerName, Supplier Supplier)>();
+		var uniqueMappings = new HashSet<(string NormalizedName, Supplier Supplier)>();
 
 		foreach (var (idx, item) in mappings)
 		{
@@ -111,7 +111,7 @@ public class ProducerSupplierMappingImportLrt(
 				continue;
 			}
 
-			if (!uniqueMappings.Add((supplierProducerName, item.Supplier)))
+			if (!uniqueMappings.Add((Producer.ToNormalizedName(supplierProducerName), item.Supplier)))
 			{
 				errors.Add(
 					CreateError(

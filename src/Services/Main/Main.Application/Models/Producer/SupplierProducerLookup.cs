@@ -1,5 +1,6 @@
 using Enums;
 using Main.Application.Interfaces.Services;
+using ProducerEntity = Main.Entities.Producer.Producer;
 
 namespace Main.Application.Models.Producer;
 
@@ -14,7 +15,7 @@ public sealed class SupplierProducerLookup(
 
 		if (supplier.HasValue)
 		{
-			var supplierKey = new ProducerSupplierLookupKey(supplier.Value, producer.Trim());
+			var supplierKey = new ProducerSupplierLookupKey(supplier.Value, ProducerEntity.ToNormalizedName(producer));
 
 			if (supplierMappings.TryGetValue(supplierKey, out var producerId))
 				return producerId;
@@ -24,4 +25,4 @@ public sealed class SupplierProducerLookup(
 	}
 }
 
-public readonly record struct ProducerSupplierLookupKey(Supplier Supplier, string SupplierProducerName);
+public readonly record struct ProducerSupplierLookupKey(Supplier Supplier, string NormalizedName);

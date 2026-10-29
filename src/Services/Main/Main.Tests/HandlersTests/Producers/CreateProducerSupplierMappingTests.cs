@@ -1,4 +1,4 @@
-﻿using Enums;
+using Enums;
 using FluentAssertions;
 using Main.Application.Dtos.Producer.SupplierMappings;
 using Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
@@ -56,23 +56,26 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
 	}
 
-	[Fact]
+	[Theory]
+	[InlineData(" Bosch ")]
+	[InlineData("bosch")]
+	[InlineData("BOSCH")]
 	public async Task
-		CreateProducerSupplierMapping_WithSameSupplierNameAndSupplier_ThrowsMappingAlreadyExists()
+		CreateProducerSupplierMapping_WithSameSupplierNameAndSupplier_ThrowsMappingAlreadyExists(string duplicateName)
 	{
 		const string supplierProducerName = "Bosch";
 		var existing = await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(TestContext.Producers[0].Id)
 			.WithSupplier(Supplier.Armtek)
 			.WithSupplierProducerName($"  {supplierProducerName}  ")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = new CreateProducerSupplierMappingCommand(
 			new NewProducerSupplierMapping
 			{
 				ProducerId = TestContext.Producers[1].Id,
 				Supplier = existing.Supplier,
-				SupplierProducerName = $" {supplierProducerName} "
+				SupplierProducerName = duplicateName
 			});
 
 		await Assert.ThrowsAsync<ProducersSupplierMappingAlreadyExistsException>(async () =>
@@ -87,7 +90,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.Armtek)
 			.WithSupplierProducerName("Bosch")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var command = new CreateProducerSupplierMappingCommand(
 			new NewProducerSupplierMapping
 			{
@@ -130,6 +133,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		mapping.Id.Should().Be(result.ProducerSupplierMapping.Id);
 		mapping.ProducerId.Should().Be(producer.Id);
 		mapping.Supplier.Should().Be(command.ProducerSupplierMapping.Supplier);
-		mapping.SupplierProducerName.Should().Be(supplierProducerName.Trim());
+		mapping.Name.Should().Be(supplierProducerName.Trim());
+		mapping.NormalizedName.Should().Be(supplierProducerName.Trim().ToUpperInvariant());
 	}
 }

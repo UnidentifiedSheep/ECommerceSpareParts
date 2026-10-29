@@ -42,6 +42,6 @@ public sealed class ProducerLookupServiceCachingTests : IntegrationTest
 
 		var lookup = await service.Load(CancellationToken);
 
-		lookup.ResolveId(supplierProducerName, Supplier.Armtek).Should().Be(producer.Id);
+		lookup.ResolveId($" {supplierProducerName.ToUpperInvariant()} ", Supplier.Armtek).Should().Be(producer.Id);
 	}
 }

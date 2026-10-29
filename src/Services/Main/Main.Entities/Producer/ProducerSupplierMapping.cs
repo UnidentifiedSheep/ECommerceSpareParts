@@ -18,7 +18,9 @@ public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>,
 
 	public Supplier Supplier { get; private set; }
 
-	public string SupplierProducerName { get; private set; } = string.Empty;
+	public string Name { get; private set; } = string.Empty;
+
+	public string NormalizedName { get; private set; } = string.Empty;
 
 	public static Expression<Func<ProducerSupplierMapping, int>> GetKeySelector() => x => x.Id;
 
@@ -34,7 +36,8 @@ public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>,
 		{
 			ProducerId = producerId,
 			Supplier = supplier,
-			SupplierProducerName = supplierProducerName.Trim()
+			Name = supplierProducerName.Trim(),
+			NormalizedName = Producer.ToNormalizedName(supplierProducerName)
 		};
 	}
 
