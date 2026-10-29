@@ -50,7 +50,12 @@ public class ApplySupplierProductsHandler(IOfferRefreshService refreshService, I
 				ProductId: productIds.TryGetValue(x.Key, out var productId) ? productId : (int?)null,
 				Positions: (IReadOnlyList<SupplierPosition>)x.Value.ToList()))
 			.Where(x => x.ProductId != null)
-			.ToDictionary(x => x.ProductId!.Value, x => x.Positions);
+			.GroupBy(x => x.ProductId!.Value)
+			.ToDictionary(group => group.Key,
+				IReadOnlyList<SupplierPosition> (group) => group
+					.SelectMany(x => x.Positions)
+					.DistinctBy(position => position.Id)
+					.ToArray());
 
 		var offers = await refreshService.RefreshOffersAsync(
 			request.DataExtractionTime,
@@ -67,24 +72,18 @@ public class ApplySupplierProductsHandler(IOfferRefreshService refreshService, I
 		Dictionary<ProductKey, List<SupplierPosition>> dict,
 		CancellationToken cancellationToken)
 	{
-		var requestDict = new Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductReferenceLookup>>
+		var references = dict.Keys.Select(key => new InternalProductReference
 		{
-			[supplier] = dict.Keys.Select(x => new InternalSupplierProductReferenceLookup
-			{
-				Sku = x.Number, SupplierProducerName = x.Brand
-			}).ToArray()
-		};
-
-		var response =
-			await mainClient.ProductNode.ResolveSupplierProductReferences(requestDict, cancellationToken);
+			Sku = key.Number, ProducerName = key.Brand, Supplier = supplier
+		}).ToArray();
+		var response = await mainClient.ProductNode.ResolveProductReferences(references, cancellationToken);
 
 		if (!response.Success)
 			throw new InvalidOperationException("Unable to resolve product ids, from main service");
 
-		if (!response.ValueOrThrow.TryGetValue(supplier, out var result))
-			return new Dictionary<ProductKey, int>();
-
-		return result.ToDictionary(x => new ProductKey(x.SupplierProducerName, x.Sku), x => x.ProductId);
+		return response.ValueOrThrow
+			.Where(product => product.Supplier == supplier && product.ProductId.HasValue)
+			.ToDictionary(product => new ProductKey(product.ProducerName, product.Sku), product => product.ProductId!.Value);
 	}
 
 	private readonly record struct ProductKey(string Brand, string Number);

@@ -64,32 +64,16 @@ internal sealed class ProductNode(
 			cancellationToken);
 	}
 
-	public async Task<Response<Dictionary<Supplier, IReadOnlyList<InternalSupplierProductResolvedReference>>>>
-		ResolveSupplierProductReferences(
-			Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductReferenceLookup>> references,
-			CancellationToken cancellationToken = default)
+	public async Task<Response<IReadOnlyList<InternalResolvedProductReference>>> ResolveProductReferences(
+		IReadOnlyCollection<InternalProductReference> references,
+		CancellationToken cancellationToken = default)
 	{
-		using var request = await GetRequest(
-			HttpMethod.Post,
-			"/internal/products/resolve-supplier-references",
-			cancellationToken);
-
-		request.Content = JsonContent.Create(
-			new ResolveSupplierProductReferencesRequest
-			{
-				References = references
-			});
-
+		using var request = await GetRequest(HttpMethod.Post, "/internal/products/resolve-references", cancellationToken);
+		request.Content = JsonContent.Create(new ResolveProductReferencesRequest { References = references });
 		using var response = await httpClient.SendAsync(request, cancellationToken);
 
-		return await
-			ReadResponse<ResolveSupplierProductReferencesResponse, Dictionary<Supplier,
-				IReadOnlyList<InternalSupplierProductResolvedReference>>>(
-				response,
-				x => x.Products.ToDictionary(
-					z => z.Key,
-					IReadOnlyList<InternalSupplierProductResolvedReference> (z) => z.Value.ToList()),
-				cancellationToken);
+		return await ReadResponse<ResolveProductReferencesResponse, IReadOnlyList<InternalResolvedProductReference>>(
+			response, result => result.Products, cancellationToken);
 	}
 
 	private record GetFullProductsResponse
@@ -104,23 +88,15 @@ internal sealed class ProductNode(
 		public IReadOnlyList<InternalSupplierProductResolvedReference> Products { get; init; } = [];
 	}
 
-	private record ResolveSupplierProductReferencesRequest
+	private record ResolveProductReferencesRequest
 	{
 		[JsonPropertyName("references")]
-		public required Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductReferenceLookup>> References
-		{
-			get;
-			init;
-		}
+		public required IReadOnlyCollection<InternalProductReference> References { get; init; }
 	}
 
-	private record ResolveSupplierProductReferencesResponse
+	private record ResolveProductReferencesResponse
 	{
 		[JsonPropertyName("products")]
-		public Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductResolvedReference>> Products
-		{
-			get;
-			init;
-		} = [];
+		public IReadOnlyList<InternalResolvedProductReference> Products { get; init; } = [];
 	}
 }
