@@ -17,8 +17,6 @@
     "lrt.characteristic.import.description": "Adds entries to the characteristics directory.",
     "lrt.map.group.to.product.name": "Assign product groups",
     "lrt.map.group.to.product.description": "Assigns groups to products.",
-    "lrt.map.group.to.product.step.name": "Update product groups",
-    "lrt.map.group.to.product.step.description": "Assigns groups to products.",
     "lrt.product.crosses.import.name": "Product crosses import",
     "lrt.product.crosses.import.description": "Adds product cross-references.",
     "lrt.product.crosses.by.ids.import.name": "Product crosses import by IDs",

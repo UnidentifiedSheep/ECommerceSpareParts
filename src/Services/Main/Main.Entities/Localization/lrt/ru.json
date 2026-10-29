@@ -17,8 +17,6 @@
     "lrt.characteristic.import.description": "Пополняет справочник характеристик.",
     "lrt.map.group.to.product.name": "Назначение групп товарам",
     "lrt.map.group.to.product.description": "Назначает товарам группы.",
-    "lrt.map.group.to.product.step.name": "Обновление групп товаров",
-    "lrt.map.group.to.product.step.description": "Назначает товарам группы.",
     "lrt.product.crosses.import.name": "Импорт кроссов товаров",
     "lrt.product.crosses.import.description": "Добавляет кроссы товаров.",
     "lrt.product.crosses.by.ids.import.name": "Импорт кроссов товаров по ID",

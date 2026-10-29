@@ -229,11 +229,11 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 			cancellationToken: cancellationToken);
 	}
 
-	public async Task UpdateProductGroupsAsync(
+	public async Task<IReadOnlyList<int>> UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default)
 	{
-		if (assignments.Count == 0) return;
+		if (assignments.Count == 0) return [];
 
 		var items = assignments.Select(x => new BulkProduct
 		{
@@ -252,8 +252,14 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 		{
 			await bulkContext.BulkUpdateAsync(
 				items,
-				new BulkConfig { PropertiesToIncludeOnUpdate = [nameof(BulkProduct.ProductGroupId)] },
+				new BulkConfig
+				{
+					PropertiesToIncludeOnUpdate = [nameof(BulkProduct.ProductGroupId)],
+					SetOutputIdentity = true
+				},
 				cancellationToken: cancellationToken);
+
+			return items.Where(item => item.Id != 0).Select(item => item.Id).ToArray();
 		}
 		finally
 		{

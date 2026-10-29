@@ -17,8 +17,6 @@
     "lrt.characteristic.import.description": "Özellik dizinine yeni kayıtlar ekler.",
     "lrt.map.group.to.product.name": "Ürün gruplarını atama",
     "lrt.map.group.to.product.description": "Ürünlere grup atar.",
-    "lrt.map.group.to.product.step.name": "Ürün gruplarını güncelleme",
-    "lrt.map.group.to.product.step.description": "Ürünlere grup atar.",
     "lrt.product.crosses.import.name": "Ürün çaprazları içe aktarma",
     "lrt.product.crosses.import.description": "Ürün çapraz referanslarını ekler.",
     "lrt.product.crosses.by.ids.import.name": "Kimliğe göre ürün çaprazlarını içe aktarma",

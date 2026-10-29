@@ -50,7 +50,7 @@ public interface IProductRepository : IRepository<Product, int>
 		IReadOnlyCollection<ProductContent> contents,
 		CancellationToken cancellationToken = default);
 
-	Task UpdateProductGroupsAsync(
+	Task<IReadOnlyList<int>> UpdateProductGroupsAsync(
 		IReadOnlyCollection<ProductGroupAssignment> assignments,
 		CancellationToken cancellationToken = default);
 }
