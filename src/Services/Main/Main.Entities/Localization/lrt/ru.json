@@ -9,8 +9,6 @@
     "lrt.producer.supplier.mapping.import.description": "Сопоставляет названия производителей у поставщиков со справочником.",
     "lrt.product.import.name": "Импорт товаров",
     "lrt.product.import.description": "Загружает товары в каталог.",
-    "lrt.product.import.step.name": "Загрузка товаров",
-    "lrt.product.import.step.description": "Добавляет товары в каталог.",
     "lrt.product.ean.import.name": "Импорт EAN товаров",
     "lrt.product.ean.import.description": "Добавляет штрихкоды EAN товаров.",
     "lrt.product.group.import.name": "Импорт групп товаров",

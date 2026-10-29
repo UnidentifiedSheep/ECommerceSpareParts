@@ -33,7 +33,7 @@ public abstract class CsvLrtIntegrationTest<TLrt>(CombinedContainerFixture fixtu
 			fileName,
 			csv);
 
-		return ExecuteLrt(JsonSerializer.Serialize(createState(fileName)));
+		return ExecuteLrt(JsonSerializer.Serialize(createState(fileName)), cancellationToken: CancellationToken);
 	}
 
 	protected static string CsvRow(params object?[] values) => string.Join(

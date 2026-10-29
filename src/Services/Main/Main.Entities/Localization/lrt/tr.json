@@ -9,8 +9,6 @@
     "lrt.producer.supplier.mapping.import.description": "Tedarikçilerin üretici adlarını üretici diziniyle eşleştirir.",
     "lrt.product.import.name": "Ürün içe aktarma",
     "lrt.product.import.description": "Ürünleri kataloğa aktarır.",
-    "lrt.product.import.step.name": "Ürünleri yükleme",
-    "lrt.product.import.step.description": "Kataloğa ürün ekler.",
     "lrt.product.ean.import.name": "Ürün EAN içe aktarma",
     "lrt.product.ean.import.description": "Ürünlerin EAN barkodlarını ekler.",
     "lrt.product.group.import.name": "Ürün grubu içe aktarma",
