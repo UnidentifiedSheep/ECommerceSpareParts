@@ -26,8 +26,9 @@ public class CreateProducerSupplierMappingHandler(
 		CancellationToken cancellationToken)
 	{
 		var supplierProducerName = request.ProducerSupplierMapping.SupplierProducerName.Trim();
+		var normalizedSupplierProducerName = Producer.ToNormalizedName(supplierProducerName);
 		var exists = await repository.Query.AnyAsync(
-			x => x.SupplierProducerName == supplierProducerName &&
+			x => x.NormalizedName == normalizedSupplierProducerName &&
 				x.Supplier == request.ProducerSupplierMapping.Supplier,
 			cancellationToken);
 		if (exists)
@@ -49,7 +50,7 @@ public class CreateProducerSupplierMappingHandler(
 				Id = model.Id,
 				ProducerId = model.ProducerId,
 				Supplier = model.Supplier,
-				SupplierProducerName = model.SupplierProducerName
+				SupplierProducerName = model.Name
 			});
 	}
 }

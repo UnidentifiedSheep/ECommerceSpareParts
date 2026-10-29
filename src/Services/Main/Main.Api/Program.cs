@@ -11,6 +11,7 @@ using Application.Common.Consumer;
 using Cache;
 using Carter;
 using Contracts.Job;
+using Contracts.Producer;
 using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Integrations.ExchangeRate.Di;
@@ -89,9 +90,11 @@ builder.Services.AddMassTransit(x =>
 
 				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 				ep.ConfigureConsumer<BackplaneConsumer>(context);
+				ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
 				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
 				ep.Bind<BackplaneMessage>();
+				ep.Bind<ProducerLookupChangedEvent>();
 				ep
 					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
 					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);

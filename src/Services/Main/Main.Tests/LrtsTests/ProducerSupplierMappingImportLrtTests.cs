@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Contracts.Producer;
 using Domain.CommonEnums;
 using Enums;
 using FluentAssertions;
@@ -48,6 +49,8 @@ public sealed class
 			.Where(x => x.ProducerId == producer.Id)
 			.ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(2);
+		((MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<PublishEndpointAccessor>().Publisher)
+			.PublishedMessagesOfType<ProducerLookupChangedEvent>().Should().NotBeEmpty();
 	}
 
 	[Fact]
@@ -63,7 +66,7 @@ public sealed class
 			CsvRow(
 				TestContext.Producers[1].Name,
 				existing.Supplier,
-				existing.SupplierProducerName));
+				$" {existing.Name.ToUpperInvariant()} "));
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		Context.ChangeTracker.Clear();
@@ -84,7 +87,7 @@ public sealed class
 			CsvRow(
 				producer.Name,
 				Supplier.Armtek,
-				"Bosch"),
+				"bOsCh"),
 			CsvRow(
 				"Unknown producer",
 				Supplier.Armtek,
@@ -99,7 +102,8 @@ public sealed class
 		state.Errors.Should().HaveCount(3);
 
 		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
-		mapping.SupplierProducerName.Should().Be("Bosch");
+		mapping.Name.Should().Be("Bosch");
+		mapping.NormalizedName.Should().Be("BOSCH");
 	}
 
 	private async Task<LrtExecutionResult> ExecuteCsv(params string[] rows)

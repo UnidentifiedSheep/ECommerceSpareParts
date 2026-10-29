@@ -7,6 +7,7 @@ using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Cache;
 using Contracts.Job;
+using Contracts.Producer;
 using Contracts.Settings;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
@@ -114,7 +115,9 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 					ep.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
 
 					ep.ConfigureConsumer<BackplaneConsumer>(context);
+					ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
 					ep.Bind<BackplaneMessage>();
+					ep.Bind<ProducerLookupChangedEvent>();
 				});
 
 			cfg.ReceiveEndpoint(

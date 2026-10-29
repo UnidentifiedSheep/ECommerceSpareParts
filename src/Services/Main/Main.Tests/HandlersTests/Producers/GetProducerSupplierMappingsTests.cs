@@ -1,4 +1,4 @@
-﻿using Abstractions.Models;
+using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
 using FluentAssertions;
@@ -45,7 +45,7 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 		result.Mappings[0].Id.Should().Be(expected.Id);
 		result.Mappings[0].ProducerId.Should().Be(producer.Id);
 		result.Mappings[0].Supplier.Should().Be(expected.Supplier);
-		result.Mappings[0].SupplierProducerName.Should().Be(expected.SupplierProducerName);
+		result.Mappings[0].SupplierProducerName.Should().Be(expected.Name);
 	}
 
 	[Fact]

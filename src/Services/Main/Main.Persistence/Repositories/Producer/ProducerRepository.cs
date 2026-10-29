@@ -28,7 +28,7 @@ public class ProducerRepository(DContext context, QueryExtensions extensions)
 			{
 				UpdateByProperties =
 				[
-					nameof(ProducerSupplierMapping.SupplierProducerName),
+					nameof(ProducerSupplierMapping.NormalizedName),
 					nameof(ProducerSupplierMapping.Supplier)
 				],
 				PropertiesToIncludeOnUpdate = [""]

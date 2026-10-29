@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Enums;
+using Main.Entities.DomainEvents.Producer;
 
 namespace Main.Entities.Producer;
 
@@ -18,7 +19,9 @@ public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>,
 
 	public Supplier Supplier { get; private set; }
 
-	public string SupplierProducerName { get; private set; } = string.Empty;
+	public string Name { get; private set; } = string.Empty;
+
+	public string NormalizedName { get; private set; } = string.Empty;
 
 	public static Expression<Func<ProducerSupplierMapping, int>> GetKeySelector() => x => x.Id;
 
@@ -34,9 +37,16 @@ public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>,
 		{
 			ProducerId = producerId,
 			Supplier = supplier,
-			SupplierProducerName = supplierProducerName.Trim()
+			Name = supplierProducerName.Trim(),
+			NormalizedName = Producer.ToNormalizedName(supplierProducerName)
 		};
 	}
+
+	public override void OnCreated() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
+
+	public override void OnUpdated() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
+
+	public override void OnDeleted() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
 
 	public override int GetId() => Id;
 }

@@ -6,6 +6,8 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Product;
+using Main.Application.Dtos.Product.References;
+using Main.Application.Handlers.Products;
 using Main.Application.Handlers.ProductEans.GetProductsByEan;
 using MediatR;
 
@@ -46,4 +48,23 @@ public sealed class ProductQueries
 
 		return result.Products.Select(product => new GqlProduct(product)).ToArray();
 	}
+
+	[GraphQLName("resolve")]
+	[RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)]
+	public async Task<IReadOnlyList<GqlResolvedProductReference>> ResolveAsync(
+		IReadOnlyList<GqlProductReferenceInput> references,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var result = await sender.Send(new ResolveProductReferencesQuery(
+			references.Select(reference => new ProductReferenceDto
+			{
+				Sku = reference.Sku,
+				ProducerName = reference.ProducerName,
+				Supplier = reference.Supplier
+			}).ToArray()), cancellationToken);
+
+		return result.Products.Select(reference => new GqlResolvedProductReference(reference)).ToArray();
+	}
+
 }

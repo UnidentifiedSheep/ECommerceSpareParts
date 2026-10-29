@@ -2,6 +2,7 @@ using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Options.S3;
 using Attributes;
+using Contracts.Producer;
 using CsvHelper.Configuration.Attributes;
 using Domain.Extensions;
 using Enums;
@@ -86,7 +87,7 @@ public class ProducerSupplierMappingImportLrt(
 		var firstIdx = mappings[0].idx;
 		var errorsBeforeBatch = errors.Count;
 		var toAdd = new List<ProducerSupplierMapping>();
-		var uniqueMappings = new HashSet<( string SupplierProducerName, Supplier Supplier)>();
+		var uniqueMappings = new HashSet<(string NormalizedName, Supplier Supplier)>();
 
 		foreach (var (idx, item) in mappings)
 		{
@@ -111,7 +112,7 @@ public class ProducerSupplierMappingImportLrt(
 				continue;
 			}
 
-			if (!uniqueMappings.Add((supplierProducerName, item.Supplier)))
+			if (!uniqueMappings.Add((Producer.ToNormalizedName(supplierProducerName), item.Supplier)))
 			{
 				errors.Add(
 					CreateError(
@@ -141,8 +142,12 @@ public class ProducerSupplierMappingImportLrt(
 
 		await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(context, cancellationToken) =>
-				context.GetRequiredService<IProducerRepository>().AddSupplierMappingsOnConflictDoNothingAsync(toAdd, cancellationToken),
+			async (context, cancellationToken) =>
+			{
+				await context.GetRequiredService<IProducerRepository>()
+					.AddSupplierMappingsOnConflictDoNothingAsync(toAdd, cancellationToken);
+				context.IntegrationEventScope.Add(new ProducerLookupChangedEvent());
+			},
 			CancellationToken);
 
 		Logger.LogInformation(

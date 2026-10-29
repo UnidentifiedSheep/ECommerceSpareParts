@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
 using Main.Application.Dtos.Producer;
@@ -53,6 +53,6 @@ public sealed class
 		Id = x.Id,
 		ProducerId = x.ProducerId,
 		Supplier = x.Supplier,
-		SupplierProducerName = x.SupplierProducerName
+		SupplierProducerName = x.Name
 	};
 }

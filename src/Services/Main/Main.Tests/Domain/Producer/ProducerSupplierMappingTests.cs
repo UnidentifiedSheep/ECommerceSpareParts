@@ -6,14 +6,18 @@ namespace Tests.Domain.Producer;
 
 public sealed class ProducerSupplierMappingTests
 {
-	[Fact]
-	public void Create_TrimsSupplierProducerName()
+	[Theory]
+	[InlineData("  Bosch  ", "Bosch", "BOSCH")]
+	[InlineData(" Robert Bosch ", "Robert Bosch", "ROBERT BOSCH")]
+	[InlineData(" производитель ", "производитель", "ПРОИЗВОДИТЕЛЬ")]
+	public void Create_PreservesSupplierNameAndNormalizesLookupName(string input, string original, string normalized)
 	{
 		var mapping = ProducerSupplierMapping.Create(
 			1,
-			"  Bosch  ",
+			input,
 			Supplier.Armtek);
 
-		mapping.SupplierProducerName.Should().Be("Bosch");
+		mapping.Name.Should().Be(original);
+		mapping.NormalizedName.Should().Be(normalized);
 	}
 }

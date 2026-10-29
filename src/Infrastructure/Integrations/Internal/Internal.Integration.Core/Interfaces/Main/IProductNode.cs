@@ -15,8 +15,7 @@ public interface IProductNode
 		Supplier supplier,
 		CancellationToken cancellationToken = default);
 
-	Task<Response<Dictionary<Supplier, IReadOnlyList<InternalSupplierProductResolvedReference>>>>
-		ResolveSupplierProductReferences(
-			Dictionary<Supplier, IReadOnlyCollection<InternalSupplierProductReferenceLookup>> references,
-			CancellationToken cancellationToken = default);
+	Task<Response<IReadOnlyList<InternalResolvedProductReference>>> ResolveProductReferences(
+		IReadOnlyCollection<InternalProductReference> references,
+		CancellationToken cancellationToken = default);
 }
