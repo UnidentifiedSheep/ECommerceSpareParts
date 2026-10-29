@@ -99,7 +99,8 @@ public static class ServiceProvider
 		collection.AddScoped<IBalanceService, BalanceService>();
 		collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
 		collection.AddScoped<ISaleService, SaleService>();
-		collection.AddScoped<IProducerLookupService, ProducerLookupService>();
+		collection.AddSingleton<IProducerLookupService, ProducerLookupService>();
+		collection.AddScoped<IProducerLookupLoader, ProducerLookupLoader>();
 		collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
 		collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
 

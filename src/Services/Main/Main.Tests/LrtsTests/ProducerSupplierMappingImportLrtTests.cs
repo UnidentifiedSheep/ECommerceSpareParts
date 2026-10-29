@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Contracts.Producer;
 using Domain.CommonEnums;
 using Enums;
 using FluentAssertions;
@@ -48,6 +49,8 @@ public sealed class
 			.Where(x => x.ProducerId == producer.Id)
 			.ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(2);
+		((MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<PublishEndpointAccessor>().Publisher)
+			.PublishedMessagesOfType<ProducerLookupChangedEvent>().Should().NotBeEmpty();
 	}
 
 	[Fact]

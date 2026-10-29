@@ -2,6 +2,7 @@ using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Options.S3;
 using Attributes;
+using Contracts.Producer;
 using CsvHelper.Configuration.Attributes;
 using Domain.Extensions;
 using Enums;
@@ -141,8 +142,12 @@ public class ProducerSupplierMappingImportLrt(
 
 		await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(context, cancellationToken) =>
-				context.GetRequiredService<IProducerRepository>().AddSupplierMappingsOnConflictDoNothingAsync(toAdd, cancellationToken),
+			async (context, cancellationToken) =>
+			{
+				await context.GetRequiredService<IProducerRepository>()
+					.AddSupplierMappingsOnConflictDoNothingAsync(toAdd, cancellationToken);
+				context.IntegrationEventScope.Add(new ProducerLookupChangedEvent());
+			},
 			CancellationToken);
 
 		Logger.LogInformation(

@@ -28,6 +28,7 @@ public class PublishIntegrationEventsHandler(IIntegrationEventScope integrationE
 			.ToList();
 
 		integrationEventScope.AddRange(events);
+		integrationEventScope.Add(new ProducerLookupChangedEvent());
 		return Task.CompletedTask;
 	}
 }

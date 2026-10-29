@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Enums;
+using Main.Entities.DomainEvents.Producer;
 
 namespace Main.Entities.Producer;
 
@@ -40,6 +41,12 @@ public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>,
 			NormalizedName = Producer.ToNormalizedName(supplierProducerName)
 		};
 	}
+
+	public override void OnCreated() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
+
+	public override void OnUpdated() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
+
+	public override void OnDeleted() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
 
 	public override int GetId() => Id;
 }

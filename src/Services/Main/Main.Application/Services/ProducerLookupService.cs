@@ -1,105 +1,101 @@
-using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Services;
-using Main.Application.Models.Producer;
-using Main.Entities.Producer;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Main.Application.Services;
 
-public class ProducerLookupService(
-	IReadRepository<Producer, int> producerReadRepository,
-	IReadRepository<ProducerSupplierMapping, int> mappingRepository) : IProducerLookupService
+public sealed class ProducerLookupService(IServiceScopeFactory scopeFactory) : IProducerLookupService, IDisposable
 {
-	private readonly object _loadLock = new();
-
+	private readonly Lock _loadLock = new();
+	private readonly CancellationTokenSource _shutdown = new();
+	private IProducerLookup? _snapshot;
 	private Task<IProducerLookup>? _loadTask;
+	private long _version;
+	private long _loadVersion;
+	private bool _disposed;
 
-	public Task<IProducerLookup> Load(CancellationToken cancellationToken = default)
+	public async Task<IProducerLookup> Load(CancellationToken cancellationToken = default)
 	{
-		Task<IProducerLookup> loadTask;
-		lock (_loadLock)
-			loadTask = _loadTask ??= LoadCore(cancellationToken);
+		while (true)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			Task<IProducerLookup> task;
+			long version;
+			lock (_loadLock)
+			{
+				ObjectDisposedException.ThrowIf(_disposed, this);
+				if (_snapshot is not null) return _snapshot;
 
-		return AwaitAndResetOnFailure(loadTask);
+				if (_loadTask is null || _loadTask.IsFaulted || _loadTask.IsCanceled)
+				{
+					_loadVersion = _version;
+					_loadTask = LoadCore(_shutdown.Token);
+				}
+				task = _loadTask;
+				version = _loadVersion;
+			}
+
+			IProducerLookup snapshot;
+			try
+			{
+				// Each caller cancels its own wait, never the shared database load.
+				snapshot = await task.WaitAsync(cancellationToken);
+			}
+			catch
+			{
+				lock (_loadLock)
+				{
+					if (ReferenceEquals(_loadTask, task) && (task.IsFaulted || task.IsCanceled))
+						_loadTask = null;
+				}
+
+				throw;
+			}
+
+			lock (_loadLock)
+			{
+				ObjectDisposedException.ThrowIf(_disposed, this);
+				if (version == _version)
+				{
+					_snapshot ??= snapshot;
+					if (ReferenceEquals(_loadTask, task))
+						_loadTask = null;
+					return _snapshot;
+				}
+				// An invalidation during loading makes this result obsolete.
+				if (ReferenceEquals(_loadTask, task))
+					_loadTask = null;
+			}
+		}
+	}
+
+	public void Invalidate()
+	{
+		lock (_loadLock)
+		{
+			ObjectDisposedException.ThrowIf(_disposed, this);
+			_version++;
+			_snapshot = null;
+			if (_loadTask?.IsCompleted == true)
+				_loadTask = null;
+		}
 	}
 
 	private async Task<IProducerLookup> LoadCore(CancellationToken cancellationToken)
 	{
-		var producerNamesToIds = new Dictionary<string, int>();
-		var aliasesToIds = new Dictionary<string, int>();
-
-		const int batchSize = 1000;
-
-		var baseQuery = producerReadRepository
-			.Query
-			.Select(x => new
-			{
-				id = x.Id,
-				name = x.Name,
-				aliases = x.Aliases.Select(z => z.Alias)
-			})
-			.OrderBy(x => x.id);
-
-		var lastId = 0;
-
-		while (true)
-		{
-			var id = lastId;
-			var producers = await baseQuery
-				.Where(x => x.id > id)
-				.Take(batchSize)
-				.ToListAsync(cancellationToken);
-
-			if (producers.Count == 0)
-				break;
-
-			lastId = producers.Last().id;
-
-			foreach (var item in producers)
-			{
-				producerNamesToIds.TryAdd(item.name, item.id);
-				foreach (var alias in item.aliases)
-					aliasesToIds.TryAdd(alias, item.id);
-			}
-
-			if (producers.Count != batchSize)
-				break;
-		}
-
-		var supplierMappingItems = await mappingRepository
-			.Query
-			.Select(x => new
-			{
-				x.Supplier,
-				x.NormalizedName,
-				x.ProducerId
-			})
-			.ToListAsync(cancellationToken);
-
-		var supplierMappings = supplierMappingItems.ToDictionary(
-			x => new ProducerSupplierLookupKey(x.Supplier, x.NormalizedName),
-			x => x.ProducerId);
-
-		IProducerLookup lookup = new ProducerLookup(producerNamesToIds, aliasesToIds);
-
-		return new SupplierProducerLookup(lookup, supplierMappings);
+		await using var scope = scopeFactory.CreateAsyncScope();
+		return await scope.ServiceProvider.GetRequiredService<IProducerLookupLoader>().Load(cancellationToken);
 	}
 
-	private async Task<IProducerLookup> AwaitAndResetOnFailure(Task<IProducerLookup> loadTask)
+	public void Dispose()
 	{
-		try
+		lock (_loadLock)
 		{
-			return await loadTask;
+			if (_disposed) return;
+			_disposed = true;
+			_snapshot = null;
+			_loadTask = null;
 		}
-		catch
-		{
-			lock (_loadLock)
-			{
-				if (ReferenceEquals(_loadTask, loadTask))
-					_loadTask = null;
-			}
-
-			throw;
-		}
+		_shutdown.Cancel();
+		_shutdown.Dispose();
 	}
 }
