@@ -1,5 +1,6 @@
 using Enums;
 using HotChocolate;
+using Main.Api.GraphQl.Types.Producer;
 using Main.Application.Dtos.Product.References;
 
 namespace Main.Api.GraphQl.Types.Product;
@@ -21,4 +22,10 @@ public sealed record GqlResolvedProductReference([property: GraphQLIgnore] Resol
 
 	[GraphQLName("product")]
 	public GqlProduct? Product => Reference.ProductId is { } id ? new GqlProduct(id) : null;
+
+	[GraphQLName("producer")]
+	public GqlProducer? Producer
+		=> Reference.ProducerId == null
+			? null
+			: new GqlProducer(Reference.ProducerId.Value);
 }

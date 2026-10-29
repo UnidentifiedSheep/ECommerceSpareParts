@@ -38,6 +38,7 @@ public sealed class ResolveProductReferencesHandler(IProductRepository repositor
 			Sku = reference.Reference.Sku,
 			ProducerName = reference.Reference.ProducerName,
 			Supplier = reference.Reference.Supplier,
+			ProducerId = reference.ProducerId,
 			ProductId = reference.ProducerId is { } producerId &&
 				productIds.TryGetValue((reference.NormalizedSku, producerId), out var productId) ? productId : null
 		}).ToArray());

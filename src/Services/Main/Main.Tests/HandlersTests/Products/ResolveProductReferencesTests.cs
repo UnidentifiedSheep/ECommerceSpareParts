@@ -35,6 +35,7 @@ public sealed class ResolveProductReferencesTests : IntegrationTest
 
 		var resolved = result.Products.Should().ContainSingle().Which;
 		resolved.ProductId.Should().Be(product.Id);
+		resolved.ProducerId.Should().Be(producer.Id);
 		resolved.Sku.Should().Be(reference.Sku);
 		resolved.ProducerName.Should().Be(reference.ProducerName);
 		resolved.Supplier.Should().Be(reference.Supplier);
@@ -79,6 +80,7 @@ public sealed class ResolveProductReferencesTests : IntegrationTest
 			}).ToArray()), CancellationToken);
 
 		result.Products.Select(product => product.ProductId).Should().Equal(mapped.Id, direct.Id, direct.Id);
+		result.Products.Select(product => product.ProducerId).Should().Equal(producers[1].Id, producers[0].Id, producers[0].Id);
 	}
 
 	[Fact]
@@ -103,6 +105,7 @@ public sealed class ResolveProductReferencesTests : IntegrationTest
 			}).ToArray()), CancellationToken);
 
 		result.Products.Select(product => product.ProductId).Should().Equal(first.Id, second.Id, null);
+		result.Products.Select(product => product.ProducerId).Should().Equal(producers[0].Id, producers[1].Id, null);
 	}
 
 	[Fact]
@@ -143,6 +146,7 @@ public sealed class ResolveProductReferencesTests : IntegrationTest
 		var result = await Mediator.Send(new ResolveProductReferencesQuery(references), CancellationToken);
 
 		result.Products.Select(item => item.ProductId).Should().Equal(product.Id, null, null, product.Id, null, null, null);
+		result.Products.Select(item => item.ProducerId).Should().Equal(producer.Id, null, producer.Id, producer.Id, producer.Id, null, producer.Id);
 		result.Products.Select(item => (item.Sku, item.ProducerName, item.Supplier))
 			.Should().Equal(references.Select(item => (item.Sku, item.ProducerName, item.Supplier)));
 	}
@@ -171,4 +175,39 @@ public sealed class ResolveProductReferencesTests : IntegrationTest
 
 		result.Products.Should().BeEmpty();
 	}
+
+	[Theory]
+	[InlineData("direct")]
+	[InlineData("alias")]
+	[InlineData("supplier")]
+	public async Task Resolve_ProducerExistsWithoutProduct_ReturnsProducerId(string source)
+	{
+		var producer = GetContext<ProducerTestContext>().Producers[0];
+		var producerName = producer.Name;
+		Supplier? supplier = null;
+		if (source == "alias")
+		{
+			producerName = "Unmatched product brand alias";
+			await new ProducerAliasBuilder(Faker).WithProducerId(producer.Id).WithAlias(producerName)
+				.BuildAndAddToDb(Context, CancellationToken);
+		}
+		else if (source == "supplier")
+		{
+			producerName = "Unmatched product supplier brand";
+			supplier = Supplier.Armtek;
+			await new ProducerSupplierMappingBuilder(Faker).WithProducerId(producer.Id)
+				.WithSupplier(supplier.Value).WithSupplierProducerName(producerName)
+				.BuildAndAddToDb(Context, CancellationToken);
+		}
+
+		var result = await Mediator.Send(new ResolveProductReferencesQuery([new ProductReferenceDto
+		{
+			Sku = "UNKNOWN-PRODUCT-SKU", ProducerName = producerName, Supplier = supplier
+		}]), CancellationToken);
+
+		var resolved = result.Products.Should().ContainSingle().Which;
+		resolved.ProducerId.Should().Be(producer.Id);
+		resolved.ProductId.Should().BeNull();
+	}
+
 }

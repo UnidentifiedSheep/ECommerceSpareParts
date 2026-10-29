@@ -5,6 +5,9 @@ namespace Main.Application.Dtos.Product.References;
 
 public record ResolvedProductReferenceDto
 {
+	[JsonPropertyName("producerId")]
+	public required int? ProducerId { get; init; }
+
 	[JsonPropertyName("productId")]
 	public required int? ProductId { get; init; }
 

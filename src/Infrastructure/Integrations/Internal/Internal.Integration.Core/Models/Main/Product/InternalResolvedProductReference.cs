@@ -5,6 +5,9 @@ namespace Internal.Integration.Core.Models.Main.Product;
 
 public record InternalResolvedProductReference
 {
+	[JsonPropertyName("producerId")]
+	public required int? ProducerId { get; init; }
+
 	[JsonPropertyName("productId")]
 	public required int? ProductId { get; init; }
 

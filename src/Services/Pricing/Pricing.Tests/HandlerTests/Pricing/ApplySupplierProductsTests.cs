@@ -124,6 +124,6 @@ public sealed class ApplySupplierProductsTests
 
 	private static InternalResolvedProductReference Resolved(string brand, string sku, int? productId) => new()
 	{
-		ProducerName = brand, Sku = sku, Supplier = Supplier.Armtek, ProductId = productId
+		ProducerName = brand, Sku = sku, Supplier = Supplier.Armtek, ProductId = productId, ProducerId = productId.HasValue ? 1 : null
 	};
 }
