@@ -26,8 +26,8 @@ public sealed record GqlNewSaleContentInput
 	{
 		ProductId = ProductId,
 		Count = Count,
-		Price = Price,
-		PriceWithDiscount = PriceWithDiscount,
+		OriginalPrice = Price,
+		DiscountedPrice = PriceWithDiscount,
 		Comment = Comment
 	};
 }

@@ -35,13 +35,12 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 
 	public int Count { get; private set; }
 
-	public decimal Price { get; private set; }
+	public decimal OriginalPrice { get; private set; }
+	public decimal DiscountedPrice { get; private set; }
 
 	public decimal TotalSum { get; private set; }
 
 	public string? Comment { get; private set; }
-
-	public decimal Discount { get; private set; }
 
 	public Product.Product Product { get; private set; } = null!;
 
@@ -70,22 +69,24 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		Count = count.EnsureGreaterThan(0, SaleContentCountMinMessage.Instance);
 
 	public void SetPriceAndDetails(
-		decimal withOutDiscount,
-		decimal withDiscount,
+		decimal originalPrice,
+		decimal discountedPrice,
 		IEnumerable<SaleContentDetail> details)
 	{
-		withOutDiscount
+		originalPrice
 			.EnsureMaxDecimalPlaces(2, SaleContentPricePrecisionMessage.Instance)
 			.EnsureGreaterThan(0, SaleContentPriceMinMessage.Instance);
 
-		Price = withDiscount
+		discountedPrice
 			.EnsureMaxDecimalPlaces(2, SaleContentPriceWithDiscountPrecisionMessage.Instance)
 			.EnsureGreaterThan(0, SaleContentPriceWithDiscountMinMessage.Instance)
-			.EnsureAtMost(withOutDiscount, SaleContentPriceWithDiscountMaxMessage.Instance);
+			.EnsureAtMost(originalPrice, SaleContentPriceWithDiscountMaxMessage.Instance);
 
-		Discount = (withOutDiscount - withDiscount) / withOutDiscount;
+		OriginalPrice = originalPrice;
+		DiscountedPrice = discountedPrice;
+
 		ClearAndSetDetails(details);
-		TotalSum = Price * Count;
+		TotalSum = DiscountedPrice * Count;
 	}
 
 	private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)

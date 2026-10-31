@@ -74,9 +74,9 @@ public class CreateSaleTests : IntegrationTest
 		var saleContent = sale.Contents.Should().ContainSingle().Subject;
 		saleContent.ProductId.Should().Be(storageContent.ProductId);
 		saleContent.Count.Should().Be(1);
-		saleContent.Price.Should().Be(80m);
+		saleContent.DiscountedPrice.Should().Be(80m);
 		saleContent.TotalSum.Should().Be(80m);
-		saleContent.Discount.Should().Be(0.2m);
+		saleContent.OriginalPrice.Should().Be(100);
 
 		var detail = saleContent.Details.Should().ContainSingle().Subject;
 		originalContents.Should().ContainKey(detail.StorageContentId);
@@ -471,7 +471,7 @@ public class CreateSaleTests : IntegrationTest
 		var command = CreateValidCommand();
 		var content = command.Contents.Single() with
 		{
-			Price = price
+			OriginalPrice = price
 		};
 
 		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
@@ -492,7 +492,7 @@ public class CreateSaleTests : IntegrationTest
 		var command = CreateValidCommand();
 		var content = command.Contents.Single() with
 		{
-			PriceWithDiscount = priceWithDiscount
+			DiscountedPrice = priceWithDiscount
 		};
 
 		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
@@ -509,7 +509,7 @@ public class CreateSaleTests : IntegrationTest
 		var command = CreateValidCommand();
 		var content = command.Contents.Single() with
 		{
-			Price = 100m, PriceWithDiscount = 101m
+			OriginalPrice = 100m, DiscountedPrice = 101m
 		};
 
 		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
@@ -682,15 +682,15 @@ public class CreateSaleTests : IntegrationTest
 	private static NewSaleContentDto NewContent(
 		int productId,
 		int count,
-		decimal price = 100m,
-		decimal priceWithDiscount = 90m)
+		decimal originalPrice = 100m,
+		decimal discountedPrice = 90m)
 	{
 		return new NewSaleContentDto
 		{
 			ProductId = productId,
 			Count = count,
-			Price = price,
-			PriceWithDiscount = priceWithDiscount
+			OriginalPrice = originalPrice,
+			DiscountedPrice = discountedPrice
 		};
 	}
 

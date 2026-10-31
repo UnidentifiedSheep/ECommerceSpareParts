@@ -30,11 +30,11 @@ public sealed record GqlProductSaleHistory(
 	[GraphQLName("quantity")]
 	public int Quantity => History.Quantity;
 
-	[GraphQLName("discount")]
-	public decimal Discount => History.Discount;
+	[GraphQLName("originalPrice")]
+	public decimal OriginalPrice => History.OriginalPrice;
 
-	[GraphQLName("price")]
-	public decimal Price => History.Price;
+	[GraphQLName("discountedPrice")]
+	public decimal DiscountedPrice => History.DiscountedPrice;
 
 	[GraphQLName("averageBuyPrice")]
 	public decimal AverageBuyPrice => History.AverageBuyPrice;

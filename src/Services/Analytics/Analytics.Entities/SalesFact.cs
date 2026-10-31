@@ -137,7 +137,7 @@ public class SalesFact : Entity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
 			if (existingContents.TryGetValue(incomingContent.Id, out var existingContent))
 				existingContent.Update(
 					incomingContent.ProductId,
-					incomingContent.Price,
+					incomingContent.DiscountedPrice,
 					incomingContent.PriceInBaseCurrency,
 					incomingContent.Count,
 					incomingContent.Discount,

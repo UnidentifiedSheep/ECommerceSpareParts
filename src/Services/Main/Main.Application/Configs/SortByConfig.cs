@@ -79,8 +79,8 @@ public static class SortByConfig
 			.Map<SaleContent, int>("saleContentId", x => x.Id)
 			.Map<SaleContent, string>("storageCode", x => x.Sale.StorageCode)
 			.Map<SaleContent, int>("quantity", x => x.Count)
-			.Map<SaleContent, decimal>("discount", x => x.Discount)
-			.Map<SaleContent, decimal>("price", x => x.Price)
+			.Map<SaleContent, decimal>("discount", x => x.OriginalPrice)
+			.Map<SaleContent, decimal>("price", x => x.DiscountedPrice)
 			.Map<SaleContent, decimal>(
 				"averageBuyPrice",
 				x => x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count)

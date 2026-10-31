@@ -71,9 +71,9 @@ public class EditSaleTests : IntegrationTest
 		editedSale.SaleDatetime.Should().BeCloseTo(newDate, TimeSpan.FromMilliseconds(1));
 		editedSale.TransactionId.Should().NotBe(oldTransactionId);
 		editedContent.Id.Should().Be(content.Id);
-		editedContent.Price.Should().Be(90m);
+		editedContent.DiscountedPrice.Should().Be(90m);
 		editedContent.TotalSum.Should().Be(90m);
-		editedContent.Discount.Should().Be(0.25m);
+		editedContent.OriginalPrice.Should().Be(120);
 		editedContent.Comment.Should().Be("edited");
 		editedContent.Details.Sum(x => x.Count).Should().Be(content.Count);
 
@@ -332,8 +332,8 @@ public class EditSaleTests : IntegrationTest
 			Id = content.Id,
 			ProductId = content.ProductId,
 			Count = content.Count,
-			Price = content.Price,
-			PriceWithDiscount = content.Price,
+			Price = content.DiscountedPrice,
+			PriceWithDiscount = content.DiscountedPrice,
 			Comment = content.Comment
 		};
 	}

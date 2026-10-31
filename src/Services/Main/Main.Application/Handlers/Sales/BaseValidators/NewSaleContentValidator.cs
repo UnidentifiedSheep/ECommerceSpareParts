@@ -16,7 +16,7 @@ public class NewSaleContentValidator : AbstractValidator<IReadOnlyCollection<New
 				z.RuleFor(x => x.Count).SetValidator(new CountValidator());
 
 				z
-					.RuleFor(x => x.Price)
+					.RuleFor(x => x.OriginalPrice)
 					.GreaterThan(0)
 					.WithLocalizableError(SaleContentPriceMinMessage.Instance)
 					.PrecisionScale(
@@ -26,7 +26,7 @@ public class NewSaleContentValidator : AbstractValidator<IReadOnlyCollection<New
 					.WithLocalizableError(SaleContentPricePrecisionMessage.Instance);
 
 				z
-					.RuleFor(x => x.PriceWithDiscount)
+					.RuleFor(x => x.DiscountedPrice)
 					.GreaterThan(0)
 					.WithLocalizableError(SaleContentPriceWithDiscountMinMessage.Instance)
 					.PrecisionScale(
@@ -36,8 +36,8 @@ public class NewSaleContentValidator : AbstractValidator<IReadOnlyCollection<New
 					.WithLocalizableError(SaleContentPriceWithDiscountPrecisionMessage.Instance);
 
 				z
-					.RuleFor(x => x.PriceWithDiscount)
-					.LessThanOrEqualTo(x => x.Price)
+					.RuleFor(x => x.DiscountedPrice)
+					.LessThanOrEqualTo(x => x.OriginalPrice)
 					.WithLocalizableError(SaleContentPriceWithDiscountMaxMessage.Instance);
 			});
 

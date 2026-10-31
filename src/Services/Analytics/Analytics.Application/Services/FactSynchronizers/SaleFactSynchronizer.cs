@@ -135,7 +135,7 @@ public class SaleFactSynchronizer(
 			content.Id,
 			saleId,
 			content.ProductId,
-			content.Price,
+			content.DiscountedPrice,
 			content.PriceInBaseCurrency,
 			content.Count,
 			content.Discount,

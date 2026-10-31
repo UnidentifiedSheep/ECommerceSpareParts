@@ -55,7 +55,7 @@ public class CreateSaleHandler(
 
 		var systemId = systemOptions.Value.SystemId;
 
-		var totalSum = contents.Sum(x => x.PriceWithDiscount * x.Count);
+		var totalSum = contents.Sum(x => x.DiscountedPrice * x.Count);
 
 		if (request.PayedSum > 0)
 			await sender.Send(

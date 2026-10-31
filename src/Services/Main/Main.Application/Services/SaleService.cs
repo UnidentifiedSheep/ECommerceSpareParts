@@ -29,8 +29,8 @@ public class SaleService(ISender sender, IProductRepository productRepository) :
 			saleContents.Select((x, index) => new SaleContentInput(
 				index,
 				x.ProductId,
-				x.Price,
-				x.PriceWithDiscount,
+				x.OriginalPrice,
+				x.DiscountedPrice,
 				x.Count,
 				x.Comment)));
 	}
@@ -62,8 +62,8 @@ public class SaleService(ISender sender, IProductRepository productRepository) :
 			saleContents.Select(x => new SaleContentInput(
 				0,
 				x.ProductId,
-				x.Price,
-				x.PriceWithDiscount,
+				x.OriginalPrice,
+				x.DiscountedPrice,
 				x.Count,
 				x.Comment)),
 			buyerOrganizationId,

@@ -20,13 +20,13 @@ public class SaleContent : Entity<SaleContent, int>
 
 	public int Count { get; private set; }
 
-	public decimal Price { get; private set; }
+	public decimal DiscountedPrice { get; private set; }
 
 	public decimal PriceInBaseCurrency { get; private set; }
 
 	public decimal Discount { get; private set; }
 
-	public decimal TotalSum => Count * Price;
+	public decimal TotalSum => Count * DiscountedPrice;
 
 	public virtual SalesFact Sale { get; private set; } = null!;
 
@@ -38,10 +38,10 @@ public class SaleContent : Entity<SaleContent, int>
 		int id,
 		Guid saleId,
 		int productId,
-		decimal price,
+		decimal originalPrice,
+		decimal discountedPrice,
 		decimal priceInBaseCurrency,
 		int count,
-		decimal discount,
 		IEnumerable<SaleContentDetail>? details = null)
 	{
 		var content = new SaleContent
@@ -49,7 +49,7 @@ public class SaleContent : Entity<SaleContent, int>
 			Id = id,
 			SaleId = saleId,
 			ProductId = productId,
-			Price = ValidatePrice(price),
+			DiscountedPrice = ValidatePrice(price),
 			PriceInBaseCurrency = ValidatePrice(priceInBaseCurrency),
 			Count = ValidateCount(count),
 			Discount = ValidateDiscount(discount)
@@ -68,7 +68,7 @@ public class SaleContent : Entity<SaleContent, int>
 		IEnumerable<SaleContentDetail>? details = null)
 	{
 		ProductId = productId;
-		Price = ValidatePrice(price);
+		DiscountedPrice = ValidatePrice(price);
 		PriceInBaseCurrency = ValidatePrice(priceInBaseCurrency);
 		Count = ValidateCount(count);
 		Discount = ValidateDiscount(discount);

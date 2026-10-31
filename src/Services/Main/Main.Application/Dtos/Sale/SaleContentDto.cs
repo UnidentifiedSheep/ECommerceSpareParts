@@ -11,8 +11,8 @@ public record SaleContentDto
 	[JsonPropertyName("count")]
 	public required int Count { get; set; }
 
-	[JsonPropertyName("price")]
-	public required decimal Price { get; init; }
+	[JsonPropertyName("discountedPrice")]
+	public required decimal DiscountedPrice { get; init; }
 
 	[JsonPropertyName("totalSum")]
 	public required decimal TotalSum { get; init; }
@@ -20,8 +20,8 @@ public record SaleContentDto
 	[JsonPropertyName("comment")]
 	public string? Comment { get; init; }
 
-	[JsonPropertyName("discount")]
-	public required decimal Discount { get; init; }
+	[JsonPropertyName("originalPrice")]
+	public required decimal OriginalPrice { get; init; }
 
 	[JsonPropertyName("product")]
 	public required ProductDto Product { get; init; }

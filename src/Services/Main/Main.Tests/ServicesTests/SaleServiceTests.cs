@@ -51,9 +51,9 @@ public class SaleServiceTests
 		var saleContent = result.Single();
 		saleContent.ProductId.Should().Be(10);
 		saleContent.Count.Should().Be(7);
-		saleContent.Price.Should().Be(180m);
+		saleContent.DiscountedPrice.Should().Be(180m);
+		saleContent.OriginalPrice.Should().Be(200);
 		saleContent.TotalSum.Should().Be(1260m);
-		saleContent.Discount.Should().Be(0.1m);
 
 		saleContent.Details.Should().HaveCount(2);
 		saleContent.Details[0].StorageContentId.Should().Be(3);
@@ -97,7 +97,7 @@ public class SaleServiceTests
 		var saleContent = result.Single();
 		saleContent.ProductId.Should().Be(10);
 		saleContent.Count.Should().Be(3);
-		saleContent.Price.Should().Be(150m);
+		saleContent.DiscountedPrice.Should().Be(150m);
 		saleContent.TotalSum.Should().Be(450m);
 		saleContent.Details.Should().ContainSingle();
 		saleContent.Details.Single().StorageContentId.Should().Be(1);
@@ -355,8 +355,8 @@ public class SaleServiceTests
 		{
 			ProductId = productId,
 			Count = count,
-			Price = price,
-			PriceWithDiscount = priceWithDiscount
+			OriginalPrice = price,
+			DiscountedPrice = priceWithDiscount
 		};
 	}
 }

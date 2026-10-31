@@ -43,10 +43,10 @@ public sealed class SaleEventService(
 		{
 			Comment = x.Comment,
 			Count = x.Count,
-			Discount = x.Discount,
+			OriginalPrice = x.OriginalPrice,
 			ProductId = x.ProductId,
 			Id = x.Id,
-			Price = x.Price,
+			DiscountedPrice = x.DiscountedPrice,
 			PriceInBaseCurrency = 0,
 			Details = x.Details.Select(z => ToSaleContentDetailEvent.Invoke(z)).ToList()
 		};
@@ -82,7 +82,7 @@ public sealed class SaleEventService(
 				content with
 				{
 					PriceInBaseCurrency = await currencyConverter.ConvertToBaseAsync(
-						content.Price,
+						content.DiscountedPrice,
 						fromDb.CurrencyId,
 						cancellationToken)
 				});

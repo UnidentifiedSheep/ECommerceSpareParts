@@ -22,9 +22,9 @@ public class SaleContentTests
 
 		content.ProductId.Should().Be(10);
 		content.Count.Should().Be(5);
-		content.Price.Should().Be(80m);
+		content.DiscountedPrice.Should().Be(80m);
+		content.OriginalPrice.Should().Be(100m);
 		content.TotalSum.Should().Be(400m);
-		content.Discount.Should().Be(0.2m);
 		content.Details.Should().BeEquivalentTo(details);
 	}
 
@@ -85,9 +85,9 @@ public class SaleContentTests
 			details);
 
 		content.Count.Should().Be(5);
-		content.Price.Should().Be(40m);
+		content.DiscountedPrice.Should().Be(40m);
+		content.OriginalPrice.Should().Be(50);
 		content.TotalSum.Should().Be(200m);
-		content.Discount.Should().Be(0.2m);
 		content.Details.Should().BeEquivalentTo(details);
 	}
 
