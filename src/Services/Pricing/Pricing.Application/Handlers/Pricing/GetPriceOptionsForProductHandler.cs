@@ -47,19 +47,6 @@ public class GetPriceOptionsForProductHandler(
 			await CalculateCandidates(request, cancellationToken);
 
 		var options = await GetOptionsAsync(request, cancellationToken);
-		var appliersVersion =
-			await priceApplierService.GetCurrentConfigurationVersionAsync(cancellationToken);
-		var pricingSettingsVersion = (await settingsService.GetOrDefault<PricingSetting>(cancellationToken))
-			.Data.Version;
-
-		if (options.Count == 0 || options.Any(x =>
-				x.MarkupVersion != markupContainer.CurrentVersion ||
-				x.AppliersVersion != appliersVersion ||
-				x.PricingSettingsVersion != pricingSettingsVersion))
-		{
-			await CalculateCandidates(request, cancellationToken);
-			options = await GetOptionsAsync(request, cancellationToken);
-		}
 
 		var result = new List<PriceOptionDto>();
 
@@ -116,6 +103,28 @@ public class GetPriceOptionsForProductHandler(
 		GetPriceOptionsForProductQuery request,
 		CancellationToken cancellationToken)
 	{
+		var options = await GetOptionsCoreAsync(request, cancellationToken);
+		var appliersVersion =
+			await priceApplierService.GetCurrentConfigurationVersionAsync(cancellationToken);
+		var pricingSettingsVersion = (await settingsService.GetOrDefault<PricingSetting>(cancellationToken))
+			.Data.Version;
+
+		if (options.Count == 0 || options.Any(x =>
+				x.MarkupVersion != markupContainer.CurrentVersion ||
+				x.AppliersVersion != appliersVersion ||
+				x.PricingSettingsVersion != pricingSettingsVersion))
+		{
+			await CalculateCandidates(request, cancellationToken);
+			options = await GetOptionsCoreAsync(request, cancellationToken);
+		}
+
+		return options;
+	}
+
+	private async Task<List<ProductPriceOption>> GetOptionsCoreAsync(
+		GetPriceOptionsForProductQuery request,
+		CancellationToken cancellationToken)
+	{
 		var query = repository
 			.Query
 			.Include(x => x.PriceOffer)
@@ -123,7 +132,7 @@ public class GetPriceOptionsForProductHandler(
 			.Where(x => x.PriceOffer.OfferForStorage == request.StorageCode)
 			.Where(x => x.PriceOffer.ExpiresAt > DateTime.UtcNow);
 
-		if (request.Sources.Any())
+		if (request.Sources.Count > 0)
 			query = query.Where(x => request.Sources.Contains(x.PriceOffer.Source));
 
 		return await query
