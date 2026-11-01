@@ -239,7 +239,15 @@ class Deployment:
     def render(self, payload, expected):
         result = self.api.request("POST", "swarm/stacks/config/render",
                                   {k: payload[k] for k in ("name", "composeContent", "overrideContent", "envContent")})["data"]
-        require(set(result["services"]) == set(expected), "Saved stack source does not match live application services")
+        actual, expected = set(result["services"]), set(expected)
+        if actual != expected:
+            unexpected = ", ".join(sorted(actual - expected)) or "none"
+            missing = ", ".join(sorted(expected - actual)) or "none"
+            raise ReleaseError(
+                f"Saved source for stack {payload['name']} does not match CD application services: "
+                f"unexpected in source: {unexpected}; missing from source: {missing}. "
+                "Sync the updated stack from the infrastructure repository in Arcane, "
+                "remove retired services, then rerun CD.")
 
     def check_registry(self):
         matches = []
