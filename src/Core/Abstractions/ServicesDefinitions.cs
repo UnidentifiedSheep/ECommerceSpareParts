@@ -4,8 +4,6 @@ namespace Abstractions;
 
 public static class ServicesDefinitions
 {
-	public static readonly Analytics Analytics = new();
-
 	public static readonly Main Main = new();
 
 	public static readonly Pricing Pricing = new();
@@ -13,11 +11,6 @@ public static class ServicesDefinitions
 	public static readonly Search Search = new();
 
 	public static readonly Gateway Gateway = new();
-}
-
-public sealed class Analytics : IServiceDefinition
-{
-	public string ServiceName => "analytics";
 }
 
 public sealed class Main : IServiceDefinition

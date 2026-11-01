@@ -1,8 +1,6 @@
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Attributes;
-using Contracts.Sale;
 using Domain.Extensions;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Interfaces.Persistence;
@@ -24,7 +22,6 @@ public record DeleteSaleCommand(Guid Id, uint RowVersion) : ICommand;
 public class DeleteSaleHandler(
 	ISaleRepository repository,
 	ISender sender,
-	IIntegrationEventScope integrationEventScope,
 	ISaleService saleService) : ICommandHandler<DeleteSaleCommand>
 {
 	public async Task<Unit> Handle(DeleteSaleCommand request, CancellationToken cancellationToken)
@@ -49,12 +46,6 @@ public class DeleteSaleHandler(
 			sale,
 			StorageMovementType.SaleDeletion,
 			cancellationToken);
-
-		integrationEventScope.Add(
-			new SaleDeletedEvent
-			{
-				SaleId = sale.Id, OccurredAt = DateTime.UtcNow
-			});
 
 		return Unit.Value;
 	}

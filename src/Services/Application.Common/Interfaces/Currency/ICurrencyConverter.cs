@@ -29,5 +29,11 @@ public interface ICurrencyConverter
 		int fromCurrencyId,
 		CancellationToken cancellationToken = default);
 
+	Task<decimal> ConvertAsync(decimal value, int fromCurrencyId, int toCurrencyId, DateTime forDate, CancellationToken cancellationToken = default);
+
+	Task<decimal> ConvertFromBaseAsync(decimal value, int toCurrencyId, DateTime forDate, CancellationToken cancellationToken = default);
+
+	Task<decimal> ConvertToBaseAsync(decimal value, int fromCurrencyId, DateTime forDate, CancellationToken cancellationToken = default);
+
 	CurrencyRates ChangeBaseCurrency(CurrencyRates data, string newBase);
 }

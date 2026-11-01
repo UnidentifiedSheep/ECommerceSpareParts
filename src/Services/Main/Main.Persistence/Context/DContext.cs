@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Domain.CommonEntities;
 using Domain.CommonEntities.Job;
 using Main.Entities;
@@ -115,6 +115,8 @@ public partial class DContext : DbContext, INotificationDbContext
 	public virtual DbSet<Sale> Sales { get; set; }
 
 	public virtual DbSet<SaleContent> SaleContents { get; set; }
+
+	public virtual DbSet<SaleContentAnalytics> SaleContentAnalytics { get; set; }
 
 	public virtual DbSet<SaleContentDetail> SaleContentDetails { get; set; }
 

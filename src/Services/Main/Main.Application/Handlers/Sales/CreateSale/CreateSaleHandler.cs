@@ -6,7 +6,6 @@ using Attributes;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Interfaces.Services;
-using Main.Application.Interfaces.Services.Event;
 using Main.Entities.Sale;
 using Main.Enums;
 using Main.Enums.Balances;
@@ -37,7 +36,6 @@ public record CreateSaleResult(Guid SaleId);
 public class CreateSaleHandler(
 	ISender sender,
 	IOptions<SystemOptions> systemOptions,
-	ISaleEventService saleEventService,
 	IUnitOfWork unitOfWork,
 	ISaleService saleService) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
@@ -111,8 +109,6 @@ public class CreateSaleHandler(
 
 		await unitOfWork.AddAsync(sale, cancellationToken);
 		await unitOfWork.SaveChangesAsync(cancellationToken);
-
-		await saleEventService.NotifyUpdated(sale.Id, cancellationToken);
 
 		return new CreateSaleResult(sale.Id);
 	}

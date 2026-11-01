@@ -77,6 +77,9 @@ public class CreateSaleTests : IntegrationTest
 		saleContent.DiscountedPrice.Should().Be(80m);
 		saleContent.TotalSum.Should().Be(80m);
 		saleContent.OriginalPrice.Should().Be(100);
+		var analytics = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == saleContent.Id, CancellationToken);
+		analytics.OriginalAmountInBaseCurrency.Should().Be(100m * saleContent.Count);
+		analytics.RevenueInBaseCurrency.Should().Be(80m * saleContent.Count);
 
 		var detail = saleContent.Details.Should().ContainSingle().Subject;
 		originalContents.Should().ContainKey(detail.StorageContentId);

@@ -1,6 +1,7 @@
 using Exceptions;
 using FluentAssertions;
 using Main.Entities.Sale;
+using Main.Entities.DomainEvents.Sale;
 
 namespace Tests.Domain.Sale;
 
@@ -113,6 +114,75 @@ public class SaleContentTests
 		var act = () => content.SetComment(new string('a', 257));
 
 		act.Should().Throw<InvalidInputException>();
+	}
+
+	[Fact]
+	public void OnCreated_ContainsAssignedSaleIdWithoutDatabaseGeneratedContentId()
+	{
+		var content = Create();
+		var sale = AttachToSale(content);
+
+		content.OnCreated();
+
+		content.Id.Should().Be(0);
+		content.FlushDomainEvents().Should().ContainSingle()
+			.Which.Should().Be(new SaleContentUpdateDomainEvent(sale.Id, true));
+	}
+
+	[Fact]
+	public void SetPriceAndDetails_WhenChanged_PublishesFinancialUpdate()
+	{
+		var content = Create();
+		var sale = AttachToSale(content);
+
+		content.SetPriceAndDetails(120m, 90m, content.Details.ToArray());
+
+		content.FlushDomainEvents().Should().ContainSingle()
+			.Which.Should().Be(new SaleContentUpdateDomainEvent(sale.Id, true));
+	}
+
+	[Fact]
+	public void SetComment_PublishesNonFinancialUpdate()
+	{
+		var content = Create();
+		var sale = AttachToSale(content);
+
+		content.SetComment("updated");
+
+		content.FlushDomainEvents().Should().ContainSingle()
+			.Which.Should().Be(new SaleContentUpdateDomainEvent(sale.Id, false));
+	}
+
+	[Fact]
+	public void SettingUnchangedValues_DoesNotPublishUpdates()
+	{
+		var content = Create();
+		AttachToSale(content);
+
+		content.SetPriceAndDetails(content.OriginalPrice, content.DiscountedPrice, content.Details.ToArray());
+		content.SetComment(content.Comment);
+
+		content.FlushDomainEvents().Should().BeEmpty();
+	}
+
+	[Fact]
+	public void OnDeleted_PreservesSaleIdForRebuildingRemainingContents()
+	{
+		var content = Create();
+		var sale = AttachToSale(content);
+		sale.RemoveContent(content);
+
+		content.OnDeleted();
+
+		content.FlushDomainEvents().Should().ContainSingle()
+			.Which.Should().Be(new SaleContentUpdateDomainEvent(sale.Id, true));
+	}
+
+	private static Main.Entities.Sale.Sale AttachToSale(SaleContent content)
+	{
+		var sale = Main.Entities.Sale.Sale.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 1, "WH-1", DateTime.UtcNow);
+		sale.AddContent(content);
+		return sale;
 	}
 
 	private static SaleContent Create()

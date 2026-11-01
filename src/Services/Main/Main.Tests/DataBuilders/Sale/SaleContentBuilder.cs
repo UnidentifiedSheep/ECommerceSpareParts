@@ -7,6 +7,7 @@ namespace Tests.DataBuilders.Sale;
 public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
 {
 	private readonly List<int> _storageContentIds = [];
+	private IReadOnlyList<SaleContentDetail>? _details;
 
 	public int? ProductId { get; private set; }
 
@@ -55,6 +56,19 @@ public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
 		return this;
 	}
 
+	public SaleContentBuilder WithPrices(decimal originalPrice, decimal discountedPrice)
+	{
+		PriceWithOutDiscount = originalPrice;
+		PriceWithDiscount = discountedPrice;
+		return this;
+	}
+
+	public SaleContentBuilder WithDetails(IReadOnlyList<SaleContentDetail> details)
+	{
+		_details = details;
+		return this;
+	}
+
 	public override SaleContent Build()
 	{
 		var price = PriceWithOutDiscount ?? Math.Round(Faker.Random.Decimal(1), 2);
@@ -62,7 +76,7 @@ public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
 			ProductId ?? Faker.Random.Int(1),
 			price,
 			PriceWithDiscount ?? price,
-			GetDetails());
+			_details ?? GetDetails());
 	}
 
 	private List<SaleContentDetail> GetDetails()

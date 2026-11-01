@@ -74,6 +74,9 @@ public class EditSaleTests : IntegrationTest
 		editedContent.DiscountedPrice.Should().Be(90m);
 		editedContent.TotalSum.Should().Be(90m);
 		editedContent.OriginalPrice.Should().Be(120);
+		var analytics = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == editedContent.Id, CancellationToken);
+		analytics.OriginalAmountInBaseCurrency.Should().Be(120m * editedContent.Count);
+		analytics.RevenueInBaseCurrency.Should().Be(90m * editedContent.Count);
 		editedContent.Comment.Should().Be("edited");
 		editedContent.Details.Sum(x => x.Count).Should().Be(content.Count);
 

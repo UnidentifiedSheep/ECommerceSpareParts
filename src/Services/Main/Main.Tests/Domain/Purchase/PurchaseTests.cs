@@ -20,6 +20,8 @@ public class PurchaseTests
 			"WH-1",
 			DateTime.UtcNow);
 
+		purchase.Id.Should().NotBeEmpty();
+		purchase.Id.Version.Should().Be(7);
 		purchase.State.Should().Be(PurchaseState.Draft);
 		purchase.SupplierUserId.Should().Be(supplierUserId);
 		purchase.SupplierOrganizationId.Should().Be(supplierOrganizationId);
@@ -33,6 +35,30 @@ public class PurchaseTests
 		purchase.Complete();
 
 		purchase.State.Should().Be(PurchaseState.Completed);
+	}
+
+	[Fact]
+	public void AddContent_BeforeSaving_AssignsPurchaseId()
+	{
+		var purchase = Create();
+		var content = PurchaseContent.Create(1, 2, 10m, 3);
+
+		purchase.AddContent(content);
+
+		content.PurchaseId.Should().Be(purchase.Id);
+		purchase.Contents.Should().ContainSingle().Which.Should().BeSameAs(content);
+	}
+
+	[Fact]
+	public void RemoveContent_BeforeSaving_RemovesContent()
+	{
+		var purchase = Create();
+		var content = PurchaseContent.Create(1, 2, 10m, 3);
+		purchase.AddContent(content);
+
+		purchase.RemoveContent(content);
+
+		purchase.Contents.Should().BeEmpty();
 	}
 
 	[Fact]

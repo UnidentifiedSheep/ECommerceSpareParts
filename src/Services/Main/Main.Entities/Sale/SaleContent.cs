@@ -1,3 +1,4 @@
+using Main.Entities.DomainEvents.Sale;
 using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
@@ -39,6 +40,8 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 	public decimal DiscountedPrice { get; private set; }
 
 	public decimal TotalSum { get; private set; }
+
+	public SaleContentAnalytics? Analytics { get; private set; }
 
 	public string? Comment { get; private set; }
 
@@ -82,11 +85,18 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 			.EnsureGreaterThan(0, SaleContentPriceWithDiscountMinMessage.Instance)
 			.EnsureAtMost(originalPrice, SaleContentPriceWithDiscountMaxMessage.Instance);
 
+		var nextDetails = details.ToList();
+		var financialDataChanged = OriginalPrice != originalPrice || DiscountedPrice != discountedPrice ||
+			!_details.Select(detail => (detail.StorageContentId, detail.CurrencyId, detail.BuyPrice, detail.Count, detail.PurchaseDatetime))
+				.OrderBy(value => value).SequenceEqual(nextDetails.Select(detail =>
+					(detail.StorageContentId, detail.CurrencyId, detail.BuyPrice, detail.Count, detail.PurchaseDatetime)).OrderBy(value => value));
 		OriginalPrice = originalPrice;
 		DiscountedPrice = discountedPrice;
 
-		ClearAndSetDetails(details);
+		ClearAndSetDetails(nextDetails);
 		TotalSum = DiscountedPrice * Count;
+		if (financialDataChanged)
+			InvalidateAnalytics();
 	}
 
 	private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)
@@ -100,8 +110,27 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		_details.AddRange(list);
 	}
 
-	public void SetComment(string? comment) => Comment =
-		comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleContentCommentMaxMessage.Instance);
+	internal void SetSaleId(Guid saleId) => SaleId = saleId;
+
+	public void SetComment(string? comment)
+	{
+		comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleContentCommentMaxMessage.Instance);
+		if (Comment == comment) return;
+		Comment = comment;
+		NotifyUpdated(false);
+	}
+
+	public void InvalidateAnalytics() => NotifyUpdated(true);
+
+	public override void OnCreated() => InvalidateAnalytics();
+
+	public override void OnDeleted() => InvalidateAnalytics();
+
+	private void NotifyUpdated(bool financialInfoChanged)
+	{
+		if (SaleId != Guid.Empty)
+			AddDomainEvent(new SaleContentUpdateDomainEvent(SaleId, financialInfoChanged));
+	}
 
 	public override int GetId() => Id;
 }
