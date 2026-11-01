@@ -5,7 +5,6 @@
     "sale.not.found": "Не удалось найти указанную продажу.",
     "sale.id.or.transaction.id.required": "Необходимо заполнить ID продажи или ID транзакции.",
     "sale.id.not.empty": "ID продажи не должно быть пустым.",
-    "soft.confirmation.needed.for.sale.reservation.reason": "Для этой продажи требуется подтверждение, так как она конфликтует с существующими резервами. Код подтверждения: '{ConfirmationCode}'.",
     "sale.date.min": "Дата продажи не может быть старше 3 месяцев.",
     "sale.date.max": "Дата продажи не может быть в будущем.",
     "sale.content.count.min": "Количество должно быть больше 0.",

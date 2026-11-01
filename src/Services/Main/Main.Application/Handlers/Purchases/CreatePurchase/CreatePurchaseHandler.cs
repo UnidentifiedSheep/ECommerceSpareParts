@@ -1,10 +1,8 @@
 using System.Data;
 using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Contracts.Purchase;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -43,7 +41,6 @@ public class CreatePurchaseHandler(
 	ISender sender,
 	IOptions<SystemOptions> systemOptions,
 	IPurchaseLogisticsService purchaseLogisticsService,
-	IIntegrationEventScope integrationEventScope,
 	IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
 	public async Task<CreatePurchaseResult> Handle(
@@ -93,12 +90,6 @@ public class CreatePurchaseHandler(
 				cancellationToken);
 
 		await unitOfWork.SaveChangesAsync(cancellationToken);
-
-		integrationEventScope.Add(
-			new PurchaseUpdateEvent
-			{
-				PurchaseId = purchase.Id
-			});
 
 		return new CreatePurchaseResult(purchase.Id);
 	}

@@ -32,9 +32,8 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
 
 		builder
 			.Property(e => e.Id)
-			.HasDefaultValueSql("gen_random_uuid()")
 			.HasColumnName("id")
-			.ValueGeneratedOnAdd();
+			.ValueGeneratedNever();
 
 		builder.Property(e => e.Comment).HasMaxLength(256).HasColumnName("comment");
 

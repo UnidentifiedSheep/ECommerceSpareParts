@@ -1,4 +1,4 @@
-﻿using Main.Entities.Sale;
+using Main.Entities.Sale;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

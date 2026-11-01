@@ -1,5 +1,7 @@
 ﻿using Application.Common.Handlers.NamedObjects;
 using Application.Common.NamedObject;
+using Main.Application.Analytics.Analyzers;
+using Main.Application.Analytics.Charts;
 using Main.Application.Interfaces.Services.Document;
 using Main.Application.NamedObjects;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
@@ -21,6 +23,8 @@ public static class NamedObjectDiRegistry
 			IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>, GetNamedObjectsHandler>();
 
 		return services
+			.RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped)
+			.RegisterNamedObject<ChartDataSourceNamedObject>(objectsLifetime: ServiceLifetime.Scoped)
 			.RegisterNamedObject<StorageContentExtractPolicyBase>(objectsLifetime: ServiceLifetime.Singleton)
 			.RegisterNamedObject<IDocumentDefinition>(objectsLifetime: ServiceLifetime.Scoped)
 			.RegisterNamedObject<SettingDefinitionNamedObjectBase>(

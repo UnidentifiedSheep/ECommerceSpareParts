@@ -5,7 +5,6 @@ using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Organizations;
 using Main.Application.Dtos.Product;
-using Main.Application.Dtos.Product.Reservation;
 using Main.Entities.Organization;
 using Main.Entities.Product;
 using Main.Entities.Storage;
@@ -119,32 +118,4 @@ public sealed class
 	}
 
 	public override Expression<Func<ProductCharacteristic, ProductCharacteristicDto>> Projection { get; }
-}
-
-[Lifetime(Lifetime.Singleton)]
-public sealed class
-	ProductReservationDtoProjectionProvider : ProjectionProviderBase<ProductReservation,
-	ProductReservationDto>
-{
-	public ProductReservationDtoProjectionProvider(
-		IProjectionProvider<Organization, OrganizationDto> organizationProjection)
-	{
-		var organizationToDto = organizationProjection.Projection;
-
-		Projection = x => new ProductReservationDto
-		{
-			Id = x.Id,
-			WhoUpdated = x.WhoUpdated,
-			Comment = x.Comment,
-			CurrentCount = x.CurrentCount,
-			ProposedCurrencyId = x.ProposedCurrencyId,
-			ProposedPrice = x.ProposedPrice,
-			ReservedCount = x.ReservedCount,
-			Status = x.Status,
-			UpdatedAt = x.UpdatedAt,
-			Organization = organizationToDto.Invoke(x.Organization)
-		};
-	}
-
-	public override Expression<Func<ProductReservation, ProductReservationDto>> Projection { get; }
 }

@@ -78,6 +78,12 @@
     "lrt.user.tokens.clear.expired.name": "Süresi dolmuş tokenları temizleme",
     "lrt.user.tokens.clear.expired.description": "Geçerlilik süresi dolmuş kullanıcı tokenlarını siler.",
     "lrt.product.images.deletion.name": "Ürün görsellerini silme",
-    "lrt.product.images.deletion.description": "Silinen ürünün görsellerini depolamadan kaldırır."
+    "lrt.product.images.deletion.description": "Silinen ürünün görsellerini depolamadan kaldırır.",
+    "lrt.markup.calculation.name": "Kâr marjı hesaplama",
+    "lrt.markup.calculation.description": "Önerilen kâr marjı aralıklarını hesaplar.",
+    "markup.calculation.input.invalid": "Geçersiz kâr marjı hesaplama verileri sağlandı.",
+    "markup.calculation.range.start.must.be.before.or.equal.end": "Kâr marjı hesaplama zaman aralığının başlangıcı, bitişinden önce veya bitişine eşit olmalıdır.",
+    "lrt.sale.analytics.synchronization.name": "Satış analitiğini eşitle",
+    "lrt.sale.analytics.synchronization.description": "Satış analitiğini geçmiş döviz kurlarıyla yeniden hesaplar."
   }
 }

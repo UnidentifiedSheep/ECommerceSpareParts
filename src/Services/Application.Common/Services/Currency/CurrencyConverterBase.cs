@@ -37,6 +37,12 @@ public abstract class CurrencyConverterBase : ICurrencyConverter
 		int fromCurrencyId,
 		CancellationToken cancellationToken = default);
 
+	public abstract Task<decimal> ConvertAsync(decimal value, int fromCurrencyId, int toCurrencyId, DateTime forDate, CancellationToken cancellationToken = default);
+
+	public abstract Task<decimal> ConvertFromBaseAsync(decimal value, int toCurrencyId, DateTime forDate, CancellationToken cancellationToken = default);
+
+	public abstract Task<decimal> ConvertToBaseAsync(decimal value, int fromCurrencyId, DateTime forDate, CancellationToken cancellationToken = default);
+
 	public CurrencyRates ChangeBaseCurrency(CurrencyRates data, string newBase)
 	{
 		if (data.BaseCurrencyCode == newBase)

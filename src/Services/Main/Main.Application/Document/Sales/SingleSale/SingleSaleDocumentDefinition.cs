@@ -69,8 +69,8 @@ public class SingleSaleDocumentDefinition(
 					{
 						Comment = z.Comment,
 						Count = z.Count,
-						Discount = z.Discount,
-						Price = z.Price,
+						OriginalPrice = z.OriginalPrice,
+						DiscountedPrice = z.DiscountedPrice,
 						ProductId = z.ProductId,
 						ProductName = z.Product.Name,
 						Sku = z.Product.Sku,

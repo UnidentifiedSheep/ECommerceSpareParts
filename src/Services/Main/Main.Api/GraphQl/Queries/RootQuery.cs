@@ -1,4 +1,5 @@
 using HotChocolate;
+using Main.Api.GraphQl.Analytics.Queries;
 using HotChocolate.Types.Composite;
 
 namespace Main.Api.GraphQl.Queries;
@@ -6,6 +7,9 @@ namespace Main.Api.GraphQl.Queries;
 [GraphQLName("Query")]
 public sealed class RootQuery
 {
+	[GraphQLName("analytics")]
+	public AnalyticsQueries Analytics => new();
+
 	[GraphQLName("users")]
 	public UserQueries Users => new();
 

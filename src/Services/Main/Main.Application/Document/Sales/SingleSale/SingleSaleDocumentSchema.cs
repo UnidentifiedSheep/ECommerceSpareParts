@@ -89,15 +89,15 @@ public sealed record SingleSaleDocumentItemSchema
 	[SchemaFieldDescription(SaleDocumentSingleItemCountDescriptionMessage.Key)]
 	public required int Count { get; init; }
 
-	[JsonPropertyName(nameof(Price))]
+	[JsonPropertyName(nameof(DiscountedPrice))]
 	[SchemaFieldLabel(SaleDocumentSingleItemPriceNameMessage.Key)]
 	[SchemaFieldDescription(SaleDocumentSingleItemPriceDescriptionMessage.Key)]
-	public required decimal Price { get; init; }
+	public required decimal DiscountedPrice { get; init; }
 
-	[JsonPropertyName(nameof(Discount))]
+	[JsonPropertyName(nameof(OriginalPrice))]
 	[SchemaFieldLabel(SaleDocumentSingleItemDiscountNameMessage.Key)]
 	[SchemaFieldDescription(SaleDocumentSingleItemDiscountDescriptionMessage.Key)]
-	public required decimal Discount { get; init; }
+	public required decimal OriginalPrice { get; init; }
 
 	[JsonPropertyName(nameof(TotalSum))]
 	[SchemaFieldLabel(SaleDocumentSingleItemTotalSumNameMessage.Key)]

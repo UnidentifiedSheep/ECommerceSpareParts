@@ -46,8 +46,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			newDate,
-			"sale edited",
-			null);
+			"sale edited");
 
 		await Mediator.Send(command, CancellationToken);
 
@@ -71,9 +70,12 @@ public class EditSaleTests : IntegrationTest
 		editedSale.SaleDatetime.Should().BeCloseTo(newDate, TimeSpan.FromMilliseconds(1));
 		editedSale.TransactionId.Should().NotBe(oldTransactionId);
 		editedContent.Id.Should().Be(content.Id);
-		editedContent.Price.Should().Be(90m);
+		editedContent.DiscountedPrice.Should().Be(90m);
 		editedContent.TotalSum.Should().Be(90m);
-		editedContent.Discount.Should().Be(0.25m);
+		editedContent.OriginalPrice.Should().Be(120);
+		var analytics = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == editedContent.Id, CancellationToken);
+		analytics.OriginalAmountInBaseCurrency.Should().Be(120m * editedContent.Count);
+		analytics.RevenueInBaseCurrency.Should().Be(90m * editedContent.Count);
 		editedContent.Comment.Should().Be("edited");
 		editedContent.Details.Sum(x => x.Count).Should().Be(content.Count);
 
@@ -107,8 +109,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Assert.ThrowsAsync<InvalidRowVersionException>(() => Mediator.Send(command, CancellationToken));
 
@@ -140,7 +141,6 @@ public class EditSaleTests : IntegrationTest
 				],
 				SaleContext.StorageContent.CurrencyId,
 				DateTime.UtcNow,
-				null,
 				null),
 			CancellationToken));
 	}
@@ -157,8 +157,7 @@ public class EditSaleTests : IntegrationTest
 			[ToDto(content), NewDto(newStorageContent.ProductId)],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Mediator.Send(command, CancellationToken);
 
@@ -180,8 +179,7 @@ public class EditSaleTests : IntegrationTest
 			[NewDto(newStorageContent.ProductId)],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Mediator.Send(command, CancellationToken);
 
@@ -210,8 +208,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Assert.ThrowsAsync<SaleContentNotFoundException>(() =>
 			Mediator.Send(command, CancellationToken));
@@ -241,8 +238,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Assert.ThrowsAsync<ArticleDoesntMatchContentException>(() =>
 			Mediator.Send(command, CancellationToken));
@@ -266,8 +262,7 @@ public class EditSaleTests : IntegrationTest
 			[ToDto(content)],
 			deletedSale.CurrencyId,
 			deletedSale.SaleDatetime,
-			deletedSale.Comment,
-			null);
+			deletedSale.Comment);
 
 		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
@@ -299,8 +294,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Mediator.Send(command, CancellationToken);
 
@@ -332,8 +326,8 @@ public class EditSaleTests : IntegrationTest
 			Id = content.Id,
 			ProductId = content.ProductId,
 			Count = content.Count,
-			Price = content.Price,
-			PriceWithDiscount = content.Price,
+			Price = content.DiscountedPrice,
+			PriceWithDiscount = content.DiscountedPrice,
 			Comment = content.Comment
 		};
 	}

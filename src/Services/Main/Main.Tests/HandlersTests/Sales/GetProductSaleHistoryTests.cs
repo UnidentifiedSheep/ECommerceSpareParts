@@ -35,8 +35,8 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		history.CurrencyId.Should().Be(sale.CurrencyId);
 		history.StorageCode.Should().Be(sale.StorageCode);
 		history.Quantity.Should().Be(content.Count);
-		history.Discount.Should().Be(content.Discount);
-		history.Price.Should().Be(content.Price);
+		history.OriginalPrice.Should().Be(content.OriginalPrice);
+		history.DiscountedPrice.Should().Be(content.DiscountedPrice);
 		history.AverageBuyPrice.Should().Be(expectedAverageBuyPrice);
 		history
 			.SaleDate

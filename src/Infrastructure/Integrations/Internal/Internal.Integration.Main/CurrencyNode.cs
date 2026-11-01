@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+using System.Globalization;
+using System.Text.Json.Serialization;
 using Abstractions.Models.Options;
 using Integrations.Common;
 using Internal.Integration.Core;
@@ -33,6 +34,17 @@ internal sealed class CurrencyNode(
 			response,
 			x => x.Rate,
 			cancellationToken);
+	}
+
+	public async Task<Response<decimal>> GetCurrencyRate(int currencyId, DateTime forDate, CancellationToken cancellationToken = default)
+	{
+		if (forDate.Kind != DateTimeKind.Utc)
+			throw new ArgumentException("Currency rate date must be UTC.", nameof(forDate));
+		var date = Uri.EscapeDataString(forDate.ToString("O", CultureInfo.InvariantCulture));
+		using var request = await GetRequest(HttpMethod.Get,
+			$"/internal/currencies/{currencyId}/rates/historical?forDate={date}", cancellationToken);
+		using var response = await httpClient.SendAsync(request, cancellationToken);
+		return await ReadResponse<GetCurrencyRateResponse, decimal>(response, result => result.Rate, cancellationToken);
 	}
 
 	public async Task<Response<IReadOnlyList<InternalCurrency>>> GetCurrencies(

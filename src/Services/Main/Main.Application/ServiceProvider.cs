@@ -1,3 +1,5 @@
+using Main.Application.Analytics.Interfaces;
+using Main.Application.Analytics.Services;
 using Abstractions;
 using Application.Common;
 using Application.Common.Extensions;
@@ -12,7 +14,6 @@ using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Interfaces.Services.Document;
-using Main.Application.Interfaces.Services.Event;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.JobProviders;
 using Main.Application.Lrts.ProducerImport;
@@ -23,7 +24,6 @@ using Main.Application.Services.Currency;
 using Main.Application.Services.Document;
 using Main.Application.Services.Document.Providers;
 using Main.Application.Services.Document.Sources;
-using Main.Application.Services.Event;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Application.Services.PayloadProvider;
@@ -90,7 +90,8 @@ public static class ServiceProvider
 		collection.AddSingleton<ILogisticsPricingStrategy, PerWeightPricing>();
 		collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
 
-		collection.AddScoped<ISaleEventService, SaleEventService>();
+		collection.AddScoped<ISaleAnalyticsSynchronizer, SaleAnalyticsSynchronizer>();
+		collection.AddScoped<ISaleContentAnalyticsCalculator, SaleContentAnalyticsCalculator>();
 
 		collection.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();
 		collection.AddScoped<IVerificationPayloadProvider, VerificationPayloadProvider>();

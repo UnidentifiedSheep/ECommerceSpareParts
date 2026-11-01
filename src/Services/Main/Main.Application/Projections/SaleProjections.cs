@@ -58,9 +58,9 @@ public sealed class SaleContentDtoProjectionProvider : ProjectionProviderBase<Sa
 		{
 			Id = x.Id,
 			Count = x.Count,
-			Price = x.Price,
+			DiscountedPrice = x.DiscountedPrice,
 			TotalSum = x.TotalSum,
-			Discount = x.Discount,
+			OriginalPrice = x.OriginalPrice,
 			Comment = x.Comment,
 			Product = productToDto.Invoke(x.Product)
 		};
@@ -106,8 +106,8 @@ public sealed class
 			ProductId = x.ProductId,
 			StorageCode = x.Sale.StorageCode,
 			Quantity = x.Count,
-			Discount = x.Discount,
-			Price = x.Price,
+			OriginalPrice = x.OriginalPrice,
+			DiscountedPrice = x.DiscountedPrice,
 			AverageBuyPrice = x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count,
 			SaleDate = x.Sale.SaleDatetime,
 			WhoCreated = x.Sale.WhoCreated

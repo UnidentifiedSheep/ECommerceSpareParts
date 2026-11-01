@@ -17,7 +17,7 @@ public sealed record GqlSaleContent([property: GraphQLIgnore] SaleContentDto Con
 	public int Count => Content.Count;
 
 	[GraphQLName("price")]
-	public decimal Price => Content.Price;
+	public decimal Price => Content.DiscountedPrice;
 
 	[GraphQLName("totalSum")]
 	public decimal TotalSum => Content.TotalSum;
@@ -26,7 +26,7 @@ public sealed record GqlSaleContent([property: GraphQLIgnore] SaleContentDto Con
 	public string? Comment => Content.Comment;
 
 	[GraphQLName("discount")]
-	public decimal Discount => Content.Discount;
+	public decimal Discount => Content.OriginalPrice;
 
 	[GraphQLName("product")]
 	public GqlProduct Product => new(Content.Product);

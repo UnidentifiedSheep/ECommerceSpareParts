@@ -1,4 +1,4 @@
-﻿{
+{
   "culture": "ru",
   "messages": {
     "lrt.producer.import.name": "Импорт производителей",
@@ -78,6 +78,12 @@
     "lrt.user.tokens.clear.expired.name": "Очистка просроченных токенов",
     "lrt.user.tokens.clear.expired.description": "Удаляет токены пользователей с истёкшим сроком действия.",
     "lrt.product.images.deletion.name": "Удаление изображений товара",
-    "lrt.product.images.deletion.description": "Удаляет из хранилища изображения удалённого товара."
+    "lrt.product.images.deletion.description": "Удаляет из хранилища изображения удалённого товара.",
+    "lrt.markup.calculation.name": "Расчет наценок",
+    "lrt.markup.calculation.description": "Рассчитывает рекомендуемые диапазоны наценок.",
+    "markup.calculation.input.invalid": "Переданы некорректные входные данные для расчета наценки.",
+    "markup.calculation.range.start.must.be.before.or.equal.end": "Начало временного диапазона расчета наценки должно быть меньше или равно его концу.",
+    "lrt.sale.analytics.synchronization.name": "Синхронизация аналитики продаж",
+    "lrt.sale.analytics.synchronization.description": "Пересчитывает аналитику продаж по историческим курсам валют."
   }
 }

@@ -1,3 +1,4 @@
+using Main.Entities.DomainEvents.Sale;
 using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
@@ -35,13 +36,14 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 
 	public int Count { get; private set; }
 
-	public decimal Price { get; private set; }
+	public decimal OriginalPrice { get; private set; }
+	public decimal DiscountedPrice { get; private set; }
 
 	public decimal TotalSum { get; private set; }
 
-	public string? Comment { get; private set; }
+	public SaleContentAnalytics? Analytics { get; private set; }
 
-	public decimal Discount { get; private set; }
+	public string? Comment { get; private set; }
 
 	public Product.Product Product { get; private set; } = null!;
 
@@ -70,22 +72,31 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		Count = count.EnsureGreaterThan(0, SaleContentCountMinMessage.Instance);
 
 	public void SetPriceAndDetails(
-		decimal withOutDiscount,
-		decimal withDiscount,
+		decimal originalPrice,
+		decimal discountedPrice,
 		IEnumerable<SaleContentDetail> details)
 	{
-		withOutDiscount
+		originalPrice
 			.EnsureMaxDecimalPlaces(2, SaleContentPricePrecisionMessage.Instance)
 			.EnsureGreaterThan(0, SaleContentPriceMinMessage.Instance);
 
-		Price = withDiscount
+		discountedPrice
 			.EnsureMaxDecimalPlaces(2, SaleContentPriceWithDiscountPrecisionMessage.Instance)
 			.EnsureGreaterThan(0, SaleContentPriceWithDiscountMinMessage.Instance)
-			.EnsureAtMost(withOutDiscount, SaleContentPriceWithDiscountMaxMessage.Instance);
+			.EnsureAtMost(originalPrice, SaleContentPriceWithDiscountMaxMessage.Instance);
 
-		Discount = (withOutDiscount - withDiscount) / withOutDiscount;
-		ClearAndSetDetails(details);
-		TotalSum = Price * Count;
+		var nextDetails = details.ToList();
+		var financialDataChanged = OriginalPrice != originalPrice || DiscountedPrice != discountedPrice ||
+			!_details.Select(detail => (detail.StorageContentId, detail.CurrencyId, detail.BuyPrice, detail.Count, detail.PurchaseDatetime))
+				.OrderBy(value => value).SequenceEqual(nextDetails.Select(detail =>
+					(detail.StorageContentId, detail.CurrencyId, detail.BuyPrice, detail.Count, detail.PurchaseDatetime)).OrderBy(value => value));
+		OriginalPrice = originalPrice;
+		DiscountedPrice = discountedPrice;
+
+		ClearAndSetDetails(nextDetails);
+		TotalSum = DiscountedPrice * Count;
+		if (financialDataChanged)
+			InvalidateAnalytics();
 	}
 
 	private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)
@@ -99,8 +110,34 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		_details.AddRange(list);
 	}
 
-	public void SetComment(string? comment) => Comment =
-		comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleContentCommentMaxMessage.Instance);
+	internal void SetSaleId(Guid saleId) => SaleId = saleId;
+
+	public void SetComment(string? comment)
+	{
+		comment = comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleContentCommentMaxMessage.Instance);
+		if (Comment == comment) return;
+		Comment = comment;
+		NotifyUpdated(false);
+	}
+
+	public void UpdateAnalytics(decimal originalAmount, decimal revenue, decimal cost)
+	{
+		if (Analytics is null)
+			Analytics = SaleContentAnalytics.Create(Id, originalAmount, revenue, cost);
+		else
+			Analytics.Update(originalAmount, revenue, cost);
+	}
+
+	public void InvalidateAnalytics() => NotifyUpdated(true);
+
+	public override void OnCreated() => InvalidateAnalytics();
+
+
+	private void NotifyUpdated(bool financialInfoChanged)
+	{
+		if (SaleId != Guid.Empty)
+			AddDomainEvent(new SaleContentUpdateDomainEvent(this, financialInfoChanged));
+	}
 
 	public override int GetId() => Id;
 }

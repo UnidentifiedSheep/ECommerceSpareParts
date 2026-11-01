@@ -24,6 +24,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 		string storageCode,
 		DateTime saleDate)
 	{
+		Id = Guid.CreateVersion7();
 		TransactionId = transactionId;
 		CurrencyId = currencyId;
 		UserId = userId;
@@ -42,6 +43,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 	public Guid TransactionId { get; private set; }
 
 	public int CurrencyId { get; private set; }
+
 
 	public string StorageCode { get; private set; } = null!;
 
@@ -91,6 +93,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 	{
 		if (content.SaleId != Guid.Empty && content.SaleId != Id)
 			throw new InvalidOperationException("Content already added to another sale");
+		content.SetSaleId(Id);
 		_contents.Add(content);
 	}
 
@@ -101,9 +104,20 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 		_contents.Remove(content);
 	}
 
-	public void SetDateTime(DateTime dateTime) => SaleDatetime = dateTime;
+	public void SetDateTime(DateTime dateTime)
+	{
+		if (SaleDatetime == dateTime) return;
+		SaleDatetime = dateTime;
+		InvalidateAnalytics();
+	}
 
-	public void SetCurrency(int currencyId) => CurrencyId = currencyId;
+	public void SetCurrency(int currencyId)
+	{
+		if (CurrencyId == currencyId) return;
+		CurrencyId = currencyId;
+		InvalidateAnalytics();
+	}
+
 
 	public void SetTransactionId(Guid transactionId) => TransactionId = transactionId;
 
@@ -116,6 +130,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 			throw new InvalidOperationException("Cannot complete empty sale");
 
 		State = SaleState.Completed;
+		InvalidateAnalytics();
 	}
 
 	public void Delete()
@@ -124,6 +139,12 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 			return;
 
 		State = SaleState.Deleted;
+	}
+
+	private void InvalidateAnalytics()
+	{
+		foreach (var content in _contents)
+			content.InvalidateAnalytics();
 	}
 
 	public override Guid GetId() => Id;

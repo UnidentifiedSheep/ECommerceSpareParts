@@ -211,7 +211,6 @@ void MapDocs(WebApplication application)
 			var services = new Dictionary<string, string>
 			{
 				[ServicesDefinitions.Main.ServiceName] = "/main/swagger/v1/swagger.json",
-				[ServicesDefinitions.Analytics.ServiceName] = "/analytics/swagger/v1/swagger.json",
 				[ServicesDefinitions.Search.ServiceName] = "/search/swagger/v1/swagger.json",
 				[ServicesDefinitions.Pricing.ServiceName] = "/pricing/swagger/v1/swagger.json"
 			};
@@ -254,10 +253,6 @@ void MapDocs(WebApplication application)
 					ServicesDefinitions.Main.ServiceName,
 					"Main API",
 					"/docs/openapi/main.json")
-				.AddDocument(
-					ServicesDefinitions.Analytics.ServiceName,
-					"Analytics API",
-					"/docs/openapi/analytics.json")
 				.AddDocument(
 					ServicesDefinitions.Search.ServiceName,
 					"Search API",

@@ -26,6 +26,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
 		string storage,
 		DateTime purchaseDatetime)
 	{
+		Id = Guid.CreateVersion7();
 		SupplierUserId = supplierUserId;
 		SupplierOrganizationId = supplierOrganizationId;
 		SetPurchaseDate(purchaseDatetime);

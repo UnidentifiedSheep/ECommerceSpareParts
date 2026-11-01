@@ -108,5 +108,10 @@ public class SaleTestContext(
 
 		await DbContext.AddAsync(Sale, cancellationToken);
 		await DbContext.SaveChangesAsync(cancellationToken);
+		foreach (var content in Sale.Contents)
+			await DbContext.AddAsync(Main.Entities.Sale.SaleContentAnalytics.Create(content.Id,
+				content.OriginalPrice * content.Count, content.TotalSum,
+				content.Details.Sum(detail => detail.BuyPrice * detail.Count)), cancellationToken);
+		await DbContext.SaveChangesAsync(cancellationToken);
 	}
 }

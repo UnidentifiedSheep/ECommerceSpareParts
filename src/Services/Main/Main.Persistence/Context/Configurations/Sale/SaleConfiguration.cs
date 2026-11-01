@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Sale;
@@ -28,9 +28,8 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 
 		builder
 			.Property(e => e.Id)
-			.HasDefaultValueSql("gen_random_uuid()")
 			.HasColumnName("id")
-			.ValueGeneratedOnAdd();
+			.ValueGeneratedNever();
 
 		builder.Property(e => e.UserId).HasColumnName("user_id");
 

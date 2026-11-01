@@ -10,7 +10,6 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
-using Main.Application.Interfaces.Services.Event;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
@@ -33,7 +32,6 @@ public record EditSaleCommand(
 	int CurrencyId,
 	DateTime SaleDateTime,
 	string? Comment,
-	string? ConfirmationCode,
 	bool ForcePayment = false) : ICommand;
 
 public class EditSaleHandler(
@@ -41,7 +39,6 @@ public class EditSaleHandler(
 	ISaleRepository saleRepository,
 	IOptions<SystemOptions> systemOptions,
 	ISaleService saleService,
-	ISaleEventService saleEventService,
 	IUnitOfWork unitOfWork) : ICommandHandler<EditSaleCommand>
 {
 	public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
@@ -55,22 +52,10 @@ public class EditSaleHandler(
 		sale.ValidateVersion(request.RowVersion);
 
 		var contentDtos = request.Content.ToList();
-		var oldCounts = sale
-			.Contents
-			.GroupBy(x => x.ProductId)
-			.ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
 		await saleService.RestoreContents(
 			sale,
 			StorageMovementType.SaleEditing,
-			cancellationToken);
-
-		await saleService.CheckReservations(
-			contentDtos,
-			sale.OrganizationId,
-			sale.StorageCode,
-			false,
-			request.ConfirmationCode,
 			cancellationToken);
 
 		await ReverseSaleTransaction(sale, cancellationToken);
@@ -93,14 +78,8 @@ public class EditSaleHandler(
 			contentDtos,
 			false,
 			cancellationToken);
-		await UpdateOrganizationReservationCounts(
-			sale,
-			oldCounts,
-			cancellationToken);
 
 		await unitOfWork.SaveChangesAsync(cancellationToken);
-
-		await saleEventService.NotifyUpdated(sale.Id, cancellationToken);
 
 		return Unit.Value;
 	}
@@ -197,19 +176,4 @@ public class EditSaleHandler(
 		unitOfWork.Remove(content);
 	}
 
-	private async Task UpdateOrganizationReservationCounts(
-		Sale sale,
-		IReadOnlyDictionary<int, int> oldCounts,
-		CancellationToken cancellationToken)
-	{
-		var deltas = sale
-			.Contents
-			.GroupBy(x => x.ProductId)
-			.ToDictionary(x => x.Key, x => x.Sum(z => z.Count) - oldCounts.GetValueOrDefault(x.Key));
-
-		await saleService.UpdateOrganizationReservationCounts(
-			sale.OrganizationId,
-			deltas,
-			cancellationToken);
-	}
 }

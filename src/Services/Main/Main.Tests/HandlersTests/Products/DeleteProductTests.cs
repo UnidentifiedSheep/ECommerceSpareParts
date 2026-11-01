@@ -189,7 +189,6 @@ public class DeleteProductTests : IntegrationTest
 	[InlineData(ProductDeletionBlocker.Sale)]
 	[InlineData(ProductDeletionBlocker.Purchase)]
 	[InlineData(ProductDeletionBlocker.Order)]
-	[InlineData(ProductDeletionBlocker.Reservation)]
 	[InlineData(ProductDeletionBlocker.Composition)]
 	public async Task ReferencedProduct_IsPreservedWithoutEventsOrCleanup(ProductDeletionBlocker blocker)
 	{
@@ -277,10 +276,6 @@ public class DeleteProductTests : IntegrationTest
 			case ProductDeletionBlocker.StorageContent:
 				await new StorageContentBuilder(Faker).WithStorageCode(StorageCode).WithCurrencyId(CurrencyId)
 					.WithProductIds(Product.Id).WithCount(0).BuildAndAddToDb(Context, CancellationToken);
-				break;
-			case ProductDeletionBlocker.Reservation:
-				await new ProductReservationBuilder(Faker).WithOrganizationId(UserId).WithProductId(Product.Id)
-					.WithReservedCount(3).WithCurrentCount(3).BuildAndAddToDb(Context, CancellationToken);
 				break;
 			case ProductDeletionBlocker.Composition:
 				await Context.AddAsync(ProductContent.Create(Other.Id, Product.Id, 1), CancellationToken);

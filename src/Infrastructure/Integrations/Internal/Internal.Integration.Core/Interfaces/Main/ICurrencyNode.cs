@@ -7,6 +7,8 @@ public interface ICurrencyNode
 {
 	Task<Response<decimal>> GetCurrencyRate(int currencyId, CancellationToken cancellationToken = default);
 
+	Task<Response<decimal>> GetCurrencyRate(int currencyId, DateTime forDate, CancellationToken cancellationToken = default);
+
 	Task<Response<IReadOnlyList<InternalCurrency>>> GetCurrencies(
 		CancellationToken cancellationToken = default);
 }

@@ -6,7 +6,6 @@ using Attributes;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Interfaces.Services;
-using Main.Application.Interfaces.Services.Event;
 using Main.Entities.Sale;
 using Main.Enums;
 using Main.Enums.Balances;
@@ -29,7 +28,6 @@ public record CreateSaleCommand(
 	IReadOnlyCollection<NewSaleContentDto> Contents,
 	string? Comment,
 	decimal? PayedSum,
-	string? ConfirmationCode,
 	bool ForcePayment = false) : ICommand<CreateSaleResult>;
 
 public record CreateSaleResult(Guid SaleId);
@@ -37,7 +35,6 @@ public record CreateSaleResult(Guid SaleId);
 public class CreateSaleHandler(
 	ISender sender,
 	IOptions<SystemOptions> systemOptions,
-	ISaleEventService saleEventService,
 	IUnitOfWork unitOfWork,
 	ISaleService saleService) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
@@ -45,17 +42,9 @@ public class CreateSaleHandler(
 	{
 		var contents = request.Contents.ToList();
 
-		await saleService.CheckReservations(
-			contents,
-			request.OrganizationId,
-			request.StorageCode,
-			false,
-			request.ConfirmationCode,
-			cancellationToken);
-
 		var systemId = systemOptions.Value.SystemId;
 
-		var totalSum = contents.Sum(x => x.PriceWithDiscount * x.Count);
+		var totalSum = contents.Sum(x => x.DiscountedPrice * x.Count);
 
 		if (request.PayedSum > 0)
 			await sender.Send(
@@ -104,15 +93,8 @@ public class CreateSaleHandler(
 
 		sale.Complete();
 
-		await saleService.ConsumeOrganizationReservations(
-			sale,
-			request.OrganizationId,
-			cancellationToken);
-
 		await unitOfWork.AddAsync(sale, cancellationToken);
 		await unitOfWork.SaveChangesAsync(cancellationToken);
-
-		await saleEventService.NotifyUpdated(sale.Id, cancellationToken);
 
 		return new CreateSaleResult(sale.Id);
 	}

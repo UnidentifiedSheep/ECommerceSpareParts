@@ -74,9 +74,12 @@ public class CreateSaleTests : IntegrationTest
 		var saleContent = sale.Contents.Should().ContainSingle().Subject;
 		saleContent.ProductId.Should().Be(storageContent.ProductId);
 		saleContent.Count.Should().Be(1);
-		saleContent.Price.Should().Be(80m);
+		saleContent.DiscountedPrice.Should().Be(80m);
 		saleContent.TotalSum.Should().Be(80m);
-		saleContent.Discount.Should().Be(0.2m);
+		saleContent.OriginalPrice.Should().Be(100);
+		var analytics = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == saleContent.Id, CancellationToken);
+		analytics.OriginalAmountInBaseCurrency.Should().Be(100m * saleContent.Count);
+		analytics.RevenueInBaseCurrency.Should().Be(80m * saleContent.Count);
 
 		var detail = saleContent.Details.Should().ContainSingle().Subject;
 		originalContents.Should().ContainKey(detail.StorageContentId);
@@ -249,66 +252,6 @@ public class CreateSaleTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task CreateSale_WithBuyerReservation_SubtractsReservationCount()
-	{
-		var buyer = Buyer();
-		var storageContent = StorageContentWithCountAtLeast(2);
-		var reservation = await new ProductReservationBuilder(Faker)
-			.WithOrganizationId(buyer.Id)
-			.WithProductId(storageContent.ProductId)
-			.WithReservedCount(2)
-			.BuildAndAddToDb(Context, CancellationToken);
-
-		var command = CreateCommand(
-			buyer.Id,
-			storageContent.CurrencyId,
-			storageContent.StorageCode,
-			[NewContent(storageContent.ProductId, 2)]);
-
-		await Mediator.Send(command, CancellationToken);
-
-		var updatedReservation = await Context
-			.ProductReservations
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
-		updatedReservation.CurrentCount.Should().Be(2);
-		updatedReservation.Status.Should().Be(ProductReservationStatus.Done);
-	}
-
-	[Fact]
-	public async Task CreateSale_ByAnotherOrganizationMember_UsesOrganizationReservation()
-	{
-		var users = GetContext<UsersTestContext>().Users.ToArray();
-		var organization = await new OrganizationBuilder(Faker)
-			.WithOwnerId(users[0].Id)
-			.WithMember(users[1].Id)
-			.BuildAndAddToDb(Context, CancellationToken);
-		var storageContent = StorageContent();
-		var reservation = await new ProductReservationBuilder(Faker)
-			.WithOrganizationId(organization.Id)
-			.WithProductId(storageContent.ProductId)
-			.WithReservedCount(1)
-			.BuildAndAddToDb(Context, CancellationToken);
-		var command = CreateCommand(
-				users[1].Id,
-				storageContent.CurrencyId,
-				storageContent.StorageCode,
-				[NewContent(storageContent.ProductId, 1)]) with
-			{
-				OrganizationId = organization.Id
-			};
-
-		await Mediator.Send(command, CancellationToken);
-
-		var updatedReservation = await Context
-			.ProductReservations
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == reservation.Id, CancellationToken);
-		updatedReservation.CurrentCount.Should().Be(1);
-		updatedReservation.Status.Should().Be(ProductReservationStatus.Done);
-	}
-
-	[Fact]
 	public async Task CreateSale_WithDuplicateProductContents_AggregatesStockCheckAndCreatesSeparateContents()
 	{
 		var buyer = Buyer();
@@ -370,66 +313,6 @@ public class CreateSaleTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task
-		CreateSale_WithOtherBuyerReservationAndNoConfirmation_ThrowsSaleSoftConfirmationNeededException()
-	{
-		var buyer = Buyer();
-		var otherBuyer = GetContext<UsersTestContext>().Users.First(x => x.Id != buyer.Id);
-		var storageContent = StorageContent();
-		var countOnStorage = await CountOnStorage(storageContent);
-		await new ProductReservationBuilder(Faker)
-			.WithOrganizationId(otherBuyer.Id)
-			.WithProductId(storageContent.ProductId)
-			.WithReservedCount(countOnStorage + 1)
-			.WithCurrentCount(countOnStorage)
-			.BuildAndAddToDb(Context, CancellationToken);
-
-		var command = CreateCommand(
-			buyer.Id,
-			storageContent.CurrencyId,
-			storageContent.StorageCode,
-			[NewContent(storageContent.ProductId, 1)]);
-
-		await Assert.ThrowsAsync<SaleSoftConfirmationNeededException>(() =>
-			Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task CreateSale_WithOtherBuyerReservationAndValidConfirmation_CreatesSale()
-	{
-		var buyer = Buyer();
-		var otherBuyer = GetContext<UsersTestContext>().Users.First(x => x.Id != buyer.Id);
-		var storageContent = StorageContent();
-		var countOnStorage = await CountOnStorage(storageContent);
-		await new ProductReservationBuilder(Faker)
-			.WithOrganizationId(otherBuyer.Id)
-			.WithProductId(storageContent.ProductId)
-			.WithReservedCount(countOnStorage + 1)
-			.WithCurrentCount(countOnStorage)
-			.BuildAndAddToDb(Context, CancellationToken);
-		var commandWithoutConfirmation = CreateCommand(
-			buyer.Id,
-			storageContent.CurrencyId,
-			storageContent.StorageCode,
-			[NewContent(storageContent.ProductId, 1)]);
-
-		var exception = await Assert.ThrowsAsync<SaleSoftConfirmationNeededException>(() =>
-			Mediator.Send(commandWithoutConfirmation, CancellationToken));
-		var confirmationCode = Assert.IsType<string>(
-			Assert.Single(exception.LocalizableMessage.Values).Value.Value);
-		var command = commandWithoutConfirmation with
-		{
-			ConfirmationCode = confirmationCode
-		};
-
-		var result = await Mediator.Send(command, CancellationToken);
-
-		result.SaleId.Should().NotBeEmpty();
-		var salesCount = await Context.Sales.AsNoTracking().CountAsync(CancellationToken);
-		salesCount.Should().Be(1);
-	}
-
-	[Fact]
 	public async Task CreateSale_WithEmptyContents_ThrowsValidationException()
 	{
 		var storageContent = StorageContent();
@@ -471,7 +354,7 @@ public class CreateSaleTests : IntegrationTest
 		var command = CreateValidCommand();
 		var content = command.Contents.Single() with
 		{
-			Price = price
+			OriginalPrice = price
 		};
 
 		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
@@ -492,7 +375,7 @@ public class CreateSaleTests : IntegrationTest
 		var command = CreateValidCommand();
 		var content = command.Contents.Single() with
 		{
-			PriceWithDiscount = priceWithDiscount
+			DiscountedPrice = priceWithDiscount
 		};
 
 		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
@@ -509,7 +392,7 @@ public class CreateSaleTests : IntegrationTest
 		var command = CreateValidCommand();
 		var content = command.Contents.Single() with
 		{
-			Price = 100m, PriceWithDiscount = 101m
+			OriginalPrice = 100m, DiscountedPrice = 101m
 		};
 
 		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
@@ -663,7 +546,6 @@ public class CreateSaleTests : IntegrationTest
 		string storageCode,
 		IEnumerable<NewSaleContentDto> contents,
 		decimal? payedSum = null,
-		string? confirmationCode = null,
 		bool forcePayment = true)
 	{
 		return new CreateSaleCommand(
@@ -675,22 +557,21 @@ public class CreateSaleTests : IntegrationTest
 			contents.ToList(),
 			Faker.Lorem.Sentence(),
 			payedSum,
-			confirmationCode,
 			forcePayment);
 	}
 
 	private static NewSaleContentDto NewContent(
 		int productId,
 		int count,
-		decimal price = 100m,
-		decimal priceWithDiscount = 90m)
+		decimal originalPrice = 100m,
+		decimal discountedPrice = 90m)
 	{
 		return new NewSaleContentDto
 		{
 			ProductId = productId,
 			Count = count,
-			Price = price,
-			PriceWithDiscount = priceWithDiscount
+			OriginalPrice = originalPrice,
+			DiscountedPrice = discountedPrice
 		};
 	}
 

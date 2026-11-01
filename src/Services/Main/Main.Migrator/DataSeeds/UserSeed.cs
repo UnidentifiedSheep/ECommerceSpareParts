@@ -15,7 +15,6 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 	private static readonly string[] Services =
 	[
 		nameof(ServiceSecrets.MainApp),
-		nameof(ServiceSecrets.Analytics),
 		nameof(ServiceSecrets.Pricing),
 		nameof(ServiceSecrets.Search),
 		nameof(ServiceSecrets.Gateway)
@@ -56,7 +55,6 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 		return service switch
 		{
 			nameof(ServiceSecrets.MainApp) => _secrets.MainApp,
-			nameof(ServiceSecrets.Analytics) => _secrets.Analytics,
 			nameof(ServiceSecrets.Pricing) => _secrets.Pricing,
 			nameof(ServiceSecrets.Search) => _secrets.Search,
 			nameof(ServiceSecrets.Gateway) => _secrets.Gateway,

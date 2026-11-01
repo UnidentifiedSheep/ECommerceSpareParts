@@ -1,4 +1,4 @@
-﻿{
+{
   "culture": "en",
   "messages": {
     "lrt.producer.import.name": "Producer import",
@@ -78,6 +78,12 @@
     "lrt.user.tokens.clear.expired.name": "Clear expired tokens",
     "lrt.user.tokens.clear.expired.description": "Deletes user tokens that have expired.",
     "lrt.product.images.deletion.name": "Product image deletion",
-    "lrt.product.images.deletion.description": "Removes images of a deleted product from storage."
+    "lrt.product.images.deletion.description": "Removes images of a deleted product from storage.",
+    "lrt.markup.calculation.name": "Markup calculation",
+    "lrt.markup.calculation.description": "Calculates recommended markup ranges.",
+    "markup.calculation.input.invalid": "Invalid markup calculation input data was provided.",
+    "markup.calculation.range.start.must.be.before.or.equal.end": "The markup calculation time range start must be less than or equal to the time range end.",
+    "lrt.sale.analytics.synchronization.name": "Synchronize sales analytics",
+    "lrt.sale.analytics.synchronization.description": "Recalculates sales analytics using historical exchange rates."
   }
 }

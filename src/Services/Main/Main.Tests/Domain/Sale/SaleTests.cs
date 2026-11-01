@@ -24,6 +24,8 @@ public class SaleTests
 			"WH-1",
 			saleDate);
 
+		sale.Id.Should().NotBeEmpty();
+		sale.Id.Version.Should().Be(7);
 		sale.UserId.Should().Be(userId);
 		sale.OrganizationId.Should().Be(organizationId);
 		sale.TransactionId.Should().Be(transactionId);
@@ -43,6 +45,19 @@ public class SaleTests
 		sale.AddContent(content);
 
 		sale.Contents.Should().ContainSingle().Which.Should().BeSameAs(content);
+		content.SaleId.Should().Be(sale.Id);
+	}
+
+	[Fact]
+	public void RemoveContent_BeforeSaving_RemovesContent()
+	{
+		var sale = Create();
+		var content = CreateContent();
+		sale.AddContent(content);
+
+		sale.RemoveContent(content);
+
+		sale.Contents.Should().BeEmpty();
 	}
 
 	[Fact]

@@ -4,6 +4,7 @@ using System.Globalization;
 using Abstractions.Interfaces;
 using Api.Common;
 using Cache;
+using Internal.Integration.Core.Interfaces.Main;
 using Locan.Hosting;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -90,6 +91,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddScoped<IPublishEndpoint, MessageBrokerStub>();
 		services.RemoveAll<IFusionCacheBackplane>();
 		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
+
+		services.AddScoped(_ => Mock.Of<IMainClient>(MockBehavior.Strict));
 
 		services.RemoveAll<ICachedCurrencyProvider>();
 		services.AddScoped(_ => Mock.Of<ICachedCurrencyProvider>());

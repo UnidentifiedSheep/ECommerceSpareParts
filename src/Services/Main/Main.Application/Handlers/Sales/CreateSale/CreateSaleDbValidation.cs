@@ -10,6 +10,7 @@ public class CreateSaleDbValidation : AbstractDbValidation<CreateSaleCommand>
 	{
 		plan
 			.ValidateCurrencyExistsId(request.CurrencyId)
+			.ValidateProductExistsId(request.Contents.Select(content => content.ProductId))
 			.ValidateUserExistsId(request.UserId)
 			.ValidateOrganizationExistsId(request.OrganizationId)
 			.ValidateOrganizationMemberExistsPK((request.OrganizationId, request.UserId))

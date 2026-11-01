@@ -1,4 +1,4 @@
-﻿using Main.Entities.Sale;
+using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -34,9 +34,8 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
 
 		builder.Property(e => e.Count).HasColumnName("count");
 
-		builder.Property(e => e.Discount).HasColumnName("discount");
-
-		builder.Property(e => e.Price).HasColumnName("price");
+		builder.Property(e => e.DiscountedPrice).HasColumnName("discounted_price");
+		builder.Property(e => e.OriginalPrice).HasColumnName("original_price");
 
 		builder.Property(e => e.SaleId).HasColumnName("sale_id");
 

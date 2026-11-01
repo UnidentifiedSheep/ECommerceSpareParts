@@ -16,14 +16,6 @@
         },
         "AuthorizationPolicy": "DenyAll"
       },
-      "route-analytics-internal-deny": {
-        "ClusterId": "blackhole-cluster",
-        "Order": -100,
-        "Match": {
-          "Path": "/analytics/internal/{**catch-all}"
-        },
-        "AuthorizationPolicy": "DenyAll"
-      },
       "route-search-internal-deny": {
         "ClusterId": "blackhole-cluster",
         "Order": -100,
@@ -49,18 +41,6 @@
         "Transforms": [
           {
             "PathRemovePrefix": "/main"
-          }
-        ]
-      },
-      "route-analytics": {
-        "ClusterId": "analytics-cluster",
-        "Order": 0,
-        "Match": {
-          "Path": "/analytics/{**catch-all}"
-        },
-        "Transforms": [
-          {
-            "PathRemovePrefix": "/analytics"
           }
         ]
       },
@@ -102,14 +82,6 @@
         "Destinations": {
           "main-api": {
             "Address": "http://main-api:8080/"
-          }
-        }
-      },
-      "analytics-cluster": {
-        "LoadBalancingPolicy": "RoundRobin",
-        "Destinations": {
-          "analytics-api": {
-            "Address": "http://analytics-api:8080/"
           }
         }
       },

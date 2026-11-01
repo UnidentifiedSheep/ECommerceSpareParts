@@ -1,4 +1,4 @@
-﻿using Security.Core.Interfaces;
+using Security.Core.Interfaces;
 using Abstractions.Models;
 using Api.Common;
 using Application.Common.Interfaces.Validators;

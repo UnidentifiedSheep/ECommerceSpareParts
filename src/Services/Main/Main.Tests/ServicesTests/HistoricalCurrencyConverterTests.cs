@@ -1,0 +1,63 @@
+using Application.Common.Interfaces.Currency;
+using FluentAssertions;
+using Main.Entities.Currency;
+using Main.Entities.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Tests.TestContainers.Combined;
+using Tests.TestContexts.Currency;
+
+namespace Tests.ServicesTests;
+
+public class HistoricalCurrencyConverterTests : IntegrationTest
+{
+	public HistoricalCurrencyConverterTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<CurrencyRatesTestContext>();
+	}
+
+	[Fact]
+	public async Task Convert_UsesRateAtRequestedTimeAndNeverAFutureRate()
+	{
+		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
+		await SetHistory(rate, (new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), 0m, 2m),
+			(new DateTime(2020, 2, 1, 0, 0, 0, DateTimeKind.Utc), 2m, 4m));
+		var converter = Scope.ServiceProvider.GetRequiredService<ICurrencyConverter>();
+		var atFirst = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		(await converter.ConvertToBaseAsync(100m, rate.FromCurrencyId, atFirst, CancellationToken)).Should().Be(50m);
+		(await converter.ConvertToBaseAsync(100m, rate.FromCurrencyId, atFirst.AddDays(30), CancellationToken)).Should().Be(50m);
+		(await converter.ConvertAsync(100m, rate.FromCurrencyId, rate.ToCurrencyId, atFirst.AddMonths(1), CancellationToken)).Should().Be(25m);
+		(await converter.ConvertFromBaseAsync(25m, rate.FromCurrencyId, atFirst.AddMonths(1), CancellationToken)).Should().Be(100m);
+	}
+
+	[Fact]
+	public async Task Convert_BeforeFirstChange_UsesKnownPreviousRate()
+	{
+		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
+		var date = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		await SetHistory(rate, (date, 2m, 4m));
+		(await Scope.ServiceProvider.GetRequiredService<ICurrencyConverter>()
+			.ConvertToBaseAsync(100m, rate.FromCurrencyId, date.AddDays(-1), CancellationToken)).Should().Be(50m);
+	}
+
+	[Fact]
+	public async Task Convert_NoHistoricalCoverage_ThrowsInsteadOfUsingCurrentRate()
+	{
+		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
+		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() => Scope.ServiceProvider.GetRequiredService<ICurrencyConverter>()
+			.ConvertToBaseAsync(100m, rate.FromCurrencyId, new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc), CancellationToken));
+	}
+
+	private async Task SetHistory(CurrencyRate rate, params (DateTime Date, decimal Prev, decimal Next)[] history)
+	{
+		await Context.CurrencyRateHistories.Where(item => item.FromCurrencyId == rate.FromCurrencyId && item.ToCurrencyId == rate.ToCurrencyId)
+			.ExecuteDeleteAsync(CancellationToken);
+		foreach (var item in history)
+		{
+			var row = CurrencyRateHistory.Create(rate.FromCurrencyId, rate.ToCurrencyId, item.Prev, item.Next);
+			await Context.AddAsync(row, CancellationToken);
+			Context.Entry(row).Property(value => value.CreatedAt).CurrentValue = item.Date;
+		}
+		await Context.SaveChangesAsync(CancellationToken);
+	}
+}

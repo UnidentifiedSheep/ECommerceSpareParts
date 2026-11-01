@@ -3,11 +3,9 @@ using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Purchase;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -51,7 +49,6 @@ public class EditPurchaseHandler(
 	IStorageContentRepository storageContentRepository,
 	ICurrencyConverter currencyConverter,
 	IPurchaseLogisticsService purchaseLogisticsService,
-	IIntegrationEventScope integrationEventScope,
 	IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand>
 {
 	public async Task<Unit> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
@@ -90,12 +87,6 @@ public class EditPurchaseHandler(
 			contentDtos,
 			request,
 			cancellationToken);
-
-		integrationEventScope.Add(
-			new PurchaseUpdateEvent
-			{
-				PurchaseId = purchase.Id
-			});
 
 		return Unit.Value;
 	}

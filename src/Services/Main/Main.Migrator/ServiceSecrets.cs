@@ -10,9 +10,6 @@ public record ServiceSecrets
 	public required string MainApp { get; init; }
 
 	[Required]
-	public required string Analytics { get; init; }
-
-	[Required]
 	public required string Pricing { get; init; }
 
 	[Required]

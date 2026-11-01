@@ -1,11 +1,9 @@
 using System.Data;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Purchase;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Entities.Exceptions;
@@ -26,7 +24,6 @@ public record DeletePurchaseCommand(Guid PurchaseId) : ICommand<Unit>;
 public class DeletePurchaseHandler(
 	IUnitOfWork unitOfWork,
 	IRepository<Purchase, Guid> repository,
-	IIntegrationEventScope interfaceScope,
 	ISender sender) : ICommandHandler<DeletePurchaseCommand, Unit>
 {
 	public async Task<Unit> Handle(DeletePurchaseCommand request, CancellationToken cancellationToken)
@@ -36,12 +33,6 @@ public class DeletePurchaseHandler(
 		await RevertTransactions(purchase, cancellationToken);
 
 		unitOfWork.Remove(purchase);
-
-		interfaceScope.Add(
-			new PurchaseDeleteEvent
-			{
-				PurchaseId = request.PurchaseId
-			});
 
 		return Unit.Value;
 	}
