@@ -46,8 +46,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			newDate,
-			"sale edited",
-			null);
+			"sale edited");
 
 		await Mediator.Send(command, CancellationToken);
 
@@ -110,8 +109,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Assert.ThrowsAsync<InvalidRowVersionException>(() => Mediator.Send(command, CancellationToken));
 
@@ -143,7 +141,6 @@ public class EditSaleTests : IntegrationTest
 				],
 				SaleContext.StorageContent.CurrencyId,
 				DateTime.UtcNow,
-				null,
 				null),
 			CancellationToken));
 	}
@@ -160,8 +157,7 @@ public class EditSaleTests : IntegrationTest
 			[ToDto(content), NewDto(newStorageContent.ProductId)],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Mediator.Send(command, CancellationToken);
 
@@ -183,8 +179,7 @@ public class EditSaleTests : IntegrationTest
 			[NewDto(newStorageContent.ProductId)],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Mediator.Send(command, CancellationToken);
 
@@ -213,8 +208,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Assert.ThrowsAsync<SaleContentNotFoundException>(() =>
 			Mediator.Send(command, CancellationToken));
@@ -244,8 +238,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Assert.ThrowsAsync<ArticleDoesntMatchContentException>(() =>
 			Mediator.Send(command, CancellationToken));
@@ -269,8 +262,7 @@ public class EditSaleTests : IntegrationTest
 			[ToDto(content)],
 			deletedSale.CurrencyId,
 			deletedSale.SaleDatetime,
-			deletedSale.Comment,
-			null);
+			deletedSale.Comment);
 
 		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
@@ -302,8 +294,7 @@ public class EditSaleTests : IntegrationTest
 			],
 			sale.CurrencyId,
 			sale.SaleDatetime,
-			sale.Comment,
-			null);
+			sale.Comment);
 
 		await Mediator.Send(command, CancellationToken);
 

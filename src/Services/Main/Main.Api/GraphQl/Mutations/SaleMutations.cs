@@ -29,7 +29,6 @@ public sealed class SaleMutations
 				input.Contents.Select(content => content.ToDto()).ToArray(),
 				input.Comment,
 				input.PayedSum,
-				input.ConfirmationCode,
 				input.ForcePayment ?? false),
 			cancellationToken);
 
@@ -51,7 +50,6 @@ public sealed class SaleMutations
 				input.CurrencyId,
 				input.SaleDateTime,
 				input.Comment,
-				input.ConfirmationCode,
 				input.ForcePayment ?? false),
 			cancellationToken);
 

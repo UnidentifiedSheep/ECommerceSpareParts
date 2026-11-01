@@ -5,7 +5,6 @@
     "sale.not.found": "We couldn't find the sale you were looking for.",
     "sale.id.or.transaction.id.required": "Sale ID or transaction ID must be provided.",
     "sale.id.not.empty": "Sale ID must not be empty.",
-    "soft.confirmation.needed.for.sale.reservation.reason": "This sale requires confirmation because it conflicts with existing reservations. Confirmation code is '{ConfirmationCode|string}'.",
     "sale.date.min": "Sale date cannot be older than 3 months.",
     "sale.date.max": "Sale date cannot be in the future.",
     "sale.content.count.min": "Quantity must be greater than 0.",

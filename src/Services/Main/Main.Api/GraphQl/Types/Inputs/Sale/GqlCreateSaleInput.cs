@@ -29,8 +29,6 @@ public sealed record GqlCreateSaleInput
 	[GraphQLName("payedSum")]
 	public decimal? PayedSum { get; init; }
 
-	[GraphQLName("confirmationCode")]
-	public string? ConfirmationCode { get; init; }
 
 	[GraphQLName("forcePayment")]
 	public bool? ForcePayment { get; init; }

@@ -23,8 +23,6 @@ public sealed record GqlUpdateSaleInput
 	[GraphQLName("comment")]
 	public string? Comment { get; init; }
 
-	[GraphQLName("confirmationCode")]
-	public string? ConfirmationCode { get; init; }
 
 	[GraphQLName("forcePayment")]
 	public bool? ForcePayment { get; init; }

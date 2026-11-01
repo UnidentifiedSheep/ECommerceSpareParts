@@ -7,6 +7,5 @@ public enum ProductDeletionBlocker
 	Sale,
 	Purchase,
 	Order,
-	Reservation,
-	Composition
+	Composition = 6
 }

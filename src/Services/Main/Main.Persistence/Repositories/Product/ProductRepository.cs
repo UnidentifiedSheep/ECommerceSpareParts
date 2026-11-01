@@ -26,7 +26,6 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 				: Context.SaleContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Sale
 				: Context.PurchaseContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Purchase
 				: Context.OrderItems.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Order
-				: Context.ProductReservations.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Reservation
 				: Context.ProductContents.Any(item => item.ChildProductId == productId) ? ProductDeletionBlocker.Composition
 				: null)
 			.SingleAsync(cancellationToken);

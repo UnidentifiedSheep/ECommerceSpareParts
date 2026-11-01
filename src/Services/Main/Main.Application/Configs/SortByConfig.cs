@@ -86,13 +86,6 @@ public static class SortByConfig
 				x => x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count)
 			.Map<SaleContent, DateTime>("saleDate", x => x.Sale.SaleDatetime);
 
-		QueryableSortBy
-			.Value
-			.MapDefault<ProductReservation, DateTime>(x => x.CreatedAt)
-			.Map<ProductReservation, int>("id", x => x.Id)
-			.Map<ProductReservation, DateTime>("createAt", x => x.CreatedAt)
-			.Map<ProductReservation, DateTime>("updatedAt", x => x.UpdatedAt)
-			.Map<ProductReservation, ProductReservationStatus>("status", x => x.Status);
 
 		QueryableSortBy
 			.Value

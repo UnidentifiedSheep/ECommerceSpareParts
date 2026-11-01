@@ -124,8 +124,6 @@ public partial class DContext : DbContext, INotificationDbContext
 
 	public virtual DbSet<StorageContent> StorageContents { get; set; }
 
-	public virtual DbSet<ProductReservation> ProductReservations { get; set; }
-
 	public virtual DbSet<StorageOwner> StorageOwners { get; set; }
 
 	public virtual DbSet<StorageRoute> StorageRoutes { get; set; }

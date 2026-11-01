@@ -28,7 +28,6 @@ public record CreateSaleCommand(
 	IReadOnlyCollection<NewSaleContentDto> Contents,
 	string? Comment,
 	decimal? PayedSum,
-	string? ConfirmationCode,
 	bool ForcePayment = false) : ICommand<CreateSaleResult>;
 
 public record CreateSaleResult(Guid SaleId);
@@ -42,14 +41,6 @@ public class CreateSaleHandler(
 	public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
 	{
 		var contents = request.Contents.ToList();
-
-		await saleService.CheckReservations(
-			contents,
-			request.OrganizationId,
-			request.StorageCode,
-			false,
-			request.ConfirmationCode,
-			cancellationToken);
 
 		var systemId = systemOptions.Value.SystemId;
 
@@ -101,11 +92,6 @@ public class CreateSaleHandler(
 			sale.AddContent(content);
 
 		sale.Complete();
-
-		await saleService.ConsumeOrganizationReservations(
-			sale,
-			request.OrganizationId,
-			cancellationToken);
 
 		await unitOfWork.AddAsync(sale, cancellationToken);
 		await unitOfWork.SaveChangesAsync(cancellationToken);

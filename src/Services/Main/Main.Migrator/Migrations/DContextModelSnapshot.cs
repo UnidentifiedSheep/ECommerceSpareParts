@@ -1029,8 +1029,8 @@ namespace Main.Migrator.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(34)
-                        .HasColumnType("character varying(34)")
+                        .HasMaxLength(21)
+                        .HasColumnType("character varying(21)")
                         .HasColumnName("discriminator");
 
                     b.Property<string>("Json")
@@ -2543,90 +2543,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("sale_content_details", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Storage.ProductReservation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("comment");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("CurrentCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("current_count");
-
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("organization_id");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer")
-                        .HasColumnName("product_id");
-
-                    b.Property<int?>("ProposedCurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("proposed_currency_id");
-
-                    b.Property<decimal?>("ProposedPrice")
-                        .HasColumnType("numeric")
-                        .HasColumnName("proposed_price");
-
-                    b.Property<int>("ReservedCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("reserved_count");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("Id")
-                        .HasName("storage_content_reservations_pk");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.productreservation_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.productreservation_who_updated_idx");
-
-                    b.HasIndex(new[] { "ProposedCurrencyId" }, "IX_storage_content_reservations_proposed_currency_id");
-
-                    b.HasIndex(new[] { "Comment" }, "storage_content_reservations_comment_index");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Comment" }, "storage_content_reservations_comment_index"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Comment" }, "storage_content_reservations_comment_index"), new[] { "gin_trgm_ops" });
-
-                    b.HasIndex(new[] { "OrganizationId", "Status" }, "storage_content_reservations_organization_id_status_index");
-
-                    b.HasIndex(new[] { "ProductId", "Status" }, "storage_content_reservations_product_id_status_index");
-
-                    b.HasIndex(new[] { "Status" }, "storage_content_reservations_status_index");
-
-                    b.ToTable("storage_content_reservations", "public");
-                });
-
             modelBuilder.Entity("Main.Entities.Storage.Storage", b =>
                 {
                     b.Property<string>("Code")
@@ -3688,18 +3604,11 @@ namespace Main.Migrator.Migrations
                     b.HasDiscriminator().HasValue("TmtrSupplierSetting");
                 });
 
-            modelBuilder.Entity("Main.Entities.Event.ReservationManualChangeEvent", b =>
+            modelBuilder.Entity("Main.Entities.Event.ArchivedEvent", b =>
                 {
                     b.HasBaseType("Main.Entities.Event.Event");
 
-                    b.Property<int>("ReservationId")
-                        .HasColumnType("integer")
-                        .HasColumnName("reservation_id");
-
-                    b.HasIndex("ReservationId")
-                        .HasDatabaseName("reservation_manual_change_event_reservation_id_idx");
-
-                    b.HasDiscriminator().HasValue("ReservationManualChangeEvent");
+                    b.HasDiscriminator().HasValue("ArchivedEvent");
                 });
 
             modelBuilder.Entity("Main.Entities.Event.StorageMovementEvent", b =>
@@ -4468,31 +4377,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("StorageContent");
                 });
 
-            modelBuilder.Entity("Main.Entities.Storage.ProductReservation", b =>
-                {
-                    b.HasOne("Main.Entities.Organization.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("storage_content_reservations_organization_id_fk");
-
-                    b.HasOne("Main.Entities.Product.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("storage_content_reservations_products_id_fk");
-
-                    b.HasOne("Main.Entities.Currency.Currency", null)
-                        .WithMany()
-                        .HasForeignKey("ProposedCurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("storage_content_reservations_currency_id_fk");
-
-                    b.Navigation("Organization");
-                });
-
             modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
@@ -4679,16 +4563,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("notification_deliveries_notification_id_fk");
 
                     b.Navigation("Notification");
-                });
-
-            modelBuilder.Entity("Main.Entities.Event.ReservationManualChangeEvent", b =>
-                {
-                    b.HasOne("Main.Entities.Storage.ProductReservation", null)
-                        .WithMany()
-                        .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("reservation_manual_change_event_reservation_id_fk");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Job.JobSchedule", b =>

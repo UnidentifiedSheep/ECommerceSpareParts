@@ -67,13 +67,6 @@ public class ProductWeightNotFoundException(int articleId) : LocalizedNotFoundEx
 		ArticleId = articleId
 	});
 
-public class ReservationNotFoundException(int id) : LocalizedNotFoundException(
-	ArticleReservationNotFoundMessage.Instance,
-	new
-	{
-		Id = id
-	});
-
 public class ProductCrossSelfReferenceException()
 	: LocalizedBadRequestException(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance);
 
@@ -92,7 +85,6 @@ public class ProductDeletionNotAllowedException(ProductDeletionBlocker blocker) 
 		ProductDeletionBlocker.Sale => ArticleDeletionSaleMessage.Instance,
 		ProductDeletionBlocker.Purchase => ArticleDeletionPurchaseMessage.Instance,
 		ProductDeletionBlocker.Order => ArticleDeletionOrderMessage.Instance,
-		ProductDeletionBlocker.Reservation => ArticleDeletionReservationMessage.Instance,
 		ProductDeletionBlocker.Composition => ArticleDeletionCompositionMessage.Instance,
 		_ => throw new ArgumentOutOfRangeException(nameof(blocker))
 	})

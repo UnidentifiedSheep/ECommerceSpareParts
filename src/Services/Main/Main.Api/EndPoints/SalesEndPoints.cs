@@ -44,8 +44,6 @@ public record CreateSaleRequest
 	[JsonPropertyName("payedSum")]
 	public decimal? PayedSum { get; init; }
 
-	[JsonPropertyName("confirmationCode")]
-	public string? ConfirmationCode { get; init; }
 
 	[JsonPropertyName("forcePayment")]
 	public bool ForcePayment { get; init; }
@@ -107,8 +105,6 @@ public record EditSaleRequest
 	[JsonPropertyName("comment")]
 	public string? Comment { get; init; }
 
-	[JsonPropertyName("confirmationCode")]
-	public string? ConfirmationCode { get; init; }
 
 	[JsonPropertyName("forcePayment")]
 	public bool ForcePayment { get; init; }
@@ -159,7 +155,6 @@ public class SalesEndPoints : ICarterModule
 							request.Contents,
 							request.Comment,
 							request.PayedSum,
-							request.ConfirmationCode,
 							request.ForcePayment),
 						token);
 
@@ -239,7 +234,6 @@ public class SalesEndPoints : ICarterModule
 							request.CurrencyId,
 							request.SaleDateTime,
 							request.Comment,
-							request.ConfirmationCode,
 							request.ForcePayment),
 						cancellationToken);
 
