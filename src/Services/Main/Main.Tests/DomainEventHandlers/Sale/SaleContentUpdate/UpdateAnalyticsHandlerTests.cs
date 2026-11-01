@@ -21,7 +21,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task FinancialChange_RebuildsSaleAnalyticsUsingHistoricalRate()
+	public async Task FinancialChange_UpdatesAnalyticsUsingHistoricalRate()
 	{
 		var sale = GetContext<SaleTestContext>().Sale;
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
@@ -54,10 +54,11 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task SoftDelete_RemovesAnalytics()
+	public async Task SoftDelete_PreservesAnalytics()
 	{
+		var before = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken);
 		await Execute(async () => { GetContext<SaleTestContext>().Sale.Delete(); await Context.SaveChangesAsync(CancellationToken); });
-		(await Context.SaleContentAnalytics.AnyAsync(CancellationToken)).Should().BeFalse();
+		(await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken)).Should().BeEquivalentTo(before);
 	}
 
 	[Fact]
@@ -77,7 +78,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task FinancialChange_ReplacesAllSaleFactsAndPreservesOtherSales()
+	public async Task FinancialChange_UpdatesOnlyAffectedContentAndPreservesOtherSales()
 	{
 		var context = GetContext<SaleTestContext>();
 		var second = NewContent();
@@ -93,12 +94,13 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var content = context.Sale.Contents.First();
+		var originalFact = content.Analytics;
 		await Execute(async () =>
 		{
 			content.SetPriceAndDetails(150m, 100m, content.Details.ToArray());
 			await Context.SaveChangesAsync(CancellationToken);
 		});
-		// Repeating in the same scope must also replace already tracked analytics without key conflicts.
+		// Repeated changes update the same tracked analytics instance.
 		await Execute(async () =>
 		{
 			content.SetPriceAndDetails(160m, 110m, content.Details.ToArray());
@@ -108,7 +110,9 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		var facts = await Context.SaleContentAnalytics.AsNoTracking().ToDictionaryAsync(item => item.SaleContentId, CancellationToken);
 		facts.Should().HaveCount(3);
 		facts[content.Id].RevenueInBaseCurrency.Should().Be(110m * content.Count);
-		facts[second.Id].RevenueInBaseCurrency.Should().Be(second.TotalSum);
+		facts[second.Id].RevenueInBaseCurrency.Should().Be(1m);
+		content.Analytics.Should().BeSameAs(originalFact);
+		second.Analytics.Should().BeSameAs(secondFact);
 		facts[otherFact.SaleContentId].RevenueInBaseCurrency.Should().Be(2m);
 	}
 
@@ -130,7 +134,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task AddingContent_RebuildsAnalyticsForNewAndExistingContents()
+	public async Task AddingContent_CreatesAnalyticsForNewContent()
 	{
 		var sale = GetContext<SaleTestContext>().Sale;
 		var content = NewContent();
@@ -146,7 +150,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task RemovingContent_RebuildsRemainingContents()
+	public async Task RemovingContent_CascadesAnalyticsDeletionAndPreservesRemainingContents()
 	{
 		var sale = GetContext<SaleTestContext>().Sale;
 		var remaining = NewContent();
@@ -165,11 +169,11 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 
 		var fact = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken);
 		fact.SaleContentId.Should().Be(remaining.Id);
-		fact.RevenueInBaseCurrency.Should().Be(remaining.TotalSum);
+		fact.RevenueInBaseCurrency.Should().Be(1m);
 	}
 
 	[Fact]
-	public async Task FailureAfterReplacement_RollsBackDeletedAndInsertedFacts()
+	public async Task FailureAfterUpdate_RollsBackAnalyticsChanges()
 	{
 		var sale = GetContext<SaleTestContext>().Sale;
 		var before = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken);
@@ -178,12 +182,57 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 			var content = sale.Contents.Single();
 			content.SetPriceAndDetails(150m, 100m, content.Details.ToArray());
 			await Context.SaveChangesAsync(CancellationToken);
-			await Scope.ServiceProvider.GetRequiredService<ISaleAnalyticsSynchronizer>().SynchronizeAsync([sale.Id], CancellationToken);
+			await Scope.ServiceProvider.GetRequiredService<ISaleAnalyticsSynchronizer>().SynchronizeAsync(sale.Contents, CancellationToken);
 			await Context.SaveChangesAsync(CancellationToken);
-			throw new InvalidOperationException("Abort after replacing analytics.");
+			throw new InvalidOperationException("Abort after updating analytics.");
 		}));
 
 		(await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken)).Should().BeEquivalentTo(before);
+	}
+
+	[Fact]
+	public async Task SaleDateChange_UpdatesAnalyticsForAllContents()
+	{
+		var sale = GetContext<SaleTestContext>().Sale;
+		var second = NewContent();
+		sale.AddContent(second);
+		await Context.SaveChangesAsync(CancellationToken);
+		await Context.AddAsync(SaleContentAnalytics.Create(second.Id, 1m, 1m, 1m), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		await Execute(async () =>
+		{
+			sale.SetDateTime(sale.SaleDatetime.AddDays(-1));
+			await Context.SaveChangesAsync(CancellationToken);
+		});
+
+		var facts = await Context.SaleContentAnalytics.AsNoTracking().ToDictionaryAsync(item => item.SaleContentId, CancellationToken);
+		foreach (var content in sale.Contents)
+			facts[content.Id].RevenueInBaseCurrency.Should().Be(content.TotalSum);
+	}
+
+	[Fact]
+	public async Task FinancialChangeFollowedByContentRemoval_DoesNotRecreateDeletedAnalytics()
+	{
+		var sale = GetContext<SaleTestContext>().Sale;
+		var removed = sale.Contents.Single();
+		var remaining = NewContent();
+		sale.AddContent(remaining);
+		await Context.SaveChangesAsync(CancellationToken);
+		await Context.AddAsync(SaleContentAnalytics.Create(remaining.Id, 1m, 1m, 1m), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		await Execute(async () =>
+		{
+			sale.SetDateTime(sale.SaleDatetime.AddDays(-1));
+			sale.RemoveContent(removed);
+			Context.Remove(removed);
+			await Context.SaveChangesAsync(CancellationToken);
+		});
+
+		var fact = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken);
+		fact.SaleContentId.Should().Be(remaining.Id);
+		fact.RevenueInBaseCurrency.Should().Be(remaining.TotalSum);
 	}
 
 	private SaleContent NewContent()

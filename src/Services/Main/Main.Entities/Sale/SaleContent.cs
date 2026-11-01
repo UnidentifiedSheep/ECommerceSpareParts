@@ -120,16 +120,23 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		NotifyUpdated(false);
 	}
 
+	public void UpdateAnalytics(decimal originalAmount, decimal revenue, decimal cost)
+	{
+		if (Analytics is null)
+			Analytics = SaleContentAnalytics.Create(Id, originalAmount, revenue, cost);
+		else
+			Analytics.Update(originalAmount, revenue, cost);
+	}
+
 	public void InvalidateAnalytics() => NotifyUpdated(true);
 
 	public override void OnCreated() => InvalidateAnalytics();
 
-	public override void OnDeleted() => InvalidateAnalytics();
 
 	private void NotifyUpdated(bool financialInfoChanged)
 	{
 		if (SaleId != Guid.Empty)
-			AddDomainEvent(new SaleContentUpdateDomainEvent(SaleId, financialInfoChanged));
+			AddDomainEvent(new SaleContentUpdateDomainEvent(this, financialInfoChanged));
 	}
 
 	public override int GetId() => Id;

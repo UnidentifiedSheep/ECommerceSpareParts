@@ -139,7 +139,6 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 			return;
 
 		State = SaleState.Deleted;
-		InvalidateAnalytics();
 	}
 
 	private void InvalidateAnalytics()

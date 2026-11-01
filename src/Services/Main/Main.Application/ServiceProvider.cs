@@ -91,6 +91,7 @@ public static class ServiceProvider
 		collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
 
 		collection.AddScoped<ISaleAnalyticsSynchronizer, SaleAnalyticsSynchronizer>();
+		collection.AddScoped<ISaleContentAnalyticsCalculator, SaleContentAnalyticsCalculator>();
 
 		collection.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();
 		collection.AddScoped<IVerificationPayloadProvider, VerificationPayloadProvider>();

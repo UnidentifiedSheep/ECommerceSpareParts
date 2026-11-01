@@ -125,8 +125,9 @@ public class SaleContentTests
 		content.OnCreated();
 
 		content.Id.Should().Be(0);
+		content.SaleId.Should().Be(sale.Id);
 		content.FlushDomainEvents().Should().ContainSingle()
-			.Which.Should().Be(new SaleContentUpdateDomainEvent(sale.Id, true));
+			.Which.Should().Be(new SaleContentUpdateDomainEvent(content, true));
 	}
 
 	[Fact]
@@ -138,7 +139,7 @@ public class SaleContentTests
 		content.SetPriceAndDetails(120m, 90m, content.Details.ToArray());
 
 		content.FlushDomainEvents().Should().ContainSingle()
-			.Which.Should().Be(new SaleContentUpdateDomainEvent(sale.Id, true));
+			.Which.Should().Be(new SaleContentUpdateDomainEvent(content, true));
 	}
 
 	[Fact]
@@ -150,7 +151,7 @@ public class SaleContentTests
 		content.SetComment("updated");
 
 		content.FlushDomainEvents().Should().ContainSingle()
-			.Which.Should().Be(new SaleContentUpdateDomainEvent(sale.Id, false));
+			.Which.Should().Be(new SaleContentUpdateDomainEvent(content, false));
 	}
 
 	[Fact]
@@ -166,7 +167,7 @@ public class SaleContentTests
 	}
 
 	[Fact]
-	public void OnDeleted_PreservesSaleIdForRebuildingRemainingContents()
+	public void OnDeleted_DoesNotRequestAnalyticsRecalculation()
 	{
 		var content = Create();
 		var sale = AttachToSale(content);
@@ -174,8 +175,7 @@ public class SaleContentTests
 
 		content.OnDeleted();
 
-		content.FlushDomainEvents().Should().ContainSingle()
-			.Which.Should().Be(new SaleContentUpdateDomainEvent(sale.Id, true));
+		content.FlushDomainEvents().Should().BeEmpty();
 	}
 
 	private static Main.Entities.Sale.Sale AttachToSale(SaleContent content)

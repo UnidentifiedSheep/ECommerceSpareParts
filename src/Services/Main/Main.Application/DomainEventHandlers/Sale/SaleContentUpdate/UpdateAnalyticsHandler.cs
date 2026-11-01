@@ -10,11 +10,11 @@ public sealed class UpdateAnalyticsHandler(ISaleAnalyticsSynchronizer synchroniz
 {
 	public override Task Handle(Batch<SaleContentUpdateDomainEvent> notification, CancellationToken cancellationToken)
 	{
-		var saleIds = notification.Items
+		var contents = notification.Items
 			.Where(item => item.FinancialInfoChanged)
-			.Select(item => item.SaleId)
-			.Distinct()
+			.Select(item => item.Content)
+			.DistinctBy(content => content.Id)
 			.ToArray();
-		return synchronizer.SynchronizeAsync(saleIds, cancellationToken);
+		return synchronizer.SynchronizeAsync(contents, cancellationToken);
 	}
 }

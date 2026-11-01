@@ -3,6 +3,7 @@ using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
 using Main.Application.Analytics.Interfaces;
+using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities;
 using Main.Entities.Sale;
@@ -31,7 +32,8 @@ public class SaleAnalyticsSynchronizationLrt(IApplicationTransactionFactory tran
 				var ids = await query.OrderBy(sale => sale.Id).Select(sale => sale.Id).Take(BatchSize).ToArrayAsync(ct);
 				if (ids.Length == 0) return 0;
 
-				await context.GetRequiredService<ISaleAnalyticsSynchronizer>().SynchronizeAsync(ids, ct);
+				var sales = await context.GetRequiredService<ISaleRepository>().GetFullSalesForUpdate(ids, ct);
+				await context.GetRequiredService<ISaleAnalyticsSynchronizer>().SynchronizeAsync(sales.SelectMany(sale => sale.Contents).ToArray(), ct);
 				await context.UnitOfWork.SaveChangesAsync(ct);
 				await SaveStateAsync(new SynchronizationState<Guid>
 				{
