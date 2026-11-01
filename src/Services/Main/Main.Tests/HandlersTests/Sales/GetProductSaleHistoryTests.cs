@@ -92,6 +92,34 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		result.History.Should().ContainSingle();
 	}
 
+	[Theory]
+	[InlineData("originalPrice_asc", true)]
+	[InlineData("originalPrice_desc", false)]
+	[InlineData("discountedPrice_asc", false)]
+	[InlineData("discountedPrice_desc", true)]
+	public async Task GetProductSaleHistory_SortsByRequestedPrice(string sortBy, bool firstContentFirst)
+	{
+		var sale = SaleContext.Sale;
+		var first = sale.Contents.Single();
+		first.SetPriceAndDetails(100m, 90m, first.Details.ToArray());
+		var second = new SaleContentBuilder(Faker)
+			.WithProductId(first.ProductId)
+			.WithPrices(200m, 80m)
+			.WithStorageContentIds(first.Details.Select(detail => detail.StorageContentId))
+			.WithCurrencyId(sale.CurrencyId)
+			.WithCount(1)
+			.WithDetailsCount(1)
+			.Build();
+		sale.AddContent(second);
+		await Context.AddAsync(second, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var result = await Mediator.Send(CreateQuery(sortBy: [sortBy]), CancellationToken);
+
+		result.History.Select(content => content.SaleContentId).Should()
+			.Equal(firstContentFirst ? [first.Id, second.Id] : [second.Id, first.Id]);
+	}
+
 	[Fact]
 	public async Task GetProductSaleHistory_WhenFilterDoesNotMatch_ReturnsEmptyHistory()
 	{
