@@ -1,6 +1,7 @@
 ﻿{
   "culture": "ru",
   "messages": {
+    "producer.name.already.taken": "Название производителя уже занято.",
     "producer.with.articles.cannot.be.deleted": "Нельзя удалить производителя, у которого есть связанные статьи.",
     "producer.not.found": "Не удалось найти указанного производителя.",
     "producers.not.found": "Не удалось найти указанных производителей.",

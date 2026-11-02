@@ -9,5 +9,7 @@ public sealed class AddRolesToUserDbValidation : AbstractDbValidation<AddRolesTo
 	public override void Build(IValidationPlan plan, AddRolesToUserCommand request)
 	{
 		plan.ValidateUserExistsId(request.UserId);
+		if (request.RoleNames.Count > 0)
+			plan.ValidateRoleExistsName(request.RoleNames);
 	}
 }

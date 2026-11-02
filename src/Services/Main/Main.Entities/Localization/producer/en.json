@@ -1,6 +1,7 @@
 ﻿{
   "culture": "en",
   "messages": {
+    "producer.name.already.taken": "Producer name is already taken.",
     "producer.with.articles.cannot.be.deleted": "You cannot delete a producer that has associated articles.",
     "producer.not.found": "We couldn't find the producer you were looking for.",
     "producers.not.found": "We couldn't find the producers you were looking for.",

@@ -1,8 +1,9 @@
 using System.Linq.Expressions;
-using Domain;
+using BulkValidation.Core.Attributes;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
+using Domain;
 
 namespace Main.Entities.Auth;
 
@@ -19,6 +20,7 @@ public class Role : AuditableEntity<Role, string>, ILinqEntity<Role, string>
 		Name = RoleNames.Normalize(name);
 	}
 
+	[Validate]
 	public string Name { get; } = null!;
 
 	public string? Description { get; private set; }

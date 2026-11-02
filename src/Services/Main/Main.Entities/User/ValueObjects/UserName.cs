@@ -1,4 +1,5 @@
-﻿using Domain.Validation;
+﻿using BulkValidation.Core.Attributes;
+using Domain.Validation;
 
 namespace Main.Entities.User.ValueObjects;
 
@@ -27,6 +28,7 @@ public record UserName
 
 	public string Value { get; } = null!;
 
+	[Validate]
 	public string NormalizedValue { get; } = null!;
 
 	public static string ToNormalized(string source) => source.Trim().ToUpperInvariant();

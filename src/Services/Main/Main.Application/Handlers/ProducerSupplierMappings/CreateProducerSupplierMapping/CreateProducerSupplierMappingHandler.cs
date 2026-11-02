@@ -1,11 +1,8 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Entities.Exceptions;
 using Main.Entities.Producer;
-using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
 
@@ -17,8 +14,7 @@ public record CreateProducerSupplierMappingCommand(NewProducerSupplierMapping Pr
 public record CreateProducerSupplierMappingResult(ProducerSupplierMappingDto ProducerSupplierMapping);
 
 public class CreateProducerSupplierMappingHandler(
-	IUnitOfWork unitOfWork,
-	IReadRepository<ProducerSupplierMapping, int> repository)
+	IUnitOfWork unitOfWork)
 	: ICommandHandler<CreateProducerSupplierMappingCommand, CreateProducerSupplierMappingResult>
 {
 	public async Task<CreateProducerSupplierMappingResult> Handle(
@@ -26,16 +22,6 @@ public class CreateProducerSupplierMappingHandler(
 		CancellationToken cancellationToken)
 	{
 		var supplierProducerName = request.ProducerSupplierMapping.SupplierProducerName.Trim();
-		var normalizedSupplierProducerName = Producer.ToNormalizedName(supplierProducerName);
-		var exists = await repository.Query.AnyAsync(
-			x => x.NormalizedName == normalizedSupplierProducerName &&
-				x.Supplier == request.ProducerSupplierMapping.Supplier,
-			cancellationToken);
-		if (exists)
-			throw new ProducersSupplierMappingAlreadyExistsException(
-				supplierProducerName,
-				request.ProducerSupplierMapping.Supplier);
-
 		var model = ProducerSupplierMapping.Create(
 			request.ProducerSupplierMapping.ProducerId,
 			supplierProducerName,

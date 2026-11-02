@@ -7,7 +7,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Dtos.Storage;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
 using Main.Entities.Settings;
@@ -32,7 +31,6 @@ public class AddContentHandler(
 	ICurrencyConverter converter,
 	ISettingsService settingsService,
 	IRepository<Currency, int> currencyRepository,
-	IProductRepository productRepository,
 	IUnitOfWork unitOfWork) : ICommandHandler<AddContentCommand, AddContentResult>
 {
 	public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
@@ -48,11 +46,6 @@ public class AddContentHandler(
 		var currencies = await currencyRepository.EnsureExistsAsync(
 			currencyIds,
 			nf => new CurrencyNotFoundException(nf),
-			cancellationToken);
-
-		await productRepository.EnsureExistsAsync(
-			request.StorageContent.Select(x => x.ProductId).Distinct(),
-			nf => new ProductNotFoundException(nf),
 			cancellationToken);
 
 		var storageContents = new List<StorageContent>();

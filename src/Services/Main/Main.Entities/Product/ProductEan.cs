@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
@@ -7,7 +8,9 @@ namespace Main.Entities.Product;
 
 public class ProductEan : Entity<ProductEan, ProductEanKey>, ILinqEntity<ProductEan, ProductEanKey>
 {
+	[ValidateTuple("PK")]
 	public int ProductId { get; private set; }
+	[ValidateTuple("PK")]
 	public string Ean { get; private set; } = null!;
 
 	private ProductEan()

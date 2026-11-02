@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Enums;
@@ -17,10 +18,12 @@ public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>,
 
 	public int ProducerId { get; private set; }
 
+	[ValidateTuple("SupplierName")]
 	public Supplier Supplier { get; private set; }
 
 	public string Name { get; private set; } = string.Empty;
 
+	[ValidateTuple("SupplierName")]
 	public string NormalizedName { get; private set; } = string.Empty;
 
 	public static Expression<Func<ProducerSupplierMapping, int>> GetKeySelector() => x => x.Id;

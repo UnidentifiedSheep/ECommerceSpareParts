@@ -5,13 +5,15 @@ using Main.Application.Handlers.Users.CreateUser;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization;
-using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
-using Main.Enums;
+using Main.Entities.User;
 using Main.Enums.Organization;
+using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;
+using Tests.DataBuilders.User;
+using Tests.Extensions;
 using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Users;
@@ -52,6 +54,56 @@ public class CreateUserTests(CombinedContainerFixture fixture) : IntegrationTest
 		var normalizedName = UserName.ToNormalized(command.UserName);
 		(await Context.Set<User>().AsNoTracking().AnyAsync(
 			x => x.UserName.NormalizedValue == normalizedName, CancellationToken)).Should().BeFalse();
+	}
+
+	[Fact]
+	public async Task DuplicateNormalizedLogin_ReturnsLocalizedErrorWithoutCreatingUser()
+	{
+		await new UserBuilder(Faker).WithUserName("CREATED-USER").BuildAndAddToDb(Context);
+
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
+			Mediator.Send(CreateCommand(["MEMBER"]), CancellationToken));
+
+		exception.Failures.Should().ContainSingle(failure => failure.Error is UserNameAlreadyTakenException);
+		(await Context.Set<User>().CountAsync(
+			user => user.UserName.NormalizedValue == "CREATED-USER", CancellationToken)).Should().Be(1);
+	}
+
+	[Fact]
+	public async Task EmailOwnedByAnotherUser_IsRejectedAfterNormalization()
+	{
+		await new UserBuilder(Faker).WithEmail("created@example.com").BuildAndAddToDb(Context);
+		var command = CreateCommand(["MEMBER"]) with
+		{
+			Emails = [new EmailDto { Email = "CREATED@EXAMPLE.COM", Type = EmailType.Work }]
+		};
+
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
+			Mediator.Send(command, CancellationToken));
+
+		exception.Failures.Should().ContainSingle(failure => failure.Error is UserEmailAlreadyInUseException);
+		(await Context.Set<User>().AnyAsync(
+			user => user.UserName.NormalizedValue == "CREATED-USER", CancellationToken)).Should().BeFalse();
+	}
+
+	[Fact]
+	public async Task MissingRole_IsRejectedWithoutCreatingUser()
+	{
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
+			Mediator.Send(CreateCommand(["member", "missing-role"]), CancellationToken));
+
+		exception.Failures.Should().ContainSingle(failure => failure.Error is RoleNotFoundException);
+		(await Context.Set<User>().AnyAsync(
+			user => user.UserName.NormalizedValue == "CREATED-USER", CancellationToken)).Should().BeFalse();
+	}
+
+	[Fact]
+	public async Task EmptyRoles_CreatesUserWithoutAddingAnEmptyValidationCheck()
+	{
+		var result = await Mediator.Send(CreateCommand([]), CancellationToken);
+
+		(await Context.Set<UserRole>().AnyAsync(role => role.UserId == result.UserId, CancellationToken))
+			.Should().BeFalse();
 	}
 
 	private static CreateUserCommand CreateCommand(IReadOnlyCollection<string> roles) => new(

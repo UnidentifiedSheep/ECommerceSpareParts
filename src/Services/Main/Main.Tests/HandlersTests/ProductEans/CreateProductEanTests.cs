@@ -30,6 +30,17 @@ public class CreateProductEanTests : IntegrationTest
 	}
 
 	[Fact]
+	public async Task SameEanOnAnotherProduct_IsAllowed()
+	{
+		var existing = TestContext.ProductEans.First();
+		var otherProduct = TestContext.ProductTestContext.Products.Last();
+
+		await Mediator.Send(new CreateProductEanCommand(otherProduct.Id, existing.Ean), CancellationToken);
+
+		(await Context.ProductEans.CountAsync(ean => ean.Ean == existing.Ean, CancellationToken)).Should().Be(2);
+	}
+
+	[Fact]
 	public async Task CreateProductEan_ExistingEan_ThrowsConflict()
 	{
 		var existing = TestContext.ProductEans.First();
@@ -38,6 +49,7 @@ public class CreateProductEanTests : IntegrationTest
 			new CreateProductEanCommand(existing.ProductId, $" {existing.Ean} "),
 			CancellationToken);
 
-		await action.Should().ThrowAsync<ProductEanAlreadyExistsException>();
+		var exception = await action.Should().ThrowAsync<DbValidationException>();
+		exception.Which.Failures.Should().ContainSingle(failure => failure.Error is ProductEanAlreadyExistsException);
 	}
 }

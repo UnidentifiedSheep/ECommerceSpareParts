@@ -42,7 +42,8 @@ public class AddRolesToUserTests : IntegrationTest
 		var action = () => Mediator.Send(new AddRolesToUserCommand(
 			TestContext.User.Id, [TestContext.EditorRole.Name, "missing-role"]), CancellationToken);
 
-		await action.Should().ThrowAsync<RoleNotFoundException>();
+		var exception = await action.Should().ThrowAsync<DbValidationException>();
+		exception.Which.Failures.Should().ContainSingle(failure => failure.Error is RoleNotFoundException);
 
 		(await RoleNamesFor(TestContext.User.Id)).Should().BeEquivalentTo(["MEMBER", TestContext.ReaderRole.Name]);
 	}
@@ -55,6 +56,15 @@ public class AddRolesToUserTests : IntegrationTest
 
 		await action.Should().ThrowAsync<ValidationException>();
 
+		(await RoleNamesFor(TestContext.User.Id)).Should().BeEquivalentTo(["MEMBER", TestContext.ReaderRole.Name]);
+	}
+
+	[Fact]
+	public async Task EmptyRoles_ReturnsEmptyResult()
+	{
+		var result = await Mediator.Send(new AddRolesToUserCommand(TestContext.User.Id, []), CancellationToken);
+
+		result.AddedRoles.Should().BeEmpty();
 		(await RoleNamesFor(TestContext.User.Id)).Should().BeEquivalentTo(["MEMBER", TestContext.ReaderRole.Name]);
 	}
 

@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using TransactionErrorKind = Enums.TransactionErrorKind;
 using Main.Entities.Auth;
-using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Auth.AddRolesToUser;
@@ -31,7 +30,6 @@ public sealed record AddRolesToUserResult(Guid UserId, IReadOnlyList<string> Add
 
 public sealed class AddRolesToUserHandler(
 	IReadRepository<UserRole, (Guid, string)> repository,
-	IReadRepository<Role, string> roleRepository,
 	IUnitOfWork unitOfWork) : ICommandHandler<AddRolesToUserCommand, AddRolesToUserResult>
 {
 	public async Task<AddRolesToUserResult> Handle(
@@ -40,15 +38,6 @@ public sealed class AddRolesToUserHandler(
 	{
 		if (request.RoleNames.Count == 0)
 			return new AddRolesToUserResult(request.UserId, []);
-
-		var roles = await roleRepository.Query
-			.Where(x => request.RoleNames.Contains(x.Name))
-			.Select(x => x.Name)
-			.ToListAsync(cancellationToken);
-		var knownRoles = roles.ToHashSet(StringComparer.Ordinal);
-		foreach (var name in request.RoleNames)
-			if (!knownRoles.Contains(name))
-				throw new RoleNotFoundException(name);
 
 		var existing = await repository.Query
 			.Where(x => x.UserId == request.UserId && request.RoleNames.Contains(x.RoleName))

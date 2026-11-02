@@ -40,3 +40,6 @@ public class ProducerAliasAlreadyTakenException(object values) : LocalizedConfli
 
 public class ProducerNameNotFoundException(object values) : LocalizedNotFoundException(
 	ProducerNotFoundMessage.Instance, values);
+
+public class ProducerNameAlreadyTakenException(string name) : LocalizedConflictException(
+	ProducerNameAlreadyTakenMessage.Instance, new { Name = name });

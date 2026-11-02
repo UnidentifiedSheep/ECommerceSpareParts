@@ -52,8 +52,9 @@ public class DeleteCharacteristicTests : IntegrationTest
 
 		var act = () => Mediator.Send(new DeleteCharacteristicCommand(existing.Id), CancellationToken);
 
-		var exception = await act.Should().ThrowAsync<CharacteristicInUseException>();
-		exception.Which.LocalizableMessage.MessageKey.Should().Be(CharacteristicInUseMessage.Key);
+		var exception = await act.Should().ThrowAsync<DbValidationException>();
+		var failure = Assert.IsType<CharacteristicInUseException>(exception.Which.Failures.Single().Error);
+		failure.LocalizableMessage.MessageKey.Should().Be(CharacteristicInUseMessage.Key);
 		(await Context.Characteristics.AnyAsync(x => x.Id == existing.Id, CancellationToken)).Should().BeTrue();
 		(await Context.ProductCharacteristics.AnyAsync(
 			x => x.ProductId == productId && x.CharacteristicId == existing.Id, CancellationToken)).Should().BeTrue();

@@ -10,6 +10,7 @@ public class AddToCartDbValidation : AbstractDbValidation<AddToCartCommand>
 	{
 		plan
 			.ValidateUserExistsId(request.UserId)
+			.ValidateProductExistsId(request.ProductId)
 			.ValidateCartNotExistsPK((request.UserId, request.ProductId));
 	}
 }

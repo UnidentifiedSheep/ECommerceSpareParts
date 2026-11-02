@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
@@ -18,6 +19,7 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, int)>,
 	}
 
 	public int ProductId { get; }
+	[Validate]
 	public int CharacteristicId { get; }
 	public Characteristic Characteristic { get; private set; } = null!;
 	public string Value { get; private set; } = null!;

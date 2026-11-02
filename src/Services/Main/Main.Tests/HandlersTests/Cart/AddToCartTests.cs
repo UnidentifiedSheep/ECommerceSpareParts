@@ -94,5 +94,17 @@ public class AddToCartTests : IntegrationTest
 		Assert.IsType<UserNotFoundException>(exception.Failures[0].Error);
 	}
 
+	[Fact]
+	public async Task MissingProduct_ReturnsProductNotFoundWithoutAddingCartItem()
+	{
+		var user = _usersContext.User;
+
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
+			Mediator.Send(new AddToCartCommand(user.Id, int.MaxValue, 1), CancellationToken));
+
+		exception.Failures.Should().ContainSingle(failure => failure.Error is ProductNotFoundException);
+		(await Context.Carts.AnyAsync(item => item.UserId == user.Id, CancellationToken)).Should().BeFalse();
+	}
+
 	private (User, Product) GetUserAndProduct() => (_usersContext.Users.First(), _productContext.Products[0]);
 }

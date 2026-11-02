@@ -19,6 +19,12 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
 	[Fact]
+	public async Task EmptyBatch_CompletesWithoutValidationErrors()
+	{
+		await Mediator.Send(new MakeLinkageBetweenProductsCommand([]), CancellationToken);
+	}
+
+	[Fact]
 	public async Task MakeLinkage_SameIds_FailsValidation()
 	{
 		var newLinkage = new NewProductLinkageDto

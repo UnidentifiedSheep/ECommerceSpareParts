@@ -94,6 +94,31 @@ public static class ValidationConfiguration
 		errors.For(ProducerKeys.Name)
 			.OnMissing(input => new ProducerNameNotFoundException(input.Values));
 
+		errors.For(ProductEanKeys.PK)
+			.OnAlreadyExists(input => new ProductEanAlreadyExistsException(input.Values[0].ProductId, input.Values[0].Ean));
+
+		errors.For(ProducerSupplierMappingKeys.SupplierName)
+			.OnAlreadyExists(input => new ProducersSupplierMappingAlreadyExistsException(
+				input.Values[0].NormalizedName, input.Values[0].Supplier));
+
+		errors.For(ProductCharacteristicKeys.CharacteristicId)
+			.OnAlreadyExists(input => new CharacteristicInUseException(input.Values[0]));
+
+		errors.For(CharacteristicKeys.Id)
+			.OnMissing(input => new CharacteristicNotFoundException(input.Values[0]));
+
+		errors.For(ProducerKeys.Name)
+			.OnAlreadyExists(input => new ProducerNameAlreadyTakenException(string.Join(", ", input.Values)));
+
+		errors.For(UserKeys.UserName.NormalizedValue)
+			.OnAlreadyExists(input => new UserNameAlreadyTakenException(input.Values[0]));
+
+		errors.For(UserEmailKeys.Email)
+			.OnAlreadyExists(input => new UserEmailAlreadyInUseException(input.Values[0].Value));
+
+		errors.For(RoleKeys.Name)
+			.OnMissing(input => new RoleNotFoundException(input.Values[0]));
+
 		errors.For(UserKeys.Id)
 			.OnMissing(input => new UserNotFoundException(input.Values[0]));
 

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
-using Domain;
+using BulkValidation.Core.Attributes;
 using Domain.Interfaces;
+using Domain;
 using Main.Entities.DomainEvents.User;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
@@ -25,6 +26,7 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
 
 	public Guid UserId { get; }
 
+	[Validate]
 	public Email Email { get; } = null!;
 
 	public bool Confirmed { get; private set; }

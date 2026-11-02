@@ -9,9 +9,9 @@ public class CreateCurrencyDbValidation : AbstractDbValidation<CreateCurrencyCom
 	public override void Build(IValidationPlan plan, CreateCurrencyCommand request)
 	{
 		plan
-			.ValidateCurrencyNotExistsCode(request.Code)
-			.ValidateCurrencyNotExistsName(request.Name)
-			.ValidateCurrencyNotExistsShortName(request.ShortName)
-			.ValidateCurrencyNotExistsCurrencySign(request.CurrencySign);
+			.ValidateCurrencyNotExistsCode(request.Code.Trim())
+			.ValidateCurrencyNotExistsName(request.Name.Trim())
+			.ValidateCurrencyNotExistsShortName(request.ShortName.Trim())
+			.ValidateCurrencyNotExistsCurrencySign(request.CurrencySign.Trim());
 	}
 }

@@ -78,8 +78,8 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 				SupplierProducerName = duplicateName
 			});
 
-		await Assert.ThrowsAsync<ProducersSupplierMappingAlreadyExistsException>(async () =>
-			await Mediator.Send(command, CancellationToken));
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+		exception.Failures.Should().ContainSingle(failure => failure.Error is ProducersSupplierMappingAlreadyExistsException);
 	}
 
 	[Fact]
@@ -107,6 +107,23 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 			.Where(x => x.ProducerId == producer.Id)
 			.ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(2);
+	}
+
+	[Fact]
+	public async Task SameNameForAnotherSupplier_IsAllowed()
+	{
+		var producerId = TestContext.Producers[0].Id;
+		await new ProducerSupplierMappingBuilder(Faker)
+			.WithProducerId(producerId).WithSupplier(Supplier.Armtek)
+			.WithSupplierProducerName("Bosch").BuildAndAddToDb(Context, CancellationToken);
+		var otherSupplier = Enum.GetValues<Supplier>().First(supplier => supplier != Supplier.Armtek);
+
+		await Mediator.Send(new CreateProducerSupplierMappingCommand(new NewProducerSupplierMapping
+		{
+			ProducerId = producerId, Supplier = otherSupplier, SupplierProducerName = " bosch "
+		}), CancellationToken);
+
+		(await Context.ProducerSupplierMappings.CountAsync(CancellationToken)).Should().Be(2);
 	}
 
 	[Fact]

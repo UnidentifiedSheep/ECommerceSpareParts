@@ -10,6 +10,7 @@ public class AddContentDbValidation : AbstractDbValidation<AddContentCommand>
 	{
 		plan
 			.ValidateStorageExistsCode(request.StorageCode)
-			.ValidateCurrencyExistsId(request.StorageContent.Select(x => x.CurrencyId));
+			.ValidateCurrencyExistsId(request.StorageContent.Select(x => x.CurrencyId))
+			.ValidateProductExistsId(request.StorageContent.Select(x => x.ProductId).Distinct());
 	}
 }

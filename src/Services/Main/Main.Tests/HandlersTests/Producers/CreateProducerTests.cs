@@ -1,8 +1,11 @@
 using FluentAssertions;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.CreateProducer;
+using Main.Entities.Exceptions;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
+using Tests.DataBuilders;
+using Tests.Extensions;
 using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Producers;
@@ -57,6 +60,21 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 
 		createdProducer.Name.Should().Be(Producer.ToNormalizedName(producer.Name));
 		createdProducer.Description.Should().Be(producer.Description);
+	}
+
+	[Theory]
+	[InlineData("bosch")]
+	[InlineData(" BOSCH ")]
+	public async Task DuplicateNormalizedName_ReturnsLocalizedConflict(string name)
+	{
+		await new ProducerBuilder(Faker).WithName("Bosch").BuildAndAddToDb(Context);
+
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
+			Mediator.Send(new CreateProducerCommand(CreateDto() with { Name = name }), CancellationToken));
+
+		exception.Failures.Should().ContainSingle(failure => failure.Error is ProducerNameAlreadyTakenException);
+		(await Context.Producers.CountAsync(producer => producer.Name == "BOSCH", CancellationToken))
+			.Should().Be(1);
 	}
 
 	private NewProducerDto CreateDto()

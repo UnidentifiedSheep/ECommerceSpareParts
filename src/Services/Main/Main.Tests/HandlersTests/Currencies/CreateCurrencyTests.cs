@@ -129,6 +129,32 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 		Assert.IsType<CurrencyShortNameAlreadyTakenException>(exception.Failures[0].Error);
 	}
 
+	[Theory]
+	[InlineData("code")]
+	[InlineData("name")]
+	[InlineData("shortName")]
+	[InlineData("sign")]
+	public async Task DuplicateTrimmedField_ReturnsItsLocalizedError(string field)
+	{
+		var currency = await new CurrencyBuilder(Faker).WithShortName("TT").WithSign("!").BuildAndAddToDb(Context);
+		var command = new CreateCurrencyCommand(
+			field == "shortName" ? $" {currency.ShortName} " : "QQ",
+			field == "name" ? $" {currency.Name} " : "Another currency",
+			field == "sign" ? $" {currency.CurrencySign} " : "?",
+			field == "code" ? $" {currency.Code} " : "ZZZ");
+
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+
+		var expected = field switch
+		{
+			"code" => typeof(CurrencyCodeAlreadyTakenException),
+			"name" => typeof(CurrencyNameAlreadyTakenException),
+			"shortName" => typeof(CurrencyShortNameAlreadyTakenException),
+			_ => typeof(CurrencySignAlreadyTakenException)
+		};
+		Assert.Contains(exception.Failures, failure => failure.Error?.GetType() == expected);
+	}
+
 	[Fact]
 	public async Task CreateCurrency_WithValidData_Succeeds()
 	{

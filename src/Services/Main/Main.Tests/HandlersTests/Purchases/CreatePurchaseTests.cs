@@ -492,12 +492,13 @@ public class CreatePurchaseTests : IntegrationTest
 			ProductId = int.MaxValue
 		};
 
-		await Assert.ThrowsAsync<ProductNotFoundException>(() => Mediator.Send(
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
 			command with
 			{
 				PurchaseContent = [content]
 			},
 			CancellationToken));
+		Assert.Contains(exception.Failures, failure => failure.Error is ProductNotFoundException);
 	}
 
 	[Fact]

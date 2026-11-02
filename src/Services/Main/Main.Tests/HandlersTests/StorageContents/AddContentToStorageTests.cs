@@ -123,8 +123,10 @@ public class AddContentToStorageTests : IntegrationTest
 			storageContent,
 			storage.Code,
 			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<ProductNotFoundException>(async () =>
-			await Mediator.Send(command, CancellationToken));
+		var countBefore = await Context.StorageContents.CountAsync(CancellationToken);
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+		Assert.Contains(exception.Failures, failure => failure.Error is ProductNotFoundException);
+		Assert.Equal(countBefore, await Context.StorageContents.CountAsync(CancellationToken));
 	}
 
 	[Fact]

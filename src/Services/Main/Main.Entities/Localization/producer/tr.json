@@ -1,6 +1,7 @@
 {
   "culture": "tr",
   "messages": {
+    "producer.name.already.taken": "Üretici adı zaten alınmış.",
     "producer.with.articles.cannot.be.deleted": "İlişkili ürünleri olan bir üretici silinemez.",
     "producer.not.found": "Aradığınız üreticiyi bulamadık.",
     "producers.not.found": "Aradığınız üreticileri bulamadık.",

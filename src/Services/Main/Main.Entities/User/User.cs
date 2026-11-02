@@ -43,6 +43,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 	[Validate]
 	public Guid Id { get; }
 
+	[ValidateComplex]
 	public UserName UserName { get; private set; } = null!;
 
 	public string PasswordHash { get; private set; } = null!;

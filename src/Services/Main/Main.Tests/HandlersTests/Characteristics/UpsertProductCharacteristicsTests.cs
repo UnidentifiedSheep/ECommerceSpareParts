@@ -3,13 +3,39 @@ using Application.Common.Interfaces.Repositories;
 using FluentAssertions;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductCharacteristics.UpsertCharacteristics;
+using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Moq;
+using Tests.TestContainers.Combined;
+using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Characteristics;
 
-public class UpsertProductCharacteristicsTests
+public class UpsertProductCharacteristicsTests : IntegrationTest
 {
+	public UpsertProductCharacteristicsTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+	}
+
+	[Fact]
+	public async Task MissingCharacteristic_ReturnsLocalizedError()
+	{
+		var productId = GetContext<ProductTestContext>().Products[0].Id;
+		var command = new UpsertCharacteristicsCommand(
+			[new UpsertCharacteristicsDto { ProductId = productId, CharacteristicId = int.MaxValue, Value = "Red" }]);
+
+		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+
+		exception.Failures.Should().ContainSingle(failure => failure.Error is CharacteristicNotFoundException);
+	}
+
+	[Fact]
+	public async Task EmptyBatch_CompletesWithoutValidationErrors()
+	{
+		await Mediator.Send(new UpsertCharacteristicsCommand([]), CancellationToken);
+	}
+
 	[Fact]
 	public async Task MixedBatch_UpdatesCreatesAndCanBeRepeated()
 	{
@@ -33,8 +59,8 @@ public class UpsertProductCharacteristicsTests
 			new UpsertCharacteristicsDto { ProductId = 2, CharacteristicId = 20, Value = "  New  " }
 		]);
 
-		await handler.Handle(command, CancellationToken.None);
-		await handler.Handle(command, CancellationToken.None);
+		await handler.Handle(command, CancellationToken);
+		await handler.Handle(command, CancellationToken);
 
 		existing.Value.Should().Be("Updated");
 		untouched.Value.Should().Be("Unchanged");
