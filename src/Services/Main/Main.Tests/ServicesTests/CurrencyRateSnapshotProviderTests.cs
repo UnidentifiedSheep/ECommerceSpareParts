@@ -7,6 +7,7 @@ using Main.Application.Services.Currency;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
@@ -14,16 +15,16 @@ using Tests.TestContexts.Currency;
 
 namespace Tests.ServicesTests;
 
-public sealed class HistoricalRateProviderTests : IntegrationTest
+public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 {
 	private static readonly DateTime Start = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-	public HistoricalRateProviderTests(CombinedContainerFixture fixture) : base(fixture) =>
+	public CurrencyRateSnapshotProviderTests(CombinedContainerFixture fixture) : base(fixture) =>
 		RegisterBasicContext<CurrencyRatesTestContext>();
 
 	private CurrencyRatesTestContext Rates => GetContext<CurrencyRatesTestContext>();
 	private CurrencyRate Rate => Rates.Rates.First();
-	private IHistoricalRateProvider Provider => Scope.ServiceProvider.GetRequiredService<IHistoricalRateProvider>();
+	private ICurrencyRateSnapshotProvider Provider => Scope.ServiceProvider.GetRequiredService<ICurrencyRateSnapshotProvider>();
 
 	[Theory]
 	[InlineData(-730, 2)]
@@ -35,7 +36,7 @@ public sealed class HistoricalRateProviderTests : IntegrationTest
 	[InlineData(100, 4)]
 	public async Task GetNearestRate_SelectsClosestDate_AndEarlierOnTie(int days, decimal expected)
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start.AddDays(10), 2m, 4m), (Start, 0m, 2m)], CancellationToken);
+		await Rates.SetHistoryAsync(Rate, [(Start.AddDays(10), 4m), (Start, 2m)], CancellationToken);
 
 		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(days), CancellationToken))
 			.Should().Be(expected);
@@ -44,7 +45,7 @@ public sealed class HistoricalRateProviderTests : IntegrationTest
 	[Fact]
 	public async Task SameTimestamp_SelectsChangeWithLargestId()
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 0m, 2m), (Start, 2m, 4m)], CancellationToken);
+		await Rates.SetHistoryAsync(Rate, [(Start, 2m), (Start, 4m)], CancellationToken);
 
 		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(4m);
 		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(-1), CancellationToken)).Should().Be(4m);
@@ -73,7 +74,9 @@ public sealed class HistoricalRateProviderTests : IntegrationTest
 	[InlineData(-1)]
 	public async Task InvalidRate_ThrowsNotFound(decimal value)
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 0m, value)], CancellationToken);
+		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
+		await Context.CurrencyRates.Where(row => row.FromCurrencyId == Rate.FromCurrencyId && row.ToCurrencyId == Rate.ToCurrencyId)
+			.ExecuteUpdateAsync(update => update.SetProperty(row => row.Rate, value), CancellationToken);
 
 		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() =>
 			Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken));
@@ -89,22 +92,50 @@ public sealed class HistoricalRateProviderTests : IntegrationTest
 	}
 
 	[Fact]
+	public async Task CurrentRate_UsesLatestObservationRatherThanNearestToToday()
+	{
+		await Rates.SetHistoryAsync(Rate, [(DateTime.UtcNow.AddYears(10), 8m), (Start, 2m)], CancellationToken);
+
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(8m);
+		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
+	}
+
+	[Fact]
+	public async Task CurrentBaseCurrency_WithoutObservations_ReturnsOne()
+	{
+		await Rates.SetHistoryAsync(Rate, [], CancellationToken);
+
+		(await Provider.GetCurrentRateOrDefault(Rate.ToCurrencyId, CancellationToken)).Should().Be(1m);
+	}
+
+	[Fact]
+	public async Task MissingCurrentRate_ReturnsNull_AndRequiredRateThrows()
+	{
+		await Rates.SetHistoryAsync(Rate, [], CancellationToken);
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().BeNull();
+		var rates = Scope.ServiceProvider.GetRequiredService<Application.Common.Interfaces.Currency.ICurrencyRatesProvider>();
+
+		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() => rates.GetRate(Rate.FromCurrencyId, CancellationToken));
+	}
+
+	[Fact]
 	public async Task Reload_ReplacesCachedSnapshot()
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 0m, 2m)], CancellationToken);
+		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
 		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
-		await Rates.SetHistoryAsync(Rate, [(Start, 0m, 4m)], CancellationToken);
+		await Rates.SetHistoryAsync(Rate, [(Start, 4m)], CancellationToken);
 		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
 
 		await Provider.Reload(CancellationToken);
 
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(4m);
 		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(4m);
 	}
 
 	[Fact]
 	public async Task Reload_DuringInitialLoad_DoesNotLoseNewHistory()
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 0m, 2m)], CancellationToken);
+		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
 		var readCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 		var releaseRead = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 		var (provider, factory) = CreateProvider(async attempt =>
@@ -120,7 +151,7 @@ public sealed class HistoricalRateProviderTests : IntegrationTest
 			try
 			{
 				await readCompleted.Task.WaitAsync(CancellationToken);
-				await Rates.SetHistoryAsync(Rate, [(Start, 0m, 4m)], CancellationToken);
+				await Rates.SetHistoryAsync(Rate, [(Start, 4m)], CancellationToken);
 				reload = provider.Reload(CancellationToken);
 			}
 			finally
@@ -138,13 +169,13 @@ public sealed class HistoricalRateProviderTests : IntegrationTest
 	[Fact]
 	public async Task FailedReload_PreservesPreviousSnapshot_AndCanBeRetried()
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 0m, 2m)], CancellationToken);
+		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
 		var (provider, _) = CreateProvider(attempt => attempt == 2
 			? Task.FromException(new InvalidOperationException("Load failed")) : Task.CompletedTask);
 		using (provider)
 		{
 			(await provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
-			await Rates.SetHistoryAsync(Rate, [(Start, 0m, 4m)], CancellationToken);
+			await Rates.SetHistoryAsync(Rate, [(Start, 4m)], CancellationToken);
 
 			await Assert.ThrowsAsync<InvalidOperationException>(() => provider.Reload(CancellationToken));
 			(await provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
@@ -153,7 +184,7 @@ public sealed class HistoricalRateProviderTests : IntegrationTest
 		}
 	}
 
-	private (HistoricalRateProvider Provider, Mock<IApplicationTransactionFactory> Factory) CreateProvider(Func<int, Task> afterExecute)
+	private (CurrencyRateSnapshotProvider Provider, Mock<IApplicationTransactionFactory> Factory) CreateProvider(Func<int, Task> afterExecute)
 	{
 		var context = new Mock<IApplicationTransactionContext>();
 		context.SetupGet(value => value.Repositories).Returns(Scope.ServiceProvider.GetRequiredService<IRepositoryProvider>());
@@ -166,6 +197,6 @@ public sealed class HistoricalRateProviderTests : IntegrationTest
 			var attempt = Interlocked.Increment(ref attempts);
 			return new ApplicationTransactionStub(context.Object, () => afterExecute(attempt));
 		});
-		return (new HistoricalRateProvider(factory.Object), factory);
+		return (new CurrencyRateSnapshotProvider(factory.Object), factory);
 	}
 }

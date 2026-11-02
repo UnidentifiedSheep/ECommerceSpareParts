@@ -19,7 +19,7 @@ public class GetHistoricalCurrencyRateTests : IntegrationTest
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
 		var date = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		await GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate,
-			[(date, 0m, 2m), (date.AddDays(10), 2m, 4m)], CancellationToken);
+			[(date, 2m), (date.AddDays(10), 4m)], CancellationToken);
 		var forDate = new DateTimeOffset(date.AddDays(1)).ToOffset(TimeSpan.FromHours(3));
 
 		var result = await Mediator.Send(new GetHistoricalCurrencyRateQuery(rate.FromCurrencyId, forDate), CancellationToken);

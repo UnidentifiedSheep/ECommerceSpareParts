@@ -3,21 +3,17 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cache;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Settings;
 using Cache.Extensions;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Static;
 using Main.Entities.Currency;
-using Main.Entities.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Cache;
 
 public class CurrencyCacheRepository(
 	ICache rawCache,
-	ISettingsService settingsService,
-	IRepository<CurrencyRate, (int, int)> rateRepository,
 	IReadRepository<Currency, int> repository,
 	IProjectionProvider<Currency, CurrencyDto> projection) : ICurrencyCacheRepository
 {
@@ -54,14 +50,6 @@ public class CurrencyCacheRepository(
 		return currencies;
 	}
 
-	public Task<decimal?> GetCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
-	{
-		return rawCache.GetOrSetAsync(
-			CacheKeys.CurrencyCache.CurrencyRate(currencyId),
-			() => GetRateFromDb(currencyId),
-			CacheKeys.CurrencyCache.Ttl);
-	}
-
 	public Task InvalidateCurrency(int id, CancellationToken cancellationToken = default) =>
 		rawCache.RemoveKeyAsync(CacheKeys.CurrencyCache.Currency(id));
 
@@ -78,9 +66,6 @@ public class CurrencyCacheRepository(
 		await rawCache.RemoveKeysAsync(keys);
 	}
 
-	public Task InvalidateCurrencyRate(int currencyId, CancellationToken cancellationToken = default) =>
-		rawCache.RemoveKeyAsync(CacheKeys.CurrencyCache.CurrencyRate(currencyId));
-
 	private Task<CurrencyDto?> GetCurrencyFromDb(int id) =>
 		repository.Query.Where(x => x.Id == id).Project(projection).FirstOrDefaultAsync();
 
@@ -93,13 +78,4 @@ public class CurrencyCacheRepository(
 			.ToDictionaryAsync(x => x.Id);
 	}
 
-	private async Task<decimal?> GetRateFromDb(int currencyId)
-	{
-		var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>()).Data.BaseCurrencyId;
-
-		if (currencyId == baseCurrencyId)
-			return 1m;
-
-		return (await rateRepository.GetById((currencyId, baseCurrencyId)))?.Rate;
-	}
 }

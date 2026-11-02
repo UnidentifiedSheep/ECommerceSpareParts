@@ -12,15 +12,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Services.Currency;
 
-public sealed class HistoricalRateProvider(
+public sealed class CurrencyRateSnapshotProvider(
 	IApplicationTransactionFactory transactionFactory
-	) : IHistoricalRateProvider, IDisposable
+	) : ICurrencyRateSnapshotProvider, IDisposable
 {
 	private static readonly IComparer<Info> RateComparer =
 		Comparer<Info>.Create((a, b) => a.When.CompareTo(b.When));
 
 	private readonly SemaphoreSlim _lock = new(1, 1);
 	private Snapshot? _snapshot;
+
+	public async Task<decimal?> GetCurrentRateOrDefault(int currencyId, CancellationToken token)
+	{
+		var snapshot = await GetSnapshotAsync(token);
+		if (currencyId == snapshot.BaseCurrencyId) return 1m;
+		return snapshot.History.TryGetValue((currencyId, snapshot.BaseCurrencyId), out var rates) && !rates.IsDefaultOrEmpty
+			? rates[^1].Rate : null;
+	}
 
 	public async Task<decimal> GetNearestRateFor(
 		int currencyId,
@@ -113,14 +121,14 @@ public sealed class HistoricalRateProvider(
 
 				return await ctx
 					.Repositories
-					.GetForRead<CurrencyRateHistory, int>()
+					.GetForRead<CurrencyRate, int>()
 					.Query
 					.Select(x => new
 					{
 						x.Id,
 						x.FromCurrencyId,
 						x.ToCurrencyId,
-						x.NewRate,
+						x.Rate,
 						x.CreatedAt
 					})
 					.ToArrayAsync(ct);
@@ -133,7 +141,7 @@ public sealed class HistoricalRateProvider(
 				x => x.OrderByDescending(row => row.Id)
 					.DistinctBy(row => row.CreatedAt)
 					.OrderBy(row => row.CreatedAt)
-					.Select(row => new Info(row.NewRate, row.CreatedAt)).ToImmutableArray());
+					.Select(row => new Info(row.Rate, row.CreatedAt)).ToImmutableArray());
 
 		return new Snapshot(baseCurrencyId, history);
 	}

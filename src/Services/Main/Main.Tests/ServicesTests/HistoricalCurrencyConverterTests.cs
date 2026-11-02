@@ -19,8 +19,8 @@ public class HistoricalCurrencyConverterTests : IntegrationTest
 	public async Task Convert_UsesNearestRateForEachRequestedTime()
 	{
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
-		await SetHistory(rate, (new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), 0m, 2m),
-			(new DateTime(2020, 2, 1, 0, 0, 0, DateTimeKind.Utc), 2m, 4m));
+		await SetHistory(rate, (new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), 2m),
+			(new DateTime(2020, 2, 1, 0, 0, 0, DateTimeKind.Utc), 4m));
 		var converter = Scope.ServiceProvider.GetRequiredService<ICurrencyConverter>();
 		var atFirst = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		(await converter.ConvertToBaseAsync(100m, rate.FromCurrencyId, atFirst, CancellationToken)).Should().Be(50m);
@@ -34,7 +34,7 @@ public class HistoricalCurrencyConverterTests : IntegrationTest
 	{
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
 		var date = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-		await SetHistory(rate, (date, 2m, 4m));
+		await SetHistory(rate, (date, 4m));
 		(await Scope.ServiceProvider.GetRequiredService<ICurrencyConverter>()
 			.ConvertToBaseAsync(100m, rate.FromCurrencyId, date.AddDays(-1), CancellationToken)).Should().Be(25m);
 	}
@@ -48,6 +48,6 @@ public class HistoricalCurrencyConverterTests : IntegrationTest
 			.ConvertToBaseAsync(100m, rate.FromCurrencyId, new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc), CancellationToken));
 	}
 
-	private Task SetHistory(CurrencyRate rate, params (DateTime Date, decimal Prev, decimal Next)[] rows) =>
+	private Task SetHistory(CurrencyRate rate, params (DateTime Date, decimal Rate)[] rows) =>
 		GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate, rows, CancellationToken);
 }

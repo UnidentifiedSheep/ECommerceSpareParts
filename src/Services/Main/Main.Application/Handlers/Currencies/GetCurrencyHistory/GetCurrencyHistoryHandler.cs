@@ -14,7 +14,7 @@ public record GetCurrencyHistoryQuery(int CurrencyId, Pagination Pagination)
 
 public record GetCurrencyHistoryResult(IReadOnlyList<CurrencyRateHistoryDto> History);
 
-public class GetCurrencyHistoryHandler(IReadRepository<CurrencyRateHistory, int> repository)
+public class GetCurrencyHistoryHandler(IReadRepository<CurrencyRate, int> repository)
 	: IQueryHandler<GetCurrencyHistoryQuery, GetCurrencyHistoryResult>
 {
 	public async Task<GetCurrencyHistoryResult> Handle(
@@ -29,11 +29,11 @@ public class GetCurrencyHistoryHandler(IReadRepository<CurrencyRateHistory, int>
 				Id = x.Id,
 				FromCurrencyId = x.FromCurrencyId,
 				ToCurrencyId = x.ToCurrencyId,
-				PrevRate = x.PrevRate,
-				NewRate = x.NewRate,
+				Rate = x.Rate,
 				CreatedAt = x.CreatedAt
 			})
 			.OrderByDescending(x => x.CreatedAt)
+			.ThenByDescending(x => x.Id)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);
 

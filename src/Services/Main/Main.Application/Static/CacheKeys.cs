@@ -41,7 +41,6 @@ public static class CacheKeys
 
 		public static string AllCurrencies() => "currencies";
 
-		public static string CurrencyRate(int currencyId) => $"currency:{currencyId}:rate";
 	}
 
 	public static class OneTimeTokenCache

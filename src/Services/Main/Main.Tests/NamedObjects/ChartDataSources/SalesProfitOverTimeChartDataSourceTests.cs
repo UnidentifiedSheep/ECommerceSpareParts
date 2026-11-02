@@ -110,7 +110,8 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 		sale.SetDateTime(Input().StartDate);
 		await Context.SaveChangesAsync(CancellationToken);
 		var before = await Source.QueryAsync(Input(), CancellationToken);
-		foreach (var rate in GetContext<CurrencyRatesTestContext>().Rates) rate.SetRate(rate.Rate * 2);
+		foreach (var rate in GetContext<CurrencyRatesTestContext>().Rates)
+			await Context.AddAsync(Main.Entities.Currency.CurrencyRate.Create(rate.FromCurrencyId, rate.ToCurrencyId, rate.Rate * 2), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		var after = await Source.QueryAsync(Input(), CancellationToken);
 		after.DataPoints.Should().BeEquivalentTo(before.DataPoints);

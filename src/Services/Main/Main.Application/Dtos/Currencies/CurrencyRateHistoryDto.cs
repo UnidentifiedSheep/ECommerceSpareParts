@@ -13,11 +13,8 @@ public record CurrencyRateHistoryDto
 	[JsonPropertyName("toCurrencyId")]
 	public required int ToCurrencyId { get; init; }
 
-	[JsonPropertyName("prevRate")]
-	public required decimal PrevRate { get; init; }
-
-	[JsonPropertyName("newRate")]
-	public required decimal NewRate { get; init; }
+	[JsonPropertyName("rate")]
+	public required decimal Rate { get; init; }
 
 	[JsonPropertyName("createdAt")]
 	public required DateTime CreatedAt { get; init; }

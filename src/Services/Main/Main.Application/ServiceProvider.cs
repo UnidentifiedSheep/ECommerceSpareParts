@@ -104,7 +104,7 @@ public static class ServiceProvider
 		collection.AddScoped<IProducerLookupLoader, ProducerLookupLoader>();
 		collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
 		collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
-		collection.AddSingleton<IHistoricalRateProvider, HistoricalRateProvider>();
+		collection.AddSingleton<ICurrencyRateSnapshotProvider, CurrencyRateSnapshotProvider>();
 
 		collection.AddApplicationBase(
 			ServicesDefinitions.Main,

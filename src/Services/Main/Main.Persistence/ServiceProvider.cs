@@ -4,7 +4,6 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
-using Main.Persistence.Repositories.Currency;
 using Main.Persistence.Repositories.Product;
 using Main.Persistence.Repositories.Sale;
 using Main.Persistence.Repositories.Storage;
@@ -42,7 +41,6 @@ public static class ServiceProvider
 		collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
 		collection.AddScoped<IStorageContentRepository, StorageContentRepository>();
 		collection.AddScoped<IUserRepository, UserRepository>();
-		collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
 		collection.AddScoped<ISaleRepository, SaleRepository>();
 
 		return collection;

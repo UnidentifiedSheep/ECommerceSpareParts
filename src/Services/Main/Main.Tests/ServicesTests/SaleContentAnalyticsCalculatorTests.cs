@@ -22,16 +22,8 @@ public class SaleContentAnalyticsCalculatorTests : IntegrationTest
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
 		var january = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		var march = january.AddMonths(2);
-		await Context.CurrencyRateHistories
-			.Where(item => item.FromCurrencyId == rate.FromCurrencyId && item.ToCurrencyId == rate.ToCurrencyId)
-			.ExecuteDeleteAsync(CancellationToken);
-		foreach (var (date, previous, current) in new[] { (january, 0m, 2m), (march, 2m, 4m) })
-		{
-			var history = CurrencyRateHistory.Create(rate.FromCurrencyId, rate.ToCurrencyId, previous, current);
-			await Context.AddAsync(history, CancellationToken);
-			Context.Entry(history).Property(item => item.CreatedAt).CurrentValue = date;
-		}
-		await Context.SaveChangesAsync(CancellationToken);
+		await GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate,
+			[(january, 2m), (march, 4m)], CancellationToken);
 		var content = new SaleContentBuilder(Faker).WithPrices(120m, 90m).WithDetails([
 			new SaleContentDetailBuilder(Faker).WithCurrencyId(rate.FromCurrencyId).WithPurchaseDate(january)
 				.WithPurchasePrice(40m).WithCount(2).Build(),

@@ -861,51 +861,6 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Currency.CurrencyRate", b =>
                 {
-                    b.Property<int>("FromCurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("from_currency_id");
-
-                    b.Property<int>("ToCurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("to_currency_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("numeric")
-                        .HasColumnName("rate");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("FromCurrencyId", "ToCurrencyId")
-                        .HasName("currency_to_usd_pk");
-
-                    b.HasIndex("ToCurrencyId")
-                        .HasDatabaseName("currency_to_usd_index");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.currency.currencyrate_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.currency.currencyrate_who_updated_idx");
-
-                    b.ToTable("currency_rates", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Currency.CurrencyRateHistory", b =>
-                {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -921,13 +876,9 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("from_currency_id");
 
-                    b.Property<decimal>("NewRate")
+                    b.Property<decimal>("Rate")
                         .HasColumnType("numeric")
-                        .HasColumnName("new_rate");
-
-                    b.Property<decimal>("PrevRate")
-                        .HasColumnType("numeric")
-                        .HasColumnName("prev_rate");
+                        .HasColumnName("rate");
 
                     b.Property<int>("ToCurrencyId")
                         .HasColumnType("integer")
@@ -945,17 +896,21 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("currency_rates_pk");
+
+                    b.HasIndex("ToCurrencyId");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.currency.currencyratehistory_who_created_idx");
+                        .HasDatabaseName("main.entities.currency.currencyrate_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.currency.currencyratehistory_who_updated_idx");
+                        .HasDatabaseName("main.entities.currency.currencyrate_who_updated_idx");
 
-                    b.HasIndex("FromCurrencyId", "ToCurrencyId");
+                    b.HasIndex("FromCurrencyId", "ToCurrencyId", "CreatedAt", "Id")
+                        .HasDatabaseName("currency_rates_pair_date_idx");
 
-                    b.ToTable("currency_rate_history", "public");
+                    b.ToTable("currency_rates", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Documents.DocumentGenerationRequest", b =>
@@ -3836,17 +3791,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("ToCurrency");
                 });
 
-            modelBuilder.Entity("Main.Entities.Currency.CurrencyRateHistory", b =>
-                {
-                    b.HasOne("Main.Entities.Currency.CurrencyRate", "CurrencyRate")
-                        .WithMany("History")
-                        .HasForeignKey("FromCurrencyId", "ToCurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CurrencyRate");
-                });
-
             modelBuilder.Entity("Main.Entities.Documents.DocumentGenerationRequest", b =>
                 {
                     b.HasOne("Domain.CommonEntities.Job.Job", "Job")
@@ -4580,11 +4524,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("RatesFrom");
 
                     b.Navigation("RatesTo");
-                });
-
-            modelBuilder.Entity("Main.Entities.Currency.CurrencyRate", b =>
-                {
-                    b.Navigation("History");
                 });
 
             modelBuilder.Entity("Main.Entities.Order.Order", b =>

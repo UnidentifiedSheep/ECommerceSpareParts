@@ -35,14 +35,14 @@ public class CurrencyRatesTestContext(
 		Rates = await builders.BuildManyCombinedAndAddToDb(DbContext, 1);
 	}
 	public async Task SetHistoryAsync(CurrencyRate rate,
-		IReadOnlyCollection<(DateTime Date, decimal Prev, decimal Next)> rows, CancellationToken cancellationToken)
+		IReadOnlyCollection<(DateTime Date, decimal Rate)> rows, CancellationToken cancellationToken)
 	{
-		await DbContext.CurrencyRateHistories
+		await DbContext.CurrencyRates
 			.Where(row => row.FromCurrencyId == rate.FromCurrencyId && row.ToCurrencyId == rate.ToCurrencyId)
 			.ExecuteDeleteAsync(cancellationToken);
 		foreach (var item in rows)
 		{
-			var row = CurrencyRateHistory.Create(rate.FromCurrencyId, rate.ToCurrencyId, item.Prev, item.Next);
+			var row = CurrencyRate.Create(rate.FromCurrencyId, rate.ToCurrencyId, item.Rate);
 			await DbContext.AddAsync(row, cancellationToken);
 			DbContext.Entry(row).Property(value => value.CreatedAt).CurrentValue = item.Date;
 		}

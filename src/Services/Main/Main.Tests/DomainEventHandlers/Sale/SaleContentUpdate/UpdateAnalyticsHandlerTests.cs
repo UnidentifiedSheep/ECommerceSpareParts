@@ -28,7 +28,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
 		var start = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		await GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate,
-			[(start, 0m, 2m), (start.AddDays(10), 2m, 4m)], CancellationToken);
+			[(start, 2m), (start.AddDays(10), 4m)], CancellationToken);
 		var date = start.AddDays(8);
 		await Execute(async () =>
 		{
@@ -68,7 +68,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		var originalCurrency = sale.CurrencyId;
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
 		await GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate, [], CancellationToken);
-		await Scope.ServiceProvider.GetRequiredService<IHistoricalRateProvider>().Reload(CancellationToken);
+		await Scope.ServiceProvider.GetRequiredService<ICurrencyRateSnapshotProvider>().Reload(CancellationToken);
 		var before = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken);
 		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() => Execute(async () =>
 		{

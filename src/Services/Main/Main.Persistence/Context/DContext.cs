@@ -80,7 +80,6 @@ public partial class DContext : DbContext, INotificationDbContext
 
 	public virtual DbSet<Currency> Currencies { get; set; }
 
-	public virtual DbSet<CurrencyRateHistory> CurrencyRateHistories { get; set; }
 
 	public virtual DbSet<CurrencyRate> CurrencyRates { get; set; }
 

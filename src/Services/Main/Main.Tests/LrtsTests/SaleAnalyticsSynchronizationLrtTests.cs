@@ -108,7 +108,7 @@ public class SaleAnalyticsSynchronizationLrtTests : IntegrationTest
 			var rates = GetContext<CurrencyRatesTestContext>();
 			var rate = rates.Rates.First();
 			await rates.SetHistoryAsync(rate, [], CancellationToken);
-			await Scope.ServiceProvider.GetRequiredService<IHistoricalRateProvider>().Reload(CancellationToken);
+			await Scope.ServiceProvider.GetRequiredService<ICurrencyRateSnapshotProvider>().Reload(CancellationToken);
 			var detail = new SaleContentDetailBuilder(Faker).WithCount(1).WithPurchasePrice(40m)
 				.WithStorageContentIds([context.StorageContent.Id])
 				.WithCurrencyId(rate.FromCurrencyId)

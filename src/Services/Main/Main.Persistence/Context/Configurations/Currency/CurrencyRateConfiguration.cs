@@ -9,37 +9,16 @@ public class CurrencyRateConfiguration : IEntityTypeConfiguration<CurrencyRate>
 	public void Configure(EntityTypeBuilder<CurrencyRate> builder)
 	{
 		builder.ToTable("currency_rates", "public");
-
-		builder
-			.HasKey(e => new
-			{
-				e.FromCurrencyId, e.ToCurrencyId
-			})
-			.HasName("currency_to_usd_pk");
-
-		builder.HasIndex(e => e.ToCurrencyId).HasDatabaseName("currency_to_usd_index");
-
-		builder.Property(e => e.FromCurrencyId).ValueGeneratedNever().HasColumnName("from_currency_id");
-
-		builder.Property(e => e.ToCurrencyId).ValueGeneratedNever().HasColumnName("to_currency_id");
-
-		builder.Property(e => e.Rate).HasColumnName("rate");
-
-		builder
-			.HasOne(e => e.FromCurrency)
-			.WithMany(c => c.RatesFrom)
-			.HasForeignKey(e => e.FromCurrencyId)
-			.OnDelete(DeleteBehavior.Restrict);
-
-		builder
-			.HasOne(e => e.ToCurrency)
-			.WithMany(c => c.RatesTo)
-			.HasForeignKey(e => e.ToCurrencyId)
-			.OnDelete(DeleteBehavior.Restrict);
-
-		builder
-			.Navigation(e => e.History)
-			.HasField("_history")
-			.UsePropertyAccessMode(PropertyAccessMode.Field);
+		builder.HasKey(value => value.Id).HasName("currency_rates_pk");
+		builder.Property(value => value.Id).HasColumnName("id");
+		builder.Property(value => value.FromCurrencyId).HasColumnName("from_currency_id");
+		builder.Property(value => value.ToCurrencyId).HasColumnName("to_currency_id");
+		builder.Property(value => value.Rate).HasColumnName("rate");
+		builder.HasIndex(value => new { value.FromCurrencyId, value.ToCurrencyId, value.CreatedAt, value.Id })
+			.HasDatabaseName("currency_rates_pair_date_idx");
+		builder.HasOne(value => value.FromCurrency).WithMany(currency => currency.RatesFrom)
+			.HasForeignKey(value => value.FromCurrencyId).OnDelete(DeleteBehavior.Restrict);
+		builder.HasOne(value => value.ToCurrency).WithMany(currency => currency.RatesTo)
+			.HasForeignKey(value => value.ToCurrencyId).OnDelete(DeleteBehavior.Restrict);
 	}
 }
