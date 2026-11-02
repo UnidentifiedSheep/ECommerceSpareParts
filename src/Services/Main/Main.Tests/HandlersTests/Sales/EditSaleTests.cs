@@ -380,6 +380,9 @@ public class EditSaleTests : IntegrationTest
 
 		storageContent.IncreaseCount(count, StorageMovementType.SaleEditing);
 		product.IncreaseStock(count);
+		var stock = await Context.ProductStocks.SingleAsync(
+			item => item.ProductId == productId && item.StorageCode == storageContent.StorageCode, CancellationToken);
+		stock.SetQuantity(stock.Quantity + count);
 
 		await Context.SaveChangesAsync();
 		Context.ChangeTracker.Clear();

@@ -142,6 +142,9 @@ public class EditPurchaseTests : IntegrationTest
 		content.SetCount(10);
 		PurchaseContext.StorageContent.IncreaseCount(8, StorageMovementType.PurchaseEditing);
 		product.IncreaseStock(8);
+		var stock = await Context.ProductStocks.SingleAsync(
+			item => item.ProductId == product.Id && item.StorageCode == PurchaseContext.StorageContent.StorageCode, CancellationToken);
+		stock.SetQuantity(stock.Quantity + 8);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		await Mediator.Send(

@@ -35,6 +35,11 @@ public class StorageContentTestContext(
 		foreach (var content in StorageContents)
 			products[content.ProductId].IncreaseStock(content.Count);
 
+		await DbContext.AddRangeAsync(StorageContents
+			.GroupBy(content => (content.StorageCode, content.ProductId))
+			.Select(group => ProductStock.Create(group.Key.StorageCode, group.Key.ProductId, group.Sum(content => content.Count))),
+			cancellationToken);
+
 		await DbContext.SaveChangesAsync(cancellationToken);
 	}
 }

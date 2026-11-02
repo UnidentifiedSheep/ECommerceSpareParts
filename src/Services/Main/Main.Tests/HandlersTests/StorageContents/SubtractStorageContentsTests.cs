@@ -118,6 +118,9 @@ public class SubtractStorageContentsTests : IntegrationTest
 		var originalSecondCount = second.Count;
 		first.SetCount(0, StorageMovementType.StorageContentEditing);
 		product.IncreaseStock(-originalFirstCount);
+		var stock = await Context.ProductStocks.SingleAsync(
+			item => item.ProductId == product.Id && item.StorageCode == first.StorageCode, CancellationToken);
+		stock.SetQuantity(stock.Quantity - originalFirstCount);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(

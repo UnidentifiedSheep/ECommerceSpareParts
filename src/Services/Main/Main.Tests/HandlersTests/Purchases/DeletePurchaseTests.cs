@@ -119,6 +119,9 @@ public class DeletePurchaseTests : IntegrationTest
 			.WithBuyPrice(10m)
 			.BuildAndAddToDb(Context);
 		product.IncreaseStock(storageContent.Count);
+		var stock = await Context.ProductStocks.SingleAsync(
+			item => item.ProductId == product.Id && item.StorageCode == storageContent.StorageCode, CancellationToken);
+		stock.SetQuantity(stock.Quantity + storageContent.Count);
 
 		var purchaseContent = new PurchaseContentBuilder(Faker)
 			.WithProductId(product.Id)
