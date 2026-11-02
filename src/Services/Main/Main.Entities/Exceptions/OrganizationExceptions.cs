@@ -22,3 +22,12 @@ public class OrganizationNotFoundException : LocalizedNotFoundException
 	{
 	}
 }
+
+public class OrganizationMemberNotFoundException(object values) : LocalizedBadRequestException(
+	OrganizationMemberNotFoundMessage.Instance, values);
+
+public class OrganizationMemberAlreadyExistsException(object values) : LocalizedConflictException(
+	OrganizationMemberAlreadyExistsMessage.Instance, values);
+
+public class OrganizationSystemNameAlreadyTakenException(object values) : LocalizedConflictException(
+	OrganizationSystemNameAlreadyExistsMessage.Instance, values);

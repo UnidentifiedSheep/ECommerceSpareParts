@@ -1,3 +1,4 @@
+using Main.Entities.Exceptions;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Organizations.AddOrganizationMember;
@@ -63,7 +64,7 @@ public class OrganizationManagementTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.UsersNotFound);
+		exception.Failures.Should().Contain(x => x.Error is UserNotFoundException);
 	}
 
 	[Fact]
@@ -81,7 +82,7 @@ public class OrganizationManagementTests : IntegrationTest
 		exception
 			.Failures
 			.Should()
-			.Contain(x => x.ErrorName == ApplicationErrors.OrganizationSystemNameAlreadyTaken);
+			.Contain(x => x.Error is OrganizationSystemNameAlreadyTakenException);
 	}
 
 	[Fact]
@@ -121,7 +122,7 @@ public class OrganizationManagementTests : IntegrationTest
 		exception
 			.Failures
 			.Should()
-			.Contain(x => x.ErrorName == ApplicationErrors.OrganizationMemberAlreadyExists);
+			.Contain(x => x.Error is OrganizationMemberAlreadyExistsException);
 	}
 
 	[Fact]

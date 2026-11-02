@@ -449,7 +449,7 @@ public class CreateSaleTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
+		exception.Failures[0].Error.Should().BeOfType<CurrencyNotFoundException>();
 	}
 
 	[Fact]
@@ -463,7 +463,7 @@ public class CreateSaleTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.StoragesNotFound);
+		exception.Failures[0].Error.Should().BeOfType<StorageNotFoundException>();
 	}
 
 	[Fact]
@@ -477,7 +477,7 @@ public class CreateSaleTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.UsersNotFound);
+		exception.Failures[0].Error.Should().BeOfType<UserNotFoundException>();
 	}
 
 	[Fact]
@@ -491,7 +491,7 @@ public class CreateSaleTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationsNotFound);
+		exception.Failures.Should().Contain(x => x.Error is OrganizationNotFoundException);
 	}
 
 	[Fact]
@@ -506,7 +506,7 @@ public class CreateSaleTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationMemberNotFound);
+		exception.Failures.Should().Contain(x => x.Error is OrganizationMemberNotFoundException);
 	}
 
 	[Fact]
@@ -525,7 +525,7 @@ public class CreateSaleTests : IntegrationTest
 			},
 			CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.ArticlesNotFound);
+		exception.Failures[0].Error.Should().BeOfType<ProductNotFoundException>();
 	}
 
 	private CreateSaleCommand CreateValidCommand()

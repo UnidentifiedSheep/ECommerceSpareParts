@@ -11,6 +11,8 @@ namespace Persistence.DbValidator;
 public sealed class PgsqlDbValidator<TContext>(IDbValidator<TContext, NpgsqlParameter> validator)
 	: IDbValidator where TContext : DbContext
 {
+	public IValidationPlan CreatePlan() => validator.CreatePlan();
+
 	public async Task<IEnumerable<ValidationFailure>> Validate(
 		IValidationPlan plan,
 		bool throwOnError = true,

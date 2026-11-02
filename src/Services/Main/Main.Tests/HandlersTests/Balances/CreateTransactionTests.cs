@@ -177,7 +177,7 @@ public class CreateTransactionTests : IntegrationTest
 			},
 			CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.OrganizationsNotFound);
+		exception.Failures[0].Error.Should().BeOfType<OrganizationNotFoundException>();
 	}
 
 	[Fact]
@@ -192,7 +192,7 @@ public class CreateTransactionTests : IntegrationTest
 			},
 			CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
+		exception.Failures[0].Error.Should().BeOfType<CurrencyNotFoundException>();
 	}
 
 	[Fact]

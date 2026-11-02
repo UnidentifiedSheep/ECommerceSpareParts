@@ -6,6 +6,7 @@ using Domain.CommonEnums;
 using FluentAssertions;
 using Main.Application.Analytics.Lrts.SaleAnalyticsSynchronization;
 using Main.Application.Lrts.Base.Synchronization;
+using Main.Application.Interfaces.Services.Currency;
 using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -104,9 +105,13 @@ public class SaleAnalyticsSynchronizationLrtTests : IntegrationTest
 		var last = sales.OrderBy(sale => sale.Id).Last().Contents.Single();
 		if (invalidLast)
 		{
+			var rates = GetContext<CurrencyRatesTestContext>();
+			var rate = rates.Rates.First();
+			await rates.SetHistoryAsync(rate, [], CancellationToken);
+			await Scope.ServiceProvider.GetRequiredService<IHistoricalRateProvider>().Reload(CancellationToken);
 			var detail = new SaleContentDetailBuilder(Faker).WithCount(1).WithPurchasePrice(40m)
 				.WithStorageContentIds([context.StorageContent.Id])
-				.WithCurrencyId(GetContext<CurrencyRatesTestContext>().Rates.First().FromCurrencyId)
+				.WithCurrencyId(rate.FromCurrencyId)
 				.WithPurchaseDate(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Build();
 			last.SetPriceAndDetails(120m, 90m, [detail]);
 		}

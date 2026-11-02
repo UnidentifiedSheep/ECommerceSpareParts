@@ -3,6 +3,7 @@ using Attributes;
 using FluentAssertions;
 using Main.Entities.Exceptions;
 using Main.Application.Analytics.Interfaces;
+using Main.Application.Interfaces.Services.Currency;
 using Main.Entities.Sale;
 using Tests.DataBuilders.Sale;
 using Microsoft.EntityFrameworkCore;
@@ -21,15 +22,14 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task FinancialChange_UpdatesAnalyticsUsingHistoricalRate()
+	public async Task FinancialChange_UpdatesAnalyticsUsingNearestHistoricalRate()
 	{
 		var sale = GetContext<SaleTestContext>().Sale;
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
-		rate.SetRate(2m);
-		await Context.SaveChangesAsync(CancellationToken);
-		var date = DateTime.UtcNow;
-		rate.SetRate(4m);
-		await Context.SaveChangesAsync(CancellationToken);
+		var start = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		await GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate,
+			[(start, 0m, 2m), (start.AddDays(10), 2m, 4m)], CancellationToken);
+		var date = start.AddDays(8);
 		await Execute(async () =>
 		{
 			sale.SetCurrency(rate.FromCurrencyId);
@@ -39,8 +39,8 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 			await Context.SaveChangesAsync(CancellationToken);
 		});
 		var fact = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == sale.Contents.Single().Id, CancellationToken);
-		fact.OriginalAmountInBaseCurrency.Should().Be(60m * sale.Contents.Single().Count);
-		fact.RevenueInBaseCurrency.Should().Be(45m * sale.Contents.Single().Count);
+		fact.OriginalAmountInBaseCurrency.Should().Be(30m * sale.Contents.Single().Count);
+		fact.RevenueInBaseCurrency.Should().Be(22.5m * sale.Contents.Single().Count);
 		(await Context.SaleContentAnalytics.CountAsync(CancellationToken)).Should().Be(1);
 	}
 
@@ -66,10 +66,13 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 	{
 		var sale = GetContext<SaleTestContext>().Sale;
 		var originalCurrency = sale.CurrencyId;
+		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
+		await GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate, [], CancellationToken);
+		await Scope.ServiceProvider.GetRequiredService<IHistoricalRateProvider>().Reload(CancellationToken);
 		var before = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken);
 		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() => Execute(async () =>
 		{
-			sale.SetCurrency(GetContext<CurrencyRatesTestContext>().Rates.First().FromCurrencyId);
+			sale.SetCurrency(rate.FromCurrencyId);
 			sale.SetDateTime(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 			await Context.SaveChangesAsync(CancellationToken);
 		}));

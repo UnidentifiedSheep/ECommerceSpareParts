@@ -107,7 +107,7 @@ public class AddContentToStorageTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(async () =>
 				await Mediator.Send(command, CancellationToken));
-		Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
+		Assert.IsType<StorageNotFoundException>(exception.Failures[0].Error);
 	}
 
 	[Fact]

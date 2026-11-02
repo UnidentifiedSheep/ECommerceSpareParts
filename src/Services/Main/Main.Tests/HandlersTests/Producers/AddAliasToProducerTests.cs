@@ -1,3 +1,4 @@
+using Main.Entities.Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.ProducerAliases.AddAlias;
 using Main.Application.Static;
@@ -39,7 +40,7 @@ public class AddAliasToProducerTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(async () =>
 				await Mediator.Send(command, CancellationToken));
-		Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
+		Assert.IsType<ProducerNotFoundException>(exception.Failures[0].Error);
 	}
 
 	[Fact]
@@ -73,7 +74,7 @@ public class AddAliasToProducerTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(async () =>
 				await Mediator.Send(command, CancellationToken));
-		Assert.Equal(ApplicationErrors.ProducerAliasAlreadyTaken, exception.Failures[0].ErrorName);
+		Assert.IsType<ProducerAliasAlreadyTakenException>(exception.Failures[0].Error);
 	}
 
 	[Fact]
@@ -89,6 +90,6 @@ public class AddAliasToProducerTests : IntegrationTest
 			await Assert.ThrowsAsync<DbValidationException>(async () =>
 				await Mediator.Send(command, CancellationToken));
 
-		Assert.Equal(ApplicationErrors.ProducerAliasAlreadyTaken, exception.Failures[0].ErrorName);
+		Assert.IsType<ProducerAliasAlreadyTakenException>(exception.Failures[0].Error);
 	}
 }

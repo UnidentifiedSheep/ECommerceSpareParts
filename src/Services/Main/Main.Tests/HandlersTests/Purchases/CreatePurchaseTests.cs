@@ -426,7 +426,7 @@ public class CreatePurchaseTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationsNotFound);
+		exception.Failures.Should().Contain(x => x.Error is OrganizationNotFoundException);
 	}
 
 	[Fact]
@@ -441,7 +441,7 @@ public class CreatePurchaseTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationMemberNotFound);
+		exception.Failures.Should().Contain(x => x.Error is OrganizationMemberNotFoundException);
 	}
 
 	[Fact]
@@ -466,7 +466,7 @@ public class CreatePurchaseTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
+		exception.Failures[0].Error.Should().BeOfType<CurrencyNotFoundException>();
 	}
 
 	[Fact]
@@ -480,7 +480,7 @@ public class CreatePurchaseTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.StoragesNotFound);
+		exception.Failures[0].Error.Should().BeOfType<StorageNotFoundException>();
 	}
 
 	[Fact]
@@ -514,7 +514,7 @@ public class CreatePurchaseTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.StorageOwnerNotFound);
+		exception.Failures[0].Error.Should().BeOfType<StorageOwnerNotFoundException>();
 	}
 
 	[Fact]

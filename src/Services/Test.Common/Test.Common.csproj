@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Bogus" Version="35.6.5"/>
-        <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
+        <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>
         <PackageReference Include="MassTransit.Abstractions" Version="8.5.8"/>
         <PackageReference Include="MediatR" Version="14.1.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9"/>
@@ -57,6 +57,10 @@
         <LocanResource Include="../../Core/Domain/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Tests\Api\ExceptionHandlers\" />
     </ItemGroup>
 
 </Project>

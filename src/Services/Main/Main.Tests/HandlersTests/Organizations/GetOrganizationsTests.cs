@@ -1,3 +1,4 @@
+using Main.Entities.Exceptions;
 using Abstractions.Models;
 using Application.Common.Models;
 using Exceptions;
@@ -175,7 +176,7 @@ public class GetOrganizationsTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
 
-		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.UsersNotFound);
+		exception.Failures.Should().Contain(x => x.Error is UserNotFoundException);
 	}
 
 	[Fact]

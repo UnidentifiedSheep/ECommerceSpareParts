@@ -53,7 +53,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		var exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
 			await Mediator.Send(command, CancellationToken));
 
-		Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
+		Assert.IsType<ProducerNotFoundException>(exception.Failures[0].Error);
 	}
 
 	[Theory]

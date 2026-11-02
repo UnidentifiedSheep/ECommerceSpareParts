@@ -34,3 +34,9 @@ public class ProducersSupplierMappingAlreadyExistsException(string supplierProdu
 		{
 			SupplierProducerName = supplierProducerName, Supplier = supplier
 		});
+
+public class ProducerAliasAlreadyTakenException(object values) : LocalizedConflictException(
+	ProducerOtherNameAlreadyTakenMessage.Instance, values);
+
+public class ProducerNameNotFoundException(object values) : LocalizedNotFoundException(
+	ProducerNotFoundMessage.Instance, values);

@@ -1,4 +1,5 @@
 using Domain.CommonEntities.Job;
+using Main.Application.Configs;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
@@ -23,6 +24,7 @@ public static class ServiceProvider
 	public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
 	{
 		collection.AddPersistenceBase<DContext>(
+			ValidationConfiguration.Configure,
 			typeof(BasicEfRepository<,>),
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),

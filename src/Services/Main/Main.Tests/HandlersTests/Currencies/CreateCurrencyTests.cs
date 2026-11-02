@@ -1,3 +1,4 @@
+using Main.Entities.Exceptions;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Static;
 using Microsoft.EntityFrameworkCore;
@@ -95,7 +96,7 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 				created.Code),
 			CancellationToken));
 
-		Assert.Equal(ApplicationErrors.CurrencyCodeAlreadyTaken, exception.Failures[0].ErrorName);
+		Assert.IsType<CurrencyCodeAlreadyTakenException>(exception.Failures[0].Error);
 
 		exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(
 			new CreateCurrencyCommand(
@@ -105,7 +106,7 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 				GetValidCurrencyCode()),
 			CancellationToken));
 
-		Assert.Equal(ApplicationErrors.CurrencyNameAlreadyTaken, exception.Failures[0].ErrorName);
+		Assert.IsType<CurrencyNameAlreadyTakenException>(exception.Failures[0].Error);
 
 		exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(
 			new CreateCurrencyCommand(
@@ -115,7 +116,7 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 				GetValidCurrencyCode()),
 			CancellationToken));
 
-		Assert.Equal(ApplicationErrors.CurrencySignAlreadyTaken, exception.Failures[0].ErrorName);
+		Assert.IsType<CurrencySignAlreadyTakenException>(exception.Failures[0].Error);
 
 		exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(
 			new CreateCurrencyCommand(
@@ -125,7 +126,7 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 				GetValidCurrencyCode()),
 			CancellationToken));
 
-		Assert.Equal(ApplicationErrors.CurrencyShortNameAlreadyTaken, exception.Failures[0].ErrorName);
+		Assert.IsType<CurrencyShortNameAlreadyTakenException>(exception.Failures[0].Error);
 	}
 
 	[Fact]

@@ -1,3 +1,4 @@
+using Main.Entities.Exceptions;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Application.Static;
 using Microsoft.EntityFrameworkCore;
@@ -55,7 +56,7 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(async () =>
 				await Mediator.Send(command, CancellationToken));
-		Assert.Equal(ApplicationErrors.StoragesCodeAlreadyTaken, exception.Failures[0].ErrorName);
+		Assert.IsType<StorageCodeAlreadyTakenException>(exception.Failures[0].Error);
 	}
 
 	[Fact]

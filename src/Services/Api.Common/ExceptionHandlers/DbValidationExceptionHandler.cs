@@ -1,65 +1,43 @@
 ﻿using BulkValidation.Core.Exceptions;
+using Exceptions.Interfaces;
+using Locan.Core.Interfaces.Localizers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> logger)
+public class DbValidationExceptionHandler(ILogger<DbValidationExceptionHandler> logger, IContextualLocalizer localizer)
 	: ExceptionHandlerBase<DbValidationExceptionHandler>(logger)
 {
 	public override async ValueTask<bool> TryHandleAsync(
-		HttpContext httpContext,
-		Exception exception,
-		CancellationToken cancellationToken)
+		HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
 	{
 		if (exception is not ValidationException dbValidationException)
 			return false;
 
-		var problemDetails = GetBaseDetails(
-			dbValidationException,
-			httpContext,
-			null);
-		SetStatusCode(problemDetails, dbValidationException);
-		AddDbValidationErrors(problemDetails, dbValidationException);
-		LogException(
-			httpContext,
-			exception,
-			problemDetails.Status ?? StatusCodes.Status500InternalServerError);
-
-		httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
-		await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-		return true;
-	}
-
-	private void AddDbValidationErrors(ProblemDetails details, ValidationException bulkEx)
-	{
 		var errors = new List<ProblemDetails>();
-
-		foreach (var fail in bulkEx.Failures)
+		foreach (var failure in dbValidationException.Failures)
 		{
-			var errorName = fail.ErrorName ?? "An unexpected error occurred";
-			var errorCode = fail.ErrorCode;
-			// TODO: Replace the raw message with ILocalizableMessage when BulkValidation exposes it.
-
-			errors.Add(
-				new ProblemDetails
-				{
-					Title = errorName,
-					Detail = fail.Message,
-					Status = errorCode
-				});
+			var detail = failure.Message;
+			if (failure.Error is ILocalizableException localized && localizer.TryGet(localized.LocalizableMessage, out var message))
+				detail = message;
+			var error = new ProblemDetails
+			{
+				Title = failure.Error?.GetType().Name ?? failure.ErrorName ?? "An unexpected error occurred",
+				Detail = detail,
+				Status = failure.Error is IStatusCode status ? (int)status.StatusCode : StatusCodes.Status500InternalServerError
+			};
+			if (failure.Error is IValuedException valued && valued.GetErrorValues() is { } values)
+				error.Extensions["errorRelatedData"] = values;
+			errors.Add(error);
 		}
 
-		details.Extensions["errors"] = errors;
-	}
-
-	private void SetStatusCode(ProblemDetails details, ValidationException bulkEx)
-	{
-		var max = -1;
-
-		foreach (var failure in bulkEx.Failures)
-			if (failure.ErrorCode.HasValue && failure.ErrorCode.Value > max)
-				max = failure.ErrorCode.Value;
-
-		details.Status = max == -1 ? StatusCodes.Status500InternalServerError : max;
+		var statusCode = errors.Select(error => error.Status!.Value)
+			.DefaultIfEmpty(StatusCodes.Status500InternalServerError).Max();
+		var problemDetails = GetBaseDetails(exception, httpContext, statusCode);
+		problemDetails.Extensions["errors"] = errors;
+		LogException(httpContext, exception, statusCode);
+		httpContext.Response.StatusCode = statusCode;
+		await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+		return true;
 	}
 }

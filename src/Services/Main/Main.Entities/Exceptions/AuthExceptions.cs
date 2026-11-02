@@ -108,3 +108,6 @@ public class UserPermissionNotFound(Guid id, string permission) : LocalizedNotFo
 	{
 		UserId = id, Permission = permission
 	});
+
+public class PermissionAlreadyExistsException(string value) : LocalizedConflictException(
+	new PermissionNameTakenMessage().WithName(value), new { Name = value });

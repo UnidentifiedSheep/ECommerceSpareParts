@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using Main.Entities.Exceptions;
+using FluentAssertions;
 using Main.Application.Handlers.Cart.AddToCart;
 using Main.Application.Static;
 using Main.Entities.Product;
@@ -62,7 +63,7 @@ public class AddToCartTests : IntegrationTest
 
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
-		Assert.Equal(ApplicationErrors.CartItemAlreadyExist, exception.Failures[0].ErrorName);
+		Assert.IsType<CartItemAlreadyExistsException>(exception.Failures[0].Error);
 	}
 
 	[Theory]
@@ -90,7 +91,7 @@ public class AddToCartTests : IntegrationTest
 
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
-		Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
+		Assert.IsType<UserNotFoundException>(exception.Failures[0].Error);
 	}
 
 	private (User, Product) GetUserAndProduct() => (_usersContext.Users.First(), _productContext.Products[0]);

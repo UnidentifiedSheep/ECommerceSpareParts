@@ -1,3 +1,4 @@
+using Main.Entities.Exceptions;
 using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
@@ -78,7 +79,7 @@ public class GetOrganizationMembersTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
 
-		exception.Failures.Should().Contain(x => x.ErrorName == ApplicationErrors.OrganizationsNotFound);
+		exception.Failures.Should().Contain(x => x.Error is OrganizationNotFoundException);
 	}
 
 	private static GetOrganizationMembersQuery CreateQuery(

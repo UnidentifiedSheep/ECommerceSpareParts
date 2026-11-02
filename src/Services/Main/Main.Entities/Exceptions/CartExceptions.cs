@@ -8,3 +8,6 @@ public class CartItemNotFoundException(int articleId) : LocalizedNotFoundExcepti
 	{
 		ArticleId = articleId
 	});
+
+public class CartItemAlreadyExistsException(object values) : LocalizedConflictException(
+	ItemAlreadyInCartMessage.Instance, values);

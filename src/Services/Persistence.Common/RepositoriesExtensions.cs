@@ -3,6 +3,7 @@ using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using BulkValidation.Pgsql.Extensions;
+using BulkValidation.Core.Configuration;
 using Domain;
 using Domain.CommonEntities.Job;
 using Domain.Interfaces;
@@ -22,6 +23,17 @@ public static class RepositoriesExtensions
 {
 	public static IServiceCollection AddPersistenceBase<TContext>(
 		this IServiceCollection services,
+		Type repositoryType,
+		Type linqRepositoryType,
+		Type readRepositoryType,
+		params Assembly[] entitiesAssemblies) where TContext : DbContext
+	{
+		return services.AddPersistenceBase<TContext>(_ => { }, repositoryType, linqRepositoryType, readRepositoryType, entitiesAssemblies);
+	}
+
+	public static IServiceCollection AddPersistenceBase<TContext>(
+		this IServiceCollection services,
+		Action<ValidationErrors> configureValidation,
 		Type repositoryType,
 		Type linqRepositoryType,
 		Type readRepositoryType,
@@ -74,7 +86,7 @@ public static class RepositoriesExtensions
 		services.AddUnitOfWork<TContext>();
 
 		services.AddScoped<IDbValidator, PgsqlDbValidator<TContext>>();
-		services.AddPgsqlDbValidators<TContext>();
+		services.AddPgsqlDbValidators<TContext>(configureValidation);
 
 		return services;
 	}

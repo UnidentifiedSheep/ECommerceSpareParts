@@ -5,6 +5,8 @@ namespace Application.Common.Interfaces.Persistence;
 
 public interface IDbValidator
 {
+	IValidationPlan CreatePlan();
+
 	Task<IEnumerable<ValidationFailure>> Validate(
 		IValidationPlan plan,
 		bool throwOnError = true,

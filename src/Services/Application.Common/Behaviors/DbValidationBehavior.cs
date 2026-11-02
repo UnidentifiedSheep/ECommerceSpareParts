@@ -1,7 +1,6 @@
 ﻿using Abstractions.Interfaces;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Persistence;
-using BulkValidation.Core.Plan;
 using MediatR;
 
 namespace Application.Common.Behaviors;
@@ -19,7 +18,7 @@ public class DbValidationBehavior<TRequest, TResponse>(
 		if (validation == null)
 			return await next(cancellationToken);
 
-		var plan = new ValidationPlan();
+		var plan = dbValidator.CreatePlan();
 
 		validation.Build(plan, request);
 

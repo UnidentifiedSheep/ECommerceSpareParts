@@ -1,4 +1,5 @@
-﻿using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
+﻿using Main.Entities.Exceptions;
+using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Static;
 using Main.Entities.Currency;
 using Main.Entities.Storage;
@@ -155,6 +156,6 @@ public class AddStorageRouteTests : IntegrationTest
 		var exception =
 			await Assert.ThrowsAsync<DbValidationException>(async () =>
 				await Mediator.Send(command, CancellationToken));
-		Assert.Contains(exception.Failures, f => f.ErrorName == ApplicationErrors.StoragesNotFound);
+		Assert.Contains(exception.Failures, f => f.Error is StorageNotFoundException);
 	}
 }
