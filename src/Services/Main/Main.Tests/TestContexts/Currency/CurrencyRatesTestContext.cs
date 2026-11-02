@@ -6,6 +6,7 @@ using Tests.Abstractions;
 using Tests.DataBuilders.Currency;
 using Tests.Extensions;
 using Tests.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tests.TestContexts.Currency;
 
@@ -32,5 +33,19 @@ public class CurrencyRatesTestContext(
 				.WithFromCurrencyId(currency.Id));
 
 		Rates = await builders.BuildManyCombinedAndAddToDb(DbContext, 1);
+	}
+	public async Task SetHistoryAsync(CurrencyRate rate,
+		IReadOnlyCollection<(DateTime Date, decimal Prev, decimal Next)> rows, CancellationToken cancellationToken)
+	{
+		await DbContext.CurrencyRateHistories
+			.Where(row => row.FromCurrencyId == rate.FromCurrencyId && row.ToCurrencyId == rate.ToCurrencyId)
+			.ExecuteDeleteAsync(cancellationToken);
+		foreach (var item in rows)
+		{
+			var row = CurrencyRateHistory.Create(rate.FromCurrencyId, rate.ToCurrencyId, item.Prev, item.Next);
+			await DbContext.AddAsync(row, cancellationToken);
+			DbContext.Entry(row).Property(value => value.CreatedAt).CurrentValue = item.Date;
+		}
+		await DbContext.SaveChangesAsync(cancellationToken);
 	}
 }

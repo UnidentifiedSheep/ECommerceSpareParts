@@ -17,11 +17,10 @@ public class GetHistoricalCurrencyRateTests : IntegrationTest
 	public async Task Query_ReturnsRateAtRequestedInstantRegardlessOfOffset()
 	{
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
-		rate.SetRate(2m);
-		await Context.SaveChangesAsync(CancellationToken);
-		var forDate = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(3));
-		rate.SetRate(4m);
-		await Context.SaveChangesAsync(CancellationToken);
+		var date = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		await GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate,
+			[(date, 0m, 2m), (date.AddDays(10), 2m, 4m)], CancellationToken);
+		var forDate = new DateTimeOffset(date.AddDays(1)).ToOffset(TimeSpan.FromHours(3));
 
 		var result = await Mediator.Send(new GetHistoricalCurrencyRateQuery(rate.FromCurrencyId, forDate), CancellationToken);
 
@@ -40,7 +39,9 @@ public class GetHistoricalCurrencyRateTests : IntegrationTest
 	[Fact]
 	public async Task Query_MissingHistory_ThrowsNotFound()
 	{
-		var id = GetContext<CurrencyRatesTestContext>().Rates.First().FromCurrencyId;
+		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
+		await GetContext<CurrencyRatesTestContext>().SetHistoryAsync(rate, [], CancellationToken);
+		var id = rate.FromCurrencyId;
 		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() => Mediator.Send(new GetHistoricalCurrencyRateQuery(id,
 			new DateTimeOffset(1990, 1, 1, 0, 0, 0, TimeSpan.Zero)), CancellationToken));
 	}

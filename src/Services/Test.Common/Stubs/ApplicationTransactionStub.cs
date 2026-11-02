@@ -4,7 +4,7 @@ using Attributes;
 
 namespace Tests.Stubs;
 
-public class ApplicationTransactionStub(IApplicationTransactionContext context) : IApplicationTransaction
+public class ApplicationTransactionStub(IApplicationTransactionContext context, Func<Task>? afterExecute = null) : IApplicationTransaction
 {
 	private Action<TransactionError>? _onException;
 	public IApplicationTransactionContext Context => context;
@@ -39,7 +39,9 @@ public class ApplicationTransactionStub(IApplicationTransactionContext context) 
 		IsExecuting = true;
 		try
 		{
-			return await action(context, cancellationToken);
+			var result = await action(context, cancellationToken);
+			if (afterExecute is not null) await afterExecute();
+			return result;
 		}
 		catch (Exception exception) when (exception is not OperationCanceledException && !cancellationToken.IsCancellationRequested)
 		{

@@ -20,24 +20,23 @@ public sealed class HistoricalRateProvider(
 		Comparer<Info>.Create((a, b) => a.When.CompareTo(b.When));
 
 	private readonly SemaphoreSlim _lock = new(1, 1);
-	private bool _loaded;
-
-	private FrozenDictionary<(int FromCurrencyId, int ToCurrencyId), ImmutableArray<Info>> _history
-		= new Dictionary<(int FromCurrencyId, int ToCurrencyId),ImmutableArray<Info>>().ToFrozenDictionary();
-
-	private int _baseCurrencyId = -1;
+	private Snapshot? _snapshot;
 
 	public async Task<decimal> GetNearestRateFor(
 		int currencyId,
 		DateTime date,
 		CancellationToken token)
 	{
-		await EnsureLoadedAsync(token);
-		if (!_history.TryGetValue((currencyId, _baseCurrencyId), out var arr) ||
-			arr.IsDefaultOrEmpty)
+		if (date.Kind != DateTimeKind.Utc)
+			throw new ArgumentException("Currency rate date must be UTC.", nameof(date));
+
+		var snapshot = await GetSnapshotAsync(token);
+		if (currencyId == snapshot.BaseCurrencyId) return 1m;
+		if (!snapshot.History.TryGetValue((currencyId, snapshot.BaseCurrencyId), out var rates) || rates.IsDefaultOrEmpty)
 			throw new CurrencyRateNotFoundException(currencyId);
 
-		return GetNearestRate(arr, date);
+		var rate = GetNearestRate(rates, date);
+		return rate > 0m ? rate : throw new CurrencyRateNotFoundException(currencyId);
 	}
 
 	private static decimal GetNearestRate(
@@ -65,23 +64,13 @@ public sealed class HistoricalRateProvider(
 			: after.Rate;
 	}
 
-	public Task Reload(CancellationToken token)
+	public async Task Reload(CancellationToken token)
 	{
-		Volatile.Write(ref _loaded, false);
-		return EnsureLoadedAsync(token);
-	}
-
-	private async Task EnsureLoadedAsync(CancellationToken ct)
-	{
-		if (Volatile.Read(ref _loaded)) return;
-		await _lock.WaitAsync(ct);
-
+		await _lock.WaitAsync(token);
 		try
 		{
-			if (_loaded) return;
-
-			await LoadRates(ct);
-			Volatile.Write(ref _loaded, true);
+			// Always reload after acquiring the lock: an earlier load may predate this invalidation.
+			Volatile.Write(ref _snapshot, await LoadRates(token));
 		}
 		finally
 		{
@@ -89,12 +78,32 @@ public sealed class HistoricalRateProvider(
 		}
 	}
 
-	private async Task LoadRates(CancellationToken token)
+	private async Task<Snapshot> GetSnapshotAsync(CancellationToken token)
+	{
+		var snapshot = Volatile.Read(ref _snapshot);
+		if (snapshot is not null) return snapshot;
+
+		await _lock.WaitAsync(token);
+		try
+		{
+			snapshot = Volatile.Read(ref _snapshot);
+			if (snapshot is not null) return snapshot;
+			snapshot = await LoadRates(token);
+			Volatile.Write(ref _snapshot, snapshot);
+			return snapshot;
+		}
+		finally
+		{
+			_lock.Release();
+		}
+	}
+
+	private async Task<Snapshot> LoadRates(CancellationToken token)
 	{
 		await using var transaction = transactionFactory.Create();
 		int baseCurrencyId = -1;
 
-		_history = (await transaction
+		var history = (await transaction
 			.WithSettings(new TransactionalAttribute(IsolationLevel.RepeatableRead))
 			.ExecuteAsync(async (ctx, ct) =>
 			{
@@ -108,6 +117,7 @@ public sealed class HistoricalRateProvider(
 					.Query
 					.Select(x => new
 					{
+						x.Id,
 						x.FromCurrencyId,
 						x.ToCurrencyId,
 						x.NewRate,
@@ -117,13 +127,20 @@ public sealed class HistoricalRateProvider(
 			}, token))
 			.GroupBy(
 				x => (x.FromCurrencyId, x.ToCurrencyId),
-				x => new Info(x.NewRate, x.CreatedAt))
+				x => x)
 			.ToFrozenDictionary(
 				x => x.Key,
-				x => x.OrderBy(z => z.When).ToImmutableArray());
+				x => x.OrderByDescending(row => row.Id)
+					.DistinctBy(row => row.CreatedAt)
+					.OrderBy(row => row.CreatedAt)
+					.Select(row => new Info(row.NewRate, row.CreatedAt)).ToImmutableArray());
 
-		_baseCurrencyId = baseCurrencyId;
+		return new Snapshot(baseCurrencyId, history);
 	}
+
+	private sealed record Snapshot(
+		int BaseCurrencyId,
+		FrozenDictionary<(int FromCurrencyId, int ToCurrencyId), ImmutableArray<Info>> History);
 
 	private readonly record struct Info(decimal Rate, DateTime When);
 
