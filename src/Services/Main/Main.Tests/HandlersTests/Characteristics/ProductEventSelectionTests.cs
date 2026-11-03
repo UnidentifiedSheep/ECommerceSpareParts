@@ -1,4 +1,5 @@
 using Contracts.Products;
+using Contracts.Storage;
 using FluentAssertions;
 using Main.Application.Interfaces.Products;
 using Main.Entities.Product;
@@ -88,7 +89,7 @@ public class ProductEventSelectionTests : IntegrationTest
 
 		var events = await provider.GetEventsAsync([productId, int.MaxValue], ProductEventParts.All, CancellationToken);
 
-		events.Should().HaveCount(4);
+		events.Should().HaveCount(5);
 		var products = events.OfType<ProductsUpdatedEvent>().Should().ContainSingle().Which.Products;
 		products.Should().HaveCount(2);
 		products.Should().ContainSingle(product => product.Id == productId && !product.IsDeleted);
@@ -98,6 +99,8 @@ public class ProductEventSelectionTests : IntegrationTest
 		events.OfType<ProductDimensionsUpdatedEvent>().Should().ContainSingle().Which.Products.Should()
 			.ContainSingle().Which.ProductId.Should().Be(productId);
 		events.OfType<ProductWeightUpdatedEvent>().Should().ContainSingle().Which.Products.Should()
+			.ContainSingle().Which.ProductId.Should().Be(productId);
+		events.OfType<ProductStocksSnapshotEvent>().Should().ContainSingle().Which.Products.Should()
 			.ContainSingle().Which.ProductId.Should().Be(productId);
 	}
 }

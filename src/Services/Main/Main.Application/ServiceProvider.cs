@@ -69,6 +69,7 @@ public static class ServiceProvider
 		collection.AddScoped<IProductEventPartProvider, ProductCharacteristicsEventPartProvider>();
 		collection.AddScoped<IProductEventPartProvider, ProductDimensionsEventPartProvider>();
 		collection.AddScoped<IProductEventPartProvider, ProductWeightEventPartProvider>();
+		collection.AddScoped<IProductEventPartProvider, ProductStocksEventPartProvider>();
 
 		//order is important
 		collection.AddSingleton<IDocumentTemplateSource, S3DocumentTemplateSource>();

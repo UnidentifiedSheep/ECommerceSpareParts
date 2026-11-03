@@ -7,5 +7,6 @@ public enum ProductEventParts
 	Characteristics = 2,
 	Dimensions = 4,
 	Weight = 8,
-	All = Core | Characteristics | Dimensions | Weight
+	Stocks = 16,
+	All = Core | Characteristics | Dimensions | Weight | Stocks
 }
