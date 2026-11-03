@@ -157,6 +157,39 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 		(await Total(content.ProductId)).Should().Be(11);
 	}
 
+	[Fact]
+	public async Task ConcurrentBatches_ExistingBalancesInReverseOrderDoNotLoseDeltas()
+	{
+		var first = NewContent(0, 0, 10);
+		var second = NewContent(1, 0, 10);
+		await Add(first, second);
+		var ready = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		var entered = 0;
+		var factory = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionFactory>();
+
+		async Task Apply(params (StorageContent Content, int Delta)[] changes)
+		{
+			await using var transaction = factory.Create();
+			await transaction.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
+			{
+				var events = context.GetRequiredService<IDomainEventScope>();
+				foreach (var (content, delta) in changes)
+					events.Add(new StorageContentCountUpdatedDomainEvent(
+						content.ProductId, content.StorageCode, content.CurrencyId, content.Count + delta,
+						content.BuyPrice, StorageMovementType.StorageContentAddition, delta));
+				if (Interlocked.Increment(ref entered) == 2) ready.TrySetResult();
+				await ready.Task.WaitAsync(token);
+			}, CancellationToken);
+		}
+
+		await Task.WhenAll(Apply((first, 2), (second, 3)), Apply((second, -2), (first, -1)));
+
+		(await Quantity(first)).Should().Be(11);
+		(await Quantity(second)).Should().Be(11);
+		(await Total(first.ProductId)).Should().Be(11);
+		(await Total(second.ProductId)).Should().Be(11);
+	}
+
 	private StorageContent NewContent(int product, int storage, int count) => new StorageContentBuilder(Faker)
 		.WithProductIds(GetContext<ProductTestContext>().Products[product].Id)
 		.WithStorageCode(GetContext<StorageTestContext>().Storages.ElementAt(storage).Code)

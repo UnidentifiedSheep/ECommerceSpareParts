@@ -6,8 +6,8 @@ using Application.Common.Services.Events;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.DomainEvents.StorageContent;
 using Main.Entities.Exceptions;
-using ProductEntity = Main.Entities.Product.Product;
 using Main.Entities.Storage;
+using ProductEntity = Main.Entities.Product.Product;
 
 namespace Main.Application.DomainEventHandlers.Storage.StorageContentCountUpdated;
 
@@ -29,7 +29,7 @@ public class UpdateProductStockHandler(
 		if (deltas.Length == 0) return;
 
 		var productIds = deltas.Select(item => item.Key.ProductId).Distinct().ToList();
-		// Product locks also serialize creation of stock rows that do not exist yet.
+		// Lock the shared product total before warehouse balances, always in the same order.
 		var products = await productRepository.FindByIdsAsync(
 			productIds,
 			Criteria<ProductEntity>.New().OrderByAsc(product => product.Id).Track().ForUpdate().Build(),
@@ -37,10 +37,13 @@ public class UpdateProductStockHandler(
 		productIds.EnsureAllExists(products.Keys, notFound => new ProductNotFoundException(notFound));
 
 		var storageCodes = deltas.Select(item => item.Key.StorageCode).Distinct().ToList();
-		var stocks = (await stockRepository.ListAsync(
-			Criteria<ProductStock>.New()
-				.Where(stock => productIds.Contains(stock.ProductId) && storageCodes.Contains(stock.StorageCode))
-				.Track().Build(), cancellationToken)).ToDictionary(stock => stock.GetId());
+		var stocks = (await stockRepository.ListAsync(new Criteria<ProductStock>
+		{
+			Wheres = [stock => productIds.Contains(stock.ProductId) && storageCodes.Contains(stock.StorageCode)],
+			OrderBy = query => query.OrderBy(stock => stock.StorageCode).ThenBy(stock => stock.ProductId),
+			Track = true,
+			ForUpdate = true
+		}, cancellationToken)).ToDictionary(stock => stock.GetId());
 
 		var newStocks = new List<ProductStock>();
 		foreach (var item in deltas)
