@@ -36,8 +36,8 @@ public class GetProductCrossesHandler(
 			var normalizedSku = Sku.ToNormalized(term);
 			var skuPattern = $"%{normalizedSku}%";
 			query = query.Where(product =>
-				EF.Functions.ILike(product.Name.Value, pattern) ||
-				EF.Functions.ILike(product.Producer.Name, pattern) ||
+				EF.Functions.ILike(product.Name.Value, pattern, "\\") ||
+				EF.Functions.ILike(product.Producer.Name, pattern, "\\") ||
 				normalizedSku.Length > 0 && EF.Functions.ILike(product.Sku.NormalizedValue, skuPattern));
 		}
 

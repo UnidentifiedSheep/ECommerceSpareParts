@@ -76,20 +76,22 @@ public sealed class GetProductCrossesTests : IntegrationTest
 	[InlineData("  CrOsSfIlTeR  ")]
 	[InlineData("Ab 987654")]
 	[InlineData("%")]
+	[InlineData("_")]
+	[InlineData("\\")]
 	public async Task SearchTerm_FiltersCachedCrossesByNameOrNormalizedSku(string searchTerm)
 	{
 		var (productId, ids) = await LoadCrosses();
 		var products = GetContext<ProductCrossTestContext>().ProductTestContext.Products;
 		var target = products.Single(product => product.Id == ids[0]);
-		target.SetName("CrossFilter % literal");
+		target.SetName("CrossFilter % _ \\ literal");
 		target.SetSku("AB-987654");
 		var unrelated = products.First(product => product.Id != productId && !ids.Contains(product.Id));
-		unrelated.SetName("CrossFilter % literal");
+		unrelated.SetName("CrossFilter % _ \\ literal");
 		unrelated.SetSku("AB-987654-other");
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(new GetProductCrossesQuery(
-			productId, new Pagination(0, 1), SearchTerm: searchTerm), CancellationToken);
+			productId, new Pagination(0, 100), SearchTerm: searchTerm), CancellationToken);
 
 		result.Crosses.Should().ContainSingle().Which.Id.Should().Be(target.Id);
 	}
