@@ -35,12 +35,12 @@ public sealed class ProductSnapshotUpdateTests(SearchContainerFixture fixture) :
 		{
 			ProductId = 123, UpdatedAt = Timestamp.AddSeconds(2), Characteristics = [new(10, "999", 999)]
 		}], Token);
-		await Products.ApplyUpdates([Product() with { Stock = 8, UpdatedAt = Timestamp.AddSeconds(4) }], Token);
+		await Products.ApplyUpdates([Product() with { Name = "Updated product", UpdatedAt = Timestamp.AddSeconds(4) }], Token);
 		await RefreshAsync();
 
 		var result = await Products.GetById(123, Token);
 		result!.ReadinessStatus.Should().Be(ProductReadinessStatus.Ready);
-		result.Stock.Should().Be(8);
+		result.Name.Should().Be("Updated product");
 		result.Characteristics.Should().ContainSingle().Which.NumericValue.Should().Be(12.5m);
 		result.CharacteristicsUpdatedAt.Should().Be(Timestamp.AddSeconds(3));
 		(await Search(Products)).Total.Should().Be(1);
@@ -155,7 +155,7 @@ public sealed class ProductSnapshotUpdateTests(SearchContainerFixture fixture) :
 	private static ProductCoreUpdate Product() => new()
 	{
 		ProductId = 123, UpdatedAt = Timestamp, Sku = "TEST-123", NormalizedSku = "test123", Name = "Test product",
-		ProducerId = 1, ProductGroupId = 7, Stock = 1, Indicator = "test", ReadinessStatus = ProductReadinessStatus.Ready
+		ProducerId = 1, ProductGroupId = 7, Indicator = "test", ReadinessStatus = ProductReadinessStatus.Ready
 	};
 
 	private static Task<SearchResult<Product>> Search(IProductRepository repository) => repository.Search(new CatalogueSearchCriteria

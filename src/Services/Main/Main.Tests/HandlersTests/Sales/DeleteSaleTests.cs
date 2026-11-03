@@ -1,3 +1,4 @@
+using Tests.Extensions;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Sales;
@@ -39,8 +40,7 @@ public class DeleteSaleTests : IntegrationTest
 			.StorageContents
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
-		var product =
-			await Context.Products.AsNoTracking().SingleAsync(x => x.Id == productId, CancellationToken);
+		var productStockQuantity = await Context.GetProductStockQuantityAsync(productId, CancellationToken);
 		var transaction = await Context
 			.Transactions
 			.AsNoTracking()
@@ -53,7 +53,7 @@ public class DeleteSaleTests : IntegrationTest
 
 		deletedSale.State.Should().Be(SaleState.Deleted);
 		storageContent.Count.Should().Be(storageCountBeforeDelete + soldCount);
-		product.Stock.Value.Should().Be(productStockBeforeDelete + soldCount);
+		productStockQuantity.Should().Be(productStockBeforeDelete + soldCount);
 		transaction.IsReversed.Should().BeTrue();
 		transaction.IsReversalApplied.Should().BeTrue();
 		transaction.SourceType.Should().Be(TransactionSourceType.Sale);
@@ -149,10 +149,6 @@ public class DeleteSaleTests : IntegrationTest
 		return storageContent.Count;
 	}
 
-	private async Task<int> ProductStock(int productId)
-	{
-		var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == productId);
-
-		return product.Stock.Value;
-	}
+	private Task<int> ProductStock(int productId) =>
+		Context.GetProductStockQuantityAsync(productId, CancellationToken);
 }

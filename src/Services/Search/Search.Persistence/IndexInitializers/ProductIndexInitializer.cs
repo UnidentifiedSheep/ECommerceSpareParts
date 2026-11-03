@@ -10,6 +10,8 @@ namespace Search.Persistence.IndexInitializers;
 public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSearchOptions> options)
 	: IndexInitializerBase<Product>(client, TimeSpan.FromHours(3))
 {
+	private const int TotalFieldsLimit = 10000;
+
 	public override async Task LazyInitialize(CancellationToken cancellationToken = default)
 	{
 		var idx = options.Value.IndexOptions.Products;
@@ -21,35 +23,27 @@ public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSear
 				c => c
 					.Settings(s => s
 						.Setting("index.max_ngram_diff", 18)
+						.Setting("index.mapping.total_fields.limit", TotalFieldsLimit)
 						.Analysis(a => a.ConfigureCatalogueSearch()))
 					.Map<Product>(m => m.Properties(p =>
-						p
+						p.StockFields()
 							.Number(number => number.Name(x => x.ReadinessStatus).Type(NumberType.Integer))
 							.Date(d => d.Name(x => x.ProductUpdatedAt))
-							.Date(d => d.Name(x => x.CharacteristicsUpdatedAt))
-							.Date(d => d.Name(x => x.DimensionsUpdatedAt))
-							.Date(d => d.Name(x => x.WeightUpdatedAt))
+							.Date(d => d.Name(x => x.CharacteristicsUpdatedAt).Index(false).DocValues(false))
+							.Date(d => d.Name(x => x.DimensionsUpdatedAt).Index(false).DocValues(false))
+							.Date(d => d.Name(x => x.WeightUpdatedAt).Index(false).DocValues(false))
 							.Nested<ProductCharacteristic>(n => n.Name(x => x.Characteristics).Properties(cp => cp
 								.Number(k => k.Name(x => x.CharacteristicId).Type(NumberType.Integer))
 								.Keyword(k => k.Name(x => x.Value))
 								.Number(k => k.Name(x => x.NumericValue).Type(NumberType.Double))))
 							.Keyword(k => k.Name(x => x.Id))
-							.Text(t => t
-								.Name(x => x.Name)
+							.Text(text => text
+								.Name(product => product.Name)
 								.Analyzer(CatalogueSearchAnalysis.SearchAnalyzer)
-								.Fields(f => f
-									.Keyword(k => k
-										.Name("keyword")
-										.IgnoreAbove(256)
-										.Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer))
-									.Text(prefix => prefix
-										.Name("prefix")
-										.Analyzer(CatalogueSearchAnalysis.PrefixAnalyzer)
-										.SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))
-									.Text(contains => contains
-										.Name("contains")
-										.Analyzer(CatalogueSearchAnalysis.ContainsAnalyzer)
-										.SearchAnalyzer(CatalogueSearchAnalysis.SearchAnalyzer))))
+								.Fields(fields => fields.Keyword(keyword => keyword
+									.Name("keyword")
+									.IgnoreAbove(256)
+									.Normalizer(CatalogueSearchAnalysis.LowercaseNormalizer))))
 							.Keyword(k => k.Name(x => x.Sku).Normalizer("lowercase_normalizer"))
 							.Keyword(k => k
 								.Name(x => x.NormalizedSku)
@@ -66,7 +60,6 @@ public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSear
 							.Number(n => n.Name(x => x.ProducerId).Type(NumberType.Integer))
 							.Number(n => n.Name(x => x.ProductGroupId).Type(NumberType.Integer))
 							.Text(t => t.Name(x => x.Indicator).Index(false))
-							.Number(n => n.Name(x => x.Stock).Type(NumberType.Integer))
 							.Object<ProductDimensions>(o => o
 								.Name(x => x.Dimensions)
 								.Properties(dp => dp
@@ -87,4 +80,5 @@ public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSear
 				ct),
 			cancellationToken);
 	}
+
 }

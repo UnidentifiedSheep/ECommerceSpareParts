@@ -36,7 +36,6 @@ public static class ServiceProvider
 			return new OpenSearchClient(connectionSettings);
 		});
 
-		services.AddSingleton<IProductSearchFilterProvider, ProductStockFilterProvider>();
 		services.AddSingleton<IProductSearchFilterProvider, ProductWeightFilterProvider>();
 		services.AddSingleton<IProductSearchFilterProvider, ProductDimensionsFilterProvider>();
 		services.AddSingleton<IProductSearchFilterProvider, ProductCharacteristicsFilterProvider>();

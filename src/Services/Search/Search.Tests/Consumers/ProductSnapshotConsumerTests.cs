@@ -37,7 +37,7 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 		var product = new ProductsUpdatedEvent
 		{
 			UpdatedAt = updatedAt,
-			Products = [new ProductSnapshot { Id = 901, Name = "Fixture product", Sku = "FIX-901", ProducerId = 42, Stock = 3 }]
+			Products = [new ProductSnapshot { Id = 901, Name = "Fixture product", Sku = "FIX-901", ProducerId = 42 }]
 		};
 		await Scope.ServiceProvider.GetRequiredService<ProductUpdatedConsumer>().Consume(Context(product));
 		await RefreshAsync();
@@ -143,7 +143,7 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 		await Scope.ServiceProvider.GetRequiredService<ProductUpdatedConsumer>().Consume(Context(new ProductsUpdatedEvent
 		{
 			UpdatedAt = updatedAt,
-			Products = [new ProductSnapshot { Id = productId, Name = "Ready product", Sku = "READY-904", ProducerId = 42, Stock = 3 }]
+			Products = [new ProductSnapshot { Id = productId, Name = "Ready product", Sku = "READY-904", ProducerId = 42 }]
 		}));
 		await AssertReadyAndSearchable();
 
@@ -208,7 +208,6 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 			document.Name.Should().Be("Ready product");
 			document.Sku.Should().Be("READY-904");
 			document.ProducerId.Should().Be(42);
-			document.Stock.Should().Be(3);
 
 			await RefreshAsync();
 			var result = await Mediator.Send(new SearchInCatalogueQuery(

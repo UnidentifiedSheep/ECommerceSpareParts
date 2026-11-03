@@ -2,6 +2,7 @@ using FluentAssertions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Contracts.Products;
+using Contracts.Storage;
 using Domain.Events;
 using Enums.Units;
 using Main.Application.Interfaces.Products;
@@ -36,7 +37,7 @@ public class ProductSearchEventTests : IntegrationTest
 		var version = product.RowVersion;
 		var events = await provider.GetEventsAsync([product.Id, product.Id], ProductEventParts.All, CancellationToken);
 
-		events.Should().HaveCount(4);
+		events.Should().HaveCount(5);
 		var core = GetEvent<ProductsUpdatedEvent>(events);
 		core.UpdatedAt.Kind.Should().Be(DateTimeKind.Utc);
 		core.Products.Should().ContainSingle().Which.Sku.Should().Be(product.Sku.Value);
@@ -49,6 +50,9 @@ public class ProductSearchEventTests : IntegrationTest
 		var weight = GetEvent<ProductWeightUpdatedEvent>(events);
 		weight.Products.Should().ContainSingle().Which.Weight.Should().BeNull();
 		weight.UpdatedAt.Should().Be(core.UpdatedAt);
+		var stock = GetEvent<ProductStocksSnapshotEvent>(events);
+		stock.OccurredAt.Should().Be(core.UpdatedAt);
+		stock.Products.Should().ContainSingle().Which.Stocks.Should().BeEmpty();
 		product.RowVersion.Should().Be(version);
 	}
 
@@ -109,7 +113,7 @@ public class ProductSearchEventTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task CaptureAll_LoadsSelectedRelationsInOneQuery()
+	public async Task CaptureAll_LoadsSelectedRelationsWithSplitQuery()
 	{
 		var product = GetContext<ProductTestContext>().Products[0];
 		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
@@ -130,7 +134,7 @@ public class ProductSearchEventTests : IntegrationTest
 
 		var events = await provider.GetEventsAsync([product.Id], ProductEventParts.All, CancellationToken);
 
-		counter.Reads.Should().Be(1);
+		counter.Reads.Should().Be(3);
 		queryContext.ChangeTracker.Entries().Should().BeEmpty();
 		GetEvent<ProductsUpdatedEvent>(events).Products.Should().ContainSingle().Which.Sku.Should().Be(product.Sku.Value);
 		GetEvent<ProductCharacteristicsUpdatedEvent>(events).Products.Should().ContainSingle().Which.Characteristics.Should()

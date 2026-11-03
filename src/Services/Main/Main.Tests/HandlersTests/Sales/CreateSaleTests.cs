@@ -32,17 +32,14 @@ public class CreateSaleTests : IntegrationTest
 	{
 		var buyer = Buyer();
 		var storageContent = StorageContent();
-		var product = await Context
-			.Products
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == storageContent.ProductId, CancellationToken);
+		var productStockQuantity = await Context.GetProductStockQuantityAsync(storageContent.ProductId, CancellationToken);
 		var originalContents = await Context
 			.StorageContents
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
 			.ToDictionaryAsync(x => x.Id, CancellationToken);
-		var originalStock = product.Stock.Value;
+		var originalStock = productStockQuantity;
 		var command = CreateCommand(
 			buyer.Id,
 			storageContent.CurrencyId,
@@ -100,11 +97,8 @@ public class CreateSaleTests : IntegrationTest
 			.SingleAsync(x => x.Id == detail.StorageContentId, CancellationToken);
 		updatedContent.Count.Should().Be(affectedStorageContent.Count - 1);
 
-		var updatedProduct = await Context
-			.Products
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == storageContent.ProductId, CancellationToken);
-		updatedProduct.Stock.Value.Should().Be(originalStock - 1);
+		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(storageContent.ProductId, CancellationToken);
+		updatedProductStockQuantity.Should().Be(originalStock - 1);
 
 		var saleTransaction = await Context
 			.Transactions

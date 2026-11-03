@@ -31,8 +31,6 @@ public record ProductDto
 	[JsonPropertyName("images")]
 	public List<string> Images { get; init; } = [];
 
-	[JsonPropertyName("stock")]
-	public required int Stock { get; init; }
 
 	[JsonPropertyName("rowVersion")]
 	public required uint RowVersion { get; init; }

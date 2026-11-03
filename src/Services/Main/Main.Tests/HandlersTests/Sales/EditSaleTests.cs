@@ -1,3 +1,4 @@
+using Tests.Extensions;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Dtos.Sale;
@@ -363,12 +364,8 @@ public class EditSaleTests : IntegrationTest
 			.SumAsync(x => x.Count);
 	}
 
-	private async Task<int> ProductStock(int productId)
-	{
-		var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == productId);
-
-		return product.Stock.Value;
-	}
+	private Task<int> ProductStock(int productId) =>
+		Context.GetProductStockQuantityAsync(productId, CancellationToken);
 
 	private async Task AddAvailableCount(
 		int productId,
@@ -376,10 +373,11 @@ public class EditSaleTests : IntegrationTest
 		int count)
 	{
 		var storageContent = await Context.StorageContents.SingleAsync(x => x.Id == storageContentId);
-		var product = await Context.Products.SingleAsync(x => x.Id == productId);
 
 		storageContent.IncreaseCount(count, StorageMovementType.SaleEditing);
-		product.IncreaseStock(count);
+		var stock = await Context.ProductStocks.SingleAsync(
+			item => item.ProductId == productId && item.StorageCode == storageContent.StorageCode, CancellationToken);
+		stock.SetQuantity(stock.Quantity + count);
 
 		await Context.SaveChangesAsync();
 		Context.ChangeTracker.Clear();

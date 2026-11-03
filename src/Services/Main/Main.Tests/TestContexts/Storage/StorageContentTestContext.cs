@@ -1,4 +1,4 @@
-﻿using Main.Entities.Storage;
+using Main.Entities.Storage;
 using Main.Enums;
 using Main.Persistence.Context;
 using Tests.Abstractions;
@@ -30,10 +30,10 @@ public class StorageContentTestContext(
 			.WithStorageCode(storage.Storages.First(x => x.Type == StorageType.Warehouse).Code)
 			.BuildManyAndAddToDb(DbContext, 10);
 
-		var products = product.Products.ToDictionary(k => k.Id);
-
-		foreach (var content in StorageContents)
-			products[content.ProductId].IncreaseStock(content.Count);
+		await DbContext.AddRangeAsync(StorageContents
+			.GroupBy(content => (content.StorageCode, content.ProductId))
+			.Select(group => ProductStock.Create(group.Key.StorageCode, group.Key.ProductId, group.Sum(content => content.Count))),
+			cancellationToken);
 
 		await DbContext.SaveChangesAsync(cancellationToken);
 	}

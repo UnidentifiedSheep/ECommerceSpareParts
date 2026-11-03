@@ -123,10 +123,10 @@ public sealed class ProductCriteriaTests(SearchContainerFixture fixture) : Produ
 	}
 
 	[Fact]
-	public async Task StockAndText_CombineWithAnd_AndFiltersWorkWithoutText()
+	public async Task CharacteristicsAndText_CombineWithAnd_AndFiltersWorkWithoutText()
 	{
-		var criteria = new ProductSearchCriteria { Stock = new() { Gt = 0 } };
-		(await FindAsync(criteria)).Should().Equal(101, 103);
+		var criteria = new ProductSearchCriteria { Characteristics = [new() { CharacteristicId = 20, Values = ["M10"] }] };
+		(await FindAsync(criteria)).Should().Equal(101);
 		(await FindAsync(criteria, "Oil")).Should().Equal(101);
 		(await FindAsync(criteria, "Air")).Should().BeEmpty();
 	}
@@ -151,7 +151,7 @@ public sealed class ProductCriteriaTests(SearchContainerFixture fixture) : Produ
 		var result = await Mediator.Send(new SearchInCatalogueQuery(null,
 			new HashSet<SearchTarget> { SearchTarget.Products, SearchTarget.CatalogueCandidates },
 			new HashSet<SearchMatchType>(), new HashSet<SearchMatchType>(), [], new Pagination(0, 20), [], [],
-			ProductCriteria: new() { Stock = new() { Gt = 1000 } }), CancellationToken);
+			ProductCriteria: new() { Weight = new() { Range = new() { Gt = 1000 } } }), CancellationToken);
 		result.Products.Total.Should().Be(0);
 		result.SearchInCatalogueCandidates.Total.Should().Be(1);
 	}

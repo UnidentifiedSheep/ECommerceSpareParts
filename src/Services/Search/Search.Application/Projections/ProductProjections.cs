@@ -54,7 +54,6 @@ public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Produc
 			ProductGroupId = product.ProductGroupId,
 			Dimensions = product.Dimensions == null ? null : dimensionsToDto.Invoke(product.Dimensions),
 			Weight = product.Weight == null ? null : weightToDto.Invoke(product.Weight),
-			Stock = product.Stock,
 			Indicator = product.Indicator
 		};
 	}

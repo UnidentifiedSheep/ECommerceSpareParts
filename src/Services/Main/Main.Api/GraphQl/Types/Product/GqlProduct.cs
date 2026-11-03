@@ -68,11 +68,6 @@ public record GqlProduct
 		CancellationToken cancellationToken)
 		=> await loader.LoadAsync(Id, cancellationToken) ?? [];
 
-	[GraphQLName("stock")]
-	public async Task<int> GetStockAsync(
-		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Stock;
-
 	[GraphQLName("rowVersion")]
 	public async Task<uint> GetRowVersionAsync(
 		IProductByIdDataLoader loader,
@@ -172,6 +167,12 @@ public record GqlProduct
 		var content = await loader.LoadAsync(item, cancellationToken);
 		return content?.Select(x => new GqlStorageContent(x)).ToArray() ?? [];
 	}
+
+	[GraphQLName("stock")]
+	public async Task<long> GetStockAsync(
+		IProductStockByIdDataLoader loader,
+		CancellationToken cancellationToken) => await loader.LoadAsync(Id, cancellationToken);
+
 
 	[GraphQLName("availableStock")]
 	public async Task<int> GetAvailableStockAsync(

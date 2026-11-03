@@ -6,9 +6,6 @@ namespace Search.Api.GraphQl.Types.Inputs.CatalogueSearch.Criteria;
 [GraphQLName("ProductSearchCriteriaInput")]
 public sealed record GqlProductSearchCriteriaInput
 {
-	[GraphQLName("stock")]
-	public GqlIntegerRangeInput? Stock { get; init; }
-
 	[GraphQLName("weight")]
 	public GqlWeightSearchCriteriaInput? Weight { get; init; }
 
@@ -20,7 +17,6 @@ public sealed record GqlProductSearchCriteriaInput
 
 	public ProductSearchCriteria ToCriteria() => new()
 	{
-		Stock = Stock?.ToCriteria(),
 		Weight = Weight?.ToCriteria(),
 		Dimensions = Dimensions?.ToCriteria(),
 		Characteristics = Characteristics?.Select(characteristic => characteristic.ToCriteria()).ToArray() ?? []

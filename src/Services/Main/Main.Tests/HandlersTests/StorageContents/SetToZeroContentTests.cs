@@ -1,3 +1,4 @@
+using Tests.Extensions;
 using FluentAssertions;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Entities.Exceptions;
@@ -31,18 +32,18 @@ public class SetToZeroContentTests : IntegrationTest
 		var content = TestContext.StorageContents.First();
 		var contentCount = content.Count;
 		var productCountBefore =
-			(await Context.Products.FirstAsync(x => x.Id == content.ProductId, CancellationToken)).Stock;
+			await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 
 		var command = new SetToZeroContentCommand(content.Id, content.RowVersion);
 
 		await Mediator.Send(command, CancellationToken);
 
 		var productCountAfter =
-			(await Context.Products.FirstAsync(x => x.Id == content.ProductId, CancellationToken)).Stock;
+			await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 
 		var currStorageMovements = await Context.Events.CountAsync(CancellationToken);
 
 		currStorageMovements.Should().Be(eventsCount + 1);
-		productCountBefore.Value.Should().Be(productCountAfter + contentCount);
+		productCountBefore.Should().Be(productCountAfter + contentCount);
 	}
 }

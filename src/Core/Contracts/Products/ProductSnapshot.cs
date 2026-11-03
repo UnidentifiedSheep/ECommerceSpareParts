@@ -9,7 +9,6 @@ public record ProductSnapshot
 	public string? Name { get; init; }
 	public int ProducerId { get; init; }
 	public int? ProductGroupId { get; init; }
-	public int Stock { get; init; }
 	public string? Indicator { get; init; }
 	public bool IsDeleted { get; init; }
 }

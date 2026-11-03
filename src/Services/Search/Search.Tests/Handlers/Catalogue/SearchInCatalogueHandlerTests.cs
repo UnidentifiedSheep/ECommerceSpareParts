@@ -51,7 +51,7 @@ public sealed class SearchInCatalogueHandlerTests
 					],
 					7));
 		var handler = CreateHandler();
-		var productCriteria = new ProductSearchCriteria { Stock = new() { Gt = 0 } };
+		var productCriteria = new ProductSearchCriteria { Weight = new() { Range = new() { Gt = 0 } } };
 
 		var result = await handler.Handle(
 			CreateQuery(
@@ -177,7 +177,6 @@ public sealed class SearchInCatalogueHandlerTests
 			Name = "Product name",
 			ProducerId = 42,
 			ProductGroupId = 7,
-			Stock = 5,
 			Indicator = null
 		};
 	}

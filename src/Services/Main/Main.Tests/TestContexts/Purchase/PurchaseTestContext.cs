@@ -75,7 +75,7 @@ public class PurchaseTestContext(
 			.WithBuyPrice(10m)
 			.BuildAndAddToDb(DbContext);
 
-		Product.IncreaseStock(StorageContent.Count);
+		await DbContext.AddAsync(ProductStock.Create(StorageContent.StorageCode, Product.Id, StorageContent.Count), cancellationToken);
 
 		var purchaseContent = new PurchaseContentBuilder(Faker)
 			.WithProductId(Product.Id)

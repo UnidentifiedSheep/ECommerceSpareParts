@@ -35,6 +35,9 @@ public record GqlCatalogueSearchInput
 	[GraphQLName("productSortBy")]
 	public IReadOnlyCollection<GqlSortBy>? ProductSortBy { get; init; }
 
+	[GraphQLName("stockStorageCode")]
+	public string? StockStorageCode { get; init; }
+
 	[GraphQLName("catalogueCandidateSortBy")]
 	public IReadOnlyCollection<GqlSortBy>? CatalogueCandidateSortBy { get; init; }
 

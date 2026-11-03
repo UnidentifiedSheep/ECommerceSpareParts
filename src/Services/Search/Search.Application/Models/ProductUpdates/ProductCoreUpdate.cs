@@ -13,7 +13,6 @@ public sealed record ProductCoreUpdate : ProductFieldUpdate
 	public string? Name { get; init; }
 	public int ProducerId { get; init; }
 	public int? ProductGroupId { get; init; }
-	public int Stock { get; init; }
 	public string? Indicator { get; init; }
 	public ProductReadinessStatus ReadinessStatus { get; init; }
 
@@ -26,7 +25,6 @@ public sealed record ProductCoreUpdate : ProductFieldUpdate
 		Name = product.Name,
 		ProducerId = product.ProducerId,
 		ProductGroupId = product.ProductGroupId,
-		Stock = product.Stock,
 		Indicator = product.Indicator,
 		ReadinessStatus = product.IsDeleted ? ProductReadinessStatus.Deleted : ProductReadinessStatus.Ready
 	};

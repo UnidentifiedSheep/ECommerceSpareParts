@@ -22,7 +22,7 @@ public sealed class ProductSearchCriteriaValidationTests
 	{
 		var range = scenario switch
 		{
-			"empty" => new RangeCriteria<int>(),
+			"empty" => new RangeCriteria<decimal>(),
 			"twoLowerBounds" => new() { Gt = 1, Gte = 1 },
 			"twoUpperBounds" => new() { Lt = 2, Lte = 2 },
 			"reversed" => new() { Gte = 2, Lte = 1 },
@@ -30,9 +30,9 @@ public sealed class ProductSearchCriteriaValidationTests
 			"emptyExclusiveUpper" => new() { Gte = 1, Lt = 1 },
 			_ => throw new ArgumentOutOfRangeException(nameof(scenario))
 		};
-		var result = await _validator.ValidateAsync(Query(new() { Stock = range }), TestContext.Current.CancellationToken);
+		var result = await _validator.ValidateAsync(Query(new() { Weight = new() { Range = range } }), TestContext.Current.CancellationToken);
 		result.IsValid.Should().BeFalse();
-		result.Errors.Should().Contain(error => error.PropertyName.StartsWith("ProductCriteria.Stock", StringComparison.Ordinal));
+		result.Errors.Should().Contain(error => error.PropertyName.StartsWith("ProductCriteria.Weight.Range", StringComparison.Ordinal));
 	}
 
 	[Fact]
@@ -40,7 +40,7 @@ public sealed class ProductSearchCriteriaValidationTests
 	{
 		var criteria = new ProductSearchCriteria
 		{
-			Stock = new() { Gt = 0 },
+			Weight = new() { Range = new() { Gt = 0 } },
 			Characteristics = [new() { CharacteristicId = 10, NumericRange = new() { Gte = -20, Lte = -20 } }]
 		};
 		(await _validator.ValidateAsync(Query(criteria), TestContext.Current.CancellationToken)).IsValid.Should().BeTrue();
@@ -107,7 +107,7 @@ public sealed class ProductSearchCriteriaValidationTests
 	[Fact]
 	public async Task ProductCriteria_WithOnlyCandidateTarget_AreRejected()
 	{
-		var request = Query(new() { Stock = new() { Gt = 0 } }) with { Targets = new HashSet<SearchTarget> { SearchTarget.CatalogueCandidates } };
+		var request = Query(new() { Weight = new() { Range = new() { Gt = 0 } } }) with { Targets = new HashSet<SearchTarget> { SearchTarget.CatalogueCandidates } };
 		(await _validator.ValidateAsync(request, TestContext.Current.CancellationToken)).IsValid.Should().BeFalse();
 	}
 

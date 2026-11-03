@@ -4,6 +4,7 @@ using Domain;
 using Domain.Interfaces;
 using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product.ValueObjects;
+using Main.Entities.Storage;
 
 namespace Main.Entities.Product;
 
@@ -15,6 +16,8 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 
 	private readonly List<ProductImage> _images = [];
 
+	private readonly List<ProductStock> _stocks = [];
+
 	private Product(
 		Sku sku,
 		Name name,
@@ -25,7 +28,6 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 		Name = name;
 		ProducerId = producerId;
 		Description = description;
-		Stock = 0;
 	}
 
 	private Product()
@@ -40,8 +42,6 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 	public Sku Sku { get; private set; } = null!;
 
 	public Name Name { get; private set; } = null!;
-
-	public Stock Stock { get; private set; } = null!;
 
 	public string? Description { get; private set; }
 
@@ -64,6 +64,8 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 	public IReadOnlyCollection<ProductEan> Eans => _eans;
 
 	public IReadOnlyCollection<ProductImage> Images => _images;
+
+	public IReadOnlyCollection<ProductStock> Stocks => _stocks;
 
 	public ProductSize? ProductSize { get; private set; }
 
@@ -103,12 +105,6 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 	public void SetName(Name name) => Name = name;
 
 	public void SetProducerId(int producerId) => ProducerId = producerId;
-
-	public void IncreaseStock(int value)
-	{
-		var newValue = Stock.Value + value;
-		Stock = newValue;
-	}
 
 	public void SetPackingUnit(int? packingUnit)
 	{

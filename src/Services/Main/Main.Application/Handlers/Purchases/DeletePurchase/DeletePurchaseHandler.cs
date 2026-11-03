@@ -5,7 +5,8 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Handlers.Balance.ReverseTransaction;
-using Main.Application.Handlers.StorageContents.SubtractContent;
+using Main.Application.Interfaces.Services;
+using Main.Application.Models.Storage;
 using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Main.Enums;
@@ -24,7 +25,8 @@ public record DeletePurchaseCommand(Guid PurchaseId) : ICommand<Unit>;
 public class DeletePurchaseHandler(
 	IUnitOfWork unitOfWork,
 	IRepository<Purchase, Guid> repository,
-	ISender sender) : ICommandHandler<DeletePurchaseCommand, Unit>
+	ISender sender,
+	IStorageContentService storageContentService) : ICommandHandler<DeletePurchaseCommand, Unit>
 {
 	public async Task<Unit> Handle(DeletePurchaseCommand request, CancellationToken cancellationToken)
 	{
@@ -50,8 +52,7 @@ public class DeletePurchaseHandler(
 	{
 		var items =
 			purchase.Contents.Select(x => new SubtractStorageContentItem(x.StorageContentId, x.Count)).ToArray();
-		var command = new SubtractStorageContentsCommand(items, StorageMovementType.PurchaseDeletion);
-		await sender.Send(command, token);
+		await storageContentService.SubtractByContentsAsync(items, StorageMovementType.PurchaseDeletion, token);
 	}
 
 	private async Task RevertTransactions(Purchase purchase, CancellationToken token)

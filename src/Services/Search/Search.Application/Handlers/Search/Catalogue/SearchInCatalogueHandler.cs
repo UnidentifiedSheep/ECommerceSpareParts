@@ -26,7 +26,8 @@ public sealed record SearchInCatalogueQuery(
 	CandidateMappingStatus CandidateMappingStatus = CandidateMappingStatus.Unmapped,
 	bool IncludeHighlights = false,
 	IReadOnlyCollection<int>? ProductGroupIds = null,
-	ProductSearchCriteria? ProductCriteria = null) : IQuery<SearchInCatalogueResult>;
+	ProductSearchCriteria? ProductCriteria = null,
+	string? StockStorageCode = null) : IQuery<SearchInCatalogueResult>;
 
 public sealed record SearchInCatalogueSection<T>(IReadOnlyCollection<T> Items, long Total);
 
@@ -63,7 +64,8 @@ public sealed class SearchInCatalogueHandler(
 				commonCriteria with
 				{
 					SortBy = request.ProductSortBy,
-					ProductCriteria = request.ProductCriteria
+					ProductCriteria = request.ProductCriteria,
+					StockStorageCode = request.StockStorageCode
 				},
 				cancellationToken)
 			: Task.FromResult(new SearchResult<ProductDocument>([], 0));

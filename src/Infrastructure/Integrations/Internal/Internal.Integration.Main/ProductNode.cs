@@ -22,23 +22,6 @@ internal sealed class ProductNode(
 		jsonOptions),
 	IProductNode
 {
-	public async Task<Response<IReadOnlyList<InternalFullProduct>>> GetFullProduct(
-		IEnumerable<int> productIds,
-		CancellationToken cancellationToken = default)
-	{
-		var ids = productIds.Select(x => x.ToString(CultureInfo.InvariantCulture)).ToArray();
-		using var request = await GetRequest(
-			HttpMethod.Get,
-			$"/internal/products/{IdsAsQueryString(ids, "id")}",
-			cancellationToken);
-		using var response = await httpClient.SendAsync(request, cancellationToken);
-
-		return await ReadResponse<GetFullProductsResponse, IReadOnlyList<InternalFullProduct>>(
-			response,
-			x => x.Products,
-			cancellationToken);
-	}
-
 	public async Task<Response<IReadOnlyList<InternalSupplierProductResolvedReference>>>
 		GetSupplierProductReferences(
 			IEnumerable<int> productIds,
@@ -74,12 +57,6 @@ internal sealed class ProductNode(
 
 		return await ReadResponse<ResolveProductReferencesResponse, IReadOnlyList<InternalResolvedProductReference>>(
 			response, result => result.Products, cancellationToken);
-	}
-
-	private record GetFullProductsResponse
-	{
-		[JsonPropertyName("products")]
-		public IReadOnlyList<InternalFullProduct> Products { get; init; } = [];
 	}
 
 	private record GetSupplierProductReferencesResponse

@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Repositories;
 using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Product;
@@ -21,7 +21,7 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 		=> Context.Products
 			.AsNoTracking()
 			.Where(product => product.Id == productId)
-			.Select(product => product.Stock.Value != 0 ? (ProductDeletionBlocker?)ProductDeletionBlocker.Stock
+			.Select(product => Context.ProductStocks.Any(stock => stock.ProductId == product.Id && stock.Quantity > 0) ? (ProductDeletionBlocker?)ProductDeletionBlocker.Stock
 				: Context.StorageContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.StorageContent
 				: Context.SaleContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Sale
 				: Context.PurchaseContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Purchase

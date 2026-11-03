@@ -9,6 +9,7 @@ using Search.Abstractions.Options;
 using Search.Application.Interfaces.Product;
 using Search.Application.Models.CatalogueSearch;
 using Search.Application.Models;
+using Search.Application.Models.ProductUpdates;
 using Search.Entities;
 using Search.Persistence.Abstractions;
 using Search.Persistence.Extensions;
@@ -72,6 +73,43 @@ public class ProductRepository(
 					response.ItemsWithErrors.Select(x => $"{x.Id}: {x.Error?.Reason}")));
 	}
 
+	public async Task ApplyStockUpdates(IReadOnlyCollection<ProductStockUpdate> updates, CancellationToken cancellationToken = default)
+	{
+		if (updates.Count == 0) return;
+		foreach (var update in updates)
+		{
+			if (update.UpdatedAt.Kind != DateTimeKind.Utc)
+				throw new ArgumentException("Stock timestamps must be UTC.", nameof(updates));
+			if (update.Stocks.Any(stock => string.IsNullOrWhiteSpace(stock.Key) || stock.Value < 0))
+				throw new ArgumentException("Stock storage codes must be nonempty and quantities nonnegative.", nameof(updates));
+		}
+
+		var index = await GetIndex(cancellationToken);
+		var response = await Client.BulkAsync(bulk =>
+		{
+			bulk.Index(index);
+			foreach (var update in updates)
+			{
+				var stocks = update.Stocks.Where(stock => !update.IsSnapshot || stock.Value > 0)
+					.ToDictionary(stock => ProductStockFields.GetStorageKey(stock.Key), stock => stock.Value);
+				bulk.Update<ProductDocumentSeed, object>(operation => operation
+					.Id(update.ProductId.ToString(System.Globalization.CultureInfo.InvariantCulture))
+					.RetriesOnConflict(5)
+					.ScriptedUpsert()
+					.Upsert(new ProductDocumentSeed(update.ProductId))
+					.Script(script => script.Source(ProductStockUpdateScript.Source).Params(parameters => parameters
+						.Add("stocks", stocks)
+						.Add("isSnapshot", update.IsSnapshot)
+						.Add("version", update.UpdatedAt.Ticks))));
+			}
+			return bulk;
+		}, cancellationToken);
+		EnsureResponseSucceeded(response, "update product stocks in");
+		if (response.Errors)
+			throw new InvalidOperationException(string.Join("; ",
+				response.ItemsWithErrors.Select(item => $"{item.Id}: {item.Error?.Reason}")));
+	}
+
 	public async Task<long> DeleteDeletedBefore(DateTime deletedBefore, int batchSize, CancellationToken cancellationToken = default)
 	{
 		if (deletedBefore.Kind != DateTimeKind.Utc)
@@ -114,7 +152,7 @@ public class ProductRepository(
 				.From(GetFrom(criteria.Pagination))
 				.Size(criteria.Pagination.Size)
 				.TrackTotalHits()
-				.SortBySearchRelevance(criteria.SortBy, product => product.Id)
+				.SortProductsBySearchRelevance(criteria.SortBy, criteria.StockStorageCode)
 				.Query(query => query.Bool(boolean => boolean
 					.Filter(filters.ToArray())
 					.Must(filter => CatalogueSearchQueryBuilder.Build(

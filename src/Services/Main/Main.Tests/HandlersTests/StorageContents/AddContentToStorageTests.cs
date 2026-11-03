@@ -187,7 +187,8 @@ public class AddContentToStorageTests : IntegrationTest
 			if (!expectedTotals.TryAdd(kv.Key, kv.Value))
 				expectedTotals[kv.Key] += kv.Value;
 
-		var dbArticles = await Context.Products.AsNoTracking().ToDictionaryAsync(x => x.Id);
+		var stocks = await Context.ProductStocks.AsNoTracking().Where(stock => stock.StorageCode == storage.Code)
+			.ToDictionaryAsync(stock => stock.ProductId, stock => stock.Quantity, CancellationToken);
 
 		var dbStorageContents = await Context
 			.StorageContents
@@ -198,7 +199,7 @@ public class AddContentToStorageTests : IntegrationTest
 		var events = await Context.Events.OfType<StorageMovementEvent>().ToListAsync();
 
 		foreach (var (productId, expectedTotal) in expectedTotals)
-			Assert.Equal(expectedTotal, dbArticles[productId].Stock.Value);
+			Assert.Equal(expectedTotal, stocks[productId]);
 
 		Assert.Equal(allInputs.Count, dbStorageContents.Count);
 

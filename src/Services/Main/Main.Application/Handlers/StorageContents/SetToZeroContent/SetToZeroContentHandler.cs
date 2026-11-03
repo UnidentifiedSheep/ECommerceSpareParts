@@ -1,9 +1,9 @@
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
+using Main.Application.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
-using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
@@ -17,17 +17,17 @@ namespace Main.Application.Handlers.StorageContents.SetToZeroContent;
 	2)]
 public record SetToZeroContentCommand(int ContentId, uint RowVersion) : ICommand;
 
-public class SetToZeroContentHandler(IRepository<StorageContent, int> repository)
+public class SetToZeroContentHandler(IRepository<StorageContent, int> repository, TimeProvider timeProvider)
 	: ICommandHandler<SetToZeroContentCommand>
 {
 	public async Task<Unit> Handle(SetToZeroContentCommand request, CancellationToken cancellationToken)
 	{
-		var content = await repository.GetById(request.ContentId, cancellationToken) ??
-			throw new StorageContentNotFoundException(request.ContentId);
+		var content = await repository.GetWithActiveLocksForUpdateAsync(
+			request.ContentId, cancellationToken: cancellationToken);
 
 		content.ValidateVersion(request.RowVersion);
 
-		content.IncreaseCount(-content.Count, StorageMovementType.StorageContentDeletion);
+		content.SetCount(0, StorageMovementType.StorageContentDeletion, timeProvider.GetUtcNow().UtcDateTime);
 
 		return Unit.Value;
 	}

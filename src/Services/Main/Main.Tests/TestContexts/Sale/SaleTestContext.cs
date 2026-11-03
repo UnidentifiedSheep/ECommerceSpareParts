@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Main.Entities.Balance;
 using Main.Entities.Organization;
 using Main.Entities.Product;
@@ -104,7 +105,9 @@ public class SaleTestContext(
 			.Build();
 
 		StorageContent.IncreaseCount(-SoldCount, StorageMovementType.Sale);
-		Product.IncreaseStock(-SoldCount);
+		var stock = await DbContext.ProductStocks.SingleAsync(
+			item => item.StorageCode == StorageContent.StorageCode && item.ProductId == Product.Id, cancellationToken);
+		stock.SetQuantity(stock.Quantity - SoldCount);
 
 		await DbContext.AddAsync(Sale, cancellationToken);
 		await DbContext.SaveChangesAsync(cancellationToken);

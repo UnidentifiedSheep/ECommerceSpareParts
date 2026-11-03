@@ -1,6 +1,5 @@
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.StorageContents.RestoreContent;
-using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models;
 using Main.Application.Models.Storage;
@@ -10,7 +9,7 @@ using MediatR;
 
 namespace Main.Application.Services;
 
-public class SaleService(ISender sender) : ISaleService
+public class SaleService(ISender sender, IStorageContentService storageContentService) : ISaleService
 {
 	public List<SaleContent> DistributeDetails(
 		IEnumerable<StorageLot> storageContentValues,
@@ -46,7 +45,6 @@ public class SaleService(ISender sender) : ISaleService
 		string storageCode,
 		IEnumerable<NewSaleContentDto> saleContents,
 		StorageMovementType movementType,
-		bool takeFromOtherStorages,
 		CancellationToken cancellationToken = default)
 	{
 		var contents = saleContents.ToList();
@@ -54,17 +52,15 @@ public class SaleService(ISender sender) : ISaleService
 			storageCode,
 			contents.Select(x => (x.ProductId, x.Count)),
 			movementType,
-			takeFromOtherStorages,
 			cancellationToken);
 
-		return DistributeDetails(takenFromStorage.Contents, contents);
+		return DistributeDetails(takenFromStorage, contents);
 	}
 
 	public async Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
 		string storageCode,
 		IEnumerable<EditSaleContentDto> saleContents,
 		StorageMovementType movementType,
-		bool takeFromOtherStorages,
 		CancellationToken cancellationToken = default)
 	{
 		var contents = saleContents.ToList();
@@ -72,10 +68,9 @@ public class SaleService(ISender sender) : ISaleService
 			storageCode,
 			contents.Select(x => (x.ProductId, x.Count)),
 			movementType,
-			takeFromOtherStorages,
 			cancellationToken);
 
-		return DistributeDetails(takenFromStorage.Contents, contents);
+		return DistributeDetails(takenFromStorage, contents);
 	}
 
 	public async Task RestoreContents(
@@ -186,21 +181,18 @@ public class SaleService(ISender sender) : ISaleService
 		return result.OrderBy(x => x.OriginalIndex).Select(x => x.Content).ToList();
 	}
 
-	private async Task<SubtractStorageContentsResult> TakeFromStorage(
+	private async Task<IReadOnlyList<StorageLot>> TakeFromStorage(
 		string storageCode,
 		IEnumerable<(int ProductId, int Count)> contents,
 		StorageMovementType movementType,
-		bool takeFromOtherStorages,
 		CancellationToken cancellationToken)
 	{
-		return await sender.Send(
-			new SubtractStorageContentsCommand(
+		return await storageContentService.SubtractByProductsAsync(
 				contents.Select(x => new SubtractProductFromStorageItem(
 					x.ProductId,
 					storageCode,
-					x.Count,
-					takeFromOtherStorages)).ToArray(),
-				movementType),
+					x.Count)).ToArray(),
+				movementType,
 			cancellationToken);
 	}
 

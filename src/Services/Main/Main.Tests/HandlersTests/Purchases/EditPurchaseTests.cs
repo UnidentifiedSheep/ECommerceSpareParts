@@ -1,7 +1,12 @@
+using Tests.Extensions;
 using FluentAssertions;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.EditPurchase;
-using Main.Application.Handlers.StorageContents.SubtractContent;
+using Application.Common.Interfaces.Persistence;
+using Attributes;
+using Main.Application.Interfaces.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Main.Application.Models.Storage;
 using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;
@@ -68,8 +73,7 @@ public class EditPurchaseTests : IntegrationTest
 			.Transactions
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == updatedPurchase.TransactionId, CancellationToken);
-		var updatedProduct =
-			await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id, CancellationToken);
+		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
 
 		updatedPurchase.Comment.Should().Be(editCommand.Comment);
 		updatedPurchase.CurrencyId.Should().Be(currency.Id);
@@ -82,7 +86,7 @@ public class EditPurchaseTests : IntegrationTest
 		oldTransaction.IsReversed.Should().BeTrue();
 		oldTransaction.IsReversalApplied.Should().BeTrue();
 		newTransaction.Amount.Should().Be(100m);
-		updatedProduct.Stock.Value.Should().Be(5);
+		updatedProductStockQuantity.Should().Be(5);
 	}
 
 	[Fact]
@@ -114,20 +118,14 @@ public class EditPurchaseTests : IntegrationTest
 		var updatedPurchase =
 			await Context.Purchases.Include(x => x.Contents).AsNoTracking().SingleAsync(CancellationToken);
 		var contents = await Context.StorageContents.AsNoTracking().ToListAsync(CancellationToken);
-		var removedProduct = await Context
-			.Products
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == products[0].Id, CancellationToken);
-		var addedProduct = await Context
-			.Products
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == products[1].Id, CancellationToken);
+		var removedProductStockQuantity = await Context.GetProductStockQuantityAsync(products[0].Id, CancellationToken);
+		var addedProductStockQuantity = await Context.GetProductStockQuantityAsync(products[1].Id, CancellationToken);
 
 		updatedPurchase.Contents.Should().ContainSingle(x => x.ProductId == products[1].Id);
 		contents.Single(x => x.Id == removedStorageContentId).Count.Should().Be(0);
 		contents.Single(x => x.ProductId == products[1].Id).Count.Should().Be(3);
-		removedProduct.Stock.Value.Should().Be(0);
-		addedProduct.Stock.Value.Should().Be(3);
+		removedProductStockQuantity.Should().Be(0);
+		addedProductStockQuantity.Should().Be(3);
 	}
 
 	[Fact]
@@ -141,15 +139,18 @@ public class EditPurchaseTests : IntegrationTest
 		var storageContentId = content.StorageContentId;
 		content.SetCount(10);
 		PurchaseContext.StorageContent.IncreaseCount(8, StorageMovementType.PurchaseEditing);
-		product.IncreaseStock(8);
+		var stock = await Context.ProductStocks.SingleAsync(
+			item => item.ProductId == product.Id && item.StorageCode == PurchaseContext.StorageContent.StorageCode, CancellationToken);
+		stock.SetQuantity(stock.Quantity + 8);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				storageContentId,
-				5,
-				StorageMovementType.Sale),
-			CancellationToken);
+		await Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>()
+			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
+		{
+			await context.GetRequiredService<IStorageContentService>().SubtractByContentsAsync(
+				[new SubtractStorageContentItem(storageContentId, 5)], StorageMovementType.Sale, token);
+			await context.UnitOfWork.SaveChangesAsync(token);
+		}, CancellationToken);
 
 		await Mediator.Send(
 			new EditPurchaseCommand(
@@ -176,12 +177,11 @@ public class EditPurchaseTests : IntegrationTest
 			.StorageContents
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
-		var updatedProduct =
-			await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id, CancellationToken);
+		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
 
 		updatedPurchaseContent.Count.Should().Be(8);
 		updatedStorageContent.Count.Should().Be(3);
-		updatedProduct.Stock.Value.Should().Be(3);
+		updatedProductStockQuantity.Should().Be(3);
 	}
 
 	[Fact]

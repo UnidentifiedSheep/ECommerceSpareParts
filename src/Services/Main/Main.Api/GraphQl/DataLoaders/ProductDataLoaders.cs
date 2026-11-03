@@ -18,6 +18,13 @@ namespace Main.Api.GraphQl.DataLoaders;
 public static class ProductDataLoaders
 {
 	[DataLoader]
+	public static async Task<IReadOnlyDictionary<int, long>> GetProductStockByIdAsync(
+		IReadOnlyList<int> keys,
+		ISender sender,
+		CancellationToken cancellationToken) =>
+		(await sender.Send(new GetProductsStockByIdsQuery(keys), cancellationToken)).Stocks;
+
+	[DataLoader]
 	public static async Task<IReadOnlyDictionary<int, CharacteristicDto>> GetCharacteristicByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,

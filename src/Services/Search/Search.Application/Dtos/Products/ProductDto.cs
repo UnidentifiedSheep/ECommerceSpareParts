@@ -19,8 +19,6 @@ public record ProductDto
 	[JsonPropertyName("productGroupId")]
 	public int? ProductGroupId { get; init; }
 
-	[JsonPropertyName("stock")]
-	public required int Stock { get; init; }
 
 	[JsonPropertyName("indicator")]
 	public required string? Indicator { get; init; }

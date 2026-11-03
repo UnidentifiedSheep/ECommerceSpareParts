@@ -123,6 +123,10 @@ public partial class DContext : DbContext, INotificationDbContext
 
 	public virtual DbSet<StorageContent> StorageContents { get; set; }
 
+	public virtual DbSet<ProductStock> ProductStocks { get; set; }
+
+	public virtual DbSet<StorageContentLock> StorageContentLocks { get; set; }
+
 	public virtual DbSet<StorageOwner> StorageOwners { get; set; }
 
 	public virtual DbSet<StorageRoute> StorageRoutes { get; set; }

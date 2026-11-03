@@ -1,3 +1,4 @@
+using Tests.Extensions;
 using Abstractions.Models;
 using Application.Common.Models;
 using Main.Application.Dtos.Storage;
@@ -95,10 +96,7 @@ public class EditStorageContentTests : IntegrationTest
 	public async Task EditStorageContent_ValidInput_Succeeds()
 	{
 		var content = TestContext.StorageContents.First();
-		var productBefore = await Context
-			.Products
-			.AsNoTracking()
-			.FirstAsync(x => x.Id == content.ProductId, CancellationToken);
+		var productBeforeStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 		var dto = new PatchStorageContentDto
 		{
 			Count = new PatchField<int>
@@ -125,12 +123,9 @@ public class EditStorageContentTests : IntegrationTest
 				content.Id
 			},
 			CancellationToken);
-		var productAfter = await Context
-			.Products
-			.AsNoTracking()
-			.FirstAsync(x => x.Id == content.ProductId, CancellationToken);
+		var productAfterStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 
-		Assert.Equal(productBefore.Stock.Value, productAfter.Stock.Value - 5);
+		Assert.Equal(productBeforeStockQuantity, productAfterStockQuantity - 5);
 		Assert.NotNull(updated);
 		Assert.Equal(content.Count, dto.Count.Value);
 		Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);

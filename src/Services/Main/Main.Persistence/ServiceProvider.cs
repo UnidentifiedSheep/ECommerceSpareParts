@@ -13,7 +13,6 @@ using Notification.Core.Entities;
 using Notification.Persistence;
 using Persistence.Common;
 using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
-using StorageContentRepository = Main.Persistence.Repositories.Storage.StorageContentRepository;
 using UserRepository = Main.Persistence.Repositories.User.UserRepository;
 
 namespace Main.Persistence;
@@ -39,7 +38,6 @@ public static class ServiceProvider
 		collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();
 		collection.AddScoped<IProducerRepository, ProducerRepository>();
 		collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
-		collection.AddScoped<IStorageContentRepository, StorageContentRepository>();
 		collection.AddScoped<IUserRepository, UserRepository>();
 		collection.AddScoped<ISaleRepository, SaleRepository>();
 

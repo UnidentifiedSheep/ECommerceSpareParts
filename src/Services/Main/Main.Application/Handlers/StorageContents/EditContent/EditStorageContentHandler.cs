@@ -2,13 +2,14 @@ using System.Data;
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Models;
 using Attributes;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions;
+using Main.Application.Extensions;
+using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
 
@@ -23,17 +24,17 @@ public record EditStorageContentCommand(
 	Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields) : ICommand;
 
 public class EditStorageContentHandler(
-	IStorageContentRepository storageContentRepository,
-	ICurrencyConverter currencyConverter) : ICommandHandler<EditStorageContentCommand>
+	IRepository<StorageContent, int> storageContentRepository,
+	ICurrencyConverter currencyConverter,
+	TimeProvider timeProvider) : ICommandHandler<EditStorageContentCommand>
 {
 	public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
 	{
 		var editedFields = request.EditedFields;
 
-		var storageContents = await storageContentRepository.EnsureExistsForUpdateAsync(
-			editedFields.Keys,
-			nf => new StorageContentNotFoundException(nf),
-			cancellationToken);
+		var storageContents = await storageContentRepository.GetWithActiveLocksForUpdateAsync(
+			editedFields.Keys, cancellationToken: cancellationToken);
+		var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
 		foreach (var item in editedFields)
 		{
@@ -42,7 +43,7 @@ public class EditStorageContentHandler(
 
 			content.ValidateVersion(item.Value.RowVersion);
 
-			patch.Count.Apply(x => content.SetCount(x, StorageMovementType.StorageContentEditing));
+			patch.Count.Apply(x => content.SetCount(x, StorageMovementType.StorageContentEditing, utcNow));
 			patch.CurrencyId.Apply(content.SetCurrencyId);
 
 			if (patch.BuyPrice.IsSet)

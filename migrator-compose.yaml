@@ -1,12 +1,4 @@
 ﻿services:
-  analytics.migrator:
-    image: analytics.migrator
-    build:
-      context: .
-      dockerfile: src/Services/Analytics/Analytics.Migrator/Dockerfile
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-  
   main.migrator:
     image: main.migrator
     build:

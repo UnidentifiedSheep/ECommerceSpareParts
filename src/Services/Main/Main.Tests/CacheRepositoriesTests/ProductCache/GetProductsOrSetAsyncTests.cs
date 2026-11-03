@@ -106,7 +106,6 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
 		dto.Description.Should().Be(product.Description);
 		dto.ProducerId.Should().Be(product.ProducerId);
 		dto.ProducerName.Should().Be(producer.Name);
-		dto.Stock.Should().Be(product.Stock.Value);
 		dto.Images.Should().BeEmpty();
 	}
 }

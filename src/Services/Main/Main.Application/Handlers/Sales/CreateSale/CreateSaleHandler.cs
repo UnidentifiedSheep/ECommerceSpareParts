@@ -85,7 +85,6 @@ public class CreateSaleHandler(
 			request.StorageCode,
 			contents,
 			StorageMovementType.Sale,
-			false,
 			cancellationToken);
 
 		foreach (var content in distributed)

@@ -1,4 +1,4 @@
-﻿using EFCore.ComplexIndexes;
+using EFCore.ComplexIndexes;
 using EFCore.ComplexIndexes.PostgreSQL;
 using Main.Entities.Product.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -57,16 +57,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 				b.Property(e => e.Value).HasColumnName("name").HasMaxLength(255);
 			});
 
-		builder.ComplexProperty(
-			e => e.Stock,
-			b =>
-			{
-				b
-					.Property(e => e.Value)
-					.HasColumnName("stock")
-					.HasComplexIndex(indexName: "products_stock_index");
-			});
-
 		builder
 			.Property(e => e.Indicator)
 			.HasConversion(e => e == null ? null : e.Value, x => new Indicator(x))
@@ -110,6 +100,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 		builder
 			.Navigation(e => e.Characteristics)
 			.HasField("_characteristics")
+			.UsePropertyAccessMode(PropertyAccessMode.Field);
+
+		builder
+			.Navigation(e => e.Stocks)
+			.HasField("_stocks")
 			.UsePropertyAccessMode(PropertyAccessMode.Field);
 
 		builder.Navigation(e => e.Eans).HasField("_eans").UsePropertyAccessMode(PropertyAccessMode.Field);

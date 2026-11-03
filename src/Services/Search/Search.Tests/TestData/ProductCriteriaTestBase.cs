@@ -17,9 +17,9 @@ public abstract class ProductCriteriaTestBase(SearchContainerFixture fixture) : 
 		var updatedAt = DateTime.UtcNow;
 		await Products.ApplyUpdates(new ProductSnapshot[]
 		{
-			new() { Id = 101, Sku = "OIL-101", Name = "Oil filter", ProducerId = 42, ProductGroupId = 7, Stock = 5 },
-			new() { Id = 102, Sku = "AIR-102", Name = "Air filter", ProducerId = 42, ProductGroupId = 7, Stock = 0 },
-			new() { Id = 103, Sku = "FUEL-103", Name = "Fuel filter", ProducerId = 43, ProductGroupId = 8, Stock = 10 },
+			new() { Id = 101, Sku = "OIL-101", Name = "Oil filter", ProducerId = 42, ProductGroupId = 7 },
+			new() { Id = 102, Sku = "AIR-102", Name = "Air filter", ProducerId = 42, ProductGroupId = 7 },
+			new() { Id = 103, Sku = "FUEL-103", Name = "Fuel filter", ProducerId = 43, ProductGroupId = 8 },
 			new() { Id = 105, IsDeleted = true }
 		}.Select(product => ProductCoreUpdate.From(product, updatedAt)).ToArray(), CancellationToken);
 		await Products.ApplyUpdates(new ProductCharacteristicsSnapshot[]
