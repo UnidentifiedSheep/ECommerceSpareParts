@@ -139,16 +139,17 @@ public record GqlProduct
 	[GraphQLName("crosses")]
 	public async Task<IReadOnlyList<GqlProduct>> GetCrossesAsync(
 		GqlProductCrossesInput input,
-		IProductCrossesDataLoader loader,
+		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var item = new GetProductCrossesItem(
-			Id,
-			input.Pagination,
-			input.SortBy.ToSortExpressions());
-
-		var crosses = await loader.LoadAsync(item, cancellationToken);
-		return crosses?.Select(x => new GqlProduct(x)).ToArray() ?? [];
+		var result = await sender.Send(
+			new GetProductCrossesQuery(
+				Id,
+				input.Pagination,
+				input.SortBy.ToSortExpressions(),
+				input.SearchTerm),
+			cancellationToken);
+		return result.Crosses.Select(product => new GqlProduct(product)).ToArray();
 	}
 
 	[GraphQLName("storageContents")]

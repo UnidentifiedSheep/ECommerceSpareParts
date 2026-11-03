@@ -7,7 +7,6 @@ using Main.Application.Handlers.ProductGroups;
 using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.ProductEans.GetProductsEans;
 using Main.Application.Handlers.Products;
-using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.ProductSizes;
 using Main.Application.Handlers.ProductWeight;
 using Main.Application.Handlers.StorageContents.GetProductStorageContents;
@@ -101,18 +100,6 @@ public static class ProductDataLoaders
 		ISender sender,
 		CancellationToken cancellationToken) =>
 		(await sender.Send(new GetProductsContentsQuery(keys), cancellationToken)).Contents;
-
-	[DataLoader]
-	public static async Task<Dictionary<GetProductCrossesItem, IReadOnlyList<ProductDto>>>
-		GetProductCrossesAsync(
-			IReadOnlyList<GetProductCrossesItem> keys,
-			ISender sender,
-			CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProductCrossesQuery(keys), cancellationToken)).Crosses.ToDictionary(
-			x => x.Key,
-			x => x.Value);
-	}
 
 	[DataLoader]
 	public static async Task<Dictionary<GetProductStorageContentsItem, IReadOnlyList<StorageContentDto>>>

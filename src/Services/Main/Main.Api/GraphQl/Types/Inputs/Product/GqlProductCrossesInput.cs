@@ -9,6 +9,9 @@ public sealed record GqlProductCrossesInput
 	[GraphQLName("pagination")]
 	public required GqlPagination Pagination { get; init; }
 
+	[GraphQLName("searchTerm")]
+	public string? SearchTerm { get; init; }
+
 	[GraphQLName("sortBy")]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 }

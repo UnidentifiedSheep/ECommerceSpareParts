@@ -1,13 +1,17 @@
+using Application.Common;
+using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
-public class GetArticleCrossesAmwValidation : AbstractValidator<GetProductCrossesQuery>
+public class GetProductCrossesValidation : AbstractValidator<GetProductCrossesQuery>
 {
-	public GetArticleCrossesAmwValidation()
+	public GetProductCrossesValidation()
 	{
-		RuleForEach(x => x.Items)
-			.ChildRules(item => item.RuleFor(x => x.Pagination).SetValidator(new PaginationValidator()));
+		RuleFor(query => query.Pagination).SetValidator(new PaginationValidator());
+		RuleFor(query => query.SearchTerm)
+			.MaximumLength(200)
+			.WithLocalizableError(SearchStringMaxLengthMessage.Create(200));
 	}
 }

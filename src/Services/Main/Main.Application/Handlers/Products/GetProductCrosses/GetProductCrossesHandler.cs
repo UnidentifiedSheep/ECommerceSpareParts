@@ -1,22 +1,22 @@
-using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Products;
-using Application.Common.Interfaces.Repositories;
 using Main.Entities.Product;
+using Main.Entities.Product.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
-public sealed record GetProductCrossesItem(int ProductId, Pagination Pagination, IReadOnlyCollection<string>? SortBy);
+public sealed record GetProductCrossesQuery(
+	int ProductId,
+	Pagination Pagination,
+	IReadOnlyCollection<string>? SortBy = null,
+	string? SearchTerm = null) : IQuery<GetProductCrossesResult>;
 
-public record GetProductCrossesQuery(IReadOnlyCollection<GetProductCrossesItem> Items)
-	: IQuery<GetProductCrossesResult>;
-
-public record GetProductCrossesResult(
-	IReadOnlyDictionary<GetProductCrossesItem, IReadOnlyList<ProductDto>> Crosses);
+public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses);
 
 public class GetProductCrossesHandler(
 	IProductProvider productProvider,
@@ -27,31 +27,29 @@ public class GetProductCrossesHandler(
 		GetProductCrossesQuery request,
 		CancellationToken cancellationToken)
 	{
-		var items = request.Items.Distinct().ToArray();
-		var crossIds = await productProvider.GetProductsCrossesAsync(
-			items.Select(item => item.ProductId), cancellationToken);
-		var paginatedIdsByItem = new Dictionary<GetProductCrossesItem, int[]>();
-
-		foreach (var item in items)
+		var crossIds = await productProvider.GetProductCrossesAsync(request.ProductId, cancellationToken);
+		var query = productsRepository.Query.Where(product => crossIds.Contains(product.Id));
+		if (!string.IsNullOrWhiteSpace(request.SearchTerm))
 		{
-			var ids = crossIds[item.ProductId];
-			var sortBy = (item.SortBy ?? []).Append("id").ToArray();
-			paginatedIdsByItem[item] = await productsRepository.Query
-				.Where(product => ids.Contains(product.Id))
-				.SortBy(sortBy)
-				.ApplyPagination(item.Pagination)
-				.Select(product => product.Id)
-				.ToArrayAsync(cancellationToken);
+			var term = request.SearchTerm.Trim();
+			var pattern = $"%{EscapePattern(term)}%";
+			var normalizedSku = Sku.ToNormalized(term);
+			var skuPattern = $"%{normalizedSku}%";
+			query = query.Where(product =>
+				EF.Functions.ILike(product.Name.Value, pattern) ||
+				EF.Functions.ILike(product.Producer.Name, pattern) ||
+				normalizedSku.Length > 0 && EF.Functions.ILike(product.Sku.NormalizedValue, skuPattern));
 		}
 
-		var products = await productProvider.GetProductsOrSetAsync(
-			paginatedIdsByItem.Values.SelectMany(x => x).Distinct(),
-			cancellationToken);
-
-		var crosses = paginatedIdsByItem.ToDictionary(
-			item => item.Key,
-			IReadOnlyList<ProductDto> (item) => item.Value.Select(productId => products[productId]).ToArray());
-
-		return new GetProductCrossesResult(crosses);
+		var ids = await query
+			.SortBy((request.SortBy ?? []).Append("id").ToArray())
+			.ApplyPagination(request.Pagination)
+			.Select(product => product.Id)
+			.ToArrayAsync(cancellationToken);
+		var products = await productProvider.GetProductsOrSetAsync(ids, cancellationToken);
+		return new GetProductCrossesResult(ids.Select(id => products[id]).ToArray());
 	}
+
+	private static string EscapePattern(string value) =>
+		value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }
