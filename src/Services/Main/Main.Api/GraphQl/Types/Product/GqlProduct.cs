@@ -168,6 +168,12 @@ public record GqlProduct
 		return content?.Select(x => new GqlStorageContent(x)).ToArray() ?? [];
 	}
 
+	[GraphQLName("stock")]
+	public async Task<long> GetStockAsync(
+		IProductStockByIdDataLoader loader,
+		CancellationToken cancellationToken) => await loader.LoadAsync(Id, cancellationToken);
+
+
 	[GraphQLName("availableStock")]
 	public async Task<int> GetAvailableStockAsync(
 		IProductAvailableStockDataLoader loader,
