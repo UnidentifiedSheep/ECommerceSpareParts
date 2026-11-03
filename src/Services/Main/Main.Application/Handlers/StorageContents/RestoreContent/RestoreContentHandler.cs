@@ -1,10 +1,11 @@
 using System.Data;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Interfaces.Persistence;
 using Main.Application.Models;
 using Main.Entities.Exceptions;
+using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
 
@@ -19,7 +20,7 @@ public record RestoreContentCommand(
 	IReadOnlyCollection<RestoreContentItem> ContentDetails,
 	StorageMovementType MovementType) : ICommand;
 
-public class RestoreContentHandler(IStorageContentRepository contentRepository)
+public class RestoreContentHandler(IRepository<StorageContent, int> contentRepository)
 	: ICommandHandler<RestoreContentCommand>
 {
 	public async Task<Unit> Handle(RestoreContentCommand request, CancellationToken cancellationToken)
@@ -27,8 +28,11 @@ public class RestoreContentHandler(IStorageContentRepository contentRepository)
 		var contentDetailsList = request.ContentDetails.ToList();
 		var storageContentIds = contentDetailsList.Select(x => x.StorageContentId).Distinct().ToList();
 
-		var storageContents = await contentRepository.GetByIdsForUpdateAsync(storageContentIds.ToArray(), cancellationToken);
-		storageContentIds.EnsureAllExists(storageContents.Keys, missing => new StorageContentNotFoundException(missing));
+		var storageContents = await contentRepository.EnsureExistsForUpdateAsync(
+			storageContentIds,
+			missing => new StorageContentNotFoundException(missing),
+			Criteria<StorageContent>.New().OrderByAsc(content => content.Id),
+			cancellationToken);
 
 		foreach (var detail in contentDetailsList)
 		{

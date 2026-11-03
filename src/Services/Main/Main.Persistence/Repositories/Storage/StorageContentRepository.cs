@@ -13,15 +13,6 @@ namespace Main.Persistence.Repositories.Storage;
 public class StorageContentRepository(DContext context, IQueryableExtensions extensions)
 	: LinqRepositoryBase<DContext, StorageContent, int>(context, extensions), IStorageContentRepository
 {
-	public Task<Dictionary<int, StorageContent>> GetByIdsForUpdateAsync(
-		IReadOnlyCollection<int> contentIds, CancellationToken cancellationToken = default)
-	{
-		if (contentIds.Count == 0) return Task.FromResult(new Dictionary<int, StorageContent>());
-		var query = Context.StorageContents.AsTracking().Where(content => contentIds.Contains(content.Id))
-			.OrderBy(content => content.Id);
-		return QueryableExtensions.ForUpdate(query).ToDictionaryAsync(content => content.Id, cancellationToken);
-	}
-
 	public async Task<IReadOnlyList<StorageContent>> GetForUpdateAsync(
 		IReadOnlyCollection<StorageContentSelection> selections,
 		IReadOnlyCollection<int> preferredContentIds,

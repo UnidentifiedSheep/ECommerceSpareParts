@@ -6,10 +6,6 @@ namespace Main.Application.Interfaces.Persistence;
 
 public interface IStorageContentRepository : IRepository<StorageContent, int>
 {
-	Task<Dictionary<int, StorageContent>> GetByIdsForUpdateAsync(
-		IReadOnlyCollection<int> contentIds,
-		CancellationToken cancellationToken = default);
-
 	Task<IReadOnlyList<StorageContent>> GetForUpdateAsync(
 		IReadOnlyCollection<StorageContentSelection> selections,
 		IReadOnlyCollection<int> preferredContentIds,

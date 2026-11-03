@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Repositories;
 using Domain;
 using Domain.Interfaces;
 
@@ -26,8 +26,16 @@ public static class RepositoryExtensions
 		IEnumerable<TKey> ids,
 		Func<IReadOnlyList<TKey>, Exception> errorFactory,
 		CancellationToken ct = default) where TEntity : Entity<TEntity, TKey> where TKey : notnull
+		=> repository.EnsureExistsForUpdateAsync(ids, errorFactory, Criteria<TEntity>.New(), ct);
+
+	public static Task<Dictionary<TKey, TEntity>> EnsureExistsForUpdateAsync<TEntity, TKey>(
+		this IRepository<TEntity, TKey> repository,
+		IEnumerable<TKey> ids,
+		Func<IReadOnlyList<TKey>, Exception> errorFactory,
+		CriteriaBuilder<TEntity> criteriaBuilder,
+		CancellationToken ct = default) where TEntity : Entity<TEntity, TKey> where TKey : notnull
 	{
-		var criteria = Criteria<TEntity>.New().Track().ForUpdate().Build();
+		var criteria = criteriaBuilder.Track().ForUpdate().Build();
 
 		return repository.EnsureExistsCoreAsync(
 			ids,

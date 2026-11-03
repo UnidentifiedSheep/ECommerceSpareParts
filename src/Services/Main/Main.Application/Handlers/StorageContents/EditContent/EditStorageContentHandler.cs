@@ -2,15 +2,16 @@ using System.Data;
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Models;
 using Attributes;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;
-using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models.Storage;
 using Main.Entities.Exceptions;
+using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
 
@@ -25,7 +26,7 @@ public record EditStorageContentCommand(
 	Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields) : ICommand;
 
 public class EditStorageContentHandler(
-	IStorageContentRepository storageContentRepository,
+	IRepository<StorageContent, int> storageContentRepository,
 	ICurrencyConverter currencyConverter,
 	IStorageContentService storageContentService) : ICommandHandler<EditStorageContentCommand>
 {
@@ -33,8 +34,11 @@ public class EditStorageContentHandler(
 	{
 		var editedFields = request.EditedFields;
 
-		var storageContents = await storageContentRepository.GetByIdsForUpdateAsync(editedFields.Keys.ToArray(), cancellationToken);
-		editedFields.Keys.EnsureAllExists(storageContents.Keys, missing => new StorageContentNotFoundException(missing));
+		var storageContents = await storageContentRepository.EnsureExistsForUpdateAsync(
+			editedFields.Keys,
+			missing => new StorageContentNotFoundException(missing),
+			Criteria<StorageContent>.New().OrderByAsc(content => content.Id),
+			cancellationToken);
 
 		await storageContentService.EnsureCanSetQuantitiesAsync(editedFields
 			.Where(item => item.Value.Model.Count.IsSet)

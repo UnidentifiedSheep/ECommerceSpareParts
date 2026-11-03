@@ -13,7 +13,6 @@ using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Application.Models.Storage;
-using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models;
 using Main.Entities.Balance;
@@ -46,7 +45,7 @@ public class EditPurchaseHandler(
 	IRepository<Purchase, Guid> purchaseRepository,
 	IRepository<StorageOwner, (string, Guid)> storageOwnerRepository,
 	IOptions<SystemOptions> systemOptions,
-	IStorageContentRepository storageContentRepository,
+	IRepository<StorageContent, int> storageContentRepository,
 	ICurrencyConverter currencyConverter,
 	IPurchaseLogisticsService purchaseLogisticsService,
 	IStorageContentService storageContentService,
@@ -168,8 +167,11 @@ public class EditPurchaseHandler(
 
 		var storageContentIds = purchase.Contents.Select(x => x.StorageContentId).ToHashSet();
 
-		var storageContents = await storageContentRepository.GetByIdsForUpdateAsync(storageContentIds.ToArray(), cancellationToken);
-		storageContentIds.EnsureAllExists(storageContents.Keys, missing => new StorageContentNotFoundException(missing[0]));
+		var storageContents = await storageContentRepository.EnsureExistsForUpdateAsync(
+			storageContentIds,
+			missing => new StorageContentNotFoundException(missing[0]),
+			Criteria<StorageContent>.New().OrderByAsc(content => content.Id),
+			cancellationToken);
 
 		var deletionSubtractions = new List<SubtractStorageContentItem>();
 		var editingSubtractions = new List<SubtractStorageContentItem>();
