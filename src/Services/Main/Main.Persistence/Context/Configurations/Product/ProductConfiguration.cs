@@ -102,6 +102,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 			.HasField("_characteristics")
 			.UsePropertyAccessMode(PropertyAccessMode.Field);
 
+		builder
+			.Navigation(e => e.Stocks)
+			.HasField("_stocks")
+			.UsePropertyAccessMode(PropertyAccessMode.Field);
+
 		builder.Navigation(e => e.Eans).HasField("_eans").UsePropertyAccessMode(PropertyAccessMode.Field);
 
 		builder.Navigation(e => e.Images).HasField("_images").UsePropertyAccessMode(PropertyAccessMode.Field);

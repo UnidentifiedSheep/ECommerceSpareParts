@@ -27,7 +27,7 @@ public sealed class ProductStockConfiguration : IEntityTypeConfiguration<Product
 			.HasConstraintName("product_stocks_storage_code_fk");
 
 		builder.HasOne(stock => stock.Product)
-			.WithMany()
+			.WithMany(e => e.Stocks)
 			.HasForeignKey(stock => stock.ProductId)
 			.OnDelete(DeleteBehavior.Cascade)
 			.HasConstraintName("product_stocks_product_id_fk");

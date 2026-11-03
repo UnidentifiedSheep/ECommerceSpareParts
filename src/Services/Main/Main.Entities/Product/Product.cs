@@ -4,6 +4,7 @@ using Domain;
 using Domain.Interfaces;
 using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product.ValueObjects;
+using Main.Entities.Storage;
 
 namespace Main.Entities.Product;
 
@@ -14,6 +15,8 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 	private readonly List<ProductEan> _eans = [];
 
 	private readonly List<ProductImage> _images = [];
+
+	private readonly List<ProductStock> _stocks = [];
 
 	private Product(
 		Sku sku,
@@ -61,6 +64,8 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 	public IReadOnlyCollection<ProductEan> Eans => _eans;
 
 	public IReadOnlyCollection<ProductImage> Images => _images;
+
+	public IReadOnlyCollection<ProductStock> Stocks => _stocks;
 
 	public ProductSize? ProductSize { get; private set; }
 
