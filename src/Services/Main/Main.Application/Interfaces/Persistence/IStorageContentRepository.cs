@@ -2,7 +2,6 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Main.Application.Models.Storage;
-using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Storage;
 
 namespace Main.Application.Interfaces.Persistence;
@@ -16,17 +15,22 @@ public interface IStorageContentRepository : IRepository<StorageContent, int>
 		bool showZeroCount,
 		CancellationToken cancellationToken = default);
 
-	IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
-		int? productId,
-		string? storageCode,
-		IEnumerable<int>? exceptProductIds = null,
-		IEnumerable<string>? exceptStorages = null,
-		int countGreaterThen = 0,
-		StorageContentExtractPolicyBase? policy = null);
+	Task<Dictionary<int, StorageContent>> GetByIdsForUpdateAsync(
+		IReadOnlyCollection<int> contentIds,
+		CancellationToken cancellationToken = default);
 
-	Task<Dictionary<int, int>> GetStorageContentCounts(
-		string storageCode,
-		IEnumerable<int> productIds,
-		bool takeFromOtherStorages,
+	Task<IReadOnlyList<StorageContent>> GetForUpdateAsync(
+		IReadOnlyCollection<StorageContentSelection> selections,
+		IReadOnlyCollection<int> preferredContentIds,
+		CancellationToken cancellationToken = default);
+
+	Task<Dictionary<int, long>> GetLockedQuantitiesAsync(
+		IReadOnlyCollection<int> contentIds,
+		DateTime utcNow,
+		CancellationToken cancellationToken = default);
+
+	Task<Dictionary<(int ProductId, string StorageCode), int>> GetAvailableCountsAsync(
+		IReadOnlyCollection<StorageContentSelection> selections,
+		DateTime utcNow,
 		CancellationToken cancellationToken = default);
 }

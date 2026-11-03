@@ -27,10 +27,8 @@ public class RestoreContentHandler(IStorageContentRepository contentRepository)
 		var contentDetailsList = request.ContentDetails.ToList();
 		var storageContentIds = contentDetailsList.Select(x => x.StorageContentId).Distinct().ToList();
 
-		var storageContents = await contentRepository.EnsureExistsForUpdateAsync(
-			storageContentIds,
-			nf => new StorageContentNotFoundException(nf),
-			cancellationToken);
+		var storageContents = await contentRepository.GetByIdsForUpdateAsync(storageContentIds.ToArray(), cancellationToken);
+		storageContentIds.EnsureAllExists(storageContents.Keys, missing => new StorageContentNotFoundException(missing));
 
 		foreach (var detail in contentDetailsList)
 		{

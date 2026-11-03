@@ -2,6 +2,7 @@ using FluentAssertions;
 using Main.Application.Dtos.Sale;
 using Main.Application.Models.Storage;
 using Main.Application.Services;
+using Main.Application.Interfaces.Services;
 using MediatR;
 using Moq;
 
@@ -9,7 +10,7 @@ namespace Tests.ServicesTests;
 
 public class SaleServiceTests
 {
-	private readonly SaleService _service = new(Mock.Of<ISender>());
+	private readonly SaleService _service = new(Mock.Of<ISender>(), Mock.Of<IStorageContentService>());
 
 	[Fact]
 	public void DistributeDetails_WithNewSaleContent_DistributesFromLargestLotsFirst()

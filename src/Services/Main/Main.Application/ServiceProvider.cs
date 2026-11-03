@@ -19,6 +19,7 @@ using Main.Application.JobProviders;
 using Main.Application.Lrts.ProducerImport;
 using Main.Application.Models.Options;
 using Main.Application.Services;
+using Main.Application.Services.Storage;
 using Main.Application.Services.Products.EventParts;
 using Main.Application.Services.Currency;
 using Main.Application.Services.Document;
@@ -100,6 +101,7 @@ public static class ServiceProvider
 		collection.AddScoped<IBalanceService, BalanceService>();
 		collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
 		collection.AddScoped<ISaleService, SaleService>();
+		collection.AddScoped<IStorageContentService, StorageContentService>();
 		collection.AddSingleton<IProducerLookupService, ProducerLookupService>();
 		collection.AddScoped<IProducerLookupLoader, ProducerLookupLoader>();
 		collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();

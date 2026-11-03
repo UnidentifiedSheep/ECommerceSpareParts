@@ -2,6 +2,7 @@ using FluentAssertions;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.StorageContents.SubtractContent;
+using Main.Application.Models.Storage;
 using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;

@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.StorageContents.SubtractContent;
+using Main.Application.Models.Storage;
 using Main.Entities.Exceptions;
 using Main.Enums;
 using Main.Enums.Balances;

@@ -62,6 +62,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 			.CreateLogger();
 
 		ApplicationServiceProvider.AddApplicationLayer(services, null).AddLocan().AddPersistenceLayer();
+		services.AddSingleton<TestTimeProvider>();
+		services.AddSingleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>());
 		var passwordRules = new PasswordRules
 		{
 			RequireDigit = false, RequireUppercase = false

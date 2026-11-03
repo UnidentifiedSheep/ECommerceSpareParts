@@ -8,6 +8,8 @@ using Attributes;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
+using Main.Application.Models.Storage;
 using Main.Entities.Exceptions;
 using Main.Enums;
 using MediatR;
@@ -24,15 +26,19 @@ public record EditStorageContentCommand(
 
 public class EditStorageContentHandler(
 	IStorageContentRepository storageContentRepository,
-	ICurrencyConverter currencyConverter) : ICommandHandler<EditStorageContentCommand>
+	ICurrencyConverter currencyConverter,
+	IStorageContentService storageContentService) : ICommandHandler<EditStorageContentCommand>
 {
 	public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
 	{
 		var editedFields = request.EditedFields;
 
-		var storageContents = await storageContentRepository.EnsureExistsForUpdateAsync(
-			editedFields.Keys,
-			nf => new StorageContentNotFoundException(nf),
+		var storageContents = await storageContentRepository.GetByIdsForUpdateAsync(editedFields.Keys.ToArray(), cancellationToken);
+		editedFields.Keys.EnsureAllExists(storageContents.Keys, missing => new StorageContentNotFoundException(missing));
+
+		await storageContentService.EnsureCanSetQuantitiesAsync(editedFields
+			.Where(item => item.Value.Model.Count.IsSet)
+			.Select(item => new StorageContentQuantityChange(storageContents[item.Key], item.Value.Model.Count.Value)).ToArray(),
 			cancellationToken);
 
 		foreach (var item in editedFields)

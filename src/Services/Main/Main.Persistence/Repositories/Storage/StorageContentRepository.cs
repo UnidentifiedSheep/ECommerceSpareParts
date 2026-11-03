@@ -1,10 +1,11 @@
 ﻿using System.Data;
+using System.Linq.Expressions;
 using Abstractions.Models;
 using Application.Common.Models;
 using Dapper;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Storage;
-using Main.Application.NamedObjects.StorageContentExtractPolicies;
+using Main.Enums;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -78,72 +79,97 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
 		}
 	}
 
-	public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
-		int? productId,
-		string? storageCode,
-		IEnumerable<int>? exceptProductIds = null,
-		IEnumerable<string>? exceptStorages = null,
-		int countGreaterThen = 0,
-		StorageContentExtractPolicyBase? policy = null)
+	public Task<Dictionary<int, StorageContent>> GetByIdsForUpdateAsync(
+		IReadOnlyCollection<int> contentIds, CancellationToken cancellationToken = default)
 	{
-		return BuildStorageContentsForUpdateQuery(
-				productId,
-				storageCode,
-				exceptProductIds,
-				exceptStorages,
-				countGreaterThen,
-				policy)
-			.AsAsyncEnumerable();
+		if (contentIds.Count == 0) return Task.FromResult(new Dictionary<int, StorageContent>());
+		var query = Context.StorageContents.AsTracking().Where(content => contentIds.Contains(content.Id))
+			.OrderBy(content => content.Id);
+		return QueryableExtensions.ForUpdate(query).ToDictionaryAsync(content => content.Id, cancellationToken);
 	}
 
-	public async Task<Dictionary<int, int>> GetStorageContentCounts(
-		string storageCode,
-		IEnumerable<int> productIds,
-		bool takeFromOtherStorages,
+	public async Task<IReadOnlyList<StorageContent>> GetForUpdateAsync(
+		IReadOnlyCollection<StorageContentSelection> selections,
+		IReadOnlyCollection<int> preferredContentIds,
 		CancellationToken cancellationToken = default)
 	{
-		return await Context
-			.StorageContents
-			.AsNoTracking()
-			.Where(x => x.Count > 0 &&
-				productIds.Contains(x.ProductId) && (takeFromOtherStorages || x.StorageCode == storageCode))
-			.GroupBy(x => x.ProductId)
-			.Select(g => new
-			{
-				ProductId = g.Key, TotalCount = g.Sum(x => x.Count)
-			})
-			.ToDictionaryAsync(
-				x => x.ProductId,
-				x => x.TotalCount,
-				cancellationToken);
+		if (selections.Count == 0) return [];
+		var includedIds = preferredContentIds.Concat(Context.ChangeTracker.Entries<StorageContent>()
+			.Where(entry => entry.State == EntityState.Modified && entry.Entity.Count > 0)
+			.Select(entry => entry.Entity.Id)).Distinct().ToArray();
+		var query = Context.StorageContents.AsTracking().Where(BuildSelectionPredicate(selections))
+			.Where(content => content.Count > 0 || includedIds.Contains(content.Id))
+			.OrderBy(content => content.Id);
+		return await QueryableExtensions.ForUpdate(query).ToListAsync(cancellationToken);
 	}
 
-	private IQueryable<StorageContent> BuildStorageContentsForUpdateQuery(
-		int? productId,
-		string? storageCode,
-		IEnumerable<int>? exceptProductIds = null,
-		IEnumerable<string>? exceptStorages = null,
-		int countGreaterThen = 0,
-		StorageContentExtractPolicyBase? policy = null)
+	public async Task<Dictionary<int, long>> GetLockedQuantitiesAsync(
+		IReadOnlyCollection<int> contentIds, DateTime utcNow, CancellationToken cancellationToken = default)
 	{
-		var exceptProducts = exceptProductIds?.ToList();
-		var exceptStorageCodes = exceptStorages?.ToList();
-		var query = Context.StorageContents.Where(x => x.Count > countGreaterThen);
+		if (contentIds.Count == 0) return [];
+		var quantities = await Context.StorageContentLocks.AsNoTracking()
+			.Where(item => contentIds.Contains(item.StorageContentId) && item.State == StorageContentLockState.Active &&
+				(item.ExpiresAt == null || item.ExpiresAt > utcNow))
+			.GroupBy(item => item.StorageContentId)
+			.Select(group => new { Id = group.Key, Quantity = group.Sum(item => (long)item.Quantity) })
+			.ToDictionaryAsync(item => item.Id, item => item.Quantity, cancellationToken);
 
-		if (productId != null)
-			query = query.Where(x => x.ProductId == productId);
+		// Include reservations changed in this transaction before their next SaveChanges.
+		var ids = contentIds.ToHashSet();
+		foreach (var entry in Context.ChangeTracker.Entries<StorageContentLock>())
+		{
+			if (!ids.Contains(entry.Entity.StorageContentId) || entry.State is not (EntityState.Added or EntityState.Modified or EntityState.Deleted))
+				continue;
+			long original = 0;
+			if (entry.State != EntityState.Added)
+			{
+				var state = (StorageContentLockState)entry.OriginalValues[nameof(StorageContentLock.State)]!;
+				var expiresAt = (DateTime?)entry.OriginalValues[nameof(StorageContentLock.ExpiresAt)];
+				if (state == StorageContentLockState.Active && (expiresAt is null || expiresAt > utcNow))
+					original = (int)entry.OriginalValues[nameof(StorageContentLock.Quantity)]!;
+			}
+			var current = entry.State != EntityState.Deleted && entry.Entity.IsActiveAt(utcNow) ? (long)entry.Entity.Quantity : 0L;
+			var id = entry.Entity.StorageContentId;
+			quantities[id] = checked(quantities.GetValueOrDefault(id) + current - original);
+		}
+		return quantities;
+	}
 
-		if (exceptProducts is { Count: > 0 })
-			query = query.Where(x => !exceptProducts.Contains(x.ProductId));
+	public async Task<Dictionary<(int ProductId, string StorageCode), int>> GetAvailableCountsAsync(
+		IReadOnlyCollection<StorageContentSelection> selections, DateTime utcNow, CancellationToken cancellationToken = default)
+	{
+		if (selections.Count == 0) return [];
+		var rows = await Context.StorageContents.AsNoTracking()
+			.Where(BuildSelectionPredicate(selections))
+			.Where(content => content.Count > 0)
+			.Select(content => new
+			{
+				content.ProductId, content.StorageCode,
+				Available = Math.Max(0L, (long)content.Count - (Context.StorageContentLocks
+					.Where(item => item.StorageContentId == content.Id && item.State == StorageContentLockState.Active &&
+						(item.ExpiresAt == null || item.ExpiresAt > utcNow))
+					.Sum(item => (long?)item.Quantity) ?? 0L))
+			})
+			.GroupBy(content => new { content.ProductId, content.StorageCode })
+			.Select(group => new { group.Key.ProductId, group.Key.StorageCode, Quantity = group.Sum(content => content.Available) })
+			.ToListAsync(cancellationToken);
+		return rows.ToDictionary(item => (item.ProductId, item.StorageCode), item => checked((int)item.Quantity));
+	}
 
-		if (storageCode != null)
-			query = query.Where(x => x.StorageCode == storageCode);
-
-		if (exceptStorageCodes is { Count: > 0 })
-			query = query.Where(x => !exceptStorageCodes.Contains(x.StorageCode));
-
-		query = QueryableExtensions.ForUpdate(query);
-
-		return policy != null ? policy.Apply(query) : query.OrderBy(x => x.PurchaseDatetime);
+	private static Expression<Func<StorageContent, bool>> BuildSelectionPredicate(
+		IReadOnlyCollection<StorageContentSelection> selections)
+	{
+		var parameter = Expression.Parameter(typeof(StorageContent), "content");
+		Expression body = Expression.Constant(false);
+		foreach (var selection in selections.Distinct())
+		{
+			Expression match = Expression.Equal(Expression.Property(parameter, nameof(StorageContent.ProductId)),
+				Expression.Constant(selection.ProductId));
+			if (selection.StorageCode is not null)
+				match = Expression.AndAlso(match, Expression.Equal(Expression.Property(parameter, nameof(StorageContent.StorageCode)),
+					Expression.Constant(selection.StorageCode)));
+			body = Expression.OrElse(body, match);
+		}
+		return Expression.Lambda<Func<StorageContent, bool>>(body, parameter);
 	}
 }

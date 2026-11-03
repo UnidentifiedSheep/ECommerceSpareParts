@@ -12,7 +12,7 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.RestoreContent;
-using Main.Application.Handlers.StorageContents.SubtractContent;
+using Main.Application.Models.Storage;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models;
@@ -49,6 +49,7 @@ public class EditPurchaseHandler(
 	IStorageContentRepository storageContentRepository,
 	ICurrencyConverter currencyConverter,
 	IPurchaseLogisticsService purchaseLogisticsService,
+	IStorageContentService storageContentService,
 	IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand>
 {
 	public async Task<Unit> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
@@ -167,12 +168,8 @@ public class EditPurchaseHandler(
 
 		var storageContentIds = purchase.Contents.Select(x => x.StorageContentId).ToHashSet();
 
-		var storageContents = storageContentIds.Count == 0
-			? new Dictionary<int, StorageContent>()
-			: await storageContentRepository.EnsureExistsForUpdateAsync(
-				storageContentIds,
-				ids => new StorageContentNotFoundException(ids[0]),
-				cancellationToken);
+		var storageContents = await storageContentRepository.GetByIdsForUpdateAsync(storageContentIds.ToArray(), cancellationToken);
+		storageContentIds.EnsureAllExists(storageContents.Keys, missing => new StorageContentNotFoundException(missing[0]));
 
 		var deletionSubtractions = new List<SubtractStorageContentItem>();
 		var editingSubtractions = new List<SubtractStorageContentItem>();
@@ -210,13 +207,13 @@ public class EditPurchaseHandler(
 				cancellationToken);
 
 		if (deletionSubtractions.Count > 0)
-			await sender.Send(
-				new SubtractStorageContentsCommand(deletionSubtractions, StorageMovementType.PurchaseEditing),
+			await storageContentService.SubtractAsync(
+				deletionSubtractions, StorageMovementType.PurchaseEditing,
 				cancellationToken);
 
 		if (editingSubtractions.Count > 0)
-			await sender.Send(
-				new SubtractStorageContentsCommand(editingSubtractions, StorageMovementType.PurchaseEditing),
+			await storageContentService.SubtractAsync(
+				editingSubtractions, StorageMovementType.PurchaseEditing,
 				cancellationToken);
 
 		if (editingRestorations.Count > 0)

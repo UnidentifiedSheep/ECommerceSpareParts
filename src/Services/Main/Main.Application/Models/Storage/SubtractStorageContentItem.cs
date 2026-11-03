@@ -1,4 +1,4 @@
-namespace Main.Application.Handlers.StorageContents.SubtractContent;
+namespace Main.Application.Models.Storage;
 
 public interface ISubtractStorageContentItem
 {

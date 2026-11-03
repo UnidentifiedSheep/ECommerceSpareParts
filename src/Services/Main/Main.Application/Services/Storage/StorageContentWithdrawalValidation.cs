@@ -2,13 +2,14 @@ using Application.Common.Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Locan.Core.Interfaces;
+using Main.Application.Models.Storage;
 using Main.Entities;
 
-namespace Main.Application.Handlers.StorageContents.SubtractContent;
+namespace Main.Application.Services.Storage;
 
-public class SubtractStorageContentsValidation : AbstractValidator<SubtractStorageContentsCommand>
+public class StorageContentWithdrawalValidation : AbstractValidator<StorageContentWithdrawal>
 {
-	public SubtractStorageContentsValidation()
+	public StorageContentWithdrawalValidation()
 	{
 		RuleFor(x => x.Items).NotEmpty().WithLocalizableError(StorageContentItemsRequiredMessage.Instance);
 
