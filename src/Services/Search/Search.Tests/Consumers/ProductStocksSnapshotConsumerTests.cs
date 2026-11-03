@@ -133,6 +133,31 @@ public sealed class ProductStocksSnapshotConsumerTests(SearchContainerFixture fi
 		result.Hits.Select(item => item.Document.Id).Should().Equal(902, 903, 901);
 	}
 
+	[Theory]
+	[InlineData("warehouse.a", false, new[] { 902, 903, 901 })]
+	[InlineData("warehouse.a", true, new[] { 901, 903, 902 })]
+	[InlineData("unknown-warehouse", false, new[] { 901, 902, 903 })]
+	public async Task Catalogue_SortsBySelectedWarehouseIncludingMissingValues(
+		string storageCode, bool descending, int[] expectedIds)
+	{
+		var now = DateTime.UtcNow;
+		await Products.ApplyUpdates(new[] { 901, 902, 903 }.Select(id => ProductCoreUpdate.From(
+			new ProductSnapshot { Id = id, Sku = $"STOCK-{id}", Name = "Stock product", ProducerId = 1 }, now)).ToArray(), CancellationToken);
+		await Snapshot(901, now, new Dictionary<string, int> { ["warehouse.a"] = 10 });
+		await Snapshot(902, now, new Dictionary<string, int> { ["other-warehouse"] = 100 });
+		await Snapshot(903, now, new Dictionary<string, int> { ["warehouse.a"] = 5, ["other-warehouse"] = 200 });
+		await RefreshAsync();
+
+		var result = await Products.Search(new CatalogueSearchCriteria
+		{
+			Query = "", SkuModes = new HashSet<SearchMatchType>(), NameModes = new HashSet<SearchMatchType>(),
+			Pagination = new Pagination(0, 20), SortBy = [descending ? "stock_desc" : "stock_asc"],
+			StockStorageCode = storageCode
+		}, CancellationToken);
+
+		result.Hits.Select(item => item.Document.Id).Should().Equal(expectedIds);
+	}
+
 	private Task Snapshot(int id, DateTime occurredAt, IReadOnlyDictionary<string, int> stocks) =>
 		Scope.ServiceProvider.GetRequiredService<ProductStocksSnapshotConsumer>().Consume(Context(new ProductStocksSnapshotEvent
 		{
