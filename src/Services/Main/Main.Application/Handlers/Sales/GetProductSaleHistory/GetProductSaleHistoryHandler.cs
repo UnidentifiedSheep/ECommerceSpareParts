@@ -36,7 +36,7 @@ public class GetProductSaleHistoryHandler(
 	{
 		var productIds = new List<int> { request.ProductId };
 		if (request.ShowCrosses)
-			productIds.AddRange(await productProvider.GetProductCrossesAsync(request.ProductId, null, cancellationToken));
+			productIds.AddRange(await productProvider.GetProductCrossesAsync(request.ProductId, cancellationToken));
 
 		var query = repository.Query
 			.CompletedSales()

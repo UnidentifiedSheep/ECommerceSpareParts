@@ -102,13 +102,13 @@ public class DeleteProductTests : IntegrationTest
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 		await provider.GetProductOrSetAsync(Product.Id, CancellationToken);
 		await provider.GetProductOrSetAsync(Other.Id, CancellationToken);
-		(await provider.GetProductCrossesAsync(Other.Id, null, CancellationToken)).Should().Contain(Product.Id);
+		(await provider.GetProductCrossesAsync(Other.Id, CancellationToken)).Should().Contain(Product.Id);
 
 		await Delete();
 
 		(await provider.GetProductAsync(Product.Id, CancellationToken)).Should().BeNull();
 		(await provider.GetProductAsync(Other.Id, CancellationToken)).Should().NotBeNull();
-		(await provider.GetProductCrossesAsync(Other.Id, null, CancellationToken)).Should().BeEmpty();
+		(await provider.GetProductCrossesAsync(Other.Id, CancellationToken)).Should().BeEmpty();
 		(await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken)).Should().BeEmpty();
 		(await Context.Set<Job>().AsNoTracking().AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should().BeFalse();
 	}

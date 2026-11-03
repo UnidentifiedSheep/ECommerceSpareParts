@@ -27,7 +27,7 @@ public sealed class ProductCrossesByIdsDeleteLrtTests : CsvLrtIntegrationTest<Pr
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var productProvider = Scope.ServiceProvider.GetRequiredService<IProductProvider>();
-		(await productProvider.GetProductCrossesAsync(products[0].Id, null, CancellationToken))
+		(await productProvider.GetProductCrossesAsync(products[0].Id, CancellationToken))
 			.Should().Contain(products[1].Id);
 
 		var execution = await ExecuteCsv(
@@ -52,7 +52,7 @@ public sealed class ProductCrossesByIdsDeleteLrtTests : CsvLrtIntegrationTest<Pr
 		crosses[0].RightProductId.Should().Be(retainedCross.RightProductId);
 
 		var cachedCrossIds = await productProvider.GetProductCrossesAsync(
-			products[0].Id, null, CancellationToken);
+			products[0].Id, CancellationToken);
 		cachedCrossIds.Should().BeEquivalentTo([products[2].Id]);
 	}
 
