@@ -1,10 +1,9 @@
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentValidation;
 using LinqKit;
-using Microsoft.EntityFrameworkCore;
+using Main.Application.Extensions;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models.Storage;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
@@ -18,131 +17,144 @@ namespace Main.Application.Services.Storage;
 
 public sealed class StorageContentService(
 	IRepository<StorageContent, int> repository,
-	IReadRepository<StorageContentLock, Guid> lockRepository,
 	ISettingsService settingsService,
 	INamedObjectRegistry<StorageContentExtractPolicyBase> policyRegistry,
-	IValidator<StorageContentWithdrawal> validator,
+	IValidator<IReadOnlyCollection<SubtractStorageContentItem>> contentValidator,
+	IValidator<IReadOnlyCollection<SubtractProductFromStorageItem>> productValidator,
 	IUnitOfWork unitOfWork,
 	TimeProvider timeProvider) : IStorageContentService
 {
-	public async Task<IReadOnlyList<StorageLot>> SubtractAsync(
-		IReadOnlyCollection<ISubtractStorageContentItem> items,
+	public async Task<IReadOnlyList<StorageLot>> SubtractByProductsAsync(
+		IReadOnlyCollection<SubtractProductFromStorageItem> items,
 		StorageMovementType movementType,
 		CancellationToken cancellationToken = default)
 	{
-		await validator.ValidateAndThrowAsync(new StorageContentWithdrawal(items, movementType), cancellationToken);
+		await productValidator.ValidateAndThrowAsync(items, cancellationToken);
 		EnsureTransaction();
-		var byContent = new Dictionary<int, int>();
-		var byProduct = new Dictionary<(int ProductId, string? StorageCode), int>();
-		foreach (var item in items)
-			switch (item)
+		var requests = items.GroupBy(item => (item.ProductId, item.StorageCode))
+			.Select(group => new
 			{
-				case SubtractStorageContentItem content:
-					byContent[content.StorageContentId] = checked(byContent.GetValueOrDefault(content.StorageContentId) + content.Count);
-					break;
-				case SubtractProductFromStorageItem product:
-					var key = (product.ProductId, product.StorageCode);
-					byProduct[key] = checked(byProduct.GetValueOrDefault(key) + product.Count);
-					break;
-				default:
-					throw new InvalidOperationException($"Unsupported subtract item type {item.GetType().Name}.");
-			}
-
-		var preferred = byContent.Count == 0
-			? []
-			: await repository.ListAsync(Criteria<StorageContent>.New()
-				.Where(content => byContent.Keys.Contains(content.Id)).Build(), cancellationToken);
-		byContent.Keys.EnsureAllExists(preferred.Select(content => content.Id),
-			missing => new StorageContentNotFoundException(missing[0]));
-
-		var selections = byProduct.Keys
-			.Select(key => new StorageContentSelection(key.ProductId, key.StorageCode))
-			.Concat(preferred.Select(content => new StorageContentSelection(content.ProductId, content.StorageCode)))
-			.Distinct()
+				group.Key,
+				Count = checked((int)group.Sum(item => (long)item.Count))
+			})
 			.ToArray();
 
-		var selectionPredicate = PredicateBuilder.New<StorageContent>(false);
-		foreach (var selection in selections)
-			selectionPredicate = selectionPredicate.Or(content => content.ProductId == selection.ProductId &&
-				(selection.StorageCode == null || content.StorageCode == selection.StorageCode));
+		var contents = await LoadByProductsForUpdateAsync(
+			requests.Select(request => request.Key),
+			[],
+			cancellationToken);
 
-		var preferredIds = byContent.Keys.ToArray();
-		var contents = await repository.ListAsync(Criteria<StorageContent>.New()
-			.Where(selectionPredicate)
-			.Where(content => content.Count > 0 || preferredIds.Contains(content.Id))
-			.OrderByAsc(content => content.Id).Track().ForUpdate().Build(), cancellationToken);
-		var contentsById = contents.ToDictionary(content => content.Id);
-		byContent.Keys.EnsureAllExists(contentsById.Keys, missing => new StorageContentNotFoundException(missing[0]));
-		// A separate statement after acquiring row locks sees reservations committed while we waited.
-		var locked = await GetLockedQuantitiesAsync(contentsById.Keys.ToArray(),
-			timeProvider.GetUtcNow().UtcDateTime, cancellationToken);
-		var setting = (await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Data;
-		var policy = policyRegistry.GetBySystemName(setting.StorageContentExtractionPolicy);
+		var policy = await GetPolicyAsync(cancellationToken);
+		var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 		var affected = new List<StorageLot>();
 
-		foreach (var (id, count) in byContent)
+		foreach (var request in requests)
 		{
-			var content = contentsById[id];
-			var remaining = count;
-			Subtract(content, ref remaining);
-			Take(content.ProductId, content.StorageCode, ref remaining, id);
-			EnsureEnough(content.ProductId, count, remaining);
-		}
-		foreach (var (key, count) in byProduct)
-		{
-			var remaining = count;
-			Take(key.ProductId, key.StorageCode, ref remaining);
-			EnsureEnough(key.ProductId, count, remaining);
+			var candidates = contents
+				.Where(content => content.ProductId == request.Key.ProductId &&
+					content.StorageCode == request.Key.StorageCode)
+				.AsQueryable();
+
+			var remaining = SubtractFrom(
+				policy.Apply(candidates)
+					.ThenBy(content => content.Id),
+				request.Count,
+				movementType,
+				utcNow,
+				affected);
+
+			EnsureEnough(request.Key.ProductId, request.Count, remaining);
 		}
 
 		return affected;
+	}
 
-		void Take(int productId, string? storageCode, ref int remaining, int? exceptId = null)
+	public async Task<IReadOnlyList<StorageLot>> SubtractByContentsAsync(
+		IReadOnlyCollection<SubtractStorageContentItem> items,
+		StorageMovementType movementType,
+		CancellationToken cancellationToken = default)
+	{
+		await contentValidator.ValidateAndThrowAsync(items, cancellationToken);
+		EnsureTransaction();
+		var requests = items.GroupBy(item => item.StorageContentId)
+			.ToDictionary(
+				group => group.Key,
+				group => checked((int)group.Sum(item => (long)item.Count)));
+
+		var preferredIds = requests.Keys.ToArray();
+		var preferred = await repository.GetWithActiveLocksForUpdateAsync(
+			preferredIds, cancellationToken: cancellationToken);
+
+		var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+		var affected = new List<StorageLot>();
+		var outstanding = new List<(StorageContent Content, int Requested, int Remaining)>();
+		foreach (var (id, count) in requests)
 		{
-			var candidates = contents.Where(content => content.ProductId == productId &&
-				(storageCode is null || content.StorageCode == storageCode) && content.Id != exceptId).AsQueryable();
-			foreach (var content in policy.Apply(candidates).ThenBy(content => content.Id))
-			{
-				if (remaining == 0) break;
-				Subtract(content, ref remaining);
-			}
+			var content = preferred[id];
+			var remaining = SubtractFrom([content], count, movementType, utcNow, affected);
+			if (remaining > 0)
+				outstanding.Add((content, count, remaining));
 		}
 
-		void Subtract(StorageContent content, ref int remaining)
+		if (outstanding.Count == 0) return affected;
+
+		var additional = await LoadByProductsForUpdateAsync(
+			outstanding.Select(item => (item.Content.ProductId, item.Content.StorageCode)),
+			preferredIds,
+			cancellationToken);
+		var policy = await GetPolicyAsync(cancellationToken);
+		foreach (var (content, requested, remaining) in outstanding)
 		{
-			var available = Math.Max(0L, content.Count - locked.GetValueOrDefault(content.Id));
-			var count = (int)Math.Min(available, remaining);
-			if (count == 0) return;
-			content.IncreaseCount(-count, movementType);
+			var candidates = preferred.Values.Concat(additional).Where(candidate =>
+				candidate.ProductId == content.ProductId && candidate.StorageCode == content.StorageCode &&
+				candidate.Id != content.Id).AsQueryable();
+			var shortage = SubtractFrom(policy.Apply(candidates).ThenBy(candidate => candidate.Id),
+				remaining, movementType, utcNow, affected);
+			EnsureEnough(content.ProductId, requested, shortage);
+		}
+
+		return affected;
+	}
+
+	private Task<List<StorageContent>> LoadByProductsForUpdateAsync(
+		IEnumerable<(int ProductId, string StorageCode)> selections,
+		IReadOnlyCollection<int> excludedIds,
+		CancellationToken cancellationToken)
+	{
+		var predicate = PredicateBuilder.New<StorageContent>(false);
+		foreach (var selection in selections.Distinct())
+			predicate = predicate.Or(content => content.ProductId == selection.ProductId &&
+				content.StorageCode == selection.StorageCode);
+
+		return repository.GetWithActiveLocksForUpdateAsync(
+			Criteria<StorageContent>.New()
+				.Where(predicate)
+				.Where(content => content.Count > 0 && !excludedIds.Contains(content.Id)),
+			cancellationToken);
+	}
+
+	private async Task<StorageContentExtractPolicyBase> GetPolicyAsync(CancellationToken cancellationToken)
+	{
+		var setting = (await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Data;
+		return policyRegistry.GetBySystemName(setting.StorageContentExtractionPolicy);
+	}
+
+	private static int SubtractFrom(IEnumerable<StorageContent> contents,
+		int requested, StorageMovementType movementType, DateTime utcNow, List<StorageLot> affected)
+	{
+		var remaining = requested;
+		foreach (var content in contents)
+		{
+			if (remaining == 0) break;
+			var count = Math.Min(content.GetAvailableQuantity(utcNow), remaining);
+			if (count == 0) continue;
+			content.Take(count, movementType, utcNow);
 			affected.Add(new StorageLot(content.Id, content.ProductId, content.CurrencyId,
 				content.BuyPrice, count, content.PurchaseDatetime));
 			remaining -= count;
 		}
+		return remaining;
 	}
-
-	public async Task EnsureCanSetQuantitiesAsync(
-		IReadOnlyCollection<StorageContentQuantityChange> changes,
-		CancellationToken cancellationToken = default)
-	{
-		if (changes.Count == 0) return;
-		EnsureTransaction();
-		var locked = await GetLockedQuantitiesAsync(changes.Select(change => change.Content.Id).ToArray(),
-			timeProvider.GetUtcNow().UtcDateTime, cancellationToken);
-		foreach (var change in changes)
-			if (change.Quantity < locked.GetValueOrDefault(change.Content.Id))
-				throw new NotEnoughCountOnStorageException(change.Content.ProductId,
-					(int)Math.Max(0L, change.Content.Count - locked.GetValueOrDefault(change.Content.Id)),
-					change.Content.Count - change.Quantity);
-	}
-
-	private Task<Dictionary<int, long>> GetLockedQuantitiesAsync(
-		IReadOnlyCollection<int> contentIds, DateTime utcNow, CancellationToken cancellationToken) =>
-		lockRepository.Query
-			.Where(item => contentIds.Contains(item.StorageContentId) && item.State == StorageContentLockState.Active &&
-				(item.ExpiresAt == null || item.ExpiresAt > utcNow))
-			.GroupBy(item => item.StorageContentId)
-			.Select(group => new { Id = group.Key, Quantity = group.Sum(item => (long)item.Quantity) })
-			.ToDictionaryAsync(item => item.Id, item => item.Quantity, cancellationToken);
 
 	private void EnsureTransaction()
 	{

@@ -7,6 +7,7 @@ using Application.Common.Models;
 using Attributes;
 using FluentAssertions;
 using Main.Application.Dtos.Storage;
+using Main.Application.Extensions;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
@@ -45,7 +46,7 @@ public class StorageContentServiceTests : IntegrationTest
 		await Add(first, second);
 		await AddLock(first, 7);
 
-		var result = await Withdraw(new SubtractProductFromStorageItem(first.ProductId, first.StorageCode, 6));
+		var result = await WithdrawProducts(new SubtractProductFromStorageItem(first.ProductId, first.StorageCode, 6));
 
 		result.Select(lot => (lot.Id, lot.Count)).Should().Equal((first.Id, 3), (second.Id, 3));
 		(await Count(first)).Should().Be(7);
@@ -65,6 +66,77 @@ public class StorageContentServiceTests : IntegrationTest
 		result.Should().ContainSingle().Which.Id.Should().Be(second.Id);
 		(await Count(first)).Should().Be(10);
 		(await Count(second)).Should().Be(2);
+	}
+
+	[Fact]
+	public async Task SelectedParties_AreUsedBeforeFallbackForOtherRequests()
+	{
+		var first = NewContent(1);
+		var second = NewContent(5, date: first.PurchaseDatetime.AddDays(1));
+		await Add(first, second);
+
+		var result = await Withdraw(new SubtractStorageContentItem(first.Id, 3),
+			new SubtractStorageContentItem(second.Id, 3));
+
+		result.Select(lot => (lot.Id, lot.Count)).Should().Equal((first.Id, 1), (second.Id, 3), (second.Id, 2));
+		(await Count(first)).Should().Be(0);
+		(await Count(second)).Should().Be(0);
+	}
+
+	[Fact]
+	public async Task EmptySelectedParty_FallsBackOnlyToSameProductAndStorage()
+	{
+		var preferred = NewContent(0);
+		var otherProduct = NewContent(10, product: 1);
+		var otherStorage = NewContent(10, storage: 1);
+		var fallback = NewContent(5);
+		await Add(preferred, otherProduct, otherStorage, fallback);
+
+		var result = await Withdraw(new SubtractStorageContentItem(preferred.Id, 3));
+
+		result.Should().ContainSingle().Which.Id.Should().Be(fallback.Id);
+		(await Count(fallback)).Should().Be(2);
+		(await Count(otherProduct)).Should().Be(10);
+		(await Count(otherStorage)).Should().Be(10);
+	}
+
+	[Fact]
+	public async Task SufficientSelectedParty_DoesNotWaitForAnotherPartyLock()
+	{
+		var preferred = NewContent(5);
+		var other = NewContent(10);
+		await Add(preferred, other);
+		var factory = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionFactory>();
+		var locked = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		async Task HoldOtherParty()
+		{
+			await using var transaction = factory.Create();
+			await transaction.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
+			{
+				await context.GetRequiredService<IRepository<StorageContent, int>>()
+					.EnsureExistForUpdateAsync(other.Id, id => new StorageContentNotFoundException(id), ct: token);
+				locked.TrySetResult();
+				await release.Task.WaitAsync(token);
+			}, CancellationToken);
+		}
+		var holder = HoldOtherParty();
+		await locked.Task.WaitAsync(CancellationToken);
+		var withdrawal = Withdraw(new SubtractStorageContentItem(preferred.Id, 3));
+		try
+		{
+			var result = await withdrawal.WaitAsync(TimeSpan.FromSeconds(10), CancellationToken);
+			result.Should().ContainSingle().Which.Id.Should().Be(preferred.Id);
+		}
+		finally
+		{
+			release.TrySetResult();
+			await holder;
+			await withdrawal;
+		}
+
+		(await Count(preferred)).Should().Be(2);
+		(await Count(other)).Should().Be(10);
 	}
 
 	[Theory]
@@ -125,15 +197,19 @@ public class StorageContentServiceTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task OverlappingRequests_CannotSpendFreeQuantityTwice()
+	public async Task SequentialWithdrawals_CannotSpendFreeQuantityTwice()
 	{
 		var content = NewContent(10);
 		await Add(content);
 		await AddLock(content, 6);
 
-		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Withdraw(
-			new SubtractStorageContentItem(content.Id, 3),
-			new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 2)));
+		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Execute(async (context, token) =>
+		{
+			var service = context.GetRequiredService<IStorageContentService>();
+			await service.SubtractByContentsAsync([new(content.Id, 3)], StorageMovementType.Sale, token);
+			await context.UnitOfWork.SaveChangesAsync(token);
+			await service.SubtractByProductsAsync([new(content.ProductId, content.StorageCode, 2)], StorageMovementType.Sale, token);
+		}));
 
 		(await Count(content)).Should().Be(10);
 	}
@@ -202,7 +278,7 @@ public class StorageContentServiceTests : IntegrationTest
 		{
 			content.IncreaseCount(5, StorageMovementType.SaleEditing);
 			await context.UnitOfWork.SaveChangesAsync(token);
-			await context.GetRequiredService<IStorageContentService>().SubtractAsync(
+			await context.GetRequiredService<IStorageContentService>().SubtractByProductsAsync(
 				[new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 3)], StorageMovementType.Sale, token);
 			await context.UnitOfWork.SaveChangesAsync(token);
 		});
@@ -220,7 +296,7 @@ public class StorageContentServiceTests : IntegrationTest
 		{
 			await context.UnitOfWork.AddAsync(StorageContentLock.Create(content.Id, 8), token);
 			await context.UnitOfWork.SaveChangesAsync(token);
-			await context.GetRequiredService<IStorageContentService>().SubtractAsync(
+			await context.GetRequiredService<IStorageContentService>().SubtractByContentsAsync(
 				[new SubtractStorageContentItem(content.Id, 3)], StorageMovementType.Sale, token);
 		}));
 
@@ -239,7 +315,7 @@ public class StorageContentServiceTests : IntegrationTest
 		{
 			item.Release(Scope.ServiceProvider.GetRequiredService<TestTimeProvider>().GetUtcNow().UtcDateTime);
 			await context.UnitOfWork.SaveChangesAsync(token);
-			await context.GetRequiredService<IStorageContentService>().SubtractAsync(
+			await context.GetRequiredService<IStorageContentService>().SubtractByContentsAsync(
 				[new SubtractStorageContentItem(content.Id, 10)], StorageMovementType.Sale, token);
 			await context.UnitOfWork.SaveChangesAsync(token);
 		});
@@ -268,10 +344,11 @@ public class StorageContentServiceTests : IntegrationTest
 				{
 					if (Interlocked.Increment(ref entered) == 2) ready.TrySetResult();
 					await ready.Task.WaitAsync(token);
-					ISubtractStorageContentItem item = byContentId
-						? new SubtractStorageContentItem(content.Id, 7)
-						: new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 7);
-					await context.GetRequiredService<IStorageContentService>().SubtractAsync([item], StorageMovementType.Sale, token);
+					var service = context.GetRequiredService<IStorageContentService>();
+					if (byContentId)
+						await service.SubtractByContentsAsync([new(content.Id, 7)], StorageMovementType.Sale, token);
+					else
+						await service.SubtractByProductsAsync([new(content.ProductId, content.StorageCode, 7)], StorageMovementType.Sale, token);
 					await context.UnitOfWork.SaveChangesAsync(token);
 				}, CancellationToken);
 				return true;
@@ -285,8 +362,10 @@ public class StorageContentServiceTests : IntegrationTest
 		(await Count(content)).Should().Be(3);
 	}
 
-	[Fact]
-	public async Task ReservationCommittedWhileWaiting_IsReadAfterAcquiringPartyLock()
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task ReservationCommittedWhileWaiting_IsReadAfterAcquiringPartyLock(bool byContentId)
 	{
 		var content = NewContent(10);
 		await Add(content);
@@ -315,8 +394,11 @@ public class StorageContentServiceTests : IntegrationTest
 			{
 				var db = context.GetRequiredService<DContext>();
 				readerPid.TrySetResult(((NpgsqlConnection)db.Database.GetDbConnection()).ProcessID);
-				await context.GetRequiredService<IStorageContentService>().SubtractAsync(
-					[new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 7)], StorageMovementType.Sale, token);
+				var service = context.GetRequiredService<IStorageContentService>();
+				if (byContentId)
+					await service.SubtractByContentsAsync([new(content.Id, 7)], StorageMovementType.Sale, token);
+				else
+					await service.SubtractByProductsAsync([new(content.ProductId, content.StorageCode, 7)], StorageMovementType.Sale, token);
 				await context.UnitOfWork.SaveChangesAsync(token);
 			}, CancellationToken);
 		}
@@ -350,12 +432,81 @@ public class StorageContentServiceTests : IntegrationTest
 		{
 			content.IncreaseCount(5, StorageMovementType.SaleEditing);
 			await context.UnitOfWork.SaveChangesAsync(token);
-			await context.GetRequiredService<IStorageContentService>().SubtractAsync(
+			await context.GetRequiredService<IStorageContentService>().SubtractByProductsAsync(
 				[new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 6)], StorageMovementType.Sale, token);
 		}));
 
 		(await Count(content)).Should().Be(0);
 		(await Context.ProductStocks.AsNoTracking().SumAsync(stock => stock.Quantity, CancellationToken)).Should().Be(0);
+	}
+
+	[Fact]
+	public async Task ByProducts_StartsFromPolicyPartyAndContinuesOnSameStorage()
+	{
+		var first = NewContent(5, date: DateTime.UtcNow.AddDays(-2));
+		var second = NewContent(7, date: DateTime.UtcNow.AddDays(-1));
+		await Add(first, second);
+
+		var result = await WithdrawProducts(new SubtractProductFromStorageItem(first.ProductId, first.StorageCode, 6));
+
+		result.Select(lot => (lot.Id, lot.Count)).Should().Equal((first.Id, 5), (second.Id, 1));
+		(await Count(first)).Should().Be(0);
+		(await Count(second)).Should().Be(6);
+	}
+
+	[Fact]
+	public async Task ByProducts_NoPartyOnStorage_ThrowsNotEnoughCount()
+	{
+		var content = NewContent(10);
+		await Add(content);
+
+		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() =>
+			WithdrawProducts(new SubtractProductFromStorageItem(content.ProductId, "missing-storage", 1)));
+
+		(await Count(content)).Should().Be(10);
+	}
+
+	[Theory]
+	[InlineData(0, "storage", 1)]
+	[InlineData(1, "", 1)]
+	[InlineData(1, " ", 1)]
+	[InlineData(1, "storage", 0)]
+	[InlineData(1, "storage", -1)]
+	public async Task ByProducts_InvalidRequest_ThrowsValidationException(int productId, string storageCode, int count)
+	{
+		await Assert.ThrowsAsync<ValidationException>(() => WithdrawProducts(new SubtractProductFromStorageItem(productId, storageCode, count)));
+	}
+
+	[Fact]
+	public async Task DomainTake_RequiresLoadedLocksForMaterializedParty()
+	{
+		var content = NewContent(10);
+		await Add(content);
+		var unloaded = await Context.StorageContents.AsNoTracking().SingleAsync(item => item.Id == content.Id, CancellationToken);
+
+		var take = () => unloaded.Take(1, StorageMovementType.Sale, DateTime.UtcNow);
+
+		take.Should().Throw<InvalidOperationException>();
+		unloaded.Count.Should().Be(10);
+	}
+
+	[Fact]
+	public async Task DomainTake_RejectsReservedQuantityWithoutServiceValidation()
+	{
+		var content = NewContent(10);
+		await Add(content);
+		await AddLock(content, 6);
+
+		await Execute(async (context, token) =>
+		{
+			var repository = context.GetRequiredService<IRepository<StorageContent, int>>();
+			var party = await repository.GetWithActiveLocksForUpdateAsync(content.Id, cancellationToken: token);
+
+			var take = () => party.Take(5, StorageMovementType.Sale, DateTime.UtcNow);
+
+			take.Should().Throw<NotEnoughCountOnStorageException>();
+			party.Count.Should().Be(10);
+		});
 	}
 
 	private StorageContent NewContent(int count, int product = 0, int storage = 0, DateTime? date = null) =>
@@ -382,11 +533,18 @@ public class StorageContentServiceTests : IntegrationTest
 		Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>()
 			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(action, CancellationToken);
 
-	private Task<IReadOnlyList<StorageLot>> Withdraw(params ISubtractStorageContentItem[] items) =>
+	private Task<IReadOnlyList<StorageLot>> Withdraw(params SubtractStorageContentItem[] items) =>
+		ExecuteWithdrawal((service, token) => service.SubtractByContentsAsync(items, StorageMovementType.Sale, token));
+
+	private Task<IReadOnlyList<StorageLot>> WithdrawProducts(params SubtractProductFromStorageItem[] items) =>
+		ExecuteWithdrawal((service, token) => service.SubtractByProductsAsync(items, StorageMovementType.Sale, token));
+
+	private Task<IReadOnlyList<StorageLot>> ExecuteWithdrawal(
+		Func<IStorageContentService, CancellationToken, Task<IReadOnlyList<StorageLot>>> action) =>
 		Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>()
 			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
 			{
-				var result = await context.GetRequiredService<IStorageContentService>().SubtractAsync(items, StorageMovementType.Sale, token);
+				var result = await action(context.GetRequiredService<IStorageContentService>(), token);
 				await context.UnitOfWork.SaveChangesAsync(token);
 				return result;
 			}, CancellationToken);

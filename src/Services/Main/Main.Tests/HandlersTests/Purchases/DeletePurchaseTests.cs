@@ -1,6 +1,9 @@
 using FluentAssertions;
 using Main.Application.Handlers.Purchases.DeletePurchase;
-using Main.Application.Handlers.StorageContents.SubtractContent;
+using Application.Common.Interfaces.Persistence;
+using Attributes;
+using Main.Application.Interfaces.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Main.Application.Models.Storage;
 using Main.Entities.Exceptions;
 using Main.Enums;
@@ -194,12 +197,13 @@ public class DeletePurchaseTests : IntegrationTest
 		var storageContentId = content.StorageContentId;
 		var transactionId = purchase.TransactionId;
 
-		await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				storageContentId,
-				1,
-				StorageMovementType.Sale),
-			CancellationToken);
+		await Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>()
+			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
+		{
+			await context.GetRequiredService<IStorageContentService>().SubtractByContentsAsync(
+				[new SubtractStorageContentItem(storageContentId, 1)], StorageMovementType.Sale, token);
+			await context.UnitOfWork.SaveChangesAsync(token);
+		}, CancellationToken);
 
 		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(
 			new DeletePurchaseCommand(purchase.Id),

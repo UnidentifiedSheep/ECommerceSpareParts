@@ -187,7 +187,7 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 		StorageMovementType movementType,
 		CancellationToken cancellationToken)
 	{
-		return await storageContentService.SubtractAsync(
+		return await storageContentService.SubtractByProductsAsync(
 				contents.Select(x => new SubtractProductFromStorageItem(
 					x.ProductId,
 					storageCode,

@@ -1,12 +1,9 @@
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Extensions;
-using Main.Application.Interfaces.Services;
-using Main.Application.Models.Storage;
+using Main.Application.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
-using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
@@ -20,19 +17,17 @@ namespace Main.Application.Handlers.StorageContents.SetToZeroContent;
 	2)]
 public record SetToZeroContentCommand(int ContentId, uint RowVersion) : ICommand;
 
-public class SetToZeroContentHandler(IRepository<StorageContent, int> repository, IStorageContentService storageContentService)
+public class SetToZeroContentHandler(IRepository<StorageContent, int> repository, TimeProvider timeProvider)
 	: ICommandHandler<SetToZeroContentCommand>
 {
 	public async Task<Unit> Handle(SetToZeroContentCommand request, CancellationToken cancellationToken)
 	{
-		var content = await repository.EnsureExistForUpdateAsync(request.ContentId,
-			id => new StorageContentNotFoundException(id), ct: cancellationToken);
+		var content = await repository.GetWithActiveLocksForUpdateAsync(
+			request.ContentId, cancellationToken: cancellationToken);
 
 		content.ValidateVersion(request.RowVersion);
 
-		await storageContentService.EnsureCanSetQuantitiesAsync([new StorageContentQuantityChange(content, 0)], cancellationToken);
-
-		content.IncreaseCount(-content.Count, StorageMovementType.StorageContentDeletion);
+		content.SetCount(0, StorageMovementType.StorageContentDeletion, timeProvider.GetUtcNow().UtcDateTime);
 
 		return Unit.Value;
 	}

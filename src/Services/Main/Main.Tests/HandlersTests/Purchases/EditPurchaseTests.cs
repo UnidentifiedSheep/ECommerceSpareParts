@@ -2,7 +2,10 @@ using Tests.Extensions;
 using FluentAssertions;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.EditPurchase;
-using Main.Application.Handlers.StorageContents.SubtractContent;
+using Application.Common.Interfaces.Persistence;
+using Attributes;
+using Main.Application.Interfaces.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Main.Application.Models.Storage;
 using Main.Entities.Storage;
 using Main.Enums;
@@ -141,12 +144,13 @@ public class EditPurchaseTests : IntegrationTest
 		stock.SetQuantity(stock.Quantity + 8);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				storageContentId,
-				5,
-				StorageMovementType.Sale),
-			CancellationToken);
+		await Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>()
+			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
+		{
+			await context.GetRequiredService<IStorageContentService>().SubtractByContentsAsync(
+				[new SubtractStorageContentItem(storageContentId, 5)], StorageMovementType.Sale, token);
+			await context.UnitOfWork.SaveChangesAsync(token);
+		}, CancellationToken);
 
 		await Mediator.Send(
 			new EditPurchaseCommand(

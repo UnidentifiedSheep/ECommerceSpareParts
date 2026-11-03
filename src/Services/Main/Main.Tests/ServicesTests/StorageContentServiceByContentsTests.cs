@@ -1,6 +1,9 @@
 using Tests.Extensions;
 using FluentAssertions;
-using Main.Application.Handlers.StorageContents.SubtractContent;
+using Application.Common.Interfaces.Persistence;
+using Attributes;
+using Main.Application.Interfaces.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Main.Application.Models.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
@@ -10,17 +13,17 @@ using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
-namespace Tests.HandlersTests.StorageContents;
+namespace Tests.ServicesTests;
 
-public class SubtractStorageContentsTests : IntegrationTest
+public class StorageContentServiceByContentsTests : IntegrationTest
 {
-	public SubtractStorageContentsTests(CombinedContainerFixture fixture) : base(fixture)
+	public StorageContentServiceByContentsTests(CombinedContainerFixture fixture) : base(fixture)
 	{
 		RegisterBasicContext<StorageContentTestContext>();
 	}
 
 	[Fact]
-	public async Task SubtractStorageContents_StartsFromPassedStorageContentAndContinuesOnSameStorage()
+	public async Task ByContents_StartsFromPassedStorageContentAndContinuesOnSameStorage()
 	{
 		var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(2)
 			.OrderBy(x => x.PurchaseDatetime)
@@ -36,15 +39,12 @@ public class SubtractStorageContentsTests : IntegrationTest
 		var firstByDateOriginalCount = firstByDate.Count;
 		var countToSubtract = passedContent.Count + 1;
 
-		var result = await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				passedContent.Id,
-				countToSubtract,
-				StorageMovementType.Sale),
-			CancellationToken);
+		var result = await Withdraw(
+			passedContent.Id,
+			countToSubtract,
+			StorageMovementType.Sale);
 
 		result
-			.Contents
 			.Should()
 			.Equal(ToStorageLot(passedContent, passedContentOriginalCount), ToStorageLot(firstByDate, 1));
 
@@ -76,20 +76,18 @@ public class SubtractStorageContentsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task SubtractStorageContents_WhenFirstStorageContentHasEnoughCount_UsesOnlyIt()
+	public async Task ByContents_WhenFirstStorageContentHasEnoughCount_UsesOnlyIt()
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First(x => x.Count >= 2);
 		var originalCount = content.Count;
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 
-		var result = await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				content.Id,
-				2,
-				StorageMovementType.Sale),
-			CancellationToken);
+		var result = await Withdraw(
+			content.Id,
+			2,
+			StorageMovementType.Sale);
 
-		result.Contents.Should().Equal(ToStorageLot(content, 2));
+		result.Should().Equal(ToStorageLot(content, 2));
 
 		var updatedContent = await Context
 			.StorageContents
@@ -101,7 +99,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task SubtractStorageContents_WhenFirstStorageContentIsZero_ContinuesOnSameStorage()
+	public async Task ByContents_WhenFirstStorageContentIsZero_ContinuesOnSameStorage()
 	{
 		var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(2)
 			.OrderBy(x => x.PurchaseDatetime)
@@ -117,14 +115,12 @@ public class SubtractStorageContentsTests : IntegrationTest
 		stock.SetQuantity(stock.Quantity - originalFirstCount);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		var result = await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				first.Id,
-				1,
-				StorageMovementType.Sale),
-			CancellationToken);
+		var result = await Withdraw(
+			first.Id,
+			1,
+			StorageMovementType.Sale);
 
-		result.Contents.Should().Equal(ToStorageLot(second, 1));
+		result.Should().Equal(ToStorageLot(second, 1));
 
 		var updatedFirst = await Context
 			.StorageContents
@@ -139,7 +135,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task SubtractStorageContents_WhenCountEqualsAvailableOnSameStorage_ConsumesAll()
+	public async Task ByContents_WhenCountEqualsAvailableOnSameStorage_ConsumesAll()
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First();
 		var countToSubtract = await Context
@@ -148,14 +144,12 @@ public class SubtractStorageContentsTests : IntegrationTest
 			.Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
 			.SumAsync(x => x.Count, CancellationToken);
 
-		var result = await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				content.Id,
-				countToSubtract,
-				StorageMovementType.Sale),
-			CancellationToken);
+		var result = await Withdraw(
+			content.Id,
+			countToSubtract,
+			StorageMovementType.Sale);
 
-		result.Contents.Sum(x => x.Count).Should().Be(countToSubtract);
+		result.Sum(x => x.Count).Should().Be(countToSubtract);
 
 		var leftOnSameStorage = await Context
 			.StorageContents
@@ -166,7 +160,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task SubtractStorageContents_WithBatch_SubtractsEveryItem()
+	public async Task ByContents_WithBatch_SubtractsEveryItem()
 	{
 		var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(2)
 			.OrderBy(x => x.PurchaseDatetime)
@@ -177,13 +171,11 @@ public class SubtractStorageContentsTests : IntegrationTest
 		var originalFirstCount = first.Count;
 		var originalSecondCount = second.Count;
 
-		var result = await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				[new SubtractStorageContentItem(first.Id, 1), new SubtractStorageContentItem(second.Id, 1)],
-				StorageMovementType.PurchaseEditing),
-			CancellationToken);
+		var result = await Withdraw(
+			[new SubtractStorageContentItem(first.Id, 1), new SubtractStorageContentItem(second.Id, 1)],
+			StorageMovementType.PurchaseEditing);
 
-		result.Contents.Should().Equal(ToStorageLot(first, 1), ToStorageLot(second, 1));
+		result.Should().Equal(ToStorageLot(first, 1), ToStorageLot(second, 1));
 
 		var contents =
 			await Context.StorageContents.AsNoTracking().ToDictionaryAsync(x => x.Id, CancellationToken);
@@ -212,7 +204,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 
 	[Fact]
 	public async Task
-		SubtractStorageContents_WithBatch_WhenOneItemHasNotEnoughCount_DoesNotPersistPartialChanges()
+		ByContents_WithBatch_WhenOneItemHasNotEnoughCount_DoesNotPersistPartialChanges()
 	{
 		var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(2)
 			.OrderBy(x => x.PurchaseDatetime)
@@ -230,14 +222,12 @@ public class SubtractStorageContentsTests : IntegrationTest
 		var originalProductStockQuantity = await Context.GetProductStockQuantityAsync(first.ProductId, CancellationToken);
 		var countOnSameStorage = originalCounts.Values.Sum();
 
-		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				[
-					new SubtractStorageContentItem(first.Id, 1),
-					new SubtractStorageContentItem(second.Id, countOnSameStorage + 1)
-				],
-				StorageMovementType.PurchaseEditing),
-			CancellationToken));
+		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Withdraw(
+			[
+				new SubtractStorageContentItem(first.Id, 1),
+				new SubtractStorageContentItem(second.Id, countOnSameStorage + 1)
+			],
+			StorageMovementType.PurchaseEditing));
 
 		var actualCounts = await Context
 			.StorageContents
@@ -261,7 +251,7 @@ public class SubtractStorageContentsTests : IntegrationTest
 
 	[Fact]
 	public async Task
-		SubtractStorageContents_WhenNotEnoughCountOnSameStorage_ThrowsNotEnoughCountOnStorageException()
+		ByContents_WhenNotEnoughCountOnSameStorage_ThrowsNotEnoughCountOnStorageException()
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First();
 		var countOnSameStorage = await Context
@@ -270,16 +260,14 @@ public class SubtractStorageContentsTests : IntegrationTest
 			.Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
 			.SumAsync(x => x.Count, CancellationToken);
 
-		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				content.Id,
-				countOnSameStorage + 1,
-				StorageMovementType.Sale),
-			CancellationToken));
+		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Withdraw(
+			content.Id,
+			countOnSameStorage + 1,
+			StorageMovementType.Sale));
 	}
 
 	[Fact]
-	public async Task SubtractStorageContents_WhenNotEnoughCount_DoesNotPersistPartialChanges()
+	public async Task ByContents_WhenNotEnoughCount_DoesNotPersistPartialChanges()
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First();
 		var originalCounts = await Context
@@ -293,12 +281,10 @@ public class SubtractStorageContentsTests : IntegrationTest
 		var originalProductStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 		var countOnSameStorage = originalCounts.Values.Sum();
 
-		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				content.Id,
-				countOnSameStorage + 1,
-				StorageMovementType.Sale),
-			CancellationToken));
+		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Withdraw(
+			content.Id,
+			countOnSameStorage + 1,
+			StorageMovementType.Sale));
 
 		var actualCounts = await Context
 			.StorageContents
@@ -315,172 +301,56 @@ public class SubtractStorageContentsTests : IntegrationTest
 
 	[Fact]
 	public async Task
-		SubtractStorageContents_WithMissingStorageContent_ThrowsStorageContentNotFoundException()
+		ByContents_WithMissingStorageContent_ThrowsStorageContentNotFoundException()
 	{
-		await Assert.ThrowsAsync<StorageContentNotFoundException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				int.MaxValue,
-				1,
-				StorageMovementType.Sale),
-			CancellationToken));
+		await Assert.ThrowsAsync<StorageContentNotFoundException>(() => Withdraw(
+			int.MaxValue,
+			1,
+			StorageMovementType.Sale));
 	}
 
 	[Fact]
-	public async Task SubtractStorageContents_WithEmptyBatch_ThrowsValidationException()
+	public async Task ByContents_WithEmptyBatch_ThrowsValidationException()
 	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand([], StorageMovementType.Sale),
-			CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(() => Withdraw([], StorageMovementType.Sale));
 	}
 
 	[Theory]
 	[InlineData(0)]
 	[InlineData(-1)]
-	public async Task SubtractStorageContents_WithInvalidStorageContentId_ThrowsValidationException(
+	public async Task ByContents_WithInvalidStorageContentId_ThrowsValidationException(
 		int storageContentId)
 	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				storageContentId,
-				1,
-				StorageMovementType.Sale),
-			CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(() => Withdraw(
+			storageContentId,
+			1,
+			StorageMovementType.Sale));
 	}
 
 	[Theory]
 	[InlineData(0)]
 	[InlineData(-1)]
-	public async Task SubtractStorageContents_WithInvalidCount_ThrowsValidationException(int count)
+	public async Task ByContents_WithInvalidCount_ThrowsValidationException(int count)
 	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				1,
-				count,
-				StorageMovementType.Sale),
-			CancellationToken));
+		await Assert.ThrowsAsync<ValidationException>(() => Withdraw(
+			1,
+			count,
+			StorageMovementType.Sale));
 	}
 
-	[Fact]
-	public async Task SubtractStorageContents_ByProductAndStorage_StartsFromPolicyContent()
-	{
-		var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(2)
-			.OrderBy(x => x.PurchaseDatetime)
-			.ToList();
-		var firstByDate = contentsForSameProductAndStorage.First();
-		var secondByDate = contentsForSameProductAndStorage.Skip(1).First();
-		var productStockQuantity = await Context.GetProductStockQuantityAsync(firstByDate.ProductId, CancellationToken);
-		var firstByDateOriginalCount = firstByDate.Count;
-		var secondByDateOriginalCount = secondByDate.Count;
-		var countToSubtract = firstByDate.Count + 1;
+	private Task<IReadOnlyList<StorageLot>> Withdraw(int storageContentId, int count, StorageMovementType movementType) =>
+		Withdraw([new SubtractStorageContentItem(storageContentId, count)], movementType);
 
-		var result = await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				[
-					new SubtractProductFromStorageItem(
-						firstByDate.ProductId,
-						firstByDate.StorageCode,
-						countToSubtract)
-				],
-				StorageMovementType.Sale),
-			CancellationToken);
-
-		result
-			.Contents
-			.Should()
-			.Equal(ToStorageLot(firstByDate, firstByDateOriginalCount), ToStorageLot(secondByDate, 1));
-
-		var contents =
-			await Context.StorageContents.AsNoTracking().ToDictionaryAsync(x => x.Id, CancellationToken);
-		contents[firstByDate.Id].Count.Should().Be(0);
-		contents[secondByDate.Id].Count.Should().Be(secondByDateOriginalCount - 1);
-
-		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(firstByDate.ProductId, CancellationToken);
-		updatedProductStockQuantity.Should().Be(productStockQuantity - countToSubtract);
-	}
-
-	[Fact]
-	public async Task SubtractStorageContents_WithMixedItems_SubtractsEveryItem()
-	{
-		var groups = GetContext<StorageContentTestContext>()
-			.StorageContents
-			.Where(x => x.Count > 0)
-			.GroupBy(x => new
-			{
-				x.ProductId, x.StorageCode
-			})
-			.Where(x => x.Count() >= 1)
-			.Take(2)
-			.Select(x => x.First())
-			.ToList();
-
-		groups.Should().HaveCount(2);
-
-		var result = await Mediator.Send(
-			new SubtractStorageContentsCommand(
-				[
-					new SubtractStorageContentItem(groups[0].Id, 1),
-					new SubtractProductFromStorageItem(
-						groups[1].ProductId,
-						groups[1].StorageCode,
-						1)
-				],
-				StorageMovementType.Sale),
-			CancellationToken);
-
-		result.Contents.Should().HaveCount(2);
-		result.Contents.Should().OnlyContain(x => x.Count == 1);
-	}
-
-	[Fact]
-	public async Task
-		SubtractStorageContents_ByProductAndStorage_WhenNoContentOnStorage_ThrowsNotEnoughCount()
-	{
-		var product = await Context.Products.AsNoTracking().FirstAsync(CancellationToken);
-		var productStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
-
-		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				[
-					new SubtractProductFromStorageItem(
-						product.Id,
-						"missing-storage",
-						1)
-				],
-				StorageMovementType.Sale),
-			CancellationToken));
-	}
-
-	[Fact]
-	public async Task
-		SubtractStorageContents_ByProductAndStorage_WithInvalidProductId_ThrowsValidationException()
-	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				[
-					new SubtractProductFromStorageItem(
-						0,
-						"storage",
-						1)
-				],
-				StorageMovementType.Sale),
-			CancellationToken));
-	}
-
-	[Fact]
-	public async Task
-		SubtractStorageContents_ByProductAndStorage_WithInvalidStorageCode_ThrowsValidationException()
-	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new SubtractStorageContentsCommand(
-				[
-					new SubtractProductFromStorageItem(
-						1,
-						"",
-						1)
-				],
-				StorageMovementType.Sale),
-			CancellationToken));
-	}
+	private Task<IReadOnlyList<StorageLot>> Withdraw(
+		IReadOnlyCollection<SubtractStorageContentItem> items, StorageMovementType movementType) =>
+		Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>()
+			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
+		{
+			var result = await context.GetRequiredService<IStorageContentService>()
+			.SubtractByContentsAsync(items, movementType, token);
+			await context.UnitOfWork.SaveChangesAsync(token);
+			return result;
+		}, CancellationToken);
 
 	private IReadOnlyList<StorageContent> GetContentsForSameProductAndStorage(int minCount)
 	{

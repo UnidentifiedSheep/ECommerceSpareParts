@@ -209,12 +209,12 @@ public class EditPurchaseHandler(
 				cancellationToken);
 
 		if (deletionSubtractions.Count > 0)
-			await storageContentService.SubtractAsync(
+			await storageContentService.SubtractByContentsAsync(
 				deletionSubtractions, StorageMovementType.PurchaseEditing,
 				cancellationToken);
 
 		if (editingSubtractions.Count > 0)
-			await storageContentService.SubtractAsync(
+			await storageContentService.SubtractByContentsAsync(
 				editingSubtractions, StorageMovementType.PurchaseEditing,
 				cancellationToken);
 

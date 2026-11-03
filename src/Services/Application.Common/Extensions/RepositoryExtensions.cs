@@ -10,9 +10,10 @@ public static class RepositoryExtensions
 		this IRepository<TEntity, TKey> repository,
 		IEnumerable<TKey> ids,
 		Func<IReadOnlyList<TKey>, Exception> errorFactory,
-		CancellationToken ct = default) where TEntity : Entity<TEntity, TKey> where TKey : notnull
+		CancellationToken ct = default,
+		CriteriaBuilder<TEntity>? criteriaBuilder = null) where TEntity : Entity<TEntity, TKey> where TKey : notnull
 	{
-		var criteria = Criteria<TEntity>.New().Track().Build();
+		var criteria = (criteriaBuilder ?? Criteria<TEntity>.New()).Track().Build();
 
 		return repository.EnsureExistsCoreAsync(
 			ids,

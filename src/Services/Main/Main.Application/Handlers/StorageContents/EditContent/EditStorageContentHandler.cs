@@ -8,9 +8,7 @@ using Application.Common.Models;
 using Attributes;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;
-using Main.Application.Interfaces.Services;
-using Main.Application.Models.Storage;
-using Main.Entities.Exceptions;
+using Main.Application.Extensions;
 using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
@@ -28,22 +26,15 @@ public record EditStorageContentCommand(
 public class EditStorageContentHandler(
 	IRepository<StorageContent, int> storageContentRepository,
 	ICurrencyConverter currencyConverter,
-	IStorageContentService storageContentService) : ICommandHandler<EditStorageContentCommand>
+	TimeProvider timeProvider) : ICommandHandler<EditStorageContentCommand>
 {
 	public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
 	{
 		var editedFields = request.EditedFields;
 
-		var storageContents = await storageContentRepository.EnsureExistsForUpdateAsync(
-			editedFields.Keys,
-			missing => new StorageContentNotFoundException(missing),
-			Criteria<StorageContent>.New().OrderByAsc(content => content.Id),
-			cancellationToken);
-
-		await storageContentService.EnsureCanSetQuantitiesAsync(editedFields
-			.Where(item => item.Value.Model.Count.IsSet)
-			.Select(item => new StorageContentQuantityChange(storageContents[item.Key], item.Value.Model.Count.Value)).ToArray(),
-			cancellationToken);
+		var storageContents = await storageContentRepository.GetWithActiveLocksForUpdateAsync(
+			editedFields.Keys, cancellationToken: cancellationToken);
+		var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
 		foreach (var item in editedFields)
 		{
@@ -52,7 +43,7 @@ public class EditStorageContentHandler(
 
 			content.ValidateVersion(item.Value.RowVersion);
 
-			patch.Count.Apply(x => content.SetCount(x, StorageMovementType.StorageContentEditing));
+			patch.Count.Apply(x => content.SetCount(x, StorageMovementType.StorageContentEditing, utcNow));
 			patch.CurrencyId.Apply(content.SetCurrencyId);
 
 			if (patch.BuyPrice.IsSet)

@@ -52,7 +52,7 @@ public class DeletePurchaseHandler(
 	{
 		var items =
 			purchase.Contents.Select(x => new SubtractStorageContentItem(x.StorageContentId, x.Count)).ToArray();
-		await storageContentService.SubtractAsync(items, StorageMovementType.PurchaseDeletion, token);
+		await storageContentService.SubtractByContentsAsync(items, StorageMovementType.PurchaseDeletion, token);
 	}
 
 	private async Task RevertTransactions(Purchase purchase, CancellationToken token)
