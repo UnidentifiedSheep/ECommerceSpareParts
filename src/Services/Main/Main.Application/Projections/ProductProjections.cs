@@ -38,38 +38,6 @@ public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Produc
 }
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class FullProductDtoProjectionProvider : ProjectionProviderBase<Product, FullProductDto>
-{
-	public FullProductDtoProjectionProvider(
-		IOptions<S3BucketsOptions> bucketsOptions,
-		IProjectionProvider<ProductWeight, ProductWeightDto> productWeightProjection,
-		IProjectionProvider<ProductSize, ProductSizeDto> productSizeProjection)
-	{
-		var imagesBaseUrl = bucketsOptions.Value.Images.PublicBaseUrl.TrimEnd('/') + "/";
-		var weightToDto = productWeightProjection.Projection;
-		var sizeToDto = productSizeProjection.Projection;
-
-		Projection = x => new FullProductDto
-		{
-			Id = x.Id,
-			Name = x.Name,
-			Sku = x.Sku,
-			Description = x.Description,
-			ProducerId = x.ProducerId,
-			ProducerName = x.Producer.Name,
-			GroupId = x.ProductGroupId,
-			Indicator = x.Indicator,
-			RowVersion = x.RowVersion,
-			Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList(),
-			ProductWeight = x.ProductWeight == null ? null : weightToDto.Invoke(x.ProductWeight),
-			ProductSize = x.ProductSize == null ? null : sizeToDto.Invoke(x.ProductSize)
-		};
-	}
-
-	public override Expression<Func<Product, FullProductDto>> Projection { get; }
-}
-
-[Lifetime(Lifetime.Singleton)]
 public sealed class
 	ProductWeightDtoProjectionProvider : ProjectionProviderBase<ProductWeight, ProductWeightDto>
 {

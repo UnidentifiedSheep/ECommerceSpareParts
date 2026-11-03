@@ -34,25 +34,9 @@ public class RootClient(
 		optionsMonitor,
 		jsonOptions);
 
-	private readonly PurchaseNode _purchaseNode = new(
-		httpClient,
-		authClient,
-		optionsMonitor,
-		jsonOptions);
-
-	private readonly SaleNode _saleNode = new(
-		httpClient,
-		authClient,
-		optionsMonitor,
-		jsonOptions);
-
 	public IProductNode ProductNode => _productNode;
 
 	public IProducerNode ProducerNode => _producerNode;
-
-	public IPurchaseNode PurchaseNode => _purchaseNode;
-
-	public ISaleNode SaleNode => _saleNode;
 
 	public ICurrencyNode CurrencyNode => _currencyNode;
 }

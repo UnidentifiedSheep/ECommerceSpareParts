@@ -6,10 +6,6 @@ namespace Internal.Integration.Core.Interfaces.Main;
 
 public interface IProductNode
 {
-	Task<Response<IReadOnlyList<InternalFullProduct>>> GetFullProduct(
-		IEnumerable<int> productIds,
-		CancellationToken cancellationToken = default);
-
 	Task<Response<IReadOnlyList<InternalSupplierProductResolvedReference>>> GetSupplierProductReferences(
 		IEnumerable<int> productIds,
 		Supplier supplier,
