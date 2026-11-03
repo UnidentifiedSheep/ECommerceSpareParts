@@ -1,6 +1,5 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentValidation;
 using Main.Application.Interfaces.Persistence;
@@ -33,28 +32,32 @@ public sealed class StorageContentService(
 		var byContent = new Dictionary<int, int>();
 		var byProduct = new Dictionary<(int ProductId, string? StorageCode), int>();
 		foreach (var item in items)
-		{
 			switch (item)
 			{
 				case SubtractStorageContentItem content:
 					byContent[content.StorageContentId] = checked(byContent.GetValueOrDefault(content.StorageContentId) + content.Count);
 					break;
 				case SubtractProductFromStorageItem product:
-					var key = (product.ProductId, product.TakeFromOtherStorages ? null : product.StorageCode);
+					var key = (product.ProductId, product.StorageCode);
 					byProduct[key] = checked(byProduct.GetValueOrDefault(key) + product.Count);
 					break;
 				default:
 					throw new InvalidOperationException($"Unsupported subtract item type {item.GetType().Name}.");
 			}
-		}
 
 		var preferred = byContent.Count == 0
 			? new Dictionary<int, StorageContent>()
-			: await repository.FindByIdsAsync(byContent.Keys, ct: cancellationToken);
-		byContent.Keys.EnsureAllExists(preferred.Keys, missing => new StorageContentNotFoundException(missing[0]));
-		var selections = byProduct.Keys.Select(key => new StorageContentSelection(key.ProductId, key.StorageCode))
+			: await repository.EnsureExistsAsync(
+				ids: byContent.Keys,
+				errorFactory: missing => new StorageContentNotFoundException(missing[0]),
+				ct: cancellationToken);
+
+		var selections = byProduct.Keys
+			.Select(key => new StorageContentSelection(key.ProductId, key.StorageCode))
 			.Concat(preferred.Values.Select(content => new StorageContentSelection(content.ProductId, content.StorageCode)))
-			.Distinct().ToArray();
+			.Distinct()
+			.ToArray();
+
 		var contents = await repository.GetForUpdateAsync(selections, byContent.Keys.ToArray(), cancellationToken);
 		var contentsById = contents.ToDictionary(content => content.Id);
 		byContent.Keys.EnsureAllExists(contentsById.Keys, missing => new StorageContentNotFoundException(missing[0]));
@@ -79,6 +82,7 @@ public sealed class StorageContentService(
 			Take(key.ProductId, key.StorageCode, ref remaining);
 			EnsureEnough(key.ProductId, count, remaining);
 		}
+
 		return affected;
 
 		void Take(int productId, string? storageCode, ref int remaining, int? exceptId = null)

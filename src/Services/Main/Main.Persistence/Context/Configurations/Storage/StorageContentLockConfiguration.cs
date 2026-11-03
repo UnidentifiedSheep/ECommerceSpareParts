@@ -51,7 +51,7 @@ public sealed class StorageContentLockConfiguration : IEntityTypeConfiguration<S
 			.HasFilter($"state = '{nameof(StorageContentLockState.Active)}' AND expires_at IS NOT NULL");
 
 		builder.HasOne(item => item.StorageContent)
-			.WithMany()
+			.WithMany(content => content.Locks)
 			.HasForeignKey(item => item.StorageContentId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("storage_content_locks_storage_content_id_fk");

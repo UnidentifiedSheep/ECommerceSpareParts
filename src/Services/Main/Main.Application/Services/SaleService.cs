@@ -45,7 +45,6 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 		string storageCode,
 		IEnumerable<NewSaleContentDto> saleContents,
 		StorageMovementType movementType,
-		bool takeFromOtherStorages,
 		CancellationToken cancellationToken = default)
 	{
 		var contents = saleContents.ToList();
@@ -53,7 +52,6 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 			storageCode,
 			contents.Select(x => (x.ProductId, x.Count)),
 			movementType,
-			takeFromOtherStorages,
 			cancellationToken);
 
 		return DistributeDetails(takenFromStorage, contents);
@@ -63,7 +61,6 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 		string storageCode,
 		IEnumerable<EditSaleContentDto> saleContents,
 		StorageMovementType movementType,
-		bool takeFromOtherStorages,
 		CancellationToken cancellationToken = default)
 	{
 		var contents = saleContents.ToList();
@@ -71,7 +68,6 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 			storageCode,
 			contents.Select(x => (x.ProductId, x.Count)),
 			movementType,
-			takeFromOtherStorages,
 			cancellationToken);
 
 		return DistributeDetails(takenFromStorage, contents);
@@ -189,15 +185,13 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 		string storageCode,
 		IEnumerable<(int ProductId, int Count)> contents,
 		StorageMovementType movementType,
-		bool takeFromOtherStorages,
 		CancellationToken cancellationToken)
 	{
 		return await storageContentService.SubtractAsync(
 				contents.Select(x => new SubtractProductFromStorageItem(
 					x.ProductId,
 					storageCode,
-					x.Count,
-					takeFromOtherStorages)).ToArray(),
+					x.Count)).ToArray(),
 				movementType,
 			cancellationToken);
 	}

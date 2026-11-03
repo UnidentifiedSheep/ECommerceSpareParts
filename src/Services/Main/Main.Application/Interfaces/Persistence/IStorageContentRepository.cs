@@ -1,6 +1,4 @@
-﻿using Abstractions.Models;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Models;
 using Main.Application.Models.Storage;
 using Main.Entities.Storage;
 
@@ -8,13 +6,6 @@ namespace Main.Application.Interfaces.Persistence;
 
 public interface IStorageContentRepository : IRepository<StorageContent, int>
 {
-	Task<IReadOnlyList<StorageContentPageItem>> GetByProductsAsync(
-		IReadOnlyCollection<int> productIds,
-		Pagination pagination,
-		string? storageCode,
-		bool showZeroCount,
-		CancellationToken cancellationToken = default);
-
 	Task<Dictionary<int, StorageContent>> GetByIdsForUpdateAsync(
 		IReadOnlyCollection<int> contentIds,
 		CancellationToken cancellationToken = default);

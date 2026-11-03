@@ -10,5 +10,4 @@ public record SubtractStorageContentItem(int StorageContentId, int Count) : ISub
 public record SubtractProductFromStorageItem(
 	int ProductId,
 	string StorageCode,
-	int Count,
-	bool TakeFromOtherStorages = false) : ISubtractStorageContentItem;
+	int Count) : ISubtractStorageContentItem;

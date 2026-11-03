@@ -19,14 +19,12 @@ public interface ISaleService
 		string storageCode,
 		IEnumerable<NewSaleContentDto> saleContents,
 		StorageMovementType movementType,
-		bool takeFromOtherStorages,
 		CancellationToken cancellationToken = default);
 
 	Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
 		string storageCode,
 		IEnumerable<EditSaleContentDto> saleContents,
 		StorageMovementType movementType,
-		bool takeFromOtherStorages,
 		CancellationToken cancellationToken = default);
 
 	Task RestoreContents(

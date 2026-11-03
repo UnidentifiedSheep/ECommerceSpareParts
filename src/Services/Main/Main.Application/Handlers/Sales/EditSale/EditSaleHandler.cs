@@ -130,7 +130,6 @@ public class EditSaleHandler(
 			sale.StorageCode,
 			contentDtos,
 			StorageMovementType.SaleEditing,
-			sellFromOtherStorages,
 			cancellationToken);
 
 		foreach (var removed in sale.Contents.Where(x => !requestedIds.Contains(x.Id)).ToList())

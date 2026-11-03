@@ -12,6 +12,8 @@ public class StorageContent : AuditableEntity<StorageContent, int>,
 	ILinqEntity<StorageContent, int>,
 	IVersionable<uint>
 {
+	private readonly List<StorageContentLock> _locks = [];
+
 	private StorageContent()
 	{
 	}
@@ -53,6 +55,8 @@ public class StorageContent : AuditableEntity<StorageContent, int>,
 	public DateTime PurchaseDatetime { get; private set; }
 
 	public Currency.Currency Currency { get; private set; } = null!;
+
+	public IReadOnlyCollection<StorageContentLock> Locks => _locks;
 
 	public static Expression<Func<StorageContent, int>> GetKeySelector() => x => x.Id;
 
