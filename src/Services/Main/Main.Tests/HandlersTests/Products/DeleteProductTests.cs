@@ -271,7 +271,7 @@ public class DeleteProductTests : IntegrationTest
 		switch (blocker)
 		{
 			case ProductDeletionBlocker.Stock:
-				Product.IncreaseStock(1);
+				await Context.AddAsync(Main.Entities.Storage.ProductStock.Create(StorageCode, Product.Id, 1), CancellationToken);
 				break;
 			case ProductDeletionBlocker.StorageContent:
 				await new StorageContentBuilder(Faker).WithStorageCode(StorageCode).WithCurrencyId(CurrencyId)

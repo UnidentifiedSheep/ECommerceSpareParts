@@ -1,4 +1,4 @@
-﻿using EFCore.ComplexIndexes;
+using EFCore.ComplexIndexes;
 using EFCore.ComplexIndexes.PostgreSQL;
 using Main.Entities.Product.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -55,16 +55,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 			b =>
 			{
 				b.Property(e => e.Value).HasColumnName("name").HasMaxLength(255);
-			});
-
-		builder.ComplexProperty(
-			e => e.Stock,
-			b =>
-			{
-				b
-					.Property(e => e.Value)
-					.HasColumnName("stock")
-					.HasComplexIndex(indexName: "products_stock_index");
 			});
 
 		builder

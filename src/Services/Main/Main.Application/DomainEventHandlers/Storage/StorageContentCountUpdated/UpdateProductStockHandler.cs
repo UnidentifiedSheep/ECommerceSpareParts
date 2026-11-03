@@ -29,14 +29,22 @@ public class UpdateProductStockHandler(
 		if (deltas.Length == 0) return;
 
 		var productIds = deltas.Select(item => item.Key.ProductId).Distinct().ToList();
-		// Lock the shared product total before warehouse balances, always in the same order.
-		var products = await productRepository.FindByIdsAsync(
-			productIds,
-			Criteria<ProductEntity>.New().OrderByAsc(product => product.Id).Track().ForUpdate().Build(),
-			cancellationToken);
-		productIds.EnsureAllExists(products.Keys, notFound => new ProductNotFoundException(notFound));
-
 		var storageCodes = deltas.Select(item => item.Key.StorageCode).Distinct().ToList();
+		var existingKeys = (await stockRepository.ListAsync(Criteria<ProductStock>.New()
+			.Where(stock => productIds.Contains(stock.ProductId) && storageCodes.Contains(stock.StorageCode))
+			.Build(), cancellationToken)).Select(stock => stock.GetId()).ToHashSet();
+		var missingProductIds = deltas.Where(item => !existingKeys.Contains(item.Key))
+			.Select(item => item.Key.ProductId).Distinct().ToList();
+
+		if (missingProductIds.Count > 0)
+		{
+			// An absent stock row cannot be locked. Serialize its creation and reread stocks below.
+			var products = await productRepository.FindByIdsAsync(missingProductIds,
+				Criteria<ProductEntity>.New().OrderByAsc(product => product.Id).ForUpdate().Build(),
+				cancellationToken);
+			missingProductIds.EnsureAllExists(products.Keys, notFound => new ProductNotFoundException(notFound));
+		}
+
 		var stocks = (await stockRepository.ListAsync(new Criteria<ProductStock>
 		{
 			Wheres = [stock => productIds.Contains(stock.ProductId) && storageCodes.Contains(stock.StorageCode)],
@@ -55,7 +63,5 @@ public class UpdateProductStockHandler(
 		if (newStocks.Count > 0)
 			await unitOfWork.AddRangeAsync(newStocks, cancellationToken);
 
-		foreach (var group in deltas.GroupBy(item => item.Key.ProductId))
-			products[group.Key].IncreaseStock(checked((int)group.Sum(item => (long)item.Delta)));
 	}
 }

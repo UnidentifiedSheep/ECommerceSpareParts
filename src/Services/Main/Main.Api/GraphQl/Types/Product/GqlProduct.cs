@@ -68,11 +68,6 @@ public record GqlProduct
 		CancellationToken cancellationToken)
 		=> await loader.LoadAsync(Id, cancellationToken) ?? [];
 
-	[GraphQLName("stock")]
-	public async Task<int> GetStockAsync(
-		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Stock;
-
 	[GraphQLName("rowVersion")]
 	public async Task<uint> GetRowVersionAsync(
 		IProductByIdDataLoader loader,

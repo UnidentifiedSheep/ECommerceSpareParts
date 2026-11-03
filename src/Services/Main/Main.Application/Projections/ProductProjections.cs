@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Models.Options.S3;
 using Attributes;
@@ -25,7 +25,6 @@ public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Produc
 			Name = x.Name,
 			Sku = x.Sku,
 			Description = x.Description,
-			Stock = x.Stock,
 			ProducerId = x.ProducerId,
 			ProducerName = x.Producer.Name,
 			GroupId = x.ProductGroupId,
@@ -56,7 +55,6 @@ public sealed class FullProductDtoProjectionProvider : ProjectionProviderBase<Pr
 			Name = x.Name,
 			Sku = x.Sku,
 			Description = x.Description,
-			Stock = x.Stock,
 			ProducerId = x.ProducerId,
 			ProducerName = x.Producer.Name,
 			GroupId = x.ProductGroupId,

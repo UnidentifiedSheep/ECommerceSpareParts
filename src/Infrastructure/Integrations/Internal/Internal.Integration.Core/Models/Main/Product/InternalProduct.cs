@@ -31,6 +31,4 @@ public record InternalProduct
 	[JsonPropertyName("images")]
 	public List<string> Images { get; init; } = [];
 
-	[JsonPropertyName("stock")]
-	public required int Stock { get; init; }
 }

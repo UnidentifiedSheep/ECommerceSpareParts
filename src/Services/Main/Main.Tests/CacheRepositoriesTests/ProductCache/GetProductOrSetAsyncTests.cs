@@ -37,7 +37,6 @@ public class GetProductOrSetAsyncTests : IntegrationTest
 		result.Description.Should().Be(product.Description);
 		result.ProducerId.Should().Be(product.ProducerId);
 		result.ProducerName.Should().Be(producer.Name);
-		result.Stock.Should().Be(product.Stock.Value);
 		result.Images.Should().BeEmpty();
 	}
 

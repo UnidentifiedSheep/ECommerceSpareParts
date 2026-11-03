@@ -159,7 +159,7 @@ public sealed class ProductRepositorySearchTests
 								          "name": "Bosch product",
 								          "producerId": 42,
 								          "productGroupId": 7,
-								          "stock": 0
+								          "indicator": null
 								        },
 								        "highlight": { "name": ["[[[Bosch]]] product"] }
 								      }

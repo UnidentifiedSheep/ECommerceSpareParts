@@ -15,8 +15,6 @@ public class Product
 
 	public int? ProductGroupId { get; init; }
 
-	public required int Stock { get; init; }
-
 	public required string? Indicator { get; init; }
 
 	public ProductDimensions? Dimensions { get; init; }

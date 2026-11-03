@@ -10,7 +10,6 @@ internal sealed class BulkProduct
 	public required string Sku { get; init; }
 	public required string NormalizedSku { get; init; }
 	public required string Name { get; init; }
-	public int Stock { get; init; }
 	public string? Description { get; init; }
 	public int? PackingUnit { get; init; }
 	public int ProducerId { get; init; }
@@ -30,7 +29,6 @@ internal sealed class BulkProduct
 		Sku = product.Sku.Value,
 		NormalizedSku = product.Sku.NormalizedValue,
 		Name = product.Name.Value,
-		Stock = product.Stock.Value,
 		Description = product.Description,
 		PackingUnit = product.PackingUnit,
 		ProducerId = product.ProducerId,

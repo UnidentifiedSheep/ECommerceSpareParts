@@ -23,7 +23,6 @@ public static class SortByConfig
 			.Map<Product, int>("id", x => x.Id)
 			.Map<Product, string>("sku", x => x.Sku.NormalizedValue)
 			.Map<Product, string>("name", x => x.Name.Value)
-			.Map<Product, int>("count", x => x.Stock.Value)
 			.Map<Product, string>("producerName", x => x.Producer.Name)
 			.Map<Product, string>("indicator", x => x.Indicator!.Value!)
 			.Map<Product, long>("popularity", x => x.Popularity);

@@ -1819,18 +1819,6 @@ namespace Main.Migrator.Migrations
                                 .HasColumnName("sku");
                         });
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Stock", "Main.Entities.Product.Product.Stock#Stock", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<int>("Value")
-                                .HasColumnType("integer")
-                                .HasColumnName("stock")
-                                .HasAnnotation("CustomIndex:IsIndexed", true)
-                                .HasAnnotation("CustomIndex:IsUnique", false)
-                                .HasAnnotation("CustomIndex:Name", "products_stock_index");
-                        });
-
                     b.HasKey("Id")
                         .HasName("products_id_pk");
 

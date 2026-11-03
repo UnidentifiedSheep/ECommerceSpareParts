@@ -18,7 +18,6 @@ internal sealed class BulkProductContext(DbContextOptions<BulkProductContext> op
 		product.Property(x => x.Sku).HasColumnName("sku");
 		product.Property(x => x.NormalizedSku).HasColumnName("normalized_sku");
 		product.Property(x => x.Name).HasColumnName("name").HasMaxLength(255);
-		product.Property(x => x.Stock).HasColumnName("stock");
 		product.Property(x => x.Description).HasColumnName("description").HasMaxLength(255);
 		product.Property(x => x.PackingUnit).HasColumnName("packing_unit");
 		product.Property(x => x.ProducerId).HasColumnName("producer_id");

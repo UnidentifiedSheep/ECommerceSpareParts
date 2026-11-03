@@ -190,6 +190,26 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 		(await Total(second.ProductId)).Should().Be(11);
 	}
 
+	[Fact]
+	public async Task ExistingBalance_UpdateDoesNotChangeProductRowVersion()
+	{
+		var content = NewContent(0, 0, 5);
+		await Add(content);
+		var originalVersion = await Context.Products.AsNoTracking().Where(product => product.Id == content.ProductId)
+			.Select(product => product.RowVersion).SingleAsync(CancellationToken);
+
+		await Execute(async () =>
+		{
+			content.SetCount(7, StorageMovementType.StorageContentAddition);
+			await Context.SaveChangesAsync(CancellationToken);
+		});
+
+		(await Quantity(content)).Should().Be(7);
+		var currentVersion = await Context.Products.AsNoTracking().Where(product => product.Id == content.ProductId)
+			.Select(product => product.RowVersion).SingleAsync(CancellationToken);
+		currentVersion.Should().Be(originalVersion);
+	}
+
 	private StorageContent NewContent(int product, int storage, int count) => new StorageContentBuilder(Faker)
 		.WithProductIds(GetContext<ProductTestContext>().Products[product].Id)
 		.WithStorageCode(GetContext<StorageTestContext>().Storages.ElementAt(storage).Code)
@@ -209,6 +229,6 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 		(await Context.ProductStocks.AsNoTracking().SingleAsync(
 			stock => stock.ProductId == content.ProductId && stock.StorageCode == content.StorageCode, CancellationToken)).Quantity;
 
-	private async Task<int> Total(int productId) =>
-		(await Context.Products.AsNoTracking().SingleAsync(product => product.Id == productId, CancellationToken)).Stock.Value;
+	private Task<int> Total(int productId) => Context.ProductStocks.AsNoTracking()
+		.Where(stock => stock.ProductId == productId).SumAsync(stock => stock.Quantity, CancellationToken);
 }

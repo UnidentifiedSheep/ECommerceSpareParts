@@ -25,7 +25,6 @@ public sealed class ProductCoreEventPartProvider : IProductEventPartProvider
 					Name = product.Name.Value,
 					ProducerId = product.ProducerId,
 					ProductGroupId = product.ProductGroupId,
-					Stock = product.Stock.Value,
 					Indicator = product.Indicator?.Value
 				})
 				.Concat(missingProductIds

@@ -9,10 +9,6 @@ public sealed class ProductSearchCriteriaValidator : AbstractValidator<ProductSe
 {
 	public ProductSearchCriteriaValidator()
 	{
-		RuleFor(criteria => criteria.Stock!)
-			.SetValidator(new SearchRangeCriteriaValidator<int>())
-			.When(criteria => criteria.Stock is not null);
-
 		RuleFor(criteria => criteria.Weight!)
 			.SetValidator(new WeightSearchCriteriaValidator())
 			.When(criteria => criteria.Weight is not null);
