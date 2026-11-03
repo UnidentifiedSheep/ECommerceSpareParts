@@ -1,5 +1,10 @@
 using FluentAssertions;
 using Main.Application.Handlers.Products;
+using Main.Entities.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using Tests.DataBuilders.Storage;
+using Tests.Extensions;
+using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
@@ -78,4 +83,45 @@ public class GetAvailableProductsStockTests : IntegrationTest
 		result.Stocks.Should().ContainSingle();
 		result.Stocks.Should().ContainKey(item);
 	}
+	[Fact]
+	public async Task GetAvailableProductsStock_OverlockedPartyDoesNotReduceOtherPartiesAvailability()
+	{
+		var content = TestContext.StorageContents.First(item => item.Count > 0);
+		var item = new GetAvailableProductsStockItem(content.ProductId, content.StorageCode);
+		var expected = TestContext.StorageContents.Where(source => source.ProductId == item.ProductId &&
+			source.StorageCode == item.StorageCode).Sum(source => source.Count) - content.Count + 7;
+		await new StorageContentBuilder(Faker).WithProductIds(content.ProductId).WithStorageCode(content.StorageCode)
+			.WithCurrencyId(content.CurrencyId).WithCount(7).BuildAndAddToDb(Context, CancellationToken);
+		await Context.AddAsync(StorageContentLock.Create(content.Id, content.Count + 3), CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var result = await Mediator.Send(new GetAvailableProductsStockQuery(item), CancellationToken);
+
+		result.Stocks[item].Should().Be(expected);
+	}
+
+	[Fact]
+	public async Task GetAvailableProductsStock_OnlyActiveUnexpiredLocksReduceAvailability()
+	{
+		var content = TestContext.StorageContents.First(source => source.Count > 0);
+		var item = new GetAvailableProductsStockItem(content.ProductId, content.StorageCode);
+		var expected = TestContext.StorageContents.Where(source => source.ProductId == item.ProductId &&
+			source.StorageCode == item.StorageCode).Sum(source => source.Count) - 1;
+		var clock = Scope.ServiceProvider.GetRequiredService<TestTimeProvider>();
+		var now = clock.GetUtcNow().UtcDateTime;
+		var released = StorageContentLock.Create(content.Id, content.Count);
+		released.Release(now);
+		await Context.AddRangeAsync([
+			released,
+			StorageContentLock.Create(content.Id, content.Count, now.AddHours(1)),
+			StorageContentLock.Create(content.Id, 1, now.AddHours(2))
+		], CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
+		clock.SetUtcNow(now.AddHours(1));
+
+		var result = await Mediator.Send(new GetAvailableProductsStockQuery(item), CancellationToken);
+
+		result.Stocks[item].Should().Be(expected);
+	}
+
 }

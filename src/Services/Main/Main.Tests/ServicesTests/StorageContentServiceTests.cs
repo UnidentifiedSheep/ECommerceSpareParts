@@ -193,7 +193,7 @@ public class StorageContentServiceTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task UnsavedRestoration_CanBeWithdrawnInSameTransaction()
+	public async Task SavedRestoration_CanBeWithdrawnInSameTransaction()
 	{
 		var content = NewContent(0);
 		await Add(content);
@@ -201,6 +201,7 @@ public class StorageContentServiceTests : IntegrationTest
 		await Execute(async (context, token) =>
 		{
 			content.IncreaseCount(5, StorageMovementType.SaleEditing);
+			await context.UnitOfWork.SaveChangesAsync(token);
 			await context.GetRequiredService<IStorageContentService>().SubtractAsync(
 				[new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 3)], StorageMovementType.Sale, token);
 			await context.UnitOfWork.SaveChangesAsync(token);
@@ -210,7 +211,7 @@ public class StorageContentServiceTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task UnsavedNewLock_IsIncludedInAvailableQuantity()
+	public async Task SavedNewLock_IsIncludedAndRolledBackWithFailedWithdrawal()
 	{
 		var content = NewContent(10);
 		await Add(content);
@@ -218,6 +219,7 @@ public class StorageContentServiceTests : IntegrationTest
 		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Execute(async (context, token) =>
 		{
 			await context.UnitOfWork.AddAsync(StorageContentLock.Create(content.Id, 8), token);
+			await context.UnitOfWork.SaveChangesAsync(token);
 			await context.GetRequiredService<IStorageContentService>().SubtractAsync(
 				[new SubtractStorageContentItem(content.Id, 3)], StorageMovementType.Sale, token);
 		}));
@@ -227,7 +229,7 @@ public class StorageContentServiceTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task UnsavedRelease_FreesQuantityWithinSameTransaction()
+	public async Task SavedRelease_FreesQuantityWithinSameTransaction()
 	{
 		var content = NewContent(10);
 		await Add(content);
@@ -236,6 +238,7 @@ public class StorageContentServiceTests : IntegrationTest
 		await Execute(async (context, token) =>
 		{
 			item.Release(Scope.ServiceProvider.GetRequiredService<TestTimeProvider>().GetUtcNow().UtcDateTime);
+			await context.UnitOfWork.SaveChangesAsync(token);
 			await context.GetRequiredService<IStorageContentService>().SubtractAsync(
 				[new SubtractStorageContentItem(content.Id, 10)], StorageMovementType.Sale, token);
 			await context.UnitOfWork.SaveChangesAsync(token);
@@ -245,8 +248,10 @@ public class StorageContentServiceTests : IntegrationTest
 		(await Context.StorageContentLocks.AsNoTracking().SingleAsync(CancellationToken)).State.Should().Be(StorageContentLockState.Released);
 	}
 
-	[Fact]
-	public async Task ConcurrentWithdrawals_CannotSpendTheSameFreeQuantity()
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task ConcurrentWithdrawals_CannotSpendTheSameFreeQuantity(bool byContentId)
 	{
 		var content = NewContent(10);
 		await Add(content);
@@ -263,8 +268,10 @@ public class StorageContentServiceTests : IntegrationTest
 				{
 					if (Interlocked.Increment(ref entered) == 2) ready.TrySetResult();
 					await ready.Task.WaitAsync(token);
-					await context.GetRequiredService<IStorageContentService>().SubtractAsync(
-						[new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 7)], StorageMovementType.Sale, token);
+					ISubtractStorageContentItem item = byContentId
+						? new SubtractStorageContentItem(content.Id, 7)
+						: new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 7);
+					await context.GetRequiredService<IStorageContentService>().SubtractAsync([item], StorageMovementType.Sale, token);
 					await context.UnitOfWork.SaveChangesAsync(token);
 				}, CancellationToken);
 				return true;
@@ -295,6 +302,7 @@ public class StorageContentServiceTests : IntegrationTest
 				await context.GetRequiredService<IRepository<StorageContent, int>>()
 					.EnsureExistForUpdateAsync(content.Id, id => new StorageContentNotFoundException(id), ct: token);
 				await context.UnitOfWork.AddAsync(StorageContentLock.Create(content.Id, 8), token);
+			await context.UnitOfWork.SaveChangesAsync(token);
 				await context.UnitOfWork.SaveChangesAsync(token);
 				reserved.TrySetResult();
 				await commit.Task.WaitAsync(token);
@@ -330,6 +338,24 @@ public class StorageContentServiceTests : IntegrationTest
 
 		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => reader);
 		(await Count(content)).Should().Be(10);
+	}
+
+	[Fact]
+	public async Task SavedRestoration_FailedWithdrawalRollsBackRestoration()
+	{
+		var content = NewContent(0);
+		await Add(content);
+
+		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Execute(async (context, token) =>
+		{
+			content.IncreaseCount(5, StorageMovementType.SaleEditing);
+			await context.UnitOfWork.SaveChangesAsync(token);
+			await context.GetRequiredService<IStorageContentService>().SubtractAsync(
+				[new SubtractProductFromStorageItem(content.ProductId, content.StorageCode, 6)], StorageMovementType.Sale, token);
+		}));
+
+		(await Count(content)).Should().Be(0);
+		(await Context.ProductStocks.AsNoTracking().SumAsync(stock => stock.Quantity, CancellationToken)).Should().Be(0);
 	}
 
 	private StorageContent NewContent(int count, int product = 0, int storage = 0, DateTime? date = null) =>

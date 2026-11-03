@@ -1,8 +1,10 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentValidation;
-using Main.Application.Interfaces.Persistence;
+using LinqKit;
+using Microsoft.EntityFrameworkCore;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models.Storage;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
@@ -15,7 +17,8 @@ using NamedObject.Core.Interfaces;
 namespace Main.Application.Services.Storage;
 
 public sealed class StorageContentService(
-	IStorageContentRepository repository,
+	IRepository<StorageContent, int> repository,
+	IReadRepository<StorageContentLock, Guid> lockRepository,
 	ISettingsService settingsService,
 	INamedObjectRegistry<StorageContentExtractPolicyBase> policyRegistry,
 	IValidator<StorageContentWithdrawal> validator,
@@ -46,23 +49,32 @@ public sealed class StorageContentService(
 			}
 
 		var preferred = byContent.Count == 0
-			? new Dictionary<int, StorageContent>()
-			: await repository.EnsureExistsAsync(
-				ids: byContent.Keys,
-				errorFactory: missing => new StorageContentNotFoundException(missing[0]),
-				ct: cancellationToken);
+			? []
+			: await repository.ListAsync(Criteria<StorageContent>.New()
+				.Where(content => byContent.Keys.Contains(content.Id)).Build(), cancellationToken);
+		byContent.Keys.EnsureAllExists(preferred.Select(content => content.Id),
+			missing => new StorageContentNotFoundException(missing[0]));
 
 		var selections = byProduct.Keys
 			.Select(key => new StorageContentSelection(key.ProductId, key.StorageCode))
-			.Concat(preferred.Values.Select(content => new StorageContentSelection(content.ProductId, content.StorageCode)))
+			.Concat(preferred.Select(content => new StorageContentSelection(content.ProductId, content.StorageCode)))
 			.Distinct()
 			.ToArray();
 
-		var contents = await repository.GetForUpdateAsync(selections, byContent.Keys.ToArray(), cancellationToken);
+		var selectionPredicate = PredicateBuilder.New<StorageContent>(false);
+		foreach (var selection in selections)
+			selectionPredicate = selectionPredicate.Or(content => content.ProductId == selection.ProductId &&
+				(selection.StorageCode == null || content.StorageCode == selection.StorageCode));
+
+		var preferredIds = byContent.Keys.ToArray();
+		var contents = await repository.ListAsync(Criteria<StorageContent>.New()
+			.Where(selectionPredicate)
+			.Where(content => content.Count > 0 || preferredIds.Contains(content.Id))
+			.OrderByAsc(content => content.Id).Track().ForUpdate().Build(), cancellationToken);
 		var contentsById = contents.ToDictionary(content => content.Id);
 		byContent.Keys.EnsureAllExists(contentsById.Keys, missing => new StorageContentNotFoundException(missing[0]));
 		// A separate statement after acquiring row locks sees reservations committed while we waited.
-		var locked = await repository.GetLockedQuantitiesAsync(contentsById.Keys.ToArray(),
+		var locked = await GetLockedQuantitiesAsync(contentsById.Keys.ToArray(),
 			timeProvider.GetUtcNow().UtcDateTime, cancellationToken);
 		var setting = (await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Data;
 		var policy = policyRegistry.GetBySystemName(setting.StorageContentExtractionPolicy);
@@ -114,7 +126,7 @@ public sealed class StorageContentService(
 	{
 		if (changes.Count == 0) return;
 		EnsureTransaction();
-		var locked = await repository.GetLockedQuantitiesAsync(changes.Select(change => change.Content.Id).ToArray(),
+		var locked = await GetLockedQuantitiesAsync(changes.Select(change => change.Content.Id).ToArray(),
 			timeProvider.GetUtcNow().UtcDateTime, cancellationToken);
 		foreach (var change in changes)
 			if (change.Quantity < locked.GetValueOrDefault(change.Content.Id))
@@ -122,6 +134,15 @@ public sealed class StorageContentService(
 					(int)Math.Max(0L, change.Content.Count - locked.GetValueOrDefault(change.Content.Id)),
 					change.Content.Count - change.Quantity);
 	}
+
+	private Task<Dictionary<int, long>> GetLockedQuantitiesAsync(
+		IReadOnlyCollection<int> contentIds, DateTime utcNow, CancellationToken cancellationToken) =>
+		lockRepository.Query
+			.Where(item => contentIds.Contains(item.StorageContentId) && item.State == StorageContentLockState.Active &&
+				(item.ExpiresAt == null || item.ExpiresAt > utcNow))
+			.GroupBy(item => item.StorageContentId)
+			.Select(group => new { Id = group.Key, Quantity = group.Sum(item => (long)item.Quantity) })
+			.ToDictionaryAsync(item => item.Id, item => item.Quantity, cancellationToken);
 
 	private void EnsureTransaction()
 	{
