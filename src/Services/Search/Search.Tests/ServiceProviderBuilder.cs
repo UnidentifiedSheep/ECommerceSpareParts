@@ -35,6 +35,8 @@ public sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProv
 		services.AddSystemOptionsForTests();
 		services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
 		services.AddTransient<ProductUpdatedConsumer>();
+		services.AddTransient<ProductStocksUpdatedConsumer>();
+		services.AddTransient<ProductStocksSnapshotConsumer>();
 		services.AddTransient<ProductCharacteristicsUpdatedConsumer>();
 		services.AddTransient<ProductDimensionsUpdatedConsumer>();
 		services.AddTransient<ProductWeightUpdatedConsumer>();

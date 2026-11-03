@@ -21,6 +21,11 @@ public class Product
 	public ProductWeight? Weight { get; init; }
 	public IReadOnlyList<ProductCharacteristic> Characteristics { get; init; } = [];
 
+	public IReadOnlyDictionary<string, int> Stocks { get; init; } = new Dictionary<string, int>();
+	public long? Stock { get; init; }
+	public long? StockSnapshotVersion { get; init; }
+	public IReadOnlyDictionary<string, long> StockVersions { get; init; } = new Dictionary<string, long>();
+
 	public ProductReadinessStatus ReadinessStatus { get; init; } = ProductReadinessStatus.Partial;
 	public DateTime? ProductUpdatedAt { get; init; }
 	public DateTime? CharacteristicsUpdatedAt { get; init; }

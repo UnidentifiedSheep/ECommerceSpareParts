@@ -31,18 +31,16 @@ public abstract class IndexInitializerBase<TDocument>(
 			if (!ShouldRefreshExistsCache() && LastExistsResult)
 				return;
 
-			LastExistsResult = (await Client.Indices.ExistsAsync(idx, ct: cancellationToken)).Exists;
-			ExistsCheckedAt = DateTime.UtcNow;
+			var exists = (await Client.Indices.ExistsAsync(idx, ct: cancellationToken)).Exists;
+			if (!exists)
+			{
+				var response = await createIndex(cancellationToken);
+				var alreadyExists = response.ServerError?.Error?.Type == "resource_already_exists_exception";
 
-			if (LastExistsResult)
-				return;
-
-			var response = await createIndex(cancellationToken);
-			var alreadyExists = response.ServerError?.Error?.Type == "resource_already_exists_exception";
-
-			if (!response.IsValid && !alreadyExists)
-				throw new InvalidOperationException(
-					response.ServerError?.Error?.Reason ?? $"Failed to create OpenSearch index '{idx}'.");
+				if (!response.IsValid && !alreadyExists)
+					throw new InvalidOperationException(
+						response.ServerError?.Error?.Reason ?? $"Failed to create OpenSearch index '{idx}'.");
+			}
 
 			LastExistsResult = true;
 			ExistsCheckedAt = DateTime.UtcNow;
