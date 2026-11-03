@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.ProductStock;
 
 namespace Main.Entities.Storage;
 
@@ -33,7 +34,9 @@ public class ProductStock : Entity<ProductStock, (string, int)>, ILinqEntity<Pro
 	{
 		if (quantity < 0)
 			throw new InvalidOperationException("Stock quantity must be greater than or equal to zero.");
+		if (Quantity == quantity) return;
 		Quantity = quantity;
+		AddDomainEvent(new ProductStockUpdatedDomainEvent(StorageCode, ProductId));
 	}
 
 	public static Expression<Func<ProductStock, (string, int)>> GetKeySelector() =>
