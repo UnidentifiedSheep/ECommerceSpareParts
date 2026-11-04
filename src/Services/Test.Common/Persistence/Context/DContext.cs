@@ -38,6 +38,10 @@ internal sealed class DContext(DbContextOptions<DContext> options) : DbContext(o
 			.HasValue<Setting>(nameof(Setting))
 			.HasValue<TestSetting>(TestSetting.SettingName);
 
+		modelBuilder.Entity<TestMetadataEntity>().ToTable("metadata_entities").HasKey(entity => entity.Id);
+		modelBuilder.Entity<TestAuditableMetadataEntity>().ToTable("auditable_metadata_entities").HasKey(entity => entity.Id);
+
+		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();
 		modelBuilder.AllDateTimesToUtc().AllEnumsToString();
 	}

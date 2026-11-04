@@ -52,6 +52,7 @@ public partial class DContext : DbContext
 			.HasValue<Setting>(nameof(Setting))
 			.HasValue<PricingSetting>(PricingSetting.SettingName);
 
+		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();
 
 		modelBuilder.AllDateTimesToUtc().AllEnumsToString();

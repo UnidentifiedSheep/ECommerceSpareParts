@@ -209,6 +209,7 @@ public partial class DContext : DbContext, INotificationDbContext
 			.HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)
 			.HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
 
+		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();
 
 		modelBuilder.AllDateTimesToUtc().AllEnumsToString();
