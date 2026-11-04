@@ -43,6 +43,11 @@
     "lrt.price.candidate.calculation.storage.code.name": "Код склада",
     "lrt.price.candidate.calculation.storage.code.description": "Код склада, для которого нужно рассчитать варианты цены.",
     "lrt.invalidate.stale.price.options.name": "Обновление устаревших вариантов цены",
-    "lrt.invalidate.stale.price.options.description": "Обновляет устаревшие варианты цены."
+    "lrt.invalidate.stale.price.options.description": "Обновляет устаревшие варианты цены.",
+    "pricing.product.id.must.be.positive": "Идентификатор товара должен быть положительным.",
+    "pricing.currency.id.must.be.positive": "Идентификатор валюты должен быть положительным.",
+    "pricing.storage.code.invalid": "Код склада должен содержать от 1 до 128 символов.",
+    "pricing.quantity.must.be.positive": "Количество должно быть положительным.",
+    "pricing.sources.invalid": "Указаны некорректные источники предложений."
   }
 }

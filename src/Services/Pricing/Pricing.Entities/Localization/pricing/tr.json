@@ -43,6 +43,11 @@
     "lrt.price.candidate.calculation.storage.code.name": "Depo kodu",
     "lrt.price.candidate.calculation.storage.code.description": "Fiyat adaylarının hesaplanacağı depo kodu.",
     "lrt.invalidate.stale.price.options.name": "Eski fiyat seçeneklerini güncelleme",
-    "lrt.invalidate.stale.price.options.description": "Eski fiyat seçeneklerini günceller."
+    "lrt.invalidate.stale.price.options.description": "Eski fiyat seçeneklerini günceller.",
+    "pricing.product.id.must.be.positive": "Ürün kimliği pozitif olmalıdır.",
+    "pricing.currency.id.must.be.positive": "Para birimi kimliği pozitif olmalıdır.",
+    "pricing.storage.code.invalid": "Depo kodu 1 ile 128 karakter arasında olmalıdır.",
+    "pricing.quantity.must.be.positive": "Miktar pozitif olmalıdır.",
+    "pricing.sources.invalid": "Geçersiz fiyat teklifi kaynakları."
   }
 }

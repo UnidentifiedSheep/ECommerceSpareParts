@@ -14,6 +14,38 @@ public class ProductPriceOptionDataBuilder(Faker faker) : BuilderBase<ProductPri
 
 	public Guid PricingSettingsVersion { get; private set; } = faker.Random.Guid();
 
+	public decimal Price { get; private set; } = 100m;
+
+	public decimal Score { get; private set; } = 1m;
+
+	public int CurrencyId { get; private set; } = 1;
+
+	public string StorageCode { get; private set; } = "main";
+
+	public ProductPriceOptionDataBuilder WithPrice(decimal price)
+	{
+		Price = price;
+		return this;
+	}
+
+	public ProductPriceOptionDataBuilder WithScore(decimal score)
+	{
+		Score = score;
+		return this;
+	}
+
+	public ProductPriceOptionDataBuilder WithCurrencyId(int currencyId)
+	{
+		CurrencyId = currencyId;
+		return this;
+	}
+
+	public ProductPriceOptionDataBuilder WithStorageCode(string storageCode)
+	{
+		StorageCode = storageCode;
+		return this;
+	}
+
 	public ProductPriceOptionDataBuilder WithPriceOfferId(Guid priceOfferId)
 	{
 		PriceOfferId = priceOfferId;
@@ -38,10 +70,10 @@ public class ProductPriceOptionDataBuilder(Faker faker) : BuilderBase<ProductPri
 			MarkupVersion,
 			AppliersVersion,
 			PricingSettingsVersion,
-			"main",
-			1m,
-			100m,
-			1,
+			StorageCode,
+			Score,
+			Price,
+			CurrencyId,
 			0.2m,
 			TimeSpan.FromDays(1),
 			TimeSpan.FromDays(2),
