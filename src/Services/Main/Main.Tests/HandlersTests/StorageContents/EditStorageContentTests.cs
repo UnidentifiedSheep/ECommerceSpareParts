@@ -1,3 +1,4 @@
+using Main.Enums;
 using Tests.Extensions;
 using Abstractions.Models;
 using Application.Common.Models;
@@ -129,6 +130,9 @@ public class EditStorageContentTests : IntegrationTest
 		Assert.NotNull(updated);
 		Assert.Equal(content.Count, dto.Count.Value);
 		Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);
+		var persisted = await Context.StorageContents.AsNoTracking()
+			.SingleAsync(item => item.Id == content.Id, CancellationToken);
+		Assert.Equal(StorageMovementType.StorageContentEditing, persisted.Metadata.LastMovementType);
 	}
 
 	[Fact]
@@ -190,5 +194,8 @@ public class EditStorageContentTests : IntegrationTest
 		Assert.NotNull(updated);
 		Assert.Equal(content.Count, dto.Count.Value);
 		Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);
+		var persisted = await Context.StorageContents.AsNoTracking()
+			.SingleAsync(item => item.Id == content.Id, CancellationToken);
+		Assert.Equal(StorageMovementType.StorageContentEditing, persisted.Metadata.LastMovementType);
 	}
 }

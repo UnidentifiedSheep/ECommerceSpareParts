@@ -9,7 +9,7 @@ using Main.Enums;
 
 namespace Main.Entities.Storage;
 
-public class StorageContent : AuditableEntity<StorageContent, int>,
+public class StorageContent : AuditableEntity<StorageContent, int, StorageContentMetadata>,
 	ILinqEntity<StorageContent, int>,
 	IVersionable<uint>
 {
@@ -112,6 +112,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>,
 				newCount - Count));
 
 		Count = newCount;
+		Metadata.LastMovementType = movementType;
 	}
 
 	public void IncreaseCount(int amount, StorageMovementType movementType) =>
@@ -186,4 +187,9 @@ public class StorageContent : AuditableEntity<StorageContent, int>,
 	public void SetPurchaseDate(DateTime purchaseDate) => PurchaseDatetime = purchaseDate;
 
 	public override int GetId() => Id;
+}
+
+public sealed class StorageContentMetadata
+{
+	public StorageMovementType? LastMovementType { get; internal set; }
 }

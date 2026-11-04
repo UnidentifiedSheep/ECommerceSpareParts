@@ -2640,6 +2640,17 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Metadata", "Main.Entities.Storage.StorageContent.Metadata#StorageContentMetadata", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int?>("LastMovementType");
+
+                            b1
+                                .ToJson("metadata")
+                                .HasColumnType("jsonb");
+                        });
+
                     b.HasKey("Id")
                         .HasName("storage_content_pk");
 
@@ -4413,7 +4424,7 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Storage.ProductStock", b =>
                 {
                     b.HasOne("Main.Entities.Product.Product", "Product")
-                        .WithMany()
+                        .WithMany("Stocks")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -4690,6 +4701,8 @@ namespace Main.Migrator.Migrations
                     b.Navigation("ProductSize");
 
                     b.Navigation("ProductWeight");
+
+                    b.Navigation("Stocks");
                 });
 
             modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
