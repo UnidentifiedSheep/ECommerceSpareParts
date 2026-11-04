@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
@@ -13,7 +14,7 @@ namespace Main.Application.Handlers.Products.GetProductCrosses;
 public sealed record GetProductCrossesQuery(
 	int ProductId,
 	Pagination Pagination,
-	IReadOnlyCollection<string>? SortBy = null,
+	IReadOnlyCollection<SortExpression>? SortBy = null,
 	string? SearchTerm = null) : IQuery<GetProductCrossesResult>;
 
 public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses);
@@ -42,7 +43,7 @@ public class GetProductCrossesHandler(
 		}
 
 		var ids = await query
-			.SortBy((request.SortBy ?? []).Append("id").ToArray())
+			.SortBy((request.SortBy ?? []).Append(new SortExpression("id")).ToArray())
 			.ApplyPagination(request.Pagination)
 			.Select(product => product.Id)
 			.ToArrayAsync(cancellationToken);

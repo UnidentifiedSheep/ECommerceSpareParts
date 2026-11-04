@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
@@ -17,7 +18,7 @@ public record GetPurchasesQuery(
 	IReadOnlyCollection<Guid> SupplierOrganizationIds,
 	IReadOnlyCollection<int> CurrencyIds,
 	IReadOnlyCollection<int> ProductIds,
-	IReadOnlyCollection<string> SortBy,
+	IReadOnlyCollection<SortExpression> SortBy,
 	string? SearchTerm) : IQuery<GetPurchasesResult>;
 
 public record GetPurchasesResult(IReadOnlyCollection<PurchaseDto> Purchases);

@@ -61,7 +61,7 @@ public static class JobScheduleEndPoints
 						new GetScheduleQuery(
 							request.JobSystemNames,
 							new RangeModel<DateTime>(request.NextRunFrom, request.NextRunTo),
-							request.SortBy,
+							request.ToSortExpressions(),
 							request),
 						ct);
 

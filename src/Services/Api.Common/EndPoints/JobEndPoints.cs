@@ -100,7 +100,7 @@ public class JobEndPoints : ICarterModule
 							request,
 							request.SystemNames,
 							request.Statuses,
-							request.SortBy),
+							request.ToSortExpressions()),
 						ct);
 
 					return Results.Ok(

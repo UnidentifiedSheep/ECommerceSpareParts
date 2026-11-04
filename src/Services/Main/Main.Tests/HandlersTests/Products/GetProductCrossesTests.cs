@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Application.Common.Querying;
 using FluentAssertions;
 using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Interfaces.Products;
@@ -70,6 +71,29 @@ public sealed class GetProductCrossesTests : IntegrationTest
 		var result = await Mediator.Send(item, CancellationToken);
 
 		result.Crosses.Select(product => product.Id).Should().Equal(ids);
+	}
+
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task CountSort_WithStorageArgument_UsesOnlySelectedWarehouse(bool parseFromText)
+	{
+		var (productId, ids) = await LoadCrosses();
+		var storages = GetContext<StorageTestContext>().Storages.Take(2).ToArray();
+		Context.ProductStocks.AddRange(
+			ProductStock.Create(storages[0].Code, ids[0], 1),
+			ProductStock.Create(storages[1].Code, ids[0], 20),
+			ProductStock.Create(storages[0].Code, ids[1], 5),
+			ProductStock.Create(storages[1].Code, ids[1], 2));
+		await Context.SaveChangesAsync(CancellationToken);
+		var sort = parseFromText
+			? SortExpression.Parse($"count_{storages[0].Code}_desc")
+			: new SortExpression("count", true, storages[0].Code);
+
+		var result = await Mediator.Send(new GetProductCrossesQuery(
+			productId, new Pagination(0, 2), [sort]), CancellationToken);
+
+		result.Crosses.Select(product => product.Id).Should().Equal(ids[1], ids[0]);
 	}
 
 	[Theory]

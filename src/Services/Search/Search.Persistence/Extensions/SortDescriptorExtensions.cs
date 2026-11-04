@@ -13,12 +13,12 @@ public static class SortDescriptorExtensions
 {
 	public static SearchDescriptor<Product> SortProductsBySearchRelevance(
 		this SearchDescriptor<Product> search,
-		IReadOnlyCollection<string>? sortBy,
+		IReadOnlyCollection<SortExpression>? sortBy,
 		string? stockStorageCode)
 	{
 		if (string.IsNullOrWhiteSpace(stockStorageCode))
 			return search.SortBySearchRelevance(sortBy, product => product.Id);
-		if (sortBy is null || sortBy.All(string.IsNullOrWhiteSpace))
+		if (sortBy is null || sortBy.Count == 0)
 			return search.SortBySearchRelevance(sortBy, product => product.Id);
 
 		return search.Sort(sort =>
@@ -42,10 +42,10 @@ public static class SortDescriptorExtensions
 
 	public static SearchDescriptor<TEntity> SortBySearchRelevance<TEntity, TKey>(
 		this SearchDescriptor<TEntity> search,
-		IReadOnlyCollection<string>? sortBy,
+		IReadOnlyCollection<SortExpression>? sortBy,
 		Expression<Func<TEntity, TKey>> idSelector) where TEntity : class
 	{
-		if (sortBy is not null && sortBy.Any(x => !string.IsNullOrWhiteSpace(x)))
+		if (sortBy is not null && sortBy.Count > 0)
 			return search.SortBy(sortBy);
 
 		return search.Sort(sort => sort.Descending(SortSpecialField.Score).Ascending(idSelector));
@@ -53,10 +53,10 @@ public static class SortDescriptorExtensions
 
 	public static SearchDescriptor<TEntity> SortBy<TEntity>(
 		this SearchDescriptor<TEntity> search,
-		IReadOnlyCollection<string>? sortBy,
+		IReadOnlyCollection<SortExpression>? sortBy,
 		bool useDefault = true) where TEntity : class
 	{
-		if (!useDefault && (sortBy is null || sortBy.All(string.IsNullOrWhiteSpace)))
+		if (!useDefault && (sortBy is null || sortBy.Count == 0))
 			return search;
 
 		return search.Sort(sort => sort.SortBy(sortBy));
@@ -64,7 +64,7 @@ public static class SortDescriptorExtensions
 
 	public static IPromise<IList<ISort>> SortBy<TEntity>(
 		this SortDescriptor<TEntity> sort,
-		IReadOnlyCollection<string>? sortBy)
+		IReadOnlyCollection<SortExpression>? sortBy)
 		where TEntity : class
 	{
 		var definitions = ParseSortDefinitions<TEntity>(sortBy);
@@ -78,7 +78,7 @@ public static class SortDescriptorExtensions
 	}
 
 	private static IReadOnlyList<KeySelectorSortDefinition<TEntity>> ParseSortDefinitions<TEntity>(
-		IReadOnlyCollection<string>? sortBy) where TEntity : class
+		IReadOnlyCollection<SortExpression>? sortBy) where TEntity : class
 	{
 		try
 		{

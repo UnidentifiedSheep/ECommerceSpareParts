@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
@@ -21,8 +22,8 @@ public sealed record SearchInCatalogueQuery(
 	IReadOnlySet<SearchMatchType> NameModes,
 	IReadOnlyCollection<int> ProducerIds,
 	Pagination Pagination,
-	IReadOnlyCollection<string> ProductSortBy,
-	IReadOnlyCollection<string> CatalogueCandidateSortBy,
+	IReadOnlyCollection<SortExpression> ProductSortBy,
+	IReadOnlyCollection<SortExpression> CatalogueCandidateSortBy,
 	CandidateMappingStatus CandidateMappingStatus = CandidateMappingStatus.Unmapped,
 	bool IncludeHighlights = false,
 	IReadOnlyCollection<int>? ProductGroupIds = null,

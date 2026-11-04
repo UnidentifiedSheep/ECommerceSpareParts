@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
@@ -11,7 +12,7 @@ namespace Main.Application.Handlers.Characteristics.GetCharacteristics;
 
 public record GetCharacteristicsQuery(
 	string? SearchTerm,
-	IReadOnlyCollection<string>? SortBy,
+	IReadOnlyCollection<SortExpression>? SortBy,
 	Pagination Pagination) : IQuery<GetCharacteristicsResult>;
 
 public record GetCharacteristicsResult(IReadOnlyList<CharacteristicDto> Characteristics);

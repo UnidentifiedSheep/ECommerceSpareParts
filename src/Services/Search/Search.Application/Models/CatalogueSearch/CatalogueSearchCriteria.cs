@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Models;
 using Search.Enums;
@@ -21,7 +22,7 @@ public sealed record CatalogueSearchCriteria
 
 	public required Pagination Pagination { get; init; }
 
-	public IReadOnlyCollection<string> SortBy { get; init; } = [];
+	public IReadOnlyCollection<SortExpression> SortBy { get; init; } = [];
 
 	public string? StockStorageCode { get; init; }
 

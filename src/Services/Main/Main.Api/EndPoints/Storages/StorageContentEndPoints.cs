@@ -112,7 +112,7 @@ public static class StorageContentEndPoints
 					var query = new GetStorageContentsQuery(
 						request.ProductId,
 						request.StorageCode,
-						request.SortBy,
+						request.ToSortExpressions(),
 						request,
 						request.ShowZeroCount);
 					var result = await sender.Send(query, token);

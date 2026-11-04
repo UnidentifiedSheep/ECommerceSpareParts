@@ -284,7 +284,7 @@ public class SalesEndPoints : ICarterModule
 							request.OrganizationId,
 							request.PreferredOrganizationId,
 							request.CurrencyId,
-							request.SortBy,
+							request.ToSortExpressions(),
 							request.ShowCrosses),
 						cancellationToken);
 
@@ -313,7 +313,7 @@ public class SalesEndPoints : ICarterModule
 							request.CurrencyIds,
 							request.ProductIds,
 							request.States,
-							request.SortBy,
+							request.ToSortExpressions(),
 							request.SearchTerm),
 						token);
 

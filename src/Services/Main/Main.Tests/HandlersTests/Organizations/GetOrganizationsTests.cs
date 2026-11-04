@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Main.Entities.Exceptions;
 using Abstractions.Models;
 using Application.Common.Models;
@@ -347,7 +348,7 @@ public class GetOrganizationsTests : IntegrationTest
 		Guid? userId = null,
 		IReadOnlyCollection<Guid>? ids = null,
 		IReadOnlyCollection<OrganizationType>? types = null,
-		IReadOnlyCollection<string>? sortBy = null,
+		IReadOnlyCollection<SortExpression>? sortBy = null,
 		int page = 0,
 		int size = 20,
 		bool showHidden = false)

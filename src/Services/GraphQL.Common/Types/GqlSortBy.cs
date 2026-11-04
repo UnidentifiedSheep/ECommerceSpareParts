@@ -1,4 +1,3 @@
-using Abstractions;
 using Application.Common.Querying;
 
 namespace GraphQL.Common.Types;
@@ -12,12 +11,11 @@ public record GqlSortBy
 	[GraphQLName("isDescending")]
 	public required bool IsDescending { get; init; }
 
-	[GraphQLIgnore]
-	public string ToSortExpression()
-	{
-		var dir = IsDescending ? "desc" : "asc";
-		return $"{Field}{QueryableSortBy.Value.Delimiter}{dir}";
-	}
+	[GraphQLName("argument")]
+	public string? Argument { get; init; }
 
-	public static implicit operator string?(GqlSortBy? sortBy) => sortBy?.ToSortExpression();
+	[GraphQLIgnore]
+	public SortExpression ToSortExpression() => new(Field, IsDescending, Argument);
+
+	public static implicit operator SortExpression?(GqlSortBy? sortBy) => sortBy?.ToSortExpression();
 }

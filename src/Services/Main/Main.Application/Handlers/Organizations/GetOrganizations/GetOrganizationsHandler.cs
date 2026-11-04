@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
@@ -15,7 +16,7 @@ namespace Main.Application.Handlers.Organizations.GetOrganizations;
 
 public record GetOrganizationsQuery(
 	Pagination Pagination,
-	IReadOnlyCollection<string> SortBy,
+	IReadOnlyCollection<SortExpression> SortBy,
 	string? SearchTerm,
 	Guid? UserId,
 	IReadOnlyCollection<Guid> Ids,

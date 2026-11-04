@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductGroups.GetProductGroups;
 
-public record GetProductGroupsQuery(string? SearchTerm, IReadOnlyCollection<string>? SortBy, Pagination Pagination)
+public record GetProductGroupsQuery(string? SearchTerm, IReadOnlyCollection<SortExpression>? SortBy, Pagination Pagination)
 	: IQuery<GetProductGroupsResult>;
 
 public record GetProductGroupsResult(IReadOnlyList<ProductGroupDto> Groups);

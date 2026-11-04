@@ -140,7 +140,7 @@ public class OrganizationEndPoints : ICarterModule
 					var result = await sender.Send(
 						new GetOrganizationsQuery(
 							request,
-							request.SortBy,
+							request.ToSortExpressions(),
 							request.SearchTerm,
 							null,
 							request.Ids,

@@ -51,7 +51,7 @@ public class PriceEndPoints : ICarterModule
 						request.StorageCode,
 						request.Sources,
 						request,
-						request.SortBy);
+						request.ToSortExpressions());
 
 					var result = await sender.Send(query, cancellationToken);
 					return Results.Ok(

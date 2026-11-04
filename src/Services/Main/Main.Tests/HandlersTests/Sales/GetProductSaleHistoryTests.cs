@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
@@ -226,7 +227,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		Guid? organizationId = null,
 		Guid? preferredOrganizationId = null,
 		int? currencyId = null,
-		IReadOnlyCollection<string>? sortBy = null,
+		IReadOnlyCollection<SortExpression>? sortBy = null,
 		bool showCrosses = false,
 		Pagination? pagination = null)
 	{

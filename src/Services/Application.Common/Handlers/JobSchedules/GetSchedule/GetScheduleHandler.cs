@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Dtos;
 using Application.Common.Extensions;
@@ -13,7 +14,7 @@ namespace Application.Common.Handlers.JobSchedules.GetSchedule;
 public record GetScheduleQuery(
 	IEnumerable<string> JobSystemNames,
 	RangeModel<DateTime>? NextRunRange,
-	IReadOnlyCollection<string> SortBy,
+	IReadOnlyCollection<SortExpression> SortBy,
 	Pagination Pagination) : IQuery<GetScheduleResult>;
 
 public record GetScheduleResult(IReadOnlyList<JobScheduleDto> Schedules);

@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
@@ -19,7 +20,7 @@ public record GetProductSaleHistoryQuery(
 	Guid? OrganizationId,
 	Guid? PreferredOrganizationId,
 	int? CurrencyId,
-	IReadOnlyCollection<string> SortBy,
+	IReadOnlyCollection<SortExpression> SortBy,
 	bool ShowCrosses = false) : IQuery<GetProductSaleHistoryResult>;
 
 public record GetProductSaleHistoryResult(IReadOnlyList<ProductSaleHistoryDto> History);

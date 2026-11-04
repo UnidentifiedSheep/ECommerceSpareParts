@@ -7,9 +7,23 @@ namespace Application.Common.Extensions;
 
 public static class SortByExtensions
 {
+	public static SortExpression[] ToSortExpressions(this IEnumerable<string>? sorting)
+	{
+		try
+		{
+			return sorting?.Where(value => !string.IsNullOrWhiteSpace(value))
+				.Select(SortExpression.Parse)
+				.ToArray() ?? [];
+		}
+		catch (ArgumentException exception)
+		{
+			throw new InvalidInputException(SortingInvalidMessage.Create(exception.Message), exception.Message);
+		}
+	}
+
 	public static IOrderedQueryable<TEntity> SortBy<TEntity>(
 		this IQueryable<TEntity> query,
-		IReadOnlyCollection<string>? sortParams)
+		IReadOnlyCollection<SortExpression>? sortParams)
 	{
 		var sorts = ParseSorts<TEntity>(sortParams);
 		var first = sorts[0];
@@ -28,7 +42,7 @@ public static class SortByExtensions
 
 	public static IOrderedQueryable<TEntity> ThenSortBy<TEntity>(
 		this IOrderedQueryable<TEntity> query,
-		IReadOnlyCollection<string>? sortParams)
+		IReadOnlyCollection<SortExpression>? sortParams)
 	{
 		return ParseSorts<TEntity>(sortParams)
 			.Aggregate(
@@ -40,7 +54,7 @@ public static class SortByExtensions
 
 	public static CriteriaBuilder<TEntity> WithSorting<TEntity>(
 		this CriteriaBuilder<TEntity> builder,
-		IReadOnlyCollection<string>? sortParams) where TEntity : class
+		IReadOnlyCollection<SortExpression>? sortParams) where TEntity : class
 	{
 		foreach (var sort in ParseSorts<TEntity>(sortParams))
 			if (sort.Desc)
@@ -52,7 +66,7 @@ public static class SortByExtensions
 	}
 
 	private static IReadOnlyList<KeySelectorSortDefinition<TEntity>> ParseSorts<TEntity>(
-		IReadOnlyCollection<string>? sortParams)
+		IReadOnlyCollection<SortExpression>? sortParams)
 	{
 		try
 		{

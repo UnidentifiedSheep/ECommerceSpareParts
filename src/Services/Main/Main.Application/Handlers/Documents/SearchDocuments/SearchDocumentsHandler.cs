@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
@@ -15,7 +16,7 @@ public record SearchDocumentsQuery(
 	string? DocumentSystemName,
 	bool CanAccessAll,
 	Pagination Pagination,
-	IReadOnlyCollection<string>? SortBy) : IQuery<SearchDocumentsResult>;
+	IReadOnlyCollection<SortExpression>? SortBy) : IQuery<SearchDocumentsResult>;
 public record SearchDocumentsResult(IReadOnlyList<DocumentGenerationRequestDto> Requests);
 
 public class SearchDocumentsHandler(

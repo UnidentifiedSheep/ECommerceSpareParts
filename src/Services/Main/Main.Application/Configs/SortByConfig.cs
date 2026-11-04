@@ -26,7 +26,10 @@ public static class SortByConfig
 			.Map<Product, string>("producerName", x => x.Producer.Name)
 			.Map<Product, string>("indicator", x => x.Indicator!.Value!)
 			.Map<Product, long>("popularity", x => x.Popularity)
-			.Map<Product, long>("count", x => x.Stocks.Sum(stock => (long)stock.Quantity));
+			.Map<Product, long>("count", x => x.Stocks.Sum(stock => (long)stock.Quantity))
+			.MapParameterized<Product, string, long>("count", (product, storage) => product.Stocks
+				.Where(stock => stock.StorageCode == storage)
+				.Sum(stock => (long)stock.Quantity));
 
 		QueryableSortBy
 			.Value

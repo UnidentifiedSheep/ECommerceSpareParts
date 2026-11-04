@@ -33,7 +33,7 @@ public static class ProductRelationsEndPoints
 					var query = new GetProductCrossesQuery(
 						productId,
 						queryParams,
-						queryParams.SortBy,
+						queryParams.ToSortExpressions(),
 						searchTerm);
 					var result = await sender.Send(query, token);
 					var response = new GetProductCrossesResponse(result.Crosses);

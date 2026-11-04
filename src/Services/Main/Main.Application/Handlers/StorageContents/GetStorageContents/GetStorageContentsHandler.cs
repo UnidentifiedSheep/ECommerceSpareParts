@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
@@ -13,7 +14,7 @@ namespace Main.Application.Handlers.StorageContents.GetStorageContents;
 public sealed record GetStorageContentsQuery(
 	int? ProductId,
 	string? StorageCode,
-	IReadOnlyCollection<string> SortBy,
+	IReadOnlyCollection<SortExpression> SortBy,
 	Pagination Pagination,
 	bool ShowZeroCount) : IQuery<GetStorageContentsResult>;
 

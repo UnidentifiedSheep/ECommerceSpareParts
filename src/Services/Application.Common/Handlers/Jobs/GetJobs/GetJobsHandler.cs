@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Dtos;
 using Application.Common.Extensions;
@@ -15,7 +16,7 @@ public record GetJobsQuery(
 	Pagination Pagination,
 	IEnumerable<string> SystemNames,
 	IEnumerable<JobStatus> Statuses,
-	IReadOnlyCollection<string> SortBy) : IQuery<GetJobsResult>;
+	IReadOnlyCollection<SortExpression> SortBy) : IQuery<GetJobsResult>;
 
 public record GetJobsResult(IReadOnlyList<JobDto> Jobs);
 

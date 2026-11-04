@@ -244,7 +244,7 @@ public class PurchaseEndPoints : ICarterModule
 						request.SupplierOrganizationIds,
 						request.CurrencyIds,
 						request.ProductIds,
-						request.SortBy,
+						request.ToSortExpressions(),
 						request.SearchTerm);
 					var result = await sender.Send(query, token);
 					return Results.Ok(new GetPurchasesResponse(result.Purchases));

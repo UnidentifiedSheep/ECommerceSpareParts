@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Application.Common.Models;
+using Application.Common.Extensions;
 using Carter;
 using Enums;
 using MediatR;
@@ -93,8 +94,8 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 							(request.Fields?.Name ?? CatalogueSearchDefaults.NameModes).ToHashSet(),
 							request.ProducerIds,
 							new Pagination(request.Page, request.Size),
-							request.SortBy?.Products ?? [],
-							request.SortBy?.CatalogueCandidates ?? [],
+							request.SortBy?.Products.ToSortExpressions() ?? [],
+							request.SortBy?.CatalogueCandidates.ToSortExpressions() ?? [],
 							request.CandidateMappingStatus,
 							request.IncludeHighlights,
 							request.ProductGroupIds),

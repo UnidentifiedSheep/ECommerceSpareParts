@@ -1,3 +1,4 @@
+using Application.Common.Querying;
 using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
@@ -22,7 +23,7 @@ public record GetPriceOptionsForProductQuery(
 	string StorageCode,
 	IReadOnlyCollection<PriceOfferSource> Sources,
 	Pagination Pagination,
-	IReadOnlyCollection<string> SortBy) : IQuery<GetPriceOptionsForProductResult>;
+	IReadOnlyCollection<SortExpression> SortBy) : IQuery<GetPriceOptionsForProductResult>;
 
 public record GetPriceOptionsForProductResult(IReadOnlyCollection<PriceOptionDto> PriceOptions);
 
