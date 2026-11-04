@@ -206,6 +206,7 @@ public partial class DContext : DbContext, INotificationDbContext
 			.HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)
 			.HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
 
+		modelBuilder.ApplyConfiguration(new EntityHistoryConfiguration());
 		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();
 
