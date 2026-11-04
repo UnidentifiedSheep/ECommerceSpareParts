@@ -1,3 +1,4 @@
+using Main.Entities.Storage;
 using Main.Enums;
 using Tests.Extensions;
 using Abstractions.Models;
@@ -133,6 +134,7 @@ public class EditStorageContentTests : IntegrationTest
 		var persisted = await Context.StorageContents.AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 		Assert.Equal(StorageMovementType.StorageContentEditing, persisted.Metadata.LastMovementType);
+
 	}
 
 	[Fact]

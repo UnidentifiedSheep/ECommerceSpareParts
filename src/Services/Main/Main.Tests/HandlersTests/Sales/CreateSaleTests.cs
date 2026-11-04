@@ -3,7 +3,6 @@ using FluentAssertions;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Static;
-using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Entities.User;
@@ -109,16 +108,6 @@ public class CreateSaleTests : IntegrationTest
 		saleTransaction.Amount.Should().Be(80m);
 		saleTransaction.CurrencyId.Should().Be(storageContent.CurrencyId);
 		saleTransaction.SourceType.Should().Be(TransactionSourceType.Sale);
-
-		var movement = await Context
-			.Events
-			.OfType<StorageMovementEvent>()
-			.AsNoTracking()
-			.SingleAsync(CancellationToken);
-		movement.Data.ProductId.Should().Be(storageContent.ProductId);
-		movement.Data.StorageCode.Should().Be(storageContent.StorageCode);
-		movement.Data.Count.Should().Be(updatedContent.Count);
-		movement.Data.MovementType.Should().Be(StorageMovementType.Sale);
 	}
 
 	[Fact]

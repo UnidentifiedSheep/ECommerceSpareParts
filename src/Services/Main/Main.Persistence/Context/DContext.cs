@@ -28,7 +28,6 @@ using NpgsqlTypes;
 using Persistence.Common;
 using Persistence.Common.BaseTableConfigurations;
 using Persistence.Interceptors;
-using Event = Main.Entities.Event.Event;
 
 namespace Main.Persistence.Context;
 
@@ -73,8 +72,6 @@ public partial class DContext : DbContext, INotificationDbContext
 	public virtual DbSet<SupplierProductCross> SupplierProductCrosses { get; set; }
 
 	public virtual DbSet<CatalogueCandidate> CatalogueCandidates { get; set; }
-
-	public virtual DbSet<Event> Events { get; set; }
 
 	public virtual DbSet<Cart> Carts { get; set; }
 
@@ -209,7 +206,6 @@ public partial class DContext : DbContext, INotificationDbContext
 			.HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)
 			.HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
 
-		modelBuilder.ApplyConfiguration(new EntityHistoryConfiguration());
 		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();
 
