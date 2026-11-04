@@ -42,6 +42,7 @@ public sealed class GetStorageContentsHandler(
 
 		var content = await query
 			.SortBy(request.SortBy)
+			.ThenBy(content => content.Id)
 			.Project(projection)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);

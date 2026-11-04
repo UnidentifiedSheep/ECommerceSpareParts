@@ -34,8 +34,7 @@ public sealed class CatalogueQueries
 				input.CandidateMappingStatus ?? CandidateMappingStatus.Unmapped,
 				input.IncludeHighlights ?? false,
 				input.ProductGroupIds ?? [],
-				input.ProductCriteria?.ToCriteria(),
-				input.StockStorageCode),
+				input.ProductCriteria?.ToCriteria()),
 			ct);
 
 		return new GqlCatalogueSearchResult

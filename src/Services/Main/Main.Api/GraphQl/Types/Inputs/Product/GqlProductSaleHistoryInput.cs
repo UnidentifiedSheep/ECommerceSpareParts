@@ -15,9 +15,6 @@ public sealed record GqlProductSaleHistoryInput
 	[GraphQLName("organizationId")]
 	public Guid? OrganizationId { get; init; }
 
-	[GraphQLName("preferredOrganizationId")]
-	public Guid? PreferredOrganizationId { get; init; }
-
 	[GraphQLName("currencyId")]
 	public int? CurrencyId { get; init; }
 

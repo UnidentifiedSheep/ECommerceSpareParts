@@ -13,28 +13,30 @@ public static class SortDescriptorExtensions
 {
 	public static SearchDescriptor<Product> SortProductsBySearchRelevance(
 		this SearchDescriptor<Product> search,
-		IReadOnlyCollection<SortExpression>? sortBy,
-		string? stockStorageCode)
+		IReadOnlyCollection<SortExpression>? sortBy)
 	{
-		if (string.IsNullOrWhiteSpace(stockStorageCode))
-			return search.SortBySearchRelevance(sortBy, product => product.Id);
 		if (sortBy is null || sortBy.Count == 0)
 			return search.SortBySearchRelevance(sortBy, product => product.Id);
 
+		var values = sortBy.ToArray();
+		var definitions = ParseSortDefinitions<Product>(values);
 		return search.Sort(sort =>
 		{
-			foreach (var definition in ParseSortDefinitions<Product>(sortBy))
+			for (var i = 0; i < values.Length; i++)
 			{
-				var field = Infer.Field(definition.KeySelector);
+				var definition = definitions[i];
 				var order = definition.Desc ? SortOrder.Descending : SortOrder.Ascending;
-				var member = definition.KeySelector.Body is UnaryExpression conversion
-					? conversion.Operand
-					: definition.KeySelector.Body;
-				sort = member is MemberExpression { Member.Name: nameof(Product.Stock) }
-					? sort.Field(value => value
-						.Field($"stocks.{ProductStockFields.GetStorageKey(stockStorageCode)}")
-						.Order(order).Missing(0).UnmappedType(FieldType.Long))
-					: sort.Field(value => value.Field(field).Order(order));
+				if (values[i].Argument is { } storage &&
+					string.Equals(values[i].Field.Trim(), "stock", StringComparison.OrdinalIgnoreCase))
+				{
+					if (string.IsNullOrWhiteSpace(storage))
+						throw new InvalidInputException(SortingInvalidMessage.Create("Storage code must not be empty."));
+					sort = sort.Field(value => value
+						.Field($"stocks.{ProductStockFields.GetStorageKey(storage)}")
+						.Order(order).Missing(0).UnmappedType(FieldType.Long));
+				}
+				else
+					sort = sort.Field(value => value.Field(definition.KeySelector).Order(order));
 			}
 			return sort.Ascending(product => product.Id);
 		});

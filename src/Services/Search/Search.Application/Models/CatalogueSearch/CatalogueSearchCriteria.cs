@@ -24,8 +24,6 @@ public sealed record CatalogueSearchCriteria
 
 	public IReadOnlyCollection<SortExpression> SortBy { get; init; } = [];
 
-	public string? StockStorageCode { get; init; }
-
 	public bool IncludeHighlights { get; init; }
 
 	public ProductSearchCriteria? ProductCriteria { get; init; }

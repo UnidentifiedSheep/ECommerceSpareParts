@@ -18,7 +18,6 @@ public record GetProductSaleHistoryQuery(
 	Pagination Pagination,
 	string? StorageCode,
 	Guid? OrganizationId,
-	Guid? PreferredOrganizationId,
 	int? CurrencyId,
 	IReadOnlyCollection<SortExpression> SortBy,
 	bool ShowCrosses = false) : IQuery<GetProductSaleHistoryResult>;
@@ -52,13 +51,9 @@ public class GetProductSaleHistoryHandler(
 		if (request.CurrencyId.HasValue)
 			query = query.Where(x => x.Sale.CurrencyId == request.CurrencyId);
 
-		var sortedQuery = request.PreferredOrganizationId.HasValue && !request.OrganizationId.HasValue
-			? query
-				.OrderByDescending(x => x.Sale.OrganizationId == request.PreferredOrganizationId)
-				.ThenSortBy(request.SortBy)
-			: query.SortBy(request.SortBy);
 
-		var result = await sortedQuery
+		var result = await query
+			.SortBy(request.SortBy)
 			.ThenByDescending(x => x.Id)
 			.Project(projectionProvider)
 			.ApplyPagination(request.Pagination)

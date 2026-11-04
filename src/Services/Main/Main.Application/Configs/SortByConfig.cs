@@ -87,7 +87,9 @@ public static class SortByConfig
 			.Map<SaleContent, decimal>(
 				"averageBuyPrice",
 				x => x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count)
-			.Map<SaleContent, DateTime>("saleDate", x => x.Sale.SaleDatetime);
+			.Map<SaleContent, DateTime>("saleDate", x => x.Sale.SaleDatetime)
+			.MapParameterized<SaleContent, Guid, bool>("organizationMatch",
+				(content, organizationId) => content.Sale.OrganizationId == organizationId);
 
 
 		QueryableSortBy
@@ -99,7 +101,12 @@ public static class SortByConfig
 			.Map<StorageContent, int>("count", x => x.Count)
 			.Map<StorageContent, decimal>("buyPrice", x => x.BuyPriceInBaseCurrency)
 			.Map<StorageContent, DateTime>("purchaseDatetime", x => x.PurchaseDatetime)
-			.Map<StorageContent, int>("currencyId", x => x.CurrencyId);
+			.Map<StorageContent, int>("currencyId", x => x.CurrencyId)
+			.Map<StorageContent, long>("availableCount", content => Math.Max(0L,
+				content.Count - content.Locks
+					.Where(item => item.State == StorageContentLockState.Active &&
+						(item.ExpiresAt == null || item.ExpiresAt > DateTime.UtcNow))
+					.Sum(item => (long)item.Quantity)));
 
 		QueryableSortBy.Value.ConfigureForJob();
 

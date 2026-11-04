@@ -218,11 +218,11 @@ public class GetOrganizationsTests : IntegrationTest
 	}
 
 	[Theory]
-	[InlineData("unknown_desc")]
-	[InlineData("name_down")]
-	public async Task GetOrganizations_WithInvalidSort_ThrowsInvalidInputException(string sortBy)
+	[InlineData("unknown", null)]
+	[InlineData("name", "unexpected")]
+	public async Task GetOrganizations_WithInvalidSort_ThrowsInvalidInputException(string field, string? argument)
 	{
-		var query = CreateQuery(sortBy: [sortBy]);
+		var query = CreateQuery(sortBy: [new SortExpression(field, Argument: argument)]);
 
 		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(query, CancellationToken));
 	}

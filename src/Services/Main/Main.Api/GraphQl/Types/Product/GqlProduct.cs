@@ -196,7 +196,6 @@ public record GqlProduct
 				input.Pagination,
 				input.StorageCode,
 				input.OrganizationId,
-				input.PreferredOrganizationId,
 				input.CurrencyId,
 				input.SortBy.ToSortExpressions(),
 				input.ShowCrosses ?? false),

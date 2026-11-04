@@ -85,7 +85,6 @@ public class GetProductSaleHistoryTests : IntegrationTest
 			CreateQuery(
 				sale.StorageCode,
 				sale.OrganizationId,
-				sale.OrganizationId,
 				sale.CurrencyId,
 				["averageBuyPrice_desc"]),
 			CancellationToken);
@@ -158,7 +157,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(
-			CreateQuery(preferredOrganizationId: preferredSale.OrganizationId, sortBy: ["saleDate_desc"]),
+			CreateQuery(sortBy: [new SortExpression("organizationMatch", true, preferredSale.OrganizationId.ToString()), "saleDate_desc"]),
 			CancellationToken);
 
 		result
@@ -222,10 +221,17 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		secondPage.History.Should().ContainSingle().Which.SaleContentId.Should().Be(originalContent.Id);
 	}
 
+	[Fact]
+	public async Task OrganizationMatch_InvalidGuid_ThrowsInvalidInputException()
+	{
+		var query = CreateQuery(sortBy: [new SortExpression("organizationMatch", true, "not-a-guid")]);
+
+		await Assert.ThrowsAsync<Exceptions.InvalidInputException>(() => Mediator.Send(query, CancellationToken));
+	}
+
 	private GetProductSaleHistoryQuery CreateQuery(
 		string? storageCode = null,
 		Guid? organizationId = null,
-		Guid? preferredOrganizationId = null,
 		int? currencyId = null,
 		IReadOnlyCollection<SortExpression>? sortBy = null,
 		bool showCrosses = false,
@@ -236,7 +242,6 @@ public class GetProductSaleHistoryTests : IntegrationTest
 			pagination ?? new Pagination(0, 20),
 			storageCode,
 			organizationId,
-			preferredOrganizationId,
 			currencyId,
 			sortBy ?? [],
 			showCrosses);

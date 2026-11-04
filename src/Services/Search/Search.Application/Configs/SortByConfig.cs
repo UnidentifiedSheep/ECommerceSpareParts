@@ -15,6 +15,7 @@ public static class SortByConfig
 			.Map<Product, string>("sku", x => x.NormalizedSku)
 			.Map<Product, int>("producerId", x => x.ProducerId)
 			.Map<Product, long?>("stock", x => x.Stock)
+			.MapParameterized<Product, string, int>("stock", (product, storage) => product.Stocks[storage])
 			.Map<Product, decimal?>("length", x => x.Dimensions!.LengthM)
 			.Map<Product, decimal?>("width", x => x.Dimensions!.WidthM)
 			.Map<Product, decimal?>("height", x => x.Dimensions!.HeightM)

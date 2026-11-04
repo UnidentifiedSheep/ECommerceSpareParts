@@ -1,4 +1,6 @@
 using Application.Common.Querying;
+using Application.Common.Extensions;
+using Exceptions;
 using FluentAssertions;
 using GraphQL.Common.Extensions;
 using GraphQL.Common.Types;
@@ -29,6 +31,16 @@ public sealed class QueryableSortByTests
 	{
 		var action = () => SortExpression.Parse(text);
 		action.Should().Throw<ArgumentException>();
+	}
+
+	[Theory]
+	[InlineData("count_down")]
+	[InlineData("name_down")]
+	[InlineData("count__desc")]
+	public void TextInput_InvalidFormat_ThrowsLocalizedInvalidInputException(string text)
+	{
+		var action = () => new[] { text }.ToSortExpressions();
+		action.Should().Throw<InvalidInputException>();
 	}
 
 	[Fact]

@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Application.Common.Querying;
 using Contracts.Products;
 using Contracts.Storage;
 using FluentAssertions;
@@ -151,11 +152,45 @@ public sealed class ProductStocksSnapshotConsumerTests(SearchContainerFixture fi
 		var result = await Products.Search(new CatalogueSearchCriteria
 		{
 			Query = "", SkuModes = new HashSet<SearchMatchType>(), NameModes = new HashSet<SearchMatchType>(),
-			Pagination = new Pagination(0, 20), SortBy = [descending ? "stock_desc" : "stock_asc"],
-			StockStorageCode = storageCode
+			Pagination = new Pagination(0, 20), SortBy = [new SortExpression("stock", descending, storageCode)]
 		}, CancellationToken);
 
 		result.Hits.Select(item => item.Document.Id).Should().Equal(expectedIds);
+	}
+
+	[Fact]
+	public async Task Catalogue_MultipleWarehouseSorts_KeepArgumentsIndependent()
+	{
+		var now = DateTime.UtcNow;
+		await Products.ApplyUpdates(new[] { 901, 902, 903 }.Select(id => ProductCoreUpdate.From(
+			new ProductSnapshot { Id = id, Sku = $"STOCK-{id}", Name = "Stock product", ProducerId = 1 }, now)).ToArray(), CancellationToken);
+		await Snapshot(901, now, new Dictionary<string, int> { ["first"] = 5, ["second"] = 10 });
+		await Snapshot(902, now, new Dictionary<string, int> { ["first"] = 5, ["second"] = 2 });
+		await Snapshot(903, now, new Dictionary<string, int> { ["first"] = 3, ["second"] = 20 });
+		await RefreshAsync();
+
+		var result = await Products.Search(new CatalogueSearchCriteria
+		{
+			Query = "", SkuModes = new HashSet<SearchMatchType>(), NameModes = new HashSet<SearchMatchType>(),
+			Pagination = new Pagination(0, 20),
+			SortBy = [new SortExpression("stock", true, "first"), new SortExpression("stock", false, "second")]
+		}, CancellationToken);
+
+		result.Hits.Select(item => item.Document.Id).Should().Equal(902, 901, 903);
+	}
+
+	[Theory]
+	[InlineData("stock", "")]
+	[InlineData("sku", "warehouse")]
+	public async Task Catalogue_InvalidSortArguments_ThrowInvalidInputException(string field, string argument)
+	{
+		var criteria = new CatalogueSearchCriteria
+		{
+			Query = "", SkuModes = new HashSet<SearchMatchType>(), NameModes = new HashSet<SearchMatchType>(),
+			Pagination = new Pagination(0, 20), SortBy = [new SortExpression(field, Argument: argument)]
+		};
+
+		await Assert.ThrowsAsync<Exceptions.InvalidInputException>(() => Products.Search(criteria, CancellationToken));
 	}
 
 	private Task Snapshot(int id, DateTime occurredAt, IReadOnlyDictionary<string, int> stocks) =>

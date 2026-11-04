@@ -152,7 +152,7 @@ public class ProductRepository(
 				.From(GetFrom(criteria.Pagination))
 				.Size(criteria.Pagination.Size)
 				.TrackTotalHits()
-				.SortProductsBySearchRelevance(criteria.SortBy, criteria.StockStorageCode)
+				.SortProductsBySearchRelevance(criteria.SortBy)
 				.Query(query => query.Bool(boolean => boolean
 					.Filter(filters.ToArray())
 					.Must(filter => CatalogueSearchQueryBuilder.Build(
