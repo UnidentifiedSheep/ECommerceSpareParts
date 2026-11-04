@@ -28,13 +28,15 @@ public static class ProductRelationsEndPoints
 					ISender sender, IUserContext user,
 					int productId, [AsParameters] SortablePaginationQueryModel queryParams,
 					string? searchTerm,
+					string? stockStorageCode,
 					CancellationToken token) =>
 				{
 					var query = new GetProductCrossesQuery(
 						productId,
 						queryParams,
 						queryParams.SortBy,
-						searchTerm);
+						searchTerm,
+						stockStorageCode);
 					var result = await sender.Send(query, token);
 					var response = new GetProductCrossesResponse(result.Crosses);
 					return Results.Ok(response);

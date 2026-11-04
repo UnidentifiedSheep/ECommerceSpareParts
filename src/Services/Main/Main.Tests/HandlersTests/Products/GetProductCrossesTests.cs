@@ -19,6 +19,76 @@ public sealed class GetProductCrossesTests : IntegrationTest
 	}
 
 	[Fact]
+	public async Task CountSort_UsesSelectedWarehouseBeforePaginationAndKeepsDefaultTotalSorting()
+	{
+		var (productId, ids) = await LoadCrosses();
+		var storages = GetContext<StorageTestContext>().Storages.Take(2).ToArray();
+		Context.ProductStocks.AddRange(
+			ProductStock.Create(storages[0].Code, ids[0], 2),
+			ProductStock.Create(storages[1].Code, ids[0], 10),
+			ProductStock.Create(storages[0].Code, ids[1], 8));
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var first = await Mediator.Send(new GetProductCrossesQuery(productId, new Pagination(0, 1),
+			["count_desc"], StockStorageCode: $" {storages[0].Code} "), CancellationToken);
+		var second = await Mediator.Send(new GetProductCrossesQuery(productId, new Pagination(1, 1),
+			["count_desc"], StockStorageCode: storages[0].Code), CancellationToken);
+		var other = await Mediator.Send(new GetProductCrossesQuery(productId, new Pagination(0, 1),
+			["count_desc"], StockStorageCode: storages[1].Code), CancellationToken);
+		var total = await Mediator.Send(new GetProductCrossesQuery(productId, new Pagination(0, 1),
+			["count_desc"]), CancellationToken);
+
+		first.Crosses.Should().ContainSingle().Which.Id.Should().Be(ids[1]);
+		second.Crosses.Should().ContainSingle().Which.Id.Should().Be(ids[0]);
+		other.Crosses.Should().ContainSingle().Which.Id.Should().Be(ids[0]);
+		total.Crosses.Should().ContainSingle().Which.Id.Should().Be(ids[0]);
+	}
+
+	[Fact]
+	public async Task CountSort_SelectedWarehouseTreatsMissingStocksAsZeroAndUsesStableIdTies()
+	{
+		var (productId, ids) = await LoadCrosses();
+		var storages = GetContext<StorageTestContext>().Storages.Take(2).ToArray();
+		Context.ProductStocks.AddRange(
+			ProductStock.Create(storages[0].Code, ids[^1], 5),
+			ProductStock.Create(storages[1].Code, ids[0], 100));
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var ascending = await Mediator.Send(new GetProductCrossesQuery(productId, new Pagination(0, 100),
+			["count"], StockStorageCode: storages[0].Code), CancellationToken);
+		var descending = await Mediator.Send(new GetProductCrossesQuery(productId, new Pagination(0, 100),
+			["count_desc"], StockStorageCode: storages[0].Code), CancellationToken);
+		var absent = await Mediator.Send(new GetProductCrossesQuery(productId, new Pagination(0, 100),
+			["count_desc"], StockStorageCode: "NONEXISTENT-WAREHOUSE"), CancellationToken);
+
+		ascending.Crosses.Select(product => product.Id).Should().Equal(ids);
+		descending.Crosses.Select(product => product.Id).Should().Equal(ids.TakeLast(1).Concat(ids.SkipLast(1)));
+		absent.Crosses.Select(product => product.Id).Should().Equal(ids);
+	}
+
+	[Fact]
+	public async Task CountSort_SelectedWarehouseCombinesWithSearchAndSecondarySorting()
+	{
+		var (productId, ids) = await LoadCrosses();
+		var products = GetContext<ProductCrossTestContext>().ProductTestContext.Products;
+		foreach (var product in products.Where(product => ids.Contains(product.Id)))
+			product.SetName("WarehouseSort B");
+		products.Single(product => product.Id == ids[0]).SetName("WarehouseSort A");
+		products.Single(product => product.Id == ids[1]).SetName("WarehouseSort A");
+		var storages = GetContext<StorageTestContext>().Storages.Take(2).ToArray();
+		Context.ProductStocks.AddRange(
+			ProductStock.Create(storages[0].Code, ids[0], 2),
+			ProductStock.Create(storages[1].Code, ids[0], 100),
+			ProductStock.Create(storages[0].Code, ids[1], 8));
+		await Context.SaveChangesAsync(CancellationToken);
+
+		var result = await Mediator.Send(new GetProductCrossesQuery(productId, new Pagination(0, 2),
+			["name", "count_desc"], SearchTerm: "WarehouseSort", StockStorageCode: storages[0].Code), CancellationToken);
+
+		result.Crosses.Select(product => product.Id).Should().Equal(ids[1], ids[0]);
+	}
+
+	[Fact]
 	public async Task CountSort_UsesTotalAcrossWarehousesAndPaginatesAfterSorting()
 	{
 		var (productId, ids) = await LoadCrosses();

@@ -1,7 +1,9 @@
+using System.Linq.Expressions;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
+using Application.Common.Querying;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Products;
 using Main.Entities.Product;
@@ -14,7 +16,8 @@ public sealed record GetProductCrossesQuery(
 	int ProductId,
 	Pagination Pagination,
 	IReadOnlyCollection<string>? SortBy = null,
-	string? SearchTerm = null) : IQuery<GetProductCrossesResult>;
+	string? SearchTerm = null,
+	string? StockStorageCode = null) : IQuery<GetProductCrossesResult>;
 
 public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses);
 
@@ -41,13 +44,40 @@ public class GetProductCrossesHandler(
 				normalizedSku.Length > 0 && EF.Functions.ILike(product.Sku.NormalizedValue, skuPattern));
 		}
 
-		var ids = await query
-			.SortBy((request.SortBy ?? []).Append("id").ToArray())
+		var ids = await SortCrosses(query, (request.SortBy ?? []).Append("id").ToArray(), request.StockStorageCode)
 			.ApplyPagination(request.Pagination)
 			.Select(product => product.Id)
 			.ToArrayAsync(cancellationToken);
 		var products = await productProvider.GetProductsOrSetAsync(ids, cancellationToken);
 		return new GetProductCrossesResult(ids.Select(id => products[id]).ToArray());
+	}
+
+	private static IOrderedQueryable<Product> SortCrosses(
+		IQueryable<Product> query, IReadOnlyCollection<string> sortBy, string? storageCode)
+	{
+		// Validate all sort keys through the standard mapper; constructing this query does not execute SQL.
+		var defaultOrder = query.SortBy(sortBy);
+		if (string.IsNullOrWhiteSpace(storageCode)) return defaultOrder;
+
+		storageCode = storageCode.Trim();
+		Expression<Func<Product, long>> stockCount = product => product.Stocks
+			.Where(stock => stock.StorageCode == storageCode)
+			.Sum(stock => (long)stock.Quantity);
+		IOrderedQueryable<Product>? ordered = null;
+		foreach (var sort in sortBy.Where(value => !string.IsNullOrWhiteSpace(value)))
+		{
+			var definition = QueryableSortBy.ParseToText(sort);
+			if (definition.Field != "count")
+			{
+				ordered = ordered is null ? query.SortBy([sort]) : ordered.ThenSortBy([sort]);
+				continue;
+			}
+
+			ordered = ordered is null
+				? definition.Desc ? query.OrderByDescending(stockCount) : query.OrderBy(stockCount)
+				: definition.Desc ? ordered.ThenByDescending(stockCount) : ordered.ThenBy(stockCount);
+		}
+		return ordered ?? defaultOrder;
 	}
 
 	private static string EscapePattern(string value) =>

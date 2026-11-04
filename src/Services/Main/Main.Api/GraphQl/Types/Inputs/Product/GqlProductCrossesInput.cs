@@ -12,6 +12,9 @@ public sealed record GqlProductCrossesInput
 	[GraphQLName("searchTerm")]
 	public string? SearchTerm { get; init; }
 
+	[GraphQLName("stockStorageCode")]
+	public string? StockStorageCode { get; init; }
+
 	[GraphQLName("sortBy")]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 }

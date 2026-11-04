@@ -147,7 +147,8 @@ public record GqlProduct
 				Id,
 				input.Pagination,
 				input.SortBy.ToSortExpressions(),
-				input.SearchTerm),
+				input.SearchTerm,
+				input.StockStorageCode),
 			cancellationToken);
 		return result.Crosses.Select(product => new GqlProduct(product)).ToArray();
 	}
