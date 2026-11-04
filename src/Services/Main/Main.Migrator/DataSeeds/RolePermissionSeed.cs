@@ -170,7 +170,14 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.NOTIFICATIONS_ME,
 				PermissionCodes.NOTIFICATIONS_ALL,
 				PermissionCodes.DOCUMENTS_ME,
-				PermissionCodes.DOCUMENTS_ALL
+				PermissionCodes.DOCUMENTS_ALL,
+				PermissionCodes.ORDERS_GET,
+				PermissionCodes.ORDERS_GET_OWN,
+				PermissionCodes.ORDERS_CREATE,
+				PermissionCodes.ORDERS_EDIT,
+				PermissionCodes.ORDERS_PRICE_EDIT,
+				PermissionCodes.ORDERS_CONFIRM,
+				PermissionCodes.ORDERS_CANCEL
 			],
 			[Role.Worker] =
 			[
@@ -265,6 +272,7 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.ARTICLES_DETAILS_GET,
 				PermissionCodes.JOBS_CREATE,
 				PermissionCodes.JOBS_GET,
+				PermissionCodes.ORDERS_GET_OWN,
 				PermissionCodes.NOTIFICATIONS_ME
 			],
 			[Role.Supplier] =
@@ -377,7 +385,14 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.NOTIFICATIONS_ME,
 				PermissionCodes.NOTIFICATIONS_ALL,
 				PermissionCodes.DOCUMENTS_ME,
-				PermissionCodes.DOCUMENTS_ALL
+				PermissionCodes.DOCUMENTS_ALL,
+				PermissionCodes.ORDERS_GET,
+				PermissionCodes.ORDERS_GET_OWN,
+				PermissionCodes.ORDERS_CREATE,
+				PermissionCodes.ORDERS_EDIT,
+				PermissionCodes.ORDERS_PRICE_EDIT,
+				PermissionCodes.ORDERS_CONFIRM,
+				PermissionCodes.ORDERS_CANCEL
 			]
 		};
 	}

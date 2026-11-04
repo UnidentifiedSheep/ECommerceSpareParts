@@ -218,6 +218,20 @@
     "permissions.documents.me.name": "Own documents",
     "permissions.documents.me.description": "Permission to request document generation and access own requests.",
     "permissions.documents.all.name": "All documents",
-    "permissions.documents.all.description": "Permission to request document generation and access all users' requests."
+    "permissions.documents.all.description": "Permission to request document generation and access all users' requests.",
+    "permissions.orders.get.name": "View all orders",
+    "permissions.orders.get.description": "Permission to view all orders and their items.",
+    "permissions.orders.get.own.name": "View own orders",
+    "permissions.orders.get.own.description": "Permission to view orders belonging to the current user and their items.",
+    "permissions.orders.create.name": "Create orders",
+    "permissions.orders.create.description": "Permission to create orders.",
+    "permissions.orders.edit.name": "Edit orders",
+    "permissions.orders.edit.description": "Permission to change order items and quantities.",
+    "permissions.orders.price.edit.name": "Set order prices manually",
+    "permissions.orders.price.edit.description": "Permission to assign order item prices manually.",
+    "permissions.orders.confirm.name": "Confirm orders",
+    "permissions.orders.confirm.description": "Permission to confirm orders.",
+    "permissions.orders.cancel.name": "Cancel orders",
+    "permissions.orders.cancel.description": "Permission to cancel orders."
   }
 }

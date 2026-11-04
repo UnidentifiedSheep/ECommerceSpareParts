@@ -218,6 +218,20 @@
     "permissions.documents.me.name": "Свои документы",
     "permissions.documents.me.description": "Право на создание запросов генерации документов и доступ к собственным запросам.",
     "permissions.documents.all.name": "Все документы",
-    "permissions.documents.all.description": "Право на создание запросов генерации документов и доступ к запросам всех пользователей."
+    "permissions.documents.all.description": "Право на создание запросов генерации документов и доступ к запросам всех пользователей.",
+    "permissions.orders.get.name": "Просмотр всех заказов",
+    "permissions.orders.get.description": "Право на просмотр всех заказов и их позиций.",
+    "permissions.orders.get.own.name": "Просмотр своих заказов",
+    "permissions.orders.get.own.description": "Право на просмотр заказов текущего пользователя и их позиций.",
+    "permissions.orders.create.name": "Создание заказов",
+    "permissions.orders.create.description": "Право на создание заказов.",
+    "permissions.orders.edit.name": "Редактирование заказов",
+    "permissions.orders.edit.description": "Право на изменение позиций и количества в заказах.",
+    "permissions.orders.price.edit.name": "Ручное назначение цен в заказах",
+    "permissions.orders.price.edit.description": "Право на ручное назначение цен позиций заказа.",
+    "permissions.orders.confirm.name": "Подтверждение заказов",
+    "permissions.orders.confirm.description": "Право на подтверждение заказов.",
+    "permissions.orders.cancel.name": "Отмена заказов",
+    "permissions.orders.cancel.description": "Право на отмену заказов."
   }
 }
