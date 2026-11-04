@@ -187,6 +187,8 @@ public sealed class ProductRepositorySearchTests
 		requestBody().Should().Contain("\"highlight\"");
 		requestBody().Should().Contain("\"pre_tags\":[\"[[[\"]");
 		requestBody().Should().Contain("\"matched_fields\"");
+		requestBody().Should().NotContain("name.prefix");
+		requestBody().Should().NotContain("name.contains");
 		result.Hits.Single().Highlights["name"].Should().Equal("[[[Bosch]]] product");
 		result.Hits.Single().Document.ProductGroupId.Should().Be(7);
 	}

@@ -38,8 +38,6 @@ internal static class CatalogueSearchHighlightExtensions
 					.NumberOfFragments(5)
 					.MatchedFields(fields => fields
 						.Field(nameField)
-						.Field($"{nameField.Name}.keyword")
-						.Field($"{nameField.Name}.prefix")
-						.Field($"{nameField.Name}.contains"))));
+						.Field($"{nameField.Name}.keyword"))));
 	}
 }

@@ -138,6 +138,16 @@ public abstract class OpenSearchRepository<TDocument, TKey>(
 			$"Failed to {operation} OpenSearch index '{indexProvider()}'. {GetErrorDetails(response)}");
 	}
 
-	private static string GetErrorDetails(IResponse response) =>
-		response.ServerError?.Error?.Reason ?? response.DebugInformation;
+	private static string GetErrorDetails(IResponse response)
+	{
+		var error = response.ServerError?.Error;
+		if (error is null) return response.DebugInformation;
+
+		var details = new List<string> { $"{error.Type}: {error.Reason}" };
+		foreach (var root in error.RootCause ?? [])
+			details.Add($"{root.Type}: {root.Reason}");
+		for (var cause = error.CausedBy; cause is not null; cause = cause.CausedBy)
+			details.Add($"{cause.Type}: {cause.Reason}");
+		return string.Join("; ", details.Distinct());
+	}
 }
