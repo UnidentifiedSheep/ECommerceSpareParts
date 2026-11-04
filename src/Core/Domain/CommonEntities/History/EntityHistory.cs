@@ -51,10 +51,10 @@ public sealed class EntityHistory : Entity<EntityHistory, Guid>, ILinqEntity<Ent
 		{
 			ArgumentNullException.ThrowIfNull(reason);
 			ArgumentException.ThrowIfNullOrWhiteSpace(reason.Code);
-			if (reason.ReferenceType is not null || reason.ReferenceKey is not null)
+			if (reason.SourceType is not null || reason.SourceKey is not null)
 			{
-				ArgumentException.ThrowIfNullOrWhiteSpace(reason.ReferenceType);
-				ArgumentException.ThrowIfNullOrWhiteSpace(reason.ReferenceKey);
+				ArgumentException.ThrowIfNullOrWhiteSpace(reason.SourceType);
+				ArgumentException.ThrowIfNullOrWhiteSpace(reason.SourceKey);
 			}
 		}
 

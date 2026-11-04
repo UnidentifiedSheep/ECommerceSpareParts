@@ -5,12 +5,14 @@ using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.History;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Models;
 using Application.Common.Services;
 using Application.Common.Services.Events;
+using Application.Common.Services.History;
 using Application.Common.Services.Persistence;
 using Application.Common.Services.Settings;
 using Domain.CommonEntities.Events;
@@ -108,6 +110,7 @@ public static class ServiceCollectionExtensions
 
 	public static IServiceCollection RegisterApplicationTransactions(this IServiceCollection services)
 	{
+		services.AddScoped<IEntityHistoryContext, EntityHistoryContext>();
 		services.AddScoped<IRepositoryProvider, RepositoryProvider>();
 		services.AddScoped<IApplicationTransactionContext, ApplicationTransactionContext>();
 		services.AddScoped<ApplicationTransaction>();

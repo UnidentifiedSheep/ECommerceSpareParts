@@ -1,7 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Interfaces.Repositories;
 using Domain;
-using Domain.Interfaces;
+using Domain.Keys;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
@@ -19,7 +18,7 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(
 	protected readonly IQueryableExtensions QueryableExtensions = queryableExtensions;
 
 	public async ValueTask<TEntity?> GetById(TKey id, CancellationToken ct = default) =>
-		await DbSet.FindAsync(ToKeyValues(id), ct);
+		await DbSet.FindAsync(EntityKey.GetValues(id), ct);
 
 	public async Task<TEntity?> FirstOrDefaultAsync(
 		Criteria<TEntity>? criteria = null,
@@ -59,25 +58,4 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(
 	public abstract Task DeleteManyAsync(
 		IEnumerable<TKey> ids,
 		CancellationToken cancellationToken = default);
-
-	private static object[] ToKeyValues(TKey key)
-	{
-		return key switch
-		{
-			null => [],
-			ITuple v => GetTupleValues(v),
-			ICompositeKey k => k.ToArray(),
-			_ => [key]
-		};
-	}
-
-	private static object[] GetTupleValues(ITuple tuple)
-	{
-		var values = new object[tuple.Length];
-
-		for (var i = 0; i < tuple.Length; i++)
-			values[i] = tuple[i]!;
-
-		return values;
-	}
 }
