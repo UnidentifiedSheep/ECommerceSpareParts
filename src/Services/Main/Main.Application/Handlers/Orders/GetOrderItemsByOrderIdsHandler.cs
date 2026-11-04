@@ -3,6 +3,8 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Orders;
+using Main.Application.Extensions.Entities;
+using Security.Core.Interfaces;
 using Main.Entities.Order;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +26,9 @@ public sealed record GetOrderItemsByOrderIdsResult(IReadOnlyDictionary<Guid, IRe
 
 public sealed class GetOrderItemsByOrderIdsHandler(
 	IReadRepository<OrderItem, int> repository,
-	IProjectionProvider<OrderItem, OrderItemDto> projection)
+	IReadRepository<Order, Guid> orders,
+	IProjectionProvider<OrderItem, OrderItemDto> projection,
+	IUserContext userContext)
 	: IQueryHandler<GetOrderItemsByOrderIdsQuery, GetOrderItemsByOrderIdsResult>
 {
 	public async Task<GetOrderItemsByOrderIdsResult> Handle(
@@ -34,8 +38,12 @@ public sealed class GetOrderItemsByOrderIdsHandler(
 		if (request.Ids.Count == 0)
 			return new GetOrderItemsByOrderIdsResult(new Dictionary<Guid, IReadOnlyList<OrderItemDto>>());
 
+		var orderIds =  orders.Query.WhereReadableBy(userContext)
+			.Where(order => request.Ids.Contains(order.Id))
+			.Select(order => order.Id);
+
 		var items = await repository.Query
-			.Where(item => request.Ids.Contains(item.OrderId))
+			.Where(item => orderIds.Contains(item.OrderId))
 			.OrderBy(item => item.Id)
 			.Project(projection)
 			.ToListAsync(cancellationToken);

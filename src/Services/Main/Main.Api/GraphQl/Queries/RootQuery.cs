@@ -22,6 +22,9 @@ public sealed class RootQuery
 	[GraphQLName("purchases")]
 	public PurchaseQueries Purchases => new();
 
+	[GraphQLName("orders")]
+	public OrderQueries Orders => new();
+
 	[GraphQLName("sales")]
 	public SaleQueries Sales => new();
 
