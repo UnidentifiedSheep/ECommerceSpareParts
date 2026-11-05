@@ -8,7 +8,7 @@ using Main.Enums;
 
 namespace Main.Entities.Sale;
 
-public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersionable<uint>
+public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IGenerateAutomaticDomainEvents, IVersionable<uint>
 {
 	private readonly List<SaleContent> _contents = [];
 
@@ -145,6 +145,14 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 	{
 		foreach (var content in _contents)
 			content.InvalidateAnalytics();
+	}
+
+	public override void OnUpdated()
+	{
+		if (State == SaleState.Deleted)
+			AddEntityDeleteDomainEvent();
+		else
+			base.OnUpdated();
 	}
 
 	public override Guid GetId() => Id;

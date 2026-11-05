@@ -1,3 +1,6 @@
+using Tests.Stubs;
+using Application.Common.Interfaces.Events;
+using Contracts;
 using FluentAssertions;
 using Main.Application.Handlers.Purchases.DeletePurchase;
 using Application.Common.Interfaces.Persistence;
@@ -31,6 +34,9 @@ public class DeletePurchaseTests : IntegrationTest
 
 	private PurchaseTestContext PurchaseContext => GetContext<PurchaseTestContext>();
 
+	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
+		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+
 	[Fact]
 	public async Task DeletePurchase_ValidPurchase_RemovesPurchaseAndRevertsStockAndTransaction()
 	{
@@ -40,6 +46,7 @@ public class DeletePurchaseTests : IntegrationTest
 		var productId = content.ProductId;
 		var transactionId = purchase.TransactionId;
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		await Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken);
 
 		var purchaseExists =
@@ -64,6 +71,11 @@ public class DeletePurchaseTests : IntegrationTest
 		productStockQuantity.Should().Be(0);
 		transaction.IsReversed.Should().BeTrue();
 		transaction.IsReversalApplied.Should().BeTrue();
+
+		var published = Broker.PublishedMessages.Skip(publishedBefore).ToArray();
+		published.OfType<PurchaseDeletedEvent>().Should().ContainSingle().Which.Id.Should().Be(purchase.Id);
+		published.OfType<PurchaseCreatedEvent>().Should().BeEmpty();
+		published.OfType<PurchaseUpdatedEvent>().Should().BeEmpty();
 	}
 
 	[Fact]
@@ -121,7 +133,7 @@ public class DeletePurchaseTests : IntegrationTest
 			.WithCurrencyId(currencyId)
 			.WithCount(2)
 			.WithBuyPrice(10m)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var stock = await Context.ProductStocks.SingleAsync(
 			item => item.ProductId == product.Id && item.StorageCode == storageContent.StorageCode, CancellationToken);
 		stock.SetQuantity(stock.Quantity + storageContent.Count);
@@ -145,7 +157,7 @@ public class DeletePurchaseTests : IntegrationTest
 			.WithStorage(route.ToStorageCode)
 			.WithContent(purchaseContent)
 			.WithLogistic(route, logisticsTransaction.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		await Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken);
 
@@ -205,6 +217,7 @@ public class DeletePurchaseTests : IntegrationTest
 			await context.UnitOfWork.SaveChangesAsync(token);
 		}, CancellationToken);
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(
 			new DeletePurchaseCommand(purchase.Id),
 			CancellationToken));
@@ -226,5 +239,6 @@ public class DeletePurchaseTests : IntegrationTest
 		productStockQuantity.Should().Be(1);
 		transaction.IsReversed.Should().BeFalse();
 		transaction.IsReversalApplied.Should().BeFalse();
+		Broker.PublishedMessages.Skip(publishedBefore).OfType<PurchaseDeletedEvent>().Should().BeEmpty();
 	}
 }

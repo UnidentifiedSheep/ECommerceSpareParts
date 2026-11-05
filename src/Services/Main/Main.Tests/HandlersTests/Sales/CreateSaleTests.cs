@@ -1,3 +1,7 @@
+using Tests.Stubs;
+using Microsoft.Extensions.DependencyInjection;
+using Application.Common.Interfaces.Events;
+using Contracts;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Dtos.Sale;
@@ -26,6 +30,9 @@ public class CreateSaleTests : IntegrationTest
 		RegisterBasicContext<UsersTestContext>();
 	}
 
+	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
+		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+
 	[Fact]
 	public async Task CreateSale_CreatesSaleAndSubtractsStorageContent()
 	{
@@ -51,6 +58,7 @@ public class CreateSaleTests : IntegrationTest
 					80m)
 			]);
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		var result = await Mediator.Send(command, CancellationToken);
 
 		result.SaleId.Should().NotBeEmpty();
@@ -108,6 +116,11 @@ public class CreateSaleTests : IntegrationTest
 		saleTransaction.Amount.Should().Be(80m);
 		saleTransaction.CurrencyId.Should().Be(storageContent.CurrencyId);
 		saleTransaction.SourceType.Should().Be(TransactionSourceType.Sale);
+
+		var published = Broker.PublishedMessages.Skip(publishedBefore).ToArray();
+		published.OfType<SaleCreatedEvent>().Should().ContainSingle().Which.Id.Should().Be(result.SaleId);
+		published.OfType<SaleUpdatedEvent>().Should().BeEmpty();
+		published.OfType<SaleDeletedEvent>().Should().BeEmpty();
 	}
 
 	[Fact]

@@ -1,3 +1,7 @@
+using Tests.Stubs;
+using Microsoft.Extensions.DependencyInjection;
+using Application.Common.Interfaces.Events;
+using Contracts;
 using Tests.Extensions;
 using Exceptions;
 using FluentAssertions;
@@ -22,6 +26,9 @@ public class EditSaleTests : IntegrationTest
 	}
 
 	private SaleTestContext SaleContext => GetContext<SaleTestContext>();
+
+	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
+		.GetRequiredService<PublishEndpointAccessor>().Publisher;
 
 	[Fact]
 	public async Task EditSale_ValidSale_UpdatesSaleContentsAndRecreatesTransaction()
@@ -48,6 +55,7 @@ public class EditSaleTests : IntegrationTest
 			newDate,
 			"sale edited");
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		await Mediator.Send(command, CancellationToken);
 
 		var editedSale = await ReloadSale();
@@ -78,6 +86,11 @@ public class EditSaleTests : IntegrationTest
 		oldTransaction.IsReversalApplied.Should().BeTrue();
 		newTransaction.Amount.Should().Be(90m);
 		newTransaction.SourceType.Should().Be(TransactionSourceType.Sale);
+
+		var published = Broker.PublishedMessages.Skip(publishedBefore).ToArray();
+		published.OfType<SaleUpdatedEvent>().Should().ContainSingle().Which.Id.Should().Be(sale.Id);
+		published.OfType<SaleCreatedEvent>().Should().BeEmpty();
+		published.OfType<SaleDeletedEvent>().Should().BeEmpty();
 	}
 
 	[Fact]

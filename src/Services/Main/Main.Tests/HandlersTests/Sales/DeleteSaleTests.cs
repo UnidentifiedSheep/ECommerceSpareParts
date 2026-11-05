@@ -1,3 +1,7 @@
+using Tests.Stubs;
+using Microsoft.Extensions.DependencyInjection;
+using Application.Common.Interfaces.Events;
+using Contracts;
 using Tests.Extensions;
 using Exceptions;
 using FluentAssertions;
@@ -21,6 +25,9 @@ public class DeleteSaleTests : IntegrationTest
 
 	private SaleTestContext SaleContext => GetContext<SaleTestContext>();
 
+	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
+		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+
 	[Fact]
 	public async Task DeleteSale_ValidSale_MarksSaleDeletedRestoresStockAndReversesTransaction()
 	{
@@ -32,6 +39,7 @@ public class DeleteSaleTests : IntegrationTest
 		var storageCountBeforeDelete = await StorageContentCount(storageContentId);
 		var productStockBeforeDelete = await ProductStock(productId);
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		await Mediator.Send(new DeleteSaleCommand(sale.Id, sale.RowVersion), CancellationToken);
 
 		var deletedSale = await ReloadSale();
@@ -51,6 +59,11 @@ public class DeleteSaleTests : IntegrationTest
 		transaction.IsReversed.Should().BeTrue();
 		transaction.IsReversalApplied.Should().BeTrue();
 		transaction.SourceType.Should().Be(TransactionSourceType.Sale);
+
+		var published = Broker.PublishedMessages.Skip(publishedBefore).ToArray();
+		published.OfType<SaleDeletedEvent>().Should().ContainSingle().Which.Id.Should().Be(sale.Id);
+		published.OfType<SaleCreatedEvent>().Should().BeEmpty();
+		published.OfType<SaleUpdatedEvent>().Should().BeEmpty();
 	}
 
 	[Fact]
@@ -94,6 +107,7 @@ public class DeleteSaleTests : IntegrationTest
 		var sale = await ReloadSale();
 		var invalidRowVersion = sale.RowVersion + 1;
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		await Assert.ThrowsAsync<InvalidRowVersionException>(() => Mediator.Send(
 			new DeleteSaleCommand(sale.Id, invalidRowVersion),
 			CancellationToken));
@@ -107,6 +121,7 @@ public class DeleteSaleTests : IntegrationTest
 		saleAfterFailedDelete.State.Should().Be(SaleState.Completed);
 		transaction.IsReversed.Should().BeFalse();
 		transaction.IsReversalApplied.Should().BeFalse();
+		Broker.PublishedMessages.Skip(publishedBefore).OfType<SaleDeletedEvent>().Should().BeEmpty();
 	}
 
 	private Task<Sale> ReloadSale()

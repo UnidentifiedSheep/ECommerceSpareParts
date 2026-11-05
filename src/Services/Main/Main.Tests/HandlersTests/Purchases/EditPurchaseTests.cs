@@ -1,3 +1,6 @@
+using Tests.Stubs;
+using Application.Common.Interfaces.Events;
+using Contracts;
 using Tests.Extensions;
 using FluentAssertions;
 using Main.Application.Dtos.Purchase;
@@ -29,6 +32,9 @@ public class EditPurchaseTests : IntegrationTest
 
 	private PurchaseTestContext PurchaseContext => GetContext<PurchaseTestContext>();
 
+	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
+		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+
 	[Fact]
 	public async Task EditPurchase_ValidContent_UpdatesPurchaseStorageAndTransaction()
 	{
@@ -56,6 +62,7 @@ public class EditPurchaseTests : IntegrationTest
 			false,
 			null);
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		await Mediator.Send(editCommand, CancellationToken);
 
 		var updatedPurchase =
@@ -87,6 +94,11 @@ public class EditPurchaseTests : IntegrationTest
 		oldTransaction.IsReversalApplied.Should().BeTrue();
 		newTransaction.Amount.Should().Be(100m);
 		updatedProductStockQuantity.Should().Be(5);
+
+		var published = Broker.PublishedMessages.Skip(publishedBefore).ToArray();
+		published.OfType<PurchaseUpdatedEvent>().Should().ContainSingle().Which.Id.Should().Be(purchase.Id);
+		published.OfType<PurchaseCreatedEvent>().Should().BeEmpty();
+		published.OfType<PurchaseDeletedEvent>().Should().BeEmpty();
 	}
 
 	[Fact]

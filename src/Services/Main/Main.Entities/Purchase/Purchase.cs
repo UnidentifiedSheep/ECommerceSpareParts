@@ -10,7 +10,7 @@ using Main.Enums;
 
 namespace Main.Entities.Purchase;
 
-public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, Guid>
+public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, Guid>, IGenerateAutomaticDomainEvents
 {
 	private readonly List<PurchaseContent> _contents = [];
 

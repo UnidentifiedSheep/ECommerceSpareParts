@@ -15,6 +15,7 @@ from image_catalog import catalog
 
 SHA = re.compile(r"[0-9a-f]{40}")
 DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
+ALIAS_VERIFY_DELAYS = (0, 1, 2, 4, 8, 15)
 
 def registry_prefix():
     owner = os.environ.get("GITHUB_REPOSITORY_OWNER") or os.environ.get("GITHUB_REPOSITORY", "").split("/")[0]
@@ -122,7 +123,18 @@ class Registries:
         self.login(image)
         command(["docker", "buildx", "imagetools", "create", "--prefer-index=false",
                  "--tag", image + ":" + tag, image + "@" + digest])
-        require(self.digest(image + ":" + tag) == digest, "GHCR alias does not match the expected digest")
+        alias = image + ":" + tag
+        for attempt, delay in enumerate(ALIAS_VERIFY_DELAYS, start=1):
+            if delay:
+                time.sleep(delay)
+            actual = self.digest(alias, missing=True)
+            if actual == digest:
+                return
+            if attempt < len(ALIAS_VERIFY_DELAYS):
+                print(f"Waiting for GHCR alias {alias} ({attempt}/{len(ALIAS_VERIFY_DELAYS)}): "
+                      f"expected {digest}, got {actual or 'not found'}", flush=True)
+        raise ReleaseError(f"GHCR alias {alias} did not converge after {len(ALIAS_VERIFY_DELAYS)} reads: "
+                           f"expected {digest}, got {actual or 'not found'}")
 
 
 def prepare_source(operation, run_id, output_file):

@@ -1,3 +1,7 @@
+using Tests.Stubs;
+using Microsoft.Extensions.DependencyInjection;
+using Application.Common.Interfaces.Events;
+using Contracts;
 using Enums.Units;
 using FluentAssertions;
 using Main.Application.Dtos.Purchase;
@@ -39,6 +43,9 @@ public class CreatePurchaseTests : IntegrationTest
 		_supplier = await new SupplierUserBuilder(Faker).BuildAndAddToDb(Context);
 	}
 
+	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
+		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+
 	[Fact]
 	public async Task CreatePurchase_WithoutLogistics_CreatesPurchaseAndStorageContents()
 	{
@@ -56,6 +63,7 @@ public class CreatePurchaseTests : IntegrationTest
 				index + 1,
 				false)));
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
@@ -91,6 +99,11 @@ public class CreatePurchaseTests : IntegrationTest
 		purchaseTransaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
 		purchaseTransaction.Amount.Should().Be(command.PurchaseContent.Sum(x => x.Price * x.Count));
 		purchaseTransaction.SourceType.Should().Be(TransactionSourceType.Purchase);
+
+		var published = Broker.PublishedMessages.Skip(publishedBefore).ToArray();
+		published.OfType<PurchaseCreatedEvent>().Should().ContainSingle().Which.Id.Should().Be(purchase.Id);
+		published.OfType<PurchaseUpdatedEvent>().Should().BeEmpty();
+		published.OfType<PurchaseDeletedEvent>().Should().BeEmpty();
 	}
 
 	[Fact]
