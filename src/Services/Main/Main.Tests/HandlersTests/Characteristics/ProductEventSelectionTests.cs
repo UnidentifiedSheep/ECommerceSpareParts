@@ -1,7 +1,7 @@
 using Contracts.Products;
 using Contracts.Storage;
 using FluentAssertions;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Entities.Product;
 using Main.Enums;
 using Microsoft.Extensions.DependencyInjection;

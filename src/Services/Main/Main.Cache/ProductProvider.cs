@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Repositories;
 using Cache.Extensions;
 using Main.Application.Dtos.Product;
 using Main.Application.Extensions.QueryExtensions;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Application.Static;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;

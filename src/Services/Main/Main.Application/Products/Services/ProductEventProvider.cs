@@ -1,11 +1,10 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Entities.Product;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
-using ProductEntity = Main.Entities.Product.Product;
 
-namespace Main.Application.Services.Products;
+namespace Main.Application.Products.Services;
 
 public sealed class ProductEventProvider(
 	IReadRepository<Product, int> productRepository,

@@ -1,7 +1,7 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Interfaces.Products;
 using Main.Application.Lrts.ProductCrossesByIdsDelete;
+using Main.Application.Products.Interfaces;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

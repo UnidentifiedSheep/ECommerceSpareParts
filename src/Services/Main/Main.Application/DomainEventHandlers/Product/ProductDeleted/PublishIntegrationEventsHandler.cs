@@ -1,6 +1,6 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Entities.DomainEvents.Product;
 using Main.Enums;
 

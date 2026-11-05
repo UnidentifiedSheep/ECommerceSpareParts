@@ -8,7 +8,6 @@ using Contracts.Job;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Interfaces.Products;
 using Main.Application.Lrts.Base.Synchronization;
 using Main.Application.Lrts.ProductSynchronization;
 using Main.Entities.Product;

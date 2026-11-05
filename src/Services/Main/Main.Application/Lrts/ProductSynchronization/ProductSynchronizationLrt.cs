@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Persistence;
-using Main.Application.Interfaces.Products;
 using Locan.Core.Interfaces;
 using Main.Application.Lrts.Base.Synchronization;
+using Main.Application.Products.Interfaces;
 using Main.Entities;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;

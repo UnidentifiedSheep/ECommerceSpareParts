@@ -3,14 +3,11 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Models.Options.S3;
 using Attributes;
 using LinqKit;
-using Main.Application.Dtos.Organizations;
 using Main.Application.Dtos.Product;
-using Main.Entities.Organization;
 using Main.Entities.Product;
-using Main.Entities.Storage;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Projections;
+namespace Main.Application.Products;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Product, ProductDto>

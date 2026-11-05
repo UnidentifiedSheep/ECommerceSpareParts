@@ -1,6 +1,6 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Application.Static;
 using Main.Entities.Product;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Main.Application.Dtos.Product;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 
 namespace Main.Application.Products.Queries;
 

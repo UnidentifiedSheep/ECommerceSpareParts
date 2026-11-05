@@ -4,7 +4,7 @@ using Attributes;
 using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 
-namespace Main.Application.Projections;
+namespace Main.Application.Products;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductGroupDtoProjectionProvider : ProjectionProviderBase<ProductGroup, ProductGroupDto>

@@ -1,8 +1,8 @@
 using Application.Common.Interfaces.Events;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Enums;
 
-namespace Main.Application.Services.Products;
+namespace Main.Application.Products.Services;
 
 public sealed class ProductEventPublisher(IProductEventProvider provider, IIntegrationEventScope scope) : IProductEventPublisher
 {

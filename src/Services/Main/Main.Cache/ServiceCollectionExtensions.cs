@@ -1,5 +1,5 @@
 ﻿﻿﻿using Main.Application.Interfaces.Cache;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Main.Cache;

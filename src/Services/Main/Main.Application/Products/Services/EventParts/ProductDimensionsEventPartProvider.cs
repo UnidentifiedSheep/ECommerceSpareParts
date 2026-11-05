@@ -1,10 +1,10 @@
 using Contracts.Products;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using ProductEntity = Main.Entities.Product.Product;
 
-namespace Main.Application.Services.Products.EventParts;
+namespace Main.Application.Products.Services.EventParts;
 
 public sealed class ProductDimensionsEventPartProvider : IProductEventPartProvider
 {

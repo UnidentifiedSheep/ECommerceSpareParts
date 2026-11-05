@@ -1,7 +1,7 @@
 using Main.Enums;
 using ProductEntity = Main.Entities.Product.Product;
 
-namespace Main.Application.Interfaces.Products;
+namespace Main.Application.Products.Interfaces;
 
 public interface IProductEventPartProvider
 {

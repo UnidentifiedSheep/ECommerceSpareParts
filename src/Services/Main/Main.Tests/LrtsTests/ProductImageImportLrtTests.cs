@@ -1,8 +1,8 @@
 using Application.Common.Interfaces.Cache;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Interfaces.Products;
 using Main.Application.Lrts.ProductImageImport;
+using Main.Application.Products.Interfaces;
 using Main.Application.Static;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;

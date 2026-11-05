@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Main.Application.Dtos.Product;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using Microsoft.EntityFrameworkCore;

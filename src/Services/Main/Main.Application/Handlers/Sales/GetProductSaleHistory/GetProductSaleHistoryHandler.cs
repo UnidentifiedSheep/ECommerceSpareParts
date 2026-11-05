@@ -7,7 +7,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Main.Application.Dtos.Sale;
 using Main.Application.Extensions.QueryExtensions;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
 

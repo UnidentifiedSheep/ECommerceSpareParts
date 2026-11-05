@@ -1,7 +1,7 @@
 using Application.Common.Models;
 using Application.Common.Querying;
 using FluentAssertions;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Application.Products.Queries.GetProductCrosses;
 using Main.Entities.Storage;
 using Microsoft.Extensions.DependencyInjection;

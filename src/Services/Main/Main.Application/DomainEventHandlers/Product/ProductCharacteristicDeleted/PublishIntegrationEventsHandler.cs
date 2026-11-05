@@ -1,7 +1,7 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
 using Domain.Events;
-using Main.Application.Interfaces.Products;
+using Main.Application.Products.Interfaces;
 using Main.Entities.Product;
 using Main.Enums;
 

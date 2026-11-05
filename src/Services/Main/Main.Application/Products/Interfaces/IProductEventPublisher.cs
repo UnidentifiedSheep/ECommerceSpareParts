@@ -1,6 +1,6 @@
 using Main.Enums;
 
-namespace Main.Application.Interfaces.Products;
+namespace Main.Application.Products.Interfaces;
 
 public interface IProductEventPublisher
 {
