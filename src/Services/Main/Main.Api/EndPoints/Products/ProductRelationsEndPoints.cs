@@ -5,8 +5,9 @@ using Api.Common.Models.Requests;
 using Enums;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products;
-using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
+using Main.Application.Products.Queries;
+using Main.Application.Products.Queries.GetProductCrosses;
 using MediatR;
 
 namespace Main.Api.EndPoints.Products;

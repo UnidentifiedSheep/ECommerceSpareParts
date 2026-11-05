@@ -46,7 +46,7 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>
 
 	public void AddItem(OrderItem item)
 	{
-		if (Status != OrderStatus.Pending)
+		if (Status is not (OrderStatus.Pending or OrderStatus.Confirmed))
 			throw new InvalidOperationException($"Cannot add items to an order in '{Status}' status.");
 
 		if (item.OrderId != Id)

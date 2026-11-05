@@ -4,6 +4,7 @@ using Enums;
 using Main.Application.Dtos.Product.SupplierReferences;
 using Main.Application.Dtos.Product.References;
 using Main.Application.Handlers.Products;
+using Main.Application.Products.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

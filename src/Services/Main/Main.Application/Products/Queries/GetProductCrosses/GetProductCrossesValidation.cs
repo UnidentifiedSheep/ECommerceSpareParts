@@ -3,7 +3,7 @@ using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Products.GetProductCrosses;
+namespace Main.Application.Products.Queries.GetProductCrosses;
 
 public class GetProductCrossesValidation : AbstractValidator<GetProductCrossesQuery>
 {

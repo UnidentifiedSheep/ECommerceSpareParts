@@ -6,6 +6,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Handlers.Products.PatchProduct;
+using Main.Application.Products.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

@@ -13,6 +13,7 @@ using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models.Storage;
+using Main.Application.Products.Queries;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;

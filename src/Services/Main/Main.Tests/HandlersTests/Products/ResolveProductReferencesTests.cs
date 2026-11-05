@@ -2,6 +2,7 @@ using Enums;
 using FluentAssertions;
 using Main.Application.Dtos.Product.References;
 using Main.Application.Handlers.Products;
+using Main.Application.Products.Queries;
 using Main.Entities.Product.ValueObjects;
 using Tests.DataBuilders;
 using Tests.Extensions;

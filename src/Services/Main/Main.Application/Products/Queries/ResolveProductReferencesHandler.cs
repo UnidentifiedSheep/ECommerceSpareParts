@@ -4,7 +4,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Product.ValueObjects;
 
-namespace Main.Application.Handlers.Products;
+namespace Main.Application.Products.Queries;
 
 public record ResolveProductReferencesQuery(IReadOnlyCollection<ProductReferenceDto> References)
 	: IQuery<ResolveProductReferencesResult>;

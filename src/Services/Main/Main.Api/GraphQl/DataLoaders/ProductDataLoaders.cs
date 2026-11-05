@@ -10,6 +10,7 @@ using Main.Application.Handlers.Products;
 using Main.Application.Handlers.ProductSizes;
 using Main.Application.Handlers.ProductWeight;
 using Main.Application.Handlers.StorageContents.GetProductStorageContents;
+using Main.Application.Products.Queries;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

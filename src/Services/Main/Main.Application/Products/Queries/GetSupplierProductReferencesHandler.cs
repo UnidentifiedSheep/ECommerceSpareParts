@@ -5,7 +5,7 @@ using Main.Application.Dtos.Product.SupplierReferences;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Products;
+namespace Main.Application.Products.Queries;
 
 public record GetSupplierProductReferencesQuery(IReadOnlyCollection<int> ProductIds, Supplier Supplier)
 	: IQuery<GetSupplierProductReferencesResult>;

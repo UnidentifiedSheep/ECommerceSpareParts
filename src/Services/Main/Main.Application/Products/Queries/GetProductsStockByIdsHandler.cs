@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Repositories;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Products;
+namespace Main.Application.Products.Queries;
 
 public record GetProductsStockByIdsQuery : IQuery<GetProductsStockByIdsResult>
 {

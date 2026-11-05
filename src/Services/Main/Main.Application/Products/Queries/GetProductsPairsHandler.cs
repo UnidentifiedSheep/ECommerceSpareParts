@@ -6,7 +6,7 @@ using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Products;
+namespace Main.Application.Products.Queries;
 
 public record GetProductsPairsQuery : IQuery<GetProductsPairsResult>
 {

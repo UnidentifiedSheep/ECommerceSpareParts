@@ -1,15 +1,15 @@
-using Application.Common.Querying;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
+using Application.Common.Querying;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Products;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Products.GetProductCrosses;
+namespace Main.Application.Products.Queries.GetProductCrosses;
 
 public sealed record GetProductCrossesQuery(
 	int ProductId,

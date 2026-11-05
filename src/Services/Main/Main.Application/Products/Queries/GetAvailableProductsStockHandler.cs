@@ -5,7 +5,7 @@ using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Products;
+namespace Main.Application.Products.Queries;
 
 public record GetAvailableProductsStockQuery : IQuery<GetAvailableProductsStockResult>
 {

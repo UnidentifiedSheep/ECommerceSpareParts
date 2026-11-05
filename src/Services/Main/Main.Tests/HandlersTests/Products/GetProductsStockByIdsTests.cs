@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Main.Application.Handlers.Products;
+using Main.Application.Products.Queries;
 using Main.Entities.Storage;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
