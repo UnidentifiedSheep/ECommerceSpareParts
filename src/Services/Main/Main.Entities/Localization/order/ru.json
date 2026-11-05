@@ -1,0 +1,9 @@
+{
+  "culture": "ru",
+  "messages": {
+    "order.not.found": "Заказ не найден.",
+    "order.date.range.invalid": "Начальная дата не должна быть позже конечной.",
+    "order.filter.invalid": "Некорректное значение фильтра заказов.",
+    "order.read.access.denied": "Недостаточно прав для просмотра заказов."
+  }
+}

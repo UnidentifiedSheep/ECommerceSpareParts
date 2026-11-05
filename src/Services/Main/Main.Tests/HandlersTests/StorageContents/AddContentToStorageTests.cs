@@ -1,7 +1,6 @@
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Static;
-using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
@@ -196,8 +195,6 @@ public class AddContentToStorageTests : IntegrationTest
 			.Where(x => x.StorageCode == storage.Code)
 			.ToListAsync();
 
-		var events = await Context.Events.OfType<StorageMovementEvent>().ToListAsync();
-
 		foreach (var (productId, expectedTotal) in expectedTotals)
 			Assert.Equal(expectedTotal, stocks[productId]);
 
@@ -227,18 +224,6 @@ public class AddContentToStorageTests : IntegrationTest
 			Assert.NotNull(actual);
 			Assert.Equal(exp.Count, actual.Count);
 			Assert.Equal(storage.Code, actual.StorageCode);
-		}
-
-		Assert.Equal(dbStorageContents.Count, events.Count);
-		foreach (var sc in dbStorageContents)
-		{
-			var match = events.FirstOrDefault(m =>
-				m.Data.ProductId == sc.ProductId && m.Data.Count == sc.Count &&
-				m.Data.BuyPrice == sc.BuyPrice && m.Data.CurrencyId == sc.CurrencyId &&
-				m.Data.StorageCode == sc.StorageCode &&
-				m.Data.MovementType == StorageMovementType.StorageContentAddition);
-
-			Assert.NotNull(match);
 		}
 	}
 

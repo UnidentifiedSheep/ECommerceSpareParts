@@ -1,0 +1,9 @@
+{
+  "culture": "en",
+  "messages": {
+    "order.not.found": "Order was not found.",
+    "order.date.range.invalid": "The start date must not be after the end date.",
+    "order.filter.invalid": "Invalid order filter value.",
+    "order.read.access.denied": "You do not have permission to view orders."
+  }
+}

@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.History;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Persistence;
 using Attributes;
@@ -72,10 +73,12 @@ public sealed class ApplicationTransaction(IApplicationTransactionContext contex
 			return await action(Context, cancellationToken);
 		}
 
+		var historyContext = Context.GetRequiredService<IEntityHistoryContext>();
 		IsExecuting = true;
 		var handlers = _onException;
 		Task<TResult> ExecuteAttemptAsync()
 		{
+			historyContext.Clear();
 			_onException = handlers;
 			return ExecuteBoundaryAsync(action, cancellationToken);
 		}
@@ -97,6 +100,7 @@ public sealed class ApplicationTransaction(IApplicationTransactionContext contex
 		}
 		finally
 		{
+			historyContext.Clear();
 			_settings = null;
 			_onException = null;
 			IsExecuting = false;

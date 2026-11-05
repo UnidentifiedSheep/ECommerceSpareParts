@@ -2,7 +2,6 @@ using Tests.Extensions;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Sales;
-using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 using Main.Enums;
@@ -45,11 +44,6 @@ public class DeleteSaleTests : IntegrationTest
 			.Transactions
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == transactionId, CancellationToken);
-		var movement = await Context
-			.Events
-			.OfType<StorageMovementEvent>()
-			.AsNoTracking()
-			.SingleAsync(CancellationToken);
 
 		deletedSale.State.Should().Be(SaleState.Deleted);
 		storageContent.Count.Should().Be(storageCountBeforeDelete + soldCount);
@@ -57,9 +51,6 @@ public class DeleteSaleTests : IntegrationTest
 		transaction.IsReversed.Should().BeTrue();
 		transaction.IsReversalApplied.Should().BeTrue();
 		transaction.SourceType.Should().Be(TransactionSourceType.Sale);
-		movement.Data.ProductId.Should().Be(productId);
-		movement.Data.StorageCode.Should().Be(storageContent.StorageCode);
-		movement.Data.MovementType.Should().Be(StorageMovementType.SaleDeletion);
 	}
 
 	[Fact]
@@ -73,11 +64,6 @@ public class DeleteSaleTests : IntegrationTest
 
 		var storageCountAfterFirstDelete = await StorageContentCount(storageContentId);
 		var productStockAfterFirstDelete = await ProductStock(productId);
-		var movementsAfterFirstDelete = await Context
-			.Events
-			.OfType<StorageMovementEvent>()
-			.AsNoTracking()
-			.CountAsync(CancellationToken);
 
 		await Mediator.Send(new DeleteSaleCommand(sale.Id, sale.RowVersion), CancellationToken);
 
@@ -86,16 +72,10 @@ public class DeleteSaleTests : IntegrationTest
 			.Transactions
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
-		var movementsAfterSecondDelete = await Context
-			.Events
-			.OfType<StorageMovementEvent>()
-			.AsNoTracking()
-			.CountAsync(CancellationToken);
 
 		deletedSale.State.Should().Be(SaleState.Deleted);
 		(await StorageContentCount(storageContentId)).Should().Be(storageCountAfterFirstDelete);
 		(await ProductStock(productId)).Should().Be(productStockAfterFirstDelete);
-		movementsAfterSecondDelete.Should().Be(movementsAfterFirstDelete);
 		transaction.IsReversed.Should().BeTrue();
 		transaction.IsReversalApplied.Should().BeTrue();
 	}

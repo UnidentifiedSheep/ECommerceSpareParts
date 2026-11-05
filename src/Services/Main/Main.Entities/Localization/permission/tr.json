@@ -218,6 +218,20 @@
     "permissions.documents.me.name": "Kendi belgeleri",
     "permissions.documents.me.description": "Belge oluşturma isteği gönderme ve kendi isteklerine erişme izni.",
     "permissions.documents.all.name": "Tüm belgeler",
-    "permissions.documents.all.description": "Belge oluşturma isteği gönderme ve tüm kullanıcıların isteklerine erişme izni."
+    "permissions.documents.all.description": "Belge oluşturma isteği gönderme ve tüm kullanıcıların isteklerine erişme izni.",
+    "permissions.orders.get.name": "Tüm siparişleri görüntüleme",
+    "permissions.orders.get.description": "Tüm siparişleri ve kalemlerini görüntüleme izni.",
+    "permissions.orders.get.own.name": "Kendi siparişlerini görüntüleme",
+    "permissions.orders.get.own.description": "Geçerli kullanıcıya ait siparişleri ve kalemlerini görüntüleme izni.",
+    "permissions.orders.create.name": "Sipariş oluşturma",
+    "permissions.orders.create.description": "Sipariş oluşturma izni.",
+    "permissions.orders.edit.name": "Siparişleri düzenleme",
+    "permissions.orders.edit.description": "Sipariş kalemlerini ve miktarlarını değiştirme izni.",
+    "permissions.orders.price.edit.name": "Sipariş fiyatlarını elle belirleme",
+    "permissions.orders.price.edit.description": "Sipariş kalemlerinin fiyatlarını elle belirleme izni.",
+    "permissions.orders.confirm.name": "Siparişleri onaylama",
+    "permissions.orders.confirm.description": "Siparişleri onaylama izni.",
+    "permissions.orders.cancel.name": "Siparişleri iptal etme",
+    "permissions.orders.cancel.description": "Siparişleri iptal etme izni."
   }
 }

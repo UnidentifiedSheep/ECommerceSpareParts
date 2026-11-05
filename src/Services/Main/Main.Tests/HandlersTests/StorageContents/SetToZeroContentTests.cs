@@ -2,7 +2,6 @@ using Tests.Extensions;
 using FluentAssertions;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Entities.Exceptions;
-using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
@@ -28,7 +27,6 @@ public class SetToZeroContentTests : IntegrationTest
 	[Fact]
 	public async Task SetToZeroContent_WithValidData_Succeeds()
 	{
-		var eventsCount = await Context.Events.CountAsync(CancellationToken);
 		var content = TestContext.StorageContents.First();
 		var contentCount = content.Count;
 		var productCountBefore =
@@ -41,9 +39,6 @@ public class SetToZeroContentTests : IntegrationTest
 		var productCountAfter =
 			await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 
-		var currStorageMovements = await Context.Events.CountAsync(CancellationToken);
-
-		currStorageMovements.Should().Be(eventsCount + 1);
 		productCountBefore.Should().Be(productCountAfter + contentCount);
 	}
 }

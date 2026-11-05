@@ -43,6 +43,11 @@
     "lrt.price.candidate.calculation.storage.code.name": "Storage code",
     "lrt.price.candidate.calculation.storage.code.description": "Code of the storage for which price candidates should be calculated.",
     "lrt.invalidate.stale.price.options.name": "Update stale price options",
-    "lrt.invalidate.stale.price.options.description": "Updates stale price options."
+    "lrt.invalidate.stale.price.options.description": "Updates stale price options.",
+    "pricing.product.id.must.be.positive": "Product ID must be positive.",
+    "pricing.currency.id.must.be.positive": "Currency ID must be positive.",
+    "pricing.storage.code.invalid": "Storage code must contain between 1 and 128 characters.",
+    "pricing.quantity.must.be.positive": "Quantity must be positive.",
+    "pricing.sources.invalid": "Invalid price offer sources."
   }
 }

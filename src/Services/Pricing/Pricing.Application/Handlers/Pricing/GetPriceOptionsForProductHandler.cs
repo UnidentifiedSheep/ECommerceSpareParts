@@ -22,7 +22,7 @@ public record GetPriceOptionsForProductQuery(
 	int CurrencyId,
 	string StorageCode,
 	IReadOnlyCollection<PriceOfferSource> Sources,
-	Pagination Pagination,
+	Pagination? Pagination,
 	IReadOnlyCollection<SortExpression> SortBy) : IQuery<GetPriceOptionsForProductResult>;
 
 public record GetPriceOptionsForProductResult(IReadOnlyCollection<PriceOptionDto> PriceOptions);

@@ -3,7 +3,6 @@ using Exceptions;
 using FluentAssertions;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.EditSale;
-using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
@@ -61,11 +60,6 @@ public class EditSaleTests : IntegrationTest
 			.Transactions
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == editedSale.TransactionId, CancellationToken);
-		var movements = await Context
-			.Events
-			.OfType<StorageMovementEvent>()
-			.AsNoTracking()
-			.ToListAsync(CancellationToken);
 
 		editedSale.Comment.Should().Be(command.Comment);
 		editedSale.SaleDatetime.Should().BeCloseTo(newDate, TimeSpan.FromMilliseconds(1));
@@ -84,10 +78,6 @@ public class EditSaleTests : IntegrationTest
 		oldTransaction.IsReversalApplied.Should().BeTrue();
 		newTransaction.Amount.Should().Be(90m);
 		newTransaction.SourceType.Should().Be(TransactionSourceType.Sale);
-		movements
-			.Select(x => x.Data.MovementType)
-			.Should()
-			.BeEquivalentTo([StorageMovementType.SaleEditing, StorageMovementType.SaleEditing]);
 	}
 
 	[Fact]

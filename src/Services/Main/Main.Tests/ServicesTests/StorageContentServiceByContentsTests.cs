@@ -5,7 +5,6 @@ using Attributes;
 using Main.Application.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Main.Application.Models.Storage;
-using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
@@ -55,24 +54,6 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 
 		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
 		updatedProductStockQuantity.Should().Be(originalStock - countToSubtract);
-
-		var events = await Context
-			.Events
-			.OfType<StorageMovementEvent>()
-			.AsNoTracking()
-			.ToListAsync(CancellationToken);
-		events.Should().HaveCount(2);
-		events
-			.Should()
-			.Contain(x =>
-				x.Data.ProductId == product.Id && x.Data.StorageCode == passedContent.StorageCode &&
-				x.Data.Count == 0 && x.Data.MovementType == StorageMovementType.Sale);
-		events
-			.Should()
-			.Contain(x =>
-				x.Data.ProductId == product.Id && x.Data.StorageCode == passedContent.StorageCode &&
-				x.Data.Count == firstByDateOriginalCount - 1 &&
-				x.Data.MovementType == StorageMovementType.Sale);
 	}
 
 	[Fact]
@@ -184,22 +165,6 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 
 		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(first.ProductId, CancellationToken);
 		updatedProductStockQuantity.Should().Be(productStockQuantity - 2);
-
-		var events = await Context
-			.Events
-			.OfType<StorageMovementEvent>()
-			.AsNoTracking()
-			.ToListAsync(CancellationToken);
-		events.Should().HaveCount(2);
-		events
-			.Should()
-			.OnlyContain(x =>
-				x.Data.ProductId == first.ProductId && x.Data.StorageCode == first.StorageCode &&
-				x.Data.MovementType == StorageMovementType.PurchaseEditing);
-		events
-			.Select(x => x.Data.Count)
-			.Should()
-			.BeEquivalentTo([originalFirstCount - 1, originalSecondCount - 1]);
 	}
 
 	[Fact]
@@ -240,13 +205,6 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 		var actualProductStockQuantity = await Context.GetProductStockQuantityAsync(first.ProductId, CancellationToken);
 		actualCounts.Should().Equal(originalCounts);
 		actualProductStockQuantity.Should().Be(originalProductStockQuantity);
-
-		var events = await Context
-			.Events
-			.OfType<StorageMovementEvent>()
-			.AsNoTracking()
-			.ToListAsync(CancellationToken);
-		events.Should().BeEmpty();
 	}
 
 	[Fact]

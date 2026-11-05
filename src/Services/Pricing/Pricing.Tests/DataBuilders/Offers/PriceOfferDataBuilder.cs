@@ -15,6 +15,30 @@ public class PriceOfferDataBuilder(Faker faker) : BuilderBase<PriceOffer>(faker)
 
 	public DateTime ExpiresAt { get; private set; } = DateTime.UtcNow.AddDays(1);
 
+	public int AvailableQuantity { get; private set; } = faker.Random.Int(1, 100);
+
+	public PriceOfferSource Source { get; private set; } = PriceOfferSource.Armtek;
+
+	public DateTime OrderTill { get; private set; } = DateTime.UtcNow.AddHours(1);
+
+	public PriceOfferDataBuilder WithAvailableQuantity(int quantity)
+	{
+		AvailableQuantity = quantity;
+		return this;
+	}
+
+	public PriceOfferDataBuilder WithSource(PriceOfferSource source)
+	{
+		Source = source;
+		return this;
+	}
+
+	public PriceOfferDataBuilder WithOrderTill(DateTime orderTill)
+	{
+		OrderTill = orderTill;
+		return this;
+	}
+
 	public PriceOfferDataBuilder WithProductId(int productId)
 	{
 		ProductId = productId;
@@ -47,16 +71,16 @@ public class PriceOfferDataBuilder(Faker faker) : BuilderBase<PriceOffer>(faker)
 			CurrencyId,
 			StorageCode,
 			Faker.Random.Decimal(1m, 10_000m),
-			PriceOfferSource.Armtek,
+			Source,
 			$"offer-{Faker.Random.Guid():N}",
-			Faker.Random.Int(1, 100),
+			AvailableQuantity,
 			1,
 			1,
 			0,
 			now.AddDays(1),
 			now.AddDays(2),
 			95,
-			now.AddHours(1),
+			OrderTill,
 			ExpiresAt);
 	}
 }

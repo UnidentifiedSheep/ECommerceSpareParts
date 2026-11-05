@@ -1,0 +1,9 @@
+{
+  "culture": "tr",
+  "messages": {
+    "order.not.found": "Sipariş bulunamadı.",
+    "order.date.range.invalid": "Başlangıç tarihi bitiş tarihinden sonra olamaz.",
+    "order.filter.invalid": "Geçersiz sipariş filtresi değeri.",
+    "order.read.access.denied": "Siparişleri görüntüleme izniniz yok."
+  }
+}

@@ -18,6 +18,7 @@ public sealed class StorageContentTests
 		content.Take(3, StorageMovementType.Sale, DateTime.UtcNow);
 
 		content.Count.Should().Be(7);
+		content.Metadata.LastMovementType.Should().Be(StorageMovementType.Sale);
 		var movement = content.FlushDomainEvents().Should().ContainSingle().Which
 			.Should().BeOfType<StorageContentCountUpdatedDomainEvent>().Subject;
 		movement.Delta.Should().Be(-3);
@@ -34,6 +35,7 @@ public sealed class StorageContentTests
 
 		take.Should().Throw<NotEnoughCountOnStorageException>();
 		content.Count.Should().Be(10);
+		content.Metadata.LastMovementType.Should().Be(StorageMovementType.StorageContentAddition);
 		content.FlushDomainEvents().Should().BeEmpty();
 	}
 
@@ -48,7 +50,39 @@ public sealed class StorageContentTests
 
 		take.Should().Throw<InvalidOperationException>();
 		content.Count.Should().Be(10);
+		content.Metadata.LastMovementType.Should().Be(StorageMovementType.StorageContentAddition);
 		content.FlushDomainEvents().Should().BeEmpty();
+	}
+
+	[Fact]
+	public void SetCount_UnchangedQuantityPreservesLastMovementType()
+	{
+		var content = NewContent();
+
+		content.SetCount(content.Count, StorageMovementType.Sale);
+
+		content.Metadata.LastMovementType.Should().Be(StorageMovementType.StorageContentAddition);
+		content.FlushDomainEvents().Should().BeEmpty();
+	}
+
+	[Fact]
+	public void IncreaseCount_UpdatesLastMovementTypeEvenWhenItMatchesPreviousMovement()
+	{
+		var content = NewContent();
+
+		content.IncreaseCount(2, StorageMovementType.Purchase);
+		content.IncreaseCount(3, StorageMovementType.Purchase);
+
+		content.Count.Should().Be(15);
+		content.Metadata.LastMovementType.Should().Be(StorageMovementType.Purchase);
+	}
+
+	[Fact]
+	public void Create_WithoutMovementsHasNoLastMovementType()
+	{
+		var content = new StorageContentBuilder(new Faker()).WithCount(0).Build();
+
+		content.Metadata.LastMovementType.Should().BeNull();
 	}
 
 	private static StorageContent NewContent()
