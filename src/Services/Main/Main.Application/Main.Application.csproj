@@ -24,9 +24,7 @@
         <Folder Include="Analytics\Interfaces\" />
         <Folder Include="Handlers\Auth\RemoveRoleFromUser\"/>
         <Folder Include="Handlers\Logistics\"/>
-        <Folder Include="Handlers\ProductEans\" />
-        <Folder Include="Handlers\ProductGroups\GetProductGroups\" />
-        <Folder Include="Handlers\Products\" />
+        <Folder Include="Products\Services\" />
     </ItemGroup>
 
     <ItemGroup>

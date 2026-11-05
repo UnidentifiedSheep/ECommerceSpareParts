@@ -1,10 +1,10 @@
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductContent;
-using Main.Application.Handlers.ProductContent.AddProductContent;
-using Main.Application.Handlers.ProductContent.RemoveProductContent;
-using Main.Application.Handlers.ProductContent.SetProductContentQuantity;
+using Main.Application.Products.Commands.AddProductContent;
+using Main.Application.Products.Commands.RemoveProductContent;
+using Main.Application.Products.Commands.SetProductContentQuantity;
+using Main.Application.Products.Queries;
 using MediatR;
 
 namespace Main.Api.EndPoints.Products;

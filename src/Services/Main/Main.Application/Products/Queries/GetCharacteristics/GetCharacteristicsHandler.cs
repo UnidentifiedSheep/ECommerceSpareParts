@@ -1,0 +1,36 @@
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
+using Application.Common.Interfaces.Repositories;
+using Application.Common.Models;
+using Main.Application.Dtos.Product;
+using Main.Entities.Product;
+using Microsoft.EntityFrameworkCore;
+
+namespace Main.Application.Products.Queries.GetCharacteristics;
+
+public record GetCharacteristicsQuery(int ProductId, Pagination Pagination)
+	: IQuery<GetCharacteristicsResult>;
+
+public record GetCharacteristicsResult(IReadOnlyList<ProductCharacteristicDto> Characteristics);
+
+public class GetCharacteristicsHandler(
+	IReadRepository<ProductCharacteristic, (int, int)> repository,
+	IProjectionProvider<ProductCharacteristic, ProductCharacteristicDto> projection)
+	: IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
+{
+	public async Task<GetCharacteristicsResult> Handle(
+		GetCharacteristicsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var result = await repository
+			.Query
+			.Where(x => x.ProductId == request.ProductId)
+			.OrderBy(x => x.CharacteristicId)
+			.Project(projection)
+			.ApplyPagination(request.Pagination)
+			.ToListAsync(cancellationToken);
+
+		return new GetCharacteristicsResult(result);
+	}
+}

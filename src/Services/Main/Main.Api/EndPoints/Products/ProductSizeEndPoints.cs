@@ -2,8 +2,9 @@ using Api.Common.Extensions;
 using Enums;
 using Enums.Units;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductSizes;
-using Main.Application.Handlers.ProductSizes.SetProductSizes;
+using Main.Application.Products.Commands;
+using Main.Application.Products.Commands.SetProductSizes;
+using Main.Application.Products.Queries;
 using MediatR;
 
 namespace Main.Api.EndPoints.Products;

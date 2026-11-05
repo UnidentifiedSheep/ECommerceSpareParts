@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProductGroups.UpsertProductGroup;
+using Main.Application.Products.Commands.UpsertProductGroup;
 using Main.Entities;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;

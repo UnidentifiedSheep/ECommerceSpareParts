@@ -2,14 +2,9 @@ using GreenDonut;
 using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Characteristics;
-using Main.Application.Handlers.ProductCharacteristics;
-using Main.Application.Handlers.ProductGroups;
-using Main.Application.Handlers.ProductContent;
-using Main.Application.Handlers.ProductEans.GetProductsEans;
-using Main.Application.Handlers.ProductSizes;
-using Main.Application.Handlers.ProductWeight;
 using Main.Application.Handlers.StorageContents.GetProductStorageContents;
 using Main.Application.Products.Queries;
+using Main.Application.Products.Queries.GetProductsEans;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

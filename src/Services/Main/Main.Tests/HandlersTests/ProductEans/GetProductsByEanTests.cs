@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.ProductEans.GetProductsByEan;
+using Main.Application.Products.Queries.GetProductsByEan;
 using Main.Entities.Product;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProductEans.GetProductsEans;
+using Main.Application.Products.Queries.GetProductsEans;
 using Main.Entities.Product;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

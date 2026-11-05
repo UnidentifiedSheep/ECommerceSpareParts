@@ -2,7 +2,7 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using FluentAssertions;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductCharacteristics.UpsertCharacteristics;
+using Main.Application.Products.Commands.UpsertCharacteristics;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Moq;

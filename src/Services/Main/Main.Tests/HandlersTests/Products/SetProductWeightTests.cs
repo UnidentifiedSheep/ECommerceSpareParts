@@ -1,6 +1,6 @@
 using Enums.Units;
 using FluentAssertions;
-using Main.Application.Handlers.ProductWeight.SetProductWeight;
+using Main.Application.Products.Commands.SetProductWeight;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;

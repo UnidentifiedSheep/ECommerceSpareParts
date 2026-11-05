@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProductEans.DeleteProductEan;
+using Main.Application.Products.Commands.DeleteProductEan;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;

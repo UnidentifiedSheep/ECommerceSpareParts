@@ -4,7 +4,7 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductGroups.GetProductGroups;
+using Main.Application.Products.Queries.GetProductGroups;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

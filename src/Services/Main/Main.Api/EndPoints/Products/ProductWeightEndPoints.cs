@@ -2,8 +2,9 @@ using Api.Common.Extensions;
 using Enums;
 using Enums.Units;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductWeight;
-using Main.Application.Handlers.ProductWeight.SetProductWeight;
+using Main.Application.Products.Commands;
+using Main.Application.Products.Commands.SetProductWeight;
+using Main.Application.Products.Queries;
 using MediatR;
 
 namespace Main.Api.EndPoints.Products;

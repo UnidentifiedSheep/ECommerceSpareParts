@@ -7,8 +7,8 @@ using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Product.References;
-using Main.Application.Handlers.ProductEans.GetProductsByEan;
 using Main.Application.Products.Queries;
+using Main.Application.Products.Queries.GetProductsByEan;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProductEans.CreateProductEan;
+using Main.Application.Products.Commands.CreateProductEan;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
