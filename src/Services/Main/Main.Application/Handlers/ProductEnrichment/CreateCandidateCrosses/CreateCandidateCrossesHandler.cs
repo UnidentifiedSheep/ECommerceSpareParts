@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
+using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
 using Main.Entities.Exceptions;
 using Main.Enums.Products;
 using MediatR;

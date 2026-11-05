@@ -8,7 +8,6 @@ using Attributes;
 using FluentAssertions;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
-using Main.Application.Handlers.Products;
 using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Application.Interfaces.Services;

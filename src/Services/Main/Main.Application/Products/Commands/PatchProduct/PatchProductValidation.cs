@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Products.PatchProduct;
+namespace Main.Application.Products.Commands.PatchProduct;
 
 public class PatchProductValidation : AbstractValidator<PatchProductCommand>
 {

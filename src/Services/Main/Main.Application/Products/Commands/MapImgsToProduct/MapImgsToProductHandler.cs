@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
 
-namespace Main.Application.Handlers.Products.MapImgsToProduct;
+namespace Main.Application.Products.Commands.MapImgsToProduct;
 
 [AutoSave]
 [Transactional]

@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Products.CreateProducts;
+namespace Main.Application.Products.Commands.CreateProducts;
 
 public class CreateProductsValidation : AbstractValidator<CreateProductsCommand>
 {

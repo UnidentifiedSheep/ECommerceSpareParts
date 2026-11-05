@@ -26,7 +26,7 @@
         <Folder Include="Handlers\Logistics\"/>
         <Folder Include="Handlers\ProductEans\" />
         <Folder Include="Handlers\ProductGroups\GetProductGroups\" />
-        <Folder Include="Products\Commands\" />
+        <Folder Include="Handlers\Products\" />
     </ItemGroup>
 
     <ItemGroup>

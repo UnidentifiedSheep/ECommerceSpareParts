@@ -6,7 +6,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
 using MediatR;
 
-namespace Main.Application.Handlers.Products.PatchProduct;
+namespace Main.Application.Products.Commands.PatchProduct;
 
 [Transactional]
 [AutoSave]

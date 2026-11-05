@@ -10,7 +10,7 @@ using Main.Entities.Product;
 using Main.Enums.Products;
 using MediatR;
 
-namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
+namespace Main.Application.Products.Commands.MakeLinkageBetweenArticles;
 
 [AutoSave]
 [Transactional]

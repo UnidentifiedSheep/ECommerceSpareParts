@@ -10,7 +10,7 @@ using Main.Entities.Product;
 using Main.Entities.Product.Enrichment;
 using MediatR;
 
-namespace Main.Application.Handlers.Products;
+namespace Main.Application.Products.Commands;
 
 [Transactional(IsolationLevel.Serializable, 30, 3), AutoSave]
 public record DeleteProductCommand(int ProductId, uint RowVersion) : ICommand;

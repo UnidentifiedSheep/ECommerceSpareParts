@@ -8,7 +8,7 @@ using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 
-namespace Main.Application.Handlers.Products.CreateProducts;
+namespace Main.Application.Products.Commands.CreateProducts;
 
 [AutoSave]
 [Transactional]

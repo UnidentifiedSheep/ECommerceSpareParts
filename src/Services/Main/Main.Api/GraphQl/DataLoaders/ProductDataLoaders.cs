@@ -6,7 +6,6 @@ using Main.Application.Handlers.ProductCharacteristics;
 using Main.Application.Handlers.ProductGroups;
 using Main.Application.Handlers.ProductContent;
 using Main.Application.Handlers.ProductEans.GetProductsEans;
-using Main.Application.Handlers.Products;
 using Main.Application.Handlers.ProductSizes;
 using Main.Application.Handlers.ProductWeight;
 using Main.Application.Handlers.StorageContents.GetProductStorageContents;

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
+using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
 using Main.Entities.Product;
 using Main.Enums.Products;
 using Microsoft.EntityFrameworkCore;

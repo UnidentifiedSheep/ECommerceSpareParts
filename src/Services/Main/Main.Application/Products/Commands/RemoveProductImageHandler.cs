@@ -8,7 +8,7 @@ using Main.Entities.Product;
 using MediatR;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Handlers.Products;
+namespace Main.Application.Products.Commands;
 
 [Transactional]
 [AutoSave]

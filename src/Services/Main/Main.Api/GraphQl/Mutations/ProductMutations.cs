@@ -3,9 +3,9 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Handlers.Products;
-using Main.Application.Handlers.Products.CreateProducts;
-using Main.Application.Handlers.Products.PatchProduct;
+using Main.Application.Products.Commands;
+using Main.Application.Products.Commands.CreateProducts;
+using Main.Application.Products.Commands.PatchProduct;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

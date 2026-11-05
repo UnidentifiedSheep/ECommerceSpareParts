@@ -7,7 +7,6 @@ using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Product.References;
-using Main.Application.Handlers.Products;
 using Main.Application.Handlers.ProductEans.GetProductsByEan;
 using Main.Application.Products.Queries;
 using MediatR;
