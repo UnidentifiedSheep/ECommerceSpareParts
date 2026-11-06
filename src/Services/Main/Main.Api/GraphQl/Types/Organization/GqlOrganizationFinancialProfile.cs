@@ -1,7 +1,7 @@
 using HotChocolate;
 using Main.Application.Dtos.Balances;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Organization;
 
 [GraphQLName("OrganizationFinancialProfile")]
 public sealed record GqlOrganizationFinancialProfile(

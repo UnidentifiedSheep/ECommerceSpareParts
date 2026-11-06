@@ -2,7 +2,7 @@ using HotChocolate;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Purchase;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Purchase;
 
 [GraphQLName("PurchaseContent")]
 public sealed record GqlPurchaseContent([property: GraphQLIgnore] PurchaseContentDto Content)

@@ -1,7 +1,7 @@
 using HotChocolate;
 using Main.Application.Dtos.Sale;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Sale;
 
 [GraphQLName("SaleContentDetail")]
 public sealed record GqlSaleContentDetail([property: GraphQLIgnore] SaleContentDetailDto Detail)

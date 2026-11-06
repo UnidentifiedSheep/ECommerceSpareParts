@@ -1,13 +1,12 @@
-using Enums;
-using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.User;
 using Main.Application.Orders.Dtos;
 using Main.Entities.Exceptions;
 using Main.Enums.Orders;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Order;
 
 [GraphQLName("Order")]
 public sealed record GqlOrder
@@ -91,6 +90,12 @@ public sealed record GqlOrder
 		IOrderByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
 		(await GetOrderAsync(loader, cancellationToken)).UpdatedAt;
+
+	[GraphQLName("rowVersion")]
+	public async Task<uint> GetRowVersionAsync(
+		IOrderByIdDataLoader loader,
+		CancellationToken cancellationToken) =>
+		(await GetOrderAsync(loader, cancellationToken)).RowVersion;
 
 	[GraphQLName("items")]
 	public async Task<IReadOnlyList<GqlOrderItem>> GetItemsAsync(

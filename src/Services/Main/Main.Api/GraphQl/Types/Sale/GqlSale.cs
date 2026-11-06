@@ -2,12 +2,13 @@ using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.User;
 using Main.Application.Dtos.Sale;
 using Main.Entities.Exceptions;
 using Main.Enums;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Sale;
 
 [GraphQLName("Sale")]
 public sealed record GqlSale

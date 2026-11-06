@@ -3,7 +3,7 @@ using Main.Api.GraphQl.Types.User;
 using Main.Application.Dtos.Organizations;
 using Main.Enums.Organization;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Organization;
 
 [GraphQLName("OrganizationMember")]
 public sealed record GqlOrganizationMember(

@@ -1,4 +1,5 @@
 using HotChocolate;
+using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.Product;
 using Main.Api.GraphQl.Types.User;
 using Main.Application.Dtos.Sale;

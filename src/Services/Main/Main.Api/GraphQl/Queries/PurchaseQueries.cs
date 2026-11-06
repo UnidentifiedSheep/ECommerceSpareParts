@@ -7,6 +7,7 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Purchase;
+using Main.Api.GraphQl.Types.Purchase;
 using Main.Application.Handlers.Purchases.GetPurchase;
 using Main.Application.Handlers.Purchases.GetPurchases;
 using MediatR;

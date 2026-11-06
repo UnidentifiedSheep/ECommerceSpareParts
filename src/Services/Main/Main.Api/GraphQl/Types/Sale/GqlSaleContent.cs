@@ -5,7 +5,7 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Sale;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Sale;
 
 [GraphQLName("SaleContent")]
 public sealed record GqlSaleContent([property: GraphQLIgnore] SaleContentDto Content)

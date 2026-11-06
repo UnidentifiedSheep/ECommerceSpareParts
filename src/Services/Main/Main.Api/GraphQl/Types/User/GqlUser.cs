@@ -6,6 +6,7 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Auth;
 using Main.Api.GraphQl.Types.Inputs.User;
+using Main.Api.GraphQl.Types.Organization;
 using Main.Application.Handlers.Organizations.GetOrganizations;
 using MediatR;
 using Main.Application.Dtos.Users;

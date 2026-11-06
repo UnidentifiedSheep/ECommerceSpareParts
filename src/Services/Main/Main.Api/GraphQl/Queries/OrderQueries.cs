@@ -8,6 +8,7 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.Types.Inputs.Order;
 using MediatR;
 using HotChocolate;
+using Main.Api.GraphQl.Types.Order;
 using Main.Application.Orders.Dtos;
 using Main.Application.Orders.Queries.GetOrders;
 

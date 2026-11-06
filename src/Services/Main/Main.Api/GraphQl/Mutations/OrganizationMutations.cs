@@ -3,6 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Organization;
+using Main.Api.GraphQl.Types.Organization;
 using Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 using Main.Application.Handlers.Organizations.AddOrganizationMember;
 using Main.Application.Handlers.Organizations.ChangeOrganizationMemberRole;

@@ -1,20 +1,19 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.User;
 using Main.Application.Dtos.Organizations;
-using Main.Api.GraphQl.Types.Inputs.Organization;
-using Main.Application.Handlers.Organizations.GetOrganizationMembers;
 using Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
 using Main.Application.Handlers.Balance.GetTransactions;
-using MediatR;
+using Main.Application.Handlers.Organizations.GetOrganizationMembers;
 using Main.Entities.Exceptions;
 using Main.Enums.Organization;
+using MediatR;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Organization;
 
 [GraphQLName("Organization")]
 public sealed record GqlOrganization

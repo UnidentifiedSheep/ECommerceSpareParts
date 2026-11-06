@@ -4,7 +4,7 @@ using HotChocolate;
 using Main.Application.Dtos.Purchase;
 using Main.Enums;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Purchase;
 
 [GraphQLName("PurchaseLogistic")]
 public sealed record GqlPurchaseLogistic(

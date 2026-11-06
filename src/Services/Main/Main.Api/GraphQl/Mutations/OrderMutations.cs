@@ -4,6 +4,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Order;
+using Main.Api.GraphQl.Types.Order;
 using Main.Application.Orders.Commands.ChangeOrderStatus;
 using Main.Application.Orders.Commands.UpsertOrder;
 using Main.Enums.Orders;

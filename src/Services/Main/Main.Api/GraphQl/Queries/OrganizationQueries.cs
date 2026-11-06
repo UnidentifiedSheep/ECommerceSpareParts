@@ -6,6 +6,7 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Organization;
+using Main.Api.GraphQl.Types.Organization;
 using Main.Application.Handlers.Organizations;
 using Main.Application.Handlers.Organizations.GetOrganizations;
 using MediatR;

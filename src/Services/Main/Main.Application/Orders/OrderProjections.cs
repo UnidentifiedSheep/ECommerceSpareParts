@@ -4,7 +4,7 @@ using Attributes;
 using Main.Application.Orders.Dtos;
 using Main.Entities.Order;
 
-namespace Main.Application.Projections;
+namespace Main.Application.Orders;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class OrderDtoProjectionProvider : ProjectionProviderBase<Order, OrderDto>
@@ -17,6 +17,7 @@ public sealed class OrderDtoProjectionProvider : ProjectionProviderBase<Order, O
 		CurrencyId = order.CurrencyId,
 		Source = order.Source,
 		Status = order.Status,
+		RowVersion = order.RowVersion,
 		FulfillmentStatus = order.FulfillmentStatus,
 		ConfirmedByUserId = order.ConfirmedByUserId,
 		ConfirmedAt = order.ConfirmedAt,

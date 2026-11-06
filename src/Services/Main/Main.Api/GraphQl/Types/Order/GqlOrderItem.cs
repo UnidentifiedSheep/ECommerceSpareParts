@@ -3,7 +3,7 @@ using Main.Api.GraphQl.Types.Product;
 using Main.Application.Orders.Dtos;
 using Main.Enums.Orders;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Order;
 
 [GraphQLName("OrderItem")]
 public sealed record GqlOrderItem([property: GraphQLIgnore] OrderItemDto Dto)

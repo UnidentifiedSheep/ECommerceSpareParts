@@ -1,7 +1,7 @@
 using HotChocolate;
 using Main.Application.Dtos.Purchase;
 
-namespace Main.Api.GraphQl.Types;
+namespace Main.Api.GraphQl.Types.Purchase;
 
 [GraphQLName("PurchaseContentLogistic")]
 public sealed record GqlPurchaseContentLogistic(

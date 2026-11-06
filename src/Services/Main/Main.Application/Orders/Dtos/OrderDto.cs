@@ -40,4 +40,7 @@ public sealed record OrderDto
 
 	[JsonPropertyName("updatedAt")]
 	public required DateTime UpdatedAt { get; init; }
+
+	[JsonPropertyName("rowVersion")]
+	public required uint RowVersion { get; init; }
 }
