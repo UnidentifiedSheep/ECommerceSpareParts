@@ -44,6 +44,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
 
 		builder.Property(e => e.UserId).HasColumnName("user_id");
 
+		builder.Property(e => e.RowVersion).HasColumnName("xmin").IsRowVersion();
+
 		builder
 			.HasOne<Entities.Organization.Organization>()
 			.WithMany()

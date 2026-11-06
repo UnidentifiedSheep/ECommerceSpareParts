@@ -2,13 +2,13 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Orders;
-using Main.Application.Extensions.Entities;
-using Security.Core.Interfaces;
+using Main.Application.Orders.Dtos;
+using Main.Application.Orders.Extensions;
 using Main.Entities.Order;
 using Microsoft.EntityFrameworkCore;
+using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Orders;
+namespace Main.Application.Orders.Queries;
 
 public sealed record GetOrdersByIdsQuery : IQuery<GetOrdersByIdsResult>
 {

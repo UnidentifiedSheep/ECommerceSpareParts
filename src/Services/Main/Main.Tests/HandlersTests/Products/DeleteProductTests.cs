@@ -282,7 +282,7 @@ public class DeleteProductTests : IntegrationTest
 				break;
 			case ProductDeletionBlocker.Order:
 				var order = Order.CreateManual(UserId, UserId, CurrencyId);
-				order.AddItem(OrderItem.Create(order, Product.Id, 1));
+				order.AddItem(Product.Id, 1);
 				await Context.AddAsync(order, CancellationToken);
 				break;
 			case ProductDeletionBlocker.Sale:

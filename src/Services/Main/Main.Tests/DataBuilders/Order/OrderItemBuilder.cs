@@ -41,7 +41,7 @@ public sealed class OrderItemBuilder(Faker faker) : BuilderBase<OrderItem>(faker
 
 	public override OrderItem Build()
 	{
-		var item = OrderItem.Create(Order, ProductId, Count);
+		var item = OrderItem.Create(Order.Id, ProductId, Count);
 		if (UnitPrice.HasValue)
 			item.AssignPrice(null, UnitPrice.Value, PriceOrigin);
 		return item;

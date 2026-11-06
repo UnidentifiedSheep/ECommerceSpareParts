@@ -4,6 +4,12 @@
     "order.not.found": "Order was not found.",
     "order.date.range.invalid": "The start date must not be after the end date.",
     "order.filter.invalid": "Invalid order filter value.",
-    "order.read.access.denied": "You do not have permission to view orders."
+    "order.read.access.denied": "You do not have permission to view orders.",
+    "order.input.invalid": "Invalid order input.",
+    "order.items.invalid": "Order items must not be empty or contain duplicate item IDs.",
+    "order.item.invalid": "Invalid order item.",
+    "order.item.not.found": "The item does not belong to this order.",
+    "order.change.not.allowed": "This operation is not allowed in the current order status.",
+    "order.row.version.required": "The order version is required for updates."
   }
 }

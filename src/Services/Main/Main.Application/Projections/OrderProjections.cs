@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using Main.Application.Dtos.Orders;
+using Main.Application.Orders.Dtos;
 using Main.Entities.Order;
 
 namespace Main.Application.Projections;

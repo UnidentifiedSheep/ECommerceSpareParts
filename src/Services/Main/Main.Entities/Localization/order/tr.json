@@ -4,6 +4,12 @@
     "order.not.found": "Sipariş bulunamadı.",
     "order.date.range.invalid": "Başlangıç tarihi bitiş tarihinden sonra olamaz.",
     "order.filter.invalid": "Geçersiz sipariş filtresi değeri.",
-    "order.read.access.denied": "Siparişleri görüntüleme izniniz yok."
+    "order.read.access.denied": "Siparişleri görüntüleme izniniz yok.",
+    "order.input.invalid": "Geçersiz sipariş verisi.",
+    "order.items.invalid": "Sipariş kalemleri boş olamaz veya yinelenen kimlikler içeremez.",
+    "order.item.invalid": "Geçersiz sipariş kalemi.",
+    "order.item.not.found": "Kalem bu siparişe ait değil.",
+    "order.change.not.allowed": "Bu işlem mevcut sipariş durumunda kullanılamaz.",
+    "order.row.version.required": "Güncelleme için sipariş sürümü gereklidir."
   }
 }

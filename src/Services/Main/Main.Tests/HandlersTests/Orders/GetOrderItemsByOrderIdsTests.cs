@@ -1,11 +1,11 @@
 using FluentAssertions;
 using Enums;
+using Main.Application.Orders.Queries;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;
 using Tests.Stubs;
-using Main.Application.Handlers.Orders;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Order;
 

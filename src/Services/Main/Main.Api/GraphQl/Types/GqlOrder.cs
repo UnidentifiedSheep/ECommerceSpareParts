@@ -3,7 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Dtos.Orders;
+using Main.Application.Orders.Dtos;
 using Main.Entities.Exceptions;
 using Main.Enums.Orders;
 

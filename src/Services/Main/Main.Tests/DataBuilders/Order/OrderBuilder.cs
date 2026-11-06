@@ -51,7 +51,10 @@ public sealed class OrderBuilder(Faker faker) : BuilderBase<DomainOrder>(faker)
 			? DomainOrder.CreateOnline(OrganizationId, UserId!.Value, CurrencyId)
 			: DomainOrder.CreateManual(OrganizationId, UserId, CurrencyId);
 		foreach (var item in _items)
-			order.AddItem(item.WithOrder(order).Build());
+			{
+			var built = item.WithOrder(order).Build();
+			order.AddItem(built.ProductId, built.Count).AssignPrice(built.SignedPrice, built.UnitPrice, built.PriceOrigin);
+		}
 		return order;
 	}
 }

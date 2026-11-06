@@ -4,7 +4,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Order;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Extensions.Entities;
+namespace Main.Application.Orders.Extensions;
 
 public static class OrderExtensions
 {

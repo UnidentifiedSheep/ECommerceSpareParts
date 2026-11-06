@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+using Exceptions;
+using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
@@ -20,29 +21,35 @@ public class OrderItem : Entity<OrderItem, int>, ILinqEntity<OrderItem, int>
 
 	private OrderItem() {}
 
-	private OrderItem(Order order, int productId, int count)
+	private OrderItem(Guid orderId, int productId, int count)
 	{
-		OrderId = order.Id;
-		ProductId = productId;
-		Count = count;
+		OrderId = orderId;
+		SetProductId(productId);
+		SetCount(count);
 	}
 
-	public static OrderItem Create(Order order, int productId, int count)
-		=> new(order, productId, count);
+	internal static OrderItem Create(Guid orderId, int productId, int count)
+		=> new(orderId, productId, count);
 
-	public void AssignPrice(string? signedPrice, decimal unitPrice, PriceOrigin priceOrigin)
+	internal void AssignPrice(string? signedPrice, decimal? unitPrice, PriceOrigin priceOrigin)
 	{
 		SignedPrice = signedPrice.TrimSafe();
 
-		UnitPrice = unitPrice
-			.EnsureMaxDecimalPlaces(
-				maxDecimals: 2,
-				exceptionFactory: () => new InvalidOperationException("Price must have maximum 2 decimal places."))
-			.EnsureGreaterThan(
-				min: 0,
-				exceptionFactory: () => new InvalidOperationException("Price must be greater than zero."));
+		UnitPrice = unitPrice?
+			.EnsureMaxDecimalPlaces(2, OrderItemInvalidMessage.Instance)
+			.EnsureGreaterThan(0, OrderItemInvalidMessage.Instance);
 
 		PriceOrigin = priceOrigin;
+	}
+
+	internal void SetCount(int count)
+	{
+		Count = count.EnsureGreaterThan(0, OrderItemInvalidMessage.Instance);
+	}
+
+	internal void SetProductId(int productId)
+	{
+		ProductId = productId.EnsureGreaterThan(0, OrderItemInvalidMessage.Instance);
 	}
 
 	public override int GetId() => Id;

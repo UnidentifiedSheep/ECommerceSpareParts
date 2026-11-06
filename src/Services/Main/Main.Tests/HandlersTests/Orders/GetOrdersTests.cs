@@ -4,7 +4,7 @@ using Enums;
 using Exceptions;
 using FluentAssertions;
 using FluentValidation;
-using Main.Application.Handlers.Orders.GetOrders;
+using Main.Application.Orders.Queries.GetOrders;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Enums.Orders;

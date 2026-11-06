@@ -4,8 +4,8 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Orders;
-using Main.Application.Extensions.Entities;
+using Main.Application.Orders.Dtos;
+using Main.Application.Orders.Extensions;
 using Main.Entities.Order;
 using Main.Entities.Organization;
 using Main.Entities.Product;
@@ -15,7 +15,7 @@ using Main.Enums.Orders;
 using Microsoft.EntityFrameworkCore;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Orders.GetOrders;
+namespace Main.Application.Orders.Queries.GetOrders;
 
 public sealed record GetOrdersQuery(
 	RangeModel<DateTime> DateRange,

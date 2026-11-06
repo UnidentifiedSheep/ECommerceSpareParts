@@ -4,12 +4,12 @@ using GraphQL.Common.Attributes;
 using GraphQL.Common.Extensions;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Application.Dtos.Orders;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.Types.Inputs.Order;
-using Main.Application.Handlers.Orders.GetOrders;
 using MediatR;
 using HotChocolate;
+using Main.Application.Orders.Dtos;
+using Main.Application.Orders.Queries.GetOrders;
 
 namespace Main.Api.GraphQl.Queries;
 
