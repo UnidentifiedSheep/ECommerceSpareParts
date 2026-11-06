@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Static;
@@ -22,60 +24,6 @@ public class AddContentToStorageTests : IntegrationTest
 		RegisterBasicContext<ProductTestContext>();
 		RegisterBasicContext<CurrencyRatesTestContext>();
 		RegisterBasicContext<StorageTestContext>();
-	}
-
-	[Fact]
-	public async Task AddContentToStorage_WithEmptyContentList_ThrowsValidationException()
-	{
-		var storage = GetContext<StorageTestContext>().Storages.First();
-		var command = new AddContentCommand(
-			[],
-			storage.Code,
-			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(-1)]
-	[InlineData(0.0001)]
-	[InlineData(0.001)]
-	[InlineData(0)]
-	public async Task AddContentToStorage_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(
-		decimal price)
-	{
-		var storage = GetContext<StorageTestContext>().Storages.First();
-		var storageContent = GetNewStorageContents(3);
-		storageContent[^1] = storageContent[^1] with
-		{
-			BuyPrice = price
-		};
-		var command = new AddContentCommand(
-			storageContent,
-			storage.Code,
-			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(0)]
-	[InlineData(-1)]
-	public async Task
-		AddContentToStorage_WithInvalidItemCount_ThrowsStorageContentCountCantBeNegativeException(int count)
-	{
-		var storage = GetContext<StorageTestContext>().Storages.First();
-		var storageContent = GetNewStorageContents(3);
-		storageContent[^1] = storageContent[^1] with
-		{
-			Count = count
-		};
-		var command = new AddContentCommand(
-			storageContent,
-			storage.Code,
-			StorageMovementType.StorageContentAddition);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -248,5 +196,76 @@ public class AddContentToStorageTests : IntegrationTest
 				PurchaseDate = x.PurchaseDatetime
 			})
 			.ToList();
+	}
+}
+
+public class AddContentValidationTests : ValidationTest<AddContentValidation, AddContentCommand>
+{
+	protected override AddContentValidation CreateValidator()
+	{
+		var policy = new Moq.Mock<Application.Common.Services.IOperationDatePolicy>();
+		policy.Setup(x => x.IsAllowed(Moq.It.IsAny<DateTime>()))
+			.Returns(Application.Common.Services.OperationDateValidationResult.Valid());
+		return new AddContentValidation(policy.Object);
+	}
+
+	private static List<NewStorageContentDto> GetNewStorageContents(int count) => Enumerable.Range(1, count)
+		.Select(id => new NewStorageContentDto
+		{
+			ProductId = id, CurrencyId = 1, BuyPrice = 10m, Count = 1, PurchaseDate = DateTime.UtcNow
+		}).ToList();
+
+	[Fact]
+	public async Task AddContentToStorage_WithEmptyContentList_FailsValidation()
+	{
+		var storage = new { Code = "warehouse" };
+		var command = new AddContentCommand(
+			[],
+			storage.Code,
+			StorageMovementType.StorageContentAddition);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.StorageContent);
+	}
+
+	[Theory]
+	[InlineData(-1)]
+	[InlineData(0.0001)]
+	[InlineData(0.001)]
+	[InlineData(0)]
+	public async Task AddContentToStorage_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(
+		decimal price)
+	{
+		var storage = new { Code = "warehouse" };
+		var storageContent = GetNewStorageContents(3);
+		storageContent[^1] = storageContent[^1] with
+		{
+			BuyPrice = price
+		};
+		var command = new AddContentCommand(
+			storageContent,
+			storage.Code,
+			StorageMovementType.StorageContentAddition);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("StorageContent[2].BuyPrice");
+	}
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task
+		AddContentToStorage_WithInvalidItemCount_ThrowsStorageContentCountCantBeNegativeException(int count)
+	{
+		var storage = new { Code = "warehouse" };
+		var storageContent = GetNewStorageContents(3);
+		storageContent[^1] = storageContent[^1] with
+		{
+			Count = count
+		};
+		var command = new AddContentCommand(
+			storageContent,
+			storage.Code,
+			StorageMovementType.StorageContentAddition);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("StorageContent[2].Count");
 	}
 }

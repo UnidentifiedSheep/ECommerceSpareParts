@@ -1,4 +1,6 @@
-﻿using Main.Entities.Exceptions;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
+using Main.Entities.Exceptions;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Static;
 using Main.Entities.Currency;
@@ -74,48 +76,6 @@ public class AddStorageRouteTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task AddStorageRoute_WithInvalidDistance_ThrowsValidationException()
-	{
-		var command = new AddStorageRouteCommand(
-			_fromStorage.Code,
-			_toStorage.Code,
-			0,
-			RouteType.IntraCity,
-			LogisticPricingType.PerOrder,
-			60,
-			10.5m,
-			20.5m,
-			_currency.Id,
-			5.0m,
-			0,
-			_carrier.Id);
-
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task AddStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
-	{
-		var command = new AddStorageRouteCommand(
-			_fromStorage.Code,
-			_toStorage.Code,
-			1000,
-			RouteType.IntraCity,
-			LogisticPricingType.PerOrder,
-			60,
-			10.555m,
-			20.5m,
-			_currency.Id,
-			5.0m,
-			0,
-			_carrier.Id);
-
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
 	public async Task AddStorageRoute_WithNonExistentCurrency_ThrowsValidationException()
 	{
 		var command = new AddStorageRouteCommand(
@@ -157,5 +117,50 @@ public class AddStorageRouteTests : IntegrationTest
 			await Assert.ThrowsAsync<DbValidationException>(async () =>
 				await Mediator.Send(command, CancellationToken));
 		Assert.Contains(exception.Failures, f => f.Error is StorageNotFoundException);
+	}
+}
+
+public class AddStorageRouteValidationTests : ValidationTest<AddStorageRouteValidation, AddStorageRouteCommand>
+{
+	[Fact]
+	public async Task AddStorageRoute_WithInvalidDistance_FailsValidation()
+	{
+		var command = new AddStorageRouteCommand(
+			"warehouse-a",
+			"warehouse-b",
+			0,
+			RouteType.IntraCity,
+			LogisticPricingType.PerOrder,
+			60,
+			10.5m,
+			20.5m,
+			1,
+			5.0m,
+			0,
+			Guid.NewGuid());
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.Distance);
+	}
+
+	[Fact]
+	public async Task AddStorageRoute_WithInvalidPricePrecision_FailsValidation()
+	{
+		var command = new AddStorageRouteCommand(
+			"warehouse-a",
+			"warehouse-b",
+			1000,
+			RouteType.IntraCity,
+			LogisticPricingType.PerOrder,
+			60,
+			10.555m,
+			20.5m,
+			1,
+			5.0m,
+			0,
+			Guid.NewGuid());
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.PriceKg);
 	}
 }

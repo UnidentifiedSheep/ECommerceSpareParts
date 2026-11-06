@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Main.Entities.Storage;
 using Main.Enums;
 using Tests.Extensions;
@@ -20,57 +22,6 @@ public class EditStorageContentTests : IntegrationTest
 	}
 
 	public StorageContentTestContext TestContext => GetContext<StorageContentTestContext>();
-
-	[Fact]
-	public async Task EditStorageContent_WithNegativeCount_ThrowsException()
-	{
-		var dto = new PatchStorageContentDto
-		{
-			Count = new PatchField<int>
-			{
-				IsSet = true, Value = -1
-			}
-		};
-		var content = TestContext.StorageContents.First();
-
-		var dict = new Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>>
-		{
-			[content.Id] = new(dto, content.RowVersion)
-		};
-
-		var command = new EditStorageContentCommand(dict);
-
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(0)]
-	[InlineData(0.001)]
-	[InlineData(0.0001)]
-	[InlineData(-1)]
-	public async Task EditStorageContent_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(
-		decimal price)
-	{
-		var dto = new PatchStorageContentDto
-		{
-			BuyPrice = new PatchField<decimal>
-			{
-				IsSet = true, Value = price
-			}
-		};
-
-		var content = TestContext.StorageContents.First();
-		var dict = new Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>>
-		{
-			[content.Id] = new(dto, content.RowVersion)
-		};
-
-		var command = new EditStorageContentCommand(dict);
-
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
 
 	[Fact]
 	public async Task EditStorageContent_WithInvalidStorageContentId_ThrowsStorageContentNotFoundException()
@@ -199,5 +150,67 @@ public class EditStorageContentTests : IntegrationTest
 		var persisted = await Context.StorageContents.AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 		Assert.Equal(StorageMovementType.StorageContentEditing, persisted.Metadata.LastMovementType);
+	}
+}
+
+public class EditStorageContentValidationTests : ValidationTest<EditStorageContentValidation, EditStorageContentCommand>
+{
+	protected override EditStorageContentValidation CreateValidator()
+	{
+		var policy = new Moq.Mock<Application.Common.Services.IOperationDatePolicy>();
+		policy.Setup(x => x.IsAllowed(Moq.It.IsAny<DateTime>()))
+			.Returns(Application.Common.Services.OperationDateValidationResult.Valid());
+		return new EditStorageContentValidation(policy.Object);
+	}
+
+	[Fact]
+	public async Task EditStorageContent_WithNegativeCount_ThrowsException()
+	{
+		var dto = new PatchStorageContentDto
+		{
+			Count = new PatchField<int>
+			{
+				IsSet = true, Value = -1
+			}
+		};
+		var content = new { Id = 1, RowVersion = 1u };
+
+		var dict = new Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>>
+		{
+			[content.Id] = new(dto, content.RowVersion)
+		};
+
+		var command = new EditStorageContentCommand(dict);
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("EditedFields.Values[0].Model.Count.Value");
+	}
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(0.001)]
+	[InlineData(0.0001)]
+	[InlineData(-1)]
+	public async Task EditStorageContent_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(
+		decimal price)
+	{
+		var dto = new PatchStorageContentDto
+		{
+			BuyPrice = new PatchField<decimal>
+			{
+				IsSet = true, Value = price
+			}
+		};
+
+		var content = new { Id = 1, RowVersion = 1u };
+		var dict = new Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>>
+		{
+			[content.Id] = new(dto, content.RowVersion)
+		};
+
+		var command = new EditStorageContentCommand(dict);
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("EditedFields.Values[0].Model.BuyPrice.Value");
 	}
 }

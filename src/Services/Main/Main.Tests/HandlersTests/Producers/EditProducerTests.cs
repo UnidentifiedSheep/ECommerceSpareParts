@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
@@ -18,55 +20,6 @@ public class EditProducerTests : IntegrationTest
 	}
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
-
-	[Theory]
-	[InlineData("tooBig")]
-	[InlineData("в")]
-	public async Task EditProducer_TooLargeName_FailsValidation(string? name)
-	{
-		if (name == "tooBig")
-			name = Faker.Lorem.Letter(200);
-		var model = new PatchProducerDto
-		{
-			Name = new PatchField<string>
-			{
-				IsSet = true, Value = name
-			}
-		};
-		var command = new EditProducerCommand(GetFirstProducer().Id, model);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task EditProducer_IsSetButNullValue_FailsValidation()
-	{
-		var model = new PatchProducerDto
-		{
-			Name = new PatchField<string>
-			{
-				IsSet = true, Value = null
-			}
-		};
-		var command = new EditProducerCommand(GetFirstProducer().Id, model);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task EditProducer_DescriptionTooLarge_FailsValidation()
-	{
-		var model = new PatchProducerDto
-		{
-			Description = new PatchField<string?>
-			{
-				IsSet = true, Value = Faker.Lorem.Letter(1000)
-			}
-		};
-		var command = new EditProducerCommand(GetFirstProducer().Id, model);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
 
 	[Fact]
 	public async Task EditProducer_NoValuesSet_Succeeds()
@@ -117,4 +70,56 @@ public class EditProducerTests : IntegrationTest
 	}
 
 	private Producer GetFirstProducer() => TestContext.Producers[0];
+}
+
+public class EditProducerValidationTests : ValidationTest<EditProducerValidation, EditProducerCommand>
+{
+	[Theory]
+	[InlineData("tooBig")]
+	[InlineData("в")]
+	public async Task EditProducer_TooLargeName_FailsValidation(string? name)
+	{
+		if (name == "tooBig")
+			name = new string('x', 200);
+		var model = new PatchProducerDto
+		{
+			Name = new PatchField<string>
+			{
+				IsSet = true, Value = name
+			}
+		};
+		var command = new EditProducerCommand(1, model);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("Producer.Name.Value");
+	}
+
+	[Fact]
+	public async Task EditProducer_IsSetButNullValue_FailsValidation()
+	{
+		var model = new PatchProducerDto
+		{
+			Name = new PatchField<string>
+			{
+				IsSet = true, Value = null
+			}
+		};
+		var command = new EditProducerCommand(1, model);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("Producer.Name.Value");
+	}
+
+	[Fact]
+	public async Task EditProducer_DescriptionTooLarge_FailsValidation()
+	{
+		var model = new PatchProducerDto
+		{
+			Description = new PatchField<string?>
+			{
+				IsSet = true, Value = new string('x', 1000)
+			}
+		};
+		var command = new EditProducerCommand(1, model);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("Producer.Description.Value");
+	}
 }

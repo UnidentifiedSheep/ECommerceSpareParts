@@ -1,4 +1,6 @@
-﻿using Main.Application.Handlers.Storages.DeleteStorage;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
+using Main.Application.Handlers.Storages.DeleteStorage;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
@@ -11,14 +13,6 @@ public class DeleteStorageTests : IntegrationTest
 	public DeleteStorageTests(CombinedContainerFixture fixture) : base(fixture)
 	{
 		RegisterBasicContext<StorageContentTestContext>();
-	}
-
-	[Fact]
-	public async Task DeleteStorage_EmptyName_ThrowsValidationException()
-	{
-		var command = new DeleteStorageCommand("");
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -54,5 +48,16 @@ public class DeleteStorageTests : IntegrationTest
 
 		var exists = await Context.Storages.AnyAsync(x => x.Code == storage, CancellationToken);
 		Assert.True(exists);
+	}
+}
+
+public class DeleteStorageValidationTests : ValidationTest<DeleteStorageValidation, DeleteStorageCommand>
+{
+	[Fact]
+	public async Task DeleteStorage_EmptyName_FailsValidation()
+	{
+		var command = new DeleteStorageCommand("");
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.StorageCode);
 	}
 }

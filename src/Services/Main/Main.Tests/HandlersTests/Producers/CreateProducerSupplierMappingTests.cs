@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Enums;
 using FluentAssertions;
 using Main.Application.Dtos.Producer.SupplierMappings;
@@ -20,24 +22,6 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 	}
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
-
-	[Theory]
-	[InlineData("")]
-	[InlineData("  ")]
-	public async Task CreateProducerSupplierMapping_InvalidSupplierProducerName_ThrowsValidationException(
-		string supplierProducerName)
-	{
-		var command = new CreateProducerSupplierMappingCommand(
-			new NewProducerSupplierMapping
-			{
-				ProducerId = TestContext.Producers[0].Id,
-				Supplier = Supplier.Armtek,
-				SupplierProducerName = supplierProducerName
-			});
-
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
 
 	[Fact]
 	public async Task CreateProducerSupplierMapping_InvalidProducerId_ThrowsProducerNotFound()
@@ -152,5 +136,26 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		mapping.Supplier.Should().Be(command.ProducerSupplierMapping.Supplier);
 		mapping.Name.Should().Be(supplierProducerName.Trim());
 		mapping.NormalizedName.Should().Be(supplierProducerName.Trim().ToUpperInvariant());
+	}
+}
+
+public class CreateProducerSupplierMappingValidationTests : ValidationTest<CreateProducerSupplierMappingValidation, CreateProducerSupplierMappingCommand>
+{
+	[Theory]
+	[InlineData("")]
+	[InlineData("  ")]
+	public async Task CreateProducerSupplierMapping_InvalidSupplierProducerName_FailsValidation(
+		string supplierProducerName)
+	{
+		var command = new CreateProducerSupplierMappingCommand(
+			new NewProducerSupplierMapping
+			{
+				ProducerId = 1,
+				Supplier = Supplier.Armtek,
+				SupplierProducerName = supplierProducerName
+			});
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.ProducerSupplierMapping.SupplierProducerName);
 	}
 }

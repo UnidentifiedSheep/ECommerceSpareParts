@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Abstractions.Models;
 using Application.Common.Models;
 using Main.Application.Dtos.Storage;
@@ -70,38 +72,6 @@ public class EditStorageTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task EditStorage_TooLargeLocation_FailsValidation()
-	{
-		var storage = GetStorage();
-		var model = new PatchStorageDto
-		{
-			Location = new PatchField<string?>
-			{
-				IsSet = true, Value = Faker.Lorem.Letter(300)
-			}
-		};
-		var command = new EditStorageCommand(storage.Code, model);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task EditStorage_TooLargeDesctiption_FailsValidation()
-	{
-		var storage = GetStorage();
-		var model = new PatchStorageDto
-		{
-			Description = new PatchField<string?>
-			{
-				IsSet = true, Value = Faker.Lorem.Letter(300)
-			}
-		};
-		var command = new EditStorageCommand(storage.Code, model);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
 	public async Task EditStorage_Normal_Succeeds()
 	{
 		var storage = GetStorage();
@@ -150,4 +120,39 @@ public class EditStorageTests : IntegrationTest
 
 	private Storage GetStorage() =>
 		GetContext<StorageTestContext>().Storages.First(x => x.Type == StorageType.Warehouse);
+}
+
+public class EditStorageValidationTests : ValidationTest<EditStorageValidation, EditStorageCommand>
+{
+	[Fact]
+	public async Task EditStorage_TooLargeLocation_FailsValidation()
+	{
+		var storage = new { Code = "warehouse" };
+		var model = new PatchStorageDto
+		{
+			Location = new PatchField<string?>
+			{
+				IsSet = true, Value = new string('x', 300)
+			}
+		};
+		var command = new EditStorageCommand(storage.Code, model);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("EditStorage.Location.Value");
+	}
+
+	[Fact]
+	public async Task EditStorage_TooLargeDesctiption_FailsValidation()
+	{
+		var storage = new { Code = "warehouse" };
+		var model = new PatchStorageDto
+		{
+			Description = new PatchField<string?>
+			{
+				IsSet = true, Value = new string('x', 300)
+			}
+		};
+		var command = new EditStorageCommand(storage.Code, model);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor("EditStorage.Description.Value");
+	}
 }

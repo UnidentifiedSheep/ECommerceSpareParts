@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Main.Entities.Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.ProducerAliases.AddAlias;
@@ -19,19 +21,6 @@ public class AddAliasToProducerTests : IntegrationTest
 	}
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
-
-	[Theory]
-	[InlineData(" ")]
-	[InlineData("tooBig")]
-	public async Task AddProducerAlias_EmptyProducerName_FailsValidation(string alias)
-	{
-		if (alias == "tooBig")
-			alias = Faker.Lorem.Letter(200);
-		var producer = TestContext.Producers[0];
-		var command = new AddAliasCommand(producer.Id, alias);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
 
 	[Fact]
 	public async Task AddProducerAlias_InvalidProducerId_ThrowsProducerNotFound()
@@ -91,5 +80,21 @@ public class AddAliasToProducerTests : IntegrationTest
 				await Mediator.Send(command, CancellationToken));
 
 		Assert.IsType<ProducerAliasAlreadyTakenException>(exception.Failures[0].Error);
+	}
+}
+
+public class AddAliasValidationTests : ValidationTest<AddAliasValidation, AddAliasCommand>
+{
+	[Theory]
+	[InlineData(" ")]
+	[InlineData("tooBig")]
+	public async Task AddProducerAlias_EmptyProducerName_FailsValidation(string alias)
+	{
+		if (alias == "tooBig")
+			alias = new string('x', 200);
+		var producer = new { Id = 1 };
+		var command = new AddAliasCommand(producer.Id, alias);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.Alias);
 	}
 }
