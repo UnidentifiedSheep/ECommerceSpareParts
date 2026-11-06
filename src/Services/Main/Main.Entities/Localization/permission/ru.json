@@ -223,8 +223,6 @@
     "permissions.orders.get.description": "Право на просмотр всех заказов и их позиций.",
     "permissions.orders.get.own.name": "Просмотр своих заказов",
     "permissions.orders.get.own.description": "Право на просмотр заказов текущего пользователя и их позиций.",
-    "permissions.orders.create.name": "Создание заказов",
-    "permissions.orders.create.description": "Право на создание заказов.",
     "permissions.orders.edit.name": "Редактирование заказов",
     "permissions.orders.edit.description": "Право на изменение позиций и количества в заказах.",
     "permissions.orders.price.edit.name": "Ручное назначение цен в заказах",

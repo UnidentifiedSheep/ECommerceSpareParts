@@ -10,6 +10,7 @@
     "order.item.invalid": "Invalid order item.",
     "order.item.not.found": "The item does not belong to this order.",
     "order.change.not.allowed": "This operation is not allowed in the current order status.",
-    "order.row.version.required": "The order version is required for updates."
+    "order.row.version.required": "The order version is required for updates.",
+    "order.write.access.denied": "You do not have permission to modify this order."
   }
 }

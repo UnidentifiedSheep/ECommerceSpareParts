@@ -10,6 +10,7 @@
     "order.item.invalid": "Geçersiz sipariş kalemi.",
     "order.item.not.found": "Kalem bu siparişe ait değil.",
     "order.change.not.allowed": "Bu işlem mevcut sipariş durumunda kullanılamaz.",
-    "order.row.version.required": "Güncelleme için sipariş sürümü gereklidir."
+    "order.row.version.required": "Güncelleme için sipariş sürümü gereklidir.",
+    "order.write.access.denied": "Bu siparişi değiştirme izniniz yok."
   }
 }

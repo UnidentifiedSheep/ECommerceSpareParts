@@ -223,8 +223,6 @@
     "permissions.orders.get.description": "Permission to view all orders and their items.",
     "permissions.orders.get.own.name": "View own orders",
     "permissions.orders.get.own.description": "Permission to view orders belonging to the current user and their items.",
-    "permissions.orders.create.name": "Create orders",
-    "permissions.orders.create.description": "Permission to create orders.",
     "permissions.orders.edit.name": "Edit orders",
     "permissions.orders.edit.description": "Permission to change order items and quantities.",
     "permissions.orders.price.edit.name": "Set order prices manually",

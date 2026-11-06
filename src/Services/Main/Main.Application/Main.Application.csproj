@@ -24,7 +24,6 @@
         <Folder Include="Analytics\Interfaces\" />
         <Folder Include="Handlers\Auth\RemoveRoleFromUser\"/>
         <Folder Include="Handlers\Logistics\"/>
-        <Folder Include="Orders\Commands\" />
     </ItemGroup>
 
     <ItemGroup>

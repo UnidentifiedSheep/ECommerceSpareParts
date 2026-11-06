@@ -34,7 +34,6 @@ public class UpsertOrderHandler(
 		order.ChangeCurrency(dto.CurrencyId);
 
 		ProcessItems(dto, order);
-		order.Touch(order.WhoUpdated);
 
 		return new UpsertOrderResult(order.Id);
 	}
@@ -48,14 +47,20 @@ public class UpsertOrderHandler(
 			if (upDto.Id == null)
 			{
 				var item = order.AddItem(upDto.ProductId, upDto.Count);
-				order.ChangeItemPrice(item, upDto.UnitPrice);
+				if (upDto.UnitPrice.HasValue)
+				{
+					order.ChangeItemPrice(item, upDto.UnitPrice);
+				}
 				continue;
 			}
 
 			if (!existingItems.TryGetValue(upDto.Id.Value, out var existing))
 				throw new InvalidInputException(OrderItemNotFoundMessage.Instance);
 
-			order.ChangeItemPrice(existing, upDto.UnitPrice);
+			if (existing.UnitPrice != upDto.UnitPrice)
+			{
+				order.ChangeItemPrice(existing, upDto.UnitPrice);
+			}
 
 			order.ChangeItemCount(existing, upDto.Count);
 			order.ChangeItemProduct(existing, upDto.ProductId);

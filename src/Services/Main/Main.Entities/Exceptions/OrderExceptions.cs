@@ -7,3 +7,5 @@ public sealed class OrderNotFoundException(Guid id) : LocalizedNotFoundException
 	new { Id = id });
 
 public sealed class OrderReadAccessDeniedException() : LocalizedForbiddenException(OrderReadAccessDeniedMessage.Instance);
+
+public sealed class OrderWriteAccessDeniedException() : LocalizedForbiddenException(OrderWriteAccessDeniedMessage.Instance);

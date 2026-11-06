@@ -256,7 +256,6 @@ public enum PermissionCodes
 	// ===== ORDERS =====
 	ORDERS_GET,
 	ORDERS_GET_OWN,
-	ORDERS_CREATE,
 	ORDERS_EDIT,
 	ORDERS_PRICE_EDIT,
 	ORDERS_CONFIRM,

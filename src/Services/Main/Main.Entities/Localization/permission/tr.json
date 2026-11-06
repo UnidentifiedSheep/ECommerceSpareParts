@@ -223,8 +223,6 @@
     "permissions.orders.get.description": "Tüm siparişleri ve kalemlerini görüntüleme izni.",
     "permissions.orders.get.own.name": "Kendi siparişlerini görüntüleme",
     "permissions.orders.get.own.description": "Geçerli kullanıcıya ait siparişleri ve kalemlerini görüntüleme izni.",
-    "permissions.orders.create.name": "Sipariş oluşturma",
-    "permissions.orders.create.description": "Sipariş oluşturma izni.",
     "permissions.orders.edit.name": "Siparişleri düzenleme",
     "permissions.orders.edit.description": "Sipariş kalemlerini ve miktarlarını değiştirme izni.",
     "permissions.orders.price.edit.name": "Sipariş fiyatlarını elle belirleme",
