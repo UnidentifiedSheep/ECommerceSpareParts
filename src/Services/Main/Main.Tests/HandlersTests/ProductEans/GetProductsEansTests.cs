@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Products.Queries.GetProductsEans;
 using Main.Entities.Product;
@@ -51,16 +53,17 @@ public class GetProductsEansTests : IntegrationTest
 		result.Eans.Should().BeEmpty();
 	}
 
+
+}
+
+public class GetProductsEansValidationTests : ValidationTest<GetProductsEansValidation, GetProductsEansQuery>
+{
 	[Theory]
 	[InlineData(0)]
 	[InlineData(-1)]
 	public async Task GetProductsEans_InvalidProductId_ThrowsValidationException(int productId)
 	{
-		var action = () => Mediator.Send(
-			new GetProductsEansQuery([TestContext.ProductTestContext.Products[0].Id, productId]),
-			CancellationToken);
-
-		var exception = await Assert.ThrowsAsync<ValidationException>(action);
-		exception.Errors.Should().ContainSingle(x => x.PropertyName == "ProductIds[1]");
+		var result = await ValidateAsync(new GetProductsEansQuery([1, productId]));
+		result.ShouldHaveValidationErrorFor("ProductIds[1]").Only();
 	}
 }

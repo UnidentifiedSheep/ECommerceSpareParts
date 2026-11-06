@@ -1,3 +1,7 @@
+using Application.Common.Services;
+using Moq;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Tests.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Common.Interfaces.Events;
@@ -309,132 +313,6 @@ public class CreateSaleTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task CreateSale_WithEmptyContents_ThrowsValidationException()
-	{
-		var storageContent = StorageContent();
-		var command = CreateValidCommand() with
-		{
-			CurrencyId = storageContent.CurrencyId,
-			StorageCode = storageContent.StorageCode,
-			Contents = []
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(0)]
-	[InlineData(-1)]
-	public async Task CreateSale_WithInvalidContentCount_ThrowsValidationException(int count)
-	{
-		var command = CreateValidCommand();
-		var content = command.Contents.Single() with
-		{
-			Count = count
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				Contents = [content]
-			},
-			CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(0)]
-	[InlineData(-1)]
-	[InlineData(0.001)]
-	public async Task CreateSale_WithInvalidContentPrice_ThrowsValidationException(decimal price)
-	{
-		var command = CreateValidCommand();
-		var content = command.Contents.Single() with
-		{
-			OriginalPrice = price
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				Contents = [content]
-			},
-			CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(0)]
-	[InlineData(-1)]
-	[InlineData(0.001)]
-	public async Task CreateSale_WithInvalidPriceWithDiscount_ThrowsValidationException(
-		decimal priceWithDiscount)
-	{
-		var command = CreateValidCommand();
-		var content = command.Contents.Single() with
-		{
-			DiscountedPrice = priceWithDiscount
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				Contents = [content]
-			},
-			CancellationToken));
-	}
-
-	[Fact]
-	public async Task CreateSale_WithPriceWithDiscountGreaterThanPrice_ThrowsValidationException()
-	{
-		var command = CreateValidCommand();
-		var content = command.Contents.Single() with
-		{
-			OriginalPrice = 100m, DiscountedPrice = 101m
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				Contents = [content]
-			},
-			CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(-1)]
-	[InlineData(0.001)]
-	public async Task CreateSale_WithInvalidPayedSum_ThrowsValidationException(decimal payedSum)
-	{
-		var command = CreateValidCommand() with
-		{
-			PayedSum = payedSum
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task CreateSale_WithEmptyUserId_ThrowsValidationException()
-	{
-		var command = CreateValidCommand() with
-		{
-			UserId = Guid.Empty
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task CreateSale_WithEmptyOrganizationId_ThrowsValidationException()
-	{
-		var command = CreateValidCommand() with
-		{
-			OrganizationId = Guid.Empty
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
 	public async Task CreateSale_WithMissingCurrency_ThrowsDbValidationException()
 	{
 		var command = CreateValidCommand() with
@@ -599,5 +477,144 @@ public class CreateSaleTests : IntegrationTest
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
 			.SumAsync(x => x.Count);
+	}
+}
+
+public class CreateSaleValidationTests : ValidationTest<CreateSaleValidation, CreateSaleCommand>
+{
+	protected override CreateSaleValidation CreateValidator()
+	{
+		var policy = new Mock<IOperationDatePolicy>();
+		policy.Setup(x => x.IsAllowed(It.IsAny<DateTime>())).Returns(OperationDateValidationResult.Valid());
+		return new CreateSaleValidation(policy.Object);
+	}
+
+	private static CreateSaleCommand CreateValidCommand() => new(Guid.NewGuid(), Guid.NewGuid(), 1, "storage", DateTime.UtcNow, [new NewSaleContentDto { ProductId = 1, Count = 1, OriginalPrice = 100m, DiscountedPrice = 80m }], null, null);
+
+	[Fact]
+	public async Task CreateSale_WithEmptyContents_FailsValidation()
+	{
+		var command = CreateValidCommand() with
+		{
+			Contents = []
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.Contents);
+	}
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task CreateSale_WithInvalidContentCount_FailsValidation(int count)
+	{
+		var command = CreateValidCommand();
+		var content = command.Contents.Single() with
+		{
+			Count = count
+		};
+
+		var result = await ValidateAsync(
+			command with
+			{
+				Contents = [content]
+			});
+		result.ShouldHaveValidationErrorFor("Contents[0].Count");
+	}
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	[InlineData(0.001)]
+	public async Task CreateSale_WithInvalidContentPrice_FailsValidation(decimal price)
+	{
+		var command = CreateValidCommand();
+		var content = command.Contents.Single() with
+		{
+			OriginalPrice = price
+		};
+
+		var result = await ValidateAsync(
+			command with
+			{
+				Contents = [content]
+			});
+		result.ShouldHaveValidationErrorFor("Contents[0].OriginalPrice");
+	}
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	[InlineData(0.001)]
+	public async Task CreateSale_WithInvalidPriceWithDiscount_FailsValidation(
+		decimal priceWithDiscount)
+	{
+		var command = CreateValidCommand();
+		var content = command.Contents.Single() with
+		{
+			DiscountedPrice = priceWithDiscount
+		};
+
+		var result = await ValidateAsync(
+			command with
+			{
+				Contents = [content]
+			});
+		result.ShouldHaveValidationErrorFor("Contents[0].DiscountedPrice");
+	}
+
+	[Fact]
+	public async Task CreateSale_WithPriceWithDiscountGreaterThanPrice_FailsValidation()
+	{
+		var command = CreateValidCommand();
+		var content = command.Contents.Single() with
+		{
+			OriginalPrice = 100m, DiscountedPrice = 101m
+		};
+
+		var result = await ValidateAsync(
+			command with
+			{
+				Contents = [content]
+			});
+		result.ShouldHaveValidationErrorFor("Contents[0].DiscountedPrice");
+	}
+
+	[Theory]
+	[InlineData(-1)]
+	[InlineData(0.001)]
+	public async Task CreateSale_WithInvalidPayedSum_FailsValidation(decimal payedSum)
+	{
+		var command = CreateValidCommand() with
+		{
+			PayedSum = payedSum
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.PayedSum);
+	}
+
+	[Fact]
+	public async Task CreateSale_WithEmptyUserId_FailsValidation()
+	{
+		var command = CreateValidCommand() with
+		{
+			UserId = Guid.Empty
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.UserId);
+	}
+
+	[Fact]
+	public async Task CreateSale_WithEmptyOrganizationId_FailsValidation()
+	{
+		var command = CreateValidCommand() with
+		{
+			OrganizationId = Guid.Empty
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.OrganizationId);
 	}
 }

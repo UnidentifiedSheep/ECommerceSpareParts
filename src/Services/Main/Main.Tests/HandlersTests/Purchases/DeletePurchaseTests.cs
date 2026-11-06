@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Tests.Stubs;
 using Application.Common.Interfaces.Events;
 using Contracts;
@@ -184,14 +186,6 @@ public class DeletePurchaseTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task DeletePurchase_WhenPurchaseIdIsEmpty_ThrowsValidationException()
-	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new DeletePurchaseCommand(Guid.Empty),
-			CancellationToken));
-	}
-
-	[Fact]
 	public async Task DeletePurchase_WhenPurchaseDoesNotExist_ThrowsPurchaseNotFoundException()
 	{
 		var purchaseId = Guid.NewGuid();
@@ -240,5 +234,16 @@ public class DeletePurchaseTests : IntegrationTest
 		transaction.IsReversed.Should().BeFalse();
 		transaction.IsReversalApplied.Should().BeFalse();
 		Broker.PublishedMessages.Skip(publishedBefore).OfType<PurchaseDeletedEvent>().Should().BeEmpty();
+	}
+}
+
+public class DeletePurchaseValidationTests : ValidationTest<DeletePurchaseValidation, DeletePurchaseCommand>
+{
+	[Fact]
+	public async Task DeletePurchase_WhenPurchaseIdIsEmpty_FailsValidation()
+	{
+		var result = await ValidateAsync(
+			new DeletePurchaseCommand(Guid.Empty));
+		result.ShouldHaveValidationErrorFor(x => x.PurchaseId);
 	}
 }

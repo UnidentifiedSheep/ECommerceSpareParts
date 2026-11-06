@@ -1,3 +1,5 @@
+using FluentValidation.TestHelper;
+using Tests.Abstractions.Test;
 using FluentAssertions;
 using Main.Application.Handlers.Sales.GetSale;
 using Main.Entities.Exceptions;
@@ -58,9 +60,17 @@ public class GetSaleTests : IntegrationTest
 			CancellationToken));
 	}
 
+
+}
+
+
+public class GetSaleValidationTests : ValidationTest<GetSaleValidation, GetSaleQuery>
+{
 	[Fact]
-	public async Task GetSale_WhenSaleIdAndTransactionIdAreEmpty_ThrowsValidationException() =>
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new GetSaleQuery(null, null),
-			CancellationToken));
+	public async Task MissingSaleAndTransactionIds_FailsValidation()
+	{
+		var result = await ValidateAsync(new GetSaleQuery(null, null));
+		result.ShouldHaveValidationErrorFor(x => x)
+			.WithErrorCode(Main.Entities.SaleIdOrTransactionIdRequiredMessage.Instance.MessageKey).Only();
+	}
 }

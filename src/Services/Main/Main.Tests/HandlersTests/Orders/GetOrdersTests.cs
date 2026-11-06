@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Enums;
@@ -243,6 +245,26 @@ public sealed class GetOrdersTests : IntegrationTest
 		result.Orders.Select(order => order.Id).Should().Equal(expected.Select(order => order.Id));
 	}
 
+	[Fact]
+	public async Task InvalidSorting_ThrowsInvalidInputException()
+	{
+		await Assert.ThrowsAsync<InvalidInputException>(() => Search(Query() with { SortBy = [new SortExpression("unknown")] }));
+	}
+
+	private static GetOrdersQuery Query() => new(new(), new(0, 100), [], [], [], [], [], [], [], [], null);
+
+	private Task<GetOrdersResult> Search(GetOrdersQuery? query = null, PermissionCodes? permission = PermissionCodes.ORDERS_GET)
+	{
+		if (permission.HasValue)
+			UserContext.SetPermissions([Permission.ToNormalizedPermission(permission.Value)]);
+		return Mediator.Send(query ?? Query(), CancellationToken);
+	}
+}
+
+public class GetOrdersValidationTests : ValidationTest<GetOrdersValidation, GetOrdersQuery>
+{
+	private static GetOrdersQuery Query() => new(new(), new(0, 100), [], [], [], [], [], [], [], [], null);
+
 	[Theory]
 	[InlineData("pagination")]
 	[InlineData("range")]
@@ -262,21 +284,11 @@ public sealed class GetOrdersTests : IntegrationTest
 			_ => Query() with { Sources = [(OrderSource)999] }
 		};
 
-		await Assert.ThrowsAsync<ValidationException>(() => Search(query));
-	}
-
-	[Fact]
-	public async Task InvalidSorting_ThrowsInvalidInputException()
-	{
-		await Assert.ThrowsAsync<InvalidInputException>(() => Search(Query() with { SortBy = [new SortExpression("unknown")] }));
-	}
-
-	private static GetOrdersQuery Query() => new(new(), new(0, 100), [], [], [], [], [], [], [], [], null);
-
-	private Task<GetOrdersResult> Search(GetOrdersQuery? query = null, PermissionCodes? permission = PermissionCodes.ORDERS_GET)
-	{
-		if (permission.HasValue)
-			UserContext.SetPermissions([Permission.ToNormalizedPermission(permission.Value)]);
-		return Mediator.Send(query ?? Query(), CancellationToken);
+		var result = await ValidateAsync(query);
+		result.ShouldHaveValidationErrorFor(input switch
+		{
+			"pagination" => "Pagination.Page", "range" => "DateRange", "term" => "SearchTerm",
+			"status" => "Statuses[0]", "fulfillment" => "FulfillmentStatuses[0]", _ => "Sources[0]"
+		});
 	}
 }

@@ -1,3 +1,5 @@
+using FluentValidation.TestHelper;
+using Tests.Abstractions.Test;
 using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
@@ -75,24 +77,6 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 		await act.Should().ThrowAsync<OrganizationNotFoundException>();
 	}
 
-	[Theory]
-	[InlineData(null)]
-	[InlineData("")]
-	[InlineData("ab")]
-	public async Task UpdateOrganization_InvalidName_ThrowsValidationException(string? name)
-	{
-		var organization = await CreateOrganization();
-		var command = new UpdateOrganizationCommand(
-			organization.Id,
-			new PatchOrganizationDto
-			{
-				Name = PatchField<string>.From(name!)
-			});
-
-		var act = () => Mediator.Send(command);
-
-		await act.Should().ThrowAsync<ValidationException>();
-	}
 
 	private async Task<Organization> CreateOrganization()
 	{
@@ -104,4 +88,26 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 		Context.ChangeTracker.Clear();
 		return organization;
 	}
+}
+
+public class UpdateOrganizationValidationTests : ValidationTest<UpdateOrganizationValidation, UpdateOrganizationCommand>
+{
+	[Theory]
+	[InlineData(null)]
+	[InlineData("")]
+	[InlineData("ab")]
+	public async Task UpdateOrganization_InvalidName_ThrowsValidationException(string? name)
+	{
+		var command = new UpdateOrganizationCommand(
+			Guid.NewGuid(),
+			new PatchOrganizationDto
+			{
+				Name = PatchField<string>.From(name!)
+			});
+
+		var result = await ValidateAsync(command);
+
+		result.ShouldHaveValidationErrorFor("Organization.Name.Value");
+	}
+
 }

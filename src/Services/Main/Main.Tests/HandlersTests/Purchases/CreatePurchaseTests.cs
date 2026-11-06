@@ -1,3 +1,7 @@
+using Application.Common.Services;
+using Moq;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Tests.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Common.Interfaces.Events;
@@ -344,91 +348,6 @@ public class CreatePurchaseTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task CreatePurchase_WithEmptyContent_ThrowsValidationException()
-	{
-		var command = CreateValidCommand() with
-		{
-			PurchaseContent = []
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(0)]
-	[InlineData(-1)]
-	public async Task CreatePurchase_WithInvalidContentCount_ThrowsValidationException(int count)
-	{
-		var command = CreateValidCommand();
-		var content = command.PurchaseContent.Single() with
-		{
-			Count = count
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				PurchaseContent = [content]
-			},
-			CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(0)]
-	[InlineData(-1)]
-	[InlineData(0.001)]
-	public async Task CreatePurchase_WithInvalidContentPrice_ThrowsValidationException(decimal price)
-	{
-		var command = CreateValidCommand();
-		var content = command.PurchaseContent.Single() with
-		{
-			Price = price
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				PurchaseContent = [content]
-			},
-			CancellationToken));
-	}
-
-	[Theory]
-	[InlineData(-1)]
-	[InlineData(0.001)]
-	public async Task CreatePurchase_WithInvalidPayedSum_ThrowsValidationException(decimal payedSum)
-	{
-		var command = CreateValidCommand() with
-		{
-			PayedSum = payedSum
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task CreatePurchase_WithEmptySupplierUserId_ThrowsValidationException()
-	{
-		var command = CreateValidCommand() with
-		{
-			SupplierUserId = Guid.Empty
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task CreatePurchase_WithEmptySupplierOrganizationId_ThrowsValidationException()
-	{
-		var command = CreateValidCommand() with
-		{
-			SupplierOrganizationId = Guid.Empty
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
 	public async Task CreatePurchase_WithMissingSupplierOrganization_ThrowsDbValidationException()
 	{
 		var command = CreateValidCommand() with
@@ -455,17 +374,6 @@ public class CreatePurchaseTests : IntegrationTest
 			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.Error is OrganizationMemberNotFoundException);
-	}
-
-	[Fact]
-	public async Task CreatePurchase_WithLogisticsAndEmptyStorageFrom_ThrowsValidationException()
-	{
-		var command = CreateValidCommand() with
-		{
-			WithLogistics = true, StorageFrom = null
-		};
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -673,5 +581,118 @@ public class CreatePurchaseTests : IntegrationTest
 				WeightUnit.Kilogram));
 		Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, supplierId));
 		await Context.SaveChangesAsync();
+	}
+}
+
+public class CreatePurchaseValidationTests : ValidationTest<CreatePurchaseValidation, CreatePurchaseCommand>
+{
+	protected override CreatePurchaseValidation CreateValidator()
+	{
+		var policy = new Mock<IOperationDatePolicy>();
+		policy.Setup(x => x.IsAllowed(It.IsAny<DateTime>())).Returns(OperationDateValidationResult.Valid());
+		return new CreatePurchaseValidation(policy.Object);
+	}
+
+	private static CreatePurchaseCommand CreateValidCommand() => new(Guid.NewGuid(), Guid.NewGuid(), 1, "storage", DateTime.UtcNow, [new NewPurchaseContentDto { ProductId = 1, Count = 1, Price = 100m, CalculateLogistics = false }], null, null, false, null);
+
+	[Fact]
+	public async Task CreatePurchase_WithEmptyContent_FailsValidation()
+	{
+		var command = CreateValidCommand() with
+		{
+			PurchaseContent = []
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.PurchaseContent);
+	}
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task CreatePurchase_WithInvalidContentCount_FailsValidation(int count)
+	{
+		var command = CreateValidCommand();
+		var content = command.PurchaseContent.Single() with
+		{
+			Count = count
+		};
+
+		var result = await ValidateAsync(
+			command with
+			{
+				PurchaseContent = [content]
+			});
+		result.ShouldHaveValidationErrorFor("PurchaseContent[0].Count");
+	}
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	[InlineData(0.001)]
+	public async Task CreatePurchase_WithInvalidContentPrice_FailsValidation(decimal price)
+	{
+		var command = CreateValidCommand();
+		var content = command.PurchaseContent.Single() with
+		{
+			Price = price
+		};
+
+		var result = await ValidateAsync(
+			command with
+			{
+				PurchaseContent = [content]
+			});
+		result.ShouldHaveValidationErrorFor("PurchaseContent[0].Price");
+	}
+
+	[Theory]
+	[InlineData(-1)]
+	[InlineData(0.001)]
+	public async Task CreatePurchase_WithInvalidPayedSum_FailsValidation(decimal payedSum)
+	{
+		var command = CreateValidCommand() with
+		{
+			PayedSum = payedSum
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.PayedSum);
+	}
+
+	[Fact]
+	public async Task CreatePurchase_WithEmptySupplierUserId_FailsValidation()
+	{
+		var command = CreateValidCommand() with
+		{
+			SupplierUserId = Guid.Empty
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.SupplierUserId);
+	}
+
+	[Fact]
+	public async Task CreatePurchase_WithEmptySupplierOrganizationId_FailsValidation()
+	{
+		var command = CreateValidCommand() with
+		{
+			SupplierOrganizationId = Guid.Empty
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.SupplierOrganizationId);
+	}
+
+	[Fact]
+	public async Task CreatePurchase_WithLogisticsAndEmptyStorageFrom_FailsValidation()
+	{
+		var command = CreateValidCommand() with
+		{
+			WithLogistics = true, StorageFrom = null
+		};
+
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.StorageFrom);
 	}
 }

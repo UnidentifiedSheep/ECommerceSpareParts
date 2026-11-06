@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Main.Entities.Exceptions;
 using Abstractions.Models;
 using Application.Common.Models;
@@ -64,14 +66,6 @@ public class GetOrganizationMembersTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task GetOrganizationMembers_InvalidPagination_ThrowsValidationException()
-	{
-		var query = CreateQuery(Guid.NewGuid(), -1);
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
-	}
-
-	[Fact]
 	public async Task GetOrganizationMembers_MissingOrganization_ThrowsDbValidationException()
 	{
 		var query = CreateQuery(Guid.NewGuid());
@@ -95,5 +89,17 @@ public class GetOrganizationMembersTests : IntegrationTest
 			.WithMember(userIds[1], OrganizationRole.Admin)
 			.WithMember(userIds[2])
 			.BuildAndAddToDb(Context);
+	}
+}
+
+public class GetOrganizationMembersValidationTests : ValidationTest<GetOrganizationMembersValidation, GetOrganizationMembersQuery>
+{
+	[Fact]
+	public async Task GetOrganizationMembers_InvalidPagination_FailsValidation()
+	{
+		var query = new GetOrganizationMembersQuery(Guid.NewGuid(), new(-1, 20));
+
+		var result = await ValidateAsync(query);
+		result.ShouldHaveValidationErrorFor("Pagination.Page");
 	}
 }

@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Application.Common.Querying;
 using Main.Entities.Exceptions;
 using Abstractions.Models;
@@ -228,14 +230,6 @@ public class GetOrganizationsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task GetOrganizations_InvalidPagination_ThrowsValidationException()
-	{
-		var query = CreateQuery(page: -1);
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
-	}
-
-	[Fact]
 	public async Task GetOrganizations_ShowHidden_ReturnsAlsoHiddenOrganizations()
 	{
 		var hiddenOrg = await CreateOrganization(
@@ -375,5 +369,17 @@ public class GetOrganizationsTests : IntegrationTest
 			.WithIsHidden(isHidden)
 			.WithSystemName($"{systemName}-{Guid.NewGuid():N}")
 			.BuildAndAddToDb(Context);
+	}
+}
+
+public class GetOrganizationsValidationTests : ValidationTest<GetOrganizationsValidation, GetOrganizationsQuery>
+{
+	[Fact]
+	public async Task GetOrganizations_InvalidPagination_FailsValidation()
+	{
+		var query = new GetOrganizationsQuery(new(-1, 20), [], null, null, [], [], false);
+
+		var result = await ValidateAsync(query);
+		result.ShouldHaveValidationErrorFor("Pagination.Page");
 	}
 }

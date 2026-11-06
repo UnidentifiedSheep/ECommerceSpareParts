@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Application.Common.Models;
 using FluentAssertions;
 using Main.Application.Products.Queries.GetProductsByEan;
@@ -44,6 +46,11 @@ public class GetProductsByEanTests : IntegrationTest
 		result.Products.Should().BeEmpty();
 	}
 
+
+}
+
+public class GetProductsByEanValidationTests : ValidationTest<GetProductsByEanValidation, GetProductsByEanQuery>
+{
 	[Theory]
 	[InlineData(null)]
 	[InlineData("")]
@@ -51,11 +58,7 @@ public class GetProductsByEanTests : IntegrationTest
 	[InlineData("123456789012345")]
 	public async Task GetProductsByEan_InvalidEan_ThrowsValidationException(string? ean)
 	{
-		var action = () => Mediator.Send(
-			new GetProductsByEanQuery(ean!, new Pagination(0, 10)),
-			CancellationToken);
-
-		var exception = await Assert.ThrowsAsync<ValidationException>(action);
-		exception.Errors.Should().ContainSingle(x => x.PropertyName == nameof(GetProductsByEanQuery.Ean));
+		var result = await ValidateAsync(new GetProductsByEanQuery(ean!, new Pagination(0, 10)));
+		result.ShouldHaveValidationErrorFor(x => x.Ean).Only();
 	}
 }
