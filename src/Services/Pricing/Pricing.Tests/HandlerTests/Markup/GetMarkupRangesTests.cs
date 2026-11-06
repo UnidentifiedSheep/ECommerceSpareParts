@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Application.Common.Models;
 using FluentAssertions;
 using Pricing.Application.Handlers.Markup.GetMarkupRanges;
@@ -53,13 +55,17 @@ public sealed class GetMarkupRangesTests(CombinedContainerFixture fixture) : Int
 		result.Ranges.Should().BeEmpty();
 	}
 
+}
+
+public class GetMarkupRangesValidationTests : ValidationTest<GetMarkupRangesValidation, GetMarkupRangesQuery>
+{
 	[Theory]
 	[InlineData(0)]
 	[InlineData(-1)]
 	public async Task InvalidGroupId_IsRejected(int groupId)
 	{
-		await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(new GetMarkupRangesQuery(groupId, new Pagination(0, 10)), CancellationToken));
+		var result = await ValidateAsync(new GetMarkupRangesQuery(groupId, new Pagination(0, 10)));
+		result.ShouldHaveValidationErrorFor("GroupId");
 	}
 
 	[Theory]
@@ -68,7 +74,7 @@ public sealed class GetMarkupRangesTests(CombinedContainerFixture fixture) : Int
 	[InlineData(0, 101)]
 	public async Task InvalidPagination_IsRejected(int page, int size)
 	{
-		await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(new GetMarkupRangesQuery(1, new Pagination(page, size)), CancellationToken));
+		var result = await ValidateAsync(new GetMarkupRangesQuery(1, new Pagination(page, size)));
+		result.ShouldHaveValidationErrorFor(page < 0 ? "Pagination.Page" : "Pagination.Size");
 	}
 }

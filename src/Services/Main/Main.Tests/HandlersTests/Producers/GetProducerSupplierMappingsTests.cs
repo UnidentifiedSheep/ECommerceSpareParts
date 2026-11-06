@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
@@ -96,15 +98,20 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 		result.Mappings.Should().ContainSingle();
 	}
 
+
+}
+
+public class GetProducerSupplierMappingsValidationTests : ValidationTest<GetProducerSupplierMappingsValidation, GetProducerSupplierMappingsQuery>
+{
 	[Fact]
-	public async Task GetProducerSupplierMappings_InvalidPagination_ThrowsValidationException()
+	public async Task GetProducerSupplierMappings_InvalidPagination_FailsValidation()
 	{
 		var query = new GetProducerSupplierMappingsQuery(
-			TestContext.Producers[0].Id,
+			1,
 			[],
 			new Pagination(-1, 10));
 
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(query, CancellationToken));
+		var result = await ValidateAsync(query);
+		result.ShouldHaveValidationErrorFor("Pagination.Page");
 	}
 }

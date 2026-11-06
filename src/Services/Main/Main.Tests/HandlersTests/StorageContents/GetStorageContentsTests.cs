@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Abstractions.Models;
 using Application.Common.Models;
 using Application.Common.Querying;
@@ -143,22 +145,6 @@ public sealed class GetStorageContentsTests : IntegrationTest
 		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(query, CancellationToken));
 	}
 
-	[Theory]
-	[InlineData(-1, 20)]
-	[InlineData(0, 0)]
-	[InlineData(0, 101)]
-	public async Task GetStorageContents_WithInvalidPagination_ThrowsValidationException(int page, int size)
-	{
-		var query = new GetStorageContentsQuery(
-			null,
-			null,
-			[],
-			new Pagination(page, size),
-			true);
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
-	}
-
 	[Fact]
 	public async Task AvailableCountSort_UsesActiveLocksClampsZeroAndBreaksTiesById()
 	{
@@ -199,5 +185,25 @@ public sealed class GetStorageContentsTests : IntegrationTest
 			.WithCurrencyId(currencyId)
 			.WithCount(count)
 			.BuildAndAddToDb(Context);
+	}
+}
+
+public class GetStorageContentsValidationTests : ValidationTest<GetStorageContentsValidation, GetStorageContentsQuery>
+{
+	[Theory]
+	[InlineData(-1, 20)]
+	[InlineData(0, 0)]
+	[InlineData(0, 101)]
+	public async Task GetStorageContents_WithInvalidPagination_FailsValidation(int page, int size)
+	{
+		var query = new GetStorageContentsQuery(
+			null,
+			null,
+			[],
+			new Pagination(page, size),
+			true);
+
+		var result = await ValidateAsync(query);
+		result.ShouldHaveValidationErrorFor(page < 0 ? "Pagination.Page" : "Pagination.Size");
 	}
 }

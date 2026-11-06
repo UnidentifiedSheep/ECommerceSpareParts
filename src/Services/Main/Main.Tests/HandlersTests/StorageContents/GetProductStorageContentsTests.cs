@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Abstractions.Models;
 using Application.Common.Models;
 using Main.Application.Handlers.StorageContents.GetProductStorageContents;
@@ -169,26 +171,6 @@ public class GetProductStorageContentsTests : IntegrationTest
 		Assert.True(result.Content.ContainsKey(item));
 	}
 
-	[Theory]
-	[InlineData(-1, 10)]
-	[InlineData(0, 0)]
-	[InlineData(0, 101)]
-	public async Task GetProductStorageContents_WithInvalidPagination_ThrowsValidationException(
-		int page,
-		int size)
-	{
-		var productId = GetContext<ProductTestContext>().Products.First().Id;
-		var item = new GetProductStorageContentsItem(
-			productId,
-			new Pagination(page, size),
-			null,
-			true);
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new GetProductStorageContentsQuery([item]),
-			CancellationToken));
-	}
-
 	private async Task<StorageContent> CreateContent(
 		int productId,
 		string storageCode,
@@ -201,5 +183,28 @@ public class GetProductStorageContentsTests : IntegrationTest
 			.WithCurrencyId(currencyId)
 			.WithCount(count)
 			.BuildAndAddToDb(Context);
+	}
+}
+
+public class GetProductStorageContentsValidationTests : ValidationTest<GetProductStorageContentsValidation, GetProductStorageContentsQuery>
+{
+	[Theory]
+	[InlineData(-1, 10)]
+	[InlineData(0, 0)]
+	[InlineData(0, 101)]
+	public async Task GetProductStorageContents_WithInvalidPagination_FailsValidation(
+		int page,
+		int size)
+	{
+		var productId = 1;
+		var item = new GetProductStorageContentsItem(
+			productId,
+			new Pagination(page, size),
+			null,
+			true);
+
+		var result = await ValidateAsync(
+			new GetProductStorageContentsQuery([item]));
+		result.ShouldHaveValidationErrorFor(page < 0 ? "Items[0].Pagination.Page" : "Items[0].Pagination.Size");
 	}
 }

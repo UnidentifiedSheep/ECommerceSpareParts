@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Application.Handlers.PriceApplier;
@@ -189,11 +191,17 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 		markup.States[0].Enabled.Should().BeFalse();
 	}
 
+
+}
+
+public class GetPriceAppliersValidationTests : ValidationTest<GetPriceAppliersValidation, GetPriceAppliersQuery>
+{
 	[Fact]
-	public async Task WithInvalidUsage_ThrowsValidationException()
+	public async Task WithInvalidUsage_FailsValidation()
 	{
 		var query = new GetPriceAppliersQuery((PriceOfferSourceType)int.MaxValue);
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query, CancellationToken));
+		var result = await ValidateAsync(query);
+		result.ShouldHaveValidationErrorFor(x => x.Usage);
 	}
 }

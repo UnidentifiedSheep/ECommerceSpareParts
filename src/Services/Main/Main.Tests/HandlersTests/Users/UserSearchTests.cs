@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Application.Common.Models;
 using Enums;
 using FluentAssertions;
@@ -159,28 +161,6 @@ public sealed class UserSearchTests : IntegrationTest
 			result.Users.Should().BeEmpty();
 	}
 
-	[Theory]
-	[InlineData(null)]
-	[InlineData("")]
-	[InlineData("   ")]
-	[InlineData("\t\r\n")]
-	public async Task Search_EmptyTermIsRejectedWithLocalizedMessage(string? term)
-	{
-		var exception = await Assert.ThrowsAsync<ValidationException>(() => Search(term!));
-
-		exception.Errors.Should().ContainSingle(error =>
-			error.PropertyName == nameof(SearchUsersQuery.SearchTerm) && error.ErrorCode == "search.string.required");
-	}
-
-	[Fact]
-	public async Task Search_TermOver200CharactersIsRejectedWithLocalizedMessage()
-	{
-		var exception = await Assert.ThrowsAsync<ValidationException>(() => Search(new string('a', 201)));
-
-		exception.Errors.Should().ContainSingle(error =>
-			error.PropertyName == nameof(SearchUsersQuery.SearchTerm) && error.ErrorCode == "search.string.max.length");
-	}
-
 	[Fact]
 	public async Task Search_TermOf200CharactersIsAccepted()
 	{
@@ -188,18 +168,6 @@ public sealed class UserSearchTests : IntegrationTest
 		var user = await CreateUser("search-length-boundary", "Граница", "Поиска", term);
 
 		(await Search(term)).Users.Select(result => result.Id).Should().Equal(user.Id);
-	}
-
-	[Theory]
-	[InlineData(-1, 25)]
-	[InlineData(0, 0)]
-	[InlineData(0, 101)]
-	public async Task Search_InvalidPaginationIsRejected(int page, int size)
-	{
-		var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-			Search(RoleSearchTerm, new Pagination(page, size)));
-
-		exception.Errors.Should().Contain(error => error.PropertyName.StartsWith("Pagination.", StringComparison.Ordinal));
 	}
 
 	private async Task PrepareRoleSearchProfiles()
@@ -217,4 +185,35 @@ public sealed class UserSearchTests : IntegrationTest
 	private Task<User> CreateUser(string login, string name, string surname, string? description = null) =>
 		new UserBuilder(Faker).WithUserName(login).WithUserInfo(name, surname, description)
 			.BuildAndAddToDb(Context);
+}
+
+public class SearchUsersValidationTests : ValidationTest<SearchUsersValidation, SearchUsersQuery>
+{
+	[Theory]
+	[InlineData(null)]
+	[InlineData("")]
+	[InlineData("   ")]
+	[InlineData("\t\r\n")]
+	public async Task Search_EmptyTermIsRejectedWithLocalizedMessage(string? term)
+	{
+		var result = await ValidateAsync(new SearchUsersQuery(term!, null, new Pagination(0, 25)));
+		result.ShouldHaveValidationErrorFor(x => x.SearchTerm).WithErrorCode("search.string.required").Only();
+	}
+
+	[Fact]
+	public async Task Search_TermOver200CharactersIsRejectedWithLocalizedMessage()
+	{
+		var result = await ValidateAsync(new SearchUsersQuery(new string('a', 201), null, new Pagination(0, 25)));
+		result.ShouldHaveValidationErrorFor(x => x.SearchTerm).WithErrorCode("search.string.max.length").Only();
+	}
+
+	[Theory]
+	[InlineData(-1, 25)]
+	[InlineData(0, 0)]
+	[InlineData(0, 101)]
+	public async Task Search_InvalidPaginationIsRejected(int page, int size)
+	{
+		var result = await ValidateAsync(new SearchUsersQuery("search", null, new Pagination(page, size)));
+		result.ShouldHaveValidationErrorFor(page < 0 ? "Pagination.Page" : "Pagination.Size").Only();
+	}
 }

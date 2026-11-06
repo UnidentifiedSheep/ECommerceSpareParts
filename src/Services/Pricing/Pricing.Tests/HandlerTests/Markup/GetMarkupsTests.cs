@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Application.Common.Models;
 using FluentAssertions;
 using Pricing.Application.Handlers.Markup.GetMarkups;
@@ -93,10 +95,15 @@ public sealed class GetMarkupsTests(CombinedContainerFixture fixture) : Integrat
 		result.Groups.Select(item => item.Id).Should().Equal(group.Id);
 	}
 
+
+}
+
+public class GetMarkupsValidationTests : ValidationTest<GetMarkupsValidation, GetMarkupsQuery>
+{
 	[Fact]
 	public async Task TooLongSearchTerm_IsRejected()
 	{
-		await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(new GetMarkupsQuery(new Pagination(0, 10), new string('a', 129)), CancellationToken));
+		var result = await ValidateAsync(new GetMarkupsQuery(new Pagination(0, 10), new string('a', 129)));
+		result.ShouldHaveValidationErrorFor(x => x.SearchTerm);
 	}
 }

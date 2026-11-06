@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
@@ -177,27 +179,7 @@ public class GetTransactionsTests : IntegrationTest
 		result.Transactions.Should().Contain(x => x.Id == transaction.Id);
 	}
 
-	[Fact]
-	public async Task GetTransactions_SameSenderAndReceiver_ThrowsValidationException()
-	{
-		var userId = TestContext.Users[0].Id;
 
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			GetQuery(userId, userId),
-			CancellationToken));
-	}
-
-	[Fact]
-	public async Task GetTransactions_WithoutSenderAndReceiver_ThrowsValidationException() =>
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(GetQuery(), CancellationToken));
-
-	[Fact]
-	public async Task GetTransactions_InvalidRange_ThrowsValidationException()
-	{
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			GetQuery(rangeStart: DateTime.UtcNow, rangeEnd: DateTime.UtcNow.AddDays(-1)),
-			CancellationToken));
-	}
 
 	private GetTransactionsQuery GetQuery(
 		Guid? senderId = null,
@@ -299,5 +281,59 @@ public class GetTransactionsTests : IntegrationTest
 		await Context.SaveChangesAsync();
 
 		return transaction;
+	}
+}
+
+public class GetTransactionsValidationTests : ValidationTest<GetTransactionsValidation, GetTransactionsQuery>
+{
+	[Fact]
+	public async Task MissingSenderAndReceiver_FailsValidation()
+	{
+		var result = await ValidateAsync(GetQuery());
+		result.ShouldHaveValidationErrorFor("")
+			.WithErrorCode(Main.Entities.TransactionSenderOrReceiverRequiredMessage.Instance.MessageKey).Only();
+	}
+
+	private static GetTransactionsQuery GetQuery(
+		Guid? senderId = null,
+		Guid? receiverId = null,
+		int? currencyId = null,
+		int size = 20,
+		DateTime? rangeStart = null,
+		DateTime? rangeEnd = null,
+		LogicalOperation logicalOperation = LogicalOperation.And,
+		bool skipReversed = false,
+		Guid? cursorId = null,
+		DateTime? cursorDate = null)
+	{
+		return new GetTransactionsQuery(
+			new RangeModel<DateTime>(rangeStart, rangeEnd),
+			currencyId,
+			senderId,
+			receiverId,
+			logicalOperation,
+			new Cursor<(Guid id, DateTime dt)>(
+				(cursorId ?? Guid.Empty, cursorDate ?? DateTime.MinValue),
+				size),
+			skipReversed);
+	}
+
+
+	[Fact]
+	public async Task GetTransactions_SameSenderAndReceiver_FailsValidation()
+	{
+		var userId = Guid.NewGuid();
+
+		var result = await ValidateAsync(
+			GetQuery(userId, userId));
+		result.ShouldHaveValidationErrorFor("");
+	}
+
+	[Fact]
+	public async Task GetTransactions_InvalidRange_FailsValidation()
+	{
+		var result = await ValidateAsync(
+			GetQuery(rangeStart: DateTime.UtcNow, rangeEnd: DateTime.UtcNow.AddDays(-1)));
+		result.ShouldHaveValidationErrorFor("DateRange");
 	}
 }
