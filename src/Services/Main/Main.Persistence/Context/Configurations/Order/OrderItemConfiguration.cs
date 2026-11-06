@@ -1,4 +1,4 @@
-﻿using Main.Entities.Order;
+using Main.Entities.Order;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,6 +23,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 		builder.Property(e => e.ProductId).HasColumnName("product_id");
 
 		builder.Property(e => e.Count).HasColumnName("count");
+		builder.Property(e => e.IsDeleted).HasColumnName("is_deleted");
 
 		builder.Property(e => e.UnitPrice).HasColumnName("unit_price");
 

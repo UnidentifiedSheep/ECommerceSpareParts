@@ -73,6 +73,31 @@ public class OrderTests
 		item.UnitPrice.Should().Be(12m);
 	}
 
+	[Fact]
+	public void RemoveItem_PreservesItemAndMarksItDeleted()
+	{
+		var order = Create();
+		var item = order.AddItem(1, 2);
+		order.RemoveItem(item);
+		order.Items.Should().ContainSingle().Which.Should().BeSameAs(item);
+		item.IsDeleted.Should().BeTrue();
+		var edit = () => order.ChangeItemCount(item, 3);
+		edit.Should().Throw<InvalidInputException>();
+	}
+
+	[Fact]
+	public void DeletedOrder_CannotBeChangedOrReactivated()
+	{
+		var order = Create();
+		var item = order.AddItem(1, 1);
+		order.Delete();
+		order.Status.Should().Be(OrderStatus.Deleted);
+		Action[] actions = [() => order.AddItem(2, 1), () => order.RemoveItem(item),
+			() => order.ChangeItemCount(item, 2), () => order.Confirm(null), order.Complete, order.Cancel,
+			() => order.SetFulfillmentStatus(OrderFulfillmentStatus.FullyAvailable)];
+		foreach (var action in actions) action.Should().Throw<InvalidInputException>();
+	}
+
 	private static DomainOrder Create()
 		=> DomainOrder.CreateOnline(
 			Guid.NewGuid(),

@@ -20,6 +20,7 @@ public class ChangeOrderStatusTests : IntegrationTest
 	[InlineData(OrderStatus.Confirmed)]
 	[InlineData(OrderStatus.Completed)]
 	[InlineData(OrderStatus.Cancelled)]
+	[InlineData(OrderStatus.Deleted)]
 	public async Task AllowedTransition_PersistsStatusAndUsesProvidedActor(OrderStatus status)
 	{
 		var actorId = Orders.OtherUser.Id;
@@ -27,6 +28,8 @@ public class ChangeOrderStatusTests : IntegrationTest
 		await Mediator.Send(new ChangeOrderStatusCommand(order.Id, actorId, status, order.RowVersion), CancellationToken);
 		var saved = await Context.Orders.AsNoTracking().SingleAsync(x => x.Id == order.Id, CancellationToken);
 		saved.Status.Should().Be(status);
+		if (status == OrderStatus.Deleted)
+			(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should().Be(order.Items.Count);
 		if (status == OrderStatus.Confirmed)
 		{
 			saved.ConfirmedByUserId.Should().Be(actorId);

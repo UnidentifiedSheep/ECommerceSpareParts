@@ -1,3 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+using Exceptions;
+using Main.Entities.Exceptions;
+using Main.Enums.Orders;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
@@ -62,6 +66,104 @@ public class UpsertOrderTests : IntegrationTest
 		(await Context.Orders.AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == dto.Id, CancellationToken))
 			.Items.Single().UnitPrice.Should().Be(200m);
 	}
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task ReplacesItems_SoftDeletesMissingUpdatesRetainedAndAddsNew(bool confirmed)
+	{
+		var order = Orders.OnlineOrder;
+		if (confirmed)
+		{
+			order.Confirm(order.UserId);
+			await Context.SaveChangesAsync(CancellationToken);
+		}
+		var retained = order.Items[0];
+		var removed = order.Items[1];
+		var otherItemIds = await Context.OrderItems.AsNoTracking().Where(item => item.OrderId != order.Id)
+			.Select(item => item.Id).ToArrayAsync(CancellationToken);
+		var dto = new UpsertOrderDto
+		{
+			Id = order.Id, RowVersion = order.RowVersion, OrganizationId = order.OrganizationId,
+			UserId = order.UserId, CurrencyId = order.CurrencyId,
+			Items = [
+				new() { Id = retained.Id, ProductId = retained.ProductId, Count = retained.Count + 1, UnitPrice = retained.UnitPrice },
+				new() { ProductId = removed.ProductId, Count = 7 }]
+		};
+
+		await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
+
+		var saved = await Context.OrderItems.AsNoTracking().Where(item => item.OrderId == order.Id && !item.IsDeleted).ToArrayAsync(CancellationToken);
+		saved.Should().HaveCount(2);
+		saved.Single(item => item.Id == retained.Id).Count.Should().Be(dto.Items.First().Count);
+		saved.Single(item => item.Id != retained.Id).Count.Should().Be(7);
+		(await Context.OrderItems.AsNoTracking().SingleAsync(item => item.Id == removed.Id, CancellationToken)).IsDeleted.Should().BeTrue();
+		(await Context.OrderItems.AsNoTracking().Where(item => item.OrderId != order.Id)
+			.Select(item => item.Id).ToArrayAsync(CancellationToken)).Should().BeEquivalentTo(otherItemIds);
+	}
+
+	[Theory]
+	[InlineData(OrderStatus.Completed)]
+	[InlineData(OrderStatus.Cancelled)]
+	[InlineData(OrderStatus.Deleted)]
+	public async Task RemovingItemFromClosedOrder_IsRejectedWithoutDeletingItems(OrderStatus status)
+	{
+		var order = Orders.OnlineOrder;
+		if (status == OrderStatus.Completed)
+		{
+			order.Confirm(order.UserId);
+			order.Complete();
+		}
+		else if (status == OrderStatus.Deleted) order.Delete();
+		else order.Cancel();
+		await Context.SaveChangesAsync(CancellationToken);
+		var retained = order.Items[0];
+		var dto = new UpsertOrderDto
+		{
+			Id = order.Id, RowVersion = order.RowVersion, OrganizationId = order.OrganizationId,
+			UserId = order.UserId, CurrencyId = order.CurrencyId,
+			Items = [new() { Id = retained.Id, ProductId = retained.ProductId, Count = retained.Count, UnitPrice = retained.UnitPrice }]
+		};
+
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
+
+		(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should().Be(2);
+	}
+
+	[Fact]
+	public async Task ItemFromAnotherOrder_IsRejectedWithoutDeletingItems()
+	{
+		var dto = UpdateDto();
+		dto = dto with { Items = [dto.Items.Single() with { Id = Orders.OnlineOrder.Items[0].Id }] };
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
+		(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == dto.Id, CancellationToken)).Should().Be(1);
+	}
+
+	[Fact]
+	public async Task SoftDeletedItems_AreNotReturnedAndCannotBeUpdated()
+	{
+		var order = Orders.OnlineOrder;
+		var removed = order.Items[1];
+		order.RemoveItem(removed);
+		await Context.SaveChangesAsync(CancellationToken);
+		var userContext = (global::Tests.Stubs.UserContextMock)Scope.ServiceProvider
+			.GetRequiredService<Security.Core.Interfaces.IUserContext>();
+		userContext.SetIsAuthenticated(true).SetUserId(order.UserId!.Value)
+			.SetPermissions([Main.Entities.Auth.Permission.ToNormalizedPermission(Enums.PermissionCodes.ORDERS_GET)]);
+
+		var result = await Mediator.Send(new Main.Application.Orders.Queries.GetOrderItemsByOrderIdsQuery(order.Id), CancellationToken);
+		result.Items[order.Id].Should().ContainSingle().Which.Id.Should().NotBe(removed.Id);
+
+		var dto = new UpsertOrderDto
+		{
+			Id = order.Id, RowVersion = order.RowVersion, OrganizationId = order.OrganizationId,
+			UserId = order.UserId, CurrencyId = order.CurrencyId,
+			Items = [new() { Id = removed.Id, ProductId = removed.ProductId, Count = removed.Count, UnitPrice = removed.UnitPrice }]
+		};
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
+		(await Context.OrderItems.AsNoTracking().SingleAsync(item => item.Id == removed.Id, CancellationToken))
+			.IsDeleted.Should().BeTrue();
+	}
+
 }
 
 public class UpsertOrderValidationTests : ValidationTest<UpsertOrderValidation, UpsertOrderCommand>
@@ -103,8 +205,34 @@ public class UpsertOrderValidationTests : ValidationTest<UpsertOrderValidation, 
 	{
 		var item = new UpsertOrderItemDto { Id = 1, ProductId = 1, Count = 1 };
 		var result = await ValidateAsync(new UpsertOrderCommand(Valid with
-		{ Id = Guid.NewGuid(), RowVersion = 1, Items = [item, item] }));
+		{ Id = Guid.NewGuid(), RowVersion = 1, Items = [item, item with { ProductId = 2, Count = 3 }] }));
 		result.ShouldHaveValidationErrorFor(x => x.Order.Items)
 			.WithErrorCode(OrderItemsInvalidMessage.Instance.MessageKey).Only();
 	}
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task SeveralNewItemsWithoutIds_AreAccepted(bool updating)
+	{
+		var dto = Valid with
+		{
+			Id = updating ? Guid.NewGuid() : null, RowVersion = updating ? 1u : null,
+			Items = [new() { ProductId = 1, Count = 1 }, new() { ProductId = 2, Count = 2 }]
+		};
+		var result = await ValidateAsync(new UpsertOrderCommand(dto));
+		result.ShouldNotHaveAnyValidationErrors();
+	}
+
+	[Fact]
+	public async Task DifferentExistingIdsMixedWithNewItems_AreAccepted()
+	{
+		var dto = Valid with
+		{
+			Id = Guid.NewGuid(), RowVersion = 1,
+			Items = [new() { Id = 1, ProductId = 1, Count = 1 }, new() { Id = 2, ProductId = 2, Count = 2 }, new() { ProductId = 3, Count = 1 }]
+		};
+		var result = await ValidateAsync(new UpsertOrderCommand(dto));
+		result.ShouldNotHaveAnyValidationErrors();
+	}
+
 }

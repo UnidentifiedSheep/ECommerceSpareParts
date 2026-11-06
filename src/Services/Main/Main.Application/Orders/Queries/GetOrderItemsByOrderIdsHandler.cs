@@ -43,7 +43,7 @@ public sealed class GetOrderItemsByOrderIdsHandler(
 			.Select(order => order.Id);
 
 		var items = await repository.Query
-			.Where(item => orderIds.Contains(item.OrderId))
+			.Where(item => !item.IsDeleted && orderIds.Contains(item.OrderId))
 			.OrderBy(item => item.Id)
 			.Project(projection)
 			.ToListAsync(cancellationToken);

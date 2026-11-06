@@ -40,6 +40,9 @@ public class ChangeOrderStatusHandler(
 			case OrderStatus.Cancelled:
 				order.Cancel();
 				break;
+			case OrderStatus.Deleted:
+				order.Delete();
+				break;
 			default:
 				throw new InvalidInputException(OrderChangeNotAllowedMessage.Instance);
 		}

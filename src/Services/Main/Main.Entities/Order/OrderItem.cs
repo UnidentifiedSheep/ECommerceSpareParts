@@ -14,6 +14,7 @@ public class OrderItem : Entity<OrderItem, int>, ILinqEntity<OrderItem, int>
 	public Guid OrderId { get; private set; }
 	public int ProductId { get; private set; }
 	public int Count { get; private set; }
+	public bool IsDeleted { get; private set; }
 
 	public decimal? UnitPrice { get; private set; }
 	public string? SignedPrice { get; private set; }
@@ -41,6 +42,8 @@ public class OrderItem : Entity<OrderItem, int>, ILinqEntity<OrderItem, int>
 
 		PriceOrigin = priceOrigin;
 	}
+
+	internal void Delete() => IsDeleted = true;
 
 	internal void SetCount(int count)
 	{

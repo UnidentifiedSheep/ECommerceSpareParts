@@ -82,4 +82,24 @@ public sealed class OrderMutations
 			cancellationToken);
 		return new GqlOrder(input.OrderId);
 	}
+
+	[GraphQLName("delete")]
+	[RequireAllPermissions(PermissionCodes.ORDERS_EDIT)]
+	public async Task<GqlOrder> DeleteAsync(
+		GqlChangeOrderStatusInput input,
+		ISender sender,
+		IUserContext userContext,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(
+			new ChangeOrderStatusCommand(
+				input.OrderId,
+				userContext.UserId,
+				OrderStatus.Deleted,
+				input.RowVersion),
+			cancellationToken);
+
+		return new GqlOrder(input.OrderId);
+	}
+
 }

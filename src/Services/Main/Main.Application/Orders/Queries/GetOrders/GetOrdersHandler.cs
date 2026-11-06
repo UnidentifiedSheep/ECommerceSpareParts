@@ -55,9 +55,11 @@ public sealed class GetOrdersHandler(
 		if (request.CurrencyIds.Count > 0)
 			query = query.Where(order => request.CurrencyIds.Contains(order.CurrencyId));
 		if (request.ProductIds.Count > 0)
-			query = query.Where(order => order.Items.Any(item => request.ProductIds.Contains(item.ProductId)));
+			query = query.Where(order => order.Items.Any(item => !item.IsDeleted && request.ProductIds.Contains(item.ProductId)));
 		if (request.Statuses.Count > 0)
 			query = query.Where(order => request.Statuses.Contains(order.Status));
+		else
+			query = query.Where(order => order.Status != OrderStatus.Deleted);
 		if (request.FulfillmentStatuses.Count > 0)
 			query = query.Where(order => request.FulfillmentStatuses.Contains(order.FulfillmentStatus));
 		if (request.Sources.Count > 0)
@@ -95,7 +97,7 @@ public sealed class GetOrdersHandler(
 		return query.Where(order => isId && order.Id == id ||
 			matchingOrganizations.Contains(order.OrganizationId) ||
 			order.UserId.HasValue && matchingUsers.Contains(order.UserId.Value) ||
-			order.Items.Any(item => matchingProducts.Contains(item.ProductId)));
+			order.Items.Any(item => !item.IsDeleted && matchingProducts.Contains(item.ProductId)));
 	}
 
 	private static string EscapePattern(string value) =>

@@ -40,7 +40,9 @@ public class UpsertOrderHandler(
 
 	private static void ProcessItems(UpsertOrderDto dto, Order order)
 	{
-		var existingItems = order.Items.ToDictionary(x => x.Id);
+		var existingItems = order.Items.Where(item => !item.IsDeleted).ToDictionary(x => x.Id);
+		var requestedIds = dto.Items.Where(item => item.Id.HasValue).Select(item => item.Id!.Value).ToHashSet();
+		var toRemove = existingItems.Values.Where(item => !requestedIds.Contains(item.Id)).ToArray();
 
 		foreach (var upDto in dto.Items)
 		{
@@ -48,9 +50,7 @@ public class UpsertOrderHandler(
 			{
 				var item = order.AddItem(upDto.ProductId, upDto.Count);
 				if (upDto.UnitPrice.HasValue)
-				{
 					order.ChangeItemPrice(item, upDto.UnitPrice);
-				}
 				continue;
 			}
 
@@ -58,13 +58,14 @@ public class UpsertOrderHandler(
 				throw new InvalidInputException(OrderItemNotFoundMessage.Instance);
 
 			if (existing.UnitPrice != upDto.UnitPrice)
-			{
 				order.ChangeItemPrice(existing, upDto.UnitPrice);
-			}
 
 			order.ChangeItemCount(existing, upDto.Count);
 			order.ChangeItemProduct(existing, upDto.ProductId);
 		}
+
+		foreach (var item in toRemove)
+			order.RemoveItem(item);
 	}
 
 	private async Task<Order> GetOrder(UpsertOrderDto dto, CancellationToken ct)

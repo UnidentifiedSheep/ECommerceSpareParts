@@ -251,6 +251,34 @@ public sealed class GetOrdersTests : IntegrationTest
 		await Assert.ThrowsAsync<InvalidInputException>(() => Search(Query() with { SortBy = [new SortExpression("unknown")] }));
 	}
 
+	[Fact]
+	public async Task RemovedItems_DoNotMatchProductFilterOrSearch()
+	{
+		var orders = GetContext<OrderTestContext>();
+		var order = orders.OnlineOrder;
+		var item = order.Items[1];
+		var sku = await Context.Products.Where(product => product.Id == item.ProductId)
+			.Select(product => product.Sku.Value).SingleAsync(CancellationToken);
+		order.RemoveItem(item);
+		await Context.SaveChangesAsync(CancellationToken);
+
+		(await Search(Query() with { ProductIds = [item.ProductId] })).Orders.Should().NotContain(x => x.Id == order.Id);
+		(await Search(Query() with { SearchTerm = sku })).Orders.Should().NotContain(x => x.Id == order.Id);
+	}
+
+	[Fact]
+	public async Task DeletedOrder_IsHiddenByDefaultButAvailableByStatusAndId()
+	{
+		var order = GetContext<OrderTestContext>().OnlineOrder;
+		order.Delete();
+		await Context.SaveChangesAsync(CancellationToken);
+
+		(await Search()).Orders.Should().NotContain(item => item.Id == order.Id);
+		(await Search(Query() with { Statuses = [OrderStatus.Deleted] })).Orders.Select(item => item.Id).Should().Equal(order.Id);
+		var byId = await Mediator.Send(new Main.Application.Orders.Queries.GetOrdersByIdsQuery(order.Id), CancellationToken);
+		byId.Orders[order.Id].Status.Should().Be(OrderStatus.Deleted);
+	}
+
 	private static GetOrdersQuery Query() => new(new(), new(0, 100), [], [], [], [], [], [], [], [], null);
 
 	private Task<GetOrdersResult> Search(GetOrdersQuery? query = null, PermissionCodes? permission = PermissionCodes.ORDERS_GET)

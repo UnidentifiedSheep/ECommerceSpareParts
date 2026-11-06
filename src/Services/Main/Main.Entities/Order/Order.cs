@@ -61,6 +61,13 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVe
 		return item;
 	}
 
+	public void RemoveItem(OrderItem item)
+	{
+		CheckIfBelongs(item);
+		EnsureItemsEditable();
+		item.Delete();
+	}
+
 	public void ChangeCurrency(int currencyId)
 	{
 		if (CurrencyId == currencyId) return;
@@ -141,9 +148,11 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVe
 		Status = OrderStatus.Cancelled;
 	}
 
+	public void Delete() => Status = OrderStatus.Deleted;
+
 	public void SetFulfillmentStatus(OrderFulfillmentStatus status)
 	{
-		if (Status is OrderStatus.Completed or OrderStatus.Cancelled)
+		if (Status is OrderStatus.Completed or OrderStatus.Cancelled or OrderStatus.Deleted)
 			throw new InvalidInputException(OrderChangeNotAllowedMessage.Instance);
 
 		FulfillmentStatus = status;
@@ -157,7 +166,7 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVe
 
 	private void CheckIfBelongs(OrderItem item)
 	{
-		if (!_items.Contains(item))
+		if (!_items.Contains(item) || item.IsDeleted)
 			throw new InvalidInputException(OrderItemNotFoundMessage.Instance);
 	}
 

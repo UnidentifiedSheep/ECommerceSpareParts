@@ -22,7 +22,11 @@ public class UpsertOrderValidation : AbstractValidator<UpsertOrderCommand>
 			When(x => x.Order.Items != null, () =>
 			{
 				RuleFor(x => x.Order.Items)
-					.Must(items => items.Where(item => item != null && item.Id.HasValue).Select(item => item.Id).Distinct().Count() == items.Count(item => item != null && item.Id.HasValue))
+					.Must(items =>
+					{
+						var ids = items.Where(item => item?.Id != null).Select(item => item.Id!.Value).ToArray();
+						return ids.Distinct().Count() == ids.Length;
+					})
 					.WithLocalizableError(OrderItemsInvalidMessage.Instance);
 				RuleForEach(x => x.Order.Items).NotNull().WithLocalizableError(OrderItemInvalidMessage.Instance);
 				RuleForEach(x => x.Order.Items).ChildRules(item =>

@@ -1198,6 +1198,10 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("count");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid")
                         .HasColumnName("order_id");
