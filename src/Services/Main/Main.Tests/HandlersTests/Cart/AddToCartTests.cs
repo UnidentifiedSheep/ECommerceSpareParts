@@ -1,4 +1,7 @@
-﻿using Main.Entities.Exceptions;
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
+using Main.Entities.Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Cart.AddToCart;
 using Main.Application.Static;
@@ -66,20 +69,6 @@ public class AddToCartTests : IntegrationTest
 		Assert.IsType<CartItemAlreadyExistsException>(exception.Failures[0].Error);
 	}
 
-	[Theory]
-	[InlineData(0)]
-	[InlineData(-1)]
-	public async Task AddToCart_InvalidCount_ThrowsValidationException(int count)
-	{
-		var (user, product) = GetUserAndProduct();
-		var command = new AddToCartCommand(
-			user.Id,
-			product.Id,
-			count);
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
 	[Fact]
 	public async Task AddToCart_UserNotFound_ThrowsUserNotFoundException()
 	{
@@ -107,4 +96,18 @@ public class AddToCartTests : IntegrationTest
 	}
 
 	private (User, Product) GetUserAndProduct() => (_usersContext.Users.First(), _productContext.Products[0]);
+}
+
+public class AddToCartValidationTests : ValidationTest<AddToCartValidation, AddToCartCommand>
+{
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task AddToCart_InvalidCount_FailsValidation(int count)
+	{
+		var result = await ValidateAsync(new AddToCartCommand(Guid.NewGuid(), 1, count));
+		result.ShouldHaveValidationErrorFor(x => x.Count)
+			.WithErrorCode(PositionCountMustBeGreaterThanZeroMessage.Instance.MessageKey)
+			.WithCustomState(PositionCountMustBeGreaterThanZeroMessage.Instance).Only();
+	}
 }

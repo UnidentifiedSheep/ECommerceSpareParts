@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Auth.AddRolesToUser;
@@ -49,17 +52,6 @@ public class AddRolesToUserTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task SystemRoleInBatch_IsRejectedWithoutChangingOtherRoles()
-	{
-		var action = () => Mediator.Send(new AddRolesToUserCommand(TestContext.User.Id,
-			[TestContext.EditorRole.Name, " system "]), CancellationToken);
-
-		await action.Should().ThrowAsync<ValidationException>();
-
-		(await RoleNamesFor(TestContext.User.Id)).Should().BeEquivalentTo(["MEMBER", TestContext.ReaderRole.Name]);
-	}
-
-	[Fact]
 	public async Task EmptyRoles_ReturnsEmptyResult()
 	{
 		var result = await Mediator.Send(new AddRolesToUserCommand(TestContext.User.Id, []), CancellationToken);
@@ -79,4 +71,16 @@ public class AddRolesToUserTests : IntegrationTest
 
 	private Task<string[]> RoleNamesFor(Guid userId) => Context.Set<UserRole>().AsNoTracking()
 		.Where(x => x.UserId == userId).Select(x => x.RoleName).ToArrayAsync(CancellationToken);
+}
+
+public class AddRolesToUserValidationTests : ValidationTest<AddRolesToUserValidation, AddRolesToUserCommand>
+{
+	[Fact]
+	public async Task SystemRoleInBatch_FailsValidation()
+	{
+		var result = await ValidateAsync(new AddRolesToUserCommand(Guid.NewGuid(), ["reader", " system "]));
+		result.ShouldHaveValidationErrorFor("RoleNames[1]")
+			.WithErrorCode(CantAddSystemRoleToUserMessage.Instance.MessageKey)
+			.WithCustomState(CantAddSystemRoleToUserMessage.Instance).Only();
+	}
 }

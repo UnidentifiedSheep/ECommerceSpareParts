@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using FluentValidation;
 using Main.Application.Dtos.NotificationPreference;
@@ -121,30 +123,22 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 		preferences.Single(x => x.UserId == user.Id).Enabled.Should().BeFalse();
 	}
 
+
+}
+
+public class UpsertNotificationPreferencesValidationTests : ValidationTest<UpsertNotificationPreferencesValidation, UpsertNotificationPreferencesCommand>
+{
 	[Fact]
 	public async Task UpsertPreferences_WithDuplicateChannels_ReturnsLocalizedValidationError()
 	{
-		var user = PreferencesContext.Users[2];
-		var command = new UpsertNotificationPreferencesCommand(user.Id,
+		var command = new UpsertNotificationPreferencesCommand(Guid.NewGuid(),
 			[
-				new UpsertUserNotificationPreferenceDto
-				{
-					ChannelName = EmailRecipient.ChannelName,
-					IsEnabled = true
-				},
-				new UpsertUserNotificationPreferenceDto
-				{
-					ChannelName = EmailRecipient.ChannelName,
-					IsEnabled = false
-				}
+				new UpsertUserNotificationPreferenceDto { ChannelName = EmailRecipient.ChannelName, IsEnabled = true },
+				new UpsertUserNotificationPreferenceDto { ChannelName = EmailRecipient.ChannelName, IsEnabled = false }
 			]);
-
-		var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(command, CancellationToken));
-
-		exception.Errors.Should().ContainSingle(x =>
-			x.ErrorCode == NotificationsChannelDuplicateMessage.Key);
-		(await Context.UserNotificationPreferences.AsNoTracking()
-			.CountAsync(x => x.UserId == user.Id, CancellationToken)).Should().Be(0);
+		var result = await ValidateAsync(command);
+		result.ShouldHaveValidationErrorFor(x => x.Preferences)
+			.WithErrorCode(NotificationsChannelDuplicateMessage.Key)
+			.WithCustomState(NotificationsChannelDuplicateMessage.Instance).Only();
 	}
 }

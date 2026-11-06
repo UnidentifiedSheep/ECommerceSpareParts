@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Abstractions.Models.Options;
 using Exceptions;
 using FluentAssertions;
@@ -112,22 +115,6 @@ public class AddEmailToUserTests(CombinedContainerFixture fixture) : Integration
 		await action.Should().ThrowAsync<UserNotFoundException>();
 	}
 
-	[Theory]
-	[InlineData("invalid-email", EmailType.Personal)]
-	[InlineData("valid@example.com", (EmailType)999)]
-	public async Task AddEmail_InvalidInput_ThrowsValidationException(string email, EmailType emailType)
-	{
-		var user = await CreateUser();
-
-		var action = () => Mediator.Send(
-			new AddEmailToUserCommand(
-				user.Id,
-				email,
-				emailType));
-
-		await action.Should().ThrowAsync<ValidationException>();
-	}
-
 	private async Task<User> CreateUser(string? primaryEmail = null)
 	{
 		var builder = new MemberUserBuilder(Faker);
@@ -138,5 +125,25 @@ public class AddEmailToUserTests(CombinedContainerFixture fixture) : Integration
 		var user = await builder.BuildAndAddToDb(Context);
 		Context.ChangeTracker.Clear();
 		return user;
+	}
+}
+
+public class AddEmailToUserValidationTests : ValidationTest<AddEmailToUserValidation, AddEmailToUserCommand>
+{
+	protected override AddEmailToUserValidation CreateValidator() =>
+		new(new Application.Common.Validators.EmailValidator());
+
+	[Theory]
+	[InlineData("invalid-email", EmailType.Personal)]
+	[InlineData("valid@example.com", (EmailType)999)]
+	public async Task AddEmail_InvalidInput_FailsValidation(string email, EmailType emailType)
+	{
+		var result = await ValidateAsync(new AddEmailToUserCommand(Guid.NewGuid(), email, emailType));
+		if (emailType == (EmailType)999)
+			result.ShouldHaveValidationErrorFor(x => x.EmailType).Only();
+		else
+			result.ShouldHaveValidationErrorFor(x => x.Email)
+				.WithErrorCode(EmailMustBeValidMessage.Instance.MessageKey)
+				.WithCustomState(EmailMustBeValidMessage.Instance).Only();
 	}
 }

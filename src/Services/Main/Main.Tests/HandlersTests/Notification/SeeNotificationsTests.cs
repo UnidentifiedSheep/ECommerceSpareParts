@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Handlers.Notifications.SeeNotifications;
 using Main.Entities;
@@ -66,19 +68,6 @@ public class SeeNotificationsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task SeeNotifications_RejectsMoreThan100Ids()
-	{
-		var user = NotificationsContext.Users[0];
-		var ids = Enumerable.Range(1, 101).ToArray();
-
-		var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-			Mediator.Send(new SeeNotificationsCommand(user.Id, ids), CancellationToken));
-
-		exception.Errors.Should().ContainSingle(x =>
-			x.ErrorCode == NotificationsSeeTooManyMessage.Key);
-	}
-
-	[Fact]
 	public async Task SeeNotifications_Accepts100Ids()
 	{
 		var user = NotificationsContext.Users[0];
@@ -94,5 +83,17 @@ public class SeeNotificationsTests : IntegrationTest
 		var persisted = await Context.InAppNotifications.AsNoTracking()
 			.SingleAsync(x => x.Id == unread.Id, CancellationToken);
 		persisted.SeenAt.Should().NotBeNull();
+	}
+}
+
+public class SeeNotificationsValidationTests : ValidationTest<SeeNotificationsValidation, SeeNotificationsCommand>
+{
+	[Fact]
+	public async Task SeeNotifications_RejectsMoreThan100Ids()
+	{
+		var result = await ValidateAsync(new SeeNotificationsCommand(Guid.NewGuid(), Enumerable.Range(1, 101).ToArray()));
+		result.ShouldHaveValidationErrorFor(x => x.Ids)
+			.WithErrorCode(NotificationsSeeTooManyMessage.Key)
+			.WithCustomState(NotificationsSeeTooManyMessage.Instance).Only();
 	}
 }

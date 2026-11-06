@@ -1,4 +1,7 @@
-﻿using Main.Application.Handlers.Cart.ChangeCartItemCount;
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
+using Main.Application.Handlers.Cart.ChangeCartItemCount;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
@@ -57,16 +60,19 @@ public class ChangeCartItemCountTests : IntegrationTest
 		await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
 
+
+}
+
+public class ChangeCartItemCountValidationTests : ValidationTest<ChangeCartItemCountValidation, ChangeCartItemCountCommand>
+{
 	[Theory]
 	[InlineData(0)]
 	[InlineData(-1)]
-	public async Task ChangeCartItemCount_InvalidCount_ThrowsValidationException(int newCount)
+	public async Task ChangeCartItemCount_InvalidCount_FailsValidation(int newCount)
 	{
-		var command = new ChangeCartItemCountCommand(
-			_cartItem.UserId,
-			_cartItem.ProductId,
-			newCount);
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
+		var result = await ValidateAsync(new ChangeCartItemCountCommand(Guid.NewGuid(), 1, newCount));
+		result.ShouldHaveValidationErrorFor(x => x.NewCount)
+			.WithErrorCode(PositionCountMustBeGreaterThanZeroMessage.Instance.MessageKey)
+			.WithCustomState(PositionCountMustBeGreaterThanZeroMessage.Instance).Only();
 	}
 }

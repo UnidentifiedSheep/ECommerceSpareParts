@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
+using FluentAssertions;
 using Main.Application.Handlers.Auth.UpsertRole;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.Auth;
@@ -9,16 +12,7 @@ namespace Tests.HandlersTests.Roles;
 
 public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-	[Theory]
-	[InlineData("")]
-	[InlineData("  ")]
-	[InlineData("ab")]
-	public async Task UpsertRole_InvalidName_ThrowsValidation(string invalidName)
-	{
-		var command = new UpsertRoleCommand(invalidName, null);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
+
 
 	[Fact]
 	public async Task UpsertRole_ValidData_CreatesRole()
@@ -56,5 +50,18 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 		roleInDb.Should().NotBeNull();
 		roleInDb.Description.Should().Be(command.Description);
 		roleInDb.Name.Should().Be(role.Name);
+	}
+}
+
+public class UpsertRoleValidationTests : ValidationTest<UpsertRoleValidation, UpsertRoleCommand>
+{
+	[Theory]
+	[InlineData("")]
+	[InlineData("  ")]
+	[InlineData("ab")]
+	public async Task UpsertRole_InvalidName_FailsValidation(string invalidName)
+	{
+		var result = await ValidateAsync(new UpsertRoleCommand(invalidName, null));
+		result.ShouldHaveValidationErrorFor(x => x.Name).Only();
 	}
 }
