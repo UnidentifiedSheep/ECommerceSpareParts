@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Dtos.Product;
@@ -34,35 +37,6 @@ public class CreateProductTests : IntegrationTest
 
 		for (var i = 0; i < dtos.Count; i++)
 			Validate(dtos[i], products[i]);
-	}
-
-	[Fact]
-	public async Task CreateArticle_WithEmptyList_FailsValidation()
-	{
-		var command = new CreateProductsCommand([]);
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
-	[Fact]
-	public async Task CreateArticle_WithLongName_FailsValidation()
-	{
-		var dtos = CreateDtos(1)[0] with
-		{
-			Name = string.Join(" ", TestContext.Faker.Lorem.Words(100))
-		};
-
-		var command = new CreateProductsCommand([dtos]);
-		var act = () => Mediator.Send(command);
-
-		await act.Should().ThrowAsync<ValidationException>();
-	}
-
-	[Fact]
-	public async Task CreateArticle_WithManyItems_FailsValidation()
-	{
-		var act = () => Mediator.Send(new CreateProductsCommand(CreateDtos(200)));
-		await act.Should().ThrowAsync<ValidationException>();
 	}
 
 	[Fact]
@@ -127,5 +101,34 @@ public class CreateProductTests : IntegrationTest
 				ProducerId = TestContext.Faker.PickRandom(TestContext.Producers.Select(p => p.Id).ToArray())
 			})
 			.ToList();
+	}
+}
+
+public class CreateProductsValidationTests : ValidationTest<CreateProductsValidation, CreateProductsCommand>
+{
+	private static CreateProductDto ValidProduct() => new() { Sku = "ABC-123", Name = "Product", ProducerId = 1 };
+
+	[Fact]
+	public async Task CreateArticle_WithEmptyList_FailsValidation()
+	{
+		var result = await ValidateAsync(new CreateProductsCommand([]));
+		result.ShouldHaveValidationErrorFor(x => x.NewProducts)
+			.WithErrorCode(ArticleCreateArticlesMustHaveAtLeastOneMessage.Instance.MessageKey).WithCustomState(ArticleCreateArticlesMustHaveAtLeastOneMessage.Instance).Only();
+	}
+
+	[Fact]
+	public async Task CreateArticle_WithLongName_FailsValidation()
+	{
+		var result = await ValidateAsync(new CreateProductsCommand([ValidProduct() with { Name = new string('x', 256) }]));
+		result.ShouldHaveValidationErrorFor("NewProducts[0].Name")
+			.WithErrorCode(ArticleNameMaxLength255Message.Instance.MessageKey).WithCustomState(ArticleNameMaxLength255Message.Instance).Only();
+	}
+
+	[Fact]
+	public async Task CreateArticle_WithManyItems_FailsValidation()
+	{
+		var result = await ValidateAsync(new CreateProductsCommand(Enumerable.Range(0, 200).Select(_ => ValidProduct()).ToList()));
+		result.ShouldHaveValidationErrorFor(x => x.NewProducts)
+			.WithErrorCode(ArticleCreateArticlesMax100AtOnceMessage.Instance.MessageKey).WithCustomState(ArticleCreateArticlesMax100AtOnceMessage.Instance).Only();
 	}
 }

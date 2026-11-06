@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Products.Commands.UpsertProductGroup;
 using Main.Entities;
@@ -122,18 +124,19 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 		(await Context.ProductGroups.CountAsync(CancellationToken)).Should().Be(0);
 	}
 
+
+}
+
+public class UpsertProductGroupValidationTests : ValidationTest<UpsertProductGroupValidation, UpsertProductGroupCommand>
+{
 	[Theory]
 	[InlineData("")]
 	[InlineData("  ")]
 	[InlineData("ab")]
 	[InlineData("!!!")]
-	public async Task InvalidName_ThrowsValidation(string name)
+	public async Task InvalidName_FailsValidation(string name)
 	{
-		var act = () => Mediator.Send(
-			new UpsertProductGroupCommand(null, name),
-			CancellationToken);
-
-		await act.Should().ThrowAsync<ValidationException>();
-		(await Context.ProductGroups.CountAsync(CancellationToken)).Should().Be(0);
+		var result = await ValidateAsync(new UpsertProductGroupCommand(null, name));
+		result.ShouldHaveValidationErrorFor(x => x.Name).Only();
 	}
 }

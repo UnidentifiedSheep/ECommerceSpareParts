@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.CreateProducer;
@@ -12,36 +15,6 @@ namespace Tests.HandlersTests.Producers;
 
 public class CreateProducerTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-	[Theory]
-	[InlineData("")]
-	[InlineData("           ")]
-	[InlineData("a")]
-	public async Task CreateProducer_TooShortName_FailsValidation(string name)
-	{
-		var producer = CreateDto() with
-		{
-			Name = name
-		};
-		var command = new CreateProducerCommand(producer);
-
-		var act = () => Mediator.Send(command);
-
-		await act.Should().ThrowAsync<ValidationException>();
-	}
-
-	[Fact]
-	public async Task CreateProducer_TooLargeDescription_FailsValidation()
-	{
-		var producer = CreateDto() with
-		{
-			Description = Faker.Lorem.Letter(600)
-		};
-		var command = new CreateProducerCommand(producer);
-
-		var act = () => Mediator.Send(command);
-
-		await act.Should().ThrowAsync<ValidationException>();
-	}
 
 	[Fact]
 	public async Task CreateProducer_WithValidData_Succeeds()
@@ -83,5 +56,25 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 		{
 			Name = Faker.Lorem.Word(), Description = Faker.Lorem.Sentence()
 		};
+	}
+}
+
+public class CreateProducerValidationTests : ValidationTest<CreateProducerValidation, CreateProducerCommand>
+{
+	[Theory]
+	[InlineData("")]
+	[InlineData("           ")]
+	[InlineData("a")]
+	public async Task CreateProducer_TooShortName_FailsValidation(string name)
+	{
+		var result = await ValidateAsync(new CreateProducerCommand(new NewProducerDto { Name = name, Description = null }));
+		result.ShouldHaveValidationErrorFor(x => x.NewProducer.Name).Only();
+	}
+
+	[Fact]
+	public async Task CreateProducer_TooLargeDescription_FailsValidation()
+	{
+		var result = await ValidateAsync(new CreateProducerCommand(new NewProducerDto { Name = "Bosch", Description = new string('x', 600) }));
+		result.ShouldHaveValidationErrorFor(x => x.NewProducer.Description).Only();
 	}
 }

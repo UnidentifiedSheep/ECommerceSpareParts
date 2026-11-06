@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Handlers.Characteristics.UpsertCharacteristic;
 using Main.Entities;
@@ -122,32 +124,6 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(0);
 	}
 
-	[Theory]
-	[InlineData(null)]
-	[InlineData("")]
-	[InlineData("  ")]
-	[InlineData("!!!")]
-	public async Task InvalidName_ThrowsValidation(string? name)
-	{
-		var act = () => Mediator.Send(
-			new UpsertCharacteristicCommand(null, name!),
-			CancellationToken);
-
-		await act.Should().ThrowAsync<ValidationException>();
-		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(0);
-	}
-
-	[Fact]
-	public async Task NameOverMaximumLength_ThrowsValidation()
-	{
-		var act = () => Mediator.Send(
-			new UpsertCharacteristicCommand(null, new string('a', 129)),
-			CancellationToken);
-
-		await act.Should().ThrowAsync<ValidationException>();
-		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(0);
-	}
-
 	[Fact]
 	public async Task NameAtMaximumLength_CreatesCharacteristic()
 	{
@@ -159,14 +135,35 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 		result.Characteristic.NormalizedName.Should().HaveLength(128);
 	}
 
+
+}
+
+public class UpsertCharacteristicValidationTests : ValidationTest<UpsertCharacteristicValidation, UpsertCharacteristicCommand>
+{
+	[Theory]
+	[InlineData(null)]
+	[InlineData("")]
+	[InlineData("  ")]
+	[InlineData("!!!")]
+	public async Task InvalidName_FailsValidation(string? name)
+	{
+		var result = await ValidateAsync(new UpsertCharacteristicCommand(null, name!));
+		result.ShouldHaveValidationErrorFor(x => x.Name).Only();
+	}
+
+	[Fact]
+	public async Task NameOverMaximumLength_FailsValidation()
+	{
+		var result = await ValidateAsync(new UpsertCharacteristicCommand(null, new string('a', 129)));
+		result.ShouldHaveValidationErrorFor(x => x.Name).Only();
+	}
+
 	[Theory]
 	[InlineData(0)]
 	[InlineData(-1)]
-	public async Task InvalidId_ThrowsValidation(int id)
+	public async Task InvalidId_FailsValidation(int id)
 	{
-		var act = () => Mediator.Send(new UpsertCharacteristicCommand(id, "Color"), CancellationToken);
-
-		await act.Should().ThrowAsync<ValidationException>();
-		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(0);
+		var result = await ValidateAsync(new UpsertCharacteristicCommand(id, "Color"));
+		result.ShouldHaveValidationErrorFor(x => x.Id).Only();
 	}
 }

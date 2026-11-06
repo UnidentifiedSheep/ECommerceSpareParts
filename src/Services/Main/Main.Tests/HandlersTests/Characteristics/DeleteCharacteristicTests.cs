@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Handlers.Characteristics.DeleteCharacteristic;
 using Main.Entities;
@@ -78,13 +80,17 @@ public class DeleteCharacteristicTests : IntegrationTest
 		(await Context.ProductCharacteristics.CountAsync(CancellationToken)).Should().Be(1);
 	}
 
+
+}
+
+public class DeleteCharacteristicValidationTests : ValidationTest<DeleteCharacteristicValidation, DeleteCharacteristicCommand>
+{
 	[Theory]
 	[InlineData(0)]
 	[InlineData(-1)]
-	public async Task InvalidId_ThrowsValidation(int id)
+	public async Task InvalidId_FailsValidation(int id)
 	{
-		var act = () => Mediator.Send(new DeleteCharacteristicCommand(id), CancellationToken);
-
-		await act.Should().ThrowAsync<ValidationException>();
+		var result = await ValidateAsync(new DeleteCharacteristicCommand(id));
+		result.ShouldHaveValidationErrorFor(x => x.Id).Only();
 	}
 }

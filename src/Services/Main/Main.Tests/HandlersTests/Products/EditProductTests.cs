@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Abstractions.Models;
 using Application.Common.Models;
 using Application.Common.Interfaces.Events;
@@ -197,23 +200,6 @@ public class EditProductTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task EditArticle_WithEmptyArticleNumber_FailsValidation()
-	{
-		var command = new PatchProductCommand(
-			GetFirstId(),
-			new PatchProductDto
-			{
-				Sku = new PatchField<string>
-				{
-					IsSet = true, Value = ""
-				}
-			});
-
-		var act = () => Mediator.Send(command, CancellationToken);
-		await act.Should().ThrowAsync<ValidationException>();
-	}
-
-	[Fact]
 	public async Task EditArticle_WhenNothingEdited_Succeeds()
 	{
 		var command = new PatchProductCommand(
@@ -228,22 +214,6 @@ public class EditProductTests : IntegrationTest
 
 		var act = () => Mediator.Send(command, CancellationToken);
 		await act.Should().NotThrowAsync();
-	}
-
-	[Fact]
-	public async Task EditArticle_WhenArticleNumberNull_FailsValidation()
-	{
-		var command = new PatchProductCommand(
-			GetFirstId(),
-			new PatchProductDto
-			{
-				Sku = new PatchField<string>
-				{
-					IsSet = true, Value = null
-				}
-			});
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
 	}
 
 	private async Task<(ProductDto Reloaded, ProductDto Before)> PatchAndReload(
@@ -273,4 +243,31 @@ public class EditProductTests : IntegrationTest
 
 	private async Task<Product?> GetProduct(int productId) =>
 		await Context.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId, CancellationToken);
+}
+
+public class PatchProductValidationTests : ValidationTest<PatchProductValidation, PatchProductCommand>
+{
+	[Fact]
+	public async Task EditArticle_WithEmptyArticleNumber_FailsValidation()
+	{
+		var result = await ValidateAsync(new PatchProductCommand(1, new PatchProductDto { Sku = PatchField<string>.From("") }));
+		result.ShouldHaveValidationErrorFor("PatchProduct.Sku.Value").Only();
+	}
+
+	[Fact]
+	public async Task EditArticle_WhenArticleNumberNull_FailsValidation()
+	{
+		var result = await ValidateAsync(new PatchProductCommand(1, new PatchProductDto { Sku = PatchField<string>.From(null!) }));
+		result.ShouldHaveValidationErrorFor("PatchProduct.Sku.Value").Only();
+	}
+	[Fact]
+	public async Task InvalidName_FailsValidation()
+	{
+		var result = await ValidateAsync(new PatchProductCommand(1,
+			new PatchProductDto { Name = PatchField<string>.From("ab") }));
+		result.ShouldHaveValidationErrorFor("PatchProduct.Name.Value")
+			.WithErrorCode(ArticleNameMinLength3Message.Instance.MessageKey)
+			.WithCustomState(ArticleNameMinLength3Message.Instance).Only();
+	}
+
 }

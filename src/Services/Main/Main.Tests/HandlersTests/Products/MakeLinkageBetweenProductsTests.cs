@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Dtos.Product;
 using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
@@ -22,20 +25,6 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 	public async Task EmptyBatch_CompletesWithoutValidationErrors()
 	{
 		await Mediator.Send(new MakeLinkageBetweenProductsCommand([]), CancellationToken);
-	}
-
-	[Fact]
-	public async Task MakeLinkage_SameIds_FailsValidation()
-	{
-		var newLinkage = new NewProductLinkageDto
-		{
-			ProductId = 1,
-			CrossProductId = 1,
-			LinkageType = ProductLinkageType.FullCross
-		};
-		var command = new MakeLinkageBetweenProductsCommand([newLinkage]);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
 	}
 
 	[Fact]
@@ -268,5 +257,16 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		var crosses = await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken);
 
 		crosses.Should().HaveCountGreaterThanOrEqualTo(2);
+	}
+}
+
+public class MakeLinkageBetweenProductsValidationTests : ValidationTest<MakeLinkageBetweenProductsValidation, MakeLinkageBetweenProductsCommand>
+{
+	[Fact]
+	public async Task MakeLinkage_SameIds_FailsValidation()
+	{
+		var result = await ValidateAsync(new MakeLinkageBetweenProductsCommand([new NewProductLinkageDto { ProductId = 1, CrossProductId = 1, LinkageType = ProductLinkageType.FullCross }]));
+		result.ShouldHaveValidationErrorFor("Linkages[0]")
+			.WithErrorCode(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance.MessageKey).WithCustomState(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance).Only();
 	}
 }

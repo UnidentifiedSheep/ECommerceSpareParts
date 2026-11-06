@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 using Main.Entities.Exceptions;
@@ -63,16 +66,16 @@ public sealed class CreateCandidateCrossesTests : IntegrationTest
 		crosses.Should().BeEquivalentTo(mustBe);
 	}
 
+
+}
+
+public class CreateCandidateCrossesValidationTests : ValidationTest<CreateCandidateCrossesValidation, CreateCandidateCrossesCommand>
+{
 	[Fact]
 	public async Task WhenEmptyList_Throws()
 	{
-		var act = () => Mediator.Send(
-			new CreateCandidateCrossesCommand(
-				TestContext.Candidates[0].Id,
-				[],
-				ProductLinkageType.SingleCross),
-			CancellationToken);
-
-		await act.Should().ThrowAsync<ValidationException>();
+		var result = await ValidateAsync(new CreateCandidateCrossesCommand(Guid.NewGuid(), [], ProductLinkageType.SingleCross));
+		result.ShouldHaveValidationErrorFor(x => x.CrossCandidateIds)
+			.WithErrorCode(CatalogueCandidateCrossesNotEmptyMessage.Instance.MessageKey).WithCustomState(CatalogueCandidateCrossesNotEmptyMessage.Instance).Only();
 	}
 }
