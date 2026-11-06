@@ -12,12 +12,22 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 	private readonly List<RedisDatabaseLease> _redisLeases = [];
 
 	private Channel<TestEnvironmentSlot> _slots = null!;
+	private readonly Lazy<Task> _initialization;
+	private readonly Lazy<PostgresContainerFixture> _postgres = new(() => new());
+	private readonly Lazy<RedisContainerFixture> _redis = new(() => new());
 
-	public PostgresContainerFixture Postgres { get; } = new();
+	public CombinedContainerFixture()
+	{
+		_initialization = new Lazy<Task>(InitializeCoreAsync);
+	}
 
-	public RedisContainerFixture Redis { get; } = new();
+	public PostgresContainerFixture Postgres => _postgres.Value;
 
-	public async ValueTask InitializeAsync()
+	public RedisContainerFixture Redis => _redis.Value;
+
+	public ValueTask InitializeAsync() => ValueTask.CompletedTask;
+
+	private async Task InitializeCoreAsync()
 	{
 		await Task.WhenAll(Postgres.InitializeAsync().AsTask(), Redis.InitializeAsync().AsTask());
 
@@ -47,7 +57,21 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 
 	public async ValueTask DisposeAsync()
 	{
-		_slots.Writer.TryComplete();
+		if (!_initialization.IsValueCreated) return;
+
+		try
+		{
+			await _initialization.Value;
+		}
+		finally
+		{
+			await DisposeCoreAsync();
+		}
+	}
+
+	private async Task DisposeCoreAsync()
+	{
+		_slots?.Writer.TryComplete();
 
 		foreach (var lease in _redisLeases)
 			await lease.DisposeAsync();
@@ -61,6 +85,8 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 
 	public async ValueTask<TestEnvironmentLease> AcquireAsync(CancellationToken cancellationToken = default)
 	{
+		cancellationToken.ThrowIfCancellationRequested();
+		await _initialization.Value.WaitAsync(cancellationToken);
 		var slot = await _slots.Reader.ReadAsync(cancellationToken);
 
 		return new TestEnvironmentLease(slot, ReleaseAsync);
