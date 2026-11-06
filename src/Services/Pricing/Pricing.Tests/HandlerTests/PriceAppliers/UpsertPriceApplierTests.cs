@@ -1,3 +1,5 @@
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using System.Text.Json.Nodes;
 using Domain.CommonEntities.Job;
 using Exceptions;
@@ -195,21 +197,6 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 	}
 
 	[Fact]
-	public async Task WithDuplicateUsages_ThrowsValidationException()
-	{
-		var command = new UpsertPriceApplierCommand(
-			$"dynamic-{Faker.Random.Guid():N}",
-			"Dynamic price rule",
-			"""{"var":"salePrice"}""",
-			[State(PriceOfferSourceType.Supplier, 10), State(PriceOfferSourceType.Supplier, 20)]);
-
-		var exception =
-			await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-
-		exception.Errors.Should().ContainSingle(x => x.ErrorCode == "price.applier.usage.duplicate");
-	}
-
-	[Fact]
 	public async Task WithDynamicApplierWithoutDslLogic_ThrowsInvalidInputException()
 	{
 		var systemName = $"dynamic-{Faker.Random.Guid():N}";
@@ -249,21 +236,6 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.AsNoTracking()
 			.AnyAsync(x => x.SystemName == systemName, CancellationToken);
 		exists.Should().BeFalse();
-	}
-
-	[Fact]
-	public async Task WithDynamicApplierNameOverMaximumLength_ThrowsValidationException()
-	{
-		var command = new UpsertPriceApplierCommand(
-			$"dynamic-{Faker.Random.Guid():N}",
-			new string('a', 129),
-			"""{"var":"salePrice"}""",
-			[]);
-
-		var exception =
-			await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-
-		exception.Errors.Should().ContainSingle(x => x.ErrorCode == "price.applier.name.max.length");
 	}
 
 	[Theory]
@@ -532,5 +504,22 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			Order = order,
 			Enabled = enabled
 		};
+	}
+}
+
+public class UpsertPriceApplierValidationTests : ValidationTest<UpsertPriceApplierValidation, UpsertPriceApplierCommand>
+{
+	[Fact]
+	public async Task WithDuplicateUsages_FailsValidation()
+	{
+		var result = await ValidateAsync(new UpsertPriceApplierCommand("dynamic-test", "Dynamic price rule", """{"var":"salePrice"}""", [new UpsertPriceApplierStateDto { Usage = PriceOfferSourceType.Supplier, Order = 10, Enabled = true }, new UpsertPriceApplierStateDto { Usage = PriceOfferSourceType.Supplier, Order = 20, Enabled = true }]));
+		result.ShouldHaveValidationErrorFor(x => x.States).WithErrorCode("price.applier.usage.duplicate").Only();
+	}
+
+	[Fact]
+	public async Task WithDynamicApplierNameOverMaximumLength_FailsValidation()
+	{
+		var result = await ValidateAsync(new UpsertPriceApplierCommand("dynamic-test", new string('a', 129), """{"var":"salePrice"}""", []));
+		result.ShouldHaveValidationErrorFor(x => x.Name).WithErrorCode("price.applier.name.max.length").Only();
 	}
 }

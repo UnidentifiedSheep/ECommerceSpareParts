@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Main.Entities.Exceptions;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Static;
@@ -17,71 +20,6 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 	private string GetValidCurrencySign() => Faker.Lorem.Letter();
 
 	private string GetValidShortName() => Faker.Lorem.Letter(3);
-
-	[Theory]
-	[InlineData("")]
-	[InlineData("  ")]
-	[InlineData("d")]
-	[InlineData("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")]
-	public async Task CreateCurrency_WithInvalidShortName_ThrowsValidationException(string shortName)
-	{
-		var command = new CreateCurrencyCommand(
-			shortName,
-			GetValidName(),
-			GetValidCurrencySign(),
-			GetValidCurrencyCode());
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Theory]
-	[InlineData("")]
-	[InlineData("  ")]
-	[InlineData("d")]
-	[InlineData("tooBig")]
-	public async Task CreateCurrency_WithInvalidName_ThrowsValidationException(string name)
-	{
-		if (name == "tooBig")
-			name = Faker.Lorem.Letter(200);
-		var command = new CreateCurrencyCommand(
-			GetValidShortName(),
-			name,
-			GetValidCurrencySign(),
-			GetValidCurrencyCode());
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Theory]
-	[InlineData("")]
-	[InlineData("  ")]
-	[InlineData("sdfsddddd")]
-	public async Task CreateCurrency_WithInvalidSign_ThrowsValidationException(string sign)
-	{
-		var command = new CreateCurrencyCommand(
-			GetValidShortName(),
-			GetValidName(),
-			sign,
-			GetValidCurrencyCode());
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
-
-	[Theory]
-	[InlineData("")]
-	[InlineData("  ")]
-	[InlineData("d")]
-	[InlineData("sdfsddiimimimimiimimiiimmmmmimimiimmmiiimim")]
-	public async Task CreateCurrency_WithInvalidCode_ThrowsValidationException(string code)
-	{
-		var command = new CreateCurrencyCommand(
-			GetValidShortName(),
-			GetValidName(),
-			GetValidCurrencySign(),
-			code);
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
-	}
 
 	[Fact]
 	public async Task CreateCurrency_WithDuplicateData_ThrowsErrors()
@@ -177,5 +115,51 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 		Assert.Equal(name.Trim(), currencyInDb.Name);
 		Assert.Equal(code.Trim(), currencyInDb.Code);
 		Assert.Equal(sign.Trim(), currencyInDb.CurrencySign);
+	}
+}
+
+public class CreateCurrencyValidationTests : ValidationTest<CreateCurrencyValidation, CreateCurrencyCommand>
+{
+	[Theory]
+	[InlineData("")]
+	[InlineData("  ")]
+	[InlineData("d")]
+	[InlineData("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")]
+	public async Task CreateCurrency_WithInvalidShortName_FailsValidation(string shortName)
+	{
+		var result = await ValidateAsync(new CreateCurrencyCommand(shortName, "US dollar", "$", "USD"));
+		result.ShouldHaveValidationErrorFor(x => x.ShortName).Only();
+	}
+
+	[Theory]
+	[InlineData("")]
+	[InlineData("  ")]
+	[InlineData("d")]
+	[InlineData("tooBig")]
+	public async Task CreateCurrency_WithInvalidName_FailsValidation(string name)
+	{
+		var result = await ValidateAsync(new CreateCurrencyCommand("USD", name == "tooBig" ? new string('x', 200) : name, "$", "USD"));
+		result.ShouldHaveValidationErrorFor(x => x.Name).Only();
+	}
+
+	[Theory]
+	[InlineData("")]
+	[InlineData("  ")]
+	[InlineData("sdfsddddd")]
+	public async Task CreateCurrency_WithInvalidSign_FailsValidation(string sign)
+	{
+		var result = await ValidateAsync(new CreateCurrencyCommand("USD", "US dollar", sign, "USD"));
+		result.ShouldHaveValidationErrorFor(x => x.CurrencySign).Only();
+	}
+
+	[Theory]
+	[InlineData("")]
+	[InlineData("  ")]
+	[InlineData("d")]
+	[InlineData("sdfsddiimimimimiimimiiimmmmmimimiimmmiiimim")]
+	public async Task CreateCurrency_WithInvalidCode_FailsValidation(string code)
+	{
+		var result = await ValidateAsync(new CreateCurrencyCommand("USD", "US dollar", "$", code));
+		result.ShouldHaveValidationErrorFor(x => x.Code).Only();
 	}
 }

@@ -1,4 +1,7 @@
-﻿using Abstractions.Models;
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
+using Abstractions.Models;
 using Application.Common.Models;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageRoutes.EditStorageRoute;
@@ -66,31 +69,21 @@ public class EditStorageRouteTests : IntegrationTest
 			await Mediator.Send(command, CancellationToken));
 	}
 
+}
+
+public class EditStorageRouteValidationTests : ValidationTest<EditStorageRouteValidation, EditStorageRouteCommand>
+{
 	[Fact]
-	public async Task EditStorageRoute_WithInvalidData_ThrowsValidationException()
+	public async Task EditStorageRoute_WithInvalidData_FailsValidation()
 	{
-		var patchDto = new PatchStorageRouteDto
-		{
-			DistanceM = PatchField<int>.From(0)
-		};
-
-		var command = new EditStorageRouteCommand(_testContext.ActiveRoute.Id, patchDto);
-
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
+		var result = await ValidateAsync(new EditStorageRouteCommand(Guid.NewGuid(), new PatchStorageRouteDto { DistanceM = PatchField<int>.From(0) }));
+		result.ShouldHaveValidationErrorFor("PatchStorageRoute.DistanceM.Value").Only();
 	}
 
 	[Fact]
-	public async Task EditStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
+	public async Task EditStorageRoute_WithInvalidPricePrecision_FailsValidation()
 	{
-		var patchDto = new PatchStorageRouteDto
-		{
-			PriceKg = PatchField<decimal>.From(10.555m)
-		};
-
-		var command = new EditStorageRouteCommand(_testContext.ActiveRoute.Id, patchDto);
-
-		await Assert.ThrowsAsync<ValidationException>(async () =>
-			await Mediator.Send(command, CancellationToken));
+		var result = await ValidateAsync(new EditStorageRouteCommand(Guid.NewGuid(), new PatchStorageRouteDto { PriceKg = PatchField<decimal>.From(10.555m) }));
+		result.ShouldHaveValidationErrorFor("PatchStorageRoute.PriceKg.Value").Only();
 	}
 }

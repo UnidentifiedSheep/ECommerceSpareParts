@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Enums;
 using Extensions;
 using FluentAssertions;
@@ -74,58 +77,6 @@ public class CreateTransactionTests : IntegrationTest
 
 		senderBalance.Balance.Should().Be(amount);
 		receiverBalance.Balance.Should().Be(-amount);
-	}
-
-	[Theory]
-	[InlineData(0)]
-	[InlineData(-1)]
-	public async Task CreateTransaction_InvalidAmount_ThrowsValidationException(decimal amount)
-	{
-		var command = GetValidCommand();
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				Amount = amount
-			},
-			CancellationToken));
-	}
-
-	[Fact]
-	public async Task CreateTransaction_TooOldDate_ThrowsValidationException()
-	{
-		var command = GetValidCommand();
-
-		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				TransactionDateTime = DateTime.UtcNow.AddDays(-31)
-			},
-			CancellationToken));
-
-		exception.Errors.Should().ContainSingle().Which.ErrorCode.Should().Be("operation.date.too.old");
-	}
-
-	[Fact]
-	public async Task CreateTransaction_FutureDate_ThrowsValidationException()
-	{
-		var command = GetValidCommand();
-
-		var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			command with
-			{
-				TransactionDateTime = DateTime.UtcNow.AddMinutes(6)
-			},
-			CancellationToken));
-
-		exception
-			.Errors
-			.Should()
-			.ContainSingle()
-			.Which
-			.ErrorCode
-			.Should()
-			.Be("operation.date.cannot.be.in.future");
 	}
 
 	[Fact]
@@ -262,5 +213,37 @@ public class CreateTransactionTests : IntegrationTest
 
 		await Context.AddAsync(profile);
 		await Context.SaveChangesAsync();
+	}
+}
+
+public class CreateTransactionValidationTests : ValidationTest<CreateTransactionValidation, CreateTransactionCommand>
+{
+	protected override CreateTransactionValidation CreateValidator() =>
+		new(new Application.Common.Services.OperationDatePolicy(TimeProvider.System, new global::Tests.Stubs.UserContextMock()));
+
+	private static CreateTransactionCommand ValidCommand() => new(
+		Guid.NewGuid(), Guid.NewGuid(), 100m, 1, DateTime.UtcNow, TransactionSourceType.Manual);
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-1)]
+	public async Task CreateTransaction_InvalidAmount_FailsValidation(decimal amount)
+	{
+		var result = await ValidateAsync(ValidCommand() with { Amount = amount });
+		result.ShouldHaveValidationErrorFor(x => x.Amount).Only();
+	}
+
+	[Fact]
+	public async Task CreateTransaction_TooOldDate_FailsValidation()
+	{
+		var result = await ValidateAsync(ValidCommand() with { TransactionDateTime = DateTime.UtcNow.AddDays(-31) });
+		result.ShouldHaveValidationErrorFor(x => x.TransactionDateTime).WithErrorCode("operation.date.too.old").Only();
+	}
+
+	[Fact]
+	public async Task CreateTransaction_FutureDate_FailsValidation()
+	{
+		var result = await ValidateAsync(ValidCommand() with { TransactionDateTime = DateTime.UtcNow.AddMinutes(6) });
+		result.ShouldHaveValidationErrorFor(x => x.TransactionDateTime).WithErrorCode("operation.date.cannot.be.in.future").Only();
 	}
 }

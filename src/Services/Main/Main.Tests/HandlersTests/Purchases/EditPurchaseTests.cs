@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using Tests.Stubs;
 using Application.Common.Interfaces.Events;
 using Contracts;
@@ -306,39 +309,23 @@ public class EditPurchaseTests : IntegrationTest
 		updatedPurchase.Contents.Single().PurchaseContentLogistic.Should().BeNull();
 	}
 
-	[Fact]
-	public async Task EditPurchase_WithDuplicateContentIds_ThrowsValidationException()
-	{
-		var command = new EditPurchaseCommand(
-			[
-				new EditPurchaseDto
-				{
-					Id = 1,
-					ProductId = 1,
-					Count = 1,
-					Price = 10m
-				},
-				new EditPurchaseDto
-				{
-					Id = 1,
-					ProductId = 1,
-					Count = 1,
-					Price = 10m
-				}
-			],
-			Guid.NewGuid(),
-			GetContext<CurrencyTestContext>().Currencies[0].Id,
-			null,
-			DateTime.UtcNow,
-			false,
-			null);
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command, CancellationToken));
-	}
-
 	private async Task AddStorageOwner(StorageRoute route, Guid supplierId)
 	{
 		Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, supplierId));
 		await Context.SaveChangesAsync();
+	}
+}
+
+public class EditPurchaseValidationTests : ValidationTest<EditPurchaseValidation, EditPurchaseCommand>
+{
+	protected override EditPurchaseValidation CreateValidator() =>
+		new(new Application.Common.Services.OperationDatePolicy(TimeProvider.System, new global::Tests.Stubs.UserContextMock()));
+
+	[Fact]
+	public async Task EditPurchase_WithDuplicateContentIds_FailsValidation()
+	{
+		var result = await ValidateAsync(new EditPurchaseCommand([new EditPurchaseDto { Id = 1, ProductId = 1, Count = 1, Price = 10m }, new EditPurchaseDto { Id = 1, ProductId = 1, Count = 1, Price = 10m }], Guid.NewGuid(), 1, null, DateTime.UtcNow, false, null));
+		result.ShouldHaveValidationErrorFor(x => x.Content)
+			.WithErrorCode(PurchaseContentDuplicateIdsNotAllowedMessage.Instance.MessageKey).WithCustomState(PurchaseContentDuplicateIdsNotAllowedMessage.Instance).Only();
 	}
 }

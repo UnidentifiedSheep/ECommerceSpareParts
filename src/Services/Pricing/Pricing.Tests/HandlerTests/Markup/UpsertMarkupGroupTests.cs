@@ -1,3 +1,5 @@
+using FluentValidation.TestHelper;
+using Tests.Abstractions.Test;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Settings;
 using Contracts.Analytics;
@@ -271,4 +273,35 @@ public sealed class UpsertMarkupGroupTests(CombinedContainerFixture fixture) : I
 		CurrencyId = 1,
 		Ranges = [new UpsertMarkupRangeDto { RangeStart = 0m, RangeEnd = 100m, Markup = 0.2m }]
 	};
+}
+
+public class UpsertMarkupGroupValidationTests : ValidationTest<UpsertMarkupGroupValidation, UpsertMarkupGroupCommand>
+{
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task OverlappingRanges_FailValidation(bool automatic)
+	{
+		var dto = new UpsertMarkupGroupDto
+		{
+			Name = "Markup", CurrencyId = 1,
+			Ranges = [
+				new UpsertMarkupRangeDto { RangeStart = 0m, RangeEnd = 10m, Markup = 0.2m },
+				new UpsertMarkupRangeDto { RangeStart = 5m, RangeEnd = 20m, Markup = 0.1m }]
+		};
+		var result = await ValidateAsync(new UpsertMarkupGroupCommand(dto, automatic ? Guid.NewGuid() : null));
+		result.ShouldHaveValidationErrorFor(x => x.MarkupGroup.Ranges)
+			.WithErrorCode(MarkupGroupRangesMustNotOverlapMessage.Instance.MessageKey)
+			.WithCustomState(MarkupGroupRangesMustNotOverlapMessage.Instance).Only();
+	}
+
+	[Fact]
+	public async Task EmptyRanges_FailValidation()
+	{
+		var dto = new UpsertMarkupGroupDto { Name = "Markup", CurrencyId = 1, Ranges = [] };
+		var result = await ValidateAsync(new UpsertMarkupGroupCommand(dto));
+		result.ShouldHaveValidationErrorFor(x => x.MarkupGroup.Ranges)
+			.WithErrorCode(MarkupGroupRangesRequiredMessage.Instance.MessageKey)
+			.WithCustomState(MarkupGroupRangesRequiredMessage.Instance).Only();
+	}
 }

@@ -1,3 +1,6 @@
+using Main.Entities;
+using Tests.Abstractions.Test;
+using FluentValidation.TestHelper;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Entities.Balance;
@@ -96,16 +99,6 @@ public class ReverseTransactionTests : IntegrationTest
 			CancellationToken));
 	}
 
-	[Fact]
-	public async Task ReverseTransaction_EmptyTransactionId_ThrowsValidationException()
-	{
-		var reversedBy = TestContext.Users[0].Id;
-
-		await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(
-			new ReverseTransactionCommand(Guid.Empty),
-			CancellationToken));
-	}
-
 	private async Task<Transaction> CreateAppliedTransaction(TransactionSourceType sourceType)
 	{
 		var currencyId = TestContext.Currencies[0].Id;
@@ -133,5 +126,16 @@ public class ReverseTransactionTests : IntegrationTest
 		await Context.SaveChangesAsync();
 
 		return transaction;
+	}
+}
+
+public class ReverseTransactionValidationTests : ValidationTest<ReverseTransactionValidation, ReverseTransactionCommand>
+{
+	[Fact]
+	public async Task ReverseTransaction_EmptyTransactionId_FailsValidation()
+	{
+		var result = await ValidateAsync(new ReverseTransactionCommand(Guid.Empty));
+		result.ShouldHaveValidationErrorFor(x => x.TransactionId)
+			.WithErrorCode(TransactionIdRequiredMessage.Instance.MessageKey).WithCustomState(TransactionIdRequiredMessage.Instance).Only();
 	}
 }
