@@ -1,6 +1,6 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.MapCatalogueCandidatesToProducts;
+using Main.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;

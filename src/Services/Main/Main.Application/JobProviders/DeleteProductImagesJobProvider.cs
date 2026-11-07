@@ -12,9 +12,10 @@ public class DeleteProductImagesJobProvider : IJobProvider<DeleteProductImagesLr
 	public Job Create(DeleteProductImagesInputState inputState, int maxAttempts = 3)
 	{
 		inputState.ValidateState();
-		return SingleRunJob.Create(
+		return SingleRunJob.CreateUnique(
+			$"delete:product:{inputState.ProductId}:images:{inputState.BucketName}",
 			DeleteProductImagesLrt.Name,
-			JsonSerializer.Serialize(inputState),
+			initialState: JsonSerializer.Serialize(inputState),
 			maxAttempts: maxAttempts);
 	}
 }

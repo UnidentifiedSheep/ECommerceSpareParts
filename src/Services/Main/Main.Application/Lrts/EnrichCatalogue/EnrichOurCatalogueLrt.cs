@@ -2,12 +2,12 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Locan.Core.Interfaces;
-using Main.Application.Lrts.BuildCatalogueCandidates;
-using Main.Application.Lrts.MapCatalogueCandidatesToProducts;
+using Main.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;
+using Main.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
 using Main.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts;
+namespace Main.Application.Lrts.EnrichCatalogue;
 
 public class EnrichOurCatalogueLrt(
 	IApplicationTransactionFactory transactionService,
@@ -15,8 +15,8 @@ public class EnrichOurCatalogueLrt(
 	transactionService,
 	logger)
 {
-
-	public override string SystemName => nameof(EnrichOurCatalogueLrt);
+	public const string Name = nameof(EnrichOurCatalogueLrt);
+	public override string SystemName => Name;
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtCatalogueEnrichmentNameMessage.Instance;
 

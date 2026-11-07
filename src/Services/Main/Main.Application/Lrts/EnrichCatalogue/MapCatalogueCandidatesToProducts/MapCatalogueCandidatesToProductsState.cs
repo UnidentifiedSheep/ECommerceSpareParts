@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Application.Common.LRT;
 
-namespace Main.Application.Lrts.MapCatalogueCandidatesToProducts;
+namespace Main.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
 
 public sealed record MapCatalogueCandidatesToProductsState : NoneInputState
 {

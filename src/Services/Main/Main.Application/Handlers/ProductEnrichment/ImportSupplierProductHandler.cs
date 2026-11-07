@@ -1,11 +1,15 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Services;
+using Application.Common.LRT;
 using Attributes;
 using Contracts.Models.Supplier;
 using Enums;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Lrts.EnrichCatalogue;
 using Main.Entities.Product.Enrichment;
 using Main.Entities.Product.ValueObjects;
 using MediatR;
@@ -26,6 +30,8 @@ public record ImportSupplierProductCommand(
 public class ImportSupplierProductHandler(
 	ISupplierProductRepository repository,
 	IUnitOfWork unitOfWork,
+	IJobProvider<EnrichOurCatalogueLrt, NoneInputState> jobProvider,
+	IJobService jobService,
 	ILogger<ImportSupplierProductHandler> logger) : ICommandHandler<ImportSupplierProductCommand>
 {
 	public async Task<Unit> Handle(ImportSupplierProductCommand request, CancellationToken cancellationToken)
@@ -69,6 +75,8 @@ public class ImportSupplierProductHandler(
 			.ToList();
 
 		await repository.UpsertCrossesAsync(crosses, cancellationToken);
+
+		await jobService.TryEnqueueJobsAsync([jobProvider.Create(new NoneInputState())], cancellationToken);
 		return Unit.Value;
 	}
 

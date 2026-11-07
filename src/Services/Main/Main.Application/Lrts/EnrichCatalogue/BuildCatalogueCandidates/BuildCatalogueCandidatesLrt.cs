@@ -11,7 +11,7 @@ using Main.Entities;
 using Main.Entities.Product.Enrichment;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts.BuildCatalogueCandidates;
+namespace Main.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;
 
 public class BuildCatalogueCandidatesLrt(
 	IApplicationTransactionFactory transactionService,

@@ -1,7 +1,7 @@
 using Domain.CommonEnums;
 using Enums;
 using FluentAssertions;
-using Main.Application.Lrts.BuildCatalogueCandidates;
+using Main.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;
 using Main.Entities.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
