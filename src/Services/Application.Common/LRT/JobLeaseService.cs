@@ -82,7 +82,8 @@ public class JobLeaseService(IApplicationTransaction transactionService) : IJobL
 
 	private static CriteriaBuilder<Job> GetCriteriaBase(int maxBatchSize) => Criteria<Job>
 		.New()
-		.OrderByAsc(job => job.Id)
+		.OrderByAsc(x => x.CreatedAt)
+		.ThenByAsc(job => job.Id)
 		.ForUpdate(true, true)
 		.Track()
 		.Size(maxBatchSize);

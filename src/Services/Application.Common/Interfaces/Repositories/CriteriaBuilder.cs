@@ -44,6 +44,28 @@ public sealed class CriteriaBuilder<T> where T : class
 		return this;
 	}
 
+	public CriteriaBuilder<T> ThenByAsc<TKey>(
+		Expression<Func<T, TKey>> keySelector)
+	{
+		var previous = _orderBy
+			?? throw new InvalidOperationException(
+				"OrderBy must be specified before ThenBy.");
+
+		_orderBy = q => previous(q).ThenBy(keySelector);
+		return this;
+	}
+
+	public CriteriaBuilder<T> ThenByDesc<TKey>(
+		Expression<Func<T, TKey>> keySelector)
+	{
+		var previous = _orderBy
+			?? throw new InvalidOperationException(
+				"OrderBy must be specified before ThenBy.");
+
+		_orderBy = q => previous(q).ThenByDescending(keySelector);
+		return this;
+	}
+
 	public CriteriaBuilder<T> Page(int skip)
 	{
 		_page = skip;
