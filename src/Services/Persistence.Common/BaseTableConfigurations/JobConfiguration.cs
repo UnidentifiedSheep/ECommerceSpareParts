@@ -42,6 +42,8 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 
 		builder.Property(e => e.MultiStepJobId).HasColumnName("multi_step_job_id");
 
+		builder.HasIndex(e => e.CreatedAt, "jobs_created_at_idx");
+
 		builder.HasIndex(e => e.SystemName, "jobs_system_name_idx");
 		builder.HasIndex(
 			e => new
