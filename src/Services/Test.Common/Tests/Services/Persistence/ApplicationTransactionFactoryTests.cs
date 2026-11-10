@@ -154,6 +154,7 @@ public sealed class ApplicationTransactionFactoryTests
 		services.RegisterApplicationTransactions();
 		services.RegisterIntegrationEventScope();
 		services.RegisterDomainEventScope();
+		services.AddScoped(_ => new Mock<IDomainEventCollector>(MockBehavior.Strict).Object);
 		services.AddLogging();
 		services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<TransactionProbeHandler>());
 		services.AddScoped(_ => Mock.Of<IUnitOfWork>(unit => unit.Context.SuppressAutoSave == true));

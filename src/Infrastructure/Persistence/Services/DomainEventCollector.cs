@@ -1,28 +1,28 @@
-using System.Runtime.CompilerServices;
 using Application.Common.Interfaces.Events;
 using Domain.Interfaces;
 using Domain.Interfaces.Events;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
 
 namespace Persistence.Services;
 
-public sealed class DomainEventCollector(IDomainEventScope eventScope) : IDomainEventCollector
+public sealed class DomainEventCollector<TContext>(
+	IDomainEventScope eventScope,
+	Func<TContext> contextFactory)
+	: IDomainEventCollector where TContext : DbContext
 {
-	private readonly ConditionalWeakTable<DbContext, Dictionary<IEntity, EntityState>> _collected = new();
+	private readonly Dictionary<IEntity, EntityState> _states = new(ReferenceEqualityComparer.Instance);
 
-	public void Collect(DbContext? context)
+	public void Collect()
 	{
-		if (context is null) return;
+		var context = contextFactory();
 		context.ChangeTracker.DetectChanges();
-		var states = _collected.GetValue(context, _ => new(ReferenceEqualityComparer.Instance));
 
 		foreach (var entry in context.ChangeTracker.Entries<IEntity>())
 		{
 			if (entry.State == EntityState.Detached) continue;
-			if (!states.TryGetValue(entry.Entity, out var previous) || previous != entry.State)
+			if (!_states.TryGetValue(entry.Entity, out var previous) || previous != entry.State)
 			{
-				states[entry.Entity] = entry.State;
+				_states[entry.Entity] = entry.State;
 				switch (entry.State)
 				{
 					case EntityState.Added:
@@ -43,5 +43,5 @@ public sealed class DomainEventCollector(IDomainEventScope eventScope) : IDomain
 		}
 	}
 
-	public void Reset(DbContext context) => _collected.Remove(context);
+	public void Reset() => _states.Clear();
 }

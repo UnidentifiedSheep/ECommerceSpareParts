@@ -105,6 +105,7 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddScoped<IDomainEventScope, DomainEventScope>();
 		services.AddScoped<IDomainEventExecutor, DomainEventExecutor>();
+		services.AddScoped<Func<IDomainEventExecutor>>(provider => provider.GetRequiredService<IDomainEventExecutor>);
 		return services;
 	}
 

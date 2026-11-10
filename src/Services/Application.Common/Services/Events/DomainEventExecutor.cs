@@ -1,12 +1,14 @@
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using MediatR;
+using Domain.Interfaces.Events;
 
 namespace Application.Common.Services.Events;
 
 public sealed class DomainEventExecutor(
 	IDomainEventScope eventScope,
 	IPublisher publisher,
+	IDomainEventCollector collector,
 	IUnitOfWork? unitOfWork = null) : IDomainEventExecutor
 {
 	private const int MaxDispatchRounds = 10;
@@ -41,18 +43,33 @@ public sealed class DomainEventExecutor(
 		}
 	}
 
-	private async Task DispatchAsync(CancellationToken cancellationToken)
+	public async Task DispatchBeforeSaveAsync(CancellationToken cancellationToken = default)
+	{
+		using var collection = eventScope.EnableCollection();
+		try
+		{
+			await DispatchAsync(cancellationToken, beforeSave: true);
+		}
+		catch
+		{
+			eventScope.Flush();
+			throw;
+		}
+	}
+
+	private async Task DispatchAsync(CancellationToken cancellationToken, bool beforeSave = false)
 	{
 		for (var round = 0; round < MaxDispatchRounds; round++)
 		{
-			var events = eventScope.Flush();
+			if (beforeSave) collector.Collect();
+			var events = beforeSave ? eventScope.FlushBeforeSave() : eventScope.Flush();
 			if (events.Count == 0)
 				return;
 
 			foreach (var @event in events)
 				await publisher.Publish((object)@event, cancellationToken);
 
-			if (unitOfWork is { Context.SuppressAutoSave: false })
+			if (!beforeSave && unitOfWork is { Context.SuppressAutoSave: false })
 				await unitOfWork.SaveChangesAsync(cancellationToken);
 		}
 

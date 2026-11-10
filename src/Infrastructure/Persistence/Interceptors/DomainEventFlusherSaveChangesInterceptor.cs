@@ -1,23 +1,31 @@
+using Application.Common.Interfaces.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Persistence.Interfaces;
+using Domain.Interfaces.Events;
 
 namespace Persistence.Interceptors;
 
-public class DomainEventFlusherSaveChangesInterceptor(IDomainEventCollector collector) : SaveChangesInterceptor
+public class DomainEventFlusherSaveChangesInterceptor(
+	IDomainEventCollector collector,
+	Func<IDomainEventExecutor> executorFactory) : SaveChangesInterceptor
 {
-	public override InterceptionResult<int> SavingChanges(
-		DbContextEventData eventData, InterceptionResult<int> result)
-	{
-		Collect(eventData.Context);
-		return result;
-	}
+	private bool _saving;
 
-	public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+	public override InterceptionResult<int> SavingChanges(
+		DbContextEventData eventData, InterceptionResult<int> result) =>
+		throw new NotSupportedException("Use SaveChangesAsync instead of SaveChanges.");
+
+	public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
 		DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
 	{
-		Collect(eventData.Context);
-		return ValueTask.FromResult(result);
+		if (eventData.Context is not { } context) return result;
+		EnterSave();
+		try
+		{
+			await executorFactory().DispatchBeforeSaveAsync(cancellationToken);
+			return result;
+		}
+		catch { Reset(context); throw; }
 	}
 
 	public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
@@ -51,18 +59,17 @@ public class DomainEventFlusherSaveChangesInterceptor(IDomainEventCollector coll
 		return Task.CompletedTask;
 	}
 
-	private void Collect(DbContext? context)
+	private void EnterSave()
 	{
-		try { collector.Collect(context); }
-		catch
-		{
-			Reset(context);
-			throw;
-		}
+		if (_saving)
+			throw new InvalidOperationException("Before-save handlers must not call SaveChanges on the same DbContext.");
+		_saving = true;
 	}
 
 	private void Reset(DbContext? context)
 	{
-		if (context is not null) collector.Reset(context);
+		if (context is null) return;
+		_saving = false;
+		collector.Reset();
 	}
 }

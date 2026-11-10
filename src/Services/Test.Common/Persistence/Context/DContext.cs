@@ -42,6 +42,8 @@ internal sealed class DContext(DbContextOptions<DContext> options) : DbContext(o
 		modelBuilder.Entity<TestAuditableMetadataEntity>().ToTable("auditable_metadata_entities").HasKey(entity => entity.Id);
 
 		modelBuilder.ApplyConfiguration(new EntityHistoryConfiguration());
+		modelBuilder.Entity<BeforeSaveTestEntity>().ToTable("before_save_entities").HasKey(entity => entity.Id);
+		modelBuilder.Entity<BeforeSaveTestEntity>().Ignore(entity => entity.CreatedCalls);
 		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();
 		modelBuilder.AllDateTimesToUtc().AllEnumsToString();

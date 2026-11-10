@@ -18,14 +18,14 @@ public sealed class DomainEventCollectorTests
 	public void RepeatedCollection_DoesNotRepeatLifecycleCallbacks(EntityState state, string expected)
 	{
 		using var context = CreateContext();
-		var scope = new DomainEventScope(Mock.Of<IPublisher>());
+		var scope = new DomainEventScope();
 		using var collection = scope.EnableCollection();
-		var collector = new DomainEventCollector(scope);
+		var collector = new DomainEventCollector<CollectorContext>(scope, () => context);
 		var entity = new CollectorEntity();
 		context.Entry(entity).State = state;
 
-		collector.Collect(context);
-		collector.Collect(context);
+		collector.Collect();
+		collector.Collect();
 
 		entity.Callbacks.Should().Equal(expected);
 		scope.Flush().Should().ContainSingle().Which.Should().Be(new LifecycleEvent(expected));
@@ -35,16 +35,16 @@ public sealed class DomainEventCollectorTests
 	public void RepeatedCollection_StillCollectsNewExplicitEvents()
 	{
 		using var context = CreateContext();
-		var scope = new DomainEventScope(Mock.Of<IPublisher>());
+		var scope = new DomainEventScope();
 		using var collection = scope.EnableCollection();
-		var collector = new DomainEventCollector(scope);
+		var collector = new DomainEventCollector<CollectorContext>(scope, () => context);
 		var entity = new CollectorEntity();
 		context.Add(entity);
-		collector.Collect(context);
+		collector.Collect();
 		scope.Flush();
 		entity.Raise(new ExplicitEvent());
 
-		collector.Collect(context);
+		collector.Collect();
 
 		entity.Callbacks.Should().Equal("created");
 		scope.Flush().Should().ContainSingle().Which.Should().BeOfType<ExplicitEvent>();
@@ -54,18 +54,18 @@ public sealed class DomainEventCollectorTests
 	public void Reset_AllowsLifecycleCallbackForTheNextSave()
 	{
 		using var context = CreateContext();
-		var scope = new DomainEventScope(Mock.Of<IPublisher>());
+		var scope = new DomainEventScope();
 		using var collection = scope.EnableCollection();
-		var collector = new DomainEventCollector(scope);
+		var collector = new DomainEventCollector<CollectorContext>(scope, () => context);
 		var entity = new CollectorEntity();
 		context.Attach(entity);
 		entity.Value = "first change";
-		collector.Collect(context);
+		collector.Collect();
 		context.ChangeTracker.AcceptAllChanges();
-		collector.Reset(context);
+		collector.Reset();
 
 		entity.Value = "next change";
-		collector.Collect(context);
+		collector.Collect();
 
 		entity.Callbacks.Should().Equal("updated", "updated");
 		scope.Flush().Should().HaveCount(2);
@@ -75,17 +75,17 @@ public sealed class DomainEventCollectorTests
 	public void ChangedEntityState_RaisesTheMatchingLifecycleCallback()
 	{
 		using var context = CreateContext();
-		var scope = new DomainEventScope(Mock.Of<IPublisher>());
+		var scope = new DomainEventScope();
 		using var collection = scope.EnableCollection();
-		var collector = new DomainEventCollector(scope);
+		var collector = new DomainEventCollector<CollectorContext>(scope, () => context);
 		var entity = new CollectorEntity();
 		context.Attach(entity);
 		entity.Value = "changed";
-		collector.Collect(context);
+		collector.Collect();
 
 		context.Remove(entity);
-		collector.Collect(context);
-		collector.Collect(context);
+		collector.Collect();
+		collector.Collect();
 
 		entity.Callbacks.Should().Equal("updated", "deleted");
 	}
@@ -94,16 +94,16 @@ public sealed class DomainEventCollectorTests
 	public void NextCollection_DiscoversNewEntities()
 	{
 		using var context = CreateContext();
-		var scope = new DomainEventScope(Mock.Of<IPublisher>());
+		var scope = new DomainEventScope();
 		using var collection = scope.EnableCollection();
-		var collector = new DomainEventCollector(scope);
+		var collector = new DomainEventCollector<CollectorContext>(scope, () => context);
 		var first = new CollectorEntity();
 		context.Add(first);
-		collector.Collect(context);
+		collector.Collect();
 
 		var second = new CollectorEntity();
 		context.Add(second);
-		collector.Collect(context);
+		collector.Collect();
 
 		first.Callbacks.Should().Equal("created");
 		second.Callbacks.Should().Equal("created");
@@ -114,37 +114,36 @@ public sealed class DomainEventCollectorTests
 	public void OutsideCollection_PreservesBeforeSaveEventsWithoutDispatchingThem()
 	{
 		using var context = CreateContext();
-		var publisher = new Mock<IPublisher>(MockBehavior.Strict);
-		var scope = new DomainEventScope(publisher.Object);
-		var collector = new DomainEventCollector(scope);
+		var scope = new DomainEventScope();
+		var collector = new DomainEventCollector<CollectorContext>(scope, () => context);
 		var entity = new CollectorEntity();
 		entity.Raise(new BeforeSaveEvent());
 		context.Add(entity);
 
-		collector.Collect(context);
+		collector.Collect();
 
 		scope.Flush().Should().ContainSingle().Which.Should().BeOfType<BeforeSaveEvent>();
 		entity.FlushDomainEvents().Should().BeEmpty();
-		publisher.VerifyNoOtherCalls();
 	}
 
 	[Fact]
-	public void Reset_OnlyResetsTheSpecifiedContext()
+	public void SeparateCollectors_HaveIndependentState()
 	{
 		using var first = CreateContext();
 		using var second = CreateContext();
-		var scope = new DomainEventScope(Mock.Of<IPublisher>());
-		var collector = new DomainEventCollector(scope);
+		var scope = new DomainEventScope();
+		var firstCollector = new DomainEventCollector<CollectorContext>(scope, () => first);
+		var secondCollector = new DomainEventCollector<CollectorContext>(scope, () => second);
 		var firstEntity = new CollectorEntity();
 		var secondEntity = new CollectorEntity();
 		first.Add(firstEntity);
 		second.Add(secondEntity);
-		collector.Collect(first);
-		collector.Collect(second);
+		firstCollector.Collect();
+		secondCollector.Collect();
 
-		collector.Reset(first);
-		collector.Collect(first);
-		collector.Collect(second);
+		firstCollector.Reset();
+		firstCollector.Collect();
+		secondCollector.Collect();
 
 		firstEntity.Callbacks.Should().Equal("created", "created");
 		secondEntity.Callbacks.Should().Equal("created");

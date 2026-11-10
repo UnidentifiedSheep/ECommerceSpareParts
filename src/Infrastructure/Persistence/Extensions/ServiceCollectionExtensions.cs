@@ -1,4 +1,6 @@
 ﻿using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Events;
+using Domain.Interfaces.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,7 +18,8 @@ public static class ServiceCollectionExtensions
 		collection.TryAddSingleton<PostgresTransactionExceptionClassifier>();
 		collection.TryAddSingleton<ITransactionExceptionClassifier>(provider =>
 			provider.GetRequiredService<PostgresTransactionExceptionClassifier>());
-		collection.TryAddScoped<IDomainEventCollector, DomainEventCollector>();
+		collection.TryAddScoped<IDomainEventCollector>(provider => new DomainEventCollector<T>(
+			provider.GetRequiredService<IDomainEventScope>(), () => provider.GetRequiredService<T>()));
 		collection.AddScoped<IUnitOfWork, EfUnitOfWork<T>>();
 		collection.AddScoped<IContextMetadata, ContextMetadata<T>>();
 		collection.AddScoped<IQueryableExtensions, QueryableExtensions>();
