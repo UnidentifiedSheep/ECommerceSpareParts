@@ -152,7 +152,7 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVe
 
 	public void SetFulfillmentStatus(OrderFulfillmentStatus status)
 	{
-		if (Status is OrderStatus.Completed or OrderStatus.Cancelled or OrderStatus.Deleted)
+		if (Status is OrderStatus.Cancelled or OrderStatus.Deleted)
 			throw new InvalidInputException(OrderChangeNotAllowedMessage.Instance);
 
 		FulfillmentStatus = status;

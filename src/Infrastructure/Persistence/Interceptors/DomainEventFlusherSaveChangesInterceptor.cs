@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Persistence.Interceptors;
 
-public class DomainEventFlusherSaveChangesInterceptor(IDomainEventScope domainEventScope)
+public class DomainEventFlusherSaveChangesInterceptor(
+	IDomainEventScope domainEventScope,
+	IDomainEventExecutor executor)
 	: SaveChangesInterceptor
 {
 	public override InterceptionResult<int> SavingChanges(

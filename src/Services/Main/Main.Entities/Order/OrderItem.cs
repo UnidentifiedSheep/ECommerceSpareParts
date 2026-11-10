@@ -20,6 +20,8 @@ public class OrderItem : Entity<OrderItem, int>, ILinqEntity<OrderItem, int>
 	public string? SignedPrice { get; private set; }
 	public PriceOrigin PriceOrigin { get; private set; }
 
+	public Order Order { get; private set; } = null!;
+
 	private OrderItem() {}
 
 	private OrderItem(Guid orderId, int productId, int count)
