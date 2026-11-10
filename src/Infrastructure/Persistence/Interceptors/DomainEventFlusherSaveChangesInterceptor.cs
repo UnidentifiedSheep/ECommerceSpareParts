@@ -1,64 +1,68 @@
-using Application.Common.Interfaces.Events;
-using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Persistence.Interfaces;
 
 namespace Persistence.Interceptors;
 
-public class DomainEventFlusherSaveChangesInterceptor(
-	IDomainEventScope domainEventScope,
-	IDomainEventExecutor executor)
-	: SaveChangesInterceptor
+public class DomainEventFlusherSaveChangesInterceptor(IDomainEventCollector collector) : SaveChangesInterceptor
 {
 	public override InterceptionResult<int> SavingChanges(
-		DbContextEventData eventData,
-		InterceptionResult<int> result)
+		DbContextEventData eventData, InterceptionResult<int> result)
 	{
-		CollectDomainEvents(eventData.Context);
-		return base.SavingChanges(eventData, result);
+		Collect(eventData.Context);
+		return result;
 	}
 
 	public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
-		DbContextEventData eventData,
-		InterceptionResult<int> result,
-		CancellationToken cancellationToken = default)
+		DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
 	{
-		CollectDomainEvents(eventData.Context);
-
-		return base.SavingChangesAsync(
-			eventData,
-			result,
-			cancellationToken);
+		Collect(eventData.Context);
+		return ValueTask.FromResult(result);
 	}
 
-	private void CollectDomainEvents(DbContext? context)
+	public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
 	{
-		if (context is null)
-			return;
+		Reset(eventData.Context);
+		return result;
+	}
 
-		foreach (var entry in context.ChangeTracker.Entries<IEntity>())
+	public override ValueTask<int> SavedChangesAsync(
+		SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
+	{
+		Reset(eventData.Context);
+		return ValueTask.FromResult(result);
+	}
+
+	public override void SaveChangesFailed(DbContextErrorEventData eventData) => Reset(eventData.Context);
+
+	public override Task SaveChangesFailedAsync(
+		DbContextErrorEventData eventData, CancellationToken cancellationToken = default)
+	{
+		Reset(eventData.Context);
+		return Task.CompletedTask;
+	}
+
+	public override void SaveChangesCanceled(DbContextEventData eventData) => Reset(eventData.Context);
+
+	public override Task SaveChangesCanceledAsync(
+		DbContextEventData eventData, CancellationToken cancellationToken = default)
+	{
+		Reset(eventData.Context);
+		return Task.CompletedTask;
+	}
+
+	private void Collect(DbContext? context)
+	{
+		try { collector.Collect(context); }
+		catch
 		{
-			switch (entry.State)
-			{
-				case EntityState.Added:
-					entry.Entity.OnCreated();
-					break;
-
-				case EntityState.Modified when entry.Properties.Any(p => p.IsModified):
-					entry.Entity.OnUpdated();
-					break;
-
-				case EntityState.Deleted:
-					entry.Entity.OnDeleted();
-					break;
-
-				case EntityState.Detached:
-					continue;
-			}
-
-			var events = entry.Entity.FlushDomainEvents();
-			if (domainEventScope.IsCollectionEnabled)
-				domainEventScope.AddRange(events);
+			Reset(context);
+			throw;
 		}
+	}
+
+	private void Reset(DbContext? context)
+	{
+		if (context is not null) collector.Reset(context);
 	}
 }

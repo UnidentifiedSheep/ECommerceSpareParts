@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
 		collection.TryAddSingleton<PostgresTransactionExceptionClassifier>();
 		collection.TryAddSingleton<ITransactionExceptionClassifier>(provider =>
 			provider.GetRequiredService<PostgresTransactionExceptionClassifier>());
+		collection.TryAddScoped<IDomainEventCollector, DomainEventCollector>();
 		collection.AddScoped<IUnitOfWork, EfUnitOfWork<T>>();
 		collection.AddScoped<IContextMetadata, ContextMetadata<T>>();
 		collection.AddScoped<IQueryableExtensions, QueryableExtensions>();
