@@ -111,10 +111,17 @@ internal static class CatalogueSearchQueryBuilder
 				.Boost(15)));
 
 		if (query.Length >= 2 && modes.Contains(SearchMatchType.Contains))
+		{
 			queries.Add(descriptor => descriptor.Wildcard(wildcard => wildcard
 				.Field(new Field($"{field.Name}.keyword"))
 				.Value($"*{EscapeWildcard(query.ToLowerInvariant())}*")
 				.Boost(8)));
+			queries.Add(descriptor => descriptor.Match(match => match
+				.Field(field)
+				.Query(query)
+				.Operator(Operator.And)
+				.Boost(6)));
+		}
 
 		if (query.Length >= 4 && modes.Contains(SearchMatchType.Fuzzy))
 			queries.Add(descriptor => descriptor.Match(match => match

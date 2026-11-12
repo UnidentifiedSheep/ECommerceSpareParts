@@ -1,5 +1,7 @@
 using Application.Common.Models;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using Search.Application.Interfaces.CatalogueCandidate;
 using Search.Application.Models.CatalogueSearch;
 using Search.Application.Models.ProductUpdates;
 using Search.Entities;
@@ -37,12 +39,14 @@ public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : I
 		if (!highlights)
 			result.Hits.Single().Highlights.Should().BeEmpty();
 	}
+
 	private const string ExhaustBellowsName =
 		"Гофра глушителя D:121 L:1000 о.н MAN  81152100033 / Dinex 94120 (материал - цинк)";
 
 	[Theory]
 	[InlineData("гофра 121")]
 	[InlineData("ГОФРА 121")]
+	[InlineData("121 гофра")]
 	public async Task NameContains_SeparatedTerms_ReturnsProductContainingBothTerms(string query)
 	{
 		await SeedExhaustProductsAsync();
@@ -56,6 +60,7 @@ public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : I
 	[InlineData("гофра глушителя")]
 	[InlineData("глушителя D:121")]
 	[InlineData("81152100033 / Dinex 94120")]
+	[InlineData("лушит")]
 	public async Task NameContains_ContiguousSubstring_ReturnsProduct(string query)
 	{
 		await SeedExhaustProductsAsync();
@@ -85,6 +90,38 @@ public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : I
 
 		result.IsValid.Should().BeTrue(result.DebugInformation);
 		result.Tokens.Select(token => token.Token).Should().Contain(["гофра", "121", "1000"]);
+	}
+
+	[Theory]
+	[InlineData("гофра 121", true)]
+	[InlineData("гофра 122", false)]
+	public async Task CandidateNameContains_RequiresAllTerms(string query, bool matches)
+	{
+		var repository = Scope.ServiceProvider.GetRequiredService<ICatalogueCandidateRepository>();
+		var candidateId = Guid.NewGuid();
+		await repository.UpsertMany([
+			new CatalogueCandidate
+			{
+				Id = candidateId, Sku = "EXH-A", NormalizedSku = "exha", ProducerId = 1,
+				MappedProductId = null, Names = [ExhaustBellowsName, "Компенсатор выхлопной"]
+			},
+			new CatalogueCandidate
+			{
+				Id = Guid.NewGuid(), Sku = "EXH-B", NormalizedSku = "exhb", ProducerId = 1,
+				MappedProductId = null, Names = ["Гофра D:110 L:1000"]
+			},
+			new CatalogueCandidate
+			{
+				Id = Guid.NewGuid(), Sku = "EXH-C", NormalizedSku = "exhc", ProducerId = 1,
+				MappedProductId = null, Names = ["Труба D:121 L:1000"]
+			}
+		], CancellationToken);
+		await RefreshAsync();
+
+		var result = await repository.Search(NameContainsCriteria(query), CancellationToken);
+
+		if (matches) result.Hits.Should().ContainSingle().Which.Document.Id.Should().Be(candidateId);
+		else result.Hits.Should().BeEmpty();
 	}
 
 	private async Task SeedExhaustProductsAsync()
