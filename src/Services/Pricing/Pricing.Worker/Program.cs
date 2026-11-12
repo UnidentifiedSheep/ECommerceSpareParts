@@ -49,7 +49,7 @@ builder.AddLokiLogger(
 
 builder
 	.Services
-	.AddPersistenceLayer()
+	.AddPricingPersistence(builder.Configuration)
 	.AddApplicationCache()
 	.AddCacheLayer("pricing")
 	.AddIntegrationClients()

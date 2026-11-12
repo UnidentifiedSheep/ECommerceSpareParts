@@ -110,7 +110,7 @@ builder.Services.AddMassTransit(x =>
 builder
 	.Services
 	.AddEComAuth(builder.Configuration)
-	.AddPersistenceLayer()
+	.AddPricingPersistence(builder.Configuration)
 	.AddApplicationCache()
 	.AddMainSupplierSettingProviders()
 	.AddFavoriteIntegration<FavoriteConnectionProvider, FavoriteSettingsProvider>()

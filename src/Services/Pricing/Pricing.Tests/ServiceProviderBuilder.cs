@@ -8,6 +8,7 @@ using Internal.Integration.Core.Interfaces.Main;
 using Locan.Hosting;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -57,7 +58,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 			.AddApplicationLayer(services, null!)
 			.AddApplicationCache()
 			.AddLocan()
-			.AddPersistenceLayer();
+			.AddPricingPersistence(new ConfigurationBuilder().Build());
 
 		services.AddSingleton(
 			Options.Create(

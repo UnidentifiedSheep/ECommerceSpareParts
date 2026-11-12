@@ -47,7 +47,7 @@
         <ProjectReference Include="..\Pricing.Api\Pricing.Api.csproj"/>
         <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj"/>
         <ProjectReference Include="..\Pricing.Cache\Pricing.Cache.csproj"/>
-        <ProjectReference Include="..\Pricing.Persistence\Pricing.Persistence.csproj"/>
+        <ProjectReference Include="..\..\Main\Modules\Pricing\Pricing.Persistence\Pricing.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
