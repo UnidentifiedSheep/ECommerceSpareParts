@@ -1,3 +1,4 @@
+using Main.Entities.Cart;
 using Main.Entities;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
@@ -47,7 +48,7 @@ public class AddToCartTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var cartItem = await Context
-			.Carts
+			.Set<global::Main.Entities.Cart.Cart>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id, CancellationToken);
 		Assert.NotNull(cartItem);
@@ -92,7 +93,7 @@ public class AddToCartTests : IntegrationTest
 			Mediator.Send(new AddToCartCommand(user.Id, int.MaxValue, 1), CancellationToken));
 
 		exception.Failures.Should().ContainSingle(failure => failure.Error is ProductNotFoundException);
-		(await Context.Carts.AnyAsync(item => item.UserId == user.Id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<global::Main.Entities.Cart.Cart>().AnyAsync(item => item.UserId == user.Id, CancellationToken)).Should().BeFalse();
 	}
 
 	private (User, Product) GetUserAndProduct() => (_usersContext.Users.First(), _productContext.Products[0]);

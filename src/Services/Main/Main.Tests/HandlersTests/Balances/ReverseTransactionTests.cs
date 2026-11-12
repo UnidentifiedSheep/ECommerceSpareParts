@@ -32,7 +32,7 @@ public class ReverseTransactionTests : IntegrationTest
 		await Mediator.Send(new ReverseTransactionCommand(transaction.Id), CancellationToken);
 
 		var reversed = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == transaction.Id, CancellationToken);
 
@@ -42,13 +42,13 @@ public class ReverseTransactionTests : IntegrationTest
 		reversed.ReversedAt.Should().NotBeNull();
 
 		var senderBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId,
 				CancellationToken);
 		var receiverBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId,
@@ -81,7 +81,7 @@ public class ReverseTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var reversed = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == transaction.Id, CancellationToken);
 
@@ -106,9 +106,9 @@ public class ReverseTransactionTests : IntegrationTest
 		var receiverId = TestContext.Users[1].Id;
 
 		var senderBalance =
-			await Context.UserBalances.FirstAsync(x =>
+			await Context.Set<OrganizationBalance>().FirstAsync(x =>
 				x.OrganizationId == senderId && x.CurrencyId == currencyId);
-		var receiverBalance = await Context.UserBalances.FirstAsync(x =>
+		var receiverBalance = await Context.Set<OrganizationBalance>().FirstAsync(x =>
 			x.OrganizationId == receiverId && x.CurrencyId == currencyId);
 
 		var transaction = new TransactionBuilder(Faker)
@@ -122,7 +122,7 @@ public class ReverseTransactionTests : IntegrationTest
 			.Applied()
 			.Build();
 
-		await Context.Transactions.AddAsync(transaction);
+		await Context.Set<Transaction>().AddAsync(transaction);
 		await Context.SaveChangesAsync();
 
 		return transaction;

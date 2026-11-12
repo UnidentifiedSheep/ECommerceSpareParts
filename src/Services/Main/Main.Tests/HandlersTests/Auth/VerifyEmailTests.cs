@@ -36,7 +36,7 @@ public class VerifyEmailTests : IntegrationTest
 		await Mediator.Send(new VerifyEmailCommand(token), CancellationToken);
 
 		var email =
-			await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == Email, CancellationToken);
+			await Context.Set<UserEmail>().AsNoTracking().SingleAsync(x => x.Email == Email, CancellationToken);
 		email.Confirmed.Should().BeTrue();
 		email.ConfirmedAt.Should().NotBeNull();
 	}

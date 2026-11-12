@@ -52,7 +52,7 @@ public class CreateTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -65,11 +65,11 @@ public class CreateTransactionTests : IntegrationTest
 		transaction.IsCompletionApplied.Should().BeTrue();
 
 		var senderBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var receiverBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id,
@@ -184,7 +184,7 @@ public class CreateTransactionTests : IntegrationTest
 		var result = await Mediator.Send(command, CancellationToken);
 
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 

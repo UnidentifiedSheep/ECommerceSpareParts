@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
@@ -7,7 +8,7 @@ using Tests.Extensions;
 
 namespace Tests.TestContexts;
 
-public class UserContactsTestContext(DContext context) : TestContextBase<DContext>(context)
+public class UserContactsTestContext(UnifiedDbContext context) : TestContextBase<UnifiedDbContext>(context)
 {
 	public User FirstUser { get; private set; } = null!;
 

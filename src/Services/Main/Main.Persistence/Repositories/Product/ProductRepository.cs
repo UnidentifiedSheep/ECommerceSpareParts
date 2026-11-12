@@ -1,3 +1,8 @@
+using Main.Entities.Storage;
+using Main.Entities.Sale;
+using Main.Entities.Purchase;
+using Main.Entities.Order;
+using Persistence.Context;
 using Application.Common.Interfaces.Repositories;
 using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
@@ -14,19 +19,19 @@ using ProductEntity = Main.Entities.Product.Product;
 
 namespace Main.Persistence.Repositories.Product;
 
-internal class ProductRepository(DContext context, BulkProductContext bulkContext, QueryExtensions extensions)
-	: LinqRepositoryBase<DContext, ProductEntity, int>(context, extensions), IProductRepository
+internal class ProductRepository(UnifiedDbContext context, BulkProductContext bulkContext, QueryExtensions extensions)
+	: LinqRepositoryBase<UnifiedDbContext, ProductEntity, int>(context, extensions), IProductRepository
 {
 	public Task<ProductDeletionBlocker?> GetDeletionBlockerAsync(int productId, CancellationToken cancellationToken = default)
-		=> Context.Products
+		=> Context.Set<ProductEntity>()
 			.AsNoTracking()
 			.Where(product => product.Id == productId)
-			.Select(product => Context.ProductStocks.Any(stock => stock.ProductId == product.Id && stock.Quantity > 0) ? (ProductDeletionBlocker?)ProductDeletionBlocker.Stock
-				: Context.StorageContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.StorageContent
-				: Context.SaleContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Sale
-				: Context.PurchaseContents.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Purchase
-				: Context.OrderItems.Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Order
-				: Context.ProductContents.Any(item => item.ChildProductId == productId) ? ProductDeletionBlocker.Composition
+			.Select(product => Context.Set<ProductStock>().Any(stock => stock.ProductId == product.Id && stock.Quantity > 0) ? (ProductDeletionBlocker?)ProductDeletionBlocker.Stock
+				: Context.Set<StorageContent>().Any(item => item.ProductId == productId) ? ProductDeletionBlocker.StorageContent
+				: Context.Set<SaleContent>().Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Sale
+				: Context.Set<PurchaseContent>().Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Purchase
+				: Context.Set<OrderItem>().Any(item => item.ProductId == productId) ? ProductDeletionBlocker.Order
+				: Context.Set<ProductContent>().Any(item => item.ChildProductId == productId) ? ProductDeletionBlocker.Composition
 				: null)
 			.SingleAsync(cancellationToken);
 
@@ -36,12 +41,12 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 		CancellationToken cancellationToken = default)
 	{
 		var left = Context
-			.ProductCrosses
+			.Set<ProductCross>()
 			.Where(c => c.RightProductId == productId)
 			.Select(c => c.LeftProduct);
 
 		var right = Context
-			.ProductCrosses
+			.Set<ProductCross>()
 			.Where(c => c.LeftProductId == productId)
 			.Select(c => c.RightProduct);
 
@@ -62,7 +67,7 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 		var producerIds = requestedKeys.Select(x => x.ProducerId).Distinct().ToList();
 
 		var existing = await Context
-			.Products
+			.Set<ProductEntity>()
 			.AsNoTracking()
 			.Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))
 			.Where(x => producerIds.Contains(x.ProducerId))
@@ -92,7 +97,7 @@ internal class ProductRepository(DContext context, BulkProductContext bulkContex
 		var producerIds = requestedKeys.Select(x => x.ProducerId).Distinct().ToList();
 
 		var products = await Context
-			.Products
+			.Set<ProductEntity>()
 			.AsNoTracking()
 			.Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))
 			.Where(x => producerIds.Contains(x.ProducerId))

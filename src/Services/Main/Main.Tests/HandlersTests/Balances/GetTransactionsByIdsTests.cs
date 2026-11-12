@@ -61,12 +61,12 @@ public sealed class GetTransactionsByIdsTests : IntegrationTest
 	{
 		var transaction = TestContext.Transactions[0];
 		transaction.Reverse(TestContext.Users[0].Id);
-		var senderBalance = await Context.UserBalances
+		var senderBalance = await Context.Set<OrganizationBalance>()
 			.SingleAsync(balance =>
 				balance.OrganizationId == transaction.SenderId &&
 				balance.CurrencyId == transaction.CurrencyId,
 				CancellationToken);
-		var receiverBalance = await Context.UserBalances
+		var receiverBalance = await Context.Set<OrganizationBalance>()
 			.SingleAsync(balance =>
 				balance.OrganizationId == transaction.ReceiverId &&
 				balance.CurrencyId == transaction.CurrencyId,

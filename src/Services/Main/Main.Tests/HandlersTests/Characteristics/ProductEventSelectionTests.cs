@@ -37,7 +37,7 @@ public class ProductEventSelectionTests : IntegrationTest
 	{
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
-		await Context.ProductCharacteristics.AddAsync(ProductCharacteristic.Create(productId, characteristic.Id, "100"), CancellationToken);
+		await Context.Set<ProductCharacteristic>().AddAsync(ProductCharacteristic.Create(productId, characteristic.Id, "100"), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 

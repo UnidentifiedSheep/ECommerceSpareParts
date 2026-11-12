@@ -1,14 +1,14 @@
+using Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 using Persistence.Repository;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities.Offers;
-using Pricing.Persistence.Contexts;
 
 namespace Pricing.Persistence.Repositories;
 
-public class PriceOfferRefreshStateRepository(DContext context, IQueryableExtensions extensions)
-	: LinqRepositoryBase<DContext, PriceOfferRefreshState, PriceOfferRefreshStateKey>(context, extensions),
+public class PriceOfferRefreshStateRepository(UnifiedDbContext context, IQueryableExtensions extensions)
+	: LinqRepositoryBase<UnifiedDbContext, PriceOfferRefreshState, PriceOfferRefreshStateKey>(context, extensions),
 		IPriceOfferRefreshStateRepository
 {
 	public async Task<bool> UpsertStateAsync(

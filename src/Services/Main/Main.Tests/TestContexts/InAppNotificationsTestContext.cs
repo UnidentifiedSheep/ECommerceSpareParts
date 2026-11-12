@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Entities.User;
 using Main.Persistence.Context;
 using Notification.Core.Entities;
@@ -7,8 +8,8 @@ using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class InAppNotificationsTestContext(DContext context, UsersTestContext usersTestContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class InAppNotificationsTestContext(UnifiedDbContext context, UsersTestContext usersTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public static Type[] DependsOn { get; } = [typeof(UsersTestContext)];
 

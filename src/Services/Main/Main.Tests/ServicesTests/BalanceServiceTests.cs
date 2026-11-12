@@ -346,7 +346,7 @@ public class BalanceServiceTests : IntegrationTest
 	private Task<OrganizationBalance> GetUserBalance(Guid userId, int currencyId)
 	{
 		return Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.SingleAsync(x => x.OrganizationId == userId && x.CurrencyId == currencyId);
 	}

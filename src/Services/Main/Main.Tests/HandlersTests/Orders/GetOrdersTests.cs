@@ -257,7 +257,7 @@ public sealed class GetOrdersTests : IntegrationTest
 		var orders = GetContext<OrderTestContext>();
 		var order = orders.OnlineOrder;
 		var item = order.Items[1];
-		var sku = await Context.Products.Where(product => product.Id == item.ProductId)
+		var sku = await Context.Set<Product>().Where(product => product.Id == item.ProductId)
 			.Select(product => product.Sku.Value).SingleAsync(CancellationToken);
 		order.RemoveItem(item);
 		await Context.SaveChangesAsync(CancellationToken);

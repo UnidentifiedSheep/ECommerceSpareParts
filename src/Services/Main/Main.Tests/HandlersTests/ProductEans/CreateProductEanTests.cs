@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using FluentAssertions;
 using Main.Application.Products.Commands.CreateProductEan;
 using Main.Entities.Exceptions;
@@ -24,7 +25,7 @@ public class CreateProductEanTests : IntegrationTest
 
 		await Mediator.Send(new CreateProductEanCommand(productId, ean), CancellationToken);
 
-		var saved = await Context.ProductEans.AsNoTracking()
+		var saved = await Context.Set<ProductEan>().AsNoTracking()
 			.SingleAsync(x => x.ProductId == productId && x.Ean == ean.Trim(), CancellationToken);
 		saved.Ean.Should().Be(ean.Trim());
 	}
@@ -37,7 +38,7 @@ public class CreateProductEanTests : IntegrationTest
 
 		await Mediator.Send(new CreateProductEanCommand(otherProduct.Id, existing.Ean), CancellationToken);
 
-		(await Context.ProductEans.CountAsync(ean => ean.Ean == existing.Ean, CancellationToken)).Should().Be(2);
+		(await Context.Set<ProductEan>().CountAsync(ean => ean.Ean == existing.Ean, CancellationToken)).Should().Be(2);
 	}
 
 	[Fact]

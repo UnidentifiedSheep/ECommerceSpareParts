@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Enums.Orders;
 using Main.Persistence.Context;
 using Tests.Abstractions;
@@ -12,10 +13,10 @@ using DomainOrder = Main.Entities.Order.Order;
 namespace Tests.TestContexts.Order;
 
 public sealed class OrderTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	UserContextTestContext userContext,
 	CurrencyTestContext currencies,
-	ProductTestContext products) : TestContextBase<DContext>(context), IDependentTestContext
+	ProductTestContext products) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public DomainOrder OnlineOrder { get; private set; } = null!;
 	public DomainOrder ManualOrder { get; private set; } = null!;

@@ -1,3 +1,4 @@
+using Main.Entities.Producer;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
 using Enums;
@@ -86,7 +87,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var mappings = await Context
-			.ProducerSupplierMappings
+			.Set<global::Main.Entities.Producer.ProducerSupplierMapping>()
 			.AsNoTracking()
 			.Where(x => x.ProducerId == producer.Id)
 			.ToListAsync(CancellationToken);
@@ -107,7 +108,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 			ProducerId = producerId, Supplier = otherSupplier, SupplierProducerName = " bosch "
 		}), CancellationToken);
 
-		(await Context.ProducerSupplierMappings.CountAsync(CancellationToken)).Should().Be(2);
+		(await Context.Set<ProducerSupplierMapping>().CountAsync(CancellationToken)).Should().Be(2);
 	}
 
 	[Fact]
@@ -129,7 +130,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		result.ProducerSupplierMapping.Supplier.Should().Be(command.ProducerSupplierMapping.Supplier);
 		result.ProducerSupplierMapping.SupplierProducerName.Should().Be(supplierProducerName.Trim());
 
-		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
+		var mapping = await Context.Set<ProducerSupplierMapping>().AsNoTracking().SingleAsync(CancellationToken);
 
 		mapping.Id.Should().Be(result.ProducerSupplierMapping.Id);
 		mapping.ProducerId.Should().Be(producer.Id);

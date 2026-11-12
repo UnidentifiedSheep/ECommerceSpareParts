@@ -21,7 +21,7 @@ public class GetProductsByEanTests : IntegrationTest
 	{
 		var existing = TestContext.ProductEans.First();
 		var otherProducts = TestContext.ProductTestContext.Products.Skip(3).Take(2).ToArray();
-		Context.ProductEans.AddRange(otherProducts.Select(x => ProductEan.Create(x.Id, existing.Ean)));
+		Context.Set<ProductEan>().AddRange(otherProducts.Select(x => ProductEan.Create(x.Id, existing.Ean)));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var expectedIds = otherProducts.Select(x => x.Id).Append(existing.ProductId).Order().ToArray();

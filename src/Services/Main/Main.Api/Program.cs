@@ -1,3 +1,4 @@
+using Persistence.Context;
 using System.Reflection;
 using Abstractions;
 using Api.Common;
@@ -69,7 +70,7 @@ builder.Services.AddMassTransit(x =>
 	x.AddConsumer<JobStatusUpdatedConsumer>();
 	x.AddConsumer<SettingUpdatedConsumer>();
 
-	x.AddEntityFrameworkOutbox<DContext>(o =>
+	x.AddEntityFrameworkOutbox<UnifiedDbContext>(o =>
 	{
 		o.UsePostgres();
 		o.UseBusOutbox();

@@ -1,3 +1,6 @@
+using Main.Entities.Balance;
+using Main.Entities.Storage;
+using Main.Entities.Purchase;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
 using Tests.Stubs;
@@ -52,18 +55,18 @@ public class DeletePurchaseTests : IntegrationTest
 		await Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken);
 
 		var purchaseExists =
-			await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
+			await Context.Set<Purchase>().AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
 		var purchaseContentExists = await Context
-			.PurchaseContents
+			.Set<global::Main.Entities.Purchase.PurchaseContent>()
 			.AsNoTracking()
 			.AnyAsync(x => x.PurchaseId == purchase.Id, CancellationToken);
 		var storageContent = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(productId, CancellationToken);
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == transactionId, CancellationToken);
 
@@ -91,10 +94,10 @@ public class DeletePurchaseTests : IntegrationTest
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
 		var originalStock = productStockQuantity;
 
-		var supplierBalance = await Context.UserBalances.SingleAsync(
+		var supplierBalance = await Context.Set<OrganizationBalance>().SingleAsync(
 			x => x.OrganizationId == supplier.Id && x.CurrencyId == currencyId,
 			CancellationToken);
-		var systemBalance = await Context.UserBalances.SingleAsync(
+		var systemBalance = await Context.Set<OrganizationBalance>().SingleAsync(
 			x => x.OrganizationId == systemUserId && x.CurrencyId == currencyId,
 			CancellationToken);
 		var carrierBalance = new UserBalanceBuilder(Faker)
@@ -136,7 +139,7 @@ public class DeletePurchaseTests : IntegrationTest
 			.WithCount(2)
 			.WithBuyPrice(10m)
 			.BuildAndAddToDb(Context, CancellationToken);
-		var stock = await Context.ProductStocks.SingleAsync(
+		var stock = await Context.Set<ProductStock>().SingleAsync(
 			item => item.ProductId == product.Id && item.StorageCode == storageContent.StorageCode, CancellationToken);
 		stock.SetQuantity(stock.Quantity + storageContent.Count);
 
@@ -164,13 +167,13 @@ public class DeletePurchaseTests : IntegrationTest
 		await Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken);
 
 		var purchaseExists =
-			await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
+			await Context.Set<Purchase>().AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
 		var purchaseTransactionAfterDelete = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == purchaseTransaction.Id, CancellationToken);
 		var logisticsTransactionAfterDelete = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == logisticsTransaction.Id, CancellationToken);
 		var productAfterDeleteStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
@@ -217,14 +220,14 @@ public class DeletePurchaseTests : IntegrationTest
 			CancellationToken));
 
 		var purchaseExists =
-			await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
+			await Context.Set<Purchase>().AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
 		var storageContent = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == transactionId, CancellationToken);
 

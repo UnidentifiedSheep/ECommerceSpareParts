@@ -27,7 +27,7 @@ public sealed class ClearExpiredTokensLrtTests(CombinedContainerFixture fixture)
 		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
-		var remaining = await Context.UserTokens.AsNoTracking().Select(x => x.Id).ToListAsync(CancellationToken);
+		var remaining = await Context.Set<UserToken>().AsNoTracking().Select(x => x.Id).ToListAsync(CancellationToken);
 		remaining.Should().BeEquivalentTo([active.Id, revoked.Id, noExpiry.Id]);
 	}
 
@@ -39,13 +39,13 @@ public sealed class ClearExpiredTokensLrtTests(CombinedContainerFixture fixture)
 
 		first.Job.Status.Should().Be(JobStatus.Succeeded, first.Job.ErrorMessage);
 		second.Job.Status.Should().Be(JobStatus.Succeeded, second.Job.ErrorMessage);
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	private async Task<UserToken> AddTokenAsync(Guid userId, DateTime? expiresAt, bool revoked = false)
 	{
 		var token = UserToken.CreateRefreshToken(userId, Guid.NewGuid().ToString("N"));
-		await Context.UserTokens.AddAsync(token, CancellationToken);
+		await Context.Set<UserToken>().AddAsync(token, CancellationToken);
 		Context.Entry(token).Property(x => x.ExpiresAt).CurrentValue = expiresAt;
 		Context.Entry(token).Property(x => x.Revoked).CurrentValue = revoked;
 		return token;

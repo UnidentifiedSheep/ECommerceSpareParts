@@ -31,7 +31,7 @@ public class EditProducerTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var dbProducer = await Context
-			.Producers
+			.Set<global::Main.Entities.Producer.Producer>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == producer.Id, CancellationToken);
 		dbProducer.Should().NotBeNull();
@@ -59,7 +59,7 @@ public class EditProducerTests : IntegrationTest
 		var edited = await Mediator.Send(command, CancellationToken);
 
 		var dbProducer = await Context
-			.Producers
+			.Set<global::Main.Entities.Producer.Producer>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == producer.Id, CancellationToken);
 		dbProducer.Should().NotBeNull();

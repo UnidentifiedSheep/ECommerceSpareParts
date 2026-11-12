@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using FluentAssertions;
 using Main.Application.Handlers.ProductEnrichment;
 using Main.Entities.Exceptions;
@@ -34,7 +35,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var products = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 
 		products.Should().HaveCount(2);
 		products.Single(x => x.Sku.Value == "BATCH-SELECTED").Name.Value.Should().Be("Selected name");
@@ -63,7 +64,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var products = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 
 		products.Should().HaveCount(2);
 		products.Should().ContainSingle(x => x.Id == existingProduct.Id);
@@ -84,7 +85,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 
 		await action.Should().ThrowAsync<CatalogueCandidateNotFoundException>();
 		Context.ChangeTracker.Clear();
-		(await Context.Products.AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<Product>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	[Fact]
@@ -101,7 +102,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 
 		await action.Should().ThrowAsync<CatalogueCandidateDuplicateIdsException>();
 		Context.ChangeTracker.Clear();
-		(await Context.Products.AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<Product>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	private async Task<CatalogueCandidate> CreateCandidate(string sku, params string[] names)

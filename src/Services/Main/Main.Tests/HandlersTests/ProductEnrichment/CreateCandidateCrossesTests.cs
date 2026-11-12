@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Main.Entities;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
@@ -50,12 +51,12 @@ public sealed class CreateCandidateCrossesTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var candidates = await Context
-			.CatalogueCandidates
+			.Set<global::Main.Entities.Product.Enrichment.CatalogueCandidate>()
 			.Include(x => x.Product)
 			.AsNoTracking()
 			.ToListAsync(CancellationToken);
 
-		var crosses = (await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken))
+		var crosses = (await Context.Set<ProductCross>().AsNoTracking().ToListAsync(CancellationToken))
 			.Select(x => new Tuple<Guid, Guid>(
 				candidates.First(z => z.Product!.Id == x.RightProductId).Id,
 				candidates.First(z => z.Product!.Id == x.LeftProductId).Id))

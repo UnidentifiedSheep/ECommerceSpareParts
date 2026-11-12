@@ -229,7 +229,7 @@ public class EditProductTests : IntegrationTest
 
 		await Mediator.Send(new PatchProductCommand(id, patch), CancellationToken);
 
-		var updated = await Context.Products.AsNoTracking().SingleAsync(product => product.Id == id, CancellationToken);
+		var updated = await Context.Set<Product>().AsNoTracking().SingleAsync(product => product.Id == id, CancellationToken);
 		assertDatabase(updated);
 		(await provider.GetProductAsync(id, CancellationToken)).Should().BeNull("the handler must invalidate the cached product");
 		(await provider.GetProductAsync(otherId, CancellationToken)).Should().BeEquivalentTo(otherCached);
@@ -242,7 +242,7 @@ public class EditProductTests : IntegrationTest
 	private int GetFirstId() => TestContext.Products[0].Id;
 
 	private async Task<Product?> GetProduct(int productId) =>
-		await Context.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId, CancellationToken);
+		await Context.Set<Product>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId, CancellationToken);
 }
 
 public class PatchProductValidationTests : ValidationTest<PatchProductValidation, PatchProductCommand>

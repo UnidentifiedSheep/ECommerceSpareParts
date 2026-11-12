@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Main.Entities.Balance;
 using Main.Entities.Organization;
@@ -20,11 +21,11 @@ using DomainSale = Main.Entities.Sale.Sale;
 namespace Tests.TestContexts.Sale;
 
 public class SaleTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	UserContextTestContext userContext,
 	ProductTestContext productContext,
 	StorageContentTestContext storageContentContext,
-	CurrencyTestContext currencyContext) : TestContextBase<DContext>(context), IDependentTestContext
+	CurrencyTestContext currencyContext) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public User Buyer { get; private set; } = null!;
 
@@ -105,7 +106,7 @@ public class SaleTestContext(
 			.Build();
 
 		StorageContent.IncreaseCount(-SoldCount, StorageMovementType.Sale);
-		var stock = await DbContext.ProductStocks.SingleAsync(
+		var stock = await DbContext.Set<global::Main.Entities.Storage.ProductStock>().SingleAsync(
 			item => item.StorageCode == StorageContent.StorageCode && item.ProductId == Product.Id, cancellationToken);
 		stock.SetQuantity(stock.Quantity - SoldCount);
 

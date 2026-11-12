@@ -1,10 +1,11 @@
+using Persistence.Context;
 using Domain.CommonEntities.Job;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Common;
+using Persistence.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities.Offers;
-using Pricing.Persistence.Contexts;
 using Pricing.Persistence.Repositories;
 
 namespace Pricing.Persistence;
@@ -15,7 +16,8 @@ public static class ServiceCollectionExtensions
 		this IServiceCollection collection,
 		IConfiguration configuration)
 	{
-		collection.AddPersistenceBase<DContext>(
+		collection.AddDbContextModule<PricingDbContextModule>();
+		collection.AddPersistenceBase<UnifiedDbContext>(
 			typeof(BasicEfRepository<,>),
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),

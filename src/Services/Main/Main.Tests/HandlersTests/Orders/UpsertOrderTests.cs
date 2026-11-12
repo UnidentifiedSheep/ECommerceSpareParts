@@ -1,3 +1,4 @@
+using Main.Entities.Order;
 using Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Exceptions;
@@ -41,7 +42,7 @@ public class UpsertOrderTests : IntegrationTest
 			Items = [new() { ProductId = template.Items.First().ProductId, Count = 2 }]
 		};
 		var result = await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
-		var created = await Context.Orders.AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == result.OrderId, CancellationToken);
+		var created = await Context.Set<Order>().AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == result.OrderId, CancellationToken);
 		created.Id.Should().NotBe(template.Id!.Value);
 		created.Items.Should().ContainSingle().Which.Count.Should().Be(2);
 	}
@@ -52,9 +53,9 @@ public class UpsertOrderTests : IntegrationTest
 		var dto = UpdateDto();
 		var otherVersion = Orders.OnlineOrder.RowVersion;
 		await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
-		var updated = await Context.Orders.AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == dto.Id, CancellationToken);
+		var updated = await Context.Set<Order>().AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == dto.Id, CancellationToken);
 		updated.Items.Should().ContainSingle().Which.Count.Should().Be(dto.Items.Single().Count);
-		(await Context.Orders.AsNoTracking().SingleAsync(x => x.Id == Orders.OnlineOrder.Id, CancellationToken)).RowVersion.Should().Be(otherVersion);
+		(await Context.Set<Order>().AsNoTracking().SingleAsync(x => x.Id == Orders.OnlineOrder.Id, CancellationToken)).RowVersion.Should().Be(otherVersion);
 	}
 
 	[Fact]
@@ -63,7 +64,7 @@ public class UpsertOrderTests : IntegrationTest
 		var dto = UpdateDto();
 		dto = dto with { Items = [dto.Items.Single() with { UnitPrice = 200m }] };
 		await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
-		(await Context.Orders.AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == dto.Id, CancellationToken))
+		(await Context.Set<Order>().AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == dto.Id, CancellationToken))
 			.Items.Single().UnitPrice.Should().Be(200m);
 	}
 	[Theory]
@@ -79,7 +80,7 @@ public class UpsertOrderTests : IntegrationTest
 		}
 		var retained = order.Items[0];
 		var removed = order.Items[1];
-		var otherItemIds = await Context.OrderItems.AsNoTracking().Where(item => item.OrderId != order.Id)
+		var otherItemIds = await Context.Set<OrderItem>().AsNoTracking().Where(item => item.OrderId != order.Id)
 			.Select(item => item.Id).ToArrayAsync(CancellationToken);
 		var dto = new UpsertOrderDto
 		{
@@ -92,12 +93,12 @@ public class UpsertOrderTests : IntegrationTest
 
 		await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
 
-		var saved = await Context.OrderItems.AsNoTracking().Where(item => item.OrderId == order.Id && !item.IsDeleted).ToArrayAsync(CancellationToken);
+		var saved = await Context.Set<OrderItem>().AsNoTracking().Where(item => item.OrderId == order.Id && !item.IsDeleted).ToArrayAsync(CancellationToken);
 		saved.Should().HaveCount(2);
 		saved.Single(item => item.Id == retained.Id).Count.Should().Be(dto.Items.First().Count);
 		saved.Single(item => item.Id != retained.Id).Count.Should().Be(7);
-		(await Context.OrderItems.AsNoTracking().SingleAsync(item => item.Id == removed.Id, CancellationToken)).IsDeleted.Should().BeTrue();
-		(await Context.OrderItems.AsNoTracking().Where(item => item.OrderId != order.Id)
+		(await Context.Set<OrderItem>().AsNoTracking().SingleAsync(item => item.Id == removed.Id, CancellationToken)).IsDeleted.Should().BeTrue();
+		(await Context.Set<OrderItem>().AsNoTracking().Where(item => item.OrderId != order.Id)
 			.Select(item => item.Id).ToArrayAsync(CancellationToken)).Should().BeEquivalentTo(otherItemIds);
 	}
 
@@ -126,7 +127,7 @@ public class UpsertOrderTests : IntegrationTest
 
 		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
 
-		(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should().Be(2);
+		(await Context.Set<OrderItem>().AsNoTracking().CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should().Be(2);
 	}
 
 	[Fact]
@@ -135,7 +136,7 @@ public class UpsertOrderTests : IntegrationTest
 		var dto = UpdateDto();
 		dto = dto with { Items = [dto.Items.Single() with { Id = Orders.OnlineOrder.Items[0].Id }] };
 		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
-		(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == dto.Id, CancellationToken)).Should().Be(1);
+		(await Context.Set<OrderItem>().AsNoTracking().CountAsync(item => item.OrderId == dto.Id, CancellationToken)).Should().Be(1);
 	}
 
 	[Fact]
@@ -160,7 +161,7 @@ public class UpsertOrderTests : IntegrationTest
 			Items = [new() { Id = removed.Id, ProductId = removed.ProductId, Count = removed.Count, UnitPrice = removed.UnitPrice }]
 		};
 		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
-		(await Context.OrderItems.AsNoTracking().SingleAsync(item => item.Id == removed.Id, CancellationToken))
+		(await Context.Set<OrderItem>().AsNoTracking().SingleAsync(item => item.Id == removed.Id, CancellationToken))
 			.IsDeleted.Should().BeTrue();
 	}
 

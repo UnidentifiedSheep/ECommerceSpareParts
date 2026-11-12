@@ -1,3 +1,4 @@
+using Main.Entities.Producer;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Main.Application.Lrts.ProducerAliasesImport;
@@ -43,7 +44,7 @@ public sealed class ProducerAliasImportLrtTests : CsvLrtIntegrationTest<Producer
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProducerAliasesImportState>();
 		state.Errors.Should().HaveCount(3);
-		var aliases = await Context.ProducersAliases.AsNoTracking().ToListAsync(CancellationToken);
+		var aliases = await Context.Set<ProducerAlias>().AsNoTracking().ToListAsync(CancellationToken);
 		aliases.Should().ContainSingle(x => x.Alias == "NEW ALIAS");
 	}
 }

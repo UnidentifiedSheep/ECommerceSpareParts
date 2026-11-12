@@ -43,7 +43,7 @@ public class AddAliasToProducerTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var alias = await Context.ProducersAliases.AsNoTracking().FirstOrDefaultAsync(CancellationToken);
+		var alias = await Context.Set<ProducerAlias>().AsNoTracking().FirstOrDefaultAsync(CancellationToken);
 
 		alias.Should().NotBeNull();
 

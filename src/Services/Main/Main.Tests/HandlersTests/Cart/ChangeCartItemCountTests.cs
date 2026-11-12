@@ -1,3 +1,4 @@
+using Main.Entities.Cart;
 using Main.Entities;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
@@ -42,7 +43,7 @@ public class ChangeCartItemCountTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var cartItem = await Context.Carts.FirstOrDefaultAsync(
+		var cartItem = await Context.Set<global::Main.Entities.Cart.Cart>().FirstOrDefaultAsync(
 			x => x.UserId == command.UserId && x.ProductId == command.ProductId,
 			CancellationToken);
 		Assert.NotNull(cartItem);

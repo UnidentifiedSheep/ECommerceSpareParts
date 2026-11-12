@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Persistence.Context;
 using Security.Core.Interfaces;
 using System.Globalization;
@@ -94,7 +95,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 					}
 				}));
 
-		services.ConfigureDbContext<DContext>(options =>
+		services.ConfigureDbContext<UnifiedDbContext>(options =>
 			options.UseNpgsql(pgsql => pgsql.MigrationsAssembly("Main.Migrator")));
 
 		var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);

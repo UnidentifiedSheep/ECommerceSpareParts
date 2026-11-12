@@ -25,7 +25,7 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 		var created = await Mediator.Send(command, CancellationToken);
 
 		var createdProducer = await Context
-			.Producers
+			.Set<global::Main.Entities.Producer.Producer>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == created.ProducerId, CancellationToken);
 
@@ -46,7 +46,7 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 			Mediator.Send(new CreateProducerCommand(CreateDto() with { Name = name }), CancellationToken));
 
 		exception.Failures.Should().ContainSingle(failure => failure.Error is ProducerNameAlreadyTakenException);
-		(await Context.Producers.CountAsync(producer => producer.Name == "BOSCH", CancellationToken))
+		(await Context.Set<Producer>().CountAsync(producer => producer.Name == "BOSCH", CancellationToken))
 			.Should().Be(1);
 	}
 

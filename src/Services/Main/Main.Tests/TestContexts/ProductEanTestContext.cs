@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Tests.Abstractions;
@@ -7,8 +8,8 @@ using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class ProductEanTestContext(DContext context, ProductTestContext productTestContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class ProductEanTestContext(UnifiedDbContext context, ProductTestContext productTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public ProductTestContext ProductTestContext => productTestContext;
 

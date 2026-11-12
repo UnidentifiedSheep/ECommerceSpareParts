@@ -39,7 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <LocanResource Include="../Pricing.Entities/Localization/**/*.json"
+        <LocanResource Include="../../Main/Modules/Pricing/Pricing.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 

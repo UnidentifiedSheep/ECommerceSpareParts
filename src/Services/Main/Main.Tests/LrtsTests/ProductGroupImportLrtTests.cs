@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Main.Application.Lrts.ProductGroupImport;
@@ -34,7 +35,7 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		state.Checkpoint!.CurrentLine.Should().Be(5);
 		state.Errors.Should().ContainSingle(error => error.RowIdx == 4);
 
-		var groups = await Context.ProductGroups.AsNoTracking().ToListAsync(CancellationToken);
+		var groups = await Context.Set<ProductGroup>().AsNoTracking().ToListAsync(CancellationToken);
 		groups.Should().HaveCount(3);
 		groups.Select(group => group.NormalizedName).Should()
 			.BeEquivalentTo(["brake-pads", "oil-filters", "air-filters"]);
@@ -61,7 +62,7 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2, 3);
 		state.Errors.Should().OnlyContain(error => !string.IsNullOrWhiteSpace(error.Message));
 
-		var groups = await Context.ProductGroups.AsNoTracking().ToListAsync(CancellationToken);
+		var groups = await Context.Set<ProductGroup>().AsNoTracking().ToListAsync(CancellationToken);
 		groups.Should().HaveCount(2);
 		groups.Select(group => group.Name).Should()
 			.BeEquivalentTo([longestValidName, "Filters, Oil"]);
@@ -80,7 +81,7 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		var state = execution.GetState<ProductGroupImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(1001);
 		state.Errors.Should().BeEmpty();
-		(await Context.ProductGroups.AsNoTracking().ToListAsync(CancellationToken))
+		(await Context.Set<ProductGroup>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle(group => group.Name == "Brake Pads");
 	}
 
@@ -96,6 +97,6 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		var state = execution.GetState<ProductGroupImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(2);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2);
-		(await Context.ProductGroups.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<ProductGroup>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 }

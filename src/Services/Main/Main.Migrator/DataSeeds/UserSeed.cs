@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Security.Core.Interfaces;
 using Application.Common.Interfaces.Validators;
 using Main.Entities.Auth;
@@ -10,7 +11,7 @@ using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
-public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdManager) : ISeed<DContext>
+public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdManager) : ISeed<UnifiedDbContext>
 {
 	private static readonly string[] Services =
 	[
@@ -22,10 +23,10 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 
 	private readonly ServiceSecrets _secrets = secrets.Value;
 
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
 		var existingSystemUsers = await context
-			.Users
+			.Set<User>()
 			.Where(x => x.Roles.Any(y => y.RoleName == RoleNames.Normalize(nameof(Role.System))))
 			.AsNoTracking()
 			.ToDictionaryAsync(x => x.UserName);
@@ -44,7 +45,7 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 		if (toAdd.Count == 0)
 			return;
 
-		await context.Users.AddRangeAsync(toAdd);
+		await context.Set<User>().AddRangeAsync(toAdd);
 		await context.SaveChangesAsync();
 	}
 

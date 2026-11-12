@@ -25,7 +25,7 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 
 		Context.ChangeTracker.Clear();
 		var persisted = await Context
-			.Jobs
+			.Set<Job>()
 			.AsNoTracking()
 			.OfType<MultiStepJob>()
 			.Include(x => x.Steps)
@@ -52,7 +52,7 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 
 		Context.ChangeTracker.Clear();
 		var roots = await Context
-			.Jobs
+			.Set<Job>()
 			.AsNoTracking()
 			.Where(x => x.MultiStepJobId == null)
 			.Where(x => x.SystemName == "workflow")
@@ -60,7 +60,7 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 			.ToListAsync(CancellationToken);
 
 		roots.Should().ContainSingle().Which.Id.Should().Be(first.Id);
-		(await Context.Jobs.AnyAsync(x => x.Id == duplicate.Id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<Job>().AnyAsync(x => x.Id == duplicate.Id, CancellationToken)).Should().BeFalse();
 	}
 
 	[Fact]
@@ -81,14 +81,14 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 
 		Context.ChangeTracker.Clear();
 		var rootCount = await Context
-			.Jobs
+			.Set<Job>()
 			.AsNoTracking()
 			.CountAsync(
 				x => x.MultiStepJobId == null && x.SystemName == "workflow" &&
 					(x.NaturalKey == "workflow:42" || x.NaturalKey == "workflow:43"),
 				CancellationToken);
 		var stepCount = await Context
-			.Jobs
+			.Set<Job>()
 			.AsNoTracking()
 			.CountAsync(x => x.MultiStepJobId != null, CancellationToken);
 
@@ -110,9 +110,9 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 		addedCount.Should().Be(2);
 
 		Context.ChangeTracker.Clear();
-		(await Context.Jobs.AnyAsync(x => x.Id == singleRunJob.Id, CancellationToken)).Should().BeTrue();
+		(await Context.Set<Job>().AnyAsync(x => x.Id == singleRunJob.Id, CancellationToken)).Should().BeTrue();
 		var persistedWorkflow = await Context
-			.Jobs
+			.Set<Job>()
 			.AsNoTracking()
 			.OfType<MultiStepJob>()
 			.Include(x => x.Steps)
@@ -159,7 +159,7 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 
 		Context.ChangeTracker.Clear();
 		var persistedIds = await Context
-			.Jobs
+			.Set<Job>()
 			.AsNoTracking()
 			.Where(x => x.Id == first.Id || x.Id == second.Id || x.Id == workflow.Id || x.Id == step.Id)
 			.Select(x => x.Id)

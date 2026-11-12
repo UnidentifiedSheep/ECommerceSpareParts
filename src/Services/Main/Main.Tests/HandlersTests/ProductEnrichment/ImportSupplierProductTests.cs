@@ -133,7 +133,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			.Should()
 			.ContainSingle("Analogue name");
 
-		var cross = await Context.SupplierProductCrosses.AsNoTracking().SingleAsync(CancellationToken);
+		var cross = await Context.Set<SupplierProductCross>().AsNoTracking().SingleAsync(CancellationToken);
 		cross.LeftId.Should().Be(Math.Min(products[0].Id, products[1].Id));
 		cross.RightId.Should().Be(Math.Max(products[0].Id, products[1].Id));
 	}
@@ -184,14 +184,14 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			.Should()
 			.BeEquivalentTo("First analogue name", "Second analogue name");
 
-		var crossesCount = await Context.SupplierProductCrosses.AsNoTracking().CountAsync(CancellationToken);
+		var crossesCount = await Context.Set<SupplierProductCross>().AsNoTracking().CountAsync(CancellationToken);
 		crossesCount.Should().Be(1);
 	}
 
 	private async Task<List<SupplierProduct>> GetProducts()
 	{
 		return await Context
-			.SupplierProducts
+			.Set<global::Main.Entities.Product.Enrichment.SupplierProduct>()
 			.AsNoTracking()
 			.Include(x => x.Names)
 			.OrderBy(x => x.Id)

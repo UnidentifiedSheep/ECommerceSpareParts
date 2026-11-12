@@ -132,6 +132,6 @@ public sealed class ProducerLookupServiceCachingTests : IntegrationTest
 
 		((MessageBrokerStub)transaction.Context.Publisher).PublishedMessagesOfType<ProducerLookupChangedEvent>().Should().BeEmpty();
 		(await service.Load(CancellationToken)).Should().BeSameAs(before);
-		(await Context.Producers.AsNoTracking().SingleAsync(x => x.Id == producer.Id, CancellationToken)).Name.Should().Be(originalName);
+		(await Context.Set<Producer>().AsNoTracking().SingleAsync(x => x.Id == producer.Id, CancellationToken)).Name.Should().Be(originalName);
 	}
 }

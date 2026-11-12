@@ -2,14 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Notification.Core.Entities;
 using Notification.Core.Enums;
 using Notification.Core.Interfaces.Repositories;
-using Notification.Persistence.Interfaces;
 using Persistence.Interfaces;
 
 namespace Notification.Persistence.Repositories;
 
-public class NotificationDeliveryRepository(
-	INotificationDbContext context,
-	IQueryableExtensions queryableExtensions) : INotificationDeliveryRepository
+public class NotificationDeliveryRepository<TContext>(
+	TContext context,
+	IQueryableExtensions queryableExtensions) : INotificationDeliveryRepository where TContext : DbContext
 {
 	public async Task<IReadOnlyList<NotificationDelivery>> GetPendingBatchForUpdateAsync(
 		string channelSystemName,
@@ -19,7 +18,7 @@ public class NotificationDeliveryRepository(
 		ArgumentException.ThrowIfNullOrWhiteSpace(channelSystemName);
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
 
-		var query = context.NotificationDeliveries
+		var query = context.Set<NotificationDelivery>()
 			.Include(delivery => delivery.Notification)
 			.Where(delivery => delivery.ChannelSystemName == channelSystemName &&
 			                   delivery.Status == DeliveryStatus.Pending)
@@ -37,7 +36,7 @@ public class NotificationDeliveryRepository(
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(channelSystemName);
 
-		var query = context.NotificationDeliveries
+		var query = context.Set<NotificationDelivery>()
 			.Where(delivery => delivery.ChannelSystemName == channelSystemName &&
 			                   delivery.Status == DeliveryStatus.Pending)
 			.Take(1);

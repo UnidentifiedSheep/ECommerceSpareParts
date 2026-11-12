@@ -42,7 +42,7 @@ public class CreateSystemTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -53,11 +53,11 @@ public class CreateSystemTransactionTests : IntegrationTest
 		transaction.IsCompleted.Should().BeTrue();
 
 		var userBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var systemBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id,
@@ -86,7 +86,7 @@ public class CreateSystemTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -97,11 +97,11 @@ public class CreateSystemTransactionTests : IntegrationTest
 		transaction.IsCompleted.Should().BeTrue();
 
 		var userBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var systemBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id,

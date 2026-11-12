@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Application.Common.Models;
 using Application.Common.Querying;
 using FluentAssertions;
@@ -24,7 +25,7 @@ public sealed class GetProductCrossesTests : IntegrationTest
 	{
 		var (productId, ids) = await LoadCrosses();
 		var storages = GetContext<StorageTestContext>().Storages.Take(2).ToArray();
-		Context.ProductStocks.AddRange(
+		Context.Set<ProductStock>().AddRange(
 			ProductStock.Create(storages[0].Code, ids[0], 2),
 			ProductStock.Create(storages[1].Code, ids[0], 10),
 			ProductStock.Create(storages[0].Code, ids[1], 8));
@@ -45,7 +46,7 @@ public sealed class GetProductCrossesTests : IntegrationTest
 		var (productId, ids) = await LoadCrosses();
 		var storage = GetContext<StorageTestContext>().Storages.First();
 		var stock = ProductStock.Create(storage.Code, ids[0], 10);
-		Context.ProductStocks.AddRange(stock, ProductStock.Create(storage.Code, ids[1], 5));
+		Context.Set<ProductStock>().AddRange(stock, ProductStock.Create(storage.Code, ids[1], 5));
 		await Context.SaveChangesAsync(CancellationToken);
 		var item = new GetProductCrossesQuery(productId, new Pagination(0, 1), ["count_desc"]);
 
@@ -64,7 +65,7 @@ public sealed class GetProductCrossesTests : IntegrationTest
 	{
 		var (productId, ids) = await LoadCrosses();
 		var storage = GetContext<StorageTestContext>().Storages.First();
-		Context.ProductStocks.Add(ProductStock.Create(storage.Code, ids[^1], 5));
+		Context.Set<ProductStock>().Add(ProductStock.Create(storage.Code, ids[^1], 5));
 		await Context.SaveChangesAsync(CancellationToken);
 		var item = new GetProductCrossesQuery(productId, new Pagination(0, 100), ["count"]);
 
@@ -80,7 +81,7 @@ public sealed class GetProductCrossesTests : IntegrationTest
 	{
 		var (productId, ids) = await LoadCrosses();
 		var storages = GetContext<StorageTestContext>().Storages.Take(2).ToArray();
-		Context.ProductStocks.AddRange(
+		Context.Set<ProductStock>().AddRange(
 			ProductStock.Create(storages[0].Code, ids[0], 1),
 			ProductStock.Create(storages[1].Code, ids[0], 20),
 			ProductStock.Create(storages[0].Code, ids[1], 5),

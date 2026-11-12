@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
 using FluentAssertions;
@@ -24,7 +25,7 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 		result.Group.Name.Should().Be("Brake Pads");
 		result.Group.NormalizedName.Should().Be("brake-pads");
 
-		var saved = await Context.ProductGroups.AsNoTracking()
+		var saved = await Context.Set<ProductGroup>().AsNoTracking()
 			.SingleAsync(CancellationToken);
 		saved.Id.Should().Be(result.Group.Id);
 		saved.Name.Should().Be(result.Group.Name);
@@ -47,7 +48,7 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 		result.Group.Name.Should().Be("Oil Filters");
 		result.Group.NormalizedName.Should().Be("oil-filters");
 
-		var saved = await Context.ProductGroups.AsNoTracking()
+		var saved = await Context.Set<ProductGroup>().AsNoTracking()
 			.SingleAsync(CancellationToken);
 		saved.Id.Should().Be(existing.Id);
 		saved.Name.Should().Be("Oil Filters");
@@ -69,7 +70,7 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 		result.Group.Id.Should().Be(existing.Id);
 		result.Group.Name.Should().Be("BRAKE PADS");
 		result.Group.NormalizedName.Should().Be("brake-pads");
-		(await Context.ProductGroups.CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<ProductGroup>().CountAsync(CancellationToken)).Should().Be(1);
 	}
 
 	[Fact]
@@ -86,7 +87,7 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 		var exception = await act.Should().ThrowAsync<ProductGroupNameAlreadyExistsException>();
 		exception.Which.LocalizableMessage.MessageKey.Should().Be(
 			ProductGroupNormalizedNameAlreadyExistsMessage.Key);
-		(await Context.ProductGroups.CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<ProductGroup>().CountAsync(CancellationToken)).Should().Be(1);
 	}
 
 	[Fact]
@@ -105,11 +106,11 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 			CancellationToken);
 
 		await act.Should().ThrowAsync<ProductGroupNameAlreadyExistsException>();
-		var saved = await Context.ProductGroups.AsNoTracking()
+		var saved = await Context.Set<ProductGroup>().AsNoTracking()
 			.SingleAsync(group => group.Id == existing.Id, CancellationToken);
 		saved.Name.Should().Be("Brake Pads");
 		saved.NormalizedName.Should().Be("brake-pads");
-		(await Context.ProductGroups.CountAsync(CancellationToken)).Should().Be(2);
+		(await Context.Set<ProductGroup>().CountAsync(CancellationToken)).Should().Be(2);
 		other.Id.Should().NotBe(existing.Id);
 	}
 
@@ -121,7 +122,7 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 			CancellationToken);
 
 		await act.Should().ThrowAsync<ProductGroupNotFoundException>();
-		(await Context.ProductGroups.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<ProductGroup>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 

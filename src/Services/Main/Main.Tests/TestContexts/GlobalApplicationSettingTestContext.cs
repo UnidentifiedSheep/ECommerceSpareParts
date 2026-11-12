@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces.Settings;
+﻿using Persistence.Context;
+using Application.Common.Interfaces.Settings;
 using Main.Entities.Organization;
 using Main.Entities.Settings;
 using Main.Entities.User;
@@ -10,9 +11,9 @@ using Tests.Stubs;
 namespace Tests.TestContexts;
 
 public abstract class GlobalApplicationSettingTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	ISettingsService settingsService,
-	TestSystemOptionsAccessor systemOptionsAccessor) : TestContextBase<DContext>(context)
+	TestSystemOptionsAccessor systemOptionsAccessor) : TestContextBase<UnifiedDbContext>(context)
 {
 	public User SystemUser { get; private set; } = null!;
 

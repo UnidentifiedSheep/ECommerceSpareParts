@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces.Settings;
+﻿using Persistence.Context;
+using Application.Common.Interfaces.Settings;
 using Main.Entities.Currency;
 using Main.Entities.Settings;
 using Main.Persistence.Context;
@@ -11,9 +12,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Tests.TestContexts.Currency;
 
 public class CurrencyRatesTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	CurrencyTestContext currencyTestContext,
-	ISettingsService settingsService) : TestContextBase<DContext>(context), IDependentTestContext
+	ISettingsService settingsService) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public CurrencyTestContext CurrencyTestContext => currencyTestContext;
 
@@ -37,7 +38,7 @@ public class CurrencyRatesTestContext(
 	public async Task SetHistoryAsync(CurrencyRate rate,
 		IReadOnlyCollection<(DateTime Date, decimal Rate)> rows, CancellationToken cancellationToken)
 	{
-		await DbContext.CurrencyRates
+		await DbContext.Set<global::Main.Entities.Currency.CurrencyRate>()
 			.Where(row => row.FromCurrencyId == rate.FromCurrencyId && row.ToCurrencyId == rate.ToCurrencyId)
 			.ExecuteDeleteAsync(cancellationToken);
 		foreach (var item in rows)

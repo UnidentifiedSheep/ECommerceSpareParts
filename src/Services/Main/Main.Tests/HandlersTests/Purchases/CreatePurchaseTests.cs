@@ -1,3 +1,4 @@
+using Main.Entities.Balance;
 using Application.Common.Services;
 using Moq;
 using Tests.Abstractions.Test;
@@ -71,7 +72,7 @@ public class CreatePurchaseTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
-			.Purchases
+			.Set<global::Main.Entities.Purchase.Purchase>()
 			.Include(x => x.Contents)
 			.Include(x => x.PurchaseLogistic)
 			.AsNoTracking()
@@ -86,7 +87,7 @@ public class CreatePurchaseTests : IntegrationTest
 		purchase.PurchaseLogistic.Should().BeNull();
 		purchase.Contents.Should().HaveCount(command.PurchaseContent.Count());
 
-		var storageContents = await Context.StorageContents.AsNoTracking().ToListAsync(CancellationToken);
+		var storageContents = await Context.Set<StorageContent>().AsNoTracking().ToListAsync(CancellationToken);
 		storageContents.Should().HaveCount(command.PurchaseContent.Count());
 		foreach (var item in command.PurchaseContent)
 			storageContents
@@ -96,7 +97,7 @@ public class CreatePurchaseTests : IntegrationTest
 					x.CurrencyId == command.CurrencyId && x.StorageCode == command.StorageCode);
 
 		var purchaseTransaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == purchase.TransactionId, CancellationToken);
 		purchaseTransaction.SenderId.Should().Be(_supplier.Id);
@@ -127,14 +128,14 @@ public class CreatePurchaseTests : IntegrationTest
 		var result = await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
-			.Purchases
+			.Set<global::Main.Entities.Purchase.Purchase>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == result.PurchaseId, CancellationToken);
 		purchase.SupplierUserId.Should().Be(_supplier.Id);
 		purchase.SupplierOrganizationId.Should().Be(organization.Id);
 
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == purchase.TransactionId, CancellationToken);
 		transaction.SenderId.Should().Be(organization.Id);
@@ -162,7 +163,7 @@ public class CreatePurchaseTests : IntegrationTest
 
 		var result = await Mediator.Send(command, CancellationToken);
 		var purchase = await Context
-			.Purchases
+			.Set<global::Main.Entities.Purchase.Purchase>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == result.PurchaseId, CancellationToken);
 
@@ -197,7 +198,7 @@ public class CreatePurchaseTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
-			.Purchases
+			.Set<global::Main.Entities.Purchase.Purchase>()
 			.Include(x => x.PurchaseLogistic)
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.PurchaseContentLogistic)
@@ -224,7 +225,7 @@ public class CreatePurchaseTests : IntegrationTest
 		{
 			purchase.PurchaseLogistic.TransactionId.Should().NotBeNull();
 			var logisticsTransaction = await Context
-				.Transactions
+				.Set<global::Main.Entities.Balance.Transaction>()
 				.AsNoTracking()
 				.SingleAsync(x => x.Id == purchase.PurchaseLogistic.TransactionId, CancellationToken);
 			logisticsTransaction.SenderId.Should().Be(route.CarrierId.Value);
@@ -256,7 +257,7 @@ public class CreatePurchaseTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var transactions = await Context.Transactions.AsNoTracking().ToListAsync(CancellationToken);
+		var transactions = await Context.Set<Transaction>().AsNoTracking().ToListAsync(CancellationToken);
 		transactions.Should().HaveCount(2);
 
 		var paymentTransaction = transactions.Single(x => x.Amount == payedSum);
@@ -277,7 +278,7 @@ public class CreatePurchaseTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var supplierBalance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.OrganizationId == command.SupplierOrganizationId && x.CurrencyId == command.CurrencyId,
@@ -309,7 +310,7 @@ public class CreatePurchaseTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var transactions = await Context.Transactions.AsNoTracking().ToListAsync(CancellationToken);
+		var transactions = await Context.Set<Transaction>().AsNoTracking().ToListAsync(CancellationToken);
 		transactions.Should().HaveCount(1);
 	}
 
@@ -320,7 +321,7 @@ public class CreatePurchaseTests : IntegrationTest
 		var currency = GetContext<CurrencyTestContext>().Currencies[0];
 		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
 		var product = GetContext<ProductTestContext>().Products.First();
-		Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
+		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var command = CreateCommand(
@@ -339,7 +340,7 @@ public class CreatePurchaseTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
-			.Purchases
+			.Set<global::Main.Entities.Purchase.Purchase>()
 			.Include(x => x.PurchaseLogistic)
 			.AsNoTracking()
 			.SingleAsync(CancellationToken);
@@ -444,12 +445,12 @@ public class CreatePurchaseTests : IntegrationTest
 	{
 		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
 		var product = GetContext<ProductTestContext>().Products.First();
-		Context.ProductWeights.Add(
+		Context.Set<ProductWeight>().Add(
 			ProductWeight.Create(
 				product.Id,
 				2m,
 				WeightUnit.Kilogram));
-		Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
+		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var command = CreateCommand(
@@ -476,14 +477,14 @@ public class CreatePurchaseTests : IntegrationTest
 	{
 		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
 		var product = GetContext<ProductTestContext>().Products.First();
-		Context.ProductSizes.Add(
+		Context.Set<ProductSize>().Add(
 			ProductSize.Create(
 				product.Id,
 				1m,
 				1m,
 				1m,
 				DimensionUnit.Meter));
-		Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
+		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var command = CreateCommand(
@@ -567,19 +568,19 @@ public class CreatePurchaseTests : IntegrationTest
 		StorageRoute route,
 		Guid supplierId)
 	{
-		Context.ProductSizes.Add(
+		Context.Set<ProductSize>().Add(
 			ProductSize.Create(
 				product.Id,
 				1m,
 				1m,
 				1m,
 				DimensionUnit.Meter));
-		Context.ProductWeights.Add(
+		Context.Set<ProductWeight>().Add(
 			ProductWeight.Create(
 				product.Id,
 				2m,
 				WeightUnit.Kilogram));
-		Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, supplierId));
+		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, supplierId));
 		await Context.SaveChangesAsync();
 	}
 }

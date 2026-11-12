@@ -29,7 +29,7 @@ public class DeleteCharacteristicTests : IntegrationTest
 
 		await Mediator.Send(new DeleteCharacteristicCommand(existing.Id), CancellationToken);
 
-		var remaining = await Context.Characteristics.AsNoTracking().ToListAsync(CancellationToken);
+		var remaining = await Context.Set<Characteristic>().AsNoTracking().ToListAsync(CancellationToken);
 		remaining.Should().ContainSingle().Which.Id.Should().Be(other.Id);
 	}
 
@@ -48,7 +48,7 @@ public class DeleteCharacteristicTests : IntegrationTest
 		var existing = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context);
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var link = ProductCharacteristic.Create(productId, existing.Id, "Red");
-		await Context.ProductCharacteristics.AddAsync(link, CancellationToken);
+		await Context.Set<ProductCharacteristic>().AddAsync(link, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
@@ -57,8 +57,8 @@ public class DeleteCharacteristicTests : IntegrationTest
 		var exception = await act.Should().ThrowAsync<DbValidationException>();
 		var failure = Assert.IsType<CharacteristicInUseException>(exception.Which.Failures.Single().Error);
 		failure.LocalizableMessage.MessageKey.Should().Be(CharacteristicInUseMessage.Key);
-		(await Context.Characteristics.AnyAsync(x => x.Id == existing.Id, CancellationToken)).Should().BeTrue();
-		(await Context.ProductCharacteristics.AnyAsync(
+		(await Context.Set<Characteristic>().AnyAsync(x => x.Id == existing.Id, CancellationToken)).Should().BeTrue();
+		(await Context.Set<ProductCharacteristic>().AnyAsync(
 			x => x.ProductId == productId && x.CharacteristicId == existing.Id, CancellationToken)).Should().BeTrue();
 	}
 
@@ -68,16 +68,16 @@ public class DeleteCharacteristicTests : IntegrationTest
 		var used = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context);
 		var unused = await new CharacteristicBuilder(Faker).WithName("Size").BuildAndAddToDb(Context);
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
-		await Context.ProductCharacteristics.AddAsync(
+		await Context.Set<ProductCharacteristic>().AddAsync(
 			ProductCharacteristic.Create(productId, used.Id, "Red"), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		await Mediator.Send(new DeleteCharacteristicCommand(unused.Id), CancellationToken);
 
-		var remaining = await Context.Characteristics.AsNoTracking().ToListAsync(CancellationToken);
+		var remaining = await Context.Set<Characteristic>().AsNoTracking().ToListAsync(CancellationToken);
 		remaining.Should().ContainSingle().Which.Id.Should().Be(used.Id);
-		(await Context.ProductCharacteristics.CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<ProductCharacteristic>().CountAsync(CancellationToken)).Should().Be(1);
 	}
 
 

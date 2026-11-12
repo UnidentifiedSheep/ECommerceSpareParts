@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Enums;
 using LinqKit;
 using Main.Entities.Auth;
@@ -8,16 +9,16 @@ using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
-public class RolePermissionSeed : ISeed<DContext>
+public class RolePermissionSeed : ISeed<UnifiedDbContext>
 {
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
-		var roles = await context.Roles.ToListAsync();
+		var roles = await context.Set<Main.Entities.Auth.Role>().ToListAsync();
 
 		if (roles.Count == 0)
 			return;
 
-		var permissions = await context.Permissions.ToDictionaryAsync(p => p.Name);
+		var permissions = await context.Set<Permission>().ToDictionaryAsync(p => p.Name);
 
 		var rolePermissions = BuildRolePermissions();
 		var existingRolePermissions = (await context
@@ -62,7 +63,7 @@ public class RolePermissionSeed : ISeed<DContext>
 
 	public int ExecutionOrder => 1;
 
-	private static async Task ClearRetiredRolePermissions(DContext context)
+	private static async Task ClearRetiredRolePermissions(UnifiedDbContext context)
 	{
 		var predicate = PredicateBuilder.New<RolePermission>(false);
 

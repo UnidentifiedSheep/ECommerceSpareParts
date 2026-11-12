@@ -43,7 +43,7 @@ public class EditStorageRouteTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var updatedRoute = await Context
-			.StorageRoutes
+			.Set<global::Main.Entities.Storage.StorageRoute>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == route.Id, CancellationToken);
 		Assert.Equal(2000, updatedRoute.DistanceM);

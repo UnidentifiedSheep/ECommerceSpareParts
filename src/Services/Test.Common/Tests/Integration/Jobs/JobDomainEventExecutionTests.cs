@@ -61,7 +61,7 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 
 		Context.ChangeTracker.Clear();
 		var persistedParent =
-			await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == parent.Id, CancellationToken);
+			await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == parent.Id, CancellationToken);
 
 		persistedParent.Status.Should().Be(JobStatus.Pending);
 	}
@@ -97,7 +97,7 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 
 		Context.ChangeTracker.Clear();
 		var jobs = await Context
-			.Jobs
+			.Set<Job>()
 			.AsNoTracking()
 			.Where(x => x.Id == parent.Id || x.Id == step.Id)
 			.ToDictionaryAsync(x => x.Id, CancellationToken);
@@ -126,13 +126,13 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 
 		cancelledJobs.Should().ContainSingle(x => x.Id == job.Id);
 		Context.ChangeTracker.Clear();
-		var persisted = await Context.Jobs.AsNoTracking()
+		var persisted = await Context.Set<Job>().AsNoTracking()
 			.SingleAsync(x => x.Id == job.Id, CancellationToken);
 		persisted.Status.Should().Be(JobStatus.Cancelled);
 		persisted.ErrorMessage.Should().Be("stop requested");
 		persisted.LeaseHolderId.Should().BeNull();
 		persisted.LeaseExpiresAt.Should().BeNull();
-		(await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == activeJob.Id, CancellationToken))
+		(await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == activeJob.Id, CancellationToken))
 			.Status.Should().Be(JobStatus.CancellationRequested);
 	}
 

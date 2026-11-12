@@ -1,3 +1,6 @@
+using Main.Entities.Cart;
+using Main.Entities.Product.Enrichment;
+using Persistence.Context;
 using System.Text.Json;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
@@ -72,16 +75,16 @@ public class DeleteProductTests : IntegrationTest
 		await deletionScope.ServiceProvider.GetRequiredService<IMediator>()
 			.Send(new DeleteProductCommand(id, Product.RowVersion), CancellationToken);
 
-		(await Context.Products.AsNoTracking().AnyAsync(item => item.Id == id, CancellationToken)).Should().BeFalse();
-		(await Context.ProductEans.AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.ProductCharacteristics.AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.ProductSizes.AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.ProductWeights.AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.ProductContents.AsNoTracking().AnyAsync(item => item.ParentProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.Carts.AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle().Which.StorageKey.Should().Be(otherImage.StorageKey);
-		(await Context.Products.AsNoTracking().AnyAsync(item => item.Id == Other.Id, CancellationToken)).Should().BeTrue();
-		(await Context.Characteristics.AsNoTracking().AnyAsync(item => item.Id == characteristic.Id, CancellationToken)).Should().BeTrue();
+		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<ProductEan>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<ProductCharacteristic>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<ProductSize>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<ProductWeight>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<ProductContent>().AsNoTracking().AnyAsync(item => item.ParentProductId == id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<global::Main.Entities.Cart.Cart>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle().Which.StorageKey.Should().Be(otherImage.StorageKey);
+		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Other.Id, CancellationToken)).Should().BeTrue();
+		(await Context.Set<Characteristic>().AsNoTracking().AnyAsync(item => item.Id == characteristic.Id, CancellationToken)).Should().BeTrue();
 		var job = (await Context.Set<Job>().AsNoTracking()
 			.Where(item => item.SystemName == DeleteProductImagesLrt.Name).ToListAsync(CancellationToken))
 			.Should().ContainSingle("deletion must persist a cleanup job with the image keys").Which;
@@ -109,7 +112,7 @@ public class DeleteProductTests : IntegrationTest
 		(await provider.GetProductAsync(Product.Id, CancellationToken)).Should().BeNull();
 		(await provider.GetProductAsync(Other.Id, CancellationToken)).Should().NotBeNull();
 		(await provider.GetProductCrossesAsync(Other.Id, CancellationToken)).Should().BeEmpty();
-		(await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken)).Should().BeEmpty();
+		(await Context.Set<ProductCross>().AsNoTracking().ToListAsync(CancellationToken)).Should().BeEmpty();
 		(await Context.Set<Job>().AsNoTracking().AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should().BeFalse();
 	}
 
@@ -140,8 +143,8 @@ public class DeleteProductTests : IntegrationTest
 		await deletionScope.ServiceProvider.GetRequiredService<IMediator>()
 			.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), CancellationToken);
 
-		(await Context.Products.AsNoTracking().SingleAsync(item => item.Id == Other.Id, CancellationToken)).PairId.Should().BeNull();
-		(await Context.CatalogueCandidates.AsNoTracking().SingleAsync(item => item.Id == candidate.Id, CancellationToken)).ProductId.Should().BeNull();
+		(await Context.Set<Product>().AsNoTracking().SingleAsync(item => item.Id == Other.Id, CancellationToken)).PairId.Should().BeNull();
+		(await Context.Set<CatalogueCandidate>().AsNoTracking().SingleAsync(item => item.Id == candidate.Id, CancellationToken)).ProductId.Should().BeNull();
 		publisher.PublishedMessages.Skip(publishedBefore).OfType<CatalogueCandidateUpdatedEvent>()
 			.Should().ContainSingle(item => item.Candidate.Id == candidate.Id && item.Candidate.MappedProductId == null);
 	}
@@ -158,9 +161,9 @@ public class DeleteProductTests : IntegrationTest
 			async (_, ct) => await Mediator.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), ct),
 			CancellationToken);
 
-		(await Context.Products.AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken))
+		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken))
 			.Should().BeFalse();
-		(await Context.Products.AsNoTracking().SingleAsync(item => item.Id == Other.Id, CancellationToken))
+		(await Context.Set<Product>().AsNoTracking().SingleAsync(item => item.Id == Other.Id, CancellationToken))
 			.PairId.Should().BeNull();
 	}
 
@@ -179,7 +182,7 @@ public class DeleteProductTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 		var action = () => Mediator.Send(new DeleteProductCommand(Product.Id, version), CancellationToken);
 		await action.Should().ThrowAsync<InvalidRowVersionException>();
-		(await Context.Products.AsNoTracking().SingleAsync(item => item.Id == Product.Id, CancellationToken))
+		(await Context.Set<Product>().AsNoTracking().SingleAsync(item => item.Id == Product.Id, CancellationToken))
 			.Description.Should().Be("updated since opening the deletion dialog");
 	}
 
@@ -205,8 +208,8 @@ public class DeleteProductTests : IntegrationTest
 		var action = () => Delete();
 
 		(await action.Should().ThrowAsync<ProductDeletionNotAllowedException>()).Which.Blocker.Should().Be(blocker);
-		(await Context.Products.AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeTrue();
-		(await Context.ProductImages.AsNoTracking().AnyAsync(item => item.ProductId == Product.Id, CancellationToken)).Should().BeTrue();
+		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeTrue();
+		(await Context.Set<ProductImage>().AsNoTracking().AnyAsync(item => item.ProductId == Product.Id, CancellationToken)).Should().BeTrue();
 		(await provider.GetProductAsync(Product.Id, CancellationToken)).Should().NotBeNull();
 		(await Context.Set<Job>().AsNoTracking().AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should().BeFalse();
 		publisher.PublishedMessages.Skip(publishedBefore).Should().BeEmpty();
@@ -232,9 +235,9 @@ public class DeleteProductTests : IntegrationTest
 		await action.Should().ThrowAsync<InvalidOperationException>();
 
 		using var verification = Sp.CreateScope();
-		var db = verification.ServiceProvider.GetRequiredService<DContext>();
-		(await db.Products.AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeTrue();
-		(await db.ProductImages.AnyAsync(item => item.ProductId == Product.Id, CancellationToken)).Should().BeTrue();
+		var db = verification.ServiceProvider.GetRequiredService<UnifiedDbContext>();
+		(await db.Set<Product>().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeTrue();
+		(await db.Set<ProductImage>().AnyAsync(item => item.ProductId == Product.Id, CancellationToken)).Should().BeTrue();
 		(await db.Set<Job>().AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should().BeFalse();
 		publisher.PublishedMessages.Skip(publishedBefore).OfType<ProductsUpdatedEvent>().SelectMany(item => item.Products)
 			.Should().NotContain(item => item.Id == Product.Id && item.IsDeleted);
@@ -245,9 +248,9 @@ public class DeleteProductTests : IntegrationTest
 	public async Task ConcurrentCompositionInsert_CannotAttachToDeletedProduct()
 	{
 		using var insertionScope = Sp.CreateScope();
-		var insertionDb = insertionScope.ServiceProvider.GetRequiredService<DContext>();
+		var insertionDb = insertionScope.ServiceProvider.GetRequiredService<UnifiedDbContext>();
 		var content = ProductContent.Create(Other.Id, Product.Id, 1);
-		insertionDb.ProductContents.Add(content);
+		insertionDb.Set<global::Main.Entities.Product.ProductContent>().Add(content);
 		Task<int>? insertion = null;
 		var transaction = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 
@@ -262,8 +265,8 @@ public class DeleteProductTests : IntegrationTest
 		var action = async () => await insertion!;
 		(await action.Should().ThrowAsync<DbUpdateException>()).Which.InnerException
 			.Should().BeOfType<Npgsql.PostgresException>().Which.SqlState.Should().Be(Npgsql.PostgresErrorCodes.ForeignKeyViolation);
-		(await Context.Products.AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeFalse();
-		(await Context.ProductContents.AsNoTracking().AnyAsync(item => item.ChildProductId == Product.Id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<ProductContent>().AsNoTracking().AnyAsync(item => item.ChildProductId == Product.Id, CancellationToken)).Should().BeFalse();
 	}
 
 	private async Task AddBlocker(ProductDeletionBlocker blocker)

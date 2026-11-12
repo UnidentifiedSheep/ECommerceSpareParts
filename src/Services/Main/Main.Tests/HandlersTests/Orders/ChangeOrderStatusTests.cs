@@ -1,3 +1,4 @@
+using Main.Entities.Order;
 using Exceptions;
 using FluentAssertions;
 using FluentValidation.TestHelper;
@@ -26,10 +27,10 @@ public class ChangeOrderStatusTests : IntegrationTest
 		var actorId = Orders.OtherUser.Id;
 		var order = status == OrderStatus.Completed ? Orders.ConfirmedOrder : Orders.ManualOrder;
 		await Mediator.Send(new ChangeOrderStatusCommand(order.Id, actorId, status, order.RowVersion), CancellationToken);
-		var saved = await Context.Orders.AsNoTracking().SingleAsync(x => x.Id == order.Id, CancellationToken);
+		var saved = await Context.Set<Order>().AsNoTracking().SingleAsync(x => x.Id == order.Id, CancellationToken);
 		saved.Status.Should().Be(status);
 		if (status == OrderStatus.Deleted)
-			(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should().Be(order.Items.Count);
+			(await Context.Set<OrderItem>().AsNoTracking().CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should().Be(order.Items.Count);
 		if (status == OrderStatus.Confirmed)
 		{
 			saved.ConfirmedByUserId.Should().Be(actorId);
@@ -43,7 +44,7 @@ public class ChangeOrderStatusTests : IntegrationTest
 		var order = Orders.ManualOrder;
 		await Assert.ThrowsAsync<InvalidRowVersionException>(() => Mediator.Send(
 			new ChangeOrderStatusCommand(order.Id, Orders.OtherUser.Id, OrderStatus.Confirmed, order.RowVersion + 1), CancellationToken));
-		(await Context.Orders.AsNoTracking().SingleAsync(x => x.Id == order.Id, CancellationToken)).Status.Should().Be(OrderStatus.Pending);
+		(await Context.Set<Order>().AsNoTracking().SingleAsync(x => x.Id == order.Id, CancellationToken)).Status.Should().Be(OrderStatus.Pending);
 	}
 
 	[Fact]

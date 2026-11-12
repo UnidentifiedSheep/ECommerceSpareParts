@@ -97,7 +97,7 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 			productId,
 			CancellationToken)).ToList();
 
-		await Context.ProductCrosses.AddAsync(
+		await Context.Set<ProductCross>().AddAsync(
 			ProductCross.Create(productId, isolatedProductId),
 			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);

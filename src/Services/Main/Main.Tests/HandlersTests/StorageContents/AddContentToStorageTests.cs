@@ -70,10 +70,10 @@ public class AddContentToStorageTests : IntegrationTest
 			storageContent,
 			storage.Code,
 			StorageMovementType.StorageContentAddition);
-		var countBefore = await Context.StorageContents.CountAsync(CancellationToken);
+		var countBefore = await Context.Set<StorageContent>().CountAsync(CancellationToken);
 		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 		Assert.Contains(exception.Failures, failure => failure.Error is ProductNotFoundException);
-		Assert.Equal(countBefore, await Context.StorageContents.CountAsync(CancellationToken));
+		Assert.Equal(countBefore, await Context.Set<StorageContent>().CountAsync(CancellationToken));
 	}
 
 	[Fact]
@@ -134,11 +134,11 @@ public class AddContentToStorageTests : IntegrationTest
 			if (!expectedTotals.TryAdd(kv.Key, kv.Value))
 				expectedTotals[kv.Key] += kv.Value;
 
-		var stocks = await Context.ProductStocks.AsNoTracking().Where(stock => stock.StorageCode == storage.Code)
+		var stocks = await Context.Set<ProductStock>().AsNoTracking().Where(stock => stock.StorageCode == storage.Code)
 			.ToDictionaryAsync(stock => stock.ProductId, stock => stock.Quantity, CancellationToken);
 
 		var dbStorageContents = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.StorageCode == storage.Code)
 			.ToListAsync();

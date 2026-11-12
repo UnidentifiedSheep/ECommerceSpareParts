@@ -22,7 +22,7 @@ public class MakeEmailPrimaryTests(CombinedContainerFixture fixture) : Integrati
 			CancellationToken);
 
 		var emails = await Context
-			.UserEmails
+			.Set<global::Main.Entities.User.UserEmail>()
 			.AsNoTracking()
 			.Where(x => x.UserId == user.Id)
 			.ToListAsync(CancellationToken);
@@ -42,7 +42,7 @@ public class MakeEmailPrimaryTests(CombinedContainerFixture fixture) : Integrati
 
 		Context.ChangeTracker.Clear();
 		var primaryEmail = await Context
-			.UserEmails
+			.Set<global::Main.Entities.User.UserEmail>()
 			.AsNoTracking()
 			.SingleAsync(x => x.UserId == user.Id && x.IsPrimary, CancellationToken);
 		primaryEmail.Email.Value.Should().Be("current-primary@example.com");

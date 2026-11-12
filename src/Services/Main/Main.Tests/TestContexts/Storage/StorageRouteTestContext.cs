@@ -1,4 +1,5 @@
-﻿using Main.Entities.Storage;
+﻿using Persistence.Context;
+using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Storage;
@@ -9,10 +10,10 @@ using Tests.TestContexts.Currency;
 namespace Tests.TestContexts.Storage;
 
 public class StorageRouteTestContext(
-	DContext ctx,
+	UnifiedDbContext ctx,
 	StorageTestContext storageTestContext,
 	CurrencyTestContext currencyTestContext,
-	UsersTestContext usersTestContext) : TestContextBase<DContext>(ctx), IDependentTestContext
+	UsersTestContext usersTestContext) : TestContextBase<UnifiedDbContext>(ctx), IDependentTestContext
 {
 	public StorageRoute ActiveRoute { get; private set; } = null!;
 

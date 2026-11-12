@@ -77,7 +77,7 @@ public sealed class MapGroupToProductLrtTests : CsvLrtIntegrationTest<MapGroupTo
 		var state = execution.GetState<MapGroupToProductState>();
 		state.Checkpoint!.CurrentLine.Should().Be(6);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(5, 6);
-		var groups = await Context.Products.AsNoTracking()
+		var groups = await Context.Set<Product>().AsNoTracking()
 			.ToDictionaryAsync(product => product.Id, product => product.ProductGroupId, CancellationToken);
 		groups.Should().HaveCount(4);
 		groups[first.Id].Should().Be(filters.Id);
@@ -113,7 +113,7 @@ public sealed class MapGroupToProductLrtTests : CsvLrtIntegrationTest<MapGroupTo
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		execution.GetState<MapGroupToProductState>().Checkpoint!.CurrentLine.Should().Be(rows.Length);
-		var saved = (await Context.Products.AsNoTracking().ToListAsync(CancellationToken))
+		var saved = (await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		saved.ProductGroupId.Should().BeNull();
 		GetPublishedSnapshots().Should().BeEmpty();
@@ -137,7 +137,7 @@ public sealed class MapGroupToProductLrtTests : CsvLrtIntegrationTest<MapGroupTo
 		var snapshots = GetPublishedSnapshots();
 		snapshots.Select(snapshot => snapshot.Id).Should().Equal(product.Id, product.Id);
 		snapshots.Select(snapshot => snapshot.ProductGroupId).Should().Equal(filters.Id, brakes.Id);
-		(await Context.Products.AsNoTracking().SingleAsync(CancellationToken)).ProductGroupId.Should().Be(brakes.Id);
+		(await Context.Set<Product>().AsNoTracking().SingleAsync(CancellationToken)).ProductGroupId.Should().Be(brakes.Id);
 	}
 
 	[Fact]
@@ -162,7 +162,7 @@ public sealed class MapGroupToProductLrtTests : CsvLrtIntegrationTest<MapGroupTo
 
 		execution.Job.Status.Should().Be(JobStatus.Failed);
 		execution.Job.ErrorMessage.Should().Contain("Product publication failed");
-		var groups = await Context.Products.AsNoTracking()
+		var groups = await Context.Set<Product>().AsNoTracking()
 			.ToDictionaryAsync(product => product.Id, product => product.ProductGroupId, CancellationToken);
 		groups[first.Id].Should().Be(brakes.Id);
 		groups[second.Id].Should().BeNull();
@@ -209,7 +209,7 @@ public sealed class MapGroupToProductLrtTests : CsvLrtIntegrationTest<MapGroupTo
 		storage.GetDownloadOffsets("uploads", fileName).Should().Equal(0, Encoding.UTF8.GetByteCount(committedPrefix));
 		var snapshots = GetPublishedSnapshots(broker);
 		snapshots.Select(snapshot => snapshot.Id).Should().BeEquivalentTo(products.Select(product => product.Id));
-		var groups = await Context.Products.AsNoTracking()
+		var groups = await Context.Set<Product>().AsNoTracking()
 			.ToDictionaryAsync(product => product.Id, product => product.ProductGroupId, CancellationToken);
 		foreach (var product in products.Take(3))
 			groups[product.Id].Should().Be(brakes.Id);

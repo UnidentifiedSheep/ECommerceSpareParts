@@ -51,7 +51,7 @@ public class DeleteAliasTests : IntegrationTest
 		var act = () => Mediator.Send(command);
 		await act.Should().NotThrowAsync();
 
-		var dbAliass = await Context.ProducersAliases.AsNoTracking().ToListAsync(CancellationToken);
+		var dbAliass = await Context.Set<ProducerAlias>().AsNoTracking().ToListAsync(CancellationToken);
 		dbAliass.Should().HaveCount(0);
 	}
 }

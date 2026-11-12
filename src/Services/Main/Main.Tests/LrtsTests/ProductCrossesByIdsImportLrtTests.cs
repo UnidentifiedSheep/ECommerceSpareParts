@@ -19,7 +19,7 @@ public sealed class ProductCrossesByIdsImportLrtTests : CsvLrtIntegrationTest<Pr
 	public async Task ImportsCrosses_SkipsExistingAndReverseDuplicates()
 	{
 		var products = TestContext.Products.Take(3).ToArray();
-		Context.ProductCrosses.Add(ProductCross.Create(products[0].Id, products[1].Id));
+		Context.Set<ProductCross>().Add(ProductCross.Create(products[0].Id, products[1].Id));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -35,7 +35,7 @@ public sealed class ProductCrossesByIdsImportLrtTests : CsvLrtIntegrationTest<Pr
 		var state = execution.GetState<ProductCrossesByIdsImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(3);
 		state.Errors.Should().BeEmpty();
-		var crosses = await Context.ProductCrosses.AsNoTracking()
+		var crosses = await Context.Set<ProductCross>().AsNoTracking()
 			.Select(x => new { x.LeftProductId, x.RightProductId })
 			.ToListAsync(CancellationToken);
 		crosses.Should().HaveCount(2);
@@ -63,6 +63,6 @@ public sealed class ProductCrossesByIdsImportLrtTests : CsvLrtIntegrationTest<Pr
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var errors = execution.GetState<ProductCrossesByIdsImportState>().Errors;
 		errors.Select(x => x.RowIdx).Should().Equal(1, 2, 3);
-		(await Context.ProductCrosses.AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<ProductCross>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
 	}
 }

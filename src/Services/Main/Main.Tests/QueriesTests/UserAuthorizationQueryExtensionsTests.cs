@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Application.Common.Interfaces.Projections;
 using Enums;
 using FluentAssertions;
@@ -95,10 +96,10 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 		authorization.Permissions.Should().BeEmpty();
 	}
 
-	private DContext CreateReadContext(QueryCounter counter) => new(
-		new DbContextOptionsBuilder<DContext>()
+	private UnifiedDbContext CreateReadContext(QueryCounter counter) => new(
+		new DbContextOptionsBuilder<UnifiedDbContext>()
 			.UseNpgsql(Context.Database.GetDbConnection(), options =>
 				options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 			.AddInterceptors(counter)
-			.Options);
+			.Options, [new global::Main.Persistence.MainDbContextModule()]);
 }

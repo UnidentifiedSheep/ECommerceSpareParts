@@ -1,15 +1,15 @@
+using Persistence.Context;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Pricing.Persistence.Contexts;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 
 namespace Pricing.Integration.Tests;
 
 public abstract class IntegrationTest(CombinedContainerFixture fixture)
-	: IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
+	: IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, UnifiedDbContext>
 {
 	private TestEnvironmentLease _environmentLease = null!;
 	protected IMediator Mediator { get; private set; } = null!;

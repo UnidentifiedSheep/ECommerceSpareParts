@@ -90,9 +90,9 @@ public sealed class ProductSynchronizationLrtTests : IntegrationTest
 	{
 		var products = TestContext.Products.OrderBy(product => product.Id).ToArray();
 		var characteristic = Characteristic.Create("Color");
-		Context.Characteristics.Add(characteristic);
+		Context.Set<Characteristic>().Add(characteristic);
 		await Context.SaveChangesAsync(CancellationToken);
-		Context.ProductCharacteristics.AddRange(
+		Context.Set<ProductCharacteristic>().AddRange(
 			ProductCharacteristic.Create(products[0].Id, characteristic.Id, "Red"),
 			ProductCharacteristic.Create(products[1].Id, characteristic.Id, "Blue"));
 		await Context.SaveChangesAsync(CancellationToken);

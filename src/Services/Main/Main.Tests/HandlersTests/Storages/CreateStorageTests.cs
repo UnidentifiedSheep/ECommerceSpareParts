@@ -1,3 +1,4 @@
+using Main.Entities.Storage;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
 using Main.Entities.Exceptions;
@@ -35,7 +36,7 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 		var command = GetCommand();
 		await Mediator.Send(command, CancellationToken);
 
-		var createdStorage = await Context.Storages.FirstOrDefaultAsync(
+		var createdStorage = await Context.Set<Storage>().FirstOrDefaultAsync(
 			x => x.Code == command.Code,
 			CancellationToken);
 		Assert.NotNull(createdStorage);

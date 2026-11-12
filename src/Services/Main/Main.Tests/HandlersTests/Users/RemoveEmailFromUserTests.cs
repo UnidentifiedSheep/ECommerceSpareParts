@@ -21,7 +21,7 @@ public class RemoveEmailFromUserTests(CombinedContainerFixture fixture) : Integr
 			CancellationToken);
 
 		var emails = await Context
-			.UserEmails
+			.Set<global::Main.Entities.User.UserEmail>()
 			.AsNoTracking()
 			.Where(x => x.UserId == user.Id)
 			.ToListAsync(CancellationToken);
@@ -43,7 +43,7 @@ public class RemoveEmailFromUserTests(CombinedContainerFixture fixture) : Integr
 
 		Context.ChangeTracker.Clear();
 		var emails = await Context
-			.UserEmails
+			.Set<global::Main.Entities.User.UserEmail>()
 			.AsNoTracking()
 			.Where(x => x.UserId == user.Id)
 			.ToListAsync(CancellationToken);

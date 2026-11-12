@@ -35,7 +35,7 @@ public class EditStorageTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
-			.Storages
+			.Set<global::Main.Entities.Storage.Storage>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Code == storage.Code, CancellationToken);
 		Assert.NotNull(dbStorage);
@@ -60,7 +60,7 @@ public class EditStorageTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
-			.Storages
+			.Set<global::Main.Entities.Storage.Storage>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Code == storage.Code, CancellationToken);
 
@@ -94,7 +94,7 @@ public class EditStorageTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
-			.Storages
+			.Set<global::Main.Entities.Storage.Storage>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Code == storage.Code, CancellationToken);
 

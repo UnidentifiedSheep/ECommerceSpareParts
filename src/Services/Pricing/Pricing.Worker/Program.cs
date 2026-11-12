@@ -1,3 +1,4 @@
+using Persistence.Context;
 using System.Reflection;
 using Abstractions;
 using Api.Common;
@@ -20,7 +21,6 @@ using Pricing.Application;
 using Pricing.Application.Consumers;
 using Pricing.Cache;
 using Pricing.Persistence;
-using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
 using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -78,7 +78,7 @@ builder.Services.AddMassTransit(x =>
 	x.AddConsumer<ProductPriceOffersUpdatedConsumer, ProductPriceOffersUpdatedDefinition>();
 	x.AddConsumer<StorageContentUpdatedConsumer, StorageContentUpdatedDefinition>();
 
-	x.AddEntityFrameworkOutbox<DContext>(o =>
+	x.AddEntityFrameworkOutbox<UnifiedDbContext>(o =>
 	{
 		o.UsePostgres();
 		o.UseBusOutbox();

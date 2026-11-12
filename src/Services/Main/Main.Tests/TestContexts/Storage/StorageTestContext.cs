@@ -1,4 +1,5 @@
-﻿using Main.Enums;
+﻿using Persistence.Context;
+using Main.Enums;
 using Main.Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Storage;
@@ -6,7 +7,7 @@ using Tests.Extensions;
 
 namespace Tests.TestContexts.Storage;
 
-public class StorageTestContext(DContext ctx) : TestContextBase<DContext>(ctx)
+public class StorageTestContext(UnifiedDbContext ctx) : TestContextBase<UnifiedDbContext>(ctx)
 {
 	public IReadOnlyCollection<Main.Entities.Storage.Storage> Storages { get; private set; } = null!;
 

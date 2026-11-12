@@ -1,3 +1,5 @@
+using Main.Entities.Balance;
+using Main.Entities.Sale;
 using Application.Common.Services;
 using Moq;
 using Tests.Abstractions.Test;
@@ -44,7 +46,7 @@ public class CreateSaleTests : IntegrationTest
 		var storageContent = StorageContent();
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(storageContent.ProductId, CancellationToken);
 		var originalContents = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
@@ -68,7 +70,7 @@ public class CreateSaleTests : IntegrationTest
 		result.SaleId.Should().NotBeEmpty();
 
 		var sale = await Context
-			.Sales
+			.Set<global::Main.Entities.Sale.Sale>()
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
@@ -85,7 +87,7 @@ public class CreateSaleTests : IntegrationTest
 		saleContent.DiscountedPrice.Should().Be(80m);
 		saleContent.TotalSum.Should().Be(80m);
 		saleContent.OriginalPrice.Should().Be(100);
-		var analytics = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == saleContent.Id, CancellationToken);
+		var analytics = await Context.Set<SaleContentAnalytics>().AsNoTracking().SingleAsync(item => item.SaleContentId == saleContent.Id, CancellationToken);
 		analytics.OriginalAmountInBaseCurrency.Should().Be(100m * saleContent.Count);
 		analytics.RevenueInBaseCurrency.Should().Be(80m * saleContent.Count);
 
@@ -103,7 +105,7 @@ public class CreateSaleTests : IntegrationTest
 				TimeSpan.FromMilliseconds(1));
 
 		var updatedContent = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == detail.StorageContentId, CancellationToken);
 		updatedContent.Count.Should().Be(affectedStorageContent.Count - 1);
@@ -112,7 +114,7 @@ public class CreateSaleTests : IntegrationTest
 		updatedProductStockQuantity.Should().Be(originalStock - 1);
 
 		var saleTransaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 		saleTransaction.SenderId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
@@ -142,7 +144,7 @@ public class CreateSaleTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var transactions = await Context.Transactions.AsNoTracking().ToListAsync(CancellationToken);
+		var transactions = await Context.Set<Transaction>().AsNoTracking().ToListAsync(CancellationToken);
 		transactions.Should().HaveCount(2);
 
 		var payment = transactions.Single(x => x.SourceType == TransactionSourceType.Manual);
@@ -174,7 +176,7 @@ public class CreateSaleTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var balance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId,
@@ -224,7 +226,7 @@ public class CreateSaleTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var balance = await Context
-			.UserBalances
+			.Set<global::Main.Entities.Balance.OrganizationBalance>()
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId,
@@ -246,7 +248,7 @@ public class CreateSaleTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var transactions = await Context.Transactions.AsNoTracking().ToListAsync(CancellationToken);
+		var transactions = await Context.Set<Transaction>().AsNoTracking().ToListAsync(CancellationToken);
 		transactions.Should().ContainSingle();
 		transactions.Single().SourceType.Should().Be(TransactionSourceType.Sale);
 	}
@@ -273,7 +275,7 @@ public class CreateSaleTests : IntegrationTest
 		var result = await Mediator.Send(command, CancellationToken);
 
 		var sale = await Context
-			.Sales
+			.Set<global::Main.Entities.Sale.Sale>()
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
@@ -293,7 +295,7 @@ public class CreateSaleTests : IntegrationTest
 		var buyer = Buyer();
 		var storageContent = StorageContent();
 		var countOnStorage = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
@@ -308,7 +310,7 @@ public class CreateSaleTests : IntegrationTest
 			command,
 			CancellationToken));
 
-		var salesCount = await Context.Sales.AsNoTracking().CountAsync(CancellationToken);
+		var salesCount = await Context.Set<Sale>().AsNoTracking().CountAsync(CancellationToken);
 		salesCount.Should().Be(0);
 	}
 
@@ -472,7 +474,7 @@ public class CreateSaleTests : IntegrationTest
 	private Task<int> CountOnStorage(StorageContent storageContent)
 	{
 		return Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)

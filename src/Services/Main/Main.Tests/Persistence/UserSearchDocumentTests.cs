@@ -3,6 +3,9 @@ using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.DatabaseObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Persistence;
 using Npgsql;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
@@ -104,8 +107,9 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		var user = await CreateUser("concurrent-user", "Первоначальное", "Имя");
 		user.AddEmail("concurrent.old@contacts.example", EmailType.Unknown, false, false);
 		await Context.SaveChangesAsync(CancellationToken);
-		await using var first = new NpgsqlConnection(Context.Database.GetConnectionString());
-		await using var second = new NpgsqlConnection(Context.Database.GetConnectionString());
+		var connectionString = Scope.ServiceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
+		await using var first = new NpgsqlConnection(connectionString);
+		await using var second = new NpgsqlConnection(connectionString);
 		await first.OpenAsync(CancellationToken);
 		await second.OpenAsync(CancellationToken);
 		await using var firstTransaction = await first.BeginTransactionAsync(CancellationToken);
@@ -120,7 +124,7 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		emailCommand.Parameters.AddWithValue("id", user.Id);
 		var emailUpdate = emailCommand.ExecuteNonQueryAsync(CancellationToken);
 
-		await using var observer = new NpgsqlConnection(Context.Database.GetConnectionString());
+		await using var observer = new NpgsqlConnection(connectionString);
 		await observer.OpenAsync(CancellationToken);
 		await using var lockCommand = new NpgsqlCommand(
 			"SELECT coalesce(wait_event_type = 'Lock', false) FROM pg_stat_activity WHERE pid = @pid", observer);

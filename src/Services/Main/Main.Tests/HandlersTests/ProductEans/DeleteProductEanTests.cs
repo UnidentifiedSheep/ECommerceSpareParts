@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using FluentAssertions;
 using Main.Application.Products.Commands.DeleteProductEan;
 using Main.Entities.Exceptions;
@@ -25,7 +26,7 @@ public class DeleteProductEanTests : IntegrationTest
 			new DeleteProductEanCommand(existing.ProductId, $" {existing.Ean} "),
 			CancellationToken);
 
-		var remaining = await Context.ProductEans.AsNoTracking()
+		var remaining = await Context.Set<ProductEan>().AsNoTracking()
 			.Where(x => x.ProductId == existing.ProductId)
 			.Select(x => x.Ean)
 			.ToListAsync(CancellationToken);

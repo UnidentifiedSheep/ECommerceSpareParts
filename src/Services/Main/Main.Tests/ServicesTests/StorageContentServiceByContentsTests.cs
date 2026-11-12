@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Tests.Extensions;
 using FluentAssertions;
 using Application.Common.Interfaces.Persistence;
@@ -29,7 +30,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 			.ToList();
 		var firstByDate = contentsForSameProductAndStorage.First();
 		var passedContent = contentsForSameProductAndStorage.Last();
-		var product = await Context.Products.SingleAsync(
+		var product = await Context.Set<Product>().SingleAsync(
 			x => x.Id == passedContent.ProductId,
 			CancellationToken);
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
@@ -48,7 +49,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 			.Equal(ToStorageLot(passedContent, passedContentOriginalCount), ToStorageLot(firstByDate, 1));
 
 		var contents =
-			await Context.StorageContents.AsNoTracking().ToDictionaryAsync(x => x.Id, CancellationToken);
+			await Context.Set<StorageContent>().AsNoTracking().ToDictionaryAsync(x => x.Id, CancellationToken);
 		contents[passedContent.Id].Count.Should().Be(0);
 		contents[firstByDate.Id].Count.Should().Be(firstByDateOriginalCount - 1);
 
@@ -71,7 +72,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 		result.Should().Equal(ToStorageLot(content, 2));
 
 		var updatedContent = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == content.Id, CancellationToken);
 		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
@@ -91,7 +92,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 		var originalFirstCount = first.Count;
 		var originalSecondCount = second.Count;
 		first.SetCount(0, StorageMovementType.StorageContentEditing);
-		var stock = await Context.ProductStocks.SingleAsync(
+		var stock = await Context.Set<ProductStock>().SingleAsync(
 			item => item.ProductId == first.ProductId && item.StorageCode == first.StorageCode, CancellationToken);
 		stock.SetQuantity(stock.Quantity - originalFirstCount);
 		await Context.SaveChangesAsync(CancellationToken);
@@ -104,11 +105,11 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 		result.Should().Equal(ToStorageLot(second, 1));
 
 		var updatedFirst = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == first.Id, CancellationToken);
 		var updatedSecond = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == second.Id, CancellationToken);
 		updatedFirst.Count.Should().Be(0);
@@ -120,7 +121,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First();
 		var countToSubtract = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
 			.SumAsync(x => x.Count, CancellationToken);
@@ -133,7 +134,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 		result.Sum(x => x.Count).Should().Be(countToSubtract);
 
 		var leftOnSameStorage = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
 			.SumAsync(x => x.Count, CancellationToken);
@@ -159,7 +160,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 		result.Should().Equal(ToStorageLot(first, 1), ToStorageLot(second, 1));
 
 		var contents =
-			await Context.StorageContents.AsNoTracking().ToDictionaryAsync(x => x.Id, CancellationToken);
+			await Context.Set<StorageContent>().AsNoTracking().ToDictionaryAsync(x => x.Id, CancellationToken);
 		contents[first.Id].Count.Should().Be(originalFirstCount - 1);
 		contents[second.Id].Count.Should().Be(originalSecondCount - 1);
 
@@ -177,7 +178,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 		var first = contentsForSameProductAndStorage.First();
 		var second = contentsForSameProductAndStorage.Skip(1).First();
 		var originalCounts = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == first.ProductId && x.StorageCode == first.StorageCode)
 			.ToDictionaryAsync(
@@ -195,7 +196,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 			StorageMovementType.PurchaseEditing));
 
 		var actualCounts = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == first.ProductId && x.StorageCode == first.StorageCode)
 			.ToDictionaryAsync(
@@ -213,7 +214,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First();
 		var countOnSameStorage = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
 			.SumAsync(x => x.Count, CancellationToken);
@@ -229,7 +230,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First();
 		var originalCounts = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
 			.ToDictionaryAsync(
@@ -245,7 +246,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 			StorageMovementType.Sale));
 
 		var actualCounts = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == content.ProductId && x.StorageCode == content.StorageCode)
 			.ToDictionaryAsync(

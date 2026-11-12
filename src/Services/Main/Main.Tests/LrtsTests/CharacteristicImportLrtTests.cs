@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Main.Application.Lrts.CharacteristicImport;
@@ -38,7 +39,7 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 			state.Errors.Should().BeEmpty();
 		}
 
-		var characteristics = await Context.Characteristics.AsNoTracking().ToListAsync(CancellationToken);
+		var characteristics = await Context.Set<Characteristic>().AsNoTracking().ToListAsync(CancellationToken);
 		characteristics.Should().HaveCount(3);
 		characteristics.Select(characteristic => characteristic.Name).Should()
 			.BeEquivalentTo(["Brake Color", "Размер детали", "Material"]);
@@ -68,7 +69,7 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2, 3);
 		state.Errors.Should().OnlyContain(error => !string.IsNullOrWhiteSpace(error.Message));
 
-		var characteristics = await Context.Characteristics.AsNoTracking().ToListAsync(CancellationToken);
+		var characteristics = await Context.Set<Characteristic>().AsNoTracking().ToListAsync(CancellationToken);
 		characteristics.Should().HaveCount(3);
 		characteristics.Select(characteristic => characteristic.Name).Should()
 			.BeEquivalentTo([longestValidName, "A", "Material, Grade"]);
@@ -87,7 +88,7 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 		var state = execution.GetState<CharacteristicImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(1001);
 		state.Errors.Should().BeEmpty();
-		(await Context.Characteristics.AsNoTracking().ToListAsync(CancellationToken))
+		(await Context.Set<Characteristic>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle(characteristic => characteristic.Name == "Brake Color");
 	}
 
@@ -103,6 +104,6 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 		var state = execution.GetState<CharacteristicImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(2);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2);
-		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<Characteristic>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 }

@@ -99,7 +99,9 @@ public sealed class DeleteMarkupTests(CombinedContainerFixture fixture) : Integr
 		var failures = await Task.WhenAll(TryDelete(first.Id), TryDelete(second.Id));
 
 		failures.Count(x => x is null).Should().Be(1);
-		failures.OfType<LastMarkupGroupCanNotBeDeletedException>().Should().ContainSingle();
+		failures.OfType<LastMarkupGroupCanNotBeDeletedException>().Should().ContainSingle(
+			"one deletion must fail with the business rule; actual errors: {0}",
+			string.Join(Environment.NewLine, failures.Where(error => error is not null)));
 		(await Context.Set<MarkupGroup>().CountAsync(CancellationToken)).Should().Be(1);
 	}
 

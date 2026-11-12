@@ -1,3 +1,5 @@
+using Main.Entities.User;
+using Persistence.Context;
 using System.Security.Claims;
 using FluentAssertions;
 using Main.Application.Handlers.Auth;
@@ -30,7 +32,7 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 
 		var result = await RefreshAsync(RawToken);
 
-		var saved = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
+		var saved = await Context.Set<UserToken>().AsNoTracking().SingleAsync(CancellationToken);
 		result.RefreshToken.Should().NotBeNullOrWhiteSpace().And.NotBe(RawToken);
 		saved.Id.Should().Be(stored.Id);
 		saved.UserId.Should().Be(stored.UserId);
@@ -51,12 +53,12 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 
 		var replay = () => RefreshAsync(RawToken);
 		await replay.Should().ThrowAsync<InvalidTokenException>();
-		var afterReplay = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
+		var afterReplay = await Context.Set<UserToken>().AsNoTracking().SingleAsync(CancellationToken);
 		afterReplay.TokenHash.Should().Be(Hasher.Hash(first.RefreshToken));
 
 		var second = await RefreshAsync(first.RefreshToken);
 
-		var saved = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
+		var saved = await Context.Set<UserToken>().AsNoTracking().SingleAsync(CancellationToken);
 		saved.Id.Should().Be(stored.Id);
 		saved.TokenHash.Should().Be(Hasher.Hash(second.RefreshToken));
 		second.RefreshToken.Should().NotBe(first.RefreshToken);
@@ -72,7 +74,7 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 		var action = () => RefreshAsync(rawToken!);
 
 		await action.Should().ThrowAsync<InvalidTokenException>();
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	[Theory]
@@ -88,7 +90,7 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 		var action = () => RefreshAsync(RawToken);
 
 		await action.Should().ThrowAsync<InvalidTokenException>();
-		var saved = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
+		var saved = await Context.Set<UserToken>().AsNoTracking().SingleAsync(CancellationToken);
 		saved.TokenHash.Should().Be(stored.TokenHash);
 		saved.ExpiresAt.Should().Be(stored.ExpiresAt);
 		saved.RowVersion.Should().Be(stored.RowVersion);
@@ -110,7 +112,7 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 
 		var winner = attempts.Where(x => x.Result is not null).Should().ContainSingle().Which.Result!;
 		attempts.Where(x => x.Error is not null).Should().ContainSingle().Which.Error.Should().BeOfType<InvalidTokenException>();
-		var saved = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
+		var saved = await Context.Set<UserToken>().AsNoTracking().SingleAsync(CancellationToken);
 		saved.TokenHash.Should().Be(Hasher.Hash(winner.RefreshToken));
 	}
 
@@ -120,10 +122,10 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 		var stored = await CreateTokenAsync(DateTime.UtcNow.AddDays(1));
 		using var firstScope = Sp.CreateScope();
 		using var secondScope = Sp.CreateScope();
-		var firstContext = firstScope.ServiceProvider.GetRequiredService<DContext>();
-		var secondContext = secondScope.ServiceProvider.GetRequiredService<DContext>();
-		var first = await firstContext.UserTokens.SingleAsync(x => x.Id == stored.Id, CancellationToken);
-		var second = await secondContext.UserTokens.SingleAsync(x => x.Id == stored.Id, CancellationToken);
+		var firstContext = firstScope.ServiceProvider.GetRequiredService<UnifiedDbContext>();
+		var secondContext = secondScope.ServiceProvider.GetRequiredService<UnifiedDbContext>();
+		var first = await firstContext.Set<global::Main.Entities.Auth.UserToken>().SingleAsync(x => x.Id == stored.Id, CancellationToken);
+		var second = await secondContext.Set<global::Main.Entities.Auth.UserToken>().SingleAsync(x => x.Id == stored.Id, CancellationToken);
 		first.RotateToken(Hasher.Hash("winner"));
 		second.RotateToken(Hasher.Hash("loser"));
 		await firstContext.SaveChangesAsync(CancellationToken);
@@ -131,7 +133,7 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 		var action = () => secondContext.SaveChangesAsync(CancellationToken);
 
 		await action.Should().ThrowAsync<DbUpdateConcurrencyException>();
-		var saved = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
+		var saved = await Context.Set<UserToken>().AsNoTracking().SingleAsync(CancellationToken);
 		saved.TokenHash.Should().Be(Hasher.Hash("winner"));
 	}
 
@@ -157,7 +159,7 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 
 		role.RemovePermission(Permission.ToNormalizedPermission(PermissionCodes.USERS_INFO_GET));
 		Context.Remove(direct);
-		var user = await Context.Users.Include(user => user.UserInfo)
+		var user = await Context.Set<User>().Include(user => user.UserInfo)
 			.SingleAsync(user => user.Id == stored.UserId, CancellationToken);
 		user.SetUserInfo("New", "Profile", null);
 		await Context.SaveChangesAsync(CancellationToken);
@@ -181,12 +183,12 @@ public sealed class RefreshTokenTests(CombinedContainerFixture fixture) : Integr
 	{
 		var user = await new MemberUserBuilder(Faker).BuildAndAddToDb(Context);
 		var token = UserToken.CreateRefreshToken(user.Id, Hasher.Hash(RawToken));
-		await Context.UserTokens.AddAsync(token, CancellationToken);
+		await Context.Set<UserToken>().AddAsync(token, CancellationToken);
 		Context.Entry(token).Property(x => x.ExpiresAt).CurrentValue = expiresAt;
 		Context.Entry(token).Property(x => x.Revoked).CurrentValue = revoked;
 		Context.Entry(token).Property(x => x.Type).CurrentValue = type;
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
-		return await Context.UserTokens.AsNoTracking().SingleAsync(x => x.Id == token.Id, CancellationToken);
+		return await Context.Set<UserToken>().AsNoTracking().SingleAsync(x => x.Id == token.Id, CancellationToken);
 	}
 }

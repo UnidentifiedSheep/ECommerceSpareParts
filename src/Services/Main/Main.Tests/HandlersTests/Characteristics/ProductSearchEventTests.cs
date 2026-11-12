@@ -1,3 +1,4 @@
+using Persistence.Context;
 using FluentAssertions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
@@ -62,14 +63,14 @@ public class ProductSearchEventTests : IntegrationTest
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
 		var link = ProductCharacteristic.Create(productId, characteristic.Id, "100");
-		await Context.ProductCharacteristics.AddAsync(link, CancellationToken);
+		await Context.Set<ProductCharacteristic>().AddAsync(link, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 		var initial = GetEvent<ProductCharacteristicsUpdatedEvent>(
 			await provider.GetEventsAsync([productId], ProductEventParts.Characteristics, CancellationToken));
 		initial.Products.Should().ContainSingle().Which.Characteristics.Should().ContainSingle().Which.Value.Should().Be("100");
 
-		Context.ProductCharacteristics.Remove(link);
+		Context.Set<ProductCharacteristic>().Remove(link);
 		await Context.SaveChangesAsync(CancellationToken);
 		var notification = GetEvent<ProductCharacteristicsUpdatedEvent>(
 			await provider.GetEventsAsync([productId], ProductEventParts.Characteristics, CancellationToken));
@@ -84,7 +85,7 @@ public class ProductSearchEventTests : IntegrationTest
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
 		var link = ProductCharacteristic.Create(productId, characteristic.Id, "100");
-		await Context.ProductCharacteristics.AddAsync(link, CancellationToken);
+		await Context.Set<ProductCharacteristic>().AddAsync(link, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		var scope = Scope.ServiceProvider.GetRequiredService<IIntegrationEventScope>();
 		scope.Flush();
@@ -103,7 +104,7 @@ public class ProductSearchEventTests : IntegrationTest
 			.BeOfType<ProductCharacteristicsUpdatedEvent>().Which;
 		updated.Products.Should().ContainSingle().Which.Characteristics.Should().ContainSingle().Which.Value.Should().Be("200");
 
-		Context.ProductCharacteristics.Remove(link);
+		Context.Set<ProductCharacteristic>().Remove(link);
 		await Context.SaveChangesAsync(CancellationToken);
 		await Mediator.Publish(new Batch<EntityDeletedDomainEvent<ProductCharacteristic, (int, int)>>(
 			[new(link.GetId())]), CancellationToken);
@@ -117,17 +118,17 @@ public class ProductSearchEventTests : IntegrationTest
 	{
 		var product = GetContext<ProductTestContext>().Products[0];
 		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
-		await Context.ProductCharacteristics.AddAsync(ProductCharacteristic.Create(product.Id, characteristic.Id, "100"), CancellationToken);
-		await Context.ProductSizes.AddAsync(ProductSize.Create(product.Id, 10, 20, 30, DimensionUnit.Millimeter), CancellationToken);
-		await Context.ProductWeights.AddAsync(ProductWeight.Create(product.Id, 2, WeightUnit.Kilogram), CancellationToken);
+		await Context.Set<ProductCharacteristic>().AddAsync(ProductCharacteristic.Create(product.Id, characteristic.Id, "100"), CancellationToken);
+		await Context.Set<ProductSize>().AddAsync(ProductSize.Create(product.Id, 10, 20, 30, DimensionUnit.Millimeter), CancellationToken);
+		await Context.Set<ProductWeight>().AddAsync(ProductWeight.Create(product.Id, 2, WeightUnit.Kilogram), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var counter = new QueryCounter();
-		var options = new DbContextOptionsBuilder<DContext>()
+		var options = new DbContextOptionsBuilder<UnifiedDbContext>()
 			.UseNpgsql(Context.Database.GetDbConnection())
 			.AddInterceptors(counter)
 			.Options;
-		await using var queryContext = new DContext(options);
+		await using var queryContext = new UnifiedDbContext(options, [new global::Main.Persistence.MainDbContextModule()]);
 		var provider = new ProductEventProvider(
 			new Main.Persistence.ReadRepository<Main.Entities.Product.Product, int>(queryContext),
 			Scope.ServiceProvider.GetServices<IProductEventPartProvider>());

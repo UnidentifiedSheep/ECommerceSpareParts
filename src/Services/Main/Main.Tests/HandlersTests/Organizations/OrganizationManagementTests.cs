@@ -39,7 +39,7 @@ public class OrganizationManagementTests : IntegrationTest
 		var result = await Mediator.Send(command, CancellationToken);
 
 		var organization = await Context
-			.Organizations
+			.Set<global::Main.Entities.Organization.Organization>()
 			.Include(x => x.Members)
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == result.OrganizationId, CancellationToken);

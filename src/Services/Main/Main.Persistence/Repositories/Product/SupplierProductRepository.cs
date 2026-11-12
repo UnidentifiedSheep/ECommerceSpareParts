@@ -1,3 +1,4 @@
+using Persistence.Context;
 using EFCore.BulkExtensions;
 using Enums;
 using Main.Application.Interfaces.Persistence;
@@ -9,8 +10,8 @@ using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Main.Persistence.Repositories.Product;
 
-public class SupplierProductRepository(DContext context, QueryExtensions extensions)
-	: LinqRepositoryBase<DContext, SupplierProduct, int>(context, extensions), ISupplierProductRepository
+public class SupplierProductRepository(UnifiedDbContext context, QueryExtensions extensions)
+	: LinqRepositoryBase<UnifiedDbContext, SupplierProduct, int>(context, extensions), ISupplierProductRepository
 {
 	public async Task<IReadOnlyList<SupplierProduct>> GetBySupplierKeysAsync(
 		Supplier supplier,
@@ -26,7 +27,7 @@ public class SupplierProductRepository(DContext context, QueryExtensions extensi
 		var producers = requestedKeys.Select(x => x.Producer).Distinct().ToList();
 
 		var products = await Context
-			.SupplierProducts
+			.Set<SupplierProduct>()
 			.Include(x => x.Names)
 			.Where(x => x.Supplier == supplier)
 			.Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))

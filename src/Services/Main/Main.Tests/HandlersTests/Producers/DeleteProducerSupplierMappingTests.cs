@@ -1,4 +1,5 @@
-﻿using Enums;
+﻿using Main.Entities.Producer;
+using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.ProducerSupplierMappings;
 using Main.Entities.Exceptions;
@@ -48,7 +49,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var mappings = await Context.ProducerSupplierMappings.AsNoTracking().ToListAsync(CancellationToken);
+		var mappings = await Context.Set<ProducerSupplierMapping>().AsNoTracking().ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(0);
 	}
 }

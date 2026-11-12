@@ -1,3 +1,4 @@
+using Persistence.Context;
 using System.Text.Json;
 using Abstractions;
 using Application.Common.Interfaces.Lrt;
@@ -13,11 +14,11 @@ using Persistence.Interfaces;
 
 namespace Main.Migrator.DataSeeds;
 
-public class ScheduledLrtSeed : ISeed<DContext>
+public class ScheduledLrtSeed : ISeed<UnifiedDbContext>
 {
 	public int ExecutionOrder => int.MaxValue;
 
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
 		DefaultSchedule[] defaults =
 		[
@@ -55,7 +56,7 @@ public class ScheduledLrtSeed : ISeed<DContext>
 			.Select(x => x.JobSystemName)
 			.ToList();
 
-		var existingSchedules = await context.JobSchedules
+		var existingSchedules = await context.Set<JobSchedule>()
 			.AsNoTracking()
 			.Where(schedule => systemNames.Contains(schedule.JobSystemName))
 			.Select(schedule => new { schedule.JobSystemName, schedule.InputState })
@@ -80,7 +81,7 @@ public class ScheduledLrtSeed : ISeed<DContext>
 			schedule.Enable();
 			schedule.SetNextRunAt(CronExpression.Parse(item.Cron)
 				.GetNextOccurrence(now, JobSchedule.TimeZone));
-			context.JobSchedules.Add(schedule);
+			context.Set<JobSchedule>().Add(schedule);
 		}
 
 		await context.SaveChangesAsync();

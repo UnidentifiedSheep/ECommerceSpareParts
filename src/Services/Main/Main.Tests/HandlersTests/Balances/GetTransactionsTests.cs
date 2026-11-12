@@ -228,11 +228,11 @@ public class GetTransactionsTests : IntegrationTest
 
 	private async Task<Transaction> ReverseSeedTransaction()
 	{
-		var transaction = await Context.Transactions.FirstAsync(x => x.Id == TestContext.Transactions[0].Id);
+		var transaction = await Context.Set<Transaction>().FirstAsync(x => x.Id == TestContext.Transactions[0].Id);
 
-		var senderBalance = await Context.UserBalances.FirstAsync(x =>
+		var senderBalance = await Context.Set<OrganizationBalance>().FirstAsync(x =>
 			x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
-		var receiverBalance = await Context.UserBalances.FirstAsync(x =>
+		var receiverBalance = await Context.Set<OrganizationBalance>().FirstAsync(x =>
 			x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
 
 		transaction.Reverse(TestContext.Users[0].Id);
@@ -247,9 +247,9 @@ public class GetTransactionsTests : IntegrationTest
 		var sender = TestContext.Users[0];
 		var receiver = TestContext.Users[1];
 		var currency = TestContext.Currencies[0];
-		var senderBalance = await Context.UserBalances.FirstAsync(x =>
+		var senderBalance = await Context.Set<OrganizationBalance>().FirstAsync(x =>
 			x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
-		var receiverBalance = await Context.UserBalances.FirstAsync(x =>
+		var receiverBalance = await Context.Set<OrganizationBalance>().FirstAsync(x =>
 			x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
 		var senderProfile = await Context
 			.Set<OrganizationFinancialProfile>()

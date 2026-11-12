@@ -1,3 +1,4 @@
+using Main.Entities.User;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
 using FluentAssertions;
@@ -35,7 +36,7 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 				IsEnabled = true
 			}]), CancellationToken);
 
-		var preferences = await Context.UserNotificationPreferences
+		var preferences = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
 			.Where(x => x.ChannelName == EmailRecipient.ChannelName)
 			.ToArrayAsync(CancellationToken);
@@ -57,7 +58,7 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 				IsEnabled = false
 			}]), CancellationToken);
 
-		var preference = await Context.UserNotificationPreferences
+		var preference = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
 			.SingleAsync(x => x.UserId == user.Id && x.ChannelName == EmailRecipient.ChannelName,
 				CancellationToken);
@@ -78,7 +79,7 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 				IsEnabled = false
 			}]), CancellationToken);
 
-		var preferences = await Context.UserNotificationPreferences
+		var preferences = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
 			.ToArrayAsync(CancellationToken);
 
@@ -99,7 +100,7 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 				IsEnabled = false
 			}]), CancellationToken);
 
-		var preference = await Context.UserNotificationPreferences
+		var preference = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
 			.SingleAsync(x => x.UserId == user.Id && x.ChannelName == InAppRecipient.ChannelName,
 				CancellationToken);
@@ -115,7 +116,7 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 		await Mediator.Send(new UpsertNotificationPreferencesCommand(user.Id,
 			[]), CancellationToken);
 
-		var preferences = await Context.UserNotificationPreferences
+		var preferences = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
 			.ToArrayAsync(CancellationToken);
 

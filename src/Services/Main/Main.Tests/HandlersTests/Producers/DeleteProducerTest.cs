@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using FluentAssertions;
 using Main.Application.Handlers.Producers;
 using Main.Entities.Exceptions;
@@ -37,17 +38,17 @@ public class DeleteProducerTest : IntegrationTest
 	{
 		var producer = TestContext.ProducerTestContext.Producers[0];
 		var toRemove =
-			await Context.Products.Where(x => x.ProducerId == producer.Id).ToListAsync(CancellationToken);
+			await Context.Set<Product>().Where(x => x.ProducerId == producer.Id).ToListAsync(CancellationToken);
 		if (toRemove.Count > 0)
 		{
-			Context.Products.RemoveRange(toRemove);
+			Context.Set<Product>().RemoveRange(toRemove);
 			await Context.SaveChangesAsync(CancellationToken);
 		}
 
 		var act = () => Mediator.Send(new DeleteProducerCommand(producer.Id));
 		await act.Should().NotThrowAsync();
 
-		var dbProduct = await Context.Products.FirstOrDefaultAsync(
+		var dbProduct = await Context.Set<Product>().FirstOrDefaultAsync(
 			x => x.ProducerId == producer.Id,
 			CancellationToken);
 		dbProduct.Should().BeNull();

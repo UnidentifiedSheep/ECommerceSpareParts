@@ -44,7 +44,7 @@ public class RemoveProductImageTests : IntegrationTest
 		await Mediator.Send(new RemoveProductImageCommand(ProductId, $"https://images.example.com/{image.StorageKey}"),
 			CancellationToken);
 
-		(await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken))
+		(await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which.StorageKey.Should().Be(otherImage.StorageKey);
 		(await provider.GetProductAsync(ProductId, CancellationToken)).Should().BeNull();
 		(await S3.DownloadFileAsync("images", image.StorageKey, CancellationToken)).IsSuccess.Should().BeTrue();
@@ -84,7 +84,7 @@ public class RemoveProductImageTests : IntegrationTest
 
 		await action.Should().ThrowAsync<InvalidOperationException>();
 
-		(await Context.ProductImages.AsNoTracking().AnyAsync(item => item.ProductId == ProductId, CancellationToken))
+		(await Context.Set<ProductImage>().AsNoTracking().AnyAsync(item => item.ProductId == ProductId, CancellationToken))
 			.Should().BeTrue();
 		(await Context.Set<Job>().AsNoTracking().AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken))
 			.Should().BeFalse();

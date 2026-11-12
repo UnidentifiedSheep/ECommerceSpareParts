@@ -20,7 +20,7 @@ public class GetProductsEansTests : IntegrationTest
 	{
 		var productIds = TestContext.ProductTestContext.Products.Take(4).Select(x => x.Id).ToArray();
 		const string extraEan = "9999999999999";
-		Context.ProductEans.Add(ProductEan.Create(productIds[0], extraEan));
+		Context.Set<ProductEan>().Add(ProductEan.Create(productIds[0], extraEan));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(

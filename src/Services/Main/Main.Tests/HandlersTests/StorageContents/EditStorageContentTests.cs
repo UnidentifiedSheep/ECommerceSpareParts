@@ -70,7 +70,7 @@ public class EditStorageContentTests : IntegrationTest
 		var command = new EditStorageContentCommand(dict);
 		await Mediator.Send(command, CancellationToken);
 
-		var updated = await Context.StorageContents.FindAsync(
+		var updated = await Context.Set<StorageContent>().FindAsync(
 			new object?[]
 			{
 				content.Id
@@ -82,7 +82,7 @@ public class EditStorageContentTests : IntegrationTest
 		Assert.NotNull(updated);
 		Assert.Equal(content.Count, dto.Count.Value);
 		Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);
-		var persisted = await Context.StorageContents.AsNoTracking()
+		var persisted = await Context.Set<StorageContent>().AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 		Assert.Equal(StorageMovementType.StorageContentEditing, persisted.Metadata.LastMovementType);
 
@@ -138,7 +138,7 @@ public class EditStorageContentTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var updated = await Context.StorageContents.FindAsync(
+		var updated = await Context.Set<StorageContent>().FindAsync(
 			new object?[]
 			{
 				content.Id
@@ -147,7 +147,7 @@ public class EditStorageContentTests : IntegrationTest
 		Assert.NotNull(updated);
 		Assert.Equal(content.Count, dto.Count.Value);
 		Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);
-		var persisted = await Context.StorageContents.AsNoTracking()
+		var persisted = await Context.Set<StorageContent>().AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 		Assert.Equal(StorageMovementType.StorageContentEditing, persisted.Metadata.LastMovementType);
 	}

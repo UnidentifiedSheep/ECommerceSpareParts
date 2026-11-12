@@ -176,7 +176,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		var crossProduct = products.First(x => x.Id != SaleContext.Product.Id);
 		var unrelatedProduct = products.First(x => x.Id != SaleContext.Product.Id && x.Id != crossProduct.Id);
 
-		await Context.ProductCrosses.AddAsync(
+		await Context.Set<ProductCross>().AddAsync(
 			ProductCross.Create(SaleContext.Product.Id, crossProduct.Id),
 			CancellationToken);
 

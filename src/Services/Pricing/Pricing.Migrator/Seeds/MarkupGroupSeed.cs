@@ -1,19 +1,19 @@
+using Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 using Pricing.Entities;
-using Pricing.Persistence.Contexts;
 
 namespace Pricing.Migrator.Seeds;
 
-public class MarkupGroupSeed : ISeed<DContext>
+public class MarkupGroupSeed : ISeed<UnifiedDbContext>
 {
 	private static readonly Guid SeedSourceMessageId = new("8f6a0fc3-e7ed-48b9-8716-7bf97e99dd4f");
 
 	public int ExecutionOrder => 0;
 
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
-		if (await context.MarkupGroups.AnyAsync(x => x.SourceMessageId != null))
+		if (await context.Set<MarkupGroup>().AnyAsync(x => x.SourceMessageId != null))
 			return;
 
 		var ranges = new[]
@@ -58,7 +58,7 @@ public class MarkupGroupSeed : ISeed<DContext>
 
 		var group = MarkupGroup.CreateGenerated(1, ranges, SeedSourceMessageId);
 
-		await context.MarkupGroups.AddAsync(group);
+		await context.Set<MarkupGroup>().AddAsync(group);
 		await context.SaveChangesAsync();
 	}
 }

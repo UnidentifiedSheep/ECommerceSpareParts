@@ -1,3 +1,4 @@
+using Main.Entities.Producer;
 using System.Text.Json;
 using Contracts.Producer;
 using Domain.CommonEnums;
@@ -44,7 +45,7 @@ public sealed class
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var mappings = await Context
-			.ProducerSupplierMappings
+			.Set<global::Main.Entities.Producer.ProducerSupplierMapping>()
 			.AsNoTracking()
 			.Where(x => x.ProducerId == producer.Id)
 			.ToListAsync(CancellationToken);
@@ -70,7 +71,7 @@ public sealed class
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		Context.ChangeTracker.Clear();
-		var persisted = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
+		var persisted = await Context.Set<ProducerSupplierMapping>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.ProducerId.Should().Be(existing.ProducerId);
 	}
 
@@ -101,7 +102,7 @@ public sealed class
 		var state = execution.GetState<ProducerSupplierMappingImportState>();
 		state.Errors.Should().HaveCount(3);
 
-		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
+		var mapping = await Context.Set<ProducerSupplierMapping>().AsNoTracking().SingleAsync(CancellationToken);
 		mapping.Name.Should().Be("Bosch");
 		mapping.NormalizedName.Should().Be("BOSCH");
 	}

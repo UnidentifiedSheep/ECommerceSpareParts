@@ -37,7 +37,7 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 
 		result.OrganizationId.Should().Be(organization.Id);
 		var updatedOrganization = await Context
-			.Organizations
+			.Set<global::Main.Entities.Organization.Organization>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == organization.Id, CancellationToken);
 		updatedOrganization.Name.Should().Be("Updated organization");
@@ -54,7 +54,7 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 
 		result.OrganizationId.Should().Be(organization.Id);
 		var dbOrganization = await Context
-			.Organizations
+			.Set<global::Main.Entities.Organization.Organization>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == organization.Id, CancellationToken);
 		dbOrganization.Name.Should().Be(organization.Name);

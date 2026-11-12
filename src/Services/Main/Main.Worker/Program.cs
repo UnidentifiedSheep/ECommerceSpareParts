@@ -1,3 +1,4 @@
+using Persistence.Context;
 using System.Reflection;
 using Abstractions;
 using Api.Common;
@@ -87,7 +88,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 		x.AddConsumer<BackplaneConsumer>();
 		x.AddConsumer<SettingUpdatedConsumer>();
 
-		x.AddEntityFrameworkOutbox<DContext>(o =>
+		x.AddEntityFrameworkOutbox<UnifiedDbContext>(o =>
 		{
 			o.UsePostgres();
 			o.UseBusOutbox();

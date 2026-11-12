@@ -39,7 +39,7 @@ public sealed class
 
 		Context.ChangeTracker.Clear();
 		var persistedCandidate = await Context
-			.CatalogueCandidates
+			.Set<global::Main.Entities.Product.Enrichment.CatalogueCandidate>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == candidate.Id, CancellationToken);
 		persistedCandidate.ProductId.Should().Be(product.Id);
@@ -64,7 +64,7 @@ public sealed class
 
 		Context.ChangeTracker.Clear();
 		var persistedCandidate = await Context
-			.CatalogueCandidates
+			.Set<global::Main.Entities.Product.Enrichment.CatalogueCandidate>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == candidate.Id, CancellationToken);
 		persistedCandidate.ProductId.Should().BeNull();

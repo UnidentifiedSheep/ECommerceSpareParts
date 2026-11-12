@@ -36,7 +36,7 @@ public class DeleteFromCartTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var cartItem = await Context
-			.Carts
+			.Set<global::Main.Entities.Cart.Cart>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(
 				x => x.UserId == command.UserId && x.ProductId == command.ProductId,

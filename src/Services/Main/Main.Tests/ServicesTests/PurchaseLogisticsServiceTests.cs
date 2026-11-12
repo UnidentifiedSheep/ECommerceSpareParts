@@ -75,7 +75,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 		updatedPurchase.PurchaseLogistic!.TransactionId.Should().NotBeNull();
 
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId, CancellationToken);
 		transaction.SenderId.Should().Be(route.CarrierId!.Value);
@@ -245,7 +245,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 	private async Task<Purchase> LoadPurchase()
 	{
 		return await Context
-			.Purchases
+			.Set<global::Main.Entities.Purchase.Purchase>()
 			.Include(x => x.PurchaseLogistic)
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.PurchaseContentLogistic)

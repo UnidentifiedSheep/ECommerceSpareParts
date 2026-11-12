@@ -20,7 +20,7 @@ public sealed class ProductWeightImportLrtTests : CsvLrtIntegrationTest<ProductW
 	public async Task ImportsNewWeightsAndUpdatesExistingWeights_LastValidRowWins()
 	{
 		var products = TestContext.Products.Take(2).ToArray();
-		Context.ProductWeights.Add(ProductWeight.Create(products[0].Id, 1, WeightUnit.Kilogram));
+		Context.Set<ProductWeight>().Add(ProductWeight.Create(products[0].Id, 1, WeightUnit.Kilogram));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -38,7 +38,7 @@ public sealed class ProductWeightImportLrtTests : CsvLrtIntegrationTest<ProductW
 		var state = execution.GetState<ProductWeightImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(5);
 		state.Errors.Should().ContainSingle(error => error.RowIdx == 5);
-		var weights = await Context.ProductWeights.AsNoTracking().ToDictionaryAsync(x => x.ProductId, CancellationToken);
+		var weights = await Context.Set<ProductWeight>().AsNoTracking().ToDictionaryAsync(x => x.ProductId, CancellationToken);
 		weights.Should().HaveCount(2);
 		weights[products[0].Id].Weight.Should().Be(1.75m);
 		weights[products[0].Id].Unit.Should().Be(WeightUnit.Kilogram);
@@ -70,7 +70,7 @@ public sealed class ProductWeightImportLrtTests : CsvLrtIntegrationTest<ProductW
 		var state = execution.GetState<ProductWeightImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(10);
 		state.Errors.Select(error => error.RowIdx).Should().BeEquivalentTo(Enumerable.Range(1, 9));
-		var weight = (await Context.ProductWeights.AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle().Which;
+		var weight = (await Context.Set<ProductWeight>().AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle().Which;
 		weight.ProductId.Should().Be(productId);
 		weight.Weight.Should().Be(12.34m);
 		weight.Unit.Should().Be(WeightUnit.Gram);
@@ -89,7 +89,7 @@ public sealed class ProductWeightImportLrtTests : CsvLrtIntegrationTest<ProductW
 		var state = execution.GetState<ProductWeightImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(1001);
 		state.Errors.Should().BeEmpty();
-		var weight = (await Context.ProductWeights.AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle().Which;
+		var weight = (await Context.Set<ProductWeight>().AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle().Which;
 		weight.ProductId.Should().Be(productId);
 		weight.Weight.Should().Be(1001);
 		weight.Unit.Should().Be(WeightUnit.Kilogram);

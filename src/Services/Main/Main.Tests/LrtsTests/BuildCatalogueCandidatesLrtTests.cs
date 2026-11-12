@@ -42,12 +42,12 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		state.AssignedRows.Should().Be(2);
 		state.SkippedRows.Should().Be(0);
 
-		var candidate = await Context.CatalogueCandidates.AsNoTracking().SingleAsync(CancellationToken);
+		var candidate = await Context.Set<CatalogueCandidate>().AsNoTracking().SingleAsync(CancellationToken);
 		candidate.ProducerId.Should().Be(producer.Id);
 		candidate.Sku.NormalizedValue.Should().Be("ABC123");
 
 		var candidateIds = await Context
-			.SupplierProducts
+			.Set<global::Main.Entities.Product.Enrichment.SupplierProduct>()
 			.AsNoTracking()
 			.Select(x => x.CatalogueCandidateId)
 			.ToListAsync(CancellationToken);
@@ -72,11 +72,11 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded);
 		state.AssignedRows.Should().Be(1);
-		(await Context.CatalogueCandidates.CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<CatalogueCandidate>().CountAsync(CancellationToken)).Should().Be(1);
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
-			.SupplierProducts
+			.Set<global::Main.Entities.Product.Enrichment.SupplierProduct>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == supplierProduct.Id, CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().Be(candidate.Id);
@@ -98,11 +98,11 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		state.ProcessedRows.Should().Be(1);
 		state.AssignedRows.Should().Be(0);
 		state.SkippedRows.Should().Be(1);
-		(await Context.CatalogueCandidates.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<CatalogueCandidate>().CountAsync(CancellationToken)).Should().Be(0);
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
-			.SupplierProducts
+			.Set<global::Main.Entities.Product.Enrichment.SupplierProduct>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == supplierProduct.Id, CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().BeNull();

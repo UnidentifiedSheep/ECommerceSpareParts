@@ -1,3 +1,4 @@
+using Main.Entities.Storage;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
 using Main.Application.Handlers.Storages.DeleteStorage;
@@ -33,7 +34,7 @@ public class DeleteStorageTests : IntegrationTest
 		var command = new DeleteStorageCommand(storage.Code);
 		await Mediator.Send(command, CancellationToken);
 
-		var exists = await Context.Storages.AnyAsync(x => x.Code == storage.Code, CancellationToken);
+		var exists = await Context.Set<Storage>().AnyAsync(x => x.Code == storage.Code, CancellationToken);
 		Assert.False(exists);
 	}
 
@@ -46,7 +47,7 @@ public class DeleteStorageTests : IntegrationTest
 		await Assert.ThrowsAsync<DbUpdateException>(async () =>
 			await Mediator.Send(command, CancellationToken));
 
-		var exists = await Context.Storages.AnyAsync(x => x.Code == storage, CancellationToken);
+		var exists = await Context.Set<Storage>().AnyAsync(x => x.Code == storage, CancellationToken);
 		Assert.True(exists);
 	}
 }

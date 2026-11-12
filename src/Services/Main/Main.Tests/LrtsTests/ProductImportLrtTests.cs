@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
@@ -91,7 +92,7 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		state.Errors.Should().BeEmpty();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 
-		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var products = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 		products.Should().HaveCount(3);
 		products.Should().ContainSingle(x => x.Id == existingProduct.Id)
 			.Which.Name.Value.Should().Be(existingName);
@@ -128,7 +129,7 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		state.Errors.Should().BeEmpty();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 
-		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var products = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 		products.Should().HaveCount(3);
 		products.Single(product => product.Sku.NormalizedValue == "SKU001").Name.Value
 			.Should().Be("First product");
@@ -157,7 +158,7 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		state.Checkpoint!.CurrentLine.Should().Be(3);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2);
 
-		var product = await Context.Products.AsNoTracking().SingleAsync(CancellationToken);
+		var product = await Context.Set<Product>().AsNoTracking().SingleAsync(CancellationToken);
 		product.Sku.Value.Should().Be("VALID-123");
 		product.ProducerId.Should().Be(producer.Id);
 		product.Description.Should().Be("  Description  ");
@@ -200,7 +201,7 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 
 		execution.Job.Status.Should().Be(JobStatus.Failed);
 		execution.Job.ErrorMessage.Should().Contain("Product publication failed");
-		(await Context.Products.AnyAsync(CancellationToken)).Should().BeFalse();
+		(await Context.Set<Product>().AnyAsync(CancellationToken)).Should().BeFalse();
 		(LrtStateSerializer.DeserializeState<ProductImportState>(execution.Job.State)?.Checkpoint)
 			.Should().BeNull();
 		AssertPublishedProducts([], broker);
@@ -239,7 +240,7 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		checkpoint.CurrentLine.Should().Be(4);
 		checkpoint.Offset.Should().Be(Encoding.UTF8.GetByteCount(content));
 		storage.GetDownloadOffsets("uploads", fileName).Should().Equal(0, Encoding.UTF8.GetByteCount(committedPrefix));
-		var ids = await Context.Products.AsNoTracking().Select(product => product.Id).ToListAsync(CancellationToken);
+		var ids = await Context.Set<Product>().AsNoTracking().Select(product => product.Id).ToListAsync(CancellationToken);
 		ids.Should().HaveCount(4);
 		AssertPublishedProducts(ids, broker);
 	}

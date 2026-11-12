@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
@@ -10,7 +11,7 @@ using Tests.TestContainers.Combined;
 namespace Tests;
 
 public abstract class IntegrationTest(CombinedContainerFixture fixture)
-	: IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
+	: IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, UnifiedDbContext>
 {
 	private TestEnvironmentLease _environmentLease = null!;
 	protected IMediator Mediator { get; private set; } = null!;

@@ -36,7 +36,7 @@ public sealed class ProducerImportLrtTests : CsvLrtIntegrationTest<ProducerImpor
 		var state = execution.GetState<ProducerImportState>();
 		state.Errors.Should().ContainSingle(x => x.RowIdx == 3);
 		var created = await Context
-			.Producers
+			.Set<global::Main.Entities.Producer.Producer>()
 			.AsNoTracking()
 			.CountAsync(x => x.Name == newName.ToUpperInvariant(), CancellationToken);
 		created.Should().Be(1);

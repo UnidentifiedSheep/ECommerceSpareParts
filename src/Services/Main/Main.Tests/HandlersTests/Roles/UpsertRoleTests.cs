@@ -23,7 +23,7 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var roleInDb = await Context
-			.Roles
+			.Set<global::Main.Entities.Auth.Role>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Name == r.Name, CancellationToken);
 
@@ -43,7 +43,7 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var roleInDb = await Context
-			.Roles
+			.Set<global::Main.Entities.Auth.Role>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Name == role.Name, CancellationToken);
 

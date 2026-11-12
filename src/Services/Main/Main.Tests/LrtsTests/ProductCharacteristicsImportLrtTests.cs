@@ -57,9 +57,9 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var color = Characteristic.Create("Brake Color");
 		var size = Characteristic.Create("Размер детали");
 		var material = Characteristic.Create("Material");
-		Context.Characteristics.AddRange(color, size, material);
+		Context.Set<Characteristic>().AddRange(color, size, material);
 		await Context.SaveChangesAsync(CancellationToken);
-		Context.ProductCharacteristics.AddRange(
+		Context.Set<ProductCharacteristic>().AddRange(
 			ProductCharacteristic.Create(products[0].Id, color.Id, "Old"),
 			ProductCharacteristic.Create(products[0].Id, material.Id, "Steel"));
 		await Context.SaveChangesAsync(CancellationToken);
@@ -85,7 +85,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 			state.Errors.Should().BeEmpty();
 		}
 
-		var values = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
+		var values = (await Context.Set<ProductCharacteristic>().AsNoTracking().ToListAsync(CancellationToken))
 			.ToDictionary(x => x.GetId(), x => x.Value);
 		values.Should().HaveCount(5);
 		values[(products[0].Id, color.Id)].Should().Be("x");
@@ -93,7 +93,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		values[(products[0].Id, size.Id)].Should().Be("100 mm");
 		values[(products[1].Id, size.Id)].Should().Be("300 mm");
 		values[(products[0].Id, material.Id)].Should().Be("Steel");
-		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(3);
+		(await Context.Set<Characteristic>().CountAsync(CancellationToken)).Should().Be(3);
 	}
 
 	[Fact]
@@ -102,7 +102,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var productId = TestContext.Products[0].Id;
 		var secondProductId = TestContext.Products[1].Id;
 		var characteristic = Characteristic.Create("Color");
-		Context.Characteristics.Add(characteristic);
+		Context.Set<Characteristic>().Add(characteristic);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -123,12 +123,12 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var state = execution.GetState<ProductCharacteristicsImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(8);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(Enumerable.Range(1, 6));
-		var values = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
+		var values = (await Context.Set<ProductCharacteristic>().AsNoTracking().ToListAsync(CancellationToken))
 			.ToDictionary(x => x.GetId(), x => x.Value);
 		values.Should().HaveCount(2);
 		values[(productId, characteristic.Id)].Should().Be("x");
 		values[(secondProductId, characteristic.Id)].Should().Be("ab");
-		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<Characteristic>().CountAsync(CancellationToken)).Should().Be(1);
 	}
 
 	[Fact]
@@ -136,9 +136,9 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 	{
 		var products = TestContext.Products.Take(2).ToArray();
 		var characteristic = Characteristic.Create("Color");
-		Context.Characteristics.Add(characteristic);
+		Context.Set<Characteristic>().Add(characteristic);
 		await Context.SaveChangesAsync(CancellationToken);
-		Context.ProductCharacteristics.Add(ProductCharacteristic.Create(products[0].Id, characteristic.Id, "Old"));
+		Context.Set<ProductCharacteristic>().Add(ProductCharacteristic.Create(products[0].Id, characteristic.Id, "Old"));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -155,7 +155,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		execution.Job.ErrorMessage.Should().Contain("product_characteristics_product_id_fk");
 		GetPublishedSnapshots().Should().BeEmpty();
 		execution.GetState<ProductCharacteristicsImportState>().Checkpoint.Should().BeNull();
-		var value = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
+		var value = (await Context.Set<ProductCharacteristic>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		value.ProductId.Should().Be(products[0].Id);
 		value.CharacteristicId.Should().Be(characteristic.Id);
@@ -167,9 +167,9 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 	{
 		var products = TestContext.Products.Take(2).ToArray();
 		var characteristic = Characteristic.Create("Color");
-		Context.Characteristics.Add(characteristic);
+		Context.Set<Characteristic>().Add(characteristic);
 		await Context.SaveChangesAsync(CancellationToken);
-		Context.ProductCharacteristics.Add(ProductCharacteristic.Create(products[0].Id, characteristic.Id, "Old"));
+		Context.Set<ProductCharacteristic>().Add(ProductCharacteristic.Create(products[0].Id, characteristic.Id, "Old"));
 		await Context.SaveChangesAsync(CancellationToken);
 		var repository = Scope.ServiceProvider.GetRequiredService<IProductRepository>();
 
@@ -183,7 +183,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 			await transaction.RollbackAsync(CancellationToken);
 		}
 
-		var value = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
+		var value = (await Context.Set<ProductCharacteristic>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		value.ProductId.Should().Be(products[0].Id);
 		value.CharacteristicId.Should().Be(characteristic.Id);
@@ -195,7 +195,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 	{
 		var productId = TestContext.Products[0].Id;
 		var characteristic = Characteristic.Create("Color");
-		Context.Characteristics.Add(characteristic);
+		Context.Set<Characteristic>().Add(characteristic);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -207,7 +207,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var state = execution.GetState<ProductCharacteristicsImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Errors.Should().BeEmpty();
-		var value = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
+		var value = (await Context.Set<ProductCharacteristic>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		value.ProductId.Should().Be(productId);
 		value.CharacteristicId.Should().Be(characteristic.Id);
@@ -226,7 +226,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 			.BuildAndAddToDb(Context, CancellationToken);
 		var material = await new CharacteristicBuilder(Faker).WithName("Material")
 			.BuildAndAddToDb(Context, CancellationToken);
-		Context.ProductCharacteristics.AddRange(
+		Context.Set<ProductCharacteristic>().AddRange(
 			ProductCharacteristic.Create(product.Id, color.Id, "Old"),
 			ProductCharacteristic.Create(product.Id, material.Id, "Steel"),
 			ProductCharacteristic.Create(other.Id, color.Id, "Blue"));
@@ -273,7 +273,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var products = TestContext.Products.Take(2).ToArray();
 		var color = await new CharacteristicBuilder(Faker).WithName("Color")
 			.BuildAndAddToDb(Context, CancellationToken);
-		Context.ProductCharacteristics.Add(ProductCharacteristic.Create(products[0].Id, color.Id, "Old"));
+		Context.Set<ProductCharacteristic>().Add(ProductCharacteristic.Create(products[0].Id, color.Id, "Old"));
 		await Context.SaveChangesAsync(CancellationToken);
 		var broker = Broker;
 		SetPublisher(broker, _ => true);
@@ -288,7 +288,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 
 		execution.Job.Status.Should().Be(JobStatus.Failed);
 		execution.Job.ErrorMessage.Should().Contain("Characteristics publication failed");
-		var value = (await Context.ProductCharacteristics.AsNoTracking().ToListAsync(CancellationToken))
+		var value = (await Context.Set<ProductCharacteristic>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		value.ProductId.Should().Be(products[0].Id);
 		value.Value.Should().Be("Old");
@@ -303,7 +303,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var products = TestContext.Products.Take(5).ToArray();
 		var color = await new CharacteristicBuilder(Faker).WithName("Color")
 			.BuildAndAddToDb(Context, CancellationToken);
-		Context.ProductCharacteristics.Add(ProductCharacteristic.Create(products[3].Id, color.Id, "Old"));
+		Context.Set<ProductCharacteristic>().Add(ProductCharacteristic.Create(products[3].Id, color.Id, "Old"));
 		await Context.SaveChangesAsync(CancellationToken);
 		var broker = Broker;
 		var failed = false;
@@ -336,7 +336,7 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var snapshots = GetPublishedSnapshots(broker);
 		snapshots.Select(product => product.ProductId).Should().BeEquivalentTo(products.Select(product => product.Id));
 		snapshots.Single(product => product.ProductId == products[3].Id).Characteristics.Single().Value.Should().Be("Updated");
-		var values = await Context.ProductCharacteristics.AsNoTracking()
+		var values = await Context.Set<ProductCharacteristic>().AsNoTracking()
 			.ToDictionaryAsync(item => item.ProductId, item => item.Value, CancellationToken);
 		values.Should().HaveCount(5);
 		values[products[3].Id].Should().Be("Updated");

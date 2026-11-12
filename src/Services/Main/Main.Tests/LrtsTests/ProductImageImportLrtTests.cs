@@ -25,7 +25,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 	{
 		var products = TestContext.Products.Take(2).ToArray();
 		var existingImage = ProductImage.Create(products[0].Id, ".png");
-		Context.ProductImages.Add(existingImage);
+		Context.Set<ProductImage>().Add(existingImage);
 		await Context.SaveChangesAsync(CancellationToken);
 		string[] rows =
 		[
@@ -46,7 +46,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 			state.Errors.Should().BeEmpty();
 		}
 
-		var keys = (await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken))
+		var keys = (await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken))
 			.Select(image => image.GetId());
 		keys.Should().BeEquivalentTo(new[]
 		{
@@ -81,7 +81,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		var state = execution.GetState<ProductImageImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(10);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(Enumerable.Range(1, 9));
-		var image = (await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken))
+		var image = (await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		image.GetId().Should().Be((productId, $"products/{productId}/photo.webp"));
 	}
@@ -103,7 +103,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		execution.Job.Attempts.Should().Be(1);
 		execution.Job.ErrorMessage.Should().Contain("product_images_product_id_fk");
 		execution.GetState<ProductImageImportState>().Checkpoint.Should().BeNull();
-		(await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken)).Should().BeEmpty();
+		(await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken)).Should().BeEmpty();
 	}
 
 	[Fact]
@@ -132,7 +132,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		var products = TestContext.Products.Take(3).ToArray();
 		if (imageAlreadyAssigned)
 		{
-			Context.ProductImages.Add(ProductImage.CreateFromStorageKey(products[0].Id, "owned.jpg"));
+			Context.Set<ProductImage>().Add(ProductImage.CreateFromStorageKey(products[0].Id, "owned.jpg"));
 			await Context.SaveChangesAsync(CancellationToken);
 		}
 
@@ -150,7 +150,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		var state = execution.GetState<ProductImageImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(rows.Count);
 		state.Errors.Should().BeEmpty();
-		var images = await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken);
+		var images = await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken);
 		images.Select(image => image.GetId()).Should().BeEquivalentTo(new[]
 		{
 			(products[0].Id, $"products/{products[0].Id}/owned.jpg"),
@@ -172,6 +172,6 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		var state = execution.GetState<ProductImageImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(1001);
 		state.Errors.Should().BeEmpty();
-		(await Context.ProductImages.AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle();
+		(await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle();
 	}
 }

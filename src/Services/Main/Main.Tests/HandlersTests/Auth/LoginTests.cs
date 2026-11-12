@@ -1,3 +1,6 @@
+using Main.Entities.Auth;
+using Notification.Core.Entities;
+using Main.Entities.User;
 using Security.Core.Interfaces;
 using System.Net;
 using System.Security.Claims;
@@ -42,7 +45,7 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 
 		result.Token.Should().NotBeNullOrWhiteSpace();
 		result.RefreshToken.Should().NotBeNullOrWhiteSpace();
-		var stored = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
+		var stored = await Context.Set<UserToken>().AsNoTracking().SingleAsync(CancellationToken);
 		stored.TokenHash.Should().Be(Scope.ServiceProvider.GetRequiredService<IValueHasher>().Hash(result.RefreshToken));
 		stored.TokenHash.Should().NotBe(result.RefreshToken);
 		stored.ExpiresAt.Should().BeCloseTo(DateTime.UtcNow.AddDays(30), TimeSpan.FromSeconds(10));
@@ -66,7 +69,7 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 				null));
 
 		await action.Should().ThrowAsync<WrongCredentialsException>();
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	[Theory]
@@ -80,8 +83,8 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 
 		var exception = (await action.Should().ThrowAsync<WrongCredentialsException>()).Which;
 		exception.GetErrorValues().Should().BeEquivalentTo(new { Login = (string?)null, Password = (string?)null });
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
-		(await Context.Users.AsNoTracking().SingleAsync(x => x.UserName.NormalizedValue == "LOGIN-USER", CancellationToken))
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<User>().AsNoTracking().SingleAsync(x => x.UserName.NormalizedValue == "LOGIN-USER", CancellationToken))
 			.LastLoginAt.Should().BeNull();
 	}
 
@@ -97,7 +100,7 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 		var action = () => Mediator.Send(new LoginCommand("system-login-user", Password, null, null), CancellationToken);
 
 		await action.Should().ThrowAsync<WrongCredentialsException>();
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	[Fact]
@@ -109,10 +112,10 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 
 		await Mediator.Send(new LoginCommand(UserName, Password, address, "Mozilla/5.0 Chrome/138.0 Windows"), CancellationToken);
 
-		var token = await Context.UserTokens.AsNoTracking().SingleAsync(CancellationToken);
-		var user = await Context.Users.AsNoTracking().SingleAsync(x => x.Id == token.UserId, CancellationToken);
+		var token = await Context.Set<UserToken>().AsNoTracking().SingleAsync(CancellationToken);
+		var user = await Context.Set<User>().AsNoTracking().SingleAsync(x => x.Id == token.UserId, CancellationToken);
 		user.LastLoginAt.Should().BeOnOrAfter(before).And.BeOnOrBefore(DateTime.UtcNow);
-		var notification = await Context.Notifications.AsNoTracking()
+		var notification = await Context.Set<global::Notification.Core.Entities.Notification>().AsNoTracking()
 			.SingleAsync(x => x.UserId == user.Id && x.NotificationSystemName == "UserLoggedIn", CancellationToken);
 		var model = JsonSerializer.Deserialize<UserLoggedInNotificationData>(notification.Model, new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
 		model.IpAddress.Should().Be(address.ToString());
@@ -127,7 +130,7 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 		var second = await Mediator.Send(new LoginCommand(UserName, Password, null, null), CancellationToken);
 
 		first.RefreshToken.Should().NotBe(second.RefreshToken);
-		var hashes = await Context.UserTokens.AsNoTracking().Select(x => x.TokenHash).ToListAsync(CancellationToken);
+		var hashes = await Context.Set<UserToken>().AsNoTracking().Select(x => x.TokenHash).ToListAsync(CancellationToken);
 		var hasher = Scope.ServiceProvider.GetRequiredService<IValueHasher>();
 		hashes.Should().BeEquivalentTo([hasher.Hash(first.RefreshToken), hasher.Hash(second.RefreshToken)]);
 	}

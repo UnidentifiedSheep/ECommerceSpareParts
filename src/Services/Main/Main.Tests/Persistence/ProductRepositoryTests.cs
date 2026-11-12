@@ -29,7 +29,7 @@ public sealed class ProductRepositoryTests : IntegrationTest
 		var ids = await InsertProducts(products);
 
 		ids.Should().HaveCount(3).And.OnlyHaveUniqueItems().And.OnlyContain(id => id > 0);
-		var savedIds = await Context.Products.AsNoTracking().Select(product => product.Id)
+		var savedIds = await Context.Set<Product>().AsNoTracking().Select(product => product.Id)
 			.ToListAsync(CancellationToken);
 		ids.Should().BeEquivalentTo(savedIds);
 	}
@@ -59,7 +59,7 @@ public sealed class ProductRepositoryTests : IntegrationTest
 				.WithSku(new Sku("ABC123")).WithName("Another producer").Build()
 		]);
 
-		var saved = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var saved = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 		saved.Should().HaveCount(4);
 		ids.Should().HaveCount(2).And.BeEquivalentTo(saved
 			.Where(product => product.Id != existing.Id && product.Id != unrelated.Id)
@@ -82,7 +82,7 @@ public sealed class ProductRepositoryTests : IntegrationTest
 		var repeatedIds = await InsertProducts(products);
 
 		repeatedIds.Should().BeEmpty();
-		var savedIds = await Context.Products.AsNoTracking().Select(product => product.Id)
+		var savedIds = await Context.Set<Product>().AsNoTracking().Select(product => product.Id)
 			.ToListAsync(CancellationToken);
 		savedIds.Should().BeEquivalentTo(originalIds);
 	}
@@ -93,7 +93,7 @@ public sealed class ProductRepositoryTests : IntegrationTest
 		var ids = await Repository.InsertProductsOnConflictDoNothingAsync([], CancellationToken);
 
 		ids.Should().BeEmpty();
-		(await Context.Products.AnyAsync(CancellationToken)).Should().BeFalse();
+		(await Context.Set<Product>().AnyAsync(CancellationToken)).Should().BeFalse();
 	}
 
 	[Fact]
@@ -108,12 +108,12 @@ public sealed class ProductRepositoryTests : IntegrationTest
 			rolledBackIds.Should().HaveCount(2).And.OnlyContain(id => id > 0);
 			await transaction.RollbackAsync(CancellationToken);
 		}
-		(await Context.Products.AnyAsync(CancellationToken)).Should().BeFalse();
+		(await Context.Set<Product>().AnyAsync(CancellationToken)).Should().BeFalse();
 
 		var ids = await InsertProducts(products);
 
 		ids.Should().HaveCount(2).And.OnlyContain(id => id > 0);
-		var savedIds = await Context.Products.AsNoTracking().Select(product => product.Id)
+		var savedIds = await Context.Set<Product>().AsNoTracking().Select(product => product.Id)
 			.ToListAsync(CancellationToken);
 		ids.Should().BeEquivalentTo(savedIds);
 	}

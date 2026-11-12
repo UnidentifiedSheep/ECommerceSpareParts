@@ -39,51 +39,56 @@ public static class RepositoriesExtensions
 		Type readRepositoryType,
 		params Assembly[] entitiesAssemblies) where TContext : DbContext
 	{
-		services.AddScoped<AuditableEntitySaveChangesInterceptor>();
-		services.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
-
-		services.AddDbContext<TContext>((serviceProvider, options) =>
+		if (!services.Any(descriptor => descriptor.ServiceType == typeof(DbContextOptions<TContext>)))
 		{
-			var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+			services.AddScoped<AuditableEntitySaveChangesInterceptor>();
+			services.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
 
-			options.UseNpgsql(databaseOptions.ConnectionString);
-
-			options.AddInterceptors(
-				serviceProvider.GetRequiredService<AuditableEntitySaveChangesInterceptor>());
-
-			options.AddInterceptors(
-				serviceProvider.GetRequiredService<DomainEventFlusherSaveChangesInterceptor>());
-		});
-
-		services
-			.AddMarten(serviceProvider =>
+			services.AddDbContext<TContext>((serviceProvider, options) =>
 			{
-				var options = new StoreOptions();
-
 				var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
 
-				options.Connection(databaseOptions.ConnectionString);
-				options.DatabaseSchemaName = "materialized";
+				options.UseNpgsql(databaseOptions.ConnectionString);
 
-				return options;
-			})
-			.UseLightweightSessions();
+				options.AddInterceptors(
+					serviceProvider.GetRequiredService<AuditableEntitySaveChangesInterceptor>());
 
-		services.AddScoped(typeof(IDocumentRepository<,>), typeof(DocumentRepository<,>));
+				options.AddInterceptors(
+					serviceProvider.GetRequiredService<DomainEventFlusherSaveChangesInterceptor>());
+			});
 
-		services.AddScoped(typeof(IDocumentReadRepository<,>), typeof(DocumentReadRepository<,>));
+			services
+				.AddMarten(serviceProvider =>
+				{
+					var options = new StoreOptions();
+
+					var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+
+					options.Connection(databaseOptions.ConnectionString);
+					options.DatabaseSchemaName = "materialized";
+
+					return options;
+				})
+				.UseLightweightSessions();
+
+			services.AddScoped(typeof(IDocumentRepository<,>), typeof(DocumentRepository<,>));
+
+			services.AddScoped(typeof(IDocumentReadRepository<,>), typeof(DocumentReadRepository<,>));
+		}
 
 		AddRepositories(
 			services,
 			repositoryType,
 			linqRepositoryType,
+			readRepositoryType,
 			entitiesAssemblies);
 
 		services.AddJobRepositories<TContext>();
 
 		services.AddScoped(typeof(IReadRepository<,>), readRepositoryType);
 
-		services.AddUnitOfWork<TContext>();
+		if (!services.Any(descriptor => descriptor.ServiceType == typeof(IUnitOfWork)))
+			services.AddUnitOfWork<TContext>();
 
 		services.AddScoped<IDbValidator, PgsqlDbValidator<TContext>>();
 		services.AddPgsqlDbValidators<TContext>(configureValidation);
@@ -95,6 +100,7 @@ public static class RepositoriesExtensions
 		IServiceCollection services,
 		Type repositoryType,
 		Type linqRepositoryType,
+		Type readRepositoryType,
 		Assembly[] entitiesAssemblies)
 	{
 		var registered = new HashSet<(Type EntityType, Type KeyType)>();
@@ -125,6 +131,8 @@ public static class RepositoriesExtensions
 			var implementationType = repositoryDefinition.MakeGenericType(entityType, keyType);
 
 			services.AddScoped(serviceType, implementationType);
+			services.AddScoped(typeof(IReadRepository<,>).MakeGenericType(entityType, keyType),
+				readRepositoryType.MakeGenericType(entityType, keyType));
 		}
 	}
 

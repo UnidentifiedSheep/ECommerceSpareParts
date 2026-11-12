@@ -1,3 +1,4 @@
+using Persistence.Context;
 using System.Diagnostics;
 using Abstractions.Models;
 using Application.Common.Extensions;
@@ -177,7 +178,7 @@ public class StorageContentServiceTests : IntegrationTest
 		await Withdraw(new SubtractStorageContentItem(content.Id, 10));
 
 		(await Count(content)).Should().Be(0);
-		(await Context.StorageContentLocks.AsNoTracking().SingleAsync(CancellationToken)).State.Should().Be(StorageContentLockState.Active);
+		(await Context.Set<StorageContentLock>().AsNoTracking().SingleAsync(CancellationToken)).State.Should().Be(StorageContentLockState.Active);
 	}
 
 	[Fact]
@@ -193,7 +194,7 @@ public class StorageContentServiceTests : IntegrationTest
 
 		(await Count(first)).Should().Be(10);
 		(await Count(second)).Should().Be(10);
-		(await Context.ProductStocks.AsNoTracking().SumAsync(stock => stock.Quantity, CancellationToken)).Should().Be(20);
+		(await Context.Set<ProductStock>().AsNoTracking().SumAsync(stock => stock.Quantity, CancellationToken)).Should().Be(20);
 	}
 
 	[Fact]
@@ -301,7 +302,7 @@ public class StorageContentServiceTests : IntegrationTest
 		}));
 
 		(await Count(content)).Should().Be(10);
-		(await Context.StorageContentLocks.AsNoTracking().AnyAsync(CancellationToken)).Should().BeFalse();
+		(await Context.Set<StorageContentLock>().AsNoTracking().AnyAsync(CancellationToken)).Should().BeFalse();
 	}
 
 	[Fact]
@@ -321,7 +322,7 @@ public class StorageContentServiceTests : IntegrationTest
 		});
 
 		(await Count(content)).Should().Be(0);
-		(await Context.StorageContentLocks.AsNoTracking().SingleAsync(CancellationToken)).State.Should().Be(StorageContentLockState.Released);
+		(await Context.Set<StorageContentLock>().AsNoTracking().SingleAsync(CancellationToken)).State.Should().Be(StorageContentLockState.Released);
 	}
 
 	[Theory]
@@ -392,7 +393,7 @@ public class StorageContentServiceTests : IntegrationTest
 			await using var transaction = factory.Create();
 			await transaction.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
 			{
-				var db = context.GetRequiredService<DContext>();
+				var db = context.GetRequiredService<UnifiedDbContext>();
 				readerPid.TrySetResult(((NpgsqlConnection)db.Database.GetDbConnection()).ProcessID);
 				var service = context.GetRequiredService<IStorageContentService>();
 				if (byContentId)
@@ -437,7 +438,7 @@ public class StorageContentServiceTests : IntegrationTest
 		}));
 
 		(await Count(content)).Should().Be(0);
-		(await Context.ProductStocks.AsNoTracking().SumAsync(stock => stock.Quantity, CancellationToken)).Should().Be(0);
+		(await Context.Set<ProductStock>().AsNoTracking().SumAsync(stock => stock.Quantity, CancellationToken)).Should().Be(0);
 	}
 
 	[Fact]
@@ -482,7 +483,7 @@ public class StorageContentServiceTests : IntegrationTest
 	{
 		var content = NewContent(10);
 		await Add(content);
-		var unloaded = await Context.StorageContents.AsNoTracking().SingleAsync(item => item.Id == content.Id, CancellationToken);
+		var unloaded = await Context.Set<StorageContent>().AsNoTracking().SingleAsync(item => item.Id == content.Id, CancellationToken);
 
 		var take = () => unloaded.Take(1, StorageMovementType.Sale, DateTime.UtcNow);
 
@@ -550,5 +551,5 @@ public class StorageContentServiceTests : IntegrationTest
 			}, CancellationToken);
 
 	private async Task<int> Count(StorageContent content) =>
-		(await Context.StorageContents.AsNoTracking().SingleAsync(item => item.Id == content.Id, CancellationToken)).Count;
+		(await Context.Set<StorageContent>().AsNoTracking().SingleAsync(item => item.Id == content.Id, CancellationToken)).Count;
 }

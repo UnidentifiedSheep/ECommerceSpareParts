@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Entities.Product.Enrichment;
 using Main.Persistence.Context;
 using Tests.Abstractions;
@@ -7,9 +8,9 @@ using Tests.Interfaces;
 namespace Tests.TestContexts.ProductEnrichment;
 
 public class CatalogueCandidateTestContext(
-	DContext ctx,
+	UnifiedDbContext ctx,
 	SupplierProductTestContext supplierProductTestContext,
-	ProducerTestContext producerTestContext) : TestContextBase<DContext>(ctx), IDependentTestContext
+	ProducerTestContext producerTestContext) : TestContextBase<UnifiedDbContext>(ctx), IDependentTestContext
 {
 	public IReadOnlyList<CatalogueCandidate> Candidates { get; private set; } = null!;
 

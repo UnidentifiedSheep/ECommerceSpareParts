@@ -33,7 +33,7 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 		var sale = GetContext<SaleTestContext>().Sale;
 		sale.SetDateTime(new DateTime(2026, 5, 15, 12, 0, 0, DateTimeKind.Utc));
 		var content = sale.Contents.Single();
-		var analytics = await Context.SaleContentAnalytics.SingleAsync(item => item.SaleContentId == content.Id, CancellationToken);
+		var analytics = await Context.Set<SaleContentAnalytics>().SingleAsync(item => item.SaleContentId == content.Id, CancellationToken);
 		analytics.Update(120m * content.Count, 90m * content.Count, 40m * content.Count);
 		await Context.SaveChangesAsync(CancellationToken);
 
@@ -70,7 +70,7 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 		var sale = GetContext<SaleTestContext>().Sale;
 		sale.SetDateTime(Input().StartDate);
 		var content = sale.Contents.Single();
-		await Context.SaleContentAnalytics.Where(item => item.SaleContentId == content.Id).ExecuteDeleteAsync(CancellationToken);
+		await Context.Set<SaleContentAnalytics>().Where(item => item.SaleContentId == content.Id).ExecuteDeleteAsync(CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		await Assert.ThrowsAsync<InvalidOperationException>(() => Source.QueryAsync(Input(), CancellationToken));
 	}

@@ -24,7 +24,7 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 	public async Task ImportsDirectedPairs_UpdatesQuantityAndCanBeRepeated()
 	{
 		var products = TestContext.Products.Take(3).ToArray();
-		Context.ProductContents.AddRange(
+		Context.Set<ProductContent>().AddRange(
 			ProductContent.Create(products[0].Id, products[1].Id, 1),
 			ProductContent.Create(products[0].Id, products[2].Id, 11));
 		await Context.SaveChangesAsync(CancellationToken);
@@ -47,7 +47,7 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 			state.Errors.Should().BeEmpty();
 		}
 
-		var quantities = (await Context.ProductContents.AsNoTracking().ToListAsync(CancellationToken))
+		var quantities = (await Context.Set<ProductContent>().AsNoTracking().ToListAsync(CancellationToken))
 			.ToDictionary(x => x.GetId(), x => x.Quantity);
 		quantities.Should().HaveCount(4);
 		quantities[(products[0].Id, products[1].Id)].Should().Be(5);
@@ -77,7 +77,7 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 		var state = execution.GetState<ProductContentImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(7);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(Enumerable.Range(1, 6));
-		var content = (await Context.ProductContents.AsNoTracking().ToListAsync(CancellationToken))
+		var content = (await Context.Set<ProductContent>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		content.GetId().Should().Be((products[0].Id, products[1].Id));
 		content.Quantity.Should().Be(3);
@@ -89,7 +89,7 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 	public async Task MissingParentOrChild_FailsTheJobAndRollsBackTheWholeBatch(bool missingParent)
 	{
 		var products = TestContext.Products.Take(3).ToArray();
-		Context.ProductContents.Add(ProductContent.Create(products[0].Id, products[1].Id, 2));
+		Context.Set<ProductContent>().Add(ProductContent.Create(products[0].Id, products[1].Id, 2));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -107,7 +107,7 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 		execution.Job.ErrorMessage.Should().Contain(
 			missingParent ? "product_contents_parent_fk" : "product_contents_child_fk");
 		execution.GetState<ProductContentImportState>().Checkpoint.Should().BeNull();
-		var content = (await Context.ProductContents.AsNoTracking().ToListAsync(CancellationToken))
+		var content = (await Context.Set<ProductContent>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		content.GetId().Should().Be((products[0].Id, products[1].Id));
 		content.Quantity.Should().Be(2);
@@ -117,7 +117,7 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 	public async Task BulkUpsert_RollsBackInsertsAndUpdatesWithTheTransaction()
 	{
 		var products = TestContext.Products.Take(3).ToArray();
-		Context.ProductContents.Add(ProductContent.Create(products[0].Id, products[1].Id, 2));
+		Context.Set<ProductContent>().Add(ProductContent.Create(products[0].Id, products[1].Id, 2));
 		await Context.SaveChangesAsync(CancellationToken);
 		var repository = Scope.ServiceProvider.GetRequiredService<IProductRepository>();
 
@@ -131,7 +131,7 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 			await transaction.RollbackAsync(CancellationToken);
 		}
 
-		var content = (await Context.ProductContents.AsNoTracking().ToListAsync(CancellationToken))
+		var content = (await Context.Set<ProductContent>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		content.GetId().Should().Be((products[0].Id, products[1].Id));
 		content.Quantity.Should().Be(2);
@@ -150,7 +150,7 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 		var state = execution.GetState<ProductContentImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(1001);
 		state.Errors.Should().BeEmpty();
-		var content = (await Context.ProductContents.AsNoTracking().ToListAsync(CancellationToken))
+		var content = (await Context.Set<ProductContent>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should().ContainSingle().Which;
 		content.GetId().Should().Be((products[0].Id, products[1].Id));
 		content.Quantity.Should().Be(1001);

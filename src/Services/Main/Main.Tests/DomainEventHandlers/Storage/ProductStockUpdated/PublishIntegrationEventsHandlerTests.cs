@@ -71,7 +71,7 @@ public class PublishIntegrationEventsHandlerTests : IntegrationTest
 		var item = message.Items.Should().ContainSingle().Which;
 		item.ProductId.Should().Be(first.ProductId);
 		item.Quantity.Should().Be(19);
-		(await Context.ProductStocks.AsNoTracking().SingleAsync(CancellationToken)).Quantity.Should().Be(item.Quantity);
+		(await Context.Set<ProductStock>().AsNoTracking().SingleAsync(CancellationToken)).Quantity.Should().Be(item.Quantity);
 	}
 
 	[Fact]
@@ -127,8 +127,8 @@ public class PublishIntegrationEventsHandlerTests : IntegrationTest
 		}));
 
 		PublishedSince(before).Should().BeEmpty();
-		(await Context.ProductStocks.AsNoTracking().SingleAsync(CancellationToken)).Quantity.Should().Be(5);
-		(await Context.StorageContents.AsNoTracking().SingleAsync(CancellationToken)).Count.Should().Be(5);
+		(await Context.Set<ProductStock>().AsNoTracking().SingleAsync(CancellationToken)).Quantity.Should().Be(5);
+		(await Context.Set<StorageContent>().AsNoTracking().SingleAsync(CancellationToken)).Count.Should().Be(5);
 	}
 
 	private IReadOnlyList<ProductStocksUpdatedEvent> PublishedSince(int before) =>

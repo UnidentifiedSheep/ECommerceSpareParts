@@ -1,3 +1,4 @@
+using Notification.Core.Entities;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
 using FluentAssertions;
@@ -43,7 +44,7 @@ public class SeeNotificationsTests : IntegrationTest
 
 		await Mediator.Send(new SeeNotificationsCommand(user.Id, ids), CancellationToken);
 
-		var afterFirstCall = await Context.InAppNotifications.AsNoTracking()
+		var afterFirstCall = await Context.Set<InAppNotification>().AsNoTracking()
 			.Where(x => ids.Contains(x.Id))
 			.ToArrayAsync(CancellationToken);
 		afterFirstCall.Where(x => unread.Any(unreadNotification => unreadNotification.Id == x.Id))
@@ -54,7 +55,7 @@ public class SeeNotificationsTests : IntegrationTest
 
 		await Mediator.Send(new SeeNotificationsCommand(user.Id, ids), CancellationToken);
 
-		var afterSecondCall = await Context.InAppNotifications.AsNoTracking()
+		var afterSecondCall = await Context.Set<InAppNotification>().AsNoTracking()
 			.Where(x => ids.Contains(x.Id))
 			.ToArrayAsync(CancellationToken);
 		foreach (var notification in afterFirstCall)
@@ -80,7 +81,7 @@ public class SeeNotificationsTests : IntegrationTest
 
 		await Mediator.Send(new SeeNotificationsCommand(user.Id, ids), CancellationToken);
 
-		var persisted = await Context.InAppNotifications.AsNoTracking()
+		var persisted = await Context.Set<InAppNotification>().AsNoTracking()
 			.SingleAsync(x => x.Id == unread.Id, CancellationToken);
 		persisted.SeenAt.Should().NotBeNull();
 	}

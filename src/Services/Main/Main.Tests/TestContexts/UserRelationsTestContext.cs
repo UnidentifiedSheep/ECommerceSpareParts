@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Entities.Organization;
 using StorageEntity = Main.Entities.Storage.Storage;
 using Main.Entities.User;
@@ -13,8 +14,8 @@ using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class UserRelationsTestContext(DContext context, UsersTestContext usersTestContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class UserRelationsTestContext(UnifiedDbContext context, UsersTestContext usersTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public static Type[] DependsOn { get; } = [typeof(UsersTestContext)];
 

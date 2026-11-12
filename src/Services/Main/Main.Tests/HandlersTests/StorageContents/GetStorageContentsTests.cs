@@ -157,7 +157,7 @@ public sealed class GetStorageContentsTests : IntegrationTest
 		var now = DateTimeOffset.UtcNow;
 		var released = StorageContentLock.Create(second.Id, 100);
 		released.Release(now.UtcDateTime);
-		Context.StorageContentLocks.AddRange(
+		Context.Set<StorageContentLock>().AddRange(
 			StorageContentLock.Create(first.Id, 8, now.AddHours(1).UtcDateTime),
 			StorageContentLock.Create(third.Id, 3),
 			StorageContentLock.Create(overlocked.Id, 4), released);

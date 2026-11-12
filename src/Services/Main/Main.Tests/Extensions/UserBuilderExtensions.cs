@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Entities.Organization;
 using Main.Entities.User;
 using Main.Persistence.Context;
@@ -7,7 +8,7 @@ namespace Tests.Extensions;
 
 public static class UserBuilderExtensions
 {
-	public static async Task<User> BuildAndAddToDb(this UserBuilder builder, DContext context)
+	public static async Task<User> BuildAndAddToDb(this UserBuilder builder, UnifiedDbContext context)
 	{
 		var user = builder.Build();
 		var organization = CreateIndividualOrganization(user);
@@ -19,7 +20,7 @@ public static class UserBuilderExtensions
 
 	public static async Task<IReadOnlyCollection<User>> BuildManyAndAddToDb(
 		this UserBuilder builder,
-		DContext context,
+		UnifiedDbContext context,
 		int count)
 	{
 		var users = builder.BuildMany(count).ToList();

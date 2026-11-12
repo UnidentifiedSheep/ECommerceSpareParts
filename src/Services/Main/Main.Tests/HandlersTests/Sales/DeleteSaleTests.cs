@@ -44,12 +44,12 @@ public class DeleteSaleTests : IntegrationTest
 
 		var deletedSale = await ReloadSale();
 		var storageContent = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(productId, CancellationToken);
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == transactionId, CancellationToken);
 
@@ -82,7 +82,7 @@ public class DeleteSaleTests : IntegrationTest
 
 		var deletedSale = await ReloadSale();
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 
@@ -114,7 +114,7 @@ public class DeleteSaleTests : IntegrationTest
 
 		var saleAfterFailedDelete = await ReloadSale();
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 
@@ -127,7 +127,7 @@ public class DeleteSaleTests : IntegrationTest
 	private Task<Sale> ReloadSale()
 	{
 		return Context
-			.Sales
+			.Set<global::Main.Entities.Sale.Sale>()
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
@@ -137,7 +137,7 @@ public class DeleteSaleTests : IntegrationTest
 	private async Task<int> StorageContentCount(int storageContentId)
 	{
 		var storageContent = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId);
 

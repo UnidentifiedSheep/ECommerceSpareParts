@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Main.Application.Lrts.ProductCrossesImport;
@@ -63,6 +64,6 @@ public sealed class ProductCrossesImportLrtTests : CsvLrtIntegrationTest<Product
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductCrossesImportState>();
 		state.Errors.Should().BeEmpty();
-		(await Context.ProductCrosses.AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<ProductCross>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
 	}
 }

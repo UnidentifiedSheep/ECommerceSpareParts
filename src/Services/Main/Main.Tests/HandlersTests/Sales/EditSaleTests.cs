@@ -61,11 +61,11 @@ public class EditSaleTests : IntegrationTest
 		var editedSale = await ReloadSale();
 		var editedContent = editedSale.Contents.Should().ContainSingle().Subject;
 		var oldTransaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == oldTransactionId, CancellationToken);
 		var newTransaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == editedSale.TransactionId, CancellationToken);
 
@@ -76,7 +76,7 @@ public class EditSaleTests : IntegrationTest
 		editedContent.DiscountedPrice.Should().Be(90m);
 		editedContent.TotalSum.Should().Be(90m);
 		editedContent.OriginalPrice.Should().Be(120);
-		var analytics = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == editedContent.Id, CancellationToken);
+		var analytics = await Context.Set<SaleContentAnalytics>().AsNoTracking().SingleAsync(item => item.SaleContentId == editedContent.Id, CancellationToken);
 		analytics.OriginalAmountInBaseCurrency.Should().Be(120m * editedContent.Count);
 		analytics.RevenueInBaseCurrency.Should().Be(90m * editedContent.Count);
 		editedContent.Comment.Should().Be("edited");
@@ -119,7 +119,7 @@ public class EditSaleTests : IntegrationTest
 
 		var saleAfterFailedEdit = await ReloadSale();
 		var transaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 
@@ -254,7 +254,7 @@ public class EditSaleTests : IntegrationTest
 	[Fact]
 	public async Task EditSale_WhenSaleDeleted_ThrowsSaleNotFoundException()
 	{
-		var sale = await Context.Sales.SingleAsync(x => x.Id == SaleContext.Sale.Id, CancellationToken);
+		var sale = await Context.Set<Sale>().SingleAsync(x => x.Id == SaleContext.Sale.Id, CancellationToken);
 		sale.Delete();
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
@@ -316,7 +316,7 @@ public class EditSaleTests : IntegrationTest
 	private Task<Sale> ReloadSale()
 	{
 		return Context
-			.Sales
+			.Set<global::Main.Entities.Sale.Sale>()
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
@@ -350,7 +350,7 @@ public class EditSaleTests : IntegrationTest
 	private Task<StorageContent> OtherStorageContent()
 	{
 		return Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.Count > 0)
 			.Where(x => x.StorageCode == SaleContext.StorageContent.StorageCode)
@@ -361,7 +361,7 @@ public class EditSaleTests : IntegrationTest
 	private Task<int> StorageProductCount(int productId, string storageCode)
 	{
 		return Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == productId && x.StorageCode == storageCode)
 			.SumAsync(x => x.Count);
@@ -375,10 +375,10 @@ public class EditSaleTests : IntegrationTest
 		int storageContentId,
 		int count)
 	{
-		var storageContent = await Context.StorageContents.SingleAsync(x => x.Id == storageContentId);
+		var storageContent = await Context.Set<StorageContent>().SingleAsync(x => x.Id == storageContentId);
 
 		storageContent.IncreaseCount(count, StorageMovementType.SaleEditing);
-		var stock = await Context.ProductStocks.SingleAsync(
+		var stock = await Context.Set<ProductStock>().SingleAsync(
 			item => item.ProductId == productId && item.StorageCode == storageContent.StorageCode, CancellationToken);
 		stock.SetQuantity(stock.Quantity + count);
 

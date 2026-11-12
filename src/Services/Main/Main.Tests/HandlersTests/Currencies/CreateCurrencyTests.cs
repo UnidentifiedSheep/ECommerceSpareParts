@@ -1,3 +1,4 @@
+using Main.Entities.Currency;
 using Main.Entities;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
@@ -109,7 +110,7 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 				code),
 			CancellationToken);
 
-		var currencyInDb = await Context.Currencies.AsNoTracking().FirstOrDefaultAsync(CancellationToken);
+		var currencyInDb = await Context.Set<Currency>().AsNoTracking().FirstOrDefaultAsync(CancellationToken);
 		Assert.NotNull(currencyInDb);
 		Assert.Equal(shortName.Trim(), currencyInDb.ShortName);
 		Assert.Equal(name.Trim(), currencyInDb.Name);

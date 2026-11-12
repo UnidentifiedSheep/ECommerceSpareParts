@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Security.Core.Interfaces;
 using Abstractions.Models;
 using Api.Common;
@@ -5,6 +6,7 @@ using Application.Common.Interfaces.Validators;
 using Common;
 using Main.Migrator;
 using Main.Migrator.DataSeeds;
+using Main.Persistence;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -34,7 +36,8 @@ builder.ConfigureServices((context, services) =>
 	seedingRequested = seedValue == true;
 
 	//add db context
-	services.AddDbContext<DContext>((sp, options) =>
+	services.AddDbContextModule<MainDbContextModule>();
+	services.AddDbContext<UnifiedDbContext>((sp, options) =>
 	{
 		var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
 		options.UseNpgsql(connectionString, x => x.MigrationsAssembly("Main.Migrator"));
@@ -56,20 +59,20 @@ builder.ConfigureServices((context, services) =>
 
 builder.ConfigureServices((_, services) =>
 {
-	services.AddScoped<ISeed<DContext>, PermissionSeed>();
-	services.AddScoped<ISeed<DContext>, RoleSeed>();
-	services.AddScoped<ISeed<DContext>, RolePermissionSeed>();
-	services.AddScoped<ISeed<DContext>, UserSeed>();
-	services.AddScoped<ISeed<DContext>, SystemOrganizationSeed>();
-	services.AddScoped<ISeed<DContext>, CurrencySeed>();
-	services.AddScoped<ISeed<DContext>, AdminSeed>();
-	services.AddScoped<ISeed<DContext>, ScheduledLrtSeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, PermissionSeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, RoleSeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, RolePermissionSeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, UserSeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, SystemOrganizationSeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, CurrencySeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, AdminSeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, ScheduledLrtSeed>();
 });
 
 var host = builder.Build();
 
 using var scope = host.Services.CreateScope();
-var db = scope.ServiceProvider.GetRequiredService<DContext>();
+var db = scope.ServiceProvider.GetRequiredService<UnifiedDbContext>();
 
 await db.Database.MigrateAsync();
 
@@ -80,6 +83,6 @@ if (!seedingRequested)
 
 Console.WriteLine("Seeding database...");
 
-await host.SeedAsync<DContext>();
+await host.SeedAsync<UnifiedDbContext>();
 
 Console.WriteLine("Database seeded successfully");

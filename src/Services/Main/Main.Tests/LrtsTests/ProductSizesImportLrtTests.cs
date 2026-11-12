@@ -20,7 +20,7 @@ public sealed class ProductSizesImportLrtTests : CsvLrtIntegrationTest<ProductSi
 	public async Task ImportsNewSizesAndUpdatesExistingSizes_LastRowWins()
 	{
 		var products = TestContext.Products.Take(2).ToArray();
-		Context.ProductSizes.Add(ProductSize.Create(products[0].Id, 1, 1, 1, DimensionUnit.Meter));
+		Context.Set<ProductSize>().Add(ProductSize.Create(products[0].Id, 1, 1, 1, DimensionUnit.Meter));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -38,7 +38,7 @@ public sealed class ProductSizesImportLrtTests : CsvLrtIntegrationTest<ProductSi
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Errors.Should().BeEmpty();
 
-		var sizes = await Context.ProductSizes.AsNoTracking()
+		var sizes = await Context.Set<ProductSize>().AsNoTracking()
 			.Where(x => x.ProductId == products[0].Id || x.ProductId == products[1].Id)
 			.ToDictionaryAsync(x => x.ProductId, CancellationToken);
 		sizes.Should().HaveCount(2);
@@ -68,6 +68,6 @@ public sealed class ProductSizesImportLrtTests : CsvLrtIntegrationTest<ProductSi
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductSizesImportState>();
 		state.Errors.Select(x => x.RowIdx).Should().Equal(1, 2, 3, 4);
-		(await Context.ProductSizes.AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<ProductSize>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
 	}
 }

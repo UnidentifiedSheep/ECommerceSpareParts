@@ -75,7 +75,7 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 	public async Task InvalidRate_ThrowsNotFound(decimal value)
 	{
 		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
-		await Context.CurrencyRates.Where(row => row.FromCurrencyId == Rate.FromCurrencyId && row.ToCurrencyId == Rate.ToCurrencyId)
+		await Context.Set<CurrencyRate>().Where(row => row.FromCurrencyId == Rate.FromCurrencyId && row.ToCurrencyId == Rate.ToCurrencyId)
 			.ExecuteUpdateAsync(update => update.SetProperty(row => row.Rate, value), CancellationToken);
 
 		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() =>

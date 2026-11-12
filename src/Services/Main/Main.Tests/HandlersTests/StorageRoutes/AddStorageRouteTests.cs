@@ -65,7 +65,7 @@ public class AddStorageRouteTests : IntegrationTest
 
 		var result = await Mediator.Send(command, CancellationToken);
 
-		var route = await Context.StorageRoutes.FirstOrDefaultAsync(
+		var route = await Context.Set<StorageRoute>().FirstOrDefaultAsync(
 			x => x.Id == result.RouteId,
 			CancellationToken);
 		Assert.NotNull(route);

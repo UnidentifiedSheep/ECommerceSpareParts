@@ -28,7 +28,7 @@ public sealed class CurrencyRateUpdaterTests : IntegrationTest
 	[Fact]
 	public async Task InitialUpdate_CreatesRates_AndRepeatedUpdateDoesNotDuplicateThem()
 	{
-		await Context.CurrencyRates.ExecuteDeleteAsync(CancellationToken);
+		await Context.Set<CurrencyRate>().ExecuteDeleteAsync(CancellationToken);
 		var values = Quotes();
 
 		var first = await Update(values);
@@ -36,8 +36,8 @@ public sealed class CurrencyRateUpdaterTests : IntegrationTest
 
 		first.Changed.Should().HaveCount(Rates.Rates.Count);
 		second.Changed.Should().BeEmpty();
-		(await Context.CurrencyRates.CountAsync(CancellationToken)).Should().Be(Rates.Rates.Count);
-		var rows = await Context.CurrencyRates.AsNoTracking().ToListAsync(CancellationToken);
+		(await Context.Set<CurrencyRate>().CountAsync(CancellationToken)).Should().Be(Rates.Rates.Count);
+		var rows = await Context.Set<CurrencyRate>().AsNoTracking().ToListAsync(CancellationToken);
 		rows.Should().OnlyContain(row => row.Id > 0 && row.ToCurrencyId == BaseCurrency.Id);
 		foreach (var row in rows)
 			row.Rate.Should().Be(values[Rates.CurrencyTestContext.Currencies.Single(currency => currency.Id == row.FromCurrencyId).Code]);
@@ -48,16 +48,16 @@ public sealed class CurrencyRateUpdaterTests : IntegrationTest
 	{
 		var values = Quotes();
 		await Update(values);
-		var previous = await Context.CurrencyRates.AsNoTracking().OrderByDescending(row => row.CreatedAt).ThenByDescending(row => row.Id).FirstAsync(CancellationToken);
+		var previous = await Context.Set<CurrencyRate>().AsNoTracking().OrderByDescending(row => row.CreatedAt).ThenByDescending(row => row.Id).FirstAsync(CancellationToken);
 		var currency = Rates.CurrencyTestContext.Currencies.Single(row => row.Id == previous.FromCurrencyId);
-		var count = await Context.CurrencyRates.CountAsync(CancellationToken);
+		var count = await Context.Set<CurrencyRate>().CountAsync(CancellationToken);
 		values[currency.Code] = previous.Rate + 1m;
 
 		var result = await Update(values);
 
 		result.Changed.Should().ContainSingle().Which.Key.Should().Be(currency.Id);
-		(await Context.CurrencyRates.CountAsync(CancellationToken)).Should().Be(count + 1);
-		(await Context.CurrencyRates.AsNoTracking().SingleAsync(row => row.Id == previous.Id, CancellationToken)).Rate.Should().Be(previous.Rate);
+		(await Context.Set<CurrencyRate>().CountAsync(CancellationToken)).Should().Be(count + 1);
+		(await Context.Set<CurrencyRate>().AsNoTracking().SingleAsync(row => row.Id == previous.Id, CancellationToken)).Rate.Should().Be(previous.Rate);
 	}
 
 	[Fact]
@@ -73,7 +73,7 @@ public sealed class CurrencyRateUpdaterTests : IntegrationTest
 		var result = await Update(values);
 
 		result.Changed.Should().NotContainKey(currency.Id);
-		(await Context.CurrencyRates.CountAsync(row => row.FromCurrencyId == currency.Id, CancellationToken)).Should().Be(2);
+		(await Context.Set<CurrencyRate>().CountAsync(row => row.FromCurrencyId == currency.Id, CancellationToken)).Should().Be(2);
 	}
 
 	[Fact]
@@ -83,25 +83,25 @@ public sealed class CurrencyRateUpdaterTests : IntegrationTest
 		await Update(values);
 		var missing = Rates.CurrencyTestContext.Currencies.First(currency => currency.Id != BaseCurrency.Id);
 		values.Remove(missing.Code);
-		var count = await Context.CurrencyRates.CountAsync(CancellationToken);
+		var count = await Context.Set<CurrencyRate>().CountAsync(CancellationToken);
 
 		var result = await Update(values);
 
 		result.NotFound.Should().Equal(missing.Code);
 		result.Changed.Should().BeEmpty();
-		(await Context.CurrencyRates.CountAsync(CancellationToken)).Should().Be(count);
+		(await Context.Set<CurrencyRate>().CountAsync(CancellationToken)).Should().Be(count);
 	}
 
 	[Fact]
 	public async Task ConcurrentUpdates_WithSameQuotes_DoNotCreateDuplicateObservations()
 	{
-		await Context.CurrencyRates.ExecuteDeleteAsync(CancellationToken);
+		await Context.Set<CurrencyRate>().ExecuteDeleteAsync(CancellationToken);
 		var values = Quotes();
 
 		var results = await Task.WhenAll(Update(values), Update(values));
 
 		results.Sum(result => result.Changed.Count).Should().Be(Rates.Rates.Count);
-		(await Context.CurrencyRates.CountAsync(CancellationToken)).Should().Be(Rates.Rates.Count);
+		(await Context.Set<CurrencyRate>().CountAsync(CancellationToken)).Should().Be(Rates.Rates.Count);
 	}
 
 	private Dictionary<string, decimal> Quotes() => Rates.CurrencyTestContext.Currencies

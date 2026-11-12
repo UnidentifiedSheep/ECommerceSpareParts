@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Domain.CommonEntities.Job;
 using Main.Application.Configs;
 using Main.Application.Interfaces.Persistence;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Notification.Core.Entities;
 using Notification.Persistence;
 using Persistence.Common;
+using Persistence.Extensions;
 using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
 using UserRepository = Main.Persistence.Repositories.User.UserRepository;
 
@@ -21,7 +23,8 @@ public static class ServiceProvider
 {
 	public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
 	{
-		collection.AddPersistenceBase<DContext>(
+		collection.AddDbContextModule<MainDbContextModule>();
+		collection.AddPersistenceBase<UnifiedDbContext>(
 			ValidationConfiguration.Configure,
 			typeof(BasicEfRepository<,>),
 			typeof(BasicLinqRepository<,>),
@@ -29,10 +32,10 @@ public static class ServiceProvider
 			typeof(Product).Assembly,
 			typeof(InAppNotification).Assembly,
 			typeof(JobSchedule).Assembly);
-		collection.AddNotificationPersistence<DContext>();
+		collection.AddNotificationPersistence<UnifiedDbContext>();
 
 		collection.AddDbContext<BulkProductContext>((serviceProvider, options) =>
-			options.UseNpgsql(serviceProvider.GetRequiredService<DContext>().Database.GetDbConnection()));
+			options.UseNpgsql(serviceProvider.GetRequiredService<UnifiedDbContext>().Database.GetDbConnection()));
 
 		collection.AddScoped<IProductRepository, ProductRepository>();
 		collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();

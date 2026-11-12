@@ -1,3 +1,4 @@
+using Main.Entities.Purchase;
 using Main.Entities;
 using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
@@ -69,18 +70,18 @@ public class EditPurchaseTests : IntegrationTest
 		await Mediator.Send(editCommand, CancellationToken);
 
 		var updatedPurchase =
-			await Context.Purchases.Include(x => x.Contents).AsNoTracking().SingleAsync(CancellationToken);
+			await Context.Set<Purchase>().Include(x => x.Contents).AsNoTracking().SingleAsync(CancellationToken);
 		var updatedContent = updatedPurchase.Contents.Single();
 		var storageContent = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == updatedContent.StorageContentId, CancellationToken);
 		var oldTransaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == oldTransactionId, CancellationToken);
 		var newTransaction = await Context
-			.Transactions
+			.Set<global::Main.Entities.Balance.Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == updatedPurchase.TransactionId, CancellationToken);
 		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
@@ -131,8 +132,8 @@ public class EditPurchaseTests : IntegrationTest
 		await Mediator.Send(editCommand, CancellationToken);
 
 		var updatedPurchase =
-			await Context.Purchases.Include(x => x.Contents).AsNoTracking().SingleAsync(CancellationToken);
-		var contents = await Context.StorageContents.AsNoTracking().ToListAsync(CancellationToken);
+			await Context.Set<Purchase>().Include(x => x.Contents).AsNoTracking().SingleAsync(CancellationToken);
+		var contents = await Context.Set<StorageContent>().AsNoTracking().ToListAsync(CancellationToken);
 		var removedProductStockQuantity = await Context.GetProductStockQuantityAsync(products[0].Id, CancellationToken);
 		var addedProductStockQuantity = await Context.GetProductStockQuantityAsync(products[1].Id, CancellationToken);
 
@@ -154,7 +155,7 @@ public class EditPurchaseTests : IntegrationTest
 		var storageContentId = content.StorageContentId;
 		content.SetCount(10);
 		PurchaseContext.StorageContent.IncreaseCount(8, StorageMovementType.PurchaseEditing);
-		var stock = await Context.ProductStocks.SingleAsync(
+		var stock = await Context.Set<ProductStock>().SingleAsync(
 			item => item.ProductId == product.Id && item.StorageCode == PurchaseContext.StorageContent.StorageCode, CancellationToken);
 		stock.SetQuantity(stock.Quantity + 8);
 		await Context.SaveChangesAsync(CancellationToken);
@@ -187,9 +188,9 @@ public class EditPurchaseTests : IntegrationTest
 			CancellationToken);
 
 		var updatedPurchaseContent =
-			await Context.PurchaseContents.AsNoTracking().SingleAsync(CancellationToken);
+			await Context.Set<PurchaseContent>().AsNoTracking().SingleAsync(CancellationToken);
 		var updatedStorageContent = await Context
-			.StorageContents
+			.Set<global::Main.Entities.Storage.StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
 		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
@@ -230,7 +231,7 @@ public class EditPurchaseTests : IntegrationTest
 		await Mediator.Send(editCommand, CancellationToken);
 
 		var updatedPurchase = await Context
-			.Purchases
+			.Set<global::Main.Entities.Purchase.Purchase>()
 			.Include(x => x.PurchaseLogistic)
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.PurchaseContentLogistic)
@@ -244,7 +245,7 @@ public class EditPurchaseTests : IntegrationTest
 		if (updatedPurchase.PurchaseLogistic.TransactionId is not null)
 		{
 			var logisticsTransaction = await Context
-				.Transactions
+				.Set<global::Main.Entities.Balance.Transaction>()
 				.AsNoTracking()
 				.SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId, CancellationToken);
 
@@ -298,7 +299,7 @@ public class EditPurchaseTests : IntegrationTest
 			CancellationToken);
 
 		var updatedPurchase = await Context
-			.Purchases
+			.Set<global::Main.Entities.Purchase.Purchase>()
 			.Include(x => x.PurchaseLogistic)
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.PurchaseContentLogistic)
@@ -311,7 +312,7 @@ public class EditPurchaseTests : IntegrationTest
 
 	private async Task AddStorageOwner(StorageRoute route, Guid supplierId)
 	{
-		Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageCode, supplierId));
+		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, supplierId));
 		await Context.SaveChangesAsync();
 	}
 }

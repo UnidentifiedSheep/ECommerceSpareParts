@@ -1,16 +1,16 @@
+using Persistence.Context;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Pricing.Persistence.Contexts;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 
 namespace Pricing.Integration.Tests;
 
 public abstract class LrtIntegrationTest<TLrt>(CombinedContainerFixture fixture)
-	: LrtIntegrationTestBase<TLrt, ServiceProviderBuilder, ServiceProviderArguments, DContext>
+	: LrtIntegrationTestBase<TLrt, ServiceProviderBuilder, ServiceProviderArguments, UnifiedDbContext>
 	where TLrt : class, ILrtNamedObject
 {
 	private TestEnvironmentLease _environmentLease = null!;

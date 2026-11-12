@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Security.Core.Interfaces;
 using Application.Common.Interfaces.Validators;
 using Main.Entities.Auth;
@@ -11,13 +12,13 @@ using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
-public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
+public class AdminSeed(IPasswordManager passwordManager) : ISeed<UnifiedDbContext>
 {
 	private const string AdministratorName = "Administrator";
 
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
-		var user = await context.Users.SingleOrDefaultAsync(x => x.UserName == AdministratorName);
+		var user = await context.Set<User>().SingleOrDefaultAsync(x => x.UserName == AdministratorName);
 
 		if (user is null)
 		{
@@ -38,11 +39,11 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
 				true,
 				true);
 
-			await context.Users.AddAsync(user);
+			await context.Set<User>().AddAsync(user);
 		}
 
-		if (!await context.Organizations.AnyAsync(x => x.Id == user.Id))
-			await context.Organizations.AddAsync(Organization.CreateIndividual(AdministratorName, user.Id));
+		if (!await context.Set<Organization>().AnyAsync(x => x.Id == user.Id))
+			await context.Set<Organization>().AddAsync(Organization.CreateIndividual(AdministratorName, user.Id));
 
 		await context.SaveChangesAsync();
 	}

@@ -1,3 +1,5 @@
+using Main.Entities.Product;
+using Persistence.Context;
 using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Producer;
@@ -8,11 +10,11 @@ using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Main.Persistence.Repositories.Producer;
 
-public class ProducerRepository(DContext context, QueryExtensions extensions)
-	: LinqRepositoryBase<DContext, Entities.Producer.Producer, int>(context, extensions), IProducerRepository
+public class ProducerRepository(UnifiedDbContext context, QueryExtensions extensions)
+	: LinqRepositoryBase<UnifiedDbContext, Entities.Producer.Producer, int>(context, extensions), IProducerRepository
 {
 	public Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default) =>
-		Context.Products.AsNoTracking().AnyAsync(x => x.ProducerId == producerId, cancellationToken);
+		Context.Set<Main.Entities.Product.Product>().AsNoTracking().AnyAsync(x => x.ProducerId == producerId, cancellationToken);
 
 	public async Task AddSupplierMappingsOnConflictDoNothingAsync(
 		IEnumerable<ProducerSupplierMapping> mappings,

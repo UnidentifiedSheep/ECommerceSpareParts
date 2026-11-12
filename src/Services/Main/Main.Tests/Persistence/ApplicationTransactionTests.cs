@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Persistence;
 using Attributes;
@@ -21,7 +22,7 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	public async Task Factory_EachBatchStartsWithAnEmptyTrackerAndDisposesItsContext()
 	{
 		var factory = Scope.ServiceProvider.GetRequiredService<IApplicationTransactionFactory>();
-		var contexts = new List<DContext>();
+		var contexts = new List<UnifiedDbContext>();
 		var initialTracked = Context.ChangeTracker.Entries().Count();
 		for (var batch = 0; batch < 10; batch++)
 		{
@@ -29,12 +30,12 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 			await transaction.ExecuteAsync((context, _) =>
 			{
 				context.GetRequiredService<IApplicationTransaction>().Should().BeSameAs(transaction);
-				var db = context.GetRequiredService<DContext>();
+				var db = context.GetRequiredService<UnifiedDbContext>();
 				db.Should().NotBeSameAs(Context);
 				db.ChangeTracker.Entries().Should().BeEmpty();
 				contexts.Add(db);
 				for (var item = 0; item < 100; item++)
-					db.Producers.Add(Producer.Create($"batch-{batch}-{item}"));
+					db.Set<Producer>().Add(Producer.Create($"batch-{batch}-{item}"));
 				db.ChangeTracker.Entries().Should().HaveCount(100);
 				return Task.CompletedTask;
 			}, CancellationToken);
@@ -244,7 +245,7 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 
 		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => transaction.ExecuteAsync(async (_, ct) =>
 		{
-			Context.Characteristics.Add(Characteristic.Create("Cancelled"));
+			Context.Set<Characteristic>().Add(Characteristic.Create("Cancelled"));
 			await Context.SaveChangesAsync(ct);
 			await cancellation.CancelAsync();
 			ct.ThrowIfCancellationRequested();
@@ -252,7 +253,7 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 
 		handled.Should().BeFalse();
 		Context.Database.CurrentTransaction.Should().BeNull();
-		(await Context.Characteristics.AsNoTracking().AnyAsync(characteristic => characteristic.Name == "Cancelled", CancellationToken))
+		(await Context.Set<Characteristic>().AsNoTracking().AnyAsync(characteristic => characteristic.Name == "Cancelled", CancellationToken))
 			.Should().BeFalse();
 	}
 

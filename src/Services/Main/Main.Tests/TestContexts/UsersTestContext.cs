@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Enums;
 using Main.Entities.Auth;
 using Main.Entities.User;
@@ -9,7 +10,7 @@ using Tests.Extensions;
 
 namespace Tests.TestContexts;
 
-public class UsersTestContext(DContext context) : TestContextBase<DContext>(context)
+public class UsersTestContext(UnifiedDbContext context) : TestContextBase<UnifiedDbContext>(context)
 {
 	public IReadOnlyCollection<User> Users { get; private set; } = null!;
 

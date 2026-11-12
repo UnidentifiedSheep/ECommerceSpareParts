@@ -1,37 +1,17 @@
-﻿using System.Reflection;
 using Domain.CommonEntities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Common;
 using Persistence.Common.BaseTableConfigurations;
-using Pricing.Entities;
-using Pricing.Entities.Offers;
+using Persistence.Interfaces;
 using Pricing.Entities.Settings;
 
-namespace Pricing.Persistence.Contexts;
+namespace Pricing.Persistence;
 
-public partial class DContext : DbContext
+public sealed class PricingDbContextModule : IDbContextModule
 {
-	public DContext()
-	{
-	}
-
-	public DContext(DbContextOptions<DContext> options) : base(options)
-	{
-	}
-
-	public virtual DbSet<MarkupGroup> MarkupGroups { get; set; }
-
-	public virtual DbSet<MarkupRange> MarkupRanges { get; set; }
-
-	public virtual DbSet<PriceOffer> PriceOffers { get; set; }
-
-	public virtual DbSet<ProductPriceOption> ProductPriceOptions { get; set; }
-
-	public virtual DbSet<PriceOfferRefreshState> PriceOfferRefreshStates { get; set; }
-
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	public void Configure(ModelBuilder modelBuilder)
 	{
 		modelBuilder.AddOutboxMessageEntity();
 		modelBuilder.AddOutboxStateEntity();
@@ -42,7 +22,7 @@ public partial class DContext : DbContext
 		modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
 
 		modelBuilder
-			.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
+			.ApplyConfigurationsFromAssembly(typeof(PricingDbContextModule).Assembly)
 			.ApplyConfiguration(new SettingConfiguration())
 			.ApplyJobConfigurations();
 
@@ -56,9 +36,5 @@ public partial class DContext : DbContext
 		modelBuilder.AddFieldsForAuditableEntities();
 
 		modelBuilder.AllDateTimesToUtc().AllEnumsToString();
-
-		OnModelCreatingPartial(modelBuilder);
 	}
-
-	partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

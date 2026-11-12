@@ -20,7 +20,7 @@ public sealed class UserRepositoryTests(CombinedContainerFixture fixture) : Inte
 		Context.ChangeTracker.Clear();
 		var repository = Scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
-		var users = await repository.Search(Context.Users, "repository")
+		var users = await repository.Search(Context.Set<User>(), "repository")
 			.Where(user => user.Id == expected.Id)
 			.Take(1)
 			.ToListAsync(CancellationToken);
@@ -41,7 +41,7 @@ public sealed class UserRepositoryTests(CombinedContainerFixture fixture) : Inte
 		var repository = Scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
 		var matches = await repository.SearchWithRank(
-			Context.Users.Where(user => user.Id != excluded.Id), "космонавтов")
+			Context.Set<User>().Where(user => user.Id != excluded.Id), "космонавтов")
 			.ToListAsync(CancellationToken);
 
 		matches.Select(match => match.User.Id).Should().Equal(identityMatch.Id, descriptionMatch.Id);

@@ -22,7 +22,7 @@ public sealed class ProductEanImportLrtTests : CsvLrtIntegrationTest<ProductEanI
 		var product = await new ProductBuilder(Faker)
 			.WithProducerId(producerId)
 			.BuildAndAddToDb(Context, CancellationToken);
-		Context.ProductEans.Add(ProductEan.Create(product.Id, "4601234567890"));
+		Context.Set<ProductEan>().Add(ProductEan.Create(product.Id, "4601234567890"));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -39,7 +39,7 @@ public sealed class ProductEanImportLrtTests : CsvLrtIntegrationTest<ProductEanI
 		var state = execution.GetState<ProductEanImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Errors.Should().ContainSingle(error => error.RowIdx == 4);
-		var eans = await Context.ProductEans.AsNoTracking()
+		var eans = await Context.Set<ProductEan>().AsNoTracking()
 			.Where(x => x.ProductId == product.Id)
 			.Select(x => x.Ean)
 			.ToListAsync(CancellationToken);

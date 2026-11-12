@@ -1,19 +1,19 @@
+using Persistence.Context;
 using Security.Core.Interfaces;
 using Abstractions.Interfaces;
 using EFCore.BulkExtensions;
 using Persistence.Repository;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities.Offers;
-using Pricing.Persistence.Contexts;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Pricing.Persistence.Repositories;
 
 public class ProductPriceOptionRepository(
-	DContext context,
+	UnifiedDbContext context,
 	IUserContext userContext,
 	IQueryableExtensions extensions)
-	: LinqRepositoryBase<DContext, ProductPriceOption, Guid>(context, extensions),
+	: LinqRepositoryBase<UnifiedDbContext, ProductPriceOption, Guid>(context, extensions),
 		IProductPriceOptionRepository
 {
 	public async Task UpsertAsync(

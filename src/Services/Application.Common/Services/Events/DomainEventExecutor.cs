@@ -12,6 +12,7 @@ public sealed class DomainEventExecutor(
 	IUnitOfWork? unitOfWork = null) : IDomainEventExecutor
 {
 	private const int MaxDispatchRounds = 10;
+	private bool _dispatchingBeforeSave;
 
 	public async Task ExecuteAsync(Func<Task> action, CancellationToken cancellationToken = default)
 	{
@@ -45,6 +46,9 @@ public sealed class DomainEventExecutor(
 
 	public async Task DispatchBeforeSaveAsync(CancellationToken cancellationToken = default)
 	{
+		if (_dispatchingBeforeSave)
+			throw new InvalidOperationException("Before-save handlers must not call SaveChanges.");
+		_dispatchingBeforeSave = true;
 		using var collection = eventScope.EnableCollection();
 		try
 		{
@@ -55,6 +59,7 @@ public sealed class DomainEventExecutor(
 			eventScope.Flush();
 			throw;
 		}
+		finally { _dispatchingBeforeSave = false; }
 	}
 
 	private async Task DispatchAsync(CancellationToken cancellationToken, bool beforeSave = false)

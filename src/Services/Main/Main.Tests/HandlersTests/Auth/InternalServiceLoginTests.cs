@@ -1,3 +1,5 @@
+using Main.Entities.Auth;
+using Main.Entities.User;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using FluentAssertions;
@@ -34,8 +36,8 @@ public sealed class InternalServiceLoginTests(CombinedContainerFixture fixture) 
 		principal.IsInRole("SYSTEM").Should().BeTrue();
 		new JwtSecurityTokenHandler().ReadJwtToken(result.Token).ValidTo
 			.Should().BeOnOrAfter(before.AddMinutes(75).AddSeconds(-1)).And.BeOnOrBefore(DateTime.UtcNow.AddMinutes(75));
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
-		(await Context.Users.AsNoTracking().SingleAsync(x => x.Id == user.Id, CancellationToken)).LastLoginAt.Should().BeNull();
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<User>().AsNoTracking().SingleAsync(x => x.Id == user.Id, CancellationToken)).LastLoginAt.Should().BeNull();
 	}
 
 	[Theory]
@@ -51,6 +53,6 @@ public sealed class InternalServiceLoginTests(CombinedContainerFixture fixture) 
 		var action = () => Mediator.Send(new InternalServiceLoginCommand(service, secret), CancellationToken);
 
 		await action.Should().ThrowAsync<WrongCredentialsException>();
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 }

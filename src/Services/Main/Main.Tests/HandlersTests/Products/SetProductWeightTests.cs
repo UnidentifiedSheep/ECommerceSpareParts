@@ -30,7 +30,7 @@ public class SetProductWeightTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var weight = await Context
-			.ProductWeights
+			.Set<global::Main.Entities.Product.ProductWeight>()
 			.AsNoTracking()
 			.SingleAsync(x => x.ProductId == product.Id, CancellationToken);
 
@@ -56,7 +56,7 @@ public class SetProductWeightTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var weights = await Context
-			.ProductWeights
+			.Set<global::Main.Entities.Product.ProductWeight>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == product.Id)
 			.ToListAsync(CancellationToken);

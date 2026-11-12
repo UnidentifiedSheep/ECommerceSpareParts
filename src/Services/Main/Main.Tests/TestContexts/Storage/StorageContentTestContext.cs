@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Entities.Storage;
 using Main.Enums;
 using Main.Persistence.Context;
@@ -10,10 +11,10 @@ using Tests.TestContexts.Currency;
 namespace Tests.TestContexts.Storage;
 
 public class StorageContentTestContext(
-	DContext ctx,
+	UnifiedDbContext ctx,
 	StorageTestContext storage,
 	ProductTestContext product,
-	CurrencyTestContext currency) : TestContextBase<DContext>(ctx), IDependentTestContext
+	CurrencyTestContext currency) : TestContextBase<UnifiedDbContext>(ctx), IDependentTestContext
 {
 	public IReadOnlyCollection<StorageContent> StorageContents { get; private set; } = null!;
 

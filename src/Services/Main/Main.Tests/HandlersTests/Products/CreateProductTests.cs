@@ -88,7 +88,7 @@ public class CreateProductTests : IntegrationTest
 		dbProduct.ProducerId.Should().Be(product.ProducerId);
 	}
 
-	private async Task<List<Product>> GetProducts() => await TestContext.DbContext.Products.ToListAsync();
+	private async Task<List<Product>> GetProducts() => await TestContext.DbContext.Set<global::Main.Entities.Product.Product>().ToListAsync();
 
 	private List<CreateProductDto> CreateDtos(int count)
 	{

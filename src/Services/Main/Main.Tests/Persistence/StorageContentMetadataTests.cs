@@ -1,3 +1,4 @@
+using Main.Entities.Storage;
 using FluentAssertions;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ public sealed class StorageContentMetadataTests : IntegrationTest
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First();
 
-		var loaded = await Context.StorageContents.AsNoTracking()
+		var loaded = await Context.Set<StorageContent>().AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 
 		loaded.Metadata.LastMovementType.Should().Be(StorageMovementType.StorageContentAddition);
@@ -30,7 +31,7 @@ public sealed class StorageContentMetadataTests : IntegrationTest
 			$"UPDATE public.storage_content SET metadata = '{{}}'::jsonb WHERE id = {content.Id}",
 			CancellationToken);
 
-		var loaded = await Context.StorageContents.AsNoTracking()
+		var loaded = await Context.Set<StorageContent>().AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 
 		loaded.Metadata.LastMovementType.Should().BeNull();

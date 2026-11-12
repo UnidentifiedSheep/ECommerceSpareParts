@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
@@ -102,7 +103,7 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 
 		await Add(content);
 
-		(await Context.ProductStocks.AnyAsync(CancellationToken)).Should().BeFalse();
+		(await Context.Set<ProductStock>().AnyAsync(CancellationToken)).Should().BeFalse();
 		(await Total(content.ProductId)).Should().Be(0);
 	}
 
@@ -125,7 +126,7 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 
 		(await Quantity(content)).Should().Be(5);
 		(await Total(content.ProductId)).Should().Be(5);
-		(await Context.StorageContents.AsNoTracking().SingleAsync(item => item.Id == content.Id, CancellationToken)).Count.Should().Be(5);
+		(await Context.Set<StorageContent>().AsNoTracking().SingleAsync(item => item.Id == content.Id, CancellationToken)).Count.Should().Be(5);
 	}
 
 	[Fact]
@@ -152,7 +153,7 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 
 		await Task.WhenAll(Apply(4), Apply(7));
 
-		(await Context.ProductStocks.CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<ProductStock>().CountAsync(CancellationToken)).Should().Be(1);
 		(await Quantity(content)).Should().Be(11);
 		(await Total(content.ProductId)).Should().Be(11);
 	}
@@ -195,7 +196,7 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 	{
 		var content = NewContent(0, 0, 5);
 		await Add(content);
-		var originalVersion = await Context.Products.AsNoTracking().Where(product => product.Id == content.ProductId)
+		var originalVersion = await Context.Set<Product>().AsNoTracking().Where(product => product.Id == content.ProductId)
 			.Select(product => product.RowVersion).SingleAsync(CancellationToken);
 
 		await Execute(async () =>
@@ -205,7 +206,7 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 		});
 
 		(await Quantity(content)).Should().Be(7);
-		var currentVersion = await Context.Products.AsNoTracking().Where(product => product.Id == content.ProductId)
+		var currentVersion = await Context.Set<Product>().AsNoTracking().Where(product => product.Id == content.ProductId)
 			.Select(product => product.RowVersion).SingleAsync(CancellationToken);
 		currentVersion.Should().Be(originalVersion);
 	}
@@ -226,9 +227,9 @@ public class UpdateProductStockHandlerTests : IntegrationTest
 		.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (_, _) => await action(), CancellationToken);
 
 	private async Task<int> Quantity(StorageContent content) =>
-		(await Context.ProductStocks.AsNoTracking().SingleAsync(
+		(await Context.Set<ProductStock>().AsNoTracking().SingleAsync(
 			stock => stock.ProductId == content.ProductId && stock.StorageCode == content.StorageCode, CancellationToken)).Quantity;
 
-	private Task<int> Total(int productId) => Context.ProductStocks.AsNoTracking()
+	private Task<int> Total(int productId) => Context.Set<ProductStock>().AsNoTracking()
 		.Where(stock => stock.ProductId == productId).SumAsync(stock => stock.Quantity, CancellationToken);
 }

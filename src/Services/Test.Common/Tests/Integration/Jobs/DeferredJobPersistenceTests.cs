@@ -24,7 +24,7 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		var (step, _) = await CreateLeasedStepAsync();
 		Context.ChangeTracker.Clear();
 
-		var saved = await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
+		var saved = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
 
 		saved.InputInitialized.Should().BeFalse();
 		saved.StepKey.Should().Be("import");
@@ -49,7 +49,7 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		}, CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var committed = await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
+		var committed = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
 		committed.InputInitialized.Should().BeTrue();
 		committed.Status.Should().Be(JobStatus.Succeeded);
 		committed.Output.Should().Be("{\"StorageKey\":\"files/result.csv\"}");
@@ -75,7 +75,7 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		await action.Should().ThrowAsync<InvalidOperationException>().WithMessage("rollback after save");
 
 		Context.ChangeTracker.Clear();
-		var rolledBack = await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
+		var rolledBack = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
 		rolledBack.InputInitialized.Should().BeFalse();
 		rolledBack.Status.Should().Be(JobStatus.Locked);
 		rolledBack.Output.Should().BeNull();
@@ -90,7 +90,7 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
-		var saved = await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == job.Id, CancellationToken);
+		var saved = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == job.Id, CancellationToken);
 
 		saved.InputInitialized.Should().BeTrue();
 		saved.State.Should().Be("{}");
@@ -165,7 +165,7 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		await Task.WhenAll(PrepareInputAsync(), PrepareInputAsync());
 
 		Context.ChangeTracker.Clear();
-		var saved = await Context.Jobs.AsNoTracking().SingleAsync(x => x.Id == consumer.Id, CancellationToken);
+		var saved = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == consumer.Id, CancellationToken);
 		saved.InputInitialized.Should().BeTrue();
 		LrtStateSerializer.DeserializeInput<FileInput>(saved.State).StorageKey.Should().Be("files/persisted.csv");
 		preparations.Should().Be(1);

@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
@@ -16,11 +17,11 @@ using DomainPurchase = Main.Entities.Purchase.Purchase;
 namespace Tests.TestContexts.Purchase;
 
 public class PurchaseTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	UserContextTestContext userContext,
 	ProductTestContext productContext,
 	CurrencyTestContext currencyContext,
-	StorageRouteTestContext storageRouteContext) : TestContextBase<DContext>(context), IDependentTestContext
+	StorageRouteTestContext storageRouteContext) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public User Supplier { get; private set; } = null!;
 

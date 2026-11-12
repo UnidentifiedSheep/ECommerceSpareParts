@@ -1,4 +1,5 @@
-﻿using Main.Entities.Producer;
+﻿using Persistence.Context;
+using Main.Entities.Producer;
 using Main.Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
@@ -6,7 +7,7 @@ using Tests.Extensions;
 
 namespace Tests.TestContexts;
 
-public class ProducerTestContext(DContext context) : TestContextBase<DContext>(context)
+public class ProducerTestContext(UnifiedDbContext context) : TestContextBase<UnifiedDbContext>(context)
 {
 	private readonly List<Producer> _producers = [];
 

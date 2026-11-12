@@ -1,4 +1,4 @@
-using Pricing.Persistence.Contexts;
+using Persistence.Context;
 using Security.Core.Interfaces;
 using System.Globalization;
 using Abstractions.Interfaces;
@@ -67,7 +67,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 					Url = args.CacheConnectionString, Password = null
 				}));
 
-		services.ConfigureDbContext<DContext>(options =>
+		services.ConfigureDbContext<UnifiedDbContext>(options =>
 			options.UseNpgsql(pgsql => pgsql.MigrationsAssembly("Pricing.Migrator")));
 
 		var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
