@@ -230,6 +230,8 @@
     "permissions.orders.confirm.name": "Siparişleri onaylama",
     "permissions.orders.confirm.description": "Siparişleri onaylama izni.",
     "permissions.orders.cancel.name": "Siparişleri iptal etme",
-    "permissions.orders.cancel.description": "Siparişleri iptal etme izni."
+    "permissions.orders.cancel.description": "Siparişleri iptal etme izni.",
+    "permissions.options.edit.name": "Ayarları düzenle",
+    "permissions.options.edit.description": "Ayarları değiştirme izni."
   }
 }

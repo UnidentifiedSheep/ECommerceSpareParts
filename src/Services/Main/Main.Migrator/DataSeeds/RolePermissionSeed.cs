@@ -1,4 +1,5 @@
-﻿using Enums;
+using Enums;
+using LinqKit;
 using Main.Entities.Auth;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -55,10 +56,30 @@ public class RolePermissionSeed : ISeed<DContext>
 			return;
 
 		await context.AddRangeAsync(newRolePermissions);
+		await ClearRetiredRolePermissions(context);
 		await context.SaveChangesAsync();
 	}
 
 	public int ExecutionOrder => 1;
+
+	private static async Task ClearRetiredRolePermissions(DContext context)
+	{
+		var predicate = PredicateBuilder.New<RolePermission>(false);
+
+		foreach (var (role, perm) in RetiredPermissions)
+			predicate = predicate.Or(x => x.RoleName == role && perm == x.PermissionName);
+
+		var rp = await context.Set<RolePermission>().Where(predicate).ToListAsync();
+		context.RemoveRange(rp);
+	}
+
+	private static IReadOnlyList<(string, string)> RetiredPermissions { get; } = new List<(Role, PermissionCodes)>
+	{
+		(Role.Member, PermissionCodes.JOBS_CREATE),
+		(Role.Member, PermissionCodes.JOBS_GET)
+	}
+	.Select(x => (RoleNames.Normalize(x.Item1.ToString()), Permission.ToNormalizedPermission(x.Item2)))
+	.ToList();
 
 	private static IReadOnlyDictionary<Role, PermissionCodes[]> BuildRolePermissions()
 	{
@@ -156,6 +177,7 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.STORAGES_EDIT,
 				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
 				PermissionCodes.OPTIONS_GET,
+				PermissionCodes.OPTIONS_EDIT,
 				PermissionCodes.STORAGE_ROUTES_GET,
 				PermissionCodes.STORAGE_ROUTES_EDIT,
 				PermissionCodes.STORAGE_ROUTES_CREATE,
@@ -174,7 +196,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.ORDERS_GET,
 				PermissionCodes.ORDERS_GET_OWN,
 				PermissionCodes.ORDERS_EDIT,
-				PermissionCodes.ORDERS_PRICE_EDIT,
 				PermissionCodes.ORDERS_CONFIRM,
 				PermissionCodes.ORDERS_CANCEL
 			],
@@ -368,6 +389,7 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.STORAGES_EDIT,
 				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
 				PermissionCodes.OPTIONS_GET,
+				PermissionCodes.OPTIONS_EDIT,
 				PermissionCodes.STORAGE_ROUTES_GET,
 				PermissionCodes.STORAGE_ROUTES_EDIT,
 				PermissionCodes.STORAGE_ROUTES_CREATE,
@@ -386,7 +408,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.ORDERS_GET,
 				PermissionCodes.ORDERS_GET_OWN,
 				PermissionCodes.ORDERS_EDIT,
-				PermissionCodes.ORDERS_PRICE_EDIT,
 				PermissionCodes.ORDERS_CONFIRM,
 				PermissionCodes.ORDERS_CANCEL
 			]

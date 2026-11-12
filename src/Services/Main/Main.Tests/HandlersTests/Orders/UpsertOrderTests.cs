@@ -1,6 +1,6 @@
+using Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Exceptions;
-using Main.Entities.Exceptions;
 using Main.Enums.Orders;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -145,10 +145,10 @@ public class UpsertOrderTests : IntegrationTest
 		var removed = order.Items[1];
 		order.RemoveItem(removed);
 		await Context.SaveChangesAsync(CancellationToken);
-		var userContext = (global::Tests.Stubs.UserContextMock)Scope.ServiceProvider
+		var userContext = (Stubs.UserContextMock)Scope.ServiceProvider
 			.GetRequiredService<Security.Core.Interfaces.IUserContext>();
 		userContext.SetIsAuthenticated(true).SetUserId(order.UserId!.Value)
-			.SetPermissions([Main.Entities.Auth.Permission.ToNormalizedPermission(Enums.PermissionCodes.ORDERS_GET)]);
+			.SetPermissions([Main.Entities.Auth.Permission.ToNormalizedPermission(PermissionCodes.ORDERS_GET)]);
 
 		var result = await Mediator.Send(new Main.Application.Orders.Queries.GetOrderItemsByOrderIdsQuery(order.Id), CancellationToken);
 		result.Items[order.Id].Should().ContainSingle().Which.Id.Should().NotBe(removed.Id);

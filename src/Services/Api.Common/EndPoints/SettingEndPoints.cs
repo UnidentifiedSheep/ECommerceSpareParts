@@ -60,6 +60,6 @@ public class SettingEndPoints : ICarterModule
 			.Produces(StatusCodes.Status204NoContent)
 			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
-			.RequireAllPermissions(PermissionCodes.OPTIONS_GET);
+			.RequireAllPermissions(PermissionCodes.OPTIONS_EDIT);
 	}
 }

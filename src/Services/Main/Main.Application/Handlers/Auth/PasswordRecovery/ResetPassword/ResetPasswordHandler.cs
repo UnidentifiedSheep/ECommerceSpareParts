@@ -1,4 +1,6 @@
-﻿using Security.Core.Interfaces;
+using Application.Common.Interfaces.Repositories;
+using Main.Entities.User;
+using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Validators;
 using Attributes;
@@ -28,11 +30,21 @@ public class ResetPasswordHandler(
 			!await resetPayloadProvider.IsTokenValid(payload.Id) || payload.Type != ResetType.PasswordReset)
 			throw new ResetTokenExpiredException();
 
-		var user = await userRepository.GetById(payload.UserId, cancellationToken) ??
+		var user = await userRepository.FirstOrDefaultAsync(
+				Criteria<User>.New()
+					.Where(user => user.Id == payload.UserId)
+					.Track()
+					.ForUpdate()
+					.Build(),
+				cancellationToken) ??
 			throw new UserNotFoundException(payload.UserId);
 		var pwdHash = pwdManager.GetHashOfPassword(request.NewPassword);
 
 		user.SetPasswordHash(pwdHash);
+		await userRepository.RevokeRefreshTokensAsync(
+			user.Id,
+			"Password changed",
+			cancellationToken);
 		return Unit.Value;
 	}
 }

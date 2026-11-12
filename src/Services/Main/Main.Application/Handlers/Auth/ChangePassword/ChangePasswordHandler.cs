@@ -1,4 +1,6 @@
-﻿using Security.Core.Interfaces;
+using Application.Common.Interfaces.Repositories;
+using Main.Entities.User;
+using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Validators;
 using Attributes;
@@ -17,7 +19,13 @@ public class ChangePasswordHandler(IUserRepository userRepository, IPasswordMana
 {
 	public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
 	{
-		var user = await userRepository.GetById(request.UserId, cancellationToken) ??
+		var user = await userRepository.FirstOrDefaultAsync(
+				Criteria<User>.New()
+					.Where(user => user.Id == request.UserId)
+					.Track()
+					.ForUpdate()
+					.Build(),
+				cancellationToken) ??
 			throw new UserNotFoundException(request.UserId);
 
 		if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.PreviousPassword))
@@ -25,6 +33,10 @@ public class ChangePasswordHandler(IUserRepository userRepository, IPasswordMana
 
 		user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
 
+		await userRepository.RevokeRefreshTokensAsync(
+			user.Id,
+			"Password changed",
+			cancellationToken);
 		return Unit.Value;
 	}
 }

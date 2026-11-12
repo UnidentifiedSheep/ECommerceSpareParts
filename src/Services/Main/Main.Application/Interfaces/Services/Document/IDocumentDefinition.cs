@@ -1,3 +1,4 @@
+using Enums;
 using Locan.Core.Interfaces;
 using Main.Enums.Documents;
 using NamedObject.Core.Interfaces;
@@ -16,6 +17,7 @@ public interface IDocumentDefinition<in TRequest, TResponse> : IDocumentDefiniti
 public interface IDocumentDefinition : INamedObject
 {
 	string DocumentGroup { get; }
+	IReadOnlyCollection<PermissionCodes> RequiredPermissions { get; }
 	Type SchemaType { get; }
 	Type RequestType { get; }
 	bool SupportsDocumentType(DocumentType documentType);

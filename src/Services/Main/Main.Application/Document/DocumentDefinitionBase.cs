@@ -1,3 +1,4 @@
+using Enums;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -29,6 +30,7 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 
 	public abstract string SystemName { get; }
 	public abstract string DocumentGroup { get; }
+	public abstract IReadOnlyCollection<PermissionCodes> RequiredPermissions { get; }
 	public abstract ILocalizableMessage Name { get; }
 	public abstract ILocalizableMessage Description { get; }
 	public Type SchemaType => typeof(TSchema);

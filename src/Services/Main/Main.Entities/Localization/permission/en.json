@@ -230,6 +230,8 @@
     "permissions.orders.confirm.name": "Confirm orders",
     "permissions.orders.confirm.description": "Permission to confirm orders.",
     "permissions.orders.cancel.name": "Cancel orders",
-    "permissions.orders.cancel.description": "Permission to cancel orders."
+    "permissions.orders.cancel.description": "Permission to cancel orders.",
+    "permissions.options.edit.name": "Edit settings",
+    "permissions.options.edit.description": "Permission to modify settings."
   }
 }

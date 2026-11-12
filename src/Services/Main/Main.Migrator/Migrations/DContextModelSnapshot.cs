@@ -196,6 +196,8 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("WhoUpdated")
                         .HasDatabaseName("domain.commonentities.job.singlerunjob_who_updated_idx");
 
+                    b.HasIndex(new[] { "CreatedAt" }, "jobs_created_at_idx");
+
                     b.HasIndex(new[] { "LockedAt" }, "jobs_locked_at_idx");
 
                     b.HasIndex(new[] { "MultiStepJobId" }, "jobs_multi_step_job_id_idx");
@@ -1183,6 +1185,28 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "UserId" }, "orders_user_id_index");
 
                     b.ToTable("orders", "public");
+                });
+
+            modelBuilder.Entity("Main.Entities.Order.OrderFulfillment", b =>
+                {
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("integer")
+                        .HasColumnName("order_item_id");
+
+                    b.Property<int>("SaleContentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sale_content_id");
+
+                    b.Property<int>("CoveredQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("covered_quantity");
+
+                    b.HasKey("OrderItemId", "SaleContentId")
+                        .HasName("order_fulfillments_pk");
+
+                    b.HasIndex(new[] { "SaleContentId" }, "order_fulfillments_sale_content_id_index");
+
+                    b.ToTable("order_fulfillments", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Order.OrderItem", b =>
@@ -3946,9 +3970,30 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("orders_users_id_fk");
                 });
 
+            modelBuilder.Entity("Main.Entities.Order.OrderFulfillment", b =>
+                {
+                    b.HasOne("Main.Entities.Order.OrderItem", "OrderItem")
+                        .WithMany()
+                        .HasForeignKey("OrderItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("order_fulfillments_order_item_id_fk");
+
+                    b.HasOne("Main.Entities.Sale.SaleContent", "SaleContent")
+                        .WithMany()
+                        .HasForeignKey("SaleContentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("order_fulfillments_sale_content_id_fk");
+
+                    b.Navigation("OrderItem");
+
+                    b.Navigation("SaleContent");
+                });
+
             modelBuilder.Entity("Main.Entities.Order.OrderItem", b =>
                 {
-                    b.HasOne("Main.Entities.Order.Order", null)
+                    b.HasOne("Main.Entities.Order.Order", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3961,6 +4006,8 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("order_items_products_id_fk");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Main.Entities.Organization.OrganizationFinancialProfile", b =>

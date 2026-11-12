@@ -12,6 +12,7 @@
     "document.search.pagination.required": "Pagination is required to search documents.",
     "document.search.caller.id.required": "Caller ID is required to search personal documents.",
     "document.search.system.name.too.long": "Document type name must not exceed 128 characters.",
-    "document.read.caller.id.required": "Caller ID is required to read personal documents."
+    "document.read.caller.id.required": "Caller ID is required to read personal documents.",
+    "document.source.access.denied": "You do not have permission to read the document source data."
   }
 }

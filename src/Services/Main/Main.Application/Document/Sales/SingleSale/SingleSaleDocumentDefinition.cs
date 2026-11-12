@@ -1,3 +1,4 @@
+using Enums;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
 using Locan.Core.Interfaces;
@@ -31,6 +32,7 @@ public class SingleSaleDocumentDefinition(
 
 	public override string SystemName => "SingleSale";
 	public override string DocumentGroup => "Sales";
+	public override IReadOnlyCollection<PermissionCodes> RequiredPermissions => [PermissionCodes.SALES_GET];
 	public override ILocalizableMessage Name => SaleDocumentSingleNameMessage.Instance;
 	public override ILocalizableMessage Description => SaleDocumentSingleDescriptionMessage.Instance;
 	protected override DocumentTypePair[] SupportedTypePairs => SupportedTypes;

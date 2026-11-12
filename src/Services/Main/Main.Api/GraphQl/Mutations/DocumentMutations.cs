@@ -23,7 +23,8 @@ public sealed class DocumentMutations
 			new CreateGenerationRequestCommand(
 				input.DocumentSystemName,
 				input.DocumentRequest,
-				userContext.UserId),
+				userContext.UserId,
+				userContext.Permissions),
 			cancellationToken);
 
 		return new GqlDocumentGenerationRequest(result.RequestId);

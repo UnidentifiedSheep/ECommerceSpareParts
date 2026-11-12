@@ -230,6 +230,8 @@
     "permissions.orders.confirm.name": "Подтверждение заказов",
     "permissions.orders.confirm.description": "Право на подтверждение заказов.",
     "permissions.orders.cancel.name": "Отмена заказов",
-    "permissions.orders.cancel.description": "Право на отмену заказов."
+    "permissions.orders.cancel.description": "Право на отмену заказов.",
+    "permissions.options.edit.name": "Изменение настроек",
+    "permissions.options.edit.description": "Право на изменение настроек."
   }
 }

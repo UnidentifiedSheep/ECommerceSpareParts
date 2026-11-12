@@ -17,3 +17,5 @@ public class DocumentGenerationFailedException(Guid requestId) : LocalizedConfli
 public class DocumentGenerationCancelledException(Guid requestId) : LocalizedConflictException(
 	DocumentGenerationCancelledMessage.Instance,
 	new { RequestId = requestId });
+
+public sealed class DocumentSourceAccessDeniedException() : LocalizedForbiddenException(DocumentSourceAccessDeniedMessage.Instance);

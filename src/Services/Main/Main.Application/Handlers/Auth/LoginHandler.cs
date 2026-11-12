@@ -50,6 +50,7 @@ public class LoginHandler(
 				.New()
 				.WhereDoesNotHaveRole(Role.System)
 				.Include(x => x.UserInfo)
+				.ForUpdate()
 				.Track()
 				.Build(),
 			cancellationToken) ?? throw new WrongCredentialsException(null, null);

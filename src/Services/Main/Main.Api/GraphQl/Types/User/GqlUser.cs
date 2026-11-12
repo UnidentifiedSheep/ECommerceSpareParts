@@ -58,24 +58,28 @@ public record GqlUser
 		(await GetUserAsync(loader, cancellationToken)).UpdatedAt;
 
 	[GraphQLName("twoFactorEnabled")]
+	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<bool> GetTwoFactorEnabledAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
 		(await GetUserAsync(loader, cancellationToken)).TwoFactorEnabled;
 
 	[GraphQLName("lockoutEnd")]
+	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<DateTime?> GetLockoutEndAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
 		(await GetUserAsync(loader, cancellationToken)).LockoutEnd;
 
 	[GraphQLName("accessFailedCount")]
+	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<int> GetAccessFailedCountAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>
 		(await GetUserAsync(loader, cancellationToken)).AccessFailedCount;
 
 	[GraphQLName("lastLoginAt")]
+	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<DateTime?> GetLastLoginAtAsync(
 		IUserByIdDataLoader loader,
 		CancellationToken cancellationToken) =>

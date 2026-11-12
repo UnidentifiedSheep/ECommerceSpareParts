@@ -1,3 +1,4 @@
+using Main.Enums;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Users;
@@ -14,6 +15,15 @@ namespace Main.Persistence.Repositories.User;
 public class UserRepository(DContext context, IQueryableExtensions extensions)
 	: LinqRepositoryBase<DContext, Entities.User.User, Guid>(context, extensions), IUserRepository
 {
+	public async Task RevokeRefreshTokensAsync(
+		Guid userId,
+		string reason,
+		CancellationToken cancellationToken = default) =>
+		await Context.UserTokens
+			.Where(token => token.UserId == userId && token.Type == TokenType.RefreshToken && !token.Revoked)
+			.ExecuteUpdateAsync(setters => setters.SetProperty(token => token.Revoked, true)
+				.SetProperty(token => token.RevokeReason, reason), cancellationToken);
+
 	public IQueryable<Entities.User.User> Search(
 		IQueryable<Entities.User.User> query,
 		string searchTerm) =>

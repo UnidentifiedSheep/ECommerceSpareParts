@@ -1,4 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
+// ReSharper disable InconsistentNaming
 
 namespace Enums;
 
@@ -216,6 +216,7 @@ public enum PermissionCodes
 
 	// ===== OPTIONS =====
 	OPTIONS_GET,
+	OPTIONS_EDIT,
 
 	// ===== LOGISTICS =====
 	LOGISTICS_CALCULATE,
@@ -257,7 +258,6 @@ public enum PermissionCodes
 	ORDERS_GET,
 	ORDERS_GET_OWN,
 	ORDERS_EDIT,
-	ORDERS_PRICE_EDIT,
 	ORDERS_CONFIRM,
 	ORDERS_CANCEL
 }

@@ -1,3 +1,7 @@
+using Main.Application.Interfaces.Services.Document;
+using Main.Entities.Auth;
+using Main.Entities.Exceptions;
+using NamedObject.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
@@ -12,12 +16,14 @@ namespace Main.Application.Handlers.Documents.CreateGenerationRequest;
 public record CreateGenerationRequestCommand(
 	string DocumentSystemName,
 	string DocumentRequest,
-	Guid? RequesterId = null) : ICommand<CreateGenerationRequestResult>;
+	Guid? RequesterId = null,
+	IReadOnlySet<string>? GrantedPermissions = null) : ICommand<CreateGenerationRequestResult>;
 
 public record CreateGenerationRequestResult(Guid RequestId);
 
 public class CreateGenerationRequestHandler(
 	IUnitOfWork unitOfWork,
+	INamedObjectRegistry<IDocumentDefinition> definitions,
 	IJobService jobService,
 	IJobProvider<GenerateDocumentLrt, GenerateDocumentInputState> provider
 	) : ICommandHandler<CreateGenerationRequestCommand, CreateGenerationRequestResult>
@@ -26,6 +32,11 @@ public class CreateGenerationRequestHandler(
 		CreateGenerationRequestCommand request,
 		CancellationToken cancellationToken)
 	{
+		var definition = definitions.GetBySystemName(request.DocumentSystemName);
+		if (definition.RequiredPermissions.Any(permission =>
+			request.GrantedPermissions?.Contains(Permission.ToNormalizedPermission(permission)) != true))
+			throw new DocumentSourceAccessDeniedException();
+
 		var jobs = await jobService.TryEnqueueJobsAsync(
 			[
 				provider.Create(

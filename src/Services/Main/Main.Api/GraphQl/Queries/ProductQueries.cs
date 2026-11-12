@@ -16,6 +16,7 @@ namespace Main.Api.GraphQl.Queries;
 public sealed class ProductQueries
 {
 	[GraphQLName("byId")]
+	[RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)]
 	[Lookup]
 	public async Task<GqlProduct?> GetProductByIdAsync(
 		IProductByIdDataLoader loader,
@@ -27,6 +28,7 @@ public sealed class ProductQueries
 	}
 
 	[GraphQLName("byIds")]
+	[RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)]
 	public async Task<IReadOnlyList<GqlProduct>> GetProductsByIdsAsync(
 		IProductByIdDataLoader loader,
 		IReadOnlyCollection<int> ids,
@@ -36,6 +38,7 @@ public sealed class ProductQueries
 		.ToList();
 
 	[GraphQLName("byEan")]
+	[RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)]
 	[RequireAllPermissions(PermissionCodes.ARTICLE_EANS_GET)]
 	public async Task<IReadOnlyList<GqlProduct>> GetProductsByEanAsync(
 		GqlProductsByEanInput input,
