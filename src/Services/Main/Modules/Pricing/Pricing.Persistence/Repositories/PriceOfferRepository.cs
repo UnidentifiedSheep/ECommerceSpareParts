@@ -1,17 +1,18 @@
-using Persistence.Context;
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Repository;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities.Offers;
 using Pricing.Enums;
+using Security.Core.Interfaces;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Pricing.Persistence.Repositories;
 
-public class PriceOfferRepository(UnifiedDbContext context, IUserContext userContext, IQueryableExtensions extensions)
+public class PriceOfferRepository(UnifiedDbContext context,
+	IUserContext userContext,
+	IQueryableExtensions extensions)
 	: LinqRepositoryBase<UnifiedDbContext, PriceOffer, Guid>(context, extensions), IPriceOfferRepository
 {
 	public async Task UpsertOffersAsync(
@@ -61,10 +62,11 @@ public class PriceOfferRepository(UnifiedDbContext context, IUserContext userCon
 		int productId,
 		string storageCode,
 		IEnumerable<PriceOfferSource> sources,
-		CancellationToken cancellationToken = default) => Context
-		.Set<PriceOffer>()
-		.Where(x => x.ProductId == productId)
-		.Where(x => x.OfferForStorage == storageCode)
-		.Where(x => sources.Contains(x.Source))
-		.ExecuteDeleteAsync(cancellationToken);
+		CancellationToken cancellationToken = default)
+		=> Context
+			.Set<PriceOffer>()
+			.Where(x => x.ProductId == productId)
+			.Where(x => x.OfferForStorage == storageCode)
+			.Where(x => sources.Contains(x.Source))
+			.ExecuteDeleteAsync(cancellationToken);
 }

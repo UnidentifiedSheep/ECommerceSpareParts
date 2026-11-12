@@ -15,10 +15,11 @@ public record ProductCrossesImportState : ProductCrossesImportInputState,
 	[JsonPropertyName("checkpoint")]
 	public CsvImportCheckpoint? Checkpoint { get; init; }
 
-	public ProductCrossesImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
-	{
-		Checkpoint = checkpoint
-	};
+	public ProductCrossesImportState WithCheckpoint(CsvImportCheckpoint checkpoint)
+		=> this with
+		{
+			Checkpoint = checkpoint
+		};
 }
 
 [CsvSchema(typeof(ProductCrossesImportLrt.ProductCrossCsvDto))]

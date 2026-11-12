@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces;
-using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Models.Options.S3;
 using MediatR;
 using Microsoft.Extensions.Options;

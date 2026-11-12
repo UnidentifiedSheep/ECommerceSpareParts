@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
-using Main.Application.Handlers.Auth.RemovePermissionsFromUser;
 using Main.Application.Handlers.Auth.AddPermissionsToUser;
+using Main.Application.Handlers.Auth.RemovePermissionsFromUser;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;

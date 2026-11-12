@@ -11,5 +11,4 @@ public interface ICurrencyCacheRepository
 	Task InvalidateCurrency(int id, CancellationToken cancellationToken = default);
 
 	Task InvalidateAllCurrencies(CancellationToken cancellationToken = default);
-
 }

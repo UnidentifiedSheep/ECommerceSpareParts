@@ -9,17 +9,6 @@ namespace Main.Entities.Documents;
 public sealed class DocumentGenerationRequest
 	: Entity<DocumentGenerationRequest, Guid>, ILinqEntity<DocumentGenerationRequest, Guid>
 {
-	public Guid RequestId { get; private set; }
-	public Guid JobId { get; private set; }
-	public string DocumentSystemName { get; private set; } = null!;
-	public Guid? RequesterId { get; private set; }
-	public DateTime CreatedAt { get; private set; }
-	public string? BucketName { get; private set; }
-	public string? StorageKey { get; private set; }
-	public DateTime? GeneratedAt { get; private set; }
-	public DateTime? ExpiresAt { get; private set; }
-
-	public Job Job { get; private set; } = null!;
 
 	private DocumentGenerationRequest()
 	{
@@ -37,20 +26,42 @@ public sealed class DocumentGenerationRequest
 		DocumentSystemName = documentSystemName
 			.EnsureNotNullOrWhiteSpace(() =>
 				new InvalidOperationException("Document system name is required."))
-			.EnsureMaxLength(128, () =>
-				new InvalidOperationException("Document system name is too long."));
+			.EnsureMaxLength(
+				128,
+				() =>
+					new InvalidOperationException("Document system name is too long."));
 
 		RequesterId = requesterId?.EnsureNotEqual(
 			Guid.Empty,
 			() => new InvalidOperationException("Requester ID cannot be empty."));
 		CreatedAt = DateTime.UtcNow;
 	}
+	public Guid RequestId { get; }
+	public Guid JobId { get; private set; }
+	public string DocumentSystemName { get; private set; } = null!;
+	public Guid? RequesterId { get; private set; }
+	public DateTime CreatedAt { get; private set; }
+	public string? BucketName { get; private set; }
+	public string? StorageKey { get; private set; }
+	public DateTime? GeneratedAt { get; private set; }
+	public DateTime? ExpiresAt { get; private set; }
+
+	public Job Job { get; private set; } = null!;
+
+	public static Expression<Func<DocumentGenerationRequest, Guid>> GetKeySelector()
+		=> request => request.RequestId;
+
+	public static Expression<Func<DocumentGenerationRequest, bool>> GetEqualityExpression(Guid key)
+		=> request => request.RequestId == key;
 
 	public static DocumentGenerationRequest Create(
 		Guid jobId,
 		string documentSystemName,
 		Guid? requesterId = null)
-		=> new(jobId, documentSystemName, requesterId);
+		=> new(
+			jobId,
+			documentSystemName,
+			requesterId);
 
 	public void Complete(
 		string bucketName,
@@ -64,13 +75,17 @@ public sealed class DocumentGenerationRequest
 		var validatedBucketName = bucketName
 			.EnsureNotNullOrWhiteSpace(() =>
 				new InvalidOperationException("Bucket name is required."))
-			.EnsureMaxLength(255, () =>
-				new InvalidOperationException("Bucket name is too long."));
+			.EnsureMaxLength(
+				255,
+				() =>
+					new InvalidOperationException("Bucket name is too long."));
 		var validatedStorageKey = storageKey
 			.EnsureNotNullOrWhiteSpace(() =>
 				new InvalidOperationException("Storage key is required."))
-			.EnsureMaxLength(1024, () =>
-				new InvalidOperationException("Storage key is too long."));
+			.EnsureMaxLength(
+				1024,
+				() =>
+					new InvalidOperationException("Storage key is too long."));
 		generatedAt.Ensure(
 			value => value.Kind == DateTimeKind.Utc,
 			() => new InvalidOperationException("Generation time must be UTC."));
@@ -85,10 +100,4 @@ public sealed class DocumentGenerationRequest
 	}
 
 	public override Guid GetId() => RequestId;
-
-	public static Expression<Func<DocumentGenerationRequest, Guid>> GetKeySelector()
-		=> request => request.RequestId;
-
-	public static Expression<Func<DocumentGenerationRequest, bool>> GetEqualityExpression(Guid key)
-		=> request => request.RequestId == key;
 }

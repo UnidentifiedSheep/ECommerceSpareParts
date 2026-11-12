@@ -14,13 +14,13 @@ public class RecipientProvider(
 	ICache cache,
 	IReadRepository<UserNotificationPreference, UserNotificationPreferenceKey> preferenceRepository,
 	IReadRepository<UserEmail, string> emailRepository
-	) : IRecipientProvider
+) : IRecipientProvider
 {
-	public Task InvalidateUserRecipients(Guid userId) =>
-		cache.RemoveKeyAsync(CacheKeys.UserCache.NotificationRecipients(userId));
+	public Task InvalidateUserRecipients(Guid userId)
+		=> cache.RemoveKeyAsync(CacheKeys.UserCache.NotificationRecipients(userId));
 
-	public Task InvalidateUsersRecipients(IEnumerable<Guid> userIds) =>
-		cache.RemoveKeysAsync(userIds.Select(CacheKeys.UserCache.NotificationRecipients));
+	public Task InvalidateUsersRecipients(IEnumerable<Guid> userIds)
+		=> cache.RemoveKeysAsync(userIds.Select(CacheKeys.UserCache.NotificationRecipients));
 
 	public async Task<IReadOnlyCollection<INotificationRecipient>> ResolveAsync(
 		Guid userId,
@@ -52,7 +52,7 @@ public class RecipientProvider(
 	public async Task<IReadOnlyDictionary<Guid, TRecipient>> ResolveAsync<TRecipient>(
 		IReadOnlyCollection<Guid> userIds,
 		CancellationToken cancellationToken = default
-		) where TRecipient : INotificationRecipient
+	) where TRecipient : INotificationRecipient
 	{
 		var recipientsByUser = await ResolveAsync(userIds, cancellationToken);
 		var result = new Dictionary<Guid, TRecipient>(recipientsByUser.Count);

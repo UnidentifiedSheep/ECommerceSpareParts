@@ -27,8 +27,7 @@ public sealed record PriceCalculationState
 	public required IReadOnlyList<AppliedPriceRule> AppliedRules { get; init; }
 
 	public static PriceCalculationState Initial(PriceCandidate candidate, MarketInfo.MarketInfo market)
-	{
-		return new PriceCalculationState
+		=> new()
 		{
 			Candidate = candidate,
 			Market = market,
@@ -38,5 +37,4 @@ public sealed record PriceCalculationState
 			BaseMarkup = null,
 			AppliedRules = []
 		};
-	}
 }

@@ -8,7 +8,8 @@ namespace Main.Api.GraphQl.Types.Purchase;
 
 [GraphQLName("PurchaseLogistic")]
 public sealed record GqlPurchaseLogistic(
-	[property: GraphQLIgnore] PurchaseLogisticDto Logistics)
+	[property: GraphQLIgnore]
+	PurchaseLogisticDto Logistics)
 {
 	[GraphQLName("routeId")]
 	public Guid RouteId => Logistics.RouteId;
@@ -39,5 +40,5 @@ public sealed record GqlPurchaseLogistic(
 
 	[GraphQLName("transaction")]
 	[RequireAllPermissions(PermissionCodes.BALANCES_TRANSACTION_GET_ALL)]
-	public GqlTransaction? Transaction => Logistics.TransactionId is { } id ? new(id) : null;
+	public GqlTransaction? Transaction => Logistics.TransactionId is { } id ? new GqlTransaction(id) : null;
 }

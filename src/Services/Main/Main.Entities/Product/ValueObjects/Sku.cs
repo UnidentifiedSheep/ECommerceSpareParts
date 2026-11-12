@@ -29,8 +29,8 @@ public partial record Sku
 	[GeneratedRegex("[^a-zA-Z0-9а-яА-Я]+")]
 	private static partial Regex OnlyCharacter();
 
-	public static string ToNormalized(string source) =>
-		OnlyCharacter().Replace(source, "").ToUpperInvariant();
+	public static string ToNormalized(string source)
+		=> OnlyCharacter().Replace(source, "").ToUpperInvariant();
 
 	public static bool IsValid(string? sku, [NotNullWhen(false)] out Exception? exception)
 	{

@@ -1,4 +1,3 @@
-using Security.Core.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
@@ -9,6 +8,7 @@ using Main.Entities;
 using Main.Entities.Settings.Supplier;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
+using Security.Core.Interfaces;
 
 namespace Main.Application.NamedObjects.SettingDefinitions.Supplier;
 
@@ -19,8 +19,8 @@ public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISe
 
 	public override ILocalizableMessage NameLocalizationMessage => SupplierTmtrSettingNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		SupplierTmtrSettingDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> SupplierTmtrSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(TmtrSupplierSettingInputData);
 

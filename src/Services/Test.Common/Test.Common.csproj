@@ -60,7 +60,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Tests\Api\ExceptionHandlers\" />
+        <Folder Include="Tests\Api\ExceptionHandlers\"/>
     </ItemGroup>
 
 </Project>

@@ -12,10 +12,7 @@ public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, st
 	{
 	}
 
-	protected Setting(string json)
-	{
-		Json = json;
-	}
+	protected Setting(string json) => Json = json;
 
 	public string Key { get; protected set; } = null!;
 
@@ -34,13 +31,11 @@ public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, st
 	public override void OnCreated() => RaiseUpdatedEvent();
 
 	private void RaiseUpdatedEvent()
-	{
-		AddDomainEvent(
+		=> AddDomainEvent(
 			new SettingUpdatedDomainEvent(
 				Key,
 				Json,
 				DateTime.UtcNow));
-	}
 
 	public override string GetId() => Key;
 }
@@ -49,10 +44,7 @@ public abstract class Setting<T> : Setting
 {
 	private T? _data;
 
-	protected Setting(string key, string json) : base(json)
-	{
-		Key = key;
-	}
+	protected Setting(string key, string json) : base(json) => Key = key;
 
 	protected Setting(string key, T data) : base(Serialize(data))
 	{

@@ -7,7 +7,8 @@ namespace Main.Api.GraphQl.Types.Organization;
 
 [GraphQLName("OrganizationMember")]
 public sealed record GqlOrganizationMember(
-	[property: GraphQLIgnore] OrganizationMemberDto MemberDto)
+	[property: GraphQLIgnore]
+	OrganizationMemberDto MemberDto)
 {
 	[GraphQLName("organization")]
 	public GqlOrganization Organization => new(MemberDto.OrganizationId);

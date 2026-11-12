@@ -126,7 +126,8 @@ public abstract class OpenSearchRepository<TDocument, TKey>(
 		if (response.TimedOut)
 			throw new TimeoutException("OpenSearch timed out while deleting documents.");
 		if (response.Failures.Count > 0)
-			throw new InvalidOperationException(string.Join("; ", response.Failures.Select(failure => failure.Cause.Reason)));
+			throw new InvalidOperationException(
+				string.Join("; ", response.Failures.Select(failure => failure.Cause.Reason)));
 	}
 
 	protected void EnsureResponseSucceeded(IResponse response, string operation)

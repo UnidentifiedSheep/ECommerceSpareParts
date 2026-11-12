@@ -1,7 +1,5 @@
-using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Validators;
 using Attributes;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
@@ -9,6 +7,7 @@ using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization;
 using Main.Entities.User;
+using Security.Core.Interfaces;
 using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Users.CreateUser;

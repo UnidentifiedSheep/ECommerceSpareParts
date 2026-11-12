@@ -14,30 +14,32 @@ public class SupplierOfferRequestMarkerService(ISettingsService settingsService,
 		Supplier supplier,
 		int productId,
 		string storageCode,
-		CancellationToken token) => (await cache.KeyExistsAsync(
-		[
-			CacheKeys.Offer.Failed.Key(
-				supplier,
-				productId,
-				storageCode),
-			CacheKeys.Offer.Ok.Key(
-				supplier,
-				productId,
-				storageCode)
-		],
-		token)).Any(x => x.Value);
+		CancellationToken token)
+		=> (await cache.KeyExistsAsync(
+			[
+				CacheKeys.Offer.Failed.Key(
+					supplier,
+					productId,
+					storageCode),
+				CacheKeys.Offer.Ok.Key(
+					supplier,
+					productId,
+					storageCode)
+			],
+			token)).Any(x => x.Value);
 
 	public async Task MarkAsOkAsync(
 		Supplier supplier,
 		int productId,
 		string storageCode,
-		CancellationToken token) => await cache.SetAsync(
-		CacheKeys.Offer.Ok.Key(
-			supplier,
-			productId,
-			storageCode),
-		true,
-		CacheKeys.Offer.Ok.Ttl((await settingsService.GetOrDefault<PricingSetting>(token)).Data));
+		CancellationToken token)
+		=> await cache.SetAsync(
+			CacheKeys.Offer.Ok.Key(
+				supplier,
+				productId,
+				storageCode),
+			true,
+			CacheKeys.Offer.Ok.Ttl((await settingsService.GetOrDefault<PricingSetting>(token)).Data));
 
 	public async Task MarkAsOkAsync(
 		IEnumerable<int> productId,
@@ -63,11 +65,12 @@ public class SupplierOfferRequestMarkerService(ISettingsService settingsService,
 	public async Task MarkAsFailedAsync(
 		Supplier supplier,
 		int productId,
-		string storageCode) => await cache.SetAsync(
-		CacheKeys.Offer.Failed.Key(
-			supplier,
-			productId,
-			storageCode),
-		true,
-		CacheKeys.Offer.Failed.Ttl);
+		string storageCode)
+		=> await cache.SetAsync(
+			CacheKeys.Offer.Failed.Key(
+				supplier,
+				productId,
+				storageCode),
+			true,
+			CacheKeys.Offer.Failed.Ttl);
 }

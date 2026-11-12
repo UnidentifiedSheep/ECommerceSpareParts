@@ -23,27 +23,27 @@ public class PriceOfferRefreshState : Entity<PriceOfferRefreshState, PriceOfferR
 
 	public int LastOffersCount { get; private set; }
 
-	public static Expression<Func<PriceOfferRefreshState, PriceOfferRefreshStateKey>> GetKeySelector() => x =>
-		new PriceOfferRefreshStateKey(
-			x.ProductId,
-			x.Source,
-			x.StorageCode);
+	public static Expression<Func<PriceOfferRefreshState, PriceOfferRefreshStateKey>> GetKeySelector()
+		=> x =>
+			new PriceOfferRefreshStateKey(
+				x.ProductId,
+				x.Source,
+				x.StorageCode);
 	public static Expression<Func<PriceOfferRefreshState, bool>>
-		GetEqualityExpression(PriceOfferRefreshStateKey key) => x => x.ProductId == key.ProductId &&
-		x.Source == key.Supplier && x.StorageCode == key.StorageCode;
+		GetEqualityExpression(PriceOfferRefreshStateKey key)
+		=> x => x.ProductId == key.ProductId &&
+			x.Source == key.Supplier && x.StorageCode == key.StorageCode;
 
 	public static PriceOfferRefreshState Create(
 		int productId,
 		PriceOfferSource source,
 		string storageCode)
-	{
-		return new PriceOfferRefreshState
+		=> new()
 		{
 			ProductId = productId,
 			Source = source,
 			StorageCode = storageCode
 		};
-	}
 
 	public void OffersUpdated(DateTime offersUpdatedAt, int offersCount)
 	{
@@ -53,10 +53,11 @@ public class PriceOfferRefreshState : Entity<PriceOfferRefreshState, PriceOfferR
 		LastOffersUpdatedAt = offersUpdatedAt;
 	}
 
-	public override PriceOfferRefreshStateKey GetId() => new(
-		ProductId,
-		Source,
-		StorageCode);
+	public override PriceOfferRefreshStateKey GetId()
+		=> new(
+			ProductId,
+			Source,
+			StorageCode);
 }
 
 public readonly struct PriceOfferRefreshStateKey(int productId, PriceOfferSource source, string storageCode)

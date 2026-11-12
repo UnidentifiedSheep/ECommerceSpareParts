@@ -63,7 +63,10 @@ public sealed class StorageContentService(
 				utcNow,
 				affected);
 
-			EnsureEnough(request.Key.ProductId, request.Count, remaining);
+			EnsureEnough(
+				request.Key.ProductId,
+				request.Count,
+				remaining);
 		}
 
 		return affected;
@@ -83,7 +86,8 @@ public sealed class StorageContentService(
 
 		var preferredIds = requests.Keys.ToArray();
 		var preferred = await repository.GetWithActiveLocksForUpdateAsync(
-			preferredIds, cancellationToken: cancellationToken);
+			preferredIds,
+			cancellationToken: cancellationToken);
 
 		var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 		var affected = new List<StorageLot>();
@@ -91,7 +95,12 @@ public sealed class StorageContentService(
 		foreach (var (id, count) in requests)
 		{
 			var content = preferred[id];
-			var remaining = SubtractFrom([content], count, movementType, utcNow, affected);
+			var remaining = SubtractFrom(
+				[content],
+				count,
+				movementType,
+				utcNow,
+				affected);
 			if (remaining > 0)
 				outstanding.Add((content, count, remaining));
 		}
@@ -105,12 +114,23 @@ public sealed class StorageContentService(
 		var policy = await GetPolicyAsync(cancellationToken);
 		foreach (var (content, requested, remaining) in outstanding)
 		{
-			var candidates = preferred.Values.Concat(additional).Where(candidate =>
-				candidate.ProductId == content.ProductId && candidate.StorageCode == content.StorageCode &&
-				candidate.Id != content.Id).AsQueryable();
-			var shortage = SubtractFrom(policy.Apply(candidates).ThenBy(candidate => candidate.Id),
-				remaining, movementType, utcNow, affected);
-			EnsureEnough(content.ProductId, requested, shortage);
+			var candidates = preferred.Values
+				.Concat(additional)
+				.Where(candidate =>
+					candidate.ProductId == content.ProductId &&
+					candidate.StorageCode == content.StorageCode &&
+					candidate.Id != content.Id)
+				.AsQueryable();
+			var shortage = SubtractFrom(
+				policy.Apply(candidates).ThenBy(candidate => candidate.Id),
+				remaining,
+				movementType,
+				utcNow,
+				affected);
+			EnsureEnough(
+				content.ProductId,
+				requested,
+				shortage);
 		}
 
 		return affected;
@@ -139,8 +159,12 @@ public sealed class StorageContentService(
 		return policyRegistry.GetBySystemName(setting.StorageContentExtractionPolicy);
 	}
 
-	private static int SubtractFrom(IEnumerable<StorageContent> contents,
-		int requested, StorageMovementType movementType, DateTime utcNow, List<StorageLot> affected)
+	private static int SubtractFrom(
+		IEnumerable<StorageContent> contents,
+		int requested,
+		StorageMovementType movementType,
+		DateTime utcNow,
+		List<StorageLot> affected)
 	{
 		var remaining = requested;
 		foreach (var content in contents)
@@ -148,11 +172,21 @@ public sealed class StorageContentService(
 			if (remaining == 0) break;
 			var count = Math.Min(content.GetAvailableQuantity(utcNow), remaining);
 			if (count == 0) continue;
-			content.Take(count, movementType, utcNow);
-			affected.Add(new StorageLot(content.Id, content.ProductId, content.CurrencyId,
-				content.BuyPrice, count, content.PurchaseDatetime));
+			content.Take(
+				count,
+				movementType,
+				utcNow);
+			affected.Add(
+				new StorageLot(
+					content.Id,
+					content.ProductId,
+					content.CurrencyId,
+					content.BuyPrice,
+					count,
+					content.PurchaseDatetime));
 			remaining -= count;
 		}
+
 		return remaining;
 	}
 
@@ -162,9 +196,15 @@ public sealed class StorageContentService(
 			throw new InvalidOperationException("Storage content changes require an active transaction.");
 	}
 
-	private static void EnsureEnough(int productId, int requested, int remaining)
+	private static void EnsureEnough(
+		int productId,
+		int requested,
+		int remaining)
 	{
 		if (remaining > 0)
-			throw new NotEnoughCountOnStorageException(productId, requested - remaining, requested);
+			throw new NotEnoughCountOnStorageException(
+				productId,
+				requested - remaining,
+				requested);
 	}
 }

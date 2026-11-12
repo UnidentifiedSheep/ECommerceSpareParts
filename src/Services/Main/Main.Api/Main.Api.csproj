@@ -14,7 +14,7 @@
     <ItemGroup>
         <PackageReference Include="Carter" Version="10.0.0"/>
         <PackageReference Include="Locan.Generator" Version="1.0.6"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>
         <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1"/>
         <PackageReference Include="Serilog.Sinks.Loki" Version="4.0.0-beta3"/>
@@ -26,11 +26,11 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchageRates\Integrations.ExchangeRate.Di\Integrations.ExchangeRate.Di.csproj" />
-		<ProjectReference Include="..\..\..\Infrastructure\Notifications\Notification\Notification.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchageRates\Integrations.ExchangeRate.Di\Integrations.ExchangeRate.Di.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Notifications\Notification\Notification.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Security\Security\Security.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Security\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\..\GraphQL.Common\GraphQL.Common.csproj"/>
@@ -42,7 +42,7 @@
     <ItemGroup>
         <EmailTemplate Include="..\..\..\Infrastructure\Mailing\EmailTemplates\**\*.cshtml"/>
         <Content Include="..\..\..\..\.dockerignore">
-          <Link>.dockerignore</Link>
+            <Link>.dockerignore</Link>
         </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -70,11 +70,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="Templates/Emails/**/*.cshtml" />
-      <None Include="Templates/Emails/**/*.cshtml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </None>
+        <Content Remove="Templates/Emails/**/*.cshtml"/>
+        <None Include="Templates/Emails/**/*.cshtml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

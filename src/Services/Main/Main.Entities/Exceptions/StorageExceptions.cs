@@ -98,10 +98,13 @@ public class StorageRouteNotFound : LocalizedNotFoundException
 }
 
 public class StorageOwnerAlreadyExistsException(object values) : LocalizedConflictException(
-	StorageAlreadyBelongsUserMessage.Instance, values);
+	StorageAlreadyBelongsUserMessage.Instance,
+	values);
 
 public class StorageRouteAlreadyExistsException(object values) : LocalizedConflictException(
-	StorageRouteAlreadyExistsMessage.Instance, values);
+	StorageRouteAlreadyExistsMessage.Instance,
+	values);
 
 public class StorageCodeAlreadyTakenException(object values) : LocalizedConflictException(
-	StorageCodeTakenMessage.Instance, values);
+	StorageCodeTakenMessage.Instance,
+	values);

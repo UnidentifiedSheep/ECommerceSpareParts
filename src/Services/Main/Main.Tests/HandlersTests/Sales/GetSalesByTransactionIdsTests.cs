@@ -14,9 +14,7 @@ namespace Tests.HandlersTests.Sales;
 public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 {
 	public GetSalesByTransactionIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<SaleTestContext>();
-	}
+		=> RegisterBasicContext<SaleTestContext>();
 
 	private SaleTestContext TestContext => GetContext<SaleTestContext>();
 
@@ -27,8 +25,10 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 		var second = await CreateSale();
 		await CreateSale();
 
-		var result = await Mediator.Send(new GetSalesByTransactionIdsQuery(
-			[first.TransactionId, second.TransactionId, first.TransactionId, Guid.NewGuid()]), CancellationToken);
+		var result = await Mediator.Send(
+			new GetSalesByTransactionIdsQuery(
+				[first.TransactionId, second.TransactionId, first.TransactionId, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Sales.Keys.Should().BeEquivalentTo([first.TransactionId, second.TransactionId]);
 		result.Sales[first.TransactionId].Id.Should().Be(first.Id);
@@ -40,7 +40,9 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 	{
 		var transaction = await CreateTransaction(TransactionSourceType.Manual);
 
-		var result = await Mediator.Send(new GetSalesByTransactionIdsQuery(transaction.Id), CancellationToken);
+		var result = await Mediator.Send(
+			new GetSalesByTransactionIdsQuery(transaction.Id),
+			CancellationToken);
 
 		result.Sales.Should().BeEmpty();
 	}
@@ -48,7 +50,9 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetSalesByTransactionIdsQuery(Array.Empty<Guid>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetSalesByTransactionIdsQuery(Array.Empty<Guid>()),
+			CancellationToken);
 
 		result.Sales.Should().BeEmpty();
 	}
@@ -63,7 +67,8 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(
-			new GetSalesByTransactionIdsQuery([oldTransactionId, transaction.Id]), CancellationToken);
+			new GetSalesByTransactionIdsQuery([oldTransactionId, transaction.Id]),
+			CancellationToken);
 
 		result.Sales.Keys.Should().Equal(transaction.Id);
 		result.Sales[transaction.Id].Id.Should().Be(sale.Id);
@@ -76,7 +81,9 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 		sale.Delete();
 		await Context.SaveChangesAsync(CancellationToken);
 
-		var result = await Mediator.Send(new GetSalesByTransactionIdsQuery(sale.TransactionId), CancellationToken);
+		var result = await Mediator.Send(
+			new GetSalesByTransactionIdsQuery(sale.TransactionId),
+			CancellationToken);
 
 		result.Sales.Keys.Should().Equal(sale.TransactionId);
 		result.Sales[sale.TransactionId].Id.Should().Be(sale.Id);
@@ -96,8 +103,8 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 			.BuildAndAddToDb(Context);
 	}
 
-	private Task<Transaction> CreateTransaction(TransactionSourceType sourceType) =>
-		new TransactionBuilder(Faker)
+	private Task<Transaction> CreateTransaction(TransactionSourceType sourceType)
+		=> new TransactionBuilder(Faker)
 			.WithSenderId(TestContext.Transaction.SenderId)
 			.WithReceiverId(TestContext.Transaction.ReceiverId)
 			.WithCurrencyId(TestContext.Sale.CurrencyId)

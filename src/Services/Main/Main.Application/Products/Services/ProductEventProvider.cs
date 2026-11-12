@@ -26,10 +26,16 @@ public sealed class ProductEventProvider(
 		foreach (var provider in providers)
 			query = provider.Populate(query);
 
-		query = providers.Any(provider => provider.IsHeavyRequest) ? query.AsSplitQuery() : query.AsSingleQuery();
+		query = providers.Any(provider => provider.IsHeavyRequest)
+			? query.AsSplitQuery()
+			: query.AsSingleQuery();
 		var products = await query.OrderBy(product => product.Id).ToListAsync(cancellationToken);
 		var found = products.Select(product => product.Id).ToHashSet();
 		var missingProductIds = ids.Where(id => !found.Contains(id)).ToArray();
-		return providers.Select(provider => provider.Extract(products, updatedAt, missingProductIds)).ToArray();
+		return providers.Select(provider => provider.Extract(
+				products,
+				updatedAt,
+				missingProductIds))
+			.ToArray();
 	}
 }

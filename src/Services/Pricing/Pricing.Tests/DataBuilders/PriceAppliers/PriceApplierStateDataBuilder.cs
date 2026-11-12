@@ -40,11 +40,9 @@ public class PriceApplierStateDataBuilder(Faker faker) : BuilderBase<PriceApplie
 	}
 
 	public override PriceApplierState Build()
-	{
-		return PriceApplierState.Create(
+		=> PriceApplierState.Create(
 			PriceApplierSystemName ?? $"price-applier-{Faker.Random.Guid():N}",
 			Usage,
 			Order,
 			Enabled);
-	}
 }

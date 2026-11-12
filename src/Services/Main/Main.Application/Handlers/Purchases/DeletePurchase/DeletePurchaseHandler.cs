@@ -40,19 +40,22 @@ public class DeletePurchaseHandler(
 	}
 
 	private async Task<Purchase> GetPurchase(Guid id, CancellationToken cancellationToken)
-	{
-		return await repository.EnsureExistForUpdateAsync(
+		=> await repository.EnsureExistForUpdateAsync(
 			id,
 			key => new PurchaseNotFoundException(key),
 			Criteria<Purchase>.New().Include(x => x.PurchaseLogistic).Include(x => x.Contents),
 			cancellationToken);
-	}
 
 	private async Task SubtractStock(Purchase purchase, CancellationToken token)
 	{
 		var items =
-			purchase.Contents.Select(x => new SubtractStorageContentItem(x.StorageContentId, x.Count)).ToArray();
-		await storageContentService.SubtractByContentsAsync(items, StorageMovementType.PurchaseDeletion, token);
+			purchase.Contents
+				.Select(x => new SubtractStorageContentItem(x.StorageContentId, x.Count))
+				.ToArray();
+		await storageContentService.SubtractByContentsAsync(
+			items,
+			StorageMovementType.PurchaseDeletion,
+			token);
 	}
 
 	private async Task RevertTransactions(Purchase purchase, CancellationToken token)

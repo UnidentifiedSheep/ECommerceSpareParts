@@ -6,7 +6,8 @@ using Main.Application.Dtos.Product.References;
 namespace Main.Api.GraphQl.Types.Product;
 
 [GraphQLName("ResolvedProductReference")]
-public sealed record GqlResolvedProductReference([property: GraphQLIgnore] ResolvedProductReferenceDto Reference)
+public sealed record GqlResolvedProductReference([property: GraphQLIgnore]
+	ResolvedProductReferenceDto Reference)
 {
 	[GraphQLName("sku")]
 	public string Sku => Reference.Sku;

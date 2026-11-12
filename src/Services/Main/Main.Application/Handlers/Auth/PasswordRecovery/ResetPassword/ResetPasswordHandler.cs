@@ -1,15 +1,14 @@
-using Application.Common.Interfaces.Repositories;
-using Main.Entities.User;
-using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Validators;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.Models.Auth;
 using Main.Entities.Exceptions;
+using Main.Entities.User;
 using Main.Enums.Auth;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
 

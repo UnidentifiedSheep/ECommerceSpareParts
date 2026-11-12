@@ -5,7 +5,8 @@ using Main.Entities;
 
 namespace Main.Application.Services.Storage;
 
-public sealed class SubtractStorageContentItemsValidation : AbstractValidator<IReadOnlyCollection<SubtractStorageContentItem>>
+public sealed class
+	SubtractStorageContentItemsValidation : AbstractValidator<IReadOnlyCollection<SubtractStorageContentItem>>
 {
 	public SubtractStorageContentItemsValidation()
 	{

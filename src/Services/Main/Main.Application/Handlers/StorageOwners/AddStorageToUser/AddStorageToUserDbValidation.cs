@@ -7,10 +7,8 @@ namespace Main.Application.Handlers.StorageOwners.AddStorageToUser;
 public class AddStorageToUserDbValidation : AbstractDbValidation<AddStorageToUserCommand>
 {
 	public override void Build(IValidationPlan plan, AddStorageToUserCommand request)
-	{
-		plan
+		=> plan
 			.ValidateStorageOwnerNotExistsPK((request.StorageCode, request.UserId))
 			.ValidateUserExistsId(request.UserId)
 			.ValidateStorageExistsCode(request.StorageCode);
-	}
 }

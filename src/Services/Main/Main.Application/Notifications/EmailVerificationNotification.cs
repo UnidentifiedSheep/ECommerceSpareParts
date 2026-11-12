@@ -16,16 +16,6 @@ public class EmailVerificationNotification : INotification<EmailVerificationNoti
 
 public record EmailVerificationNotificationData : INotificationModel, INotificationModelWithTitle
 {
-	public required string HtmlLang { get; init; }
-	public required string Title { get; init; }
-	public required string Heading { get; init; }
-	public required string Intro { get; init; }
-	public required string Description { get; init; }
-	public required string Button { get; init; }
-	public required string Fallback { get; init; }
-	public required string Ignore { get; init; }
-	public required string VerificationUrl { get; init; }
-	public required string AsText { get; init; }
 
 	public EmailVerificationNotificationData() { }
 
@@ -45,4 +35,14 @@ public record EmailVerificationNotificationData : INotificationModel, INotificat
 		VerificationUrl = verificationUrl;
 		AsText = $"{Heading}. {Intro} {Description} {Fallback} {VerificationUrl} {Ignore}";
 	}
+	public required string HtmlLang { get; init; }
+	public required string Heading { get; init; }
+	public required string Intro { get; init; }
+	public required string Description { get; init; }
+	public required string Button { get; init; }
+	public required string Fallback { get; init; }
+	public required string Ignore { get; init; }
+	public required string VerificationUrl { get; init; }
+	public required string AsText { get; init; }
+	public required string Title { get; init; }
 }

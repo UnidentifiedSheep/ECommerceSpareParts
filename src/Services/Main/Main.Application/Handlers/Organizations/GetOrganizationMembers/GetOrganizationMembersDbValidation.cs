@@ -6,6 +6,6 @@ namespace Main.Application.Handlers.Organizations.GetOrganizationMembers;
 
 public class GetOrganizationMembersDbValidation : AbstractDbValidation<GetOrganizationMembersQuery>
 {
-	public override void Build(IValidationPlan plan, GetOrganizationMembersQuery request) =>
-		plan.ValidateOrganizationExistsId(request.OrganizationId);
+	public override void Build(IValidationPlan plan, GetOrganizationMembersQuery request)
+		=> plan.ValidateOrganizationExistsId(request.OrganizationId);
 }

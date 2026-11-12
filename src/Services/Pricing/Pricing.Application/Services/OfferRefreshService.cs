@@ -69,14 +69,12 @@ public class OfferRefreshService(
 		string storageCode,
 		IReadOnlyDictionary<Supplier, IReadOnlyList<SupplierPosition>> supplierPositions,
 		CancellationToken token = default)
-	{
-		return RefreshOffersAsync(
+		=> RefreshOffersAsync(
 			DateTime.UtcNow,
 			productId,
 			storageCode,
 			supplierPositions,
 			token);
-	}
 
 	public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
 		DateTime dataExtractionTime,

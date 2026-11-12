@@ -34,8 +34,10 @@ public class CachedCurrencyProvider(
 		return value;
 	}
 
-	public async Task InvalidateCurrencyRate(int currencyId, CancellationToken cancellationToken = default) =>
-		await fusionCache.RemoveAsync(CacheKeys.Currency.CurrencyRate(currencyId), token: cancellationToken);
+	public async Task InvalidateCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
+		=> await fusionCache.RemoveAsync(
+			CacheKeys.Currency.CurrencyRate(currencyId),
+			token: cancellationToken);
 
 	public async Task<int?> GetCurrencyIdAsync(string code, CancellationToken token = default)
 	{
@@ -71,8 +73,7 @@ public class CachedCurrencyProvider(
 		return result;
 	}
 	public ValueTask<int> GetBaseCurrencyIdAsync(CancellationToken token = default)
-	{
-		return fusionCache.GetOrSetAsync(
+		=> fusionCache.GetOrSetAsync(
 			CacheKeys.Currency.BaseCurrencyId,
 			async ct =>
 			{
@@ -91,8 +92,6 @@ public class CachedCurrencyProvider(
 			},
 			new FusionCacheEntryOptions(CacheKeys.Currency.Ttl),
 			token);
-
-	}
 
 	private record CurrencySettingData
 	{

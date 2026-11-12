@@ -35,26 +35,16 @@ public sealed class RabbitmqEventStreamBroker(
 		var principal = httpContextAccessor.GetPrincipal();
 
 		var audience = principal?.Identity?.IsAuthenticated == true
-			? EventAudience.ForUser(principal.GetUserId() ?? throw new InvalidOperationException(
-				"Authenticated principal does not contain a user Id."))
+			? EventAudience.ForUser(
+				principal.GetUserId() ?? throw new InvalidOperationException(
+					"Authenticated principal does not contain a user Id."))
 			: EventAudience.Global;
 
-		return ReadAsync(topics, audience, _lifetime.Token, cancellationToken);
-	}
-
-	private async IAsyncEnumerable<EventMessage> ReadAsync(
-		string[] topics,
-		EventAudience audience,
-		CancellationToken lifetimeToken,
-		[EnumeratorCancellation]
-		CancellationToken cancellationToken)
-	{
-		using var linked = CancellationTokenSource.CreateLinkedTokenSource(
-			lifetimeToken,
+		return ReadAsync(
+			topics,
+			audience,
+			_lifetime.Token,
 			cancellationToken);
-
-		await foreach (var message in hub.SubscribeAsync(topics, audience, linked.Token))
-			yield return message;
 	}
 
 	public ValueTask DisposeAsync()
@@ -68,6 +58,23 @@ public sealed class RabbitmqEventStreamBroker(
 
 		return ValueTask.CompletedTask;
 	}
+
+	private async IAsyncEnumerable<EventMessage> ReadAsync(
+		string[] topics,
+		EventAudience audience,
+		CancellationToken lifetimeToken,
+		[EnumeratorCancellation] CancellationToken cancellationToken)
+	{
+		using var linked = CancellationTokenSource.CreateLinkedTokenSource(
+			lifetimeToken,
+			cancellationToken);
+
+		await foreach (var message in hub.SubscribeAsync(
+							topics,
+							audience,
+							linked.Token))
+			yield return message;
+	}
 }
 
 public sealed class RabbitmqEventStreamBrokerFactory(
@@ -76,5 +83,8 @@ public sealed class RabbitmqEventStreamBrokerFactory(
 	IHttpContextAccessor httpContextAccessor) : IEventStreamBrokerFactory
 {
 	public IEventStreamBroker Create(string? broker)
-		=> new RabbitmqEventStreamBroker(hub, registry, httpContextAccessor);
+		=> new RabbitmqEventStreamBroker(
+			hub,
+			registry,
+			httpContextAccessor);
 }

@@ -22,8 +22,8 @@ public class StorageContentSettingDefinition(
 
 	public override ILocalizableMessage NameLocalizationMessage => StorageContentSettingNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		StorageContentSettingDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> StorageContentSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(StorageContentSettingInputData);
 
@@ -46,8 +46,8 @@ public class StorageContentSettingDefinition(
 			cancellationToken);
 	}
 
-	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken) =>
-		(await SettingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Json;
+	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
+		=> (await SettingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Json;
 }
 
 public record StorageContentSettingInputData

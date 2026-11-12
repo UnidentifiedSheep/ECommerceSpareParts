@@ -9,7 +9,10 @@ public class ProductStock : Entity<ProductStock, (string, int)>, ILinqEntity<Pro
 {
 	private ProductStock() { }
 
-	private ProductStock(string storageCode, int productId, int quantity)
+	private ProductStock(
+		string storageCode,
+		int productId,
+		int quantity)
 	{
 		if (string.IsNullOrWhiteSpace(storageCode) || storageCode.Trim().Length > 128)
 			throw new InvalidOperationException("Storage code must contain between 1 and 128 characters.");
@@ -27,8 +30,20 @@ public class ProductStock : Entity<ProductStock, (string, int)>, ILinqEntity<Pro
 	public Storage Storage { get; private set; } = null!;
 	public Product.Product Product { get; private set; } = null!;
 
-	public static ProductStock Create(string storageCode, int productId, int quantity = 0) =>
-		new(storageCode, productId, quantity);
+	public static Expression<Func<ProductStock, (string, int)>> GetKeySelector()
+		=> stock => ValueTuple.Create(stock.StorageCode, stock.ProductId);
+
+	public static Expression<Func<ProductStock, bool>> GetEqualityExpression((string, int) key)
+		=> stock => stock.StorageCode == key.Item1 && stock.ProductId == key.Item2;
+
+	public static ProductStock Create(
+		string storageCode,
+		int productId,
+		int quantity = 0)
+		=> new(
+			storageCode,
+			productId,
+			quantity);
 
 	public void SetQuantity(int quantity)
 	{
@@ -38,12 +53,6 @@ public class ProductStock : Entity<ProductStock, (string, int)>, ILinqEntity<Pro
 		Quantity = quantity;
 		AddDomainEvent(new ProductStockUpdatedDomainEvent(StorageCode, ProductId));
 	}
-
-	public static Expression<Func<ProductStock, (string, int)>> GetKeySelector() =>
-		stock => ValueTuple.Create(stock.StorageCode, stock.ProductId);
-
-	public static Expression<Func<ProductStock, bool>> GetEqualityExpression((string, int) key) =>
-		stock => stock.StorageCode == key.Item1 && stock.ProductId == key.Item2;
 
 	public override (string, int) GetId() => (StorageCode, ProductId);
 }

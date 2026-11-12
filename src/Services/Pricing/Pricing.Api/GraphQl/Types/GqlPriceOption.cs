@@ -4,7 +4,8 @@ using Pricing.Application.Dtos.Price;
 namespace Pricing.Api.GraphQl.Types;
 
 [GraphQLName("PriceOption")]
-public sealed record GqlPriceOption([property: GraphQLIgnore] PriceOptionDto Dto)
+public sealed record GqlPriceOption([property: GraphQLIgnore]
+	PriceOptionDto Dto)
 {
 	[GraphQLName("priceOfferId")]
 	public Guid PriceOfferId => Dto.PriceOfferId;

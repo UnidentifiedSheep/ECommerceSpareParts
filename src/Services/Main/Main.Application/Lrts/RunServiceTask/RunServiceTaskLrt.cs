@@ -21,17 +21,21 @@ public sealed class RunServiceTaskLrt(
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtServiceTaskRunNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtServiceTaskRunDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtServiceTaskRunDescriptionMessage.Instance;
 
-	protected override Task DoWork(RunServiceTaskInputState inputState) =>
-		ExecuteInTransactionAsync(
+	protected override Task DoWork(RunServiceTaskInputState inputState)
+		=> ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			(context, _) =>
 			{
-				context.GetRequiredService<IIntegrationEventScope>().Add(new ServiceTaskRequestedEvent
-				{
-					TaskSystemName = inputState.TaskSystemName
-				}, inputState.ServiceName);
+				context.GetRequiredService<IIntegrationEventScope>()
+					.Add(
+						new ServiceTaskRequestedEvent
+						{
+							TaskSystemName = inputState.TaskSystemName
+						},
+						inputState.ServiceName);
 				return Task.CompletedTask;
 			},
 			CancellationToken);

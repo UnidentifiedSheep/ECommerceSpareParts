@@ -8,7 +8,10 @@ using Main.Enums;
 
 namespace Main.Entities.Sale;
 
-public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IGenerateAutomaticDomainEvents, IVersionable<uint>
+public class Sale : AuditableEntity<Sale, Guid>,
+	ILinqEntity<Sale, Guid>,
+	IGenerateAutomaticDomainEvents,
+	IVersionable<uint>
 {
 	private readonly List<SaleContent> _contents = [];
 
@@ -34,7 +37,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IGener
 		State = SaleState.Draft;
 	}
 
-	public Guid Id { get; private set; }
+	public Guid Id { get; }
 
 	public Guid UserId { get; private set; }
 
@@ -76,18 +79,17 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IGener
 		int currencyId,
 		string storageCode,
 		DateTime saleDate)
-	{
-		return new Sale(
+		=> new(
 			userId,
 			organizationId,
 			transactionId,
 			currencyId,
 			storageCode,
 			saleDate);
-	}
 
-	public void SetComment(string? comment) => Comment =
-		comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleCommentMaxMessage.Instance);
+	public void SetComment(string? comment)
+		=> Comment =
+			comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleCommentMaxMessage.Instance);
 
 	public void AddContent(SaleContent content)
 	{

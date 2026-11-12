@@ -1,7 +1,7 @@
-using Main.Entities.Product;
 using FluentAssertions;
 using Main.Application.Handlers.ProductEnrichment;
 using Main.Entities.Exceptions;
+using Main.Entities.Product;
 using Main.Entities.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
@@ -14,9 +14,7 @@ namespace Tests.HandlersTests.ProductEnrichment;
 public sealed class AddCandidateToCatalogueTests : IntegrationTest
 {
 	public AddCandidateToCatalogueTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 

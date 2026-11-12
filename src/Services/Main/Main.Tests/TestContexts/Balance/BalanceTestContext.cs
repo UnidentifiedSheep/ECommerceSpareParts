@@ -1,8 +1,7 @@
-using Persistence.Context;
 using Main.Entities.Balance;
 using Main.Entities.Organization;
 using Main.Entities.User;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
 using Tests.Interfaces;
@@ -13,7 +12,8 @@ namespace Tests.TestContexts.Balance;
 public class BalanceTestContext(
 	UnifiedDbContext context,
 	UsersTestContext usersTestContext,
-	CurrencyTestContext currencyTestContext) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
+	CurrencyTestContext currencyTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	private readonly List<Transaction> _transactions = [];
 

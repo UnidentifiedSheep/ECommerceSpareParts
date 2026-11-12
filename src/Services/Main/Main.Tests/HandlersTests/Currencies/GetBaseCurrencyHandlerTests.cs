@@ -60,8 +60,7 @@ public class GetBaseCurrencyHandlerTests
 	}
 
 	private static CurrencyDto CreateCurrency(int id)
-	{
-		return new CurrencyDto
+		=> new()
 		{
 			Id = id,
 			ShortName = "RUB",
@@ -69,5 +68,4 @@ public class GetBaseCurrencyHandlerTests
 			CurrencySign = "₽",
 			Code = "RUB"
 		};
-	}
 }

@@ -22,11 +22,13 @@ public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>,
 
 	public string Permission { get; } = null!;
 
-	public static Expression<Func<UserPermission, (Guid, string)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.UserId, x.Permission);
+	public static Expression<Func<UserPermission, (Guid, string)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.UserId, x.Permission);
 
-	public static Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key) => x =>
-		x.UserId == key.Item1 && x.Permission == key.Item2;
+	public static Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key)
+		=> x =>
+			x.UserId == key.Item1 && x.Permission == key.Item2;
 
 	public static UserPermission Create(Guid userId, string permission) => new(userId, permission);
 

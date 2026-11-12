@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces;
-using Application.Common.Abstractions;
+﻿using Application.Common.Abstractions;
 using Application.Common.Interfaces.Persistence;
 using MediatR;
 

@@ -19,10 +19,12 @@ public class UpdateCurrencyRatesLrt(
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtCurrencyRatesUpdateNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtCurrencyRatesUpdateDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtCurrencyRatesUpdateDescriptionMessage.Instance;
 
-	protected override Task DoWork(NoneInputState inputState) =>
-		ExecuteInScopeAsync((context, ct) =>
-			context.GetRequiredService<ISender>().Send(new UpdateCurrenciesRatesCommand(), ct), CancellationToken);
+	protected override Task DoWork(NoneInputState inputState)
+		=> ExecuteInScopeAsync(
+			(context, ct) =>
+				context.GetRequiredService<ISender>().Send(new UpdateCurrenciesRatesCommand(), ct),
+			CancellationToken);
 }

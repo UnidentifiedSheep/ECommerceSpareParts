@@ -1,5 +1,4 @@
-﻿using Abstractions.Models.Options;
-using Api.Common.Extensions;
+﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Handlers.Options.GetEmailOptions;
@@ -13,8 +12,7 @@ public record GetEmailOptionsResponse(UserEmailOptions EmailOptions);
 public class GetEmailOptionsEndPoint : ICarterModule
 {
 	public void AddRoutes(IEndpointRouteBuilder app)
-	{
-		app
+		=> app
 			.MapGet(
 				"/options/emails",
 				async (ISender sender, CancellationToken token) =>
@@ -29,5 +27,4 @@ public class GetEmailOptionsEndPoint : ICarterModule
 			.WithDisplayName("Получение параметров почт")
 			.Produces<GetEmailOptionsResponse>()
 			.RequireAnyPermission(PermissionCodes.OPTIONS_GET);
-	}
 }

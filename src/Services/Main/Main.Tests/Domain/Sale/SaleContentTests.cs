@@ -1,7 +1,7 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Entities.Sale;
 using Main.Entities.DomainEvents.Sale;
+using Main.Entities.Sale;
 
 namespace Tests.Domain.Sale;
 
@@ -126,8 +126,12 @@ public class SaleContentTests
 
 		content.Id.Should().Be(0);
 		content.SaleId.Should().Be(sale.Id);
-		content.FlushDomainEvents().Should().ContainSingle()
-			.Which.Should().Be(new SaleContentUpdateDomainEvent(content, true));
+		content.FlushDomainEvents()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.Be(new SaleContentUpdateDomainEvent(content, true));
 	}
 
 	[Fact]
@@ -136,10 +140,17 @@ public class SaleContentTests
 		var content = Create();
 		var sale = AttachToSale(content);
 
-		content.SetPriceAndDetails(120m, 90m, content.Details.ToArray());
+		content.SetPriceAndDetails(
+			120m,
+			90m,
+			content.Details.ToArray());
 
-		content.FlushDomainEvents().Should().ContainSingle()
-			.Which.Should().Be(new SaleContentUpdateDomainEvent(content, true));
+		content.FlushDomainEvents()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.Be(new SaleContentUpdateDomainEvent(content, true));
 	}
 
 	[Fact]
@@ -150,8 +161,12 @@ public class SaleContentTests
 
 		content.SetComment("updated");
 
-		content.FlushDomainEvents().Should().ContainSingle()
-			.Which.Should().Be(new SaleContentUpdateDomainEvent(content, false));
+		content.FlushDomainEvents()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.Be(new SaleContentUpdateDomainEvent(content, false));
 	}
 
 	[Fact]
@@ -160,7 +175,10 @@ public class SaleContentTests
 		var content = Create();
 		AttachToSale(content);
 
-		content.SetPriceAndDetails(content.OriginalPrice, content.DiscountedPrice, content.Details.ToArray());
+		content.SetPriceAndDetails(
+			content.OriginalPrice,
+			content.DiscountedPrice,
+			content.Details.ToArray());
 		content.SetComment(content.Comment);
 
 		content.FlushDomainEvents().Should().BeEmpty();
@@ -180,27 +198,29 @@ public class SaleContentTests
 
 	private static Main.Entities.Sale.Sale AttachToSale(SaleContent content)
 	{
-		var sale = Main.Entities.Sale.Sale.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 1, "WH-1", DateTime.UtcNow);
+		var sale = Main.Entities.Sale.Sale.Create(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1,
+			"WH-1",
+			DateTime.UtcNow);
 		sale.AddContent(content);
 		return sale;
 	}
 
 	private static SaleContent Create()
-	{
-		return SaleContent.Create(
+		=> SaleContent.Create(
 			1,
 			100m,
 			80m,
 			[CreateDetail(count: 2)]);
-	}
 
 	private static SaleContentDetail CreateDetail(int storageContentId = 1, int count = 1)
-	{
-		return SaleContentDetail.Create(
+		=> SaleContentDetail.Create(
 			storageContentId,
 			1,
 			10m,
 			count,
 			DateTime.UtcNow);
-	}
 }

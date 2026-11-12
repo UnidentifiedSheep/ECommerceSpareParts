@@ -56,12 +56,12 @@ public abstract class Entity<TModel, TKey> : IEntity<TKey>
 			_domainEvents.Add(domainEvent);
 	}
 
-	protected void AddEntityCreateDomainEvent() =>
-		AddDomainEvent(new EntityCreatedDomainEvent<TModel>((TModel)this));
+	protected void AddEntityCreateDomainEvent()
+		=> AddDomainEvent(new EntityCreatedDomainEvent<TModel>((TModel)this));
 
-	protected void AddEntityUpdateDomainEvent() =>
-		AddDomainEvent(new EntityUpdatedDomainEvent<TModel, TKey>(GetId()));
+	protected void AddEntityUpdateDomainEvent()
+		=> AddDomainEvent(new EntityUpdatedDomainEvent<TModel, TKey>(GetId()));
 
-	protected void AddEntityDeleteDomainEvent() =>
-		AddDomainEvent(new EntityDeletedDomainEvent<TModel, TKey>(GetId()));
+	protected void AddEntityDeleteDomainEvent()
+		=> AddDomainEvent(new EntityDeletedDomainEvent<TModel, TKey>(GetId()));
 }

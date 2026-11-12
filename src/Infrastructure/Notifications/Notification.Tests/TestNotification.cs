@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 
 namespace Notification.Tests;
@@ -7,13 +6,10 @@ namespace Notification.Tests;
 public class TestNotification : INotification<TestNotificationData>
 {
 	public const string Name = "TestNotification";
+
+	public TestNotification(TestNotificationData model) => Model = model;
 	public string SystemName => Name;
 	public TestNotificationData Model { get; }
-
-	public TestNotification(TestNotificationData model)
-	{
-		Model = model;
-	}
 }
 
 public record TestNotificationData : INotificationModel

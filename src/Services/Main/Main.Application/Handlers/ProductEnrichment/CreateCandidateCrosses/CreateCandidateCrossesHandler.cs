@@ -42,11 +42,12 @@ public class CreateCandidateCrossesHandler(ISender sender) : ICommandHandler<Cre
 	}
 
 	private async Task<Dictionary<Guid, int>>
-		CreateProducts(CreateCandidateCrossesCommand request, CancellationToken ct) => (await sender.Send(
-		new AddCandidateToCatalogueCommand(
-			request
-				.CrossCandidateIds
-				.Append(request.CandidateId)
-				.Select(x => new AddCandidateToCatalogueItem(x, null))),
-		ct)).CreatedIds;
+		CreateProducts(CreateCandidateCrossesCommand request, CancellationToken ct)
+		=> (await sender.Send(
+			new AddCandidateToCatalogueCommand(
+				request
+					.CrossCandidateIds
+					.Append(request.CandidateId)
+					.Select(x => new AddCandidateToCatalogueItem(x, null))),
+			ct)).CreatedIds;
 }

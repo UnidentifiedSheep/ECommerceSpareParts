@@ -12,8 +12,7 @@ public record GetPermissionsResponse(IReadOnlyList<PermissionDto> Permissions);
 public class GetPermissionsEndPoint : ICarterModule
 {
 	public void AddRoutes(IEndpointRouteBuilder app)
-	{
-		app
+		=> app
 			.MapGet(
 				"/permissions/",
 				async (ISender sender, CancellationToken ct) =>
@@ -31,5 +30,4 @@ public class GetPermissionsEndPoint : ICarterModule
 			.Produces<GetPermissionsResponse>()
 			.ProducesProblem(400)
 			.RequireAnyPermission(PermissionCodes.PERMISSIONS_GET);
-	}
 }

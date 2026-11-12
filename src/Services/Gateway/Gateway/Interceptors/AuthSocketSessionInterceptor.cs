@@ -52,11 +52,9 @@ public sealed class AuthSocketSessionInterceptor : DefaultSocketSessionIntercept
 		string operationSessionId,
 		OperationRequestBuilder requestBuilder,
 		CancellationToken cancellationToken = default)
-	{
-		await base.OnRequestAsync(
+		=> await base.OnRequestAsync(
 			session,
 			operationSessionId,
 			requestBuilder,
 			cancellationToken);
-	}
 }

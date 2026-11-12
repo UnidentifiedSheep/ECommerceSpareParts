@@ -106,8 +106,7 @@ public class UpsertCatalogueCandidatesHandlerTests
 	}
 
 	private void SetupRepository(ICollection<CatalogueCandidateDocument> upsertedDocuments)
-	{
-		_repository
+		=> _repository
 			.Setup(x => x.UpsertMany(
 				It.IsAny<IEnumerable<CatalogueCandidateDocument>>(),
 				It.IsAny<CancellationToken>()))
@@ -117,7 +116,6 @@ public class UpsertCatalogueCandidatesHandlerTests
 					upsertedDocuments.Add(document);
 			})
 			.Returns(Task.CompletedTask);
-	}
 
 	private static CatalogueCandidateUpdatedEvent CreateEvent(
 		Guid id,
@@ -125,8 +123,7 @@ public class UpsertCatalogueCandidatesHandlerTests
 		int? mappedProductId = null,
 		IReadOnlyList<string>? names = null,
 		DateTime? occuredAt = null)
-	{
-		return new CatalogueCandidateUpdatedEvent
+		=> new()
 		{
 			Candidate = new CatalogueCandidateContractDto
 			{
@@ -138,5 +135,4 @@ public class UpsertCatalogueCandidatesHandlerTests
 			},
 			OccuredAt = occuredAt ?? DateTime.UtcNow
 		};
-	}
 }

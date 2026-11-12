@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces.Services;
@@ -56,17 +55,17 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 		schedule.MaxAttempts.Should().Be(5);
 		schedule.InputState.Should().Contain("1");
 		schedule
-		.NextRunAt
-		.Should()
-		.Be(
-			new DateTime(
-				2026,
-				8,
-				21,
-				10,
-				5,
-				0,
-				DateTimeKind.Utc));
+			.NextRunAt
+			.Should()
+			.Be(
+				new DateTime(
+					2026,
+					8,
+					21,
+					10,
+					5,
+					0,
+					DateTimeKind.Utc));
 	}
 
 	[Fact]
@@ -90,17 +89,17 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 
 		updated.Cron.Should().Be("*/5 * * * *");
 		updated
-		.NextRunAt
-		.Should()
-		.Be(
-			new DateTime(
-				2026,
-				8,
-				21,
-				10,
-				5,
-				0,
-				DateTimeKind.Utc));
+			.NextRunAt
+			.Should()
+			.Be(
+				new DateTime(
+					2026,
+					8,
+					21,
+					10,
+					5,
+					0,
+					DateTimeKind.Utc));
 	}
 
 	[Fact]
@@ -133,7 +132,9 @@ public sealed class JobScheduleServiceTests(CombinedContainerFixture fixture)
 		await Service.RemoveScheduleAsync(schedule.Id, CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		(await Context.Set<JobSchedule>().AsNoTracking().AnyAsync(x => x.Id == schedule.Id, CancellationToken))
+		(await Context.Set<JobSchedule>()
+				.AsNoTracking()
+				.AnyAsync(x => x.Id == schedule.Id, CancellationToken))
 			.Should()
 			.BeFalse();
 	}

@@ -13,10 +13,7 @@ public sealed record GetOrganizationsByIdsQuery : IQuery<GetOrganizationsByIdsRe
 {
 	public GetOrganizationsByIdsQuery(Guid id) : this([id]) { }
 
-	public GetOrganizationsByIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetOrganizationsByIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }

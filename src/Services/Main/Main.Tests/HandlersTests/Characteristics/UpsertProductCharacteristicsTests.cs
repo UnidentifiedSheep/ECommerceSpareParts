@@ -14,33 +14,41 @@ namespace Tests.HandlersTests.Characteristics;
 public class UpsertProductCharacteristicsTests : IntegrationTest
 {
 	public UpsertProductCharacteristicsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	[Fact]
 	public async Task MissingCharacteristic_ReturnsLocalizedError()
 	{
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var command = new UpsertCharacteristicsCommand(
-			[new UpsertCharacteristicsDto { ProductId = productId, CharacteristicId = int.MaxValue, Value = "Red" }]);
+		[
+			new UpsertCharacteristicsDto
+				{ ProductId = productId, CharacteristicId = int.MaxValue, Value = "Red" }
+		]);
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
-		exception.Failures.Should().ContainSingle(failure => failure.Error is CharacteristicNotFoundException);
+		exception.Failures
+			.Should()
+			.ContainSingle(failure => failure.Error is CharacteristicNotFoundException);
 	}
 
 	[Fact]
 	public async Task EmptyBatch_CompletesWithoutValidationErrors()
-	{
-		await Mediator.Send(new UpsertCharacteristicsCommand([]), CancellationToken);
-	}
+		=> await Mediator.Send(new UpsertCharacteristicsCommand([]), CancellationToken);
 
 	[Fact]
 	public async Task MixedBatch_UpdatesCreatesAndCanBeRepeated()
 	{
-		var existing = ProductCharacteristic.Create(1, 10, "Old");
-		var untouched = ProductCharacteristic.Create(1, 20, "Unchanged");
+		var existing = ProductCharacteristic.Create(
+			1,
+			10,
+			"Old");
+		var untouched = ProductCharacteristic.Create(
+			1,
+			20,
+			"Unchanged");
 		var stored = new List<ProductCharacteristic> { existing, untouched };
 		var repository = new Mock<IRepository<ProductCharacteristic, (int, int)>>();
 		repository.Setup(x => x.ListAsync(
@@ -49,8 +57,10 @@ public class UpsertProductCharacteristicsTests : IntegrationTest
 			.ReturnsAsync(stored);
 		var unitOfWork = new Mock<IUnitOfWork>();
 		unitOfWork.Setup(x => x.AddRangeAsync(
-				It.IsAny<IEnumerable<ProductCharacteristic>>(), It.IsAny<CancellationToken>()))
-			.Callback<IEnumerable<ProductCharacteristic>, CancellationToken>((items, _) => stored.AddRange(items))
+				It.IsAny<IEnumerable<ProductCharacteristic>>(),
+				It.IsAny<CancellationToken>()))
+			.Callback<IEnumerable<ProductCharacteristic>, CancellationToken>((items, _)
+				=> stored.AddRange(items))
 			.Returns(Task.CompletedTask);
 		var handler = new UpsertCharacteristicsHandler(repository.Object, unitOfWork.Object);
 		var command = new UpsertCharacteristicsCommand(
@@ -66,8 +76,11 @@ public class UpsertProductCharacteristicsTests : IntegrationTest
 		untouched.Value.Should().Be("Unchanged");
 		stored.Should().HaveCount(3);
 		stored.Single(x => x.GetId() == (2, 20)).Value.Should().Be("New");
-		unitOfWork.Verify(x => x.AddRangeAsync(
-			It.IsAny<IEnumerable<ProductCharacteristic>>(), It.IsAny<CancellationToken>()), Times.Once);
+		unitOfWork.Verify(
+			x => x.AddRangeAsync(
+				It.IsAny<IEnumerable<ProductCharacteristic>>(),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
 	}
 
 	[Fact]

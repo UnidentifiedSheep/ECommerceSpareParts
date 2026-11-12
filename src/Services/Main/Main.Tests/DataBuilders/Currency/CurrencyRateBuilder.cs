@@ -31,10 +31,8 @@ public class CurrencyRateBuilder(Faker faker) : BuilderBase<CurrencyRate>(faker)
 	}
 
 	public override CurrencyRate Build()
-	{
-		return CurrencyRate.Create(
+		=> CurrencyRate.Create(
 			FromCurrencyId ?? Faker.Random.Int(1),
 			ToCurrencyId ?? Faker.Random.Int(1),
 			Rate ?? Math.Round(Faker.Random.Decimal(1), 2));
-	}
 }

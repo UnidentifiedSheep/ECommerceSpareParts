@@ -19,8 +19,14 @@ public sealed class EntityHistoryContextTests
 	public void Reasons_AreDistinctAndBelongToTheExactEntity()
 	{
 		var context = new EntityHistoryContext();
-		var firstSale = new EntityHistoryReason("Sale", "Sale", "[10]");
-		var secondSale = new EntityHistoryReason("Sale", "Sale", "[11]");
+		var firstSale = new EntityHistoryReason(
+			"Sale",
+			"Sale",
+			"[10]");
+		var secondSale = new EntityHistoryReason(
+			"Sale",
+			"Sale",
+			"[11]");
 		var id = Guid.NewGuid();
 		var otherId = Guid.NewGuid();
 		context.AddReason<TestMetadataEntity, Guid>(id, firstSale);
@@ -30,8 +36,12 @@ public sealed class EntityHistoryContextTests
 		context.AddReason<TestMetadataEntity, Guid>(otherId, new EntityHistoryReason("InventoryCorrection"));
 
 		context.GetReasons<TestMetadataEntity, Guid>(id).Should().BeEquivalentTo([firstSale, secondSale]);
-		context.GetReasons<TestAuditableMetadataEntity, Guid>(id).Should().Equal(new EntityHistoryReason("OrderCancelled"));
-		context.GetReasons<TestMetadataEntity, Guid>(otherId).Should().Equal(new EntityHistoryReason("InventoryCorrection"));
+		context.GetReasons<TestAuditableMetadataEntity, Guid>(id)
+			.Should()
+			.Equal(new EntityHistoryReason("OrderCancelled"));
+		context.GetReasons<TestMetadataEntity, Guid>(otherId)
+			.Should()
+			.Equal(new EntityHistoryReason("InventoryCorrection"));
 		context.GetReasons<TestMetadataEntity, Guid>(Guid.NewGuid()).Should().BeEmpty();
 	}
 
@@ -69,10 +79,14 @@ public sealed class EntityHistoryContextTests
 		var stepId = Guid.NewGuid();
 		var dependencyId = Guid.NewGuid();
 		var key = new JobStepDependencyKey(stepId, dependencyId);
-		var reason = EntityHistoryReason.ForSource<JobStepDependency, JobStepDependencyKey>("DependencyChanged", key);
+		var reason =
+			EntityHistoryReason.ForSource<JobStepDependency, JobStepDependencyKey>("DependencyChanged", key);
 		context.AddReason<JobStepDependency, JobStepDependencyKey>(key, reason);
 
-		context.GetReasons<JobStepDependency, JobStepDependencyKey>(new JobStepDependencyKey(stepId, dependencyId)).Should().Equal(reason);
+		context.GetReasons<JobStepDependency, JobStepDependencyKey>(
+				new JobStepDependencyKey(stepId, dependencyId))
+			.Should()
+			.Equal(reason);
 		reason.SourceType.Should().Be(nameof(JobStepDependency));
 		reason.SourceKey.Should().Be(EntityKey.FormatValues([stepId, dependencyId]));
 	}
@@ -93,7 +107,8 @@ public sealed class EntityHistoryContextTests
 	{
 		var services = new ServiceCollection();
 		services.RegisterApplicationTransactions();
-		await using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+		await using var provider =
+			services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 		await using var scope = provider.CreateAsyncScope();
 		var request = scope.ServiceProvider.GetRequiredService<IEntityHistoryContext>();
 		var entity = new TestMetadataEntityBuilder().Build();

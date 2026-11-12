@@ -5,7 +5,8 @@ namespace Main.Api.GraphQl.Types.Organization;
 
 [GraphQLName("OrganizationFinancialProfile")]
 public sealed record GqlOrganizationFinancialProfile(
-	[property: GraphQLIgnore] OrganizationFinancialProfileDto ProfileDto)
+	[property: GraphQLIgnore]
+	OrganizationFinancialProfileDto ProfileDto)
 {
 	[GraphQLName("netPositionInBaseCurrency")]
 	public decimal NetPositionInBaseCurrency => ProfileDto.NetPositionInBaseCurrency;

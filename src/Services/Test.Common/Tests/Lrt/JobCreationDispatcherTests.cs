@@ -1,13 +1,11 @@
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NamedObject.Core.Interfaces;
@@ -180,14 +178,19 @@ public sealed class JobCreationDispatcherTests
 	public void Create_DeferredInput_DoesNotEvaluateFactory()
 	{
 		var calls = 0;
-		var workflow = CreateWorkflow(builder => builder.AddStep("step", _ =>
-		{
-			calls++;
-			return new NoneInputState();
-		}));
+		var workflow = CreateWorkflow(builder => builder.AddStep(
+			"step",
+			_ =>
+			{
+				calls++;
+				return new NoneInputState();
+			}));
 		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
 
-		var job = (MultiStepJob)dispatcher.Create(workflow.SystemName, "{}", 3);
+		var job = (MultiStepJob)dispatcher.Create(
+			workflow.SystemName,
+			"{}",
+			3);
 
 		calls.Should().Be(0);
 		job.Steps.Should().ContainSingle().Which.InputInitialized.Should().BeFalse();
@@ -198,12 +201,21 @@ public sealed class JobCreationDispatcherTests
 	{
 		var workflow = CreateWorkflow(builder =>
 		{
-			builder.AddStep("step", new NoneInputState(), key: "first");
-			builder.AddStep("step", new NoneInputState(), key: "second");
+			builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "first");
+			builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "second");
 		});
 		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
 
-		var job = (MultiStepJob)dispatcher.Create(workflow.SystemName, "{}", 3);
+		var job = (MultiStepJob)dispatcher.Create(
+			workflow.SystemName,
+			"{}",
+			3);
 
 		job.Steps.Select(x => x.StepKey).Should().Equal("first", "second");
 	}
@@ -213,12 +225,21 @@ public sealed class JobCreationDispatcherTests
 	{
 		var workflow = CreateWorkflow(builder =>
 		{
-			builder.AddStep("step", new NoneInputState(), key: "same");
-			builder.AddStep("step", new NoneInputState(), key: "same");
+			builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "same");
+			builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "same");
 		});
 		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
 
-		var action = () => dispatcher.Create(workflow.SystemName, "{}", 3);
+		var action = () => dispatcher.Create(
+			workflow.SystemName,
+			"{}",
+			3);
 
 		action.Should().Throw<InvalidOperationException>().WithMessage("*Duplicate*same*");
 	}
@@ -228,14 +249,23 @@ public sealed class JobCreationDispatcherTests
 	{
 		var workflow = CreateWorkflow(builder =>
 		{
-			var first = builder.AddStep("step", new NoneInputState(), key: "first");
-			var second = builder.AddStep("step", new NoneInputState(), key: "second");
+			var first = builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "first");
+			var second = builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "second");
 			builder.AddDependency(first, second);
 			builder.AddDependency(second, first);
 		});
 		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
 
-		var action = () => dispatcher.Create(workflow.SystemName, "{}", 3);
+		var action = () => dispatcher.Create(
+			workflow.SystemName,
+			"{}",
+			3);
 
 		action.Should().Throw<InvalidOperationException>().WithMessage("*cycle*");
 	}
@@ -285,11 +315,11 @@ public sealed class JobCreationDispatcherTests
 
 		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-name");
 
-		public override ILocalizableMessage DescriptionLocalizationMessage =>
-			new LocalizableMessage("test-description");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-description");
 
-		protected override void ConfigureSteps(IMultiStepJobBuilder builder) =>
-			builder.AddStep("step", new NoneInputState());
+		protected override void ConfigureSteps(IMultiStepJobBuilder builder)
+			=> builder.AddStep("step", new NoneInputState());
 	}
 
 	private sealed class NestedMultiStepLrt(string systemName, string childSystemName)
@@ -301,10 +331,10 @@ public sealed class JobCreationDispatcherTests
 
 		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-name");
 
-		public override ILocalizableMessage DescriptionLocalizationMessage =>
-			new LocalizableMessage("test-description");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-description");
 
-		protected override void ConfigureSteps(IMultiStepJobBuilder builder) =>
-			builder.AddStep(childSystemName, new NoneInputState());
+		protected override void ConfigureSteps(IMultiStepJobBuilder builder)
+			=> builder.AddStep(childSystemName, new NoneInputState());
 	}
 }

@@ -31,8 +31,14 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 	[InlineData(10, 140)]
 	public async Task Quantity_ChangesCompositionAndWeightedUnitPrice(int quantity, decimal price)
 	{
-		var first = await AddOption(6, 100m, 2m);
-		var second = await AddOption(4, 200m, 1m);
+		var first = await AddOption(
+			6,
+			100m,
+			2m);
+		var second = await AddOption(
+			4,
+			200m,
+			1m);
 
 		var result = await GetRecommendation(quantity);
 
@@ -54,8 +60,14 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 	[Fact]
 	public async Task Shortage_ReturnsMissingQuantityWithoutFinalPrice()
 	{
-		await AddOption(2, 100m, 2m);
-		await AddOption(3, 200m, 1m);
+		await AddOption(
+			2,
+			100m,
+			2m);
+		await AddOption(
+			3,
+			200m,
+			1m);
 
 		var result = await GetRecommendation(7);
 
@@ -78,11 +90,28 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 	[Fact]
 	public async Task ExpiredEmptyAndClosedOffers_AreNotUsed()
 	{
-		await AddOption(100, 1m, 10m, configure: builder => builder.WithExpiresAt(DateTime.UtcNow.AddMinutes(-1)));
-		await AddOption(100, 1m, 10m, configure: builder => builder.WithOrderTill(DateTime.UtcNow.AddMinutes(-1)));
-		await AddOption(0, 1m, 10m);
-		await AddOption(-1, 1m, 10m);
-		var available = await AddOption(2, 120m, 1m);
+		await AddOption(
+			100,
+			1m,
+			10m,
+			configure: builder => builder.WithExpiresAt(DateTime.UtcNow.AddMinutes(-1)));
+		await AddOption(
+			100,
+			1m,
+			10m,
+			configure: builder => builder.WithOrderTill(DateTime.UtcNow.AddMinutes(-1)));
+		await AddOption(
+			0,
+			1m,
+			10m);
+		await AddOption(
+			-1,
+			1m,
+			10m);
+		var available = await AddOption(
+			2,
+			120m,
+			1m);
 
 		var result = await GetRecommendation(2);
 
@@ -93,12 +122,27 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 	[Fact]
 	public async Task OtherProductsStoragesAndSources_DoNotAffectRecommendation()
 	{
-		await AddOption(100, 1m, 10m, productId: ProductId + 1);
-		await AddOption(100, 1m, 10m, storageCode: "other");
-		await AddOption(100, 1m, 10m, source: PriceOfferSource.FavoriteParts);
-		await AddOption(2, 150m, 1m);
+		await AddOption(
+			100,
+			1m,
+			10m,
+			ProductId + 1);
+		await AddOption(
+			100,
+			1m,
+			10m,
+			storageCode: "other");
+		await AddOption(
+			100,
+			1m,
+			10m,
+			source: PriceOfferSource.FavoriteParts);
+		await AddOption(
+			2,
+			150m,
+			1m);
 
-		var result = await GetRecommendation(3, sources: [PriceOfferSource.Armtek]);
+		var result = await GetRecommendation(3, [PriceOfferSource.Armtek]);
 
 		result.MissingQuantity.Should().Be(1);
 		result.Items.Should().ContainSingle(item => item.Quantity == 2 && item.Option.Price == 150m);
@@ -107,8 +151,14 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 	[Fact]
 	public async Task EqualScores_SelectCheaperOfferFirst()
 	{
-		await AddOption(3, 200m, 1m);
-		var cheaper = await AddOption(3, 100m, 1m);
+		await AddOption(
+			3,
+			200m,
+			1m);
+		var cheaper = await AddOption(
+			3,
+			100m,
+			1m);
 
 		var result = await GetRecommendation(2);
 
@@ -119,8 +169,15 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 	[Fact]
 	public async Task DifferentCurrencies_AreConvertedBeforeAveraging()
 	{
-		await AddOption(2, 10m, 2m, currencyId: 2);
-		await AddOption(2, 30m, 1m);
+		await AddOption(
+			2,
+			10m,
+			2m,
+			currencyId: 2);
+		await AddOption(
+			2,
+			30m,
+			1m);
 
 		var result = await GetRecommendation(4);
 
@@ -137,8 +194,14 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 	[InlineData(5, 10)]
 	public async Task WeightedPrice_UsesConfiguredRoundingStep(decimal step, decimal expectedPrice)
 	{
-		await AddOption(1, 10.03m, 2m);
-		await AddOption(1, 10.26m, 1m);
+		await AddOption(
+			1,
+			10.03m,
+			2m);
+		await AddOption(
+			1,
+			10.26m,
+			1m);
 
 		var result = await GetRecommendation(2, roundingStep: step);
 
@@ -152,14 +215,24 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 	public async Task NonPositiveQuantity_FailsValidation(int quantity)
 	{
 		var result = await new GetRecommendedPriceValidation().ValidateAsync(
-			new GetRecommendedPriceQuery(ProductId, 1, StorageCode, quantity, []), CancellationToken);
+			new GetRecommendedPriceQuery(
+				ProductId,
+				1,
+				StorageCode,
+				quantity,
+				[]),
+			CancellationToken);
 
 		result.IsValid.Should().BeFalse();
-		result.Errors.Should().Contain(error => error.PropertyName == nameof(GetRecommendedPriceQuery.Quantity));
+		result.Errors
+			.Should()
+			.Contain(error => error.PropertyName == nameof(GetRecommendedPriceQuery.Quantity));
 	}
 
 	private async Task<PriceRecommendationDto> GetRecommendation(
-		int quantity, IReadOnlyCollection<PriceOfferSource>? sources = null, decimal roundingStep = 0.01m)
+		int quantity,
+		IReadOnlyCollection<PriceOfferSource>? sources = null,
+		decimal roundingStep = 0.01m)
 	{
 		var sender = new Mock<ISender>(MockBehavior.Strict);
 		sender.Setup(x => x.Send(It.IsAny<RefreshOffersCommand>(), It.IsAny<CancellationToken>()))
@@ -167,39 +240,71 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 		sender.Setup(x => x.Send(It.IsAny<CalculateCandidatesCommand>(), It.IsAny<CancellationToken>()))
 			.ReturnsAsync(Unit.Value);
 		var converter = new Mock<ICurrencyConverter>();
-		converter.Setup(x => x.ConvertAsync(It.IsAny<decimal>(), It.IsAny<int>(), 1, It.IsAny<CancellationToken>()))
-			.ReturnsAsync((decimal value, int currency, int _, CancellationToken _) => currency == 2 ? value * 20 : value);
+		converter.Setup(x => x.ConvertAsync(
+				It.IsAny<decimal>(),
+				It.IsAny<int>(),
+				1,
+				It.IsAny<CancellationToken>()))
+			.ReturnsAsync((
+				decimal value, int currency,
+				int _, CancellationToken _) => currency == 2 ? value * 20 : value);
 		var markup = new Mock<IMarkupContainer>();
 		markup.SetupGet(x => x.CurrentVersion).Returns(Version);
 		var appliers = new Mock<IPriceApplierService>();
-		appliers.Setup(x => x.GetCurrentConfigurationVersionAsync(It.IsAny<CancellationToken>())).ReturnsAsync(Version);
+		appliers.Setup(x => x.GetCurrentConfigurationVersionAsync(It.IsAny<CancellationToken>()))
+			.ReturnsAsync(Version);
 		var settings = new Mock<ISettingsService>();
 		settings.Setup(x => x.GetOrDefault<PricingSetting>(It.IsAny<CancellationToken>()))
 			.ReturnsAsync(new PricingSetting(new PricingSettingData { PriceRoundingStep = roundingStep }));
-		var offers = new GetPriceOptionsForProductHandler(sender.Object,
+		var offers = new GetPriceOptionsForProductHandler(
+			sender.Object,
 			Scope.ServiceProvider.GetRequiredService<IReadRepository<ProductPriceOption, Guid>>(),
-			converter.Object, markup.Object, appliers.Object, settings.Object);
+			converter.Object,
+			markup.Object,
+			appliers.Object,
+			settings.Object);
 		sender.Setup(x => x.Send(It.IsAny<GetPriceOptionsForProductQuery>(), It.IsAny<CancellationToken>()))
-			.Returns((GetPriceOptionsForProductQuery query, CancellationToken token) => offers.Handle(query, token));
+			.Returns((GetPriceOptionsForProductQuery query, CancellationToken token)
+				=> offers.Handle(query, token));
 		var result = await new GetRecommendedPriceHandler(sender.Object, settings.Object).Handle(
-			new GetRecommendedPriceQuery(ProductId, 1, StorageCode, quantity, sources ?? []), CancellationToken);
+			new GetRecommendedPriceQuery(
+				ProductId,
+				1,
+				StorageCode,
+				quantity,
+				sources ?? []),
+			CancellationToken);
 		return result.Item;
 	}
 
 	private async Task<ProductPriceOption> AddOption(
-		int quantity, decimal price, decimal score,
-		int productId = ProductId, string storageCode = StorageCode,
-		int currencyId = 1, PriceOfferSource source = PriceOfferSource.Armtek,
+		int quantity,
+		decimal price,
+		decimal score,
+		int productId = ProductId,
+		string storageCode = StorageCode,
+		int currencyId = 1,
+		PriceOfferSource source = PriceOfferSource.Armtek,
 		Action<PriceOfferDataBuilder>? configure = null)
 	{
 		var offerBuilder = new PriceOfferDataBuilder(Faker)
-			.WithProductId(productId).WithStorageCode(storageCode).WithCurrencyId(currencyId)
-			.WithAvailableQuantity(quantity).WithSource(source);
+			.WithProductId(productId)
+			.WithStorageCode(storageCode)
+			.WithCurrencyId(currencyId)
+			.WithAvailableQuantity(quantity)
+			.WithSource(source);
 		configure?.Invoke(offerBuilder);
 		var offer = await offerBuilder.BuildAndAddToDb(Context, CancellationToken);
 		return await new ProductPriceOptionDataBuilder(Faker)
-			.WithPriceOfferId(offer.Id).WithStorageCode(storageCode).WithCurrencyId(currencyId)
-			.WithPrice(price).WithScore(score).WithVersions(Version, Version, Guid.Empty)
+			.WithPriceOfferId(offer.Id)
+			.WithStorageCode(storageCode)
+			.WithCurrencyId(currencyId)
+			.WithPrice(price)
+			.WithScore(score)
+			.WithVersions(
+				Version,
+				Version,
+				Guid.Empty)
 			.BuildAndAddToDb(Context, CancellationToken);
 	}
 }

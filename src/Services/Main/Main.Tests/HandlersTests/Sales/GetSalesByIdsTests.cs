@@ -13,9 +13,7 @@ namespace Tests.HandlersTests.Sales;
 public sealed class GetSalesByIdsTests : IntegrationTest
 {
 	public GetSalesByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<SaleTestContext>();
-	}
+		=> RegisterBasicContext<SaleTestContext>();
 
 	private SaleTestContext TestContext => GetContext<SaleTestContext>();
 
@@ -26,7 +24,8 @@ public sealed class GetSalesByIdsTests : IntegrationTest
 		var second = await CreateSale();
 
 		var result = await Mediator.Send(
-			new GetSalesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]), CancellationToken);
+			new GetSalesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Sales.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
 	}

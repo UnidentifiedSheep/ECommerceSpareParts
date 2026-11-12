@@ -1,14 +1,14 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
+using Application.Common.Services;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Application.Static;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Storage;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -71,7 +71,8 @@ public class AddContentToStorageTests : IntegrationTest
 			storage.Code,
 			StorageMovementType.StorageContentAddition);
 		var countBefore = await Context.Set<StorageContent>().CountAsync(CancellationToken);
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 		Assert.Contains(exception.Failures, failure => failure.Error is ProductNotFoundException);
 		Assert.Equal(countBefore, await Context.Set<StorageContent>().CountAsync(CancellationToken));
 	}
@@ -134,11 +135,16 @@ public class AddContentToStorageTests : IntegrationTest
 			if (!expectedTotals.TryAdd(kv.Key, kv.Value))
 				expectedTotals[kv.Key] += kv.Value;
 
-		var stocks = await Context.Set<ProductStock>().AsNoTracking().Where(stock => stock.StorageCode == storage.Code)
-			.ToDictionaryAsync(stock => stock.ProductId, stock => stock.Quantity, CancellationToken);
+		var stocks = await Context.Set<ProductStock>()
+			.AsNoTracking()
+			.Where(stock => stock.StorageCode == storage.Code)
+			.ToDictionaryAsync(
+				stock => stock.ProductId,
+				stock => stock.Quantity,
+				CancellationToken);
 
 		var dbStorageContents = await Context
-			.Set<global::Main.Entities.Storage.StorageContent>()
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.StorageCode == storage.Code)
 			.ToListAsync();
@@ -203,17 +209,19 @@ public class AddContentValidationTests : ValidationTest<AddContentValidation, Ad
 {
 	protected override AddContentValidation CreateValidator()
 	{
-		var policy = new Moq.Mock<Application.Common.Services.IOperationDatePolicy>();
-		policy.Setup(x => x.IsAllowed(Moq.It.IsAny<DateTime>()))
-			.Returns(Application.Common.Services.OperationDateValidationResult.Valid());
+		var policy = new Mock<IOperationDatePolicy>();
+		policy.Setup(x => x.IsAllowed(It.IsAny<DateTime>()))
+			.Returns(OperationDateValidationResult.Valid());
 		return new AddContentValidation(policy.Object);
 	}
 
-	private static List<NewStorageContentDto> GetNewStorageContents(int count) => Enumerable.Range(1, count)
-		.Select(id => new NewStorageContentDto
-		{
-			ProductId = id, CurrencyId = 1, BuyPrice = 10m, Count = 1, PurchaseDate = DateTime.UtcNow
-		}).ToList();
+	private static List<NewStorageContentDto> GetNewStorageContents(int count)
+		=> Enumerable.Range(1, count)
+			.Select(id => new NewStorageContentDto
+			{
+				ProductId = id, CurrencyId = 1, BuyPrice = 10m, Count = 1, PurchaseDate = DateTime.UtcNow
+			})
+			.ToList();
 
 	[Fact]
 	public async Task AddContentToStorage_WithEmptyContentList_FailsValidation()

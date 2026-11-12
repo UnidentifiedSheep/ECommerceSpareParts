@@ -14,9 +14,7 @@ namespace Tests.CacheRepositoriesTests.ProductCache;
 public class GetProductOrSetAsyncTests : IntegrationTest
 {
 	public GetProductOrSetAsyncTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -99,10 +97,8 @@ public class GetProductOrSetAsyncTests : IntegrationTest
 	private IProductProvider GetRepository() => Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 
 	private async Task RemoveCachedProduct(int productId)
-	{
-		await Scope
+		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
 			.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
-	}
 }

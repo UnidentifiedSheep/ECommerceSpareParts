@@ -8,8 +8,7 @@ public class PerAreaOrWeightPricing : LogisticsPricingStrategyBase
 	public override LogisticPricingType Type => LogisticPricingType.PerAreaOrWeight;
 
 	public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
-	{
-		return Iterate(
+		=> Iterate(
 			context,
 			items,
 			input => CalculatePrice(
@@ -17,10 +16,10 @@ public class PerAreaOrWeightPricing : LogisticsPricingStrategyBase
 				input.WeightKg,
 				context),
 			LogisticsDataRequirements.Size | LogisticsDataRequirements.Weight);
-	}
 
 	private decimal CalculatePrice(
 		decimal area,
 		decimal weight,
-		LogisticsContext context) => Math.Max(context.PriceM3 * area, context.PriceKg * weight);
+		LogisticsContext context)
+		=> Math.Max(context.PriceM3 * area, context.PriceKg * weight);
 }

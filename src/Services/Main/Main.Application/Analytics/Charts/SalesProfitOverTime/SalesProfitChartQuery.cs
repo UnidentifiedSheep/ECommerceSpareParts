@@ -1,6 +1,6 @@
-using Main.Entities;
 using System.Text.Json.Serialization;
 using Domain.Validation;
+using Main.Entities;
 using Main.Enums;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;

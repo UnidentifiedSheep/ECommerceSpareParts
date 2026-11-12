@@ -11,9 +11,7 @@ namespace Main.Application.Handlers.Auth;
 public sealed record GetRolesPermissionsByNamesQuery : IQuery<GetRolesPermissionsByNamesResult>
 {
 	public GetRolesPermissionsByNamesQuery(IEnumerable<string> names)
-	{
-		Names = names.Select(RoleNames.Normalize).Distinct().ToArray();
-	}
+		=> Names = names.Select(RoleNames.Normalize).Distinct().ToArray();
 
 	public IReadOnlyList<string> Names { get; }
 }
@@ -21,14 +19,17 @@ public sealed record GetRolesPermissionsByNamesQuery : IQuery<GetRolesPermission
 public sealed record GetRolesPermissionsByNamesResult(
 	IReadOnlyDictionary<string, IReadOnlyList<PermissionDto>> Permissions);
 
-public sealed class GetRolesPermissionsByNamesHandler(IReadRepository<Role, string> repository, ISender sender)
+public sealed class GetRolesPermissionsByNamesHandler(IReadRepository<Role, string> repository,
+	ISender sender)
 	: IQueryHandler<GetRolesPermissionsByNamesQuery, GetRolesPermissionsByNamesResult>
 {
 	public async Task<GetRolesPermissionsByNamesResult> Handle(
-		GetRolesPermissionsByNamesQuery request, CancellationToken cancellationToken)
+		GetRolesPermissionsByNamesQuery request,
+		CancellationToken cancellationToken)
 	{
 		if (request.Names.Count == 0)
-			return new GetRolesPermissionsByNamesResult(new Dictionary<string, IReadOnlyList<PermissionDto>>());
+			return new GetRolesPermissionsByNamesResult(
+				new Dictionary<string, IReadOnlyList<PermissionDto>>());
 
 		var roles = await repository.Query
 			.Where(role => request.Names.Contains(role.Name))
@@ -40,7 +41,8 @@ public sealed class GetRolesPermissionsByNamesHandler(IReadRepository<Role, stri
 			.ToListAsync(cancellationToken);
 
 		if (roles.Count == 0)
-			return new GetRolesPermissionsByNamesResult(new Dictionary<string, IReadOnlyList<PermissionDto>>());
+			return new GetRolesPermissionsByNamesResult(
+				new Dictionary<string, IReadOnlyList<PermissionDto>>());
 
 		var catalog = (await sender.Send(new GetPermissionsQuery(), cancellationToken)).Permissions;
 		var permissions = roles.ToDictionary(

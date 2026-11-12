@@ -30,10 +30,10 @@ public static class InAppNotificationServiceCollectionExtensions
 	{
 		services.AddSingleton<Dequeuer<InAppRecipient>>(sp =>
 			new Dequeuer<InAppRecipient>(
-				systemName: InAppRecipient.ChannelName,
-				logger: sp.GetRequiredService<ILogger<Dequeuer<InAppRecipient>>>(),
-				options: sp.GetRequiredService<IOptions<InAppChannelOptions>>().Value,
-				scopeFactory: sp.GetRequiredService<IServiceScopeFactory>()));
+				InAppRecipient.ChannelName,
+				sp.GetRequiredService<ILogger<Dequeuer<InAppRecipient>>>(),
+				sp.GetRequiredService<IOptions<InAppChannelOptions>>().Value,
+				sp.GetRequiredService<IServiceScopeFactory>()));
 
 		services.AddHostedService(sp => sp.GetRequiredService<Dequeuer<InAppRecipient>>());
 		return services;

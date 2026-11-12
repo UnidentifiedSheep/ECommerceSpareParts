@@ -48,13 +48,24 @@ public sealed class OrderBuilder(Faker faker) : BuilderBase<DomainOrder>(faker)
 	public override DomainOrder Build()
 	{
 		var order = Source == OrderSource.Online
-			? DomainOrder.CreateOnline(OrganizationId, UserId!.Value, CurrencyId)
-			: DomainOrder.CreateManual(OrganizationId, UserId, CurrencyId);
+			? DomainOrder.CreateOnline(
+				OrganizationId,
+				UserId!.Value,
+				CurrencyId)
+			: DomainOrder.CreateManual(
+				OrganizationId,
+				UserId,
+				CurrencyId);
 		foreach (var item in _items)
-			{
+		{
 			var built = item.WithOrder(order).Build();
-			order.AddItem(built.ProductId, built.Count).AssignPrice(built.SignedPrice, built.UnitPrice, built.PriceOrigin);
+			order.AddItem(built.ProductId, built.Count)
+			.AssignPrice(
+				built.SignedPrice,
+				built.UnitPrice,
+				built.PriceOrigin);
 		}
+
 		return order;
 	}
 }

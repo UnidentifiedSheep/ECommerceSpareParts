@@ -10,17 +10,13 @@ namespace Main.Application.Products.Queries;
 
 public sealed record GetProductGroupsByIdsQuery : IQuery<GetProductGroupsByIdsResult>
 {
-	public IReadOnlyList<int> Ids { get; }
 
 	public GetProductGroupsByIdsQuery(int id) : this([id])
 	{
 	}
 
-	public GetProductGroupsByIdsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
-
+	public GetProductGroupsByIdsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToArray();
+	public IReadOnlyList<int> Ids { get; }
 }
 
 public sealed record GetProductGroupsByIdsResult(IReadOnlyDictionary<int, ProductGroupDto> Groups);

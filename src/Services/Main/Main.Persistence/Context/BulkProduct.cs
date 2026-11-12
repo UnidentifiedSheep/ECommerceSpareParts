@@ -23,22 +23,23 @@ internal sealed class BulkProduct
 	public Guid? WhoCreated { get; init; }
 	public Guid? WhoUpdated { get; init; }
 
-	public static BulkProduct FromProduct(Product product) => new()
-	{
-		PairId = product.PairId,
-		Sku = product.Sku.Value,
-		NormalizedSku = product.Sku.NormalizedValue,
-		Name = product.Name.Value,
-		Description = product.Description,
-		PackingUnit = product.PackingUnit,
-		ProducerId = product.ProducerId,
-		Indicator = product.Indicator?.Value,
-		CategoryId = product.CategoryId,
-		ProductGroupId = product.ProductGroupId,
-		Popularity = product.Popularity,
-		CreatedAt = product.CreatedAt,
-		UpdatedAt = product.UpdatedAt,
-		WhoCreated = product.WhoCreated,
-		WhoUpdated = product.WhoUpdated
-	};
+	public static BulkProduct FromProduct(Product product)
+		=> new()
+		{
+			PairId = product.PairId,
+			Sku = product.Sku.Value,
+			NormalizedSku = product.Sku.NormalizedValue,
+			Name = product.Name.Value,
+			Description = product.Description,
+			PackingUnit = product.PackingUnit,
+			ProducerId = product.ProducerId,
+			Indicator = product.Indicator?.Value,
+			CategoryId = product.CategoryId,
+			ProductGroupId = product.ProductGroupId,
+			Popularity = product.Popularity,
+			CreatedAt = product.CreatedAt,
+			UpdatedAt = product.UpdatedAt,
+			WhoCreated = product.WhoCreated,
+			WhoUpdated = product.WhoUpdated
+		};
 }

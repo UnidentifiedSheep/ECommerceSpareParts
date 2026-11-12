@@ -22,11 +22,11 @@ public class ProducerSynchronizationLrt(
 
 	public override string SystemName => nameof(ProducerSynchronizationLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtProducerSynchronizationNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProducerSynchronizationNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProducerSynchronizationDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProducerSynchronizationDescriptionMessage.Instance;
 
 	protected override async Task<SynchronizationPage<int, ProducerUpdatedEvent>> GetPageAsync(
 		int? lastProcessedId,

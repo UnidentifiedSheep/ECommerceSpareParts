@@ -7,12 +7,9 @@ namespace Main.Application.Products.Queries.GetProductsEans;
 
 public record GetProductsEansQuery : IQuery<GetProductsEansResult>
 {
-	public IReadOnlyList<int> ProductIds { get; }
 
-	public GetProductsEansQuery(IEnumerable<int> productIds)
-	{
-		ProductIds = productIds.Distinct().ToArray();
-	}
+	public GetProductsEansQuery(IEnumerable<int> productIds) => ProductIds = productIds.Distinct().ToArray();
+	public IReadOnlyList<int> ProductIds { get; }
 }
 
 public record GetProductsEansResult(IReadOnlyDictionary<int, IReadOnlyList<string>> Eans);
@@ -35,11 +32,12 @@ public class GetProductsEansHandler(
 			.Select(x => new { x.ProductId, x.Ean })
 			.ToListAsync(cancellationToken);
 
-		return new GetProductsEansResult(eans
-			.GroupBy(x => x.ProductId)
-			.ToDictionary(
-				x => x.Key,
-				IReadOnlyList<string> (x)
-					=> x.Select(ean => ean.Ean).ToArray()));
+		return new GetProductsEansResult(
+			eans
+				.GroupBy(x => x.ProductId)
+				.ToDictionary(
+					x => x.Key,
+					IReadOnlyList<string> (x)
+						=> x.Select(ean => ean.Ean).ToArray()));
 	}
 }

@@ -1,8 +1,7 @@
-using Application.Common.Querying;
-using Abstractions.Models;
 using Application.Common.Models;
-using Search.Enums;
+using Application.Common.Querying;
 using Search.Application.Models.CatalogueSearch.Criteria;
+using Search.Enums;
 
 namespace Search.Application.Models.CatalogueSearch;
 

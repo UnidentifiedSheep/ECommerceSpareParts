@@ -1,10 +1,9 @@
-using Application.Common.Querying;
-using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
+using Application.Common.Querying;
 using Main.Application.Dtos.Sale;
 using Main.Application.Extensions.QueryExtensions;
 using Main.Application.Products.Interfaces;
@@ -36,7 +35,8 @@ public class GetProductSaleHistoryHandler(
 	{
 		var productIds = new List<int> { request.ProductId };
 		if (request.ShowCrosses)
-			productIds.AddRange(await productProvider.GetProductCrossesAsync(request.ProductId, cancellationToken));
+			productIds.AddRange(
+				await productProvider.GetProductCrossesAsync(request.ProductId, cancellationToken));
 
 		var query = repository.Query
 			.CompletedSales()

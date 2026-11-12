@@ -1,4 +1,3 @@
-using Persistence.Context;
 using System.Text.Json;
 using Abstractions;
 using Application.Common.Interfaces.Lrt;
@@ -8,8 +7,8 @@ using Domain.CommonEntities.Job;
 using Main.Application.Lrts;
 using Main.Application.Lrts.RemoveExpiredDocuments;
 using Main.Application.Lrts.RunServiceTask;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 
 namespace Main.Migrator.DataSeeds;
@@ -63,7 +62,8 @@ public class ScheduledLrtSeed : ISeed<UnifiedDbContext>
 			.ToHashSetAsync();
 
 		var missingSchedules = defaults
-			.Where(schedule => !existingSchedules.Contains(new { schedule.JobSystemName, schedule.InputState }))
+			.Where(schedule
+				=> !existingSchedules.Contains(new { schedule.JobSystemName, schedule.InputState }))
 			.ToArray();
 
 		if (missingSchedules.Length == 0) return;
@@ -79,8 +79,9 @@ public class ScheduledLrtSeed : ISeed<UnifiedDbContext>
 				3,
 				item.Cron);
 			schedule.Enable();
-			schedule.SetNextRunAt(CronExpression.Parse(item.Cron)
-				.GetNextOccurrence(now, JobSchedule.TimeZone));
+			schedule.SetNextRunAt(
+				CronExpression.Parse(item.Cron)
+					.GetNextOccurrence(now, JobSchedule.TimeZone));
 			context.Set<JobSchedule>().Add(schedule);
 		}
 

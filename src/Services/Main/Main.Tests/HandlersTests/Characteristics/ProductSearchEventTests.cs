@@ -1,34 +1,31 @@
-using Persistence.Context;
-using FluentAssertions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Contracts.Products;
 using Contracts.Storage;
 using Domain.Events;
 using Enums.Units;
+using FluentAssertions;
 using Main.Application.Products.Interfaces;
 using Main.Application.Products.Services;
 using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
 using Main.Enums;
-using Main.Persistence.Context;
+using Main.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Context;
 using Tests.DataBuilders;
 using Tests.Extensions;
+using Tests.Persistence.Interceptors;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
-
-using Tests.Persistence.Interceptors;
 
 namespace Tests.HandlersTests.Characteristics;
 
 public class ProductSearchEventTests : IntegrationTest
 {
 	public ProductSearchEventTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	[Fact]
 	public async Task CaptureAll_ReturnsProductAndEmptyNullableSectionsWithoutChangingProduct()
@@ -36,7 +33,10 @@ public class ProductSearchEventTests : IntegrationTest
 		var product = GetContext<ProductTestContext>().Products[0];
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 		var version = product.RowVersion;
-		var events = await provider.GetEventsAsync([product.Id, product.Id], ProductEventParts.All, CancellationToken);
+		var events = await provider.GetEventsAsync(
+			[product.Id, product.Id],
+			ProductEventParts.All,
+			CancellationToken);
 
 		events.Should().HaveCount(5);
 		var core = GetEvent<ProductsUpdatedEvent>(events);
@@ -61,19 +61,39 @@ public class ProductSearchEventTests : IntegrationTest
 	public async Task DeletingLastCharacteristic_ProducesAnEmptySnapshot()
 	{
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
-		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
-		var link = ProductCharacteristic.Create(productId, characteristic.Id, "100");
+		var characteristic =
+			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
+		var link = ProductCharacteristic.Create(
+			productId,
+			characteristic.Id,
+			"100");
 		await Context.Set<ProductCharacteristic>().AddAsync(link, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 		var initial = GetEvent<ProductCharacteristicsUpdatedEvent>(
-			await provider.GetEventsAsync([productId], ProductEventParts.Characteristics, CancellationToken));
-		initial.Products.Should().ContainSingle().Which.Characteristics.Should().ContainSingle().Which.Value.Should().Be("100");
+			await provider.GetEventsAsync(
+				[productId],
+				ProductEventParts.Characteristics,
+				CancellationToken));
+		initial.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.Characteristics
+			.Should()
+			.ContainSingle()
+			.Which
+			.Value
+			.Should()
+			.Be("100");
 
 		Context.Set<ProductCharacteristic>().Remove(link);
 		await Context.SaveChangesAsync(CancellationToken);
 		var notification = GetEvent<ProductCharacteristicsUpdatedEvent>(
-			await provider.GetEventsAsync([productId], ProductEventParts.Characteristics, CancellationToken));
+			await provider.GetEventsAsync(
+				[productId],
+				ProductEventParts.Characteristics,
+				CancellationToken));
 
 		notification.Products.Should().ContainSingle().Which.Characteristics.Should().BeEmpty();
 		notification.UpdatedAt.Should().BeAfter(initial.UpdatedAt);
@@ -83,33 +103,84 @@ public class ProductSearchEventTests : IntegrationTest
 	public async Task LifecycleBatches_PublishCurrentCharacteristicsSnapshot()
 	{
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
-		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
-		var link = ProductCharacteristic.Create(productId, characteristic.Id, "100");
+		var characteristic =
+			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
+		var link = ProductCharacteristic.Create(
+			productId,
+			characteristic.Id,
+			"100");
 		await Context.Set<ProductCharacteristic>().AddAsync(link, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		var scope = Scope.ServiceProvider.GetRequiredService<IIntegrationEventScope>();
 		scope.Flush();
 
-		await Mediator.Publish(new Batch<EntityCreatedDomainEvent<ProductCharacteristic>>(
-			[new(link), new(link)]), CancellationToken);
-		var created = scope.Flush().Should().ContainSingle().Which.Message.Should()
-			.BeOfType<ProductCharacteristicsUpdatedEvent>().Which;
-		created.Products.Should().ContainSingle().Which.Characteristics.Should().ContainSingle().Which.Value.Should().Be("100");
+		await Mediator.Publish(
+			new Batch<EntityCreatedDomainEvent<ProductCharacteristic>>(
+			[
+				new EntityCreatedDomainEvent<ProductCharacteristic>(link),
+				new EntityCreatedDomainEvent<ProductCharacteristic>(link)
+			]),
+			CancellationToken);
+		var created = scope.Flush()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Message
+			.Should()
+			.BeOfType<ProductCharacteristicsUpdatedEvent>()
+			.Which;
+		created.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.Characteristics
+			.Should()
+			.ContainSingle()
+			.Which
+			.Value
+			.Should()
+			.Be("100");
 
 		link.SetValue("200");
 		await Context.SaveChangesAsync(CancellationToken);
-		await Mediator.Publish(new Batch<EntityUpdatedDomainEvent<ProductCharacteristic, (int, int)>>(
-			[new(link.GetId())]), CancellationToken);
-		var updated = scope.Flush().Should().ContainSingle().Which.Message.Should()
-			.BeOfType<ProductCharacteristicsUpdatedEvent>().Which;
-		updated.Products.Should().ContainSingle().Which.Characteristics.Should().ContainSingle().Which.Value.Should().Be("200");
+		await Mediator.Publish(
+			new Batch<EntityUpdatedDomainEvent<ProductCharacteristic, (int, int)>>(
+				[new EntityUpdatedDomainEvent<ProductCharacteristic, (int, int)>(link.GetId())]),
+			CancellationToken);
+		var updated = scope.Flush()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Message
+			.Should()
+			.BeOfType<ProductCharacteristicsUpdatedEvent>()
+			.Which;
+		updated.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.Characteristics
+			.Should()
+			.ContainSingle()
+			.Which
+			.Value
+			.Should()
+			.Be("200");
 
 		Context.Set<ProductCharacteristic>().Remove(link);
 		await Context.SaveChangesAsync(CancellationToken);
-		await Mediator.Publish(new Batch<EntityDeletedDomainEvent<ProductCharacteristic, (int, int)>>(
-			[new(link.GetId())]), CancellationToken);
-		var deleted = scope.Flush().Should().ContainSingle().Which.Message.Should()
-			.BeOfType<ProductCharacteristicsUpdatedEvent>().Which;
+		await Mediator.Publish(
+			new Batch<EntityDeletedDomainEvent<ProductCharacteristic, (int, int)>>(
+				[new EntityDeletedDomainEvent<ProductCharacteristic, (int, int)>(link.GetId())]),
+			CancellationToken);
+		var deleted = scope.Flush()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Message
+			.Should()
+			.BeOfType<ProductCharacteristicsUpdatedEvent>()
+			.Which;
 		deleted.Products.Should().ContainSingle().Which.Characteristics.Should().BeEmpty();
 	}
 
@@ -117,10 +188,31 @@ public class ProductSearchEventTests : IntegrationTest
 	public async Task CaptureAll_LoadsSelectedRelationsWithSplitQuery()
 	{
 		var product = GetContext<ProductTestContext>().Products[0];
-		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
-		await Context.Set<ProductCharacteristic>().AddAsync(ProductCharacteristic.Create(product.Id, characteristic.Id, "100"), CancellationToken);
-		await Context.Set<ProductSize>().AddAsync(ProductSize.Create(product.Id, 10, 20, 30, DimensionUnit.Millimeter), CancellationToken);
-		await Context.Set<ProductWeight>().AddAsync(ProductWeight.Create(product.Id, 2, WeightUnit.Kilogram), CancellationToken);
+		var characteristic =
+			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
+		await Context.Set<ProductCharacteristic>()
+			.AddAsync(
+				ProductCharacteristic.Create(
+					product.Id,
+					characteristic.Id,
+					"100"),
+				CancellationToken);
+		await Context.Set<ProductSize>()
+		.AddAsync(
+			ProductSize.Create(
+				product.Id,
+				10,
+				20,
+				30,
+				DimensionUnit.Millimeter),
+			CancellationToken);
+		await Context.Set<ProductWeight>()
+		.AddAsync(
+			ProductWeight.Create(
+				product.Id,
+				2,
+				WeightUnit.Kilogram),
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var counter = new QueryCounter();
@@ -128,29 +220,65 @@ public class ProductSearchEventTests : IntegrationTest
 			.UseNpgsql(Context.Database.GetDbConnection())
 			.AddInterceptors(counter)
 			.Options;
-		await using var queryContext = new UnifiedDbContext(options, [new global::Main.Persistence.MainDbContextModule()]);
+		await using var queryContext = new UnifiedDbContext(options, [new MainDbContextModule()]);
 		var provider = new ProductEventProvider(
-			new Main.Persistence.ReadRepository<Main.Entities.Product.Product, int>(queryContext),
+			new ReadRepository<Product, int>(queryContext),
 			Scope.ServiceProvider.GetServices<IProductEventPartProvider>());
 
-		var events = await provider.GetEventsAsync([product.Id], ProductEventParts.All, CancellationToken);
+		var events = await provider.GetEventsAsync(
+			[product.Id],
+			ProductEventParts.All,
+			CancellationToken);
 
 		counter.Reads.Should().Be(3);
 		queryContext.ChangeTracker.Entries().Should().BeEmpty();
-		GetEvent<ProductsUpdatedEvent>(events).Products.Should().ContainSingle().Which.Sku.Should().Be(product.Sku.Value);
-		GetEvent<ProductCharacteristicsUpdatedEvent>(events).Products.Should().ContainSingle().Which.Characteristics.Should()
-			.ContainSingle().Which.Value.Should().Be("100");
-		GetEvent<ProductDimensionsUpdatedEvent>(events).Products.Should().ContainSingle().Which.Dimensions!.Length.Should().Be(10);
-		GetEvent<ProductWeightUpdatedEvent>(events).Products.Should().ContainSingle().Which.Weight!.Value.Should().Be(2);
+		GetEvent<ProductsUpdatedEvent>(events)
+			.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.Sku
+			.Should()
+			.Be(product.Sku.Value);
+		GetEvent<ProductCharacteristicsUpdatedEvent>(events)
+			.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.Characteristics
+			.Should()
+			.ContainSingle()
+			.Which
+			.Value
+			.Should()
+			.Be("100");
+		GetEvent<ProductDimensionsUpdatedEvent>(events).Products.Should().ContainSingle().Which.Dimensions!
+			.Length
+			.Should()
+			.Be(10);
+		GetEvent<ProductWeightUpdatedEvent>(events).Products.Should().ContainSingle().Which.Weight!.Value
+			.Should()
+			.Be(2);
 	}
 
 	[Fact]
 	public async Task MissingProduct_ProducesDeletionSnapshot()
 	{
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
-		var events = await provider.GetEventsAsync([int.MaxValue], ProductEventParts.Core, CancellationToken);
-		var deleted = events.Should().ContainSingle().Which.Should().BeOfType<ProductsUpdatedEvent>().Which
-			.Products.Should().ContainSingle().Which;
+		var events = await provider.GetEventsAsync(
+			[int.MaxValue],
+			ProductEventParts.Core,
+			CancellationToken);
+		var deleted = events.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.BeOfType<ProductsUpdatedEvent>()
+			.Which
+			.Products
+			.Should()
+			.ContainSingle()
+			.Which;
 		deleted.Id.Should().Be(int.MaxValue);
 		deleted.IsDeleted.Should().BeTrue();
 	}
@@ -162,12 +290,13 @@ public class ProductSearchEventTests : IntegrationTest
 		var scope = Scope.ServiceProvider.GetRequiredService<IIntegrationEventScope>();
 		scope.Flush();
 
-		await Mediator.Publish(new Batch<ProductImageUpdatedDomainEvent>([new(productId)]), CancellationToken);
+		await Mediator.Publish(
+			new Batch<ProductImageUpdatedDomainEvent>([new ProductImageUpdatedDomainEvent(productId)]),
+			CancellationToken);
 
 		scope.Flush().Should().BeEmpty();
 	}
 
-	private static TEvent GetEvent<TEvent>(IReadOnlyList<object> events) =>
-		events.OfType<TEvent>().Should().ContainSingle().Which;
-
+	private static TEvent GetEvent<TEvent>(IReadOnlyList<object> events)
+		=> events.OfType<TEvent>().Should().ContainSingle().Which;
 }

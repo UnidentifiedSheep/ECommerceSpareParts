@@ -10,23 +10,26 @@ namespace Pricing.Application.Lrts.PriceCandidateCalculation;
 
 public class PriceCandidateCalculationLrt(
 	IApplicationTransactionFactory transactionService,
-	ILogger<PriceCandidateCalculationLrt> logger) : LrtBase<PriceCandidateCalculationState, PriceCandidateCalculationState>(
-	transactionService,
-	logger)
+	ILogger<PriceCandidateCalculationLrt> logger)
+	: LrtBase<PriceCandidateCalculationState, PriceCandidateCalculationState>(
+		transactionService,
+		logger)
 {
 	public static string LrtName => nameof(PriceCandidateCalculationLrt);
 
 	public override string SystemName => LrtName;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtPriceCandidateCalculationNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtPriceCandidateCalculationNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtPriceCandidateCalculationDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtPriceCandidateCalculationDescriptionMessage.Instance;
 
 	protected override async Task DoWork(PriceCandidateCalculationState inputState)
-	{
-		await ExecuteInScopeAsync((context, ct) => context.GetRequiredService<ISender>().Send(
-			new CalculateCandidatesCommand(inputState.ProductId, inputState.StorageCode), ct), CancellationToken);
-	}
+		=> await ExecuteInScopeAsync(
+			(context, ct) => context.GetRequiredService<ISender>()
+				.Send(
+					new CalculateCandidatesCommand(inputState.ProductId, inputState.StorageCode),
+					ct),
+			CancellationToken);
 }

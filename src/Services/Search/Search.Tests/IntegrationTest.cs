@@ -14,10 +14,10 @@ namespace Search.Tests;
 
 public abstract class IntegrationTest(SearchContainerFixture fixture) : TestBase
 {
+	private bool _disposed;
 	private SearchTestEnvironmentLease? _lease;
 	private IServiceProvider? _provider;
 	private IServiceScope? _scope;
-	private bool _disposed;
 
 	protected override IServiceProvider Sp => _provider!;
 	protected override IServiceScope Scope => _scope!;
@@ -27,15 +27,18 @@ public abstract class IntegrationTest(SearchContainerFixture fixture) : TestBase
 	protected OpenSearchIndexOptions Indexes { get; private set; } = null!;
 	protected IMediator Mediator { get; private set; } = null!;
 
+	private string IndexPattern => _lease!.Slot.OpenSearch.Prefix + "*";
+
 	public override async ValueTask InitializeAsync()
 	{
 		_lease = await fixture.AcquireAsync(CancellationToken);
-		_provider = new ServiceProviderBuilder().Build(new ServiceProviderArguments
-		{
-			OpenSearchEndpoint = _lease.Slot.OpenSearch.Endpoint,
-			IndexPrefix = _lease.Slot.OpenSearch.Prefix,
-			RedisConnectionString = _lease.Slot.Redis.ConnectionString
-		});
+		_provider = new ServiceProviderBuilder().Build(
+			new ServiceProviderArguments
+			{
+				OpenSearchEndpoint = _lease.Slot.OpenSearch.Endpoint,
+				IndexPrefix = _lease.Slot.OpenSearch.Prefix,
+				RedisConnectionString = _lease.Slot.Redis.ConnectionString
+			});
 		_scope = Sp.CreateScope();
 		Client = Scope.ServiceProvider.GetRequiredService<IOpenSearchClient>();
 		Products = Scope.ServiceProvider.GetRequiredService<IProductRepository>();
@@ -43,9 +46,15 @@ public abstract class IntegrationTest(SearchContainerFixture fixture) : TestBase
 		Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 		await ResetDataStoresAsync(CancellationToken);
 		await Task.WhenAll(
-			Scope.ServiceProvider.GetRequiredService<IIndexInitializer<Product>>().LazyInitialize(CancellationToken),
-			Scope.ServiceProvider.GetRequiredService<IIndexInitializer<Producer>>().LazyInitialize(CancellationToken),
-			Scope.ServiceProvider.GetRequiredService<IIndexInitializer<CatalogueCandidate>>().LazyInitialize(CancellationToken));
+			Scope.ServiceProvider
+				.GetRequiredService<IIndexInitializer<Product>>()
+				.LazyInitialize(CancellationToken),
+			Scope.ServiceProvider
+				.GetRequiredService<IIndexInitializer<Producer>>()
+				.LazyInitialize(CancellationToken),
+			Scope.ServiceProvider
+				.GetRequiredService<IIndexInitializer<CatalogueCandidate>>()
+				.LazyInitialize(CancellationToken));
 		await InitializeBasicContexts();
 	}
 
@@ -80,11 +89,12 @@ public abstract class IntegrationTest(SearchContainerFixture fixture) : TestBase
 		EnsureSucceeded(response);
 	}
 
-	private string IndexPattern => _lease!.Slot.OpenSearch.Prefix + "*";
-
 	private async Task ResetDataStoresAsync(CancellationToken cancellationToken = default)
 	{
-		var response = await Client.Indices.DeleteAsync(IndexPattern, request => request.IgnoreUnavailable(), cancellationToken);
+		var response = await Client.Indices.DeleteAsync(
+			IndexPattern,
+			request => request.IgnoreUnavailable(),
+			cancellationToken);
 		EnsureSucceeded(response);
 		var multiplexer = Scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>();
 		var database = multiplexer.GetDatabase();

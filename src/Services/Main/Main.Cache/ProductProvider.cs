@@ -37,14 +37,13 @@ public class ProductProvider(
 
 	public async Task<ProductDto?> GetProductAsync(
 		int productId,
-		CancellationToken cancellationToken = default) =>
-		await rawCache.GetAsync<ProductDto>(CacheKeys.ProductCache.Product(productId));
+		CancellationToken cancellationToken = default)
+		=> await rawCache.GetAsync<ProductDto>(CacheKeys.ProductCache.Product(productId));
 
 	public async Task<Dictionary<int, ProductDto>> GetProductsOrSetAsync(
 		IEnumerable<int> ids,
 		CancellationToken cancellationToken = default)
-	{
-		return await rawCache.GetOrSetManyAsync(
+		=> await rawCache.GetOrSetManyAsync(
 			ids,
 			CacheKeys.ProductCache.Product,
 			product => product.Id,
@@ -53,7 +52,6 @@ public class ProductProvider(
 				x => missingIds.Contains(x.Id),
 				cancellationToken),
 			CacheKeys.ProductCache.Ttl);
-	}
 
 	public async Task<IReadOnlyList<int>> GetProductCrossesAsync(
 		int productId,
@@ -74,29 +72,34 @@ public class ProductProvider(
 		var cachedValues = await rawCache.GetAsync<int[]>(ids.Select(CacheKeys.ProductCache.ProductCrosses));
 		var missingIds = new List<int>();
 		for (var i = 0; i < ids.Length; i++)
-		{
 			if (cachedValues[i] is { } cached)
 				result[ids[i]] = cached;
 			else
 				missingIds.Add(ids[i]);
-		}
 		if (missingIds.Count == 0) return result;
 
 		var missingIdSet = missingIds.ToHashSet();
-		var crosses = await crossesReadRepository.Query.GetCrosses(missingIdSet).ToListAsync(cancellationToken);
+		var crosses = await crossesReadRepository.Query
+			.GetCrosses(missingIdSet)
+			.ToListAsync(cancellationToken);
 		var loaded = crosses.GetCrosses(missingIdSet);
 		await rawCache.SetAsync(
 			missingIds.Select(id => (CacheKeys.ProductCache.ProductCrosses(id), loaded[id].ToArray())),
 			CacheKeys.ProductCache.Ttl);
 
 		var relations = missingIds
-			.SelectMany(id => loaded[id].Prepend(id).Distinct().Select(productId => new
-			{
-				RelationKey = CacheKeys.ProductCache.ProductCrossRelations(productId),
-				CacheKey = CacheKeys.ProductCache.ProductCrosses(id)
-			}))
+			.SelectMany(id => loaded[id]
+				.Prepend(id)
+				.Distinct()
+				.Select(productId => new
+				{
+					RelationKey = CacheKeys.ProductCache.ProductCrossRelations(productId),
+					CacheKey = CacheKeys.ProductCache.ProductCrosses(id)
+				}))
 			.GroupBy(item => item.RelationKey)
-			.ToDictionary(group => group.Key, group => group.Select(item => item.CacheKey).Distinct().ToList());
+			.ToDictionary(
+				group => group.Key,
+				group => group.Select(item => item.CacheKey).Distinct().ToList());
 		await rawCache.AddToSetAsync(relations, CacheKeys.ProductCache.Ttl);
 
 		foreach (var id in missingIds)
@@ -104,15 +107,12 @@ public class ProductProvider(
 		return result;
 	}
 
-	public async Task<IReadOnlyList<ProductDto?>> GetProductsAsync(IEnumerable<int> ids) =>
-		await rawCache.GetAsync<ProductDto>(ids.Select(CacheKeys.ProductCache.Product));
+	public async Task<IReadOnlyList<ProductDto?>> GetProductsAsync(IEnumerable<int> ids)
+		=> await rawCache.GetAsync<ProductDto>(ids.Select(CacheKeys.ProductCache.Product));
 
 	private async Task<ProductDto> GetProductFromDb(int id, CancellationToken cancellationToken)
-	{
-		return await productReadRepository.Query.FirstProductDtoAsync(
+		=> await productReadRepository.Query.FirstProductDtoAsync(
 			productProjection,
 			x => x.Id == id,
 			cancellationToken) ?? throw new ProductNotFoundException(id);
-	}
-
 }

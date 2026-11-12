@@ -3,6 +3,7 @@ using Exceptions;
 using Exceptions.Base;
 using FluentAssertions;
 using GraphQL.Common.ErrorFilters;
+using HotChocolate;
 using Locan.Core.LocalizableMessages;
 using Microsoft.Extensions.Logging.Abstractions;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
@@ -16,9 +17,16 @@ public class DbValidationErrorFilterTests
 	{
 		var payload = new InvalidInputException(new LocalizableMessage("Domain.NotFound"));
 		var filter = CreateFilter();
-		var exception = new DbValidationException([
-			new ValidationFailure("fallback", 42, error: payload),
-			new ValidationFailure("conflict fallback", "code", error: new ConflictException("Conflict"))
+		var exception = new DbValidationException(
+		[
+			new ValidationFailure(
+				"fallback",
+				42,
+				error: payload),
+			new ValidationFailure(
+				"conflict fallback",
+				"code",
+				error: new ConflictException("Conflict"))
 		]);
 
 		var result = filter.OnError(ErrorFilterTestFactory.CreateError(exception));
@@ -37,8 +45,12 @@ public class DbValidationErrorFilterTests
 	public void OnError_PreservesRelatedDataFromErrorObject()
 	{
 		var values = new { Id = 42 };
-		var exception = new DbValidationException([
-			new ValidationFailure("missing", 42, error: new NotFoundException("missing", values))
+		var exception = new DbValidationException(
+		[
+			new ValidationFailure(
+				"missing",
+				42,
+				error: new NotFoundException("missing", values))
 		]);
 
 		var result = CreateFilter().OnError(ErrorFilterTestFactory.CreateError(exception));
@@ -51,8 +63,16 @@ public class DbValidationErrorFilterTests
 	[InlineData(true)]
 	public void OnError_UsesFallbackForMissingPayloadOrTranslation(bool hasPayload)
 	{
-		var payload = hasPayload ? new InvalidInputException(new LocalizableMessage("Missing.Translation")) : null;
-		var exception = new DbValidationException([new ValidationFailure("fallback", 42, error: payload)]);
+		var payload = hasPayload
+			? new InvalidInputException(new LocalizableMessage("Missing.Translation"))
+			: null;
+		var exception = new DbValidationException(
+		[
+			new ValidationFailure(
+				"fallback",
+				42,
+				error: payload)
+		]);
 
 		var result = CreateFilter().OnError(ErrorFilterTestFactory.CreateError(exception));
 
@@ -60,9 +80,15 @@ public class DbValidationErrorFilterTests
 		result.Extensions!["status"].Should().Be(hasPayload ? 400 : 500);
 	}
 
-	private static IReadOnlyList<IReadOnlyDictionary<string, object?>> Errors(HotChocolate.IError result) =>
-		result.Extensions!["errors"].Should().BeAssignableTo<IReadOnlyList<IReadOnlyDictionary<string, object?>>>().Subject;
+	private static IReadOnlyList<IReadOnlyDictionary<string, object?>> Errors(IError result)
+		=> result.Extensions!["errors"]
+			.Should()
+			.BeAssignableTo<IReadOnlyList<IReadOnlyDictionary<string, object?>>>()
+			.Subject;
 
-	private static DbValidationErrorFilter CreateFilter() => new(NullLoggerFactory.Instance,
-		ErrorFilterTestFactory.CreateLocalizer(), ErrorFilterTestFactory.CreateHttpContextAccessor());
+	private static DbValidationErrorFilter CreateFilter()
+		=> new(
+			NullLoggerFactory.Instance,
+			ErrorFilterTestFactory.CreateLocalizer(),
+			ErrorFilterTestFactory.CreateHttpContextAccessor());
 }

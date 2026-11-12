@@ -13,8 +13,8 @@ namespace Tests.Persistence;
 
 public sealed class ProductRepositoryTests : IntegrationTest
 {
-	public ProductRepositoryTests(CombinedContainerFixture fixture) : base(fixture) =>
-		RegisterBasicContext<ProducerTestContext>();
+	public ProductRepositoryTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 	private IProductRepository Repository => Scope.ServiceProvider.GetRequiredService<IProductRepository>();
@@ -29,7 +29,9 @@ public sealed class ProductRepositoryTests : IntegrationTest
 		var ids = await InsertProducts(products);
 
 		ids.Should().HaveCount(3).And.OnlyHaveUniqueItems().And.OnlyContain(id => id > 0);
-		var savedIds = await Context.Set<Product>().AsNoTracking().Select(product => product.Id)
+		var savedIds = await Context.Set<Product>()
+			.AsNoTracking()
+			.Select(product => product.Id)
 			.ToListAsync(CancellationToken);
 		ids.Should().BeEquivalentTo(savedIds);
 	}
@@ -40,35 +42,54 @@ public sealed class ProductRepositoryTests : IntegrationTest
 		var firstProducer = TestContext.Producers[0];
 		var secondProducer = TestContext.Producers[1];
 		var existing = await new ProductBuilder(Faker)
-			.WithProducerId(firstProducer.Id).WithSku(new Sku("ABC-123"))
-			.WithName("Original product").BuildAndAddToDb(Context, CancellationToken);
+			.WithProducerId(firstProducer.Id)
+			.WithSku(new Sku("ABC-123"))
+			.WithName("Original product")
+			.BuildAndAddToDb(Context, CancellationToken);
 		var unrelated = await new ProductBuilder(Faker)
-			.WithProducerId(firstProducer.Id).WithSku(new Sku("OTHER-123"))
+			.WithProducerId(firstProducer.Id)
+			.WithSku(new Sku("OTHER-123"))
 			.BuildAndAddToDb(Context, CancellationToken);
 
 		var ids = await InsertProducts(
 		[
 			existing,
 			new ProductBuilder(Faker).WithProducerId(firstProducer.Id)
-				.WithSku(new Sku("ABC 123")).WithName("Existing duplicate").Build(),
+				.WithSku(new Sku("ABC 123"))
+				.WithName("Existing duplicate")
+				.Build(),
 			new ProductBuilder(Faker).WithProducerId(firstProducer.Id)
-				.WithSku(new Sku("XYZ-123")).WithName("First new product").Build(),
+				.WithSku(new Sku("XYZ-123"))
+				.WithName("First new product")
+				.Build(),
 			new ProductBuilder(Faker).WithProducerId(firstProducer.Id)
-				.WithSku(new Sku("XYZ 123")).WithName("Batch duplicate").Build(),
+				.WithSku(new Sku("XYZ 123"))
+				.WithName("Batch duplicate")
+				.Build(),
 			new ProductBuilder(Faker).WithProducerId(secondProducer.Id)
-				.WithSku(new Sku("ABC123")).WithName("Another producer").Build()
+				.WithSku(new Sku("ABC123"))
+				.WithName("Another producer")
+				.Build()
 		]);
 
 		var saved = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 		saved.Should().HaveCount(4);
-		ids.Should().HaveCount(2).And.BeEquivalentTo(saved
-			.Where(product => product.Id != existing.Id && product.Id != unrelated.Id)
-			.Select(product => product.Id));
+		ids.Should()
+			.HaveCount(2)
+			.And
+			.BeEquivalentTo(
+				saved
+					.Where(product => product.Id != existing.Id && product.Id != unrelated.Id)
+					.Select(product => product.Id));
 		saved.Single(product => product.Id == existing.Id).Name.Value.Should().Be("Original product");
-		saved.Single(product => product.Sku.NormalizedValue == "XYZ123").Name.Value
-			.Should().Be("First new product");
-		saved.Should().ContainSingle(product => product.ProducerId == secondProducer.Id &&
-			product.Sku.NormalizedValue == "ABC123");
+		saved.Single(product => product.Sku.NormalizedValue == "XYZ123")
+			.Name
+			.Value
+			.Should()
+			.Be("First new product");
+		saved.Should()
+			.ContainSingle(product => product.ProducerId == secondProducer.Id &&
+				product.Sku.NormalizedValue == "ABC123");
 	}
 
 	[Fact]
@@ -82,7 +103,9 @@ public sealed class ProductRepositoryTests : IntegrationTest
 		var repeatedIds = await InsertProducts(products);
 
 		repeatedIds.Should().BeEmpty();
-		var savedIds = await Context.Set<Product>().AsNoTracking().Select(product => product.Id)
+		var savedIds = await Context.Set<Product>()
+			.AsNoTracking()
+			.Select(product => product.Id)
 			.ToListAsync(CancellationToken);
 		savedIds.Should().BeEquivalentTo(originalIds);
 	}
@@ -104,16 +127,20 @@ public sealed class ProductRepositoryTests : IntegrationTest
 			.BuildMany(2);
 		await using (var transaction = await Context.Database.BeginTransactionAsync(CancellationToken))
 		{
-			var rolledBackIds = await Repository.InsertProductsOnConflictDoNothingAsync(products, CancellationToken);
+			var rolledBackIds =
+				await Repository.InsertProductsOnConflictDoNothingAsync(products, CancellationToken);
 			rolledBackIds.Should().HaveCount(2).And.OnlyContain(id => id > 0);
 			await transaction.RollbackAsync(CancellationToken);
 		}
+
 		(await Context.Set<Product>().AnyAsync(CancellationToken)).Should().BeFalse();
 
 		var ids = await InsertProducts(products);
 
 		ids.Should().HaveCount(2).And.OnlyContain(id => id > 0);
-		var savedIds = await Context.Set<Product>().AsNoTracking().Select(product => product.Id)
+		var savedIds = await Context.Set<Product>()
+			.AsNoTracking()
+			.Select(product => product.Id)
 			.ToListAsync(CancellationToken);
 		ids.Should().BeEquivalentTo(savedIds);
 	}

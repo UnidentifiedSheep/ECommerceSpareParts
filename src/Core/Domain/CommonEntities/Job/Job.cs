@@ -127,21 +127,17 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 	}
 
 	private void SetMaxAttempts(int maxAttempts)
-	{
-		MaxAttempts = maxAttempts.EnsureGreaterThan(
+		=> MaxAttempts = maxAttempts.EnsureGreaterThan(
 			0,
 			() => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
-	}
 
 	private void SetNaturalKey(string? naturalKey)
-	{
-		NaturalKey = naturalKey is null
+		=> NaturalKey = naturalKey is null
 			? null
 			: naturalKey
 				.TrimSafe()
 				.EnsureNotNullOrWhiteSpace(() =>
 					new InvalidOperationException("Natural key cannot be null or empty."));
-	}
 
 	public virtual void Start(Guid leaseHolderId)
 	{
@@ -286,8 +282,8 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 		ClearLease();
 	}
 
-	public bool CanBeCancelledByExpiredLease(DateTime now) =>
-		IsCancellationRequested && LeaseExpiresAt is not null && LeaseExpiresAt <= now;
+	public bool CanBeCancelledByExpiredLease(DateTime now)
+		=> IsCancellationRequested && LeaseExpiresAt is not null && LeaseExpiresAt <= now;
 
 	public void CancelByExpiredLease(DateTime now)
 	{
@@ -321,7 +317,9 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 		if (IsStep)
 			throw new InvalidOperationException("Job already belongs to a multi-step job.");
 		if (stepKey is not null && (string.IsNullOrWhiteSpace(stepKey) || stepKey.Length > 128))
-			throw new ArgumentException("Step key must contain between 1 and 128 characters.", nameof(stepKey));
+			throw new ArgumentException(
+				"Step key must contain between 1 and 128 characters.",
+				nameof(stepKey));
 
 		MultiStepJobId = parent.Id;
 		MultiStepJob = parent;
@@ -360,13 +358,11 @@ public abstract class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 	}
 
 	private void RaiseStatusUpdatedEvent()
-	{
-		AddDomainEvent(
+		=> AddDomainEvent(
 			new JobStatusUpdatedDomainEvent(
 				Id,
 				Status,
 				Attempts));
-	}
 
 	public override void OnCreated() => RaiseFinishedEventIfStepIsTerminal();
 

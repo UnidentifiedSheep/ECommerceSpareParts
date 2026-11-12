@@ -11,7 +11,8 @@ using MediatR;
 namespace Main.Api.GraphQl.Analytics.Types;
 
 [GraphQLName("Chart")]
-public sealed record GqlChart([property: GraphQLIgnore] ChartDto Chart)
+public sealed record GqlChart([property: GraphQLIgnore]
+	ChartDto Chart)
 {
 	[GraphQLName("systemName")]
 	public string SystemName => Chart.SystemName;
@@ -32,13 +33,20 @@ public sealed record GqlChart([property: GraphQLIgnore] ChartDto Chart)
 	[RequireAllPermissions(PermissionCodes.CHARTS_GET)]
 	public async Task<GqlChartData> GetDataAsync(
 		[GraphQLType<NonNullType<AnyType>>] JsonElement queryInput,
-		ISender sender, CancellationToken cancellationToken)
+		ISender sender,
+		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new QueryChartDataSourceQuery(SystemName, queryInput.GetRawText()), cancellationToken);
+		var result = await sender.Send(
+			new QueryChartDataSourceQuery(SystemName, queryInput.GetRawText()),
+			cancellationToken);
 		return new GqlChartData
 		{
 			DataPoints = result.DataPoints
-				.Select(point => JsonSerializer.SerializeToElement(point, point.GetType(), JsonSerializerOptions.Web)).ToArray(),
+				.Select(point => JsonSerializer.SerializeToElement(
+					point,
+					point.GetType(),
+					JsonSerializerOptions.Web))
+				.ToArray(),
 			NextCursor = result.NextCursor
 		};
 	}

@@ -1,12 +1,10 @@
-using Persistence.Context;
-using Security.Core.Interfaces;
-using Application.Common.Interfaces.Validators;
 using Main.Entities.Auth;
 using Main.Entities.User;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Persistence.Context;
 using Persistence.Interfaces;
+using Security.Core.Interfaces;
 using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
@@ -52,8 +50,7 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 	public int ExecutionOrder => 1;
 
 	private string GetServiceSecret(string service)
-	{
-		return service switch
+		=> service switch
 		{
 			nameof(ServiceSecrets.MainApp) => _secrets.MainApp,
 			nameof(ServiceSecrets.Pricing) => _secrets.Pricing,
@@ -61,7 +58,6 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 			nameof(ServiceSecrets.Gateway) => _secrets.Gateway,
 			_ => throw new InvalidOperationException($"Unknown service: {service}")
 		};
-	}
 
 	private User CreateSystemUser(string service, string secret)
 	{

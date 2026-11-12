@@ -27,8 +27,8 @@ public class OrganizationFinancialProfile : AuditableEntity<OrganizationFinancia
 
 	public override Guid GetId() => OrganizationId;
 
-	public static OrganizationFinancialProfile Create(Guid organizationId, decimal minAllowedBalance = 0) =>
-		new(organizationId, minAllowedBalance);
+	public static OrganizationFinancialProfile Create(Guid organizationId, decimal minAllowedBalance = 0)
+		=> new(organizationId, minAllowedBalance);
 
 	public void SetMinAllowedBalance(decimal minAllowedBalance)
 	{
@@ -39,9 +39,7 @@ public class OrganizationFinancialProfile : AuditableEntity<OrganizationFinancia
 	}
 
 	public void SetApproximateBalance(decimal approximateBalance)
-	{
-		ApproximateBalance = approximateBalance.EnsureMaxDecimalPlaces(
+		=> ApproximateBalance = approximateBalance.EnsureMaxDecimalPlaces(
 			2,
 			() => new InvalidOperationException("ApproximateBalance must have maximum 2 decimal places"));
-	}
 }

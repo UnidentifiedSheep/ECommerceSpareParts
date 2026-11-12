@@ -14,10 +14,11 @@ public record ProductImageImportState : ProductImageImportInputState, ICsvImport
 	[JsonPropertyName("checkpoint")]
 	public CsvImportCheckpoint? Checkpoint { get; init; }
 
-	public ProductImageImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
-	{
-		Checkpoint = checkpoint
-	};
+	public ProductImageImportState WithCheckpoint(CsvImportCheckpoint checkpoint)
+		=> this with
+		{
+			Checkpoint = checkpoint
+		};
 }
 
 [CsvSchema(typeof(ProductImageImportLrt.ProductImageCsvDto))]
@@ -34,6 +35,7 @@ public record ProductImageImportInputState : IInputState, ICsvImportInputState
 	public void ValidateState()
 	{
 		if (!FileName.EndsWith(".csv", StringComparison.InvariantCulture))
-			throw new InvalidOperationException("Product image import state error. File name should end with .csv");
+			throw new InvalidOperationException(
+				"Product image import state error. File name should end with .csv");
 	}
 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Search.Application.Consumers.Product;
 using Search.Application.Handlers.Search.Catalogue;
+using Search.Entities;
 using Search.Enums;
 using Tests.TestContainers.Search;
 
@@ -25,42 +26,62 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 			[
 				new ProductCharacteristicsSnapshot(
 					901,
-				[
-					new ProductCharacteristicSnapshot(10, "12.5")
-				])
+					[
+						new ProductCharacteristicSnapshot(10, "12.5")
+					])
 			]
 		};
-		await Scope.ServiceProvider.GetRequiredService<ProductCharacteristicsUpdatedConsumer>()
+		await Scope.ServiceProvider
+			.GetRequiredService<ProductCharacteristicsUpdatedConsumer>()
 			.Consume(Context(characteristics));
-		(await Products.GetById(901, CancellationToken))!.ReadinessStatus.Should().Be(ProductReadinessStatus.Partial);
+		(await Products.GetById(901, CancellationToken))!.ReadinessStatus
+			.Should()
+			.Be(ProductReadinessStatus.Partial);
 
 		var product = new ProductsUpdatedEvent
 		{
 			UpdatedAt = updatedAt,
-			Products = [new ProductSnapshot { Id = 901, Name = "Fixture product", Sku = "FIX-901", ProducerId = 42 }]
+			Products =
+			[
+				new ProductSnapshot { Id = 901, Name = "Fixture product", Sku = "FIX-901", ProducerId = 42 }
+			]
 		};
 		await Scope.ServiceProvider.GetRequiredService<ProductUpdatedConsumer>().Consume(Context(product));
 		await RefreshAsync();
 
-		var result = await Mediator.Send(new SearchInCatalogueQuery(
-			"Fixture product",
-			new HashSet<SearchTarget> { SearchTarget.Products },
-			new HashSet<SearchMatchType>(),
-			new HashSet<SearchMatchType> { SearchMatchType.Exact },
-			[], new Pagination(0, 20), [], []), CancellationToken);
+		var result = await Mediator.Send(
+			new SearchInCatalogueQuery(
+				"Fixture product",
+				new HashSet<SearchTarget> { SearchTarget.Products },
+				new HashSet<SearchMatchType>(),
+				new HashSet<SearchMatchType> { SearchMatchType.Exact },
+				[],
+				new Pagination(0, 20),
+				[],
+				[]),
+			CancellationToken);
 
-		(await Products.GetById(901, CancellationToken))!.ReadinessStatus.Should().Be(ProductReadinessStatus.Ready);
+		(await Products.GetById(901, CancellationToken))!.ReadinessStatus
+			.Should()
+			.Be(ProductReadinessStatus.Ready);
 		result.Products.Total.Should().Be(1);
 		result.Products.Items.Should().ContainSingle().Which.Id.Should().Be(901);
-		(await Products.GetById(901, CancellationToken))!.Characteristics.Should()
-			.ContainSingle().Which.NumericValue.Should().Be(12.5m);
+		(await Products.GetById(901, CancellationToken))!.Characteristics
+			.Should()
+			.ContainSingle()
+			.Which
+			.NumericValue
+			.Should()
+			.Be(12.5m);
 
 		var cleared = characteristics with
 		{
 			UpdatedAt = updatedAt.AddSeconds(1),
 			Products = [new ProductCharacteristicsSnapshot(901, [])]
 		};
-		await Scope.ServiceProvider.GetRequiredService<ProductCharacteristicsUpdatedConsumer>().Consume(Context(cleared));
+		await Scope.ServiceProvider
+			.GetRequiredService<ProductCharacteristicsUpdatedConsumer>()
+			.Consume(Context(cleared));
 		(await Products.GetById(901, CancellationToken))!.Characteristics.Should().BeEmpty();
 	}
 
@@ -71,12 +92,21 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 		var dimensions = new ProductDimensionsUpdatedEvent
 		{
 			UpdatedAt = updatedAt,
-			Products = [new(902, new(10, 20, 30, DimensionUnit.Millimeter))]
+			Products =
+			[
+				new ProductDimensionsSnapshot(
+					902,
+					new ProductDimensionsData(
+						10,
+						20,
+						30,
+						DimensionUnit.Millimeter))
+			]
 		};
 		var weight = new ProductWeightUpdatedEvent
 		{
 			UpdatedAt = updatedAt,
-			Products = [new(902, new(2, WeightUnit.Kilogram))]
+			Products = [new ProductWeightSnapshot(902, new ProductWeightData(2, WeightUnit.Kilogram))]
 		};
 		var dimensionsConsumer = Scope.ServiceProvider.GetRequiredService<ProductDimensionsUpdatedConsumer>();
 		var weightConsumer = Scope.ServiceProvider.GetRequiredService<ProductWeightUpdatedConsumer>();
@@ -90,16 +120,20 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 		product.Weight!.WeightKg.Should().Be(2);
 		product.ReadinessStatus.Should().Be(ProductReadinessStatus.Partial);
 
-		await dimensionsConsumer.Consume(Context(new ProductDimensionsUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(1),
-			Products = [new(902, null)]
-		}));
-		await weightConsumer.Consume(Context(new ProductWeightUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(1),
-			Products = [new(902, null)]
-		}));
+		await dimensionsConsumer.Consume(
+			Context(
+				new ProductDimensionsUpdatedEvent
+				{
+					UpdatedAt = updatedAt.AddSeconds(1),
+					Products = [new ProductDimensionsSnapshot(902, null)]
+				}));
+		await weightConsumer.Consume(
+			Context(
+				new ProductWeightUpdatedEvent
+				{
+					UpdatedAt = updatedAt.AddSeconds(1),
+					Products = [new ProductWeightSnapshot(902, null)]
+				}));
 
 		product = await Products.GetById(902, CancellationToken);
 		product!.Dimensions.Should().BeNull();
@@ -110,23 +144,42 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 	public async Task DeletedCoreEvent_RemainsDeletedAfterPartialEvents()
 	{
 		var updatedAt = DateTime.UtcNow;
-		await Scope.ServiceProvider.GetRequiredService<ProductUpdatedConsumer>().Consume(Context(new ProductsUpdatedEvent
-		{
-			UpdatedAt = updatedAt,
-			Products = [new ProductSnapshot { Id = 903, IsDeleted = true }]
-		}));
+		await Scope.ServiceProvider
+			.GetRequiredService<ProductUpdatedConsumer>()
+			.Consume(
+				Context(
+					new ProductsUpdatedEvent
+					{
+						UpdatedAt = updatedAt,
+						Products = [new ProductSnapshot { Id = 903, IsDeleted = true }]
+					}));
 
-		await Scope.ServiceProvider.GetRequiredService<ProductCharacteristicsUpdatedConsumer>()
-			.Consume(Context(new ProductCharacteristicsUpdatedEvent
-			{
-				UpdatedAt = updatedAt.AddSeconds(1),
-				Products = [new(903, [new(10, "12.5")])]
-			}));
-		await Scope.ServiceProvider.GetRequiredService<ProductWeightUpdatedConsumer>().Consume(Context(new ProductWeightUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(1),
-			Products = [new(903, new(2, WeightUnit.Kilogram))]
-		}));
+		await Scope.ServiceProvider
+			.GetRequiredService<ProductCharacteristicsUpdatedConsumer>()
+			.Consume(
+				Context(
+					new ProductCharacteristicsUpdatedEvent
+					{
+						UpdatedAt = updatedAt.AddSeconds(1),
+						Products =
+						[
+							new ProductCharacteristicsSnapshot(
+								903,
+								[new ProductCharacteristicSnapshot(10, "12.5")])
+						]
+					}));
+		await Scope.ServiceProvider
+			.GetRequiredService<ProductWeightUpdatedConsumer>()
+			.Consume(
+				Context(
+					new ProductWeightUpdatedEvent
+					{
+						UpdatedAt = updatedAt.AddSeconds(1),
+						Products =
+ [
+							new ProductWeightSnapshot(903, new ProductWeightData(2, WeightUnit.Kilogram))
+						]
+					}));
 
 		var product = await Products.GetById(903, CancellationToken);
 		product!.ReadinessStatus.Should().Be(ProductReadinessStatus.Deleted);
@@ -140,66 +193,107 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 	{
 		var updatedAt = DateTime.UtcNow;
 		const int productId = 904;
-		await Scope.ServiceProvider.GetRequiredService<ProductUpdatedConsumer>().Consume(Context(new ProductsUpdatedEvent
-		{
-			UpdatedAt = updatedAt,
-			Products = [new ProductSnapshot { Id = productId, Name = "Ready product", Sku = "READY-904", ProducerId = 42 }]
-		}));
+		await Scope.ServiceProvider
+			.GetRequiredService<ProductUpdatedConsumer>()
+			.Consume(
+				Context(
+					new ProductsUpdatedEvent
+					{
+						UpdatedAt = updatedAt,
+						Products =
+						[
+							new ProductSnapshot
+								{ Id = productId, Name = "Ready product", Sku = "READY-904", ProducerId = 42 }
+						]
+					}));
 		await AssertReadyAndSearchable();
 
 		var dimensionsConsumer = Scope.ServiceProvider.GetRequiredService<ProductDimensionsUpdatedConsumer>();
 		var weightConsumer = Scope.ServiceProvider.GetRequiredService<ProductWeightUpdatedConsumer>();
-		var characteristicsConsumer = Scope.ServiceProvider.GetRequiredService<ProductCharacteristicsUpdatedConsumer>();
+		var characteristicsConsumer =
+			Scope.ServiceProvider.GetRequiredService<ProductCharacteristicsUpdatedConsumer>();
 
-		await dimensionsConsumer.Consume(Context(new ProductDimensionsUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(1),
-			Products = [new(productId, new(10, 20, 30, DimensionUnit.Millimeter))]
-		}));
+		await dimensionsConsumer.Consume(
+			Context(
+				new ProductDimensionsUpdatedEvent
+				{
+					UpdatedAt = updatedAt.AddSeconds(1),
+					Products =
+					[
+						new ProductDimensionsSnapshot(
+							productId,
+							new ProductDimensionsData(
+								10,
+								20,
+								30,
+								DimensionUnit.Millimeter))
+					]
+				}));
 		var product = await AssertReadyAndSearchable();
 		product.Dimensions!.LengthM.Should().Be(0.01m);
 		product.DimensionsUpdatedAt.Should().Be(updatedAt.AddSeconds(1));
 
-		await weightConsumer.Consume(Context(new ProductWeightUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(1),
-			Products = [new(productId, new(2, WeightUnit.Kilogram))]
-		}));
+		await weightConsumer.Consume(
+			Context(
+				new ProductWeightUpdatedEvent
+				{
+					UpdatedAt = updatedAt.AddSeconds(1),
+					Products =
+					[
+						new ProductWeightSnapshot(productId, new ProductWeightData(2, WeightUnit.Kilogram))
+					]
+				}));
 		product = await AssertReadyAndSearchable();
 		product.Weight!.WeightKg.Should().Be(2);
 		product.WeightUpdatedAt.Should().Be(updatedAt.AddSeconds(1));
 		product.Dimensions!.LengthM.Should().Be(0.01m);
 
-		await characteristicsConsumer.Consume(Context(new ProductCharacteristicsUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(1),
-			Products = [new(productId, [new(10, "12.5")])]
-		}));
+		await characteristicsConsumer.Consume(
+			Context(
+				new ProductCharacteristicsUpdatedEvent
+				{
+					UpdatedAt = updatedAt.AddSeconds(1),
+					Products =
+					[
+						new ProductCharacteristicsSnapshot(
+							productId,
+							[new ProductCharacteristicSnapshot(10, "12.5")])
+					]
+				}));
 		product = await AssertReadyAndSearchable();
 		product.Characteristics.Should().ContainSingle().Which.NumericValue.Should().Be(12.5m);
 		product.CharacteristicsUpdatedAt.Should().Be(updatedAt.AddSeconds(1));
 		product.Weight!.WeightKg.Should().Be(2);
 		product.Dimensions!.LengthM.Should().Be(0.01m);
 
-		await dimensionsConsumer.Consume(Context(new ProductDimensionsUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(2), Products = [new(productId, null)]
-		}));
+		await dimensionsConsumer.Consume(
+			Context(
+				new ProductDimensionsUpdatedEvent
+				{
+					UpdatedAt = updatedAt.AddSeconds(2),
+					Products = [new ProductDimensionsSnapshot(productId, null)]
+				}));
 		(await AssertReadyAndSearchable()).Dimensions.Should().BeNull();
 
-		await weightConsumer.Consume(Context(new ProductWeightUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(2), Products = [new(productId, null)]
-		}));
+		await weightConsumer.Consume(
+			Context(
+				new ProductWeightUpdatedEvent
+				{
+					UpdatedAt = updatedAt.AddSeconds(2),
+					Products = [new ProductWeightSnapshot(productId, null)]
+				}));
 		(await AssertReadyAndSearchable()).Weight.Should().BeNull();
 
-		await characteristicsConsumer.Consume(Context(new ProductCharacteristicsUpdatedEvent
-		{
-			UpdatedAt = updatedAt.AddSeconds(2), Products = [new(productId, [])]
-		}));
+		await characteristicsConsumer.Consume(
+			Context(
+				new ProductCharacteristicsUpdatedEvent
+				{
+					UpdatedAt = updatedAt.AddSeconds(2),
+					Products = [new ProductCharacteristicsSnapshot(productId, [])]
+				}));
 		(await AssertReadyAndSearchable()).Characteristics.Should().BeEmpty();
 
-		async Task<Search.Entities.Product> AssertReadyAndSearchable()
+		async Task<Product> AssertReadyAndSearchable()
 		{
 			var document = await Products.GetById(productId, CancellationToken);
 			document.Should().NotBeNull();
@@ -210,10 +304,17 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 			document.ProducerId.Should().Be(42);
 
 			await RefreshAsync();
-			var result = await Mediator.Send(new SearchInCatalogueQuery(
-				"Ready product", new HashSet<SearchTarget> { SearchTarget.Products },
-				new HashSet<SearchMatchType>(), new HashSet<SearchMatchType> { SearchMatchType.Exact },
-				[], new Pagination(0, 20), [], []), CancellationToken);
+			var result = await Mediator.Send(
+				new SearchInCatalogueQuery(
+					"Ready product",
+					new HashSet<SearchTarget> { SearchTarget.Products },
+					new HashSet<SearchMatchType>(),
+					new HashSet<SearchMatchType> { SearchMatchType.Exact },
+					[],
+					new Pagination(0, 20),
+					[],
+					[]),
+				CancellationToken);
 			result.Products.Total.Should().Be(1);
 			result.Products.Items.Should().ContainSingle().Which.Id.Should().Be(productId);
 			return document;

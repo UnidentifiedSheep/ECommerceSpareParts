@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Net;
 using Integrations.Common;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
@@ -29,8 +28,8 @@ public class TmtrSupplier(
 		return await GetPrices(request, cancellationToken);
 	}
 
-	public async Task<ConnectionCheck> CheckConnectionAsync(CancellationToken cancellationToken = default) =>
-		await connectionProvider.CheckConnectionAsync(cancellationToken);
+	public async Task<ConnectionCheck> CheckConnectionAsync(CancellationToken cancellationToken = default)
+		=> await connectionProvider.CheckConnectionAsync(cancellationToken);
 
 	private async Task<Response<IReadOnlyList<SupplierProduct>>> GetProducts(
 		GetProductsRequest request,
@@ -125,40 +124,39 @@ public class TmtrSupplier(
 		]);
 	}
 
-	private static SupplierPosition AdaptToPosition(GetPriceItem item, TmtrSettings settings) => new()
-	{
-		Id = CreateSourceKey(item),
-		DeliveryInfo = item.ExpectedDeliveryDate.HasValue
-			? new DeliveryInfo
-			{
-				DeliveryDate = item.ExpectedDeliveryDate.Value.UtcDateTime,
-				DeliveryProbability = 99,
-				GuaranteedDeliveryDate =
-					item.GuaranteedDeliveryDate?.UtcDateTime ?? item.ExpectedDeliveryDate.Value
-						.AddDays(settings.GuaranteedDeliveryOffsetDays)
-						.UtcDateTime,
-				OrderTill = DateTime.UtcNow.Date.AddHours(14) //The order can be placed till 14 utc.
-			}
-			: null,
-		PurchaseInfo = new PurchaseInfo
+	private static SupplierPosition AdaptToPosition(GetPriceItem item, TmtrSettings settings)
+		=> new()
 		{
-			AvailableQuantity = item.AvailableQuantity,
-			MinimumPurchaseQuantity = item.MinimumOrderQuantity,
-			QuantityCoefficient = item.MinimumPackQuantity,
-			PartnerWarehouse = item.LocationType == OfferLocationType.PartnerNetworkWarehouse,
-			DaysToRefund = 14, //14 days to refund
-			PriceInfo = new PriceInfo
+			Id = CreateSourceKey(item),
+			DeliveryInfo = item.ExpectedDeliveryDate.HasValue
+				? new DeliveryInfo
+				{
+					DeliveryDate = item.ExpectedDeliveryDate.Value.UtcDateTime,
+					DeliveryProbability = 99,
+					GuaranteedDeliveryDate =
+						item.GuaranteedDeliveryDate?.UtcDateTime ?? item.ExpectedDeliveryDate.Value
+							.AddDays(settings.GuaranteedDeliveryOffsetDays)
+							.UtcDateTime,
+					OrderTill = DateTime.UtcNow.Date.AddHours(14) //The order can be placed till 14 utc.
+				}
+				: null,
+			PurchaseInfo = new PurchaseInfo
 			{
-				CurrencyCode = "RUB", Price = item.UnitPrice
+				AvailableQuantity = item.AvailableQuantity,
+				MinimumPurchaseQuantity = item.MinimumOrderQuantity,
+				QuantityCoefficient = item.MinimumPackQuantity,
+				PartnerWarehouse = item.LocationType == OfferLocationType.PartnerNetworkWarehouse,
+				DaysToRefund = 14, //14 days to refund
+				PriceInfo = new PriceInfo
+				{
+					CurrencyCode = "RUB", Price = item.UnitPrice
+				}
 			}
-		}
-	};
+		};
 
 	private static string CreateSourceKey(GetPriceItem item)
-	{
-		return $"{item.ProductId}:" + $"{item.WarehouseIdentifier}:" + $"{item.StorageLocationCode}:" +
+		=> $"{item.ProductId}:" + $"{item.WarehouseIdentifier}:" + $"{item.StorageLocationCode}:" +
 			$"{item.PriceListId}:" + $"{item.PriceListItemId}:" + $"{item.LocationType}";
-	}
 
 	private static bool IsRequestedProduct(
 		string requestedBrand,
@@ -178,12 +176,14 @@ public class TmtrSupplier(
 		return NormalizeSku(requestedSku) == NormalizeSku(compareSku);
 	}
 
-	private static bool IsSameBrand(string brand1, string brand2) => string.Equals(
-		brand1,
-		brand2,
-		StringComparison.OrdinalIgnoreCase);
-	private static string NormalizeSku(string value) => new(
-		value.Where(char.IsLetterOrDigit).Select(char.ToUpperInvariant).ToArray());
+	private static bool IsSameBrand(string brand1, string brand2)
+		=> string.Equals(
+			brand1,
+			brand2,
+			StringComparison.OrdinalIgnoreCase);
+	private static string NormalizeSku(string value)
+		=> new(
+			value.Where(char.IsLetterOrDigit).Select(char.ToUpperInvariant).ToArray());
 
 	private static bool IsFail<T>(
 		Response<T> response,

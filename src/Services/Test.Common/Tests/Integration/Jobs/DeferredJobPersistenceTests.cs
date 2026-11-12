@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
 using Domain.CommonEntities.Job;
@@ -16,7 +15,8 @@ using Tests.TestContainers.Combined;
 
 namespace Tests.Tests.Integration.Jobs;
 
-public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture) : CommonLayerIntegrationTest(fixture)
+public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture)
+	: CommonLayerIntegrationTest(fixture)
 {
 	[Fact]
 	public async Task SaveChanges_DeferredStepHasNoPreparedInputOrOutput()
@@ -24,7 +24,9 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		var (step, _) = await CreateLeasedStepAsync();
 		Context.ChangeTracker.Clear();
 
-		var saved = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
+		var saved = await Context.Set<Job>()
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == step.Id, CancellationToken);
 
 		saved.InputInitialized.Should().BeFalse();
 		saved.StepKey.Should().Be("import");
@@ -38,18 +40,23 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		var (step, lease) = await CreateLeasedStepAsync();
 		await using var transaction = Sp.GetRequiredService<IApplicationTransactionFactory>().Create();
 
-		await transaction.WithSettings(TransactionalAttribute.ReadCommitted(30, 1)).ExecuteAsync(async (context, ct) =>
-		{
-			var saved = await context.Repositories.Get<Job, Guid>().GetById(step.Id, ct) ??
-				throw new InvalidOperationException();
-			saved.InitializeInput(LrtStateSerializer.SerializeInput("{}"), lease);
-			saved.Start(lease);
-			saved.Succeed(lease, "{\"StorageKey\":\"files/result.csv\"}");
-			await context.UnitOfWork.SaveChangesAsync(ct);
-		}, CancellationToken);
+		await transaction.WithSettings(TransactionalAttribute.ReadCommitted(30, 1))
+			.ExecuteAsync(
+				async (context, ct) =>
+				{
+					var saved = await context.Repositories.Get<Job, Guid>().GetById(step.Id, ct) ??
+						throw new InvalidOperationException();
+					saved.InitializeInput(LrtStateSerializer.SerializeInput("{}"), lease);
+					saved.Start(lease);
+					saved.Succeed(lease, "{\"StorageKey\":\"files/result.csv\"}");
+					await context.UnitOfWork.SaveChangesAsync(ct);
+				},
+				CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var committed = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
+		var committed = await Context.Set<Job>()
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == step.Id, CancellationToken);
 		committed.InputInitialized.Should().BeTrue();
 		committed.Status.Should().Be(JobStatus.Succeeded);
 		committed.Output.Should().Be("{\"StorageKey\":\"files/result.csv\"}");
@@ -61,21 +68,26 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 	{
 		var (step, lease) = await CreateLeasedStepAsync();
 		await using var transaction = Sp.GetRequiredService<IApplicationTransactionFactory>().Create();
-		var action = () => transaction.WithSettings(TransactionalAttribute.ReadCommitted(30, 1)).ExecuteAsync(async (context, ct) =>
-		{
-			var saved = await context.Repositories.Get<Job, Guid>().GetById(step.Id, ct) ??
-				throw new InvalidOperationException();
-			saved.InitializeInput(LrtStateSerializer.SerializeInput("{}"), lease);
-			saved.Start(lease);
-			saved.Succeed(lease, "{\"StorageKey\":\"files/result.csv\"}");
-			await context.UnitOfWork.SaveChangesAsync(ct);
-			throw new InvalidOperationException("rollback after save");
-		}, CancellationToken);
+		var action = () => transaction.WithSettings(TransactionalAttribute.ReadCommitted(30, 1))
+			.ExecuteAsync(
+				async (context, ct) =>
+				{
+					var saved = await context.Repositories.Get<Job, Guid>().GetById(step.Id, ct) ??
+						throw new InvalidOperationException();
+					saved.InitializeInput(LrtStateSerializer.SerializeInput("{}"), lease);
+					saved.Start(lease);
+					saved.Succeed(lease, "{\"StorageKey\":\"files/result.csv\"}");
+					await context.UnitOfWork.SaveChangesAsync(ct);
+					throw new InvalidOperationException("rollback after save");
+				},
+				CancellationToken);
 
 		await action.Should().ThrowAsync<InvalidOperationException>().WithMessage("rollback after save");
 
 		Context.ChangeTracker.Clear();
-		var rolledBack = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == step.Id, CancellationToken);
+		var rolledBack = await Context.Set<Job>()
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == step.Id, CancellationToken);
 		rolledBack.InputInitialized.Should().BeFalse();
 		rolledBack.Status.Should().Be(JobStatus.Locked);
 		rolledBack.Output.Should().BeNull();
@@ -90,7 +102,9 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
-		var saved = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == job.Id, CancellationToken);
+		var saved = await Context.Set<Job>()
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == job.Id, CancellationToken);
 
 		saved.InputInitialized.Should().BeTrue();
 		saved.State.Should().Be("{}");
@@ -105,16 +119,23 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		var workflow = new Mock<IMultiStepLrt>();
 		workflow.SetupGet(x => x.SystemName).Returns("workflow");
 		workflow.SetupGet(x => x.InputType).Returns(typeof(NoneInputState));
-		workflow.Setup(x => x.ConfigureSteps(It.IsAny<IMultiStepJobBuilder>())).Callback<IMultiStepJobBuilder>(builder =>
-		{
-			var producer = builder.AddStep("producer", new NoneInputState(), key: "download");
-			var consumer = builder.AddStep("consumer", context =>
+		workflow.Setup(x => x.ConfigureSteps(It.IsAny<IMultiStepJobBuilder>()))
+			.Callback<IMultiStepJobBuilder>(builder =>
 			{
-				Interlocked.Increment(ref preparations);
-				return new FileInput(context.GetOutput<FileOutput>(producer).StorageKey);
-			}, key: "import");
-			builder.AddDependency(consumer, producer);
-		});
+				var producer = builder.AddStep(
+					"producer",
+					new NoneInputState(),
+					key: "download");
+				var consumer = builder.AddStep(
+					"consumer",
+					context =>
+					{
+						Interlocked.Increment(ref preparations);
+						return new FileInput(context.GetOutput<FileOutput>(producer).StorageKey);
+					},
+					key: "import");
+				builder.AddDependency(consumer, producer);
+			});
 		var producerLrt = new Mock<ILrtNamedObject>();
 		producerLrt.SetupGet(x => x.SystemName).Returns("producer");
 		producerLrt.SetupGet(x => x.InputType).Returns(typeof(NoneInputState));
@@ -123,14 +144,18 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		consumerLrt.SetupGet(x => x.SystemName).Returns("consumer");
 		consumerLrt.SetupGet(x => x.InputType).Returns(typeof(FileInput));
 		var registry = new Mock<INamedObjectRegistry<ILrtNamedObject>>();
-		registry.Setup(x => x.GetBySystemName(It.IsAny<string>())).Returns((string name) => name switch
-		{
-			"workflow" => workflow.Object,
-			"producer" => producerLrt.Object,
-			"consumer" => consumerLrt.Object,
-			_ => throw new InvalidOperationException(name)
-		});
-		var parent = (MultiStepJob)new JobCreationDispatcher(registry.Object).Create("workflow", "{}", 3);
+		registry.Setup(x => x.GetBySystemName(It.IsAny<string>()))
+			.Returns((string name) => name switch
+			{
+				"workflow" => workflow.Object,
+				"producer" => producerLrt.Object,
+				"consumer" => consumerLrt.Object,
+				_ => throw new InvalidOperationException(name)
+			});
+		var parent = (MultiStepJob)new JobCreationDispatcher(registry.Object).Create(
+			"workflow",
+			"{}",
+			3);
 		var producer = parent.Steps[0];
 		var consumer = parent.Steps[1];
 		var parentLease = Guid.NewGuid();
@@ -151,30 +176,37 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		preparations.Should().Be(0);
 
 		var initializer = new JobStepInputInitializer(registry.Object);
+
 		async Task PrepareInputAsync()
 		{
 			await using var transaction = Sp.GetRequiredService<IApplicationTransactionFactory>().Create();
-			await transaction.WithSettings(TransactionalAttribute.ReadCommitted(30, 1)).ExecuteAsync(async (context, ct) =>
-			{
-				await initializer.InitializeAsync(consumer, lease, context, ct);
-				await Task.Yield();
-				await context.UnitOfWork.SaveChangesAsync(ct);
-			}, CancellationToken);
+			await transaction.WithSettings(TransactionalAttribute.ReadCommitted(30, 1))
+				.ExecuteAsync(
+					async (context, ct) =>
+					{
+						await initializer.InitializeAsync(
+							consumer,
+							lease,
+							context,
+							ct);
+						await Task.Yield();
+						await context.UnitOfWork.SaveChangesAsync(ct);
+					},
+					CancellationToken);
 		}
 
 		await Task.WhenAll(PrepareInputAsync(), PrepareInputAsync());
 
 		Context.ChangeTracker.Clear();
-		var saved = await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == consumer.Id, CancellationToken);
+		var saved = await Context.Set<Job>()
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == consumer.Id, CancellationToken);
 		saved.InputInitialized.Should().BeTrue();
-		LrtStateSerializer.DeserializeInput<FileInput>(saved.State).StorageKey.Should().Be("files/persisted.csv");
+		LrtStateSerializer.DeserializeInput<FileInput>(saved.State)
+			.StorageKey
+			.Should()
+			.Be("files/persisted.csv");
 		preparations.Should().Be(1);
-	}
-
-	private sealed record FileOutput(string StorageKey);
-	private sealed record FileInput(string StorageKey) : IInputState
-	{
-		public void ValidateState() => ArgumentException.ThrowIfNullOrWhiteSpace(StorageKey);
 	}
 
 	private async Task<(Job Step, Guid Lease)> CreateLeasedStepAsync()
@@ -192,5 +224,12 @@ public sealed class DeferredJobPersistenceTests(CombinedContainerFixture fixture
 		await Context.AddAsync(parent, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		return (step, lease);
+	}
+
+	private sealed record FileOutput(string StorageKey);
+
+	private sealed record FileInput(string StorageKey) : IInputState
+	{
+		public void ValidateState() => ArgumentException.ThrowIfNullOrWhiteSpace(StorageKey);
 	}
 }

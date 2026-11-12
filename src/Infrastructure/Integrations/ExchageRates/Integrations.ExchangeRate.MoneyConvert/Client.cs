@@ -19,7 +19,8 @@ public sealed class Client(HttpClient client) :
 		var response = await client.GetAsync("", cancellationToken);
 		var result = await ReadResponse<MoneyConvertRatesResponse>(response, cancellationToken);
 		return result.Success
-			? Response<ExchangeRates>.Ok(new ExchangeRates(result.ValueOrThrow.Base, result.ValueOrThrow.Rates))
+			? Response<ExchangeRates>.Ok(
+				new ExchangeRates(result.ValueOrThrow.Base, result.ValueOrThrow.Rates))
 			: Response<ExchangeRates>.FromFail(result);
 	}
 
@@ -41,7 +42,6 @@ public sealed class Client(HttpClient client) :
 		public required string Source { get; init; }
 
 		[JsonPropertyName("rates")]
-		public Dictionary<string, decimal> Rates { get; init; } = [];
+		public Dictionary<string, decimal> Rates { get; } = [];
 	}
-
 }

@@ -7,16 +7,17 @@ namespace Main.Application.Notifications.DeliveryObservers;
 
 public class InAppDeliveryObserver(
 	IIntegrationEventScope eventScope
-	) : IChannelDeliveryObserver<InAppReceipt, InAppRecipient>
+) : IChannelDeliveryObserver<InAppReceipt, InAppRecipient>
 {
 	public Task ObserveAsync(IReadOnlyCollection<InAppReceipt> receipts, CancellationToken cancellationToken)
 	{
 		foreach (var i in receipts)
-			eventScope.Add(new InAppNotificationCreatedEvent
-			{
-				Id = i.CreatedRowId,
-				UserId = i.Recipient.UserId
-			});
+			eventScope.Add(
+				new InAppNotificationCreatedEvent
+				{
+					Id = i.CreatedRowId,
+					UserId = i.Recipient.UserId
+				});
 		return Task.CompletedTask;
 	}
 }

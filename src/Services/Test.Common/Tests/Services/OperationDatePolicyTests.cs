@@ -1,10 +1,9 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using Application.Common.Services;
 using Enums;
 using Extensions;
 using FluentAssertions;
 using Moq;
+using Security.Core.Interfaces;
 
 namespace Tests.Tests.Services;
 

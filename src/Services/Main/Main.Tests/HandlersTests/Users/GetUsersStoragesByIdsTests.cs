@@ -8,9 +8,7 @@ namespace Tests.HandlersTests.Users;
 public class GetUsersStoragesByIdsTests : IntegrationTest
 {
 	public GetUsersStoragesByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UserRelationsTestContext>();
-	}
+		=> RegisterBasicContext<UserRelationsTestContext>();
 
 	private UserRelationsTestContext TestContext => GetContext<UserRelationsTestContext>();
 
@@ -21,12 +19,23 @@ public class GetUsersStoragesByIdsTests : IntegrationTest
 		var second = TestContext.SecondUser;
 
 		var result = await Mediator.Send(
-			new GetUsersStoragesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]), CancellationToken);
+			new GetUsersStoragesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Storages.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
-		result.Storages[first.Id].Select(x => x.Code).Should().Equal([
-			TestContext.FirstUserStorage.Code, TestContext.SharedStorage.Code]);
-		result.Storages[second.Id].Should().ContainSingle().Which.Code.Should().Be(TestContext.SharedStorage.Code);
+		result.Storages[first.Id]
+			.Select(x => x.Code)
+			.Should()
+			.Equal(
+				TestContext.FirstUserStorage.Code,
+				TestContext.SharedStorage.Code);
+		result.Storages[second.Id]
+			.Should()
+			.ContainSingle()
+			.Which
+			.Code
+			.Should()
+			.Be(TestContext.SharedStorage.Code);
 	}
 
 	[Fact]
@@ -52,7 +61,8 @@ public class GetUsersStoragesByIdsTests : IntegrationTest
 	public async Task IndividualOnlyUser_ReturnsEmptyDictionary()
 	{
 		var result = await Mediator.Send(
-			new GetUsersStoragesByIdsQuery(TestContext.IndividualOnlyUser.Id), CancellationToken);
+			new GetUsersStoragesByIdsQuery(TestContext.IndividualOnlyUser.Id),
+			CancellationToken);
 
 		result.Storages.Should().BeEmpty();
 	}
@@ -68,7 +78,9 @@ public class GetUsersStoragesByIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetUsersStoragesByIdsQuery(Array.Empty<Guid>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetUsersStoragesByIdsQuery(Array.Empty<Guid>()),
+			CancellationToken);
 
 		result.Storages.Should().BeEmpty();
 	}

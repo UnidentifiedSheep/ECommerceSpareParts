@@ -37,16 +37,15 @@ public class RedisCache(IDatabase redis, string? prefix = null) : ICache
 	public Task SetAsync<T>(
 		string key,
 		T value,
-		TimeSpan? ttl = null) => SetAsync([(key, value)], ttl);
+		TimeSpan? ttl = null)
+		=> SetAsync([(key, value)], ttl);
 
 	public Task<bool> SetExpireAsync(string key, TimeSpan? ttl = null)
-	{
-		return SetExpireCore(
+		=> SetExpireCore(
 			redis,
 			key,
 			ttl,
 			ExpireWhen.Always);
-	}
 
 	public async Task<Dictionary<string, bool>> SetExpireAsync(IEnumerable<string> keys, TimeSpan? ttl = null)
 	{
@@ -99,11 +98,11 @@ public class RedisCache(IDatabase redis, string? prefix = null) : ICache
 		TimeSpan? ttl = null)
 	{
 		await redis
-		.JSON()
-		.SetAsync(
-			GetWithPrefix(key),
-			"$",
-			values);
+			.JSON()
+			.SetAsync(
+				GetWithPrefix(key),
+				"$",
+				values);
 
 		await SetExpireAsync(key, ttl);
 	}
@@ -112,14 +111,12 @@ public class RedisCache(IDatabase redis, string? prefix = null) : ICache
 		string key,
 		IEnumerable<string> values,
 		TimeSpan? ttl = null)
-	{
-		return AddToSetAsync(
+		=> AddToSetAsync(
 			new Dictionary<string, List<string>>
 			{
 				[key] = values.ToList()
 			},
 			ttl);
-	}
 
 	public Task RemoveKeysAsync(IEnumerable<string> keys) => redis.KeyDeleteAsync(GetWithPrefixes(keys));
 
@@ -184,24 +181,23 @@ public class RedisCache(IDatabase redis, string? prefix = null) : ICache
 	private Task AddToSetCore(
 		IDatabaseAsync db,
 		string key,
-		IEnumerable<string> values) => db.SetAddAsync(
-		GetWithPrefix(key),
-		values.Select(x => new RedisValue(x)).ToArray());
+		IEnumerable<string> values)
+		=> db.SetAddAsync(
+			GetWithPrefix(key),
+			values.Select(x => new RedisValue(x)).ToArray());
 
 	private Task<bool> SetExpireCore(
 		IDatabaseAsync db,
 		string key,
 		TimeSpan? ttl,
 		ExpireWhen when)
-	{
-		return db.KeyExpireAsync(
+		=> db.KeyExpireAsync(
 			GetWithPrefix(key),
 			ttl,
 			when);
-	}
 
-	private string GetWithPrefixString(string key) =>
-		string.IsNullOrWhiteSpace(prefix) ? key : $"{prefix}:{key}";
+	private string GetWithPrefixString(string key)
+		=> string.IsNullOrWhiteSpace(prefix) ? key : $"{prefix}:{key}";
 
 	private RedisKey GetWithPrefix(string key) => GetWithPrefixString(key);
 

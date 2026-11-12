@@ -52,10 +52,8 @@ public class SettingsContainer : ISettingsContainer
 	}
 
 	private void SetCore(Setting setting)
-	{
-		_settings.AddOrUpdate(
+		=> _settings.AddOrUpdate(
 			setting.GetType(),
 			setting,
 			(_, _) => setting);
-	}
 }

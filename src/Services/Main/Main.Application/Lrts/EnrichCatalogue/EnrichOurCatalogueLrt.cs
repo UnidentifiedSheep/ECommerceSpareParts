@@ -20,8 +20,8 @@ public class EnrichOurCatalogueLrt(
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtCatalogueEnrichmentNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtCatalogueEnrichmentDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtCatalogueEnrichmentDescriptionMessage.Instance;
 
 	protected override void ConfigureSteps(IMultiStepJobBuilder builder)
 	{

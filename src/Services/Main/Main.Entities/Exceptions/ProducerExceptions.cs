@@ -36,10 +36,13 @@ public class ProducersSupplierMappingAlreadyExistsException(string supplierProdu
 		});
 
 public class ProducerAliasAlreadyTakenException(object values) : LocalizedConflictException(
-	ProducerOtherNameAlreadyTakenMessage.Instance, values);
+	ProducerOtherNameAlreadyTakenMessage.Instance,
+	values);
 
 public class ProducerNameNotFoundException(object values) : LocalizedNotFoundException(
-	ProducerNotFoundMessage.Instance, values);
+	ProducerNotFoundMessage.Instance,
+	values);
 
 public class ProducerNameAlreadyTakenException(string name) : LocalizedConflictException(
-	ProducerNameAlreadyTakenMessage.Instance, new { Name = name });
+	ProducerNameAlreadyTakenMessage.Instance,
+	new { Name = name });

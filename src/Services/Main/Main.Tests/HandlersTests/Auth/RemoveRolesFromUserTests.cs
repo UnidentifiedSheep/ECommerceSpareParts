@@ -1,12 +1,11 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Exceptions;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Handlers.Auth.RemoveRolesFromUser;
+using Main.Entities;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -15,9 +14,7 @@ namespace Tests.HandlersTests.Auth;
 public class RemoveRolesFromUserTests : IntegrationTest
 {
 	public RemoveRolesFromUserTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UsersTestContext>();
-	}
+		=> RegisterBasicContext<UsersTestContext>();
 
 	private UsersTestContext TestContext => GetContext<UsersTestContext>();
 
@@ -31,46 +28,65 @@ public class RemoveRolesFromUserTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(
-			new RemoveRolesFromUserCommand(user.Id, [$" {reader.ToLowerInvariant()} ", editor, reader]), CancellationToken);
+			new RemoveRolesFromUserCommand(user.Id, [$" {reader.ToLowerInvariant()} ", editor, reader]),
+			CancellationToken);
 
 		result.UserId.Should().Be(user.Id);
 		result.RemovedRoles.Should().Equal(reader, editor);
 		(await RoleNamesFor(user.Id)).Should().Equal("MEMBER");
-		(await RoleNamesFor(TestContext.OtherUser.Id)).Should().BeEquivalentTo(["MEMBER", editor]);
+		(await RoleNamesFor(TestContext.OtherUser.Id)).Should()
+			.BeEquivalentTo(
+				"MEMBER",
+				editor);
 	}
 
 	[Fact]
 	public async Task RemoveRoles_MissingAssignmentRejectsWholeBatch()
 	{
-		var action = () => Mediator.Send(new RemoveRolesFromUserCommand(
-			TestContext.User.Id, [TestContext.ReaderRole.Name, TestContext.EditorRole.Name]), CancellationToken);
+		var action = () => Mediator.Send(
+			new RemoveRolesFromUserCommand(
+				TestContext.User.Id,
+				[TestContext.ReaderRole.Name, TestContext.EditorRole.Name]),
+			CancellationToken);
 
 		await action.Should().ThrowAsync<UserRoleNotFoundException>();
 
-		(await RoleNamesFor(TestContext.User.Id)).Should().BeEquivalentTo(["MEMBER", TestContext.ReaderRole.Name]);
+		(await RoleNamesFor(TestContext.User.Id)).Should()
+			.BeEquivalentTo(
+				"MEMBER",
+				TestContext.ReaderRole.Name);
 	}
 
 	[Fact]
 	public async Task MissingUser_IsRejected()
 	{
 		var action = () => Mediator.Send(
-			new RemoveRolesFromUserCommand(Guid.NewGuid(), [TestContext.ReaderRole.Name]), CancellationToken);
+			new RemoveRolesFromUserCommand(Guid.NewGuid(), [TestContext.ReaderRole.Name]),
+			CancellationToken);
 
 		await action.Should().ThrowAsync<DbValidationException>();
 	}
 
-	private Task<string[]> RoleNamesFor(Guid userId) => Context.Set<UserRole>().AsNoTracking()
-		.Where(x => x.UserId == userId).Select(x => x.RoleName).ToArrayAsync(CancellationToken);
+	private Task<string[]> RoleNamesFor(Guid userId)
+		=> Context.Set<UserRole>()
+			.AsNoTracking()
+			.Where(x => x.UserId == userId)
+			.Select(x => x.RoleName)
+			.ToArrayAsync(CancellationToken);
 }
 
-public class RemoveRolesFromUserValidationTests : ValidationTest<RemoveRolesFromUserValidation, RemoveRolesFromUserCommand>
+public class
+	RemoveRolesFromUserValidationTests : ValidationTest<RemoveRolesFromUserValidation,
+	RemoveRolesFromUserCommand>
 {
 	[Fact]
 	public async Task SystemRoleInBatch_FailsValidation()
 	{
-		var result = await ValidateAsync(new RemoveRolesFromUserCommand(Guid.NewGuid(), ["reader", " system "]));
+		var result =
+			await ValidateAsync(new RemoveRolesFromUserCommand(Guid.NewGuid(), ["reader", " system "]));
 		result.ShouldHaveValidationErrorFor("RoleNames[1]")
 			.WithErrorCode(CantRemoveSystemRoleFromUserMessage.Instance.MessageKey)
-			.WithCustomState(CantRemoveSystemRoleFromUserMessage.Instance).Only();
+			.WithCustomState(CantRemoveSystemRoleFromUserMessage.Instance)
+			.Only();
 	}
 }

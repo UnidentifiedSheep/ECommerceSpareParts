@@ -8,14 +8,12 @@ namespace Persistence.Common;
 public static class ModelBuilderExtensions
 {
 	public static ModelBuilder ApplyJobConfigurations(this ModelBuilder modelBuilder)
-	{
-		return modelBuilder
+		=> modelBuilder
 			.ApplyConfiguration(new JobConfiguration())
 			.ApplyConfiguration(new MultiStepJobConfiguration())
 			.ApplyConfiguration(new JobStepDependencyConfiguration())
 			.ApplyConfiguration(new JobScheduleConfiguration())
 			.ApplyConfiguration(new JobScheduleRunConfiguration());
-	}
 
 	public static ModelBuilder AllDateTimesToUtc(this ModelBuilder modelBuilder)
 	{

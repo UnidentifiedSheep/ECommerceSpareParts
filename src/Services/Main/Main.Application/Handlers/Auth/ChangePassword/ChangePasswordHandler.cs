@@ -1,12 +1,11 @@
-using Application.Common.Interfaces.Repositories;
-using Main.Entities.User;
-using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Validators;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
+using Main.Entities.User;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Auth.ChangePassword;
 

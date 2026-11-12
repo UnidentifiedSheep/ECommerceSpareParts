@@ -13,6 +13,6 @@ public class GetAllCurrenciesHandler(ICurrencyCacheRepository cacheRepository)
 {
 	public async Task<GetAllCurrenciesResult> Handle(
 		GetAllCurrenciesQuery request,
-		CancellationToken cancellationToken) =>
-		new(await cacheRepository.GetAllCurrencies(cancellationToken));
+		CancellationToken cancellationToken)
+		=> new(await cacheRepository.GetAllCurrencies(cancellationToken));
 }

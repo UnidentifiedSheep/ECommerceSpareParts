@@ -12,8 +12,8 @@ namespace Tests.LrtsTests;
 
 public sealed class ProductEanImportLrtTests : CsvLrtIntegrationTest<ProductEanImportLrt>
 {
-	public ProductEanImportLrtTests(CombinedContainerFixture fixture) : base(fixture) =>
-		RegisterBasicContext<ProducerTestContext>();
+	public ProductEanImportLrtTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	[Fact]
 	public async Task ImportsEans_SkipsDuplicates_AndReportsInvalidRows()
@@ -39,10 +39,14 @@ public sealed class ProductEanImportLrtTests : CsvLrtIntegrationTest<ProductEanI
 		var state = execution.GetState<ProductEanImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Errors.Should().ContainSingle(error => error.RowIdx == 4);
-		var eans = await Context.Set<ProductEan>().AsNoTracking()
+		var eans = await Context.Set<ProductEan>()
+			.AsNoTracking()
 			.Where(x => x.ProductId == product.Id)
 			.Select(x => x.Ean)
 			.ToListAsync(CancellationToken);
-		eans.Should().BeEquivalentTo(["4601234567890", "4601234567891"]);
+		eans.Should()
+			.BeEquivalentTo(
+				"4601234567890",
+				"4601234567891");
 	}
 }

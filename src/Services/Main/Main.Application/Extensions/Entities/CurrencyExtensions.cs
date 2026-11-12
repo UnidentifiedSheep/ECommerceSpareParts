@@ -5,8 +5,7 @@ namespace Main.Application.Extensions.Entities;
 public static class CurrencyExtensions
 {
 	public static Currency ToContract(this Main.Entities.Currency.Currency model)
-	{
-		return new Currency
+		=> new()
 		{
 			Id = model.Id,
 			Name = model.Name,
@@ -14,5 +13,4 @@ public static class CurrencyExtensions
 			Code = model.Code,
 			ShortName = model.ShortName
 		};
-	}
 }

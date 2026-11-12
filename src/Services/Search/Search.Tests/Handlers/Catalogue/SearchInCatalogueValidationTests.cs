@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
 using Search.Application.Handlers.Search.Catalogue;
@@ -73,8 +72,9 @@ public sealed class SearchInCatalogueValidationTests
 			TestContext.Current.CancellationToken);
 
 		result.IsValid.Should().BeFalse();
-		result.Errors.Should().Contain(
-			error => error.PropertyName == nameof(SearchInCatalogueQuery.CandidateMappingStatus));
+		result.Errors
+			.Should()
+			.Contain(error => error.PropertyName == nameof(SearchInCatalogueQuery.CandidateMappingStatus));
 	}
 
 	[Fact]
@@ -84,8 +84,9 @@ public sealed class SearchInCatalogueValidationTests
 			CreateQuery() with { ProductGroupIds = Enumerable.Range(1, 101).ToArray() },
 			TestContext.Current.CancellationToken);
 
-		result.Errors.Should().Contain(
-			error => error.PropertyName == nameof(SearchInCatalogueQuery.ProductGroupIds));
+		result.Errors
+			.Should()
+			.Contain(error => error.PropertyName == nameof(SearchInCatalogueQuery.ProductGroupIds));
 	}
 
 	private static SearchInCatalogueQuery CreateQuery(
@@ -93,8 +94,7 @@ public sealed class SearchInCatalogueValidationTests
 		IReadOnlySet<SearchTarget>? targets = null,
 		IReadOnlySet<SearchMatchType>? skuModes = null,
 		IReadOnlySet<SearchMatchType>? nameModes = null)
-	{
-		return new SearchInCatalogueQuery(
+		=> new(
 			query,
 			targets ?? new HashSet<SearchTarget>
 			{
@@ -112,5 +112,4 @@ public sealed class SearchInCatalogueValidationTests
 			new Pagination(0, 20),
 			[],
 			[]);
-	}
 }

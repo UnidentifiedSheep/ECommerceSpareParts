@@ -105,7 +105,8 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddScoped<IDomainEventScope, DomainEventScope>();
 		services.AddScoped<IDomainEventExecutor, DomainEventExecutor>();
-		services.AddScoped<Func<IDomainEventExecutor>>(provider => provider.GetRequiredService<IDomainEventExecutor>);
+		services.AddScoped<Func<IDomainEventExecutor>>(provider
+			=> provider.GetRequiredService<IDomainEventExecutor>);
 		return services;
 	}
 
@@ -115,7 +116,8 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<IRepositoryProvider, RepositoryProvider>();
 		services.AddScoped<IApplicationTransactionContext, ApplicationTransactionContext>();
 		services.AddScoped<ApplicationTransaction>();
-		services.AddScoped<IApplicationTransaction>(provider => provider.GetRequiredService<ApplicationTransaction>());
+		services.AddScoped<IApplicationTransaction>(provider
+			=> provider.GetRequiredService<ApplicationTransaction>());
 		services.AddSingleton<IApplicationTransactionFactory, ApplicationTransactionFactory>();
 		return services;
 	}

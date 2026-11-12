@@ -15,7 +15,10 @@ public static class StorageContentRepositoryExtensions
 		CancellationToken cancellationToken = default)
 	{
 		var contents = await repository
-			.GetWithActiveLocksForUpdateAsync([contentId], criteriaBuilder, cancellationToken);
+			.GetWithActiveLocksForUpdateAsync(
+				[contentId],
+				criteriaBuilder,
+				cancellationToken);
 		return contents[contentId];
 	}
 
@@ -28,10 +31,13 @@ public static class StorageContentRepositoryExtensions
 		if (contentIds.Count == 0) return [];
 
 		var contents = await repository.GetWithActiveLocksForUpdateAsync(
-			(criteriaBuilder ?? Criteria<StorageContent>.New()).Where(content => contentIds.Contains(content.Id)),
+			(criteriaBuilder ?? Criteria<StorageContent>.New()).Where(content
+				=> contentIds.Contains(content.Id)),
 			cancellationToken);
 		var contentsById = contents.ToDictionary(content => content.Id);
-		contentIds.EnsureAllExists(contentsById.Keys, missing => new StorageContentNotFoundException(missing));
+		contentIds.EnsureAllExists(
+			contentsById.Keys,
+			missing => new StorageContentNotFoundException(missing));
 		return contentsById;
 	}
 
@@ -61,12 +67,12 @@ public static class StorageContentRepositoryExtensions
 	{
 		if (contentIds.Count == 0) return;
 		var contents = await repository.EnsureExistsAsync(
-				ids: contentIds,
-				errorFactory: m => new StorageContentNotFoundException(m),
-				ct: cancellationToken,
-				criteriaBuilder: Criteria<StorageContent>.New()
-					.Include(content => content.Locks.Where(item => item.State == StorageContentLockState.Active))
-					.Track());
+			contentIds,
+			m => new StorageContentNotFoundException(m),
+			cancellationToken,
+			Criteria<StorageContent>.New()
+				.Include(content => content.Locks.Where(item => item.State == StorageContentLockState.Active))
+				.Track());
 
 		foreach (var (_, content) in contents)
 			content.MarkLocksLoaded();

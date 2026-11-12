@@ -14,39 +14,12 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 	where TDestination : INotificationRecipient
 	where TDestinationReceipt : IDeliveryReceipt<TDestination>
 {
-	private readonly IReadOnlyList<IChannelDeliveryObserver<TDestinationReceipt, TDestination>> _observers = observers.ToArray();
+	private readonly IReadOnlyList<IChannelDeliveryObserver<TDestinationReceipt, TDestination>> _observers =
+		observers.ToArray();
+
 	protected ILogger Logger => logger;
 
 	public abstract string SystemName { get; }
-
-	protected async Task NotifyObserversAsync(
-		IReadOnlyCollection<TDestinationReceipt> receipts,
-		CancellationToken cancellationToken = default)
-	{
-		ArgumentNullException.ThrowIfNull(receipts);
-
-		if (receipts.Count == 0) return;
-
-		foreach (var observer in _observers)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-			try
-			{
-				await observer.ObserveAsync(receipts, cancellationToken);
-			}
-			catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-			{
-				throw;
-			}
-			catch (Exception exception)
-			{
-				logger.LogError(exception,
-					"Notification delivery observer {ObserverType} failed for channel {ChannelSystemName}.",
-					observer.GetType().FullName,
-					SystemName);
-			}
-		}
-	}
 
 	public bool CanHandle(
 		INotification notification,
@@ -92,6 +65,36 @@ public abstract class NotificationChannelBase<TNotification, TDestination, TDest
 				$"Channel '{SystemName}' returned {results.Count} results for {typed.Length} deliveries.");
 
 		return results;
+	}
+
+	protected async Task NotifyObserversAsync(
+		IReadOnlyCollection<TDestinationReceipt> receipts,
+		CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(receipts);
+
+		if (receipts.Count == 0) return;
+
+		foreach (var observer in _observers)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			try
+			{
+				await observer.ObserveAsync(receipts, cancellationToken);
+			}
+			catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+			{
+				throw;
+			}
+			catch (Exception exception)
+			{
+				logger.LogError(
+					exception,
+					"Notification delivery observer {ObserverType} failed for channel {ChannelSystemName}.",
+					observer.GetType().FullName,
+					SystemName);
+			}
+		}
 	}
 
 	private NotificationDelivery<TNotification, TDestination> Convert(NotificationDelivery delivery)

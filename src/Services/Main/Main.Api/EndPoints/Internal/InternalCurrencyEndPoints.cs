@@ -1,6 +1,6 @@
+using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
-using System.Text.Json.Serialization;
 using Main.Application.Handlers.Currencies.GetCurrencyRate;
 using MediatR;
 
@@ -43,12 +43,17 @@ public static class InternalCurrencyEndPoints
 			.Produces<GetCurrencyRateResult>()
 			.ProducesProblem(StatusCodes.Status404NotFound);
 
-		currency.MapGet("{id:int}/rates/historical", async (
-			ISender sender, int id, DateTimeOffset forDate, CancellationToken cancellationToken) =>
-		{
-			var result = await sender.Send(new GetHistoricalCurrencyRateQuery(id, forDate), cancellationToken);
-			return Results.Ok(new GetCurrencyRateResult { Rate = result.Rate });
-		})
+		currency.MapGet(
+				"{id:int}/rates/historical",
+				async (
+					ISender sender, int id,
+					DateTimeOffset forDate, CancellationToken cancellationToken) =>
+				{
+					var result = await sender.Send(
+						new GetHistoricalCurrencyRateQuery(id, forDate),
+						cancellationToken);
+					return Results.Ok(new GetCurrencyRateResult { Rate = result.Rate });
+				})
 			.WithName("InternalHistoricalCurrencyRate")
 			.WithSummary("Получить исторический курс валюты для внутреннего сервиса")
 			.Produces<GetCurrencyRateResult>()

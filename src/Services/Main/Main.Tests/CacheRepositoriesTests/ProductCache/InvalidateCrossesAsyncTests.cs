@@ -12,9 +12,7 @@ namespace Tests.CacheRepositoriesTests.ProductCache;
 public class InvalidateCrossesAsyncTests : IntegrationTest
 {
 	public InvalidateCrossesAsyncTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductCrossTestContext>();
-	}
+		=> RegisterBasicContext<ProductCrossTestContext>();
 
 	private ProductCrossTestContext TestContext => GetContext<ProductCrossTestContext>();
 
@@ -75,11 +73,11 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
 		relations.Should().BeEmpty();
 	}
 
-	private IProductProvider GetProductProvider() =>
-		Scope.ServiceProvider.GetRequiredService<IProductProvider>();
+	private IProductProvider GetProductProvider()
+		=> Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 
-	private IProductCacheInvalidator GetCacheInvalidator() =>
-		Scope.ServiceProvider.GetRequiredService<IProductCacheInvalidator>();
+	private IProductCacheInvalidator GetCacheInvalidator()
+		=> Scope.ServiceProvider.GetRequiredService<IProductCacheInvalidator>();
 
 	private async Task RemoveCrossesCache(int productId)
 	{
@@ -92,21 +90,17 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
 	}
 
 	private async Task RemoveRelation(int productId)
-	{
-		await Scope
+		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
 			.RemoveKeyAsync(CacheKeys.ProductCache.ProductCrossRelations(productId));
-	}
 
-	private async Task<bool> CacheKeyExists(string key) =>
-		await Scope.ServiceProvider.GetRequiredService<ICache>().KeyExistsAsync(key);
+	private async Task<bool> CacheKeyExists(string key)
+		=> await Scope.ServiceProvider.GetRequiredService<ICache>().KeyExistsAsync(key);
 
 	private async Task<string[]> GetRelations(int productId)
-	{
-		return await Scope
+		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
 			.GetFromSetAsync(CacheKeys.ProductCache.ProductCrossRelations(productId));
-	}
 }

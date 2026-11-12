@@ -1,4 +1,3 @@
-using Abstractions;
 using Application.Common.Querying;
 using Search.Entities;
 

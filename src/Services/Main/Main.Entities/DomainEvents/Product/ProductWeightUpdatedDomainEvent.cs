@@ -5,10 +5,7 @@ namespace Main.Entities.DomainEvents.Product;
 public class ProductWeightUpdatedDomainEvent : IKeyedDomainEvent, IBatchableDomainEvent
 {
 
-	public ProductWeightUpdatedDomainEvent(int productId)
-	{
-		ProductId = productId;
-	}
+	public ProductWeightUpdatedDomainEvent(int productId) => ProductId = productId;
 
 	public int ProductId { get; }
 

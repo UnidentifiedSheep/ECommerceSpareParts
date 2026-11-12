@@ -20,7 +20,11 @@ public sealed class UserTokenTests
 		token.Type.Should().Be(TokenType.RefreshToken);
 		token.Revoked.Should().BeFalse();
 		token.RevokeReason.Should().BeNull();
-		token.ExpiresAt.Should().BeOnOrAfter(before.AddDays(30)).And.BeOnOrBefore(DateTime.UtcNow.AddDays(30));
+		token.ExpiresAt
+			.Should()
+			.BeOnOrAfter(before.AddDays(30))
+			.And
+			.BeOnOrBefore(DateTime.UtcNow.AddDays(30));
 		token.IsActive.Should().BeTrue();
 	}
 
@@ -48,7 +52,11 @@ public sealed class UserTokenTests
 		token.Id.Should().Be(id);
 		token.UserId.Should().Be(userId);
 		token.TokenHash.Should().Be("second-hash");
-		token.ExpiresAt.Should().BeOnOrAfter(before.AddDays(30)).And.BeOnOrBefore(DateTime.UtcNow.AddDays(30));
+		token.ExpiresAt
+			.Should()
+			.BeOnOrAfter(before.AddDays(30))
+			.And
+			.BeOnOrBefore(DateTime.UtcNow.AddDays(30));
 		token.IsActive.Should().BeTrue();
 	}
 

@@ -11,15 +11,9 @@ public record GqlProducer
 {
 	private readonly ProducerDto? _producer;
 
-	public GqlProducer(int id)
-	{
-		Id = id;
-	}
+	public GqlProducer(int id) => Id = id;
 
-	public GqlProducer(ProducerDto producer) : this(producer.Id)
-	{
-		_producer = producer;
-	}
+	public GqlProducer(ProducerDto producer) : this(producer.Id) => _producer = producer;
 
 	[GraphQLName("id")]
 	[Shareable]
@@ -28,28 +22,32 @@ public record GqlProducer
 	[GraphQLName("name")]
 	public async Task<string> GetNameAsync(
 		IProducerByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await GetProducerAsync(loader, cancellationToken)).Name;
+		CancellationToken cancellationToken)
+		=> (await GetProducerAsync(loader, cancellationToken)).Name;
 
 	[GraphQLName("description")]
 	public async Task<string?> GetDescriptionAsync(
 		IProducerByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetProducerAsync(loader, cancellationToken)).Description;
+		CancellationToken cancellationToken)
+		=> (await GetProducerAsync(loader, cancellationToken)).Description;
 
 	[GraphQLName("aliases")]
 	public async Task<IReadOnlyCollection<string>> GetAliasesAsync(
 		IProducerAliasesByIdDataLoader loader,
-		CancellationToken cancellationToken) => await loader.LoadAsync(Id, cancellationToken) ?? [];
+		CancellationToken cancellationToken)
+		=> await loader.LoadAsync(Id, cancellationToken) ?? [];
 
 	[GraphQLName("supplierMappings")]
 	public async Task<List<GqlProducerSupplierMapping>> GetSupplierMappingsAsync(
 		IProducerSupplierMappingsByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await loader.LoadAsync(Id, cancellationToken) ?? [])
-		.Select(x => new GqlProducerSupplierMapping(x))
-		.ToList();
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
+			.Select(x => new GqlProducerSupplierMapping(x))
+			.ToList();
 
 	private async Task<ProducerDto> GetProducerAsync(
 		IProducerByIdDataLoader loader,
-		CancellationToken cancellationToken) => _producer ?? await loader.LoadAsync(Id, cancellationToken) ??
-		throw new ProducerNotFoundException(Id);
+		CancellationToken cancellationToken)
+		=> _producer ?? await loader.LoadAsync(Id, cancellationToken) ??
+			throw new ProducerNotFoundException(Id);
 }

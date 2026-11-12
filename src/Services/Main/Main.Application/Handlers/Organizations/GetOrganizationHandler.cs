@@ -14,14 +14,9 @@ public record GetOrganizationQuery : IQuery<GetOrganizationResult>
 {
 
 	public GetOrganizationQuery(string systemName)
-	{
-		SystemName = Organization.NormalizeSystemName(systemName);
-	}
+		=> SystemName = Organization.NormalizeSystemName(systemName);
 
-	public GetOrganizationQuery(Guid id)
-	{
-		Id = id;
-	}
+	public GetOrganizationQuery(Guid id) => Id = id;
 
 	public Guid? Id { get; }
 

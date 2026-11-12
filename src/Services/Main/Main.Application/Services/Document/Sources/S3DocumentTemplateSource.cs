@@ -1,7 +1,6 @@
 using System.Net;
 using Application.Common.Models.Options.S3;
 using Main.Application.Interfaces.Services.Document;
-using Main.Entities.Documents;
 using Main.Enums.Documents;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -21,7 +20,10 @@ public class S3DocumentTemplateSource(
 		CancellationToken token = default)
 	{
 		var response = await GetResponseAsync(templateName, token);
-		return await ReadTemplateBytesAsync(response, templateName, token);
+		return await ReadTemplateBytesAsync(
+			response,
+			templateName,
+			token);
 	}
 
 	protected virtual Task<Response<IStreamResponse>> GetResponseAsync(

@@ -28,13 +28,14 @@ public record GqlSupplierProduct(
 	public Supplier Supplier => SupplierProductDto.Supplier;
 
 	[GraphQLName("names")]
-	public IReadOnlyList<GqlSupplierProductName> Names =>
-		SupplierProductDto.Names.Select(x => new GqlSupplierProductName(x)).ToList();
+	public IReadOnlyList<GqlSupplierProductName> Names
+		=> SupplierProductDto.Names.Select(x => new GqlSupplierProductName(x)).ToList();
 
 	[GraphQLName("crosses")]
 	public async Task<IReadOnlyList<GqlSupplierProduct>> GetCrossesAsync(
 		ISupplierProductCrossesByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await loader.LoadAsync(Id, cancellationToken))
-		?.Select(x => new GqlSupplierProduct(x))
-		.ToList() ?? [];
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken))
+			?.Select(x => new GqlSupplierProduct(x))
+			.ToList() ?? [];
 }

@@ -1,5 +1,3 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
@@ -9,6 +7,7 @@ using Main.Application.Handlers.NotificationPreferences.UpsertNotificationPrefer
 using Main.Application.Handlers.Notifications;
 using Main.Application.Handlers.Notifications.SeeNotifications;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Api.GraphQl.Mutations;
 
@@ -32,8 +31,8 @@ public sealed class NotificationMutations
 		GqlSendNotificationInput input,
 		CancellationToken cancellationToken)
 		=> (await sender.Send(
-			new SendNotificationCommand(input.UserId, input.Message),
-			cancellationToken))
+				new SendNotificationCommand(input.UserId, input.Message),
+				cancellationToken))
 			.Succeeded;
 
 	[GraphQLName("upsertPreferences")]

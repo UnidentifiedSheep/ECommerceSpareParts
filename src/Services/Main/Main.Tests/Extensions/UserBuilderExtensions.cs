@@ -1,7 +1,6 @@
-using Persistence.Context;
 using Main.Entities.Organization;
 using Main.Entities.User;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.DataBuilders.User;
 
 namespace Tests.Extensions;

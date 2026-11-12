@@ -1,11 +1,10 @@
-using Application.Common.Querying;
-using Abstractions.Models;
 using Application.Common.Dtos;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
+using Application.Common.Querying;
 using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 

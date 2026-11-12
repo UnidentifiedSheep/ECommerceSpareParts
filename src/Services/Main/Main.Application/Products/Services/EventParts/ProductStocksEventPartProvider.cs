@@ -12,19 +12,23 @@ public sealed class ProductStocksEventPartProvider : IProductEventPartProvider
 
 	public bool IsHeavyRequest => true;
 
-	public IQueryable<ProductEntity> Populate(IQueryable<ProductEntity> query) =>
-		query.Include(product => product.Stocks);
+	public IQueryable<ProductEntity> Populate(IQueryable<ProductEntity> query)
+		=> query.Include(product => product.Stocks);
 
 	public object Extract(
-		IReadOnlyList<ProductEntity> products, DateTime updatedAt, IReadOnlyList<int> missingProductIds) =>
-		new ProductStocksSnapshotEvent
+		IReadOnlyList<ProductEntity> products,
+		DateTime updatedAt,
+		IReadOnlyList<int> missingProductIds)
+		=> new ProductStocksSnapshotEvent
 		{
 			OccurredAt = updatedAt,
 			Products = products.Select(product => new ProductStocksSnapshot
-			{
-				ProductId = product.Id,
-				Stocks = product.Stocks.Where(stock => stock.Quantity > 0)
-					.ToDictionary(stock => stock.StorageCode, stock => stock.Quantity)
-			}).ToArray()
+				{
+					ProductId = product.Id,
+					Stocks = product.Stocks
+						.Where(stock => stock.Quantity > 0)
+						.ToDictionary(stock => stock.StorageCode, stock => stock.Quantity)
+				})
+				.ToArray()
 		};
 }

@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Entities.Exceptions;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Products.Commands;
@@ -12,7 +13,7 @@ namespace Main.Application.Products.Commands;
 public record DeleteProductWeightCommand(int ProductId) : ICommand;
 
 public class DeleteProductWeightHandler(
-	IRepository<Entities.Product.ProductWeight, int> repository,
+	IRepository<ProductWeight, int> repository,
 	IUnitOfWork unitOfWork) : ICommandHandler<DeleteProductWeightCommand>
 {
 	public async Task<Unit> Handle(DeleteProductWeightCommand request, CancellationToken cancellationToken)

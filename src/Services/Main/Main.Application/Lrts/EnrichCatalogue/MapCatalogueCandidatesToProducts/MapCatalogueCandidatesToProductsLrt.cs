@@ -21,11 +21,11 @@ public class MapCatalogueCandidatesToProductsLrt(
 
 	public override string SystemName => LrtSystemName;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtCatalogueCandidatesMapToProductsNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtCatalogueCandidatesMapToProductsNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtCatalogueCandidatesMapToProductsDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtCatalogueCandidatesMapToProductsDescriptionMessage.Instance;
 
 	protected override async Task DoWork(NoneInputState inputState)
 	{
@@ -60,16 +60,17 @@ public class MapCatalogueCandidatesToProductsLrt(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
-				var candidates = await context.GetRequiredService<IRepository<CatalogueCandidate, Guid>>().ListAsync(
-					Criteria<CatalogueCandidate>
-						.New()
-						.Where(x => x.ProductId == null)
-						.Where(x => x.Id > lastProcessedId)
-						.OrderByAsc(x => x.Id)
-						.Track()
-						.Size(batchSize)
-						.Build(),
-					cancellationToken);
+				var candidates = await context.GetRequiredService<IRepository<CatalogueCandidate, Guid>>()
+					.ListAsync(
+						Criteria<CatalogueCandidate>
+							.New()
+							.Where(x => x.ProductId == null)
+							.Where(x => x.Id > lastProcessedId)
+							.OrderByAsc(x => x.Id)
+							.Track()
+							.Size(batchSize)
+							.Build(),
+						cancellationToken);
 
 				if (candidates.Count == 0)
 					return new BatchResult(
@@ -79,9 +80,10 @@ public class MapCatalogueCandidatesToProductsLrt(
 						0,
 						false);
 
-				var productIds = await context.GetRequiredService<IProductRepository>().GetProductIdsByKeys(
-					candidates.Select(x => (NormalizedSku: x.Sku.NormalizedValue, x.ProducerId)),
-					cancellationToken);
+				var productIds = await context.GetRequiredService<IProductRepository>()
+					.GetProductIdsByKeys(
+						candidates.Select(x => (NormalizedSku: x.Sku.NormalizedValue, x.ProducerId)),
+						cancellationToken);
 
 				var mappedRows = 0;
 				foreach (var candidate in candidates)

@@ -1,10 +1,9 @@
-using Main.Entities.Cart;
-using Main.Entities;
-using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
 using Main.Application.Handlers.Cart.ChangeCartItemCount;
+using Main.Entities;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -43,9 +42,10 @@ public class ChangeCartItemCountTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var cartItem = await Context.Set<global::Main.Entities.Cart.Cart>().FirstOrDefaultAsync(
-			x => x.UserId == command.UserId && x.ProductId == command.ProductId,
-			CancellationToken);
+		var cartItem = await Context.Set<Main.Entities.Cart.Cart>()
+			.FirstOrDefaultAsync(
+				x => x.UserId == command.UserId && x.ProductId == command.ProductId,
+				CancellationToken);
 		Assert.NotNull(cartItem);
 		Assert.Equal(newCount, cartItem.Count);
 	}
@@ -60,20 +60,25 @@ public class ChangeCartItemCountTests : IntegrationTest
 
 		await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
-
-
 }
 
-public class ChangeCartItemCountValidationTests : ValidationTest<ChangeCartItemCountValidation, ChangeCartItemCountCommand>
+public class
+	ChangeCartItemCountValidationTests : ValidationTest<ChangeCartItemCountValidation,
+	ChangeCartItemCountCommand>
 {
 	[Theory]
 	[InlineData(0)]
 	[InlineData(-1)]
 	public async Task ChangeCartItemCount_InvalidCount_FailsValidation(int newCount)
 	{
-		var result = await ValidateAsync(new ChangeCartItemCountCommand(Guid.NewGuid(), 1, newCount));
+		var result = await ValidateAsync(
+			new ChangeCartItemCountCommand(
+				Guid.NewGuid(),
+				1,
+				newCount));
 		result.ShouldHaveValidationErrorFor(x => x.NewCount)
 			.WithErrorCode(PositionCountMustBeGreaterThanZeroMessage.Instance.MessageKey)
-			.WithCustomState(PositionCountMustBeGreaterThanZeroMessage.Instance).Only();
+			.WithCustomState(PositionCountMustBeGreaterThanZeroMessage.Instance)
+			.Only();
 	}
 }

@@ -13,8 +13,8 @@ public sealed class RedisContainerFixture : IAsyncLifetime
 
 	private Channel<RedisDatabaseSlot> _databasePool = null!;
 
-	public string BaseConnectionString =>
-		$"{_redisContainer.Hostname}:{_redisContainer.GetMappedPublicPort(6379)}";
+	public string BaseConnectionString
+		=> $"{_redisContainer.Hostname}:{_redisContainer.GetMappedPublicPort(6379)}";
 
 	public async ValueTask InitializeAsync()
 	{

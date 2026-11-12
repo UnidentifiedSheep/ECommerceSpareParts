@@ -82,8 +82,9 @@ public class ValidationErrorFilterTests
 		result.Should().BeSameAs(error);
 	}
 
-	private static ValidationErrorFilter CreateFilter(ILoggerFactory? loggerFactory = null) => new(
-		loggerFactory ?? NullLoggerFactory.Instance,
-		ErrorFilterTestFactory.CreateLocalizer(),
-		ErrorFilterTestFactory.CreateHttpContextAccessor());
+	private static ValidationErrorFilter CreateFilter(ILoggerFactory? loggerFactory = null)
+		=> new(
+			loggerFactory ?? NullLoggerFactory.Instance,
+			ErrorFilterTestFactory.CreateLocalizer(),
+			ErrorFilterTestFactory.CreateHttpContextAccessor());
 }

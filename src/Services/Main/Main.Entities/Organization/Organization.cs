@@ -59,28 +59,31 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 
 	public static string NormalizeSystemName(string systemName) => systemName.ToLowerInvariant().TrimSafe();
 
-	public static Organization CreateIndividual(string name, Guid ownerId) => new(
-		$"individual-{Guid.NewGuid():N}",
-		name,
-		OrganizationType.Individual,
-		ownerId,
-		ownerId);
+	public static Organization CreateIndividual(string name, Guid ownerId)
+		=> new(
+			$"individual-{Guid.NewGuid():N}",
+			name,
+			OrganizationType.Individual,
+			ownerId,
+			ownerId);
 
 	public static Organization CreateBusiness(
 		string name,
 		string systemName,
-		Guid ownerId) => new(
-		systemName,
-		name,
-		OrganizationType.Business,
-		ownerId);
+		Guid ownerId)
+		=> new(
+			systemName,
+			name,
+			OrganizationType.Business,
+			ownerId);
 
-	public static Organization CreateSystem(Guid id, Guid ownerId) => new(
-		$"system-{id:N}",
-		"System",
-		OrganizationType.System,
-		ownerId,
-		id);
+	public static Organization CreateSystem(Guid id, Guid ownerId)
+		=> new(
+			$"system-{id:N}",
+			"System",
+			OrganizationType.System,
+			ownerId,
+			id);
 
 	public void AddMember(Guid userId, OrganizationRole role)
 	{
@@ -132,15 +135,17 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 
 	public void SetIsHidden(bool isHidden) => IsHidden = isHidden;
 
-	public void SetName(string name) => Name = name
-		.TrimSafe()
-		.EnsureNotNullOrWhiteSpace(OrganizationNameRequiredMessage.Instance)
-		.EnsureMaxLength(128, OrganizationNameMaxLengthMessage.Instance)
-		.EnsureMinLength(3, OrganizationNameMinLengthMessage.Instance);
+	public void SetName(string name)
+		=> Name = name
+			.TrimSafe()
+			.EnsureNotNullOrWhiteSpace(OrganizationNameRequiredMessage.Instance)
+			.EnsureMaxLength(128, OrganizationNameMaxLengthMessage.Instance)
+			.EnsureMinLength(3, OrganizationNameMinLengthMessage.Instance);
 
-	private void SetSystemName(string systemName) => SystemName = NormalizeSystemName(systemName)
-		.EnsureNotNullOrWhiteSpace(OrganizationSystemNameRequiredMessage.Instance)
-		.EnsureMaxLength(128, OrganizationSystemNameMaxLengthMessage.Instance);
+	private void SetSystemName(string systemName)
+		=> SystemName = NormalizeSystemName(systemName)
+			.EnsureNotNullOrWhiteSpace(OrganizationSystemNameRequiredMessage.Instance)
+			.EnsureMaxLength(128, OrganizationSystemNameMaxLengthMessage.Instance);
 
 	public override Guid GetId() => Id;
 }

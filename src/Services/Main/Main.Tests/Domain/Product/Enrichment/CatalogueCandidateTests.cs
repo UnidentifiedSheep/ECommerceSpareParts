@@ -269,10 +269,8 @@ public sealed class CatalogueCandidateTests
 	private static CatalogueCandidate CreateCandidate() => CatalogueCandidate.Create("ABC-123", 42);
 
 	private static SupplierProduct CreateSupplierProduct(string sku = "SUPPLIER-123")
-	{
-		return SupplierProduct.Create(
+		=> SupplierProduct.Create(
 			new Sku(sku),
 			"Supplier producer",
 			Supplier.FavoritParts);
-	}
 }

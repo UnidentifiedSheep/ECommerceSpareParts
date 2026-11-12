@@ -7,11 +7,15 @@ using Domain.Validation;
 namespace Main.Entities.Product;
 
 public class ProductCharacteristic : Entity<ProductCharacteristic, (int, int)>,
-	ILinqEntity<ProductCharacteristic, (int, int)>, IGenerateAutomaticDomainEvents
+	ILinqEntity<ProductCharacteristic, (int, int)>,
+	IGenerateAutomaticDomainEvents
 {
-	private ProductCharacteristic() {}
+	private ProductCharacteristic() { }
 
-	private ProductCharacteristic(int productId, int characteristicId, string value)
+	private ProductCharacteristic(
+		int productId,
+		int characteristicId,
+		string value)
 	{
 		ProductId = productId;
 		CharacteristicId = characteristicId;
@@ -19,27 +23,34 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, int)>,
 	}
 
 	public int ProductId { get; }
+
 	[Validate]
 	public int CharacteristicId { get; }
+
 	public Characteristic Characteristic { get; private set; } = null!;
 	public string Value { get; private set; } = null!;
 
-	public static Expression<Func<ProductCharacteristic, (int, int)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.ProductId, x.CharacteristicId);
+	public static Expression<Func<ProductCharacteristic, (int, int)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.ProductId, x.CharacteristicId);
 
-	public static Expression<Func<ProductCharacteristic, bool>> GetEqualityExpression((int, int) key) =>
-		x => x.ProductId == key.Item1 && x.CharacteristicId == key.Item2;
+	public static Expression<Func<ProductCharacteristic, bool>> GetEqualityExpression((int, int) key)
+		=> x => x.ProductId == key.Item1 && x.CharacteristicId == key.Item2;
 
-	public static ProductCharacteristic Create(int productId, int characteristicId, string value) =>
-		new(productId, characteristicId, value);
+	public static ProductCharacteristic Create(
+		int productId,
+		int characteristicId,
+		string value)
+		=> new(
+			productId,
+			characteristicId,
+			value);
 
 	public void SetValue(string value)
-	{
-		Value = value
+		=> Value = value
 			.Trim()
 			.EnsureNotNullOrWhiteSpace(ArticleCharacteristicValueMustNotBeEmptyMessage.Instance)
 			.EnsureMaxLength(128, ArticleCharacteristicValueMaxLengthMessage.Instance);
-	}
 
 	public override (int, int) GetId() => (ProductId, CharacteristicId);
 }

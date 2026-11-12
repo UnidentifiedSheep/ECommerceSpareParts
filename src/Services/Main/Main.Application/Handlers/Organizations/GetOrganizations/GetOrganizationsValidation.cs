@@ -5,8 +5,5 @@ namespace Main.Application.Handlers.Organizations.GetOrganizations;
 
 public class GetOrganizationsValidation : AbstractValidator<GetOrganizationsQuery>
 {
-	public GetOrganizationsValidation()
-	{
-		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
-	}
+	public GetOrganizationsValidation() => RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 }

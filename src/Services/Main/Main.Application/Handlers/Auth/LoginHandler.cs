@@ -1,6 +1,4 @@
-using Security.Core.Interfaces;
 using System.Net;
-using System.Security.Cryptography;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Projections;
@@ -16,7 +14,7 @@ using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Enums;
+using Security.Core.Interfaces;
 using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Auth;

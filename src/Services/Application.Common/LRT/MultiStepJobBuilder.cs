@@ -15,7 +15,11 @@ internal sealed class MultiStepJobBuilder : IMultiStepJobBuilder
 		string? key = null) where TInputState : class, IInputState
 	{
 		ArgumentNullException.ThrowIfNull(inputState);
-		return AddStep(systemName, _ => inputState, maxAttempts, key);
+		return AddStep(
+			systemName,
+			_ => inputState,
+			maxAttempts,
+			key);
 	}
 
 	public LrtStepDefinition AddStep<TInputState>(
@@ -25,7 +29,11 @@ internal sealed class MultiStepJobBuilder : IMultiStepJobBuilder
 		string? key = null) where TInputState : class, IInputState
 	{
 		ArgumentNullException.ThrowIfNull(inputFactory);
-		return AddStep(systemName, (context, _) => Task.FromResult(inputFactory(context)), maxAttempts, key);
+		return AddStep(
+			systemName,
+			(context, _) => Task.FromResult(inputFactory(context)),
+			maxAttempts,
+			key);
 	}
 
 	public LrtStepDefinition AddStep<TInputState>(
@@ -35,12 +43,18 @@ internal sealed class MultiStepJobBuilder : IMultiStepJobBuilder
 		string? key = null) where TInputState : class, IInputState
 	{
 		ArgumentNullException.ThrowIfNull(inputFactory);
-		return Add(systemName, key, maxAttempts, typeof(TInputState), async (context, ct) =>
-		{
-			var input = await inputFactory(context, ct) ??
-				throw new InvalidOperationException($"Input factory for '{key ?? systemName}' returned null.");
-			return JsonSerializer.Serialize(input);
-		});
+		return Add(
+			systemName,
+			key,
+			maxAttempts,
+			typeof(TInputState),
+			async (context, ct) =>
+			{
+				var input = await inputFactory(context, ct) ??
+					throw new InvalidOperationException(
+						$"Input factory for '{key ?? systemName}' returned null.");
+				return JsonSerializer.Serialize(input);
+			});
 	}
 
 	public void AddDependency(LrtStepDefinition step, LrtStepDefinition dependsOn)
@@ -55,7 +69,8 @@ internal sealed class MultiStepJobBuilder : IMultiStepJobBuilder
 		string systemName,
 		string? key,
 		int? maxAttempts,
-		Type inputType, Func<LrtStepInputContext, CancellationToken, Task<string>> inputFactory)
+		Type inputType,
+		Func<LrtStepInputContext, CancellationToken, Task<string>> inputFactory)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(systemName);
 		key ??= systemName;
@@ -65,7 +80,12 @@ internal sealed class MultiStepJobBuilder : IMultiStepJobBuilder
 			throw new InvalidOperationException($"Duplicate workflow step key '{key}'.");
 		if (maxAttempts is <= 0)
 			throw new ArgumentOutOfRangeException(nameof(maxAttempts));
-		var step = new LrtStepDefinition(key, systemName, maxAttempts, inputType, inputFactory);
+		var step = new LrtStepDefinition(
+			key,
+			systemName,
+			maxAttempts,
+			inputType,
+			inputFactory);
 		Steps.Add(step);
 		return step;
 	}

@@ -37,12 +37,12 @@ public sealed class DocumentGenerationRequestConfiguration
 			request => new { request.RequesterId, CreatedAtUtc = request.CreatedAt },
 			"document_generation_requests_requester_created_idx");
 		builder.HasIndex(
-			request => request.JobId,
-			"document_generation_requests_job_id_uq")
+				request => request.JobId,
+				"document_generation_requests_job_id_uq")
 			.IsUnique();
 		builder.HasIndex(
-			request => request.ExpiresAt,
-			"document_generation_requests_expires_at_idx")
+				request => request.ExpiresAt,
+				"document_generation_requests_expires_at_idx")
 			.HasFilter("expires_at_utc IS NOT NULL");
 
 		builder.HasOne(request => request.Job)
@@ -51,7 +51,7 @@ public sealed class DocumentGenerationRequestConfiguration
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("document_generation_requests_job_fk");
 
-		builder.HasOne<Main.Entities.User.User>()
+		builder.HasOne<Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(request => request.RequesterId)
 			.OnDelete(DeleteBehavior.SetNull)

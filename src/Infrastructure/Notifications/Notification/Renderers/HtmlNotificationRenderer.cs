@@ -13,8 +13,8 @@ public class HtmlNotificationRenderer(
 	{
 		var model = notification.GetModel();
 		var body = await engine.CompileRenderAsync(
-			key: $"{notification.SystemName}.cshtml",
-			model: model);
+			$"{notification.SystemName}.cshtml",
+			model);
 
 		return string.IsNullOrWhiteSpace(body)
 			? null

@@ -1,9 +1,8 @@
-﻿using Persistence.Context;
-using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using Persistence.Repository;
 
@@ -32,9 +31,8 @@ public class StorageRouteRepository(UnifiedDbContext context, IQueryableExtensio
 		string from,
 		string to,
 		CancellationToken ct = default)
-	{
-		return await Context.Set<StorageRoute>().AnyAsync(
-			x => x.FromStorageCode == from && x.ToStorageCode == to && x.IsActive,
-			ct);
-	}
+		=> await Context.Set<StorageRoute>()
+			.AnyAsync(
+				x => x.FromStorageCode == from && x.ToStorageCode == to && x.IsActive,
+				ct);
 }

@@ -6,64 +6,60 @@ namespace Api.Common.Extensions;
 public static class PermissionExtensions
 {
 	public static TBuilder RequireAnyPermission<TBuilder>(this TBuilder builder, params string[] permissions)
-		where TBuilder : IEndpointConventionBuilder => AddPermissionRequirement(
-		builder,
-		permissions,
-		AuthorizationMatch.Any);
+		where TBuilder : IEndpointConventionBuilder
+		=> AddPermissionRequirement(
+			builder,
+			permissions,
+			AuthorizationMatch.Any);
 
 	public static TBuilder RequireAllPermissions<TBuilder>(this TBuilder builder, params string[] permissions)
-		where TBuilder : IEndpointConventionBuilder => AddPermissionRequirement(
-		builder,
-		permissions,
-		AuthorizationMatch.All);
+		where TBuilder : IEndpointConventionBuilder
+		=> AddPermissionRequirement(
+			builder,
+			permissions,
+			AuthorizationMatch.All);
 
 	public static TBuilder RequireAnyPermission<TBuilder>(this TBuilder builder, params Enum[] permissions)
 		where TBuilder : IEndpointConventionBuilder
-	{
-		return AddPermissionRequirement(
+		=> AddPermissionRequirement(
 			builder,
 			permissions.Select(x => x.ToString()),
 			AuthorizationMatch.Any);
-	}
 
 	public static TBuilder RequireAllPermissions<TBuilder>(this TBuilder builder, params Enum[] permissions)
 		where TBuilder : IEndpointConventionBuilder
-	{
-		return AddPermissionRequirement(
+		=> AddPermissionRequirement(
 			builder,
 			permissions.Select(x => x.ToString()),
 			AuthorizationMatch.All);
-	}
 
 	public static TBuilder RequireAnyRole<TBuilder>(this TBuilder builder, params string[] roles)
-		where TBuilder : IEndpointConventionBuilder => AddRoleRequirement(
-		builder,
-		roles,
-		AuthorizationMatch.Any);
+		where TBuilder : IEndpointConventionBuilder
+		=> AddRoleRequirement(
+			builder,
+			roles,
+			AuthorizationMatch.Any);
 
 	public static TBuilder RequireAllRoles<TBuilder>(this TBuilder builder, params string[] roles)
-		where TBuilder : IEndpointConventionBuilder => AddRoleRequirement(
-		builder,
-		roles,
-		AuthorizationMatch.All);
+		where TBuilder : IEndpointConventionBuilder
+		=> AddRoleRequirement(
+			builder,
+			roles,
+			AuthorizationMatch.All);
 
 	public static TBuilder RequireAnyRole<TBuilder>(this TBuilder builder, params Enum[] roles)
 		where TBuilder : IEndpointConventionBuilder
-	{
-		return AddRoleRequirement(
+		=> AddRoleRequirement(
 			builder,
 			roles.Select(x => x.ToString()),
 			AuthorizationMatch.Any);
-	}
 
 	public static TBuilder RequireAllRoles<TBuilder>(this TBuilder builder, params Enum[] roles)
 		where TBuilder : IEndpointConventionBuilder
-	{
-		return AddRoleRequirement(
+		=> AddRoleRequirement(
 			builder,
 			roles.Select(x => x.ToString()),
 			AuthorizationMatch.All);
-	}
 
 	private static TBuilder AddPermissionRequirement<TBuilder>(
 		TBuilder builder,

@@ -8,9 +8,7 @@ public abstract class RequireAuthorizationAttribute : AuthorizeAttribute
 {
 	protected RequireAuthorizationAttribute(string policy, IAuthorizationRequirement requirement) : base(
 		policy)
-	{
-		Requirement = requirement;
-	}
+		=> Requirement = requirement;
 
 	public IAuthorizationRequirement Requirement { get; }
 }

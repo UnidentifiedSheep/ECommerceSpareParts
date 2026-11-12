@@ -12,11 +12,11 @@ public class UniquenessAdditionalMarkupApplier(ISettingsService settingsService)
 {
 	public override string SystemName => nameof(UniquenessAdditionalMarkupApplier);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		PriceApplierUniquenessAdditionalMarkupNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> PriceApplierUniquenessAdditionalMarkupNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		PriceApplierUniquenessAdditionalMarkupDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> PriceApplierUniquenessAdditionalMarkupDescriptionMessage.Instance;
 
 	public override int Order => 10000;
 

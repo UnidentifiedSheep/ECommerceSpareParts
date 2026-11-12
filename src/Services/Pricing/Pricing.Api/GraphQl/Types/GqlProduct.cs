@@ -13,14 +13,12 @@ namespace Pricing.Api.GraphQl.Types;
 [GraphQLName("Product")]
 public record GqlProduct
 {
+
+	public GqlProduct(int id) => Id = id;
+
 	[GraphQLName("id")]
 	[Shareable]
 	public int Id { get; }
-
-	public GqlProduct(int id)
-	{
-		Id = id;
-	}
 
 	[GraphQLName("offers")]
 	[RequireAllPermissions(PermissionCodes.PRICES_GET_DETAILED)]
@@ -49,8 +47,14 @@ public record GqlProduct
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new GetRecommendedPriceQuery(
-			Id, input.CurrencyId, input.StorageCode, input.Quantity, input.Sources), cancellationToken);
+		var result = await sender.Send(
+			new GetRecommendedPriceQuery(
+				Id,
+				input.CurrencyId,
+				input.StorageCode,
+				input.Quantity,
+				input.Sources),
+			cancellationToken);
 		return new GqlPriceRecommendation(result.Item);
 	}
 }

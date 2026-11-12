@@ -1,13 +1,11 @@
-using Persistence.Context;
-using Security.Core.Interfaces;
-using Application.Common.Interfaces.Validators;
 using Main.Entities.Auth;
 using Main.Entities.Organization;
 using Main.Entities.User;
 using Main.Enums;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
+using Security.Core.Interfaces;
 using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
@@ -43,7 +41,8 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<UnifiedDbContex
 		}
 
 		if (!await context.Set<Organization>().AnyAsync(x => x.Id == user.Id))
-			await context.Set<Organization>().AddAsync(Organization.CreateIndividual(AdministratorName, user.Id));
+			await context.Set<Organization>()
+				.AddAsync(Organization.CreateIndividual(AdministratorName, user.Id));
 
 		await context.SaveChangesAsync();
 	}

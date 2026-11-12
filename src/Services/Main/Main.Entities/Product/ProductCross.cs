@@ -30,11 +30,13 @@ public class ProductCross : Entity<ProductCross, (int, int)>, ILinqEntity<Produc
 
 	public Product RightProduct { get; private set; } = null!;
 
-	public static Expression<Func<ProductCross, (int, int)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.LeftProductId, x.RightProductId);
+	public static Expression<Func<ProductCross, (int, int)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.LeftProductId, x.RightProductId);
 
-	public static Expression<Func<ProductCross, bool>> GetEqualityExpression((int, int) key) => x =>
-		x.LeftProductId == key.Item1 && x.RightProductId == key.Item2;
+	public static Expression<Func<ProductCross, bool>> GetEqualityExpression((int, int) key)
+		=> x =>
+			x.LeftProductId == key.Item1 && x.RightProductId == key.Item2;
 
 	public static ProductCross Create(int id, int crossId) => new(id, crossId);
 

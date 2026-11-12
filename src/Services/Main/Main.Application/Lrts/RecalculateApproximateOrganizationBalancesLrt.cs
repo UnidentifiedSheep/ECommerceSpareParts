@@ -20,11 +20,11 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 
 	public override string SystemName => nameof(RecalculateApproximateOrganizationBalancesLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtOrganizationApproximateBalanceRecalculateNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtOrganizationApproximateBalanceRecalculateNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtOrganizationApproximateBalanceRecalculateDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtOrganizationApproximateBalanceRecalculateDescriptionMessage.Instance;
 
 	protected override async Task DoWork(NoneInputState inputState)
 	{
@@ -33,14 +33,17 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 		while (true)
 		{
 			var id = lastOrganizationId;
-			var organizationIds = await ExecuteInScopeAsync((context, ct) =>
-				context.Repositories.GetForRead<OrganizationFinancialProfile, Guid>()
-				.Query
-				.Where(x => x.OrganizationId > id)
-				.OrderBy(x => x.OrganizationId)
-				.Select(x => x.OrganizationId)
-				.Take(BatchSize)
-				.ToListAsync(ct), CancellationToken);
+			var organizationIds = await ExecuteInScopeAsync(
+				(context, ct) =>
+					context.Repositories
+						.GetForRead<OrganizationFinancialProfile, Guid>()
+						.Query
+						.Where(x => x.OrganizationId > id)
+						.OrderBy(x => x.OrganizationId)
+						.Select(x => x.OrganizationId)
+						.Take(BatchSize)
+						.ToListAsync(ct),
+				CancellationToken);
 
 			if (organizationIds.Count == 0)
 				break;
@@ -49,9 +52,10 @@ public sealed class RecalculateApproximateOrganizationBalancesLrt(
 				TransactionalAttribute.ReadCommitted(20, 3),
 				async (context, cancellationToken) =>
 				{
-					await context.GetRequiredService<IBalanceService>().RecalculateApproximateBalancesAsync(
-						organizationIds,
-						cancellationToken);
+					await context.GetRequiredService<IBalanceService>()
+						.RecalculateApproximateBalancesAsync(
+							organizationIds,
+							cancellationToken);
 					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
 				},
 				CancellationToken);

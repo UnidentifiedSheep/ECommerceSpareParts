@@ -13,11 +13,11 @@ public class PriceRoundingApplier(ISettingsService settingsService)
 {
 	public override string SystemName => nameof(PriceRoundingApplier);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		PriceApplierPriceRoundingNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> PriceApplierPriceRoundingNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		PriceApplierPriceRoundingDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> PriceApplierPriceRoundingDescriptionMessage.Instance;
 
 	public override int Order => 100000;
 

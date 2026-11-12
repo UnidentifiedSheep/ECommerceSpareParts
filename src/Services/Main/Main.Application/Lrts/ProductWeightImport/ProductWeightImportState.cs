@@ -6,7 +6,8 @@ using SchemaGeneration.Abstractions.Enums;
 
 namespace Main.Application.Lrts.ProductWeightImport;
 
-public record ProductWeightImportState : ProductWeightImportInputState, ICsvImportState<ProductWeightImportState>
+public record ProductWeightImportState : ProductWeightImportInputState,
+	ICsvImportState<ProductWeightImportState>
 {
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
@@ -14,10 +15,11 @@ public record ProductWeightImportState : ProductWeightImportInputState, ICsvImpo
 	[JsonPropertyName("checkpoint")]
 	public CsvImportCheckpoint? Checkpoint { get; init; }
 
-	public ProductWeightImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
-	{
-		Checkpoint = checkpoint
-	};
+	public ProductWeightImportState WithCheckpoint(CsvImportCheckpoint checkpoint)
+		=> this with
+		{
+			Checkpoint = checkpoint
+		};
 }
 
 [CsvSchema(typeof(ProductWeightImportLrt.ProductWeightCsvDto))]
@@ -34,6 +36,7 @@ public record ProductWeightImportInputState : IInputState, ICsvImportInputState
 	public void ValidateState()
 	{
 		if (!FileName.EndsWith(".csv", StringComparison.InvariantCulture))
-			throw new InvalidOperationException("Product weight import state error. File name should end with .csv");
+			throw new InvalidOperationException(
+				"Product weight import state error. File name should end with .csv");
 	}
 }

@@ -34,8 +34,9 @@ public class PriceApplier : AuditableEntity<PriceApplier, string>, ILinqEntity<P
 
 	public static Expression<Func<PriceApplier, string>> GetKeySelector() => x => x.SystemName;
 
-	public static Expression<Func<PriceApplier, bool>> GetEqualityExpression(string key) => x =>
-		x.SystemName == key;
+	public static Expression<Func<PriceApplier, bool>> GetEqualityExpression(string key)
+		=> x =>
+			x.SystemName == key;
 
 	public static PriceApplier Create(
 		string systemName,
@@ -58,15 +59,17 @@ public class PriceApplier : AuditableEntity<PriceApplier, string>, ILinqEntity<P
 		_states.RemoveAll(x => !usagesToKeep.Contains(x.Usage));
 	}
 
-	public void SetName(string name) => Name = name
-		.TrimSafe()
-		.EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Name cannot be empty"))
-		.EnsureMaxLength(128, () => new InvalidOperationException("Name cannot exceed 128 characters"));
+	public void SetName(string name)
+		=> Name = name
+			.TrimSafe()
+			.EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Name cannot be empty"))
+			.EnsureMaxLength(128, () => new InvalidOperationException("Name cannot exceed 128 characters"));
 
-	public void SetDslLogic(string dslLogic) => DslLogic = dslLogic
-		.TrimSafe()
-		.EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("DSL logic cannot be empty"))
-		.EnsureValidJson(() => new InvalidOperationException("DSL logic is not valid JSON"));
+	public void SetDslLogic(string dslLogic)
+		=> DslLogic = dslLogic
+			.TrimSafe()
+			.EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("DSL logic cannot be empty"))
+			.EnsureValidJson(() => new InvalidOperationException("DSL logic is not valid JSON"));
 
 	public override void OnCreated() => AddUpdatedDomainEvent();
 
@@ -74,11 +77,12 @@ public class PriceApplier : AuditableEntity<PriceApplier, string>, ILinqEntity<P
 
 	public override void OnDeleted() => AddUpdatedDomainEvent();
 
-	private void AddUpdatedDomainEvent() => AddDomainEvent(
-		new PriceApplierUpdatedDomainEvent
-		{
-			SystemName = SystemName
-		});
+	private void AddUpdatedDomainEvent()
+		=> AddDomainEvent(
+			new PriceApplierUpdatedDomainEvent
+			{
+				SystemName = SystemName
+			});
 
 	public override string GetId() => SystemName;
 }

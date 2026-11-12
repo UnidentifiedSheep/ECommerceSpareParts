@@ -43,12 +43,10 @@ public class EmailOutBox : AuditableEntity<EmailOutBox, Guid>, ILinqEntity<Email
 		string subject,
 		string to,
 		string body)
-	{
-		return new EmailOutBox(
+		=> new(
 			subject,
 			to,
 			body);
-	}
 
 	public void Sent()
 	{

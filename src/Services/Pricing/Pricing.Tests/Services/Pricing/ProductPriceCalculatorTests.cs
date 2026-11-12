@@ -135,8 +135,7 @@ public class ProductPriceCalculatorTests
 	}
 
 	private static PriceCandidate Candidate(PriceOfferSourceType sourceType)
-	{
-		return new PriceCandidate(
+		=> new(
 			Guid.NewGuid(),
 			10,
 			"main",
@@ -145,11 +144,9 @@ public class ProductPriceCalculatorTests
 			1,
 			10,
 			FulfillmentRouteInfo.SameStorage("main"));
-	}
 
 	private static CalculatedPriceCandidate Calculated(PriceCandidate candidate)
-	{
-		return new CalculatedPriceCandidate
+		=> new()
 		{
 			PriceOfferId = candidate.PriceOfferId,
 			ProductId = candidate.ProductId,
@@ -164,5 +161,4 @@ public class ProductPriceCalculatorTests
 			GuaranteedDeliveryTime = TimeSpan.Zero,
 			DeliveryProbability = 100
 		};
-	}
 }

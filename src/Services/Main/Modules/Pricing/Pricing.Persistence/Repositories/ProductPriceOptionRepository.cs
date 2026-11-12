@@ -1,10 +1,9 @@
-using Persistence.Context;
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using EFCore.BulkExtensions;
+using Persistence.Context;
 using Persistence.Repository;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities.Offers;
+using Security.Core.Interfaces;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Pricing.Persistence.Repositories;

@@ -29,11 +29,13 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>,
 
 	public Storage Storage { get; private set; } = null!;
 
-	public static Expression<Func<StorageOwner, (string, Guid)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.StorageCode, x.UserId);
+	public static Expression<Func<StorageOwner, (string, Guid)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.StorageCode, x.UserId);
 
-	public static Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key) => x =>
-		x.StorageCode == key.Item1 && x.UserId == key.Item2;
+	public static Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key)
+		=> x =>
+			x.StorageCode == key.Item1 && x.UserId == key.Item2;
 
 	public static StorageOwner Create(string storageCode, Guid ownerId) => new(storageCode, ownerId);
 

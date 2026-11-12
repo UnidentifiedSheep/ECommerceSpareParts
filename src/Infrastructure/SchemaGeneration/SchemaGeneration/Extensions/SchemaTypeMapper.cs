@@ -27,11 +27,9 @@ internal static class SchemaTypeMapper
 	}
 
 	private static bool IsInteger(Type type)
-	{
-		return type == typeof(byte) || type == typeof(short) || type == typeof(int) || type == typeof(long) ||
+		=> type == typeof(byte) || type == typeof(short) || type == typeof(int) || type == typeof(long) ||
 			type == typeof(sbyte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong);
-	}
 
-	private static bool IsNumber(Type type) =>
-		type == typeof(float) || type == typeof(double) || type == typeof(decimal);
+	private static bool IsNumber(Type type)
+		=> type == typeof(float) || type == typeof(double) || type == typeof(decimal);
 }

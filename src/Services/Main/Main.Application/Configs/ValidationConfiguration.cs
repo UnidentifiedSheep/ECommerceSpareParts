@@ -27,13 +27,17 @@ public static class ValidationConfiguration
 			.OnAlreadyExists(input => new StorageOwnerAlreadyExistsException(input.Values));
 
 		errors.For(StorageOwnerKeys.PK)
-			.OnMissing(input => new StorageOwnerNotFoundException(input.Values[0].UserId, input.Values[0].StorageCode));
+			.OnMissing(input => new StorageOwnerNotFoundException(
+				input.Values[0].UserId,
+				input.Values[0].StorageCode));
 
 		errors.For(StorageRouteKeys.Id)
 			.OnMissing(input => new StorageRouteNotFound(input.Values[0]));
 
 		errors.For(StorageRouteKeys.FromTo)
-			.OnMissing(input => new StorageRouteNotFound(input.Values[0].FromStorageCode, input.Values[0].ToStorageCode));
+			.OnMissing(input => new StorageRouteNotFound(
+				input.Values[0].FromStorageCode,
+				input.Values[0].ToStorageCode));
 
 		errors.For(StorageRouteKeys.FromTo)
 			.OnAlreadyExists(input => new StorageRouteAlreadyExistsException(input.Values));
@@ -63,7 +67,8 @@ public static class ValidationConfiguration
 			.OnAlreadyExists(input => new CurrencyNameAlreadyTakenException(string.Join(", ", input.Values)));
 
 		errors.For(CurrencyKeys.ShortName)
-			.OnAlreadyExists(input => new CurrencyShortNameAlreadyTakenException(string.Join(", ", input.Values)));
+			.OnAlreadyExists(input
+				=> new CurrencyShortNameAlreadyTakenException(string.Join(", ", input.Values)));
 
 		errors.For(CurrencyKeys.CurrencySign)
 			.OnAlreadyExists(input => new CurrencySignAlreadyTakenException(string.Join(", ", input.Values)));
@@ -95,11 +100,13 @@ public static class ValidationConfiguration
 			.OnMissing(input => new ProducerNameNotFoundException(input.Values));
 
 		errors.For(ProductEanKeys.PK)
-			.OnAlreadyExists(input => new ProductEanAlreadyExistsException(input.Values[0].ProductId, input.Values[0].Ean));
+			.OnAlreadyExists(input
+				=> new ProductEanAlreadyExistsException(input.Values[0].ProductId, input.Values[0].Ean));
 
 		errors.For(ProducerSupplierMappingKeys.SupplierName)
 			.OnAlreadyExists(input => new ProducersSupplierMappingAlreadyExistsException(
-				input.Values[0].NormalizedName, input.Values[0].Supplier));
+				input.Values[0].NormalizedName,
+				input.Values[0].Supplier));
 
 		errors.For(ProductCharacteristicKeys.CharacteristicId)
 			.OnAlreadyExists(input => new CharacteristicInUseException(input.Values[0]));

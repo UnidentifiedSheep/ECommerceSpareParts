@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Application.Common.Models;
 using Enums;

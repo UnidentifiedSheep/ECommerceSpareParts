@@ -26,21 +26,24 @@ public class OrganizationMember : AuditableEntity<OrganizationMember, Organizati
 
 	public User.User User { get; private set; } = null!;
 
-	public static Expression<Func<OrganizationMember, OrganizationMemberKey>> GetKeySelector() => x =>
-		new OrganizationMemberKey(x.OrganizationId, x.UserId);
+	public static Expression<Func<OrganizationMember, OrganizationMemberKey>> GetKeySelector()
+		=> x =>
+			new OrganizationMemberKey(x.OrganizationId, x.UserId);
 	public static Expression<Func<OrganizationMember, bool>>
-		GetEqualityExpression(OrganizationMemberKey key) => x =>
-		x.OrganizationId == key.OrganizationId && x.UserId == key.UserId;
+		GetEqualityExpression(OrganizationMemberKey key)
+		=> x =>
+			x.OrganizationId == key.OrganizationId && x.UserId == key.UserId;
 
 	internal static OrganizationMember Create(
 		Guid userId,
 		Guid organizationId,
-		OrganizationRole role) => new()
-	{
-		UserId = userId,
-		OrganizationId = organizationId,
-		Role = role
-	};
+		OrganizationRole role)
+		=> new()
+		{
+			UserId = userId,
+			OrganizationId = organizationId,
+			Role = role
+		};
 
 	internal void SetRole(OrganizationRole role) => Role = role;
 

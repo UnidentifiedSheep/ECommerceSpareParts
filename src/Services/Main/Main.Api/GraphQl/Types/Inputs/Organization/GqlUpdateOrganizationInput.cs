@@ -1,5 +1,5 @@
-using HotChocolate;
 using GraphQL.Common.Types;
+using HotChocolate;
 using Main.Application.Dtos.Organizations;
 
 namespace Main.Api.GraphQl.Types.Inputs.Organization;
@@ -16,9 +16,10 @@ public sealed record GqlUpdateOrganizationInput
 	[GraphQLName("isHidden")]
 	public GqlPatchField<bool>? IsHidden { get; init; }
 
-	public PatchOrganizationDto ToDto() => new()
-	{
-		Name = Name,
-		IsHidden = IsHidden
-	};
+	public PatchOrganizationDto ToDto()
+		=> new()
+		{
+			Name = Name,
+			IsHidden = IsHidden
+		};
 }

@@ -10,9 +10,12 @@ namespace Main.Application.DomainEventHandlers.Sale.SaleDeleted;
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
 	: BatchableDomainEventHandler<EntityDeletedDomainEvent<SaleEntity, Guid>>
 {
-	public override Task Handle(Batch<EntityDeletedDomainEvent<SaleEntity, Guid>> notification, CancellationToken cancellationToken)
+	public override Task Handle(
+		Batch<EntityDeletedDomainEvent<SaleEntity, Guid>> notification,
+		CancellationToken cancellationToken)
 	{
-		integrationEventScope.AddRange(notification.Items.Select(item => new SaleDeletedEvent { Id = item.Id }));
+		integrationEventScope.AddRange(
+			notification.Items.Select(item => new SaleDeletedEvent { Id = item.Id }));
 		return Task.CompletedTask;
 	}
 }

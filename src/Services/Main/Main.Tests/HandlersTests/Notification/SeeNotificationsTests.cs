@@ -1,10 +1,10 @@
-using Notification.Core.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Handlers.Notifications.SeeNotifications;
 using Main.Entities;
 using Microsoft.EntityFrameworkCore;
+using Notification.Core.Entities;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -13,12 +13,9 @@ namespace Tests.HandlersTests.Notification;
 public class SeeNotificationsTests : IntegrationTest
 {
 	public SeeNotificationsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<InAppNotificationsTestContext>();
-	}
+		=> RegisterBasicContext<InAppNotificationsTestContext>();
 
-	private InAppNotificationsTestContext NotificationsContext =>
-		GetContext<InAppNotificationsTestContext>();
+	private InAppNotificationsTestContext NotificationsContext => GetContext<InAppNotificationsTestContext>();
 
 	[Fact]
 	public async Task SeeNotifications_MarksOnlyUnreadNotificationsOfRequestedUser()
@@ -44,18 +41,23 @@ public class SeeNotificationsTests : IntegrationTest
 
 		await Mediator.Send(new SeeNotificationsCommand(user.Id, ids), CancellationToken);
 
-		var afterFirstCall = await Context.Set<InAppNotification>().AsNoTracking()
+		var afterFirstCall = await Context.Set<InAppNotification>()
+			.AsNoTracking()
 			.Where(x => ids.Contains(x.Id))
 			.ToArrayAsync(CancellationToken);
 		afterFirstCall.Where(x => unread.Any(unreadNotification => unreadNotification.Id == x.Id))
-			.Should().OnlyContain(x => x.SeenAt.HasValue);
-		afterFirstCall.Single(x => x.Id == alreadySeen.Id).SeenAt.Should()
+			.Should()
+			.OnlyContain(x => x.SeenAt.HasValue);
+		afterFirstCall.Single(x => x.Id == alreadySeen.Id)
+			.SeenAt
+			.Should()
 			.BeCloseTo(alreadySeen.SeenAt!.Value, TimeSpan.FromMicroseconds(1));
 		afterFirstCall.Single(x => x.Id == otherUsersNotification.Id).SeenAt.Should().BeNull();
 
 		await Mediator.Send(new SeeNotificationsCommand(user.Id, ids), CancellationToken);
 
-		var afterSecondCall = await Context.Set<InAppNotification>().AsNoTracking()
+		var afterSecondCall = await Context.Set<InAppNotification>()
+			.AsNoTracking()
 			.Where(x => ids.Contains(x.Id))
 			.ToArrayAsync(CancellationToken);
 		foreach (var notification in afterFirstCall)
@@ -81,20 +83,24 @@ public class SeeNotificationsTests : IntegrationTest
 
 		await Mediator.Send(new SeeNotificationsCommand(user.Id, ids), CancellationToken);
 
-		var persisted = await Context.Set<InAppNotification>().AsNoTracking()
+		var persisted = await Context.Set<InAppNotification>()
+			.AsNoTracking()
 			.SingleAsync(x => x.Id == unread.Id, CancellationToken);
 		persisted.SeenAt.Should().NotBeNull();
 	}
 }
 
-public class SeeNotificationsValidationTests : ValidationTest<SeeNotificationsValidation, SeeNotificationsCommand>
+public class
+	SeeNotificationsValidationTests : ValidationTest<SeeNotificationsValidation, SeeNotificationsCommand>
 {
 	[Fact]
 	public async Task SeeNotifications_RejectsMoreThan100Ids()
 	{
-		var result = await ValidateAsync(new SeeNotificationsCommand(Guid.NewGuid(), Enumerable.Range(1, 101).ToArray()));
+		var result = await ValidateAsync(
+			new SeeNotificationsCommand(Guid.NewGuid(), Enumerable.Range(1, 101).ToArray()));
 		result.ShouldHaveValidationErrorFor(x => x.Ids)
 			.WithErrorCode(NotificationsSeeTooManyMessage.Key)
-			.WithCustomState(NotificationsSeeTooManyMessage.Instance).Only();
+			.WithCustomState(NotificationsSeeTooManyMessage.Instance)
+			.Only();
 	}
 }

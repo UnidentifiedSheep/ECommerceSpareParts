@@ -1,7 +1,6 @@
-﻿using Persistence.Context;
-using Main.Entities.Auth;
-using Main.Persistence.Context;
+﻿using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using RoleEnum = Enums.Role;
 

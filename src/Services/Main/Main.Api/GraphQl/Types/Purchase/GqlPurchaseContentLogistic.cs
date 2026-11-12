@@ -5,7 +5,8 @@ namespace Main.Api.GraphQl.Types.Purchase;
 
 [GraphQLName("PurchaseContentLogistic")]
 public sealed record GqlPurchaseContentLogistic(
-	[property: GraphQLIgnore] PurchaseContentLogisticDto Logistics)
+	[property: GraphQLIgnore]
+	PurchaseContentLogisticDto Logistics)
 {
 	[GraphQLName("weightKg")]
 	public decimal WeightKg => Logistics.WeightKg;

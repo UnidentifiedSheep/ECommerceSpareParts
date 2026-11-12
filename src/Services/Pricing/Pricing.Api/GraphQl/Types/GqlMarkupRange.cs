@@ -4,7 +4,8 @@ using Pricing.Application.Dtos.Markup;
 namespace Pricing.Api.GraphQl.Types;
 
 [GraphQLName("MarkupRange")]
-public sealed record GqlMarkupRange([property: GraphQLIgnore] MarkupRangeDto Range)
+public sealed record GqlMarkupRange([property: GraphQLIgnore]
+	MarkupRangeDto Range)
 {
 	[GraphQLName("id")]
 	public int Id => Range.Id;

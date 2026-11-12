@@ -12,7 +12,7 @@ public class EmailChannel(
 	IEmailSender sender,
 	IEnumerable<IChannelDeliveryObserver<EmailReceipt, EmailRecipient>> observers,
 	ILogger<EmailChannel> logger
-	) : NotificationChannelBase<INotification, EmailRecipient, EmailReceipt>(observers, logger)
+) : NotificationChannelBase<INotification, EmailRecipient, EmailReceipt>(observers, logger)
 {
 	public override string SystemName => EmailRecipient.ChannelName;
 
@@ -46,7 +46,11 @@ public class EmailChannel(
 			}
 
 			var recipient = deliveries[i].Recipient;
-			messages.Add(new EmailMessage(content.Title, recipient.Email, content.Text));
+			messages.Add(
+				new EmailMessage(
+					content.Title,
+					recipient.Email,
+					content.Text));
 			messageIndexes.Add(i);
 		}
 

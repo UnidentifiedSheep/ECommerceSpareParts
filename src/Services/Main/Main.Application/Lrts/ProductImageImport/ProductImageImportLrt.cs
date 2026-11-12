@@ -26,16 +26,22 @@ public class ProductImageImportLrt(
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductImageImportInputState, ProductImageImportState,
 		ProductImageImportLrt.ProductImageCsvDto, ProductImage>(
-		bucketsOptions, transactionService,
-		logger, s3Service, stringLocalizer)
+		bucketsOptions,
+		transactionService,
+		logger,
+		s3Service,
+		stringLocalizer)
 {
 	public const string Name = nameof(ProductImageImportLrt);
 
 	public override string SystemName => Name;
 	public override ILocalizableMessage NameLocalizationMessage => LrtProductImageImportNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtProductImageImportDescriptionMessage.Instance;
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductImageImportDescriptionMessage.Instance;
+
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -47,7 +53,10 @@ public class ProductImageImportLrt(
 		item = null!;
 		if (row.ProductId <= 0)
 		{
-			errors.Add(CreateError(rowIdx, StringLocalizer.Get(LrtProductImageImportInvalidProductIdMessage.Instance)));
+			errors.Add(
+				CreateError(
+					rowIdx,
+					StringLocalizer.Get(LrtProductImageImportInvalidProductIdMessage.Instance)));
 			return false;
 		}
 
@@ -108,17 +117,23 @@ public class ProductImageImportLrt(
 			.ExecuteAsync(
 				async (context, cancellationToken) =>
 				{
-					await context.GetRequiredService<IProductRepository>().InsertProductImagesOnConflictDoNothingAsync(images, cancellationToken);
-					context.GetRequiredService<IDomainEventScope>().AddRange(images.Select(image => image.ProductId)
-						.Distinct()
-						.Select(id => new ProductImageUpdatedDomainEvent(id)));
+					await context.GetRequiredService<IProductRepository>()
+						.InsertProductImagesOnConflictDoNothingAsync(images, cancellationToken);
+					context.GetRequiredService<IDomainEventScope>()
+						.AddRange(
+							images.Select(image => image.ProductId)
+								.Distinct()
+								.Select(id => new ProductImageUpdatedDomainEvent(id)));
 				},
 				CancellationToken);
 
 		Logger.LogInformation(
 			"Product image import batch processed. JobId: {JobId}, " +
 			"BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}, Errors: {Errors}",
-			JobId, items[0].idx, items.Count, errors.Count);
+			JobId,
+			items[0].idx,
+			items.Count,
+			errors.Count);
 	}
 
 	public sealed record ProductImageCsvDto

@@ -28,10 +28,12 @@ public class SupplierProductCross : Entity<SupplierProductCross, SupplierProduct
 	public SupplierProduct Left { get; private set; } = null!;
 	public SupplierProduct Right { get; private set; } = null!;
 
-	public static Expression<Func<SupplierProductCross, SupplierProductCrossKey>> GetKeySelector() => x =>
-		new SupplierProductCrossKey(x.LeftId, x.RightId);
+	public static Expression<Func<SupplierProductCross, SupplierProductCrossKey>> GetKeySelector()
+		=> x =>
+			new SupplierProductCrossKey(x.LeftId, x.RightId);
 	public static Expression<Func<SupplierProductCross, bool>> GetEqualityExpression(
-		SupplierProductCrossKey key) => x => x.RightId == key.RightId && x.LeftId == key.LeftId;
+		SupplierProductCrossKey key)
+		=> x => x.RightId == key.RightId && x.LeftId == key.LeftId;
 
 	public static SupplierProductCross Create(int id, int crossId) => new(id, crossId);
 

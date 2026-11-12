@@ -8,10 +8,7 @@ public class BadRequestException : BaseValuedException
 	{
 	}
 
-	public BadRequestException(string? message, string details) : base(message)
-	{
-		Details = details;
-	}
+	public BadRequestException(string? message, string details) : base(message) => Details = details;
 
 	public BadRequestException(string? message, object relatedData) : base(message, relatedData)
 	{

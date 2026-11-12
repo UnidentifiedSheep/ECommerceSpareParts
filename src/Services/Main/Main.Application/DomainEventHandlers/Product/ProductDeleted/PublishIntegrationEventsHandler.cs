@@ -19,6 +19,9 @@ public class PublishIntegrationEventsHandler(IProductEventPublisher eventPublish
 			.ToList();
 
 		if (ids.Count > 0)
-			await eventPublisher.PublishAsync(ids, ProductEventParts.Core, cancellationToken);
+			await eventPublisher.PublishAsync(
+				ids,
+				ProductEventParts.Core,
+				cancellationToken);
 	}
 }

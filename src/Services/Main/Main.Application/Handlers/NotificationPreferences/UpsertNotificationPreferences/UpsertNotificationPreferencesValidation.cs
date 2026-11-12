@@ -23,8 +23,8 @@ public class UpsertNotificationPreferencesValidation : AbstractValidator<UpsertN
 				z.RuleFor(x => x.ChannelName)
 					.Must(x => Recipients.All.ContainsKey(x))
 					.WithLocalizableError(
-						message: NotificationsChannelNotFoundMessage.Create,
-						errorCode: NotificationsChannelNotFoundMessage.Key);
+						NotificationsChannelNotFoundMessage.Create,
+						NotificationsChannelNotFoundMessage.Key);
 			});
 	}
 }

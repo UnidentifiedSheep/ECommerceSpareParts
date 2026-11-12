@@ -10,7 +10,9 @@ using Main.Enums;
 
 namespace Main.Entities.Purchase;
 
-public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, Guid>, IGenerateAutomaticDomainEvents
+public class Purchase : AuditableEntity<Purchase, Guid>,
+	ILinqEntity<Purchase, Guid>,
+	IGenerateAutomaticDomainEvents
 {
 	private readonly List<PurchaseContent> _contents = [];
 
@@ -37,7 +39,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
 	}
 
 	[Validate]
-	public Guid Id { get; private set; }
+	public Guid Id { get; }
 
 	public Guid SupplierUserId { get; private set; }
 
@@ -78,24 +80,20 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
 		Guid transactionId,
 		string storage,
 		DateTime purchaseDatetime)
-	{
-		return new Purchase(
+		=> new(
 			supplierUserId,
 			supplierOrganizationId,
 			currencyId,
 			transactionId,
 			storage,
 			purchaseDatetime);
-	}
 
 	public void SetComment(string? comment)
-	{
-		Comment = comment
+		=> Comment = comment
 			.NullIfWhiteSpace()
 			?.EnsureMaxLength(
 				256,
 				() => throw new InvalidInputException(PurchaseCommentTooLongMessage.Instance));
-	}
 
 	public void SetCurrencyId(int currencyId) => CurrencyId = currencyId;
 

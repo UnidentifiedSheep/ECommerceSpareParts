@@ -1,8 +1,8 @@
-using Enums;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Application.Common.Models.Options.S3;
+using Enums;
 using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Services.Document;
 using Main.Enums.Documents;
@@ -15,18 +15,20 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 	IDocumentTemplateResolver templateResolver,
 	IS3Service s3Service,
 	IOptions<S3BucketsOptions> options
-	) : IDocumentDefinition<TRequest, DocumentResponse>
+) : IDocumentDefinition<TRequest, DocumentResponse>
 	where TRequest : IDocumentRequest
 {
 	private static readonly FieldAccessor[] Fields = typeof(TSchema)
 		.GetProperties(BindingFlags.Instance | BindingFlags.Public)
 		.Where(property => property.GetIndexParameters().Length == 0 &&
-		                   property.GetMethod is { IsPublic: true } &&
-		                   property.GetCustomAttribute<JsonPropertyNameAttribute>() is not null)
+			property.GetMethod is { IsPublic: true } &&
+			property.GetCustomAttribute<JsonPropertyNameAttribute>() is not null)
 		.Select(property => new FieldAccessor(
 			property.GetCustomAttribute<JsonPropertyNameAttribute>()!.Name,
 			property))
 		.ToArray();
+
+	protected abstract DocumentTypePair[] SupportedTypePairs { get; }
 
 	public abstract string SystemName { get; }
 	public abstract string DocumentGroup { get; }
@@ -36,50 +38,8 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 	public Type SchemaType => typeof(TSchema);
 	public Type RequestType => typeof(TRequest);
 
-	protected abstract DocumentTypePair[] SupportedTypePairs { get; }
-
-	public bool SupportsDocumentType(DocumentType documentType) =>
-		SupportedTypePairs.Any(pair => pair.OutputDocumentType == documentType);
-
-	protected virtual DocumentType GetTemplateType(TRequest request)
-	{
-		foreach (var (outputDocumentType, inputTemplateType) in SupportedTypePairs)
-			if (outputDocumentType == request.DocumentType) return inputTemplateType;
-
-		throw new NotSupportedException(
-			$"Document type '{request.DocumentType}' is not supported for '{SystemName}'.");
-	}
-
-	protected async Task<IDocumentTemplate> GetTemplateAsync(
-		TRequest request,
-		CancellationToken token = default)
-	{
-		var templateType = GetTemplateType(request);
-		var culture = DocumentCulture.GetRequired(request.Culture);
-		var baseKey = $"{DocumentGroup}/{SystemName}";
-		var extension = templateType.GetFileExtension();
-
-		foreach (var cultureName in GetTemplateCultureNames(culture))
-		{
-			var key = $"{baseKey}.{cultureName}{extension}";
-			var template = await templateResolver.TryResolveAsync(
-				key, request.DocumentType, templateType, token);
-			if (template is not null) return template;
-		}
-
-		var fallbackKey = $"{baseKey}{extension}";
-		return await templateResolver.TryResolveAsync(
-			fallbackKey, request.DocumentType, templateType, token)
-			?? throw new InvalidOperationException(
-				$"Unable to find template for '{SystemName}' and culture '{culture.Name}'.");
-	}
-
-	private static IEnumerable<string> GetTemplateCultureNames(CultureInfo culture)
-	{
-		yield return culture.Name;
-		if (!string.Equals(culture.Name, culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
-			yield return culture.TwoLetterISOLanguageName;
-	}
+	public bool SupportsDocumentType(DocumentType documentType)
+		=> SupportedTypePairs.Any(pair => pair.OutputDocumentType == documentType);
 
 	public async Task<DocumentResponse> GenerateAsync(
 		TRequest request,
@@ -104,8 +64,8 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 
 		var uploadStartedAtUtc = DateTime.UtcNow;
 		var key = $"Generated/{DocumentGroup}/{SystemName}/" +
-		          $"{uploadStartedAtUtc:yyyy/MM/dd}/{Guid.NewGuid():N}" +
-		          template.Type.GetFileExtension();
+			$"{uploadStartedAtUtc:yyyy/MM/dd}/{Guid.NewGuid():N}" +
+			template.Type.GetFileExtension();
 		var bucket = options.Value.Documents;
 		var uploadedKey = await s3Service.UploadFileAsync(
 			bucket.Name,
@@ -119,10 +79,6 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 			StorageKey = uploadedKey
 		};
 	}
-
-	protected abstract Task<TSchema> GetSchemaDataAsync(
-		TRequest request,
-		CancellationToken token);
 
 	public async Task<IDocumentResponse> GenerateAsync(
 		IDocumentRequest data,
@@ -138,8 +94,62 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 		return await GenerateAsync(request, token);
 	}
 
+	protected virtual DocumentType GetTemplateType(TRequest request)
+	{
+		foreach (var (outputDocumentType, inputTemplateType) in SupportedTypePairs)
+			if (outputDocumentType == request.DocumentType)
+				return inputTemplateType;
+
+		throw new NotSupportedException(
+			$"Document type '{request.DocumentType}' is not supported for '{SystemName}'.");
+	}
+
+	protected async Task<IDocumentTemplate> GetTemplateAsync(
+		TRequest request,
+		CancellationToken token = default)
+	{
+		var templateType = GetTemplateType(request);
+		var culture = DocumentCulture.GetRequired(request.Culture);
+		var baseKey = $"{DocumentGroup}/{SystemName}";
+		var extension = templateType.GetFileExtension();
+
+		foreach (var cultureName in GetTemplateCultureNames(culture))
+		{
+			var key = $"{baseKey}.{cultureName}{extension}";
+			var template = await templateResolver.TryResolveAsync(
+				key,
+				request.DocumentType,
+				templateType,
+				token);
+			if (template is not null) return template;
+		}
+
+		var fallbackKey = $"{baseKey}{extension}";
+		return await templateResolver.TryResolveAsync(
+				fallbackKey,
+				request.DocumentType,
+				templateType,
+				token)
+			?? throw new InvalidOperationException(
+				$"Unable to find template for '{SystemName}' and culture '{culture.Name}'.");
+	}
+
+	private static IEnumerable<string> GetTemplateCultureNames(CultureInfo culture)
+	{
+		yield return culture.Name;
+		if (!string.Equals(
+				culture.Name,
+				culture.TwoLetterISOLanguageName,
+				StringComparison.OrdinalIgnoreCase))
+			yield return culture.TwoLetterISOLanguageName;
+	}
+
+	protected abstract Task<TSchema> GetSchemaDataAsync(
+		TRequest request,
+		CancellationToken token);
+
 	/// <summary>
-	/// Adds all schema properties marked with JsonPropertyName to the template.
+	///     Adds all schema properties marked with JsonPropertyName to the template.
 	/// </summary>
 	protected void AddAllFields(IDocumentTemplate template, TSchema schemaData)
 	{

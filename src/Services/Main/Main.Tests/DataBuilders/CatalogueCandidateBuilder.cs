@@ -41,8 +41,8 @@ public sealed class CatalogueCandidateBuilder(Faker faker) : BuilderBase<Catalog
 		return this;
 	}
 
-	public CatalogueCandidateBuilder WithProducers(IEnumerable<Producer> producers) =>
-		WithProducerIds(producers.Select(x => x.Id));
+	public CatalogueCandidateBuilder WithProducers(IEnumerable<Producer> producers)
+		=> WithProducerIds(producers.Select(x => x.Id));
 
 	public CatalogueCandidateBuilder WithProductId(int productId)
 	{

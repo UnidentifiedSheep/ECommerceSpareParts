@@ -1,21 +1,18 @@
-using Persistence.Context;
-using Security.Core.Interfaces;
-using Abstractions.Models;
 using Api.Common;
-using Application.Common.Interfaces.Validators;
 using Common;
 using Main.Migrator;
 using Main.Migrator.DataSeeds;
 using Main.Persistence;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Persistence;
+using Persistence.Context;
 using Persistence.Extensions;
 using Persistence.Interfaces;
+using Security.Core.Interfaces;
 using Security.Models;
 using Security.Services;
 

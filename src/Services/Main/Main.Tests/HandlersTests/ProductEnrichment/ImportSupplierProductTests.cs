@@ -184,27 +184,25 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			.Should()
 			.BeEquivalentTo("First analogue name", "Second analogue name");
 
-		var crossesCount = await Context.Set<SupplierProductCross>().AsNoTracking().CountAsync(CancellationToken);
+		var crossesCount =
+			await Context.Set<SupplierProductCross>().AsNoTracking().CountAsync(CancellationToken);
 		crossesCount.Should().Be(1);
 	}
 
 	private async Task<List<SupplierProduct>> GetProducts()
-	{
-		return await Context
-			.Set<global::Main.Entities.Product.Enrichment.SupplierProduct>()
+		=> await Context
+			.Set<SupplierProduct>()
 			.AsNoTracking()
 			.Include(x => x.Names)
 			.OrderBy(x => x.Id)
 			.ToListAsync();
-	}
 
 	private static ContractSupplierProductDto CreateProduct(
 		string number,
 		string brand,
 		IReadOnlyList<string> names,
 		IReadOnlyList<ContractSupplierProductDto>? analogues = null)
-	{
-		return new ContractSupplierProductDto
+		=> new()
 		{
 			Id = Guid.NewGuid().ToString(),
 			Number = number,
@@ -213,5 +211,4 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			Analogues = analogues ?? [],
 			Positions = []
 		};
-	}
 }

@@ -10,7 +10,7 @@ namespace Main.Application.JobProviders;
 [Lifetime(Lifetime.Scoped)]
 public sealed class EnrichOurCatalogueJobProvider(
 	IJobCreationDispatcher creationDispatcher
-	) : IJobProvider<EnrichOurCatalogueLrt, NoneInputState>
+) : IJobProvider<EnrichOurCatalogueLrt, NoneInputState>
 {
 	public Job Create(NoneInputState inputState, int maxAttempts = 3)
 		=> creationDispatcher.Create(

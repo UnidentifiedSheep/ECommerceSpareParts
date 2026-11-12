@@ -32,11 +32,12 @@ public class SupplierProductName : Entity<SupplierProductName, int>, ILinqEntity
 
 	public static Expression<Func<SupplierProductName, int>> GetKeySelector() => x => x.Id;
 
-	public static Expression<Func<SupplierProductName, bool>> GetEqualityExpression(int key) => x =>
-		x.Id == key;
+	public static Expression<Func<SupplierProductName, bool>> GetEqualityExpression(int key)
+		=> x =>
+			x.Id == key;
 
-	public static SupplierProductName Create(int supplierProductId, string name) =>
-		new(supplierProductId, name);
+	public static SupplierProductName Create(int supplierProductId, string name)
+		=> new(supplierProductId, name);
 
 	public override int GetId() => Id;
 }

@@ -89,8 +89,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 		decimal transactionSum,
 		DateTime transactionDatetime,
 		TransactionSourceType sourceType)
-	{
-		return new Transaction(
+		=> new(
 			senderId,
 			receiverId,
 			currencyId,
@@ -98,14 +97,11 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 			transactionSum,
 			transactionDatetime,
 			sourceType);
-	}
 
 	private void SetAmount(decimal newAmount)
-	{
-		Amount = newAmount
+		=> Amount = newAmount
 			.EnsureMaxDecimalPlaces(2, TransactionAmountMaxTwoDecimalPlacesMessage.Instance)
 			.EnsureGreaterThan(0m, TransactionAmountMustBePositiveMessage.Instance);
-	}
 
 	private void SetCurrencyId(int currencyId)
 	{

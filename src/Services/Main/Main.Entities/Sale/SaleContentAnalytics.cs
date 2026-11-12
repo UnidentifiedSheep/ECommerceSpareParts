@@ -13,16 +13,29 @@ public class SaleContentAnalytics : Entity<SaleContentAnalytics, int>, ILinqEnti
 	public decimal RevenueInBaseCurrency { get; private set; }
 	public decimal CostInBaseCurrency { get; private set; }
 	public SaleContent Content { get; private set; } = null!;
+	public static Expression<Func<SaleContentAnalytics, int>> GetKeySelector() => item => item.SaleContentId;
+	public static Expression<Func<SaleContentAnalytics, bool>> GetEqualityExpression(int key)
+		=> item => item.SaleContentId == key;
 
-	public static SaleContentAnalytics Create(int saleContentId, decimal originalAmount, decimal revenue, decimal cost)
+	public static SaleContentAnalytics Create(
+		int saleContentId,
+		decimal originalAmount,
+		decimal revenue,
+		decimal cost)
 	{
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(saleContentId);
 		var result = new SaleContentAnalytics { SaleContentId = saleContentId };
-		result.Update(originalAmount, revenue, cost);
+		result.Update(
+			originalAmount,
+			revenue,
+			cost);
 		return result;
 	}
 
-	public void Update(decimal originalAmount, decimal revenue, decimal cost)
+	public void Update(
+		decimal originalAmount,
+		decimal revenue,
+		decimal cost)
 	{
 		ArgumentOutOfRangeException.ThrowIfNegative(originalAmount);
 		ArgumentOutOfRangeException.ThrowIfNegative(revenue);
@@ -35,6 +48,4 @@ public class SaleContentAnalytics : Entity<SaleContentAnalytics, int>, ILinqEnti
 	}
 
 	public override int GetId() => SaleContentId;
-	public static Expression<Func<SaleContentAnalytics, int>> GetKeySelector() => item => item.SaleContentId;
-	public static Expression<Func<SaleContentAnalytics, bool>> GetEqualityExpression(int key) => item => item.SaleContentId == key;
 }

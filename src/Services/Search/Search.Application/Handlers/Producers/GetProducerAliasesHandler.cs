@@ -21,6 +21,7 @@ public class GetProducerAliasesHandler(
 	{
 		var producer = await producerRepository.GetById(request.ProducerId, cancellationToken);
 
-		return new GetProducerAliasesResult(producer?.Aliases.Select(projection.ProjectionFunc).ToArray() ?? []);
+		return new GetProducerAliasesResult(
+			producer?.Aliases.Select(projection.ProjectionFunc).ToArray() ?? []);
 	}
 }

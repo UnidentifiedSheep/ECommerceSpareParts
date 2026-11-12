@@ -46,8 +46,7 @@ public sealed class MarkupBucketBuilder
 	}
 
 	public MarkupBucketBuilder Copy()
-	{
-		return new MarkupBucketBuilder
+		=> new()
 		{
 			FromCost = FromCost,
 			ToCost = ToCost,
@@ -55,15 +54,12 @@ public sealed class MarkupBucketBuilder
 			Mean = Mean,
 			_m2 = _m2
 		};
-	}
 
 	public MarkupRangeDraft Build()
-	{
-		return new MarkupRangeDraft(
+		=> new(
 			FromCost,
 			ToCost,
 			(decimal)Mean,
 			(decimal)StdDev,
 			Count);
-	}
 }

@@ -19,12 +19,6 @@ public sealed class DocumentGeneratedNotification(DocumentGeneratedNotificationD
 
 public sealed record DocumentGeneratedNotificationData : INotificationModel, INotificationModelWithTitle
 {
-	public required Guid RequestId { get; init; }
-	public required string DocumentName { get; init; }
-	public required string DocumentDescription { get; init; }
-	public required string DocumentUrl { get; init; }
-	public required string Title { get; init; }
-	public required string AsText { get; init; }
 
 	public DocumentGeneratedNotificationData() { }
 
@@ -43,6 +37,13 @@ public sealed record DocumentGeneratedNotificationData : INotificationModel, INo
 		DocumentUrl = documentUrl;
 		Title = localizer.Get(NotificationsDocumentGeneratedTitleMessage.Instance, culture);
 		AsText = localizer.Get(
-			NotificationsDocumentGeneratedTextMessage.Create(DocumentName, documentUrl), culture);
+			NotificationsDocumentGeneratedTextMessage.Create(DocumentName, documentUrl),
+			culture);
 	}
+	public required Guid RequestId { get; init; }
+	public required string DocumentName { get; init; }
+	public required string DocumentDescription { get; init; }
+	public required string DocumentUrl { get; init; }
+	public required string AsText { get; init; }
+	public required string Title { get; init; }
 }

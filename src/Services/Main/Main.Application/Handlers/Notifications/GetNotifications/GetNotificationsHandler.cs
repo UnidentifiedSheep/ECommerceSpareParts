@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
@@ -13,7 +12,7 @@ namespace Main.Application.Handlers.Notifications.GetNotifications;
 public record GetNotificationsQuery(
 	Guid UserId,
 	Cursor<DateTime?> Cursor
-	) : IQuery<GetNotificationsResult>;
+) : IQuery<GetNotificationsResult>;
 
 public record GetNotificationsResult(
 	IReadOnlyList<InAppNotificationDto> Notifications);
@@ -21,7 +20,7 @@ public record GetNotificationsResult(
 public class GetNotificationsHandler(
 	IReadRepository<InAppNotification, int> repository,
 	IProjectionProvider<InAppNotification, InAppNotificationDto> projection
-	) : IQueryHandler<GetNotificationsQuery, GetNotificationsResult>
+) : IQueryHandler<GetNotificationsQuery, GetNotificationsResult>
 {
 	public async Task<GetNotificationsResult> Handle(
 		GetNotificationsQuery request,

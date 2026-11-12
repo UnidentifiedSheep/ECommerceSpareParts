@@ -12,9 +12,9 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.RestoreContent;
-using Main.Application.Models.Storage;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models;
+using Main.Application.Models.Storage;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
@@ -94,13 +94,11 @@ public class EditPurchaseHandler(
 	private Guid GetSystemUserId() => systemOptions.Value.SystemId;
 
 	private Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
-	{
-		return purchaseRepository.EnsureExistForUpdateAsync(
+		=> purchaseRepository.EnsureExistForUpdateAsync(
 			purchaseId,
 			id => new PurchaseNotFoundException(id),
 			Criteria<Purchase>.New().Include(x => x.Contents).Include(x => x.PurchaseLogistic),
 			cancellationToken);
-	}
 
 	private async Task EnsureStorageOwner(
 		Purchase purchase,
@@ -141,8 +139,7 @@ public class EditPurchaseHandler(
 		int currencyId,
 		DateTime transactionDateTime,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(
+		=> (await sender.Send(
 			new CreateTransactionCommand(
 				senderId,
 				receiverId,
@@ -152,7 +149,6 @@ public class EditPurchaseHandler(
 				TransactionSourceType.Purchase,
 				TransactionCreationMode.System),
 			cancellationToken)).Transaction;
-	}
 
 	private async Task UpdateContents(
 		Purchase purchase,
@@ -210,12 +206,14 @@ public class EditPurchaseHandler(
 
 		if (deletionSubtractions.Count > 0)
 			await storageContentService.SubtractByContentsAsync(
-				deletionSubtractions, StorageMovementType.PurchaseEditing,
+				deletionSubtractions,
+				StorageMovementType.PurchaseEditing,
 				cancellationToken);
 
 		if (editingSubtractions.Count > 0)
 			await storageContentService.SubtractByContentsAsync(
-				editingSubtractions, StorageMovementType.PurchaseEditing,
+				editingSubtractions,
+				StorageMovementType.PurchaseEditing,
 				cancellationToken);
 
 		if (editingRestorations.Count > 0)

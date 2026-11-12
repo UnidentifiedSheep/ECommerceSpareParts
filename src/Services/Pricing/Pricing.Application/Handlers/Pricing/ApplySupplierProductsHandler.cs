@@ -51,7 +51,8 @@ public class ApplySupplierProductsHandler(IOfferRefreshService refreshService, I
 				Positions: (IReadOnlyList<SupplierPosition>)x.Value.ToList()))
 			.Where(x => x.ProductId != null)
 			.GroupBy(x => x.ProductId!.Value)
-			.ToDictionary(group => group.Key,
+			.ToDictionary(
+				group => group.Key,
 				IReadOnlyList<SupplierPosition> (group) => group
 					.SelectMany(x => x.Positions)
 					.DistinctBy(position => position.Id)
@@ -72,10 +73,12 @@ public class ApplySupplierProductsHandler(IOfferRefreshService refreshService, I
 		Dictionary<ProductKey, List<SupplierPosition>> dict,
 		CancellationToken cancellationToken)
 	{
-		var references = dict.Keys.Select(key => new InternalProductReference
-		{
-			Sku = key.Number, ProducerName = key.Brand, Supplier = supplier
-		}).ToArray();
+		var references = dict.Keys
+			.Select(key => new InternalProductReference
+			{
+				Sku = key.Number, ProducerName = key.Brand, Supplier = supplier
+			})
+			.ToArray();
 		var response = await mainClient.ProductNode.ResolveProductReferences(references, cancellationToken);
 
 		if (!response.Success)
@@ -83,7 +86,9 @@ public class ApplySupplierProductsHandler(IOfferRefreshService refreshService, I
 
 		return response.ValueOrThrow
 			.Where(product => product.Supplier == supplier && product.ProductId.HasValue)
-			.ToDictionary(product => new ProductKey(product.ProducerName, product.Sku), product => product.ProductId!.Value);
+			.ToDictionary(
+				product => new ProductKey(product.ProducerName, product.Sku),
+				product => product.ProductId!.Value);
 	}
 
 	private readonly record struct ProductKey(string Brand, string Number);

@@ -54,7 +54,8 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 		builder.HasIndex(e => e.LockedAt, "jobs_locked_at_idx");
 		builder.HasIndex(e => e.MultiStepJobId, "jobs_multi_step_job_id_idx");
 		builder.HasIndex(e => new { e.MultiStepJobId, e.StepKey }, "jobs_multi_step_job_id_step_key_uq")
-			.IsUnique().HasFilter("step_key IS NOT NULL");
+			.IsUnique()
+			.HasFilter("step_key IS NOT NULL");
 		builder
 			.HasIndex(
 				e => new

@@ -18,16 +18,25 @@ public sealed class ClearExpiredTokensLrtTests(CombinedContainerFixture fixture)
 		var user = await new MemberUserBuilder(Faker).BuildAndAddToDb(Context);
 		var now = DateTime.UtcNow;
 		await AddTokenAsync(user.Id, now.AddDays(-1));
-		await AddTokenAsync(user.Id, now.AddSeconds(-1), revoked: true);
+		await AddTokenAsync(
+			user.Id,
+			now.AddSeconds(-1),
+			true);
 		var active = await AddTokenAsync(user.Id, now.AddDays(1));
-		var revoked = await AddTokenAsync(user.Id, now.AddDays(1), revoked: true);
+		var revoked = await AddTokenAsync(
+			user.Id,
+			now.AddDays(1),
+			true);
 		var noExpiry = await AddTokenAsync(user.Id, null);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteLrt(cancellationToken: CancellationToken);
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
-		var remaining = await Context.Set<UserToken>().AsNoTracking().Select(x => x.Id).ToListAsync(CancellationToken);
+		var remaining = await Context.Set<UserToken>()
+			.AsNoTracking()
+			.Select(x => x.Id)
+			.ToListAsync(CancellationToken);
 		remaining.Should().BeEquivalentTo([active.Id, revoked.Id, noExpiry.Id]);
 	}
 
@@ -42,7 +51,10 @@ public sealed class ClearExpiredTokensLrtTests(CombinedContainerFixture fixture)
 		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
-	private async Task<UserToken> AddTokenAsync(Guid userId, DateTime? expiresAt, bool revoked = false)
+	private async Task<UserToken> AddTokenAsync(
+		Guid userId,
+		DateTime? expiresAt,
+		bool revoked = false)
 	{
 		var token = UserToken.CreateRefreshToken(userId, Guid.NewGuid().ToString("N"));
 		await Context.Set<UserToken>().AddAsync(token, CancellationToken);

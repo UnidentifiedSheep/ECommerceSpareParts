@@ -14,32 +14,66 @@ public class CurrencyRatesProviderTests
 	[Fact]
 	public async Task HistoricalConversion_UsesMainRateForRequestedDate()
 	{
-		var date = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		var date = new DateTime(
+			2026,
+			1,
+			1,
+			0,
+			0,
+			0,
+			DateTimeKind.Utc);
 		var cached = new Mock<ICachedCurrencyProvider>(MockBehavior.Strict);
 		var node = new Mock<ICurrencyNode>();
-		node.Setup(client => client.GetCurrencyRate(2, date, It.IsAny<CancellationToken>())).ReturnsAsync(Response<decimal>.Ok(2m));
+		node.Setup(client => client.GetCurrencyRate(
+				2,
+				date,
+				It.IsAny<CancellationToken>()))
+			.ReturnsAsync(Response<decimal>.Ok(2m));
 		var main = new Mock<IMainClient>();
 		main.SetupGet(client => client.CurrencyNode).Returns(node.Object);
 		var converter = new CurrencyConverter(new RatesProvider(cached.Object, main.Object));
 
-		var result = await converter.ConvertToBaseAsync(100m, 2, date, TestContext.Current.CancellationToken);
+		var result = await converter.ConvertToBaseAsync(
+			100m,
+			2,
+			date,
+			TestContext.Current.CancellationToken);
 
 		result.Should().Be(50m);
-		node.Verify(client => client.GetCurrencyRate(2, date, It.IsAny<CancellationToken>()), Times.Once);
+		node.Verify(
+			client => client.GetCurrencyRate(
+				2,
+				date,
+				It.IsAny<CancellationToken>()),
+			Times.Once);
 	}
 
 	[Fact]
 	public async Task HistoricalConversion_MainFailure_DoesNotFallBackToCurrentRate()
 	{
-		var date = new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		var date = new DateTime(
+			1990,
+			1,
+			1,
+			0,
+			0,
+			0,
+			DateTimeKind.Utc);
 		var cached = new Mock<ICachedCurrencyProvider>(MockBehavior.Strict);
 		var node = new Mock<ICurrencyNode>();
-		node.Setup(client => client.GetCurrencyRate(2, date, It.IsAny<CancellationToken>())).ReturnsAsync(Response<decimal>.Fail(HttpStatusCode.NotFound));
+		node.Setup(client => client.GetCurrencyRate(
+				2,
+				date,
+				It.IsAny<CancellationToken>()))
+			.ReturnsAsync(Response<decimal>.Fail(HttpStatusCode.NotFound));
 		var main = new Mock<IMainClient>();
 		main.SetupGet(client => client.CurrencyNode).Returns(node.Object);
 		var provider = new RatesProvider(cached.Object, main.Object);
 
-		await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetRate(2, date, TestContext.Current.CancellationToken));
+		await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetRate(
+			2,
+			date,
+			TestContext.Current.CancellationToken));
 	}
 
 	[Fact]
@@ -50,6 +84,10 @@ public class CurrencyRatesProviderTests
 		var main = new Mock<IMainClient>(MockBehavior.Strict);
 		var converter = new CurrencyConverter(new RatesProvider(cached.Object, main.Object));
 
-		(await converter.ConvertToBaseAsync(100m, 2, TestContext.Current.CancellationToken)).Should().Be(25m);
+		(await converter.ConvertToBaseAsync(
+				100m,
+				2,
+				TestContext.Current.CancellationToken)).Should()
+			.Be(25m);
 	}
 }

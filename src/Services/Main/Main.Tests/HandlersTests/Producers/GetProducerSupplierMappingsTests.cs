@@ -1,10 +1,8 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -15,9 +13,7 @@ namespace Tests.HandlersTests.Producers;
 public class GetProducerSupplierMappingsTests : IntegrationTest
 {
 	public GetProducerSupplierMappingsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -97,11 +93,10 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 
 		result.Mappings.Should().ContainSingle();
 	}
-
-
 }
 
-public class GetProducerSupplierMappingsValidationTests : ValidationTest<GetProducerSupplierMappingsValidation, GetProducerSupplierMappingsQuery>
+public class GetProducerSupplierMappingsValidationTests : ValidationTest<GetProducerSupplierMappingsValidation
+	, GetProducerSupplierMappingsQuery>
 {
 	[Fact]
 	public async Task GetProducerSupplierMappings_InvalidPagination_FailsValidation()

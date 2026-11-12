@@ -20,16 +20,20 @@ public sealed class PriceApplierMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new UpsertPriceApplierCommand(
-			input.SystemName,
-			input.Name,
-			input.DslLogic,
-			input.States.Select(state => new UpsertPriceApplierStateDto
-			{
-				Usage = state.Usage,
-				Order = state.Order,
-				Enabled = state.Enabled
-			}).ToArray()), cancellationToken);
+		var result = await sender.Send(
+			new UpsertPriceApplierCommand(
+				input.SystemName,
+				input.Name,
+				input.DslLogic,
+				input.States
+					.Select(state => new UpsertPriceApplierStateDto
+					{
+						Usage = state.Usage,
+						Order = state.Order,
+						Enabled = state.Enabled
+					})
+					.ToArray()),
+			cancellationToken);
 		var applier = await sender.Send(new GetPriceApplierQuery(result.SystemName), cancellationToken);
 		return new GqlPriceApplier(applier.Applier);
 	}

@@ -1,13 +1,11 @@
-using Main.Entities.Producer;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using Enums;
 using FluentAssertions;
 using Main.Application.Dtos.Producer.SupplierMappings;
 using Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
-using Main.Application.Static;
 using Main.Entities.Exceptions;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -18,9 +16,7 @@ namespace Tests.HandlersTests.Producers;
 public class CreateProducerSupplierMappingTests : IntegrationTest
 {
 	public CreateProducerSupplierMappingTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -46,7 +42,8 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 	[InlineData("bosch")]
 	[InlineData("BOSCH")]
 	public async Task
-		CreateProducerSupplierMapping_WithSameSupplierNameAndSupplier_ThrowsMappingAlreadyExists(string duplicateName)
+		CreateProducerSupplierMapping_WithSameSupplierNameAndSupplier_ThrowsMappingAlreadyExists(
+			string duplicateName)
 	{
 		const string supplierProducerName = "Bosch";
 		var existing = await new ProducerSupplierMappingBuilder(Faker)
@@ -63,8 +60,11 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 				SupplierProducerName = duplicateName
 			});
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
-		exception.Failures.Should().ContainSingle(failure => failure.Error is ProducersSupplierMappingAlreadyExistsException);
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+		exception.Failures
+			.Should()
+			.ContainSingle(failure => failure.Error is ProducersSupplierMappingAlreadyExistsException);
 	}
 
 	[Fact]
@@ -87,7 +87,7 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var mappings = await Context
-			.Set<global::Main.Entities.Producer.ProducerSupplierMapping>()
+			.Set<ProducerSupplierMapping>()
 			.AsNoTracking()
 			.Where(x => x.ProducerId == producer.Id)
 			.ToListAsync(CancellationToken);
@@ -99,14 +99,19 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 	{
 		var producerId = TestContext.Producers[0].Id;
 		await new ProducerSupplierMappingBuilder(Faker)
-			.WithProducerId(producerId).WithSupplier(Supplier.Armtek)
-			.WithSupplierProducerName("Bosch").BuildAndAddToDb(Context, CancellationToken);
+			.WithProducerId(producerId)
+			.WithSupplier(Supplier.Armtek)
+			.WithSupplierProducerName("Bosch")
+			.BuildAndAddToDb(Context, CancellationToken);
 		var otherSupplier = Enum.GetValues<Supplier>().First(supplier => supplier != Supplier.Armtek);
 
-		await Mediator.Send(new CreateProducerSupplierMappingCommand(new NewProducerSupplierMapping
-		{
-			ProducerId = producerId, Supplier = otherSupplier, SupplierProducerName = " bosch "
-		}), CancellationToken);
+		await Mediator.Send(
+			new CreateProducerSupplierMappingCommand(
+				new NewProducerSupplierMapping
+				{
+					ProducerId = producerId, Supplier = otherSupplier, SupplierProducerName = " bosch "
+				}),
+			CancellationToken);
 
 		(await Context.Set<ProducerSupplierMapping>().CountAsync(CancellationToken)).Should().Be(2);
 	}
@@ -130,7 +135,9 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 		result.ProducerSupplierMapping.Supplier.Should().Be(command.ProducerSupplierMapping.Supplier);
 		result.ProducerSupplierMapping.SupplierProducerName.Should().Be(supplierProducerName.Trim());
 
-		var mapping = await Context.Set<ProducerSupplierMapping>().AsNoTracking().SingleAsync(CancellationToken);
+		var mapping = await Context.Set<ProducerSupplierMapping>()
+			.AsNoTracking()
+			.SingleAsync(CancellationToken);
 
 		mapping.Id.Should().Be(result.ProducerSupplierMapping.Id);
 		mapping.ProducerId.Should().Be(producer.Id);
@@ -140,7 +147,8 @@ public class CreateProducerSupplierMappingTests : IntegrationTest
 	}
 }
 
-public class CreateProducerSupplierMappingValidationTests : ValidationTest<CreateProducerSupplierMappingValidation, CreateProducerSupplierMappingCommand>
+public class CreateProducerSupplierMappingValidationTests : ValidationTest<
+	CreateProducerSupplierMappingValidation, CreateProducerSupplierMappingCommand>
 {
 	[Theory]
 	[InlineData("")]

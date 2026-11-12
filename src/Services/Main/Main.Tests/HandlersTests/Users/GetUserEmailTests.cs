@@ -9,9 +9,7 @@ namespace Tests.HandlersTests.Users;
 public class GetUserEmailTests : IntegrationTest
 {
 	public GetUserEmailTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UserContactsTestContext>();
-	}
+		=> RegisterBasicContext<UserContactsTestContext>();
 
 	private UserContactsTestContext TestContext => GetContext<UserContactsTestContext>();
 

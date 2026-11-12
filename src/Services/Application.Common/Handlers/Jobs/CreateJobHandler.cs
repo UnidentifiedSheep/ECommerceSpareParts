@@ -20,7 +20,12 @@ public class CreateJobHandler(IJobService jobService)
 		CancellationToken cancellationToken)
 	{
 		var jobIds = await jobService.TryEnqueueJobsAsync(
-			[new JobItem(request.SystemName, request.InputState, request.MaxAttempts)],
+			[
+				new JobItem(
+					request.SystemName,
+					request.InputState,
+					request.MaxAttempts)
+			],
 			cancellationToken);
 
 		if (jobIds.Count != 1)

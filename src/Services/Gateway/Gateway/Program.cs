@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Text.Json.Nodes;
 using Abstractions;
 using Abstractions.Models.Options;
@@ -7,7 +6,6 @@ using Api.Common.Extensions;
 using Application.Common.Backplane;
 using Application.Common.Diagnostics;
 using Cache;
-using Common;
 using Gateway.Application;
 using Gateway.EndPoints;
 using Gateway.EventStreamBrokers;
@@ -22,7 +20,6 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using RabbitMq.Extensions;
 using Scalar.AspNetCore;
-using Security;
 using Security.Extensions;
 using Yarp.ReverseProxy.Transforms;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -117,10 +114,12 @@ builder
 		});
 	});
 
-builder.Services.AddConfiguredCors().ConfigureHttpJsonOptions(options =>
-{
-	ProjectJsonOptions.Configure(options.SerializerOptions);
-});
+builder.Services
+	.AddConfiguredCors()
+	.ConfigureHttpJsonOptions(options =>
+	{
+		ProjectJsonOptions.Configure(options.SerializerOptions);
+	});
 
 var uniqQueueName = $"queue-of-gateway-{Environment.MachineName}";
 

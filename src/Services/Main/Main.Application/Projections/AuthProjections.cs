@@ -23,6 +23,6 @@ public sealed class RoleDtoProjectionProvider(IContextualLocalizer localizer)
 		UpdatedAt = x.UpdatedAt
 	};
 
-	private static string? GetName(IContextualLocalizer localizer, string name) =>
-		localizer.TryGet(new LocalizableMessage($"role.{name}.name"), out var value) ? value : null;
+	private static string? GetName(IContextualLocalizer localizer, string name)
+		=> localizer.TryGet(new LocalizableMessage($"role.{name}.name"), out var value) ? value : null;
 }

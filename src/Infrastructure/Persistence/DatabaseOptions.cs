@@ -20,6 +20,6 @@ public class DatabaseOptions
 	[Required]
 	public required string Password { get; init; }
 
-	public string ConnectionString =>
-		$"Host={Host};{(Port is null ? "" : $"Port={Port};")}Database={Database};Username={Username};Password={Password}";
+	public string ConnectionString
+		=> $"Host={Host};{(Port is null ? "" : $"Port={Port};")}Database={Database};Username={Username};Password={Password}";
 }

@@ -29,13 +29,15 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 
 	public int ProductId { get; }
 
-	public string StorageKey { get; private set; } = null!;
+	public string StorageKey { get; } = null!;
 
-	public static Expression<Func<ProductImage, (int, string)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.ProductId, x.StorageKey);
+	public static Expression<Func<ProductImage, (int, string)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.ProductId, x.StorageKey);
 
-	public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key) => x =>
-		x.ProductId == key.Item1 && x.StorageKey == key.Item2;
+	public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key)
+		=> x =>
+			x.ProductId == key.Item1 && x.StorageKey == key.Item2;
 
 	public static ProductImage Create(int productId, string extension)
 	{
@@ -52,8 +54,9 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 			.EnsureMaxLength(255, ArticleImageInvalidStorageKeyMessage.Instance);
 
 		(!storageKey.Contains('\\')
-		 && !storageKey.Any(char.IsControl)
-		 && storageKey.Split('/').All(segment => !string.IsNullOrWhiteSpace(segment) && segment is not "." and not ".."))
+				&& !storageKey.Any(char.IsControl)
+				&& storageKey.Split('/')
+					.All(segment => !string.IsNullOrWhiteSpace(segment) && segment is not "." and not ".."))
 			.EnsureTrue(ArticleImageInvalidStorageKeyMessage.Instance);
 		IsSupportedExtension(Path.GetExtension(storageKey), out _)
 			.EnsureTrue(ArticleImageInvalidExtensionMessage.Instance);
@@ -65,7 +68,8 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 
 	public override void OnUpdated() => OnCreated();
 
-	public override void OnDeleted() => AddDomainEvent(new ProductImageDeletedDomainEvent(ProductId, StorageKey));
+	public override void OnDeleted()
+		=> AddDomainEvent(new ProductImageDeletedDomainEvent(ProductId, StorageKey));
 
 	public override (int, string) GetId() => (ProductId, StorageKey);
 

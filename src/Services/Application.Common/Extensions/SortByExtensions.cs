@@ -1,5 +1,4 @@
-﻿using Abstractions;
-using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Interfaces.Repositories;
 using Application.Common.Querying;
 using Exceptions;
 
@@ -17,7 +16,9 @@ public static class SortByExtensions
 		}
 		catch (ArgumentException exception)
 		{
-			throw new InvalidInputException(SortingInvalidMessage.Create(exception.Message), exception.Message);
+			throw new InvalidInputException(
+				SortingInvalidMessage.Create(exception.Message),
+				exception.Message);
 		}
 	}
 
@@ -43,14 +44,12 @@ public static class SortByExtensions
 	public static IOrderedQueryable<TEntity> ThenSortBy<TEntity>(
 		this IOrderedQueryable<TEntity> query,
 		IReadOnlyCollection<SortExpression>? sortParams)
-	{
-		return ParseSorts<TEntity>(sortParams)
+		=> ParseSorts<TEntity>(sortParams)
 			.Aggregate(
 				query,
 				static (current, sort) => sort.Desc
 					? current.ThenByDescending(sort.KeySelector)
 					: current.ThenBy(sort.KeySelector));
-	}
 
 	public static CriteriaBuilder<TEntity> WithSorting<TEntity>(
 		this CriteriaBuilder<TEntity> builder,

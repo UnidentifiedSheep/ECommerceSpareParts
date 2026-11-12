@@ -1,7 +1,6 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Domain.Validation;
-using Extensions;
 using FluentValidation;
 using Main.Application.Document;
 using Main.Application.Interfaces.Services.Document;
@@ -29,7 +28,11 @@ public class CreateGenerationRequestValidation : AbstractValidator<CreateGenerat
 			.Cascade(CascadeMode.Stop)
 			.NotEmpty()
 			.WithLocalizableError(LrtDocumentGenerationRequestRequiredMessage.Instance)
-			.Must((command, json) => IsValidRequest(command, json, registry, jsonSerializer))
+			.Must((command, json) => IsValidRequest(
+				command,
+				json,
+				registry,
+				jsonSerializer))
 			.WithLocalizableError(LrtDocumentGenerationInvalidRequestMessage.Instance);
 
 		RuleFor(x => x.RequesterId)
@@ -49,9 +52,12 @@ public class CreateGenerationRequestValidation : AbstractValidator<CreateGenerat
 
 		if (definition is null) return json.IsValidJson();
 
-		return jsonSerializer.TryDeserialize(json, definition.RequestType, out var value) &&
-		       value is IDocumentRequest request &&
-		       DocumentCulture.TryGetSupported(request.Culture, out _) &&
-		       definition.SupportsDocumentType(request.DocumentType);
+		return jsonSerializer.TryDeserialize(
+				json,
+				definition.RequestType,
+				out var value) &&
+			value is IDocumentRequest request &&
+			DocumentCulture.TryGetSupported(request.Culture, out _) &&
+			definition.SupportsDocumentType(request.DocumentType);
 	}
 }

@@ -14,15 +14,9 @@ public sealed record GqlPurchase
 {
 	private readonly PurchaseDto? _dto;
 
-	public GqlPurchase(Guid id)
-	{
-		Id = id;
-	}
+	public GqlPurchase(Guid id) => Id = id;
 
-	public GqlPurchase(PurchaseDto purchase) : this(purchase.Id)
-	{
-		_dto = purchase;
-	}
+	public GqlPurchase(PurchaseDto purchase) : this(purchase.Id) => _dto = purchase;
 
 	[GraphQLName("id")]
 	public Guid Id { get; }
@@ -30,59 +24,60 @@ public sealed record GqlPurchase
 	[GraphQLName("supplier")]
 	public async Task<GqlUser> GetSupplierAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetPurchaseAsync(loader, cancellationToken)).Supplier);
+		CancellationToken cancellationToken)
+		=> new((await GetPurchaseAsync(loader, cancellationToken)).Supplier);
 
 	[GraphQLName("supplierOrganization")]
 	public async Task<GqlOrganization> GetSupplierOrganizationAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetPurchaseAsync(loader, cancellationToken)).SupplierOrganization);
+		CancellationToken cancellationToken)
+		=> new((await GetPurchaseAsync(loader, cancellationToken)).SupplierOrganization);
 
 	[GraphQLName("comment")]
 	public async Task<string?> GetCommentAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetPurchaseAsync(loader, cancellationToken)).Comment;
+		CancellationToken cancellationToken)
+		=> (await GetPurchaseAsync(loader, cancellationToken)).Comment;
 
 	[GraphQLName("purchaseDatetime")]
 	public async Task<DateTime> GetPurchaseDatetimeAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetPurchaseAsync(loader, cancellationToken)).PurchaseDatetime;
+		CancellationToken cancellationToken)
+		=> (await GetPurchaseAsync(loader, cancellationToken)).PurchaseDatetime;
 
 	[GraphQLName("transaction")]
 	[RequireAllPermissions(PermissionCodes.BALANCES_TRANSACTION_GET_ALL)]
 	public async Task<GqlTransaction> GetTransactionAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetPurchaseAsync(loader, cancellationToken)).TransactionId);
+		CancellationToken cancellationToken)
+		=> new((await GetPurchaseAsync(loader, cancellationToken)).TransactionId);
 
 	[GraphQLName("totalSum")]
 	public async Task<decimal> GetTotalSumAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetPurchaseAsync(loader, cancellationToken)).TotalSum;
+		CancellationToken cancellationToken)
+		=> (await GetPurchaseAsync(loader, cancellationToken)).TotalSum;
 
 	[GraphQLName("storage")]
 	public async Task<GqlStorage> GetStorageAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetPurchaseAsync(loader, cancellationToken)).StorageCode);
+		CancellationToken cancellationToken)
+		=> new((await GetPurchaseAsync(loader, cancellationToken)).StorageCode);
 
 	[GraphQLName("currency")]
 	public async Task<GqlCurrency> GetCurrencyAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetPurchaseAsync(loader, cancellationToken)).Currency);
+		CancellationToken cancellationToken)
+		=> new((await GetPurchaseAsync(loader, cancellationToken)).Currency);
 
 	[GraphQLName("contents")]
 	[RequireAllPermissions(PermissionCodes.PURCHASE_GET)]
 	public async Task<IReadOnlyList<GqlPurchaseContent>> GetContentsAsync(
 		IPurchaseContentsByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await loader.LoadAsync(Id, cancellationToken) ?? [])
-			.Select(content => new GqlPurchaseContent(content)).ToArray();
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
+			.Select(content => new GqlPurchaseContent(content))
+			.ToArray();
 
 	[GraphQLName("logistics")]
 	public async Task<GqlPurchaseLogistic?> GetLogisticsAsync(
@@ -95,7 +90,7 @@ public sealed record GqlPurchase
 
 	private async Task<PurchaseDto> GetPurchaseAsync(
 		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		_dto ?? await loader.LoadAsync(Id, cancellationToken)
-		?? throw new PurchaseNotFoundException(Id);
+		CancellationToken cancellationToken)
+		=> _dto ?? await loader.LoadAsync(Id, cancellationToken)
+			?? throw new PurchaseNotFoundException(Id);
 }

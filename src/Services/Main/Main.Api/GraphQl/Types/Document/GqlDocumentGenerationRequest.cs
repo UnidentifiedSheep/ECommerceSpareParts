@@ -12,16 +12,11 @@ public record GqlDocumentGenerationRequest
 {
 	private readonly DocumentGenerationRequestDto? _document;
 
-	public GqlDocumentGenerationRequest(Guid requestId)
-	{
-		RequestId = requestId;
-	}
+	public GqlDocumentGenerationRequest(Guid requestId) => RequestId = requestId;
 
 	public GqlDocumentGenerationRequest(
 		DocumentGenerationRequestDto document) : this(document.RequestId)
-	{
-		_document = document;
-	}
+		=> _document = document;
 
 	[GraphQLName("requestId")]
 	public Guid RequestId { get; }
@@ -29,44 +24,44 @@ public record GqlDocumentGenerationRequest
 	[GraphQLName("jobId")]
 	public async Task<Guid> GetJobIdAsync(
 		IDocumentGenerationRequestsDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetDocumentAsync(loader, cancellationToken)).JobId;
+		CancellationToken cancellationToken)
+		=> (await GetDocumentAsync(loader, cancellationToken)).JobId;
 
 	[GraphQLName("status")]
 	public async Task<JobStatus> GetStatusAsync(
 		IDocumentGenerationRequestsDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetDocumentAsync(loader, cancellationToken)).Status;
+		CancellationToken cancellationToken)
+		=> (await GetDocumentAsync(loader, cancellationToken)).Status;
 
 	[GraphQLName("documentSystemName")]
 	public async Task<string> GetDocumentSystemNameAsync(
 		IDocumentGenerationRequestsDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetDocumentAsync(loader, cancellationToken)).DocumentSystemName;
+		CancellationToken cancellationToken)
+		=> (await GetDocumentAsync(loader, cancellationToken)).DocumentSystemName;
 
 	[GraphQLName("requesterId")]
 	public async Task<Guid?> GetRequesterIdAsync(
 		IDocumentGenerationRequestsDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetDocumentAsync(loader, cancellationToken)).RequesterId;
+		CancellationToken cancellationToken)
+		=> (await GetDocumentAsync(loader, cancellationToken)).RequesterId;
 
 	[GraphQLName("createdAt")]
 	public async Task<DateTime> GetCreatedAtAsync(
 		IDocumentGenerationRequestsDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetDocumentAsync(loader, cancellationToken)).CreatedAt;
+		CancellationToken cancellationToken)
+		=> (await GetDocumentAsync(loader, cancellationToken)).CreatedAt;
 
 	[GraphQLName("generatedAt")]
 	public async Task<DateTime?> GetGeneratedAtAsync(
 		IDocumentGenerationRequestsDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetDocumentAsync(loader, cancellationToken)).GeneratedAt;
+		CancellationToken cancellationToken)
+		=> (await GetDocumentAsync(loader, cancellationToken)).GeneratedAt;
 
 	[GraphQLName("expiresAt")]
 	public async Task<DateTime?> GetExpiresAtAsync(
 		IDocumentGenerationRequestsDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetDocumentAsync(loader, cancellationToken)).ExpiresAt;
+		CancellationToken cancellationToken)
+		=> (await GetDocumentAsync(loader, cancellationToken)).ExpiresAt;
 
 	[GraphQLName("fileLink")]
 	public async Task<GqlDocumentLink?> GetFileLinkAsync(
@@ -89,7 +84,7 @@ public record GqlDocumentGenerationRequest
 
 	private async Task<DocumentGenerationRequestDto> GetDocumentAsync(
 		IDocumentGenerationRequestsDataLoader loader,
-		CancellationToken cancellationToken) =>
-		_document ?? await loader.LoadAsync(RequestId, cancellationToken) ??
-		throw new DocumentGenerationRequestNotFoundException(RequestId);
+		CancellationToken cancellationToken)
+		=> _document ?? await loader.LoadAsync(RequestId, cancellationToken) ??
+			throw new DocumentGenerationRequestNotFoundException(RequestId);
 }

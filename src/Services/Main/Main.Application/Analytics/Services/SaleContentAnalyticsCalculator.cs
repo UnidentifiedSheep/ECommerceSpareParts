@@ -5,7 +5,8 @@ using Main.Entities.Sale;
 
 namespace Main.Application.Analytics.Services;
 
-public sealed class SaleContentAnalyticsCalculator(ICurrencyConverter converter) : ISaleContentAnalyticsCalculator
+public sealed class SaleContentAnalyticsCalculator(ICurrencyConverter converter)
+	: ISaleContentAnalyticsCalculator
 {
 	public async Task<SaleContentAnalyticsAmounts> CalculateAsync(
 		SaleContent content,
@@ -14,8 +15,16 @@ public sealed class SaleContentAnalyticsCalculator(ICurrencyConverter converter)
 		CancellationToken cancellationToken)
 	{
 		saleDate = saleDate.ToUniversalTime();
-		var originalAmount = await converter.ConvertToBaseAsync(content.OriginalPrice * content.Count, currencyId, saleDate, cancellationToken);
-		var revenue = await converter.ConvertToBaseAsync(content.TotalSum, currencyId, saleDate, cancellationToken);
+		var originalAmount = await converter.ConvertToBaseAsync(
+			content.OriginalPrice * content.Count,
+			currencyId,
+			saleDate,
+			cancellationToken);
+		var revenue = await converter.ConvertToBaseAsync(
+			content.TotalSum,
+			currencyId,
+			saleDate,
+			cancellationToken);
 		var cost = 0m;
 		foreach (var detail in content.Details)
 			cost += await converter.ConvertToBaseAsync(
@@ -24,6 +33,9 @@ public sealed class SaleContentAnalyticsCalculator(ICurrencyConverter converter)
 				detail.PurchaseDatetime.ToUniversalTime(),
 				cancellationToken);
 
-		return new SaleContentAnalyticsAmounts(originalAmount, revenue, cost);
+		return new SaleContentAnalyticsAmounts(
+			originalAmount,
+			revenue,
+			cost);
 	}
 }

@@ -15,8 +15,8 @@ public static class ProductDataLoaders
 	public static async Task<IReadOnlyDictionary<int, long>> GetProductStockByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
-		CancellationToken cancellationToken) =>
-		(await sender.Send(new GetProductsStockByIdsQuery(keys), cancellationToken)).Stocks;
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetProductsStockByIdsQuery(keys), cancellationToken)).Stocks;
 
 	[DataLoader]
 	public static async Task<IReadOnlyDictionary<int, CharacteristicDto>> GetCharacteristicByIdAsync(
@@ -44,57 +44,49 @@ public static class ProductDataLoaders
 		IReadOnlyList<int> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProductByIdsQuery(keys), cancellationToken)).Products.ToDictionary(
+		=> (await sender.Send(new GetProductByIdsQuery(keys), cancellationToken)).Products.ToDictionary(
 			x => x.Id,
 			x => x);
-	}
 
 	[DataLoader]
 	public static async Task<Dictionary<int, ProductDto>> GetProductPairByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProductsPairsQuery(keys), cancellationToken)).Pairs.ToDictionary(
+		=> (await sender.Send(new GetProductsPairsQuery(keys), cancellationToken)).Pairs.ToDictionary(
 			x => x.Key,
 			x => x.Value);
-	}
 
 	[DataLoader]
 	public static async Task<Dictionary<int, ProductSizeDto>> GetProductSizeByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProductsSizesByIdsQuery(keys), cancellationToken)).Sizes
+		=> (await sender.Send(new GetProductsSizesByIdsQuery(keys), cancellationToken)).Sizes
 			.ToDictionary(x => x.ProductId, x => x);
-	}
 
 	[DataLoader]
 	public static async Task<Dictionary<int, ProductWeightDto>> GetProductWeightByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProductsWeightsByIdsQuery(keys), cancellationToken)).Weights
+		=> (await sender.Send(new GetProductsWeightsByIdsQuery(keys), cancellationToken)).Weights
 			.ToDictionary(x => x.ProductId, x => x);
-	}
 
 	[DataLoader]
 	public static async Task<Dictionary<int, List<ProductCharacteristicDto>>>
 		GetProductCharacteristicsByIdAsync(
 			IReadOnlyList<int> keys,
 			ISender sender,
-			CancellationToken cancellationToken) =>
-		(await sender.Send(new GetCharacteristicsBatchQuery(keys), cancellationToken)).Characteristics;
+			CancellationToken cancellationToken)
+		=> (await sender.Send(new GetCharacteristicsBatchQuery(keys), cancellationToken)).Characteristics;
 
 	[DataLoader]
 	public static async Task<Dictionary<int, List<ProductContentDto>>> GetProductContentsByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
-		CancellationToken cancellationToken) =>
-		(await sender.Send(new GetProductsContentsQuery(keys), cancellationToken)).Contents;
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetProductsContentsQuery(keys), cancellationToken)).Contents;
 
 	[DataLoader]
 	public static async Task<Dictionary<GetProductStorageContentsItem, IReadOnlyList<StorageContentDto>>>
@@ -102,10 +94,8 @@ public static class ProductDataLoaders
 			IReadOnlyList<GetProductStorageContentsItem> keys,
 			ISender sender,
 			CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProductStorageContentsQuery(keys), cancellationToken)).Content
+		=> (await sender.Send(new GetProductStorageContentsQuery(keys), cancellationToken)).Content
 			.ToDictionary(x => x.Key, x => x.Value);
-	}
 
 	[DataLoader]
 	public static async Task<Dictionary<GetAvailableProductsStockItem, int>> GetProductAvailableStockAsync(

@@ -11,7 +11,8 @@ public sealed class UnifiedDbContext(
 {
 	private readonly IDbContextModule[] _modules = modules.ToArray();
 
-	internal string ModelModulesKey => string.Join("|", _modules.Select(module => module.GetType().AssemblyQualifiedName));
+	internal string ModelModulesKey
+		=> string.Join("|", _modules.Select(module => module.GetType().AssemblyQualifiedName));
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{

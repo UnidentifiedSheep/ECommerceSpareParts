@@ -12,6 +12,9 @@ public class PublishIntegrationEventsHandler(IProductEventPublisher eventPublish
 {
 	public override Task Handle(
 		Batch<EntityCreatedDomainEvent<ProductCharacteristic>> notification,
-		CancellationToken cancellationToken) =>
-		eventPublisher.PublishAsync(notification.Items.Select(x => x.Entity.ProductId), ProductEventParts.Characteristics, cancellationToken);
+		CancellationToken cancellationToken)
+		=> eventPublisher.PublishAsync(
+			notification.Items.Select(x => x.Entity.ProductId),
+			ProductEventParts.Characteristics,
+			cancellationToken);
 }

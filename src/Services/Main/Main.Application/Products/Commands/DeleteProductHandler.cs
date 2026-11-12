@@ -12,7 +12,11 @@ using MediatR;
 
 namespace Main.Application.Products.Commands;
 
-[Transactional(IsolationLevel.Serializable, 30, 3), AutoSave]
+[Transactional(
+	IsolationLevel.Serializable,
+	30,
+	3)]
+[AutoSave]
 public record DeleteProductCommand(int ProductId, uint RowVersion) : ICommand;
 
 public class DeleteProductHandler(
@@ -24,12 +28,13 @@ public class DeleteProductHandler(
 	{
 		var id = request.ProductId;
 		var product = await products.FirstOrDefaultAsync(
-			Criteria<Product>.New()
-				.Where(item => item.Id == id)
-				.Include(item => item.Images)
-				.Track()
-				.ForUpdate()
-				.Build(), cancellationToken)
+				Criteria<Product>.New()
+					.Where(item => item.Id == id)
+					.Include(item => item.Images)
+					.Track()
+					.ForUpdate()
+					.Build(),
+				cancellationToken)
 			?? throw new ProductNotFoundException(id);
 
 		product.ValidateVersion(request.RowVersion);

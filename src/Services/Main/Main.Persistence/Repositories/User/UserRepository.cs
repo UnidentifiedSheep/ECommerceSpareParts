@@ -1,13 +1,14 @@
-using Main.Entities.Auth;
-using Persistence.Context;
-using Main.Enums;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Users;
+using Main.Entities.Auth;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
+using Main.Enums;
+using Main.Persistence.DatabaseObjects;
 using Main.Persistence.ReadModels;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using Persistence.Repository;
 
@@ -19,16 +20,18 @@ public class UserRepository(UnifiedDbContext context, IQueryableExtensions exten
 	public async Task RevokeRefreshTokensAsync(
 		Guid userId,
 		string reason,
-		CancellationToken cancellationToken = default) =>
-		await Context.Set<UserToken>()
+		CancellationToken cancellationToken = default)
+		=> await Context.Set<UserToken>()
 			.Where(token => token.UserId == userId && token.Type == TokenType.RefreshToken && !token.Revoked)
-			.ExecuteUpdateAsync(setters => setters.SetProperty(token => token.Revoked, true)
-				.SetProperty(token => token.RevokeReason, reason), cancellationToken);
+			.ExecuteUpdateAsync(
+				setters => setters.SetProperty(token => token.Revoked, true)
+					.SetProperty(token => token.RevokeReason, reason),
+				cancellationToken);
 
 	public IQueryable<Entities.User.User> Search(
 		IQueryable<Entities.User.User> query,
-		string searchTerm) =>
-		SearchWithRank(query, searchTerm)
+		string searchTerm)
+		=> SearchWithRank(query, searchTerm)
 			.Select(match => match.User);
 
 	public IQueryable<UserSearchMatch> SearchWithRank(
@@ -42,13 +45,17 @@ public class UserRepository(UnifiedDbContext context, IQueryableExtensions exten
 			normalized = UserPhone.ToNormalizedPhone(normalized);
 
 		return query.AsNoTracking()
-			.Join(Context.Set<UserSearchDocument>(), user => user.Id, document => document.UserId,
+			.Join(
+				Context.Set<UserSearchDocument>(),
+				user => user.Id,
+				document => document.UserId,
 				(user, document) => new { User = user, Document = document })
-			.Where(match => match.Document.SearchVector.Matches(DatabaseObjects.UserSearchDbFunctions.ToUserSearchQuery(normalized)))
+			.Where(match
+				=> match.Document.SearchVector.Matches(UserSearchDbFunctions.ToUserSearchQuery(normalized)))
 			.Select(match => new UserSearchMatch
 			{
 				User = match.User,
-				Rank = match.Document.SearchVector.Rank(DatabaseObjects.UserSearchDbFunctions.ToUserSearchQuery(normalized))
+				Rank = match.Document.SearchVector.Rank(UserSearchDbFunctions.ToUserSearchQuery(normalized))
 			})
 			.OrderByDescending(match => match.Rank)
 			.ThenBy(match => match.User.Id);
@@ -60,7 +67,8 @@ public class UserRepository(UnifiedDbContext context, IQueryableExtensions exten
 		CancellationToken cancellationToken = default)
 	{
 		Email normalizedEmail = email;
-		var query = Context.Set<Entities.User.User>().Where(x => x.Emails.Any(z => z.Email == normalizedEmail && z.IsPrimary));
+		var query = Context.Set<Entities.User.User>()
+			.Where(x => x.Emails.Any(z => z.Email == normalizedEmail && z.IsPrimary));
 
 		if (criteria != null)
 			query = QueryableExtensions.Apply(query, criteria);
@@ -81,7 +89,8 @@ public class UserRepository(UnifiedDbContext context, IQueryableExtensions exten
 				cancellationToken);
 
 		var normalizedUserName = UserName.ToNormalized(login);
-		var query = Context.Set<Entities.User.User>().Where(x => x.UserName.NormalizedValue == normalizedUserName);
+		var query = Context.Set<Entities.User.User>()
+			.Where(x => x.UserName.NormalizedValue == normalizedUserName);
 
 		if (criteria != null)
 			query = QueryableExtensions.Apply(query, criteria);

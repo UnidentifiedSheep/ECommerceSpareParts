@@ -93,13 +93,14 @@ public class PricingSettingDefinitionTests
 
 	private static string ValidInputJson() => JsonSerializer.Serialize(ValidInput());
 
-	private static PricingSettingInputData ValidInput() => new()
-	{
-		SelectedMarkupId = 1,
-		DefaultMarkup = 0.2m,
-		OfferTtl = TimeSpan.FromDays(1),
-		PriceRoundingStep = 0.01m,
-		DeliveryDayPenalty = 2m,
-		UniqProductAdditionalMarkup = 0.2m
-	};
+	private static PricingSettingInputData ValidInput()
+		=> new()
+		{
+			SelectedMarkupId = 1,
+			DefaultMarkup = 0.2m,
+			OfferTtl = TimeSpan.FromDays(1),
+			PriceRoundingStep = 0.01m,
+			DeliveryDayPenalty = 2m,
+			UniqProductAdditionalMarkup = 0.2m
+		};
 }

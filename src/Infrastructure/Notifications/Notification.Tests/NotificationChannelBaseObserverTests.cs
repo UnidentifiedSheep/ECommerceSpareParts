@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Recipients;
@@ -77,7 +78,9 @@ public class NotificationChannelBaseObserverTests
 		var second = new RecordingInAppObserver(secondFailure);
 		var third = new RecordingInAppObserver();
 		var loggerFactory = new RecordingLoggerFactory();
-		var channel = new TestChannel([first, second, third], loggerFactory.CreateLogger(nameof(TestChannel)));
+		var channel = new TestChannel(
+			[first, second, third],
+			loggerFactory.CreateLogger(nameof(TestChannel)));
 		var receipts = new[] { new InAppReceipt(new InAppRecipient(Guid.NewGuid()), 1) };
 
 		await channel.NotifyAsync(receipts, TestContext.Current.CancellationToken);
@@ -97,8 +100,8 @@ public class NotificationChannelBaseObserverTests
 		var channel = new TestChannel([first, second], loggerFactory.CreateLogger(nameof(TestChannel)));
 		var receipts = new[] { new InAppReceipt(new InAppRecipient(Guid.NewGuid()), 1) };
 
-		await Assert.ThrowsAnyAsync<OperationCanceledException>(
-			() => channel.NotifyAsync(receipts, cancellation.Token));
+		await Assert.ThrowsAnyAsync<OperationCanceledException>(()
+			=> channel.NotifyAsync(receipts, cancellation.Token));
 
 		Assert.Single(first.Received);
 		Assert.Empty(second.Received);
@@ -110,20 +113,20 @@ public class NotificationChannelBaseObserverTests
 		IEnumerable<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>> observers,
 		ILogger? logger = null)
 		: NotificationChannelBase<TestNotification, InAppRecipient, InAppReceipt>(
-			observers, logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance)
+			observers,
+			logger ?? NullLogger.Instance)
 	{
 		public override string SystemName => InAppRecipient.ChannelName;
 
 		public Task NotifyAsync(
 			IReadOnlyCollection<InAppReceipt> receipts,
-			CancellationToken cancellationToken = default) =>
-			NotifyObserversAsync(receipts, cancellationToken);
+			CancellationToken cancellationToken = default)
+			=> NotifyObserversAsync(receipts, cancellationToken);
 
 		public override Task<IReadOnlyList<SendResult>> SendBatchAsync(
 			IReadOnlyCollection<NotificationDelivery<TestNotification, InAppRecipient>> notifications,
-			CancellationToken cancellationToken = default) =>
-			Task.FromResult<IReadOnlyList<SendResult>>(
+			CancellationToken cancellationToken = default)
+			=> Task.FromResult<IReadOnlyList<SendResult>>(
 				notifications.Select(_ => SendResult.Success()).ToArray());
 	}
-
 }

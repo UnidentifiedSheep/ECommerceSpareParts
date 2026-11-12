@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Options.S3;
@@ -38,18 +37,20 @@ public class ProductCrossesImportLrt(
 
 	public override string SystemName => nameof(ProductCrossesImportLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtProductCrossesImportNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProductCrossesImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProductCrossesImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductCrossesImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
-	protected override async Task BeforeRead(ProductCrossesImportState state) =>
-		_producerLookup = await ExecuteInScopeAsync((context, ct) =>
-			context.GetRequiredService<IProducerLookupService>().Load(ct), CancellationToken);
+	protected override async Task BeforeRead(ProductCrossesImportState state)
+		=> _producerLookup = await ExecuteInScopeAsync(
+			(context, ct) =>
+				context.GetRequiredService<IProducerLookupService>().Load(ct),
+			CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -85,8 +86,14 @@ public class ProductCrossesImportLrt(
 			}
 
 			item = new ProductCrossBatchItem(
-				new ProductKey(row.Sku, producerId.Value, row.Producer),
-				new ProductKey(row.CrossSku, crossProducerId.Value, row.CrossProducer));
+				new ProductKey(
+					row.Sku,
+					producerId.Value,
+					row.Producer),
+				new ProductKey(
+					row.CrossSku,
+					crossProducerId.Value,
+					row.CrossProducer));
 
 			return true;
 		}
@@ -107,13 +114,17 @@ public class ProductCrossesImportLrt(
 
 		var firstIdx = items[0].idx;
 		var errorsBeforeBatch = errors.Count;
-		var productIds = await ExecuteInScopeAsync((context, ct) =>
-			context.GetRequiredService<IProductRepository>().GetProductIdsByKeys(
-			items.SelectMany(x => new[]
-			{
-				x.item.Product.ToTuple(),
-				x.item.CrossProduct.ToTuple()
-			}), ct), CancellationToken);
+		var productIds = await ExecuteInScopeAsync(
+			(context, ct) =>
+				context.GetRequiredService<IProductRepository>()
+					.GetProductIdsByKeys(
+						items.SelectMany(x => new[]
+						{
+							x.item.Product.ToTuple(),
+							x.item.CrossProduct.ToTuple()
+						}),
+						ct),
+			CancellationToken);
 
 		var crosses = new HashSet<(int ProductId, int CrossProductId)>();
 
@@ -167,15 +178,17 @@ public class ProductCrossesImportLrt(
 					var entities = crosses
 						.Select(x => ProductCross.Create(x.ProductId, x.CrossProductId))
 						.ToList();
-					await context.GetRequiredService<IProductRepository>().InsertProductCrossesOnConflictDoNothingAsync(entities, cancellationToken);
-					context.GetRequiredService<IDomainEventScope>().AddRange(
-						entities
-							.SelectMany(x => new[]
-							{
-								x.LeftProductId, x.RightProductId
-							})
-							.Distinct()
-							.Select(x => new ProductLinkageUpdatedDomainEvent(x)));
+					await context.GetRequiredService<IProductRepository>()
+						.InsertProductCrossesOnConflictDoNothingAsync(entities, cancellationToken);
+					context.GetRequiredService<IDomainEventScope>()
+						.AddRange(
+							entities
+								.SelectMany(x => new[]
+								{
+									x.LeftProductId, x.RightProductId
+								})
+								.Distinct()
+								.Select(x => new ProductLinkageUpdatedDomainEvent(x)));
 				},
 				CancellationToken);
 

@@ -1,6 +1,5 @@
-﻿using Persistence.Context;
-using Main.Entities.Storage;
-using Main.Persistence.Context;
+﻿using Main.Entities.Storage;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;

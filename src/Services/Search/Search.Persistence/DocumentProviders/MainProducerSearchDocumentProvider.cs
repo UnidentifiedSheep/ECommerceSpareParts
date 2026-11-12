@@ -27,8 +27,7 @@ public class MainProducerSearchDocumentProvider(IMainClient mainClient) : IProdu
 	}
 
 	private static Producer MapProducer(InternalFullProducer producer)
-	{
-		return new Producer
+		=> new()
 		{
 			Id = producer.Id,
 			Name = producer.Name,
@@ -41,5 +40,4 @@ public class MainProducerSearchDocumentProvider(IMainClient mainClient) : IProdu
 				})
 				.ToList()
 		};
-	}
 }

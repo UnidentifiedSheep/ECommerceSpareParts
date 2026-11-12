@@ -10,8 +10,8 @@ public abstract class SettingDefinitionNamedObjectBase<TSetting>(ISettingsServic
 {
 	protected ISettingsService SettingsService => settingsService;
 
-	public override async Task<Setting> GetSettingAsync(CancellationToken cancellationToken) =>
-		await settingsService.GetOrDefault<TSetting>(cancellationToken);
+	public override async Task<Setting> GetSettingAsync(CancellationToken cancellationToken)
+		=> await settingsService.GetOrDefault<TSetting>(cancellationToken);
 }
 
 public abstract class SettingDefinitionNamedObjectBase : LocalizableNameObject

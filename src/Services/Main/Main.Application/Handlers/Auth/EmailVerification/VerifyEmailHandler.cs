@@ -1,4 +1,3 @@
-using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -9,6 +8,7 @@ using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
 using Main.Enums.Auth;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Auth.EmailVerification;
 

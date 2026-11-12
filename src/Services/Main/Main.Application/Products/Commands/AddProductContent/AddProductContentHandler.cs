@@ -1,6 +1,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Products.Commands.AddProductContent;
@@ -15,7 +16,7 @@ public class AddProductContentHandler(IUnitOfWork unitOfWork) : ICommandHandler<
 	{
 		var contents = request
 			.Contents
-			.Select(x => Entities.Product.ProductContent.Create(
+			.Select(x => ProductContent.Create(
 				request.ParentProductId,
 				x.Key,
 				x.Value))

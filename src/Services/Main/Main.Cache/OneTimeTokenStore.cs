@@ -10,10 +10,11 @@ public class OneTimeTokenStore(ICache cache) : IOneTimeTokenStore
 	public Task StoreAsync(
 		OneTimeTokenPurpose purpose,
 		Guid tokenId,
-		TimeSpan ttl) => cache.SetAsync(
-		CacheKeys.OneTimeTokenCache.OneTimeToken(purpose, tokenId),
-		tokenId,
-		ttl);
+		TimeSpan ttl)
+		=> cache.SetAsync(
+			CacheKeys.OneTimeTokenCache.OneTimeToken(purpose, tokenId),
+			tokenId,
+			ttl);
 
 	public async Task<bool> ConsumeAsync(OneTimeTokenPurpose purpose, Guid tokenId)
 	{

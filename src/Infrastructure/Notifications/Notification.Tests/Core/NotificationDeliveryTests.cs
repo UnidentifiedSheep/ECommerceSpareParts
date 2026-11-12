@@ -1,3 +1,4 @@
+using Notification.Core.Entities;
 using Notification.Core.Enums;
 using NotificationEntity = Notification.Core.Entities.Notification;
 
@@ -67,7 +68,10 @@ public class NotificationDeliveryTests
 		Assert.Equal(DeliveryStatus.Delivered, delivery.Status);
 		Assert.Equal(1, delivery.Attempts);
 		Assert.Null(delivery.Error);
-		Assert.InRange(delivery.DeliveredAt!.Value, before, DateTime.UtcNow);
+		Assert.InRange(
+			delivery.DeliveredAt!.Value,
+			before,
+			DateTime.UtcNow);
 		Assert.True(delivery.IsTerminal);
 	}
 
@@ -85,8 +89,11 @@ public class NotificationDeliveryTests
 		Assert.Throws<InvalidOperationException>(delivered.MarkDelivered);
 	}
 
-	private static Notification.Core.Entities.NotificationDelivery CreateDelivery() =>
-		NotificationEntity
-			.Create(Guid.NewGuid(), "test", "{}")
+	private static NotificationDelivery CreateDelivery()
+		=> NotificationEntity
+			.Create(
+				Guid.NewGuid(),
+				"test",
+				"{}")
 			.MakeDelivery("InApp");
 }

@@ -1,5 +1,3 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
@@ -10,6 +8,7 @@ using Main.Api.GraphQl.Types.Notification;
 using Main.Application.Handlers.NotificationPreferences;
 using Main.Application.Handlers.Notifications.GetNotifications;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Api.GraphQl.Queries;
 

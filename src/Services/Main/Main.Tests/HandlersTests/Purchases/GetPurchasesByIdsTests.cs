@@ -14,9 +14,7 @@ namespace Tests.HandlersTests.Purchases;
 public sealed class GetPurchasesByIdsTests : IntegrationTest
 {
 	public GetPurchasesByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<PurchaseTestContext>();
-	}
+		=> RegisterBasicContext<PurchaseTestContext>();
 
 	private PurchaseTestContext TestContext => GetContext<PurchaseTestContext>();
 
@@ -27,7 +25,8 @@ public sealed class GetPurchasesByIdsTests : IntegrationTest
 		var second = await CreatePurchase();
 
 		var result = await Mediator.Send(
-			new GetPurchasesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]), CancellationToken);
+			new GetPurchasesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Purchases.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
 	}

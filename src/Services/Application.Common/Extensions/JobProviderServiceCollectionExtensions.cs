@@ -8,8 +8,8 @@ namespace Application.Common.Extensions;
 public static class JobProviderServiceCollectionExtensions
 {
 	public static IServiceCollection
-		RegisterJobProviders<TAssemblyMarker>(this IServiceCollection services) =>
-		services.RegisterJobProviders(typeof(TAssemblyMarker).Assembly);
+		RegisterJobProviders<TAssemblyMarker>(this IServiceCollection services)
+		=> services.RegisterJobProviders(typeof(TAssemblyMarker).Assembly);
 
 	public static IServiceCollection RegisterJobProviders(
 		this IServiceCollection services,
@@ -61,14 +61,15 @@ public static class JobProviderServiceCollectionExtensions
 		return services;
 	}
 
-	private static ServiceLifetime ToServiceLifetime(Lifetime lifetime) => lifetime switch
-	{
-		Lifetime.Singleton => ServiceLifetime.Singleton,
-		Lifetime.Scoped => ServiceLifetime.Scoped,
-		Lifetime.Transient => ServiceLifetime.Transient,
-		_ => throw new ArgumentOutOfRangeException(
-			nameof(lifetime),
-			lifetime,
-			null)
-	};
+	private static ServiceLifetime ToServiceLifetime(Lifetime lifetime)
+		=> lifetime switch
+		{
+			Lifetime.Singleton => ServiceLifetime.Singleton,
+			Lifetime.Scoped => ServiceLifetime.Scoped,
+			Lifetime.Transient => ServiceLifetime.Transient,
+			_ => throw new ArgumentOutOfRangeException(
+				nameof(lifetime),
+				lifetime,
+				null)
+		};
 }

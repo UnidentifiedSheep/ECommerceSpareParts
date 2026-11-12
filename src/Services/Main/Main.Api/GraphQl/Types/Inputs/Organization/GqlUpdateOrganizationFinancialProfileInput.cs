@@ -1,5 +1,5 @@
-using HotChocolate;
 using GraphQL.Common.Types;
+using HotChocolate;
 using Main.Application.Dtos.Balances;
 
 namespace Main.Api.GraphQl.Types.Inputs.Organization;
@@ -13,8 +13,9 @@ public sealed record GqlUpdateOrganizationFinancialProfileInput
 	[GraphQLName("minimalAllowedBalance")]
 	public GqlPatchField<decimal>? MinimalAllowedBalance { get; init; }
 
-	public PatchOrganizationFinancialProfileDto ToDto() => new()
-	{
-		MinimalAllowedBalance = MinimalAllowedBalance
-	};
+	public PatchOrganizationFinancialProfileDto ToDto()
+		=> new()
+		{
+			MinimalAllowedBalance = MinimalAllowedBalance
+		};
 }

@@ -11,5 +11,10 @@ public sealed record DeleteObjectResult(
 	public static DeleteObjectResult Fail(
 		string key,
 		string? errorCode,
-		string? errorMessage) => new(key, false, errorCode, errorMessage);
+		string? errorMessage)
+		=> new(
+			key,
+			false,
+			errorCode,
+			errorMessage);
 }

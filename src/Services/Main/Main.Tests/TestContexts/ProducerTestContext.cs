@@ -1,6 +1,5 @@
-﻿using Persistence.Context;
-using Main.Entities.Producer;
-using Main.Persistence.Context;
+﻿using Main.Entities.Producer;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -13,6 +12,6 @@ public class ProducerTestContext(UnifiedDbContext context) : TestContextBase<Uni
 
 	public IReadOnlyList<Producer> Producers => _producers;
 
-	public override async Task InitializeAsync(CancellationToken cancellationToken = default) =>
-		_producers.AddRange(await new ProducerBuilder(Faker).BuildManyAndAddToDb(DbContext, 5));
+	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+		=> _producers.AddRange(await new ProducerBuilder(Faker).BuildManyAndAddToDb(DbContext, 5));
 }

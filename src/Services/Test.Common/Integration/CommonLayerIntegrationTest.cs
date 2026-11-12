@@ -27,10 +27,7 @@ public abstract class CommonLayerIntegrationTest : TestBase
 
 	private IServiceProvider _serviceProvider = null!;
 
-	internal CommonLayerIntegrationTest(CombinedContainerFixture fixture)
-	{
-		_fixture = fixture;
-	}
+	internal CommonLayerIntegrationTest(CombinedContainerFixture fixture) => _fixture = fixture;
 
 	protected override IServiceProvider Sp => _serviceProvider;
 

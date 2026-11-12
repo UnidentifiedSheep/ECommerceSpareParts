@@ -54,8 +54,8 @@ public sealed class PostgresContainerFixture : IAsyncLifetime
 		return new PostgresDatabaseLease(database, ReleaseDatabaseAsync);
 	}
 
-	private ValueTask ReleaseDatabaseAsync(PostgresDatabaseSlot database) =>
-		_databasePool.Writer.WriteAsync(database);
+	private ValueTask ReleaseDatabaseAsync(PostgresDatabaseSlot database)
+		=> _databasePool.Writer.WriteAsync(database);
 
 	private async Task CreateDatabaseAsync(string databaseName)
 	{

@@ -7,8 +7,8 @@ using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Lrts.Base;
-using Main.Application.Models.Product;
 using Main.Application.Models.Producer;
+using Main.Application.Models.Product;
 using Main.Application.Products.Interfaces;
 using Main.Entities;
 using Main.Entities.Product;
@@ -29,31 +29,42 @@ public class MapGroupToProductLrt(
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<MapGroupToProductInputState, MapGroupToProductState,
 		MapGroupToProductLrt.ProductGroupMappingCsvDto, ProductGroupAssignment>(
-		bucketsOptions, transactionService,
-		logger, s3Service, stringLocalizer)
+		bucketsOptions,
+		transactionService,
+		logger,
+		s3Service,
+		stringLocalizer)
 {
-	private IProducerLookup _producerLookup = ProducerLookup.Empty;
 	private IReadOnlyDictionary<string, int> _groupIds = new Dictionary<string, int>();
+	private IProducerLookup _producerLookup = ProducerLookup.Empty;
 
 	protected override int BatchSize => 10_000;
 
 	public override string SystemName => nameof(MapGroupToProductLrt);
 	public override ILocalizableMessage NameLocalizationMessage => LrtMapGroupToProductNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtMapGroupToProductDescriptionMessage.Instance;
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtMapGroupToProductDescriptionMessage.Instance;
+
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override async Task BeforeRead(MapGroupToProductState state)
-	{
-		(_producerLookup, _groupIds) = await ExecuteInScopeAsync(async (context, ct) =>
-		{
-			var lookup = await context.GetRequiredService<IProducerLookupService>().Load(ct);
-			var groups = await context.Repositories.GetForRead<ProductGroup, int>().Query
-				.Select(x => new { x.NormalizedName, x.Id })
-				.ToDictionaryAsync(x => x.NormalizedName, x => x.Id, ct);
-			return (lookup, groups);
-		}, CancellationToken);
-	}
+		=> (_producerLookup, _groupIds) = await ExecuteInScopeAsync(
+			async (context, ct) =>
+			{
+				var lookup = await context.GetRequiredService<IProducerLookupService>().Load(ct);
+				var groups = await context.Repositories
+					.GetForRead<ProductGroup, int>()
+					.Query
+					.Select(x => new { x.NormalizedName, x.Id })
+					.ToDictionaryAsync(
+						x => x.NormalizedName,
+						x => x.Id,
+						ct);
+				return (lookup, groups);
+			},
+			CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -68,8 +79,11 @@ public class MapGroupToProductLrt(
 			var producerId = _producerLookup.ResolveId(row.Producer);
 			if (producerId is null)
 			{
-				errors.Add(CreateError(rowIdx, StringLocalizer.Get(
-					new ArticleImportProducerNotFoundMessage().WithProducer(row.Producer))));
+				errors.Add(
+					CreateError(
+						rowIdx,
+						StringLocalizer.Get(
+							new ArticleImportProducerNotFoundMessage().WithProducer(row.Producer))));
 				return false;
 			}
 
@@ -99,10 +113,14 @@ public class MapGroupToProductLrt(
 		IReadOnlyList<(int idx, ProductGroupAssignment item)> items,
 		MapGroupToProductState state,
 		CsvImportCheckpoint checkpoint,
-		List<CsvImportError> errors) =>
-		ExecuteInTransactionAsync(
+		List<CsvImportError> errors)
+		=> ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(_, _) => base.SaveBatchAsync(items, state, checkpoint, errors),
+			(_, _) => base.SaveBatchAsync(
+				items,
+				state,
+				checkpoint,
+				errors),
 			CancellationToken);
 
 	protected override async Task ProcessBatch(
@@ -119,19 +137,26 @@ public class MapGroupToProductLrt(
 		var ids = await TransactionContext.GetRequiredService<IProductRepository>()
 			.UpdateProductGroupsAsync(assignments.Values, CancellationToken);
 		await TransactionContext.GetRequiredService<IProductEventPublisher>()
-			.PublishAsync(ids, ProductEventParts.Core, CancellationToken);
+			.PublishAsync(
+				ids,
+				ProductEventParts.Core,
+				CancellationToken);
 
 		Logger.LogInformation(
 			"Product group mapping batch processed. JobId: {JobId}, BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}",
-			JobId, items[0].idx, assignments.Count);
+			JobId,
+			items[0].idx,
+			assignments.Count);
 	}
 
 	public sealed record ProductGroupMappingCsvDto
 	{
 		[Name("Sku")]
 		public required string Sku { get; init; }
+
 		[Name("Producer")]
 		public required string Producer { get; init; }
+
 		[Name("ProductGroup")]
 		public required string ProductGroup { get; init; }
 	}

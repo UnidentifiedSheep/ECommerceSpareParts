@@ -25,7 +25,8 @@ public sealed class SettingsServiceTests
 		var transactionContext = new Mock<IApplicationTransactionContext>();
 		transactionContext.SetupGet(x => x.UnitOfWork).Returns(unitOfWork.Object);
 		var transactionService = new Mock<IApplicationTransaction>();
-		transactionService.Setup(x => x.WithSettings(It.IsAny<TransactionalAttribute?>())).Returns(transactionService.Object);
+		transactionService.Setup(x => x.WithSettings(It.IsAny<TransactionalAttribute?>()))
+			.Returns(transactionService.Object);
 		transactionService
 			.Setup(x => x.ExecuteAsync(
 				It.IsAny<Func<IApplicationTransactionContext, CancellationToken, Task>>(),

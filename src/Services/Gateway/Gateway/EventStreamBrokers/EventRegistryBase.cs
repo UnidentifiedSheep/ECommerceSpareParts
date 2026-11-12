@@ -10,13 +10,28 @@ public interface IEventRegistry
 
 public abstract class EventRegistryBase : IEventRegistry
 {
-	public FrozenDictionary<Type, FusionEventDescriptor> ByTypeDescriptors { get; private set; } = FrozenDictionary<Type, FusionEventDescriptor>.Empty;
-	public FrozenDictionary<string, FusionEventDescriptor> ByTopicDescriptors { get; private set; } = FrozenDictionary<string, FusionEventDescriptor>.Empty;
+	private readonly Dictionary<string, FusionEventDescriptor> _byTopic = new();
+
+	private readonly Dictionary<Type, FusionEventDescriptor> _byType = new();
 
 	private bool _registrationCompleted;
 
-	private readonly Dictionary<Type, FusionEventDescriptor> _byType = new();
-	private readonly Dictionary<string, FusionEventDescriptor> _byTopic = new();
+	public FrozenDictionary<Type, FusionEventDescriptor> ByTypeDescriptors { get; private set; } =
+		FrozenDictionary<Type, FusionEventDescriptor>.Empty;
+
+	public FrozenDictionary<string, FusionEventDescriptor> ByTopicDescriptors { get; private set; } =
+		FrozenDictionary<string, FusionEventDescriptor>.Empty;
+
+	public FusionEventDescriptor Get<TEvent>()
+		=> ByTypeDescriptors.TryGetValue(typeof(TEvent), out var descriptor)
+			? descriptor
+			: throw new InvalidOperationException(
+				$"Fusion event '{typeof(TEvent).FullName}' is not registered.");
+
+	public FusionEventDescriptor Get(string topic)
+		=> ByTopicDescriptors.TryGetValue(topic, out var descriptor)
+			? descriptor
+			: throw new InvalidOperationException($"Fusion event topic '{topic}' is not registered.");
 
 	protected void CompleteRegistration()
 	{
@@ -38,8 +53,8 @@ public abstract class EventRegistryBase : IEventRegistry
 		var descriptor = new FusionEventDescriptor(
 			topic,
 			typeof(TEvent),
-			Map: value => mapper((TEvent)value),
-			ResolveAudience: value => resolveAudience((TEvent)value));
+			value => mapper((TEvent)value),
+			value => resolveAudience((TEvent)value));
 
 		_byType.Add(typeof(TEvent), descriptor);
 		_byTopic.Add(topic, descriptor);
@@ -50,14 +65,4 @@ public abstract class EventRegistryBase : IEventRegistry
 		if (_registrationCompleted)
 			throw new InvalidOperationException("Event registration has already been completed.");
 	}
-
-	public FusionEventDescriptor Get<TEvent>()
-		=> ByTypeDescriptors.TryGetValue(typeof(TEvent), out var descriptor)
-			? descriptor
-			: throw new InvalidOperationException($"Fusion event '{typeof(TEvent).FullName}' is not registered.");
-
-	public FusionEventDescriptor Get(string topic)
-		=> ByTopicDescriptors.TryGetValue(topic, out var descriptor)
-			? descriptor
-			: throw new InvalidOperationException($"Fusion event topic '{topic}' is not registered.");
 }

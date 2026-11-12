@@ -7,11 +7,9 @@ namespace Attributes;
 public partial class TransactionalAttribute
 {
 	public static TransactionalAttribute RetryOnConflict(int delay, int retryCount)
-	{
-		return new TransactionalAttribute(
+		=> new(
 			IsolationLevel.ReadCommitted,
 			delay,
 			retryCount,
 			TransactionErrorKind.UniqueConstraintViolation);
-	}
 }

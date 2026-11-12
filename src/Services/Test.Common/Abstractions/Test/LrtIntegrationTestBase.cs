@@ -58,9 +58,7 @@ public abstract class
 public sealed record LrtExecutionResult(Job Job)
 {
 	public TState GetState<TState>() where TState : class
-	{
-		return LrtStateSerializer.DeserializeState<TState>(Job.State) ??
+		=> LrtStateSerializer.DeserializeState<TState>(Job.State) ??
 			throw new InvalidOperationException(
 				$"LRT state could not be deserialized as '{typeof(TState).Name}'.");
-	}
 }

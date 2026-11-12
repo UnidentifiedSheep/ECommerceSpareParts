@@ -1,9 +1,9 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Handlers.Auth.UpsertRole;
+using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Auth;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -23,7 +23,7 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var roleInDb = await Context
-			.Set<global::Main.Entities.Auth.Role>()
+			.Set<Role>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Name == r.Name, CancellationToken);
 
@@ -43,7 +43,7 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var roleInDb = await Context
-			.Set<global::Main.Entities.Auth.Role>()
+			.Set<Role>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Name == role.Name, CancellationToken);
 

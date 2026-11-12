@@ -53,12 +53,10 @@ public class SupplierProduct : AuditableEntity<SupplierProduct, int>, ILinqEntit
 		Sku sku,
 		string producer,
 		Supplier supplier)
-	{
-		return new SupplierProduct(
+		=> new(
 			sku,
 			producer,
 			supplier);
-	}
 
 	public void AddName(string name)
 	{

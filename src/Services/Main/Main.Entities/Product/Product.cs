@@ -57,8 +57,6 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 
 	public long Popularity { get; private set; }
 
-	public uint RowVersion { get; private set; }
-
 	public IReadOnlyCollection<ProductCharacteristic> Characteristics => _characteristics;
 
 	public IReadOnlyCollection<ProductEan> Eans => _eans;
@@ -81,18 +79,18 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>,
 
 	public static Expression<Func<Product, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 
+	public uint RowVersion { get; private set; }
+
 	public static Product Create(
 		Sku sku,
 		Name name,
 		int producerId,
 		string? description)
-	{
-		return new Product(
+		=> new(
 			sku,
 			name,
 			producerId,
 			description);
-	}
 
 	public void SetDescription(string? description)
 	{

@@ -5,14 +5,16 @@ namespace Main.Api.GraphQl.Types.Organization;
 
 [GraphQLName("OrganizationFinances")]
 public sealed record GqlOrganizationFinances(
-	[property: GraphQLIgnore] OrganizationFinancialProfileDto? Profile,
-	[property: GraphQLIgnore] IReadOnlyCollection<OrganizationBalanceDto> BalanceDtos)
+	[property: GraphQLIgnore]
+	OrganizationFinancialProfileDto? Profile,
+	[property: GraphQLIgnore]
+	IReadOnlyCollection<OrganizationBalanceDto> BalanceDtos)
 {
 	[GraphQLName("financialProfile")]
 	public GqlOrganizationFinancialProfile? FinancialProfile
-		=> Profile is null ? null : new(Profile);
+		=> Profile is null ? null : new GqlOrganizationFinancialProfile(Profile);
 
 	[GraphQLName("balances")]
-	public IReadOnlyList<GqlOrganizationBalance> Balances =>
-		BalanceDtos.Select(balance => new GqlOrganizationBalance(balance)).ToArray();
+	public IReadOnlyList<GqlOrganizationBalance> Balances
+		=> BalanceDtos.Select(balance => new GqlOrganizationBalance(balance)).ToArray();
 }

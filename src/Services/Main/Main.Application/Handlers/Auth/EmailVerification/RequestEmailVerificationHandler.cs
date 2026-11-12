@@ -1,11 +1,10 @@
-using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Notifications;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
+using Main.Application.Notifications;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
@@ -13,6 +12,7 @@ using Main.Enums.Auth;
 using MediatR;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Auth.EmailVerification;
 
@@ -48,7 +48,8 @@ public class RequestEmailVerificationHandler(
 				VerificationType.EmailVerification,
 				normalizedEmail));
 
-		var verificationUrl = await appLinkProvider.CreateEmailVerificationUrlAsync(signed, cancellationToken);
+		var verificationUrl =
+			await appLinkProvider.CreateEmailVerificationUrlAsync(signed, cancellationToken);
 
 		await notificationService.QueueAsync(
 			request.UserId,

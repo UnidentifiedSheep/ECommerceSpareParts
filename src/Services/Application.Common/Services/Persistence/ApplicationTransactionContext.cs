@@ -13,7 +13,9 @@ public class ApplicationTransactionContext(IServiceProvider services) : IApplica
 	public IDomainEventExecutor DomainEventExecutor => GetRequiredService<IDomainEventExecutor>();
 	public IIntegrationEventScope IntegrationEventScope => GetRequiredService<IIntegrationEventScope>();
 	public IPublishEndpoint Publisher => GetRequiredService<IPublishEndpoint>();
-	public ITransactionExceptionClassifier ExceptionClassifier => GetRequiredService<ITransactionExceptionClassifier>();
+
+	public ITransactionExceptionClassifier ExceptionClassifier
+		=> GetRequiredService<ITransactionExceptionClassifier>();
 
 	public virtual T GetRequiredService<T>() where T : notnull => services.GetRequiredService<T>();
 

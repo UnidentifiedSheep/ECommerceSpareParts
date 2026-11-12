@@ -1,4 +1,4 @@
-﻿﻿using Main.Enums;
+﻿using Main.Enums;
 
 namespace Main.Application.Static;
 
@@ -29,7 +29,6 @@ public static class CacheKeys
 		public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
 
 		public static string NotificationRecipients(Guid userId) => $"user:{userId}:notification:recipients";
-
 	}
 
 	public static class CurrencyCache
@@ -39,12 +38,11 @@ public static class CacheKeys
 		public static string Currency(int currencyId) => $"currency:{currencyId}";
 
 		public static string AllCurrencies() => "currencies";
-
 	}
 
 	public static class OneTimeTokenCache
 	{
-		public static string OneTimeToken(OneTimeTokenPurpose purpose, Guid tokenId) =>
-			$"ont-time-token:{purpose}:{tokenId}";
+		public static string OneTimeToken(OneTimeTokenPurpose purpose, Guid tokenId)
+			=> $"ont-time-token:{purpose}:{tokenId}";
 	}
 }

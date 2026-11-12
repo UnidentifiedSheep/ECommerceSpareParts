@@ -31,15 +31,16 @@ public sealed record GqlPatchProductInput
 	[GraphQLName("pairId")]
 	public GqlPatchField<int?>? PairId { get; init; }
 
-	public PatchProductDto ToDto() => new()
-	{
-		Sku = Sku,
-		Name = Name,
-		ProducerId = ProducerId,
-		Description = Description,
-		PackingUnit = PackingUnit,
-		Indicator = Indicator,
-		GroupId = GroupId,
-		PairId = PairId
-	};
+	public PatchProductDto ToDto()
+		=> new()
+		{
+			Sku = Sku,
+			Name = Name,
+			ProducerId = ProducerId,
+			Description = Description,
+			PackingUnit = PackingUnit,
+			Indicator = Indicator,
+			GroupId = GroupId,
+			PairId = PairId
+		};
 }

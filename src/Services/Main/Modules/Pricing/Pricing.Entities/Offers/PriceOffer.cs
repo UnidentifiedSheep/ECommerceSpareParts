@@ -65,8 +65,7 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
 		int deliveryProbability,
 		DateTime orderTill,
 		DateTime expiresAt)
-	{
-		return new PriceOffer
+		=> new()
 		{
 			Id = Guid.NewGuid(),
 			ProductId = productId,
@@ -85,7 +84,6 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
 			OrderTill = orderTill,
 			ExpiresAt = expiresAt
 		};
-	}
 
 	public static PriceOffer CreateForOurWarehouse(
 		int productId,
@@ -98,8 +96,7 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
 		int quantityCoefficient,
 		int daysToRefund,
 		DateTime occuredAt)
-	{
-		return new PriceOffer
+		=> new()
 		{
 			Id = Guid.NewGuid(),
 			ProductId = productId,
@@ -119,7 +116,6 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
 			SourceOccurredAt = occuredAt,
 			ExpiresAt = DateTime.SpecifyKind(DateTime.MaxValue, DateTimeKind.Utc)
 		};
-	}
 
 	public override Guid GetId() => Id;
 }

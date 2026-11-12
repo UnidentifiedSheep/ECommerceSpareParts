@@ -11,10 +11,7 @@ namespace Main.Application.Products.Queries;
 public record GetProductsPairsQuery : IQuery<GetProductsPairsResult>
 {
 
-	public GetProductsPairsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToList();
-	}
+	public GetProductsPairsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToList();
 
 	public GetProductsPairsQuery(int id) : this([id])
 	{

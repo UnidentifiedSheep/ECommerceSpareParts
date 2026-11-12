@@ -5,5 +5,6 @@ public static class ReadOnlyListExtensions
 	public static IReadOnlyList<T> ReplaceAt<T>(
 		this IReadOnlyList<T> source,
 		int index,
-		Func<T, T> replace) => source.Select((x, i) => i == index ? replace(x) : x).ToList();
+		Func<T, T> replace)
+		=> source.Select((x, i) => i == index ? replace(x) : x).ToList();
 }

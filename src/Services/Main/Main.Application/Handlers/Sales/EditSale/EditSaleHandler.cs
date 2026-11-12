@@ -85,14 +85,12 @@ public class EditSaleHandler(
 	}
 
 	private async Task ReverseSaleTransaction(Sale sale, CancellationToken cancellationToken)
-	{
-		await sender.Send(
+		=> await sender.Send(
 			new ReverseTransactionCommand(
 				sale.TransactionId,
 				TransactionReversalMode.System,
 				true),
 			cancellationToken);
-	}
 
 	private async Task<Transaction> CreateSaleTransaction(
 		Guid organizationId,
@@ -101,8 +99,7 @@ public class EditSaleHandler(
 		DateTime transactionDateTime,
 		bool forcePayment,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(
+		=> (await sender.Send(
 			new CreateTransactionCommand(
 				systemOptions.Value.SystemId,
 				organizationId,
@@ -113,7 +110,6 @@ public class EditSaleHandler(
 				TransactionCreationMode.System,
 				forcePayment),
 			cancellationToken)).Transaction;
-	}
 
 	private async Task UpdateContents(
 		Sale sale,
@@ -174,5 +170,4 @@ public class EditSaleHandler(
 		sale.RemoveContent(content);
 		unitOfWork.Remove(content);
 	}
-
 }

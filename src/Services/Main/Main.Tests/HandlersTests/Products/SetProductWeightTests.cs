@@ -1,6 +1,7 @@
 using Enums.Units;
 using FluentAssertions;
 using Main.Application.Products.Commands.SetProductWeight;
+using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -12,9 +13,7 @@ namespace Tests.HandlersTests.Products;
 public class SetProductWeightTests : IntegrationTest
 {
 	public SetProductWeightTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -30,7 +29,7 @@ public class SetProductWeightTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var weight = await Context
-			.Set<global::Main.Entities.Product.ProductWeight>()
+			.Set<ProductWeight>()
 			.AsNoTracking()
 			.SingleAsync(x => x.ProductId == product.Id, CancellationToken);
 
@@ -56,7 +55,7 @@ public class SetProductWeightTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var weights = await Context
-			.Set<global::Main.Entities.Product.ProductWeight>()
+			.Set<ProductWeight>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == product.Id)
 			.ToListAsync(CancellationToken);

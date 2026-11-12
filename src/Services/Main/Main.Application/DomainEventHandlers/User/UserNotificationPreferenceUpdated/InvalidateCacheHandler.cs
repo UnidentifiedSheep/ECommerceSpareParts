@@ -10,6 +10,6 @@ public class InvalidateCacheHandler(IRecipientProvider recipientProvider)
 {
 	public override Task Handle(
 		Batch<UserNotificationPreferenceUpdatedDomainEvent> notification,
-		CancellationToken cancellationToken) =>
-		recipientProvider.InvalidateUsersRecipients(notification.Items.Select(item => item.UserId));
+		CancellationToken cancellationToken)
+		=> recipientProvider.InvalidateUsersRecipients(notification.Items.Select(item => item.UserId));
 }

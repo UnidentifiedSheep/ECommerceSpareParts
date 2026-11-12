@@ -99,14 +99,16 @@ public class CreatePurchaseHandler(
 		CancellationToken cancellationToken)
 	{
 		var command = new AddContentCommand(
-			request.PurchaseContent.Select(x => new NewStorageContentDto
-			{
-				BuyPrice = x.Price,
-				Count = x.Count,
-				CurrencyId = request.CurrencyId,
-				PurchaseDate = request.PurchaseDate,
-				ProductId = x.ProductId
-			}).ToArray(),
+			request.PurchaseContent
+				.Select(x => new NewStorageContentDto
+				{
+					BuyPrice = x.Price,
+					Count = x.Count,
+					CurrencyId = request.CurrencyId,
+					PurchaseDate = request.PurchaseDate,
+					ProductId = x.ProductId
+				})
+				.ToArray(),
 			request.StorageCode,
 			StorageMovementType.Purchase);
 

@@ -21,8 +21,8 @@ public static class ServiceProvider
 	public static IServiceCollection AddProjectJsonSerialization(this IServiceCollection collection)
 	{
 		collection.TryAddSingleton<ProjectJsonOptions>();
-		collection.TryAddSingleton<JsonSerializerOptions>(
-			sp => sp.GetRequiredService<ProjectJsonOptions>().SerializerOptions);
+		collection.TryAddSingleton<JsonSerializerOptions>(sp
+			=> sp.GetRequiredService<ProjectJsonOptions>().SerializerOptions);
 
 		return collection;
 	}
@@ -101,12 +101,10 @@ public static class ServiceProvider
 	}
 
 	public static IServiceCollection AddLrtHostedServices(this IServiceCollection serviceCollection)
-	{
-		return serviceCollection
+		=> serviceCollection
 			.AddHostedService<LrtExecutorHostedService>()
 			.AddHostedService<ScheduledJobEnqueuerHostedService>()
 			.AddHostedService<ExpiredJobsWiperHostedService>();
-	}
 
 	public static IServiceCollection AddScheduledJobEnqueuerOptions(this IServiceCollection collection)
 	{

@@ -1,5 +1,4 @@
 using GraphQL.Common.Extensions;
-using HotChocolate.Types;
 using Pricing.Api.GraphQl.Mutations;
 using Pricing.Api.GraphQl.Queries.Root;
 

@@ -25,8 +25,9 @@ public class RolePermission : Entity<RolePermission, (string, string)>,
 
 	public Permission Permission { get; set; } = null!;
 
-	public static Expression<Func<RolePermission, (string, string)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.RoleName, x.PermissionName);
+	public static Expression<Func<RolePermission, (string, string)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.RoleName, x.PermissionName);
 
 	public static Expression<Func<RolePermission, bool>> GetEqualityExpression((string, string) key)
 	{
@@ -34,8 +35,8 @@ public class RolePermission : Entity<RolePermission, (string, string)>,
 		return x => x.RoleName == normalized && x.PermissionName == key.Item2;
 	}
 
-	public static RolePermission Create(string roleName, string permissionName) =>
-		new(roleName, permissionName);
+	public static RolePermission Create(string roleName, string permissionName)
+		=> new(roleName, permissionName);
 
 	public override (string, string) GetId() => (RoleName, PermissionName);
 }

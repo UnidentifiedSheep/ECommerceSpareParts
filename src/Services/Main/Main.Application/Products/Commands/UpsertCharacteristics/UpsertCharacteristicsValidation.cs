@@ -11,7 +11,8 @@ public class UpsertCharacteristicsValidation : AbstractValidator<UpsertCharacter
 		RuleFor(x => x.Characteristics)
 			.Cascade(CascadeMode.Stop)
 			.NotNull()
-			.Must(items => items.Select(x => (x.ProductId, x.CharacteristicId)).Distinct().Count() == items.Count)
+			.Must(items => items.Select(x => (x.ProductId, x.CharacteristicId)).Distinct().Count() ==
+				items.Count)
 			.WithMessage("Each product and characteristic pair must occur only once.");
 
 		RuleForEach(x => x.Characteristics)

@@ -22,12 +22,13 @@ public sealed record GqlNewSaleContentInput
 	public string? Comment { get; init; }
 
 	[GraphQLIgnore]
-	public NewSaleContentDto ToDto() => new()
-	{
-		ProductId = ProductId,
-		Count = Count,
-		OriginalPrice = Price,
-		DiscountedPrice = PriceWithDiscount,
-		Comment = Comment
-	};
+	public NewSaleContentDto ToDto()
+		=> new()
+		{
+			ProductId = ProductId,
+			Count = Count,
+			OriginalPrice = Price,
+			DiscountedPrice = PriceWithDiscount,
+			Comment = Comment
+		};
 }

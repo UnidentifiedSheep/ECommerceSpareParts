@@ -6,7 +6,8 @@ using SchemaGeneration.Abstractions.Enums;
 
 namespace Main.Application.Lrts.CharacteristicImport;
 
-public record CharacteristicImportState : CharacteristicImportInputState, ICsvImportState<CharacteristicImportState>
+public record CharacteristicImportState : CharacteristicImportInputState,
+	ICsvImportState<CharacteristicImportState>
 {
 	[JsonPropertyName("errors")]
 	public List<CsvImportError> Errors { get; init; } = [];
@@ -14,10 +15,11 @@ public record CharacteristicImportState : CharacteristicImportInputState, ICsvIm
 	[JsonPropertyName("checkpoint")]
 	public CsvImportCheckpoint? Checkpoint { get; init; }
 
-	public CharacteristicImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
-	{
-		Checkpoint = checkpoint
-	};
+	public CharacteristicImportState WithCheckpoint(CsvImportCheckpoint checkpoint)
+		=> this with
+		{
+			Checkpoint = checkpoint
+		};
 }
 
 [CsvSchema(typeof(CharacteristicImportLrt.CharacteristicCsvDto))]
@@ -34,6 +36,7 @@ public record CharacteristicImportInputState : IInputState, ICsvImportInputState
 	public void ValidateState()
 	{
 		if (!FileName.EndsWith(".csv", StringComparison.InvariantCulture))
-			throw new InvalidOperationException("Characteristic import state error. File name should end with .csv");
+			throw new InvalidOperationException(
+				"Characteristic import state error. File name should end with .csv");
 	}
 }

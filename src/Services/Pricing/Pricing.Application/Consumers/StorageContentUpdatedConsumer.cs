@@ -21,10 +21,8 @@ public class StorageContentUpdatedDefinition : ConsumerDefinition<StorageContent
 		IReceiveEndpointConfigurator endpointConfigurator,
 		IConsumerConfigurator<StorageContentUpdatedConsumer> consumerConfigurator,
 		IRegistrationContext context)
-	{
-		consumerConfigurator.Options<BatchOptions>(options => options
+		=> consumerConfigurator.Options<BatchOptions>(options => options
 			.SetMessageLimit(100)
 			.SetTimeLimit(TimeSpan.FromSeconds(1))
 			.SetConcurrencyLimit(1));
-	}
 }

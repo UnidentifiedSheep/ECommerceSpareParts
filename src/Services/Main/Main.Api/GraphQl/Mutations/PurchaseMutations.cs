@@ -1,11 +1,10 @@
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
-using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Purchase;
 using Main.Api.GraphQl.Types.Purchase;
-using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
+using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.Purchases.EditPurchase;
 using MediatR;
 

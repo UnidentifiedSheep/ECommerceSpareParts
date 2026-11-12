@@ -15,13 +15,11 @@ public abstract class MainSupplierSettingProvider<TSetting>(
 {
 	public async Task<MainSupplierSettingResult<TSetting>> GetAsync(
 		CancellationToken cancellationToken = default)
-	{
-		return await cache.GetOrSetAsync(
+		=> await cache.GetOrSetAsync(
 			cacheKey,
 			LoadAsync,
 			new FusionCacheEntryOptions(CacheKeys.SettingsCache.Ttl),
 			cancellationToken);
-	}
 
 	private async Task<MainSupplierSettingResult<TSetting>> LoadAsync(CancellationToken cancellationToken)
 	{
@@ -37,7 +35,7 @@ public abstract class MainSupplierSettingProvider<TSetting>(
 
 		try
 		{
-			var setting = System.Text.Json.JsonSerializer.Deserialize<TSetting>(response.ValueOrThrow);
+			var setting = JsonSerializer.Deserialize<TSetting>(response.ValueOrThrow);
 
 			return setting is null
 				? MainSupplierSettingResult<TSetting>.Failure(
@@ -66,10 +64,8 @@ public sealed record MainSupplierSettingResult<TSetting>(
 	public static MainSupplierSettingResult<TSetting> Failure(
 		SupplierUnavailableReason reason,
 		string message)
-	{
-		return new MainSupplierSettingResult<TSetting>(
+		=> new(
 			default,
 			reason,
 			message);
-	}
 }

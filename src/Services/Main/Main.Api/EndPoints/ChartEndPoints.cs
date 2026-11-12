@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Main.Application.Analytics.Dtos.Charts;
-using Main.Application.Analytics.Queries;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
+using Main.Application.Analytics.Dtos.Charts;
+using Main.Application.Analytics.Queries;
 using MediatR;
 
 namespace Main.Api.EndPoints;

@@ -1,7 +1,6 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using Domain.CommonEntities.Job;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Application.Handlers.PriceApplier.DeletePriceApplier;
@@ -12,6 +11,7 @@ using Pricing.Entities.Exceptions;
 using Pricing.Entities.Pricing;
 using Pricing.Enums;
 using Pricing.Integration.Tests.DataBuilders.PriceAppliers;
+using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 
@@ -87,16 +87,18 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 
 		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.not.found");
 	}
-
-
 }
 
-public class DeletePriceApplierValidationTests : ValidationTest<DeletePriceApplierValidation, DeletePriceApplierCommand>
+public class
+	DeletePriceApplierValidationTests : ValidationTest<DeletePriceApplierValidation,
+	DeletePriceApplierCommand>
 {
 	[Fact]
 	public async Task WithEmptySystemName_FailsValidation()
 	{
 		var result = await ValidateAsync(new DeletePriceApplierCommand(""));
-		result.ShouldHaveValidationErrorFor(x => x.SystemName).WithErrorCode("price.applier.system.name.required").Only();
+		result.ShouldHaveValidationErrorFor(x => x.SystemName)
+			.WithErrorCode("price.applier.system.name.required")
+			.Only();
 	}
 }

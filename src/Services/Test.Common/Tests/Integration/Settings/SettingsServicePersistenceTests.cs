@@ -17,8 +17,8 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 {
 	private ISettingsService SettingsService => Scope.ServiceProvider.GetRequiredService<ISettingsService>();
 
-	private ISettingsContainer SettingsContainer =>
-		Scope.ServiceProvider.GetRequiredService<ISettingsContainer>();
+	private ISettingsContainer SettingsContainer
+		=> Scope.ServiceProvider.GetRequiredService<ISettingsContainer>();
 
 	private MessageBrokerStub MessageBroker => Scope.ServiceProvider.GetRequiredService<MessageBrokerStub>();
 
@@ -120,9 +120,11 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		SettingsContainer.Set(stale);
 		var replacement = new TestSettingBuilder(Faker).WithValue(20).Build();
 		await Context.Set<TestSetting>()
-			.ExecuteUpdateAsync(update => update.SetProperty(x => x.Json, replacement.Json), CancellationToken);
+			.ExecuteUpdateAsync(
+				update => update.SetProperty(x => x.Json, replacement.Json),
+				CancellationToken);
 
-		var result = await SettingsService.GetOrDefault<TestSetting>(directRead: true, CancellationToken);
+		var result = await SettingsService.GetOrDefault<TestSetting>(true, CancellationToken);
 
 		result.Data.Value.Should().Be(20);
 		result.Should().NotBeSameAs(stale);
@@ -137,7 +139,7 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		var cached = new TestSettingBuilder(Faker).WithValue(30).Build();
 		SettingsContainer.Set(cached);
 
-		var result = await SettingsService.GetOrDefault<TestSetting>(directRead: true, CancellationToken);
+		var result = await SettingsService.GetOrDefault<TestSetting>(true, CancellationToken);
 
 		result.Data.Should().Be(TestSetting.Default.Data);
 		SettingsContainer.Get<TestSetting>().Should().BeSameAs(cached);
@@ -148,7 +150,7 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 	[Fact]
 	public async Task GetOrDefault_DirectRead_MissingSetting_ReturnsDefaultWithoutSavingOrCaching()
 	{
-		var result = await SettingsService.GetOrDefault<TestSetting>(directRead: true, CancellationToken);
+		var result = await SettingsService.GetOrDefault<TestSetting>(true, CancellationToken);
 
 		result.Data.Should().Be(TestSetting.Default.Data);
 		SettingsContainer.TryGet<TestSetting>(out _).Should().BeFalse();

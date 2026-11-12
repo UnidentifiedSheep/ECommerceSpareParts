@@ -22,7 +22,8 @@ public class ResetPayloadProvider(IOneTimeTokenStore oneTimeTokenStore) : IReset
 		return payload;
 	}
 
-	public Task<bool> IsTokenValid(Guid tokenId) => oneTimeTokenStore.ConsumeAsync(
-		OneTimeTokenPurpose.Reset,
-		tokenId);
+	public Task<bool> IsTokenValid(Guid tokenId)
+		=> oneTimeTokenStore.ConsumeAsync(
+			OneTimeTokenPurpose.Reset,
+			tokenId);
 }

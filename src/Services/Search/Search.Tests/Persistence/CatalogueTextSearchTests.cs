@@ -12,6 +12,10 @@ namespace Search.Tests.Persistence;
 
 public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : IntegrationTest(fixture)
 {
+
+	private const string ExhaustBellowsName =
+		"Гофра глушителя D:121 L:1000 о.н MAN  81152100033 / Dinex 94120 (материал - цинк)";
+
 	[Theory]
 	[InlineData("bosch", true)]
 	[InlineData("bosch", false)]
@@ -19,19 +23,26 @@ public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : I
 	[InlineData("ab12", false)]
 	public async Task TextSearch_WithCurrentMapping_ReturnsProduct(string query, bool highlights)
 	{
-		await Products.ApplyUpdates([new ProductCoreUpdate
-		{
-			ProductId = 123, UpdatedAt = DateTime.UtcNow,
-			Sku = "AB-12345", NormalizedSku = "ab12345", Name = "Bosch oil filter", ProducerId = 1,
-			ReadinessStatus = ProductReadinessStatus.Ready
-		}], CancellationToken);
+		await Products.ApplyUpdates(
+			[
+				new ProductCoreUpdate
+				{
+					ProductId = 123, UpdatedAt = DateTime.UtcNow,
+					Sku = "AB-12345", NormalizedSku = "ab12345", Name = "Bosch oil filter", ProducerId = 1,
+					ReadinessStatus = ProductReadinessStatus.Ready
+				}
+			],
+			CancellationToken);
 		await RefreshAsync();
 
-		var result = await Products.Search(new CatalogueSearchCriteria
-		{
-			Query = query, SkuModes = CatalogueSearchDefaults.SkuModes, NameModes = CatalogueSearchDefaults.NameModes,
-			Pagination = new Pagination(0, 20), IncludeHighlights = highlights
-		}, CancellationToken);
+		var result = await Products.Search(
+			new CatalogueSearchCriteria
+			{
+				Query = query, SkuModes = CatalogueSearchDefaults.SkuModes,
+				NameModes = CatalogueSearchDefaults.NameModes,
+				Pagination = new Pagination(0, 20), IncludeHighlights = highlights
+			},
+			CancellationToken);
 
 		result.Hits.Should().ContainSingle().Which.Document.Id.Should().Be(123);
 		if (highlights && query == "bosch")
@@ -39,9 +50,6 @@ public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : I
 		if (!highlights)
 			result.Hits.Single().Highlights.Should().BeEmpty();
 	}
-
-	private const string ExhaustBellowsName =
-		"Гофра глушителя D:121 L:1000 о.н MAN  81152100033 / Dinex 94120 (материал - цинк)";
 
 	[Theory]
 	[InlineData("гофра 121")]
@@ -85,8 +93,11 @@ public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : I
 	[Fact]
 	public async Task NameAnalyzer_SeparatesDiameterNumberFromLabel()
 	{
-		var result = await Client.Indices.AnalyzeAsync(request => request.Index(Indexes.Products)
-			.Field("name").Text(ExhaustBellowsName), CancellationToken);
+		var result = await Client.Indices.AnalyzeAsync(
+			request => request.Index(Indexes.Products)
+				.Field("name")
+				.Text(ExhaustBellowsName),
+			CancellationToken);
 
 		result.IsValid.Should().BeTrue(result.DebugInformation);
 		result.Tokens.Select(token => token.Token).Should().Contain(["гофра", "121", "1000"]);
@@ -99,23 +110,25 @@ public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : I
 	{
 		var repository = Scope.ServiceProvider.GetRequiredService<ICatalogueCandidateRepository>();
 		var candidateId = Guid.NewGuid();
-		await repository.UpsertMany([
-			new CatalogueCandidate
-			{
-				Id = candidateId, Sku = "EXH-A", NormalizedSku = "exha", ProducerId = 1,
-				MappedProductId = null, Names = [ExhaustBellowsName, "Компенсатор выхлопной"]
-			},
-			new CatalogueCandidate
-			{
-				Id = Guid.NewGuid(), Sku = "EXH-B", NormalizedSku = "exhb", ProducerId = 1,
-				MappedProductId = null, Names = ["Гофра D:110 L:1000"]
-			},
-			new CatalogueCandidate
-			{
-				Id = Guid.NewGuid(), Sku = "EXH-C", NormalizedSku = "exhc", ProducerId = 1,
-				MappedProductId = null, Names = ["Труба D:121 L:1000"]
-			}
-		], CancellationToken);
+		await repository.UpsertMany(
+			[
+				new CatalogueCandidate
+				{
+					Id = candidateId, Sku = "EXH-A", NormalizedSku = "exha", ProducerId = 1,
+					MappedProductId = null, Names = [ExhaustBellowsName, "Компенсатор выхлопной"]
+				},
+				new CatalogueCandidate
+				{
+					Id = Guid.NewGuid(), Sku = "EXH-B", NormalizedSku = "exhb", ProducerId = 1,
+					MappedProductId = null, Names = ["Гофра D:110 L:1000"]
+				},
+				new CatalogueCandidate
+				{
+					Id = Guid.NewGuid(), Sku = "EXH-C", NormalizedSku = "exhc", ProducerId = 1,
+					MappedProductId = null, Names = ["Труба D:121 L:1000"]
+				}
+			],
+			CancellationToken);
 		await RefreshAsync();
 
 		var result = await repository.Search(NameContainsCriteria(query), CancellationToken);
@@ -127,30 +140,35 @@ public sealed class CatalogueTextSearchTests(SearchContainerFixture fixture) : I
 	private async Task SeedExhaustProductsAsync()
 	{
 		var now = DateTime.UtcNow;
-		await Products.ApplyUpdates([
-			new ProductCoreUpdate
-			{
-				ProductId = 123, UpdatedAt = now, Sku = "EXH-A", NormalizedSku = "exha",
-				Name = ExhaustBellowsName, ProducerId = 1, ReadinessStatus = ProductReadinessStatus.Ready
-			},
-			new ProductCoreUpdate
-			{
-				ProductId = 124, UpdatedAt = now, Sku = "EXH-B", NormalizedSku = "exhb",
-				Name = "Гофра D:110 L:1000", ProducerId = 1, ReadinessStatus = ProductReadinessStatus.Ready
-			},
-			new ProductCoreUpdate
-			{
-				ProductId = 125, UpdatedAt = now, Sku = "EXH-C", NormalizedSku = "exhc",
-				Name = "Труба D:121 L:1000", ProducerId = 1, ReadinessStatus = ProductReadinessStatus.Ready
-			}
-		], CancellationToken);
+		await Products.ApplyUpdates(
+			[
+				new ProductCoreUpdate
+				{
+					ProductId = 123, UpdatedAt = now, Sku = "EXH-A", NormalizedSku = "exha",
+					Name = ExhaustBellowsName, ProducerId = 1, ReadinessStatus = ProductReadinessStatus.Ready
+				},
+				new ProductCoreUpdate
+				{
+					ProductId = 124, UpdatedAt = now, Sku = "EXH-B", NormalizedSku = "exhb",
+					Name = "Гофра D:110 L:1000", ProducerId = 1,
+					ReadinessStatus = ProductReadinessStatus.Ready
+				},
+				new ProductCoreUpdate
+				{
+					ProductId = 125, UpdatedAt = now, Sku = "EXH-C", NormalizedSku = "exhc",
+					Name = "Труба D:121 L:1000", ProducerId = 1,
+					ReadinessStatus = ProductReadinessStatus.Ready
+				}
+			],
+			CancellationToken);
 		await RefreshAsync();
 	}
 
-	private static CatalogueSearchCriteria NameContainsCriteria(string query) => new()
-	{
-		Query = query, SkuModes = new HashSet<SearchMatchType>(), NameModes = new HashSet<SearchMatchType> { SearchMatchType.Contains },
-		Pagination = new Pagination(0, 20)
-	};
-
+	private static CatalogueSearchCriteria NameContainsCriteria(string query)
+		=> new()
+		{
+			Query = query, SkuModes = new HashSet<SearchMatchType>(),
+			NameModes = new HashSet<SearchMatchType> { SearchMatchType.Contains },
+			Pagination = new Pagination(0, 20)
+		};
 }

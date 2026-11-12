@@ -6,11 +6,16 @@ using Main.Enums;
 namespace Main.Entities.Storage;
 
 public class StorageContentLock : AuditableEntity<StorageContentLock, Guid>,
-	ILinqEntity<StorageContentLock, Guid>, IVersionable<uint>
+	ILinqEntity<StorageContentLock, Guid>,
+	IVersionable<uint>
 {
 	private StorageContentLock() { }
 
-	private StorageContentLock(Guid id, int storageContentId, int quantity, DateTime? expiresAt)
+	private StorageContentLock(
+		Guid id,
+		int storageContentId,
+		int quantity,
+		DateTime? expiresAt)
 	{
 		if (id == Guid.Empty)
 			throw new InvalidOperationException("Lock ID must not be empty.");
@@ -31,18 +36,29 @@ public class StorageContentLock : AuditableEntity<StorageContentLock, Guid>,
 		ExpiresAt = expiresAt;
 	}
 
-	public Guid Id { get; private set; }
+	public Guid Id { get; }
 	public int StorageContentId { get; private set; }
 	public int Quantity { get; private set; }
 	public StorageContentLockState State { get; private set; }
-	public DateTime? ExpiresAt { get; private set; }
+	public DateTime? ExpiresAt { get; }
 	public DateTime? ClosedAt { get; private set; }
-	public uint RowVersion { get; private set; }
 	public StorageContent StorageContent { get; private set; } = null!;
 
+	public static Expression<Func<StorageContentLock, Guid>> GetKeySelector() => value => value.Id;
+	public static Expression<Func<StorageContentLock, bool>> GetEqualityExpression(Guid key)
+		=> value => value.Id == key;
+	public uint RowVersion { get; private set; }
+
 	public static StorageContentLock Create(
-		int storageContentId, int quantity, DateTime? expiresAt = null, Guid? id = null) =>
-		new(id ?? Guid.NewGuid(), storageContentId, quantity, expiresAt);
+		int storageContentId,
+		int quantity,
+		DateTime? expiresAt = null,
+		Guid? id = null)
+		=> new(
+			id ?? Guid.NewGuid(),
+			storageContentId,
+			quantity,
+			expiresAt);
 
 	public bool IsActiveAt(DateTime utcNow)
 	{
@@ -100,8 +116,5 @@ public class StorageContentLock : AuditableEntity<StorageContentLock, Guid>,
 		if (value.Kind != DateTimeKind.Utc)
 			throw new InvalidOperationException("Lock timestamps must be UTC.");
 	}
-
-	public static Expression<Func<StorageContentLock, Guid>> GetKeySelector() => value => value.Id;
-	public static Expression<Func<StorageContentLock, bool>> GetEqualityExpression(Guid key) => value => value.Id == key;
 	public override Guid GetId() => Id;
 }

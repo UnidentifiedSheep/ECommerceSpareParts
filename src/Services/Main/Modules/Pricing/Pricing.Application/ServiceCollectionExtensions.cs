@@ -8,7 +8,5 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddPricingApplication(
 		this IServiceCollection services,
 		IConfiguration configuration)
-	{
-		return services;
-	}
+		=> services;
 }

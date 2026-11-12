@@ -27,5 +27,6 @@ public class FusionCacheBackplaneStub : IFusionCacheBackplane
 	public ValueTask PublishAsync(
 		BackplaneMessage message,
 		FusionCacheEntryOptions options,
-		CancellationToken token = default) => ValueTask.CompletedTask;
+		CancellationToken token = default)
+		=> ValueTask.CompletedTask;
 }

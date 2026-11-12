@@ -5,7 +5,8 @@ using Pricing.Enums;
 namespace Pricing.Api.GraphQl.Types;
 
 [GraphQLName("PriceOffer")]
-public sealed record GqlPriceOffer([property: GraphQLIgnore] PriceOfferDto Dto)
+public sealed record GqlPriceOffer([property: GraphQLIgnore]
+	PriceOfferDto Dto)
 {
 	[GraphQLName("id")]
 	public Guid Id => Dto.Id;

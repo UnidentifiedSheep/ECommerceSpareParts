@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Enums;
+using FluentAssertions;
 using Main.Application.Orders.Queries;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
@@ -14,9 +14,7 @@ namespace Tests.HandlersTests.Orders;
 public sealed class GetOrderItemsByOrderIdsTests : IntegrationTest
 {
 	public GetOrderItemsByOrderIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<OrderTestContext>();
-	}
+		=> RegisterBasicContext<OrderTestContext>();
 
 	private OrderTestContext TestContext => GetContext<OrderTestContext>();
 
@@ -30,8 +28,14 @@ public sealed class GetOrderItemsByOrderIdsTests : IntegrationTest
 			new GetOrderItemsByOrderIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]));
 
 		result.Items.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
-		result.Items[first.Id].Select(item => item.Id).Should().Equal(first.Items.Select(item => item.Id).Order());
-		result.Items[second.Id].Select(item => item.Id).Should().Equal(second.Items.Select(item => item.Id).Order());
+		result.Items[first.Id]
+			.Select(item => item.Id)
+			.Should()
+			.Equal(first.Items.Select(item => item.Id).Order());
+		result.Items[second.Id]
+			.Select(item => item.Id)
+			.Should()
+			.Equal(second.Items.Select(item => item.Id).Order());
 	}
 
 	[Fact]
@@ -42,7 +46,10 @@ public sealed class GetOrderItemsByOrderIdsTests : IntegrationTest
 		var result = await Send(new GetOrderItemsByOrderIdsQuery(order.Id));
 
 		result.Items.Keys.Should().Equal(order.Id);
-		result.Items[order.Id].Select(item => item.Id).Should().Equal(order.Items.Select(item => item.Id).Order());
+		result.Items[order.Id]
+			.Select(item => item.Id)
+			.Should()
+			.Equal(order.Items.Select(item => item.Id).Order());
 	}
 
 	[Fact]
@@ -88,8 +95,11 @@ public sealed class GetOrderItemsByOrderIdsTests : IntegrationTest
 	[Fact]
 	public async Task OwnPermission_ExcludesOtherUsersAndUnassignedOrders()
 	{
-		var result = await Send(new GetOrderItemsByOrderIdsQuery([
-			TestContext.OnlineOrder.Id, TestContext.ManualOrder.Id, TestContext.ConfirmedOrder.Id]),
+		var result = await Send(
+			new GetOrderItemsByOrderIdsQuery(
+			[
+				TestContext.OnlineOrder.Id, TestContext.ManualOrder.Id, TestContext.ConfirmedOrder.Id
+			]),
 			PermissionCodes.ORDERS_GET_OWN);
 
 		result.Items.Keys.Should().Equal(TestContext.OnlineOrder.Id);
@@ -98,7 +108,9 @@ public sealed class GetOrderItemsByOrderIdsTests : IntegrationTest
 	[Fact]
 	public async Task OwnPermission_OtherUsersOrderReturnsEmptyResult()
 	{
-		var result = await Send(new GetOrderItemsByOrderIdsQuery(TestContext.ConfirmedOrder.Id), PermissionCodes.ORDERS_GET_OWN);
+		var result = await Send(
+			new GetOrderItemsByOrderIdsQuery(TestContext.ConfirmedOrder.Id),
+			PermissionCodes.ORDERS_GET_OWN);
 
 		result.Items.Should().BeEmpty();
 	}
@@ -112,10 +124,13 @@ public sealed class GetOrderItemsByOrderIdsTests : IntegrationTest
 		user.SetIsAuthenticated(authenticated);
 
 		await Assert.ThrowsAsync<OrderReadAccessDeniedException>(() => Send(
-			new GetOrderItemsByOrderIdsQuery(TestContext.OnlineOrder.Id), authenticated ? null : PermissionCodes.ORDERS_GET));
+			new GetOrderItemsByOrderIdsQuery(TestContext.OnlineOrder.Id),
+			authenticated ? null : PermissionCodes.ORDERS_GET));
 	}
 
-	private Task<GetOrderItemsByOrderIdsResult> Send(GetOrderItemsByOrderIdsQuery query, PermissionCodes? permission = PermissionCodes.ORDERS_GET)
+	private Task<GetOrderItemsByOrderIdsResult> Send(
+		GetOrderItemsByOrderIdsQuery query,
+		PermissionCodes? permission = PermissionCodes.ORDERS_GET)
 	{
 		if (permission.HasValue)
 			((UserContextMock)Scope.ServiceProvider.GetRequiredService<IUserContext>())

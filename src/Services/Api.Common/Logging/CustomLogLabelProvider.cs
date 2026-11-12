@@ -14,6 +14,6 @@ public class CustomLogLabelProvider(IList<LokiLabel> lokiLabels) : ILogLabelProv
 
 	public IList<string> PropertiesToAppend { get; } = new List<string>();
 
-	public LokiFormatterStrategy FormatterStrategy =>
-		LokiFormatterStrategy.SpecificPropertiesAsLabelsOrAppended;
+	public LokiFormatterStrategy FormatterStrategy
+		=> LokiFormatterStrategy.SpecificPropertiesAsLabelsOrAppended;
 }

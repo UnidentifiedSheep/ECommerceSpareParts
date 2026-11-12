@@ -129,8 +129,7 @@ public class PriceApplierService(
 		ApplierNamedObjectBase local,
 		PriceOfferSourceType usage,
 		bool enabled)
-	{
-		return new PriceApplierDto
+		=> new()
 		{
 			SystemName = local.SystemName,
 			Name = local.GetLocalizedName(localizer),
@@ -145,30 +144,25 @@ public class PriceApplierService(
 					enabled)
 			]
 		};
-	}
 
 	private static PriceApplierStateDto CreateState(
 		string systemName,
 		PriceOfferSourceType usage,
 		int order,
 		bool enabled)
-	{
-		return new PriceApplierStateDto
+		=> new()
 		{
 			PriceApplierSystemName = systemName,
 			Usage = usage,
 			Order = order,
 			Enabled = enabled
 		};
-	}
 
 	private static bool SupportsUsage(ApplierNamedObjectBase local, PriceOfferSourceType usage)
-	{
-		return usage switch
+		=> usage switch
 		{
 			PriceOfferSourceType.OurWarehouse => local is IInternalPriceApplier,
 			PriceOfferSourceType.Supplier => local is ISupplierPriceApplier,
 			_ => false
 		};
-	}
 }

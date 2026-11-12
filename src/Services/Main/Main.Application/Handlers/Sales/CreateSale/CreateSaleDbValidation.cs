@@ -7,13 +7,11 @@ namespace Main.Application.Handlers.Sales.CreateSale;
 public class CreateSaleDbValidation : AbstractDbValidation<CreateSaleCommand>
 {
 	public override void Build(IValidationPlan plan, CreateSaleCommand request)
-	{
-		plan
+		=> plan
 			.ValidateCurrencyExistsId(request.CurrencyId)
 			.ValidateProductExistsId(request.Contents.Select(content => content.ProductId))
 			.ValidateUserExistsId(request.UserId)
 			.ValidateOrganizationExistsId(request.OrganizationId)
 			.ValidateOrganizationMemberExistsPK((request.OrganizationId, request.UserId))
 			.ValidateStorageExistsCode(request.StorageCode);
-	}
 }

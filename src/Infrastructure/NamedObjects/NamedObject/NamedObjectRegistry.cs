@@ -8,18 +8,14 @@ internal class NamedObjectRegistry<TBaseObject> : INamedObjectRegistry<TBaseObje
 	private readonly IReadOnlyDictionary<string, TBaseObject> _objects;
 
 	public NamedObjectRegistry(IEnumerable<TBaseObject> objects)
-	{
-		_objects = objects.ToDictionary(x => x.SystemName, StringComparer.OrdinalIgnoreCase);
-	}
+		=> _objects = objects.ToDictionary(x => x.SystemName, StringComparer.OrdinalIgnoreCase);
 
 	public IReadOnlyCollection<TBaseObject> All => _objects.Values.ToList();
 
 	public TBaseObject GetBySystemName(string systemName)
-	{
-		return !_objects.TryGetValue(systemName, out var obj)
+		=> !_objects.TryGetValue(systemName, out var obj)
 			? throw new KeyNotFoundException($"Named object '{systemName}' not found")
 			: obj;
-	}
 
 	public TBaseObject? TryGetBySystemName(string systemName)
 	{
@@ -27,8 +23,8 @@ internal class NamedObjectRegistry<TBaseObject> : INamedObjectRegistry<TBaseObje
 		return obj;
 	}
 
-	INamedObject? INamedObjectRegistry.TryGetBySystemName(string systemName) =>
-		TryGetBySystemName(systemName);
+	INamedObject? INamedObjectRegistry.TryGetBySystemName(string systemName)
+		=> TryGetBySystemName(systemName);
 
 	IReadOnlyCollection<INamedObject> INamedObjectRegistry.All => All;
 

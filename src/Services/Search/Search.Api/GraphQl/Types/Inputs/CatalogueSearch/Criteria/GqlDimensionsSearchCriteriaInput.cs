@@ -22,8 +22,9 @@ public sealed record GqlDimensionsSearchCriteriaInput
 	[GraphQLName("volume")]
 	public GqlNumericRangeInput? Volume { get; init; }
 
-	public DimensionsSearchCriteria ToCriteria() => new()
-	{
-		Unit = Unit, Length = Length, Width = Width, Height = Height, Volume = Volume
-	};
+	public DimensionsSearchCriteria ToCriteria()
+		=> new()
+		{
+			Unit = Unit, Length = Length, Width = Width, Height = Height, Volume = Volume
+		};
 }

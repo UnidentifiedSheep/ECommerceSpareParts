@@ -1,9 +1,8 @@
-using Main.Entities.Storage;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using Main.Application.Handlers.Storages.DeleteStorage;
 using Main.Entities.Exceptions;
+using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
@@ -12,9 +11,7 @@ namespace Tests.HandlersTests.Storages;
 public class DeleteStorageTests : IntegrationTest
 {
 	public DeleteStorageTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<StorageContentTestContext>();
-	}
+		=> RegisterBasicContext<StorageContentTestContext>();
 
 	[Fact]
 	public async Task DeleteStorage_NotExisting_ThrowsStorageNotFoundException()

@@ -1,4 +1,3 @@
-using Persistence.Context;
 using Domain.CommonEntities.Job;
 using Main.Application.Configs;
 using Main.Application.Interfaces.Persistence;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Notification.Core.Entities;
 using Notification.Persistence;
 using Persistence.Common;
+using Persistence.Context;
 using Persistence.Extensions;
 using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
 using UserRepository = Main.Persistence.Repositories.User.UserRepository;
@@ -35,7 +35,8 @@ public static class ServiceProvider
 		collection.AddNotificationPersistence<UnifiedDbContext>();
 
 		collection.AddDbContext<BulkProductContext>((serviceProvider, options) =>
-			options.UseNpgsql(serviceProvider.GetRequiredService<UnifiedDbContext>().Database.GetDbConnection()));
+			options.UseNpgsql(
+				serviceProvider.GetRequiredService<UnifiedDbContext>().Database.GetDbConnection()));
 
 		collection.AddScoped<IProductRepository, ProductRepository>();
 		collection.AddScoped<ISupplierProductRepository, SupplierProductRepository>();

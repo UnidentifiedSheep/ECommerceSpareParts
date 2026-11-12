@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
-using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Extensions;
 using Notification.Renderers;
@@ -45,7 +44,7 @@ public class NotificationDefinitionRegistrationTests
 			TestNotification.Name,
 			model => new TestNotification(model));
 
-		using var provider = services.BuildServiceProvider(validateScopes: true);
+		using var provider = services.BuildServiceProvider(true);
 		using var scope = provider.CreateScope();
 		var registry = scope.ServiceProvider
 			.GetRequiredService<INamedObjectRegistry<INotificationDefinition>>();
@@ -71,10 +70,15 @@ public class NotificationDefinitionRegistrationTests
 		services.AddNotification<TestNotification, TestNotificationData>(
 			"TestNotification",
 			model => new TestNotification(model));
-		Assert.Equal(ServiceLifetime.Singleton, Assert.Single(services, descriptor =>
-			descriptor.ServiceType == typeof(INotificationDefinition)).Lifetime);
+		Assert.Equal(
+			ServiceLifetime.Singleton,
+			Assert.Single(
+					services,
+					descriptor =>
+						descriptor.ServiceType == typeof(INotificationDefinition))
+				.Lifetime);
 
-		using var provider = services.BuildServiceProvider(validateScopes: true);
+		using var provider = services.BuildServiceProvider(true);
 		using var firstScope = provider.CreateScope();
 		using var secondScope = provider.CreateScope();
 		var first = firstScope.ServiceProvider
@@ -98,7 +102,7 @@ public class NotificationDefinitionRegistrationTests
 			"OtherNotification",
 			model => new OtherNotification(model));
 
-		using var provider = services.BuildServiceProvider(validateScopes: true);
+		using var provider = services.BuildServiceProvider(true);
 		using var scope = provider.CreateScope();
 		var registry = scope.ServiceProvider
 			.GetRequiredService<INamedObjectRegistry<INotificationDefinition>>();
@@ -121,7 +125,7 @@ public class NotificationDefinitionRegistrationTests
 			"Duplicate",
 			model => new OtherNotification(model));
 
-		using var provider = services.BuildServiceProvider(validateScopes: true);
+		using var provider = services.BuildServiceProvider(true);
 		using var scope = provider.CreateScope();
 
 		Assert.Throws<ArgumentException>(() => scope.ServiceProvider

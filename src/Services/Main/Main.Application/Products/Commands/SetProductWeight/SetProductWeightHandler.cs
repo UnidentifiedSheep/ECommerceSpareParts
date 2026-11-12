@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums.Units;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Products.Commands.SetProductWeight;
@@ -12,7 +13,7 @@ namespace Main.Application.Products.Commands.SetProductWeight;
 public record SetProductWeightCommand(int ProductId, decimal Weight, WeightUnit Unit) : ICommand;
 
 public class SetProductWeightHandler(
-	IRepository<Entities.Product.ProductWeight, int> repository,
+	IRepository<ProductWeight, int> repository,
 	IUnitOfWork unitOfWork) : ICommandHandler<SetProductWeightCommand>
 {
 	public async Task<Unit> Handle(SetProductWeightCommand request, CancellationToken cancellationToken)
@@ -21,7 +22,7 @@ public class SetProductWeightHandler(
 
 		if (weight == null)
 		{
-			weight = Entities.Product.ProductWeight.Create(
+			weight = ProductWeight.Create(
 				request.ProductId,
 				request.Weight,
 				request.Unit);

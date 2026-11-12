@@ -12,8 +12,8 @@ namespace Tests.LrtsTests;
 
 public sealed class ProductCrossesByIdsDeleteLrtTests : CsvLrtIntegrationTest<ProductCrossesByIdsDeleteLrt>
 {
-	public ProductCrossesByIdsDeleteLrtTests(CombinedContainerFixture fixture) : base(fixture) =>
-		RegisterBasicContext<ProductTestContext>();
+	public ProductCrossesByIdsDeleteLrtTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -28,7 +28,8 @@ public sealed class ProductCrossesByIdsDeleteLrtTests : CsvLrtIntegrationTest<Pr
 
 		var productProvider = Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 		(await productProvider.GetProductCrossesAsync(products[0].Id, CancellationToken))
-			.Should().Contain(products[1].Id);
+			.Should()
+			.Contain(products[1].Id);
 
 		var execution = await ExecuteCsv(
 			"Id,CrossId",
@@ -44,7 +45,8 @@ public sealed class ProductCrossesByIdsDeleteLrtTests : CsvLrtIntegrationTest<Pr
 		var state = execution.GetState<ProductCrossesByIdsDeleteState>();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Errors.Should().BeEmpty();
-		var crosses = await Context.Set<ProductCross>().AsNoTracking()
+		var crosses = await Context.Set<ProductCross>()
+			.AsNoTracking()
 			.Select(x => new { x.LeftProductId, x.RightProductId })
 			.ToListAsync(CancellationToken);
 		crosses.Should().ContainSingle();
@@ -52,7 +54,8 @@ public sealed class ProductCrossesByIdsDeleteLrtTests : CsvLrtIntegrationTest<Pr
 		crosses[0].RightProductId.Should().Be(retainedCross.RightProductId);
 
 		var cachedCrossIds = await productProvider.GetProductCrossesAsync(
-			products[0].Id, CancellationToken);
+			products[0].Id,
+			CancellationToken);
 		cachedCrossIds.Should().BeEquivalentTo([products[2].Id]);
 	}
 
@@ -74,8 +77,14 @@ public sealed class ProductCrossesByIdsDeleteLrtTests : CsvLrtIntegrationTest<Pr
 			fileName => new ProductCrossesByIdsDeleteInputState { FileName = fileName });
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
-		execution.GetState<ProductCrossesByIdsDeleteState>().Errors
-			.Select(x => x.RowIdx).Should().Equal(1, 2, 3);
+		execution.GetState<ProductCrossesByIdsDeleteState>()
+			.Errors
+			.Select(x => x.RowIdx)
+			.Should()
+			.Equal(
+				1,
+				2,
+				3);
 		(await Context.Set<ProductCross>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
 	}
 }

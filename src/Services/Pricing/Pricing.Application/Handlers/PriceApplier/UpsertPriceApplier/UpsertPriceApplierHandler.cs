@@ -108,18 +108,14 @@ public class UpsertPriceApplierHandler(
 	}
 
 	private static string GetRequiredDslLogic(string? dslLogic)
-	{
-		return string.IsNullOrWhiteSpace(dslLogic)
+		=> string.IsNullOrWhiteSpace(dslLogic)
 			? throw new InvalidInputException(PriceApplierDslLogicRequiredMessage.Instance)
 			: dslLogic;
-	}
 
 	private static string GetRequiredName(string? name)
-	{
-		return string.IsNullOrWhiteSpace(name)
+		=> string.IsNullOrWhiteSpace(name)
 			? throw new InvalidInputException(PriceApplierNameRequiredMessage.Instance)
 			: name;
-	}
 
 	private static int GetLocalOrder(ApplierNamedObjectBase local, PriceOfferSourceType usage)
 	{
@@ -136,11 +132,9 @@ public class UpsertPriceApplierHandler(
 	}
 
 	private static int GetOrder(UpsertPriceApplierStateDto state, ApplierNamedObjectBase? local)
-	{
-		return local is null
+		=> local is null
 			? state.Order ?? throw new InvalidInputException(PriceApplierOrderRequiredMessage.Instance)
 			: GetLocalOrder(local, state.Usage);
-	}
 
 	private static void EnsureKindMatches(Entities.Pricing.PriceApplier model, ApplierNamedObjectBase? local)
 	{

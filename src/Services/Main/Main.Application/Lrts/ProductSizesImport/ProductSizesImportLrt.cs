@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
@@ -32,14 +31,13 @@ public class ProductSizesImportLrt(
 {
 	public override string SystemName => nameof(ProductSizesImportLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtProductSizesImportNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage => LrtProductSizesImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProductSizesImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductSizesImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -51,17 +49,19 @@ public class ProductSizesImportLrt(
 		item = null!;
 		if (row.ProductId <= 0)
 		{
-			errors.Add(CreateError(
-				rowIdx,
-				StringLocalizer.Get(LrtProductSizesImportInvalidProductIdMessage.Instance)));
+			errors.Add(
+				CreateError(
+					rowIdx,
+					StringLocalizer.Get(LrtProductSizesImportInvalidProductIdMessage.Instance)));
 			return false;
 		}
 
 		if (!Enum.IsDefined(row.Unit))
 		{
-			errors.Add(CreateError(
-				rowIdx,
-				StringLocalizer.Get(LrtProductSizesImportInvalidUnitMessage.Instance)));
+			errors.Add(
+				CreateError(
+					rowIdx,
+					StringLocalizer.Get(LrtProductSizesImportInvalidUnitMessage.Instance)));
 			return false;
 		}
 
@@ -99,9 +99,9 @@ public class ProductSizesImportLrt(
 					.Repositories
 					.Get<Product, int>()
 					.FindByIdsAsync(
-						ids: productIds,
-						criteria: Criteria<Product>.New().Include(x => x.ProductSize).Track().Build(),
-						ct: cancellationToken);
+						productIds,
+						Criteria<Product>.New().Include(x => x.ProductSize).Track().Build(),
+						cancellationToken);
 
 				var newSizes = new Dictionary<int, ProductSize>();
 				var batchErrors = new List<CsvImportError>();
@@ -110,9 +110,10 @@ public class ProductSizesImportLrt(
 				{
 					if (!products.TryGetValue(size.ProductId, out var product))
 					{
-						batchErrors.Add(CreateError(
-							rowIdx,
-							StringLocalizer.Get(LrtProductSizesImportProductNotFoundMessage.Instance)));
+						batchErrors.Add(
+							CreateError(
+								rowIdx,
+								StringLocalizer.Get(LrtProductSizesImportProductNotFoundMessage.Instance)));
 						continue;
 					}
 

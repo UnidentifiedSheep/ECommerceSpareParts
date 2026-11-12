@@ -1,5 +1,4 @@
 using System.Text;
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
@@ -21,11 +20,14 @@ public sealed class ProductRepositorySearchTests
 	public async Task Search_WithProductGroupIds_ShouldFilterProductsByGroup()
 	{
 		var (repository, requestBody) = CreateRepository();
-		var criteria = CreateCriteria("", new HashSet<SearchMatchType>(), new HashSet<SearchMatchType>()) with
-		{
-			ProducerIds = [42],
-			ProductGroupIds = [7, 8]
-		};
+		var criteria = CreateCriteria(
+				"",
+				new HashSet<SearchMatchType>(),
+				new HashSet<SearchMatchType>()) with
+			{
+				ProducerIds = [42],
+				ProductGroupIds = [7, 8]
+			};
 
 		await repository.Search(criteria, TestContext.Current.CancellationToken);
 
@@ -197,8 +199,7 @@ public sealed class ProductRepositorySearchTests
 		string query,
 		IReadOnlySet<SearchMatchType> skuModes,
 		IReadOnlySet<SearchMatchType> nameModes)
-	{
-		return new CatalogueSearchCriteria
+		=> new()
 		{
 			Query = query,
 			SkuModes = skuModes,
@@ -206,7 +207,6 @@ public sealed class ProductRepositorySearchTests
 			ProducerIds = [],
 			Pagination = new Pagination(0, 20)
 		};
-	}
 
 	private static (ProductRepository Repository, Func<string> RequestBody) CreateRepository(
 		string responseJson = "{\"hits\":{\"total\":{\"value\":0,\"relation\":\"eq\"},\"hits\":[]}}")
@@ -245,6 +245,6 @@ public sealed class ProductRepositorySearchTests
 			options.Object,
 			client,
 			initializer.Object,
-			System.Array.Empty<Search.Persistence.Interfaces.IProductSearchFilterProvider>()), () => requestBody);
+			Array.Empty<IProductSearchFilterProvider>()), () => requestBody);
 	}
 }

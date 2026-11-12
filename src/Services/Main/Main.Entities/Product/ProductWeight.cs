@@ -35,19 +35,18 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
 
 	public static Expression<Func<ProductWeight, int>> GetKeySelector() => x => x.ProductId;
 
-	public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key) => x =>
-		x.ProductId == key;
+	public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
+		=> x =>
+			x.ProductId == key;
 
 	public static ProductWeight Create(
 		int productId,
 		decimal weight,
 		WeightUnit unit)
-	{
-		return new ProductWeight(
+		=> new(
 			productId,
 			weight,
 			unit);
-	}
 
 	public void Update(decimal weight, WeightUnit unit)
 	{
@@ -65,9 +64,7 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
 	public override int GetId() => ProductId;
 
 	private static void ValidateWeight(decimal weight)
-	{
-		weight
+		=> weight
 			.EnsureGreaterThan(0, ArticleWeightMustBeGreaterThanZeroMessage.Instance)
 			.EnsureMaxDecimalPlaces(2, ArticleWeightMaxTwoDecimalsMessage.Instance);
-	}
 }

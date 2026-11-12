@@ -36,7 +36,9 @@ public static class ProductCharacteristicsEndPoints
 			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
 			.WithSummary("Создать или обновить характеристики продуктов")
-			.RequireAllPermissions(PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE, PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
+			.RequireAllPermissions(
+				PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
 
 		products
 			.MapDelete(
@@ -84,7 +86,9 @@ public static class ProductCharacteristicsEndPoints
 			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
 			.WithSummary("Создать или обновить характеристику продукта")
-			.RequireAllPermissions(PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE, PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
+			.RequireAllPermissions(
+				PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
+				PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
 
 		products
 			.MapGet(

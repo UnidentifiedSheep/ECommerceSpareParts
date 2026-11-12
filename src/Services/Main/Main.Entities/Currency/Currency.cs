@@ -56,49 +56,39 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
 		string shortName,
 		string currencySign,
 		string code)
-	{
-		return new Currency(
+		=> new(
 			name,
 			shortName,
 			currencySign,
 			code);
-	}
 
 	private void SetName(string name)
-	{
-		Name = name
+		=> Name = name
 			.Trim()
 			.EnsureNotNullOrWhiteSpace(CurrencyNameNotEmptyMessage.Instance)
 			.EnsureMaxLength(128, CurrencyNameMaxLengthMessage.Instance)
 			.EnsureMinLength(3, CurrencyNameMinLengthMessage.Instance);
-	}
 
 	private void SetShortName(string name)
-	{
-		ShortName = name
+		=> ShortName = name
 			.Trim()
 			.EnsureNotNullOrWhiteSpace(CurrencyShortNameNotEmptyMessage.Instance)
 			.EnsureMaxLength(5, CurrencyShortNameMaxLengthMessage.Instance)
 			.EnsureMinLength(2, CurrencyShortNameMinLengthMessage.Instance);
-	}
 
 	private void SetCurrencySign(string currencySign)
-	{
-		CurrencySign = currencySign
+		=> CurrencySign = currencySign
 			.Trim()
 			.EnsureNotNullOrWhiteSpace(CurrencySignNotEmptyMessage.Instance)
 			.EnsureMaxLength(3, CurrencySignMaxLengthMessage.Instance)
 			.EnsureMinLength(1, CurrencySignMinLengthMessage.Instance);
-	}
 
 	private void SetCode(string code)
-	{
-		Code = code
+		=> Code = code
 			.Trim()
 			.EnsureNotNullOrWhiteSpace(CurrencyCodeNotEmptyMessage.Instance)
 			.EnsureMaxLength(26, CurrencyCodeMaxLengthMessage.Instance)
 			.EnsureMinLength(2, CurrencyCodeMinLengthMessage.Instance);
-	}
 
 	public override int GetId() => Id;
 }

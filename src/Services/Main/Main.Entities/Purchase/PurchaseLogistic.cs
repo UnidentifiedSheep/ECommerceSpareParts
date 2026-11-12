@@ -70,8 +70,9 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
 
 	public static Expression<Func<PurchaseLogistic, Guid>> GetKeySelector() => x => x.PurchaseId;
 
-	public static Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key) => x =>
-		x.PurchaseId == key;
+	public static Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key)
+		=> x =>
+			x.PurchaseId == key;
 
 	internal static PurchaseLogistic Create(
 		Guid purchaseId,
@@ -85,8 +86,7 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
 		decimal pricePerOrder,
 		decimal? minimumPrice,
 		bool minimumPriceApplied)
-	{
-		return new PurchaseLogistic(
+		=> new(
 			purchaseId,
 			routeId,
 			currencyId,
@@ -98,7 +98,6 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
 			pricePerOrder,
 			minimumPrice,
 			minimumPriceApplied);
-	}
 
 	public void Update(
 		Guid routeId,
@@ -173,25 +172,19 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
 	}
 
 	private void SetPriceKg(decimal priceKg)
-	{
-		PriceKg = priceKg
+		=> PriceKg = priceKg
 			.EnsureMaxDecimalPlaces(2, StorageRoutePriceKgPrecisionMessage.Instance)
 			.EnsureAtLeast(0, StorageRoutePriceKgMinMessage.Instance);
-	}
 
 	private void SetPricePerM3(decimal pricePerM3)
-	{
-		PricePerM3 = pricePerM3
+		=> PricePerM3 = pricePerM3
 			.EnsureMaxDecimalPlaces(2, StorageRoutePriceM3PrecisionMessage.Instance)
 			.EnsureAtLeast(0, StorageRoutePriceM3MinMessage.Instance);
-	}
 
 	private void SetPricePerOrder(decimal pricePerOrder)
-	{
-		PricePerOrder = pricePerOrder
+		=> PricePerOrder = pricePerOrder
 			.EnsureMaxDecimalPlaces(2, StorageRoutePriceOrderPrecisionMessage.Instance)
 			.EnsureAtLeast(0, StorageRoutePriceOrderMinMessage.Instance);
-	}
 
 	private void SetMinimumPrice(decimal? minimumPrice)
 	{
@@ -207,8 +200,8 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
 			.EnsureAtLeast(0, StorageRouteMinimumPriceMinMessage.Instance);
 	}
 
-	private void SetMinimumPriceApplied(bool minimumPriceApplied) =>
-		MinimumPriceApplied = minimumPriceApplied;
+	private void SetMinimumPriceApplied(bool minimumPriceApplied)
+		=> MinimumPriceApplied = minimumPriceApplied;
 
 	public override Guid GetId() => PurchaseId;
 }

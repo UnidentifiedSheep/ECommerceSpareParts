@@ -18,12 +18,10 @@ internal sealed class PublishIntegrationEventsHandler(
 	public override Task Handle(
 		Batch<EntityCreatedDomainEvent<Candidate>> notification,
 		CancellationToken cancellationToken)
-	{
-		return CatalogueCandidateInternalService.PublishUpdatedEvents(
+		=> CatalogueCandidateInternalService.PublishUpdatedEvents(
 			integrationEventScope,
 			projection,
 			repository,
 			notification.Items.Select(x => x.Entity.Id),
 			cancellationToken);
-	}
 }

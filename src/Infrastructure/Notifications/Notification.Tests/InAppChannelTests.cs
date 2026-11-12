@@ -3,6 +3,7 @@ using Attributes;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Notification.Channels;
+using Notification.Core;
 using Notification.Core.Entities;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
@@ -25,14 +26,18 @@ public class InAppChannelTests
 				It.IsAny<TransactionalAttribute>(),
 				It.IsAny<Func<Task>>(),
 				It.IsAny<CancellationToken>()))
-			.Returns<TransactionalAttribute, Func<Task>, CancellationToken>(async (_, action, _) =>
+			.Returns<TransactionalAttribute, Func<Task>, CancellationToken>(async (
+				_, action,
+				_) =>
 			{
 				calls.Add("begin");
 				await action();
 				calls.Add("commit");
 			});
 		unitOfWork
-			.Setup(x => x.AddRangeAsync(It.IsAny<IEnumerable<InAppNotification>>(), It.IsAny<CancellationToken>()))
+			.Setup(x => x.AddRangeAsync(
+				It.IsAny<IEnumerable<InAppNotification>>(),
+				It.IsAny<CancellationToken>()))
 			.Callback<IEnumerable<InAppNotification>, CancellationToken>((items, _) =>
 			{
 				calls.Add("add");
@@ -50,11 +55,12 @@ public class InAppChannelTests
 			})
 			.Returns(Task.CompletedTask);
 
-		var observer = new RecordingInAppObserver(onObserve: receipts =>
-		{
-			calls.Add("observe");
-			Assert.Equal([100, 101], receipts.Select(x => x.CreatedRowId));
-		});
+		var observer = new RecordingInAppObserver(
+			onObserve: receipts =>
+			{
+				calls.Add("observe");
+				Assert.Equal([100, 101], receipts.Select(x => x.CreatedRowId));
+			});
 		var channel = CreateChannel(
 			[new NotificationContent("First"), null, new NotificationContent("Third")],
 			unitOfWork.Object,
@@ -81,7 +87,10 @@ public class InAppChannelTests
 		var unitOfWork = CreateUnitOfWork();
 		var observer = new RecordingInAppObserver(
 			onObserve: _ => throw new InvalidOperationException("Observer failed."));
-		var channel = CreateChannel([new NotificationContent("Text")], unitOfWork.Object, observer);
+		var channel = CreateChannel(
+			[new NotificationContent("Text")],
+			unitOfWork.Object,
+			observer);
 
 		var result = await channel.SendAsync(
 			Delivery(new InAppRecipient(Guid.NewGuid())),
@@ -89,8 +98,9 @@ public class InAppChannelTests
 
 		Assert.True(result.Succeeded);
 		Assert.Single(observer.Received);
-		unitOfWork.Verify(x => x.SaveChangesAsync(
-			It.IsAny<CancellationToken>()),
+		unitOfWork.Verify(
+			x => x.SaveChangesAsync(
+				It.IsAny<CancellationToken>()),
 			Times.Once);
 	}
 
@@ -103,7 +113,10 @@ public class InAppChannelTests
 			.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
 			.ThrowsAsync(failure);
 		var observer = new RecordingInAppObserver();
-		var channel = CreateChannel([new NotificationContent("Text")], unitOfWork.Object, observer);
+		var channel = CreateChannel(
+			[new NotificationContent("Text")],
+			unitOfWork.Object,
+			observer);
 
 		var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => channel.SendBatchAsync(
 			[Delivery(new InAppRecipient(Guid.NewGuid()))],
@@ -118,7 +131,10 @@ public class InAppChannelTests
 	{
 		var unitOfWork = CreateUnitOfWork();
 		var observer = new RecordingInAppObserver();
-		var channel = CreateChannel([null], unitOfWork.Object, observer);
+		var channel = CreateChannel(
+			[null],
+			unitOfWork.Object,
+			observer);
 
 		var results = await channel.SendBatchAsync(
 			[Delivery(new InAppRecipient(Guid.NewGuid()))],
@@ -140,7 +156,11 @@ public class InAppChannelTests
 				It.IsAny<IEnumerable<ITextNotification>>(),
 				It.IsAny<CancellationToken>()))
 			.ReturnsAsync(contents);
-		return new InAppChannel(renderer.Object, [observer], unitOfWork, NullLogger<InAppChannel>.Instance);
+		return new InAppChannel(
+			renderer.Object,
+			[observer],
+			unitOfWork,
+			NullLogger<InAppChannel>.Instance);
 	}
 
 	private static Mock<IUnitOfWork> CreateUnitOfWork()
@@ -151,11 +171,13 @@ public class InAppChannelTests
 				It.IsAny<TransactionalAttribute>(),
 				It.IsAny<Func<Task>>(),
 				It.IsAny<CancellationToken>()))
-			.Returns<TransactionalAttribute, Func<Task>, CancellationToken>((_, action, _) => action());
+			.Returns<TransactionalAttribute, Func<Task>, CancellationToken>((
+				_, action,
+				_) => action());
 		return unitOfWork;
 	}
 
-	private static Notification.Core.NotificationDelivery<ITextNotification, InAppRecipient>
-		Delivery(InAppRecipient recipient) => new(new Mock<ITextNotification>().Object, recipient);
-
+	private static NotificationDelivery<ITextNotification, InAppRecipient>
+		Delivery(InAppRecipient recipient)
+		=> new(new Mock<ITextNotification>().Object, recipient);
 }

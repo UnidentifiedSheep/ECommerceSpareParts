@@ -13,8 +13,8 @@ public sealed class MarkupApplier(IMarkupCalculator calculator)
 
 	public override ILocalizableMessage NameLocalizationMessage => PriceApplierMarkupNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		PriceApplierMarkupDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> PriceApplierMarkupDescriptionMessage.Instance;
 
 	public override int Order => 0;
 

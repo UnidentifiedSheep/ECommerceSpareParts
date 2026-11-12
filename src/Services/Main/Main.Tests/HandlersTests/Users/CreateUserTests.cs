@@ -5,10 +5,10 @@ using Main.Application.Handlers.Users.CreateUser;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization;
-using Main.Entities.User.ValueObjects;
 using Main.Entities.User;
-using Main.Enums.Organization;
+using Main.Entities.User.ValueObjects;
 using Main.Enums;
+using Main.Enums.Organization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;
@@ -27,16 +27,28 @@ public class CreateUserTests(CombinedContainerFixture fixture) : IntegrationTest
 
 		var result = await Mediator.Send(command, CancellationToken);
 
-		var user = await Context.Set<User>().AsNoTracking().SingleAsync(x => x.Id == result.UserId, CancellationToken);
-		Scope.ServiceProvider.GetRequiredService<IPasswordManager>()
-			.VerifyHashedPassword(user.PasswordHash, command.Password).Should().BeTrue();
-		var roles = await Context.Set<UserRole>().AsNoTracking()
-			.Where(x => x.UserId == user.Id).Select(x => x.RoleName).ToArrayAsync(CancellationToken);
+		var user = await Context.Set<User>()
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == result.UserId, CancellationToken);
+		Scope.ServiceProvider
+			.GetRequiredService<IPasswordManager>()
+			.VerifyHashedPassword(user.PasswordHash, command.Password)
+			.Should()
+			.BeTrue();
+		var roles = await Context.Set<UserRole>()
+			.AsNoTracking()
+			.Where(x => x.UserId == user.Id)
+			.Select(x => x.RoleName)
+			.ToArrayAsync(CancellationToken);
 		roles.Should().Equal("MEMBER");
-		var organization = await Context.Set<Organization>().AsNoTracking()
-			.Include(x => x.Members).SingleAsync(x => x.Id == user.Id, CancellationToken);
+		var organization = await Context.Set<Organization>()
+			.AsNoTracking()
+			.Include(x => x.Members)
+			.SingleAsync(x => x.Id == user.Id, CancellationToken);
 		organization.Type.Should().Be(OrganizationType.Individual);
-		organization.Members.Should().ContainSingle(x => x.UserId == user.Id && x.Role == OrganizationRole.Owner);
+		organization.Members
+			.Should()
+			.ContainSingle(x => x.UserId == user.Id && x.Role == OrganizationRole.Owner);
 	}
 
 	[Theory]
@@ -52,8 +64,12 @@ public class CreateUserTests(CombinedContainerFixture fixture) : IntegrationTest
 		await action.Should().ThrowAsync<CantCreateSystemUserException>();
 
 		var normalizedName = UserName.ToNormalized(command.UserName);
-		(await Context.Set<User>().AsNoTracking().AnyAsync(
-			x => x.UserName.NormalizedValue == normalizedName, CancellationToken)).Should().BeFalse();
+		(await Context.Set<User>()
+				.AsNoTracking()
+				.AnyAsync(
+					x => x.UserName.NormalizedValue == normalizedName,
+					CancellationToken)).Should()
+			.BeFalse();
 	}
 
 	[Fact]
@@ -65,8 +81,11 @@ public class CreateUserTests(CombinedContainerFixture fixture) : IntegrationTest
 			Mediator.Send(CreateCommand(["MEMBER"]), CancellationToken));
 
 		exception.Failures.Should().ContainSingle(failure => failure.Error is UserNameAlreadyTakenException);
-		(await Context.Set<User>().CountAsync(
-			user => user.UserName.NormalizedValue == "CREATED-USER", CancellationToken)).Should().Be(1);
+		(await Context.Set<User>()
+				.CountAsync(
+					user => user.UserName.NormalizedValue == "CREATED-USER",
+					CancellationToken)).Should()
+			.Be(1);
 	}
 
 	[Fact]
@@ -82,8 +101,11 @@ public class CreateUserTests(CombinedContainerFixture fixture) : IntegrationTest
 			Mediator.Send(command, CancellationToken));
 
 		exception.Failures.Should().ContainSingle(failure => failure.Error is UserEmailAlreadyInUseException);
-		(await Context.Set<User>().AnyAsync(
-			user => user.UserName.NormalizedValue == "CREATED-USER", CancellationToken)).Should().BeFalse();
+		(await Context.Set<User>()
+				.AnyAsync(
+					user => user.UserName.NormalizedValue == "CREATED-USER",
+					CancellationToken)).Should()
+			.BeFalse();
 	}
 
 	[Fact]
@@ -93,8 +115,11 @@ public class CreateUserTests(CombinedContainerFixture fixture) : IntegrationTest
 			Mediator.Send(CreateCommand(["member", "missing-role"]), CancellationToken));
 
 		exception.Failures.Should().ContainSingle(failure => failure.Error is RoleNotFoundException);
-		(await Context.Set<User>().AnyAsync(
-			user => user.UserName.NormalizedValue == "CREATED-USER", CancellationToken)).Should().BeFalse();
+		(await Context.Set<User>()
+				.AnyAsync(
+					user => user.UserName.NormalizedValue == "CREATED-USER",
+					CancellationToken)).Should()
+			.BeFalse();
 	}
 
 	[Fact]
@@ -103,14 +128,27 @@ public class CreateUserTests(CombinedContainerFixture fixture) : IntegrationTest
 		var result = await Mediator.Send(CreateCommand([]), CancellationToken);
 
 		(await Context.Set<UserRole>().AnyAsync(role => role.UserId == result.UserId, CancellationToken))
-			.Should().BeFalse();
+			.Should()
+			.BeFalse();
 	}
 
-	private static CreateUserCommand CreateCommand(IReadOnlyCollection<string> roles) => new(
-		"created-user",
-		"TestPassword123!",
-		new UserInfoDto { Name = "Created", Surname = "User", Description = null },
-		[new EmailDto { Email = "created@example.com", Type = EmailType.Work, IsPrimary = true, IsConfirmed = true }],
-		[new UserPhoneDto { Number = "+1 (555) 123-4567", Type = PhoneType.Mobile, IsPrimary = true, IsConfirmed = true }],
-		roles);
+	private static CreateUserCommand CreateCommand(IReadOnlyCollection<string> roles)
+		=> new(
+			"created-user",
+			"TestPassword123!",
+			new UserInfoDto { Name = "Created", Surname = "User", Description = null },
+			[
+				new EmailDto
+				{
+					Email = "created@example.com", Type = EmailType.Work, IsPrimary = true, IsConfirmed = true
+				}
+			],
+			[
+				new UserPhoneDto
+				{
+					Number = "+1 (555) 123-4567", Type = PhoneType.Mobile, IsPrimary = true,
+					IsConfirmed = true
+				}
+			],
+			roles);
 }

@@ -10,7 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Products.Queries.GetProductGroups;
 
-public record GetProductGroupsQuery(string? SearchTerm, IReadOnlyCollection<SortExpression>? SortBy, Pagination Pagination)
+public record GetProductGroupsQuery(string? SearchTerm,
+	IReadOnlyCollection<SortExpression>? SortBy,
+	Pagination Pagination)
 	: IQuery<GetProductGroupsResult>;
 
 public record GetProductGroupsResult(IReadOnlyList<ProductGroupDto> Groups);

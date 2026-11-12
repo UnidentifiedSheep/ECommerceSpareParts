@@ -51,6 +51,6 @@ public class CreateProductsHandler(IProductRepository productRepository, IUnitOf
 		return new CreateProductsResult(products.Select(x => x.Id).ToList());
 	}
 
-	private static (string NormalizedSku, int ProducerId) GetProductKey(CreateProductDto product) =>
-		(new Sku(product.Sku).NormalizedValue, product.ProducerId);
+	private static (string NormalizedSku, int ProducerId) GetProductKey(CreateProductDto product)
+		=> (new Sku(product.Sku).NormalizedValue, product.ProducerId);
 }

@@ -10,9 +10,7 @@ namespace Tests.HandlersTests.ProductEnrichment;
 public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 {
 	public GetCatalogueCandidateCrossesHandlerTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<CatalogueCandidateTestContext>();
-	}
+		=> RegisterBasicContext<CatalogueCandidateTestContext>();
 
 	private CatalogueCandidateTestContext CatalogueTestContext => GetContext<CatalogueCandidateTestContext>();
 	private SupplierProductTestContext SupplierTestContext => GetContext<SupplierProductTestContext>();

@@ -10,12 +10,17 @@ namespace Main.Application.Lrts.DeleteProductImages;
 public class DeleteProductImagesLrt(
 	IApplicationTransactionFactory transactions,
 	IS3Service storage,
-	ILogger<DeleteProductImagesLrt> logger) : LrtBase<DeleteProductImagesInputState, NoneInputState>(transactions, logger)
+	ILogger<DeleteProductImagesLrt> logger)
+	: LrtBase<DeleteProductImagesInputState, NoneInputState>(transactions, logger)
 {
 	public const string Name = nameof(DeleteProductImagesLrt);
 	public override string SystemName => Name;
-	public override ILocalizableMessage NameLocalizationMessage => LrtProductImagesDeletionNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtProductImagesDeletionDescriptionMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProductImagesDeletionNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductImagesDeletionDescriptionMessage.Instance;
 
 	protected override async Task DoWork(DeleteProductImagesInputState inputState)
 	{
@@ -23,7 +28,10 @@ public class DeleteProductImagesLrt(
 		// S3 returns true for non existing key.
 		foreach (var key in inputState.StorageKeys.Distinct(StringComparer.Ordinal))
 		{
-			var result = await storage.DeleteFileAsync(inputState.BucketName, key, CancellationToken);
+			var result = await storage.DeleteFileAsync(
+				inputState.BucketName,
+				key,
+				CancellationToken);
 			if (!result.IsSuccess)
 				throw new InvalidOperationException(
 					$"Failed to delete product image '{key}': {result.ErrorCode}: {result.ErrorMessage}");

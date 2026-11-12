@@ -32,10 +32,11 @@ public sealed class ProductQueries
 	public async Task<IReadOnlyList<GqlProduct>> GetProductsByIdsAsync(
 		IProductByIdDataLoader loader,
 		IReadOnlyCollection<int> ids,
-		CancellationToken cancellationToken) => (await loader.LoadAsync(ids, cancellationToken))
-		.OfType<ProductDto>()
-		.Select(x => new GqlProduct(x))
-		.ToList();
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(ids, cancellationToken))
+			.OfType<ProductDto>()
+			.Select(x => new GqlProduct(x))
+			.ToList();
 
 	[GraphQLName("byEan")]
 	[RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)]
@@ -59,15 +60,17 @@ public sealed class ProductQueries
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new ResolveProductReferencesQuery(
-			references.Select(reference => new ProductReferenceDto
-			{
-				Sku = reference.Sku,
-				ProducerName = reference.ProducerName,
-				Supplier = reference.Supplier
-			}).ToArray()), cancellationToken);
+		var result = await sender.Send(
+			new ResolveProductReferencesQuery(
+				references.Select(reference => new ProductReferenceDto
+					{
+						Sku = reference.Sku,
+						ProducerName = reference.ProducerName,
+						Supplier = reference.Supplier
+					})
+					.ToArray()),
+			cancellationToken);
 
 		return result.Products.Select(reference => new GqlResolvedProductReference(reference)).ToArray();
 	}
-
 }

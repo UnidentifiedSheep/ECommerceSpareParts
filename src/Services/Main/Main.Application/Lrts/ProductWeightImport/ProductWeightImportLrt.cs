@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
@@ -36,10 +35,11 @@ public class ProductWeightImportLrt(
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtProductWeightImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtProductWeightImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductWeightImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -51,13 +51,17 @@ public class ProductWeightImportLrt(
 		item = null!;
 		if (!Enum.IsDefined(row.Unit))
 		{
-			errors.Add(CreateError(rowIdx, StringLocalizer.Get(LrtProductWeightImportInvalidUnitMessage.Instance)));
+			errors.Add(
+				CreateError(rowIdx, StringLocalizer.Get(LrtProductWeightImportInvalidUnitMessage.Instance)));
 			return false;
 		}
 
 		try
 		{
-			item = ProductWeight.Create(row.ProductId, row.Weight, row.Unit);
+			item = ProductWeight.Create(
+				row.ProductId,
+				row.Weight,
+				row.Unit);
 			return true;
 		}
 		catch (Exception ex)
@@ -79,13 +83,15 @@ public class ProductWeightImportLrt(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{
-				var products = await context.Repositories.Get<Product, int>().FindByIdsAsync(
-					ids: productIds,
-					criteria: Criteria<Product>.New()
-						.Include(x => x.ProductWeight)
-						.Track()
-						.Build(),
-					ct: cancellationToken);
+				var products = await context.Repositories
+					.Get<Product, int>()
+					.FindByIdsAsync(
+						productIds,
+						Criteria<Product>.New()
+							.Include(x => x.ProductWeight)
+							.Track()
+							.Build(),
+						cancellationToken);
 				var newWeights = new Dictionary<int, ProductWeight>();
 				var batchErrors = new List<CsvImportError>();
 
@@ -93,7 +99,10 @@ public class ProductWeightImportLrt(
 				{
 					if (!products.TryGetValue(weight.ProductId, out var product))
 					{
-						batchErrors.Add(CreateError(rowIdx, StringLocalizer.Get(LrtProductWeightImportProductNotFoundMessage.Instance)));
+						batchErrors.Add(
+							CreateError(
+								rowIdx,
+								StringLocalizer.Get(LrtProductWeightImportProductNotFoundMessage.Instance)));
 						continue;
 					}
 
@@ -117,7 +126,11 @@ public class ProductWeightImportLrt(
 		Logger.LogInformation(
 			"Product weight import batch processed. JobId: {JobId}, " +
 			"BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}, Created: {Created}, Errors: {Errors}",
-			JobId, items[0].idx, items.Count, result.Created, errors.Count);
+			JobId,
+			items[0].idx,
+			items.Count,
+			result.Created,
+			errors.Count);
 	}
 
 	private sealed record ProductWeightImportBatchResult(int Created, IReadOnlyList<CsvImportError> Errors);

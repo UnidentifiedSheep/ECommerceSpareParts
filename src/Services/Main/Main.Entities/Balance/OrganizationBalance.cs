@@ -29,14 +29,15 @@ public class OrganizationBalance : AuditableEntity<OrganizationBalance, UserBala
 
 	public Currency.Currency Currency { get; private set; } = null!;
 
-	public static Expression<Func<OrganizationBalance, UserBalanceKey>> GetKeySelector() => x =>
-		new UserBalanceKey(x.OrganizationId, x.CurrencyId);
+	public static Expression<Func<OrganizationBalance, UserBalanceKey>> GetKeySelector()
+		=> x =>
+			new UserBalanceKey(x.OrganizationId, x.CurrencyId);
 
-	public static Expression<Func<OrganizationBalance, bool>> GetEqualityExpression(UserBalanceKey key) =>
-		x => x.OrganizationId == key.OrganizationId && x.CurrencyId == key.CurrencyId;
+	public static Expression<Func<OrganizationBalance, bool>> GetEqualityExpression(UserBalanceKey key)
+		=> x => x.OrganizationId == key.OrganizationId && x.CurrencyId == key.CurrencyId;
 
-	public static OrganizationBalance Create(Guid organizationId, int currencyId) =>
-		new(organizationId, currencyId);
+	public static OrganizationBalance Create(Guid organizationId, int currencyId)
+		=> new(organizationId, currencyId);
 
 	internal void IncrementBalance(decimal amount)
 	{

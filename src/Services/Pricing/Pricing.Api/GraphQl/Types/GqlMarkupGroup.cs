@@ -3,9 +3,9 @@ using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 using MediatR;
-using Pricing.Application.Handlers.Markup.GetMarkupRanges;
 using Pricing.Api.GraphQl.DataLoaders;
 using Pricing.Application.Dtos.Markup;
+using Pricing.Application.Handlers.Markup.GetMarkupRanges;
 using Pricing.Entities.Exceptions.Markup;
 
 namespace Pricing.Api.GraphQl.Types;
@@ -14,6 +14,14 @@ namespace Pricing.Api.GraphQl.Types;
 public class GqlMarkupGroup
 {
 	private MarkupGroupDto? _dto;
+
+	public GqlMarkupGroup(int id) => Id = id;
+
+	public GqlMarkupGroup(MarkupGroupDto dto)
+	{
+		_dto = dto;
+		Id = _dto.Id;
+	}
 
 	[GraphQLName("id")]
 	public int Id { get; }
@@ -45,17 +53,6 @@ public class GqlMarkupGroup
 	{
 		var result = await sender.Send(new GetMarkupRangesQuery(Id, pagination), cancellationToken);
 		return result.Ranges.Select(range => new GqlMarkupRange(range)).ToArray();
-	}
-
-	public GqlMarkupGroup(int id)
-	{
-		Id = id;
-	}
-
-	public GqlMarkupGroup(MarkupGroupDto dto)
-	{
-		_dto = dto;
-		Id = _dto.Id;
 	}
 
 

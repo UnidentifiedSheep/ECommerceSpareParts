@@ -10,14 +10,14 @@ namespace Main.Application.Handlers.Notifications;
 
 public record GetNotificationsByIdsQuery : IQuery<GetNotificationsByIdsResult>
 {
-	public IReadOnlyList<int> Ids { get; }
-	public Guid UserId { get; }
 
 	public GetNotificationsByIdsQuery(IEnumerable<int> ids, Guid userId)
 	{
 		Ids = ids.Distinct().ToList();
 		UserId = userId;
 	}
+	public IReadOnlyList<int> Ids { get; }
+	public Guid UserId { get; }
 }
 
 public record GetNotificationsByIdsResult(
@@ -26,7 +26,7 @@ public record GetNotificationsByIdsResult(
 public class GetNotificationsByIdsHandler(
 	IReadRepository<InAppNotification, int> repository,
 	IProjectionProvider<InAppNotification, InAppNotificationDto> projection
-	) : IQueryHandler<GetNotificationsByIdsQuery, GetNotificationsByIdsResult>
+) : IQueryHandler<GetNotificationsByIdsQuery, GetNotificationsByIdsResult>
 {
 	public async Task<GetNotificationsByIdsResult> Handle(
 		GetNotificationsByIdsQuery request,

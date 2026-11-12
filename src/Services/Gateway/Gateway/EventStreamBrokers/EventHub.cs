@@ -50,6 +50,21 @@ public sealed class EventHub(IEventRegistry registry) : IEventHub
 		}
 	}
 
+	public void Dispose()
+	{
+		lock (_disposeGate)
+		{
+			if (_disposed)
+				return;
+
+			_disposed = true;
+		}
+
+		foreach (var (session, _) in _sessions)
+			if (_sessions.TryRemove(session, out _))
+				session.Close();
+	}
+
 	private async IAsyncEnumerable<EventMessage> ReadAsync(
 		Session session,
 		[EnumeratorCancellation] CancellationToken cancellationToken)
@@ -83,8 +98,7 @@ public sealed class EventHub(IEventRegistry registry) : IEventHub
 
 	private static async IAsyncEnumerable<EventMessage> ReadMessagesAsync(
 		ChannelReader<EventMessage> reader,
-		[EnumeratorCancellation]
-		CancellationToken cancellationToken)
+		[EnumeratorCancellation] CancellationToken cancellationToken)
 	{
 		while (true)
 		{
@@ -105,27 +119,13 @@ public sealed class EventHub(IEventRegistry registry) : IEventHub
 		}
 	}
 
-	public void Dispose()
-	{
-		lock (_disposeGate)
-		{
-			if (_disposed)
-				return;
-
-			_disposed = true;
-		}
-
-		foreach (var (session, _) in _sessions)
-			if (_sessions.TryRemove(session, out _))
-				session.Close();
-	}
-
 	private sealed class Session(string[] topics, EventAudience audience) : IDisposable
 	{
 		private volatile bool _closed;
 
 		public EventAudience Audience => audience;
 		public HashSet<string> Topics { get; } = topics.ToHashSet(StringComparer.Ordinal);
+
 		public Channel<EventMessage> Channel { get; } = System.Threading.Channels.Channel
 			.CreateBounded<EventMessage>(
 				new BoundedChannelOptions(256) //TODO: maybe we should take it from options?
@@ -135,32 +135,36 @@ public sealed class EventHub(IEventRegistry registry) : IEventHub
 					FullMode = BoundedChannelFullMode.Wait
 				});
 
+		public void Dispose()
+		{
+			Close();
+			while (Channel.Reader.TryRead(out var message))
+				message.Dispose();
+		}
+
 		public void TryPublish(ReadOnlySpan<byte> payload)
 		{
 			if (_closed) return;
 
 			var owner = MemoryPool<byte>.Shared.Rent(payload.Length);
 			payload.CopyTo(owner.Memory.Span);
-			var message = new EventMessage(owner, ..payload.Length, ..0);
+			var message = new EventMessage(
+				owner,
+				..payload.Length,
+				..0);
 
 			if (Channel.Writer.TryWrite(message)) return;
 
 			message.Dispose();
-			Close(new InvalidOperationException(
-				"The event stream subscriber cannot keep up with incoming messages."));
+			Close(
+				new InvalidOperationException(
+					"The event stream subscriber cannot keep up with incoming messages."));
 		}
 
 		public void Close(Exception? error = null)
 		{
 			_closed = true;
 			Channel.Writer.TryComplete(error);
-		}
-
-		public void Dispose()
-		{
-			Close();
-			while (Channel.Reader.TryRead(out var message))
-				message.Dispose();
 		}
 	}
 }

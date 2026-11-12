@@ -6,17 +6,18 @@ using Notification.Core.Entities;
 
 namespace Main.Application.Handlers.Notifications.SeeNotifications;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record SeeNotificationsCommand : ICommand
 {
-	public Guid UserId { get; }
-	public IReadOnlyList<int> Ids { get; }
 
 	public SeeNotificationsCommand(Guid userId, IEnumerable<int> ids)
 	{
 		UserId = userId;
 		Ids = ids.Distinct().ToList();
 	}
+	public Guid UserId { get; }
+	public IReadOnlyList<int> Ids { get; }
 }
 
 public class SeeNotificationsHandler(IRepository<InAppNotification, int> repository)
@@ -29,7 +30,7 @@ public class SeeNotificationsHandler(IRepository<InAppNotification, int> reposit
 		var notifications = await repository.ListAsync(
 			Criteria<InAppNotification>.New()
 				.Where(x => x.UserId == request.UserId)
-				.Where(x =>  request.Ids.Contains(x.Id))
+				.Where(x => request.Ids.Contains(x.Id))
 				.Track()
 				.Build(),
 			cancellationToken);

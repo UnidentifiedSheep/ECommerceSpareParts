@@ -18,7 +18,10 @@ public class GetJobStateHandler(IReadRepository<Job, Guid> repository)
 		var result = await repository
 			.Query
 			.Where(x => x.Id == request.JobId)
-			.Select(x => new GetJobStateResult(x.State, x.InputInitialized, x.Output))
+			.Select(x => new GetJobStateResult(
+				x.State,
+				x.InputInitialized,
+				x.Output))
 			.FirstOrDefaultAsync(cancellationToken) ?? throw new JobNotFoundException(request.JobId);
 
 		return result;

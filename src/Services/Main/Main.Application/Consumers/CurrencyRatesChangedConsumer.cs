@@ -4,7 +4,9 @@ using MassTransit;
 
 namespace Main.Application.Consumers;
 
-public class CurrencyRatesChangedConsumer(ICurrencyRateSnapshotProvider rates) : IConsumer<CurrencyRateChangedEvent>
+public class CurrencyRatesChangedConsumer(ICurrencyRateSnapshotProvider rates)
+	: IConsumer<CurrencyRateChangedEvent>
 {
-	public Task Consume(ConsumeContext<CurrencyRateChangedEvent> context) => rates.Reload(context.CancellationToken);
+	public Task Consume(ConsumeContext<CurrencyRateChangedEvent> context)
+		=> rates.Reload(context.CancellationToken);
 }

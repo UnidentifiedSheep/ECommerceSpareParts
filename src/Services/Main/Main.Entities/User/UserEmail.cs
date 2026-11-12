@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
-using Domain.Interfaces;
 using Domain;
+using Domain.Interfaces;
 using Main.Entities.DomainEvents.User;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
@@ -47,12 +47,10 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
 		Guid userId,
 		Email email,
 		EmailType emailType)
-	{
-		return new UserEmail(
+		=> new(
 			userId,
 			email,
 			emailType);
-	}
 
 	public void Confirm(bool confirmed = true)
 	{

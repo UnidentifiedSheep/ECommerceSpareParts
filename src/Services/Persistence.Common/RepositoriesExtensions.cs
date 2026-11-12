@@ -1,9 +1,8 @@
 using System.Reflection;
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using BulkValidation.Pgsql.Extensions;
 using BulkValidation.Core.Configuration;
+using BulkValidation.Pgsql.Extensions;
 using Domain;
 using Domain.CommonEntities.Job;
 using Domain.Interfaces;
@@ -27,9 +26,12 @@ public static class RepositoriesExtensions
 		Type linqRepositoryType,
 		Type readRepositoryType,
 		params Assembly[] entitiesAssemblies) where TContext : DbContext
-	{
-		return services.AddPersistenceBase<TContext>(_ => { }, repositoryType, linqRepositoryType, readRepositoryType, entitiesAssemblies);
-	}
+		=> services.AddPersistenceBase<TContext>(
+			_ => { },
+			repositoryType,
+			linqRepositoryType,
+			readRepositoryType,
+			entitiesAssemblies);
 
 	public static IServiceCollection AddPersistenceBase<TContext>(
 		this IServiceCollection services,
@@ -62,7 +64,8 @@ public static class RepositoriesExtensions
 				{
 					var options = new StoreOptions();
 
-					var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+					var databaseOptions =
+						serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
 
 					options.Connection(databaseOptions.ConnectionString);
 					options.DatabaseSchemaName = "materialized";
@@ -131,7 +134,8 @@ public static class RepositoriesExtensions
 			var implementationType = repositoryDefinition.MakeGenericType(entityType, keyType);
 
 			services.AddScoped(serviceType, implementationType);
-			services.AddScoped(typeof(IReadRepository<,>).MakeGenericType(entityType, keyType),
+			services.AddScoped(
+				typeof(IReadRepository<,>).MakeGenericType(entityType, keyType),
 				readRepositoryType.MakeGenericType(entityType, keyType));
 		}
 	}

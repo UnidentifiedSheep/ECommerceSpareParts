@@ -5,7 +5,6 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
-using Domain.CommonEntities.Job;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Main.Application.Document;
@@ -34,32 +33,37 @@ public class GenerateDocumentLrt(
 	public static string Name => nameof(GenerateDocumentLrt);
 	public override string SystemName => Name;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtDocumentGenerationNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage => LrtDocumentGenerationNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtDocumentGenerationDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtDocumentGenerationDescriptionMessage.Instance;
 
 	protected override async Task DoWork(GenerateDocumentInputState inputState)
 	{
 		await using var operation = TransactionFactory.Create();
 		var definition = string.IsNullOrWhiteSpace(inputState.DocumentSystemName)
 			? null
-			: operation.Context.GetRequiredService<INamedObjectRegistry<IDocumentDefinition>>()
+			: operation.Context
+				.GetRequiredService<INamedObjectRegistry<IDocumentDefinition>>()
 				.TryGetBySystemName(inputState.DocumentSystemName);
 
 		if (definition == null)
 		{
-			Interrupt(localizer.Get(
-				LrtDocumentGenerationUnknownSystemNameMessage.Instance));
+			Interrupt(
+				localizer.Get(
+					LrtDocumentGenerationUnknownSystemNameMessage.Instance));
 			return;
 		}
 
-		if (!TryDeserializeDocumentRequest(inputState, definition, out var request) ||
-		    !DocumentCulture.TryGetSupported(request.Culture, out var culture))
+		if (!TryDeserializeDocumentRequest(
+				inputState,
+				definition,
+				out var request) ||
+			!DocumentCulture.TryGetSupported(request.Culture, out var culture))
 		{
-			Interrupt(localizer.Get(
-				LrtDocumentGenerationInvalidRequestMessage.Instance));
+			Interrupt(
+				localizer.Get(
+					LrtDocumentGenerationInvalidRequestMessage.Instance));
 			return;
 		}
 
@@ -75,7 +79,7 @@ public class GenerateDocumentLrt(
 	{
 		request = null;
 		if (string.IsNullOrWhiteSpace(inputState.DocumentRequest) ||
-		    !jsonSerializer.TryDeserialize(
+			!jsonSerializer.TryDeserialize(
 				inputState.DocumentRequest,
 				definition.RequestType,
 				out var deserializedRequest))
@@ -88,25 +92,26 @@ public class GenerateDocumentLrt(
 	private async Task GenerateIfNeededAsync(IDocumentDefinition definition, IDocumentRequest request)
 	{
 		if (State is
-		    {
-			    BucketName: not null,
-			    StorageKey: not null,
-			    GeneratedAtUtc: not null
-		    })
+			{
+				BucketName: not null,
+				StorageKey: not null,
+				GeneratedAtUtc: not null
+			})
 			return;
 
 		var result = await definition.GenerateAsync(request, CancellationToken);
 
 		if (string.IsNullOrWhiteSpace(result.BucketName) ||
-		    string.IsNullOrWhiteSpace(result.StorageKey))
+			string.IsNullOrWhiteSpace(result.StorageKey))
 			throw new InvalidOperationException("Generated document response is missing storage details.");
 
-		await SaveStateAsync(new GenerateDocumentState
-		{
-			BucketName = result.BucketName,
-			StorageKey = result.StorageKey,
-			GeneratedAtUtc = DateTime.UtcNow
-		});
+		await SaveStateAsync(
+			new GenerateDocumentState
+			{
+				BucketName = result.BucketName,
+				StorageKey = result.StorageKey,
+				GeneratedAtUtc = DateTime.UtcNow
+			});
 	}
 
 	private async Task CompleteRequestAsync(IDocumentDefinition definition, CultureInfo culture)
@@ -116,15 +121,16 @@ public class GenerateDocumentLrt(
 		var generatedAtUtc = State.GeneratedAtUtc;
 
 		if (string.IsNullOrWhiteSpace(bucketName) ||
-		    string.IsNullOrWhiteSpace(storageKey) ||
-		    generatedAtUtc is not { Kind: DateTimeKind.Utc })
+			string.IsNullOrWhiteSpace(storageKey) ||
+			generatedAtUtc is not { Kind: DateTimeKind.Utc })
 			throw new InvalidOperationException("Generated document storage details are missing.");
 
 		await ExecuteInTransactionAsync(
-			settings: TransactionalAttribute.ReadCommitted(30, 3),
-			action: async (context, ct) =>
+			TransactionalAttribute.ReadCommitted(30, 3),
+			async (context, ct) =>
 			{
-				var request = await context.Repositories.Get<DocumentGenerationRequest, Guid>()
+				var request = await context.Repositories
+					.Get<DocumentGenerationRequest, Guid>()
 					.FirstOrDefaultAsync(
 						Criteria<DocumentGenerationRequest>.New()
 							.Track()
@@ -141,16 +147,20 @@ public class GenerateDocumentLrt(
 							generatedAtUtc.Value,
 							generatedAtUtc.Value.Add(DocumentLifetime));
 					else if (request.BucketName != bucketName ||
-					         request.StorageKey != storageKey)
+							request.StorageKey != storageKey)
 						throw new InvalidOperationException(
 							"Document generation request is already completed with different storage details.");
 
-					await QueueNotificationAsync(request, definition, culture, ct);
+					await QueueNotificationAsync(
+						request,
+						definition,
+						culture,
+						ct);
 				}
 
 				await SaveStateAsync(State with { NotificationProcessed = true });
 			},
-			cancellationToken: CancellationToken);
+			CancellationToken);
 	}
 
 	private async Task QueueNotificationAsync(
@@ -164,17 +174,18 @@ public class GenerateDocumentLrt(
 		var documentUrl = await TransactionContext.GetRequiredService<IAppLinkProvider>()
 			.CreateDocumentUrlAsync(request.RequestId, token);
 
-		await TransactionContext.GetRequiredService<INotificationService>().QueueAsync(
-			request.RequesterId.Value,
-			new DocumentGeneratedNotification(
-				new DocumentGeneratedNotificationData(
-					notificationLocalizer,
-					culture,
-					definition.Name,
-					definition.Description,
-					request.RequestId,
-					documentUrl.AbsoluteUri)),
-			[new InAppRecipient(request.RequesterId.Value)],
-			token);
+		await TransactionContext.GetRequiredService<INotificationService>()
+			.QueueAsync(
+				request.RequesterId.Value,
+				new DocumentGeneratedNotification(
+					new DocumentGeneratedNotificationData(
+						notificationLocalizer,
+						culture,
+						definition.Name,
+						definition.Description,
+						request.RequestId,
+						documentUrl.AbsoluteUri)),
+				[new InAppRecipient(request.RequesterId.Value)],
+				token);
 	}
 }

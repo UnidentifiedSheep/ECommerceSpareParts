@@ -89,11 +89,11 @@ public class LrtExecutorHostedService(
 					scope.ServiceProvider.GetRequiredService<INamedObjectRegistry<ILrtNamedObject>>();
 
 				await registry
-				.GetBySystemName(systemName)
-				.ExecuteAsync(
-					jobId,
-					lrtQuota.HolderId,
-					ct);
+					.GetBySystemName(systemName)
+					.ExecuteAsync(
+						jobId,
+						lrtQuota.HolderId,
+						ct);
 			}
 			catch (OperationCanceledException) when (ct.IsCancellationRequested)
 			{

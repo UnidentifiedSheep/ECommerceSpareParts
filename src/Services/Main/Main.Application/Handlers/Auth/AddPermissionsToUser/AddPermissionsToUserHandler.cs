@@ -2,10 +2,10 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using TransactionErrorKind = Enums.TransactionErrorKind;
-using Main.Entities.Auth;
 using Extensions;
+using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
+using TransactionErrorKind = Enums.TransactionErrorKind;
 
 namespace Main.Application.Handlers.Auth.AddPermissionsToUser;
 
@@ -51,7 +51,8 @@ public sealed class AddPermissionsToUserHandler(
 		var added = request.PermissionNames.Where(name => !existingNames.Contains(name)).ToArray();
 
 		await unitOfWork.AddRangeAsync(
-			added.Select(name => UserPermission.Create(request.UserId, name)), cancellationToken);
+			added.Select(name => UserPermission.Create(request.UserId, name)),
+			cancellationToken);
 
 		return new AddPermissionsToUserResult(request.UserId, added);
 	}

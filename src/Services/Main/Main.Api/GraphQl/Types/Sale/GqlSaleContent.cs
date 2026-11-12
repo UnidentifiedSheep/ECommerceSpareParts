@@ -8,7 +8,8 @@ using Main.Application.Dtos.Sale;
 namespace Main.Api.GraphQl.Types.Sale;
 
 [GraphQLName("SaleContent")]
-public sealed record GqlSaleContent([property: GraphQLIgnore] SaleContentDto Content)
+public sealed record GqlSaleContent([property: GraphQLIgnore]
+	SaleContentDto Content)
 {
 	[GraphQLName("id")]
 	public int Id => Content.Id;
@@ -35,7 +36,8 @@ public sealed record GqlSaleContent([property: GraphQLIgnore] SaleContentDto Con
 	[RequireAllPermissions(PermissionCodes.SALES_GET)]
 	public async Task<IReadOnlyList<GqlSaleContentDetail>> GetDetailsAsync(
 		ISaleContentDetailsByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await loader.LoadAsync(Id, cancellationToken) ?? [])
-			.Select(detail => new GqlSaleContentDetail(detail)).ToArray();
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
+			.Select(detail => new GqlSaleContentDetail(detail))
+			.ToArray();
 }

@@ -14,9 +14,11 @@ public sealed class ProducerLookupLoader(
 	IReadRepository<ProducerSupplierMapping, int> mappingRepository,
 	IUnitOfWork unitOfWork) : IProducerLookupLoader
 {
-	public Task<IProducerLookup> Load(CancellationToken cancellationToken = default) =>
-		unitOfWork.ExecuteWithTransaction(new TransactionalAttribute(IsolationLevel.RepeatableRead),
-			() => LoadCore(cancellationToken), cancellationToken);
+	public Task<IProducerLookup> Load(CancellationToken cancellationToken = default)
+		=> unitOfWork.ExecuteWithTransaction(
+			new TransactionalAttribute(IsolationLevel.RepeatableRead),
+			() => LoadCore(cancellationToken),
+			cancellationToken);
 
 	private async Task<IProducerLookup> LoadCore(CancellationToken cancellationToken)
 	{
@@ -79,5 +81,4 @@ public sealed class ProducerLookupLoader(
 			new ProducerLookup(producerNamesToIds, aliasesToIds),
 			supplierMappings);
 	}
-
 }

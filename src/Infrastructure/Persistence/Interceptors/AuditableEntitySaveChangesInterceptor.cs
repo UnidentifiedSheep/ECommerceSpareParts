@@ -1,8 +1,7 @@
-﻿using Security.Core.Interfaces;
-using Abstractions.Interfaces;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Security.Core.Interfaces;
 
 namespace Persistence.Interceptors;
 

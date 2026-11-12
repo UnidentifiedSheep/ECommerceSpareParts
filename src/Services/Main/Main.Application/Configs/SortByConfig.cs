@@ -1,9 +1,7 @@
-using Abstractions;
 using Application.Common.Extensions;
 using Application.Common.Querying;
 using Main.Entities.Documents;
 using Main.Entities.Order;
-using Main.Enums.Orders;
 using Main.Entities.Organization;
 using Main.Entities.Producer;
 using Main.Entities.Product;
@@ -11,6 +9,7 @@ using Main.Entities.Purchase;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
 using Main.Enums;
+using Main.Enums.Orders;
 using Main.Enums.Organization;
 
 namespace Main.Application.Configs;
@@ -29,9 +28,11 @@ public static class SortByConfig
 			.Map<Product, string>("indicator", x => x.Indicator!.Value!)
 			.Map<Product, long>("popularity", x => x.Popularity)
 			.Map<Product, long>("count", x => x.Stocks.Sum(stock => (long)stock.Quantity))
-			.MapParameterized<Product, string, long>("count", (product, storage) => product.Stocks
-				.Where(stock => stock.StorageCode == storage)
-				.Sum(stock => (long)stock.Quantity));
+			.MapParameterized<Product, string, long>(
+				"count",
+				(product, storage) => product.Stocks
+					.Where(stock => stock.StorageCode == storage)
+					.Sum(stock => (long)stock.Quantity));
 
 		QueryableSortBy
 			.Value
@@ -77,13 +78,20 @@ public static class SortByConfig
 			.Map<Order, DateTime>("createdAt", order => order.CreatedAt)
 			.Map<Order, DateTime>("updatedAt", order => order.UpdatedAt)
 			.Map<Order, DateTime?>("confirmedAt", order => order.ConfirmedAt)
-			.Map<Order, int>("status", order => order.Status == OrderStatus.Pending ? (int)OrderStatus.Pending :
-				order.Status == OrderStatus.Confirmed ? (int)OrderStatus.Confirmed :
-				order.Status == OrderStatus.Completed ? (int)OrderStatus.Completed : (int)OrderStatus.Cancelled)
-			.Map<Order, int>("fulfillmentStatus", order =>
-				order.FulfillmentStatus == OrderFulfillmentStatus.NotAvailable ? (int)OrderFulfillmentStatus.NotAvailable :
-				order.FulfillmentStatus == OrderFulfillmentStatus.PartiallyAvailable ? (int)OrderFulfillmentStatus.PartiallyAvailable :
-				(int)OrderFulfillmentStatus.FullyAvailable)
+			.Map<Order, int>(
+				"status",
+				order => order.Status == OrderStatus.Pending ? (int)OrderStatus.Pending :
+					order.Status == OrderStatus.Confirmed ? (int)OrderStatus.Confirmed :
+					order.Status == OrderStatus.Completed ? (int)OrderStatus.Completed :
+					(int)OrderStatus.Cancelled)
+			.Map<Order, int>(
+				"fulfillmentStatus",
+				order =>
+					order.FulfillmentStatus == OrderFulfillmentStatus.NotAvailable ?
+						(int)OrderFulfillmentStatus.NotAvailable :
+						order.FulfillmentStatus == OrderFulfillmentStatus.PartiallyAvailable ?
+							(int)OrderFulfillmentStatus.PartiallyAvailable :
+							(int)OrderFulfillmentStatus.FullyAvailable)
 			.Map<Order, OrderSource>("source", order => order.Source);
 
 		QueryableSortBy
@@ -105,7 +113,8 @@ public static class SortByConfig
 				"averageBuyPrice",
 				x => x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count)
 			.Map<SaleContent, DateTime>("saleDate", x => x.Sale.SaleDatetime)
-			.MapParameterized<SaleContent, Guid, bool>("organizationMatch",
+			.MapParameterized<SaleContent, Guid, bool>(
+				"organizationMatch",
 				(content, organizationId) => content.Sale.OrganizationId == organizationId);
 
 
@@ -119,11 +128,14 @@ public static class SortByConfig
 			.Map<StorageContent, decimal>("buyPrice", x => x.BuyPriceInBaseCurrency)
 			.Map<StorageContent, DateTime>("purchaseDatetime", x => x.PurchaseDatetime)
 			.Map<StorageContent, int>("currencyId", x => x.CurrencyId)
-			.Map<StorageContent, long>("availableCount", content => Math.Max(0L,
-				content.Count - content.Locks
-					.Where(item => item.State == StorageContentLockState.Active &&
-						(item.ExpiresAt == null || item.ExpiresAt > DateTime.UtcNow))
-					.Sum(item => (long)item.Quantity)));
+			.Map<StorageContent, long>(
+				"availableCount",
+				content => Math.Max(
+					0L,
+					content.Count - content.Locks
+						.Where(item => item.State == StorageContentLockState.Active &&
+							(item.ExpiresAt == null || item.ExpiresAt > DateTime.UtcNow))
+						.Sum(item => (long)item.Quantity)));
 
 		QueryableSortBy.Value.ConfigureForJob();
 

@@ -4,7 +4,8 @@ using Pricing.Application.Dtos.PriceApplier;
 namespace Pricing.Api.GraphQl.Types;
 
 [GraphQLName("PriceApplier")]
-public sealed record GqlPriceApplier([property: GraphQLIgnore] PriceApplierDto Dto)
+public sealed record GqlPriceApplier([property: GraphQLIgnore]
+	PriceApplierDto Dto)
 {
 	[GraphQLName("systemName")]
 	public string SystemName => Dto.SystemName;
@@ -19,5 +20,6 @@ public sealed record GqlPriceApplier([property: GraphQLIgnore] PriceApplierDto D
 	public string? DslLogic => Dto.DslLogic;
 
 	[GraphQLName("states")]
-	public IReadOnlyList<GqlPriceApplierState> States => Dto.States.Select(state => new GqlPriceApplierState(state)).ToArray();
+	public IReadOnlyList<GqlPriceApplierState> States
+		=> Dto.States.Select(state => new GqlPriceApplierState(state)).ToArray();
 }

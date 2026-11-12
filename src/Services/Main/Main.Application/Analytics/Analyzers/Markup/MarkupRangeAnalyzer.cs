@@ -1,6 +1,6 @@
-using Main.Entities;
 using Application.Common.Interfaces.Repositories;
 using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Sale;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +29,8 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 
 	public override ILocalizableMessage NameLocalizationMessage => MarkupRangeAnalyzerNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		MarkupRangeAnalyzerDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> MarkupRangeAnalyzerDescriptionMessage.Instance;
 
 	public override async Task<IReadOnlyList<MarkupRangeDraft>> AnalyzeAsync(
 		MarkupAnalyzerInput input,
@@ -111,7 +111,8 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 
 	private IQueryable<SaleContent> FilterContents(MarkupAnalyzerInput input)
 	{
-		var query = repository.Query.Where(content => content.Sale.State == SaleState.Completed && content.Details.Any());
+		var query = repository.Query.Where(content
+			=> content.Sale.State == SaleState.Completed && content.Details.Any());
 		if (input.StartDate is { } start)
 			query = query.Where(content => content.Sale.SaleDatetime >= start);
 		if (input.EndDate is { } end)
@@ -119,13 +120,18 @@ public class MarkupRangeAnalyzer(IReadRepository<SaleContent, int> repository) :
 		return query;
 	}
 
-	private IQueryable<SaleContentMarkupRow> BuildRowsQuery(MarkupAnalyzerInput input) =>
-		FilterContents(input).Select(content => new SaleContentMarkupRow
-		{
-			Id = content.Id,
-			SaleUnitPriceBase = Math.Round(content.Analytics!.OriginalAmountInBaseCurrency / content.Count, DecimalScale),
-			AvgBuyPriceBase = Math.Round(content.Analytics!.CostInBaseCurrency / content.Count, DecimalScale)
-		});
+	private IQueryable<SaleContentMarkupRow> BuildRowsQuery(MarkupAnalyzerInput input)
+		=> FilterContents(input)
+			.Select(content => new SaleContentMarkupRow
+			{
+				Id = content.Id,
+				SaleUnitPriceBase = Math.Round(
+					content.Analytics!.OriginalAmountInBaseCurrency / content.Count,
+					DecimalScale),
+				AvgBuyPriceBase = Math.Round(
+					content.Analytics!.CostInBaseCurrency / content.Count,
+					DecimalScale)
+			});
 
 	private static void TryAddToBuckets(
 		SaleContentMarkupRow row,

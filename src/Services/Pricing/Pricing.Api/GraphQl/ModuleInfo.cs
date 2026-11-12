@@ -1,1 +1,3 @@
-[assembly: HotChocolate.Module("PricingGraphQL")]
+using HotChocolate;
+
+[assembly: Module("PricingGraphQL")]

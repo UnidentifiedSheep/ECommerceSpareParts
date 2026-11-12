@@ -1,5 +1,4 @@
-using Search.Enums;
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using Search.Abstractions.Options;
 using Search.Entities;
@@ -32,10 +31,11 @@ public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSear
 							.Date(d => d.Name(x => x.CharacteristicsUpdatedAt).Index(false).DocValues(false))
 							.Date(d => d.Name(x => x.DimensionsUpdatedAt).Index(false).DocValues(false))
 							.Date(d => d.Name(x => x.WeightUpdatedAt).Index(false).DocValues(false))
-							.Nested<ProductCharacteristic>(n => n.Name(x => x.Characteristics).Properties(cp => cp
-								.Number(k => k.Name(x => x.CharacteristicId).Type(NumberType.Integer))
-								.Keyword(k => k.Name(x => x.Value))
-								.Number(k => k.Name(x => x.NumericValue).Type(NumberType.Double))))
+							.Nested<ProductCharacteristic>(n => n.Name(x => x.Characteristics)
+								.Properties(cp => cp
+									.Number(k => k.Name(x => x.CharacteristicId).Type(NumberType.Integer))
+									.Keyword(k => k.Name(x => x.Value))
+									.Number(k => k.Name(x => x.NumericValue).Type(NumberType.Double))))
 							.Keyword(k => k.Name(x => x.Id))
 							.Text(text => text
 								.Name(product => product.Name)
@@ -80,5 +80,4 @@ public class ProductIndexInitializer(IOpenSearchClient client, IOptions<OpenSear
 				ct),
 			cancellationToken);
 	}
-
 }

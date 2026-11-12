@@ -7,6 +7,6 @@ namespace Main.Application.Handlers.Producers.CreateProducer;
 
 public class CreateProducerDbValidation : AbstractDbValidation<CreateProducerCommand>
 {
-	public override void Build(IValidationPlan plan, CreateProducerCommand request) =>
-		plan.ValidateProducerNotExistsName(Producer.ToNormalizedName(request.NewProducer.Name));
+	public override void Build(IValidationPlan plan, CreateProducerCommand request)
+		=> plan.ValidateProducerNotExistsName(Producer.ToNormalizedName(request.NewProducer.Name));
 }

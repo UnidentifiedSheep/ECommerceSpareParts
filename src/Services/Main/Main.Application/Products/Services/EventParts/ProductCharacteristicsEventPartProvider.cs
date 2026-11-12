@@ -12,11 +12,14 @@ public sealed class ProductCharacteristicsEventPartProvider : IProductEventPartP
 
 	public bool IsHeavyRequest => false;
 
-	public IQueryable<ProductEntity> Populate(IQueryable<ProductEntity> query) =>
-		query.Include(product => product.Characteristics);
+	public IQueryable<ProductEntity> Populate(IQueryable<ProductEntity> query)
+		=> query.Include(product => product.Characteristics);
 
-	public object Extract(IReadOnlyList<ProductEntity> products, DateTime updatedAt, IReadOnlyList<int> missingProductIds) =>
-		new ProductCharacteristicsUpdatedEvent
+	public object Extract(
+		IReadOnlyList<ProductEntity> products,
+		DateTime updatedAt,
+		IReadOnlyList<int> missingProductIds)
+		=> new ProductCharacteristicsUpdatedEvent
 		{
 			UpdatedAt = updatedAt,
 			Products = products

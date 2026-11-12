@@ -8,12 +8,10 @@ namespace Main.Application.Handlers.Balance.CreateTransaction;
 public class CreateTransactionDbValidation : AbstractDbValidation<CreateTransactionCommand>
 {
 	public override void Build(IValidationPlan plan, CreateTransactionCommand request)
-	{
-		plan
+		=> plan
 			.ValidateOrganizationExistsId(
 				Quantifier.All,
 				request.ReceiverId,
 				request.SenderId)
 			.ValidateCurrencyExistsId(request.CurrencyId);
-	}
 }

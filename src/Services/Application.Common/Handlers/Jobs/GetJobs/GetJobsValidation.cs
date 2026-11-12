@@ -5,8 +5,5 @@ namespace Application.Common.Handlers.Jobs.GetJobs;
 
 public class GetJobsValidation : AbstractValidator<GetJobsQuery>
 {
-	public GetJobsValidation()
-	{
-		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
-	}
+	public GetJobsValidation() => RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 }

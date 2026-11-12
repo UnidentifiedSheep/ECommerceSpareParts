@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Services.Events;
@@ -9,7 +8,6 @@ using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Main.Application.Lrts.RunServiceTask;
-using MassTransit;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Tests.Stubs;
@@ -26,22 +24,38 @@ public sealed class RunServiceTaskLrtTests
 		var events = new IntegrationEventScope();
 		var repositories = new Mock<IRepository<Job, Guid>>();
 		var unitOfWork = new Mock<IUnitOfWork>();
-		unitOfWork.Setup(value => value.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-		unitOfWork.Setup(value => value.ReloadAsync(It.IsAny<Job>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-		var lrt = new RunServiceTaskLrt(new ApplicationTransactionFactoryStub(unitOfWork.Object, Mock.Of<IRepositoryProvider>(provider => provider.Get<Job, Guid>() == repositories.Object), events), NullLogger<RunServiceTaskLrt>.Instance);
-		var input = new RunServiceTaskInputState { ServiceName = serviceName, TaskSystemName = "CleanupProductIndex" };
-		var job = SingleRunJob.Create(lrt.SystemName, lrt.ValidateState(JsonSerializer.Serialize(input)), 1);
+		unitOfWork.Setup(value => value.SaveChangesAsync(It.IsAny<CancellationToken>()))
+			.Returns(Task.CompletedTask);
+		unitOfWork.Setup(value => value.ReloadAsync(It.IsAny<Job>(), It.IsAny<CancellationToken>()))
+			.Returns(Task.CompletedTask);
+		var lrt = new RunServiceTaskLrt(
+			new ApplicationTransactionFactoryStub(
+				unitOfWork.Object,
+				Mock.Of<IRepositoryProvider>(provider => provider.Get<Job, Guid>() == repositories.Object),
+				events),
+			NullLogger<RunServiceTaskLrt>.Instance);
+		var input = new RunServiceTaskInputState
+			{ ServiceName = serviceName, TaskSystemName = "CleanupProductIndex" };
+		var job = SingleRunJob.Create(
+			lrt.SystemName,
+			lrt.ValidateState(JsonSerializer.Serialize(input)),
+			1);
 		var leaseHolderId = Guid.NewGuid();
 		job.AcquireLease(leaseHolderId, TimeSpan.FromMinutes(5));
 		repositories.Setup(value => value.GetById(job.Id, It.IsAny<CancellationToken>()))
 			.Returns(() => new ValueTask<Job?>(job));
 
-		await lrt.ExecuteAsync(job.Id, leaseHolderId, TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			job.Id,
+			leaseHolderId,
+			TestContext.Current.CancellationToken);
 
 		job.Status.Should().Be(JobStatus.Succeeded, job.ErrorMessage);
 		var envelope = events.Flush().Should().ContainSingle().Which;
 		envelope.RoutingKey.Should().Be(serviceName);
-		envelope.Message.Should().BeEquivalentTo(new ServiceTaskRequestedEvent { TaskSystemName = input.TaskSystemName });
+		envelope.Message
+			.Should()
+			.BeEquivalentTo(new ServiceTaskRequestedEvent { TaskSystemName = input.TaskSystemName });
 	}
 
 	[Theory]

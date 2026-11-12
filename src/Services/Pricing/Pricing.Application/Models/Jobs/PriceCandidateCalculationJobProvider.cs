@@ -22,6 +22,6 @@ public sealed class
 			maxAttempts);
 	}
 
-	private static string BuildNaturalKey(int productId, string storageCode) =>
-		$"{PriceCandidateCalculationLrt.LrtName}:{productId}:{storageCode}";
+	private static string BuildNaturalKey(int productId, string storageCode)
+		=> $"{PriceCandidateCalculationLrt.LrtName}:{productId}:{storageCode}";
 }

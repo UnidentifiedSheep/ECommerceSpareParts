@@ -8,11 +8,9 @@ public class NonePricing : LogisticsPricingStrategyBase
 	public override LogisticPricingType Type => LogisticPricingType.None;
 
 	public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
-	{
-		return Iterate(
+		=> Iterate(
 			context,
 			items,
 			_ => 0,
 			LogisticsDataRequirements.None);
-	}
 }

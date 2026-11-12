@@ -110,7 +110,8 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 		addedCount.Should().Be(2);
 
 		Context.ChangeTracker.Clear();
-		(await Context.Set<Job>().AnyAsync(x => x.Id == singleRunJob.Id, CancellationToken)).Should().BeTrue();
+		(await Context.Set<Job>().AnyAsync(x => x.Id == singleRunJob.Id, CancellationToken)).Should()
+			.BeTrue();
 		var persistedWorkflow = await Context
 			.Set<Job>()
 			.AsNoTracking()
@@ -176,11 +177,11 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 		return addedIds.Count;
 	}
 
-	private Task<IReadOnlyList<Guid>> AddJobIdsAsync(IEnumerable<Job> jobs) =>
-		AddJobIdsAsync(Scope.ServiceProvider, jobs);
+	private Task<IReadOnlyList<Guid>> AddJobIdsAsync(IEnumerable<Job> jobs)
+		=> AddJobIdsAsync(Scope.ServiceProvider, jobs);
 
-	private static async Task<int> AddJobsAsync(IServiceProvider serviceProvider, Job job) =>
-		await AddJobsAsync(serviceProvider, [job]);
+	private static async Task<int> AddJobsAsync(IServiceProvider serviceProvider, Job job)
+		=> await AddJobsAsync(serviceProvider, [job]);
 
 	private static async Task<int> AddJobsAsync(IServiceProvider serviceProvider, IEnumerable<Job> jobs)
 	{
@@ -194,8 +195,8 @@ public sealed class UniqueMultiStepJobPersistenceTests(CombinedContainerFixture 
 	{
 		var transactionService = serviceProvider.GetRequiredService<IApplicationTransaction>();
 
-		return await transactionService.WithSettingsIfIdle(new TransactionalAttribute()).ExecuteAsync(
-			async (context, cancellationToken) =>
+		return await transactionService.WithSettingsIfIdle(new TransactionalAttribute())
+			.ExecuteAsync(async (context, cancellationToken) =>
 			{
 				var repository = context.Repositories.Get<IJobRepository>();
 				var addedIds = await repository.InsertJobsAsync(jobs, cancellationToken);

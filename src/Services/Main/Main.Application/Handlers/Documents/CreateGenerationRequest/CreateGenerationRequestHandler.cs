@@ -1,18 +1,19 @@
-using Main.Application.Interfaces.Services.Document;
-using Main.Entities.Auth;
-using Main.Entities.Exceptions;
-using NamedObject.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Services;
 using Attributes;
+using Main.Application.Interfaces.Services.Document;
 using Main.Application.Lrts.GenerateDocument;
+using Main.Entities.Auth;
 using Main.Entities.Documents;
+using Main.Entities.Exceptions;
+using NamedObject.Core.Interfaces;
 
 namespace Main.Application.Handlers.Documents.CreateGenerationRequest;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record CreateGenerationRequestCommand(
 	string DocumentSystemName,
 	string DocumentRequest,
@@ -26,7 +27,7 @@ public class CreateGenerationRequestHandler(
 	INamedObjectRegistry<IDocumentDefinition> definitions,
 	IJobService jobService,
 	IJobProvider<GenerateDocumentLrt, GenerateDocumentInputState> provider
-	) : ICommandHandler<CreateGenerationRequestCommand, CreateGenerationRequestResult>
+) : ICommandHandler<CreateGenerationRequestCommand, CreateGenerationRequestResult>
 {
 	public async Task<CreateGenerationRequestResult> Handle(
 		CreateGenerationRequestCommand request,
@@ -34,17 +35,17 @@ public class CreateGenerationRequestHandler(
 	{
 		var definition = definitions.GetBySystemName(request.DocumentSystemName);
 		if (definition.RequiredPermissions.Any(permission =>
-			request.GrantedPermissions?.Contains(Permission.ToNormalizedPermission(permission)) != true))
+				request.GrantedPermissions?.Contains(Permission.ToNormalizedPermission(permission)) != true))
 			throw new DocumentSourceAccessDeniedException();
 
 		var jobs = await jobService.TryEnqueueJobsAsync(
 			[
 				provider.Create(
-				new GenerateDocumentInputState
-				{
-					DocumentSystemName = request.DocumentSystemName,
-					DocumentRequest = request.DocumentRequest
-				})
+					new GenerateDocumentInputState
+					{
+						DocumentSystemName = request.DocumentSystemName,
+						DocumentRequest = request.DocumentRequest
+					})
 			],
 			cancellationToken);
 

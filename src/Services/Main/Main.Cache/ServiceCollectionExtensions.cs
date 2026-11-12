@@ -1,4 +1,4 @@
-﻿﻿﻿using Main.Application.Interfaces.Cache;
+﻿using Main.Application.Interfaces.Cache;
 using Main.Application.Products.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 

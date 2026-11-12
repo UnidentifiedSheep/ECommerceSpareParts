@@ -13,7 +13,11 @@ using Pricing.Entities.Exceptions.Markup;
 
 namespace Pricing.Application.Handlers.Markup.UpsertMarkupGroup;
 
-[Transactional(IsolationLevel.Serializable, 20, 3, TransactionErrorKind.UniqueConstraintViolation)]
+[Transactional(
+	IsolationLevel.Serializable,
+	20,
+	3,
+	TransactionErrorKind.UniqueConstraintViolation)]
 [AutoSave]
 public record UpsertMarkupGroupCommand(UpsertMarkupGroupDto MarkupGroup, Guid? SourceMessageId = null)
 	: ICommand<UpsertMarkupGroupResult>;
@@ -24,9 +28,12 @@ public class UpsertMarkupGroupHandler(
 	IRepository<MarkupGroup, int> repository,
 	IReadRepository<MarkupGroup, int> readRepository,
 	IUnitOfWork unitOfWork,
-	IIntegrationEventScope integrationEvents) : ICommandHandler<UpsertMarkupGroupCommand, UpsertMarkupGroupResult>
+	IIntegrationEventScope integrationEvents)
+	: ICommandHandler<UpsertMarkupGroupCommand, UpsertMarkupGroupResult>
 {
-	public async Task<UpsertMarkupGroupResult> Handle(UpsertMarkupGroupCommand request, CancellationToken cancellationToken)
+	public async Task<UpsertMarkupGroupResult> Handle(
+		UpsertMarkupGroupCommand request,
+		CancellationToken cancellationToken)
 	{
 		if (request.MarkupGroup.Id is null && request.SourceMessageId is { } messageId)
 		{
@@ -38,18 +45,22 @@ public class UpsertMarkupGroupHandler(
 				return new UpsertMarkupGroupResult(id);
 		}
 
-		var ranges = request.MarkupGroup.Ranges
-			.Select(x => MarkupRange.Create(x.RangeStart, x.RangeEnd, x.Markup))
+		var ranges = request.MarkupGroup
+			.Ranges
+			.Select(x => MarkupRange.Create(
+				x.RangeStart,
+				x.RangeEnd,
+				x.Markup))
 			.ToList();
 
 		MarkupGroup group;
 		if (request.MarkupGroup.Id is null)
 		{
 			group = MarkupGroup.Create(
-					request.MarkupGroup.Name,
-					request.MarkupGroup.CurrencyId,
-					ranges,
-					request.SourceMessageId);
+				request.MarkupGroup.Name,
+				request.MarkupGroup.CurrencyId,
+				ranges,
+				request.SourceMessageId);
 			await unitOfWork.AddAsync(group, cancellationToken);
 		}
 		else
@@ -64,7 +75,10 @@ public class UpsertMarkupGroupHandler(
 			group = await repository.FirstOrDefaultAsync(criteria, cancellationToken) ??
 				throw new MarkupGroupNotFoundException(request.MarkupGroup.Id.Value);
 
-			group.Update(request.MarkupGroup.Name, request.MarkupGroup.CurrencyId, ranges);
+			group.Update(
+				request.MarkupGroup.Name,
+				request.MarkupGroup.CurrencyId,
+				ranges);
 		}
 
 		integrationEvents.Add(new MarkupRangesRefreshRequestedEvent());

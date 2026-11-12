@@ -1,6 +1,7 @@
 using Domain.CommonEntities;
 using Main.Entities.Settings;
 using Main.Entities.Settings.Supplier;
+using Main.Persistence.DatabaseObjects;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,11 @@ public sealed class MainDbContextModule : IDbContextModule
 	public void Configure(ModelBuilder modelBuilder)
 	{
 		modelBuilder.HasDefaultSchema("public");
-		modelBuilder.HasDbFunction(typeof(DatabaseObjects.UserSearchDbFunctions)
-			.GetMethod(nameof(DatabaseObjects.UserSearchDbFunctions.ToUserSearchQuery))!)
-			.HasName("user_search_query").HasSchema("auth");
+		modelBuilder.HasDbFunction(
+				typeof(UserSearchDbFunctions)
+					.GetMethod(nameof(UserSearchDbFunctions.ToUserSearchQuery))!)
+			.HasName("user_search_query")
+			.HasSchema("auth");
 
 		modelBuilder.AddOutboxMessageEntity();
 		modelBuilder.AddOutboxStateEntity();

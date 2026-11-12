@@ -11,11 +11,11 @@ public class MinimumSupplierPriceApplier(ICurrencyConverter currencyConverter)
 {
 	public override string SystemName => nameof(MinimumSupplierPriceApplier);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		PriceApplierMinimumSupplierPriceNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> PriceApplierMinimumSupplierPriceNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		PriceApplierMinimumSupplierPriceDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> PriceApplierMinimumSupplierPriceDescriptionMessage.Instance;
 
 	public override int Order => -1000;
 

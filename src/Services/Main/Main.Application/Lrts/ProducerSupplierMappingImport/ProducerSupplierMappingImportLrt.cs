@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Options.S3;
 using Attributes;
@@ -39,18 +38,20 @@ public class ProducerSupplierMappingImportLrt(
 
 	public override string SystemName => nameof(ProducerSupplierMappingImportLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtProducerSupplierMappingImportNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProducerSupplierMappingImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProducerSupplierMappingImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProducerSupplierMappingImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 
-	protected override async Task BeforeRead(ProducerSupplierMappingImportState state) =>
-		_producerLookup = await ExecuteInScopeAsync((context, ct) =>
-			context.GetRequiredService<IProducerLookupService>().Load(ct), CancellationToken);
+	protected override async Task BeforeRead(ProducerSupplierMappingImportState state)
+		=> _producerLookup = await ExecuteInScopeAsync(
+			(context, ct) =>
+				context.GetRequiredService<IProducerLookupService>().Load(ct),
+			CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,

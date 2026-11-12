@@ -1,27 +1,21 @@
-using Main.Entities.Balance;
-using Main.Entities.Sale;
 using Application.Common.Services;
-using Moq;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Tests.Stubs;
-using Microsoft.Extensions.DependencyInjection;
-using Application.Common.Interfaces.Events;
 using Contracts;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.CreateSale;
-using Main.Application.Static;
+using Main.Entities.Balance;
 using Main.Entities.Exceptions;
+using Main.Entities.Sale;
 using Main.Entities.Storage;
 using Main.Entities.User;
-using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
-using Tests.DataBuilders.Organization;
-using Tests.DataBuilders.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Tests.Abstractions.Test;
 using Tests.Extensions;
+using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Storage;
@@ -36,17 +30,21 @@ public class CreateSaleTests : IntegrationTest
 		RegisterBasicContext<UsersTestContext>();
 	}
 
-	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
-		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+	private MessageBrokerStub Broker
+		=> (MessageBrokerStub)Scope.ServiceProvider
+			.GetRequiredService<PublishEndpointAccessor>()
+			.Publisher;
 
 	[Fact]
 	public async Task CreateSale_CreatesSaleAndSubtractsStorageContent()
 	{
 		var buyer = Buyer();
 		var storageContent = StorageContent();
-		var productStockQuantity = await Context.GetProductStockQuantityAsync(storageContent.ProductId, CancellationToken);
+		var productStockQuantity = await Context.GetProductStockQuantityAsync(
+			storageContent.ProductId,
+			CancellationToken);
 		var originalContents = await Context
-			.Set<global::Main.Entities.Storage.StorageContent>()
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
@@ -70,7 +68,7 @@ public class CreateSaleTests : IntegrationTest
 		result.SaleId.Should().NotBeEmpty();
 
 		var sale = await Context
-			.Set<global::Main.Entities.Sale.Sale>()
+			.Set<Sale>()
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
@@ -87,7 +85,9 @@ public class CreateSaleTests : IntegrationTest
 		saleContent.DiscountedPrice.Should().Be(80m);
 		saleContent.TotalSum.Should().Be(80m);
 		saleContent.OriginalPrice.Should().Be(100);
-		var analytics = await Context.Set<SaleContentAnalytics>().AsNoTracking().SingleAsync(item => item.SaleContentId == saleContent.Id, CancellationToken);
+		var analytics = await Context.Set<SaleContentAnalytics>()
+			.AsNoTracking()
+			.SingleAsync(item => item.SaleContentId == saleContent.Id, CancellationToken);
 		analytics.OriginalAmountInBaseCurrency.Should().Be(100m * saleContent.Count);
 		analytics.RevenueInBaseCurrency.Should().Be(80m * saleContent.Count);
 
@@ -105,16 +105,17 @@ public class CreateSaleTests : IntegrationTest
 				TimeSpan.FromMilliseconds(1));
 
 		var updatedContent = await Context
-			.Set<global::Main.Entities.Storage.StorageContent>()
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == detail.StorageContentId, CancellationToken);
 		updatedContent.Count.Should().Be(affectedStorageContent.Count - 1);
 
-		var updatedProductStockQuantity = await Context.GetProductStockQuantityAsync(storageContent.ProductId, CancellationToken);
+		var updatedProductStockQuantity =
+			await Context.GetProductStockQuantityAsync(storageContent.ProductId, CancellationToken);
 		updatedProductStockQuantity.Should().Be(originalStock - 1);
 
 		var saleTransaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 		saleTransaction.SenderId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
@@ -171,12 +172,12 @@ public class CreateSaleTests : IntegrationTest
 					1200m)
 			],
 			1200m,
-			forcePayment: false);
+			false);
 
 		await Mediator.Send(command, CancellationToken);
 
 		var balance = await Context
-			.Set<global::Main.Entities.Balance.OrganizationBalance>()
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId,
@@ -226,7 +227,7 @@ public class CreateSaleTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var balance = await Context
-			.Set<global::Main.Entities.Balance.OrganizationBalance>()
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.OrganizationId == buyer.Id && x.CurrencyId == storageContent.CurrencyId,
@@ -275,7 +276,7 @@ public class CreateSaleTests : IntegrationTest
 		var result = await Mediator.Send(command, CancellationToken);
 
 		var sale = await Context
-			.Set<global::Main.Entities.Sale.Sale>()
+			.Set<Sale>()
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
@@ -295,7 +296,7 @@ public class CreateSaleTests : IntegrationTest
 		var buyer = Buyer();
 		var storageContent = StorageContent();
 		var countOnStorage = await Context
-			.Set<global::Main.Entities.Storage.StorageContent>()
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
@@ -423,8 +424,7 @@ public class CreateSaleTests : IntegrationTest
 		IEnumerable<NewSaleContentDto> contents,
 		decimal? payedSum = null,
 		bool forcePayment = true)
-	{
-		return new CreateSaleCommand(
+		=> new(
 			userId,
 			userId,
 			currencyId,
@@ -434,31 +434,27 @@ public class CreateSaleTests : IntegrationTest
 			Faker.Lorem.Sentence(),
 			payedSum,
 			forcePayment);
-	}
 
 	private static NewSaleContentDto NewContent(
 		int productId,
 		int count,
 		decimal originalPrice = 100m,
 		decimal discountedPrice = 90m)
-	{
-		return new NewSaleContentDto
+		=> new()
 		{
 			ProductId = productId,
 			Count = count,
 			OriginalPrice = originalPrice,
 			DiscountedPrice = discountedPrice
 		};
-	}
 
 	private User Buyer() => GetContext<UsersTestContext>().Users.First();
 
-	private StorageContent StorageContent() =>
-		GetContext<StorageContentTestContext>().StorageContents.First(x => x.Count > 0);
+	private StorageContent StorageContent()
+		=> GetContext<StorageContentTestContext>().StorageContents.First(x => x.Count > 0);
 
 	private StorageContent StorageContentWithCountAtLeast(int count)
-	{
-		return GetContext<StorageContentTestContext>()
+		=> GetContext<StorageContentTestContext>()
 			.StorageContents
 			.Where(x => x.Count > 0)
 			.GroupBy(x => new
@@ -469,17 +465,14 @@ public class CreateSaleTests : IntegrationTest
 			.First(x => x.Sum(z => z.Count) >= count)
 			.OrderByDescending(x => x.Count)
 			.First();
-	}
 
 	private Task<int> CountOnStorage(StorageContent storageContent)
-	{
-		return Context
-			.Set<global::Main.Entities.Storage.StorageContent>()
+		=> Context
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.Where(x =>
 				x.ProductId == storageContent.ProductId && x.StorageCode == storageContent.StorageCode)
 			.SumAsync(x => x.Count);
-	}
 }
 
 public class CreateSaleValidationTests : ValidationTest<CreateSaleValidation, CreateSaleCommand>
@@ -491,7 +484,16 @@ public class CreateSaleValidationTests : ValidationTest<CreateSaleValidation, Cr
 		return new CreateSaleValidation(policy.Object);
 	}
 
-	private static CreateSaleCommand CreateValidCommand() => new(Guid.NewGuid(), Guid.NewGuid(), 1, "storage", DateTime.UtcNow, [new NewSaleContentDto { ProductId = 1, Count = 1, OriginalPrice = 100m, DiscountedPrice = 80m }], null, null);
+	private static CreateSaleCommand CreateValidCommand()
+		=> new(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1,
+			"storage",
+			DateTime.UtcNow,
+			[new NewSaleContentDto { ProductId = 1, Count = 1, OriginalPrice = 100m, DiscountedPrice = 80m }],
+			null,
+			null);
 
 	[Fact]
 	public async Task CreateSale_WithEmptyContents_FailsValidation()

@@ -23,7 +23,8 @@ public class OrganizationFinancialProfileBuilder(Faker faker)
 		return this;
 	}
 
-	public override OrganizationFinancialProfile Build() => OrganizationFinancialProfile.Create(
-		OrganizationId ?? Guid.NewGuid(),
-		MinAllowedBalance ?? 0m);
+	public override OrganizationFinancialProfile Build()
+		=> OrganizationFinancialProfile.Create(
+			OrganizationId ?? Guid.NewGuid(),
+			MinAllowedBalance ?? 0m);
 }

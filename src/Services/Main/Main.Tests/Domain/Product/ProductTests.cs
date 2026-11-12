@@ -50,7 +50,12 @@ public class ProductTests
 		product.AddEan("1234567890123");
 		product.AddEan("1234567890124");
 
-		product.Eans.Select(x => x.Ean).Should().BeEquivalentTo(["1234567890123", "1234567890124"]);
+		product.Eans
+			.Select(x => x.Ean)
+			.Should()
+			.BeEquivalentTo(
+				"1234567890123",
+				"1234567890124");
 
 		product.RemoveEan("1234567890123");
 		product.Eans.Select(x => x.Ean).Should().Equal("1234567890124");
@@ -87,11 +92,9 @@ public class ProductTests
 	}
 
 	private static ProductDomain Create()
-	{
-		return ProductDomain.Create(
+		=> ProductDomain.Create(
 			new Sku("ABC-123"),
 			new Name("test product"),
 			1,
 			"desc");
-	}
 }

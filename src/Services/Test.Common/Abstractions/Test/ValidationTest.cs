@@ -8,6 +8,7 @@ public abstract class ValidationTest<TValidator, TRequest>
 {
 	protected virtual TValidator CreateValidator() => Activator.CreateInstance<TValidator>();
 
-	protected Task<TestValidationResult<TRequest>> ValidateAsync(TRequest request) =>
-		CreateValidator().TestValidateAsync(request, cancellationToken: TestContext.Current.CancellationToken);
+	protected Task<TestValidationResult<TRequest>> ValidateAsync(TRequest request)
+		=> CreateValidator()
+			.TestValidateAsync(request, cancellationToken: TestContext.Current.CancellationToken);
 }

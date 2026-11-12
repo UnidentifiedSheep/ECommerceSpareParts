@@ -1,11 +1,11 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Handlers.Characteristics.DeleteCharacteristic;
 using Main.Entities;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -16,9 +16,7 @@ namespace Tests.HandlersTests.Characteristics;
 public class DeleteCharacteristicTests : IntegrationTest
 {
 	public DeleteCharacteristicTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	[Fact]
 	public async Task ExistingCharacteristic_RemovesOnlyRequestedCharacteristic()
@@ -47,7 +45,10 @@ public class DeleteCharacteristicTests : IntegrationTest
 	{
 		var existing = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context);
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
-		var link = ProductCharacteristic.Create(productId, existing.Id, "Red");
+		var link = ProductCharacteristic.Create(
+			productId,
+			existing.Id,
+			"Red");
 		await Context.Set<ProductCharacteristic>().AddAsync(link, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
@@ -57,9 +58,13 @@ public class DeleteCharacteristicTests : IntegrationTest
 		var exception = await act.Should().ThrowAsync<DbValidationException>();
 		var failure = Assert.IsType<CharacteristicInUseException>(exception.Which.Failures.Single().Error);
 		failure.LocalizableMessage.MessageKey.Should().Be(CharacteristicInUseMessage.Key);
-		(await Context.Set<Characteristic>().AnyAsync(x => x.Id == existing.Id, CancellationToken)).Should().BeTrue();
-		(await Context.Set<ProductCharacteristic>().AnyAsync(
-			x => x.ProductId == productId && x.CharacteristicId == existing.Id, CancellationToken)).Should().BeTrue();
+		(await Context.Set<Characteristic>().AnyAsync(x => x.Id == existing.Id, CancellationToken)).Should()
+			.BeTrue();
+		(await Context.Set<ProductCharacteristic>()
+				.AnyAsync(
+					x => x.ProductId == productId && x.CharacteristicId == existing.Id,
+					CancellationToken)).Should()
+			.BeTrue();
 	}
 
 	[Fact]
@@ -68,8 +73,13 @@ public class DeleteCharacteristicTests : IntegrationTest
 		var used = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context);
 		var unused = await new CharacteristicBuilder(Faker).WithName("Size").BuildAndAddToDb(Context);
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
-		await Context.Set<ProductCharacteristic>().AddAsync(
-			ProductCharacteristic.Create(productId, used.Id, "Red"), CancellationToken);
+		await Context.Set<ProductCharacteristic>()
+			.AddAsync(
+				ProductCharacteristic.Create(
+					productId,
+					used.Id,
+					"Red"),
+				CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
@@ -79,11 +89,11 @@ public class DeleteCharacteristicTests : IntegrationTest
 		remaining.Should().ContainSingle().Which.Id.Should().Be(used.Id);
 		(await Context.Set<ProductCharacteristic>().CountAsync(CancellationToken)).Should().Be(1);
 	}
-
-
 }
 
-public class DeleteCharacteristicValidationTests : ValidationTest<DeleteCharacteristicValidation, DeleteCharacteristicCommand>
+public class
+	DeleteCharacteristicValidationTests : ValidationTest<DeleteCharacteristicValidation,
+	DeleteCharacteristicCommand>
 {
 	[Theory]
 	[InlineData(0)]

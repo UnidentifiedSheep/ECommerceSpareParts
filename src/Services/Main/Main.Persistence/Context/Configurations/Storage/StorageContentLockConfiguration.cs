@@ -9,10 +9,13 @@ public sealed class StorageContentLockConfiguration : IEntityTypeConfiguration<S
 {
 	public void Configure(EntityTypeBuilder<StorageContentLock> builder)
 	{
-		builder.ToTable("storage_content_locks", "public", table =>
-		{
-			table.HasCheckConstraint("storage_content_locks_quantity_positive_ck", "quantity > 0");
-		});
+		builder.ToTable(
+			"storage_content_locks",
+			"public",
+			table =>
+			{
+				table.HasCheckConstraint("storage_content_locks_quantity_positive_ck", "quantity > 0");
+			});
 
 		builder.HasKey(item => item.Id)
 			.HasName("storage_content_locks_pk");
@@ -47,7 +50,9 @@ public sealed class StorageContentLockConfiguration : IEntityTypeConfiguration<S
 			.HasFilter($"state = '{nameof(StorageContentLockState.Active)}'")
 			.IncludeProperties(item => new { item.Quantity, item.ExpiresAt });
 
-		builder.HasIndex(item => new { item.ExpiresAt, item.Id }, "storage_content_locks_active_expiration_idx")
+		builder.HasIndex(
+				item => new { item.ExpiresAt, item.Id },
+				"storage_content_locks_active_expiration_idx")
 			.HasFilter($"state = '{nameof(StorageContentLockState.Active)}' AND expires_at IS NOT NULL");
 
 		builder.HasOne(item => item.StorageContent)

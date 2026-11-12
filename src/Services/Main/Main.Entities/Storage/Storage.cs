@@ -41,13 +41,11 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
 	public static Storage Create(string code, StorageType type) => new(code, type);
 
 	private void SetCode(string code)
-	{
-		Code = code
+		=> Code = code
 			.Trim()
 			.EnsureNotNullOrEmpty(StorageCodeNotEmptyMessage.Instance)
 			.EnsureMinLength(6, StorageCodeMinLengthMessage.Instance)
 			.EnsureMaxLength(128, StorageCodeMaxLengthMessage.Instance);
-	}
 
 	public void SetType(StorageType type)
 	{
@@ -60,12 +58,14 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
 		Type = type;
 	}
 
-	public void SetDescription(string? description) => Description = description
-		.NullIfWhiteSpace()
-		?.EnsureMaxLength(256, StorageDescriptionMaxLengthMessage.Instance);
+	public void SetDescription(string? description)
+		=> Description = description
+			.NullIfWhiteSpace()
+			?.EnsureMaxLength(256, StorageDescriptionMaxLengthMessage.Instance);
 
-	public void SetLocation(string? location) => Location =
-		location.NullIfWhiteSpace()?.EnsureMaxLength(256, StorageLocationMaxLengthMessage.Instance);
+	public void SetLocation(string? location)
+		=> Location =
+			location.NullIfWhiteSpace()?.EnsureMaxLength(256, StorageLocationMaxLengthMessage.Instance);
 
 	public void AddOwner(Guid userId)
 	{

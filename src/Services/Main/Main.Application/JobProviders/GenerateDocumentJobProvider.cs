@@ -11,7 +11,7 @@ public class GenerateDocumentJobProvider : IJobProvider<GenerateDocumentLrt, Gen
 {
 	public Job Create(GenerateDocumentInputState inputState, int maxAttempts = 3)
 		=> SingleRunJob.Create(
-			systemName: GenerateDocumentLrt.Name,
-			initialState: JsonSerializer.Serialize(inputState),
-			maxAttempts: maxAttempts);
+			GenerateDocumentLrt.Name,
+			JsonSerializer.Serialize(inputState),
+			maxAttempts);
 }

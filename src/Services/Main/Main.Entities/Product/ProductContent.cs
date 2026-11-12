@@ -32,22 +32,22 @@ public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<Pr
 
 	public Product ChildProduct { get; private set; } = null!;
 
-	public static Expression<Func<ProductContent, (int, int)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.ParentProductId, x.ChildProductId);
+	public static Expression<Func<ProductContent, (int, int)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.ParentProductId, x.ChildProductId);
 
-	public static Expression<Func<ProductContent, bool>> GetEqualityExpression((int, int) key) => x =>
-		x.ParentProductId == key.Item1 && x.ChildProductId == key.Item2;
+	public static Expression<Func<ProductContent, bool>> GetEqualityExpression((int, int) key)
+		=> x =>
+			x.ParentProductId == key.Item1 && x.ChildProductId == key.Item2;
 
 	public static ProductContent Create(
 		int parentProductId,
 		int childProductId,
 		int quantity)
-	{
-		return new ProductContent(
+		=> new(
 			parentProductId,
 			childProductId,
 			quantity);
-	}
 
 	public void SetQuantity(int quantity)
 	{

@@ -13,5 +13,5 @@ public interface IRecipientResolver
 	Task<IReadOnlyDictionary<Guid, TRecipient>> ResolveAsync<TRecipient>(
 		IReadOnlyCollection<Guid> userIds,
 		CancellationToken cancellationToken = default
-		) where TRecipient : INotificationRecipient;
+	) where TRecipient : INotificationRecipient;
 }

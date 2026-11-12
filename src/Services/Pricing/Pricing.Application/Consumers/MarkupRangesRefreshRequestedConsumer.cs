@@ -22,14 +22,15 @@ public class MarkupRangesRefreshRequestedConsumer(
 	{
 		await markupInitializer.Initialize(context.CancellationToken);
 
-		await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3)).ExecuteAsync(
-			async (transactionContext, ct) =>
-			{
-				var job = jobProvider.Create(new NoneInputState());
-				var addedIds = await jobService.TryEnqueueJobsAsync([job], ct);
-				if (addedIds.Count != 0)
-					await transactionContext.UnitOfWork.SaveChangesAsync(ct);
-			},
-			context.CancellationToken);
+		await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3))
+			.ExecuteAsync(
+				async (transactionContext, ct) =>
+				{
+					var job = jobProvider.Create(new NoneInputState());
+					var addedIds = await jobService.TryEnqueueJobsAsync([job], ct);
+					if (addedIds.Count != 0)
+						await transactionContext.UnitOfWork.SaveChangesAsync(ct);
+				},
+				context.CancellationToken);
 	}
 }

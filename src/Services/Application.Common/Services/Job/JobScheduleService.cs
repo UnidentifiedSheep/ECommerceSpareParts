@@ -29,35 +29,36 @@ public class JobScheduleService(
 		ArgumentNullException.ThrowIfNull(newSchedule);
 		await newScheduleValidator.ValidateAndThrowAsync(newSchedule, token);
 
-		return await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
-			async (ctx, ct) =>
-			{
-				var lrt = registry.GetBySystemName(newSchedule.JobSystemName);
-				var validatedState = lrt.ValidateState(newSchedule.InputState);
+		return await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2))
+			.ExecuteAsync(
+				async (ctx, ct) =>
+				{
+					var lrt = registry.GetBySystemName(newSchedule.JobSystemName);
+					var validatedState = lrt.ValidateState(newSchedule.InputState);
 
-				var schedule = JobSchedule.Create(
-					newSchedule.Name,
-					newSchedule.Description,
-					lrt.SystemName,
-					validatedState,
-					newSchedule.MaxAttempts,
-					newSchedule.Cron);
+					var schedule = JobSchedule.Create(
+						newSchedule.Name,
+						newSchedule.Description,
+						lrt.SystemName,
+						validatedState,
+						newSchedule.MaxAttempts,
+						newSchedule.Cron);
 
-				if (newSchedule.Enabled)
-					schedule.Enable();
+					if (newSchedule.Enabled)
+						schedule.Enable();
 
-				var nextRunAt = CronExpression
-					.Parse(schedule.Cron)
-					.GetNextOccurrence(GetUtcNow(), JobSchedule.TimeZone);
+					var nextRunAt = CronExpression
+						.Parse(schedule.Cron)
+						.GetNextOccurrence(GetUtcNow(), JobSchedule.TimeZone);
 
-				schedule.SetNextRunAt(nextRunAt);
+					schedule.SetNextRunAt(nextRunAt);
 
-				await ctx.UnitOfWork.AddAsync(schedule, ct);
-				await ctx.UnitOfWork.SaveChangesAsync(ct);
+					await ctx.UnitOfWork.AddAsync(schedule, ct);
+					await ctx.UnitOfWork.SaveChangesAsync(ct);
 
-				return schedule.Id;
-			},
-			token);
+					return schedule.Id;
+				},
+				token);
 	}
 
 	public async Task<Guid> UpdateScheduleAsync(
@@ -68,130 +69,133 @@ public class JobScheduleService(
 		ArgumentNullException.ThrowIfNull(patch);
 		await patchScheduleValidator.ValidateAndThrowAsync(patch, token);
 
-		return await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
-			async (ctx, ct) =>
-			{
-				var repository = ctx.Repositories.Get<JobSchedule, Guid>();
-				var schedule = await GetForUpdateAsync(
-					repository,
-					scheduleId,
-					ct) ?? throw new JobScheduleNotFoundException(scheduleId);
-
-				var nextRunAtMustBeRecalculated = false;
-
-				patch.Name.Apply(schedule.SetName);
-				patch.Description.Apply(schedule.SetDescription);
-				patch.MaxAttempts.Apply(schedule.SetMaxAttempts);
-
-				if (patch.InputState.IsSet)
+		return await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2))
+			.ExecuteAsync(
+				async (ctx, ct) =>
 				{
-					var lrt = registry.GetBySystemName(schedule.JobSystemName);
-					var validatedState = lrt.ValidateState(patch.InputState.Value!);
+					var repository = ctx.Repositories.Get<JobSchedule, Guid>();
+					var schedule = await GetForUpdateAsync(
+						repository,
+						scheduleId,
+						ct) ?? throw new JobScheduleNotFoundException(scheduleId);
 
-					schedule.SetInputState(validatedState);
-				}
+					var nextRunAtMustBeRecalculated = false;
 
-				if (patch.Cron.IsSet)
-				{
-					schedule.SetCron(patch.Cron.Value!);
-					nextRunAtMustBeRecalculated = true;
-				}
+					patch.Name.Apply(schedule.SetName);
+					patch.Description.Apply(schedule.SetDescription);
+					patch.MaxAttempts.Apply(schedule.SetMaxAttempts);
 
-				if (patch.Enabled.IsSet)
-				{
-					if (patch.Enabled.Value)
+					if (patch.InputState.IsSet)
 					{
-						schedule.Enable();
+						var lrt = registry.GetBySystemName(schedule.JobSystemName);
+						var validatedState = lrt.ValidateState(patch.InputState.Value!);
+
+						schedule.SetInputState(validatedState);
+					}
+
+					if (patch.Cron.IsSet)
+					{
+						schedule.SetCron(patch.Cron.Value!);
 						nextRunAtMustBeRecalculated = true;
 					}
-					else
-						schedule.Disable();
-				}
 
-				if (nextRunAtMustBeRecalculated)
-					schedule.SetNextRunAt(GetNextRunAt(schedule));
+					if (patch.Enabled.IsSet)
+					{
+						if (patch.Enabled.Value)
+						{
+							schedule.Enable();
+							nextRunAtMustBeRecalculated = true;
+						}
+						else
+							schedule.Disable();
+					}
 
-				await ctx.UnitOfWork.SaveChangesAsync(ct);
-				return schedule.Id;
-			},
-			token);
+					if (nextRunAtMustBeRecalculated)
+						schedule.SetNextRunAt(GetNextRunAt(schedule));
+
+					await ctx.UnitOfWork.SaveChangesAsync(ct);
+					return schedule.Id;
+				},
+				token);
 	}
 
 	public Task RemoveScheduleAsync(Guid scheduleId, CancellationToken token = default)
-	{
-		return transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
-			async (ctx, ct) =>
-			{
-				var repository = ctx.Repositories.Get<JobSchedule, Guid>();
-				var schedule = await GetForUpdateAsync(
-					repository,
-					scheduleId,
-					ct) ?? throw new JobScheduleNotFoundException(scheduleId);
+		=> transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2))
+			.ExecuteAsync(
+				async (ctx, ct) =>
+				{
+					var repository = ctx.Repositories.Get<JobSchedule, Guid>();
+					var schedule = await GetForUpdateAsync(
+						repository,
+						scheduleId,
+						ct) ?? throw new JobScheduleNotFoundException(scheduleId);
 
-				ctx.UnitOfWork.Remove(schedule);
-				await ctx.UnitOfWork.SaveChangesAsync(ct);
-			},
-			token);
-	}
+					ctx.UnitOfWork.Remove(schedule);
+					await ctx.UnitOfWork.SaveChangesAsync(ct);
+				},
+				token);
 
 	public Task<int> QueueDueSchedulesAsync(int batchSize, CancellationToken token = default)
 	{
 		if (batchSize <= 0)
 			return Task.FromResult(0);
 
-		return transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2)).ExecuteAsync(
-			async (ctx, ct) =>
-			{
-				var utcNow = GetUtcNow();
-				var repository = ctx.Repositories.Get<JobSchedule, Guid>();
-				var criteria = Criteria<JobSchedule>
-					.New()
-					.Where(x => x.Enabled)
-					.Where(x => x.NextRunAt != null && x.NextRunAt <= utcNow)
-					.OrderByAsc(x => x.NextRunAt)
-					.ForUpdate(true, true)
-					.Track()
-					.Size(batchSize)
-					.Build();
-
-				var schedules = await repository.ListAsync(criteria, ct);
-				if (schedules.Count == 0)
-					return 0;
-
-				var jobIds = await jobService.TryEnqueueJobsAsync(
-					schedules.Select(x => new JobItem(
-						x.JobSystemName,
-						x.InputState,
-						x.MaxAttempts)),
-					ct);
-
-				if (jobIds.Count != schedules.Count)
-					throw new InvalidOperationException("All non-unique scheduled jobs must be enqueued.");
-
-				for (var i = 0; i < schedules.Count; i++)
+		return transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 2))
+			.ExecuteAsync(
+				async (ctx, ct) =>
 				{
-					var schedule = schedules[i];
-					var scheduledAt = schedule.NextRunAt!.Value;
-					var nextRunAt = CronExpression
-						.Parse(schedule.Cron)
-						.GetNextOccurrence(utcNow, JobSchedule.TimeZone);
+					var utcNow = GetUtcNow();
+					var repository = ctx.Repositories.Get<JobSchedule, Guid>();
+					var criteria = Criteria<JobSchedule>
+						.New()
+						.Where(x => x.Enabled)
+						.Where(x => x.NextRunAt != null && x.NextRunAt <= utcNow)
+						.OrderByAsc(x => x.NextRunAt)
+						.ForUpdate(true, true)
+						.Track()
+						.Size(batchSize)
+						.Build();
 
-					schedule.MarkQueued(utcNow, nextRunAt);
-					schedule.AddScheduleRun(
-						jobIds[i],
-						scheduledAt,
-						utcNow);
-				}
+					var schedules = await repository.ListAsync(criteria, ct);
+					if (schedules.Count == 0)
+						return 0;
 
-				await ctx.UnitOfWork.SaveChangesAsync(ct);
-				return schedules.Count;
-			},
-			token);
+					var jobIds = await jobService.TryEnqueueJobsAsync(
+						schedules.Select(x => new JobItem(
+							x.JobSystemName,
+							x.InputState,
+							x.MaxAttempts)),
+						ct);
+
+					if (jobIds.Count != schedules.Count)
+						throw new InvalidOperationException(
+							"All non-unique scheduled jobs must be enqueued.");
+
+					for (var i = 0; i < schedules.Count; i++)
+					{
+						var schedule = schedules[i];
+						var scheduledAt = schedule.NextRunAt!.Value;
+						var nextRunAt = CronExpression
+							.Parse(schedule.Cron)
+							.GetNextOccurrence(utcNow, JobSchedule.TimeZone);
+
+						schedule.MarkQueued(utcNow, nextRunAt);
+						schedule.AddScheduleRun(
+							jobIds[i],
+							scheduledAt,
+							utcNow);
+					}
+
+					await ctx.UnitOfWork.SaveChangesAsync(ct);
+					return schedules.Count;
+				},
+				token);
 	}
 
-	private DateTime? GetNextRunAt(JobSchedule schedule) => CronExpression
-		.Parse(schedule.Cron)
-		.GetNextOccurrence(GetUtcNow(), JobSchedule.TimeZone);
+	private DateTime? GetNextRunAt(JobSchedule schedule)
+		=> CronExpression
+			.Parse(schedule.Cron)
+			.GetNextOccurrence(GetUtcNow(), JobSchedule.TimeZone);
 
 	private DateTime GetUtcNow() => timeProvider.GetUtcNow().UtcDateTime;
 

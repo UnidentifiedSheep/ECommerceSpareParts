@@ -14,9 +14,7 @@ namespace Tests.LrtsTests;
 public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildCatalogueCandidatesLrt>
 {
 	public BuildCatalogueCandidatesLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -47,7 +45,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		candidate.Sku.NormalizedValue.Should().Be("ABC123");
 
 		var candidateIds = await Context
-			.Set<global::Main.Entities.Product.Enrichment.SupplierProduct>()
+			.Set<SupplierProduct>()
 			.AsNoTracking()
 			.Select(x => x.CatalogueCandidateId)
 			.ToListAsync(CancellationToken);
@@ -76,7 +74,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
-			.Set<global::Main.Entities.Product.Enrichment.SupplierProduct>()
+			.Set<SupplierProduct>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == supplierProduct.Id, CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().Be(candidate.Id);
@@ -102,7 +100,7 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
-			.Set<global::Main.Entities.Product.Enrichment.SupplierProduct>()
+			.Set<SupplierProduct>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == supplierProduct.Id, CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().BeNull();
@@ -112,11 +110,9 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		string sku,
 		string producer,
 		Supplier supplier)
-	{
-		return new SupplierProductBuilder(Faker)
+		=> new SupplierProductBuilder(Faker)
 			.WithSku(sku)
 			.WithProducer(producer)
 			.WithSupplier(supplier)
 			.BuildAndAddToDb(Context, CancellationToken);
-	}
 }

@@ -1,6 +1,3 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Application.Common.Models;
 using Carter;
@@ -11,6 +8,7 @@ using Main.Application.Handlers.Cart.ChangeCartItemCount;
 using Main.Application.Handlers.Cart.DeleteFromCart;
 using Main.Application.Handlers.Cart.GetCartItems;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Api.EndPoints;
 

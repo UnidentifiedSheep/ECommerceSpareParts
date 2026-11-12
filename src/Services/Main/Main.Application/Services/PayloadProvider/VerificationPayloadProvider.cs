@@ -27,7 +27,8 @@ public class VerificationPayloadProvider(IOneTimeTokenStore oneTimeTokenStore) :
 		return payload;
 	}
 
-	public Task<bool> TryConsumeToken(Guid tokenId) => oneTimeTokenStore.ConsumeAsync(
-		OneTimeTokenPurpose.Verification,
-		tokenId);
+	public Task<bool> TryConsumeToken(Guid tokenId)
+		=> oneTimeTokenStore.ConsumeAsync(
+			OneTimeTokenPurpose.Verification,
+			tokenId);
 }

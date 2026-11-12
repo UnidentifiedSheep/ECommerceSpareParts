@@ -49,12 +49,10 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
 		string name,
 		string? description = null,
 		string? imagePath = null)
-	{
-		return new Producer(
+		=> new(
 			name,
 			description,
 			imagePath);
-	}
 
 	public void SetImagePath(string? imagePath)
 	{

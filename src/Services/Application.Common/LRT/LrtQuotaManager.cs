@@ -51,11 +51,9 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 	}
 
 	public ILrtQuota UseQuota(Guid holderId)
-	{
-		return TryUseQuota(holderId, out var quota)
+		=> TryUseQuota(holderId, out var quota)
 			? quota
 			: throw new InvalidOperationException("No available quota.");
-	}
 
 	public async ValueTask<ILrtQuota> UseQuotaAsync(
 		Guid holderId,

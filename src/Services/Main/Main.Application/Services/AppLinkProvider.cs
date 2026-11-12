@@ -15,26 +15,35 @@ public sealed class AppLinkProvider(
 	public Task<Uri> CreatePasswordResetUrlAsync(
 		string token,
 		CancellationToken cancellationToken = default)
-		=> CreateAsync(options.Value.PasswordReset, new Dictionary<string, string>
-		{
-			["token"] = token
-		}, cancellationToken);
+		=> CreateAsync(
+			options.Value.PasswordReset,
+			new Dictionary<string, string>
+			{
+				["token"] = token
+			},
+			cancellationToken);
 
 	public Task<Uri> CreateEmailVerificationUrlAsync(
 		string token,
 		CancellationToken cancellationToken = default)
-		=> CreateAsync(options.Value.EmailVerification, new Dictionary<string, string>
-		{
-			["token"] = token
-		}, cancellationToken);
+		=> CreateAsync(
+			options.Value.EmailVerification,
+			new Dictionary<string, string>
+			{
+				["token"] = token
+			},
+			cancellationToken);
 
 	public Task<Uri> CreateDocumentUrlAsync(
 		Guid requestId,
 		CancellationToken cancellationToken = default)
-		=> CreateAsync(options.Value.Document, new Dictionary<string, string>
-		{
-			["requestId"] = requestId.ToString("D")
-		}, cancellationToken);
+		=> CreateAsync(
+			options.Value.Document,
+			new Dictionary<string, string>
+			{
+				["requestId"] = requestId.ToString("D")
+			},
+			cancellationToken);
 
 	private async Task<Uri> CreateAsync(
 		string template,
@@ -59,7 +68,8 @@ public sealed class AppLinkProvider(
 
 		var setting = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
 		var appServiceUrl = setting.AppServiceUrl ??
-			throw new InvalidInputException(GlobalApplicationSettingAppServiceUrlNotConfiguredMessage.Instance);
+			throw new InvalidInputException(
+				GlobalApplicationSettingAppServiceUrlNotConfiguredMessage.Instance);
 
 		return new Uri(new Uri(appServiceUrl.TrimEnd('/') + "/"), relativeUrl);
 	}

@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Notification.Options;
 
 public abstract record ChannelOptionsBase

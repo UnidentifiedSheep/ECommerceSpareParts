@@ -15,7 +15,7 @@ public class InAppChannel(
 	IEnumerable<IChannelDeliveryObserver<InAppReceipt, InAppRecipient>> observers,
 	IUnitOfWork unitOfWork,
 	ILogger<InAppChannel> logger
-	) : NotificationChannelBase<ITextNotification, InAppRecipient, InAppReceipt>(observers, logger)
+) : NotificationChannelBase<ITextNotification, InAppRecipient, InAppReceipt>(observers, logger)
 {
 	public override string SystemName => InAppRecipient.ChannelName;
 

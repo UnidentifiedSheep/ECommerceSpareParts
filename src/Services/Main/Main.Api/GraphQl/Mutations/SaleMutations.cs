@@ -1,7 +1,6 @@
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
-using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Sale;
 using Main.Api.GraphQl.Types.Sale;
 using Main.Application.Handlers.Sales;

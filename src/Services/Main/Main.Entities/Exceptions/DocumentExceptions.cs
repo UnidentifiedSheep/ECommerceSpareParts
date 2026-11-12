@@ -18,4 +18,5 @@ public class DocumentGenerationCancelledException(Guid requestId) : LocalizedCon
 	DocumentGenerationCancelledMessage.Instance,
 	new { RequestId = requestId });
 
-public sealed class DocumentSourceAccessDeniedException() : LocalizedForbiddenException(DocumentSourceAccessDeniedMessage.Instance);
+public sealed class DocumentSourceAccessDeniedException()
+	: LocalizedForbiddenException(DocumentSourceAccessDeniedMessage.Instance);

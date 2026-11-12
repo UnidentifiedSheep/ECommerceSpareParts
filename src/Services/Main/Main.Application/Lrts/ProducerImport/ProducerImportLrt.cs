@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
@@ -34,11 +33,11 @@ public class ProducerImportLrt(
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtProducerImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProducerImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProducerImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -88,13 +87,14 @@ public class ProducerImportLrt(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{
-				var existingNames = (await context.GetRequiredService<IProducerRepository>().ListAsync(
-						Criteria<Producer>
-							.New()
-							.Where(x => uniqueNames.Contains(x.Name))
-							.Track(false)
-							.Build(),
-						cancellationToken))
+				var existingNames = (await context.GetRequiredService<IProducerRepository>()
+						.ListAsync(
+							Criteria<Producer>
+								.New()
+								.Where(x => uniqueNames.Contains(x.Name))
+								.Track(false)
+								.Build(),
+							cancellationToken))
 					.Select(x => x.Name)
 					.ToHashSet();
 				var toAdd = uniqueProducers.Where(x => !existingNames.Contains(x.Name)).ToList();

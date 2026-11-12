@@ -10,7 +10,8 @@ namespace Main.Api.GraphQl.Types;
 
 [GraphQLName("ProductSaleHistory")]
 public sealed record GqlProductSaleHistory(
-	[property: GraphQLIgnore] ProductSaleHistoryDto History)
+	[property: GraphQLIgnore]
+	ProductSaleHistoryDto History)
 {
 	[GraphQLName("saleContentId")]
 	public int SaleContentId => History.SaleContentId;
@@ -23,10 +24,6 @@ public sealed record GqlProductSaleHistory(
 
 	[GraphQLName("storage")]
 	public GqlStorage Storage => new(History.StorageCode);
-
-	[GraphQLName("currency")]
-	public async Task<GqlCurrency> GetCurrencyAsync(ISender sender, CancellationToken cancellationToken) =>
-		new((await sender.Send(new GetCurrencyByIdQuery(History.CurrencyId), cancellationToken)).Currency);
 
 	[GraphQLName("quantity")]
 	public int Quantity => History.Quantity;
@@ -45,4 +42,8 @@ public sealed record GqlProductSaleHistory(
 
 	[GraphQLName("createdBy")]
 	public GqlUser? CreatedBy => History.WhoCreated.HasValue ? new GqlUser(History.WhoCreated.Value) : null;
+
+	[GraphQLName("currency")]
+	public async Task<GqlCurrency> GetCurrencyAsync(ISender sender, CancellationToken cancellationToken)
+		=> new((await sender.Send(new GetCurrencyByIdQuery(History.CurrencyId), cancellationToken)).Currency);
 }

@@ -1,6 +1,6 @@
-using Abstractions.Models;
-using Application.Common.Interfaces.Lrt;
+using System.Text.Json;
 using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -11,7 +11,6 @@ using Domain.Exceptions;
 using FluentAssertions;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Persistence;
@@ -173,7 +172,7 @@ public class LrtBaseTests
 			fixture.LeaseHolderId,
 			TestContext.Current.CancellationToken);
 
-		using var saved = System.Text.Json.JsonDocument.Parse(fixture.Job.State);
+		using var saved = JsonDocument.Parse(fixture.Job.State);
 		saved.RootElement.GetProperty("$lrtVersion").GetInt32().Should().Be(1);
 		saved.RootElement.GetProperty("state").GetProperty("Value").GetInt32().Should().Be(42);
 		lrt.CapturedState!.Value.Should().Be(42);
@@ -303,8 +302,8 @@ public class LrtBaseTests
 		lrt.CapturedInitialized.Should().BeTrue();
 	}
 
-	private static TestFixture CreateFixture(string initialState = "{}", int maxAttempts = 3) =>
-		new(initialState, maxAttempts);
+	private static TestFixture CreateFixture(string initialState = "{}", int maxAttempts = 3)
+		=> new(initialState, maxAttempts);
 
 	private sealed class TestFixture
 	{
@@ -366,19 +365,19 @@ public class LrtBaseTests
 		public Mock<ILogger> Logger { get; } = new();
 
 		public TestLrt CreateLrt()
-		{
-			return new TestLrt(
+			=> new(
 				new ApplicationTransactionFactoryStub(
 					UnitOfWork.Object,
-					Mock.Of<IRepositoryProvider>(provider => provider.Get<Job, Guid>() == JobRepository.Object),
+					Mock.Of<IRepositoryProvider>(provider
+						=> provider.Get<Job, Guid>() == JobRepository.Object),
 					Mock.Of<IIntegrationEventScope>()),
 				Logger.Object);
-		}
 	}
 
-	private sealed class TestLrt(IApplicationTransactionFactory transactionService, ILogger logger) : LrtBase<TestInput, TestState>(
-		transactionService,
-		logger)
+	private sealed class TestLrt(IApplicationTransactionFactory transactionService, ILogger logger)
+		: LrtBase<TestInput, TestState>(
+			transactionService,
+			logger)
 	{
 		public Func<TestLrt, Task> Work { get; set; } = _ => Task.CompletedTask;
 
@@ -410,11 +409,11 @@ public class LrtBaseTests
 
 		public override string SystemName => nameof(TestLrt);
 
-		public override ILocalizableMessage NameLocalizationMessage =>
-			new LocalizableMessage("test-lrt-name");
+		public override ILocalizableMessage NameLocalizationMessage
+			=> new LocalizableMessage("test-lrt-name");
 
-		public override ILocalizableMessage DescriptionLocalizationMessage =>
-			new LocalizableMessage("test-lrt-description");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-lrt-description");
 
 		protected override Task DoWork(TestInput inputState)
 		{

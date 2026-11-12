@@ -16,16 +16,6 @@ public class PasswordResetNotification : INotification<PasswordResetNotification
 
 public record PasswordResetNotificationData : INotificationModel, INotificationModelWithTitle
 {
-	public required string HtmlLang { get; init; }
-	public required string Title { get; init; }
-	public required string Heading { get; init; }
-	public required string Intro { get; init; }
-	public required string Description { get; init; }
-	public required string Button { get; init; }
-	public required string Fallback { get; init; }
-	public required string Ignore { get; init; }
-	public required string ResetUrl { get; init; }
-	public required string AsText { get; init; }
 
 	public PasswordResetNotificationData() { }
 
@@ -45,4 +35,14 @@ public record PasswordResetNotificationData : INotificationModel, INotificationM
 		ResetUrl = resetUrl;
 		AsText = $"{Heading}. {Intro} {Description} {Fallback} {ResetUrl} {Ignore}";
 	}
+	public required string HtmlLang { get; init; }
+	public required string Heading { get; init; }
+	public required string Intro { get; init; }
+	public required string Description { get; init; }
+	public required string Button { get; init; }
+	public required string Fallback { get; init; }
+	public required string Ignore { get; init; }
+	public required string ResetUrl { get; init; }
+	public required string AsText { get; init; }
+	public required string Title { get; init; }
 }

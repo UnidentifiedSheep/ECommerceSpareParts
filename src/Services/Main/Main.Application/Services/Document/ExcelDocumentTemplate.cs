@@ -6,7 +6,6 @@ namespace Main.Application.Services.Document;
 
 public sealed class ExcelDocumentTemplate : IDocumentTemplate
 {
-	public DocumentType Type => DocumentType.Excel;
 
 	private readonly XLTemplate _template;
 	private readonly Stream _templateStream;
@@ -16,6 +15,7 @@ public sealed class ExcelDocumentTemplate : IDocumentTemplate
 		_templateStream = templateStream;
 		_template = new XLTemplate(templateStream);
 	}
+	public DocumentType Type => DocumentType.Excel;
 
 	public void AddData<TData>(string key, TData data) => _template.AddVariable(key, data);
 

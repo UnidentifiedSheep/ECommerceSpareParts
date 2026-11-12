@@ -7,7 +7,7 @@ namespace Main.Application.Interfaces.Services.Document;
 
 public interface IDocumentDefinition<in TRequest, TResponse> : IDocumentDefinition
 	where TRequest : IDocumentRequest
-    where TResponse : IDocumentResponse
+	where TResponse : IDocumentResponse
 {
 	Task<TResponse> GenerateAsync(
 		TRequest request,
@@ -20,10 +20,10 @@ public interface IDocumentDefinition : INamedObject
 	IReadOnlyCollection<PermissionCodes> RequiredPermissions { get; }
 	Type SchemaType { get; }
 	Type RequestType { get; }
-	bool SupportsDocumentType(DocumentType documentType);
 
 	ILocalizableMessage Name { get; }
 	ILocalizableMessage Description { get; }
+	bool SupportsDocumentType(DocumentType documentType);
 
 	Task<IDocumentResponse> GenerateAsync(
 		IDocumentRequest data,

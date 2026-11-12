@@ -24,5 +24,7 @@ public sealed record PriceRecommendationDto
 }
 
 public sealed record PriceRecommendationItemDto(
-	[property: JsonPropertyName("quantity")] int Quantity,
-	[property: JsonPropertyName("option")] PriceOptionDto Option);
+	[property: JsonPropertyName("quantity")]
+	int Quantity,
+	[property: JsonPropertyName("option")]
+	PriceOptionDto Option);

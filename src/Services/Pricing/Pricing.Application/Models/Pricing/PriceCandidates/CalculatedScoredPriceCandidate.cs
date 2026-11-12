@@ -5,8 +5,7 @@ public record CalculatedScoredPriceCandidate : CalculatedPriceCandidate
 	public required decimal Score { get; init; }
 
 	public static CalculatedScoredPriceCandidate From(CalculatedPriceCandidate candidate, decimal score)
-	{
-		return new CalculatedScoredPriceCandidate
+		=> new()
 		{
 			Score = score,
 			AvailableQuantity = candidate.AvailableQuantity,
@@ -22,5 +21,4 @@ public record CalculatedScoredPriceCandidate : CalculatedPriceCandidate
 			SourceType = candidate.SourceType,
 			StorageCode = candidate.StorageCode
 		};
-	}
 }

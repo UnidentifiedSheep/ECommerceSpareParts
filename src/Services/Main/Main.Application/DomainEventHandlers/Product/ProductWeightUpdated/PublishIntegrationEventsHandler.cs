@@ -15,6 +15,9 @@ public class PublishIntegrationEventsHandler(IProductEventPublisher eventPublish
 	{
 		var ids = notification.Items.Select(x => x.ProductId).Distinct().ToList();
 		if (ids.Count > 0)
-			await eventPublisher.PublishAsync(ids, ProductEventParts.Weight, cancellationToken);
+			await eventPublisher.PublishAsync(
+				ids,
+				ProductEventParts.Weight,
+				cancellationToken);
 	}
 }

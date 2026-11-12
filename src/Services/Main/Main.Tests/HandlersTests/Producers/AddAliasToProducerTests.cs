@@ -1,11 +1,9 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Main.Entities.Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.ProducerAliases.AddAlias;
-using Main.Application.Static;
+using Main.Entities.Exceptions;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -16,9 +14,7 @@ namespace Tests.HandlersTests.Producers;
 public class AddAliasToProducerTests : IntegrationTest
 {
 	public AddAliasToProducerTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 

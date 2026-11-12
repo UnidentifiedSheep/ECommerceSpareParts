@@ -36,15 +36,23 @@ internal sealed class CurrencyNode(
 			cancellationToken);
 	}
 
-	public async Task<Response<decimal>> GetCurrencyRate(int currencyId, DateTime forDate, CancellationToken cancellationToken = default)
+	public async Task<Response<decimal>> GetCurrencyRate(
+		int currencyId,
+		DateTime forDate,
+		CancellationToken cancellationToken = default)
 	{
 		if (forDate.Kind != DateTimeKind.Utc)
 			throw new ArgumentException("Currency rate date must be UTC.", nameof(forDate));
 		var date = Uri.EscapeDataString(forDate.ToString("O", CultureInfo.InvariantCulture));
-		using var request = await GetRequest(HttpMethod.Get,
-			$"/internal/currencies/{currencyId}/rates/historical?forDate={date}", cancellationToken);
+		using var request = await GetRequest(
+			HttpMethod.Get,
+			$"/internal/currencies/{currencyId}/rates/historical?forDate={date}",
+			cancellationToken);
 		using var response = await httpClient.SendAsync(request, cancellationToken);
-		return await ReadResponse<GetCurrencyRateResponse, decimal>(response, result => result.Rate, cancellationToken);
+		return await ReadResponse<GetCurrencyRateResponse, decimal>(
+			response,
+			result => result.Rate,
+			cancellationToken);
 	}
 
 	public async Task<Response<IReadOnlyList<InternalCurrency>>> GetCurrencies(

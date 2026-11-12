@@ -1,9 +1,9 @@
-using Main.Entities.DomainEvents.Sale;
 using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
+using Main.Entities.DomainEvents.Sale;
 
 namespace Main.Entities.Sale;
 
@@ -60,16 +60,14 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		decimal priceWithOutDiscount,
 		decimal priceWithDiscount,
 		IEnumerable<SaleContentDetail> details)
-	{
-		return new SaleContent(
+		=> new(
 			productId,
 			priceWithOutDiscount,
 			priceWithDiscount,
 			details);
-	}
 
-	private void SetCount(int count) =>
-		Count = count.EnsureGreaterThan(0, SaleContentCountMinMessage.Instance);
+	private void SetCount(int count)
+		=> Count = count.EnsureGreaterThan(0, SaleContentCountMinMessage.Instance);
 
 	public void SetPriceAndDetails(
 		decimal originalPrice,
@@ -87,9 +85,14 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 
 		var nextDetails = details.ToList();
 		var financialDataChanged = OriginalPrice != originalPrice || DiscountedPrice != discountedPrice ||
-			!_details.Select(detail => (detail.StorageContentId, detail.CurrencyId, detail.BuyPrice, detail.Count, detail.PurchaseDatetime))
-				.OrderBy(value => value).SequenceEqual(nextDetails.Select(detail =>
-					(detail.StorageContentId, detail.CurrencyId, detail.BuyPrice, detail.Count, detail.PurchaseDatetime)).OrderBy(value => value));
+			!_details.Select(detail => (detail.StorageContentId, detail.CurrencyId, detail.BuyPrice,
+					detail.Count, detail.PurchaseDatetime))
+				.OrderBy(value => value)
+				.SequenceEqual(
+					nextDetails.Select(detail =>
+							(detail.StorageContentId, detail.CurrencyId, detail.BuyPrice, detail.Count,
+								detail.PurchaseDatetime))
+						.OrderBy(value => value));
 		OriginalPrice = originalPrice;
 		DiscountedPrice = discountedPrice;
 
@@ -120,12 +123,22 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		NotifyUpdated(false);
 	}
 
-	public void UpdateAnalytics(decimal originalAmount, decimal revenue, decimal cost)
+	public void UpdateAnalytics(
+		decimal originalAmount,
+		decimal revenue,
+		decimal cost)
 	{
 		if (Analytics is null)
-			Analytics = SaleContentAnalytics.Create(Id, originalAmount, revenue, cost);
+			Analytics = SaleContentAnalytics.Create(
+				Id,
+				originalAmount,
+				revenue,
+				cost);
 		else
-			Analytics.Update(originalAmount, revenue, cost);
+			Analytics.Update(
+				originalAmount,
+				revenue,
+				cost);
 	}
 
 	public void InvalidateAnalytics() => NotifyUpdated(true);

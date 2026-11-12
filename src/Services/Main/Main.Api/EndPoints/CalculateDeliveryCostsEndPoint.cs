@@ -30,8 +30,7 @@ public record CalculateDeliveryCostResponse(DeliveryCostDto DeliveryCost, Storag
 public class CalculateDeliveryCostsEndPoint : ICarterModule
 {
 	public void AddRoutes(IEndpointRouteBuilder app)
-	{
-		app
+		=> app
 			.MapPost(
 				"/logistics/calculate",
 				async (
@@ -56,5 +55,4 @@ public class CalculateDeliveryCostsEndPoint : ICarterModule
 			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
 			.RequireAnyPermission(PermissionCodes.LOGISTICS_CALCULATE);
-	}
 }

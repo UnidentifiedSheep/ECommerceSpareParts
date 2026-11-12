@@ -1,7 +1,7 @@
 using Application.Common.Extensions;
 using Application.Common.Validators;
-using Pricing.Entities;
 using FluentValidation;
+using Pricing.Entities;
 
 namespace Pricing.Application.Handlers.Markup.GetMarkupRanges;
 
@@ -9,7 +9,8 @@ public sealed class GetMarkupRangesValidation : AbstractValidator<GetMarkupRange
 {
 	public GetMarkupRangesValidation()
 	{
-		RuleFor(x => x.GroupId).GreaterThan(0)
+		RuleFor(x => x.GroupId)
+			.GreaterThan(0)
 			.WithLocalizableError(MarkupGroupIdMustBePositiveMessage.Instance);
 
 		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());

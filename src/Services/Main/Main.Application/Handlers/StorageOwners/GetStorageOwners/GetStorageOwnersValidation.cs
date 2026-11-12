@@ -5,8 +5,5 @@ namespace Main.Application.Handlers.StorageOwners.GetStorageOwners;
 
 public class GetStorageOwnersValidation : AbstractValidator<GetStorageOwnersQuery>
 {
-	public GetStorageOwnersValidation()
-	{
-		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
-	}
+	public GetStorageOwnersValidation() => RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 }

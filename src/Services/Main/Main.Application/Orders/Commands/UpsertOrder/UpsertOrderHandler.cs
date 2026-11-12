@@ -4,8 +4,8 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
 using Exceptions;
-using Main.Entities;
 using Main.Application.Orders.Dtos;
+using Main.Entities;
 using Main.Entities.Exceptions;
 using Main.Entities.Order;
 
@@ -21,7 +21,7 @@ public record UpsertOrderResult(Guid OrderId);
 public class UpsertOrderHandler(
 	IRepository<Order, Guid> repository,
 	IUnitOfWork unitOfWork
-	) : ICommandHandler<UpsertOrderCommand, UpsertOrderResult>
+) : ICommandHandler<UpsertOrderCommand, UpsertOrderResult>
 {
 	public async Task<UpsertOrderResult> Handle(
 		UpsertOrderCommand request,
@@ -41,7 +41,8 @@ public class UpsertOrderHandler(
 	private static void ProcessItems(UpsertOrderDto dto, Order order)
 	{
 		var existingItems = order.Items.Where(item => !item.IsDeleted).ToDictionary(x => x.Id);
-		var requestedIds = dto.Items.Where(item => item.Id.HasValue).Select(item => item.Id!.Value).ToHashSet();
+		var requestedIds =
+			dto.Items.Where(item => item.Id.HasValue).Select(item => item.Id!.Value).ToHashSet();
 		var toRemove = existingItems.Values.Where(item => !requestedIds.Contains(item.Id)).ToArray();
 
 		foreach (var upDto in dto.Items)
@@ -84,7 +85,8 @@ public class UpsertOrderHandler(
 				dto.CurrencyId);
 
 		if (dto.Id.HasValue)
-			order.ValidateVersion(dto.RowVersion ??
+			order.ValidateVersion(
+				dto.RowVersion ??
 				throw new InvalidInputException(OrderRowVersionRequiredMessage.Instance));
 		else
 			await unitOfWork.AddAsync(order, ct);

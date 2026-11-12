@@ -1,11 +1,10 @@
-using Main.Entities.Exceptions;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Organizations.AddOrganizationMember;
 using Main.Application.Handlers.Organizations.ChangeOrganizationMemberRole;
 using Main.Application.Handlers.Organizations.CreateOrganization;
 using Main.Application.Handlers.Organizations.RemoveOrganizationMember;
-using Main.Application.Static;
+using Main.Entities.Exceptions;
 using Main.Entities.Organization;
 using Main.Entities.User;
 using Main.Enums.Organization;
@@ -20,9 +19,7 @@ namespace Tests.HandlersTests.Organizations;
 public class OrganizationManagementTests : IntegrationTest
 {
 	public OrganizationManagementTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UsersTestContext>();
-	}
+		=> RegisterBasicContext<UsersTestContext>();
 
 	private IReadOnlyList<User> Users => GetContext<UsersTestContext>().Users.ToArray();
 
@@ -39,7 +36,7 @@ public class OrganizationManagementTests : IntegrationTest
 		var result = await Mediator.Send(command, CancellationToken);
 
 		var organization = await Context
-			.Set<global::Main.Entities.Organization.Organization>()
+			.Set<Organization>()
 			.Include(x => x.Members)
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == result.OrganizationId, CancellationToken);

@@ -38,6 +38,8 @@ public sealed class CharacteristicQueries
 				input.Pagination),
 			cancellationToken);
 
-		return result.Characteristics.Select(characteristic => new GqlCharacteristic(characteristic)).ToArray();
+		return result.Characteristics
+			.Select(characteristic => new GqlCharacteristic(characteristic))
+			.ToArray();
 	}
 }

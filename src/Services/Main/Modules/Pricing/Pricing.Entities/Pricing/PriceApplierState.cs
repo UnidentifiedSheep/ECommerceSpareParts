@@ -18,23 +18,25 @@ public class PriceApplierState : AuditableEntity<PriceApplierState, PriceApplier
 
 	public bool Enabled { get; private set; }
 
-	public static Expression<Func<PriceApplierState, PriceApplierStateKey>> GetKeySelector() => x =>
-		new PriceApplierStateKey(x.PriceApplierSystemName, x.Usage);
-	public static Expression<Func<PriceApplierState, bool>> GetEqualityExpression(PriceApplierStateKey key) =>
-		x => x.PriceApplierSystemName == key.PriceApplierSystemName && x.Usage == key.Usage;
+	public static Expression<Func<PriceApplierState, PriceApplierStateKey>> GetKeySelector()
+		=> x =>
+			new PriceApplierStateKey(x.PriceApplierSystemName, x.Usage);
+	public static Expression<Func<PriceApplierState, bool>> GetEqualityExpression(PriceApplierStateKey key)
+		=> x => x.PriceApplierSystemName == key.PriceApplierSystemName && x.Usage == key.Usage;
 
 	public static PriceApplierState Create(
 		string priceApplierSystemName,
 		PriceOfferSourceType usage,
 		int order,
-		bool enabled = true) => new()
-	{
-		Enabled = enabled,
-		Usage = usage,
-		Order = order,
-		PriceApplierSystemName = priceApplierSystemName.EnsureNotNullOrWhiteSpace(() =>
-			new InvalidOperationException("Price applier system name cannot be empty"))
-	};
+		bool enabled = true)
+		=> new()
+		{
+			Enabled = enabled,
+			Usage = usage,
+			Order = order,
+			PriceApplierSystemName = priceApplierSystemName.EnsureNotNullOrWhiteSpace(() =>
+				new InvalidOperationException("Price applier system name cannot be empty"))
+		};
 
 	public void Update(int order, bool enabled = true)
 	{
@@ -48,11 +50,12 @@ public class PriceApplierState : AuditableEntity<PriceApplierState, PriceApplier
 
 	public override void OnDeleted() => AddPriceApplierUpdatedDomainEvent();
 
-	private void AddPriceApplierUpdatedDomainEvent() => AddDomainEvent(
-		new PriceApplierUpdatedDomainEvent
-		{
-			SystemName = PriceApplierSystemName
-		});
+	private void AddPriceApplierUpdatedDomainEvent()
+		=> AddDomainEvent(
+			new PriceApplierUpdatedDomainEvent
+			{
+				SystemName = PriceApplierSystemName
+			});
 
 	public override PriceApplierStateKey GetId() => new(PriceApplierSystemName, Usage);
 }

@@ -1,5 +1,5 @@
-using Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using Pricing.Entities;
 
@@ -56,7 +56,10 @@ public class MarkupGroupSeed : ISeed<UnifiedDbContext>
 				0.20m)
 		};
 
-		var group = MarkupGroup.CreateGenerated(1, ranges, SeedSourceMessageId);
+		var group = MarkupGroup.CreateGenerated(
+			1,
+			ranges,
+			SeedSourceMessageId);
 
 		await context.Set<MarkupGroup>().AddAsync(group);
 		await context.SaveChangesAsync();

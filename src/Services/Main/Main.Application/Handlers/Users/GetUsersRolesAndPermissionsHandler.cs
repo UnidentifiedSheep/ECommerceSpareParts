@@ -1,9 +1,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Users;
-using Application.Common.Interfaces.Repositories;
 using Main.Application.Extensions.QueryExtensions;
-using Main.Entities.User;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 
@@ -13,10 +11,7 @@ public sealed record GetUsersRolesAndPermissionsQuery : IQuery<GetUsersRolesAndP
 {
 	public GetUsersRolesAndPermissionsQuery(Guid id) : this([id]) { }
 
-	public GetUsersRolesAndPermissionsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetUsersRolesAndPermissionsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }

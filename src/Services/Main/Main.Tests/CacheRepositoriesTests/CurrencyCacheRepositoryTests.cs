@@ -14,9 +14,7 @@ namespace Tests.CacheRepositoriesTests;
 public class CurrencyCacheRepositoryTests : IntegrationTest
 {
 	public CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<CurrencyTestContext>();
-	}
+		=> RegisterBasicContext<CurrencyTestContext>();
 
 	private CurrencyTestContext TestContext => GetContext<CurrencyTestContext>();
 
@@ -143,8 +141,8 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 		cachedIds.Should().BeEmpty();
 	}
 
-	private ICurrencyCacheRepository GetRepository() =>
-		Scope.ServiceProvider.GetRequiredService<ICurrencyCacheRepository>();
+	private ICurrencyCacheRepository GetRepository()
+		=> Scope.ServiceProvider.GetRequiredService<ICurrencyCacheRepository>();
 
 	private ICache GetCache() => Scope.ServiceProvider.GetRequiredService<ICache>();
 
@@ -154,8 +152,8 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 		await Task.WhenAll(currencyIds.Select(RemoveCachedCurrency));
 	}
 
-	private async Task RemoveCachedCurrency(int currencyId) =>
-		await GetCache().RemoveKeyAsync(CacheKeys.CurrencyCache.Currency(currencyId));
+	private async Task RemoveCachedCurrency(int currencyId)
+		=> await GetCache().RemoveKeyAsync(CacheKeys.CurrencyCache.Currency(currencyId));
 
 	private async Task UpdateCurrencyName(int currencyId, string name)
 	{

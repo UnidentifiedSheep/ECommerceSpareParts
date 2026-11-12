@@ -9,9 +9,7 @@ public class LogisticsCostService : ILogisticsCostService
 	private readonly Dictionary<LogisticPricingType, ILogisticsPricingStrategy> _strategies;
 
 	public LogisticsCostService(IEnumerable<ILogisticsPricingStrategy> strategies)
-	{
-		_strategies = strategies.ToDictionary(x => x.Type);
-	}
+		=> _strategies = strategies.ToDictionary(x => x.Type);
 
 	public LogisticsCalcResult Calculate(
 		LogisticPricingType type,

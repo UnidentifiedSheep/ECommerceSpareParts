@@ -5,7 +5,6 @@ using Notification.Channels;
 using Notification.Channels.Email;
 using Notification.Core;
 using Notification.Core.Interfaces.Notification;
-using Notification.Core.Interfaces.Recipient;
 using Notification.Interfaces;
 using Notification.Renderers;
 
@@ -22,7 +21,7 @@ public static class ServiceCollectionExtensions
 			objectsToExclude: [typeof(EmailChannel)]);
 		services.UseInAppNotifications();
 
-		AddRenderers(services);
+		services.AddRenderers();
 
 		services.TryAddSingleton<INotificationSerializer, NotificationSerializer>();
 		services.TryAddScoped<INotificationService, NotificationService>();

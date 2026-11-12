@@ -41,6 +41,6 @@ internal static class CsvSchemaGenerator
 		};
 	}
 
-	private static IReadOnlyList<string> GetNames(PropertyInfo property) =>
-		property.GetCustomAttribute<NameAttribute>()?.Names ?? [];
+	private static IReadOnlyList<string> GetNames(PropertyInfo property)
+		=> property.GetCustomAttribute<NameAttribute>()?.Names ?? [];
 }

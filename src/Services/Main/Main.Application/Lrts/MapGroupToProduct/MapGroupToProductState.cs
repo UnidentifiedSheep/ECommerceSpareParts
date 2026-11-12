@@ -14,10 +14,11 @@ public record MapGroupToProductState : MapGroupToProductInputState, ICsvImportSt
 	[JsonPropertyName("checkpoint")]
 	public CsvImportCheckpoint? Checkpoint { get; init; }
 
-	public MapGroupToProductState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
-	{
-		Checkpoint = checkpoint
-	};
+	public MapGroupToProductState WithCheckpoint(CsvImportCheckpoint checkpoint)
+		=> this with
+		{
+			Checkpoint = checkpoint
+		};
 }
 
 [CsvSchema(typeof(MapGroupToProductLrt.ProductGroupMappingCsvDto))]

@@ -10,10 +10,10 @@ public sealed class AppLinksOptions
 
 	public string Document { get; set; } = "documents/{requestId}";
 
-	public bool IsValid() =>
-		IsValidTemplate(PasswordReset, "token") &&
-		IsValidTemplate(EmailVerification, "token") &&
-		IsValidTemplate(Document, "requestId");
+	public bool IsValid()
+		=> IsValidTemplate(PasswordReset, "token") &&
+			IsValidTemplate(EmailVerification, "token") &&
+			IsValidTemplate(Document, "requestId");
 
 	private static bool IsValidTemplate(string? template, string parameterName)
 	{
@@ -24,9 +24,18 @@ public sealed class AppLinksOptions
 		if (!template.Contains(placeholder, StringComparison.Ordinal))
 			return false;
 
-		var rendered = template.Replace(placeholder, "value", StringComparison.Ordinal);
+		var rendered = template.Replace(
+			placeholder,
+			"value",
+			StringComparison.Ordinal);
 		return rendered.IndexOfAny(['{', '}']) < 0 &&
-		       !Uri.TryCreate(rendered, UriKind.Absolute, out _) &&
-		       Uri.TryCreate(rendered, UriKind.Relative, out _);
+			!Uri.TryCreate(
+				rendered,
+				UriKind.Absolute,
+				out _) &&
+			Uri.TryCreate(
+				rendered,
+				UriKind.Relative,
+				out _);
 	}
 }

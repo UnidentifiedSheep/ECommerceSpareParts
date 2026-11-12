@@ -14,7 +14,7 @@ namespace Main.Application.Services.Currency;
 
 public sealed class CurrencyRateSnapshotProvider(
 	IApplicationTransactionFactory transactionFactory
-	) : ICurrencyRateSnapshotProvider, IDisposable
+) : ICurrencyRateSnapshotProvider, IDisposable
 {
 	private static readonly IComparer<Info> RateComparer =
 		Comparer<Info>.Create((a, b) => a.When.CompareTo(b.When));
@@ -26,8 +26,10 @@ public sealed class CurrencyRateSnapshotProvider(
 	{
 		var snapshot = await GetSnapshotAsync(token);
 		if (currencyId == snapshot.BaseCurrencyId) return 1m;
-		return snapshot.History.TryGetValue((currencyId, snapshot.BaseCurrencyId), out var rates) && !rates.IsDefaultOrEmpty
-			? rates[^1].Rate : null;
+		return snapshot.History.TryGetValue((currencyId, snapshot.BaseCurrencyId), out var rates) &&
+			!rates.IsDefaultOrEmpty
+				? rates[^1].Rate
+				: null;
 	}
 
 	public async Task<decimal> GetNearestRateFor(
@@ -40,12 +42,29 @@ public sealed class CurrencyRateSnapshotProvider(
 
 		var snapshot = await GetSnapshotAsync(token);
 		if (currencyId == snapshot.BaseCurrencyId) return 1m;
-		if (!snapshot.History.TryGetValue((currencyId, snapshot.BaseCurrencyId), out var rates) || rates.IsDefaultOrEmpty)
+		if (!snapshot.History.TryGetValue((currencyId, snapshot.BaseCurrencyId), out var rates) ||
+			rates.IsDefaultOrEmpty)
 			throw new CurrencyRateNotFoundException(currencyId);
 
 		var rate = GetNearestRate(rates, date);
 		return rate > 0m ? rate : throw new CurrencyRateNotFoundException(currencyId);
 	}
+
+	public async Task Reload(CancellationToken token)
+	{
+		await _lock.WaitAsync(token);
+		try
+		{
+			// Always reload after acquiring the lock: an earlier load may predate this invalidation.
+			Volatile.Write(ref _snapshot, await LoadRates(token));
+		}
+		finally
+		{
+			_lock.Release();
+		}
+	}
+
+	public void Dispose() => _lock.Dispose();
 
 	private static decimal GetNearestRate(
 		ImmutableArray<Info> rates,
@@ -72,20 +91,6 @@ public sealed class CurrencyRateSnapshotProvider(
 			: after.Rate;
 	}
 
-	public async Task Reload(CancellationToken token)
-	{
-		await _lock.WaitAsync(token);
-		try
-		{
-			// Always reload after acquiring the lock: an earlier load may predate this invalidation.
-			Volatile.Write(ref _snapshot, await LoadRates(token));
-		}
-		finally
-		{
-			_lock.Release();
-		}
-	}
-
 	private async Task<Snapshot> GetSnapshotAsync(CancellationToken token)
 	{
 		var snapshot = Volatile.Read(ref _snapshot);
@@ -109,30 +114,32 @@ public sealed class CurrencyRateSnapshotProvider(
 	private async Task<Snapshot> LoadRates(CancellationToken token)
 	{
 		await using var transaction = transactionFactory.Create();
-		int baseCurrencyId = -1;
+		var baseCurrencyId = -1;
 
 		var history = (await transaction
-			.WithSettings(new TransactionalAttribute(IsolationLevel.RepeatableRead))
-			.ExecuteAsync(async (ctx, ct) =>
-			{
-				baseCurrencyId = (await ctx
-						.GetRequiredService<ISettingsService>()
-						.GetOrDefault<CurrencySetting>(ct)).Data.BaseCurrencyId;
-
-				return await ctx
-					.Repositories
-					.GetForRead<CurrencyRate, int>()
-					.Query
-					.Select(x => new
+				.WithSettings(new TransactionalAttribute(IsolationLevel.RepeatableRead))
+				.ExecuteAsync(
+					async (ctx, ct) =>
 					{
-						x.Id,
-						x.FromCurrencyId,
-						x.ToCurrencyId,
-						x.Rate,
-						x.CreatedAt
-					})
-					.ToArrayAsync(ct);
-			}, token))
+						baseCurrencyId = (await ctx
+							.GetRequiredService<ISettingsService>()
+							.GetOrDefault<CurrencySetting>(ct)).Data.BaseCurrencyId;
+
+						return await ctx
+							.Repositories
+							.GetForRead<CurrencyRate, int>()
+							.Query
+							.Select(x => new
+							{
+								x.Id,
+								x.FromCurrencyId,
+								x.ToCurrencyId,
+								x.Rate,
+								x.CreatedAt
+							})
+							.ToArrayAsync(ct);
+					},
+					token))
 			.GroupBy(
 				x => (x.FromCurrencyId, x.ToCurrencyId),
 				x => x)
@@ -141,7 +148,8 @@ public sealed class CurrencyRateSnapshotProvider(
 				x => x.OrderByDescending(row => row.Id)
 					.DistinctBy(row => row.CreatedAt)
 					.OrderBy(row => row.CreatedAt)
-					.Select(row => new Info(row.Rate, row.CreatedAt)).ToImmutableArray());
+					.Select(row => new Info(row.Rate, row.CreatedAt))
+					.ToImmutableArray());
 
 		return new Snapshot(baseCurrencyId, history);
 	}
@@ -151,6 +159,4 @@ public sealed class CurrencyRateSnapshotProvider(
 		FrozenDictionary<(int FromCurrencyId, int ToCurrencyId), ImmutableArray<Info>> History);
 
 	private readonly record struct Info(decimal Rate, DateTime When);
-
-	public void Dispose() => _lock.Dispose();
 }

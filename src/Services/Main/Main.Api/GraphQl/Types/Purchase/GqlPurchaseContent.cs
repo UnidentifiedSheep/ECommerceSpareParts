@@ -5,7 +5,8 @@ using Main.Application.Dtos.Purchase;
 namespace Main.Api.GraphQl.Types.Purchase;
 
 [GraphQLName("PurchaseContent")]
-public sealed record GqlPurchaseContent([property: GraphQLIgnore] PurchaseContentDto Content)
+public sealed record GqlPurchaseContent([property: GraphQLIgnore]
+	PurchaseContentDto Content)
 {
 	[GraphQLName("id")]
 	public int Id => Content.Id;
@@ -26,6 +27,6 @@ public sealed record GqlPurchaseContent([property: GraphQLIgnore] PurchaseConten
 	public GqlProduct Product => new(Content.Product);
 
 	[GraphQLName("logistics")]
-	public GqlPurchaseContentLogistic? Logistics =>
-		Content.ContentLogistics is { } logistics ? new(logistics) : null;
+	public GqlPurchaseContentLogistic? Logistics
+		=> Content.ContentLogistics is { } logistics ? new GqlPurchaseContentLogistic(logistics) : null;
 }

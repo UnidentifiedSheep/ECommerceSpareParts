@@ -323,17 +323,16 @@ public class SelectForUpdateCommandInterceptorTests
 		Assert.EndsWith("FOR UPDATE OF p", command.CommandText);
 	}
 
-	private static string Normalize(string value) => string.Join(
-		' ',
-		value.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
+	private static string Normalize(string value)
+		=> string.Join(
+			' ',
+			value.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries));
 
 	private static TestDbCommand CreateCommand(string commandText)
-	{
-		return new TestDbCommand
+		=> new()
 		{
 			CommandText = commandText
 		};
-	}
 
 	private sealed class TestDbCommand : DbCommand
 	{
@@ -373,7 +372,7 @@ public class SelectForUpdateCommandInterceptorTests
 
 		protected override DbParameter CreateDbParameter() => throw new NotSupportedException();
 
-		protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior) =>
-			throw new NotSupportedException();
+		protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
+			=> throw new NotSupportedException();
 	}
 }

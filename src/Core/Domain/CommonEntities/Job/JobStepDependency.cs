@@ -35,11 +35,12 @@ public sealed class JobStepDependency : Entity<JobStepDependency, JobStepDepende
 
 	public Job DependsOnStep { get; private set; } = null!;
 
-	public static Expression<Func<JobStepDependency, JobStepDependencyKey>> GetKeySelector() => x =>
-		new JobStepDependencyKey(x.StepId, x.DependsOnStepId);
+	public static Expression<Func<JobStepDependency, JobStepDependencyKey>> GetKeySelector()
+		=> x =>
+			new JobStepDependencyKey(x.StepId, x.DependsOnStepId);
 
-	public static Expression<Func<JobStepDependency, bool>> GetEqualityExpression(JobStepDependencyKey key) =>
-		x => x.StepId == key.StepId && x.DependsOnStepId == key.DependsOnStepId;
+	public static Expression<Func<JobStepDependency, bool>> GetEqualityExpression(JobStepDependencyKey key)
+		=> x => x.StepId == key.StepId && x.DependsOnStepId == key.DependsOnStepId;
 
 	internal static JobStepDependency Create(
 		MultiStepJob multiStepJob,

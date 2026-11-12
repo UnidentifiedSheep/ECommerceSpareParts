@@ -15,9 +15,7 @@ namespace Tests.HandlersTests.Purchases;
 public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
 {
 	public GetPurchasesContentsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<PurchaseTestContext>();
-	}
+		=> RegisterBasicContext<PurchaseTestContext>();
 
 	private PurchaseTestContext TestContext => GetContext<PurchaseTestContext>();
 
@@ -25,23 +23,28 @@ public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
 	public async Task Batch_ReturnsOnlyRequestedContentsGroupedByPurchaseWithoutDuplicates()
 	{
 		var first = TestContext.Purchase;
-		var second = await CreatePurchase(withContents: true);
-		await CreatePurchase(withContents: true);
+		var second = await CreatePurchase(true);
+		await CreatePurchase(true);
 
 		var result = await Mediator.Send(
-			new GetPurchasesContentsByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]), CancellationToken);
+			new GetPurchasesContentsByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Contents.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
-		result.Contents[first.Id].Select(content => content.Id)
-			.Should().Equal(first.Contents.Select(content => content.Id).Order());
-		result.Contents[second.Id].Select(content => content.Id)
-			.Should().Equal(second.Contents.Select(content => content.Id).Order());
+		result.Contents[first.Id]
+			.Select(content => content.Id)
+			.Should()
+			.Equal(first.Contents.Select(content => content.Id).Order());
+		result.Contents[second.Id]
+			.Select(content => content.Id)
+			.Should()
+			.Equal(second.Contents.Select(content => content.Id).Order());
 	}
 
 	[Fact]
 	public async Task EmptyPurchase_ReturnsEmptyDictionary()
 	{
-		var purchase = await CreatePurchase(withContents: false);
+		var purchase = await CreatePurchase(false);
 
 		var result = await Mediator.Send(new GetPurchasesContentsByIdsQuery(purchase.Id), CancellationToken);
 
@@ -51,7 +54,9 @@ public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
 	[Fact]
 	public async Task MissingPurchase_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetPurchasesContentsByIdsQuery(Guid.NewGuid()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPurchasesContentsByIdsQuery(Guid.NewGuid()),
+			CancellationToken);
 
 		result.Contents.Should().BeEmpty();
 	}
@@ -59,7 +64,9 @@ public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetPurchasesContentsByIdsQuery(Array.Empty<Guid>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPurchasesContentsByIdsQuery(Array.Empty<Guid>()),
+			CancellationToken);
 
 		result.Contents.Should().BeEmpty();
 	}
@@ -77,7 +84,6 @@ public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
 
 		var contents = new List<PurchaseContent>();
 		if (withContents)
-		{
 			for (var index = 0; index < 2; index++)
 			{
 				var storageContent = await new StorageContentBuilder(Faker)
@@ -87,12 +93,14 @@ public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
 					.WithCount(1)
 					.WithBuyPrice(10m)
 					.BuildAndAddToDb(Context);
-				contents.Add(new PurchaseContentBuilder(Faker)
-					.WithProductId(TestContext.Product.Id)
-					.WithStorageContentId(storageContent.Id)
-					.WithCount(1).WithPrice(10m).Build());
+				contents.Add(
+					new PurchaseContentBuilder(Faker)
+						.WithProductId(TestContext.Product.Id)
+						.WithStorageContentId(storageContent.Id)
+						.WithCount(1)
+						.WithPrice(10m)
+						.Build());
 			}
-		}
 
 		var builder = new PurchaseBuilder(Faker)
 			.WithSupplierUserId(TestContext.Supplier.Id)

@@ -1,8 +1,9 @@
-using FluentValidation.TestHelper;
-using Tests.Abstractions.Test;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Handlers.Sales.GetSale;
+using Main.Entities;
 using Main.Entities.Exceptions;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
@@ -11,9 +12,7 @@ namespace Tests.HandlersTests.Sales;
 public class GetSaleTests : IntegrationTest
 {
 	public GetSaleTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<SaleTestContext>();
-	}
+		=> RegisterBasicContext<SaleTestContext>();
 
 	private SaleTestContext SaleContext => GetContext<SaleTestContext>();
 
@@ -46,23 +45,16 @@ public class GetSaleTests : IntegrationTest
 
 	[Fact]
 	public async Task GetSale_WhenSaleDoesNotExist_ThrowsSaleNotFoundException()
-	{
-		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
+		=> await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
 			new GetSaleQuery(Guid.NewGuid(), null),
 			CancellationToken));
-	}
 
 	[Fact]
 	public async Task GetSale_WhenTransactionDoesNotExist_ThrowsSaleNotFoundException()
-	{
-		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
+		=> await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
 			new GetSaleQuery(null, Guid.NewGuid()),
 			CancellationToken));
-	}
-
-
 }
-
 
 public class GetSaleValidationTests : ValidationTest<GetSaleValidation, GetSaleQuery>
 {
@@ -71,6 +63,7 @@ public class GetSaleValidationTests : ValidationTest<GetSaleValidation, GetSaleQ
 	{
 		var result = await ValidateAsync(new GetSaleQuery(null, null));
 		result.ShouldHaveValidationErrorFor(x => x)
-			.WithErrorCode(Main.Entities.SaleIdOrTransactionIdRequiredMessage.Instance.MessageKey).Only();
+			.WithErrorCode(SaleIdOrTransactionIdRequiredMessage.Instance.MessageKey)
+			.Only();
 	}
 }

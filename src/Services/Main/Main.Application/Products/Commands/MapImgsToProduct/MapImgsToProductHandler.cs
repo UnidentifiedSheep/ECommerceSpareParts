@@ -52,7 +52,10 @@ public class MapImgsToProductHandler(
 			if (keys.Count != 0)
 			{
 				var deleteResults = await s3Storage
-					.TryDeleteFilesAsync(opt.Name, keys, cancellationToken);
+					.TryDeleteFilesAsync(
+						opt.Name,
+						keys,
+						cancellationToken);
 
 				foreach (var failure in deleteResults.Where(result => !result.IsSuccess))
 					logger.LogWarning(
@@ -61,6 +64,7 @@ public class MapImgsToProductHandler(
 						failure.ErrorCode,
 						failure.ErrorMessage);
 			}
+
 			throw;
 		}
 

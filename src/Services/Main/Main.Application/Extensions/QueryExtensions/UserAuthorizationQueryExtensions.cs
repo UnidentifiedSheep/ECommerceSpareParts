@@ -10,16 +10,22 @@ namespace Main.Application.Extensions.QueryExtensions;
 
 public static class UserAuthorizationQueryExtensions
 {
-	private static readonly Expression<Func<User, UserAccessData>> AccessProjection = user => new UserAccessData
-	{
-		UserId = user.Id,
-		Roles = user.Roles.Select(role => new RoleAccessData
+	private static readonly Expression<Func<User, UserAccessData>> AccessProjection = user
+		=> new UserAccessData
 		{
-			Name = role.RoleName,
-			Permissions = role.Role.RolePermissions.Select(permission => permission.PermissionName).ToArray()
-		}).ToArray(),
-		DirectPermissions = user.Permissions.Select(permission => permission.Permission).ToArray()
-	};
+			UserId = user.Id,
+			Roles = user.Roles
+				.Select(role => new RoleAccessData
+				{
+					Name = role.RoleName,
+					Permissions = role.Role
+						.RolePermissions
+						.Select(permission => permission.PermissionName)
+						.ToArray()
+				})
+				.ToArray(),
+			DirectPermissions = user.Permissions.Select(permission => permission.Permission).ToArray()
+		};
 
 	public static async Task<UserAuthorizationDto?> GetUserAuthorizationAsync(
 		this IReadRepository<User, Guid> repository,
@@ -43,7 +49,10 @@ public static class UserAuthorizationQueryExtensions
 			return null;
 
 		var access = ExtractAccess(result.Access);
-		return new UserAuthorizationDto(result.User, access.Roles, access.Permissions);
+		return new UserAuthorizationDto(
+			result.User,
+			access.Roles,
+			access.Permissions);
 	}
 
 	public static async Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
@@ -55,10 +64,11 @@ public static class UserAuthorizationQueryExtensions
 		return users.GetValueOrDefault(userId);
 	}
 
-	public static async Task<IReadOnlyDictionary<Guid, UserRolesAndPermissions>> GetUsersRolesAndPermissionsAsync(
-		this IReadRepository<User, Guid> repository,
-		IReadOnlyCollection<Guid> userIds,
-		CancellationToken cancellationToken = default)
+	public static async Task<IReadOnlyDictionary<Guid, UserRolesAndPermissions>>
+		GetUsersRolesAndPermissionsAsync(
+			this IReadRepository<User, Guid> repository,
+			IReadOnlyCollection<Guid> userIds,
+			CancellationToken cancellationToken = default)
 	{
 		cancellationToken.ThrowIfCancellationRequested();
 		var ids = userIds.Distinct().ToArray();
@@ -69,17 +79,21 @@ public static class UserAuthorizationQueryExtensions
 			.Where(user => ids.Contains(user.Id))
 			.AsSingleQuery()
 			.Select(AccessProjection)
-			.ToDictionaryAsync(user => user.UserId, user => ExtractAccess(user), cancellationToken);
+			.ToDictionaryAsync(
+				user => user.UserId,
+				user => ExtractAccess(user),
+				cancellationToken);
 	}
 
-	private static UserRolesAndPermissions ExtractAccess(UserAccessData user) => new()
-	{
-		Roles = user.Roles.Select(role => role.Name).ToArray(),
-		Permissions = user.DirectPermissions
-			.Concat(user.Roles.SelectMany(role => role.Permissions))
-			.Distinct()
-			.ToArray()
-	};
+	private static UserRolesAndPermissions ExtractAccess(UserAccessData user)
+		=> new()
+		{
+			Roles = user.Roles.Select(role => role.Name).ToArray(),
+			Permissions = user.DirectPermissions
+				.Concat(user.Roles.SelectMany(role => role.Permissions))
+				.Distinct()
+				.ToArray()
+		};
 
 	private sealed record UserAccessData
 	{

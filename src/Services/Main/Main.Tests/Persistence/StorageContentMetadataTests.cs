@@ -1,5 +1,5 @@
-using Main.Entities.Storage;
 using FluentAssertions;
+using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
@@ -9,15 +9,16 @@ namespace Tests.Persistence;
 
 public sealed class StorageContentMetadataTests : IntegrationTest
 {
-	public StorageContentMetadataTests(CombinedContainerFixture fixture) : base(fixture) =>
-		RegisterBasicContext<StorageContentTestContext>();
+	public StorageContentMetadataTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<StorageContentTestContext>();
 
 	[Fact]
 	public async Task Metadata_MovementTypeSurvivesReload()
 	{
 		var content = GetContext<StorageContentTestContext>().StorageContents.First();
 
-		var loaded = await Context.Set<StorageContent>().AsNoTracking()
+		var loaded = await Context.Set<StorageContent>()
+			.AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 
 		loaded.Metadata.LastMovementType.Should().Be(StorageMovementType.StorageContentAddition);
@@ -31,7 +32,8 @@ public sealed class StorageContentMetadataTests : IntegrationTest
 			$"UPDATE public.storage_content SET metadata = '{{}}'::jsonb WHERE id = {content.Id}",
 			CancellationToken);
 
-		var loaded = await Context.Set<StorageContent>().AsNoTracking()
+		var loaded = await Context.Set<StorageContent>()
+			.AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 
 		loaded.Metadata.LastMovementType.Should().BeNull();

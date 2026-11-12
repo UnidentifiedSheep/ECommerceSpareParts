@@ -8,6 +8,6 @@ public class
 	UpdateOrganizationFinancialProfileDbValidation : AbstractDbValidation<
 	UpdateOrganizationFinancialProfileCommand>
 {
-	public override void Build(IValidationPlan plan, UpdateOrganizationFinancialProfileCommand request) =>
-		plan.ValidateOrganizationExistsId(request.OrganizationId);
+	public override void Build(IValidationPlan plan, UpdateOrganizationFinancialProfileCommand request)
+		=> plan.ValidateOrganizationExistsId(request.OrganizationId);
 }

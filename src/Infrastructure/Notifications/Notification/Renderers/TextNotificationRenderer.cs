@@ -13,7 +13,9 @@ public class TextNotificationRenderer : INotificationRenderer<ITextNotification>
 	public Task<IReadOnlyList<INotificationContent?>> TryRenderAsync(
 		IEnumerable<ITextNotification> notifications,
 		CancellationToken cancellationToken)
-		=> Task.FromResult<IReadOnlyList<INotificationContent?>>(notifications
-			.Select(INotificationContent? (notification) => new NotificationContent(notification.GetModel().AsText))
-			.ToList());
+		=> Task.FromResult<IReadOnlyList<INotificationContent?>>(
+			notifications
+				.Select(INotificationContent? (notification)
+					=> new NotificationContent(notification.GetModel().AsText))
+				.ToList());
 }

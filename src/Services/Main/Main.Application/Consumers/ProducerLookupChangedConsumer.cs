@@ -4,7 +4,8 @@ using MassTransit;
 
 namespace Main.Application.Consumers;
 
-public sealed class ProducerLookupChangedConsumer(IProducerLookupService lookup) : IConsumer<ProducerLookupChangedEvent>
+public sealed class ProducerLookupChangedConsumer(IProducerLookupService lookup)
+	: IConsumer<ProducerLookupChangedEvent>
 {
 	public Task Consume(ConsumeContext<ProducerLookupChangedEvent> context)
 	{

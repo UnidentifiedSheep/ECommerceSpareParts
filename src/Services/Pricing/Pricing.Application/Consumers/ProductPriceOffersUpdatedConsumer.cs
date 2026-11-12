@@ -31,10 +31,8 @@ public class ProductPriceOffersUpdatedDefinition : ConsumerDefinition<ProductPri
 		IReceiveEndpointConfigurator endpointConfigurator,
 		IConsumerConfigurator<ProductPriceOffersUpdatedConsumer> consumerConfigurator,
 		IRegistrationContext context)
-	{
-		consumerConfigurator.Options<BatchOptions>(options => options
+		=> consumerConfigurator.Options<BatchOptions>(options => options
 			.SetMessageLimit(100)
 			.SetTimeLimit(TimeSpan.FromSeconds(1))
 			.SetConcurrencyLimit(1));
-	}
 }

@@ -16,10 +16,8 @@ public static class ProductCrossQueryExtensions
 	public static IQueryable<ProductCross> GetCrosses(
 		this IQueryable<ProductCross> query,
 		IReadOnlySet<int> productIds)
-	{
-		return query.Where(x =>
+		=> query.Where(x =>
 			productIds.Contains(x.LeftProductId) || productIds.Contains(x.RightProductId));
-	}
 
 	public static IReadOnlyDictionary<int, IReadOnlySet<int>> GetCrosses(
 		this IEnumerable<ProductCross> crosses,

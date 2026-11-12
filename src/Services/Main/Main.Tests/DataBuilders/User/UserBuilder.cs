@@ -66,7 +66,12 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
 		bool isPrimary = false,
 		bool isConfirmed = true)
 	{
-		_phones.Add(new UserPhoneData(phone, type, isPrimary, isConfirmed));
+		_phones.Add(
+			new UserPhoneData(
+				phone,
+				type,
+				isPrimary,
+				isConfirmed));
 		return this;
 	}
 

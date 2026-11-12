@@ -9,7 +9,8 @@ public class UpsertOrderDbValidation : AbstractDbValidation<UpsertOrderCommand>
 	public override void Build(IValidationPlan plan, UpsertOrderCommand request)
 	{
 		if (request.Order.UserId != null)
-			plan.ValidateOrganizationMemberExistsPK((request.Order.OrganizationId, request.Order.UserId.Value));
+			plan.ValidateOrganizationMemberExistsPK(
+				(request.Order.OrganizationId, request.Order.UserId.Value));
 		else
 			plan.ValidateOrganizationExistsId(request.Order.OrganizationId);
 

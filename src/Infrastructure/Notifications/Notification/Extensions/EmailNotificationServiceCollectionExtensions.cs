@@ -18,7 +18,10 @@ public static class EmailNotificationServiceCollectionExtensions
 		this IServiceCollection services,
 		string? templatesRoot = null)
 	{
-		templatesRoot ??= Path.Combine(AppContext.BaseDirectory, "Templates", "Emails");
+		templatesRoot ??= Path.Combine(
+			AppContext.BaseDirectory,
+			"Templates",
+			"Emails");
 
 		services.AddNamedObjectRegistry();
 		services.TryAddEnumerable(ServiceDescriptor.Scoped<INotificationChannel, EmailChannel>());
@@ -41,10 +44,10 @@ public static class EmailNotificationServiceCollectionExtensions
 	{
 		services.AddSingleton<Dequeuer<EmailRecipient>>(sp =>
 			new Dequeuer<EmailRecipient>(
-				systemName: EmailRecipient.ChannelName,
-				logger: sp.GetRequiredService<ILogger<Dequeuer<EmailRecipient>>>(),
-				options: sp.GetRequiredService<IOptions<EmailChannelOptions>>().Value,
-				scopeFactory: sp.GetRequiredService<IServiceScopeFactory>()));
+				EmailRecipient.ChannelName,
+				sp.GetRequiredService<ILogger<Dequeuer<EmailRecipient>>>(),
+				sp.GetRequiredService<IOptions<EmailChannelOptions>>().Value,
+				sp.GetRequiredService<IServiceScopeFactory>()));
 
 		services.AddHostedService(sp => sp.GetRequiredService<Dequeuer<EmailRecipient>>());
 		return services;

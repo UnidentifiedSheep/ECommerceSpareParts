@@ -14,7 +14,9 @@ public sealed record RemoveRolesFromUserCommand : ICommand<RemoveRolesFromUserRe
 	public RemoveRolesFromUserCommand(Guid userId, IEnumerable<string> names)
 	{
 		UserId = userId;
-		RoleNames = names.Select(Main.Entities.Auth.RoleNames.Normalize).Distinct(StringComparer.Ordinal).ToArray();
+		RoleNames = names.Select(Entities.Auth.RoleNames.Normalize)
+			.Distinct(StringComparer.Ordinal)
+			.ToArray();
 	}
 
 	public Guid UserId { get; }
@@ -39,7 +41,8 @@ public sealed class RemoveRolesFromUserHandler(
 			Criteria<UserRole>.New()
 				.Where(x => x.UserId == request.UserId && request.RoleNames.Contains(x.RoleName))
 				.Track()
-				.Build(), cancellationToken);
+				.Build(),
+			cancellationToken);
 		var found = models.Select(x => x.RoleName).ToHashSet(StringComparer.Ordinal);
 		foreach (var name in request.RoleNames)
 			if (!found.Contains(name))

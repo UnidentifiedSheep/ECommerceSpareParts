@@ -16,7 +16,8 @@ public sealed class GetMarkupGroupsByIdsTests(CombinedContainerFixture fixture) 
 		await new MarkupGroupDataBuilder(Faker).BuildAndAddToDb(Context);
 
 		var result = await Mediator.Send(
-			new GetMarkupGroupsByIdsQuery([manual.Id, automatic.Id, manual.Id, int.MaxValue]), CancellationToken);
+			new GetMarkupGroupsByIdsQuery([manual.Id, automatic.Id, manual.Id, int.MaxValue]),
+			CancellationToken);
 
 		result.Groups.Keys.Should().BeEquivalentTo([manual.Id, automatic.Id]);
 	}
@@ -42,7 +43,9 @@ public sealed class GetMarkupGroupsByIdsTests(CombinedContainerFixture fixture) 
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetMarkupGroupsByIdsQuery(Array.Empty<int>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetMarkupGroupsByIdsQuery(Array.Empty<int>()),
+			CancellationToken);
 
 		result.Groups.Should().BeEmpty();
 	}

@@ -23,8 +23,9 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>, ILinqEntity<U
 
 	public Role Role { get; private set; } = null!;
 
-	public static Expression<Func<UserRole, (Guid, string)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.UserId, x.RoleName);
+	public static Expression<Func<UserRole, (Guid, string)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.UserId, x.RoleName);
 
 	public static Expression<Func<UserRole, bool>> GetEqualityExpression((Guid, string) key)
 	{

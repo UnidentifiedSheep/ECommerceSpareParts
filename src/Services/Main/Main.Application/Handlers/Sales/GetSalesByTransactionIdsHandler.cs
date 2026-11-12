@@ -12,10 +12,7 @@ public sealed record GetSalesByTransactionIdsQuery : IQuery<GetSalesByTransactio
 {
 	public GetSalesByTransactionIdsQuery(Guid id) : this([id]) { }
 
-	public GetSalesByTransactionIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetSalesByTransactionIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }

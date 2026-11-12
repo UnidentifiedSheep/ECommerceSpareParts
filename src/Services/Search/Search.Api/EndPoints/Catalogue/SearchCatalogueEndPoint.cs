@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
-using Abstractions.Models;
 using Api.Common.Extensions;
-using Application.Common.Models;
 using Application.Common.Extensions;
+using Application.Common.Models;
 using Carter;
 using Enums;
 using MediatR;
@@ -78,8 +77,7 @@ public sealed record SearchCatalogueResponse
 public sealed class SearchCatalogueEndPoint : ICarterModule
 {
 	public void AddRoutes(IEndpointRouteBuilder app)
-	{
-		app
+		=> app
 			.MapPost(
 				"/catalogue/search",
 				async (
@@ -104,7 +102,8 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 					return Results.Ok(
 						new SearchCatalogueResponse
 						{
-							Products = result.Products, SearchInCatalogueCandidates = result.SearchInCatalogueCandidates
+							Products = result.Products,
+							SearchInCatalogueCandidates = result.SearchInCatalogueCandidates
 						});
 				})
 			.WithTags("Catalogue")
@@ -115,5 +114,4 @@ public sealed class SearchCatalogueEndPoint : ICarterModule
 			.RequireAllPermissions(
 				PermissionCodes.ARTICLES_GET_MAIN,
 				PermissionCodes.CATALOGUE_CANDIDATES_REVIEW);
-	}
 }

@@ -50,19 +50,18 @@ public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity
 
 	public static Expression<Func<UserPhone, string>> GetKeySelector() => x => x.NormalizedPhone;
 
-	public static Expression<Func<UserPhone, bool>> GetEqualityExpression(string key) => x =>
-		x.NormalizedPhone == key;
+	public static Expression<Func<UserPhone, bool>> GetEqualityExpression(string key)
+		=> x =>
+			x.NormalizedPhone == key;
 
 	internal static UserPhone Create(
 		Guid userId,
 		string phoneNumber,
 		PhoneType phoneType)
-	{
-		return new UserPhone(
+		=> new(
 			userId,
 			phoneNumber,
 			phoneType);
-	}
 
 	public void SetPhoneNumber(string phoneNumber)
 	{

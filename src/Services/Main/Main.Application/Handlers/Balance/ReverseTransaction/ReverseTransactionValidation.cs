@@ -7,7 +7,7 @@ namespace Main.Application.Handlers.Balance.ReverseTransaction;
 public class ReverseTransactionValidation : AbstractValidator<ReverseTransactionCommand>
 {
 	public ReverseTransactionValidation()
-	{
-		RuleFor(x => x.TransactionId).NotEmpty().WithLocalizableError(TransactionIdRequiredMessage.Instance);
-	}
+		=> RuleFor(x => x.TransactionId)
+			.NotEmpty()
+			.WithLocalizableError(TransactionIdRequiredMessage.Instance);
 }

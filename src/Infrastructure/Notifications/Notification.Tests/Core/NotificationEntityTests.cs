@@ -11,12 +11,18 @@ public class NotificationEntityTests
 		var userId = Guid.NewGuid();
 		var before = DateTime.UtcNow;
 
-		var notification = NotificationEntity.Create(userId, "order-created", "{\"id\":42}");
+		var notification = NotificationEntity.Create(
+			userId,
+			"order-created",
+			"{\"id\":42}");
 
 		Assert.Equal(userId, notification.UserId);
 		Assert.Equal("order-created", notification.NotificationSystemName);
 		Assert.Equal("{\"id\":42}", notification.Model);
-		Assert.InRange(notification.CreateAt, before, DateTime.UtcNow);
+		Assert.InRange(
+			notification.CreateAt,
+			before,
+			DateTime.UtcNow);
 		Assert.Empty(notification.Deliveries);
 	}
 
@@ -26,7 +32,10 @@ public class NotificationEntityTests
 	[InlineData("{broken}")]
 	public void Create_WithInvalidJson_Throws(string model)
 	{
-		var action = () => NotificationEntity.Create(Guid.NewGuid(), "test", model);
+		var action = () => NotificationEntity.Create(
+			Guid.NewGuid(),
+			"test",
+			model);
 
 		var exception = Assert.Throws<InvalidOperationException>(action);
 		Assert.Equal("Model must be valid json value.", exception.Message);
@@ -62,11 +71,15 @@ public class NotificationEntityTests
 	[InlineData("   ")]
 	public void MakeDelivery_WithBlankChannel_Throws(string channel)
 	{
-		var exception = Assert.Throws<InvalidOperationException>(() => CreateNotification().MakeDelivery(channel));
+		var exception =
+			Assert.Throws<InvalidOperationException>(() => CreateNotification().MakeDelivery(channel));
 
 		Assert.Equal("Channel system name must not be null or empty.", exception.Message);
 	}
 
-	private static NotificationEntity CreateNotification() =>
-		NotificationEntity.Create(Guid.NewGuid(), "test", "{}");
+	private static NotificationEntity CreateNotification()
+		=> NotificationEntity.Create(
+			Guid.NewGuid(),
+			"test",
+			"{}");
 }

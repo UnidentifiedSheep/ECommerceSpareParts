@@ -7,10 +7,7 @@ namespace Main.Application.Products.Queries;
 
 public record GetProductsStockByIdsQuery : IQuery<GetProductsStockByIdsResult>
 {
-	public GetProductsStockByIdsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetProductsStockByIdsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToArray();
 
 	public GetProductsStockByIdsQuery(int id) : this([id])
 	{
@@ -25,7 +22,8 @@ public class GetProductsStockByIdsHandler(IReadRepository<ProductStock, (string,
 	: IQueryHandler<GetProductsStockByIdsQuery, GetProductsStockByIdsResult>
 {
 	public async Task<GetProductsStockByIdsResult> Handle(
-		GetProductsStockByIdsQuery request, CancellationToken cancellationToken)
+		GetProductsStockByIdsQuery request,
+		CancellationToken cancellationToken)
 	{
 		if (request.Ids.Count == 0) return new GetProductsStockByIdsResult([]);
 

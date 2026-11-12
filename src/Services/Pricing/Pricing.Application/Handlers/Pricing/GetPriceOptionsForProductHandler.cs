@@ -1,11 +1,10 @@
-using Application.Common.Querying;
-using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Models;
+using Application.Common.Querying;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
@@ -94,11 +93,9 @@ public class GetPriceOptionsForProductHandler(
 	private async Task CalculateCandidates(
 		GetPriceOptionsForProductQuery request,
 		CancellationToken cancellationToken)
-	{
-		await sender.Send(
+		=> await sender.Send(
 			new CalculateCandidatesCommand(request.ProductId, request.StorageCode),
 			cancellationToken);
-	}
 
 	private async Task<List<ProductPriceOption>> GetOptionsAsync(
 		GetPriceOptionsForProductQuery request,

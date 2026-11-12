@@ -26,10 +26,8 @@ public abstract record CursorChartQueryInput<TCursor> : ICursorChartQueryInput<T
 	public Cursor<TCursor?> GetCursor() => new(Cursor, Size);
 
 	protected void ValidateCursor()
-	{
-		Size.EnsureInRange(
+		=> Size.EnsureInRange(
 			1,
 			100,
 			PaginationSizeRangeDefaultMessage.Instance);
-	}
 }

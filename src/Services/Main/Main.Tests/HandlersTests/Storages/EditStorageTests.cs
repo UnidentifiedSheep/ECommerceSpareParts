@@ -1,6 +1,3 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
 using Application.Common.Models;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Storages.EditStorage;
@@ -8,6 +5,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
@@ -16,9 +14,7 @@ namespace Tests.HandlersTests.Storages;
 public class EditStorageTests : IntegrationTest
 {
 	public EditStorageTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<StorageTestContext>();
-	}
+		=> RegisterBasicContext<StorageTestContext>();
 
 	[Fact]
 	public async Task EditStorage_IsNotSetButHasDescriptionValue_Succeeds()
@@ -35,7 +31,7 @@ public class EditStorageTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
-			.Set<global::Main.Entities.Storage.Storage>()
+			.Set<Storage>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Code == storage.Code, CancellationToken);
 		Assert.NotNull(dbStorage);
@@ -60,7 +56,7 @@ public class EditStorageTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
-			.Set<global::Main.Entities.Storage.Storage>()
+			.Set<Storage>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Code == storage.Code, CancellationToken);
 
@@ -94,7 +90,7 @@ public class EditStorageTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var dbStorage = await Context
-			.Set<global::Main.Entities.Storage.Storage>()
+			.Set<Storage>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Code == storage.Code, CancellationToken);
 
@@ -118,8 +114,8 @@ public class EditStorageTests : IntegrationTest
 		await Assert.ThrowsAsync<StorageNotFoundException>(() => Mediator.Send(command, CancellationToken));
 	}
 
-	private Storage GetStorage() =>
-		GetContext<StorageTestContext>().Storages.First(x => x.Type == StorageType.Warehouse);
+	private Storage GetStorage()
+		=> GetContext<StorageTestContext>().Storages.First(x => x.Type == StorageType.Warehouse);
 }
 
 public class EditStorageValidationTests : ValidationTest<EditStorageValidation, EditStorageCommand>

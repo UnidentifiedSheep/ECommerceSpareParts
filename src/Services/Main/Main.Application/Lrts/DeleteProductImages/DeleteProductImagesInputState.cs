@@ -23,9 +23,10 @@ public record DeleteProductImagesInputState : IInputState
 			throw new InvalidOperationException("Bucket name is required.");
 
 		if (StorageKeys.Length == 0 || StorageKeys.Any(key =>
-			string.IsNullOrWhiteSpace(key) || !key.StartsWith("products/", StringComparison.Ordinal)
-			|| key.Contains('\\') || key.Any(char.IsControl)
-			|| key.Split('/').Any(segment => string.IsNullOrWhiteSpace(segment) || segment is "." or "..")))
+				string.IsNullOrWhiteSpace(key) || !key.StartsWith("products/", StringComparison.Ordinal)
+				|| key.Contains('\\') || key.Any(char.IsControl)
+				|| key.Split('/')
+					.Any(segment => string.IsNullOrWhiteSpace(segment) || segment is "." or "..")))
 			throw new InvalidOperationException("Invalid product image keys.");
 	}
 }

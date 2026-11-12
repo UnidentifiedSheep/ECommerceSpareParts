@@ -1,5 +1,5 @@
-using Application.Common.Extensions;
 using System.Reflection;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using MediatR;
@@ -21,20 +21,21 @@ public sealed class ApplicationTransactionBehavior<TRequest, TResponse>(
 		RequestHandlerDelegate<TResponse> next,
 		CancellationToken cancellationToken)
 	{
-        // Unannotated requests let their transactional services own the boundary.
-        if (Settings is null && AutoSave is null)
-            return next(cancellationToken);
+		// Unannotated requests let their transactional services own the boundary.
+		if (Settings is null && AutoSave is null)
+			return next(cancellationToken);
 
-		return transactionService.WithSettingsIfIdle(Settings).ExecuteAsync(
-			async (context, ct) =>
-			{
-				var response = await next(ct);
+		return transactionService.WithSettingsIfIdle(Settings)
+			.ExecuteAsync(
+				async (context, ct) =>
+				{
+					var response = await next(ct);
 
-				if (AutoSave is not null && !context.UnitOfWork.Context.SuppressAutoSave)
-					await context.UnitOfWork.SaveChangesAsync(ct);
+					if (AutoSave is not null && !context.UnitOfWork.Context.SuppressAutoSave)
+						await context.UnitOfWork.SaveChangesAsync(ct);
 
-				return response;
-			},
-			cancellationToken);
+					return response;
+				},
+				cancellationToken);
 	}
 }

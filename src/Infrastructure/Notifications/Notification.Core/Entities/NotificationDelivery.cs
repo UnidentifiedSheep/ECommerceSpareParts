@@ -10,9 +10,25 @@ public sealed class NotificationDelivery :
 	Entity<NotificationDelivery, NotificationDeliveryKey>,
 	ILinqEntity<NotificationDelivery, NotificationDeliveryKey>
 {
+
+	private NotificationDelivery() { }
+
+	private NotificationDelivery(
+		Notification notification,
+		string channelSystemName,
+		string? recipientJson)
+	{
+		Notification = notification ?? throw new ArgumentNullException(nameof(notification));
+		ChannelSystemName = channelSystemName
+			.EnsureNotNullOrWhiteSpace(()
+				=> new InvalidOperationException("Channel system name must not be null or empty."))
+			.Trim();
+		RecipientJson = recipientJson;
+		Status = DeliveryStatus.Pending;
+	}
 	public int NotificationId { get; private set; }
 	public Notification Notification { get; private set; } = null!;
-	public string ChannelSystemName { get; private set; } = null!;
+	public string ChannelSystemName { get; } = null!;
 	public string? RecipientJson { get; private set; }
 	public DeliveryStatus Status { get; private set; }
 	public int Attempts { get; private set; }
@@ -20,22 +36,20 @@ public sealed class NotificationDelivery :
 	public DateTime? DeliveredAt { get; private set; }
 
 	public bool IsTerminal => Status is DeliveryStatus.Failed or DeliveryStatus.Delivered;
+	public static Expression<Func<NotificationDelivery, NotificationDeliveryKey>> GetKeySelector()
+		=> n => new NotificationDeliveryKey(n.NotificationId, n.ChannelSystemName);
+	public static Expression<Func<NotificationDelivery, bool>>
+		GetEqualityExpression(NotificationDeliveryKey key)
+		=> n => n.NotificationId == key.NotificationId && n.ChannelSystemName == key.ChannelSystemName;
 
-	private NotificationDelivery() { }
-
-	private NotificationDelivery(Notification notification, string channelSystemName, string? recipientJson)
-	{
-		Notification = notification ?? throw new ArgumentNullException(nameof(notification));
-		ChannelSystemName = channelSystemName
-			.EnsureNotNullOrWhiteSpace(
-				() => new InvalidOperationException("Channel system name must not be null or empty."))
-			.Trim();
-		RecipientJson = recipientJson;
-		Status = DeliveryStatus.Pending;
-	}
-
-	internal static NotificationDelivery Create(Notification notification, string channelSystemName, string? recipientJson)
-		=> new(notification, channelSystemName, recipientJson);
+	internal static NotificationDelivery Create(
+		Notification notification,
+		string channelSystemName,
+		string? recipientJson)
+		=> new(
+			notification,
+			channelSystemName,
+			recipientJson);
 
 	public void Retry()
 	{
@@ -51,8 +65,8 @@ public sealed class NotificationDelivery :
 		if (IsTerminal)
 			throw new InvalidOperationException("Cannot fail notification in terminal state.");
 
-		var validatedError = error.EnsureNotNullOrWhiteSpace(
-			() => new InvalidOperationException("Delivery error must not be null or empty."));
+		var validatedError = error.EnsureNotNullOrWhiteSpace(()
+			=> new InvalidOperationException("Delivery error must not be null or empty."));
 
 		Attempts++;
 		Error = validatedError;
@@ -73,13 +87,10 @@ public sealed class NotificationDelivery :
 	}
 
 	public override NotificationDeliveryKey GetId() => new(NotificationId, ChannelSystemName);
-	public static Expression<Func<NotificationDelivery, NotificationDeliveryKey>> GetKeySelector()
-		=> n => new NotificationDeliveryKey(n.NotificationId, n.ChannelSystemName);
-	public static Expression<Func<NotificationDelivery, bool>> GetEqualityExpression(NotificationDeliveryKey key)
-		=> n => n.NotificationId == key.NotificationId && n.ChannelSystemName == key.ChannelSystemName;
 }
 
-public readonly record struct NotificationDeliveryKey(int NotificationId, string ChannelSystemName) : ICompositeKey
+public readonly record struct NotificationDeliveryKey(int NotificationId, string ChannelSystemName)
+	: ICompositeKey
 {
 	public object[] ToArray() => [NotificationId, ChannelSystemName];
 }

@@ -12,8 +12,9 @@ public class DocumentReadRepository<TEntity, TKey>(IDocumentSession session)
 	public async Task<IEnumerable<T>> QuerySqlAsync<T>(
 		string sql,
 		object param,
-		CancellationToken cancellationToken = default) => await session.QueryAsync<T>(
-		sql,
-		cancellationToken,
-		param);
+		CancellationToken cancellationToken = default)
+		=> await session.QueryAsync<T>(
+			sql,
+			cancellationToken,
+			param);
 }

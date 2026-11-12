@@ -1,9 +1,9 @@
-using Persistence.Context;
 using Main.Entities.Auth;
 using Main.Entities.Organization;
+using Main.Entities.User;
 using Main.Enums.Organization;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using Role = Enums.Role;
 
@@ -14,7 +14,7 @@ public class SystemOrganizationSeed : ISeed<UnifiedDbContext>
 	public async Task SeedAsync(UnifiedDbContext context)
 	{
 		var systemUserIds = await context
-			.Set<Main.Entities.User.User>()
+			.Set<User>()
 			.Where(x => x.Roles.Any(role => role.RoleName == RoleNames.Normalize(nameof(Role.System))))
 			.Select(x => x.Id)
 			.ToListAsync();

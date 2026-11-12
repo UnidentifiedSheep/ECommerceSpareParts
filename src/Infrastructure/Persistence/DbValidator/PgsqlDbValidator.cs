@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces;
-using Application.Common.Interfaces.Persistence;
+﻿using Application.Common.Interfaces.Persistence;
 using BulkValidation.Base.Interfaces;
 using BulkValidation.Core.Interfaces;
 using BulkValidation.Core.Models;
@@ -17,10 +16,8 @@ public sealed class PgsqlDbValidator<TContext>(IDbValidator<TContext, NpgsqlPara
 		IValidationPlan plan,
 		bool throwOnError = true,
 		CancellationToken cancellationToken = default)
-	{
-		return await validator.Validate(
+		=> await validator.Validate(
 			plan,
 			throwOnError,
 			cancellationToken);
-	}
 }

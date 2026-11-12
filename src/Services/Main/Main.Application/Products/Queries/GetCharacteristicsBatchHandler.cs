@@ -11,10 +11,7 @@ namespace Main.Application.Products.Queries;
 public record GetCharacteristicsBatchQuery : IQuery<GetCharacteristicsBatchResult>
 {
 
-	public GetCharacteristicsBatchQuery(IEnumerable<int> ids)
-	{
-		ProductIds = ids.Distinct().ToList();
-	}
+	public GetCharacteristicsBatchQuery(IEnumerable<int> ids) => ProductIds = ids.Distinct().ToList();
 	public IReadOnlyList<int> ProductIds { get; }
 }
 

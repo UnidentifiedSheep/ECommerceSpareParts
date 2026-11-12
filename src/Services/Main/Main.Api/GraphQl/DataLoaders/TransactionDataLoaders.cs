@@ -11,6 +11,6 @@ public static class TransactionDataLoaders
 	public static async Task<IReadOnlyDictionary<Guid, TransactionDto>> GetTransactionByIdAsync(
 		IReadOnlyList<Guid> keys,
 		ISender sender,
-		CancellationToken cancellationToken) =>
-		(await sender.Send(new GetTransactionsByIdsQuery(keys), cancellationToken)).Transactions;
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetTransactionsByIdsQuery(keys), cancellationToken)).Transactions;
 }

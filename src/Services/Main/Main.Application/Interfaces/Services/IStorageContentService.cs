@@ -17,5 +17,4 @@ public interface IStorageContentService
 		IReadOnlyCollection<SubtractStorageContentItem> items,
 		StorageMovementType movementType,
 		CancellationToken cancellationToken = default);
-
 }

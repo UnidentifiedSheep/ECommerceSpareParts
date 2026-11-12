@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
 using Main.Application.Handlers.ProductEnrichment;
@@ -12,9 +11,7 @@ namespace Tests.HandlersTests.ProductEnrichment;
 public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 {
 	public GetCatalogueCandidatesForReviewTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<CatalogueCandidateTestContext>();
-	}
+		=> RegisterBasicContext<CatalogueCandidateTestContext>();
 
 	private CatalogueCandidateTestContext TestContext => GetContext<CatalogueCandidateTestContext>();
 
@@ -98,10 +95,8 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 	}
 
 	private static GetCatalogueCandidatesForReviewQuery CreateQuery(int? productId = null, string? sku = null)
-	{
-		return new GetCatalogueCandidatesForReviewQuery(
+		=> new(
 			productId,
 			sku,
 			new Pagination(0, 20));
-	}
 }

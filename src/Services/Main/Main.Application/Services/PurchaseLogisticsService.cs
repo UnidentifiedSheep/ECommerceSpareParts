@@ -40,9 +40,10 @@ public class PurchaseLogisticsService(ISender sender, IUserRepository userReposi
 				storageFrom,
 				purchase.Storage,
 				selectedItems.Select(x => new LogisticsItemDto
-				{
-					ProductId = x.ProductId, Quantity = x.Quantity
-				}).ToArray(),
+					{
+						ProductId = x.ProductId, Quantity = x.Quantity
+					})
+					.ToArray(),
 				LogisticsCalculationMode.Strict),
 			cancellationToken);
 
@@ -51,11 +52,11 @@ public class PurchaseLogisticsService(ISender sender, IUserRepository userReposi
 		{
 			var calcResult = deliveryCost.DeliveryCost.Items[i];
 			selectedItems[i]
-			.PurchaseContent
-			.SetLogistic(
-				calcResult.Weight,
-				calcResult.AreaM3,
-				calcResult.Cost);
+				.PurchaseContent
+				.SetLogistic(
+					calcResult.Weight,
+					calcResult.AreaM3,
+					calcResult.Cost);
 		}
 
 		foreach (var content in purchase

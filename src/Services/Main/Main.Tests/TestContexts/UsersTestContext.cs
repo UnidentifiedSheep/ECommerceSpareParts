@@ -1,12 +1,12 @@
-using Persistence.Context;
 using Enums;
 using Main.Entities.Auth;
 using Main.Entities.User;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Auth;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
+using Role = Main.Entities.Auth.Role;
 
 namespace Tests.TestContexts;
 
@@ -17,8 +17,8 @@ public class UsersTestContext(UnifiedDbContext context) : TestContextBase<Unifie
 	public User User { get; private set; } = null!;
 	public User OtherUser { get; private set; } = null!;
 	public User ThirdUser { get; private set; } = null!;
-	public Main.Entities.Auth.Role ReaderRole { get; private set; } = null!;
-	public Main.Entities.Auth.Role EditorRole { get; private set; } = null!;
+	public Role ReaderRole { get; private set; } = null!;
+	public Role EditorRole { get; private set; } = null!;
 	public string ReadPermission => Permission.ToNormalizedPermission(PermissionCodes.USERS_GET);
 	public string InfoPermission => Permission.ToNormalizedPermission(PermissionCodes.USERS_INFO_GET);
 	public string CreatePermission => Permission.ToNormalizedPermission(PermissionCodes.USERS_CREATE);
@@ -30,7 +30,8 @@ public class UsersTestContext(UnifiedDbContext context) : TestContextBase<Unifie
 		OtherUser = Users.ElementAt(1);
 		ThirdUser = Users.Last();
 		await new PermissionBuilder(Faker).WithCode(PermissionCodes.USERS_GET).BuildAndAddToDb(DbContext);
-		await new PermissionBuilder(Faker).WithCode(PermissionCodes.USERS_INFO_GET).BuildAndAddToDb(DbContext);
+		await new PermissionBuilder(Faker).WithCode(PermissionCodes.USERS_INFO_GET)
+			.BuildAndAddToDb(DbContext);
 		await new PermissionBuilder(Faker).WithCode(PermissionCodes.USERS_CREATE).BuildAndAddToDb(DbContext);
 
 		ReaderRole = new RoleBuilder(Faker).WithName("batch-reader").Build();

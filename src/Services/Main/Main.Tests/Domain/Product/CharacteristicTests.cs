@@ -8,9 +8,18 @@ namespace Tests.Domain.Product;
 public class CharacteristicTests
 {
 	[Theory]
-	[InlineData("  Brake Color  ", "Brake Color", "brake-color")]
-	[InlineData("  Размер детали  ", "Размер детали", "razmer-detali")]
-	public void Create_TrimsAndNormalizesName(string input, string name, string normalizedName)
+	[InlineData(
+		"  Brake Color  ",
+		"Brake Color",
+		"brake-color")]
+	[InlineData(
+		"  Размер детали  ",
+		"Размер детали",
+		"razmer-detali")]
+	public void Create_TrimsAndNormalizesName(
+		string input,
+		string name,
+		string normalizedName)
 	{
 		var characteristic = Characteristic.Create(input);
 
@@ -37,8 +46,13 @@ public class CharacteristicTests
 	{
 		var act = () => Characteristic.Create(name!);
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be(expectedKey);
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be(expectedKey);
 	}
 
 	[Fact]
@@ -47,8 +61,13 @@ public class CharacteristicTests
 		Characteristic.Create(new string('a', 128)).Name.Should().HaveLength(128);
 		var act = () => Characteristic.Create(new string('a', 129));
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be(ArticleCharacteristicNameMaxLengthMessage.Key);
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be(ArticleCharacteristicNameMaxLengthMessage.Key);
 	}
 
 	[Fact]

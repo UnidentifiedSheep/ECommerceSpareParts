@@ -12,9 +12,6 @@ namespace Main.Application.Handlers.Documents;
 
 public sealed record GetDocumentsByIdsQuery : IQuery<GetDocumentsByIdsResult>
 {
-	public IReadOnlyList<Guid> RequestIds { get; }
-	public Guid? CallerId { get; }
-	public bool CanAccessAll { get; }
 
 	public GetDocumentsByIdsQuery(
 		IEnumerable<Guid> requestIds,
@@ -25,6 +22,9 @@ public sealed record GetDocumentsByIdsQuery : IQuery<GetDocumentsByIdsResult>
 		CallerId = callerId;
 		CanAccessAll = canAccessAll;
 	}
+	public IReadOnlyList<Guid> RequestIds { get; }
+	public Guid? CallerId { get; }
+	public bool CanAccessAll { get; }
 }
 
 public sealed record GetDocumentsByIdsResult(

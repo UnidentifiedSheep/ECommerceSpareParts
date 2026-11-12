@@ -32,15 +32,16 @@ public sealed class SingleRunJob : Job
 		string systemName,
 		string initialState,
 		int maxAttempts = 3)
-	{
-		return new SingleRunJob(
+		=> new(
 			systemName,
 			initialState,
 			maxAttempts);
-	}
 
-	public static SingleRunJob CreateDeferred(string systemName, int maxAttempts = 3) =>
-		new(systemName, null, maxAttempts);
+	public static SingleRunJob CreateDeferred(string systemName, int maxAttempts = 3)
+		=> new(
+			systemName,
+			null,
+			maxAttempts);
 
 	public static SingleRunJob CreateUnique(
 		string naturalKey,

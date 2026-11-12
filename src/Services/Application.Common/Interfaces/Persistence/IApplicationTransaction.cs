@@ -12,9 +12,9 @@ public interface IApplicationTransaction : IDisposable, IAsyncDisposable
 	IApplicationTransaction WithSettings(TransactionalAttribute? settings);
 
 	/// <summary>
-	/// Registers a handler for a failed operation after rollback and retries.
-	/// Enclosing database transactions defer error handling to their owner.
-	/// Returning from the handler does not suppress the original exception.
+	///     Registers a handler for a failed operation after rollback and retries.
+	///     Enclosing database transactions defer error handling to their owner.
+	///     Returning from the handler does not suppress the original exception.
 	/// </summary>
 	IApplicationTransaction OnException(Action<TransactionError> handler);
 

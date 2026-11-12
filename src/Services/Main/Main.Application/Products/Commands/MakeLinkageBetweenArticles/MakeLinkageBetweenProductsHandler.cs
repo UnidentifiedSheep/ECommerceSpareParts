@@ -91,6 +91,7 @@ public class MakeLinkageBetweenProductsHandler(
 					if (l == rightArticle.Id) continue;
 					toAdd.Add(ProductCross.Create(l, rightArticle.Id));
 				}
+
 				break;
 
 			case ProductLinkageType.FullRightToLeftCross:
@@ -101,6 +102,7 @@ public class MakeLinkageBetweenProductsHandler(
 					if (r == leftArticle.Id) continue;
 					toAdd.Add(ProductCross.Create(leftArticle.Id, r));
 				}
+
 				break;
 
 			default:

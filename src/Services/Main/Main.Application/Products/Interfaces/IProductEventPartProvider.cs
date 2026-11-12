@@ -11,5 +11,8 @@ public interface IProductEventPartProvider
 
 	IQueryable<ProductEntity> Populate(IQueryable<ProductEntity> query);
 
-	object Extract(IReadOnlyList<ProductEntity> products, DateTime updatedAt, IReadOnlyList<int> missingProductIds);
+	object Extract(
+		IReadOnlyList<ProductEntity> products,
+		DateTime updatedAt,
+		IReadOnlyList<int> missingProductIds);
 }

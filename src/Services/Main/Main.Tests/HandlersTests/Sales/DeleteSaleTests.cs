@@ -1,16 +1,17 @@
-using Tests.Stubs;
-using Microsoft.Extensions.DependencyInjection;
-using Application.Common.Interfaces.Events;
 using Contracts;
-using Tests.Extensions;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Handlers.Sales;
+using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
+using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Tests.Extensions;
+using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
@@ -19,14 +20,14 @@ namespace Tests.HandlersTests.Sales;
 public class DeleteSaleTests : IntegrationTest
 {
 	public DeleteSaleTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<SaleTestContext>();
-	}
+		=> RegisterBasicContext<SaleTestContext>();
 
 	private SaleTestContext SaleContext => GetContext<SaleTestContext>();
 
-	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
-		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+	private MessageBrokerStub Broker
+		=> (MessageBrokerStub)Scope.ServiceProvider
+			.GetRequiredService<PublishEndpointAccessor>()
+			.Publisher;
 
 	[Fact]
 	public async Task DeleteSale_ValidSale_MarksSaleDeletedRestoresStockAndReversesTransaction()
@@ -44,12 +45,12 @@ public class DeleteSaleTests : IntegrationTest
 
 		var deletedSale = await ReloadSale();
 		var storageContent = await Context
-			.Set<global::Main.Entities.Storage.StorageContent>()
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(productId, CancellationToken);
 		var transaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == transactionId, CancellationToken);
 
@@ -82,7 +83,7 @@ public class DeleteSaleTests : IntegrationTest
 
 		var deletedSale = await ReloadSale();
 		var transaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 
@@ -95,11 +96,9 @@ public class DeleteSaleTests : IntegrationTest
 
 	[Fact]
 	public async Task DeleteSale_WhenSaleDoesNotExist_ThrowsSaleNotFoundException()
-	{
-		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
+		=> await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
 			new DeleteSaleCommand(Guid.NewGuid(), 1),
 			CancellationToken));
-	}
 
 	[Fact]
 	public async Task DeleteSale_WhenRowVersionIsInvalid_ThrowsInvalidRowVersionException()
@@ -114,7 +113,7 @@ public class DeleteSaleTests : IntegrationTest
 
 		var saleAfterFailedDelete = await ReloadSale();
 		var transaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 
@@ -125,25 +124,23 @@ public class DeleteSaleTests : IntegrationTest
 	}
 
 	private Task<Sale> ReloadSale()
-	{
-		return Context
-			.Set<global::Main.Entities.Sale.Sale>()
+		=> Context
+			.Set<Sale>()
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == SaleContext.Sale.Id);
-	}
 
 	private async Task<int> StorageContentCount(int storageContentId)
 	{
 		var storageContent = await Context
-			.Set<global::Main.Entities.Storage.StorageContent>()
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId);
 
 		return storageContent.Count;
 	}
 
-	private Task<int> ProductStock(int productId) =>
-		Context.GetProductStockQuantityAsync(productId, CancellationToken);
+	private Task<int> ProductStock(int productId)
+		=> Context.GetProductStockQuantityAsync(productId, CancellationToken);
 }

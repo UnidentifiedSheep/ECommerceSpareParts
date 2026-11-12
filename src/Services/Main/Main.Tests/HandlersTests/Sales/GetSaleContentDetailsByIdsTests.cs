@@ -10,9 +10,7 @@ namespace Tests.HandlersTests.Sales;
 public sealed class GetSaleContentDetailsByIdsTests : IntegrationTest
 {
 	public GetSaleContentDetailsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<SaleTestContext>();
-	}
+		=> RegisterBasicContext<SaleTestContext>();
 
 	private SaleTestContext TestContext => GetContext<SaleTestContext>();
 
@@ -24,13 +22,18 @@ public sealed class GetSaleContentDetailsByIdsTests : IntegrationTest
 		await AddContent();
 
 		var result = await Mediator.Send(
-			new GetSaleContentDetailsByIdsQuery([first.Id, second.Id, first.Id, int.MaxValue]), CancellationToken);
+			new GetSaleContentDetailsByIdsQuery([first.Id, second.Id, first.Id, int.MaxValue]),
+			CancellationToken);
 
 		result.Details.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
-		result.Details[first.Id].Select(detail => detail.Id)
-			.Should().Equal(first.Details.Select(detail => detail.Id).Order());
-		result.Details[second.Id].Select(detail => detail.Id)
-			.Should().Equal(second.Details.Select(detail => detail.Id).Order());
+		result.Details[first.Id]
+			.Select(detail => detail.Id)
+			.Should()
+			.Equal(first.Details.Select(detail => detail.Id).Order());
+		result.Details[second.Id]
+			.Select(detail => detail.Id)
+			.Should()
+			.Equal(second.Details.Select(detail => detail.Id).Order());
 	}
 
 	[Fact]
@@ -41,14 +44,18 @@ public sealed class GetSaleContentDetailsByIdsTests : IntegrationTest
 		var result = await Mediator.Send(new GetSaleContentDetailsByIdsQuery(content.Id), CancellationToken);
 
 		result.Details.Keys.Should().Equal(content.Id);
-		result.Details[content.Id].Select(detail => detail.Id)
-			.Should().Equal(content.Details.Select(detail => detail.Id).Order());
+		result.Details[content.Id]
+			.Select(detail => detail.Id)
+			.Should()
+			.Equal(content.Details.Select(detail => detail.Id).Order());
 	}
 
 	[Fact]
 	public async Task MissingContent_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetSaleContentDetailsByIdsQuery(int.MaxValue), CancellationToken);
+		var result = await Mediator.Send(
+			new GetSaleContentDetailsByIdsQuery(int.MaxValue),
+			CancellationToken);
 
 		result.Details.Should().BeEmpty();
 	}
@@ -56,7 +63,9 @@ public sealed class GetSaleContentDetailsByIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetSaleContentDetailsByIdsQuery(Array.Empty<int>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetSaleContentDetailsByIdsQuery(Array.Empty<int>()),
+			CancellationToken);
 
 		result.Details.Should().BeEmpty();
 	}
@@ -67,7 +76,9 @@ public sealed class GetSaleContentDetailsByIdsTests : IntegrationTest
 			.WithProductId(TestContext.Product.Id)
 			.WithCurrencyId(TestContext.Sale.CurrencyId)
 			.WithStorageContentIds([TestContext.StorageContent.Id])
-			.WithCount(2).WithDetailsCount(2).Build();
+			.WithCount(2)
+			.WithDetailsCount(2)
+			.Build();
 		TestContext.Sale.AddContent(content);
 		await Context.SaveChangesAsync(CancellationToken);
 		return content;

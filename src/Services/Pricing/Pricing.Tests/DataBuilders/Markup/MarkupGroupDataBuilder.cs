@@ -7,8 +7,8 @@ namespace Pricing.Integration.Tests.DataBuilders.Markup;
 public sealed class MarkupGroupDataBuilder(Faker faker) : BuilderBase<MarkupGroup>(faker)
 {
 	private readonly List<MarkupRange> _ranges = [];
-	private Guid? _sourceMessageId;
 	private string? _name;
+	private Guid? _sourceMessageId;
 
 	public MarkupGroupDataBuilder WithName(string name)
 	{
@@ -22,14 +22,31 @@ public sealed class MarkupGroupDataBuilder(Faker faker) : BuilderBase<MarkupGrou
 		return this;
 	}
 
-	public MarkupGroupDataBuilder WithRange(decimal start, decimal end, decimal markup)
+	public MarkupGroupDataBuilder WithRange(
+		decimal start,
+		decimal end,
+		decimal markup)
 	{
-		_ranges.Add(MarkupRange.Create(start, end, markup));
+		_ranges.Add(
+			MarkupRange.Create(
+				start,
+				end,
+				markup));
 		return this;
 	}
 
-	public override MarkupGroup Build() => MarkupGroup.Create(
-		_name ?? Faker.Commerce.ProductName(), 1,
-		_ranges.Count == 0 ? [MarkupRange.Create(0m, 100m, 0.2m)] : _ranges,
-		_sourceMessageId);
+	public override MarkupGroup Build()
+		=> MarkupGroup.Create(
+			_name ?? Faker.Commerce.ProductName(),
+			1,
+			_ranges.Count == 0
+				?
+				[
+					MarkupRange.Create(
+						0m,
+						100m,
+						0.2m)
+				]
+				: _ranges,
+			_sourceMessageId);
 }

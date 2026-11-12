@@ -3,12 +3,13 @@ using Main.Enums.Products;
 
 namespace Main.Entities.Exceptions;
 
-public class ProductCharacteristicsNotFoundException(int id, int characteristicId) : LocalizedNotFoundException(
-	ArticleCharacteristicsNotFoundMessage.Instance,
-	new
-	{
-		Id = id, CharacteristicId = characteristicId
-	});
+public class ProductCharacteristicsNotFoundException(int id, int characteristicId)
+	: LocalizedNotFoundException(
+		ArticleCharacteristicsNotFoundMessage.Instance,
+		new
+		{
+			Id = id, CharacteristicId = characteristicId
+		});
 
 public class ProductContentNotFoundException(int articleId, int insideArticleId) : LocalizedNotFoundException(
 	ArticleContentNotFoundMessage.Instance,

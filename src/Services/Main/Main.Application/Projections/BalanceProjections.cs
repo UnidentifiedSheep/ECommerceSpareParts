@@ -62,11 +62,9 @@ public static class OrganizationFinancialProfileDtoFactory
 	public static OrganizationFinancialProfileDto Create(
 		OrganizationFinancialProfile profile,
 		decimal netPositionInBaseCurrency)
-	{
-		return new OrganizationFinancialProfileDto
+		=> new()
 		{
 			NetPositionInBaseCurrency = netPositionInBaseCurrency,
 			MinimalAllowedBalance = profile.MinAllowedBalance
 		};
-	}
 }

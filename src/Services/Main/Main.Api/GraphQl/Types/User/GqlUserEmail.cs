@@ -6,7 +6,8 @@ namespace Main.Api.GraphQl.Types.User;
 
 [GraphQLName("UserEmail")]
 public sealed record GqlUserEmail(
-	[property: GraphQLIgnore] UserEmailDto EmailDto)
+	[property: GraphQLIgnore]
+	UserEmailDto EmailDto)
 {
 	[GraphQLName("email")]
 	public string Email => EmailDto.Email;

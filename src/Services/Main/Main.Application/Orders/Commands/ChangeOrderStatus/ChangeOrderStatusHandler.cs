@@ -11,7 +11,8 @@ using MediatR;
 
 namespace Main.Application.Orders.Commands.ChangeOrderStatus;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record ChangeOrderStatusCommand(
 	Guid OrderId,
 	Guid ActorId,
@@ -20,7 +21,7 @@ public record ChangeOrderStatusCommand(
 
 public class ChangeOrderStatusHandler(
 	IRepository<Order, Guid> repository
-	) : ICommandHandler<ChangeOrderStatusCommand>
+) : ICommandHandler<ChangeOrderStatusCommand>
 {
 	public async Task<Unit> Handle(ChangeOrderStatusCommand request, CancellationToken cancellationToken)
 	{

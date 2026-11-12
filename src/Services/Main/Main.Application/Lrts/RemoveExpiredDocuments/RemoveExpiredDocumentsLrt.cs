@@ -20,11 +20,11 @@ public class RemoveExpiredDocumentsLrt(
 	public const string Name = nameof(RemoveExpiredDocumentsLrt);
 	public override string SystemName => Name;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtExpiredDocumentsRemovalNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtExpiredDocumentsRemovalNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtExpiredDocumentsRemovalDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtExpiredDocumentsRemovalDescriptionMessage.Instance;
 
 	protected override async Task DoWork(NoneInputState inputState)
 	{
@@ -34,18 +34,22 @@ public class RemoveExpiredDocumentsLrt(
 		while (true)
 		{
 			var lastProcessedId = State.LastProcessedId;
-			var batch = await ExecuteInScopeAsync((context, ct) =>
-				context.Repositories.GetForRead<DocumentGenerationRequest, Guid>().Query
-				.Where(request => request.BucketName != null && request.StorageKey != null)
-				.Where(request => request.ExpiresAt <= expiredBefore)
-				.Where(request => lastProcessedId == null || request.RequestId > lastProcessedId)
-				.OrderBy(request => request.RequestId)
-				.Select(request => new ExpiredDocument(
-					request.RequestId,
-					request.BucketName!,
-					request.StorageKey!))
-				.Take(batchSize)
-				.ToListAsync(ct), CancellationToken);
+			var batch = await ExecuteInScopeAsync(
+				(context, ct) =>
+					context.Repositories
+						.GetForRead<DocumentGenerationRequest, Guid>()
+						.Query
+						.Where(request => request.BucketName != null && request.StorageKey != null)
+						.Where(request => request.ExpiresAt <= expiredBefore)
+						.Where(request => lastProcessedId == null || request.RequestId > lastProcessedId)
+						.OrderBy(request => request.RequestId)
+						.Select(request => new ExpiredDocument(
+							request.RequestId,
+							request.BucketName!,
+							request.StorageKey!))
+						.Take(batchSize)
+						.ToListAsync(ct),
+				CancellationToken);
 
 			if (batch.Count == 0) return;
 
@@ -55,7 +59,8 @@ public class RemoveExpiredDocumentsLrt(
 				await ExecuteInTransactionAsync(
 					TransactionalAttribute.ReadCommitted(30, 3),
 					async (context, ct) =>
-						await context.Repositories.Get<DocumentGenerationRequest, Guid>()
+						await context.Repositories
+							.Get<DocumentGenerationRequest, Guid>()
 							.DeleteManyAsync(deletedIds, ct),
 					CancellationToken);
 
@@ -63,10 +68,11 @@ public class RemoveExpiredDocumentsLrt(
 				throw new InvalidOperationException(
 					$"Failed to remove {failedCount} expired document files from S3.");
 
-			await SaveStateAsync(new RemoveExpiredDocumentsState
-			{
-				LastProcessedId = batch[^1].Id
-			});
+			await SaveStateAsync(
+				new RemoveExpiredDocumentsState
+				{
+					LastProcessedId = batch[^1].Id
+				});
 		}
 	}
 

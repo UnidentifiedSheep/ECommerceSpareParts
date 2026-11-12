@@ -42,40 +42,32 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 		string name,
 		string surname,
 		string? description)
-	{
-		return new UserInfo(
+		=> new(
 			userId,
 			name,
 			surname,
 			description);
-	}
 
 	public void SetName(string name)
-	{
-		Name = name
+		=> Name = name
 			.Trim()
 			.EnsureNotNullOrWhiteSpace(UserNameRequiredMessage.Instance)
 			.EnsureMinLength(3, UserNameMinLengthMessage.Instance)
 			.Ensure(x => x.All(c => !char.IsSymbol(c)), UserNameNoSpecialCharsMessage.Instance)
 			.EnsureMaxLength(30, UserNameMaxLengthMessage.Instance);
-	}
 
 	public void SetSurname(string surname)
-	{
-		Surname = surname
+		=> Surname = surname
 			.Trim()
 			.EnsureNotNullOrWhiteSpace(UserSurnameRequiredMessage.Instance)
 			.EnsureMinLength(3, UserSurnameMinLengthMessage.Instance)
 			.Ensure(x => x.All(c => !char.IsSymbol(c)), UserSurnameNoSpecialCharsMessage.Instance)
 			.EnsureMaxLength(30, UserSurnameMaxLengthMessage.Instance);
-	}
 
 	public void SetDescription(string? description)
-	{
-		Description = description
+		=> Description = description
 			.NullIfWhiteSpace()
 			?.EnsureMaxLength(300, UserDescriptionMaxLengthMessage.Instance);
-	}
 
 	internal void Update(
 		string name,

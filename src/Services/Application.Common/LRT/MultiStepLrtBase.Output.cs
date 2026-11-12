@@ -6,7 +6,8 @@ using Microsoft.Extensions.Logging;
 namespace Application.Common.LRT;
 
 public abstract class MultiStepLrtBase<TInputState, TState, TOutput>(
-	IApplicationTransactionFactory transactionFactory, ILogger logger)
+	IApplicationTransactionFactory transactionFactory,
+	ILogger logger)
 	: MultiStepLrtBase<TInputState, TState>(transactionFactory, logger)
 	where TInputState : class, IInputState where TState : class where TOutput : class
 {

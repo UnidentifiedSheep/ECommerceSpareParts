@@ -1,6 +1,6 @@
 using HotChocolate;
-using Main.Api.GraphQl.Analytics.Queries;
 using HotChocolate.Types.Composite;
+using Main.Api.GraphQl.Analytics.Queries;
 
 namespace Main.Api.GraphQl.Queries;
 

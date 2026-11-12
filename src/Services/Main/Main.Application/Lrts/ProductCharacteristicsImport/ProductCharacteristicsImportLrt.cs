@@ -27,25 +27,38 @@ public class ProductCharacteristicsImportLrt(
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductCharacteristicsImportInputState, ProductCharacteristicsImportState,
 		ProductCharacteristicsImportLrt.ProductCharacteristicCsvDto, ProductCharacteristic>(
-		bucketsOptions, transactionService,
-		logger, s3Service, stringLocalizer)
+		bucketsOptions,
+		transactionService,
+		logger,
+		s3Service,
+		stringLocalizer)
 {
 	public const string Name = nameof(ProductCharacteristicsImportLrt);
 
 	private IReadOnlyDictionary<string, int> _characteristicIds = new Dictionary<string, int>();
 
 	public override string SystemName => Name;
-	public override ILocalizableMessage NameLocalizationMessage => LrtProductCharacteristicsImportNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtProductCharacteristicsImportDescriptionMessage.Instance;
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProductCharacteristicsImportNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductCharacteristicsImportDescriptionMessage.Instance;
+
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override async Task BeforeRead(ProductCharacteristicsImportState state)
-	{
-		_characteristicIds = await ExecuteInScopeAsync((context, ct) => context.Repositories.GetForRead<Characteristic, int>().Query
-			.Select(x => new { x.NormalizedName, x.Id })
-			.ToDictionaryAsync(x => x.NormalizedName, x => x.Id, ct), CancellationToken);
-	}
+		=> _characteristicIds = await ExecuteInScopeAsync(
+			(context, ct) => context.Repositories
+				.GetForRead<Characteristic, int>()
+				.Query
+				.Select(x => new { x.NormalizedName, x.Id })
+				.ToDictionaryAsync(
+					x => x.NormalizedName,
+					x => x.Id,
+					ct),
+			CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -64,7 +77,10 @@ public class ProductCharacteristicsImportLrt(
 				return false;
 			}
 
-			item = ProductCharacteristic.Create(row.ProductId, characteristicId, row.Value);
+			item = ProductCharacteristic.Create(
+				row.ProductId,
+				characteristicId,
+				row.Value);
 			return true;
 		}
 		catch (Exception ex)
@@ -78,30 +94,35 @@ public class ProductCharacteristicsImportLrt(
 		IReadOnlyList<(int idx, ProductCharacteristic item)> items,
 		ProductCharacteristicsImportState state,
 		CsvImportCheckpoint checkpoint,
-		List<CsvImportError> errors) =>
-		ExecuteInTransactionAsync(
+		List<CsvImportError> errors)
+		=> ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			(context, _) =>
 			{
 				if (items.Count > 0)
-					context.GetRequiredService<IApplicationTransaction>().OnException(
-						TransactionErrorKind.ForeignKeyViolation,
-						error =>
-						{
-							Logger.LogWarning(
-								error.Exception,
-								"Missing reference in characteristics import batch. StartRow: {StartRow}, EndRow: {EndRow}",
-								items[0].idx,
-								items[^1].idx);
-							Interrupt(
-								StringLocalizer.Get(
-									new LrtProductCharacteristicsImportMissingReferenceMessage()
-										.WithStartRow(items[0].idx)
-										.WithEndRow(items[^1].idx)
-										.WithConstraintName(error.ConstraintName ?? string.Empty)));
-						});
+					context.GetRequiredService<IApplicationTransaction>()
+						.OnException(
+							TransactionErrorKind.ForeignKeyViolation,
+							error =>
+							{
+								Logger.LogWarning(
+									error.Exception,
+									"Missing reference in characteristics import batch. StartRow: {StartRow}, EndRow: {EndRow}",
+									items[0].idx,
+									items[^1].idx);
+								Interrupt(
+									StringLocalizer.Get(
+										new LrtProductCharacteristicsImportMissingReferenceMessage()
+											.WithStartRow(items[0].idx)
+											.WithEndRow(items[^1].idx)
+											.WithConstraintName(error.ConstraintName ?? string.Empty)));
+							});
 
-				return base.SaveBatchAsync(items, state, checkpoint, errors);
+				return base.SaveBatchAsync(
+					items,
+					state,
+					checkpoint,
+					errors);
 			},
 			CancellationToken);
 
@@ -112,15 +133,23 @@ public class ProductCharacteristicsImportLrt(
 	{
 		if (items.Count == 0) return;
 
-		await TransactionContext.GetRequiredService<IProductRepository>().UpsertProductCharacteristicsAsync(
-			items.Select(x => x.item).ToArray(), CancellationToken);
-		await TransactionContext.GetRequiredService<IProductEventPublisher>().PublishAsync(
-			items.Select(x => x.item.ProductId), ProductEventParts.Characteristics, CancellationToken);
+		await TransactionContext.GetRequiredService<IProductRepository>()
+			.UpsertProductCharacteristicsAsync(
+				items.Select(x => x.item).ToArray(),
+				CancellationToken);
+		await TransactionContext.GetRequiredService<IProductEventPublisher>()
+			.PublishAsync(
+				items.Select(x => x.item.ProductId),
+				ProductEventParts.Characteristics,
+				CancellationToken);
 
 		Logger.LogInformation(
 			"Product characteristics import batch processed. JobId: {JobId}, " +
 			"BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}, Errors: {Errors}",
-			JobId, items[0].idx, items.Count, errors.Count);
+			JobId,
+			items[0].idx,
+			items.Count,
+			errors.Count);
 	}
 
 	public sealed record ProductCharacteristicCsvDto

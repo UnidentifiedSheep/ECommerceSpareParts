@@ -1,13 +1,13 @@
-using Persistence.Context;
-using Microsoft.EntityFrameworkCore;
 using Main.Entities.Balance;
 using Main.Entities.Organization;
 using Main.Entities.Product;
+using Main.Entities.Sale;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
-using Main.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Sale;
@@ -106,16 +106,22 @@ public class SaleTestContext(
 			.Build();
 
 		StorageContent.IncreaseCount(-SoldCount, StorageMovementType.Sale);
-		var stock = await DbContext.Set<global::Main.Entities.Storage.ProductStock>().SingleAsync(
-			item => item.StorageCode == StorageContent.StorageCode && item.ProductId == Product.Id, cancellationToken);
+		var stock = await DbContext.Set<ProductStock>()
+			.SingleAsync(
+				item => item.StorageCode == StorageContent.StorageCode && item.ProductId == Product.Id,
+				cancellationToken);
 		stock.SetQuantity(stock.Quantity - SoldCount);
 
 		await DbContext.AddAsync(Sale, cancellationToken);
 		await DbContext.SaveChangesAsync(cancellationToken);
 		foreach (var content in Sale.Contents)
-			await DbContext.AddAsync(Main.Entities.Sale.SaleContentAnalytics.Create(content.Id,
-				content.OriginalPrice * content.Count, content.TotalSum,
-				content.Details.Sum(detail => detail.BuyPrice * detail.Count)), cancellationToken);
+			await DbContext.AddAsync(
+				SaleContentAnalytics.Create(
+					content.Id,
+					content.OriginalPrice * content.Count,
+					content.TotalSum,
+					content.Details.Sum(detail => detail.BuyPrice * detail.Count)),
+				cancellationToken);
 		await DbContext.SaveChangesAsync(cancellationToken);
 	}
 }

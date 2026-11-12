@@ -1,12 +1,12 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Dtos.Product;
 using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
+using Main.Entities;
 using Main.Entities.Product;
 using Main.Enums.Products;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -15,17 +15,13 @@ namespace Tests.HandlersTests.Products;
 public class MakeLinkageBetweenProductsTests : IntegrationTest
 {
 	public MakeLinkageBetweenProductsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
 	[Fact]
 	public async Task EmptyBatch_CompletesWithoutValidationErrors()
-	{
-		await Mediator.Send(new MakeLinkageBetweenProductsCommand([]), CancellationToken);
-	}
+		=> await Mediator.Send(new MakeLinkageBetweenProductsCommand([]), CancellationToken);
 
 	[Fact]
 	public async Task MakeLinkage_SingleCrosses_Succeeds()
@@ -44,7 +40,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var crosses = await Context
-			.Set<global::Main.Entities.Product.ProductCross>()
+			.Set<ProductCross>()
 			.AsNoTracking()
 			.Where(x => x.LeftProductId == l || x.RightProductId == l)
 			.FirstOrDefaultAsync(CancellationToken);
@@ -222,7 +218,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var crosses = await Context
-			.Set<global::Main.Entities.Product.ProductCross>()
+			.Set<ProductCross>()
 			.Where(x => x.LeftProductId == Math.Min(p1, p2) && x.RightProductId == Math.Max(p1, p2))
 			.ToListAsync(CancellationToken);
 
@@ -260,13 +256,21 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 	}
 }
 
-public class MakeLinkageBetweenProductsValidationTests : ValidationTest<MakeLinkageBetweenProductsValidation, MakeLinkageBetweenProductsCommand>
+public class MakeLinkageBetweenProductsValidationTests : ValidationTest<MakeLinkageBetweenProductsValidation,
+	MakeLinkageBetweenProductsCommand>
 {
 	[Fact]
 	public async Task MakeLinkage_SameIds_FailsValidation()
 	{
-		var result = await ValidateAsync(new MakeLinkageBetweenProductsCommand([new NewProductLinkageDto { ProductId = 1, CrossProductId = 1, LinkageType = ProductLinkageType.FullCross }]));
+		var result = await ValidateAsync(
+			new MakeLinkageBetweenProductsCommand(
+			[
+				new NewProductLinkageDto
+					{ ProductId = 1, CrossProductId = 1, LinkageType = ProductLinkageType.FullCross }
+			]));
 		result.ShouldHaveValidationErrorFor("Linkages[0]")
-			.WithErrorCode(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance.MessageKey).WithCustomState(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance).Only();
+			.WithErrorCode(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance.MessageKey)
+			.WithCustomState(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance)
+			.Only();
 	}
 }

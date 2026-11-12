@@ -8,12 +8,12 @@ public class FirstCheapestStorageContentExtractPolicy : StorageContentExtractPol
 {
 	public override string SystemName => "FirstCheapestStorageContentExtractPolicy";
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		FirstCheapestStorageContentExtractPolicyNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> FirstCheapestStorageContentExtractPolicyNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		FirstCheapestStorageContentExtractPolicyDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> FirstCheapestStorageContentExtractPolicyDescriptionMessage.Instance;
 
-	public override IOrderedQueryable<StorageContent> Apply(IQueryable<StorageContent> query) =>
-		query.OrderBy(x => x.BuyPriceInBaseCurrency);
+	public override IOrderedQueryable<StorageContent> Apply(IQueryable<StorageContent> query)
+		=> query.OrderBy(x => x.BuyPriceInBaseCurrency);
 }

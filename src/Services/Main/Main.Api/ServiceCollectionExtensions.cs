@@ -1,5 +1,4 @@
-﻿using Abstractions.Models.Options;
-using Main.Application.Models;
+﻿using Main.Application.Models;
 using Main.Application.Models.Options;
 
 namespace Main.Api;

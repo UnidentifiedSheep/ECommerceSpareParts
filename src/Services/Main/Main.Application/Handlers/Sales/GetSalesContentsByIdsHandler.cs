@@ -12,15 +12,13 @@ public sealed record GetSalesContentsByIdsQuery : IQuery<GetSalesContentsByIdsRe
 {
 	public GetSalesContentsByIdsQuery(Guid id) : this([id]) { }
 
-	public GetSalesContentsByIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetSalesContentsByIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }
 
-public sealed record GetSalesContentsByIdsResult(IReadOnlyDictionary<Guid, IReadOnlyList<SaleContentDto>> Contents);
+public sealed record GetSalesContentsByIdsResult(
+	IReadOnlyDictionary<Guid, IReadOnlyList<SaleContentDto>> Contents);
 
 public sealed class GetSalesContentsByIdsHandler(
 	IReadRepository<SaleContent, int> repository,

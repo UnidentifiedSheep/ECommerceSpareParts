@@ -11,7 +11,7 @@ namespace Application.Common.LRT;
 
 public sealed class JobStepInputInitializer(
 	INamedObjectRegistry<ILrtNamedObject> registry
-	) : IJobStepInputInitializer
+) : IJobStepInputInitializer
 {
 	public async Task<Job> InitializeAsync(
 		Job step,
@@ -69,7 +69,8 @@ public sealed class JobStepInputInitializer(
 				.Build(),
 			cancellationToken);
 
-		if (dependencies.Count != dependencyIds.Count || dependencies.Any(x => x.Status != JobStatus.Succeeded))
+		if (dependencies.Count != dependencyIds.Count ||
+			dependencies.Any(x => x.Status != JobStatus.Succeeded))
 			throw new InvalidOperationException("All dependencies must succeed before preparing step input.");
 
 		var parentLrt = registry.GetBySystemName(parent.SystemName);
@@ -84,19 +85,29 @@ public sealed class JobStepInputInitializer(
 		var child = registry.GetBySystemName(step.SystemName);
 		var dependencyKeys = dependencies.Select(GetStepKey).ToHashSet(StringComparer.Ordinal);
 
-		if (!string.Equals(definition.SystemName, step.SystemName, StringComparison.OrdinalIgnoreCase) ||
+		if (!string.Equals(
+				definition.SystemName,
+				step.SystemName,
+				StringComparison.OrdinalIgnoreCase) ||
 			definition.InputType != child.InputType ||
 			!dependencyKeys.SetEquals(definition.Dependencies.Select(x => x.Key)))
-			throw new InvalidOperationException($"Definition of step '{step.StepKey}' differs from the saved workflow.");
+			throw new InvalidOperationException(
+				$"Definition of step '{step.StepKey}' differs from the saved workflow.");
 
 		var outputs = dependencies
 			.ToDictionary(GetStepKey, x => (x, registry.GetBySystemName(x.SystemName).OutputType));
 
-		var inputContext = new LrtStepInputContext(parent.Id, parent.State, parentLrt.InputType, outputs, context);
+		var inputContext = new LrtStepInputContext(
+			parent.Id,
+			parent.State,
+			parentLrt.InputType,
+			outputs,
+			context);
 		var input = child.ValidateState(await definition.InputFactory(inputContext, cancellationToken));
 		step.InitializeInput(LrtStateSerializer.SerializeInput(input), leaseHolderId);
 		return step;
 	}
 
-	private static string GetStepKey(Job step) => step.StepKey ?? throw new InvalidOperationException("Dependency has no stable step key.");
+	private static string GetStepKey(Job step)
+		=> step.StepKey ?? throw new InvalidOperationException("Dependency has no stable step key.");
 }

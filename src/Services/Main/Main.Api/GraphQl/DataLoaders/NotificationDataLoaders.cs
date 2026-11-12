@@ -1,9 +1,8 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using GreenDonut;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Notifications;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Api.GraphQl.DataLoaders;
 
@@ -16,7 +15,7 @@ public static class NotificationDataLoaders
 		ISender sender,
 		CancellationToken cancellationToken)
 		=> (await sender.Send(
-			new GetNotificationsByIdsQuery(keys, userContext.UserId),
-			cancellationToken))
+				new GetNotificationsByIdsQuery(keys, userContext.UserId),
+				cancellationToken))
 			.Notifications;
 }

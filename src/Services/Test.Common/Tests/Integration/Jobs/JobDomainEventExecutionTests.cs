@@ -7,13 +7,11 @@ using Domain.CommonEnums;
 using FluentAssertions;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Tests.Integration;
-using Tests.Stubs;
 using Tests.TestContainers.Combined;
 
 namespace Tests.Tests.Integration.Jobs;
@@ -109,10 +107,10 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 	[Fact]
 	public async Task CancellationRequestedJobWithExpiredLease_IsCancelled()
 	{
-		var job = SingleRunJob.Create("job", "{}", 3);
+		var job = SingleRunJob.Create("job", "{}");
 		job.AcquireLease(Guid.NewGuid(), TimeSpan.FromSeconds(-1));
 		job.RequestCancellation("stop requested");
-		var activeJob = SingleRunJob.Create("active-job", "{}", 3);
+		var activeJob = SingleRunJob.Create("active-job", "{}");
 		activeJob.AcquireLease(Guid.NewGuid(), TimeSpan.FromMinutes(5));
 		activeJob.RequestCancellation();
 
@@ -126,26 +124,30 @@ public sealed class JobDomainEventExecutionTests(CombinedContainerFixture fixtur
 
 		cancelledJobs.Should().ContainSingle(x => x.Id == job.Id);
 		Context.ChangeTracker.Clear();
-		var persisted = await Context.Set<Job>().AsNoTracking()
+		var persisted = await Context.Set<Job>()
+			.AsNoTracking()
 			.SingleAsync(x => x.Id == job.Id, CancellationToken);
 		persisted.Status.Should().Be(JobStatus.Cancelled);
 		persisted.ErrorMessage.Should().Be("stop requested");
 		persisted.LeaseHolderId.Should().BeNull();
 		persisted.LeaseExpiresAt.Should().BeNull();
 		(await Context.Set<Job>().AsNoTracking().SingleAsync(x => x.Id == activeJob.Id, CancellationToken))
-			.Status.Should().Be(JobStatus.CancellationRequested);
+			.Status
+			.Should()
+			.Be(JobStatus.CancellationRequested);
 	}
 
-	private sealed class SucceedingTestLrt(IApplicationTransactionFactory transactionService, ILogger logger) : LrtBase<NoneInputState, NoneInputState>(
-		transactionService,
-		logger)
+	private sealed class SucceedingTestLrt(IApplicationTransactionFactory transactionService, ILogger logger)
+		: LrtBase<NoneInputState, NoneInputState>(
+			transactionService,
+			logger)
 	{
 		public override string SystemName => "step";
 
 		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-name");
 
-		public override ILocalizableMessage DescriptionLocalizationMessage =>
-			new LocalizableMessage("test-description");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-description");
 
 		protected override Task DoWork(NoneInputState inputState) => Task.CompletedTask;
 	}

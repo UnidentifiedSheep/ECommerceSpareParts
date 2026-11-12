@@ -24,7 +24,8 @@ public class ProductEanBuilder(Faker faker) : BuilderBase<ProductEan>(faker)
 		return this;
 	}
 
-	public override ProductEan Build() => ProductEan.Create(
-		ProductId ?? Faker.Random.Int(1),
-		Ean ?? Interlocked.Increment(ref _nextEan).ToString("D13"));
+	public override ProductEan Build()
+		=> ProductEan.Create(
+			ProductId ?? Faker.Random.Int(1),
+			Ean ?? Interlocked.Increment(ref _nextEan).ToString("D13"));
 }

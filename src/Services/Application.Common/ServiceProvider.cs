@@ -2,14 +2,14 @@
 using Abstractions.Interfaces;
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
-using Application.Common.DomainEventHandlers.Jobs.JobStepFinished;
 using Application.Common.DomainEventHandlers.Jobs.JobStatusUpdated;
+using Application.Common.DomainEventHandlers.Jobs.JobStepFinished;
 using Application.Common.Domains;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Services;
 using Application.Common.LRT;
@@ -25,7 +25,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
 using SchemaGeneration.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
-using ProjectJsonOptions = global::Abstractions.Models.Options.ProjectJsonOptions;
+using ProjectJsonOptions = Abstractions.Models.Options.ProjectJsonOptions;
 
 namespace Application.Common;
 

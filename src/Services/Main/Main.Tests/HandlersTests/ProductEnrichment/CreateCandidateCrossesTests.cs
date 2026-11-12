@@ -1,12 +1,13 @@
-using Main.Entities.Product;
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
+using Main.Entities;
 using Main.Entities.Exceptions;
+using Main.Entities.Product;
+using Main.Entities.Product.Enrichment;
 using Main.Enums.Products;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.ProductEnrichment;
 
@@ -15,9 +16,7 @@ namespace Tests.HandlersTests.ProductEnrichment;
 public sealed class CreateCandidateCrossesTests : IntegrationTest
 {
 	public CreateCandidateCrossesTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<CatalogueCandidateTestContext>();
-	}
+		=> RegisterBasicContext<CatalogueCandidateTestContext>();
 	private CatalogueCandidateTestContext TestContext => GetContext<CatalogueCandidateTestContext>();
 
 	[Fact]
@@ -51,7 +50,7 @@ public sealed class CreateCandidateCrossesTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var candidates = await Context
-			.Set<global::Main.Entities.Product.Enrichment.CatalogueCandidate>()
+			.Set<CatalogueCandidate>()
 			.Include(x => x.Product)
 			.AsNoTracking()
 			.ToListAsync(CancellationToken);
@@ -66,17 +65,23 @@ public sealed class CreateCandidateCrossesTests : IntegrationTest
 		var mustBe = otherIds.Select(x => new Tuple<Guid, Guid>(leftId, x)).OrderBy(x => x.Item2).ToList();
 		crosses.Should().BeEquivalentTo(mustBe);
 	}
-
-
 }
 
-public class CreateCandidateCrossesValidationTests : ValidationTest<CreateCandidateCrossesValidation, CreateCandidateCrossesCommand>
+public class
+	CreateCandidateCrossesValidationTests : ValidationTest<CreateCandidateCrossesValidation,
+	CreateCandidateCrossesCommand>
 {
 	[Fact]
 	public async Task WhenEmptyList_Throws()
 	{
-		var result = await ValidateAsync(new CreateCandidateCrossesCommand(Guid.NewGuid(), [], ProductLinkageType.SingleCross));
+		var result = await ValidateAsync(
+			new CreateCandidateCrossesCommand(
+				Guid.NewGuid(),
+				[],
+				ProductLinkageType.SingleCross));
 		result.ShouldHaveValidationErrorFor(x => x.CrossCandidateIds)
-			.WithErrorCode(CatalogueCandidateCrossesNotEmptyMessage.Instance.MessageKey).WithCustomState(CatalogueCandidateCrossesNotEmptyMessage.Instance).Only();
+			.WithErrorCode(CatalogueCandidateCrossesNotEmptyMessage.Instance.MessageKey)
+			.WithCustomState(CatalogueCandidateCrossesNotEmptyMessage.Instance)
+			.Only();
 	}
 }

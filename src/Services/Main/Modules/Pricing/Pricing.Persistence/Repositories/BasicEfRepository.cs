@@ -1,5 +1,5 @@
-﻿using Persistence.Context;
-using Domain;
+﻿using Domain;
+using Persistence.Context;
 using Persistence.Interfaces;
 using Persistence.Repository;
 

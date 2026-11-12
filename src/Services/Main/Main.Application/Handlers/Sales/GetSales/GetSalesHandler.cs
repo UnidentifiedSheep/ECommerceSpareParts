@@ -1,13 +1,12 @@
-using Application.Common.Querying;
-using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
+using Application.Common.Querying;
 using Main.Application.Dtos.Sale;
-using Main.Entities.Sale;
 using Main.Entities.Product.ValueObjects;
+using Main.Entities.Sale;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -71,14 +70,28 @@ public class GetSalesHandler(
 		var skuPattern = $"%{normalizedSku}%";
 
 		return query.Where(document =>
-			EF.Functions.ILike(document.Comment!, pattern, "\\") ||
-			EF.Functions.ILike(document.User.UserName.Value, pattern, "\\") ||
+			EF.Functions.ILike(
+				document.Comment!,
+				pattern,
+				"\\") ||
+			EF.Functions.ILike(
+				document.User.UserName.Value,
+				pattern,
+				"\\") ||
 			document.Contents.Any(content =>
-				EF.Functions.ILike(content.Comment!, pattern, "\\") ||
-				EF.Functions.ILike(content.Product.Name.Value, pattern, "\\") ||
-				normalizedSku.Length > 0 && EF.Functions.ILike(content.Product.Sku.NormalizedValue, skuPattern)));
+				EF.Functions.ILike(
+					content.Comment!,
+					pattern,
+					"\\") ||
+				EF.Functions.ILike(
+					content.Product.Name.Value,
+					pattern,
+					"\\") ||
+				normalizedSku.Length > 0 && EF.Functions.ILike(
+					content.Product.Sku.NormalizedValue,
+					skuPattern)));
 	}
 
-	private static string EscapePattern(string value) =>
-		value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+	private static string EscapePattern(string value)
+		=> value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }

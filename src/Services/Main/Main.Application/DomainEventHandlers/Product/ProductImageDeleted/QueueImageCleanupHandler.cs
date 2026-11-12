@@ -20,12 +20,13 @@ public class QueueImageCleanupHandler(
 	{
 		var jobs = notification.Items
 			.GroupBy(image => image.ProductId, image => image.StorageKey)
-			.Select(group => cleanupJobs.Create(new DeleteProductImagesInputState
-			{
-				ProductId = group.Key,
-				BucketName = buckets.Value.Images.Name,
-				StorageKeys = group.Distinct(StringComparer.Ordinal).ToArray()
-			}))
+			.Select(group => cleanupJobs.Create(
+				new DeleteProductImagesInputState
+				{
+					ProductId = group.Key,
+					BucketName = buckets.Value.Images.Name,
+					StorageKeys = group.Distinct(StringComparer.Ordinal).ToArray()
+				}))
 			.ToList();
 		if (jobs.Count == 0) return;
 

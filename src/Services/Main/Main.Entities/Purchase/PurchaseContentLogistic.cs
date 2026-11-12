@@ -32,19 +32,18 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>,
 
 	public static Expression<Func<PurchaseContentLogistic, int>> GetKeySelector() => x => x.PurchaseContentId;
 
-	public static Expression<Func<PurchaseContentLogistic, bool>> GetEqualityExpression(int key) => x =>
-		x.PurchaseContentId == key;
+	public static Expression<Func<PurchaseContentLogistic, bool>> GetEqualityExpression(int key)
+		=> x =>
+			x.PurchaseContentId == key;
 
 	internal static PurchaseContentLogistic Create(
 		decimal weightKg,
 		decimal areaM3,
 		decimal price)
-	{
-		return new PurchaseContentLogistic(
+		=> new(
 			weightKg,
 			areaM3,
 			price);
-	}
 
 	internal void Update(
 		decimal weightKg,
@@ -57,22 +56,16 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>,
 	}
 
 	private void SetWeightKg(decimal weightKg)
-	{
-		WeightKg = weightKg.EnsureNonNegative(() =>
+		=> WeightKg = weightKg.EnsureNonNegative(() =>
 			throw new InvalidOperationException("Purchase content logistics weight must be positive"));
-	}
 
 	private void SetAreaM3(decimal areaM3)
-	{
-		AreaM3 = areaM3.EnsureNonNegative(() =>
+		=> AreaM3 = areaM3.EnsureNonNegative(() =>
 			throw new InvalidOperationException("Purchase content logistics area m3 must be positive"));
-	}
 
 	private void SetPrice(decimal price)
-	{
-		Price = price.EnsureNonNegative(() =>
+		=> Price = price.EnsureNonNegative(() =>
 			throw new InvalidOperationException("Purchase content logistics price must be positive"));
-	}
 
 	public override int GetId() => PurchaseContentId;
 }

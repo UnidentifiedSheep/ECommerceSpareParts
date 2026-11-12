@@ -1,11 +1,9 @@
-using Main.Entities.Currency;
-using Main.Entities;
-using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
-using Main.Entities.Exceptions;
 using Main.Application.Handlers.Currencies.CreateCurrency;
-using Main.Application.Static;
+using Main.Entities.Currency;
+using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Currency;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -75,14 +73,17 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 	[InlineData("sign")]
 	public async Task DuplicateTrimmedField_ReturnsItsLocalizedError(string field)
 	{
-		var currency = await new CurrencyBuilder(Faker).WithShortName("TT").WithSign("!").BuildAndAddToDb(Context);
+		var currency = await new CurrencyBuilder(Faker).WithShortName("TT")
+			.WithSign("!")
+			.BuildAndAddToDb(Context);
 		var command = new CreateCurrencyCommand(
 			field == "shortName" ? $" {currency.ShortName} " : "QQ",
 			field == "name" ? $" {currency.Name} " : "Another currency",
 			field == "sign" ? $" {currency.CurrencySign} " : "?",
 			field == "code" ? $" {currency.Code} " : "ZZZ");
 
-		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
 
 		var expected = field switch
 		{
@@ -110,7 +111,8 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 				code),
 			CancellationToken);
 
-		var currencyInDb = await Context.Set<Currency>().AsNoTracking().FirstOrDefaultAsync(CancellationToken);
+		var currencyInDb =
+			await Context.Set<Currency>().AsNoTracking().FirstOrDefaultAsync(CancellationToken);
 		Assert.NotNull(currencyInDb);
 		Assert.Equal(shortName.Trim(), currencyInDb.ShortName);
 		Assert.Equal(name.Trim(), currencyInDb.Name);
@@ -128,7 +130,12 @@ public class CreateCurrencyValidationTests : ValidationTest<CreateCurrencyValida
 	[InlineData("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")]
 	public async Task CreateCurrency_WithInvalidShortName_FailsValidation(string shortName)
 	{
-		var result = await ValidateAsync(new CreateCurrencyCommand(shortName, "US dollar", "$", "USD"));
+		var result = await ValidateAsync(
+			new CreateCurrencyCommand(
+				shortName,
+				"US dollar",
+				"$",
+				"USD"));
 		result.ShouldHaveValidationErrorFor(x => x.ShortName).Only();
 	}
 
@@ -139,7 +146,12 @@ public class CreateCurrencyValidationTests : ValidationTest<CreateCurrencyValida
 	[InlineData("tooBig")]
 	public async Task CreateCurrency_WithInvalidName_FailsValidation(string name)
 	{
-		var result = await ValidateAsync(new CreateCurrencyCommand("USD", name == "tooBig" ? new string('x', 200) : name, "$", "USD"));
+		var result = await ValidateAsync(
+			new CreateCurrencyCommand(
+				"USD",
+				name == "tooBig" ? new string('x', 200) : name,
+				"$",
+				"USD"));
 		result.ShouldHaveValidationErrorFor(x => x.Name).Only();
 	}
 
@@ -149,7 +161,12 @@ public class CreateCurrencyValidationTests : ValidationTest<CreateCurrencyValida
 	[InlineData("sdfsddddd")]
 	public async Task CreateCurrency_WithInvalidSign_FailsValidation(string sign)
 	{
-		var result = await ValidateAsync(new CreateCurrencyCommand("USD", "US dollar", sign, "USD"));
+		var result = await ValidateAsync(
+			new CreateCurrencyCommand(
+				"USD",
+				"US dollar",
+				sign,
+				"USD"));
 		result.ShouldHaveValidationErrorFor(x => x.CurrencySign).Only();
 	}
 
@@ -160,7 +177,12 @@ public class CreateCurrencyValidationTests : ValidationTest<CreateCurrencyValida
 	[InlineData("sdfsddiimimimimiimimiiimmmmmimimiimmmiiimim")]
 	public async Task CreateCurrency_WithInvalidCode_FailsValidation(string code)
 	{
-		var result = await ValidateAsync(new CreateCurrencyCommand("USD", "US dollar", "$", code));
+		var result = await ValidateAsync(
+			new CreateCurrencyCommand(
+				"USD",
+				"US dollar",
+				"$",
+				code));
 		result.ShouldHaveValidationErrorFor(x => x.Code).Only();
 	}
 }

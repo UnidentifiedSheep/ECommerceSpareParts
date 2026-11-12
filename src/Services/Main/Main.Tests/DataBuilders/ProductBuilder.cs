@@ -55,11 +55,9 @@ public class ProductBuilder(Faker faker) : BuilderBase<Product>(faker)
 	}
 
 	public override Product Build()
-	{
-		return Product.Create(
+		=> Product.Create(
 			Sku ?? Faker.Lorem.Letter(10),
 			Name ?? Faker.Commerce.ProductName(),
 			Faker.PickRandom<int>(ProducerIds),
 			Description);
-	}
 }

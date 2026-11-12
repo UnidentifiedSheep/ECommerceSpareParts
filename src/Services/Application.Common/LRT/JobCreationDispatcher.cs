@@ -45,36 +45,46 @@ public sealed class JobCreationDispatcher(INamedObjectRegistry<ILrtNamedObject> 
 		HashSet<string> compositionPath)
 	{
 		if (!compositionPath.Add(lrt.SystemName))
-			throw new InvalidOperationException($"Multi-step LRT composition contains a cycle at '{lrt.SystemName}'.");
+			throw new InvalidOperationException(
+				$"Multi-step LRT composition contains a cycle at '{lrt.SystemName}'.");
 		try
 		{
-			var job = state is null
-				? MultiStepJob.CreateDeferred(lrt.SystemName, maxAttempts)
-				: naturalKey is null
-					? MultiStepJob.Create(lrt.SystemName, state)
-					: MultiStepJob.CreateUnique(naturalKey, lrt.SystemName, state);
+			var job = state is null ? MultiStepJob.CreateDeferred(lrt.SystemName, maxAttempts) :
+				naturalKey is null ? MultiStepJob.Create(lrt.SystemName, state) :
+				MultiStepJob.CreateUnique(
+					naturalKey,
+					lrt.SystemName,
+					state);
 
 			var builder = new MultiStepJobBuilder();
 			lrt.ConfigureSteps(builder);
 			if (builder.Steps.Count == 0)
-				throw new InvalidOperationException($"Multi-step LRT '{lrt.SystemName}' must contain at least one step.");
+				throw new InvalidOperationException(
+					$"Multi-step LRT '{lrt.SystemName}' must contain at least one step.");
 
 			var steps = new Dictionary<LrtStepDefinition, Job>();
 			foreach (var definition in builder.Steps)
 			{
 				var child = registry.GetBySystemName(definition.SystemName);
 				if (definition.InputType != child.InputType)
-					throw new InvalidOperationException($"Input factory for '{definition.Key}' must return '{child.InputType.Name}'.");
+					throw new InvalidOperationException(
+						$"Input factory for '{definition.Key}' must return '{child.InputType.Name}'.");
 				var attempts = definition.MaxAttempts ?? maxAttempts;
 				Job step = child is IMultiStepLrt multiStep
-					? CreateMultiStepJob(multiStep, null, attempts, null, compositionPath)
+					? CreateMultiStepJob(
+						multiStep,
+						null,
+						attempts,
+						null,
+						compositionPath)
 					: SingleRunJob.CreateDeferred(child.SystemName, attempts);
 				job.AddStep(step, definition.Key);
 				steps.Add(definition, step);
 			}
+
 			foreach (var definition in builder.Steps)
-				foreach (var dependency in definition.Dependencies)
-					job.AddDependency(steps[definition], steps[dependency]);
+			foreach (var dependency in definition.Dependencies)
+				job.AddDependency(steps[definition], steps[dependency]);
 			return job;
 		}
 		finally

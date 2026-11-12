@@ -8,8 +8,8 @@ public static class ValidationExtensions
 
 	public static bool HasMaxLength(this string value, int max) => value.Length <= max;
 
-	public static bool HasNoSpaces(this string value) =>
-		!value.Contains(' ', StringComparison.InvariantCulture);
+	public static bool HasNoSpaces(this string value)
+		=> !value.Contains(' ', StringComparison.InvariantCulture);
 
 	public static bool IsNotNullOrEmpty(this string? value) => !string.IsNullOrEmpty(value);
 
@@ -30,39 +30,40 @@ public static class ValidationExtensions
 
 	public static bool IsNotNull<T>(this T? value) where T : class => value is not null;
 
-	public static bool IsNotNullOrDefault<T>(this T? value) where T : struct =>
-		value.HasValue && !EqualityComparer<T>.Default.Equals(value.Value, default);
+	public static bool IsNotNullOrDefault<T>(this T? value) where T : struct
+		=> value.HasValue && !EqualityComparer<T>.Default.Equals(value.Value, default);
 
 	public static bool IsNullOrDefault<T>(this T? value) where T : struct => !value.IsNotNullOrDefault();
 
 	public static bool IsInRange<T>(
 		this T value,
 		T min,
-		T max) where T : IComparable<T> => value.CompareTo(min) >= 0 && value.CompareTo(max) <= 0;
+		T max) where T : IComparable<T>
+		=> value.CompareTo(min) >= 0 && value.CompareTo(max) <= 0;
 
 	public static bool IsValid<T>(this T value, Func<T, bool> predicate) => predicate(value);
 
 	public static bool IsTrue(this bool value) => value;
 
-	public static bool IsNotEqual<T>(this T value, T next) where T : IComparable<T> =>
-		value.CompareTo(next) != 0;
+	public static bool IsNotEqual<T>(this T value, T next) where T : IComparable<T>
+		=> value.CompareTo(next) != 0;
 
 	public static bool IsAtMost<T>(this T value, T max) where T : IComparable<T> => value.CompareTo(max) <= 0;
 
-	public static bool IsAtLeast<T>(this T value, T min) where T : IComparable<T> =>
-		value.CompareTo(min) >= 0;
+	public static bool IsAtLeast<T>(this T value, T min) where T : IComparable<T>
+		=> value.CompareTo(min) >= 0;
 
-	public static bool IsGreaterThan<T>(this T value, T min) where T : IComparable<T> =>
-		value.CompareTo(min) > 0;
+	public static bool IsGreaterThan<T>(this T value, T min) where T : IComparable<T>
+		=> value.CompareTo(min) > 0;
 
-	public static bool IsLessThan<T>(this T value, T max) where T : IComparable<T> =>
-		value.CompareTo(max) < 0;
+	public static bool IsLessThan<T>(this T value, T max) where T : IComparable<T>
+		=> value.CompareTo(max) < 0;
 
-	public static bool IsNonNegative<T>(this T value) where T : struct, IComparable<T> =>
-		value.CompareTo(default) >= 0;
+	public static bool IsNonNegative<T>(this T value) where T : struct, IComparable<T>
+		=> value.CompareTo(default) >= 0;
 
-	public static bool IsNonPositive<T>(this T value) where T : struct, IComparable<T> =>
-		value.CompareTo(default) <= 0;
+	public static bool IsNonPositive<T>(this T value) where T : struct, IComparable<T>
+		=> value.CompareTo(default) <= 0;
 
 	public static bool HasAtMostDecimalPlaces(this decimal value, int maxDecimals)
 	{

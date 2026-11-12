@@ -15,10 +15,11 @@ public sealed record GqlUserInfoInput
 	[GraphQLName("description")]
 	public string? Description { get; init; }
 
-	public UserInfoDto ToDto() => new()
-	{
-		Name = Name,
-		Surname = Surname,
-		Description = Description
-	};
+	public UserInfoDto ToDto()
+		=> new()
+		{
+			Name = Name,
+			Surname = Surname,
+			Description = Description
+		};
 }

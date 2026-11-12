@@ -1,8 +1,7 @@
-using Persistence.Context;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Purchase;
@@ -21,7 +20,8 @@ public class PurchaseTestContext(
 	UserContextTestContext userContext,
 	ProductTestContext productContext,
 	CurrencyTestContext currencyContext,
-	StorageRouteTestContext storageRouteContext) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
+	StorageRouteTestContext storageRouteContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public User Supplier { get; private set; } = null!;
 
@@ -76,7 +76,12 @@ public class PurchaseTestContext(
 			.WithBuyPrice(10m)
 			.BuildAndAddToDb(DbContext);
 
-		await DbContext.AddAsync(ProductStock.Create(StorageContent.StorageCode, Product.Id, StorageContent.Count), cancellationToken);
+		await DbContext.AddAsync(
+			ProductStock.Create(
+				StorageContent.StorageCode,
+				Product.Id,
+				StorageContent.Count),
+			cancellationToken);
 
 		var purchaseContent = new PurchaseContentBuilder(Faker)
 			.WithProductId(Product.Id)

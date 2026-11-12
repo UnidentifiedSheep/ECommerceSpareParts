@@ -25,18 +25,17 @@ public class MassTransitBackplane(IBus bus, IBackplaneDispatcher dispatcher) : I
 	public ValueTask PublishAsync(
 		BackplaneMessage message,
 		FusionCacheEntryOptions options,
-		CancellationToken token = new()) => new(bus.Publish(message, token));
+		CancellationToken token = new())
+		=> new(bus.Publish(message, token));
 
 	public void Publish(
 		BackplaneMessage message,
 		FusionCacheEntryOptions options,
 		CancellationToken token = new())
-	{
-		_ = Task.Run(
+		=> _ = Task.Run(
 			async () => await PublishAsync(
 				message,
 				options,
 				token),
 			token);
-	}
 }

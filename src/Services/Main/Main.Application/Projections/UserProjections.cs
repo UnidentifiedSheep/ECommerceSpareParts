@@ -76,16 +76,18 @@ public sealed class UserPhoneDtoProjectionProvider : ProjectionProviderBase<User
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserNotificationPreferenceProjectionProvider(
 	IContextualLocalizer localizer
-	) : ProjectionProviderBase<UserNotificationPreference, UserNotificationPreferenceDto>
+) : ProjectionProviderBase<UserNotificationPreference, UserNotificationPreferenceDto>
 {
 	public override Expression<Func<UserNotificationPreference, UserNotificationPreferenceDto>> Projection
-		{ get; } = x => new UserNotificationPreferenceDto
-		{
-				UserId = x.UserId,
-				ChannelName = x.ChannelName,
-				Enabled = x.Enabled,
-				LocalizableChannelName = GetLocalized(localizer, x.ChannelName)
-		};
+	{
+		get;
+	} = x => new UserNotificationPreferenceDto
+	{
+		UserId = x.UserId,
+		ChannelName = x.ChannelName,
+		Enabled = x.Enabled,
+		LocalizableChannelName = GetLocalized(localizer, x.ChannelName)
+	};
 
 	private static string GetLocalized(IContextualLocalizer localizer, string channelName)
 		=> localizer.TryGet(new LocalizableMessage($"{channelName}Channel"), out var value)

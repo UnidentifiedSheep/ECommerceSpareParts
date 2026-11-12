@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Abstractions;
 using Application.Common;
 using Application.Common.Querying;
 using Exceptions;
@@ -27,17 +26,24 @@ public static class SortDescriptorExtensions
 				var definition = definitions[i];
 				var order = definition.Desc ? SortOrder.Descending : SortOrder.Ascending;
 				if (values[i].Argument is { } storage &&
-					string.Equals(values[i].Field.Trim(), "stock", StringComparison.OrdinalIgnoreCase))
+					string.Equals(
+						values[i].Field.Trim(),
+						"stock",
+						StringComparison.OrdinalIgnoreCase))
 				{
 					if (string.IsNullOrWhiteSpace(storage))
-						throw new InvalidInputException(SortingInvalidMessage.Create("Storage code must not be empty."));
+						throw new InvalidInputException(
+							SortingInvalidMessage.Create("Storage code must not be empty."));
 					sort = sort.Field(value => value
 						.Field($"stocks.{ProductStockFields.GetStorageKey(storage)}")
-						.Order(order).Missing(0).UnmappedType(FieldType.Long));
+						.Order(order)
+						.Missing(0)
+						.UnmappedType(FieldType.Long));
 				}
 				else
 					sort = sort.Field(value => value.Field(definition.KeySelector).Order(order));
 			}
+
 			return sort.Ascending(product => product.Id);
 		});
 	}

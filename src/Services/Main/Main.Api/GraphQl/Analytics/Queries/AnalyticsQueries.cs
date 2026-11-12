@@ -12,12 +12,18 @@ public sealed class AnalyticsQueries
 {
 	[GraphQLName("charts")]
 	[RequireAllPermissions(PermissionCodes.CHARTS_GET)]
-	public async Task<IReadOnlyList<GqlChart>> GetChartsAsync(ISender sender, CancellationToken cancellationToken) =>
-		(await sender.Send(new GetChartsQuery(), cancellationToken)).Charts.Select(chart => new GqlChart(chart)).ToArray();
+	public async Task<IReadOnlyList<GqlChart>> GetChartsAsync(
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetChartsQuery(), cancellationToken)).Charts
+			.Select(chart => new GqlChart(chart))
+			.ToArray();
 
 	[GraphQLName("chart")]
 	[RequireAllPermissions(PermissionCodes.CHARTS_GET)]
-	public async Task<GqlChart?> GetChartAsync(string systemName, IChartBySystemNameDataLoader loader,
+	public async Task<GqlChart?> GetChartAsync(
+		string systemName,
+		IChartBySystemNameDataLoader loader,
 		CancellationToken cancellationToken)
 	{
 		var chart = await loader.LoadAsync(systemName, cancellationToken);

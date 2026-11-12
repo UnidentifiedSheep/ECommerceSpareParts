@@ -1,9 +1,8 @@
 using System.Data;
-using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Attributes;
 using Domain.Extensions;
@@ -33,7 +32,8 @@ public class EditStorageContentHandler(
 		var editedFields = request.EditedFields;
 
 		var storageContents = await storageContentRepository.GetWithActiveLocksForUpdateAsync(
-			editedFields.Keys, cancellationToken: cancellationToken);
+			editedFields.Keys,
+			cancellationToken: cancellationToken);
 		var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
 		foreach (var item in editedFields)
@@ -43,7 +43,10 @@ public class EditStorageContentHandler(
 
 			content.ValidateVersion(item.Value.RowVersion);
 
-			patch.Count.Apply(x => content.SetCount(x, StorageMovementType.StorageContentEditing, utcNow));
+			patch.Count.Apply(x => content.SetCount(
+				x,
+				StorageMovementType.StorageContentEditing,
+				utcNow));
 			patch.CurrencyId.Apply(content.SetCurrencyId);
 
 			if (patch.BuyPrice.IsSet)

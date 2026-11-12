@@ -1,9 +1,8 @@
-using Persistence.Context;
 using Enums;
 using LinqKit;
 using Main.Entities.Auth;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using Role = Enums.Role;
 
@@ -11,9 +10,20 @@ namespace Main.Migrator.DataSeeds;
 
 public class RolePermissionSeed : ISeed<UnifiedDbContext>
 {
+
+	private static IReadOnlyList<(string, string)> RetiredPermissions { get; } =
+		new List<(Role, PermissionCodes)>
+			{
+				(Role.Member, PermissionCodes.JOBS_CREATE),
+				(Role.Member, PermissionCodes.JOBS_GET)
+			}
+			.Select(x => (RoleNames.Normalize(x.Item1.ToString()),
+				Permission.ToNormalizedPermission(x.Item2)))
+			.ToList();
+
 	public async Task SeedAsync(UnifiedDbContext context)
 	{
-		var roles = await context.Set<Main.Entities.Auth.Role>().ToListAsync();
+		var roles = await context.Set<Entities.Auth.Role>().ToListAsync();
 
 		if (roles.Count == 0)
 			return;
@@ -74,17 +84,8 @@ public class RolePermissionSeed : ISeed<UnifiedDbContext>
 		context.RemoveRange(rp);
 	}
 
-	private static IReadOnlyList<(string, string)> RetiredPermissions { get; } = new List<(Role, PermissionCodes)>
-	{
-		(Role.Member, PermissionCodes.JOBS_CREATE),
-		(Role.Member, PermissionCodes.JOBS_GET)
-	}
-	.Select(x => (RoleNames.Normalize(x.Item1.ToString()), Permission.ToNormalizedPermission(x.Item2)))
-	.ToList();
-
 	private static IReadOnlyDictionary<Role, PermissionCodes[]> BuildRolePermissions()
-	{
-		return new Dictionary<Role, PermissionCodes[]>
+		=> new Dictionary<Role, PermissionCodes[]>
 		{
 			[Role.Admin] =
 			[
@@ -413,7 +414,6 @@ public class RolePermissionSeed : ISeed<UnifiedDbContext>
 				PermissionCodes.ORDERS_CANCEL
 			]
 		};
-	}
 
 	private static List<RolePermission> ResolvePermissions(
 		string role,

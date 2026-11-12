@@ -2,9 +2,9 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using TransactionErrorKind = Enums.TransactionErrorKind;
 using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
+using TransactionErrorKind = Enums.TransactionErrorKind;
 
 namespace Main.Application.Handlers.Auth.AddRolesToUser;
 
@@ -18,7 +18,9 @@ public sealed record AddRolesToUserCommand : ICommand<AddRolesToUserResult>
 	public AddRolesToUserCommand(Guid userId, IEnumerable<string> names)
 	{
 		UserId = userId;
-		RoleNames = names.Select(Main.Entities.Auth.RoleNames.Normalize).Distinct(StringComparer.Ordinal).ToArray();
+		RoleNames = names.Select(Entities.Auth.RoleNames.Normalize)
+			.Distinct(StringComparer.Ordinal)
+			.ToArray();
 	}
 
 	public Guid UserId { get; }
@@ -47,7 +49,8 @@ public sealed class AddRolesToUserHandler(
 		var added = request.RoleNames.Where(name => !existingNames.Contains(name)).ToArray();
 
 		await unitOfWork.AddRangeAsync(
-			added.Select(name => UserRole.Create(request.UserId, name)), cancellationToken);
+			added.Select(name => UserRole.Create(request.UserId, name)),
+			cancellationToken);
 
 		return new AddRolesToUserResult(request.UserId, added);
 	}

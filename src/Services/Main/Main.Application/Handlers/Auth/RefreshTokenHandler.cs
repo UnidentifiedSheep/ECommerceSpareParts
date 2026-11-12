@@ -1,14 +1,10 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions.Base;
 using Main.Application.Dtos.Users;
-using Main.Application.Dtos.Users;
 using Main.Application.Extensions.QueryExtensions;
-using Main.Entities.User;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
@@ -29,7 +25,8 @@ public class RefreshTokenHandler(
 	IJwtGenerator tokenGenerator,
 	IValueHasher valueHasher,
 	IReadRepository<User, Guid> userRepository,
-	IProjectionProvider<User, UserDto> userProjection) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
+	IProjectionProvider<User, UserDto> userProjection)
+	: ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
 {
 	public async Task<RefreshTokenResult> Handle(
 		RefreshTokenCommand request,

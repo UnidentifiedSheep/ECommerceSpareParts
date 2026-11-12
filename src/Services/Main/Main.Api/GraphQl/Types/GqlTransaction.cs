@@ -19,15 +19,9 @@ public sealed record GqlTransaction
 {
 	private readonly TransactionDto? _dto;
 
-	public GqlTransaction(Guid id)
-	{
-		Id = id;
-	}
+	public GqlTransaction(Guid id) => Id = id;
 
-	public GqlTransaction(TransactionDto transaction) : this(transaction.Id)
-	{
-		_dto = transaction;
-	}
+	public GqlTransaction(TransactionDto transaction) : this(transaction.Id) => _dto = transaction;
 
 	[GraphQLName("id")]
 	public Guid Id { get; }
@@ -35,38 +29,38 @@ public sealed record GqlTransaction
 	[GraphQLName("amount")]
 	public async Task<decimal> GetAmountAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetTransactionAsync(loader, cancellationToken)).Amount;
+		CancellationToken cancellationToken)
+		=> (await GetTransactionAsync(loader, cancellationToken)).Amount;
 
 	[GraphQLName("transactionDate")]
 	public async Task<DateTime> GetTransactionDateAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetTransactionAsync(loader, cancellationToken)).TransactionDate;
+		CancellationToken cancellationToken)
+		=> (await GetTransactionAsync(loader, cancellationToken)).TransactionDate;
 
 	[GraphQLName("type")]
 	public async Task<TransactionType> GetTypeAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetTransactionAsync(loader, cancellationToken)).Type;
+		CancellationToken cancellationToken)
+		=> (await GetTransactionAsync(loader, cancellationToken)).Type;
 
 	[GraphQLName("sourceType")]
 	public async Task<TransactionSourceType> GetSourceTypeAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetTransactionAsync(loader, cancellationToken)).SourceType;
+		CancellationToken cancellationToken)
+		=> (await GetTransactionAsync(loader, cancellationToken)).SourceType;
 
 	[GraphQLName("sender")]
 	public async Task<GqlOrganization> GetSenderAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetTransactionAsync(loader, cancellationToken)).Sender);
+		CancellationToken cancellationToken)
+		=> new((await GetTransactionAsync(loader, cancellationToken)).Sender);
 
 	[GraphQLName("receiver")]
 	public async Task<GqlOrganization> GetReceiverAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetTransactionAsync(loader, cancellationToken)).Receiver);
+		CancellationToken cancellationToken)
+		=> new((await GetTransactionAsync(loader, cancellationToken)).Receiver);
 
 	[GraphQLName("currency")]
 	public async Task<GqlCurrency> GetCurrencyAsync(
@@ -82,20 +76,20 @@ public sealed record GqlTransaction
 	[GraphQLName("isCompleted")]
 	public async Task<bool> GetIsCompletedAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetTransactionAsync(loader, cancellationToken)).Status.HasFlag(TransactionStatus.Completed);
+		CancellationToken cancellationToken)
+		=> (await GetTransactionAsync(loader, cancellationToken)).Status.HasFlag(TransactionStatus.Completed);
 
 	[GraphQLName("isReversed")]
 	public async Task<bool> GetIsReversedAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetTransactionAsync(loader, cancellationToken)).Status.HasFlag(TransactionStatus.Reversed);
+		CancellationToken cancellationToken)
+		=> (await GetTransactionAsync(loader, cancellationToken)).Status.HasFlag(TransactionStatus.Reversed);
 
 	[GraphQLName("reversedAt")]
 	public async Task<DateTime?> GetReversedAtAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetTransactionAsync(loader, cancellationToken)).ReversedAt;
+		CancellationToken cancellationToken)
+		=> (await GetTransactionAsync(loader, cancellationToken)).ReversedAt;
 
 	[GraphQLName("reversedBy")]
 	public async Task<GqlUser?> GetReversedByAsync(
@@ -128,7 +122,7 @@ public sealed record GqlTransaction
 
 	private async Task<TransactionDto> GetTransactionAsync(
 		ITransactionByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		_dto ?? await loader.LoadAsync(Id, cancellationToken)
-		?? throw new TransactionNotFoundException(Id);
+		CancellationToken cancellationToken)
+		=> _dto ?? await loader.LoadAsync(Id, cancellationToken)
+			?? throw new TransactionNotFoundException(Id);
 }

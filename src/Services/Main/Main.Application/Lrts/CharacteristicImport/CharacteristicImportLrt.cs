@@ -32,12 +32,14 @@ public sealed class CharacteristicImportLrt(
 
 	public override string SystemName => Name;
 
-	public override ILocalizableMessage NameLocalizationMessage => LrtCharacteristicImportNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtCharacteristicImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtCharacteristicImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtCharacteristicImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		CharacteristicImportTooManyErrorsMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> CharacteristicImportTooManyErrorsMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -70,18 +72,19 @@ public sealed class CharacteristicImportLrt(
 			.Select(characteristic => characteristic.item)
 			.DistinctBy(characteristic => characteristic.NormalizedName)
 			.ToList();
-		var uniqueNames = uniqueCharacteristics.Select(characteristic => characteristic.NormalizedName).ToArray();
+		var uniqueNames = uniqueCharacteristics.Select(characteristic => characteristic.NormalizedName)
+			.ToArray();
 
 		var created = await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{
 				var existingNames = (await context.Repositories
-					.GetForRead<Characteristic, int>()
-					.Query
-					.Where(characteristic => uniqueNames.Contains(characteristic.NormalizedName))
-					.Select(characteristic => characteristic.NormalizedName)
-					.ToListAsync(cancellationToken))
+						.GetForRead<Characteristic, int>()
+						.Query
+						.Where(characteristic => uniqueNames.Contains(characteristic.NormalizedName))
+						.Select(characteristic => characteristic.NormalizedName)
+						.ToListAsync(cancellationToken))
 					.ToHashSet();
 
 				var toCreate = uniqueCharacteristics

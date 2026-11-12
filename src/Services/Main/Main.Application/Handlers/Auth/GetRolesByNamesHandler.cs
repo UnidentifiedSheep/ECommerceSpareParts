@@ -11,9 +11,7 @@ namespace Main.Application.Handlers.Auth;
 public sealed record GetRolesByNamesQuery : IQuery<GetRolesByNamesResult>
 {
 	public GetRolesByNamesQuery(IEnumerable<string> names)
-	{
-		Names = names.Select(RoleNames.Normalize).Distinct().ToArray();
-	}
+		=> Names = names.Select(RoleNames.Normalize).Distinct().ToArray();
 
 	public IReadOnlyList<string> Names { get; }
 }
@@ -22,9 +20,12 @@ public sealed record GetRolesByNamesResult(IReadOnlyDictionary<string, RoleDto> 
 
 public sealed class GetRolesByNamesHandler(
 	IReadRepository<Role, string> repository,
-	IProjectionProvider<Role, RoleDto> projection) : IQueryHandler<GetRolesByNamesQuery, GetRolesByNamesResult>
+	IProjectionProvider<Role, RoleDto> projection)
+	: IQueryHandler<GetRolesByNamesQuery, GetRolesByNamesResult>
 {
-	public async Task<GetRolesByNamesResult> Handle(GetRolesByNamesQuery request, CancellationToken cancellationToken)
+	public async Task<GetRolesByNamesResult> Handle(
+		GetRolesByNamesQuery request,
+		CancellationToken cancellationToken)
 	{
 		if (request.Names.Count == 0)
 			return new GetRolesByNamesResult(new Dictionary<string, RoleDto>());

@@ -92,8 +92,7 @@ public sealed class CriteriaBuilder<T> where T : class
 	}
 
 	public Criteria<T> Build()
-	{
-		return new Criteria<T>
+		=> new()
 		{
 			Wheres = _wheres.ToList(),
 			OrderBy = _orderBy,
@@ -104,5 +103,4 @@ public sealed class CriteriaBuilder<T> where T : class
 			ForUpdate = _forUpdate,
 			SkipLocked = _skipLocked
 		};
-	}
 }

@@ -11,10 +11,7 @@ namespace Main.Application.Products.Queries;
 public record GetProductsContentsQuery : IQuery<GetProductsContentsResult>
 {
 
-	public GetProductsContentsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToList();
-	}
+	public GetProductsContentsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToList();
 
 	public GetProductsContentsQuery(int id) : this([id])
 	{
@@ -26,7 +23,7 @@ public record GetProductsContentsQuery : IQuery<GetProductsContentsResult>
 public record GetProductsContentsResult(Dictionary<int, List<ProductContentDto>> Contents);
 
 public class GetProductsContentsHandler(
-	IReadRepository<Entities.Product.ProductContent, (int, int)> repository,
+	IReadRepository<ProductContent, (int, int)> repository,
 	IProjectionProvider<Product, ProductDto> productProjection)
 	: IQueryHandler<GetProductsContentsQuery, GetProductsContentsResult>
 {

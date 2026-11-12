@@ -57,46 +57,39 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
 		string plateNumber,
 		string? vin = null,
 		string? comment = null)
-	{
-		return new UserVehicle(
+		=> new(
 			userId,
 			vehicleId,
 			plateNumber,
 			vin,
 			comment);
-	}
 
-	public void SetVehicle(Guid vehicleId) => VehicleId = vehicleId.EnsureNotEqual(
-		Guid.Empty,
-		UserVehicleIdNotEmptyMessage.Instance);
+	public void SetVehicle(Guid vehicleId)
+		=> VehicleId = vehicleId.EnsureNotEqual(
+			Guid.Empty,
+			UserVehicleIdNotEmptyMessage.Instance);
 
 	public void SetPlateNumber(string plateNumber) => PlateNumber = NormalizePlateNumber(plateNumber);
 
 	public void SetVin(string? vin) => Vin = NormalizeVin(vin);
 
 	public void SetComment(string? comment)
-	{
-		Comment = comment
+		=> Comment = comment
 			.NullIfWhiteSpace()
 			?.EnsureMaxLength(MaxCommentLength, UserVehicleCommentMaxLengthMessage.Instance);
-	}
 
 	public static string NormalizePlateNumber(string plateNumber)
-	{
-		return plateNumber
+		=> plateNumber
 			.TrimSafe()
 			.EnsureNotNullOrWhiteSpace(UserVehiclePlateNumberNotEmptyMessage.Instance)
 			.EnsureMaxLength(MaxPlateNumberLength, UserVehiclePlateNumberMaxLengthMessage.Instance)
 			.ToUpperInvariant();
-	}
 
 	public static string? NormalizeVin(string? vin)
-	{
-		return vin
+		=> vin
 			.NullIfWhiteSpace()
 			?.EnsureMaxLength(MaxVinLength, UserVehicleVinCodeMaxLengthMessage.Instance)
 			.ToUpperInvariant();
-	}
 
 	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(UserId));
 

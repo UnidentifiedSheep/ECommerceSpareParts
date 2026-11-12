@@ -1,5 +1,3 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Dtos.Users;
@@ -10,6 +8,7 @@ using Main.Application.Handlers.Users.MakeEmailPrimary;
 using Main.Application.Handlers.Users.RemoveEmailFromUser;
 using Main.Enums;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Api.EndPoints.Users;
 

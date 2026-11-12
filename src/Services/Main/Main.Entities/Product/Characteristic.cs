@@ -10,6 +10,11 @@ namespace Main.Entities.Product;
 
 public class Characteristic : Entity<Characteristic, int>, ILinqEntity<Characteristic, int>
 {
+
+	private Characteristic() { }
+
+	private Characteristic(string name) => SetName(name);
+
 	[Validate]
 	public int Id { get; private set; }
 
@@ -18,9 +23,8 @@ public class Characteristic : Entity<Characteristic, int>, ILinqEntity<Character
 	[Validate]
 	public string NormalizedName { get; private set; } = null!;
 
-	private Characteristic() {}
-
-	private Characteristic(string name) => SetName(name);
+	public static Expression<Func<Characteristic, int>> GetKeySelector() => x => x.Id;
+	public static Expression<Func<Characteristic, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 
 	public static Characteristic Create(string name) => new(name);
 
@@ -42,6 +46,4 @@ public class Characteristic : Entity<Characteristic, int>, ILinqEntity<Character
 	public static string NormalizeName(string name) => name.ToSlug().ToLowerInvariant();
 
 	public override int GetId() => Id;
-	public static Expression<Func<Characteristic, int>> GetKeySelector() => x => x.Id;
-	public static Expression<Func<Characteristic, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 }

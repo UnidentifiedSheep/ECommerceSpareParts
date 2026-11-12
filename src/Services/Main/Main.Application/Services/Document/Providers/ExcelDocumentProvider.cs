@@ -10,7 +10,7 @@ public sealed class ExcelDocumentProvider : IDocumentProvider
 
 	public IDocumentTemplate CreateDocument(byte[] bytes)
 	{
-		var stream = new MemoryStream(bytes, writable: false);
+		var stream = new MemoryStream(bytes, false);
 		try
 		{
 			return new ExcelDocumentTemplate(stream);

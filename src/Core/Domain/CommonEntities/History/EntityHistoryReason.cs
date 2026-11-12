@@ -10,7 +10,10 @@ public sealed record EntityHistoryReason(string Code, string? SourceType = null,
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(code);
 		ArgumentNullException.ThrowIfNull(id);
-		return new EntityHistoryReason(code, typeof(TEntity).Name, EntityKey.Format(id));
+		return new EntityHistoryReason(
+			code,
+			typeof(TEntity).Name,
+			EntityKey.Format(id));
 	}
 
 	/// <summary>Creates a reason referencing the source entity.</summary>

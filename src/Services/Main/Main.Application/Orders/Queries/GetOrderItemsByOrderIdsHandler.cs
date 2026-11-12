@@ -14,15 +14,13 @@ public sealed record GetOrderItemsByOrderIdsQuery : IQuery<GetOrderItemsByOrderI
 {
 	public GetOrderItemsByOrderIdsQuery(Guid id) : this([id]) { }
 
-	public GetOrderItemsByOrderIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetOrderItemsByOrderIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }
 
-public sealed record GetOrderItemsByOrderIdsResult(IReadOnlyDictionary<Guid, IReadOnlyList<OrderItemDto>> Items);
+public sealed record GetOrderItemsByOrderIdsResult(
+	IReadOnlyDictionary<Guid, IReadOnlyList<OrderItemDto>> Items);
 
 public sealed class GetOrderItemsByOrderIdsHandler(
 	IReadRepository<OrderItem, int> repository,
@@ -38,7 +36,8 @@ public sealed class GetOrderItemsByOrderIdsHandler(
 		if (request.Ids.Count == 0)
 			return new GetOrderItemsByOrderIdsResult(new Dictionary<Guid, IReadOnlyList<OrderItemDto>>());
 
-		var orderIds =  orders.Query.WhereReadableBy(userContext)
+		var orderIds = orders.Query
+			.WhereReadableBy(userContext)
 			.Where(order => request.Ids.Contains(order.Id))
 			.Select(order => order.Id);
 

@@ -15,10 +15,11 @@ public record ProducerSupplierMappingImportState : ProducerSupplierMappingImport
 	[JsonPropertyName("checkpoint")]
 	public CsvImportCheckpoint? Checkpoint { get; init; }
 
-	public ProducerSupplierMappingImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
-	{
-		Checkpoint = checkpoint
-	};
+	public ProducerSupplierMappingImportState WithCheckpoint(CsvImportCheckpoint checkpoint)
+		=> this with
+		{
+			Checkpoint = checkpoint
+		};
 }
 
 [CsvSchema(typeof(ProducerSupplierMappingImportLrt.ProducerSupplierMappingCsvDto))]

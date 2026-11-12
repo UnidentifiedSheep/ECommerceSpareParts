@@ -1,5 +1,4 @@
-﻿using Abstractions.Models.Options;
-using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Interfaces.Cqrs;
 using Main.Application.Models.Options;
 using Microsoft.Extensions.Options;
 
@@ -14,6 +13,6 @@ public class GetEmailOptionsHandler(IOptions<UserEmailOptions> options)
 {
 	public async Task<GetEmailOptionsResult> Handle(
 		GetEmailOptionsQuery request,
-		CancellationToken cancellationToken) =>
-		await Task.FromResult(new GetEmailOptionsResult(options.Value));
+		CancellationToken cancellationToken)
+		=> await Task.FromResult(new GetEmailOptionsResult(options.Value));
 }

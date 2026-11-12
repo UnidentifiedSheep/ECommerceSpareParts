@@ -19,24 +19,32 @@ public sealed class MarkupGroupMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new UpsertMarkupGroupCommand(new UpsertMarkupGroupDto
-		{
-			Id = input.Id,
-			Name = input.Name,
-			CurrencyId = input.CurrencyId,
-			Ranges = input.Ranges.Select(range => new UpsertMarkupRangeDto
-			{
-				RangeStart = range.RangeStart,
-				RangeEnd = range.RangeEnd,
-				Markup = range.Markup
-			}).ToArray()
-		}), cancellationToken);
+		var result = await sender.Send(
+			new UpsertMarkupGroupCommand(
+				new UpsertMarkupGroupDto
+				{
+					Id = input.Id,
+					Name = input.Name,
+					CurrencyId = input.CurrencyId,
+					Ranges = input.Ranges
+						.Select(range => new UpsertMarkupRangeDto
+						{
+							RangeStart = range.RangeStart,
+							RangeEnd = range.RangeEnd,
+							Markup = range.Markup
+						})
+						.ToArray()
+				}),
+			cancellationToken);
 		return new GqlMarkupGroup(result.Id);
 	}
 
 	[GraphQLName("delete")]
 	[RequireAllPermissions(PermissionCodes.MARKUP_DELETE)]
-	public async Task<bool> DeleteAsync(int id, ISender sender, CancellationToken cancellationToken)
+	public async Task<bool> DeleteAsync(
+		int id,
+		ISender sender,
+		CancellationToken cancellationToken)
 	{
 		await sender.Send(new DeleteMarkupCommand(id), cancellationToken);
 		return true;

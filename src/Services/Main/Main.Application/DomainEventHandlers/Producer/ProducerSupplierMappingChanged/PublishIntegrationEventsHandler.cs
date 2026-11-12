@@ -9,7 +9,9 @@ namespace Main.Application.DomainEventHandlers.Producer.ProducerSupplierMappingC
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEvents)
 	: BatchableDomainEventHandler<ProducerSupplierMappingChangedDomainEvent>
 {
-	public override Task Handle(Batch<ProducerSupplierMappingChangedDomainEvent> notification, CancellationToken cancellationToken)
+	public override Task Handle(
+		Batch<ProducerSupplierMappingChangedDomainEvent> notification,
+		CancellationToken cancellationToken)
 	{
 		integrationEvents.Add(new ProducerLookupChangedEvent());
 		return Task.CompletedTask;

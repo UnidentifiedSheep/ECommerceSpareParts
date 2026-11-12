@@ -1,11 +1,11 @@
-﻿using Persistence.Context;
-using Api.Common;
+﻿using Api.Common;
 using Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Persistence;
+using Persistence.Context;
 using Persistence.Extensions;
 using Persistence.Interfaces;
 using Pricing.Migrator.Seeds;

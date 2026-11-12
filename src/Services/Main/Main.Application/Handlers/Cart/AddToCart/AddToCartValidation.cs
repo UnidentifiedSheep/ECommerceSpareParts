@@ -5,8 +5,5 @@ namespace Main.Application.Handlers.Cart.AddToCart;
 
 public class AddToCartValidation : AbstractValidator<AddToCartCommand>
 {
-	public AddToCartValidation()
-	{
-		RuleFor(x => x.Count).SetValidator(new CountValidator());
-	}
+	public AddToCartValidation() => RuleFor(x => x.Count).SetValidator(new CountValidator());
 }

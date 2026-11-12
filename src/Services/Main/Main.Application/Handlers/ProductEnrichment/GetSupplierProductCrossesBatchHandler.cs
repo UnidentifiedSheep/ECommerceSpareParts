@@ -11,10 +11,7 @@ namespace Main.Application.Handlers.ProductEnrichment;
 public record GetSupplierProductCrossesBatchQuery : IQuery<GetSupplierProductCrossesBatchResult>
 {
 
-	public GetSupplierProductCrossesBatchQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.ToHashSet();
-	}
+	public GetSupplierProductCrossesBatchQuery(IEnumerable<int> ids) => Ids = ids.ToHashSet();
 	public IReadOnlySet<int> Ids { get; }
 }
 

@@ -33,22 +33,26 @@ public class UpsertCharacteristicsHandler(
 			.ToList();
 
 		var existing = (await repository.ListAsync(
-			Criteria<ProductCharacteristic>.New()
-				.Where(x => productIds.Contains(x.ProductId) && characteristicIds.Contains(x.CharacteristicId))
-				.Track()
-				.Build(),
-			cancellationToken))
+				Criteria<ProductCharacteristic>.New()
+					.Where(x => productIds.Contains(x.ProductId) &&
+						characteristicIds.Contains(x.CharacteristicId))
+					.Track()
+					.Build(),
+				cancellationToken))
 			.ToDictionary(x => x.GetId());
 
 		var toAdd = new List<ProductCharacteristic>();
 		foreach (var characteristic in request.Characteristics)
-			if (existing.TryGetValue((characteristic.ProductId, characteristic.CharacteristicId), out var entity))
+			if (existing.TryGetValue(
+					(characteristic.ProductId, characteristic.CharacteristicId),
+					out var entity))
 				entity.SetValue(characteristic.Value);
 			else
-				toAdd.Add(ProductCharacteristic.Create(
-					characteristic.ProductId,
-					characteristic.CharacteristicId,
-					characteristic.Value));
+				toAdd.Add(
+					ProductCharacteristic.Create(
+						characteristic.ProductId,
+						characteristic.CharacteristicId,
+						characteristic.Value));
 
 		if (toAdd.Count > 0)
 			await unitOfWork.AddRangeAsync(toAdd, cancellationToken);

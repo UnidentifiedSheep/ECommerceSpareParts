@@ -55,8 +55,10 @@ public record GetUsersRequest : PaginationQueryModel
 
 	[FromQuery(Name = "userName")]
 	public string? UserName { get; init; }
+
 	[FromQuery(Name = "description")]
 	public string? Description { get; init; }
+
 	[FromQuery(Name = "roles")]
 	public string[]? Roles { get; init; }
 }

@@ -1,8 +1,8 @@
-using Search.Enums;
+using System.Linq.Expressions;
 using Contracts.Products;
 using Extensions;
-using System.Linq.Expressions;
 using Search.Entities;
+using Search.Enums;
 
 namespace Search.Application.Models.ProductUpdates;
 
@@ -16,18 +16,21 @@ public sealed record ProductCoreUpdate : ProductFieldUpdate
 	public string? Indicator { get; init; }
 	public ProductReadinessStatus ReadinessStatus { get; init; }
 
-	public static ProductCoreUpdate From(ProductSnapshot product, DateTime updatedAt) => new()
-	{
-		ProductId = product.Id,
-		UpdatedAt = updatedAt,
-		Sku = product.Sku,
-		NormalizedSku = product.Sku?.OnlyCharacterToLower(),
-		Name = product.Name,
-		ProducerId = product.ProducerId,
-		ProductGroupId = product.ProductGroupId,
-		Indicator = product.Indicator,
-		ReadinessStatus = product.IsDeleted ? ProductReadinessStatus.Deleted : ProductReadinessStatus.Ready
-	};
+	public static ProductCoreUpdate From(ProductSnapshot product, DateTime updatedAt)
+		=> new()
+		{
+			ProductId = product.Id,
+			UpdatedAt = updatedAt,
+			Sku = product.Sku,
+			NormalizedSku = product.Sku?.OnlyCharacterToLower(),
+			Name = product.Name,
+			ProducerId = product.ProducerId,
+			ProductGroupId = product.ProductGroupId,
+			Indicator = product.Indicator,
+			ReadinessStatus =
+				product.IsDeleted ? ProductReadinessStatus.Deleted : ProductReadinessStatus.Ready
+		};
 
-	public override Expression<Func<Product, DateTime?>> GetUpdatedAtField() => product => product.ProductUpdatedAt;
+	public override Expression<Func<Product, DateTime?>> GetUpdatedAtField()
+		=> product => product.ProductUpdatedAt;
 }

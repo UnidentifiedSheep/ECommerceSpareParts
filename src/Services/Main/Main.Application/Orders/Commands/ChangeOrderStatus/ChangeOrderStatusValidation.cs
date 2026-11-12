@@ -11,7 +11,8 @@ public sealed class ChangeOrderStatusValidation : AbstractValidator<ChangeOrderS
 	{
 		RuleFor(x => x.OrderId).NotEmpty().WithLocalizableError(OrderInputInvalidMessage.Instance);
 		RuleFor(x => x.DesiredStatus)
-			.Must(status => status is OrderStatus.Confirmed or OrderStatus.Completed or OrderStatus.Cancelled or OrderStatus.Deleted)
+			.Must(status => status is OrderStatus.Confirmed or OrderStatus.Completed or
+				OrderStatus.Cancelled or OrderStatus.Deleted)
 			.WithLocalizableError(OrderChangeNotAllowedMessage.Instance);
 	}
 }

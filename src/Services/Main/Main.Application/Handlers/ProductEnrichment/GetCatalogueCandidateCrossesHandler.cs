@@ -11,10 +11,7 @@ namespace Main.Application.Handlers.ProductEnrichment;
 public record GetCatalogueCandidateCrossesQuery : IQuery<GetCatalogueCandidateCrossesResult>
 {
 
-	public GetCatalogueCandidateCrossesQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.ToHashSet();
-	}
+	public GetCatalogueCandidateCrossesQuery(IEnumerable<Guid> ids) => Ids = ids.ToHashSet();
 	public IReadOnlySet<Guid> Ids { get; }
 }
 

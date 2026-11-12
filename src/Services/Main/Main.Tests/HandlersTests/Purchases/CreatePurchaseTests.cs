@@ -1,27 +1,25 @@
-using Main.Entities.Balance;
 using Application.Common.Services;
-using Moq;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Tests.Stubs;
-using Microsoft.Extensions.DependencyInjection;
-using Application.Common.Interfaces.Events;
 using Contracts;
 using Enums.Units;
 using FluentAssertions;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
-using Main.Application.Static;
+using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
+using Main.Entities.Purchase;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
+using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
@@ -41,15 +39,17 @@ public class CreatePurchaseTests : IntegrationTest
 		RegisterBasicContext<StorageRouteTestContext>();
 	}
 
+	private MessageBrokerStub Broker
+		=> (MessageBrokerStub)Scope.ServiceProvider
+			.GetRequiredService<PublishEndpointAccessor>()
+			.Publisher;
+
 	public override async ValueTask InitializeAsync()
 	{
 		await base.InitializeAsync();
 
 		_supplier = await new SupplierUserBuilder(Faker).BuildAndAddToDb(Context);
 	}
-
-	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
-		.GetRequiredService<PublishEndpointAccessor>().Publisher;
 
 	[Fact]
 	public async Task CreatePurchase_WithoutLogistics_CreatesPurchaseAndStorageContents()
@@ -72,7 +72,7 @@ public class CreatePurchaseTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
-			.Set<global::Main.Entities.Purchase.Purchase>()
+			.Set<Purchase>()
 			.Include(x => x.Contents)
 			.Include(x => x.PurchaseLogistic)
 			.AsNoTracking()
@@ -87,7 +87,8 @@ public class CreatePurchaseTests : IntegrationTest
 		purchase.PurchaseLogistic.Should().BeNull();
 		purchase.Contents.Should().HaveCount(command.PurchaseContent.Count());
 
-		var storageContents = await Context.Set<StorageContent>().AsNoTracking().ToListAsync(CancellationToken);
+		var storageContents =
+			await Context.Set<StorageContent>().AsNoTracking().ToListAsync(CancellationToken);
 		storageContents.Should().HaveCount(command.PurchaseContent.Count());
 		foreach (var item in command.PurchaseContent)
 			storageContents
@@ -97,7 +98,7 @@ public class CreatePurchaseTests : IntegrationTest
 					x.CurrencyId == command.CurrencyId && x.StorageCode == command.StorageCode);
 
 		var purchaseTransaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == purchase.TransactionId, CancellationToken);
 		purchaseTransaction.SenderId.Should().Be(_supplier.Id);
@@ -128,14 +129,14 @@ public class CreatePurchaseTests : IntegrationTest
 		var result = await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
-			.Set<global::Main.Entities.Purchase.Purchase>()
+			.Set<Purchase>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == result.PurchaseId, CancellationToken);
 		purchase.SupplierUserId.Should().Be(_supplier.Id);
 		purchase.SupplierOrganizationId.Should().Be(organization.Id);
 
 		var transaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == purchase.TransactionId, CancellationToken);
 		transaction.SenderId.Should().Be(organization.Id);
@@ -163,7 +164,7 @@ public class CreatePurchaseTests : IntegrationTest
 
 		var result = await Mediator.Send(command, CancellationToken);
 		var purchase = await Context
-			.Set<global::Main.Entities.Purchase.Purchase>()
+			.Set<Purchase>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == result.PurchaseId, CancellationToken);
 
@@ -198,7 +199,7 @@ public class CreatePurchaseTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
-			.Set<global::Main.Entities.Purchase.Purchase>()
+			.Set<Purchase>()
 			.Include(x => x.PurchaseLogistic)
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.PurchaseContentLogistic)
@@ -225,7 +226,7 @@ public class CreatePurchaseTests : IntegrationTest
 		{
 			purchase.PurchaseLogistic.TransactionId.Should().NotBeNull();
 			var logisticsTransaction = await Context
-				.Set<global::Main.Entities.Balance.Transaction>()
+				.Set<Transaction>()
 				.AsNoTracking()
 				.SingleAsync(x => x.Id == purchase.PurchaseLogistic.TransactionId, CancellationToken);
 			logisticsTransaction.SenderId.Should().Be(route.CarrierId.Value);
@@ -278,7 +279,7 @@ public class CreatePurchaseTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var supplierBalance = await Context
-			.Set<global::Main.Entities.Balance.OrganizationBalance>()
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.OrganizationId == command.SupplierOrganizationId && x.CurrencyId == command.CurrencyId,
@@ -340,7 +341,7 @@ public class CreatePurchaseTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
-			.Set<global::Main.Entities.Purchase.Purchase>()
+			.Set<Purchase>()
 			.Include(x => x.PurchaseLogistic)
 			.AsNoTracking()
 			.SingleAsync(CancellationToken);
@@ -445,11 +446,12 @@ public class CreatePurchaseTests : IntegrationTest
 	{
 		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
 		var product = GetContext<ProductTestContext>().Products.First();
-		Context.Set<ProductWeight>().Add(
-			ProductWeight.Create(
-				product.Id,
-				2m,
-				WeightUnit.Kilogram));
+		Context.Set<ProductWeight>()
+			.Add(
+				ProductWeight.Create(
+					product.Id,
+					2m,
+					WeightUnit.Kilogram));
 		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
 		await Context.SaveChangesAsync(CancellationToken);
 
@@ -477,13 +479,14 @@ public class CreatePurchaseTests : IntegrationTest
 	{
 		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
 		var product = GetContext<ProductTestContext>().Products.First();
-		Context.Set<ProductSize>().Add(
-			ProductSize.Create(
-				product.Id,
-				1m,
-				1m,
-				1m,
-				DimensionUnit.Meter));
+		Context.Set<ProductSize>()
+			.Add(
+				ProductSize.Create(
+					product.Id,
+					1m,
+					1m,
+					1m,
+					DimensionUnit.Meter));
 		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
 		await Context.SaveChangesAsync(CancellationToken);
 
@@ -514,8 +517,7 @@ public class CreatePurchaseTests : IntegrationTest
 		IEnumerable<NewPurchaseContentDto> contents,
 		decimal? payedSum = null,
 		Guid? supplierOrganizationId = null)
-	{
-		return new CreatePurchaseCommand(
+		=> new(
 			supplierUserId,
 			supplierOrganizationId ?? supplierUserId,
 			currencyId,
@@ -526,7 +528,6 @@ public class CreatePurchaseTests : IntegrationTest
 			payedSum,
 			withLogistics,
 			storageFrom);
-	}
 
 	private CreatePurchaseCommand CreateValidCommand()
 	{
@@ -552,8 +553,7 @@ public class CreatePurchaseTests : IntegrationTest
 		Product product,
 		int count,
 		bool calculateLogistics)
-	{
-		return new NewPurchaseContentDto
+		=> new()
 		{
 			ProductId = product.Id,
 			Count = count,
@@ -561,25 +561,26 @@ public class CreatePurchaseTests : IntegrationTest
 			CalculateLogistics = calculateLogistics,
 			Comment = $"content-{count}"
 		};
-	}
 
 	private async Task AddLogisticsDependencies(
 		Product product,
 		StorageRoute route,
 		Guid supplierId)
 	{
-		Context.Set<ProductSize>().Add(
-			ProductSize.Create(
-				product.Id,
-				1m,
-				1m,
-				1m,
-				DimensionUnit.Meter));
-		Context.Set<ProductWeight>().Add(
-			ProductWeight.Create(
-				product.Id,
-				2m,
-				WeightUnit.Kilogram));
+		Context.Set<ProductSize>()
+			.Add(
+				ProductSize.Create(
+					product.Id,
+					1m,
+					1m,
+					1m,
+					DimensionUnit.Meter));
+		Context.Set<ProductWeight>()
+			.Add(
+				ProductWeight.Create(
+					product.Id,
+					2m,
+					WeightUnit.Kilogram));
 		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, supplierId));
 		await Context.SaveChangesAsync();
 	}
@@ -594,7 +595,21 @@ public class CreatePurchaseValidationTests : ValidationTest<CreatePurchaseValida
 		return new CreatePurchaseValidation(policy.Object);
 	}
 
-	private static CreatePurchaseCommand CreateValidCommand() => new(Guid.NewGuid(), Guid.NewGuid(), 1, "storage", DateTime.UtcNow, [new NewPurchaseContentDto { ProductId = 1, Count = 1, Price = 100m, CalculateLogistics = false }], null, null, false, null);
+	private static CreatePurchaseCommand CreateValidCommand()
+		=> new(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			1,
+			"storage",
+			DateTime.UtcNow,
+			[
+				new NewPurchaseContentDto
+					{ ProductId = 1, Count = 1, Price = 100m, CalculateLogistics = false }
+			],
+			null,
+			null,
+			false,
+			null);
 
 	[Fact]
 	public async Task CreatePurchase_WithEmptyContent_FailsValidation()

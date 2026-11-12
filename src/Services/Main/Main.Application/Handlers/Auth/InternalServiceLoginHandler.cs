@@ -1,8 +1,6 @@
-using Security.Core.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Validators;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions.QueryExtensions;
 using Main.Application.Interfaces.Persistence;
@@ -10,6 +8,7 @@ using Main.Application.Interfaces.Services;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Auth;
 

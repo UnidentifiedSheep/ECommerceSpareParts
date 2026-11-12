@@ -46,8 +46,9 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
 
 	public static Expression<Func<SaleContentDetail, int>> GetKeySelector() => x => x.Id;
 
-	public static Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key) => x =>
-		x.Id == key;
+	public static Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key)
+		=> x =>
+			x.Id == key;
 
 	public static SaleContentDetail Create(
 		int storageContentId,
@@ -55,28 +56,22 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
 		decimal buyPrice,
 		int count,
 		DateTime purchaseDate)
-	{
-		return new SaleContentDetail(
+		=> new(
 			storageContentId,
 			currencyId,
 			buyPrice,
 			count,
 			purchaseDate);
-	}
 
 	private void SetPrice(decimal price)
-	{
-		BuyPrice = price.EnsureGreaterThan(
+		=> BuyPrice = price.EnsureGreaterThan(
 			0,
 			() => new InvalidOperationException("Price must be greater than zero."));
-	}
 
 	private void SetCount(int count)
-	{
-		Count = count.EnsureGreaterThan(
+		=> Count = count.EnsureGreaterThan(
 			0,
 			() => new InvalidOperationException("Count must be greater than zero."));
-	}
 
 	public override int GetId() => Id;
 }

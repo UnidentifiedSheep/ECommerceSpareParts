@@ -2,7 +2,6 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.Base.Synchronization;
@@ -30,22 +29,31 @@ public abstract class SynchronizationLrtBase<TInputState, TId, TEvent>(
 				TransactionalAttribute.ReadCommitted(20, 2),
 				async (context, cancellationToken) =>
 				{
-					var page = await GetPageAsync(State.LastProcessedId, BatchSize, cancellationToken);
+					var page = await GetPageAsync(
+						State.LastProcessedId,
+						BatchSize,
+						cancellationToken);
 					if (page.Ids.Count == 0) return 0;
 					if (page.Events.Count == 0)
-						throw new InvalidOperationException("A nonempty synchronization page must contain events.");
+						throw new InvalidOperationException(
+							"A nonempty synchronization page must contain events.");
 
 					foreach (var @event in page.Events)
-						await context.Publisher.Publish(@event, @event.GetType(), cancellationToken);
+						await context.Publisher.Publish(
+							@event,
+							@event.GetType(),
+							cancellationToken);
 
 					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-					await SaveStateAsync(new SynchronizationState<TId>
-					{
-						LastProcessedId = page.Ids[^1],
-						ProcessedCount = State.ProcessedCount + page.Ids.Count
-					});
+					await SaveStateAsync(
+						new SynchronizationState<TId>
+						{
+							LastProcessedId = page.Ids[^1],
+							ProcessedCount = State.ProcessedCount + page.Ids.Count
+						});
 					return page.Ids.Count;
-				}, CancellationToken);
+				},
+				CancellationToken);
 
 			if (processed < BatchSize) break;
 		}

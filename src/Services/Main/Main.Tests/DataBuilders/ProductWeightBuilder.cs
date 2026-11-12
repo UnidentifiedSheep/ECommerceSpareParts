@@ -32,10 +32,8 @@ public class ProductWeightBuilder(Faker faker) : BuilderBase<ProductWeight>(fake
 	}
 
 	public override ProductWeight Build()
-	{
-		return ProductWeight.Create(
+		=> ProductWeight.Create(
 			ProductId ?? Faker.Random.Int(1),
 			Weight ?? 2m,
 			Unit ?? WeightUnit.Kilogram);
-	}
 }

@@ -1,10 +1,9 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using FluentAssertions;
 using GraphQL.Common.Extensions;
 using HotChocolate.Execution;
 using Locan.Core.Interfaces.Localizers;
 using Microsoft.Extensions.DependencyInjection;
+using Security.Core.Interfaces;
 using Tests.Stubs;
 
 namespace Tests.Tests.GraphQl.ErrorFilters;

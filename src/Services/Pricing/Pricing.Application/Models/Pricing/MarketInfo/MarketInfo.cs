@@ -10,9 +10,7 @@ public sealed record MarketInfo
 	};
 
 	public MarketInfo(IEnumerable<MarketInfoItem> items)
-	{
-		Items = items.OrderByDescending(x => x.Score).ToList();
-	}
+		=> Items = items.OrderByDescending(x => x.Score).ToList();
 
 	[JsonPropertyName("items")]
 	public IReadOnlyList<MarketInfoItem> Items { get; }

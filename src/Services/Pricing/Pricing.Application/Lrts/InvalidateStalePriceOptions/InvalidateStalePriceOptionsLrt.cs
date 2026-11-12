@@ -20,19 +20,20 @@ namespace Pricing.Application.Lrts.InvalidateStalePriceOptions;
 
 public class InvalidateStalePriceOptionsLrt(
 	IApplicationTransactionFactory transactionService,
-	ILogger<InvalidateStalePriceOptionsLrt> logger) : LrtBase<NoneInputState, InvalidateStalePriceOptionsState>(
-	transactionService,
-	logger)
+	ILogger<InvalidateStalePriceOptionsLrt> logger)
+	: LrtBase<NoneInputState, InvalidateStalePriceOptionsState>(
+		transactionService,
+		logger)
 {
 	public const string LrtName = nameof(InvalidateStalePriceOptionsLrt);
 
 	public override string SystemName => LrtName;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtInvalidateStalePriceOptionsNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtInvalidateStalePriceOptionsNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtInvalidateStalePriceOptionsDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtInvalidateStalePriceOptionsDescriptionMessage.Instance;
 
 	protected override async Task DoWork(NoneInputState inputState)
 	{
@@ -46,9 +47,11 @@ public class InvalidateStalePriceOptionsLrt(
 				{
 					var currentVersion = context.GetRequiredService<IMarkupContainer>().CurrentVersion;
 					var currentAppliersVersion =
-						await context.GetRequiredService<IPriceApplierService>().GetCurrentConfigurationVersionAsync(cancellationToken);
+						await context.GetRequiredService<IPriceApplierService>()
+							.GetCurrentConfigurationVersionAsync(cancellationToken);
 					var currentPricingSettingsVersion =
-						(await context.GetRequiredService<ISettingsService>().GetOrDefault<PricingSetting>(cancellationToken)).Data.Version;
+						(await context.GetRequiredService<ISettingsService>()
+							.GetOrDefault<PricingSetting>(cancellationToken)).Data.Version;
 
 					var items = await context.GetRequiredService<IReadRepository<ProductPriceOption, Guid>>()
 						.Query
@@ -69,19 +72,24 @@ public class InvalidateStalePriceOptionsLrt(
 						return 0;
 
 					var jobItems = items
-						.Select(x => context.GetRequiredService<IJobProvider<PriceCandidateCalculationLrt, PriceCandidateCalculationState>>().Create(
-							new PriceCandidateCalculationState
-							{
-								ProductId = x.ProductId, StorageCode = x.OfferForStorage
-							}))
+						.Select(x => context
+							.GetRequiredService<
+								IJobProvider<PriceCandidateCalculationLrt, PriceCandidateCalculationState>>()
+							.Create(
+								new PriceCandidateCalculationState
+								{
+									ProductId = x.ProductId, StorageCode = x.OfferForStorage
+								}))
 						.DistinctBy(x => x.NaturalKey)
 						.ToList();
 
-					await context.GetRequiredService<IJobService>().TryEnqueueJobsAsync(jobItems, cancellationToken);
+					await context.GetRequiredService<IJobService>()
+						.TryEnqueueJobsAsync(jobItems, cancellationToken);
 
-					await context.GetRequiredService<IProductPriceOptionRepository>().DeleteManyAsync(
-						items.Select(x => x.PriceOfferId),
-						cancellationToken);
+					await context.GetRequiredService<IProductPriceOptionRepository>()
+						.DeleteManyAsync(
+							items.Select(x => x.PriceOfferId),
+							cancellationToken);
 
 					await SaveStateAsync(
 						new InvalidateStalePriceOptionsState

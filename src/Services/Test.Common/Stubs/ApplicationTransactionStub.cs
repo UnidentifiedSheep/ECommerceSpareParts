@@ -4,17 +4,19 @@ using Attributes;
 
 namespace Tests.Stubs;
 
-public class ApplicationTransactionStub(IApplicationTransactionContext context, Func<Task>? afterExecute = null) : IApplicationTransaction
+public class ApplicationTransactionStub(IApplicationTransactionContext context,
+	Func<Task>? afterExecute = null) : IApplicationTransaction
 {
 	private Action<TransactionError>? _onException;
-	public IApplicationTransactionContext Context => context;
-	public bool IsExecuting { get; private set; }
 	public TransactionalAttribute? Settings { get; private set; }
 	public int Calls { get; private set; }
+	public IApplicationTransactionContext Context => context;
+	public bool IsExecuting { get; private set; }
 
 	public IApplicationTransaction WithSettings(TransactionalAttribute? settings)
 	{
-		if (IsExecuting) throw new InvalidOperationException("Transaction settings cannot change during execution.");
+		if (IsExecuting)
+			throw new InvalidOperationException("Transaction settings cannot change during execution.");
 		Settings = settings;
 		return this;
 	}
@@ -25,14 +27,19 @@ public class ApplicationTransactionStub(IApplicationTransactionContext context, 
 		return this;
 	}
 
-	public Task ExecuteAsync(Func<IApplicationTransactionContext, CancellationToken, Task> action,
-		CancellationToken cancellationToken = default) => ExecuteAsync(async (ctx, ct) =>
-		{
-			await action(ctx, ct);
-			return true;
-		}, cancellationToken);
+	public Task ExecuteAsync(
+		Func<IApplicationTransactionContext, CancellationToken, Task> action,
+		CancellationToken cancellationToken = default)
+		=> ExecuteAsync(
+			async (ctx, ct) =>
+			{
+				await action(ctx, ct);
+				return true;
+			},
+			cancellationToken);
 
-	public async Task<TResult> ExecuteAsync<TResult>(Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
+	public async Task<TResult> ExecuteAsync<TResult>(
+		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
 		CancellationToken cancellationToken = default)
 	{
 		Calls++;
@@ -43,7 +50,8 @@ public class ApplicationTransactionStub(IApplicationTransactionContext context, 
 			if (afterExecute is not null) await afterExecute();
 			return result;
 		}
-		catch (Exception exception) when (exception is not OperationCanceledException && !cancellationToken.IsCancellationRequested)
+		catch (Exception exception) when (exception is not OperationCanceledException &&
+										!cancellationToken.IsCancellationRequested)
 		{
 			_onException?.Invoke(new TransactionError(exception));
 			throw;

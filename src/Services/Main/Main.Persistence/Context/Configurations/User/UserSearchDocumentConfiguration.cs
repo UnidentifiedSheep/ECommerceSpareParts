@@ -14,11 +14,13 @@ internal sealed class UserSearchDocumentConfiguration : IEntityTypeConfiguration
 			.HasName("user_search_pk");
 
 		builder.Property(document => document.UserId)
-			.HasColumnName("user_id").ValueGeneratedNever();
+			.HasColumnName("user_id")
+			.ValueGeneratedNever();
 
 		builder.Property(document => document.SearchVector)
 			.HasColumnName("search_vector")
-			.HasColumnType("tsvector").IsRequired();
+			.HasColumnType("tsvector")
+			.IsRequired();
 
 		builder.HasIndex(document => document.SearchVector)
 			.HasMethod("gin")

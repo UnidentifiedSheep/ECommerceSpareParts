@@ -16,13 +16,15 @@ public class ClearExpiredTokensLrt(
 {
 	public static string Name => nameof(ClearExpiredTokensLrt);
 	public override string SystemName => Name;
+
 	public override ILocalizableMessage NameLocalizationMessage
 		=> LrtUserTokensClearExpiredNameMessage.Instance;
+
 	public override ILocalizableMessage DescriptionLocalizationMessage
 		=> LrtUserTokensClearExpiredDescriptionMessage.Instance;
+
 	protected override Task DoWork(NoneInputState inputState)
-	{
-		return ExecuteInTransactionAsync(
+		=> ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (ctx, ct) =>
 			{
@@ -37,5 +39,4 @@ public class ClearExpiredTokensLrt(
 
 				await repo.DeleteManyAsync(ids, ct);
 			});
-	}
 }

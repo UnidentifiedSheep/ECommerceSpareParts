@@ -1,6 +1,5 @@
-using Abstractions.Models;
-using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -10,7 +9,6 @@ using Domain.CommonEnums;
 using FluentAssertions;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
-using MassTransit;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NamedObject.Core.Interfaces;
@@ -122,7 +120,8 @@ public sealed class MultiStepLrtBaseTests
 			Lrt = new TestMultiStepLrt(
 				new ApplicationTransactionFactoryStub(
 					UnitOfWork.Object,
-					Mock.Of<IRepositoryProvider>(provider => provider.Get<Job, Guid>() == JobRepository.Object),
+					Mock.Of<IRepositoryProvider>(provider
+						=> provider.Get<Job, Guid>() == JobRepository.Object),
 					Mock.Of<IIntegrationEventScope>()),
 				Logger.Object);
 
@@ -198,17 +197,18 @@ public sealed class MultiStepLrtBaseTests
 		}
 	}
 
-	private sealed class TestMultiStepLrt(IApplicationTransactionFactory transactionService, ILogger logger) : MultiStepLrtBase<NoneInputState, NoneInputState>(
-		transactionService,
-		logger)
+	private sealed class TestMultiStepLrt(IApplicationTransactionFactory transactionService, ILogger logger)
+		: MultiStepLrtBase<NoneInputState, NoneInputState>(
+			transactionService,
+			logger)
 	{
 		public override string SystemName => nameof(TestMultiStepLrt);
 
-		public override ILocalizableMessage NameLocalizationMessage =>
-			new LocalizableMessage("test-multi-step-lrt-name");
+		public override ILocalizableMessage NameLocalizationMessage
+			=> new LocalizableMessage("test-multi-step-lrt-name");
 
-		public override ILocalizableMessage DescriptionLocalizationMessage =>
-			new LocalizableMessage("test-multi-step-lrt-description");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-multi-step-lrt-description");
 
 		protected override void ConfigureSteps(IMultiStepJobBuilder builder)
 		{

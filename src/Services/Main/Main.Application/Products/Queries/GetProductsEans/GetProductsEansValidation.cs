@@ -4,8 +4,5 @@ namespace Main.Application.Products.Queries.GetProductsEans;
 
 public class GetProductsEansValidation : AbstractValidator<GetProductsEansQuery>
 {
-	public GetProductsEansValidation()
-	{
-		RuleForEach(x => x.ProductIds).GreaterThan(0);
-	}
+	public GetProductsEansValidation() => RuleForEach(x => x.ProductIds).GreaterThan(0);
 }

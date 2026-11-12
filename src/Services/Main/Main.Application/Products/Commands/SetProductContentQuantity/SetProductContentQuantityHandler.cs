@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Entities.Exceptions;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Products.Commands.SetProductContentQuantity;
@@ -12,7 +13,7 @@ public record SetProductsContentCountCommand(int ParentProductId, int ChildProdu
 	: ICommand;
 
 public class SetProductContentQuantityHandler(
-	IRepository<Entities.Product.ProductContent, (int, int)> contentRepository)
+	IRepository<ProductContent, (int, int)> contentRepository)
 	: ICommandHandler<SetProductsContentCountCommand>
 {
 	public async Task<Unit> Handle(

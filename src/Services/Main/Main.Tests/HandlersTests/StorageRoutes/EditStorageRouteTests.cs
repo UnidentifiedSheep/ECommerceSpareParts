@@ -1,12 +1,11 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
 using Application.Common.Models;
+using FluentValidation.TestHelper;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 using Main.Entities.Exceptions;
+using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
@@ -17,9 +16,7 @@ public class EditStorageRouteTests : IntegrationTest
 	private StorageRouteTestContext _testContext = null!;
 
 	public EditStorageRouteTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<StorageRouteTestContext>();
-	}
+		=> RegisterBasicContext<StorageRouteTestContext>();
 
 	public override async ValueTask InitializeAsync()
 	{
@@ -43,7 +40,7 @@ public class EditStorageRouteTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var updatedRoute = await Context
-			.Set<global::Main.Entities.Storage.StorageRoute>()
+			.Set<StorageRoute>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == route.Id, CancellationToken);
 		Assert.Equal(2000, updatedRoute.DistanceM);
@@ -68,22 +65,28 @@ public class EditStorageRouteTests : IntegrationTest
 		await Assert.ThrowsAsync<StorageRouteNotFound>(async () =>
 			await Mediator.Send(command, CancellationToken));
 	}
-
 }
 
-public class EditStorageRouteValidationTests : ValidationTest<EditStorageRouteValidation, EditStorageRouteCommand>
+public class
+	EditStorageRouteValidationTests : ValidationTest<EditStorageRouteValidation, EditStorageRouteCommand>
 {
 	[Fact]
 	public async Task EditStorageRoute_WithInvalidData_FailsValidation()
 	{
-		var result = await ValidateAsync(new EditStorageRouteCommand(Guid.NewGuid(), new PatchStorageRouteDto { DistanceM = PatchField<int>.From(0) }));
+		var result = await ValidateAsync(
+			new EditStorageRouteCommand(
+				Guid.NewGuid(),
+				new PatchStorageRouteDto { DistanceM = PatchField<int>.From(0) }));
 		result.ShouldHaveValidationErrorFor("PatchStorageRoute.DistanceM.Value").Only();
 	}
 
 	[Fact]
 	public async Task EditStorageRoute_WithInvalidPricePrecision_FailsValidation()
 	{
-		var result = await ValidateAsync(new EditStorageRouteCommand(Guid.NewGuid(), new PatchStorageRouteDto { PriceKg = PatchField<decimal>.From(10.555m) }));
+		var result = await ValidateAsync(
+			new EditStorageRouteCommand(
+				Guid.NewGuid(),
+				new PatchStorageRouteDto { PriceKg = PatchField<decimal>.From(10.555m) }));
 		result.ShouldHaveValidationErrorFor("PatchStorageRoute.PriceKg.Value").Only();
 	}
 }

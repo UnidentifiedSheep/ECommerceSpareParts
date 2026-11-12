@@ -37,8 +37,14 @@ public class GetProductCrossesHandler(
 			var normalizedSku = Sku.ToNormalized(term);
 			var skuPattern = $"%{normalizedSku}%";
 			query = query.Where(product =>
-				EF.Functions.ILike(product.Name.Value, pattern, "\\") ||
-				EF.Functions.ILike(product.Producer.Name, pattern, "\\") ||
+				EF.Functions.ILike(
+					product.Name.Value,
+					pattern,
+					"\\") ||
+				EF.Functions.ILike(
+					product.Producer.Name,
+					pattern,
+					"\\") ||
 				normalizedSku.Length > 0 && EF.Functions.ILike(product.Sku.NormalizedValue, skuPattern));
 		}
 
@@ -51,6 +57,6 @@ public class GetProductCrossesHandler(
 		return new GetProductCrossesResult(ids.Select(id => products[id]).ToArray());
 	}
 
-	private static string EscapePattern(string value) =>
-		value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+	private static string EscapePattern(string value)
+		=> value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }

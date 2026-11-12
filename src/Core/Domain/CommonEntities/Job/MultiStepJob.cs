@@ -30,16 +30,18 @@ public sealed class MultiStepJob : Job
 	public IReadOnlyList<JobStepDependency> Dependencies => _dependencies;
 
 	public static MultiStepJob Create(string systemName, string initialState)
-	{
-		return new MultiStepJob(
+		=> new(
 			systemName,
 			initialState,
 			1,
 			null);
-	}
 
-	public static MultiStepJob CreateDeferred(string systemName, int maxAttempts = 3) =>
-		new(systemName, null, maxAttempts, null);
+	public static MultiStepJob CreateDeferred(string systemName, int maxAttempts = 3)
+		=> new(
+			systemName,
+			null,
+			maxAttempts,
+			null);
 
 	public static MultiStepJob CreateUnique(
 		string naturalKey,

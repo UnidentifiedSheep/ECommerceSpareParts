@@ -1,7 +1,6 @@
-﻿using Persistence.Context;
-using Main.Entities.Currency;
-using Main.Persistence.Context;
+﻿using Main.Entities.Currency;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 
 namespace Main.Migrator.DataSeeds;

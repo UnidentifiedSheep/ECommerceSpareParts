@@ -13,11 +13,11 @@ public class GlobalApplicationSettingDefinition(ISettingsService settingsService
 {
 	public override string SystemName => GlobalApplicationSetting.SettingName;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		GlobalApplicationSettingNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> GlobalApplicationSettingNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		GlobalApplicationSettingDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> GlobalApplicationSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(GlobalApplicationSettingData);
 
@@ -37,8 +37,8 @@ public class GlobalApplicationSettingDefinition(ISettingsService settingsService
 		await SettingsService.SetSetting(new GlobalApplicationSetting(data), cancellationToken);
 	}
 
-	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken) =>
-		(await SettingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Json;
+	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
+		=> (await SettingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Json;
 
 	private static string NormalizeUrl(string? value)
 	{

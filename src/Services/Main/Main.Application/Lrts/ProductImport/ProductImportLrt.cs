@@ -40,15 +40,17 @@ public class ProductImportLrt(
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtProductImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProductImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
-	protected override async Task BeforeRead(ProductImportState state) =>
-		_producerLookup = await ExecuteInScopeAsync((context, ct) =>
-			context.GetRequiredService<IProducerLookupService>().Load(ct), CancellationToken);
+	protected override async Task BeforeRead(ProductImportState state)
+		=> _producerLookup = await ExecuteInScopeAsync(
+			(context, ct) =>
+				context.GetRequiredService<IProducerLookupService>().Load(ct),
+			CancellationToken);
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -63,10 +65,11 @@ public class ProductImportLrt(
 			var producerId = _producerLookup.ResolveId(row.Producer);
 			if (producerId is null)
 			{
-				errors.Add(CreateError(
-					rowIdx,
-					StringLocalizer.Get(
-						new ArticleImportProducerNotFoundMessage().WithProducer(row.Producer))));
+				errors.Add(
+					CreateError(
+						rowIdx,
+						StringLocalizer.Get(
+							new ArticleImportProducerNotFoundMessage().WithProducer(row.Producer))));
 				return false;
 			}
 
@@ -91,10 +94,14 @@ public class ProductImportLrt(
 		IReadOnlyList<(int idx, Product item)> products,
 		ProductImportState state,
 		CsvImportCheckpoint checkpoint,
-		List<CsvImportError> errors) =>
-		ExecuteInTransactionAsync(
+		List<CsvImportError> errors)
+		=> ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(_, _) => base.SaveBatchAsync(products, state, checkpoint, errors),
+			(_, _) => base.SaveBatchAsync(
+				products,
+				state,
+				checkpoint,
+				errors),
 			CancellationToken);
 
 	protected override async Task ProcessBatch(
@@ -107,9 +114,14 @@ public class ProductImportLrt(
 
 		var firstIdx = products[0].idx;
 		var ids = await TransactionContext.GetRequiredService<IProductRepository>()
-			.InsertProductsOnConflictDoNothingAsync(products.Select(product => product.item).ToArray(), CancellationToken);
+			.InsertProductsOnConflictDoNothingAsync(
+				products.Select(product => product.item).ToArray(),
+				CancellationToken);
 		await TransactionContext.GetRequiredService<IProductEventPublisher>()
-			.PublishAsync(ids, ProductEventParts.All, CancellationToken);
+			.PublishAsync(
+				ids,
+				ProductEventParts.All,
+				CancellationToken);
 
 		Logger.LogInformation(
 			"Product import batch processed. JobId: {JobId}, " +

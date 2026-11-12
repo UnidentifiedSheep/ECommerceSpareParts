@@ -15,12 +15,20 @@ public sealed class StorageContentTests
 	{
 		var content = NewContent();
 
-		content.Take(3, StorageMovementType.Sale, DateTime.UtcNow);
+		content.Take(
+			3,
+			StorageMovementType.Sale,
+			DateTime.UtcNow);
 
 		content.Count.Should().Be(7);
 		content.Metadata.LastMovementType.Should().Be(StorageMovementType.Sale);
-		var movement = content.FlushDomainEvents().Should().ContainSingle().Which
-			.Should().BeOfType<StorageContentCountUpdatedDomainEvent>().Subject;
+		var movement = content.FlushDomainEvents()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.BeOfType<StorageContentCountUpdatedDomainEvent>()
+			.Subject;
 		movement.Delta.Should().Be(-3);
 		movement.NewCount.Should().Be(7);
 		movement.MovementType.Should().Be(StorageMovementType.Sale);
@@ -31,7 +39,10 @@ public sealed class StorageContentTests
 	{
 		var content = NewContent();
 
-		var take = () => content.Take(11, StorageMovementType.Sale, DateTime.UtcNow);
+		var take = () => content.Take(
+			11,
+			StorageMovementType.Sale,
+			DateTime.UtcNow);
 
 		take.Should().Throw<NotEnoughCountOnStorageException>();
 		content.Count.Should().Be(10);
@@ -46,7 +57,10 @@ public sealed class StorageContentTests
 	{
 		var content = NewContent();
 
-		var take = () => content.Take(quantity, StorageMovementType.Sale, DateTime.UtcNow);
+		var take = () => content.Take(
+			quantity,
+			StorageMovementType.Sale,
+			DateTime.UtcNow);
 
 		take.Should().Throw<InvalidOperationException>();
 		content.Count.Should().Be(10);
@@ -87,7 +101,10 @@ public sealed class StorageContentTests
 
 	private static StorageContent NewContent()
 	{
-		var content = new StorageContentBuilder(new Faker()).WithProductIds(1).WithCurrencyId(1).WithCount(10).Build();
+		var content = new StorageContentBuilder(new Faker()).WithProductIds(1)
+			.WithCurrencyId(1)
+			.WithCount(10)
+			.Build();
 		content.FlushDomainEvents();
 		return content;
 	}

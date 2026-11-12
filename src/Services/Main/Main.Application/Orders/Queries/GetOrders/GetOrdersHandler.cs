@@ -51,11 +51,13 @@ public sealed class GetOrdersHandler(
 		if (request.OrganizationIds.Count > 0)
 			query = query.Where(order => request.OrganizationIds.Contains(order.OrganizationId));
 		if (request.UserIds.Count > 0)
-			query = query.Where(order => order.UserId.HasValue && request.UserIds.Contains(order.UserId.Value));
+			query =
+				query.Where(order => order.UserId.HasValue && request.UserIds.Contains(order.UserId.Value));
 		if (request.CurrencyIds.Count > 0)
 			query = query.Where(order => request.CurrencyIds.Contains(order.CurrencyId));
 		if (request.ProductIds.Count > 0)
-			query = query.Where(order => order.Items.Any(item => !item.IsDeleted && request.ProductIds.Contains(item.ProductId)));
+			query = query.Where(order
+				=> order.Items.Any(item => !item.IsDeleted && request.ProductIds.Contains(item.ProductId)));
 		if (request.Statuses.Count > 0)
 			query = query.Where(order => request.Statuses.Contains(order.Status));
 		else
@@ -84,14 +86,26 @@ public sealed class GetOrdersHandler(
 		var isId = Guid.TryParse(term, out var id);
 
 		var matchingOrganizations = organizations.Query
-			.Where(organization => EF.Functions.ILike(organization.Name, pattern, "\\"))
+			.Where(organization => EF.Functions.ILike(
+				organization.Name,
+				pattern,
+				"\\"))
 			.Select(organization => organization.Id);
 		var matchingUsers = users.Query
-			.Where(user => EF.Functions.ILike(user.UserName.Value, pattern, "\\"))
+			.Where(user => EF.Functions.ILike(
+				user.UserName.Value,
+				pattern,
+				"\\"))
 			.Select(user => user.Id);
 		var matchingProducts = products.Query
-			.Where(product => EF.Functions.ILike(product.Name.Value, pattern, "\\") ||
-				normalizedSku.Length > 0 && EF.Functions.ILike(product.Sku.NormalizedValue, skuPattern, "\\"))
+			.Where(product => EF.Functions.ILike(
+					product.Name.Value,
+					pattern,
+					"\\") ||
+				normalizedSku.Length > 0 && EF.Functions.ILike(
+					product.Sku.NormalizedValue,
+					skuPattern,
+					"\\"))
 			.Select(product => product.Id);
 
 		return query.Where(order => isId && order.Id == id ||
@@ -100,6 +114,6 @@ public sealed class GetOrdersHandler(
 			order.Items.Any(item => !item.IsDeleted && matchingProducts.Contains(item.ProductId)));
 	}
 
-	private static string EscapePattern(string value) =>
-		value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+	private static string EscapePattern(string value)
+		=> value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }

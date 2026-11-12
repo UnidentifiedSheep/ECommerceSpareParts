@@ -1,4 +1,3 @@
-using Persistence.Context;
 using System.Reflection;
 using Abstractions;
 using Api.Common;
@@ -16,9 +15,9 @@ using Main.Application;
 using Main.Application.Consumers;
 using Main.Cache;
 using Main.Persistence;
-using Main.Persistence.Context;
 using MassTransit;
 using Notification.Extensions;
+using Persistence.Context;
 using RabbitMQ.Client;
 using RabbitMq.Extensions;
 using S3;

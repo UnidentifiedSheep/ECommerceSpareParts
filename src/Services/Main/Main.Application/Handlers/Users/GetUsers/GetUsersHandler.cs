@@ -42,14 +42,20 @@ public class GetUsersHandler(
 		{
 			var pattern = EscapePattern(request.Name.Trim()) + "%";
 			query = query.Where(user => user.UserInfo != null &&
-				EF.Functions.ILike(user.UserInfo.Name, pattern, "\\"));
+				EF.Functions.ILike(
+					user.UserInfo.Name,
+					pattern,
+					"\\"));
 		}
 
 		if (!string.IsNullOrWhiteSpace(request.Surname))
 		{
 			var pattern = EscapePattern(request.Surname.Trim()) + "%";
 			query = query.Where(user => user.UserInfo != null &&
-				EF.Functions.ILike(user.UserInfo.Surname, pattern, "\\"));
+				EF.Functions.ILike(
+					user.UserInfo.Surname,
+					pattern,
+					"\\"));
 		}
 
 		if (!string.IsNullOrWhiteSpace(request.UserName))
@@ -76,7 +82,10 @@ public class GetUsersHandler(
 			var pattern = "%" + EscapePattern(request.Description.Trim()) + "%";
 			query = query.Where(user => user.UserInfo != null &&
 				user.UserInfo.Description != null &&
-				EF.Functions.ILike(user.UserInfo.Description, pattern, "\\"));
+				EF.Functions.ILike(
+					user.UserInfo.Description,
+					pattern,
+					"\\"));
 		}
 
 		var users = await query
@@ -88,6 +97,6 @@ public class GetUsersHandler(
 		return new GetUsersResult(users);
 	}
 
-	private static string EscapePattern(string value) =>
-		value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+	private static string EscapePattern(string value)
+		=> value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }

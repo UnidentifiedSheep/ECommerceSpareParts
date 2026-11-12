@@ -65,10 +65,11 @@ public class AnyErrorFilterTests
 		result.Code.Should().Be("VALIDATION_ERROR");
 	}
 
-	private static AnyErrorFilter CreateFilter(ILoggerFactory? loggerFactory = null) => new(
-		loggerFactory ?? NullLoggerFactory.Instance,
-		ErrorFilterTestFactory.CreateLocalizer(),
-		ErrorFilterTestFactory.CreateHttpContextAccessor());
+	private static AnyErrorFilter CreateFilter(ILoggerFactory? loggerFactory = null)
+		=> new(
+			loggerFactory ?? NullLoggerFactory.Instance,
+			ErrorFilterTestFactory.CreateLocalizer(),
+			ErrorFilterTestFactory.CreateHttpContextAccessor());
 
 	private sealed class TestNotFoundException(int id) : Exception,
 		IStatusCode,

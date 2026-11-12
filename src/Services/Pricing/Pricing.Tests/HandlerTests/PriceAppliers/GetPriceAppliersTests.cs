@@ -1,5 +1,3 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Application.Handlers.PriceApplier;
@@ -9,6 +7,7 @@ using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Entities.Exceptions;
 using Pricing.Enums;
 using Pricing.Integration.Tests.DataBuilders.PriceAppliers;
+using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 
@@ -190,11 +189,10 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 		markup.States[0].Order.Should().Be(0);
 		markup.States[0].Enabled.Should().BeFalse();
 	}
-
-
 }
 
-public class GetPriceAppliersValidationTests : ValidationTest<GetPriceAppliersValidation, GetPriceAppliersQuery>
+public class
+	GetPriceAppliersValidationTests : ValidationTest<GetPriceAppliersValidation, GetPriceAppliersQuery>
 {
 	[Fact]
 	public async Task WithInvalidUsage_FailsValidation()

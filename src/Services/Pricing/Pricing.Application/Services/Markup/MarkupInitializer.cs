@@ -24,7 +24,10 @@ public class MarkupInitializer(
 		var pricingSettings = await settingsService.GetOrDefault<PricingSetting>(cancellationToken);
 
 		var query = pricingSettings.Data.SelectedMarkupId == null
-			? repository.Query.Where(x => x.SourceMessageId != null).OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
+			? repository.Query
+				.Where(x => x.SourceMessageId != null)
+				.OrderByDescending(x => x.CreatedAt)
+				.ThenByDescending(x => x.Id)
 			: repository.Query.Where(x => x.Id == pricingSettings.Data.SelectedMarkupId);
 
 		var defaultGroup = await query
@@ -34,10 +37,15 @@ public class MarkupInitializer(
 		if (defaultGroup is null)
 		{
 			if (pricingSettings.Data.SelectedMarkupId is not null)
-				throw new InvalidOperationException("Unable initialize markup service, Markup group not found.");
+				throw new InvalidOperationException(
+					"Unable initialize markup service, Markup group not found.");
 
 			var baseCurrencyId = await cachedCurrencyProvider.GetBaseCurrencyIdAsync(cancellationToken);
-			container.Initialize(baseCurrencyId, new Models.Markup(pricingSettings.Data.DefaultMarkup), [], []);
+			container.Initialize(
+				baseCurrencyId,
+				new Models.Markup(pricingSettings.Data.DefaultMarkup),
+				[],
+				[]);
 			return;
 		}
 

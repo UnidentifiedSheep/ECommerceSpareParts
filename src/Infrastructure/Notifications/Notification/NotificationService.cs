@@ -13,7 +13,7 @@ public class NotificationService(
 	INamedObjectRegistry<INotificationDefinition> definitionRegistry,
 	IUnitOfWork unitOfWork,
 	INamedObjectRegistry<INotificationChannel> channelsRegistry
-	) : INotificationService
+) : INotificationService
 {
 	public Task<SendResult> SendAsync(
 		INotificationRecipient recipient,
@@ -57,9 +57,10 @@ public class NotificationService(
 			if (!channels.Add(channel.SystemName))
 				throw new InvalidOperationException(
 					$"Multiple recipients for channel '{channel.SystemName}' are not supported.");
-			deliveries.Add((
-				channel.SystemName,
-				JsonSerializer.Serialize(recipient, recipient.GetType())));
+			deliveries.Add(
+				(
+					channel.SystemName,
+					JsonSerializer.Serialize(recipient, recipient.GetType())));
 		}
 
 		var definition = definitionRegistry.GetBySystemName(notification.SystemName);
@@ -119,8 +120,8 @@ public class NotificationService(
 		var channelSystemNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 		foreach (var recipientsByChannel in recipients
-			.Where(x => !string.IsNullOrWhiteSpace(x.ChannelSystemName))
-			.GroupBy(x => x.ChannelSystemName, StringComparer.OrdinalIgnoreCase))
+					.Where(x => !string.IsNullOrWhiteSpace(x.ChannelSystemName))
+					.GroupBy(x => x.ChannelSystemName, StringComparer.OrdinalIgnoreCase))
 		{
 			var channel = channelsRegistry.TryGetBySystemName(recipientsByChannel.Key) ??
 				throw new InvalidOperationException(

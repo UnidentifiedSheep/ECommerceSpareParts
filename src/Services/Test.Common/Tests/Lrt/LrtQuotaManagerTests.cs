@@ -375,8 +375,8 @@ public class LrtQuotaManagerTests
 		manager.AvailableQuota.Should().Be(1);
 	}
 
-	private static LrtQuotaManager CreateManager(int maxParallelPerWorker) =>
-		CreateManager(() => maxParallelPerWorker);
+	private static LrtQuotaManager CreateManager(int maxParallelPerWorker)
+		=> CreateManager(() => maxParallelPerWorker);
 
 	private static LrtQuotaManager CreateManager(Func<int> maxParallelPerWorker)
 	{

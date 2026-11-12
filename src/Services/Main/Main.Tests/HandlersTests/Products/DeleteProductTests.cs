@@ -1,12 +1,9 @@
-using Main.Entities.Cart;
-using Main.Entities.Product.Enrichment;
-using Persistence.Context;
 using System.Text.Json;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Contracts.Products;
 using Contracts.ProductEnrichment;
+using Contracts.Products;
 using Domain.CommonEntities.Job;
 using Exceptions;
 using FluentAssertions;
@@ -16,15 +13,18 @@ using Main.Application.Products.Interfaces;
 using Main.Entities.Exceptions;
 using Main.Entities.Order;
 using Main.Entities.Product;
+using Main.Entities.Product.Enrichment;
+using Main.Entities.Storage;
 using Main.Enums.Products;
-using Main.Persistence.Context;
-using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using MediatR;
-using Tests.DataBuilders.Organization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
+using Persistence.Context;
 using Tests.DataBuilders;
 using Tests.DataBuilders.Balance;
+using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.Purchase;
 using Tests.DataBuilders.Sale;
 using Tests.DataBuilders.Storage;
@@ -56,44 +56,114 @@ public class DeleteProductTests : IntegrationTest
 	[Fact]
 	public async Task UnusedProduct_DeletesDependentsAndQueuesImagesWithoutDeletingFiles()
 	{
-		var characteristic = await new CharacteristicBuilder(Faker).BuildAndAddToDb(Context, CancellationToken);
+		var characteristic =
+			await new CharacteristicBuilder(Faker).BuildAndAddToDb(Context, CancellationToken);
 		var image = ProductImage.Create(Product.Id, ".jpg");
 		var secondImage = ProductImage.Create(Product.Id, ".png");
 		var otherImage = ProductImage.Create(Other.Id, ".jpg");
 		Product.AddEan("1234567890123");
-		await Context.AddRangeAsync([image, secondImage, otherImage,
-			ProductCharacteristic.Create(Product.Id, characteristic.Id, "value"),
-			new ProductSizeBuilder(Faker).WithProductId(Product.Id).Build(),
-			new ProductWeightBuilder(Faker).WithProductId(Product.Id).Build(),
-			ProductContent.Create(Product.Id, Other.Id, 2), Main.Entities.Cart.Cart.Create(UserId, Product.Id, 1)], CancellationToken);
+		await Context.AddRangeAsync(
+			[
+				image, secondImage, otherImage,
+				ProductCharacteristic.Create(
+					Product.Id,
+					characteristic.Id,
+					"value"),
+				new ProductSizeBuilder(Faker).WithProductId(Product.Id).Build(),
+				new ProductWeightBuilder(Faker).WithProductId(Product.Id).Build(),
+				ProductContent.Create(
+					Product.Id,
+					Other.Id,
+					2),
+				Main.Entities.Cart.Cart.Create(
+					UserId,
+					Product.Id,
+					1)
+			],
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
-		S3.SetFile("images", image.StorageKey, "image");
-		S3.SetFile("images", secondImage.StorageKey, "second image");
+		S3.SetFile(
+			"images",
+			image.StorageKey,
+			"image");
+		S3.SetFile(
+			"images",
+			secondImage.StorageKey,
+			"second image");
 
 		var id = Product.Id;
 		using var deletionScope = Sp.CreateScope();
-		await deletionScope.ServiceProvider.GetRequiredService<IMediator>()
+		await deletionScope.ServiceProvider
+			.GetRequiredService<IMediator>()
 			.Send(new DeleteProductCommand(id, Product.RowVersion), CancellationToken);
 
-		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == id, CancellationToken)).Should().BeFalse();
-		(await Context.Set<ProductEan>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.Set<ProductCharacteristic>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.Set<ProductSize>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.Set<ProductWeight>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.Set<ProductContent>().AsNoTracking().AnyAsync(item => item.ParentProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.Set<global::Main.Entities.Cart.Cart>().AsNoTracking().AnyAsync(item => item.ProductId == id, CancellationToken)).Should().BeFalse();
-		(await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken)).Should().ContainSingle().Which.StorageKey.Should().Be(otherImage.StorageKey);
-		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Other.Id, CancellationToken)).Should().BeTrue();
-		(await Context.Set<Characteristic>().AsNoTracking().AnyAsync(item => item.Id == characteristic.Id, CancellationToken)).Should().BeTrue();
-		var job = (await Context.Set<Job>().AsNoTracking()
-			.Where(item => item.SystemName == DeleteProductImagesLrt.Name).ToListAsync(CancellationToken))
-			.Should().ContainSingle("deletion must persist a cleanup job with the image keys").Which;
+		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == id, CancellationToken))
+			.Should()
+			.BeFalse();
+		(await Context.Set<ProductEan>()
+				.AsNoTracking()
+				.AnyAsync(item => item.ProductId == id, CancellationToken)).Should()
+			.BeFalse();
+		(await Context.Set<ProductCharacteristic>()
+				.AsNoTracking()
+				.AnyAsync(item => item.ProductId == id, CancellationToken)).Should()
+			.BeFalse();
+		(await Context.Set<ProductSize>()
+				.AsNoTracking()
+				.AnyAsync(item => item.ProductId == id, CancellationToken)).Should()
+			.BeFalse();
+		(await Context.Set<ProductWeight>()
+				.AsNoTracking()
+				.AnyAsync(item => item.ProductId == id, CancellationToken)).Should()
+			.BeFalse();
+		(await Context.Set<ProductContent>()
+				.AsNoTracking()
+				.AnyAsync(item => item.ParentProductId == id, CancellationToken)).Should()
+			.BeFalse();
+		(await Context.Set<Main.Entities.Cart.Cart>()
+				.AsNoTracking()
+				.AnyAsync(item => item.ProductId == id, CancellationToken)).Should()
+			.BeFalse();
+		(await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken)).Should()
+			.ContainSingle()
+			.Which
+			.StorageKey
+			.Should()
+			.Be(otherImage.StorageKey);
+		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Other.Id, CancellationToken))
+			.Should()
+			.BeTrue();
+		(await Context.Set<Characteristic>()
+				.AsNoTracking()
+				.AnyAsync(item => item.Id == characteristic.Id, CancellationToken)).Should()
+			.BeTrue();
+		var job = (await Context.Set<Job>()
+				.AsNoTracking()
+				.Where(item => item.SystemName == DeleteProductImagesLrt.Name)
+				.ToListAsync(CancellationToken))
+			.Should()
+			.ContainSingle("deletion must persist a cleanup job with the image keys")
+			.Which;
 		var input = JsonSerializer.Deserialize<DeleteProductImagesInputState>(job.State)!;
 		input.ProductId.Should().Be(id);
 		input.BucketName.Should().Be("images");
-		input.StorageKeys.Should().BeEquivalentTo([image.StorageKey, secondImage.StorageKey]);
-		(await S3.DownloadFileAsync("images", image.StorageKey, CancellationToken)).IsSuccess.Should().BeTrue();
-		(await S3.DownloadFileAsync("images", secondImage.StorageKey, CancellationToken)).IsSuccess.Should().BeTrue();
+		input.StorageKeys
+			.Should()
+			.BeEquivalentTo(
+				image.StorageKey,
+				secondImage.StorageKey);
+		(await S3.DownloadFileAsync(
+				"images",
+				image.StorageKey,
+				CancellationToken)).IsSuccess
+			.Should()
+			.BeTrue();
+		(await S3.DownloadFileAsync(
+				"images",
+				secondImage.StorageKey,
+				CancellationToken)).IsSuccess
+			.Should()
+			.BeTrue();
 	}
 
 	[Fact]
@@ -113,7 +183,10 @@ public class DeleteProductTests : IntegrationTest
 		(await provider.GetProductAsync(Other.Id, CancellationToken)).Should().NotBeNull();
 		(await provider.GetProductCrossesAsync(Other.Id, CancellationToken)).Should().BeEmpty();
 		(await Context.Set<ProductCross>().AsNoTracking().ToListAsync(CancellationToken)).Should().BeEmpty();
-		(await Context.Set<Job>().AsNoTracking().AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should().BeFalse();
+		(await Context.Set<Job>()
+				.AsNoTracking()
+				.AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should()
+			.BeFalse();
 	}
 
 	[Fact]
@@ -124,8 +197,12 @@ public class DeleteProductTests : IntegrationTest
 
 		await Delete();
 
-		publisher.PublishedMessages.Skip(publishedBefore).OfType<ProductsUpdatedEvent>().SelectMany(item => item.Products)
-			.Should().ContainSingle(item => item.Id == Product.Id && item.IsDeleted);
+		publisher.PublishedMessages
+			.Skip(publishedBefore)
+			.OfType<ProductsUpdatedEvent>()
+			.SelectMany(item => item.Products)
+			.Should()
+			.ContainSingle(item => item.Id == Product.Id && item.IsDeleted);
 	}
 
 	[Fact]
@@ -133,20 +210,34 @@ public class DeleteProductTests : IntegrationTest
 	{
 		Other.SetPair(Product.Id);
 		var candidate = await new CatalogueCandidateBuilder(Faker).WithProductId(Product.Id)
-			.WithProducerId(Product.ProducerId).BuildAndAddToDb(Context, CancellationToken);
+			.WithProducerId(Product.ProducerId)
+			.BuildAndAddToDb(Context, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
 		var publisher = (MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 		var publishedBefore = publisher.PublishedMessages.Count;
 
 		using var deletionScope = Sp.CreateScope();
-		await deletionScope.ServiceProvider.GetRequiredService<IMediator>()
+		await deletionScope.ServiceProvider
+			.GetRequiredService<IMediator>()
 			.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), CancellationToken);
 
-		(await Context.Set<Product>().AsNoTracking().SingleAsync(item => item.Id == Other.Id, CancellationToken)).PairId.Should().BeNull();
-		(await Context.Set<CatalogueCandidate>().AsNoTracking().SingleAsync(item => item.Id == candidate.Id, CancellationToken)).ProductId.Should().BeNull();
-		publisher.PublishedMessages.Skip(publishedBefore).OfType<CatalogueCandidateUpdatedEvent>()
-			.Should().ContainSingle(item => item.Candidate.Id == candidate.Id && item.Candidate.MappedProductId == null);
+		(await Context.Set<Product>()
+				.AsNoTracking()
+				.SingleAsync(item => item.Id == Other.Id, CancellationToken)).PairId
+			.Should()
+			.BeNull();
+		(await Context.Set<CatalogueCandidate>()
+				.AsNoTracking()
+				.SingleAsync(item => item.Id == candidate.Id, CancellationToken)).ProductId
+			.Should()
+			.BeNull();
+		publisher.PublishedMessages
+			.Skip(publishedBefore)
+			.OfType<CatalogueCandidateUpdatedEvent>()
+			.Should()
+			.ContainSingle(item
+				=> item.Candidate.Id == candidate.Id && item.Candidate.MappedProductId == null);
 	}
 
 	[Fact]
@@ -157,14 +248,24 @@ public class DeleteProductTests : IntegrationTest
 		Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
 
 		var transaction = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
-		await transaction.WithSettings(TransactionalAttribute.Serializable(30, 0)).ExecuteAsync(
-			async (_, ct) => await Mediator.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), ct),
-			CancellationToken);
+		await transaction.WithSettings(TransactionalAttribute.Serializable(30, 0))
+			.ExecuteAsync(
+				async (_, ct) => await Mediator.Send(
+					new DeleteProductCommand(Product.Id, Product.RowVersion),
+					ct),
+				CancellationToken);
 
-		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken))
-			.Should().BeFalse();
-		(await Context.Set<Product>().AsNoTracking().SingleAsync(item => item.Id == Other.Id, CancellationToken))
-			.PairId.Should().BeNull();
+		(await Context.Set<Product>()
+				.AsNoTracking()
+				.AnyAsync(item => item.Id == Product.Id, CancellationToken))
+			.Should()
+			.BeFalse();
+		(await Context.Set<Product>()
+				.AsNoTracking()
+				.SingleAsync(item => item.Id == Other.Id, CancellationToken))
+			.PairId
+			.Should()
+			.BeNull();
 	}
 
 	[Fact]
@@ -182,8 +283,12 @@ public class DeleteProductTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 		var action = () => Mediator.Send(new DeleteProductCommand(Product.Id, version), CancellationToken);
 		await action.Should().ThrowAsync<InvalidRowVersionException>();
-		(await Context.Set<Product>().AsNoTracking().SingleAsync(item => item.Id == Product.Id, CancellationToken))
-			.Description.Should().Be("updated since opening the deletion dialog");
+		(await Context.Set<Product>()
+				.AsNoTracking()
+				.SingleAsync(item => item.Id == Product.Id, CancellationToken))
+			.Description
+			.Should()
+			.Be("updated since opening the deletion dialog");
 	}
 
 	[Theory]
@@ -207,11 +312,23 @@ public class DeleteProductTests : IntegrationTest
 
 		var action = () => Delete();
 
-		(await action.Should().ThrowAsync<ProductDeletionNotAllowedException>()).Which.Blocker.Should().Be(blocker);
-		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeTrue();
-		(await Context.Set<ProductImage>().AsNoTracking().AnyAsync(item => item.ProductId == Product.Id, CancellationToken)).Should().BeTrue();
+		(await action.Should().ThrowAsync<ProductDeletionNotAllowedException>()).Which
+			.Blocker
+			.Should()
+			.Be(blocker);
+		(await Context.Set<Product>()
+				.AsNoTracking()
+				.AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should()
+			.BeTrue();
+		(await Context.Set<ProductImage>()
+				.AsNoTracking()
+				.AnyAsync(item => item.ProductId == Product.Id, CancellationToken)).Should()
+			.BeTrue();
 		(await provider.GetProductAsync(Product.Id, CancellationToken)).Should().NotBeNull();
-		(await Context.Set<Job>().AsNoTracking().AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should().BeFalse();
+		(await Context.Set<Job>()
+				.AsNoTracking()
+				.AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should()
+			.BeFalse();
 		publisher.PublishedMessages.Skip(publishedBefore).Should().BeEmpty();
 	}
 
@@ -222,26 +339,46 @@ public class DeleteProductTests : IntegrationTest
 		await Context.AddAsync(image, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
-		S3.SetFile("images", image.StorageKey, "image");
+		S3.SetFile(
+			"images",
+			image.StorageKey,
+			"image");
 		var publisher = (MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 		var publishedBefore = publisher.PublishedMessages.Count;
 		var transaction = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
-		var action = () => transaction.WithSettings(TransactionalAttribute.Serializable(30, 1)).ExecuteAsync(async (_, ct) =>
-		{
-			await Mediator.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), ct);
-			throw new InvalidOperationException("Rollback test");
-		}, CancellationToken);
+		var action = () => transaction.WithSettings(TransactionalAttribute.Serializable(30, 1))
+			.ExecuteAsync(
+				async (_, ct) =>
+				{
+					await Mediator.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), ct);
+					throw new InvalidOperationException("Rollback test");
+				},
+				CancellationToken);
 
 		await action.Should().ThrowAsync<InvalidOperationException>();
 
 		using var verification = Sp.CreateScope();
 		var db = verification.ServiceProvider.GetRequiredService<UnifiedDbContext>();
-		(await db.Set<Product>().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeTrue();
-		(await db.Set<ProductImage>().AnyAsync(item => item.ProductId == Product.Id, CancellationToken)).Should().BeTrue();
-		(await db.Set<Job>().AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should().BeFalse();
-		publisher.PublishedMessages.Skip(publishedBefore).OfType<ProductsUpdatedEvent>().SelectMany(item => item.Products)
-			.Should().NotContain(item => item.Id == Product.Id && item.IsDeleted);
-		(await S3.DownloadFileAsync("images", image.StorageKey, CancellationToken)).IsSuccess.Should().BeTrue();
+		(await db.Set<Product>().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should()
+			.BeTrue();
+		(await db.Set<ProductImage>().AnyAsync(item => item.ProductId == Product.Id, CancellationToken))
+			.Should()
+			.BeTrue();
+		(await db.Set<Job>()
+				.AnyAsync(item => item.SystemName == DeleteProductImagesLrt.Name, CancellationToken)).Should()
+			.BeFalse();
+		publisher.PublishedMessages
+			.Skip(publishedBefore)
+			.OfType<ProductsUpdatedEvent>()
+			.SelectMany(item => item.Products)
+			.Should()
+			.NotContain(item => item.Id == Product.Id && item.IsDeleted);
+		(await S3.DownloadFileAsync(
+				"images",
+				image.StorageKey,
+				CancellationToken)).IsSuccess
+			.Should()
+			.BeTrue();
 	}
 
 	[Fact]
@@ -249,24 +386,42 @@ public class DeleteProductTests : IntegrationTest
 	{
 		using var insertionScope = Sp.CreateScope();
 		var insertionDb = insertionScope.ServiceProvider.GetRequiredService<UnifiedDbContext>();
-		var content = ProductContent.Create(Other.Id, Product.Id, 1);
-		insertionDb.Set<global::Main.Entities.Product.ProductContent>().Add(content);
+		var content = ProductContent.Create(
+			Other.Id,
+			Product.Id,
+			1);
+		insertionDb.Set<ProductContent>().Add(content);
 		Task<int>? insertion = null;
 		var transaction = Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 
-		await transaction.WithSettings(TransactionalAttribute.Serializable(30, 1)).ExecuteAsync(async (_, ct) =>
-		{
-			await Mediator.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), ct);
-			// A second connection tries to insert a reference while deletion is still uncommitted.
-			insertion = insertionDb.SaveChangesAsync(ct);
-			insertion.IsCompleted.Should().BeFalse();
-		}, CancellationToken);
+		await transaction.WithSettings(TransactionalAttribute.Serializable(30, 1))
+			.ExecuteAsync(
+				async (_, ct) =>
+				{
+					await Mediator.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), ct);
+					// A second connection tries to insert a reference while deletion is still uncommitted.
+					insertion = insertionDb.SaveChangesAsync(ct);
+					insertion.IsCompleted.Should().BeFalse();
+				},
+				CancellationToken);
 
 		var action = async () => await insertion!;
-		(await action.Should().ThrowAsync<DbUpdateException>()).Which.InnerException
-			.Should().BeOfType<Npgsql.PostgresException>().Which.SqlState.Should().Be(Npgsql.PostgresErrorCodes.ForeignKeyViolation);
-		(await Context.Set<Product>().AsNoTracking().AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should().BeFalse();
-		(await Context.Set<ProductContent>().AsNoTracking().AnyAsync(item => item.ChildProductId == Product.Id, CancellationToken)).Should().BeFalse();
+		(await action.Should().ThrowAsync<DbUpdateException>()).Which
+			.InnerException
+			.Should()
+			.BeOfType<PostgresException>()
+			.Which
+			.SqlState
+			.Should()
+			.Be(PostgresErrorCodes.ForeignKeyViolation);
+		(await Context.Set<Product>()
+				.AsNoTracking()
+				.AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should()
+			.BeFalse();
+		(await Context.Set<ProductContent>()
+				.AsNoTracking()
+				.AnyAsync(item => item.ChildProductId == Product.Id, CancellationToken)).Should()
+			.BeFalse();
 	}
 
 	private async Task AddBlocker(ProductDeletionBlocker blocker)
@@ -274,48 +429,90 @@ public class DeleteProductTests : IntegrationTest
 		switch (blocker)
 		{
 			case ProductDeletionBlocker.Stock:
-				await Context.AddAsync(Main.Entities.Storage.ProductStock.Create(StorageCode, Product.Id, 1), CancellationToken);
+				await Context.AddAsync(
+					ProductStock.Create(
+						StorageCode,
+						Product.Id,
+						1),
+					CancellationToken);
 				break;
 			case ProductDeletionBlocker.StorageContent:
-				await new StorageContentBuilder(Faker).WithStorageCode(StorageCode).WithCurrencyId(CurrencyId)
-					.WithProductIds(Product.Id).WithCount(0).BuildAndAddToDb(Context, CancellationToken);
+				await new StorageContentBuilder(Faker).WithStorageCode(StorageCode)
+					.WithCurrencyId(CurrencyId)
+					.WithProductIds(Product.Id)
+					.WithCount(0)
+					.BuildAndAddToDb(Context, CancellationToken);
 				break;
 			case ProductDeletionBlocker.Composition:
-				await Context.AddAsync(ProductContent.Create(Other.Id, Product.Id, 1), CancellationToken);
+				await Context.AddAsync(
+					ProductContent.Create(
+						Other.Id,
+						Product.Id,
+						1),
+					CancellationToken);
 				break;
 			case ProductDeletionBlocker.Order:
-				var order = Order.CreateManual(UserId, UserId, CurrencyId);
+				var order = Order.CreateManual(
+					UserId,
+					UserId,
+					CurrencyId);
 				order.AddItem(Product.Id, 1);
 				await Context.AddAsync(order, CancellationToken);
 				break;
 			case ProductDeletionBlocker.Sale:
 			case ProductDeletionBlocker.Purchase:
 				// The storage record belongs to a different product: only the document blocks the target.
-				var storage = await new StorageContentBuilder(Faker).WithStorageCode(StorageCode).WithCurrencyId(CurrencyId)
-					.WithProductIds(Other.Id).WithCount(0).BuildAndAddToDb(Context, CancellationToken);
-				var receiver = await new OrganizationBuilder(Faker).WithOwnerId(UserId).BuildAndAddToDb(Context, CancellationToken);
-				var transaction = await new TransactionBuilder(Faker).WithSenderId(UserId).WithReceiverId(receiver.Id)
-					.WithCurrencyId(CurrencyId).WithAmount(10m).BuildAndAddToDb(Context, CancellationToken);
+				var storage = await new StorageContentBuilder(Faker).WithStorageCode(StorageCode)
+					.WithCurrencyId(CurrencyId)
+					.WithProductIds(Other.Id)
+					.WithCount(0)
+					.BuildAndAddToDb(Context, CancellationToken);
+				var receiver = await new OrganizationBuilder(Faker).WithOwnerId(UserId)
+					.BuildAndAddToDb(Context, CancellationToken);
+				var transaction = await new TransactionBuilder(Faker).WithSenderId(UserId)
+					.WithReceiverId(receiver.Id)
+					.WithCurrencyId(CurrencyId)
+					.WithAmount(10m)
+					.BuildAndAddToDb(Context, CancellationToken);
 				if (blocker == ProductDeletionBlocker.Sale)
 				{
-					var content = new SaleContentBuilder(Faker).WithProductId(Product.Id).WithCurrencyId(CurrencyId)
-						.WithStorageContentIds([storage.Id]).WithCount(1).WithDetailsCount(1).Build();
-					var sale = new SaleBuilder(Faker).WithUserId(UserId).WithOrganizationId(UserId).WithCurrencyId(CurrencyId)
-						.WithStorageCode(StorageCode).WithTransactionId(transaction.Id).WithContents([content]).Completed().Build();
+					var content = new SaleContentBuilder(Faker).WithProductId(Product.Id)
+						.WithCurrencyId(CurrencyId)
+						.WithStorageContentIds([storage.Id])
+						.WithCount(1)
+						.WithDetailsCount(1)
+						.Build();
+					var sale = new SaleBuilder(Faker).WithUserId(UserId)
+						.WithOrganizationId(UserId)
+						.WithCurrencyId(CurrencyId)
+						.WithStorageCode(StorageCode)
+						.WithTransactionId(transaction.Id)
+						.WithContents([content])
+						.Completed()
+						.Build();
 					sale.Delete();
 					await Context.AddAsync(sale, CancellationToken);
 				}
 				else
-					await new PurchaseBuilder(Faker).WithSupplierUserId(UserId).WithSupplierOrganizationId(UserId)
-						.WithCurrencyId(CurrencyId).WithStorage(StorageCode).WithTransactionId(transaction.Id)
-						.WithContent(new PurchaseContentBuilder(Faker).WithProductId(Product.Id).WithStorageContentId(storage.Id).Build())
+					await new PurchaseBuilder(Faker).WithSupplierUserId(UserId)
+						.WithSupplierOrganizationId(UserId)
+						.WithCurrencyId(CurrencyId)
+						.WithStorage(StorageCode)
+						.WithTransactionId(transaction.Id)
+						.WithContent(
+							new PurchaseContentBuilder(Faker).WithProductId(Product.Id)
+								.WithStorageContentId(storage.Id)
+								.Build())
 						.BuildAndAddToDb(Context, CancellationToken);
+
 				break;
 			default:
 				throw new ArgumentOutOfRangeException(nameof(blocker));
 		}
+
 		await Context.SaveChangesAsync(CancellationToken);
 	}
 
-	private Task<Unit> Delete() => Mediator.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), CancellationToken);
+	private Task<Unit> Delete()
+		=> Mediator.Send(new DeleteProductCommand(Product.Id, Product.RowVersion), CancellationToken);
 }

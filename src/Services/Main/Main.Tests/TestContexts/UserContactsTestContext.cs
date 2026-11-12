@@ -1,7 +1,6 @@
-using Persistence.Context;
 using Main.Entities.User;
 using Main.Enums;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
@@ -22,10 +21,19 @@ public class UserContactsTestContext(UnifiedDbContext context) : TestContextBase
 	{
 		FirstUser = await new UserBuilder(Faker)
 			.WithUserName("first-contact-user")
-			.WithEmail("personal@example.com", EmailType.Personal, isConfirmed: false)
-			.WithEmail("work@example.com", EmailType.Work, isPrimary: true)
+			.WithEmail(
+				"personal@example.com",
+				EmailType.Personal,
+				isConfirmed: false)
+			.WithEmail(
+				"work@example.com",
+				EmailType.Work,
+				true)
 			.WithPhone("+1 (555) 123-4567", isConfirmed: false)
-			.WithPhone("+1 (555) 765-4321", PhoneType.Work, isPrimary: true)
+			.WithPhone(
+				"+1 (555) 765-4321",
+				PhoneType.Work,
+				true)
 			.BuildAndAddToDb(DbContext);
 
 		SecondUser = await new UserBuilder(Faker)
@@ -36,8 +44,14 @@ public class UserContactsTestContext(UnifiedDbContext context) : TestContextBase
 
 		OtherUser = await new UserBuilder(Faker)
 			.WithUserName("other-contact-user")
-			.WithEmail("excluded@example.com", EmailType.Work, isPrimary: true)
-			.WithPhone("+1 (999) 999-9999", PhoneType.Work, isPrimary: true)
+			.WithEmail(
+				"excluded@example.com",
+				EmailType.Work,
+				true)
+			.WithPhone(
+				"+1 (999) 999-9999",
+				PhoneType.Work,
+				true)
 			.BuildAndAddToDb(DbContext);
 
 		UserWithoutContacts = await new UserBuilder(Faker)

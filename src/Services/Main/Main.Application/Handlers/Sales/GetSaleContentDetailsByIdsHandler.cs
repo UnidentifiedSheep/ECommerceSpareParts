@@ -12,15 +12,13 @@ public sealed record GetSaleContentDetailsByIdsQuery : IQuery<GetSaleContentDeta
 {
 	public GetSaleContentDetailsByIdsQuery(int id) : this([id]) { }
 
-	public GetSaleContentDetailsByIdsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetSaleContentDetailsByIdsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<int> Ids { get; }
 }
 
-public sealed record GetSaleContentDetailsByIdsResult(IReadOnlyDictionary<int, IReadOnlyList<SaleContentDetailDto>> Details);
+public sealed record GetSaleContentDetailsByIdsResult(
+	IReadOnlyDictionary<int, IReadOnlyList<SaleContentDetailDto>> Details);
 
 public sealed class GetSaleContentDetailsByIdsHandler(
 	IReadRepository<SaleContentDetail, int> repository,
@@ -32,7 +30,8 @@ public sealed class GetSaleContentDetailsByIdsHandler(
 		CancellationToken cancellationToken)
 	{
 		if (request.Ids.Count == 0)
-			return new GetSaleContentDetailsByIdsResult(new Dictionary<int, IReadOnlyList<SaleContentDetailDto>>());
+			return new GetSaleContentDetailsByIdsResult(
+				new Dictionary<int, IReadOnlyList<SaleContentDetailDto>>());
 
 		var rows = await repository.Query
 			.AsExpandable()

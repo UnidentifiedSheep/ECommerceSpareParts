@@ -1,7 +1,7 @@
-using Main.Entities.Product;
 using FluentAssertions;
 using Main.Application.Products.Commands.CreateProductEan;
 using Main.Entities.Exceptions;
+using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -11,9 +11,7 @@ namespace Tests.HandlersTests.ProductEans;
 public class CreateProductEanTests : IntegrationTest
 {
 	public CreateProductEanTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductEanTestContext>();
-	}
+		=> RegisterBasicContext<ProductEanTestContext>();
 
 	private ProductEanTestContext TestContext => GetContext<ProductEanTestContext>();
 
@@ -25,7 +23,8 @@ public class CreateProductEanTests : IntegrationTest
 
 		await Mediator.Send(new CreateProductEanCommand(productId, ean), CancellationToken);
 
-		var saved = await Context.Set<ProductEan>().AsNoTracking()
+		var saved = await Context.Set<ProductEan>()
+			.AsNoTracking()
 			.SingleAsync(x => x.ProductId == productId && x.Ean == ean.Trim(), CancellationToken);
 		saved.Ean.Should().Be(ean.Trim());
 	}
@@ -38,7 +37,9 @@ public class CreateProductEanTests : IntegrationTest
 
 		await Mediator.Send(new CreateProductEanCommand(otherProduct.Id, existing.Ean), CancellationToken);
 
-		(await Context.Set<ProductEan>().CountAsync(ean => ean.Ean == existing.Ean, CancellationToken)).Should().Be(2);
+		(await Context.Set<ProductEan>().CountAsync(ean => ean.Ean == existing.Ean, CancellationToken))
+			.Should()
+			.Be(2);
 	}
 
 	[Fact]
@@ -51,6 +52,9 @@ public class CreateProductEanTests : IntegrationTest
 			CancellationToken);
 
 		var exception = await action.Should().ThrowAsync<DbValidationException>();
-		exception.Which.Failures.Should().ContainSingle(failure => failure.Error is ProductEanAlreadyExistsException);
+		exception.Which
+			.Failures
+			.Should()
+			.ContainSingle(failure => failure.Error is ProductEanAlreadyExistsException);
 	}
 }

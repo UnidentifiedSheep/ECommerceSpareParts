@@ -25,7 +25,8 @@ public static class CacheKeys
 			public static string Key(
 				Supplier supplier,
 				int productId,
-				string storageCode) => $"offer:refresh:ok:{supplier.ToString()}:{productId}:{storageCode}";
+				string storageCode)
+				=> $"offer:refresh:ok:{supplier.ToString()}:{productId}:{storageCode}";
 		}
 
 		public static class Failed
@@ -35,8 +36,8 @@ public static class CacheKeys
 			public static string Key(
 				Supplier supplier,
 				int productId,
-				string storageCode) =>
-				$"offer:refresh:failed:{supplier.ToString()}:{productId}:{storageCode}";
+				string storageCode)
+				=> $"offer:refresh:failed:{supplier.ToString()}:{productId}:{storageCode}";
 		}
 
 		public static class Lock
@@ -46,7 +47,8 @@ public static class CacheKeys
 			public static string Key(
 				Supplier supplier,
 				int productId,
-				string storageCode) => $"offer:refresh:lock:{supplier.ToString()}:{productId}:{storageCode}";
+				string storageCode)
+				=> $"offer:refresh:lock:{supplier.ToString()}:{productId}:{storageCode}";
 		}
 	}
 

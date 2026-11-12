@@ -9,8 +9,11 @@ public class ProducerLookup(
 	IReadOnlyDictionary<string, int> producerNamesToIds,
 	IReadOnlyDictionary<string, int> aliasesToIds) : IProducerLookup
 {
-	private readonly FrozenDictionary<string, int> _producerNamesToIds = producerNamesToIds.ToFrozenDictionary(StringComparer.Ordinal);
-	private readonly FrozenDictionary<string, int> _aliasesToIds = aliasesToIds.ToFrozenDictionary(StringComparer.Ordinal);
+	private readonly FrozenDictionary<string, int> _aliasesToIds =
+		aliasesToIds.ToFrozenDictionary(StringComparer.Ordinal);
+
+	private readonly FrozenDictionary<string, int> _producerNamesToIds =
+		producerNamesToIds.ToFrozenDictionary(StringComparer.Ordinal);
 
 	public static ProducerLookup Empty { get; } = new(
 		new Dictionary<string, int>(),
@@ -26,6 +29,8 @@ public class ProducerLookup(
 		if (_producerNamesToIds.TryGetValue(normalizedProducer, out var producerId))
 			return producerId;
 
-		return _aliasesToIds.TryGetValue(normalizedProducer, out var aliasProducerId) ? aliasProducerId : null;
+		return _aliasesToIds.TryGetValue(normalizedProducer, out var aliasProducerId)
+			? aliasProducerId
+			: null;
 	}
 }

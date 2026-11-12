@@ -2,14 +2,14 @@ namespace Notification.Core;
 
 public sealed record SendResult
 {
-	public bool Succeeded { get; }
-	public string? Error { get; }
 
 	private SendResult(bool succeeded, string? error)
 	{
 		Succeeded = succeeded;
 		Error = error;
 	}
+	public bool Succeeded { get; }
+	public string? Error { get; }
 
 	public static SendResult Success() => new(true, null);
 

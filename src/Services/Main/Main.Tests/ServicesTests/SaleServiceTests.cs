@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Main.Application.Dtos.Sale;
+using Main.Application.Interfaces.Services;
 using Main.Application.Models.Storage;
 using Main.Application.Services;
-using Main.Application.Interfaces.Services;
 using MediatR;
 using Moq;
 
@@ -332,8 +332,7 @@ public class SaleServiceTests
 		int count,
 		decimal buyPrice = 100m,
 		DateTime? purchaseDate = null)
-	{
-		return new StorageLot(
+		=> new(
 			id,
 			productId,
 			1,
@@ -343,20 +342,17 @@ public class SaleServiceTests
 				2026,
 				1,
 				1));
-	}
 
 	private static NewSaleContentDto NewSaleContent(
 		int productId,
 		int count,
 		decimal price = 200m,
 		decimal priceWithDiscount = 180m)
-	{
-		return new NewSaleContentDto
+		=> new()
 		{
 			ProductId = productId,
 			Count = count,
 			OriginalPrice = price,
 			DiscountedPrice = priceWithDiscount
 		};
-	}
 }

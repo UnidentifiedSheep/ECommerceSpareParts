@@ -18,7 +18,6 @@ public interface IEmailSender
 		CancellationToken token = default);
 }
 
-
 public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 {
 	public async Task<SendResult> SendAsync(EmailMessage message, CancellationToken token = default)
@@ -51,7 +50,11 @@ public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 				token.ThrowIfCancellationRequested();
 				try
 				{
-					await SendWithRetryAsync(client, BuildMessage(message, opt), opt, token);
+					await SendWithRetryAsync(
+						client,
+						BuildMessage(message, opt),
+						opt,
+						token);
 					results.Add(SendResult.Success());
 				}
 				catch (OperationCanceledException) when (token.IsCancellationRequested)
@@ -60,8 +63,9 @@ public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 				}
 				catch (Exception ex)
 				{
-					results.Add(SendResult.Failure(
-						string.IsNullOrWhiteSpace(ex.Message) ? ex.GetType().Name : ex.Message));
+					results.Add(
+						SendResult.Failure(
+							string.IsNullOrWhiteSpace(ex.Message) ? ex.GetType().Name : ex.Message));
 				}
 			}
 
@@ -107,8 +111,7 @@ public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 	}
 
 	private static ResiliencePipeline BuildRetryPipeline(EmailChannelOptions opt)
-	{
-		return new ResiliencePipelineBuilder()
+		=> new ResiliencePipelineBuilder()
 			.AddRetry(
 				new RetryStrategyOptions
 				{
@@ -118,7 +121,6 @@ public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 					ShouldHandle = new PredicateBuilder().Handle<Exception>(IsTransient)
 				})
 			.Build();
-	}
 
 	private static async Task EnsureConnectedAsync(
 		SmtpClient client,
@@ -144,8 +146,7 @@ public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 	}
 
 	private static bool IsTransient(Exception ex)
-	{
-		return ex switch
+		=> ex switch
 		{
 			SmtpCommandException smtpEx => IsTransientStatusCode(smtpEx.StatusCode),
 			SmtpProtocolException => true,
@@ -154,7 +155,6 @@ public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 			TimeoutException => true,
 			_ => false
 		};
-	}
 
 	private static bool IsTransientStatusCode(SmtpStatusCode statusCode)
 	{
@@ -194,5 +194,7 @@ public class EmailSender(IOptions<EmailChannelOptions> options) : IEmailSender
 		return toSend;
 	}
 
-	private sealed record SendMessageState(SmtpClient Client, MimeMessage Message, EmailChannelOptions Options);
+	private sealed record SendMessageState(SmtpClient Client,
+		MimeMessage Message,
+		EmailChannelOptions Options);
 }

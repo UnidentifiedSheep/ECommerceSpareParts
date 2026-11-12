@@ -130,31 +130,26 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
 	}
 
 	private Task<PriceOffer> CreateOffer()
-	{
-		return new PriceOfferDataBuilder(Faker)
+		=> new PriceOfferDataBuilder(Faker)
 			.WithProductId(ProductId)
 			.WithStorageCode(StorageCode)
 			.BuildAndAddToDb(Context);
-	}
 
 	private static ProductPriceCalculationResult Result(
 		string markupVersion,
 		string appliersVersion,
 		Guid settingsVersion,
 		IReadOnlyCollection<CalculatedScoredPriceCandidate> candidates)
-	{
-		return new ProductPriceCalculationResult
+		=> new()
 		{
 			MarkupVersion = markupVersion,
 			AppliersVersion = appliersVersion,
 			PricingSettingsVersion = settingsVersion,
 			Candidates = candidates
 		};
-	}
 
 	private static CalculatedScoredPriceCandidate ScoredCandidate(PriceOffer offer)
-	{
-		return new CalculatedScoredPriceCandidate
+		=> new()
 		{
 			PriceOfferId = offer.Id,
 			ProductId = offer.ProductId,
@@ -170,5 +165,4 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
 			DeliveryProbability = offer.DeliveryProbability,
 			Score = 10m
 		};
-	}
 }

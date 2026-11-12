@@ -199,35 +199,38 @@ public class MarkupContainerTests
 		return container;
 	}
 
-	private static IReadOnlyCollection<MarkupRange> DefaultRanges() =>
-	[
-		Range(
-			0m,
-			100m,
-			0.2m),
-		Range(
-			100m,
-			200m,
-			0.1m)
-	];
+	private static IReadOnlyCollection<MarkupRange> DefaultRanges()
+		=>
+		[
+			Range(
+				0m,
+				100m,
+				0.2m),
+			Range(
+				100m,
+				200m,
+				0.1m)
+		];
 
-	private static IReadOnlyCollection<MarkupRange> CurrencyRanges(int multiplier) =>
-	[
-		Range(
-			0m,
-			100m * multiplier,
-			0.2m),
-		Range(
-			100m * multiplier,
-			200m * multiplier,
-			0.1m)
-	];
+	private static IReadOnlyCollection<MarkupRange> CurrencyRanges(int multiplier)
+		=>
+		[
+			Range(
+				0m,
+				100m * multiplier,
+				0.2m),
+			Range(
+				100m * multiplier,
+				200m * multiplier,
+				0.1m)
+		];
 
 	private static MarkupRange Range(
 		decimal start,
 		decimal end,
-		decimal markup) => MarkupRange.Create(
-		start,
-		end,
-		markup);
+		decimal markup)
+		=> MarkupRange.Create(
+			start,
+			end,
+			markup);
 }

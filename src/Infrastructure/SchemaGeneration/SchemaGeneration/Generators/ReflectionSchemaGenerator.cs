@@ -68,7 +68,8 @@ public sealed class ReflectionSchemaGenerator : ISchemaGenerator
 			Type = type,
 			LabelKey = property.GetAttribute<SchemaFieldLabelAttribute>()?.Key,
 			DescriptionKey = property.GetAttribute<SchemaFieldDescriptionAttribute>()?.Key,
-			Required = property.IsRequired || property.GetAttribute<RequiredSchemaFieldAttribute>() is not null,
+			Required = property.IsRequired ||
+				property.GetAttribute<RequiredSchemaFieldAttribute>() is not null,
 			Control = inputControl?.InputControl,
 			Accepts = property.GetAttribute<SchemaAcceptsAttribute>()?.Accepts ?? [],
 			Dependency = dependency is null
@@ -77,7 +78,10 @@ public sealed class ReflectionSchemaGenerator : ISchemaGenerator
 				{
 					EntityName = dependency.EntityName, FieldName = dependency.FieldName
 				},
-			NestedSchema = GetNestedSchema(property.PropertyType, type, ancestors)
+			NestedSchema = GetNestedSchema(
+				property.PropertyType,
+				type,
+				ancestors)
 		};
 	}
 
@@ -94,9 +98,9 @@ public sealed class ReflectionSchemaGenerator : ISchemaGenerator
 		};
 
 		if (nestedType is null ||
-		    SchemaTypeMapper.GetValueType(nestedType) != SchemaValueType.Object ||
-		    ancestors.Contains(nestedType) ||
-		    SerializerOptions.GetTypeInfo(nestedType).Kind != JsonTypeInfoKind.Object)
+			SchemaTypeMapper.GetValueType(nestedType) != SchemaValueType.Object ||
+			ancestors.Contains(nestedType) ||
+			SerializerOptions.GetTypeInfo(nestedType).Kind != JsonTypeInfoKind.Object)
 			return null;
 
 		return BuildSchema(nestedType, ancestors);
@@ -109,7 +113,7 @@ public sealed class ReflectionSchemaGenerator : ISchemaGenerator
 		return type.GetInterfaces()
 			.Append(type)
 			.FirstOrDefault(candidate => candidate.IsGenericType &&
-			                             candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+				candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 			?.GetGenericArguments()[0];
 	}
 }

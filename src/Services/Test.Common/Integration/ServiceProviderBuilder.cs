@@ -1,4 +1,3 @@
-using Security.Core.Interfaces;
 using Abstractions.Interfaces;
 using Application.Common;
 using Application.Common.Behaviors;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Persistence.Common;
 using Persistence.Extensions;
 using Persistence.Interceptors;
+using Security.Core.Interfaces;
 using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.Interfaces.ServiceProvider;
@@ -69,8 +69,8 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 		return services.BuildServiceProvider();
 	}
 
-	private static void RegisterGlobalBasicContexts() =>
-		TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
+	private static void RegisterGlobalBasicContexts()
+		=> TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
 
 	private sealed class CommonTestServiceDefinition : IServiceDefinition
 	{

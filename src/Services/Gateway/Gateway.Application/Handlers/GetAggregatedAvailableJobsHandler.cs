@@ -70,12 +70,10 @@ public class GetAggregatedAvailableJobsHandler(ICommonClient commonClient)
 	}
 
 	private static ServiceJobsDto Fail(string serviceName)
-	{
-		return new ServiceJobsDto
+		=> new()
 		{
 			Available = false,
 			Jobs = [],
 			ServiceName = serviceName
 		};
-	}
 }

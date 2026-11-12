@@ -1,4 +1,3 @@
-using Security.Core.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
@@ -9,6 +8,7 @@ using Main.Entities;
 using Main.Entities.Settings.Supplier;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
+using Security.Core.Interfaces;
 
 namespace Main.Application.NamedObjects.SettingDefinitions.Supplier;
 
@@ -21,8 +21,8 @@ public class FavoritSupplierSettingDefinition(
 
 	public override ILocalizableMessage NameLocalizationMessage => SupplierFavoritSettingNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		SupplierFavoritSettingDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> SupplierFavoritSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(FavoritSupplierSettingInputData);
 

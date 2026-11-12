@@ -30,13 +30,15 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new CreateUserCommand(
-			input.UserName,
-			input.Password,
-			input.UserInfo.ToDto(),
-			input.Emails.Select(email => email.ToDto()).ToArray(),
-			input.Phones.Select(phone => phone.ToDto()).ToArray(),
-			input.Roles), cancellationToken);
+		var result = await sender.Send(
+			new CreateUserCommand(
+				input.UserName,
+				input.Password,
+				input.UserInfo.ToDto(),
+				input.Emails.Select(email => email.ToDto()).ToArray(),
+				input.Phones.Select(phone => phone.ToDto()).ToArray(),
+				input.Roles),
+			cancellationToken);
 
 		return new GqlUser(result.UserId);
 	}
@@ -49,7 +51,8 @@ public sealed class UserMutations
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new EditUserInfoCommand(input.UserId, input.UserInfo.ToDto()), cancellationToken);
+			new EditUserInfoCommand(input.UserId, input.UserInfo.ToDto()),
+			cancellationToken);
 
 		return new GqlUser(result.UserId);
 	}
@@ -62,7 +65,11 @@ public sealed class UserMutations
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new AddEmailToUserCommand(input.UserId, input.Email, input.Type), cancellationToken);
+			new AddEmailToUserCommand(
+				input.UserId,
+				input.Email,
+				input.Type),
+			cancellationToken);
 
 		return new GqlUser(result.UserId);
 	}
@@ -107,7 +114,9 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new AddRolesToUserCommand(input.UserId, input.Roles), cancellationToken);
+		var result = await sender.Send(
+			new AddRolesToUserCommand(input.UserId, input.Roles),
+			cancellationToken);
 		return new GqlUser(result.UserId);
 	}
 
@@ -118,7 +127,9 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new RemoveRolesFromUserCommand(input.UserId, input.Roles), cancellationToken);
+		var result = await sender.Send(
+			new RemoveRolesFromUserCommand(input.UserId, input.Roles),
+			cancellationToken);
 		return new GqlUser(result.UserId);
 	}
 
@@ -129,7 +140,9 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new AddPermissionsToUserCommand(input.UserId, input.Permissions), cancellationToken);
+		var result = await sender.Send(
+			new AddPermissionsToUserCommand(input.UserId, input.Permissions),
+			cancellationToken);
 		return new GqlUser(result.UserId);
 	}
 
@@ -140,7 +153,9 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new RemovePermissionsFromUserCommand(input.UserId, input.Permissions), cancellationToken);
+		var result = await sender.Send(
+			new RemovePermissionsFromUserCommand(input.UserId, input.Permissions),
+			cancellationToken);
 		return new GqlUser(result.UserId);
 	}
 
@@ -162,7 +177,9 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		await sender.Send(new DeleteStorageFromUserCommand(input.UserId, input.StorageCode), cancellationToken);
+		await sender.Send(
+			new DeleteStorageFromUserCommand(input.UserId, input.StorageCode),
+			cancellationToken);
 		return new GqlUser(input.UserId);
 	}
 

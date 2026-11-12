@@ -17,18 +17,19 @@ public abstract class LrtBase<TInputState, TState>(
 	ILogger logger) : ILrtNamedObject<TInputState>
 	where TInputState : class, IInputState where TState : class
 {
-	private Job? _job;
 	private IApplicationTransactionContext? _activeTransactionContext;
 
 	private TInputState? _inputState;
+	private Job? _job;
 	private TState? _state;
 
 	protected IUnitOfWork UnitOfWork => TransactionContext.UnitOfWork;
 
 	protected IApplicationTransactionFactory TransactionFactory => transactionService;
 
-	protected IApplicationTransactionContext TransactionContext => _activeTransactionContext ??
-		throw new InvalidOperationException("No LRT transaction is executing.");
+	protected IApplicationTransactionContext TransactionContext
+		=> _activeTransactionContext ??
+			throw new InvalidOperationException("No LRT transaction is executing.");
 
 	protected IRepository<Job, Guid> JobRepository => TransactionContext.Repositories.Get<Job, Guid>();
 
@@ -40,7 +41,8 @@ public abstract class LrtBase<TInputState, TState>(
 
 	protected Job Job => _job ?? throw new InvalidOperationException("Job is not initialized");
 
-	protected TInputState InputState => _inputState ?? throw new InvalidOperationException("LRT input state is not initialized");
+	protected TInputState InputState
+		=> _inputState ?? throw new InvalidOperationException("LRT input state is not initialized");
 
 	protected TState State => _state ?? throw new InvalidOperationException("LRT state is not initialized");
 
@@ -158,14 +160,20 @@ public abstract class LrtBase<TInputState, TState>(
 			await ExecuteInTransactionAsync(
 				TransactionalAttribute.ReadCommitted(30, 3),
 				async (context, ct) =>
-			{
-				_job = await context.GetRequiredService<IJobStepInputInitializer>()
-					.InitializeAsync(Job, LeaseHolderId, context, ct);
-				await context.UnitOfWork.SaveChangesAsync(ct);
-			}, CancellationToken);
+				{
+					_job = await context.GetRequiredService<IJobStepInputInitializer>()
+						.InitializeAsync(
+							Job,
+							LeaseHolderId,
+							context,
+							ct);
+					await context.UnitOfWork.SaveChangesAsync(ct);
+				},
+				CancellationToken);
 
 			Job.EnsureActiveLease(LeaseHolderId);
 		}
+
 		await ReloadStateAsync();
 	}
 
@@ -182,9 +190,10 @@ public abstract class LrtBase<TInputState, TState>(
 		_state = state ?? CreateInitialState(input);
 	}
 
-	protected virtual TState CreateInitialState(TInputState inputState) =>
-		JsonSerializer.Deserialize<TState>(JsonSerializer.Serialize(inputState)) ??
-		throw new InvalidOperationException($"LRT '{SystemName}' state could not be initialized as '{StateType.Name}'.");
+	protected virtual TState CreateInitialState(TInputState inputState)
+		=> JsonSerializer.Deserialize<TState>(JsonSerializer.Serialize(inputState)) ??
+			throw new InvalidOperationException(
+				$"LRT '{SystemName}' state could not be initialized as '{StateType.Name}'.");
 
 	protected async Task SaveStateAsync(TState state)
 	{
@@ -207,7 +216,10 @@ public abstract class LrtBase<TInputState, TState>(
 	{
 		if (_activeTransactionContext is null)
 		{
-			await ExecuteInTransactionAsync(null, (_, _) => GetJobAsync(), CancellationToken);
+			await ExecuteInTransactionAsync(
+				null,
+				(_, _) => GetJobAsync(),
+				CancellationToken);
 			return;
 		}
 
@@ -237,18 +249,24 @@ public abstract class LrtBase<TInputState, TState>(
 	protected Task ExecuteInTransactionAsync(
 		TransactionalAttribute? settings,
 		Func<IApplicationTransactionContext, CancellationToken, Task> action,
-		CancellationToken cancellationToken = default) =>
-		ExecuteInTransactionAsync(async (context, ct) =>
-		{
-			await action(context, ct);
-			return true;
-		}, settings, cancellationToken);
+		CancellationToken cancellationToken = default)
+		=> ExecuteInTransactionAsync(
+			async (context, ct) =>
+			{
+				await action(context, ct);
+				return true;
+			},
+			settings,
+			cancellationToken);
 
 	protected Task<TResult> ExecuteInTransactionAsync<TResult>(
 		TransactionalAttribute? settings,
 		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
-		CancellationToken cancellationToken = default) =>
-		ExecuteInTransactionAsync(action, settings, cancellationToken);
+		CancellationToken cancellationToken = default)
+		=> ExecuteInTransactionAsync(
+			action,
+			settings,
+			cancellationToken);
 
 	private async Task<TResult> ExecuteInTransactionAsync<TResult>(
 		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
@@ -262,19 +280,22 @@ public abstract class LrtBase<TInputState, TState>(
 		var previousState = _state;
 		try
 		{
-			return await transaction.WithSettings(settings).ExecuteAsync(async (context, ct) =>
-			{
-				_state = previousState;
-				_activeTransactionContext = context;
-				try
-				{
-					return await action(context, ct);
-				}
-				finally
-				{
-					_activeTransactionContext = null;
-				}
-			}, cancellationToken);
+			return await transaction.WithSettings(settings)
+				.ExecuteAsync(
+					async (context, ct) =>
+					{
+						_state = previousState;
+						_activeTransactionContext = context;
+						try
+						{
+							return await action(context, ct);
+						}
+						finally
+						{
+							_activeTransactionContext = null;
+						}
+					},
+					cancellationToken);
 		}
 		catch
 		{
@@ -284,8 +305,7 @@ public abstract class LrtBase<TInputState, TState>(
 	}
 
 	protected virtual async Task ProcessingJobAsync()
-	{
-		await ExecuteInTransactionAsync(
+		=> await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -296,11 +316,9 @@ public abstract class LrtBase<TInputState, TState>(
 				logger.LogInformation("LRT job processing started. JobId: {JobId}", JobId);
 			},
 			CancellationToken);
-	}
 
 	protected virtual async Task<bool> AttemptOrFailJobAsync(Exception exception, bool forceFail = false)
-	{
-		return await ExecuteInTransactionAsync(
+		=> await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -318,7 +336,6 @@ public abstract class LrtBase<TInputState, TState>(
 				return false;
 			},
 			CancellationToken);
-	}
 
 	protected virtual async Task SucceedJobAsync()
 	{
@@ -335,8 +352,7 @@ public abstract class LrtBase<TInputState, TState>(
 	}
 
 	protected virtual async Task CancelJobAsync()
-	{
-		await ExecuteInTransactionAsync(
+		=> await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -345,11 +361,9 @@ public abstract class LrtBase<TInputState, TState>(
 				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
 			},
 			CancellationToken);
-	}
 
 	protected async Task RenewLeaseAsync(TimeSpan leaseDuration)
-	{
-		await ExecuteInTransactionAsync(
+		=> await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(30, 3),
 			async (context, cancellationToken) =>
 			{
@@ -358,7 +372,6 @@ public abstract class LrtBase<TInputState, TState>(
 				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
 			},
 			CancellationToken);
-	}
 
 	protected abstract Task DoWork(TInputState inputState);
 

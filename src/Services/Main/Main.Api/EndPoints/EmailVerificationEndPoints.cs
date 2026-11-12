@@ -9,8 +9,7 @@ public record VerifyEmailRequest(string Token);
 public class EmailVerificationEndPoints : ICarterModule
 {
 	public void AddRoutes(IEndpointRouteBuilder app)
-	{
-		app
+		=> app
 			.MapPost(
 				"/users/emails/verification/verify",
 				async (
@@ -31,5 +30,4 @@ public class EmailVerificationEndPoints : ICarterModule
 			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
 			.AllowAnonymous();
-	}
 }

@@ -6,8 +6,7 @@ public class CacheableAuthClient(HttpClient client, IAuthTokenCache tokenCache) 
 		string service,
 		string serviceSecret,
 		CancellationToken cancellationToken = default)
-	{
-		return tokenCache.GetOrCreateAsync(
+		=> tokenCache.GetOrCreateAsync(
 			service,
 			serviceSecret,
 			ct => base.GetAuthToken(
@@ -15,5 +14,4 @@ public class CacheableAuthClient(HttpClient client, IAuthTokenCache tokenCache) 
 				serviceSecret,
 				ct),
 			cancellationToken);
-	}
 }

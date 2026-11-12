@@ -1,33 +1,18 @@
-using Exceptions;
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
+using Exceptions;
 using Main.Enums.Orders;
 
 namespace Main.Entities.Order;
 
 public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVersionable<uint>
 {
-	public Guid Id { get; private set; }
-	public Guid OrganizationId { get; private set; }
-	public Guid? UserId { get; private set; }
-	public int CurrencyId { get; private set; }
-	public OrderSource Source { get; private set; }
-	public OrderStatus Status { get; private set; }
-	public OrderFulfillmentStatus FulfillmentStatus { get; private set; }
-
-	public Guid? ConfirmedByUserId { get; private set; }
-	public DateTime? ConfirmedAt { get; private set; }
-
-	public uint RowVersion { get; private set; }
 
 	private readonly List<OrderItem> _items = [];
-	public IReadOnlyList<OrderItem> Items => _items;
 
-	public bool IsPending => Status == OrderStatus.Pending;
-
-	private Order() {}
+	private Order() { }
 
 	private Order(
 		Guid organizationId,
@@ -43,19 +28,56 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVe
 		Status = OrderStatus.Pending;
 		FulfillmentStatus = OrderFulfillmentStatus.NotAvailable;
 	}
+	public Guid Id { get; }
+	public Guid OrganizationId { get; private set; }
+	public Guid? UserId { get; private set; }
+	public int CurrencyId { get; private set; }
+	public OrderSource Source { get; private set; }
+	public OrderStatus Status { get; private set; }
+	public OrderFulfillmentStatus FulfillmentStatus { get; private set; }
 
-	public static Order CreateManual(Guid organizationId, Guid? userId, int currencyId)
-		=> new(organizationId, userId, currencyId, OrderSource.Manual);
+	public Guid? ConfirmedByUserId { get; private set; }
+	public DateTime? ConfirmedAt { get; private set; }
+	public IReadOnlyList<OrderItem> Items => _items;
 
-	public static Order CreateOnline(Guid organizationId, Guid userId, int currencyId)
-		=> new(organizationId, userId, currencyId, OrderSource.Online);
+	public bool IsPending => Status == OrderStatus.Pending;
+
+
+	public static Expression<Func<Order, Guid>> GetKeySelector() => x => x.Id;
+
+	public static Expression<Func<Order, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
+
+	public uint RowVersion { get; private set; }
+
+	public static Order CreateManual(
+		Guid organizationId,
+		Guid? userId,
+		int currencyId)
+		=> new(
+			organizationId,
+			userId,
+			currencyId,
+			OrderSource.Manual);
+
+	public static Order CreateOnline(
+		Guid organizationId,
+		Guid userId,
+		int currencyId)
+		=> new(
+			organizationId,
+			userId,
+			currencyId,
+			OrderSource.Online);
 
 	public OrderItem AddItem(int productId, int count)
 	{
 		if (Status is not (OrderStatus.Pending or OrderStatus.Confirmed))
 			throw new InvalidInputException(OrderChangeNotAllowedMessage.Instance);
 
-		var item = OrderItem.Create(Id, productId, count);
+		var item = OrderItem.Create(
+			Id,
+			productId,
+			count);
 		_items.Add(item);
 
 		return item;
@@ -81,7 +103,10 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVe
 	{
 		CheckIfBelongs(item);
 		EnsureItemsEditable();
-		item.AssignPrice(null, unitPrice, PriceOrigin.Manual);
+		item.AssignPrice(
+			null,
+			unitPrice,
+			PriceOrigin.Manual);
 	}
 
 	public void ChangeItemCount(OrderItem item, int count)
@@ -169,11 +194,6 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVe
 		if (!_items.Contains(item) || item.IsDeleted)
 			throw new InvalidInputException(OrderItemNotFoundMessage.Instance);
 	}
-
-
-	public static Expression<Func<Order, Guid>> GetKeySelector() => x => x.Id;
-
-	public static Expression<Func<Order, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
 
 	public override Guid GetId() => Id;
 }

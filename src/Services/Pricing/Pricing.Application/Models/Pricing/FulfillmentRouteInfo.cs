@@ -18,19 +18,16 @@ public sealed record FulfillmentRouteInfo(
 	int DeliveryProbability)
 {
 	public static FulfillmentRouteInfo SameStorage(string storageCode)
-	{
-		return new FulfillmentRouteInfo(
+		=> new(
 			storageCode,
 			storageCode,
 			0,
 			TimeSpan.Zero,
 			TimeSpan.Zero,
 			100);
-	}
 
 	public static FulfillmentRouteInfo FromSupplier(PriceOffer offer)
-	{
-		return new FulfillmentRouteInfo(
+		=> new(
 			offer.OfferForStorage,
 			offer.OfferForStorage,
 			0,
@@ -39,5 +36,4 @@ public sealed record FulfillmentRouteInfo(
 				? TimeSpan.Zero
 				: offer.GuaranteedDeliveryDate.Value - offer.UpdatedAt,
 			offer.DeliveryProbability);
-	}
 }

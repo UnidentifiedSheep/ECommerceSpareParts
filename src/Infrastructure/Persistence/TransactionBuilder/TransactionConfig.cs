@@ -1,5 +1,4 @@
 using System.Data;
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Enums;
@@ -8,7 +7,8 @@ using Persistence.Interfaces;
 
 namespace Persistence.TransactionBuilder;
 
-public class TransactionConfig(DbContext context, ITransactionExceptionClassifier exceptionClassifier) : ICustomTransaction
+public class TransactionConfig(DbContext context, ITransactionExceptionClassifier exceptionClassifier)
+	: ICustomTransaction
 {
 	private static readonly Dictionary<string, TransactionDefaultSettings> DefaultSettings = new();
 
@@ -67,10 +67,11 @@ public class TransactionConfig(DbContext context, ITransactionExceptionClassifie
 		if (context.Database.CurrentTransaction is not null)
 			return await action();
 
-		for (var attempt = 0; ; attempt++)
+		for (var attempt = 0;; attempt++)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-			await using (var transaction = await context.Database.BeginTransactionAsync(IsolationLevel, cancellationToken))
+			await using (var transaction =
+						await context.Database.BeginTransactionAsync(IsolationLevel, cancellationToken))
 			{
 				try
 				{
@@ -83,8 +84,9 @@ public class TransactionConfig(DbContext context, ITransactionExceptionClassifie
 				catch (Exception exception)
 				{
 					await transaction.RollbackAsync(CancellationToken.None);
-					if (exception is OperationCanceledException || cancellationToken.IsCancellationRequested ||
-					    attempt >= RetriesCount || !IsRetryable(exception))
+					if (exception is OperationCanceledException ||
+						cancellationToken.IsCancellationRequested ||
+						attempt >= RetriesCount || !IsRetryable(exception))
 						throw;
 				}
 			}
@@ -96,16 +98,18 @@ public class TransactionConfig(DbContext context, ITransactionExceptionClassifie
 	public Task ExecuteWithTransaction(Func<Task> action, CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(action);
-		return ExecuteWithTransaction(async () =>
-		{
-			await action();
-			return true;
-		}, cancellationToken);
+		return ExecuteWithTransaction(
+			async () =>
+			{
+				await action();
+				return true;
+			},
+			cancellationToken);
 	}
 
-	private bool IsRetryable(Exception exception) =>
-		(_retryOn & exceptionClassifier.Classify(exception).Kind) != TransactionErrorKind.None;
+	private bool IsRetryable(Exception exception)
+		=> (_retryOn & exceptionClassifier.Classify(exception).Kind) != TransactionErrorKind.None;
 
-	public static void AddDefaultSettings(string variant, TransactionDefaultSettings defaultSettings) =>
-		DefaultSettings.Add(variant, defaultSettings);
+	public static void AddDefaultSettings(string variant, TransactionDefaultSettings defaultSettings)
+		=> DefaultSettings.Add(variant, defaultSettings);
 }

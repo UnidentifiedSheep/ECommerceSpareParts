@@ -20,13 +20,14 @@ public sealed record GqlNumericRangeInput
 	public decimal? Lte { get; init; }
 
 	[return: NotNullIfNotNull(nameof(input))]
-	public static implicit operator RangeCriteria<decimal>?(GqlNumericRangeInput? input) =>
-		input is null ? null : new RangeCriteria<decimal>
-		{
-			Gt = input.Gt,
-			Gte = input.Gte,
-			Lt = input.Lt,
-			Lte = input.Lte
-		};
-
+	public static implicit operator RangeCriteria<decimal>?(GqlNumericRangeInput? input)
+		=> input is null
+			? null
+			: new RangeCriteria<decimal>
+			{
+				Gt = input.Gt,
+				Gte = input.Gte,
+				Lt = input.Lt,
+				Lte = input.Lte
+			};
 }

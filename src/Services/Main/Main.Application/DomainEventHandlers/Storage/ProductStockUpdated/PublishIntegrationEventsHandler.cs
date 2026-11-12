@@ -23,7 +23,8 @@ public class PublishIntegrationEventsHandler(
 
 		var predicate = PredicateBuilder.New<ProductStock>(false);
 		foreach (var item in notification.Items.Distinct())
-			predicate = predicate.Or(stock => stock.ProductId == item.ProductId && stock.StorageCode == item.StorageCode);
+			predicate = predicate.Or(stock
+				=> stock.ProductId == item.ProductId && stock.StorageCode == item.StorageCode);
 
 		var stocks = await repository.Query
 			.Where(predicate)
@@ -31,15 +32,17 @@ public class PublishIntegrationEventsHandler(
 			.ToListAsync(cancellationToken);
 		var occurredAt = timeProvider.GetUtcNow().UtcDateTime;
 		foreach (var storage in stocks.GroupBy(stock => stock.StorageCode))
-			integrationEventScope.Add(new ProductStocksUpdatedEvent
-			{
-				StorageCode = storage.Key,
-				Items = storage.Select(stock => new ProductStockItem
+			integrationEventScope.Add(
+				new ProductStocksUpdatedEvent
 				{
-					ProductId = stock.ProductId,
-					Quantity = stock.Quantity
-				}).ToArray(),
-				OccurredAt = occurredAt
-			});
+					StorageCode = storage.Key,
+					Items = storage.Select(stock => new ProductStockItem
+						{
+							ProductId = stock.ProductId,
+							Quantity = stock.Quantity
+						})
+						.ToArray(),
+					OccurredAt = occurredAt
+				});
 	}
 }

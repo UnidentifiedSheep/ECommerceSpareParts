@@ -50,12 +50,10 @@ public class SaleContentDetailBuilder(Faker faker) : BuilderBase<SaleContentDeta
 	}
 
 	public override SaleContentDetail Build()
-	{
-		return SaleContentDetail.Create(
+		=> SaleContentDetail.Create(
 			StorageContentIds.Count > 0 ? Faker.PickRandom<int>(StorageContentIds) : Faker.Random.Int(1),
 			CurrencyId ?? Faker.Random.Int(1),
 			PurchasePrice ?? Math.Round(Faker.Random.Decimal(1), 2),
 			Count ?? Faker.Random.Int(1),
 			PurchaseDate ?? Faker.Date.Past());
-	}
 }

@@ -6,7 +6,5 @@ namespace Main.Application.Handlers.ProducerSupplierMappings.GetProducerSupplier
 public class GetProducerSupplierMappingsValidation : AbstractValidator<GetProducerSupplierMappingsQuery>
 {
 	public GetProducerSupplierMappingsValidation()
-	{
-		RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
-	}
+		=> RuleFor(x => x.Pagination).SetValidator(new PaginationValidator());
 }

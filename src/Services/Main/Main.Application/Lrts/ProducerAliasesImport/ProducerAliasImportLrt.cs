@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Options.S3;
@@ -32,14 +31,14 @@ public class ProducerAliasImportLrt(
 {
 	public override string SystemName => nameof(ProducerAliasImportLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtProducerOtherNamesImportNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProducerOtherNamesImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProducerOtherNamesImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProducerOtherNamesImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -92,19 +91,24 @@ public class ProducerAliasImportLrt(
 			TransactionalAttribute.RetryOnConflict(20, 2),
 			async (context, cancellationToken) =>
 			{
-				var existingAliases = (await context.GetRequiredService<IRepository<ProducerAlias, string>>().ListAsync(
-						Criteria<ProducerAlias>
-							.New()
-							.Where(x => uniqueAliases.Contains(x.Alias))
-							.Track(false)
-							.Build(),
-						cancellationToken))
+				var existingAliases = (await context.GetRequiredService<IRepository<ProducerAlias, string>>()
+						.ListAsync(
+							Criteria<ProducerAlias>
+								.New()
+								.Where(x => uniqueAliases.Contains(x.Alias))
+								.Track(false)
+								.Build(),
+							cancellationToken))
 					.Select(x => x.Alias)
 					.ToHashSet();
 				var producerNames = uniqueItems.Select(x => x.item.OriginalName).Distinct().ToList();
-				var producers = (await context.GetRequiredService<IProducerRepository>().ListAsync(
-					Criteria<Producer>.New().Where(x => producerNames.Contains(x.Name)).Track(false).Build(),
-					cancellationToken)).ToDictionary(x => x.Name);
+				var producers = (await context.GetRequiredService<IProducerRepository>()
+					.ListAsync(
+						Criteria<Producer>.New()
+							.Where(x => producerNames.Contains(x.Name))
+							.Track(false)
+							.Build(),
+						cancellationToken)).ToDictionary(x => x.Name);
 
 				var transactionErrors = new List<CsvImportError>();
 				var toAdd = new List<ProducerAlias>();

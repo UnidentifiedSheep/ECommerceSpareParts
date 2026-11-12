@@ -51,18 +51,24 @@ internal sealed class ProductNode(
 		IReadOnlyCollection<InternalProductReference> references,
 		CancellationToken cancellationToken = default)
 	{
-		using var request = await GetRequest(HttpMethod.Post, "/internal/products/resolve-references", cancellationToken);
+		using var request = await GetRequest(
+			HttpMethod.Post,
+			"/internal/products/resolve-references",
+			cancellationToken);
 		request.Content = JsonContent.Create(new ResolveProductReferencesRequest { References = references });
 		using var response = await httpClient.SendAsync(request, cancellationToken);
 
-		return await ReadResponse<ResolveProductReferencesResponse, IReadOnlyList<InternalResolvedProductReference>>(
-			response, result => result.Products, cancellationToken);
+		return await ReadResponse<ResolveProductReferencesResponse,
+			IReadOnlyList<InternalResolvedProductReference>>(
+			response,
+			result => result.Products,
+			cancellationToken);
 	}
 
 	private record GetSupplierProductReferencesResponse
 	{
 		[JsonPropertyName("products")]
-		public IReadOnlyList<InternalSupplierProductResolvedReference> Products { get; init; } = [];
+		public IReadOnlyList<InternalSupplierProductResolvedReference> Products { get; } = [];
 	}
 
 	private record ResolveProductReferencesRequest
@@ -74,6 +80,6 @@ internal sealed class ProductNode(
 	private record ResolveProductReferencesResponse
 	{
 		[JsonPropertyName("products")]
-		public IReadOnlyList<InternalResolvedProductReference> Products { get; init; } = [];
+		public IReadOnlyList<InternalResolvedProductReference> Products { get; } = [];
 	}
 }

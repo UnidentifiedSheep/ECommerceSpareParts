@@ -1,7 +1,6 @@
-using Security.Core.Interfaces;
-using Application.Common.Interfaces.Validators;
 using FluentValidation;
 using FluentValidation.Results;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.BaseValidators;
 

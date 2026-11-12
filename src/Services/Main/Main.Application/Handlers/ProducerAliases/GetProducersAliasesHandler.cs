@@ -9,9 +9,7 @@ public record GetProducersAliasesQuery : IQuery<GetProducersAliasesResult>
 {
 
 	public GetProducersAliasesQuery(IEnumerable<int> producerIds)
-	{
-		ProducerIds = producerIds.Distinct().ToList();
-	}
+		=> ProducerIds = producerIds.Distinct().ToList();
 
 	public GetProducersAliasesQuery(int producerId) : this([producerId])
 	{

@@ -7,7 +7,8 @@ namespace Main.Api.GraphQl.Types.Document;
 
 [GraphQLName("DocumentDefinition")]
 public sealed record GqlDocumentDefinition(
-	[property: GraphQLIgnore] DocumentDefinitionDto Definition)
+	[property: GraphQLIgnore]
+	DocumentDefinitionDto Definition)
 {
 	[GraphQLName("systemName")]
 	public string SystemName => Definition.SystemName;

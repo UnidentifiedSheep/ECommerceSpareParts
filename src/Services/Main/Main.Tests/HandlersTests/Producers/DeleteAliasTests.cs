@@ -15,9 +15,7 @@ public class DeleteAliasTests : IntegrationTest
 	private ProducerAlias _alias = null!;
 
 	public DeleteAliasTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	public override async ValueTask InitializeAsync()
 	{

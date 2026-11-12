@@ -8,9 +8,7 @@ namespace Tests.HandlersTests.Users;
 public class GetUsersEmailsByIdsTests : IntegrationTest
 {
 	public GetUsersEmailsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UserContactsTestContext>();
-	}
+		=> RegisterBasicContext<UserContactsTestContext>();
 
 	private UserContactsTestContext TestContext => GetContext<UserContactsTestContext>();
 
@@ -22,7 +20,8 @@ public class GetUsersEmailsByIdsTests : IntegrationTest
 		var users = new[] { first, second };
 
 		var result = await Mediator.Send(
-			new GetUsersEmailsByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]), CancellationToken);
+			new GetUsersEmailsByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Emails.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
 		result.Emails[first.Id][0].IsPrimary.Should().BeTrue();
@@ -80,7 +79,9 @@ public class GetUsersEmailsByIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetUsersEmailsByIdsQuery(Array.Empty<Guid>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetUsersEmailsByIdsQuery(Array.Empty<Guid>()),
+			CancellationToken);
 
 		result.Emails.Should().BeEmpty();
 	}

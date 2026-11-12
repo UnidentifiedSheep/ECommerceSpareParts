@@ -15,14 +15,10 @@ namespace Main.Application.Handlers.ProductEnrichment;
 public record AddCandidateToCatalogueCommand : ICommand<AddCandidateToCatalogueResult>
 {
 	public AddCandidateToCatalogueCommand(Guid id, string? selectedName)
-	{
-		Items = [new AddCandidateToCatalogueItem(id, selectedName)];
-	}
+		=> Items = [new AddCandidateToCatalogueItem(id, selectedName)];
 
 	public AddCandidateToCatalogueCommand(IEnumerable<AddCandidateToCatalogueItem> items)
-	{
-		Items = items.Distinct().ToList();
-	}
+		=> Items = items.Distinct().ToList();
 	public IReadOnlyList<AddCandidateToCatalogueItem> Items { get; }
 }
 

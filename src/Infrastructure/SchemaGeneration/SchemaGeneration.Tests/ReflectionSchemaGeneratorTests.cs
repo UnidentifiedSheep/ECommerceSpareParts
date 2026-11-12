@@ -59,8 +59,11 @@ public sealed class ReflectionSchemaGeneratorTests
 		var items = schema.Fields.Single(field => field.Name == "items");
 		items.Type.Should().Be(SchemaValueType.Array);
 		items.NestedSchema.Should().NotBeNull();
-		items.NestedSchema!.Fields.Single(field => field.Name == "productId")
-			.Required.Should().BeTrue();
+		items.NestedSchema!.Fields
+			.Single(field => field.Name == "productId")
+			.Required
+			.Should()
+			.BeTrue();
 	}
 
 	[Fact]
@@ -131,13 +134,13 @@ public sealed class ReflectionSchemaGeneratorTests
 		var schema = _generator.Generate<DerivedInput>();
 
 		schema
-		.Fields
-		.Select(x => x.Name)
-		.Should()
-		.BeEquivalentTo(
-			"baseValue",
-			"alwaysIncluded",
-			"derivedValue");
+			.Fields
+			.Select(x => x.Name)
+			.Should()
+			.BeEquivalentTo(
+				"baseValue",
+				"alwaysIncluded",
+				"derivedValue");
 	}
 
 	[Fact]

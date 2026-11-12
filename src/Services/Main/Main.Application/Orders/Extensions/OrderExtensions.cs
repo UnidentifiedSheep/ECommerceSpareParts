@@ -14,7 +14,8 @@ public static class OrderExtensions
 			throw new OrderReadAccessDeniedException();
 		if (userContext.Permissions.Contains(Permission.ToNormalizedPermission(PermissionCodes.ORDERS_GET)))
 			return query;
-		if (!userContext.Permissions.Contains(Permission.ToNormalizedPermission(PermissionCodes.ORDERS_GET_OWN)))
+		if (!userContext.Permissions.Contains(
+				Permission.ToNormalizedPermission(PermissionCodes.ORDERS_GET_OWN)))
 			throw new OrderReadAccessDeniedException();
 		return query.Where(order => order.UserId == userId);
 	}

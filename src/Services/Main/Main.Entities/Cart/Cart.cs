@@ -32,22 +32,22 @@ public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid,
 
 	public Product.Product Product { get; private set; } = null!;
 
-	public static Expression<Func<Cart, (Guid, int)>> GetKeySelector() => x =>
-		ValueTuple.Create(x.UserId, x.ProductId);
+	public static Expression<Func<Cart, (Guid, int)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.UserId, x.ProductId);
 
-	public static Expression<Func<Cart, bool>> GetEqualityExpression((Guid, int) key) => x =>
-		x.UserId == key.Item1 && x.ProductId == key.Item2;
+	public static Expression<Func<Cart, bool>> GetEqualityExpression((Guid, int) key)
+		=> x =>
+			x.UserId == key.Item1 && x.ProductId == key.Item2;
 
 	public static Cart Create(
 		Guid userId,
 		int productId,
 		int count)
-	{
-		return new Cart(
+		=> new(
 			userId,
 			productId,
 			count);
-	}
 
 	public void SetCount(int count)
 	{

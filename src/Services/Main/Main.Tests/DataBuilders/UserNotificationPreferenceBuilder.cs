@@ -8,9 +8,9 @@ namespace Tests.DataBuilders;
 public class UserNotificationPreferenceBuilder(Faker faker)
 	: BuilderBase<UserNotificationPreference>(faker)
 {
-	private Guid _userId = Guid.NewGuid();
 	private string _channelName = EmailRecipient.ChannelName;
 	private bool _enabled = true;
+	private Guid _userId = Guid.NewGuid();
 
 	public UserNotificationPreferenceBuilder WithUserId(Guid userId)
 	{

@@ -1,8 +1,8 @@
-using Persistence.Context;
 using Domain.CommonEntities.Job;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Common;
+using Persistence.Context;
 using Persistence.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities.Offers;

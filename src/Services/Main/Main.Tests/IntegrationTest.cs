@@ -1,10 +1,9 @@
-using Persistence.Context;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Context;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 
@@ -48,5 +47,4 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 		using var scope = Scope;
 		await ResetDataStoresAsync();
 	}
-
 }

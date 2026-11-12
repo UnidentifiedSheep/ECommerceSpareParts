@@ -12,8 +12,6 @@ public static class StorageDataLoaders
 		IReadOnlyList<string> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetStoragesByCodesQuery(keys), cancellationToken)).Storages
+		=> (await sender.Send(new GetStoragesByCodesQuery(keys), cancellationToken)).Storages
 			.ToDictionary(x => x.Code, x => x);
-	}
 }

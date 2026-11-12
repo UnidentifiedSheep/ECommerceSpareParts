@@ -12,15 +12,13 @@ public sealed record GetPurchasesContentsByIdsQuery : IQuery<GetPurchasesContent
 {
 	public GetPurchasesContentsByIdsQuery(Guid id) : this([id]) { }
 
-	public GetPurchasesContentsByIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetPurchasesContentsByIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }
 
-public sealed record GetPurchasesContentsByIdsResult(IReadOnlyDictionary<Guid, IReadOnlyList<PurchaseContentDto>> Contents);
+public sealed record GetPurchasesContentsByIdsResult(
+	IReadOnlyDictionary<Guid, IReadOnlyList<PurchaseContentDto>> Contents);
 
 public sealed class GetPurchasesContentsByIdsHandler(
 	IReadRepository<PurchaseContent, int> repository,
@@ -32,7 +30,8 @@ public sealed class GetPurchasesContentsByIdsHandler(
 		CancellationToken cancellationToken)
 	{
 		if (request.Ids.Count == 0)
-			return new GetPurchasesContentsByIdsResult(new Dictionary<Guid, IReadOnlyList<PurchaseContentDto>>());
+			return new GetPurchasesContentsByIdsResult(
+				new Dictionary<Guid, IReadOnlyList<PurchaseContentDto>>());
 
 		var rows = await repository.Query
 			.AsExpandable()

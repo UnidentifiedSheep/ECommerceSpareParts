@@ -15,10 +15,11 @@ public record ProductCrossesByIdsDeleteState : ProductCrossesByIdsDeleteInputSta
 	[JsonPropertyName("checkpoint")]
 	public CsvImportCheckpoint? Checkpoint { get; init; }
 
-	public ProductCrossesByIdsDeleteState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
-	{
-		Checkpoint = checkpoint
-	};
+	public ProductCrossesByIdsDeleteState WithCheckpoint(CsvImportCheckpoint checkpoint)
+		=> this with
+		{
+			Checkpoint = checkpoint
+		};
 }
 
 [CsvSchema(typeof(ProductCrossesByIdsDeleteLrt.ProductCrossByIdsCsvDto))]

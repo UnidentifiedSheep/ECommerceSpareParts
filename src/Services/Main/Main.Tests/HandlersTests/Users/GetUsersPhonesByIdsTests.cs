@@ -8,9 +8,7 @@ namespace Tests.HandlersTests.Users;
 public class GetUsersPhonesByIdsTests : IntegrationTest
 {
 	public GetUsersPhonesByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UserContactsTestContext>();
-	}
+		=> RegisterBasicContext<UserContactsTestContext>();
 
 	private UserContactsTestContext TestContext => GetContext<UserContactsTestContext>();
 
@@ -22,7 +20,8 @@ public class GetUsersPhonesByIdsTests : IntegrationTest
 		var users = new[] { first, second };
 
 		var result = await Mediator.Send(
-			new GetUsersPhonesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]), CancellationToken);
+			new GetUsersPhonesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Phones.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
 		result.Phones[first.Id][0].IsPrimary.Should().BeTrue();

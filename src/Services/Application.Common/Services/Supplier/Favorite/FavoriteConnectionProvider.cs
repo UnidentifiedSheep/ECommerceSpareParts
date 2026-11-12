@@ -1,7 +1,7 @@
-using Security.Core.Interfaces;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;
+using Security.Core.Interfaces;
 
 namespace Application.Common.Services.Supplier.Favorite;
 
@@ -20,8 +20,8 @@ public class FavoriteConnectionProvider(
 	}
 
 	async Task<ConnectionCheck> IConnectionProvider.
-		CheckConnectionAsync(CancellationToken cancellationToken) =>
-		await CheckConnectionAsync(cancellationToken);
+		CheckConnectionAsync(CancellationToken cancellationToken)
+		=> await CheckConnectionAsync(cancellationToken);
 
 	public async Task<ConnectionCheck<FavoritConnection>> CheckConnectionAsync(
 		CancellationToken cancellationToken = default)
@@ -58,11 +58,9 @@ public class FavoriteConnectionProvider(
 	private static ConnectionCheck<FavoritConnection> Unavailable(
 		SupplierUnavailableReason reason,
 		string message)
-	{
-		return new ConnectionCheck<FavoritConnection>(
+		=> new(
 			false,
 			null,
 			reason,
 			message);
-	}
 }

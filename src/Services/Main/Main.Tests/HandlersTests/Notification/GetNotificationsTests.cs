@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
 using Main.Application.Handlers.Notifications.GetNotifications;
@@ -10,17 +9,15 @@ namespace Tests.HandlersTests.Notification;
 public class GetNotificationsTests : IntegrationTest
 {
 	public GetNotificationsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<InAppNotificationsTestContext>();
-	}
+		=> RegisterBasicContext<InAppNotificationsTestContext>();
 
-	private InAppNotificationsTestContext NotificationsContext =>
-		GetContext<InAppNotificationsTestContext>();
+	private InAppNotificationsTestContext NotificationsContext => GetContext<InAppNotificationsTestContext>();
 
 	[Theory]
 	[InlineData(0)]
 	[InlineData(1)]
-	public async Task GetNotifications_ReturnsOnlyRequestedUsersNotificationsWithProjectedFields(int userIndex)
+	public async Task GetNotifications_ReturnsOnlyRequestedUsersNotificationsWithProjectedFields(
+		int userIndex)
 	{
 		var user = NotificationsContext.Users[userIndex];
 		var expected = NotificationsContext.Notifications
@@ -43,6 +40,7 @@ public class GetNotificationsTests : IntegrationTest
 			else
 				actual.SeenAt.Should().BeNull();
 		}
+
 		result.Notifications.Count(x => x.SeenAt.HasValue).Should().Be(2);
 	}
 
@@ -66,8 +64,10 @@ public class GetNotificationsTests : IntegrationTest
 
 		secondPage.Notifications.Should().HaveCount(3);
 		secondPage.Notifications.Should().OnlyContain(x => x.CreateAt < cursor);
-		secondPage.Notifications.Select(x => x.Id)
-			.Should().NotIntersectWith(firstPage.Notifications.Select(x => x.Id));
+		secondPage.Notifications
+			.Select(x => x.Id)
+			.Should()
+			.NotIntersectWith(firstPage.Notifications.Select(x => x.Id));
 	}
 
 	[Fact]

@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Application.Common.Models;

@@ -25,16 +25,17 @@ public class ProducerAlias : Entity<ProducerAlias, string>, ILinqEntity<Producer
 
 	public static Expression<Func<ProducerAlias, string>> GetKeySelector() => x => x.Alias;
 
-	public static Expression<Func<ProducerAlias, bool>> GetEqualityExpression(string key) => x =>
-		x.Alias == key;
+	public static Expression<Func<ProducerAlias, bool>> GetEqualityExpression(string key)
+		=> x =>
+			x.Alias == key;
 
 	public static ProducerAlias Create(int producerId, string otherName) => new(producerId, otherName);
 
-	public override void OnDeleted() =>
-		AddDomainEvent(new ProducerAliasDeletedDomainEvent(ProducerId, Alias));
+	public override void OnDeleted()
+		=> AddDomainEvent(new ProducerAliasDeletedDomainEvent(ProducerId, Alias));
 
-	public override void OnCreated() =>
-		AddDomainEvent(new ProducerAliasCreatedDomainEvent(ProducerId, Alias));
+	public override void OnCreated()
+		=> AddDomainEvent(new ProducerAliasCreatedDomainEvent(ProducerId, Alias));
 
 	private void SetAlias(string otherName) => Alias = Producer.ToNormalizedName(otherName);
 

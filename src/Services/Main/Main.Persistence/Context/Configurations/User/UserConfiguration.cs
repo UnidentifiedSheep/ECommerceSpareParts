@@ -27,11 +27,11 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
 				b.Property(e => e.Value).HasMaxLength(36).HasColumnName("user_name");
 
 				b
-				.Property(e => e.NormalizedValue)
-				.HasComplexIndex(
-					true,
-					null,
-					"users_normalized_user_name_uindex");
+					.Property(e => e.NormalizedValue)
+					.HasComplexIndex(
+						true,
+						null,
+						"users_normalized_user_name_uindex");
 
 				b
 					.Property(e => e.NormalizedValue)

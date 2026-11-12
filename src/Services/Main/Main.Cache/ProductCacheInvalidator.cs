@@ -7,11 +7,11 @@ namespace Main.Cache;
 
 public sealed class ProductCacheInvalidator(ICache rawCache) : IProductCacheInvalidator
 {
-	public Task InvalidateProductAsync(int productId) =>
-		rawCache.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
+	public Task InvalidateProductAsync(int productId)
+		=> rawCache.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
 
-	public Task InvalidateProductsAsync(IEnumerable<int> productIds) =>
-		rawCache.RemoveKeysAsync(productIds.Select(CacheKeys.ProductCache.Product));
+	public Task InvalidateProductsAsync(IEnumerable<int> productIds)
+		=> rawCache.RemoveKeysAsync(productIds.Select(CacheKeys.ProductCache.Product));
 
 	public Task InvalidateCrossesAsync(int productId)
 	{

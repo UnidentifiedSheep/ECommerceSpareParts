@@ -45,25 +45,21 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
 		int currencyId,
 		IEnumerable<MarkupRange> markupRanges,
 		Guid? sourceMessageId = null)
-	{
-		return new MarkupGroup(
+		=> new(
 			name,
 			currencyId,
 			markupRanges,
 			sourceMessageId);
-	}
 
 	public static MarkupGroup CreateGenerated(
 		int currencyId,
 		IEnumerable<MarkupRange> markupRanges,
 		Guid sourceMessageId)
-	{
-		return new MarkupGroup(
+		=> new(
 			"Auto Generated Markup",
 			currencyId,
 			markupRanges,
 			sourceMessageId);
-	}
 
 	public void SetCurrencyId(int currencyId) => CurrencyId = currencyId;
 
@@ -97,11 +93,12 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
 			});
 	}
 
-	public override void OnUpdated() => AddDomainEvent(
-		new MarkupGroupUpdatedDomainEvent
-		{
-			Id = Id
-		});
+	public override void OnUpdated()
+		=> AddDomainEvent(
+			new MarkupGroupUpdatedDomainEvent
+			{
+				Id = Id
+			});
 
 	public override int GetId() => Id;
 }

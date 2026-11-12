@@ -14,7 +14,10 @@ using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Handlers.Markup;
 
-[Transactional(IsolationLevel.Serializable, 20, 3)]
+[Transactional(
+	IsolationLevel.Serializable,
+	20,
+	3)]
 [AutoSave]
 public record DeleteMarkupCommand(int Id) : ICommand;
 
@@ -30,7 +33,7 @@ public sealed class DeleteMarkupHandler(
 		var group = await repository.GetById(request.Id, cancellationToken)
 			?? throw new MarkupGroupNotFoundException(request.Id);
 
-		var settings = await settingsService.GetOrDefault<PricingSetting>(directRead: true, cancellationToken);
+		var settings = await settingsService.GetOrDefault<PricingSetting>(true, cancellationToken);
 		if (settings.Data.SelectedMarkupId == group.Id)
 			throw new CurrenMarkupGroupCanNotBeDeletedException();
 

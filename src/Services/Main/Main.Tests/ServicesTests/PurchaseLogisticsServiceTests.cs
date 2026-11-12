@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Main.Application.Interfaces.Services;
+using Main.Entities.Balance;
 using Main.Entities.Purchase;
 using Main.Enums;
 using Main.Enums.Balances;
@@ -75,7 +76,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 		updatedPurchase.PurchaseLogistic!.TransactionId.Should().NotBeNull();
 
 		var transaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId, CancellationToken);
 		transaction.SenderId.Should().Be(route.CarrierId!.Value);
@@ -243,21 +244,17 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 	}
 
 	private async Task<Purchase> LoadPurchase()
-	{
-		return await Context
-			.Set<global::Main.Entities.Purchase.Purchase>()
+		=> await Context
+			.Set<Purchase>()
 			.Include(x => x.PurchaseLogistic)
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.PurchaseContentLogistic)
 			.AsNoTracking()
 			.SingleAsync();
-	}
 
 	private static PurchaseLogisticsItem ToLogisticsItem(PurchaseContent content)
-	{
-		return new PurchaseLogisticsItem(
+		=> new(
 			content,
 			content.ProductId,
 			content.Count);
-	}
 }

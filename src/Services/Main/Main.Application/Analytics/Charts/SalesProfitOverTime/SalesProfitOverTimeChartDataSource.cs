@@ -1,8 +1,8 @@
-using Main.Entities;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Domain.Validation;
 using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Sale;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -19,11 +19,11 @@ public sealed class SalesProfitOverTimeChartDataSource(
 
 	public override string SystemName => DataSourceSystemName;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		ChartSalesProfitOverTimeNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> ChartSalesProfitOverTimeNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		ChartSalesProfitOverTimeDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> ChartSalesProfitOverTimeDescriptionMessage.Instance;
 
 	public override async Task<ChartDataResult<SalesProfitDataPoint>> QueryAsync(
 		SalesProfitChartQuery queryInput,
@@ -56,14 +56,13 @@ public sealed class SalesProfitOverTimeChartDataSource(
 	private static IQueryable<SalesProfitDataPoint> BuildAggregateQuery(
 		IQueryable<Sale> query,
 		TimeGranularity granularity)
-	{
-		return query.Select(sale => new SaleProfitRow
-		{
-			SaleDatetime = sale.SaleDatetime,
-			Revenue = sale.Contents.Sum(content => content.Analytics!.RevenueInBaseCurrency),
-			Cost = sale.Contents.Sum(content => content.Analytics!.CostInBaseCurrency),
-			ProductsCount = sale.Contents.Sum(content => content.Count)
-		})
+		=> query.Select(sale => new SaleProfitRow
+			{
+				SaleDatetime = sale.SaleDatetime,
+				Revenue = sale.Contents.Sum(content => content.Analytics!.RevenueInBaseCurrency),
+				Cost = sale.Contents.Sum(content => content.Analytics!.CostInBaseCurrency),
+				ProductsCount = sale.Contents.Sum(content => content.Count)
+			})
 			.GroupBy(x => new
 			{
 				x.SaleDatetime.Year,
@@ -86,7 +85,6 @@ public sealed class SalesProfitOverTimeChartDataSource(
 				SalesCount = group.Count(),
 				ProductsCount = group.Sum(x => x.ProductsCount)
 			});
-	}
 
 	private sealed record SaleProfitRow
 	{

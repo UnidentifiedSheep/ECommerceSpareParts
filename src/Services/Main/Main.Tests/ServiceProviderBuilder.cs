@@ -1,8 +1,4 @@
-using Persistence.Context;
-using Main.Persistence.Context;
-using Security.Core.Interfaces;
 using System.Globalization;
-using Abstractions.Interfaces;
 using Api.Common;
 using Application.Common.Models.Options.S3;
 using Cache;
@@ -19,8 +15,10 @@ using Microsoft.Extensions.Options;
 using Notification.Extensions;
 using Npgsql;
 using Persistence;
+using Persistence.Context;
 using S3.Core.Interfaces;
 using Security;
+using Security.Core.Interfaces;
 using Security.Extensions;
 using Security.Models;
 using Serilog;
@@ -142,7 +140,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddSystemOptionsForTests();
 
 		services.AddSingleton<PublishEndpointAccessor>();
-		services.AddScoped<IPublishEndpoint>(sp => sp.GetRequiredService<PublishEndpointAccessor>().Publisher);
+		services.AddScoped<IPublishEndpoint>(sp
+			=> sp.GetRequiredService<PublishEndpointAccessor>().Publisher);
 		services.RemoveAll<IFusionCacheBackplane>();
 		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 

@@ -52,8 +52,7 @@ public sealed class SchemaLocalizerTests
 	}
 
 	private static ObjectSchema CreateSchema()
-	{
-		return new ObjectSchema
+		=> new()
 		{
 			Fields =
 			[
@@ -62,19 +61,19 @@ public sealed class SchemaLocalizerTests
 					Name = "value",
 					Type = SchemaValueType.String,
 					LabelKey = "field.label",
-						DescriptionKey = "field.description",
-						NestedSchema = new ObjectSchema
-						{
-							Fields =
-							[
-								new FieldSchema
-								{
-									Name = "nested",
-									Type = SchemaValueType.String,
-									LabelKey = "nested.label"
-								}
-							]
-						}
+					DescriptionKey = "field.description",
+					NestedSchema = new ObjectSchema
+					{
+						Fields =
+						[
+							new FieldSchema
+							{
+								Name = "nested",
+								Type = SchemaValueType.String,
+								LabelKey = "nested.label"
+							}
+						]
+					}
 				}
 			],
 			CsvSchema = new CsvSchema
@@ -92,5 +91,4 @@ public sealed class SchemaLocalizerTests
 				]
 			}
 		};
-	}
 }

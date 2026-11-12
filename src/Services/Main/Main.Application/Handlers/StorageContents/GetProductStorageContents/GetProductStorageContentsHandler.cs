@@ -33,7 +33,8 @@ public class GetProductStorageContentsHandler(
 		var items = request.Items.Distinct().ToArray();
 		var result = items.ToDictionary(item => item, _ => (IReadOnlyList<StorageContentDto>)[]);
 
-		foreach (var group in items.GroupBy(item => new { item.Pagination, item.StorageCode, item.ShowZeroCount }))
+		foreach (var group in items.GroupBy(item => new
+					{ item.Pagination, item.StorageCode, item.ShowZeroCount }))
 		{
 			var productIds = group.Select(item => item.ProductId).ToList();
 			var query = readRepository.Query
@@ -52,8 +53,11 @@ public class GetProductStorageContentsHandler(
 				.Select(product => new
 				{
 					ProductId = product.Key,
-					Contents = product.OrderBy(content => content.Id).Skip(offset).Take(size)
-						.Select(content => projection.Projection.Invoke(content)).ToList()
+					Contents = product.OrderBy(content => content.Id)
+						.Skip(offset)
+						.Take(size)
+						.Select(content => projection.Projection.Invoke(content))
+						.ToList()
 				})
 				.ToDictionaryAsync(product => product.ProductId, cancellationToken);
 

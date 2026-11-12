@@ -25,13 +25,14 @@ public sealed record GqlEditPurchaseContentInput
 	public string? Comment { get; init; }
 
 	[GraphQLIgnore]
-	public EditPurchaseDto ToDto() => new()
-	{
-		Id = Id,
-		ProductId = ProductId,
-		Count = Count,
-		Price = Price,
-		CalculateLogistics = CalculateLogistics,
-		Comment = Comment
-	};
+	public EditPurchaseDto ToDto()
+		=> new()
+		{
+			Id = Id,
+			ProductId = ProductId,
+			Count = Count,
+			Price = Price,
+			CalculateLogistics = CalculateLogistics,
+			Comment = Comment
+		};
 }

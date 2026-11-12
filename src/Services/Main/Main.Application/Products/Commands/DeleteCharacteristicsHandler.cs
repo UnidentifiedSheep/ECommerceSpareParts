@@ -18,7 +18,9 @@ public class DeleteCharacteristicsHandler(
 {
 	public async Task<Unit> Handle(DeleteCharacteristicsCommand request, CancellationToken cancellationToken)
 	{
-		var entity = await repository.GetById((request.ProductId, request.CharacteristicId), cancellationToken) ??
+		var entity = await repository.GetById(
+				(request.ProductId, request.CharacteristicId),
+				cancellationToken) ??
 			throw new ProductCharacteristicsNotFoundException(request.ProductId, request.CharacteristicId);
 		unitOfWork.Remove(entity);
 		return Unit.Value;

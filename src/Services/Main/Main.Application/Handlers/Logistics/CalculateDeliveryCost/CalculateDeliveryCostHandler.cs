@@ -27,7 +27,7 @@ public class CalculateDeliveryCostHandler(
 	ILogisticsCostService logisticsCostService,
 	IRepository<ProductSize, int> sizesRepository,
 	IStorageRouteRepository storageRoutesRepository,
-	IRepository<Entities.Product.ProductWeight, int> weightRepository,
+	IRepository<ProductWeight, int> weightRepository,
 	ICurrencyConverter currencyConverter,
 	IProjectionProvider<StorageRoute, StorageRouteDto> routeProjection)
 	: IQueryHandler<CalculateDeliveryCostQuery, CalculateDeliveryCostResult>
@@ -113,11 +113,11 @@ public class CalculateDeliveryCostHandler(
 		return (await sizesRepository.ListAsync(criteria, cancellationToken)).ToDictionary(x => x.ProductId);
 	}
 
-	private async Task<Dictionary<int, Entities.Product.ProductWeight>> GetWeights(
+	private async Task<Dictionary<int, ProductWeight>> GetWeights(
 		IEnumerable<int> productIds,
 		CancellationToken cancellationToken)
 	{
-		var criteria = Criteria<Entities.Product.ProductWeight>
+		var criteria = Criteria<ProductWeight>
 			.New()
 			.Where(x => productIds.Contains(x.ProductId))
 			.Track(false)
@@ -128,7 +128,7 @@ public class CalculateDeliveryCostHandler(
 	private async Task<LogisticsCalcResult> CalculateLogistics(
 		StorageRoute route,
 		Dictionary<int, ProductSize> sizes,
-		Dictionary<int, Entities.Product.ProductWeight> weights,
+		Dictionary<int, ProductWeight> weights,
 		IEnumerable<LogisticsItemDto> items,
 		int currencyId,
 		LogisticsCalculationMode mode)

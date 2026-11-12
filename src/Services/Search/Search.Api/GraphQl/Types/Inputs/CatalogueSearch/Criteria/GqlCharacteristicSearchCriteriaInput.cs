@@ -18,8 +18,9 @@ public sealed record GqlCharacteristicSearchCriteriaInput
 	[GraphQLName("exists")]
 	public bool? Exists { get; init; }
 
-	public CharacteristicSearchCriteria ToCriteria() => new()
-	{
-		CharacteristicId = CharacteristicId, Values = Values, NumericRange = NumericRange, Exists = Exists
-	};
+	public CharacteristicSearchCriteria ToCriteria()
+		=> new()
+		{
+			CharacteristicId = CharacteristicId, Values = Values, NumericRange = NumericRange, Exists = Exists
+		};
 }

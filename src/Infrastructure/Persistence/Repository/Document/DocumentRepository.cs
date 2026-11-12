@@ -7,13 +7,13 @@ namespace Persistence.Repository.Document;
 public class DocumentRepository<TEntity, TKey>(IDocumentSession session) : IDocumentRepository<TEntity, TKey>
 	where TKey : notnull where TEntity : Entity<TEntity, TKey>
 {
-	public ValueTask<TEntity?> GetById(TKey id, CancellationToken ct = default) =>
-		new(session.LoadAsync<TEntity>(id, ct));
+	public ValueTask<TEntity?> GetById(TKey id, CancellationToken ct = default)
+		=> new(session.LoadAsync<TEntity>(id, ct));
 
 	public async Task<TEntity?> FirstOrDefaultAsync(
 		Criteria<TEntity>? criteria = null,
-		CancellationToken ct = default) =>
-		await ApplyCriteria(session.Query<TEntity>(), criteria).FirstOrDefaultAsync(ct);
+		CancellationToken ct = default)
+		=> await ApplyCriteria(session.Query<TEntity>(), criteria).FirstOrDefaultAsync(ct);
 
 	public async Task<List<TEntity>> ListAsync(
 		Criteria<TEntity>? criteria = null,
@@ -24,8 +24,8 @@ public class DocumentRepository<TEntity, TKey>(IDocumentSession session) : IDocu
 		return result.ToList();
 	}
 
-	public IAsyncEnumerable<TEntity> AsyncEnumerable(Criteria<TEntity>? criteria = null) =>
-		ApplyCriteria(session.Query<TEntity>(), criteria).ToAsyncEnumerable();
+	public IAsyncEnumerable<TEntity> AsyncEnumerable(Criteria<TEntity>? criteria = null)
+		=> ApplyCriteria(session.Query<TEntity>(), criteria).ToAsyncEnumerable();
 
 	public async Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
 		IEnumerable<TKey> ids,
@@ -98,8 +98,8 @@ public class DocumentRepository<TEntity, TKey>(IDocumentSession session) : IDocu
 		session.Store(entities);
 	}
 
-	public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
-		session.SaveChangesAsync(cancellationToken);
+	public Task SaveChangesAsync(CancellationToken cancellationToken = default)
+		=> session.SaveChangesAsync(cancellationToken);
 
 	private async Task<IReadOnlyList<TEntity>> LoadManyAsync(
 		IReadOnlyCollection<TKey> ids,

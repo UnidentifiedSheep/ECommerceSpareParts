@@ -30,14 +30,13 @@ public class ProductGroupImportLrt(
 {
 	public override string SystemName => nameof(ProductGroupImportLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtProductGroupImportNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage => LrtProductGroupImportNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProductGroupImportDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductGroupImportDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ProductGroupImportTooManyErrorsMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ProductGroupImportTooManyErrorsMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -79,11 +78,11 @@ public class ProductGroupImportLrt(
 			async (context, cancellationToken) =>
 			{
 				var existingNames = (await context.Repositories
-					.GetForRead<ProductGroup, int>()
-					.Query
-					.Where(group => uniqueNames.Contains(group.NormalizedName))
-					.Select(group => group.NormalizedName)
-					.ToListAsync(cancellationToken))
+						.GetForRead<ProductGroup, int>()
+						.Query
+						.Where(group => uniqueNames.Contains(group.NormalizedName))
+						.Select(group => group.NormalizedName)
+						.ToListAsync(cancellationToken))
 					.ToHashSet();
 
 				var toCreate = uniqueGroups

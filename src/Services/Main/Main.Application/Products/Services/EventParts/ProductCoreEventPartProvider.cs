@@ -13,8 +13,11 @@ public sealed class ProductCoreEventPartProvider : IProductEventPartProvider
 
 	public IQueryable<ProductEntity> Populate(IQueryable<ProductEntity> query) => query;
 
-	public object Extract(IReadOnlyList<ProductEntity> products, DateTime updatedAt, IReadOnlyList<int> missingProductIds) =>
-		new ProductsUpdatedEvent
+	public object Extract(
+		IReadOnlyList<ProductEntity> products,
+		DateTime updatedAt,
+		IReadOnlyList<int> missingProductIds)
+		=> new ProductsUpdatedEvent
 		{
 			UpdatedAt = updatedAt,
 			Products = products
@@ -27,12 +30,13 @@ public sealed class ProductCoreEventPartProvider : IProductEventPartProvider
 					ProductGroupId = product.ProductGroupId,
 					Indicator = product.Indicator?.Value
 				})
-				.Concat(missingProductIds
-					.Select(id => new ProductSnapshot
-					{
-						Id = id,
-						IsDeleted = true
-					}))
+				.Concat(
+					missingProductIds
+						.Select(id => new ProductSnapshot
+						{
+							Id = id,
+							IsDeleted = true
+						}))
 				.ToArray()
 		};
 }

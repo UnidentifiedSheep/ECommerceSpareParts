@@ -26,11 +26,9 @@ public class AddOrganizationMemberHandler(IRepository<Organization, Guid> reposi
 	}
 
 	private Task<Organization> GetOrganization(Guid organizationId, CancellationToken cancellationToken)
-	{
-		return repository.EnsureExistForUpdateAsync(
+		=> repository.EnsureExistForUpdateAsync(
 			organizationId,
 			id => new OrganizationNotFoundException(id),
 			Criteria<Organization>.New().Include(x => x.Members),
 			cancellationToken);
-	}
 }

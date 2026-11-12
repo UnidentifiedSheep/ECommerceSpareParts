@@ -46,18 +46,26 @@ public static class LrtStateSerializer
 	public static string SerializeInput(string input)
 	{
 		using var document = JsonDocument.Parse(input);
-		return JsonSerializer.Serialize(new Envelope<JsonElement, object>(CurrentVersion, document.RootElement, null));
+		return JsonSerializer.Serialize(
+			new Envelope<JsonElement, object>(
+				CurrentVersion,
+				document.RootElement,
+				null));
 	}
 
 	public static string Serialize<TInputState, TState>(TInputState input, TState? state)
 		where TInputState : class
 		where TState : class
-		=> JsonSerializer.Serialize(new Envelope<TInputState, TState>(CurrentVersion, input, state));
+		=> JsonSerializer.Serialize(
+			new Envelope<TInputState, TState>(
+				CurrentVersion,
+				input,
+				state));
 
 	private static bool IsEnvelope(JsonElement root)
 	{
 		if (root.ValueKind != JsonValueKind.Object ||
-		    !root.TryGetProperty(VersionProperty, out var version))
+			!root.TryGetProperty(VersionProperty, out var version))
 			return false;
 
 		if (version.ValueKind != JsonValueKind.Number || version.GetInt32() != CurrentVersion)
@@ -67,7 +75,10 @@ public static class LrtStateSerializer
 	}
 
 	private sealed record Envelope<TInputState, TState>(
-		[property: JsonPropertyName(VersionProperty)] int Version,
-		[property: JsonPropertyName("input")] TInputState Input,
-		[property: JsonPropertyName("state")] TState? State);
+		[property: JsonPropertyName(VersionProperty)]
+		int Version,
+		[property: JsonPropertyName("input")]
+		TInputState Input,
+		[property: JsonPropertyName("state")]
+		TState? State);
 }

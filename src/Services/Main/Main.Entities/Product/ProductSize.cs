@@ -44,8 +44,9 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
 
 	public static Expression<Func<ProductSize, int>> GetKeySelector() => x => x.ProductId;
 
-	public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key) => x =>
-		x.ProductId == key;
+	public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
+		=> x =>
+			x.ProductId == key;
 
 	public static ProductSize Create(
 		int productId,
@@ -99,13 +100,11 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
 	}
 
 	private void RecalculateVolume()
-	{
-		VolumeM3 = DimensionExtensions.ToCubicMeters(
+		=> VolumeM3 = DimensionExtensions.ToCubicMeters(
 			Length,
 			Width,
 			Height,
 			Unit);
-	}
 
 	public override void OnUpdated() => AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
 

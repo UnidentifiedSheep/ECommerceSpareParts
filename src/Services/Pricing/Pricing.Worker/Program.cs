@@ -1,4 +1,3 @@
-using Persistence.Context;
 using System.Reflection;
 using Abstractions;
 using Api.Common;
@@ -16,6 +15,7 @@ using Contracts.Settings;
 using Integrations.Supplier.DI;
 using Internal.Integration.Di;
 using MassTransit;
+using Persistence.Context;
 using Pricing.Api.Startup;
 using Pricing.Application;
 using Pricing.Application.Consumers;

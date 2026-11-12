@@ -95,8 +95,8 @@ public class MessageBrokerStub : IPublishEndpoint
 
 	public ConnectHandle ConnectPublishObserver(IPublishObserver observer) => null!;
 
-	Task IPublishEndpoint.Publish<T>(T message, CancellationToken cancellationToken) =>
-		Publish(message, cancellationToken);
+	Task IPublishEndpoint.Publish<T>(T message, CancellationToken cancellationToken)
+		=> Publish(message, cancellationToken);
 
 	public IReadOnlyList<T> PublishedMessagesOfType<T>() where T : class
 	{

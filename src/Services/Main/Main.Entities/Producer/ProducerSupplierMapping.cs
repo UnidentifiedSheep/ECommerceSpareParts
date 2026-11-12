@@ -28,28 +28,30 @@ public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>,
 
 	public static Expression<Func<ProducerSupplierMapping, int>> GetKeySelector() => x => x.Id;
 
-	public static Expression<Func<ProducerSupplierMapping, bool>> GetEqualityExpression(int key) => x =>
-		x.Id == key;
+	public static Expression<Func<ProducerSupplierMapping, bool>> GetEqualityExpression(int key)
+		=> x =>
+			x.Id == key;
 
 	public static ProducerSupplierMapping Create(
 		int producerId,
 		string supplierProducerName,
 		Supplier supplier)
-	{
-		return new ProducerSupplierMapping
+		=> new()
 		{
 			ProducerId = producerId,
 			Supplier = supplier,
 			Name = supplierProducerName.Trim(),
 			NormalizedName = Producer.ToNormalizedName(supplierProducerName)
 		};
-	}
 
-	public override void OnCreated() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
+	public override void OnCreated()
+		=> AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
 
-	public override void OnUpdated() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
+	public override void OnUpdated()
+		=> AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
 
-	public override void OnDeleted() => AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
+	public override void OnDeleted()
+		=> AddDomainEvent(new ProducerSupplierMappingChangedDomainEvent(ProducerId));
 
 	public override int GetId() => Id;
 }

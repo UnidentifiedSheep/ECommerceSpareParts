@@ -11,14 +11,11 @@ namespace Main.Application.Handlers.Users;
 
 public sealed record GetUsersByIdsQuery : IQuery<GetUsersByIdsResult>
 {
-	public IReadOnlyList<Guid> Ids { get; }
 
 	public GetUsersByIdsQuery(Guid id) : this([id]) { }
 
-	public GetUsersByIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetUsersByIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
+	public IReadOnlyList<Guid> Ids { get; }
 }
 
 public sealed record GetUsersByIdsResult(IReadOnlyDictionary<Guid, UserDto> Users);

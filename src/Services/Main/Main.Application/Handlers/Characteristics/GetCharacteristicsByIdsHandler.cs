@@ -10,20 +10,17 @@ namespace Main.Application.Handlers.Characteristics;
 
 public sealed record GetCharacteristicsByIdsQuery : IQuery<GetCharacteristicsByIdsResult>
 {
-	public IReadOnlyList<int> Ids { get; }
 
 	public GetCharacteristicsByIdsQuery(int id) : this([id])
 	{
 	}
 
-	public GetCharacteristicsByIdsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
-
+	public GetCharacteristicsByIdsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToArray();
+	public IReadOnlyList<int> Ids { get; }
 }
 
-public sealed record GetCharacteristicsByIdsResult(IReadOnlyDictionary<int, CharacteristicDto> Characteristics);
+public sealed record GetCharacteristicsByIdsResult(
+	IReadOnlyDictionary<int, CharacteristicDto> Characteristics);
 
 public sealed class GetCharacteristicsByIdsHandler(
 	IReadRepository<Characteristic, int> repository,

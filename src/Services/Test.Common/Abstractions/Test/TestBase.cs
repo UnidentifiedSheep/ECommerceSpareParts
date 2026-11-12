@@ -24,11 +24,11 @@ public abstract class TestBase : IAsyncLifetime, ITest
 	public abstract ValueTask DisposeAsync();
 	public abstract ValueTask InitializeAsync();
 
-	public void RegisterBasicContext<TContext>() where TContext : class, ITestContext =>
-		RegisterBasicContext(typeof(TContext));
+	public void RegisterBasicContext<TContext>() where TContext : class, ITestContext
+		=> RegisterBasicContext(typeof(TContext));
 
-	public void RemoveBasicContext<TContext>() where TContext : class, ITestContext =>
-		_basicContexts.Remove(typeof(TContext));
+	public void RemoveBasicContext<TContext>() where TContext : class, ITestContext
+		=> _basicContexts.Remove(typeof(TContext));
 
 	private void RegisterBasicContext(Type type)
 	{

@@ -6,7 +6,8 @@ using Main.Enums.Orders;
 namespace Main.Api.GraphQl.Types.Order;
 
 [GraphQLName("OrderItem")]
-public sealed record GqlOrderItem([property: GraphQLIgnore] OrderItemDto Dto)
+public sealed record GqlOrderItem([property: GraphQLIgnore]
+	OrderItemDto Dto)
 {
 	[GraphQLName("id")]
 	public int Id => Dto.Id;

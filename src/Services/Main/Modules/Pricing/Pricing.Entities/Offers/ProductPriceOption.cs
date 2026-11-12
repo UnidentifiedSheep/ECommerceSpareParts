@@ -41,8 +41,9 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>,
 
 	public static Expression<Func<ProductPriceOption, Guid>> GetKeySelector() => x => x.PriceOfferId;
 
-	public static Expression<Func<ProductPriceOption, bool>> GetEqualityExpression(Guid key) => x =>
-		x.PriceOfferId == key;
+	public static Expression<Func<ProductPriceOption, bool>> GetEqualityExpression(Guid key)
+		=> x =>
+			x.PriceOfferId == key;
 
 	public static ProductPriceOption Create(
 		Guid priceOfferId,
@@ -76,15 +77,18 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>,
 		return option;
 	}
 
-	public void SetScore(decimal score) => Score =
-		score.EnsureNonNegative(() => new InvalidOperationException("Score cannot be negative"));
+	public void SetScore(decimal score)
+		=> Score =
+			score.EnsureNonNegative(() => new InvalidOperationException("Score cannot be negative"));
 
-	public void SetPrice(decimal priceInBaseCurrency) => Price = priceInBaseCurrency.EnsureGreaterThan(
-		0,
-		() => new InvalidOperationException("Price cannot be negative"));
+	public void SetPrice(decimal priceInBaseCurrency)
+		=> Price = priceInBaseCurrency.EnsureGreaterThan(
+			0,
+			() => new InvalidOperationException("Price cannot be negative"));
 
-	public void SetMarkup(decimal markup) => Markup =
-		markup.EnsureNonNegative(() => new InvalidOperationException("Markup cannot be negative"));
+	public void SetMarkup(decimal markup)
+		=> Markup =
+			markup.EnsureNonNegative(() => new InvalidOperationException("Markup cannot be negative"));
 
 	public void SetDeliveryTime(
 		TimeSpan deliveryTime,
@@ -105,9 +109,10 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>,
 		DeliveryProbability = deliveryProbability;
 	}
 
-	public void SetStorageCode(string storageCode) => ForStorageCode = storageCode
-		.TrimSafe()
-		.EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Storage name cannot be empty"));
+	public void SetStorageCode(string storageCode)
+		=> ForStorageCode = storageCode
+			.TrimSafe()
+			.EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Storage name cannot be empty"));
 
 	public override Guid GetId() => PriceOfferId;
 }

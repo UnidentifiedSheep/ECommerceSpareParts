@@ -1,11 +1,9 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Exceptions;
 using Main.Application.Handlers.StorageContents.GetStorageContents;
 using Main.Entities.Storage;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -133,7 +131,9 @@ public sealed class GetStorageContentsTests : IntegrationTest
 	[Theory]
 	[InlineData("unknown", null)]
 	[InlineData("count", "unexpected")]
-	public async Task GetStorageContents_WithInvalidSort_ThrowsInvalidInputException(string field, string? argument)
+	public async Task GetStorageContents_WithInvalidSort_ThrowsInvalidInputException(
+		string field,
+		string? argument)
 	{
 		var query = new GetStorageContentsQuery(
 			null,
@@ -150,45 +150,73 @@ public sealed class GetStorageContentsTests : IntegrationTest
 	{
 		var product = GetContext<ProductTestContext>().Products[0];
 		var storage = GetContext<StorageTestContext>().Storages.First();
-		var first = await CreateContent(product.Id, storage.Code, GetCurrencyId(), 10);
-		var second = await CreateContent(product.Id, storage.Code, GetCurrencyId(), 5);
-		var third = await CreateContent(product.Id, storage.Code, GetCurrencyId(), 8);
-		var overlocked = await CreateContent(product.Id, storage.Code, GetCurrencyId(), 1);
+		var first = await CreateContent(
+			product.Id,
+			storage.Code,
+			GetCurrencyId(),
+			10);
+		var second = await CreateContent(
+			product.Id,
+			storage.Code,
+			GetCurrencyId(),
+			5);
+		var third = await CreateContent(
+			product.Id,
+			storage.Code,
+			GetCurrencyId(),
+			8);
+		var overlocked = await CreateContent(
+			product.Id,
+			storage.Code,
+			GetCurrencyId(),
+			1);
 		var now = DateTimeOffset.UtcNow;
 		var released = StorageContentLock.Create(second.Id, 100);
 		released.Release(now.UtcDateTime);
-		Context.Set<StorageContentLock>().AddRange(
-			StorageContentLock.Create(first.Id, 8, now.AddHours(1).UtcDateTime),
-			StorageContentLock.Create(third.Id, 3),
-			StorageContentLock.Create(overlocked.Id, 4), released);
+		Context.Set<StorageContentLock>()
+			.AddRange(
+				StorageContentLock.Create(
+					first.Id,
+					8,
+					now.AddHours(1).UtcDateTime),
+				StorageContentLock.Create(third.Id, 3),
+				StorageContentLock.Create(overlocked.Id, 4),
+				released);
 		await Context.SaveChangesAsync(CancellationToken);
 		var sort = new SortExpression("availableCount");
 
-		var result = await Mediator.Send(new GetStorageContentsQuery(
-			product.Id, storage.Code, [sort], new Pagination(0, 100), true), CancellationToken);
+		var result = await Mediator.Send(
+			new GetStorageContentsQuery(
+				product.Id,
+				storage.Code,
+				[sort],
+				new Pagination(0, 100),
+				true),
+			CancellationToken);
 
-		Assert.Equal(new[] { overlocked.Id, first.Id, second.Id, third.Id }, result.Content.Select(content => content.Id));
+		Assert.Equal(
+			new[] { overlocked.Id, first.Id, second.Id, third.Id },
+			result.Content.Select(content => content.Id));
 	}
 
-	private int GetCurrencyId() =>
-		GetContext<CurrencyRatesTestContext>().CurrencyTestContext.Currencies[0].Id;
+	private int GetCurrencyId()
+		=> GetContext<CurrencyRatesTestContext>().CurrencyTestContext.Currencies[0].Id;
 
 	private async Task<StorageContent> CreateContent(
 		int productId,
 		string storageCode,
 		int currencyId,
 		int count)
-	{
-		return await new StorageContentBuilder(Faker)
+		=> await new StorageContentBuilder(Faker)
 			.WithProductIds(productId)
 			.WithStorageCode(storageCode)
 			.WithCurrencyId(currencyId)
 			.WithCount(count)
 			.BuildAndAddToDb(Context);
-	}
 }
 
-public class GetStorageContentsValidationTests : ValidationTest<GetStorageContentsValidation, GetStorageContentsQuery>
+public class
+	GetStorageContentsValidationTests : ValidationTest<GetStorageContentsValidation, GetStorageContentsQuery>
 {
 	[Theory]
 	[InlineData(-1, 20)]

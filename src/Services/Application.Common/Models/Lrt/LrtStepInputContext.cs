@@ -8,9 +8,9 @@ namespace Application.Common.Models.Lrt;
 
 public sealed class LrtStepInputContext
 {
-	private readonly string _parentState;
-	private readonly Type _parentInputType;
 	private readonly IReadOnlyDictionary<string, (Job Job, Type? OutputType)> _dependencies;
+	private readonly Type _parentInputType;
+	private readonly string _parentState;
 
 	internal LrtStepInputContext(
 		Guid parentId,
@@ -40,10 +40,14 @@ public sealed class LrtStepInputContext
 	{
 		ArgumentNullException.ThrowIfNull(step);
 		if (!_dependencies.TryGetValue(step.Key, out var dependency) ||
-			!string.Equals(dependency.Job.SystemName, step.SystemName, StringComparison.OrdinalIgnoreCase))
+			!string.Equals(
+				dependency.Job.SystemName,
+				step.SystemName,
+				StringComparison.OrdinalIgnoreCase))
 			throw new InvalidOperationException($"Step '{step.Key}' is not a declared dependency.");
 		if (dependency.OutputType != typeof(TOutput))
-			throw new InvalidOperationException($"Step '{step.Key}' does not produce '{typeof(TOutput).Name}'.");
+			throw new InvalidOperationException(
+				$"Step '{step.Key}' does not produce '{typeof(TOutput).Name}'.");
 		if (dependency.Job.Output is not { } output)
 			throw new InvalidOperationException($"Step '{step.Key}' has no saved output.");
 

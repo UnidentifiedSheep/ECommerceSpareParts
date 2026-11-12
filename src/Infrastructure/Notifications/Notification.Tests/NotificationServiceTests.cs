@@ -3,7 +3,6 @@ using Application.Common.Interfaces.Persistence;
 using Moq;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
-using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Interfaces.Recipient;
 using Notification.Core.Recipients;
@@ -20,35 +19,46 @@ public class NotificationServiceTests
 		INotificationRecipient recipient = inApp
 			? new InAppRecipient(Guid.NewGuid())
 			: new EmailRecipient("unconfirmed@example.com");
-		var notification = new TestNotification(new TestNotificationData
-		{
-			TestInt = 1,
-			TestString = "Verify email"
-		});
+		var notification = new TestNotification(
+			new TestNotificationData
+			{
+				TestInt = 1,
+				TestString = "Verify email"
+			});
 		var channel = new Mock<INotificationChannel>();
 		channel.SetupGet(x => x.SystemName).Returns(recipient.ChannelSystemName);
 		channel.Setup(x => x.CanHandle(notification, recipient)).Returns(true);
 		var channels = new Mock<INamedObjectRegistry<INotificationChannel>>();
 		channels.Setup(x => x.GetBySystemName(recipient.ChannelSystemName)).Returns(channel.Object);
 		var definition = new NotificationDefinitionBase<TestNotification, TestNotificationData>(
-			notification.SystemName, new NotificationSerializer(), model => new TestNotification(model));
+			notification.SystemName,
+			new NotificationSerializer(),
+			model => new TestNotification(model));
 		var definitions = new Mock<INamedObjectRegistry<INotificationDefinition>>();
 		definitions.Setup(x => x.GetBySystemName(notification.SystemName)).Returns(definition);
 		Notification.Core.Entities.Notification? stored = null;
 		var unitOfWork = new Mock<IUnitOfWork>();
 		unitOfWork.Setup(x => x.AddRangeAsync(
-			It.IsAny<IEnumerable<Notification.Core.Entities.Notification>>(),
-			It.IsAny<CancellationToken>()))
+				It.IsAny<IEnumerable<Notification.Core.Entities.Notification>>(),
+				It.IsAny<CancellationToken>()))
 			.Callback<IEnumerable<Notification.Core.Entities.Notification>, CancellationToken>((items, _) =>
 				stored = Assert.Single(items))
 			.Returns(Task.CompletedTask);
 		var resolver = new Mock<IRecipientResolver>(MockBehavior.Strict);
 		var service = new NotificationService(
-			resolver.Object, definitions.Object, unitOfWork.Object, channels.Object);
+			resolver.Object,
+			definitions.Object,
+			unitOfWork.Object,
+			channels.Object);
 
-		await service.QueueAsync(Guid.NewGuid(), notification, [recipient], TestContext.Current.CancellationToken);
+		await service.QueueAsync(
+			Guid.NewGuid(),
+			notification,
+			[recipient],
+			TestContext.Current.CancellationToken);
 
-		var delivery = Assert.Single(Assert.IsType<Notification.Core.Entities.Notification>(stored).Deliveries);
+		var delivery =
+			Assert.Single(Assert.IsType<Notification.Core.Entities.Notification>(stored).Deliveries);
 		Assert.DoesNotContain("$recipient", delivery.RecipientJson);
 		var deserialized = inApp
 			? (INotificationRecipient?)JsonSerializer.Deserialize<InAppRecipient>(delivery.RecipientJson!)
@@ -61,21 +71,23 @@ public class NotificationServiceTests
 	public async Task SendAsync_SendsToExplicitRecipientWithoutQueueing()
 	{
 		var recipient = new EmailRecipient("unconfirmed@example.com");
-		var notification = new TestNotification(new TestNotificationData
-		{
-			TestInt = 1,
-			TestString = "Verify email"
-		});
+		var notification = new TestNotification(
+			new TestNotificationData
+			{
+				TestInt = 1,
+				TestString = "Verify email"
+			});
 		var channel = new Mock<INotificationChannel>();
 		channel.SetupGet(x => x.SystemName).Returns(EmailRecipient.ChannelName);
 		channel.Setup(x => x.CanHandle(notification, recipient)).Returns(true);
 		var expected = SendResult.Success();
 		var cancellationToken = TestContext.Current.CancellationToken;
 		channel.Setup(x => x.SendAsync(
-			It.Is<NotificationDelivery>(delivery =>
-				ReferenceEquals(delivery.Notification, notification) &&
-				ReferenceEquals(delivery.Recipient, recipient)),
-			cancellationToken)).ReturnsAsync(expected);
+				It.Is<NotificationDelivery>(delivery =>
+					ReferenceEquals(delivery.Notification, notification) &&
+					ReferenceEquals(delivery.Recipient, recipient)),
+				cancellationToken))
+			.ReturnsAsync(expected);
 		var channels = new Mock<INamedObjectRegistry<INotificationChannel>>();
 		channels.Setup(x => x.TryGetBySystemName(EmailRecipient.ChannelName))
 			.Returns(channel.Object);
@@ -83,9 +95,15 @@ public class NotificationServiceTests
 		var definitions = new Mock<INamedObjectRegistry<INotificationDefinition>>(MockBehavior.Strict);
 		var unitOfWork = new Mock<IUnitOfWork>(MockBehavior.Strict);
 		var service = new NotificationService(
-			resolver.Object, definitions.Object, unitOfWork.Object, channels.Object);
+			resolver.Object,
+			definitions.Object,
+			unitOfWork.Object,
+			channels.Object);
 
-		var result = await service.SendAsync(recipient, notification, cancellationToken);
+		var result = await service.SendAsync(
+			recipient,
+			notification,
+			cancellationToken);
 
 		Assert.Same(expected, result);
 		channel.Verify(x => x.SendAsync(It.IsAny<NotificationDelivery>(), cancellationToken), Times.Once);

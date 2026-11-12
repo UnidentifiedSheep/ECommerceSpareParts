@@ -19,11 +19,12 @@ public sealed record GqlCreateUserPhoneInput
 	[GraphQLName("isConfirmed")]
 	public required bool IsConfirmed { get; init; }
 
-	public UserPhoneDto ToDto() => new()
-	{
-		Number = Number,
-		Type = Type,
-		IsPrimary = IsPrimary,
-		IsConfirmed = IsConfirmed
-	};
+	public UserPhoneDto ToDto()
+		=> new()
+		{
+			Number = Number,
+			Type = Type,
+			IsPrimary = IsPrimary,
+			IsConfirmed = IsConfirmed
+		};
 }

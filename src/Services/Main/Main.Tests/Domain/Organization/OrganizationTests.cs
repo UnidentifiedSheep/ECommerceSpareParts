@@ -368,10 +368,8 @@ public class OrganizationTests
 	}
 
 	private static OrganizationDomain CreateBusiness(Guid? ownerId = null)
-	{
-		return OrganizationDomain.CreateBusiness(
+		=> OrganizationDomain.CreateBusiness(
 			"Test organization",
 			"test-organization",
 			ownerId ?? Guid.NewGuid());
-	}
 }

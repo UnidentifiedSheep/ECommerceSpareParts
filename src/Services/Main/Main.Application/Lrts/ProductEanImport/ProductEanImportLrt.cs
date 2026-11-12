@@ -22,17 +22,22 @@ public class ProductEanImportLrt(
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductEanImportInputState, ProductEanImportState,
 		ProductEanImportLrt.ProductEanCsvDto, ProductEan>(
-		bucketsOptions, transactionService,
-		logger, s3Service, stringLocalizer)
+		bucketsOptions,
+		transactionService,
+		logger,
+		s3Service,
+		stringLocalizer)
 {
 	protected override int BatchSize => 10_000;
 
 	public override string SystemName => nameof(ProductEanImportLrt);
 	public override ILocalizableMessage NameLocalizationMessage => LrtProductEanImportNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProductEanImportDescriptionMessage.Instance;
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductEanImportDescriptionMessage.Instance;
+
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -63,13 +68,17 @@ public class ProductEanImportLrt(
 
 		await ExecuteInTransactionAsync(
 			TransactionalAttribute.RetryOnConflict(20, 2),
-			(context, cancellationToken) => context.GetRequiredService<IProductRepository>().InsertProductEansOnConflictDoNothingAsync(
-				items.Select(x => x.item).ToArray(), cancellationToken),
+			(context, cancellationToken) => context.GetRequiredService<IProductRepository>()
+				.InsertProductEansOnConflictDoNothingAsync(
+					items.Select(x => x.item).ToArray(),
+					cancellationToken),
 			CancellationToken);
 
 		Logger.LogInformation(
 			"Product EAN import batch processed. JobId: {JobId}, BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}",
-			JobId, items[0].idx, items.Count);
+			JobId,
+			items[0].idx,
+			items.Count);
 	}
 
 	public sealed record ProductEanCsvDto

@@ -1,6 +1,7 @@
 using Domain.CommonEnums;
 using FluentAssertions;
 using Main.Application.Lrts.ProducerImport;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -10,9 +11,7 @@ namespace Tests.LrtsTests;
 public sealed class ProducerImportLrtTests : CsvLrtIntegrationTest<ProducerImportLrt>
 {
 	public ProducerImportLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -36,7 +35,7 @@ public sealed class ProducerImportLrtTests : CsvLrtIntegrationTest<ProducerImpor
 		var state = execution.GetState<ProducerImportState>();
 		state.Errors.Should().ContainSingle(x => x.RowIdx == 3);
 		var created = await Context
-			.Set<global::Main.Entities.Producer.Producer>()
+			.Set<Producer>()
 			.AsNoTracking()
 			.CountAsync(x => x.Name == newName.ToUpperInvariant(), CancellationToken);
 		created.Should().Be(1);

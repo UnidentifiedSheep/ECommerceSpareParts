@@ -12,10 +12,7 @@ public sealed record GetUsersEmailsByIdsQuery : IQuery<GetUsersEmailsByIdsResult
 {
 	public GetUsersEmailsByIdsQuery(Guid id) : this([id]) { }
 
-	public GetUsersEmailsByIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetUsersEmailsByIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }

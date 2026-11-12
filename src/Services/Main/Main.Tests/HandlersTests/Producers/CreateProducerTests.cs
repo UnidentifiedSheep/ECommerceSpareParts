@@ -1,12 +1,11 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Entities.Exceptions;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -25,7 +24,7 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 		var created = await Mediator.Send(command, CancellationToken);
 
 		var createdProducer = await Context
-			.Set<global::Main.Entities.Producer.Producer>()
+			.Set<Producer>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == created.ProducerId, CancellationToken);
 
@@ -45,18 +44,19 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 		var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
 			Mediator.Send(new CreateProducerCommand(CreateDto() with { Name = name }), CancellationToken));
 
-		exception.Failures.Should().ContainSingle(failure => failure.Error is ProducerNameAlreadyTakenException);
+		exception.Failures
+			.Should()
+			.ContainSingle(failure => failure.Error is ProducerNameAlreadyTakenException);
 		(await Context.Set<Producer>().CountAsync(producer => producer.Name == "BOSCH", CancellationToken))
-			.Should().Be(1);
+			.Should()
+			.Be(1);
 	}
 
 	private NewProducerDto CreateDto()
-	{
-		return new NewProducerDto
+		=> new()
 		{
 			Name = Faker.Lorem.Word(), Description = Faker.Lorem.Sentence()
 		};
-	}
 }
 
 public class CreateProducerValidationTests : ValidationTest<CreateProducerValidation, CreateProducerCommand>
@@ -67,14 +67,17 @@ public class CreateProducerValidationTests : ValidationTest<CreateProducerValida
 	[InlineData("a")]
 	public async Task CreateProducer_TooShortName_FailsValidation(string name)
 	{
-		var result = await ValidateAsync(new CreateProducerCommand(new NewProducerDto { Name = name, Description = null }));
+		var result = await ValidateAsync(
+			new CreateProducerCommand(new NewProducerDto { Name = name, Description = null }));
 		result.ShouldHaveValidationErrorFor(x => x.NewProducer.Name).Only();
 	}
 
 	[Fact]
 	public async Task CreateProducer_TooLargeDescription_FailsValidation()
 	{
-		var result = await ValidateAsync(new CreateProducerCommand(new NewProducerDto { Name = "Bosch", Description = new string('x', 600) }));
+		var result = await ValidateAsync(
+			new CreateProducerCommand(
+				new NewProducerDto { Name = "Bosch", Description = new string('x', 600) }));
 		result.ShouldHaveValidationErrorFor(x => x.NewProducer.Description).Only();
 	}
 }

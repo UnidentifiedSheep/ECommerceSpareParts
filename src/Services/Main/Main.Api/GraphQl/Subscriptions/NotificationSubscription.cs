@@ -3,7 +3,6 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Composite;
-using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Notification;
 
 namespace Main.Api.GraphQl.Subscriptions;
@@ -14,8 +13,7 @@ public static partial class NotificationSubscription
 	[EventStream("notification { id }")]
 	[GraphQLName("onNotificationCreated")]
 	[RequireAllPermissions(PermissionCodes.NOTIFICATIONS_ME)]
-	public static NotificationCreated OnNotificationCreated()
-		=> EventStream.Create<NotificationCreated>();
+	public static NotificationCreated OnNotificationCreated() => EventStream.Create<NotificationCreated>();
 }
 
 public record NotificationCreated(

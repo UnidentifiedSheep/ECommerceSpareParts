@@ -8,10 +8,7 @@ namespace Main.Application.Notifications;
 
 public class UserLoggedInNotification : INotification<UserLoggedInNotificationData>, ITextNotification
 {
-	public UserLoggedInNotification(UserLoggedInNotificationData model)
-	{
-		Model = model;
-	}
+	public UserLoggedInNotification(UserLoggedInNotificationData model) => Model = model;
 
 	public string SystemName => "UserLoggedIn";
 	public UserLoggedInNotificationData Model { get; }
@@ -19,19 +16,6 @@ public class UserLoggedInNotification : INotification<UserLoggedInNotificationDa
 
 public record UserLoggedInNotificationData : INotificationModel, INotificationModelWithTitle
 {
-	public required string Title { get; init; }
-	public required string Heading { get; init; }
-	public required string HtmlLang { get; init; }
-	public required string Intro { get; init; }
-	public required string DateTimeLabel { get; init; }
-	public required string OccurredAt { get; init; }
-	public required string IpAddressLabel { get; init; }
-	public required string IpAddress { get; init; }
-	public required string DeviceLabel { get; init; }
-	public required string Device { get; init; }
-	public required string WasYou { get; init; }
-	public required string NotYou { get; init; }
-	public required string AsText { get; init; }
 
 	public UserLoggedInNotificationData() { }
 
@@ -60,6 +44,19 @@ public record UserLoggedInNotificationData : INotificationModel, INotificationMo
 		AsText = $"{Heading}. {Intro} {DateTimeLabel}: {OccurredAt}; " +
 			$"{IpAddressLabel}: {IpAddress}; {DeviceLabel}: {Device}. {NotYou}";
 	}
+	public required string Heading { get; init; }
+	public required string HtmlLang { get; init; }
+	public required string Intro { get; init; }
+	public required string DateTimeLabel { get; init; }
+	public required string OccurredAt { get; init; }
+	public required string IpAddressLabel { get; init; }
+	public required string IpAddress { get; init; }
+	public required string DeviceLabel { get; init; }
+	public required string Device { get; init; }
+	public required string WasYou { get; init; }
+	public required string NotYou { get; init; }
+	public required string AsText { get; init; }
+	public required string Title { get; init; }
 
 	private static string FormatDevice(string? userAgent, string unknown)
 	{

@@ -12,10 +12,7 @@ public sealed record GetUsersStoragesByIdsQuery : IQuery<GetUsersStoragesByIdsRe
 {
 	public GetUsersStoragesByIdsQuery(Guid id) : this([id]) { }
 
-	public GetUsersStoragesByIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetUsersStoragesByIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }
@@ -46,8 +43,9 @@ public sealed class GetUsersStoragesByIdsHandler(
 			})
 			.ToListAsync(cancellationToken);
 
-		return new GetUsersStoragesByIdsResult(rows
-			.GroupBy(x => x.UserId, x => x.Dto)
-			.ToDictionary(x => x.Key, IReadOnlyList<StorageDto> (x) => x.ToArray()));
+		return new GetUsersStoragesByIdsResult(
+			rows
+				.GroupBy(x => x.UserId, x => x.Dto)
+				.ToDictionary(x => x.Key, IReadOnlyList<StorageDto> (x) => x.ToArray()));
 	}
 }

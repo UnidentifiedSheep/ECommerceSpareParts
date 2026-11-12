@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Main.Application.Handlers.Balance;
+using Main.Entities.Balance;
 using Main.Entities.Organization;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +43,7 @@ public class CreateSystemTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var transaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -53,11 +54,11 @@ public class CreateSystemTransactionTests : IntegrationTest
 		transaction.IsCompleted.Should().BeTrue();
 
 		var userBalance = await Context
-			.Set<global::Main.Entities.Balance.OrganizationBalance>()
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var systemBalance = await Context
-			.Set<global::Main.Entities.Balance.OrganizationBalance>()
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id,
@@ -86,7 +87,7 @@ public class CreateSystemTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var transaction = await Context
-			.Set<global::Main.Entities.Balance.Transaction>()
+			.Set<Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -97,11 +98,11 @@ public class CreateSystemTransactionTests : IntegrationTest
 		transaction.IsCompleted.Should().BeTrue();
 
 		var userBalance = await Context
-			.Set<global::Main.Entities.Balance.OrganizationBalance>()
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var systemBalance = await Context
-			.Set<global::Main.Entities.Balance.OrganizationBalance>()
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id,

@@ -10,9 +10,12 @@ namespace Main.Application.DomainEventHandlers.Purchase.PurchaseUpdated;
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
 	: BatchableDomainEventHandler<EntityUpdatedDomainEvent<PurchaseEntity, Guid>>
 {
-	public override Task Handle(Batch<EntityUpdatedDomainEvent<PurchaseEntity, Guid>> notification, CancellationToken cancellationToken)
+	public override Task Handle(
+		Batch<EntityUpdatedDomainEvent<PurchaseEntity, Guid>> notification,
+		CancellationToken cancellationToken)
 	{
-		integrationEventScope.AddRange(notification.Items.Select(item => new PurchaseUpdatedEvent { Id = item.Id }));
+		integrationEventScope.AddRange(
+			notification.Items.Select(item => new PurchaseUpdatedEvent { Id = item.Id }));
 		return Task.CompletedTask;
 	}
 }

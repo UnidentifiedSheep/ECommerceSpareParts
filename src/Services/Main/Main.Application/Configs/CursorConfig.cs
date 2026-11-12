@@ -1,4 +1,3 @@
-using Abstractions;
 using Application.Common.Querying;
 using Main.Application.Analytics.Configs;
 using Notification.Core.Entities;

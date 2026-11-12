@@ -21,28 +21,34 @@ public class MarkupCalculationLrt(
 
 	public override ILocalizableMessage NameLocalizationMessage => LrtMarkupCalculationNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtMarkupCalculationDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtMarkupCalculationDescriptionMessage.Instance;
 
 	protected override async Task DoWork(MarkupCalculationInputState inputState)
 	{
-		var ranges = await ExecuteInScopeAsync(async (context, ct) =>
-		{
-			var analyzer = context.GetRequiredService<INamedObjectRegistry<MarkupAnalyzerNamedObjectBase>>()
-				.GetBySystemName(MarkupRangeAnalyzer.AnalyzerSystemName);
-			var result = await analyzer.AnalyzeAsync(new MarkupAnalyzerInput
+		var ranges = await ExecuteInScopeAsync(
+			async (context, ct) =>
 			{
-				StartDate = inputState.RangeStart, EndDate = inputState.RangeEnd
-			}, ct);
-			return result.Select(x => new MarkupRangeItem
-			{
-				Count = x.Count,
-				FromCost = x.FromCost,
-				MeanMarkup = x.MeanMarkup,
-				StdDevMarkup = x.StdDevMarkup,
-				ToCost = x.ToCost
-			}).ToList();
-		}, CancellationToken);
+				var analyzer = context
+					.GetRequiredService<INamedObjectRegistry<MarkupAnalyzerNamedObjectBase>>()
+					.GetBySystemName(MarkupRangeAnalyzer.AnalyzerSystemName);
+				var result = await analyzer.AnalyzeAsync(
+					new MarkupAnalyzerInput
+					{
+						StartDate = inputState.RangeStart, EndDate = inputState.RangeEnd
+					},
+					ct);
+				return result.Select(x => new MarkupRangeItem
+					{
+						Count = x.Count,
+						FromCost = x.FromCost,
+						MeanMarkup = x.MeanMarkup,
+						StdDevMarkup = x.StdDevMarkup,
+						ToCost = x.ToCost
+					})
+					.ToList();
+			},
+			CancellationToken);
 
 		await ExecuteInTransactionAsync(
 			TransactionalAttribute.ReadCommitted(20, 2),

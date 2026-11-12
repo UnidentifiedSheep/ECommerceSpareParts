@@ -31,7 +31,10 @@ public sealed class DocumentLinkProvider(ICache cache, IS3Service s3Service) : I
 			key,
 			async () =>
 			{
-				var url = await s3Service.CreatePresignedDownloadUrl(bucketName, storageKey, lifetime);
+				var url = await s3Service.CreatePresignedDownloadUrl(
+					bucketName,
+					storageKey,
+					lifetime);
 				return new DocumentLink(url, signedAtUtc.Add(lifetime));
 			},
 			cacheTtl) ?? throw new InvalidOperationException("Document link could not be created.");

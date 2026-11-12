@@ -1,11 +1,11 @@
-using Main.Entities.Product;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Handlers.Characteristics.UpsertCharacteristic;
 using Main.Entities;
 using Main.Entities.Exceptions;
+using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -25,7 +25,8 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 		result.Characteristic.Name.Should().Be("Brake Pads");
 		result.Characteristic.NormalizedName.Should().Be("brake-pads");
 
-		var saved = await Context.Set<Characteristic>().AsNoTracking()
+		var saved = await Context.Set<Characteristic>()
+			.AsNoTracking()
 			.SingleAsync(CancellationToken);
 		saved.Id.Should().Be(result.Characteristic.Id);
 		saved.Name.Should().Be(result.Characteristic.Name);
@@ -48,7 +49,8 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 		result.Characteristic.Name.Should().Be("Oil Filters");
 		result.Characteristic.NormalizedName.Should().Be("oil-filters");
 
-		var saved = await Context.Set<Characteristic>().AsNoTracking()
+		var saved = await Context.Set<Characteristic>()
+			.AsNoTracking()
 			.SingleAsync(CancellationToken);
 		saved.Id.Should().Be(existing.Id);
 		saved.Name.Should().Be("Oil Filters");
@@ -85,8 +87,12 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 			CancellationToken);
 
 		var exception = await act.Should().ThrowAsync<CharacteristicNameAlreadyExistsException>();
-		exception.Which.LocalizableMessage.MessageKey.Should().Be(
-			CharacteristicNormalizedNameAlreadyExistsMessage.Key);
+		exception.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be(
+				CharacteristicNormalizedNameAlreadyExistsMessage.Key);
 		(await Context.Set<Characteristic>().CountAsync(CancellationToken)).Should().Be(1);
 	}
 
@@ -106,7 +112,8 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 			CancellationToken);
 
 		await act.Should().ThrowAsync<CharacteristicNameAlreadyExistsException>();
-		var saved = await Context.Set<Characteristic>().AsNoTracking()
+		var saved = await Context.Set<Characteristic>()
+			.AsNoTracking()
 			.SingleAsync(characteristic => characteristic.Id == existing.Id, CancellationToken);
 		saved.Name.Should().Be("Brake Pads");
 		saved.NormalizedName.Should().Be("brake-pads");
@@ -135,11 +142,11 @@ public class UpsertCharacteristicTests(CombinedContainerFixture fixture) : Integ
 		result.Characteristic.Name.Should().HaveLength(128);
 		result.Characteristic.NormalizedName.Should().HaveLength(128);
 	}
-
-
 }
 
-public class UpsertCharacteristicValidationTests : ValidationTest<UpsertCharacteristicValidation, UpsertCharacteristicCommand>
+public class
+	UpsertCharacteristicValidationTests : ValidationTest<UpsertCharacteristicValidation,
+	UpsertCharacteristicCommand>
 {
 	[Theory]
 	[InlineData(null)]

@@ -26,19 +26,22 @@ public abstract class CsvLrtIntegrationTest<TLrt>(CombinedContainerFixture fixtu
 				header
 			}.Concat(rows));
 		Scope
-		.ServiceProvider
-		.GetRequiredService<S3StorageServiceStub>()
-		.SetFile(
-			UploadsBucket,
-			fileName,
-			csv);
+			.ServiceProvider
+			.GetRequiredService<S3StorageServiceStub>()
+			.SetFile(
+				UploadsBucket,
+				fileName,
+				csv);
 
-		return ExecuteLrt(JsonSerializer.Serialize(createState(fileName)), cancellationToken: CancellationToken);
+		return ExecuteLrt(
+			JsonSerializer.Serialize(createState(fileName)),
+			cancellationToken: CancellationToken);
 	}
 
-	protected static string CsvRow(params object?[] values) => string.Join(
-		",",
-		values.Select(x => Escape(x?.ToString() ?? string.Empty)));
+	protected static string CsvRow(params object?[] values)
+		=> string.Join(
+			",",
+			values.Select(x => Escape(x?.ToString() ?? string.Empty)));
 
 	private static string Escape(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
 }

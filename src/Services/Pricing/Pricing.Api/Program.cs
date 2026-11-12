@@ -1,4 +1,3 @@
-using Persistence.Context;
 using System.Reflection;
 using Abstractions;
 using Api.Common;
@@ -21,6 +20,7 @@ using GraphQL.Common.Extensions;
 using Integrations.Supplier.DI;
 using Internal.Integration.Di;
 using MassTransit;
+using Persistence.Context;
 using Pricing.Api.GraphQl;
 using Pricing.Api.Startup;
 using Pricing.Application;

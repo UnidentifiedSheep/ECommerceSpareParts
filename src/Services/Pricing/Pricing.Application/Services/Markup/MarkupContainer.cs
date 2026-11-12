@@ -58,8 +58,7 @@ public class MarkupContainer : IMarkupContainer
 	}
 
 	private static MarkupRangeIndex GenMap(IEnumerable<MarkupRange> markupRanges)
-	{
-		return new MarkupRangeIndex(
+		=> new(
 			markupRanges
 				.OrderBy(x => x.RangeStart)
 				.ThenBy(x => x.RangeEnd)
@@ -68,15 +67,13 @@ public class MarkupContainer : IMarkupContainer
 					x.RangeEnd,
 					new Models.Markup(x.Markup)))
 				.ToArray());
-	}
 
 	private void GenMarkupHash(
 		IReadOnlyCollection<MarkupRange> defaultRanges,
 		IReadOnlyDictionary<int, List<MarkupRange>> otherRanges,
 		int defaultCurrencyId,
 		Models.Markup defaultMarkup)
-	{
-		CurrentVersion = ConfigurationVersionGenerator.Generate(writer =>
+		=> CurrentVersion = ConfigurationVersionGenerator.Generate(writer =>
 		{
 			writer.WriteStartObject();
 			writer.WriteNumber("defaultCurrencyId", defaultCurrencyId);
@@ -97,7 +94,6 @@ public class MarkupContainer : IMarkupContainer
 			writer.WriteEndArray();
 			writer.WriteEndObject();
 		});
-	}
 
 	private static void WriteRanges(Utf8JsonWriter writer, IEnumerable<MarkupRange> ranges)
 	{

@@ -11,19 +11,20 @@ namespace Main.Application.Lrts.ProductSynchronization;
 
 public sealed class ProductSynchronizationLrt(
 	IApplicationTransactionFactory transactionService,
-	ILogger<ProductSynchronizationLrt> logger) : SynchronizationLrtBase<ProductSynchronizationInputState, int, object>(
-	transactionService,
-	logger)
+	ILogger<ProductSynchronizationLrt> logger)
+	: SynchronizationLrtBase<ProductSynchronizationInputState, int, object>(
+		transactionService,
+		logger)
 {
 	public const string Name = nameof(ProductSynchronizationLrt);
 
 	public override string SystemName => Name;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtProductSynchronizationNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProductSynchronizationNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProductSynchronizationDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductSynchronizationDescriptionMessage.Instance;
 
 	protected override async Task<SynchronizationPage<int, object>> GetPageAsync(
 		int? lastProcessedId,
@@ -42,6 +43,10 @@ public sealed class ProductSynchronizationLrt(
 
 		return new SynchronizationPage<int, object>(
 			ids,
-			await TransactionContext.GetRequiredService<IProductEventProvider>().GetEventsAsync(ids, InputState.Parts, cancellationToken));
+			await TransactionContext.GetRequiredService<IProductEventProvider>()
+				.GetEventsAsync(
+					ids,
+					InputState.Parts,
+					cancellationToken));
 	}
 }

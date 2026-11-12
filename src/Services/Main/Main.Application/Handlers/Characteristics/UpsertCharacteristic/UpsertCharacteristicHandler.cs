@@ -37,7 +37,7 @@ public class UpsertCharacteristicHandler(
 
 		var characteristic = request.Id != null
 			? characteristics.FirstOrDefault(item => item.Id == request.Id) ??
-				throw new CharacteristicNotFoundException(request.Id.Value)
+			throw new CharacteristicNotFoundException(request.Id.Value)
 			: null;
 
 		if (characteristics.Any(item => item.NormalizedName == normalizedName && item.Id != request.Id))

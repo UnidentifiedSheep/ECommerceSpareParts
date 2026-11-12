@@ -21,7 +21,7 @@ public class NotificationDeliveryRepository<TContext>(
 		var query = context.Set<NotificationDelivery>()
 			.Include(delivery => delivery.Notification)
 			.Where(delivery => delivery.ChannelSystemName == channelSystemName &&
-			                   delivery.Status == DeliveryStatus.Pending)
+				delivery.Status == DeliveryStatus.Pending)
 			.OrderBy(delivery => delivery.NotificationId)
 			.Take(batchSize);
 
@@ -38,7 +38,7 @@ public class NotificationDeliveryRepository<TContext>(
 
 		var query = context.Set<NotificationDelivery>()
 			.Where(delivery => delivery.ChannelSystemName == channelSystemName &&
-			                   delivery.Status == DeliveryStatus.Pending)
+				delivery.Status == DeliveryStatus.Pending)
 			.Take(1);
 
 		var next = await queryableExtensions

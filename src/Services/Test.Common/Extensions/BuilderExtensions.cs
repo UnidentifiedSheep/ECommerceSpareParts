@@ -5,7 +5,10 @@ namespace Tests.Extensions;
 
 public static class BuilderExtensions
 {
-	public static async Task<T> BuildAndAddToDb<T>(this IBuilder<T> builder, DbContext context, CancellationToken cancellationToken = default)
+	public static async Task<T> BuildAndAddToDb<T>(
+		this IBuilder<T> builder,
+		DbContext context,
+		CancellationToken cancellationToken = default)
 	{
 		var entity = builder.Build();
 		ArgumentNullException.ThrowIfNull(entity);
@@ -48,11 +51,9 @@ public static class BuilderExtensions
 		DbContext context,
 		int count,
 		bool saveChanges = true) where T : class
-	{
-		return BuildManyCombinedAndAddToDb(
+		=> BuildManyCombinedAndAddToDb(
 			context,
 			count,
 			saveChanges,
 			builders.ToArray());
-	}
 }

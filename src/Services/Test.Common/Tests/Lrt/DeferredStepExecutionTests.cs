@@ -39,14 +39,19 @@ public sealed class DeferredStepExecutionTests
 		fixture.Producer.Output.Should().NotBeNull();
 
 		var lrt = fixture.CreateConsumer();
-		await fixture.ExecuteAsync(lrt, fixture.Consumer, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			lrt,
+			fixture.Consumer,
+			TestContext.Current.CancellationToken);
 
 		fixture.Preparations.Should().Be(1);
 		fixture.Consumer.Status.Should().Be(JobStatus.Succeeded);
 		fixture.Consumer.InputInitialized.Should().BeTrue();
 		lrt.ObservedInput.Should().BeEquivalentTo(new StepInput("files/source.csv", 42));
 		lrt.ObservedProgress.Should().Be(7);
-		LrtStateSerializer.DeserializeInput<StepInput>(fixture.Consumer.State).Should().BeEquivalentTo(lrt.ObservedInput);
+		LrtStateSerializer.DeserializeInput<StepInput>(fixture.Consumer.State)
+			.Should()
+			.BeEquivalentTo(lrt.ObservedInput);
 	}
 
 	[Fact]
@@ -57,7 +62,10 @@ public sealed class DeferredStepExecutionTests
 		var lrt = fixture.CreateConsumer();
 		lrt.Work = _ => lrt.Calls == 1 ? throw new InvalidOperationException("retry") : Task.CompletedTask;
 
-		await fixture.ExecuteAsync(lrt, fixture.Consumer, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			lrt,
+			fixture.Consumer,
+			TestContext.Current.CancellationToken);
 
 		fixture.Consumer.Status.Should().Be(JobStatus.Succeeded);
 		fixture.Consumer.Attempts.Should().Be(2);
@@ -70,7 +78,8 @@ public sealed class DeferredStepExecutionTests
 	{
 		using var fixture = new Fixture();
 		await fixture.ReadyConsumerAsync();
-		using var stopped = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+		using var stopped =
+			CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
 		var first = fixture.CreateConsumer();
 		first.Work = async lrt =>
 		{
@@ -79,12 +88,18 @@ public sealed class DeferredStepExecutionTests
 			await stopped.CancelAsync();
 			throw new OperationCanceledException(stopped.Token);
 		};
-		await fixture.ExecuteAsync(first, fixture.Consumer, stopped.Token);
+		await fixture.ExecuteAsync(
+			first,
+			fixture.Consumer,
+			stopped.Token);
 		fixture.Consumer.Status.Should().Be(JobStatus.Processing);
 		fixture.RejectPreparation = true;
 
 		var restarted = fixture.CreateConsumer();
-		await fixture.ExecuteAsync(restarted, fixture.Consumer, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			restarted,
+			fixture.Consumer,
+			TestContext.Current.CancellationToken);
 
 		fixture.Consumer.Status.Should().Be(JobStatus.Succeeded);
 		fixture.Consumer.Attempts.Should().Be(2);
@@ -100,7 +115,10 @@ public sealed class DeferredStepExecutionTests
 		await fixture.ReadyConsumerAsync();
 		var lrt = fixture.CreateConsumer();
 
-		await fixture.ExecuteAsync(lrt, fixture.Consumer, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			lrt,
+			fixture.Consumer,
+			TestContext.Current.CancellationToken);
 
 		fixture.Consumer.Status.Should().Be(JobStatus.Succeeded);
 		fixture.Consumer.Attempts.Should().Be(2);
@@ -115,7 +133,10 @@ public sealed class DeferredStepExecutionTests
 		await fixture.ReadyConsumerAsync();
 		var lrt = fixture.CreateConsumer();
 
-		await fixture.ExecuteAsync(lrt, fixture.Consumer, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			lrt,
+			fixture.Consumer,
+			TestContext.Current.CancellationToken);
 
 		fixture.Consumer.Status.Should().Be(JobStatus.Failed);
 		fixture.Consumer.InputInitialized.Should().BeFalse();
@@ -133,7 +154,10 @@ public sealed class DeferredStepExecutionTests
 		fixture.Parent.ActivateStep(fixture.Consumer);
 		var lrt = fixture.CreateConsumer();
 
-		await fixture.ExecuteAsync(lrt, fixture.Consumer, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			lrt,
+			fixture.Consumer,
+			TestContext.Current.CancellationToken);
 
 		fixture.Preparations.Should().Be(0);
 		fixture.Consumer.InputInitialized.Should().BeFalse();
@@ -149,7 +173,10 @@ public sealed class DeferredStepExecutionTests
 		fixture.Parent.RequestCancellation("stop");
 		var lrt = fixture.CreateConsumer();
 
-		await fixture.ExecuteAsync(lrt, fixture.Consumer, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			lrt,
+			fixture.Consumer,
+			TestContext.Current.CancellationToken);
 
 		fixture.Preparations.Should().Be(0);
 		fixture.Consumer.InputInitialized.Should().BeFalse();
@@ -183,7 +210,10 @@ public sealed class DeferredStepExecutionTests
 		fixture.Consumer.AcquireLease(Guid.NewGuid(), TimeSpan.FromMinutes(5));
 		var lrt = fixture.CreateConsumer();
 
-		await lrt.ExecuteAsync(fixture.Consumer.Id, Guid.NewGuid(), TestContext.Current.CancellationToken);
+		await lrt.ExecuteAsync(
+			fixture.Consumer.Id,
+			Guid.NewGuid(),
+			TestContext.Current.CancellationToken);
 
 		fixture.Preparations.Should().Be(0);
 		fixture.Consumer.InputInitialized.Should().BeFalse();
@@ -197,7 +227,10 @@ public sealed class DeferredStepExecutionTests
 		using var fixture = new Fixture();
 		await fixture.ReadyConsumerAsync();
 		fixture.Parent.Output.Should().BeNull();
-		await fixture.ExecuteAsync(fixture.CreateConsumer(), fixture.Consumer, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			fixture.CreateConsumer(),
+			fixture.Consumer,
+			TestContext.Current.CancellationToken);
 
 		await fixture.ResumeWorkflowAsync();
 
@@ -208,13 +241,16 @@ public sealed class DeferredStepExecutionTests
 	[Fact]
 	public async Task ExecuteAsync_NestedWorkflowPreparesInputWithRetryThenPassesItToItsOwnStep()
 	{
-		using var fixture = new Fixture(nested: true) { PreparationFailures = 1 };
+		using var fixture = new Fixture(true) { PreparationFailures = 1 };
 		await fixture.ReadyConsumerAsync();
 		var nested = (MultiStepJob)fixture.Consumer;
 		nested.MaxAttempts.Should().Be(3);
 		var leaf = nested.Steps.Single();
 
-		await fixture.ExecuteAsync(fixture.CreateNested(), nested, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			fixture.CreateNested(),
+			nested,
+			TestContext.Current.CancellationToken);
 
 		fixture.Preparations.Should().Be(2);
 		nested.Attempts.Should().Be(2);
@@ -222,10 +258,16 @@ public sealed class DeferredStepExecutionTests
 		nested.Output.Should().BeNull();
 		leaf.InputInitialized.Should().BeFalse();
 		var consumer = fixture.CreateConsumer();
-		await fixture.ExecuteAsync(consumer, leaf, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			consumer,
+			leaf,
+			TestContext.Current.CancellationToken);
 		consumer.ObservedInput.Should().BeEquivalentTo(new StepInput("files/source.csv", 42));
 		nested.Resume();
-		await fixture.ExecuteAsync(fixture.CreateNested(), nested, TestContext.Current.CancellationToken);
+		await fixture.ExecuteAsync(
+			fixture.CreateNested(),
+			nested,
+			TestContext.Current.CancellationToken);
 		await fixture.ResumeWorkflowAsync();
 
 		nested.Status.Should().Be(JobStatus.Succeeded);
@@ -235,9 +277,9 @@ public sealed class DeferredStepExecutionTests
 
 	private sealed class Fixture : IDisposable
 	{
-		private readonly ServiceProvider _services;
-		private readonly bool _nested;
 		private readonly Dictionary<Guid, Job> _jobs;
+		private readonly bool _nested;
+		private readonly ServiceProvider _services;
 		private readonly IApplicationTransactionFactory _transactions;
 
 		public Fixture(bool nested = false)
@@ -250,29 +292,41 @@ public sealed class DeferredStepExecutionTests
 			var repository = new Mock<IRepository<Job, Guid>>();
 			var unitOfWork = new Mock<IUnitOfWork>();
 			unitOfWork.SetupGet(x => x.Context).Returns(new UnitOfWorkContext());
-			unitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-			unitOfWork.Setup(x => x.ReloadAsync(It.IsAny<Job>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-			_transactions = new ApplicationTransactionFactoryStub(unitOfWork.Object,
+			unitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+				.Returns(Task.CompletedTask);
+			unitOfWork.Setup(x => x.ReloadAsync(It.IsAny<Job>(), It.IsAny<CancellationToken>()))
+				.Returns(Task.CompletedTask);
+			_transactions = new ApplicationTransactionFactoryStub(
+				unitOfWork.Object,
 				Mock.Of<IRepositoryProvider>(p => p.Get<Job, Guid>() == repository.Object),
-				Mock.Of<IIntegrationEventScope>(), _services);
-			registry.Setup(x => x.GetBySystemName(It.IsAny<string>())).Returns((string name) => name switch
-			{
-				"workflow" => CreateWorkflow(),
-				"producer" => new ProducerLrt(_transactions),
-				"consumer" => CreateConsumer(),
-				"nested" => CreateNested(),
-				_ => throw new InvalidOperationException(name)
-			});
-			Parent = (MultiStepJob)new JobCreationDispatcher(registry.Object).Create("workflow", "{\"BatchSize\":42}", 3);
+				Mock.Of<IIntegrationEventScope>(),
+				_services);
+			registry.Setup(x => x.GetBySystemName(It.IsAny<string>()))
+				.Returns((string name) => name switch
+				{
+					"workflow" => CreateWorkflow(),
+					"producer" => new ProducerLrt(_transactions),
+					"consumer" => CreateConsumer(),
+					"nested" => CreateNested(),
+					_ => throw new InvalidOperationException(name)
+				});
+			Parent = (MultiStepJob)new JobCreationDispatcher(registry.Object).Create(
+				"workflow",
+				"{\"BatchSize\":42}",
+				3);
 			Producer = Parent.Steps.Single(x => x.StepKey == "download");
 			Consumer = Parent.Steps.Single(x => x.StepKey == "import");
 			_jobs = AllJobs(Parent).ToDictionary(x => x.Id);
 			repository.Setup(x => x.GetById(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
 				.Returns((Guid id, CancellationToken _) => new ValueTask<Job?>(_jobs[id]));
-			repository.Setup(x => x.FirstOrDefaultAsync(It.IsAny<Criteria<Job>>(), It.IsAny<CancellationToken>()))
-				.Returns((Criteria<Job>? criteria, CancellationToken _) => Task.FromResult(Filter(criteria).FirstOrDefault()));
+			repository.Setup(x => x.FirstOrDefaultAsync(
+					It.IsAny<Criteria<Job>>(),
+					It.IsAny<CancellationToken>()))
+				.Returns((Criteria<Job>? criteria, CancellationToken _)
+					=> Task.FromResult(Filter(criteria).FirstOrDefault()));
 			repository.Setup(x => x.ListAsync(It.IsAny<Criteria<Job>>(), It.IsAny<CancellationToken>()))
-				.Returns((Criteria<Job>? criteria, CancellationToken _) => Task.FromResult(Filter(criteria).ToList()));
+				.Returns((Criteria<Job>? criteria, CancellationToken _)
+					=> Task.FromResult(Filter(criteria).ToList()));
 		}
 
 		public MultiStepJob Parent { get; }
@@ -283,31 +337,52 @@ public sealed class DeferredStepExecutionTests
 		public bool RejectPreparation { get; set; }
 		public bool InvalidInput { get; init; }
 
-		private IEnumerable<Job> Filter(Criteria<Job>? criteria) => criteria?.Wheres.Aggregate(
-			_jobs.Values.AsEnumerable(), (jobs, predicate) => jobs.Where(predicate.Compile())) ?? _jobs.Values;
+		public void Dispose() => _services.Dispose();
 
-		private WorkflowLrt CreateWorkflow() => new(_transactions, async (context, producer, ct) =>
-		{
-			ct.ThrowIfCancellationRequested();
-			Preparations++;
-			if (RejectPreparation || Preparations <= PreparationFailures)
-				throw new InvalidOperationException("preparation failed");
-			await Task.Yield();
-			var output = context.GetOutput<FileOutput>(producer);
-			return new StepInput(InvalidInput ? "" : output.StorageKey, context.GetParentInput<WorkflowInput>().BatchSize);
-		}, _nested ? "nested" : "consumer");
+		private IEnumerable<Job> Filter(Criteria<Job>? criteria)
+			=> criteria?.Wheres.Aggregate(
+				_jobs.Values.AsEnumerable(),
+				(jobs, predicate) => jobs.Where(predicate.Compile())) ?? _jobs.Values;
+
+		private WorkflowLrt CreateWorkflow()
+			=> new(
+				_transactions,
+				async (
+					context, producer,
+					ct) =>
+				{
+					ct.ThrowIfCancellationRequested();
+					Preparations++;
+					if (RejectPreparation || Preparations <= PreparationFailures)
+						throw new InvalidOperationException("preparation failed");
+					await Task.Yield();
+					var output = context.GetOutput<FileOutput>(producer);
+					return new StepInput(
+						InvalidInput ? "" : output.StorageKey,
+						context.GetParentInput<WorkflowInput>().BatchSize);
+				},
+				_nested ? "nested" : "consumer");
 
 		public ConsumerLrt CreateConsumer() => new(_transactions);
 		public NestedWorkflowLrt CreateNested() => new(_transactions);
 
-		private static IEnumerable<Job> AllJobs(Job job) => job is MultiStepJob workflow
-			? workflow.Steps.SelectMany(AllJobs).Prepend(job) : [job];
-		public Task StartWorkflowAsync() => ExecuteAsync(CreateWorkflow(), Parent, TestContext.Current.CancellationToken);
+		private static IEnumerable<Job> AllJobs(Job job)
+			=> job is MultiStepJob workflow
+				? workflow.Steps.SelectMany(AllJobs).Prepend(job)
+				: [job];
+		public Task StartWorkflowAsync()
+			=> ExecuteAsync(
+				CreateWorkflow(),
+				Parent,
+				TestContext.Current.CancellationToken);
 
 		public async Task ReadyConsumerAsync()
 		{
 			await StartWorkflowAsync();
-			await ExecuteAsync(new ProducerLrt(_transactions), Producer, TestContext.Current.CancellationToken);
+			await ExecuteAsync(
+				new ProducerLrt(_transactions),
+				Producer,
+				TestContext.Current.CancellationToken);
 			await ResumeWorkflowAsync();
 			Consumer.Status.Should().Be(JobStatus.Pending);
 		}
@@ -315,17 +390,24 @@ public sealed class DeferredStepExecutionTests
 		public Task ResumeWorkflowAsync()
 		{
 			Parent.Resume();
-			return ExecuteAsync(CreateWorkflow(), Parent, TestContext.Current.CancellationToken);
+			return ExecuteAsync(
+				CreateWorkflow(),
+				Parent,
+				TestContext.Current.CancellationToken);
 		}
 
-		public Task ExecuteAsync(ILrt lrt, Job job, CancellationToken cancellationToken)
+		public Task ExecuteAsync(
+			ILrt lrt,
+			Job job,
+			CancellationToken cancellationToken)
 		{
 			var lease = Guid.NewGuid();
 			job.AcquireLease(lease, TimeSpan.FromMinutes(5));
-			return lrt.ExecuteAsync(job.Id, lease, cancellationToken);
+			return lrt.ExecuteAsync(
+				job.Id,
+				lease,
+				cancellationToken);
 		}
-
-		public void Dispose() => _services.Dispose();
 	}
 
 	private sealed class WorkflowLrt(
@@ -338,13 +420,22 @@ public sealed class DeferredStepExecutionTests
 		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("workflow");
 		public override ILocalizableMessage DescriptionLocalizationMessage => NameLocalizationMessage;
 
-		protected override Task<FileOutput> CreateOutputAsync() =>
-			Task.FromResult(new FileOutput("files/workflow-output.csv"));
+		protected override Task<FileOutput> CreateOutputAsync()
+			=> Task.FromResult(new FileOutput("files/workflow-output.csv"));
 
 		protected override void ConfigureSteps(IMultiStepJobBuilder builder)
 		{
-			var producer = builder.AddStep("producer", new NoneInputState(), key: "download");
-			var consumer = builder.AddStep(consumerSystemName, (context, ct) => prepare(context, producer, ct), key: "import");
+			var producer = builder.AddStep(
+				"producer",
+				new NoneInputState(),
+				key: "download");
+			var consumer = builder.AddStep(
+				consumerSystemName,
+				(context, ct) => prepare(
+					context,
+					producer,
+					ct),
+				key: "import");
 			builder.AddDependency(consumer, producer);
 		}
 	}
@@ -355,9 +446,13 @@ public sealed class DeferredStepExecutionTests
 		public override string SystemName => "nested";
 		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("nested");
 		public override ILocalizableMessage DescriptionLocalizationMessage => NameLocalizationMessage;
-		protected override void ConfigureSteps(IMultiStepJobBuilder builder) =>
-			builder.AddStep("consumer", context => context.GetParentInput<StepInput>(), key: "leaf");
-		protected override Task<FileOutput> CreateOutputAsync() => Task.FromResult(new FileOutput(InputState.StorageKey));
+		protected override void ConfigureSteps(IMultiStepJobBuilder builder)
+			=> builder.AddStep(
+				"consumer",
+				context => context.GetParentInput<StepInput>(),
+				key: "leaf");
+		protected override Task<FileOutput> CreateOutputAsync()
+			=> Task.FromResult(new FileOutput(InputState.StorageKey));
 	}
 
 	private sealed class ProducerLrt(IApplicationTransactionFactory transactions)
@@ -367,7 +462,8 @@ public sealed class DeferredStepExecutionTests
 		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("producer");
 		public override ILocalizableMessage DescriptionLocalizationMessage => NameLocalizationMessage;
 		protected override Task DoWork(NoneInputState inputState) => Task.CompletedTask;
-		protected override Task<FileOutput> CreateOutputAsync() => Task.FromResult(new FileOutput("files/source.csv"));
+		protected override Task<FileOutput> CreateOutputAsync()
+			=> Task.FromResult(new FileOutput("files/source.csv"));
 	}
 
 	private sealed class ConsumerLrt(IApplicationTransactionFactory transactions)
@@ -393,11 +489,14 @@ public sealed class DeferredStepExecutionTests
 	}
 
 	private sealed record FileOutput(string StorageKey);
+
 	private sealed record Progress(int Rows);
+
 	private sealed record WorkflowInput(int BatchSize) : IInputState
 	{
 		public void ValidateState() { }
 	}
+
 	private sealed record StepInput(string StorageKey, int BatchSize) : IInputState
 	{
 		public void ValidateState() => ArgumentException.ThrowIfNullOrWhiteSpace(StorageKey);

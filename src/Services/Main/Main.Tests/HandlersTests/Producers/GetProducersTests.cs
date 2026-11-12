@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
 using Main.Application.Handlers.Producers.GetProducers;
@@ -103,10 +102,8 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 		string? searchTerm = null,
 		int page = 0,
 		int size = 100)
-	{
-		return new GetProducersQuery(
+		=> new(
 			searchTerm,
 			ids,
 			new Pagination(page, size));
-	}
 }

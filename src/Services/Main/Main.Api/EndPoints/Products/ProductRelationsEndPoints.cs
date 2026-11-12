@@ -1,5 +1,3 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Enums;
@@ -8,6 +6,7 @@ using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
 using Main.Application.Products.Queries;
 using Main.Application.Products.Queries.GetProductCrosses;
 using MediatR;
+using Security.Core.Interfaces;
 
 namespace Main.Api.EndPoints.Products;
 

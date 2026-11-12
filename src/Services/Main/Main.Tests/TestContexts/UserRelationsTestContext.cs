@@ -1,23 +1,21 @@
-using Persistence.Context;
 using Main.Entities.Organization;
-using StorageEntity = Main.Entities.Storage.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Organization;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.Storage;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.Interfaces;
+using StorageEntity = Main.Entities.Storage.Storage;
 
 namespace Tests.TestContexts;
 
 public class UserRelationsTestContext(UnifiedDbContext context, UsersTestContext usersTestContext)
 	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
-	public static Type[] DependsOn { get; } = [typeof(UsersTestContext)];
 
 	public User FirstUser { get; private set; } = null!;
 	public User SecondUser { get; private set; } = null!;
@@ -30,6 +28,7 @@ public class UserRelationsTestContext(UnifiedDbContext context, UsersTestContext
 	public Organization FirstUserOrganization { get; private set; } = null!;
 	public Organization OtherOrganization { get; private set; } = null!;
 	public Organization HiddenOrganization { get; private set; } = null!;
+	public static Type[] DependsOn { get; } = [typeof(UsersTestContext)];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
 	{

@@ -59,9 +59,10 @@ public abstract class GraphQlErrorFilterBase<TFilter, TException>(
 		return builder;
 	}
 
-	protected int GetStatusCode(Exception exception) => exception is IStatusCode statusCodeException
-		? (int)statusCodeException.StatusCode
-		: 500;
+	protected int GetStatusCode(Exception exception)
+		=> exception is IStatusCode statusCodeException
+			? (int)statusCodeException.StatusCode
+			: 500;
 
 	protected string GetLocalizedMessage(Exception exception, string fallback)
 	{

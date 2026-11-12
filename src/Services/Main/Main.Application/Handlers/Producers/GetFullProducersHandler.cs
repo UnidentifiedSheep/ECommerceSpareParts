@@ -10,10 +10,7 @@ namespace Main.Application.Handlers.Producers;
 
 public record GetFullProducersQuery : IQuery<GetFullProducersResult>
 {
-	public GetFullProducersQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToList();
-	}
+	public GetFullProducersQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToList();
 
 	public GetFullProducersQuery(int id) : this([id])
 	{

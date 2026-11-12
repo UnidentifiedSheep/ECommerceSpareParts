@@ -35,7 +35,7 @@ public class UpsertProductGroupHandler(
 
 		var group = request.Id != null
 			? groups.FirstOrDefault(item => item.Id == request.Id) ??
-				throw new ProductGroupNotFoundException(request.Id.Value)
+			throw new ProductGroupNotFoundException(request.Id.Value)
 			: null;
 
 		if (groups.Any(item => item.NormalizedName == normalizedName && item.Id != request.Id))

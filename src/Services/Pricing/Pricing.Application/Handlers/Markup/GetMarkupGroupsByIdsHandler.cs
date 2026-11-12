@@ -12,10 +12,7 @@ public sealed record GetMarkupGroupsByIdsQuery : IQuery<GetMarkupGroupsByIdsResu
 {
 	public GetMarkupGroupsByIdsQuery(int id) : this([id]) { }
 
-	public GetMarkupGroupsByIdsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetMarkupGroupsByIdsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<int> Ids { get; }
 }

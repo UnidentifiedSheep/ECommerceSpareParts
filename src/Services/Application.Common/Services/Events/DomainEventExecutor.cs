@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
-using MediatR;
 using Domain.Interfaces.Events;
+using MediatR;
 
 namespace Application.Common.Services.Events;
 
@@ -15,15 +15,13 @@ public sealed class DomainEventExecutor(
 	private bool _dispatchingBeforeSave;
 
 	public async Task ExecuteAsync(Func<Task> action, CancellationToken cancellationToken = default)
-	{
-		await ExecuteAsync(
+		=> await ExecuteAsync(
 			async () =>
 			{
 				await action();
 				return true;
 			},
 			cancellationToken);
-	}
 
 	public async Task<T> ExecuteAsync<T>(Func<Task<T>> action, CancellationToken cancellationToken = default)
 	{
@@ -52,7 +50,7 @@ public sealed class DomainEventExecutor(
 		using var collection = eventScope.EnableCollection();
 		try
 		{
-			await DispatchAsync(cancellationToken, beforeSave: true);
+			await DispatchAsync(cancellationToken, true);
 		}
 		catch
 		{

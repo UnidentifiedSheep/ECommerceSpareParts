@@ -1,14 +1,12 @@
-using Main.Entities.Cart;
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Main.Entities.Exceptions;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Handlers.Cart.AddToCart;
-using Main.Application.Static;
+using Main.Entities;
+using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -48,7 +46,7 @@ public class AddToCartTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var cartItem = await Context
-			.Set<global::Main.Entities.Cart.Cart>()
+			.Set<Main.Entities.Cart.Cart>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id, CancellationToken);
 		Assert.NotNull(cartItem);
@@ -90,10 +88,17 @@ public class AddToCartTests : IntegrationTest
 		var user = _usersContext.User;
 
 		var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
-			Mediator.Send(new AddToCartCommand(user.Id, int.MaxValue, 1), CancellationToken));
+			Mediator.Send(
+				new AddToCartCommand(
+					user.Id,
+					int.MaxValue,
+					1),
+				CancellationToken));
 
 		exception.Failures.Should().ContainSingle(failure => failure.Error is ProductNotFoundException);
-		(await Context.Set<global::Main.Entities.Cart.Cart>().AnyAsync(item => item.UserId == user.Id, CancellationToken)).Should().BeFalse();
+		(await Context.Set<Main.Entities.Cart.Cart>()
+				.AnyAsync(item => item.UserId == user.Id, CancellationToken)).Should()
+			.BeFalse();
 	}
 
 	private (User, Product) GetUserAndProduct() => (_usersContext.Users.First(), _productContext.Products[0]);
@@ -106,9 +111,14 @@ public class AddToCartValidationTests : ValidationTest<AddToCartValidation, AddT
 	[InlineData(-1)]
 	public async Task AddToCart_InvalidCount_FailsValidation(int count)
 	{
-		var result = await ValidateAsync(new AddToCartCommand(Guid.NewGuid(), 1, count));
+		var result = await ValidateAsync(
+			new AddToCartCommand(
+				Guid.NewGuid(),
+				1,
+				count));
 		result.ShouldHaveValidationErrorFor(x => x.Count)
 			.WithErrorCode(PositionCountMustBeGreaterThanZeroMessage.Instance.MessageKey)
-			.WithCustomState(PositionCountMustBeGreaterThanZeroMessage.Instance).Only();
+			.WithCustomState(PositionCountMustBeGreaterThanZeroMessage.Instance)
+			.Only();
 	}
 }

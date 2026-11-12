@@ -7,9 +7,9 @@ namespace Main.Application.DomainEventHandlers.Product.ProductDeleted;
 
 public class InvalidateCacheHandler(
 	IProductCacheInvalidator productCacheInvalidator
-	) : BatchableDomainEventHandler<ProductDeletedDomainEvent>
+) : BatchableDomainEventHandler<ProductDeletedDomainEvent>
 {
-	public async override Task Handle(
+	public override async Task Handle(
 		Batch<ProductDeletedDomainEvent> notification,
 		CancellationToken cancellationToken)
 	{

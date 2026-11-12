@@ -12,9 +12,7 @@ namespace Tests.HandlersTests.Balances;
 public sealed class GetTransactionsByIdsTests : IntegrationTest
 {
 	public GetTransactionsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<BalanceTestContext>();
-	}
+		=> RegisterBasicContext<BalanceTestContext>();
 
 	private BalanceTestContext TestContext => GetContext<BalanceTestContext>();
 
@@ -25,7 +23,8 @@ public sealed class GetTransactionsByIdsTests : IntegrationTest
 		var second = await CreateTransaction();
 
 		var result = await Mediator.Send(
-			new GetTransactionsByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]), CancellationToken);
+			new GetTransactionsByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Transactions.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
 	}
@@ -51,7 +50,9 @@ public sealed class GetTransactionsByIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetTransactionsByIdsQuery(Array.Empty<Guid>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetTransactionsByIdsQuery(Array.Empty<Guid>()),
+			CancellationToken);
 
 		result.Transactions.Should().BeEmpty();
 	}
@@ -62,14 +63,16 @@ public sealed class GetTransactionsByIdsTests : IntegrationTest
 		var transaction = TestContext.Transactions[0];
 		transaction.Reverse(TestContext.Users[0].Id);
 		var senderBalance = await Context.Set<OrganizationBalance>()
-			.SingleAsync(balance =>
-				balance.OrganizationId == transaction.SenderId &&
-				balance.CurrencyId == transaction.CurrencyId,
+			.SingleAsync(
+				balance =>
+					balance.OrganizationId == transaction.SenderId &&
+					balance.CurrencyId == transaction.CurrencyId,
 				CancellationToken);
 		var receiverBalance = await Context.Set<OrganizationBalance>()
-			.SingleAsync(balance =>
-				balance.OrganizationId == transaction.ReceiverId &&
-				balance.CurrencyId == transaction.CurrencyId,
+			.SingleAsync(
+				balance =>
+					balance.OrganizationId == transaction.ReceiverId &&
+					balance.CurrencyId == transaction.CurrencyId,
 				CancellationToken);
 		transaction.Apply(senderBalance, receiverBalance);
 		await Context.SaveChangesAsync(CancellationToken);
@@ -79,8 +82,8 @@ public sealed class GetTransactionsByIdsTests : IntegrationTest
 		result.Transactions.Keys.Should().Equal(transaction.Id);
 	}
 
-	private Task<Transaction> CreateTransaction() =>
-		new TransactionBuilder(Faker)
+	private Task<Transaction> CreateTransaction()
+		=> new TransactionBuilder(Faker)
 			.WithSenderId(TestContext.Users[0].Id)
 			.WithReceiverId(TestContext.Users[1].Id)
 			.WithCurrencyId(TestContext.Currencies[0].Id)

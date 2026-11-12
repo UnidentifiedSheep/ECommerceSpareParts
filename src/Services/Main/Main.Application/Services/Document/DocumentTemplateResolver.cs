@@ -10,7 +10,9 @@ public sealed class DocumentTemplateResolver(
 	: IDocumentTemplateResolver
 {
 	private readonly FrozenDictionary<(DocumentType Output, DocumentType Input), IDocumentProvider>
-		_providers = providers.ToFrozenDictionary(provider => (provider.OutputDocumentType, provider.InputTemplateType));
+		_providers =
+			providers.ToFrozenDictionary(provider
+				=> (provider.OutputDocumentType, provider.InputTemplateType));
 
 	private readonly IDocumentTemplateSource[] _sources = ValidateSources(sources);
 
@@ -26,7 +28,10 @@ public sealed class DocumentTemplateResolver(
 
 		foreach (var source in _sources)
 		{
-			var bytes = await source.TryGetBytesAsync(templateName, templateType, token);
+			var bytes = await source.TryGetBytesAsync(
+				templateName,
+				templateType,
+				token);
 			if (bytes is not null)
 				return provider.CreateDocument(bytes);
 		}

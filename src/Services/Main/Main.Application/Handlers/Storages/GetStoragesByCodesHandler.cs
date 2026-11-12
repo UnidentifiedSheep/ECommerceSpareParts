@@ -11,10 +11,7 @@ namespace Main.Application.Handlers.Storages;
 public record GetStoragesByCodesQuery : IQuery<GetStoragesByCodesResult>
 {
 
-	public GetStoragesByCodesQuery(IEnumerable<string> codes)
-	{
-		StorageCodes = codes.Distinct().ToList();
-	}
+	public GetStoragesByCodesQuery(IEnumerable<string> codes) => StorageCodes = codes.Distinct().ToList();
 
 	public GetStoragesByCodesQuery(string code) : this([code])
 	{
@@ -33,12 +30,10 @@ public class GetStoragesByCodesHandler(
 	public async Task<GetStoragesByCodesResult> Handle(
 		GetStoragesByCodesQuery request,
 		CancellationToken cancellationToken)
-	{
-		return new GetStoragesByCodesResult(
+		=> new(
 			await repository
 				.Query
 				.Where(x => request.StorageCodes.Contains(x.Code))
 				.Project(projection)
 				.ToListAsync(cancellationToken));
-	}
 }

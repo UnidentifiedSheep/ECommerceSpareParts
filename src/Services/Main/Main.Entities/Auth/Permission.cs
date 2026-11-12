@@ -19,10 +19,7 @@ public class Permission : AuditableEntity<Permission, string>, ILinqEntity<Permi
 	{
 	}
 
-	public Permission(PermissionCodes name)
-	{
-		Name = ToNormalizedPermission(name);
-	}
+	public Permission(PermissionCodes name) => Name = ToNormalizedPermission(name);
 
 	[Validate]
 	public string Name { get; } = null!;
@@ -33,12 +30,12 @@ public class Permission : AuditableEntity<Permission, string>, ILinqEntity<Permi
 
 	public override string GetId() => Name;
 
-	public static string ToNormalizedPermission(PermissionCodes permission) =>
-		permission.ToString().ToNormalizedPermission();
+	public static string ToNormalizedPermission(PermissionCodes permission)
+		=> permission.ToString().ToNormalizedPermission();
 
-	public static string GetLocalizationNameKey(PermissionCodes permission) =>
-		Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + NamePostfix;
+	public static string GetLocalizationNameKey(PermissionCodes permission)
+		=> Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + NamePostfix;
 
-	public static string GetLocalizationDescriptionKey(PermissionCodes permission) =>
-		Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + DescriptionPostfix;
+	public static string GetLocalizationDescriptionKey(PermissionCodes permission)
+		=> Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + DescriptionPostfix;
 }

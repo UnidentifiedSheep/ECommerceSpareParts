@@ -5,8 +5,8 @@ using Main.Persistence.DatabaseObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Persistence;
 using Npgsql;
+using Persistence;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -18,20 +18,37 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 	[Fact]
 	public async Task SourceChanges_UpdateProjectionAndContactDeletionRemovesTerms()
 	{
-		var user = await CreateUser("original-login", "Уникальноеимя", "Начальная");
-		user.AddEmail("original-contact@contacts.example", EmailType.Unknown, false, false);
-		user.AddUserPhone("79994445566", PhoneType.Unknown, false, false);
+		var user = await CreateUser(
+			"original-login",
+			"Уникальноеимя",
+			"Начальная");
+		user.AddEmail(
+			"original-contact@contacts.example",
+			EmailType.Unknown,
+			false,
+			false);
+		user.AddUserPhone(
+			"79994445566",
+			PhoneType.Unknown,
+			false,
+			false);
 		await Context.SaveChangesAsync(CancellationToken);
 		(await FindDocumentUserIds("Уникальноеимя")).Should().ContainSingle();
 
-		user.SetUserInfo("Обновленноеимя", "Новаяфамилия", null);
+		user.SetUserInfo(
+			"Обновленноеимя",
+			"Новаяфамилия",
+			null);
 		await Context.SaveChangesAsync(CancellationToken);
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"UPDATE auth.users SET user_name = 'changed-login', normalized_user_name = 'CHANGED-LOGIN' WHERE id = {user.Id}", CancellationToken);
+			$"UPDATE auth.users SET user_name = 'changed-login', normalized_user_name = 'CHANGED-LOGIN' WHERE id = {user.Id}",
+			CancellationToken);
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"UPDATE auth.user_emails SET normalized_email = 'changed-contact@contacts.example' WHERE user_id = {user.Id}", CancellationToken);
+			$"UPDATE auth.user_emails SET normalized_email = 'changed-contact@contacts.example' WHERE user_id = {user.Id}",
+			CancellationToken);
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"UPDATE auth.user_phones SET normalized_phone = '79995556677', phone_number = '79995556677' WHERE user_id = {user.Id}", CancellationToken);
+			$"UPDATE auth.user_phones SET normalized_phone = '79995556677', phone_number = '79995556677' WHERE user_id = {user.Id}",
+			CancellationToken);
 
 		(await FindDocumentUserIds("Уникальноеимя")).Should().BeEmpty();
 		(await FindDocumentUserIds("original-contact@contacts.example")).Should().BeEmpty();
@@ -42,33 +59,44 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		(await FindDocumentUserIds("79995556677")).Should().Equal(user.Id);
 
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"DELETE FROM auth.user_emails WHERE user_id = {user.Id}", CancellationToken);
+			$"DELETE FROM auth.user_emails WHERE user_id = {user.Id}",
+			CancellationToken);
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"DELETE FROM auth.user_phones WHERE user_id = {user.Id}", CancellationToken);
+			$"DELETE FROM auth.user_phones WHERE user_id = {user.Id}",
+			CancellationToken);
 		(await FindDocumentUserIds("changed-contact@contacts.example")).Should().BeEmpty();
 		(await FindDocumentUserIds("79995556677")).Should().BeEmpty();
 
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"DELETE FROM auth.user_info WHERE user_id = {user.Id}", CancellationToken);
+			$"DELETE FROM auth.user_info WHERE user_id = {user.Id}",
+			CancellationToken);
 		(await FindDocumentUserIds("Обновленноеимя")).Should().BeEmpty();
 		(await FindDocumentUserIds("changed-login")).Should().ContainSingle();
 
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"DELETE FROM auth.organization_members WHERE user_id = {user.Id}", CancellationToken);
+			$"DELETE FROM auth.organization_members WHERE user_id = {user.Id}",
+			CancellationToken);
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"DELETE FROM auth.users WHERE id = {user.Id}", CancellationToken);
-		(await Context.Database.SqlQuery<int>(
-			$"SELECT count(*)::integer AS \"Value\" FROM auth.user_search WHERE user_id = {user.Id}")
-			.SingleAsync(CancellationToken)).Should().Be(0);
+			$"DELETE FROM auth.users WHERE id = {user.Id}",
+			CancellationToken);
+		(await Context.Database
+				.SqlQuery<int>(
+					$"SELECT count(*)::integer AS \"Value\" FROM auth.user_search WHERE user_id = {user.Id}")
+				.SingleAsync(CancellationToken)).Should()
+			.Be(0);
 	}
 
 	[Fact]
 	public async Task ProjectionChanges_RollBackWithSourceTransaction()
 	{
-		var user = await CreateUser("rollback-original", "Александр", "Петров");
+		var user = await CreateUser(
+			"rollback-original",
+			"Александр",
+			"Петров");
 		await using var transaction = await Context.Database.BeginTransactionAsync(CancellationToken);
 		await Context.Database.ExecuteSqlInterpolatedAsync(
-			$"UPDATE auth.users SET normalized_user_name = 'ROLLBACK-TEMPORARY' WHERE id = {user.Id}", CancellationToken);
+			$"UPDATE auth.users SET normalized_user_name = 'ROLLBACK-TEMPORARY' WHERE id = {user.Id}",
+			CancellationToken);
 		(await FindDocumentUserIds("rollback-temporary")).Should().ContainSingle();
 
 		await transaction.RollbackAsync(CancellationToken);
@@ -82,8 +110,16 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 	{
 		await ExecuteStatements(UserSearchSql.V1.DropTriggers, UserSearchSql.V1.DropFunctions);
 		await Context.Database.ExecuteSqlRawAsync("DELETE FROM auth.user_search", CancellationToken);
-		var user = await CreateUser("migration-existing", "Миграционный", "Пользователь", "Existing profile");
-		user.AddEmail("migration.contact@contacts.example", EmailType.Unknown, false, false);
+		var user = await CreateUser(
+			"migration-existing",
+			"Миграционный",
+			"Пользователь",
+			"Existing profile");
+		user.AddEmail(
+			"migration.contact@contacts.example",
+			EmailType.Unknown,
+			false,
+			false);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		await ExecuteStatements(
@@ -104,10 +140,18 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 	[Fact]
 	public async Task ConcurrentChangesInDifferentTables_DoNotLoseSearchTerms()
 	{
-		var user = await CreateUser("concurrent-user", "Первоначальное", "Имя");
-		user.AddEmail("concurrent.old@contacts.example", EmailType.Unknown, false, false);
+		var user = await CreateUser(
+			"concurrent-user",
+			"Первоначальное",
+			"Имя");
+		user.AddEmail(
+			"concurrent.old@contacts.example",
+			EmailType.Unknown,
+			false,
+			false);
 		await Context.SaveChangesAsync(CancellationToken);
-		var connectionString = Scope.ServiceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
+		var connectionString = Scope.ServiceProvider.GetRequiredService<IOptions<DatabaseOptions>>()
+			.Value.ConnectionString;
 		await using var first = new NpgsqlConnection(connectionString);
 		await using var second = new NpgsqlConnection(connectionString);
 		await first.OpenAsync(CancellationToken);
@@ -115,19 +159,23 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		await using var firstTransaction = await first.BeginTransactionAsync(CancellationToken);
 		await using var secondTransaction = await second.BeginTransactionAsync(CancellationToken);
 		await using var profileCommand = new NpgsqlCommand(
-			"UPDATE auth.user_info SET name = 'Параллельноеимя' WHERE user_id = @id", first, firstTransaction);
+			"UPDATE auth.user_info SET name = 'Параллельноеимя' WHERE user_id = @id",
+			first,
+			firstTransaction);
 		profileCommand.Parameters.AddWithValue("id", user.Id);
 		await profileCommand.ExecuteNonQueryAsync(CancellationToken);
 		await using var emailCommand = new NpgsqlCommand(
 			"UPDATE auth.user_emails SET normalized_email = 'concurrent.new@contacts.example' WHERE user_id = @id",
-			second, secondTransaction);
+			second,
+			secondTransaction);
 		emailCommand.Parameters.AddWithValue("id", user.Id);
 		var emailUpdate = emailCommand.ExecuteNonQueryAsync(CancellationToken);
 
 		await using var observer = new NpgsqlConnection(connectionString);
 		await observer.OpenAsync(CancellationToken);
 		await using var lockCommand = new NpgsqlCommand(
-			"SELECT coalesce(wait_event_type = 'Lock', false) FROM pg_stat_activity WHERE pid = @pid", observer);
+			"SELECT coalesce(wait_event_type = 'Lock', false) FROM pg_stat_activity WHERE pid = @pid",
+			observer);
 		lockCommand.Parameters.AddWithValue("pid", second.ProcessID);
 		var deadline = DateTime.UtcNow.AddSeconds(10);
 		var waiting = false;
@@ -136,6 +184,7 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 			waiting = (bool)(await lockCommand.ExecuteScalarAsync(CancellationToken))!;
 			if (!waiting) await Task.Delay(20, CancellationToken);
 		}
+
 		await firstTransaction.CommitAsync(CancellationToken);
 		await emailUpdate;
 		await secondTransaction.CommitAsync(CancellationToken);
@@ -146,13 +195,22 @@ public sealed class UserSearchDocumentTests(CombinedContainerFixture fixture) : 
 		(await FindDocumentUserIds("concurrent.old@contacts.example")).Should().BeEmpty();
 	}
 
-	private Task<Guid[]> FindDocumentUserIds(string term) =>
-		Context.Database.SqlQuery<Guid>(
-			$"SELECT user_id AS \"Value\" FROM auth.user_search WHERE search_vector @@ plainto_tsquery('simple', {term})")
+	private Task<Guid[]> FindDocumentUserIds(string term)
+		=> Context.Database
+			.SqlQuery<Guid>(
+				$"SELECT user_id AS \"Value\" FROM auth.user_search WHERE search_vector @@ plainto_tsquery('simple', {term})")
 			.ToArrayAsync(CancellationToken);
 
-	private Task<User> CreateUser(string login, string name, string surname, string? description = null) =>
-		new UserBuilder(Faker).WithUserName(login).WithUserInfo(name, surname, description)
+	private Task<User> CreateUser(
+		string login,
+		string name,
+		string surname,
+		string? description = null)
+		=> new UserBuilder(Faker).WithUserName(login)
+			.WithUserInfo(
+				name,
+				surname,
+				description)
 			.BuildAndAddToDb(Context);
 
 	private async Task ExecuteStatements(params string[] statements)

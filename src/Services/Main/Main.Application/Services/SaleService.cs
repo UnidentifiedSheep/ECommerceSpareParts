@@ -14,8 +14,7 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 	public List<SaleContent> DistributeDetails(
 		IEnumerable<StorageLot> storageContentValues,
 		IEnumerable<NewSaleContentDto> saleContents)
-	{
-		return DistributeDetails(
+		=> DistributeDetails(
 			storageContentValues,
 			saleContents.Select((x, index) => new SaleContentInput(
 				index,
@@ -24,13 +23,11 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 				x.DiscountedPrice,
 				x.Count,
 				x.Comment)));
-	}
 
 	public List<SaleContent> DistributeDetails(
 		IEnumerable<StorageLot> storageContentValues,
 		IEnumerable<EditSaleContentDto> saleContents)
-	{
-		return DistributeDetails(
+		=> DistributeDetails(
 			storageContentValues,
 			saleContents.Select((x, index) => new SaleContentInput(
 				index,
@@ -39,7 +36,6 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 				x.PriceWithDiscount,
 				x.Count,
 				x.Comment)));
-	}
 
 	public async Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
 		string storageCode,
@@ -186,15 +182,14 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 		IEnumerable<(int ProductId, int Count)> contents,
 		StorageMovementType movementType,
 		CancellationToken cancellationToken)
-	{
-		return await storageContentService.SubtractByProductsAsync(
-				contents.Select(x => new SubtractProductFromStorageItem(
+		=> await storageContentService.SubtractByProductsAsync(
+			contents.Select(x => new SubtractProductFromStorageItem(
 					x.ProductId,
 					storageCode,
-					x.Count)).ToArray(),
-				movementType,
+					x.Count))
+				.ToArray(),
+			movementType,
 			cancellationToken);
-	}
 
 	private sealed record SaleContentInput(
 		int OriginalIndex,

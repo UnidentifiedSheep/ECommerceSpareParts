@@ -19,11 +19,12 @@ public sealed record GqlCreateUserEmailInput
 	[GraphQLName("isConfirmed")]
 	public required bool IsConfirmed { get; init; }
 
-	public EmailDto ToDto() => new()
-	{
-		Email = Email,
-		Type = Type,
-		IsPrimary = IsPrimary,
-		IsConfirmed = IsConfirmed
-	};
+	public EmailDto ToDto()
+		=> new()
+		{
+			Email = Email,
+			Type = Type,
+			IsPrimary = IsPrimary,
+			IsConfirmed = IsConfirmed
+		};
 }

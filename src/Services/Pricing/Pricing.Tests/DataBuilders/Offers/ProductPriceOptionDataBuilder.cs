@@ -64,8 +64,7 @@ public class ProductPriceOptionDataBuilder(Faker faker) : BuilderBase<ProductPri
 	}
 
 	public override ProductPriceOption Build()
-	{
-		return ProductPriceOption.Create(
+		=> ProductPriceOption.Create(
 			PriceOfferId,
 			MarkupVersion,
 			AppliersVersion,
@@ -78,5 +77,4 @@ public class ProductPriceOptionDataBuilder(Faker faker) : BuilderBase<ProductPri
 			TimeSpan.FromDays(1),
 			TimeSpan.FromDays(2),
 			95);
-	}
 }

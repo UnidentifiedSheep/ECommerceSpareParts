@@ -1,7 +1,4 @@
-using Persistence.Context;
-using Security.Core.Interfaces;
 using System.Globalization;
-using Abstractions.Interfaces;
 using Api.Common;
 using Cache;
 using Internal.Integration.Core.Interfaces.Main;
@@ -15,9 +12,11 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Npgsql;
 using Persistence;
+using Persistence.Context;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Cache;
 using Pricing.Persistence;
+using Security.Core.Interfaces;
 using Serilog;
 using Tests.Abstractions.Test;
 using Tests.Extensions;
@@ -102,6 +101,6 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		return serviceProvider;
 	}
 
-	private static void RegisterGlobalBasicContexts() =>
-		TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
+	private static void RegisterGlobalBasicContexts()
+		=> TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
 }

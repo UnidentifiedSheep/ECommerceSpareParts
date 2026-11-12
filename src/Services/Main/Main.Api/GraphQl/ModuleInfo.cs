@@ -1,3 +1,3 @@
-using GreenDonut;
+using HotChocolate;
 
-[assembly: HotChocolate.Module("MainGraphQL")]
+[assembly: Module("MainGraphQL")]

@@ -46,10 +46,8 @@ public class MarkupRange
 		decimal rangeStart,
 		decimal rangeEnd,
 		decimal markup)
-	{
-		return new MarkupRange(
+		=> new(
 			rangeStart,
 			rangeEnd,
 			markup);
-	}
 }

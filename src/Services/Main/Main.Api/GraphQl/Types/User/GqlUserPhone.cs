@@ -6,7 +6,8 @@ namespace Main.Api.GraphQl.Types.User;
 
 [GraphQLName("UserPhone")]
 public record GqlUserPhone(
-	[property: GraphQLIgnore] UserPhoneDto Dto)
+	[property: GraphQLIgnore]
+	UserPhoneDto Dto)
 {
 	[GraphQLName("number")]
 	public string Number => Dto.Number;

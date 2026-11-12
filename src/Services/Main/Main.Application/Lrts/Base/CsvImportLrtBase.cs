@@ -65,15 +65,17 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 		using var reader = new StreamReader(
 			source,
 			new UTF8Encoding(false, true),
-			detectEncodingFromByteOrderMarks: false);
-		using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
-		{
-			CountBytes = true,
-			Encoding = Encoding.UTF8,
-			PrepareHeaderForMatch = args => args.FieldIndex == 0
-				? args.Header.TrimStart('\uFEFF')
-				: args.Header
-		});
+			false);
+		using var csv = new CsvReader(
+			reader,
+			new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				CountBytes = true,
+				Encoding = Encoding.UTF8,
+				PrepareHeaderForMatch = args => args.FieldIndex == 0
+					? args.Header.TrimStart('\uFEFF')
+					: args.Header
+			});
 
 		var rowIdx = checkpoint?.CurrentLine ?? 0;
 		var errors = state.Errors;
@@ -115,7 +117,8 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 				rowsToAdd.Add((rowIdx, item));
 
 			var errorLimitReached = errors.Count >= MaxErrors;
-			if (rowsToAdd.Count >= BatchSize || rowIdx - (state.Checkpoint?.CurrentLine ?? 0) >= CheckpointInterval ||
+			if (rowsToAdd.Count >= BatchSize ||
+				rowIdx - (state.Checkpoint?.CurrentLine ?? 0) >= CheckpointInterval ||
 				errorLimitReached)
 				state = await ProcessBatchAndSaveState(
 					rowsToAdd,
@@ -163,21 +166,22 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 		List<CsvImportError> errors)
 	{
 		if (items.Count > 0)
-			await ProcessBatch(items, state, errors);
+			await ProcessBatch(
+				items,
+				state,
+				errors);
 
 		await SaveStateAsync(state.WithCheckpoint(checkpoint));
 	}
 
 	protected static CsvImportError CreateError(int rowIdx, string message)
-	{
-		return new CsvImportError
+		=> new()
 		{
 			RowIdx = rowIdx, Message = message
 		};
-	}
 
-	protected string GetErrorMessage(Exception ex) =>
-		ex is ILocalizableException localizableException
+	protected string GetErrorMessage(Exception ex)
+		=> ex is ILocalizableException localizableException
 			? stringLocalizer.Get(localizableException.LocalizableMessage)
 			: ex.Message;
 
@@ -190,13 +194,17 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 		string eTag,
 		List<CsvImportError> errors)
 	{
-		await SaveBatchAsync(items, state, new CsvImportCheckpoint
-		{
-			CurrentLine = currentLine,
-			Offset = offset,
-			RawHeader = rawHeader,
-			ETag = eTag
-		}, errors);
+		await SaveBatchAsync(
+			items,
+			state,
+			new CsvImportCheckpoint
+			{
+				CurrentLine = currentLine,
+				Offset = offset,
+				RawHeader = rawHeader,
+				ETag = eTag
+			},
+			errors);
 		items.Clear();
 		return State;
 	}
@@ -210,6 +218,7 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 				count++;
 				i++;
 			}
+
 		return count;
 	}
 
@@ -220,13 +229,18 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 		public override bool CanSeek => false;
 		public override bool CanWrite => false;
 		public override long Length => throw new NotSupportedException();
+
 		public override long Position
 		{
 			get => throw new NotSupportedException();
 			set => throw new NotSupportedException();
 		}
-		public override int Read(byte[] buffer, int offset, int count) =>
-			Read(buffer.AsSpan(offset, count));
+
+		public override int Read(
+			byte[] buffer,
+			int offset,
+			int count)
+			=> Read(buffer.AsSpan(offset, count));
 		public override int Read(Span<byte> buffer)
 		{
 			if (_position >= prefix.Length) return source.Read(buffer);
@@ -236,7 +250,8 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 			return count;
 		}
 		public override ValueTask<int> ReadAsync(
-			Memory<byte> buffer, CancellationToken cancellationToken = default)
+			Memory<byte> buffer,
+			CancellationToken cancellationToken = default)
 		{
 			if (_position >= prefix.Length) return source.ReadAsync(buffer, cancellationToken);
 			var count = Math.Min(buffer.Length, prefix.Length - _position);
@@ -247,7 +262,11 @@ public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>
 		public override void Flush() { }
 		public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 		public override void SetLength(long value) => throw new NotSupportedException();
-		public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+		public override void Write(
+			byte[] buffer,
+			int offset,
+			int count)
+			=> throw new NotSupportedException();
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing) source.Dispose();

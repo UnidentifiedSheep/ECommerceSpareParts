@@ -1,6 +1,5 @@
-﻿using Persistence.Context;
-using Main.Entities.Product;
-using Main.Persistence.Context;
+﻿using Main.Entities.Product;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -20,10 +19,8 @@ public class ProductTestContext(UnifiedDbContext context, ProducerTestContext pr
 	public static Type[] DependsOn { get; } = [typeof(ProducerTestContext)];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-	{
-		_products.AddRange(
+		=> _products.AddRange(
 			await new ProductBuilder(Faker)
 				.WithProducers(producerTestContext.Producers)
 				.BuildManyAndAddToDb(DbContext, 10));
-	}
 }

@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Options.S3;
@@ -35,14 +34,14 @@ public class ProductCrossesByIdsDeleteLrt(
 
 	public override string SystemName => nameof(ProductCrossesByIdsDeleteLrt);
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtProductCrossesByIdsDeleteNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProductCrossesByIdsDeleteNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtProductCrossesByIdsDeleteDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductCrossesByIdsDeleteDescriptionMessage.Instance;
 
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -54,9 +53,10 @@ public class ProductCrossesByIdsDeleteLrt(
 		item = null!;
 		if (row.Id <= 0 || row.CrossId <= 0)
 		{
-			errors.Add(CreateError(
-				rowIdx,
-				StringLocalizer.Get(LrtProductCrossesByIdsImportInvalidIdMessage.Instance)));
+			errors.Add(
+				CreateError(
+					rowIdx,
+					StringLocalizer.Get(LrtProductCrossesByIdsImportInvalidIdMessage.Instance)));
 			return false;
 		}
 
@@ -88,11 +88,14 @@ public class ProductCrossesByIdsDeleteLrt(
 			TransactionalAttribute.ReadCommitted(20, 2),
 			async (context, cancellationToken) =>
 			{
-				await context.GetRequiredService<IProductRepository>().DeleteProductCrossesAsync(crosses, cancellationToken);
-				context.GetRequiredService<IDomainEventScope>().AddRange(crosses
-					.SelectMany(x => new[] { x.LeftProductId, x.RightProductId })
-					.Distinct()
-					.Select(id => new ProductLinkageUpdatedDomainEvent(id)));
+				await context.GetRequiredService<IProductRepository>()
+					.DeleteProductCrossesAsync(crosses, cancellationToken);
+				context.GetRequiredService<IDomainEventScope>()
+					.AddRange(
+						crosses
+							.SelectMany(x => new[] { x.LeftProductId, x.RightProductId })
+							.Distinct()
+							.Select(id => new ProductLinkageUpdatedDomainEvent(id)));
 			},
 			CancellationToken);
 

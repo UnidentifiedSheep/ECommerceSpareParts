@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Enums;
+using FluentAssertions;
 using Main.Application.Orders.Queries;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
@@ -14,9 +14,7 @@ namespace Tests.HandlersTests.Orders;
 public sealed class GetOrdersByIdsTests : IntegrationTest
 {
 	public GetOrdersByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<OrderTestContext>();
-	}
+		=> RegisterBasicContext<OrderTestContext>();
 
 	private OrderTestContext TestContext => GetContext<OrderTestContext>();
 
@@ -61,8 +59,11 @@ public sealed class GetOrdersByIdsTests : IntegrationTest
 	[Fact]
 	public async Task OwnPermission_ExcludesOtherUsersAndUnassignedOrders()
 	{
-		var result = await Send(new GetOrdersByIdsQuery([
-			TestContext.OnlineOrder.Id, TestContext.ManualOrder.Id, TestContext.ConfirmedOrder.Id]),
+		var result = await Send(
+			new GetOrdersByIdsQuery(
+			[
+				TestContext.OnlineOrder.Id, TestContext.ManualOrder.Id, TestContext.ConfirmedOrder.Id
+			]),
 			PermissionCodes.ORDERS_GET_OWN);
 
 		result.Orders.Keys.Should().Equal(TestContext.OnlineOrder.Id);
@@ -71,7 +72,9 @@ public sealed class GetOrdersByIdsTests : IntegrationTest
 	[Fact]
 	public async Task OwnPermission_OtherUsersOrderReturnsEmptyResult()
 	{
-		var result = await Send(new GetOrdersByIdsQuery(TestContext.ConfirmedOrder.Id), PermissionCodes.ORDERS_GET_OWN);
+		var result = await Send(
+			new GetOrdersByIdsQuery(TestContext.ConfirmedOrder.Id),
+			PermissionCodes.ORDERS_GET_OWN);
 
 		result.Orders.Should().BeEmpty();
 	}
@@ -85,10 +88,13 @@ public sealed class GetOrdersByIdsTests : IntegrationTest
 		user.SetIsAuthenticated(authenticated);
 
 		await Assert.ThrowsAsync<OrderReadAccessDeniedException>(() => Send(
-			new GetOrdersByIdsQuery(TestContext.OnlineOrder.Id), authenticated ? null : PermissionCodes.ORDERS_GET));
+			new GetOrdersByIdsQuery(TestContext.OnlineOrder.Id),
+			authenticated ? null : PermissionCodes.ORDERS_GET));
 	}
 
-	private Task<GetOrdersByIdsResult> Send(GetOrdersByIdsQuery query, PermissionCodes? permission = PermissionCodes.ORDERS_GET)
+	private Task<GetOrdersByIdsResult> Send(
+		GetOrdersByIdsQuery query,
+		PermissionCodes? permission = PermissionCodes.ORDERS_GET)
 	{
 		if (permission.HasValue)
 			((UserContextMock)Scope.ServiceProvider.GetRequiredService<IUserContext>())

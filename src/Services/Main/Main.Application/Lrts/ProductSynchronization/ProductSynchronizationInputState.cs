@@ -19,6 +19,7 @@ public sealed record ProductSynchronizationInputState : IInputState
 	public void ValidateState()
 	{
 		if (Parts == 0 || (Parts & ~ProductEventParts.All) != 0)
-			throw new InvalidOperationException("At least one supported product event part must be selected.");
+			throw new InvalidOperationException(
+				"At least one supported product event part must be selected.");
 	}
 }

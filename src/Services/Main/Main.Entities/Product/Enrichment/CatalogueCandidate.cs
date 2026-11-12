@@ -39,8 +39,9 @@ public class CatalogueCandidate : AuditableEntity<CatalogueCandidate, Guid>,
 
 	public static Expression<Func<CatalogueCandidate, Guid>> GetKeySelector() => x => x.Id;
 
-	public static Expression<Func<CatalogueCandidate, bool>> GetEqualityExpression(Guid key) => x =>
-		x.Id == key;
+	public static Expression<Func<CatalogueCandidate, bool>> GetEqualityExpression(Guid key)
+		=> x =>
+			x.Id == key;
 
 	public static CatalogueCandidate Create(string sku, int producerId)
 	{
@@ -72,13 +73,11 @@ public class CatalogueCandidate : AuditableEntity<CatalogueCandidate, Guid>,
 	}
 
 	public Product CreateProduct(string selectedName)
-	{
-		return Product.Create(
+		=> Product.Create(
 			Sku,
 			selectedName,
 			ProducerId,
 			null);
-	}
 
 	public void RemoveSupplierProduct(SupplierProduct supplierProduct)
 	{
@@ -90,8 +89,8 @@ public class CatalogueCandidate : AuditableEntity<CatalogueCandidate, Guid>,
 		AddContentChangedDomainEvent();
 	}
 
-	private void AddContentChangedDomainEvent() =>
-		AddDomainEvent(new CatalogueCandidateContentChangedDomainEvent(Id));
+	private void AddContentChangedDomainEvent()
+		=> AddDomainEvent(new CatalogueCandidateContentChangedDomainEvent(Id));
 
 	public override Guid GetId() => Id;
 }

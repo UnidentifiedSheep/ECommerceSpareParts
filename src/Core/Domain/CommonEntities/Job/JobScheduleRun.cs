@@ -40,13 +40,11 @@ public class JobScheduleRun : Entity<JobScheduleRun, Guid>, ILinqEntity<JobSched
 		Guid jobId,
 		DateTime scheduledAt,
 		DateTime queuedAt)
-	{
-		return new JobScheduleRun(
+		=> new(
 			jobScheduleId,
 			jobId,
 			scheduledAt,
 			queuedAt);
-	}
 
 	public void SetJobScheduleId(Guid jobScheduleId)
 	{

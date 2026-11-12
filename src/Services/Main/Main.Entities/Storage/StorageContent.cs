@@ -75,8 +75,7 @@ public class StorageContent : AuditableEntity<StorageContent, int, StorageConten
 		decimal buyPriceInBaseCurrency,
 		int buyPriceInBaseCurrencyId,
 		DateTime purchaseDatetime)
-	{
-		return new StorageContent(
+		=> new(
 			storageCode,
 			productId,
 			buyPrice,
@@ -84,9 +83,11 @@ public class StorageContent : AuditableEntity<StorageContent, int, StorageConten
 			buyPriceInBaseCurrency,
 			buyPriceInBaseCurrencyId,
 			purchaseDatetime);
-	}
 
-	public void SetCount(int count, StorageMovementType movementType, DateTime? utcNow = null)
+	public void SetCount(
+		int count,
+		StorageMovementType movementType,
+		DateTime? utcNow = null)
 	{
 		var newCount = count.EnsureNonNegative(() =>
 			new InvalidOperationException("Count must be greater than or equal to zero."));
@@ -98,7 +99,10 @@ public class StorageContent : AuditableEntity<StorageContent, int, StorageConten
 		{
 			var available = GetAvailableQuantity(utcNow ?? DateTime.UtcNow);
 			if (Count - newCount > available)
-				throw new NotEnoughCountOnStorageException(ProductId, available, Count - newCount);
+				throw new NotEnoughCountOnStorageException(
+					ProductId,
+					available,
+					Count - newCount);
 		}
 
 		AddDomainEvent(
@@ -115,15 +119,16 @@ public class StorageContent : AuditableEntity<StorageContent, int, StorageConten
 		Metadata.LastMovementType = movementType;
 	}
 
-	public void IncreaseCount(int amount, StorageMovementType movementType) =>
-		SetCount(checked(Count + amount), movementType);
+	public void IncreaseCount(int amount, StorageMovementType movementType)
+		=> SetCount(checked(Count + amount), movementType);
 
 	public void MarkLocksLoaded() => _locksLoaded = true;
 
 	public int GetAvailableQuantity(DateTime utcNow)
 	{
 		if (!_locksLoaded)
-			throw new InvalidOperationException("Storage content locks must be loaded before checking availability.");
+			throw new InvalidOperationException(
+				"Storage content locks must be loaded before checking availability.");
 		if (utcNow.Kind != DateTimeKind.Utc)
 			throw new InvalidOperationException("Availability must be checked using UTC time.");
 
@@ -131,14 +136,23 @@ public class StorageContent : AuditableEntity<StorageContent, int, StorageConten
 		return (int)Math.Max(0L, Count - locked);
 	}
 
-	public void Take(int quantity, StorageMovementType movementType, DateTime utcNow)
+	public void Take(
+		int quantity,
+		StorageMovementType movementType,
+		DateTime utcNow)
 	{
 		if (quantity <= 0)
 			throw new InvalidOperationException("Quantity to take must be greater than zero.");
 		var available = GetAvailableQuantity(utcNow);
 		if (quantity > available)
-			throw new NotEnoughCountOnStorageException(ProductId, available, quantity);
-		SetCount(Count - quantity, movementType, utcNow);
+			throw new NotEnoughCountOnStorageException(
+				ProductId,
+				available,
+				quantity);
+		SetCount(
+			Count - quantity,
+			movementType,
+			utcNow);
 	}
 
 	public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)

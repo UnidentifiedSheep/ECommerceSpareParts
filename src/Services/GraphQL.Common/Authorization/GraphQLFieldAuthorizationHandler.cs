@@ -1,11 +1,10 @@
-using Security.Core.Interfaces;
 using System.Reflection;
-using Abstractions.Interfaces;
 using GraphQL.Common.Attributes;
 using GraphQL.Common.Enums;
 using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Authorization;
 using Security.Authorization;
+using Security.Core.Interfaces;
 
 namespace GraphQL.Common.Authorization;
 
@@ -55,13 +54,11 @@ internal sealed class GraphQlFieldAuthorizationHandler(IUserContext userContext)
 	private static bool Matches(
 		IAuthorizationRequirement fieldRequirement,
 		GraphQlFieldAuthorizationRequirement policyRequirement)
-	{
-		return (fieldRequirement, policyRequirement.Target) switch
+		=> (fieldRequirement, policyRequirement.Target) switch
 		{
 			(PermissionRequirement permission, GraphQlAuthorizationTarget.Permission) => permission.Match ==
 				policyRequirement.Match,
 			(RoleRequirement role, GraphQlAuthorizationTarget.Role) => role.Match == policyRequirement.Match,
 			_ => false
 		};
-	}
 }

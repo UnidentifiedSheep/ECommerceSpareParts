@@ -11,15 +11,13 @@ public class ProductUpdatedConsumer(IProductRepository repository) : IConsumer<P
 	{
 		foreach (var products in context.Message.Products.Chunk(100))
 			await repository.ApplyUpdates(
-				products.Select(product => ProductCoreUpdate.From(product, context.Message.UpdatedAt)).ToArray(),
+				products.Select(product => ProductCoreUpdate.From(product, context.Message.UpdatedAt))
+					.ToArray(),
 				context.CancellationToken);
 	}
 }
 
 public class ProductUpdatedConsumerDefinition : ConsumerDefinition<ProductUpdatedConsumer>
 {
-	public ProductUpdatedConsumerDefinition()
-	{
-		ConcurrentMessageLimit = 1;
-	}
+	public ProductUpdatedConsumerDefinition() => ConcurrentMessageLimit = 1;
 }

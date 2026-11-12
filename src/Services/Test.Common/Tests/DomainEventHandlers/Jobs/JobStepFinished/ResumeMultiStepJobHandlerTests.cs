@@ -54,13 +54,14 @@ public sealed class ResumeMultiStepJobHandlerTests
 			Times.Once);
 	}
 
-	private static Batch<JobStepFinishedDomainEvent> CreateBatch(Guid parentId) =>
-		new([CreateEvent(parentId)]);
+	private static Batch<JobStepFinishedDomainEvent> CreateBatch(Guid parentId)
+		=> new([CreateEvent(parentId)]);
 
-	private static JobStepFinishedDomainEvent CreateEvent(Guid parentId) => new(
-		Guid.NewGuid(),
-		parentId,
-		JobStatus.Succeeded);
+	private static JobStepFinishedDomainEvent CreateEvent(Guid parentId)
+		=> new(
+			Guid.NewGuid(),
+			parentId,
+			JobStatus.Succeeded);
 
 	private static Mock<IRepository<Job, Guid>> CreateRepository(params Job[] jobs)
 	{

@@ -1,9 +1,9 @@
-using Application.Common.Querying;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
+using Application.Common.Querying;
 using Main.Application.Dtos.Documents;
 using Main.Entities.Documents;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +17,7 @@ public record SearchDocumentsQuery(
 	bool CanAccessAll,
 	Pagination Pagination,
 	IReadOnlyCollection<SortExpression>? SortBy) : IQuery<SearchDocumentsResult>;
+
 public record SearchDocumentsResult(IReadOnlyList<DocumentGenerationRequestDto> Requests);
 
 public class SearchDocumentsHandler(

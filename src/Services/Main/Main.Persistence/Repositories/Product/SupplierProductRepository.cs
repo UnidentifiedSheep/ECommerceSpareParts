@@ -1,17 +1,17 @@
-using Persistence.Context;
 using EFCore.BulkExtensions;
 using Enums;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product.Enrichment;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Repository;
 using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Main.Persistence.Repositories.Product;
 
 public class SupplierProductRepository(UnifiedDbContext context, QueryExtensions extensions)
-	: LinqRepositoryBase<UnifiedDbContext, SupplierProduct, int>(context, extensions), ISupplierProductRepository
+	: LinqRepositoryBase<UnifiedDbContext, SupplierProduct, int>(context, extensions),
+		ISupplierProductRepository
 {
 	public async Task<IReadOnlyList<SupplierProduct>> GetBySupplierKeysAsync(
 		Supplier supplier,

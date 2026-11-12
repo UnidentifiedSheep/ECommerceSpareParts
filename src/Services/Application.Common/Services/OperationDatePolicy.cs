@@ -1,8 +1,7 @@
-using Security.Core.Interfaces;
-using Abstractions.Interfaces;
 using Enums;
 using Extensions;
 using Locan.Core.Interfaces;
+using Security.Core.Interfaces;
 
 namespace Application.Common.Services;
 
@@ -40,13 +39,15 @@ public record OperationDateValidationResult
 
 	public ILocalizableMessage? LocalizableMessage { get; init; }
 
-	public static OperationDateValidationResult Valid() => new()
-	{
-		IsValid = true
-	};
+	public static OperationDateValidationResult Valid()
+		=> new()
+		{
+			IsValid = true
+		};
 
-	public static OperationDateValidationResult Invalid(ILocalizableMessage message) => new()
-	{
-		LocalizableMessage = message
-	};
+	public static OperationDateValidationResult Invalid(ILocalizableMessage message)
+		=> new()
+		{
+			LocalizableMessage = message
+		};
 }

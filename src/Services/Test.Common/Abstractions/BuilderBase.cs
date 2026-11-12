@@ -9,6 +9,6 @@ public abstract class BuilderBase<T>(Faker faker) : IBuilder<T>
 
 	public abstract T Build();
 
-	public virtual IReadOnlyCollection<T> BuildMany(int count) =>
-		Enumerable.Range(0, count).Select(_ => Build()).ToList();
+	public virtual IReadOnlyCollection<T> BuildMany(int count)
+		=> Enumerable.Range(0, count).Select(_ => Build()).ToList();
 }

@@ -8,10 +8,13 @@ public sealed class ProductStockConfiguration : IEntityTypeConfiguration<Product
 {
 	public void Configure(EntityTypeBuilder<ProductStock> builder)
 	{
-		builder.ToTable("product_stocks", "public", table =>
-		{
-			table.HasCheckConstraint("product_stocks_quantity_nonnegative_ck", "quantity >= 0");
-		});
+		builder.ToTable(
+			"product_stocks",
+			"public",
+			table =>
+			{
+				table.HasCheckConstraint("product_stocks_quantity_nonnegative_ck", "quantity >= 0");
+			});
 
 		builder.HasKey(stock => new { stock.StorageCode, stock.ProductId }).HasName("product_stocks_pk");
 		builder.Property(stock => stock.StorageCode).HasColumnName("storage_code").HasMaxLength(128);

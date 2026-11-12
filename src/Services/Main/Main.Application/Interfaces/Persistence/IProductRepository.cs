@@ -7,7 +7,9 @@ namespace Main.Application.Interfaces.Persistence;
 
 public interface IProductRepository : IRepository<Product, int>
 {
-	Task<ProductDeletionBlocker?> GetDeletionBlockerAsync(int productId, CancellationToken cancellationToken = default);
+	Task<ProductDeletionBlocker?> GetDeletionBlockerAsync(
+		int productId,
+		CancellationToken cancellationToken = default);
 
 	Task<IReadOnlyList<Product>> GetProductCrosses(
 		int productId,

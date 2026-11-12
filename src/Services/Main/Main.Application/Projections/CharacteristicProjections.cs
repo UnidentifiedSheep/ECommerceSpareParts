@@ -7,9 +7,11 @@ using Main.Entities.Product;
 namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class CharacteristicDtoProjectionProvider : ProjectionProviderBase<Characteristic, CharacteristicDto>
+public sealed class
+	CharacteristicDtoProjectionProvider : ProjectionProviderBase<Characteristic, CharacteristicDto>
 {
-	public override Expression<Func<Characteristic, CharacteristicDto>> Projection { get; } = characteristic =>
+	public override Expression<Func<Characteristic, CharacteristicDto>> Projection { get; } = characteristic
+		=>
 		new CharacteristicDto
 		{
 			Id = characteristic.Id,

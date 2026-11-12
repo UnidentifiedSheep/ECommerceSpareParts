@@ -31,8 +31,8 @@ public sealed class UserContext : IUserContext
 
 	public bool IsAuthenticated { get; }
 
-	public Guid UserId =>
-		IsAuthenticated && _userId.HasValue
+	public Guid UserId
+		=> IsAuthenticated && _userId.HasValue
 			? _userId.Value
 			: throw new UnauthorizedException("Пользователь не авторизован.");
 

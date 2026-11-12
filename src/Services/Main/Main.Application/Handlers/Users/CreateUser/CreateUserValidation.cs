@@ -1,5 +1,3 @@
-using Security.Core.Interfaces;
-using Abstractions.Models.Options;
 using Application.Common.Interfaces.Validators;
 using Extensions;
 using FluentValidation;
@@ -10,6 +8,7 @@ using Main.Application.Models.Options;
 using Main.Entities;
 using Main.Entities.User;
 using Microsoft.Extensions.Options;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 
@@ -99,10 +98,8 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 	}
 
 	private static ValidationFailure CreateFailure(string propertyName, ILocalizableMessage message)
-	{
-		return new ValidationFailure(propertyName, "Validation failed")
+		=> new(propertyName, "Validation failed")
 		{
 			ErrorCode = message.MessageKey, CustomState = message
 		};
-	}
 }

@@ -1,7 +1,6 @@
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
-using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.Organization;
 using Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
@@ -24,7 +23,11 @@ public sealed class OrganizationMutations
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new CreateOrganizationCommand(input.OwnerId, input.Name, input.SystemName), cancellationToken);
+			new CreateOrganizationCommand(
+				input.OwnerId,
+				input.Name,
+				input.SystemName),
+			cancellationToken);
 
 		return new GqlOrganization(result.OrganizationId);
 	}
@@ -37,7 +40,8 @@ public sealed class OrganizationMutations
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new UpdateOrganizationCommand(input.OrganizationId, input.ToDto()), cancellationToken);
+			new UpdateOrganizationCommand(input.OrganizationId, input.ToDto()),
+			cancellationToken);
 
 		return new GqlOrganization(result.OrganizationId);
 	}
@@ -50,7 +54,11 @@ public sealed class OrganizationMutations
 		CancellationToken cancellationToken)
 	{
 		await sender.Send(
-			new AddOrganizationMemberCommand(input.OrganizationId, input.UserId, input.Role), cancellationToken);
+			new AddOrganizationMemberCommand(
+				input.OrganizationId,
+				input.UserId,
+				input.Role),
+			cancellationToken);
 
 		return new GqlOrganization(input.OrganizationId);
 	}
@@ -63,7 +71,11 @@ public sealed class OrganizationMutations
 		CancellationToken cancellationToken)
 	{
 		await sender.Send(
-			new ChangeOrganizationMemberRoleCommand(input.OrganizationId, input.UserId, input.Role), cancellationToken);
+			new ChangeOrganizationMemberRoleCommand(
+				input.OrganizationId,
+				input.UserId,
+				input.Role),
+			cancellationToken);
 
 		return new GqlOrganization(input.OrganizationId);
 	}
@@ -75,7 +87,9 @@ public sealed class OrganizationMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		await sender.Send(new RemoveOrganizationMemberCommand(input.OrganizationId, input.UserId), cancellationToken);
+		await sender.Send(
+			new RemoveOrganizationMemberCommand(input.OrganizationId, input.UserId),
+			cancellationToken);
 
 		return new GqlOrganization(input.OrganizationId);
 	}
@@ -88,7 +102,8 @@ public sealed class OrganizationMutations
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new UpdateOrganizationFinancialProfileCommand(input.OrganizationId, input.ToDto()), cancellationToken);
+			new UpdateOrganizationFinancialProfileCommand(input.OrganizationId, input.ToDto()),
+			cancellationToken);
 
 		return new GqlOrganization(result.OrganizationId);
 	}

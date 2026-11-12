@@ -1,14 +1,14 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Main.Entities.Storage;
-using Main.Enums;
-using Tests.Extensions;
-using Abstractions.Models;
 using Application.Common.Models;
+using Application.Common.Services;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Entities.Exceptions;
+using Main.Entities.Storage;
+using Main.Enums;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using Tests.Abstractions.Test;
+using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
@@ -17,9 +17,7 @@ namespace Tests.HandlersTests.StorageContents;
 public class EditStorageContentTests : IntegrationTest
 {
 	public EditStorageContentTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<StorageContentTestContext>();
-	}
+		=> RegisterBasicContext<StorageContentTestContext>();
 
 	public StorageContentTestContext TestContext => GetContext<StorageContentTestContext>();
 
@@ -49,7 +47,8 @@ public class EditStorageContentTests : IntegrationTest
 	public async Task EditStorageContent_ValidInput_Succeeds()
 	{
 		var content = TestContext.StorageContents.First();
-		var productBeforeStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
+		var productBeforeStockQuantity =
+			await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 		var dto = new PatchStorageContentDto
 		{
 			Count = new PatchField<int>
@@ -70,19 +69,22 @@ public class EditStorageContentTests : IntegrationTest
 		var command = new EditStorageContentCommand(dict);
 		await Mediator.Send(command, CancellationToken);
 
-		var updated = await Context.Set<StorageContent>().FindAsync(
-			new object?[]
-			{
-				content.Id
-			},
-			CancellationToken);
-		var productAfterStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
+		var updated = await Context.Set<StorageContent>()
+			.FindAsync(
+				new object?[]
+				{
+					content.Id
+				},
+				CancellationToken);
+		var productAfterStockQuantity =
+			await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 
 		Assert.Equal(productBeforeStockQuantity, productAfterStockQuantity - 5);
 		Assert.NotNull(updated);
 		Assert.Equal(content.Count, dto.Count.Value);
 		Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);
-		var persisted = await Context.Set<StorageContent>().AsNoTracking()
+		var persisted = await Context.Set<StorageContent>()
+			.AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 		Assert.Equal(StorageMovementType.StorageContentEditing, persisted.Metadata.LastMovementType);
 
@@ -138,28 +140,32 @@ public class EditStorageContentTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var updated = await Context.Set<StorageContent>().FindAsync(
-			new object?[]
-			{
-				content.Id
-			},
-			CancellationToken);
+		var updated = await Context.Set<StorageContent>()
+			.FindAsync(
+				new object?[]
+				{
+					content.Id
+				},
+				CancellationToken);
 		Assert.NotNull(updated);
 		Assert.Equal(content.Count, dto.Count.Value);
 		Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);
-		var persisted = await Context.Set<StorageContent>().AsNoTracking()
+		var persisted = await Context.Set<StorageContent>()
+			.AsNoTracking()
 			.SingleAsync(item => item.Id == content.Id, CancellationToken);
 		Assert.Equal(StorageMovementType.StorageContentEditing, persisted.Metadata.LastMovementType);
 	}
 }
 
-public class EditStorageContentValidationTests : ValidationTest<EditStorageContentValidation, EditStorageContentCommand>
+public class
+	EditStorageContentValidationTests : ValidationTest<EditStorageContentValidation,
+	EditStorageContentCommand>
 {
 	protected override EditStorageContentValidation CreateValidator()
 	{
-		var policy = new Moq.Mock<Application.Common.Services.IOperationDatePolicy>();
-		policy.Setup(x => x.IsAllowed(Moq.It.IsAny<DateTime>()))
-			.Returns(Application.Common.Services.OperationDateValidationResult.Valid());
+		var policy = new Mock<IOperationDatePolicy>();
+		policy.Setup(x => x.IsAllowed(It.IsAny<DateTime>()))
+			.Returns(OperationDateValidationResult.Valid());
 		return new EditStorageContentValidation(policy.Object);
 	}
 

@@ -3,8 +3,8 @@ using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
 using Search.Abstractions;
-using Search.Enums;
 using Search.Application.Validators.CatalogueSearch;
+using Search.Enums;
 
 namespace Search.Application.Handlers.Search.Catalogue;
 

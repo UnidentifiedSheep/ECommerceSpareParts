@@ -1,5 +1,5 @@
-using Application.Common.Extensions;
 using System.Data;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
@@ -29,31 +29,33 @@ public class SettingsService(
 
 	public async Task SetSetting<T>(T value, CancellationToken cancellationToken = default) where T : Setting
 	{
-		await transactionService.WithSettingsIfIdle(TransactionSettings).ExecuteAsync(
-			async (context, ct) =>
-			{
-				var criteria = Criteria<Setting>
-					.New()
-					.Where(x => x.Key == value.Key)
-					.ForUpdate()
-					.Track()
-					.Build();
+		await transactionService.WithSettingsIfIdle(TransactionSettings)
+			.ExecuteAsync(
+				async (context, ct) =>
+				{
+					var criteria = Criteria<Setting>
+						.New()
+						.Where(x => x.Key == value.Key)
+						.ForUpdate()
+						.Track()
+						.Build();
 
-				var existing = await repository.FirstOrDefaultAsync(criteria, ct);
-				existing?.SetData(value.Json);
+					var existing = await repository.FirstOrDefaultAsync(criteria, ct);
+					existing?.SetData(value.Json);
 
-				if (existing == null)
-					await context.UnitOfWork.AddAsync(value, ct);
+					if (existing == null)
+						await context.UnitOfWork.AddAsync(value, ct);
 
-				await context.UnitOfWork.SaveChangesAsync(ct);
-			},
-			cancellationToken);
+					await context.UnitOfWork.SaveChangesAsync(ct);
+				},
+				cancellationToken);
 
 		settingsContainer.Set(value);
 	}
 
 	public Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default)
-		where T : Setting, ISetting<T> => GetOrDefault<T>(false, cancellationToken);
+		where T : Setting, ISetting<T>
+		=> GetOrDefault<T>(false, cancellationToken);
 
 	public async Task<T> GetOrDefault<T>(bool directRead, CancellationToken cancellationToken = default)
 		where T : Setting, ISetting<T>
@@ -63,8 +65,12 @@ public class SettingsService(
 
 		var settingName = T.SettingName;
 		var dbSetting = directRead
-			? await repository.FirstOrDefaultAsync(Criteria<Setting>.New()
-				.Where(x => x.Key == settingName).Track(false).Build(), cancellationToken)
+			? await repository.FirstOrDefaultAsync(
+				Criteria<Setting>.New()
+					.Where(x => x.Key == settingName)
+					.Track(false)
+					.Build(),
+				cancellationToken)
 			: await repository.GetById(settingName, cancellationToken);
 
 		if (dbSetting != null)

@@ -1,9 +1,8 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using System.Text.Json.Nodes;
 using Domain.CommonEntities.Job;
 using Exceptions;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Application.Dtos.PriceApplier;
@@ -16,6 +15,7 @@ using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers.Internal;
 using Pricing.Entities.Pricing;
 using Pricing.Enums;
 using Pricing.Integration.Tests.DataBuilders.PriceAppliers;
+using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 
@@ -497,29 +497,48 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		PriceOfferSourceType usage,
 		int? order,
 		bool enabled = true)
-	{
-		return new UpsertPriceApplierStateDto
+		=> new()
 		{
 			Usage = usage,
 			Order = order,
 			Enabled = enabled
 		};
-	}
 }
 
-public class UpsertPriceApplierValidationTests : ValidationTest<UpsertPriceApplierValidation, UpsertPriceApplierCommand>
+public class
+	UpsertPriceApplierValidationTests : ValidationTest<UpsertPriceApplierValidation,
+	UpsertPriceApplierCommand>
 {
 	[Fact]
 	public async Task WithDuplicateUsages_FailsValidation()
 	{
-		var result = await ValidateAsync(new UpsertPriceApplierCommand("dynamic-test", "Dynamic price rule", """{"var":"salePrice"}""", [new UpsertPriceApplierStateDto { Usage = PriceOfferSourceType.Supplier, Order = 10, Enabled = true }, new UpsertPriceApplierStateDto { Usage = PriceOfferSourceType.Supplier, Order = 20, Enabled = true }]));
-		result.ShouldHaveValidationErrorFor(x => x.States).WithErrorCode("price.applier.usage.duplicate").Only();
+		var result = await ValidateAsync(
+			new UpsertPriceApplierCommand(
+				"dynamic-test",
+				"Dynamic price rule",
+				"""{"var":"salePrice"}""",
+				[
+					new UpsertPriceApplierStateDto
+						{ Usage = PriceOfferSourceType.Supplier, Order = 10, Enabled = true },
+					new UpsertPriceApplierStateDto
+						{ Usage = PriceOfferSourceType.Supplier, Order = 20, Enabled = true }
+				]));
+		result.ShouldHaveValidationErrorFor(x => x.States)
+			.WithErrorCode("price.applier.usage.duplicate")
+			.Only();
 	}
 
 	[Fact]
 	public async Task WithDynamicApplierNameOverMaximumLength_FailsValidation()
 	{
-		var result = await ValidateAsync(new UpsertPriceApplierCommand("dynamic-test", new string('a', 129), """{"var":"salePrice"}""", []));
-		result.ShouldHaveValidationErrorFor(x => x.Name).WithErrorCode("price.applier.name.max.length").Only();
+		var result = await ValidateAsync(
+			new UpsertPriceApplierCommand(
+				"dynamic-test",
+				new string('a', 129),
+				"""{"var":"salePrice"}""",
+				[]));
+		result.ShouldHaveValidationErrorFor(x => x.Name)
+			.WithErrorCode("price.applier.name.max.length")
+			.Only();
 	}
 }

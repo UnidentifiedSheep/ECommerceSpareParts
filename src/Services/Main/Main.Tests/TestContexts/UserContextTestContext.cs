@@ -1,8 +1,6 @@
-﻿using Persistence.Context;
+﻿using Application.Common.Interfaces.Settings;
+using Persistence.Context;
 using Security.Core.Interfaces;
-using Abstractions.Interfaces;
-using Application.Common.Interfaces.Settings;
-using Main.Persistence.Context;
 using Tests.Stubs;
 
 namespace Tests.TestContexts;

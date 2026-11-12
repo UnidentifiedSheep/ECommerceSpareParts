@@ -8,7 +8,10 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, int>, ILinqEntity<Curr
 {
 	private CurrencyRate() { }
 
-	private CurrencyRate(int fromCurrencyId, int toCurrencyId, decimal rate)
+	private CurrencyRate(
+		int fromCurrencyId,
+		int toCurrencyId,
+		decimal rate)
 	{
 		if (fromCurrencyId == toCurrencyId)
 			throw new InvalidOperationException("Currency rate self reference is not permitted.");
@@ -26,10 +29,17 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, int>, ILinqEntity<Curr
 	public Currency FromCurrency { get; private set; } = null!;
 	public Currency ToCurrency { get; private set; } = null!;
 
-	public static CurrencyRate Create(int fromCurrencyId, int toCurrencyId, decimal rate) =>
-		new(fromCurrencyId, toCurrencyId, rate);
-
 	public static Expression<Func<CurrencyRate, int>> GetKeySelector() => value => value.Id;
-	public static Expression<Func<CurrencyRate, bool>> GetEqualityExpression(int key) => value => value.Id == key;
+	public static Expression<Func<CurrencyRate, bool>> GetEqualityExpression(int key)
+		=> value => value.Id == key;
+
+	public static CurrencyRate Create(
+		int fromCurrencyId,
+		int toCurrencyId,
+		decimal rate)
+		=> new(
+			fromCurrencyId,
+			toCurrencyId,
+			rate);
 	public override int GetId() => Id;
 }

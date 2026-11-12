@@ -28,19 +28,32 @@ public class CurrencyRateUpdater(
 			throw new InvalidOperationException("Unable to get exchange rates");
 
 		var source = response.ValueOrThrow;
-		var normalized = converter.ChangeBaseCurrency(new CurrencyRates(source.Base, source.Rates), baseCurrency.Code);
+		var normalized = converter.ChangeBaseCurrency(
+			new CurrencyRates(source.Base, source.Rates),
+			baseCurrency.Code);
 
 		// Serialize updates for this base currency before comparing with the latest persisted rates.
-		await currencyRepository.FirstOrDefaultAsync(Criteria<Entities.Currency.Currency>.New()
-			.Where(currency => currency.Id == baseCurrency.Id).ForUpdate().Build(), ct);
-		var current = await rateRepository.Query.Where(rate => rate.ToCurrencyId == baseCurrency.Id)
+		await currencyRepository.FirstOrDefaultAsync(
+			Criteria<Entities.Currency.Currency>.New()
+				.Where(currency => currency.Id == baseCurrency.Id)
+				.ForUpdate()
+				.Build(),
+			ct);
+		var current = await rateRepository.Query
+			.Where(rate => rate.ToCurrencyId == baseCurrency.Id)
 			.GroupBy(rate => rate.FromCurrencyId)
 			.Select(group => new
 			{
 				CurrencyId = group.Key,
-				Rate = group.OrderByDescending(rate => rate.CreatedAt).ThenByDescending(rate => rate.Id)
-					.Select(rate => rate.Rate).First()
-			}).ToDictionaryAsync(rate => rate.CurrencyId, rate => rate.Rate, ct);
+				Rate = group.OrderByDescending(rate => rate.CreatedAt)
+					.ThenByDescending(rate => rate.Id)
+					.Select(rate => rate.Rate)
+					.First()
+			})
+			.ToDictionaryAsync(
+				rate => rate.CurrencyId,
+				rate => rate.Rate,
+				ct);
 
 		var currencies = await currencyRepository.ListAsync(ct: ct);
 		var changed = new Dictionary<int, decimal>();
@@ -54,10 +67,16 @@ public class CurrencyRateUpdater(
 				notFound.Add(currency.Code);
 				continue;
 			}
+
 			if (current.TryGetValue(currency.Id, out var previous) && previous == value) continue;
-			additions.Add(CurrencyRate.Create(currency.Id, baseCurrency.Id, value));
+			additions.Add(
+				CurrencyRate.Create(
+					currency.Id,
+					baseCurrency.Id,
+					value));
 			changed[currency.Id] = value;
 		}
+
 		if (additions.Count > 0) await unitOfWork.AddRangeAsync(additions, ct);
 		return new UpdateRatesResult(changed, notFound);
 	}

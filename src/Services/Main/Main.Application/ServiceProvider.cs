@@ -1,5 +1,3 @@
-using Main.Application.Analytics.Interfaces;
-using Main.Application.Analytics.Services;
 using Abstractions;
 using Application.Common;
 using Application.Common.Extensions;
@@ -7,6 +5,8 @@ using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Validators;
 using Application.Common.Services.Currency;
 using Application.Common.Validators;
+using Main.Application.Analytics.Interfaces;
+using Main.Application.Analytics.Services;
 using Main.Application.Configs;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Logistics;
@@ -21,7 +21,6 @@ using Main.Application.Products.Interfaces;
 using Main.Application.Products.Services;
 using Main.Application.Products.Services.EventParts;
 using Main.Application.Services;
-using Main.Application.Services.Storage;
 using Main.Application.Services.Currency;
 using Main.Application.Services.Document;
 using Main.Application.Services.Document.Providers;
@@ -29,6 +28,7 @@ using Main.Application.Services.Document.Sources;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Application.Services.PayloadProvider;
+using Main.Application.Services.Storage;
 using Main.Entities.Balance;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,7 +44,9 @@ public static class ServiceProvider
 		IConfiguration? configuration)
 	{
 		var appLinksOptions = collection.AddOptions<AppLinksOptions>()
-			.Validate(options => options.IsValid(), "App link templates must be relative and contain their required placeholders.")
+			.Validate(
+				options => options.IsValid(),
+				"App link templates must be relative and contain their required placeholders.")
 			.ValidateOnStart();
 		if (configuration is not null)
 			appLinksOptions.Bind(configuration.GetSection(AppLinksOptions.SectionName));
@@ -80,7 +82,8 @@ public static class ServiceProvider
 		collection.AddSingleton<IDocumentProvider, ExcelDocumentProvider>();
 		collection.AddSingleton<IDocumentTemplateResolver, DocumentTemplateResolver>();
 
-		collection.AddScoped<IRecipientResolver>(provider => provider.GetRequiredService<IRecipientProvider>());
+		collection.AddScoped<IRecipientResolver>(provider
+			=> provider.GetRequiredService<IRecipientProvider>());
 
 		collection.RegisterSettingsService();
 

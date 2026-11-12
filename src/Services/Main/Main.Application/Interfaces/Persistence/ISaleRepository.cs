@@ -7,5 +7,7 @@ public interface ISaleRepository : IRepository<Sale, Guid>
 {
 	Task<Sale?> GetFullSaleForUpdate(Guid id, CancellationToken cancellationToken = default);
 
-	Task<IReadOnlyList<Sale>> GetFullSalesForUpdate(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default);
+	Task<IReadOnlyList<Sale>> GetFullSalesForUpdate(
+		IReadOnlyCollection<Guid> ids,
+		CancellationToken cancellationToken = default);
 }

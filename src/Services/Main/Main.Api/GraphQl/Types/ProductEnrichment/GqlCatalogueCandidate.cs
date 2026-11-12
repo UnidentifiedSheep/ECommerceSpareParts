@@ -19,10 +19,7 @@ public record GqlCatalogueCandidate
 		Id = _candidate.Id;
 	}
 
-	public GqlCatalogueCandidate(Guid candidateId)
-	{
-		Id = candidateId;
-	}
+	public GqlCatalogueCandidate(Guid candidateId) => Id = candidateId;
 
 	[GraphQLName("id")]
 	[Shareable]
@@ -72,6 +69,7 @@ public record GqlCatalogueCandidate
 
 	private async Task<CatalogueCandidateReviewDto> GetCandidateAsync(
 		ICatalogueCandidateByIdDataLoader loader,
-		CancellationToken cancellation) => _candidate ?? await loader.LoadAsync(Id, cancellation) ??
-		throw new CatalogueCandidateNotFoundException();
+		CancellationToken cancellation)
+		=> _candidate ?? await loader.LoadAsync(Id, cancellation) ??
+			throw new CatalogueCandidateNotFoundException();
 }

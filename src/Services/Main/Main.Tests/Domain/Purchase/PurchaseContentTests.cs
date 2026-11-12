@@ -201,11 +201,9 @@ public class PurchaseContentTests
 	}
 
 	private static PurchaseContent Create()
-	{
-		return PurchaseContent.Create(
+		=> PurchaseContent.Create(
 			1,
 			2,
 			10m,
 			2);
-	}
 }

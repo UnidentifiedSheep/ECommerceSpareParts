@@ -72,8 +72,8 @@ public class AuthorizationHandlerTests
 	}
 
 	[Fact]
-	public void PermissionRequirement_WhenPermissionsAreEmpty_Throws() =>
-		Assert.Throws<ArgumentException>(() => new PermissionRequirement(
+	public void PermissionRequirement_WhenPermissionsAreEmpty_Throws()
+		=> Assert.Throws<ArgumentException>(() => new PermissionRequirement(
 			new string[]
 			{
 			},

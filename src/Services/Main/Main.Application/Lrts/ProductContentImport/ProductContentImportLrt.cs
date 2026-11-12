@@ -24,16 +24,24 @@ public class ProductContentImportLrt(
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductContentImportInputState, ProductContentImportState,
 		ProductContentImportLrt.ProductContentCsvDto, ProductContent>(
-		bucketsOptions, transactionService,
-		logger, s3Service, stringLocalizer)
+		bucketsOptions,
+		transactionService,
+		logger,
+		s3Service,
+		stringLocalizer)
 {
 	public const string Name = nameof(ProductContentImportLrt);
 
 	public override string SystemName => Name;
-	public override ILocalizableMessage NameLocalizationMessage => LrtProductContentImportNameMessage.Instance;
-	public override ILocalizableMessage DescriptionLocalizationMessage => LrtProductContentImportDescriptionMessage.Instance;
-	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-		ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
+
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtProductContentImportNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtProductContentImportDescriptionMessage.Instance;
+
+	protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+		=> ArticleImportTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 	protected override bool TryProcessRow(
 		int rowIdx,
@@ -45,13 +53,17 @@ public class ProductContentImportLrt(
 		item = null!;
 		if (row.ParentId <= 0 || row.ChildId <= 0)
 		{
-			errors.Add(CreateError(rowIdx, StringLocalizer.Get(LrtProductContentImportInvalidIdMessage.Instance)));
+			errors.Add(
+				CreateError(rowIdx, StringLocalizer.Get(LrtProductContentImportInvalidIdMessage.Instance)));
 			return false;
 		}
 
 		try
 		{
-			item = ProductContent.Create(row.ParentId, row.ChildId, row.Quantity);
+			item = ProductContent.Create(
+				row.ParentId,
+				row.ChildId,
+				row.Quantity);
 			return true;
 		}
 		catch (Exception ex)
@@ -88,15 +100,19 @@ public class ProductContentImportLrt(
 				})
 			.ExecuteAsync(
 				(context, cancellationToken) =>
-					context.GetRequiredService<IProductRepository>().UpsertProductContentsAsync(
-						items.Select(x => x.item).ToArray(),
-						cancellationToken),
+					context.GetRequiredService<IProductRepository>()
+						.UpsertProductContentsAsync(
+							items.Select(x => x.item).ToArray(),
+							cancellationToken),
 				CancellationToken);
 
 		Logger.LogInformation(
 			"Product content import batch processed. JobId: {JobId}, " +
 			"BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}, Errors: {Errors}",
-			JobId, items[0].idx, items.Count, errors.Count);
+			JobId,
+			items[0].idx,
+			items.Count,
+			errors.Count);
 	}
 
 	public sealed record ProductContentCsvDto

@@ -15,7 +15,11 @@ public record GqlSortBy
 	public string? Argument { get; init; }
 
 	[GraphQLIgnore]
-	public SortExpression ToSortExpression() => new(Field, IsDescending, Argument);
+	public SortExpression ToSortExpression()
+		=> new(
+			Field,
+			IsDescending,
+			Argument);
 
 	public static implicit operator SortExpression?(GqlSortBy? sortBy) => sortBy?.ToSortExpression();
 }

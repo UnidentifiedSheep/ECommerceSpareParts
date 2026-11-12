@@ -1,7 +1,6 @@
-using Persistence.Context;
 using Main.Entities.Storage;
 using Main.Enums;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;
@@ -31,9 +30,13 @@ public class StorageContentTestContext(
 			.WithStorageCode(storage.Storages.First(x => x.Type == StorageType.Warehouse).Code)
 			.BuildManyAndAddToDb(DbContext, 10);
 
-		await DbContext.AddRangeAsync(StorageContents
-			.GroupBy(content => (content.StorageCode, content.ProductId))
-			.Select(group => ProductStock.Create(group.Key.StorageCode, group.Key.ProductId, group.Sum(content => content.Count))),
+		await DbContext.AddRangeAsync(
+			StorageContents
+				.GroupBy(content => (content.StorageCode, content.ProductId))
+				.Select(group => ProductStock.Create(
+					group.Key.StorageCode,
+					group.Key.ProductId,
+					group.Sum(content => content.Count))),
 			cancellationToken);
 
 		await DbContext.SaveChangesAsync(cancellationToken);

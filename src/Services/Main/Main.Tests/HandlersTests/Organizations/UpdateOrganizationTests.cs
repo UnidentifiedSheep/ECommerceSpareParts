@@ -1,6 +1,3 @@
-using FluentValidation.TestHelper;
-using Tests.Abstractions.Test;
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
 using Main.Application.Dtos.Organizations;
@@ -8,6 +5,7 @@ using Main.Application.Handlers.Organizations.UpdateOrganization;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Organization;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -18,9 +16,7 @@ namespace Tests.HandlersTests.Organizations;
 public sealed class UpdateOrganizationTests : IntegrationTest
 {
 	public UpdateOrganizationTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UsersTestContext>();
-	}
+		=> RegisterBasicContext<UsersTestContext>();
 
 	[Fact]
 	public async Task UpdateOrganization_Name_UpdatesOrganization()
@@ -37,7 +33,7 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 
 		result.OrganizationId.Should().Be(organization.Id);
 		var updatedOrganization = await Context
-			.Set<global::Main.Entities.Organization.Organization>()
+			.Set<Organization>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == organization.Id, CancellationToken);
 		updatedOrganization.Name.Should().Be("Updated organization");
@@ -54,7 +50,7 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 
 		result.OrganizationId.Should().Be(organization.Id);
 		var dbOrganization = await Context
-			.Set<global::Main.Entities.Organization.Organization>()
+			.Set<Organization>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == organization.Id, CancellationToken);
 		dbOrganization.Name.Should().Be(organization.Name);
@@ -90,7 +86,9 @@ public sealed class UpdateOrganizationTests : IntegrationTest
 	}
 }
 
-public class UpdateOrganizationValidationTests : ValidationTest<UpdateOrganizationValidation, UpdateOrganizationCommand>
+public class
+	UpdateOrganizationValidationTests : ValidationTest<UpdateOrganizationValidation,
+	UpdateOrganizationCommand>
 {
 	[Theory]
 	[InlineData(null)]
@@ -109,5 +107,4 @@ public class UpdateOrganizationValidationTests : ValidationTest<UpdateOrganizati
 
 		result.ShouldHaveValidationErrorFor("Organization.Name.Value");
 	}
-
 }

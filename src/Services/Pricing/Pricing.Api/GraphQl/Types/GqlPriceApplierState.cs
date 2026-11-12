@@ -5,7 +5,8 @@ using Pricing.Enums;
 namespace Pricing.Api.GraphQl.Types;
 
 [GraphQLName("PriceApplierState")]
-public sealed record GqlPriceApplierState([property: GraphQLIgnore] PriceApplierStateDto Dto)
+public sealed record GqlPriceApplierState([property: GraphQLIgnore]
+	PriceApplierStateDto Dto)
 {
 	[GraphQLName("priceApplierSystemName")]
 	public string PriceApplierSystemName => Dto.PriceApplierSystemName;

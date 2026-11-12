@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 
@@ -7,7 +8,7 @@ namespace Main.Api.GraphQl.Queries;
 public sealed class CurrencyQueries
 {
 	[GraphQLName("byId")]
-	[HotChocolate.Types.Composite.LookupAttribute]
+	[Lookup]
 	public async Task<GqlCurrency?> GetCurrencyByIdAsync(
 		ICurrencyByIdDataLoader loader,
 		int id,

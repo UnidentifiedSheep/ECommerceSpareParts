@@ -6,7 +6,8 @@ using Pricing.Application.Dtos.Price;
 namespace Pricing.Api.GraphQl.Types;
 
 [GraphQLName("PriceRecommendation")]
-public sealed record GqlPriceRecommendation([property: GraphQLIgnore] PriceRecommendationDto Dto)
+public sealed record GqlPriceRecommendation([property: GraphQLIgnore]
+	PriceRecommendationDto Dto)
 {
 	[GraphQLName("quantity")]
 	public int Quantity => Dto.Quantity;
@@ -24,12 +25,13 @@ public sealed record GqlPriceRecommendation([property: GraphQLIgnore] PriceRecom
 	public decimal? TotalPrice => Dto.TotalPrice;
 
 	[GraphQLName("items")]
-	public IReadOnlyList<GqlPriceRecommendationItem> Items =>
-		Dto.Items.Select(item => new GqlPriceRecommendationItem(item)).ToArray();
+	public IReadOnlyList<GqlPriceRecommendationItem> Items
+		=> Dto.Items.Select(item => new GqlPriceRecommendationItem(item)).ToArray();
 }
 
 [GraphQLName("PriceRecommendationItem")]
-public sealed record GqlPriceRecommendationItem([property: GraphQLIgnore] PriceRecommendationItemDto Dto)
+public sealed record GqlPriceRecommendationItem([property: GraphQLIgnore]
+	PriceRecommendationItemDto Dto)
 {
 	[GraphQLName("quantity")]
 	public int Quantity => Dto.Quantity;

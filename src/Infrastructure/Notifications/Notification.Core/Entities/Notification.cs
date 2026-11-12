@@ -7,17 +7,10 @@ namespace Notification.Core.Entities;
 
 public sealed class Notification : Entity<Notification, int>, ILinqEntity<Notification, int>
 {
-	public int Id { get; private set; }
-
-	public Guid UserId { get; private set; }
-	public string NotificationSystemName { get; private set; } = null!;
-	public string Model { get; private set; } = null!;
-	public DateTime CreateAt { get; private set; }
 
 	private readonly List<NotificationDelivery> _deliveries = [];
-	public IReadOnlyList<NotificationDelivery> Deliveries => _deliveries;
 
-	private Notification() {}
+	private Notification() { }
 
 	private Notification(
 		Guid userId,
@@ -26,20 +19,34 @@ public sealed class Notification : Entity<Notification, int>, ILinqEntity<Notifi
 	{
 		UserId = userId;
 		NotificationSystemName = notificationSystemName;
-		Model = model.EnsureValidJson(
-			() => new InvalidOperationException("Model must be valid json value."));
+		Model = model.EnsureValidJson(() => new InvalidOperationException("Model must be valid json value."));
 		CreateAt = DateTime.UtcNow;
 	}
+	public int Id { get; private set; }
+
+	public Guid UserId { get; private set; }
+	public string NotificationSystemName { get; private set; } = null!;
+	public string Model { get; private set; } = null!;
+	public DateTime CreateAt { get; private set; }
+	public IReadOnlyList<NotificationDelivery> Deliveries => _deliveries;
+	public static Expression<Func<Notification, int>> GetKeySelector() => x => x.Id;
+	public static Expression<Func<Notification, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 
 	public static Notification Create(
 		Guid userId,
 		string notificationSystemName,
 		string model)
-		=> new(userId, notificationSystemName, model);
+		=> new(
+			userId,
+			notificationSystemName,
+			model);
 
 	public NotificationDelivery MakeDelivery(string channelSystemName, string? recipientJson = null)
 	{
-		var delivery = NotificationDelivery.Create(this, channelSystemName, recipientJson);
+		var delivery = NotificationDelivery.Create(
+			this,
+			channelSystemName,
+			recipientJson);
 
 		if (_deliveries.Any(x => string.Equals(
 				x.ChannelSystemName,
@@ -52,6 +59,4 @@ public sealed class Notification : Entity<Notification, int>, ILinqEntity<Notifi
 	}
 
 	public override int GetId() => Id;
-	public static Expression<Func<Notification, int>> GetKeySelector() => x => x.Id;
-	public static Expression<Func<Notification, bool>> GetEqualityExpression(int key) => x => x.Id == key;
 }

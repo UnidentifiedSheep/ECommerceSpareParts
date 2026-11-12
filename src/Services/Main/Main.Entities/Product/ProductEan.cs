@@ -8,10 +8,6 @@ namespace Main.Entities.Product;
 
 public class ProductEan : Entity<ProductEan, ProductEanKey>, ILinqEntity<ProductEan, ProductEanKey>
 {
-	[ValidateTuple("PK")]
-	public int ProductId { get; private set; }
-	[ValidateTuple("PK")]
-	public string Ean { get; private set; } = null!;
 
 	private ProductEan()
 	{
@@ -26,13 +22,20 @@ public class ProductEan : Entity<ProductEan, ProductEanKey>, ILinqEntity<Product
 			.EnsureMaxLength(14, ArticleEanMaxLengthMessage.Instance);
 	}
 
-	public static ProductEan Create(int productId, string ean) => new(productId, ean);
+	[ValidateTuple("PK")]
+	public int ProductId { get; }
 
-	public override ProductEanKey GetId() => new(ProductId, Ean);
+	[ValidateTuple("PK")]
+	public string Ean { get; } = null!;
+
 	public static Expression<Func<ProductEan, ProductEanKey>> GetKeySelector()
 		=> x => new ProductEanKey(x.ProductId, x.Ean);
 	public static Expression<Func<ProductEan, bool>> GetEqualityExpression(ProductEanKey key)
 		=> x => x.Ean == key.Ean && x.ProductId == key.ProductId;
+
+	public static ProductEan Create(int productId, string ean) => new(productId, ean);
+
+	public override ProductEanKey GetId() => new(ProductId, Ean);
 }
 
 public readonly record struct ProductEanKey(int ProductId, string Ean) : ICompositeKey

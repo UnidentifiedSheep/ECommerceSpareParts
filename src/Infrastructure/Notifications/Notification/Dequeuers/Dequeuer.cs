@@ -1,8 +1,8 @@
-using Application.Common.Extensions;
+using System.Runtime.ExceptionServices;
 using System.Text.Json;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,7 +22,7 @@ public class Dequeuer<TRecipient>(
 	ILogger<Dequeuer<TRecipient>> logger,
 	ChannelOptionsBase options,
 	IServiceScopeFactory scopeFactory
-	) : BackgroundService, INamedObject
+) : BackgroundService, INamedObject
 	where TRecipient : INotificationRecipient
 {
 	private readonly SemaphoreSlim _wakeUp = new(0, 1);
@@ -69,38 +69,40 @@ public class Dequeuer<TRecipient>(
 			.GetRequiredService<INamedObjectRegistry<INotificationChannel>>()
 			.GetBySystemName(SystemName);
 
-		var (hasNext, processingError) = await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(
-			async (transactionContext, ct) =>
-			{
-				var batch = await repository
-					.GetPendingBatchForUpdateAsync(
-						SystemName,
-						options.BatchSize,
+		var (hasNext, processingError) = await transactionService
+			.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(0, 0))
+			.ExecuteAsync(
+				async (transactionContext, ct) =>
+				{
+					var batch = await repository
+						.GetPendingBatchForUpdateAsync(
+							SystemName,
+							options.BatchSize,
+							ct);
+
+					if (batch.Count == 0) return (HasNext: false, Error: null);
+
+					var userIdsToResolve = batch
+						.Where(delivery => delivery.RecipientJson is null)
+						.Select(delivery => delivery.Notification.UserId)
+						.Distinct()
+						.ToArray();
+					var recipientsByUser = userIdsToResolve.Length == 0
+						? new Dictionary<Guid, TRecipient>()
+						: await recipientResolver.ResolveAsync<TRecipient>(userIdsToResolve, ct);
+
+					var error = await ProcessAsync(
+						batch,
+						recipientsByUser,
+						definitions,
+						channel,
 						ct);
 
-				if (batch.Count == 0) return (HasNext: false, Error: null);
+					await transactionContext.UnitOfWork.SaveChangesAsync(ct);
 
-				var userIdsToResolve = batch
-					.Where(delivery => delivery.RecipientJson is null)
-					.Select(delivery => delivery.Notification.UserId)
-					.Distinct()
-					.ToArray();
-				var recipientsByUser = userIdsToResolve.Length == 0
-					? new Dictionary<Guid, TRecipient>()
-					: await recipientResolver.ResolveAsync<TRecipient>(userIdsToResolve, ct);
-
-				var error = await ProcessAsync(
-					batch,
-					recipientsByUser,
-					definitions,
-					channel,
-					ct);
-
-				await transactionContext.UnitOfWork.SaveChangesAsync(ct);
-
-				return (HasNext: await repository.HasNextAsync(SystemName, ct), Error: error);
-			},
-			cancellationToken);
+					return (HasNext: await repository.HasNextAsync(SystemName, ct), Error: error);
+				},
+				cancellationToken);
 
 		if (processingError is not null)
 			ExceptionDispatchInfo.Capture(processingError).Throw();
@@ -150,9 +152,11 @@ public class Dequeuer<TRecipient>(
 			catch (Exception exception)
 			{
 				processingError ??= exception;
-				logger.LogError(exception,
+				logger.LogError(
+					exception,
 					"Unable to prepare notification {NotificationId} for channel {ChannelSystemName}.",
-					delivery.NotificationId, SystemName);
+					delivery.NotificationId,
+					SystemName);
 				RecordFailure(delivery, exception.Message);
 			}
 		}
@@ -184,8 +188,8 @@ public class Dequeuer<TRecipient>(
 		}
 
 		foreach (var group in owners
-			         .Select((delivery, index) => (delivery, result: results[index]))
-			         .GroupBy(item => item.delivery))
+					.Select((delivery, index) => (delivery, result: results[index]))
+					.GroupBy(item => item.delivery))
 		{
 			var failure = group.FirstOrDefault(item => !item.result.Succeeded).result;
 			if (failure is null)
@@ -198,11 +202,9 @@ public class Dequeuer<TRecipient>(
 	}
 
 	private void RecordFailure(DeliveryEntity delivery, string? error)
-	{
-		delivery.Fail(
+		=> delivery.Fail(
 			string.IsNullOrWhiteSpace(error) ? "Notification delivery failed." : error,
 			options.MaxAttempts);
-	}
 
 	public void SkipDelay()
 	{

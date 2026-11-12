@@ -1,9 +1,9 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using Application.Common.Models;
 using FluentAssertions;
+using FluentValidation.TestHelper;
 using Main.Application.Products.Queries.GetProductsByEan;
 using Main.Entities.Product;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -11,8 +11,8 @@ namespace Tests.HandlersTests.ProductEans;
 
 public class GetProductsByEanTests : IntegrationTest
 {
-	public GetProductsByEanTests(CombinedContainerFixture fixture) : base(fixture) =>
-		RegisterBasicContext<ProductEanTestContext>();
+	public GetProductsByEanTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<ProductEanTestContext>();
 
 	private ProductEanTestContext TestContext => GetContext<ProductEanTestContext>();
 
@@ -45,11 +45,10 @@ public class GetProductsByEanTests : IntegrationTest
 
 		result.Products.Should().BeEmpty();
 	}
-
-
 }
 
-public class GetProductsByEanValidationTests : ValidationTest<GetProductsByEanValidation, GetProductsByEanQuery>
+public class
+	GetProductsByEanValidationTests : ValidationTest<GetProductsByEanValidation, GetProductsByEanQuery>
 {
 	[Theory]
 	[InlineData(null)]

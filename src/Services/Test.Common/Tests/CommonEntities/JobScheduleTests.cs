@@ -425,16 +425,14 @@ public class JobScheduleTests
 	}
 
 	private static JobSchedule Create()
-	{
-		return JobSchedule.Create(
+		=> JobSchedule.Create(
 			"Daily import",
 			"Imports products",
 			"import-products",
 			"{}",
 			3,
 			"0 0 * * *");
-	}
 
-	private static void SetId(JobSchedule schedule, Guid id) =>
-		typeof(JobSchedule).GetProperty(nameof(JobSchedule.Id))!.SetValue(schedule, id);
+	private static void SetId(JobSchedule schedule, Guid id)
+		=> typeof(JobSchedule).GetProperty(nameof(JobSchedule.Id))!.SetValue(schedule, id);
 }

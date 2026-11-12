@@ -1,13 +1,11 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Main.Entities.Exceptions;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
-using Main.Application.Static;
 using Main.Entities.Currency;
+using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -65,9 +63,10 @@ public class AddStorageRouteTests : IntegrationTest
 
 		var result = await Mediator.Send(command, CancellationToken);
 
-		var route = await Context.Set<StorageRoute>().FirstOrDefaultAsync(
-			x => x.Id == result.RouteId,
-			CancellationToken);
+		var route = await Context.Set<StorageRoute>()
+			.FirstOrDefaultAsync(
+				x => x.Id == result.RouteId,
+				CancellationToken);
 		Assert.NotNull(route);
 		Assert.Equal(_toStorage.Code, route.FromStorageCode);
 		Assert.Equal(_fromStorage.Code, route.ToStorageCode);
@@ -120,7 +119,8 @@ public class AddStorageRouteTests : IntegrationTest
 	}
 }
 
-public class AddStorageRouteValidationTests : ValidationTest<AddStorageRouteValidation, AddStorageRouteCommand>
+public class
+	AddStorageRouteValidationTests : ValidationTest<AddStorageRouteValidation, AddStorageRouteCommand>
 {
 	[Fact]
 	public async Task AddStorageRoute_WithInvalidDistance_FailsValidation()

@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Services.Events;
 using Domain.Interfaces.Events;
@@ -17,7 +16,10 @@ public sealed class DomainEventExecutorTests
 		var calls = new List<string>();
 		var publisher = CreatePublisher((_, _) => calls.Add("publish"));
 		var eventScope = new DomainEventScope();
-		var executor = new DomainEventExecutor(eventScope, publisher.Object, Mock.Of<IDomainEventCollector>());
+		var executor = new DomainEventExecutor(
+			eventScope,
+			publisher.Object,
+			Mock.Of<IDomainEventCollector>());
 
 		await executor.ExecuteAsync(
 			() =>
@@ -77,7 +79,10 @@ public sealed class DomainEventExecutorTests
 		{
 		});
 		var eventScope = new DomainEventScope();
-		var executor = new DomainEventExecutor(eventScope, publisher.Object, Mock.Of<IDomainEventCollector>());
+		var executor = new DomainEventExecutor(
+			eventScope,
+			publisher.Object,
+			Mock.Of<IDomainEventCollector>());
 
 		var action = () => executor.ExecuteAsync(() =>
 		{
@@ -105,7 +110,11 @@ public sealed class DomainEventExecutorTests
 		scope.Add(new BeforeEvent(1));
 		scope.Add(new TestDomainEvent(3));
 		var unitOfWork = new Mock<IUnitOfWork>(MockBehavior.Strict);
-		var executor = new DomainEventExecutor(scope, publisher.Object, Mock.Of<IDomainEventCollector>(), unitOfWork.Object);
+		var executor = new DomainEventExecutor(
+			scope,
+			publisher.Object,
+			Mock.Of<IDomainEventCollector>(),
+			unitOfWork.Object);
 
 		await executor.DispatchBeforeSaveAsync(TestContext.Current.CancellationToken);
 
@@ -122,7 +131,10 @@ public sealed class DomainEventExecutorTests
 		scope = new DomainEventScope();
 		scope.Add(new BeforeEvent(1));
 		scope.Add(new TestDomainEvent(3));
-		var executor = new DomainEventExecutor(scope, publisher.Object, Mock.Of<IDomainEventCollector>());
+		var executor = new DomainEventExecutor(
+			scope,
+			publisher.Object,
+			Mock.Of<IDomainEventCollector>());
 
 		await Assert.ThrowsAsync<InvalidOperationException>(() =>
 			executor.DispatchBeforeSaveAsync(TestContext.Current.CancellationToken));
@@ -139,26 +151,22 @@ public sealed class DomainEventExecutorTests
 		scope.Add(new KeyedBatchBeforeEvent(1));
 		scope.Add(new KeyedBatchBeforeEvent(2));
 		scope.Add(new OrdinaryKeyedEvent());
-		var executor = new DomainEventExecutor(scope, publisher.Object, Mock.Of<IDomainEventCollector>());
+		var executor = new DomainEventExecutor(
+			scope,
+			publisher.Object,
+			Mock.Of<IDomainEventCollector>());
 
 		await executor.DispatchBeforeSaveAsync(TestContext.Current.CancellationToken);
 
-		var batch = published.Should().ContainSingle().Subject.Should().BeOfType<Batch<KeyedBatchBeforeEvent>>().Subject;
+		var batch = published.Should()
+			.ContainSingle()
+			.Subject
+			.Should()
+			.BeOfType<Batch<KeyedBatchBeforeEvent>>()
+			.Subject;
 		batch.Items.Should().Equal(new KeyedBatchBeforeEvent(2));
 		scope.Flush().Should().ContainSingle().Which.Should().BeOfType<OrdinaryKeyedEvent>();
 	}
-
-	private sealed record KeyedBatchBeforeEvent(int Value) : IBeforeSaveDomainEvent, IBatchableDomainEvent, IKeyedDomainEvent
-	{
-		public string GetKey() => "batch-before";
-	}
-
-	private sealed record OrdinaryKeyedEvent : IKeyedDomainEvent
-	{
-		public string GetKey() => "ordinary";
-	}
-
-	private sealed record BeforeEvent(int Value) : IBeforeSaveDomainEvent;
 
 	private static Mock<IPublisher> CreatePublisher(Action<object, CancellationToken> callback)
 	{
@@ -169,6 +177,19 @@ public sealed class DomainEventExecutorTests
 			.Returns(Task.CompletedTask);
 		return publisher;
 	}
+
+	private sealed record KeyedBatchBeforeEvent(int Value)
+		: IBeforeSaveDomainEvent, IBatchableDomainEvent, IKeyedDomainEvent
+	{
+		public string GetKey() => "batch-before";
+	}
+
+	private sealed record OrdinaryKeyedEvent : IKeyedDomainEvent
+	{
+		public string GetKey() => "ordinary";
+	}
+
+	private sealed record BeforeEvent(int Value) : IBeforeSaveDomainEvent;
 
 	private sealed record TestDomainEvent(int Value) : IDomainEvent;
 }

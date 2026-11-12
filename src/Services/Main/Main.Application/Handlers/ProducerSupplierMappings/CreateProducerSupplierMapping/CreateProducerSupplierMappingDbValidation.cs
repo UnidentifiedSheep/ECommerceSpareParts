@@ -8,9 +8,10 @@ namespace Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSuppl
 public class
 	CreateProducerSupplierMappingDbValidation : AbstractDbValidation<CreateProducerSupplierMappingCommand>
 {
-	public override void Build(IValidationPlan plan, CreateProducerSupplierMappingCommand request) =>
-		plan.ValidateProducerExistsId(request.ProducerSupplierMapping.ProducerId)
-			.ValidateProducerSupplierMappingNotExistsSupplierName((
-				request.ProducerSupplierMapping.Supplier,
-				Producer.ToNormalizedName(request.ProducerSupplierMapping.SupplierProducerName)));
+	public override void Build(IValidationPlan plan, CreateProducerSupplierMappingCommand request)
+		=> plan.ValidateProducerExistsId(request.ProducerSupplierMapping.ProducerId)
+			.ValidateProducerSupplierMappingNotExistsSupplierName(
+				(
+					request.ProducerSupplierMapping.Supplier,
+					Producer.ToNormalizedName(request.ProducerSupplierMapping.SupplierProducerName)));
 }

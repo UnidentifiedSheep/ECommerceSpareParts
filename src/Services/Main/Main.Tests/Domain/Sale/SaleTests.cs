@@ -184,19 +184,16 @@ public class SaleTests
 	}
 
 	private static DomainSale Create()
-	{
-		return DomainSale.Create(
+		=> DomainSale.Create(
 			Guid.NewGuid(),
 			Guid.NewGuid(),
 			Guid.NewGuid(),
 			1,
 			"WH-1",
 			DateTime.UtcNow);
-	}
 
 	private static SaleContent CreateContent()
-	{
-		return SaleContent.Create(
+		=> SaleContent.Create(
 			1,
 			100m,
 			80m,
@@ -208,5 +205,4 @@ public class SaleTests
 					2,
 					DateTime.UtcNow)
 			]);
-	}
 }

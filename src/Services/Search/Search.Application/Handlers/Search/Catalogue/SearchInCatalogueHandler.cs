@@ -1,8 +1,7 @@
-using Application.Common.Querying;
-using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Models;
+using Application.Common.Querying;
 using Search.Application.Dtos.CatalogueCandidates;
 using Search.Application.Dtos.Products;
 using Search.Application.Interfaces.CatalogueCandidate;
@@ -103,6 +102,6 @@ public sealed class SearchInCatalogueHandler(
 	}
 
 	private static IReadOnlyDictionary<string, IReadOnlyCollection<string>>? ToHighlights(
-		IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlights) =>
-		highlights.Count == 0 ? null : highlights;
+		IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlights)
+		=> highlights.Count == 0 ? null : highlights;
 }

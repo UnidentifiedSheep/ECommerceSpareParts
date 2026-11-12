@@ -6,8 +6,8 @@ namespace Persistence.Services;
 
 public class QueryableExtensions(IContextMetadata contextMetadata) : IQueryableExtensions
 {
-	public IQueryable<T> ConfigureTracking<T>(IQueryable<T> query, bool track) where T : class =>
-		track ? query : query.AsNoTracking();
+	public IQueryable<T> ConfigureTracking<T>(IQueryable<T> query, bool track) where T : class
+		=> track ? query : query.AsNoTracking();
 
 	public IQueryable<T> ForUpdate<T>(
 		IQueryable<T> query,

@@ -1,5 +1,4 @@
-using Search.Enums;
-using Abstractions.Models;
+using System.Globalization;
 using System.Runtime.Serialization;
 using Application.Common.Models;
 using Microsoft.Extensions.Options;
@@ -7,10 +6,11 @@ using OpenSearch.Client;
 using OpenSearch.Net;
 using Search.Abstractions.Options;
 using Search.Application.Interfaces.Product;
-using Search.Application.Models.CatalogueSearch;
 using Search.Application.Models;
+using Search.Application.Models.CatalogueSearch;
 using Search.Application.Models.ProductUpdates;
 using Search.Entities;
+using Search.Enums;
 using Search.Persistence.Abstractions;
 using Search.Persistence.Extensions;
 using Search.Persistence.Interfaces;
@@ -31,49 +31,63 @@ public class ProductRepository(
 	IProductRepository
 {
 	private const string UpdateFieldsScript = """
-		if (ctx._source[params.updatedAtField] == null || ctx._source[params.updatedAtField].compareTo(params.updatedAt) < 0) {
-		    for (field in params.fieldNames) { ctx._source[field] = params.fields[field]; }
-		    ctx._source[params.updatedAtField] = params.updatedAt;
-		} else { ctx.op = 'none'; }
-		""";
+											if (ctx._source[params.updatedAtField] == null || ctx._source[params.updatedAtField].compareTo(params.updatedAt) < 0) {
+											    for (field in params.fieldNames) { ctx._source[field] = params.fields[field]; }
+											    ctx._source[params.updatedAtField] = params.updatedAt;
+											} else { ctx.op = 'none'; }
+											""";
 
-	public async Task ApplyUpdates(IReadOnlyCollection<ProductFieldUpdate> updates, CancellationToken cancellationToken = default)
+	public async Task ApplyUpdates(
+		IReadOnlyCollection<ProductFieldUpdate> updates,
+		CancellationToken cancellationToken = default)
 	{
 		if (updates.Count == 0) return;
 		foreach (var update in updates)
 			if (update.UpdatedAt.Kind != DateTimeKind.Utc)
 				throw new ArgumentException("Snapshot timestamps must be UTC.", nameof(updates));
 		var index = await GetIndex(cancellationToken);
-		var response = await Client.BulkAsync(bulk =>
-		{
-			bulk.Index(index);
-			foreach (var update in updates)
+		var response = await Client.BulkAsync(
+			bulk =>
 			{
-				var fieldNames = update.GetType().GetProperties()
-					.Where(property => !property.IsDefined(typeof(IgnoreDataMemberAttribute), true))
-					.Select(property => Client.Infer.Field(new Field(property)))
-					.ToArray();
-				bulk.Update<ProductDocumentSeed, object>(operation => operation
-					.Id(update.ProductId.ToString(System.Globalization.CultureInfo.InvariantCulture))
-					.RetriesOnConflict(5)
-					.ScriptedUpsert()
-					.Upsert(new ProductDocumentSeed(update.ProductId))
-					.Script(script => script.Source(UpdateFieldsScript).Params(parameters => parameters
-						.Add("updatedAt", update.UpdatedAt.ToString("O", System.Globalization.CultureInfo.InvariantCulture))
-						.Add("updatedAtField", Client.Infer.Field(new Field(update.GetUpdatedAtField())))
-						.Add("fieldNames", fieldNames)
-						.Add("fields", update))));
-			}
-			return bulk;
-		}, cancellationToken);
+				bulk.Index(index);
+				foreach (var update in updates)
+				{
+					var fieldNames = update.GetType()
+						.GetProperties()
+						.Where(property => !property.IsDefined(typeof(IgnoreDataMemberAttribute), true))
+						.Select(property => Client.Infer.Field(new Field(property)))
+						.ToArray();
+					bulk.Update<ProductDocumentSeed, object>(operation => operation
+						.Id(update.ProductId.ToString(CultureInfo.InvariantCulture))
+						.RetriesOnConflict(5)
+						.ScriptedUpsert()
+						.Upsert(new ProductDocumentSeed(update.ProductId))
+						.Script(script => script.Source(UpdateFieldsScript)
+							.Params(parameters => parameters
+								.Add(
+									"updatedAt",
+									update.UpdatedAt.ToString("O", CultureInfo.InvariantCulture))
+								.Add(
+									"updatedAtField",
+									Client.Infer.Field(new Field(update.GetUpdatedAtField())))
+								.Add("fieldNames", fieldNames)
+								.Add("fields", update))));
+				}
+
+				return bulk;
+			},
+			cancellationToken);
 		EnsureResponseSucceeded(response, "update product fields in");
 		if (response.Errors)
 			throw new InvalidOperationException(
-				string.Join("; ",
+				string.Join(
+					"; ",
 					response.ItemsWithErrors.Select(x => $"{x.Id}: {x.Error?.Reason}")));
 	}
 
-	public async Task ApplyStockUpdates(IReadOnlyCollection<ProductStockUpdate> updates, CancellationToken cancellationToken = default)
+	public async Task ApplyStockUpdates(
+		IReadOnlyCollection<ProductStockUpdate> updates,
+		CancellationToken cancellationToken = default)
 	{
 		if (updates.Count == 0) return;
 		foreach (var update in updates)
@@ -81,50 +95,69 @@ public class ProductRepository(
 			if (update.UpdatedAt.Kind != DateTimeKind.Utc)
 				throw new ArgumentException("Stock timestamps must be UTC.", nameof(updates));
 			if (update.Stocks.Any(stock => string.IsNullOrWhiteSpace(stock.Key) || stock.Value < 0))
-				throw new ArgumentException("Stock storage codes must be nonempty and quantities nonnegative.", nameof(updates));
+				throw new ArgumentException(
+					"Stock storage codes must be nonempty and quantities nonnegative.",
+					nameof(updates));
 		}
 
 		var index = await GetIndex(cancellationToken);
-		var response = await Client.BulkAsync(bulk =>
-		{
-			bulk.Index(index);
-			foreach (var update in updates)
+		var response = await Client.BulkAsync(
+			bulk =>
 			{
-				var stocks = update.Stocks.Where(stock => !update.IsSnapshot || stock.Value > 0)
-					.ToDictionary(stock => ProductStockFields.GetStorageKey(stock.Key), stock => stock.Value);
-				bulk.Update<ProductDocumentSeed, object>(operation => operation
-					.Id(update.ProductId.ToString(System.Globalization.CultureInfo.InvariantCulture))
-					.RetriesOnConflict(5)
-					.ScriptedUpsert()
-					.Upsert(new ProductDocumentSeed(update.ProductId))
-					.Script(script => script.Source(ProductStockUpdateScript.Source).Params(parameters => parameters
-						.Add("stocks", stocks)
-						.Add("isSnapshot", update.IsSnapshot)
-						.Add("version", update.UpdatedAt.Ticks))));
-			}
-			return bulk;
-		}, cancellationToken);
+				bulk.Index(index);
+				foreach (var update in updates)
+				{
+					var stocks = update.Stocks
+						.Where(stock => !update.IsSnapshot || stock.Value > 0)
+						.ToDictionary(
+							stock => ProductStockFields.GetStorageKey(stock.Key),
+							stock => stock.Value);
+					bulk.Update<ProductDocumentSeed, object>(operation => operation
+						.Id(update.ProductId.ToString(CultureInfo.InvariantCulture))
+						.RetriesOnConflict(5)
+						.ScriptedUpsert()
+						.Upsert(new ProductDocumentSeed(update.ProductId))
+						.Script(script => script.Source(ProductStockUpdateScript.Source)
+							.Params(parameters => parameters
+								.Add("stocks", stocks)
+								.Add("isSnapshot", update.IsSnapshot)
+								.Add("version", update.UpdatedAt.Ticks))));
+				}
+
+				return bulk;
+			},
+			cancellationToken);
 		EnsureResponseSucceeded(response, "update product stocks in");
 		if (response.Errors)
-			throw new InvalidOperationException(string.Join("; ",
-				response.ItemsWithErrors.Select(item => $"{item.Id}: {item.Error?.Reason}")));
+			throw new InvalidOperationException(
+				string.Join(
+					"; ",
+					response.ItemsWithErrors.Select(item => $"{item.Id}: {item.Error?.Reason}")));
 	}
 
-	public async Task<long> DeleteDeletedBefore(DateTime deletedBefore, int batchSize, CancellationToken cancellationToken = default)
+	public async Task<long> DeleteDeletedBefore(
+		DateTime deletedBefore,
+		int batchSize,
+		CancellationToken cancellationToken = default)
 	{
 		if (deletedBefore.Kind != DateTimeKind.Utc)
 			throw new ArgumentException("Deletion cutoff must be UTC.", nameof(deletedBefore));
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
 		var index = await GetIndex(cancellationToken);
-		var response = await Client.DeleteByQueryAsync<Product>(request => request
-			.Index(index)
-			.MaximumDocuments(batchSize)
-			.Conflicts(Conflicts.Proceed)
-			.WaitForCompletion()
-			.Refresh()
-			.Query(query => query.Bool(boolean => boolean.Filter(
-				filter => filter.Term(term => term.Field(product => product.ReadinessStatus).Value((int)ProductReadinessStatus.Deleted)),
-				filter => filter.DateRange(range => range.Field(product => product.ProductUpdatedAt).LessThanOrEquals(deletedBefore))))),
+		var response = await Client.DeleteByQueryAsync<Product>(
+			request => request
+				.Index(index)
+				.MaximumDocuments(batchSize)
+				.Conflicts(Conflicts.Proceed)
+				.WaitForCompletion()
+				.Refresh()
+				.Query(query => query.Bool(boolean => boolean.Filter(
+					filter => filter.Term(term
+						=> term.Field(product => product.ReadinessStatus)
+							.Value((int)ProductReadinessStatus.Deleted)),
+					filter => filter.DateRange(range
+						=> range.Field(product => product.ProductUpdatedAt)
+							.LessThanOrEquals(deletedBefore))))),
 			cancellationToken);
 		EnsureDeleteByQuerySucceeded(response);
 		return response.Deleted;
@@ -156,12 +189,12 @@ public class ProductRepository(
 				.Query(query => query.Bool(boolean => boolean
 					.Filter(filters.ToArray())
 					.Must(filter => CatalogueSearchQueryBuilder.Build(
-					filter,
-					criteria,
-					normalizedSkuField,
-					nameField,
-					Infer.Field<Product>(product => product.ProducerId),
-					productGroupIdField: Infer.Field<Product>(product => product.ProductGroupId)))))
+						filter,
+						criteria,
+						normalizedSkuField,
+						nameField,
+						Infer.Field<Product>(product => product.ProducerId),
+						productGroupIdField: Infer.Field<Product>(product => product.ProductGroupId)))))
 				.AddCatalogueHighlights(
 					criteria.IncludeHighlights,
 					criteria.Query,

@@ -20,8 +20,8 @@ public class PricingSettingDefinition(ISettingsService settingsService, IPublish
 
 	public override ILocalizableMessage NameLocalizationMessage => PricingSettingNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		PricingSettingDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> PricingSettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(PricingSettingInputData);
 
@@ -51,8 +51,8 @@ public class PricingSettingDefinition(ISettingsService settingsService, IPublish
 		await publishEndpoint.Publish(new MarkupRangesRefreshRequestedEvent(), cancellationToken);
 	}
 
-	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken) =>
-		(await SettingsService.GetOrDefault<PricingSetting>(cancellationToken)).Json;
+	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
+		=> (await SettingsService.GetOrDefault<PricingSetting>(cancellationToken)).Json;
 
 	private static void Validate(PricingSettingInputData input)
 	{

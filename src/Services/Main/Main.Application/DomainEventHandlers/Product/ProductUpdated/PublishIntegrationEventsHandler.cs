@@ -6,7 +6,8 @@ using Main.Enums;
 
 namespace Main.Application.DomainEventHandlers.Product.ProductUpdated;
 
-public class PublishIntegrationEventsHandler(IProductEventPublisher eventPublisher) : BatchableDomainEventHandler<ProductUpdatedDomainEvent>
+public class PublishIntegrationEventsHandler(IProductEventPublisher eventPublisher)
+	: BatchableDomainEventHandler<ProductUpdatedDomainEvent>
 {
 	public override async Task Handle(
 		Batch<ProductUpdatedDomainEvent> notification,
@@ -14,6 +15,9 @@ public class PublishIntegrationEventsHandler(IProductEventPublisher eventPublish
 	{
 		var ids = notification.Items.Select(x => x.Id).Distinct().ToList();
 		if (ids.Count > 0)
-			await eventPublisher.PublishAsync(ids, ProductEventParts.Core, cancellationToken);
+			await eventPublisher.PublishAsync(
+				ids,
+				ProductEventParts.Core,
+				cancellationToken);
 	}
 }

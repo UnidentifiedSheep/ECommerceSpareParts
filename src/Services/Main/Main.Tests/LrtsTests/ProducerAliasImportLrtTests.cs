@@ -1,7 +1,7 @@
-using Main.Entities.Producer;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Main.Application.Lrts.ProducerAliasesImport;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -13,9 +13,7 @@ namespace Tests.LrtsTests;
 public sealed class ProducerAliasImportLrtTests : CsvLrtIntegrationTest<ProducerAliasImportLrt>
 {
 	public ProducerAliasImportLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 

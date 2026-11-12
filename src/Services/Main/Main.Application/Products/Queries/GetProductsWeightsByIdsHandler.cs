@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
+using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Products.Queries;
@@ -10,15 +11,9 @@ namespace Main.Application.Products.Queries;
 public record GetProductsWeightsByIdsQuery : IQuery<GetProductsWeightsByIdsResult>
 {
 
-	public GetProductsWeightsByIdsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToList();
-	}
+	public GetProductsWeightsByIdsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToList();
 
-	public GetProductsWeightsByIdsQuery(int id)
-	{
-		Ids = [id];
-	}
+	public GetProductsWeightsByIdsQuery(int id) => Ids = [id];
 
 	public IReadOnlyList<int> Ids { get; }
 }
@@ -26,8 +21,8 @@ public record GetProductsWeightsByIdsQuery : IQuery<GetProductsWeightsByIdsResul
 public record GetProductsWeightsByIdsResult(IReadOnlyList<ProductWeightDto> Weights);
 
 public class GetProductsWeightsByIdsHandler(
-	IReadRepository<Entities.Product.ProductWeight, int> repository,
-	IProjectionProvider<Entities.Product.ProductWeight, ProductWeightDto> projectionProvider)
+	IReadRepository<ProductWeight, int> repository,
+	IProjectionProvider<ProductWeight, ProductWeightDto> projectionProvider)
 	: IQueryHandler<GetProductsWeightsByIdsQuery, GetProductsWeightsByIdsResult>
 {
 	public async Task<GetProductsWeightsByIdsResult> Handle(

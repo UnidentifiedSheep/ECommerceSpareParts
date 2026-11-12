@@ -12,10 +12,7 @@ public record GetCatalogueCandidatesByIdsQuery : IQuery<GetCatalogueCandidatesBy
 {
 	public readonly IReadOnlyList<Guid> Ids;
 
-	public GetCatalogueCandidatesByIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToList();
-	}
+	public GetCatalogueCandidatesByIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToList();
 }
 
 public record GetCatalogueCandidatesByIdsResult(IReadOnlyList<CatalogueCandidateReviewDto> Candidates);
@@ -27,10 +24,11 @@ public class GetCatalogueCandidatesByIdsHandler(
 {
 	public async Task<GetCatalogueCandidatesByIdsResult> Handle(
 		GetCatalogueCandidatesByIdsQuery request,
-		CancellationToken cancellationToken) => new(
-		await repository
-			.Query
-			.Where(x => request.Ids.Contains(x.Id))
-			.Project(projection)
-			.ToListAsync(cancellationToken));
+		CancellationToken cancellationToken)
+		=> new(
+			await repository
+				.Query
+				.Where(x => request.Ids.Contains(x.Id))
+				.Project(projection)
+				.ToListAsync(cancellationToken));
 }

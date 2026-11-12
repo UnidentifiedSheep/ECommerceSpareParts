@@ -15,8 +15,8 @@ public class BackplaneDispatcher : IBackplaneDispatcher
 {
 	public Func<BackplaneMessage, ValueTask>? Handler { get; set; }
 
-	public void Subscribe(BackplaneSubscriptionOptions options) =>
-		Handler = options.IncomingMessageHandlerAsync;
+	public void Subscribe(BackplaneSubscriptionOptions options)
+		=> Handler = options.IncomingMessageHandlerAsync;
 
 	public void Unsubscribe() => Handler = null;
 }

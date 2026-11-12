@@ -7,7 +7,8 @@ using Main.Application.Lrts.DeleteProductImages;
 namespace Main.Application.JobProviders;
 
 [Lifetime(Lifetime.Singleton)]
-public class DeleteProductImagesJobProvider : IJobProvider<DeleteProductImagesLrt, DeleteProductImagesInputState>
+public class
+	DeleteProductImagesJobProvider : IJobProvider<DeleteProductImagesLrt, DeleteProductImagesInputState>
 {
 	public Job Create(DeleteProductImagesInputState inputState, int maxAttempts = 3)
 	{
@@ -15,7 +16,7 @@ public class DeleteProductImagesJobProvider : IJobProvider<DeleteProductImagesLr
 		return SingleRunJob.CreateUnique(
 			$"delete:product:{inputState.ProductId}:images:{inputState.BucketName}",
 			DeleteProductImagesLrt.Name,
-			initialState: JsonSerializer.Serialize(inputState),
-			maxAttempts: maxAttempts);
+			JsonSerializer.Serialize(inputState),
+			maxAttempts);
 	}
 }

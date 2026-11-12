@@ -10,7 +10,10 @@ namespace Main.Application.Projections;
 public sealed class DocumentGenerationRequestDtoProjectionProvider
 	: ProjectionProviderBase<DocumentGenerationRequest, DocumentGenerationRequestDto>
 {
-	public override Expression<Func<DocumentGenerationRequest, DocumentGenerationRequestDto>> Projection { get; } =
+	public override Expression<Func<DocumentGenerationRequest, DocumentGenerationRequestDto>> Projection
+	{
+		get;
+	} =
 		request => new DocumentGenerationRequestDto
 		{
 			RequestId = request.RequestId,

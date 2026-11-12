@@ -1,4 +1,3 @@
-using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 
 namespace Notification.Core;
@@ -11,11 +10,12 @@ public sealed class NotificationDefinitionBase<TNotification, TModel>(
 	where TNotification : INotification<TModel>
 	where TModel : INotificationModel
 {
-	private readonly INotificationSerializer _serializer =
-		serializer ?? throw new ArgumentNullException(nameof(serializer));
 
 	private readonly Func<TModel, TNotification> _createNotification =
 		createNotification ?? throw new ArgumentNullException(nameof(createNotification));
+
+	private readonly INotificationSerializer _serializer =
+		serializer ?? throw new ArgumentNullException(nameof(serializer));
 
 	public string SystemName { get; } =
 		!string.IsNullOrWhiteSpace(systemName)
@@ -58,7 +58,10 @@ public sealed class NotificationDefinitionBase<TNotification, TModel>(
 
 	private void EnsureCanHandle(string notificationSystemName)
 	{
-		if (!string.Equals(SystemName, notificationSystemName, StringComparison.OrdinalIgnoreCase))
+		if (!string.Equals(
+				SystemName,
+				notificationSystemName,
+				StringComparison.OrdinalIgnoreCase))
 			throw new InvalidOperationException(
 				$"Notification definition '{SystemName}' cannot handle " +
 				$"notification '{notificationSystemName}'.");

@@ -11,10 +11,7 @@ namespace Main.Application.Products.Queries;
 public record GetProductsSizesByIdsQuery : IQuery<GetProductsSizesByIdsResult>
 {
 
-	public GetProductsSizesByIdsQuery(IEnumerable<int> ids)
-	{
-		Ids = ids.Distinct().ToList();
-	}
+	public GetProductsSizesByIdsQuery(IEnumerable<int> ids) => Ids = ids.Distinct().ToList();
 
 	public GetProductsSizesByIdsQuery(int id)
 	{

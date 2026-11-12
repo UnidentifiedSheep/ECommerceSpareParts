@@ -20,16 +20,14 @@ public class PriceApplierProvider(
 	IProjectionProvider<PriceApplier, PriceApplierDto> projection) : IPriceApplierProvider
 {
 	public async Task<PriceApplierConfigurationSnapshot> GetConfigurationAsync(CancellationToken ct = default)
-	{
-		return await cache.GetOrSetAsync(
+		=> await cache.GetOrSetAsync(
 			CacheKeys.PriceAppliers.ConfigurationKey,
 			GetConfigurationFromDbAsync,
 			new FusionCacheEntryOptions(CacheKeys.PriceAppliers.Ttl),
 			ct);
-	}
 
-	public async Task InvalidateConfigurationAsync(CancellationToken ct = default) =>
-		await cache.RemoveAsync(CacheKeys.PriceAppliers.ConfigurationKey, token: ct);
+	public async Task InvalidateConfigurationAsync(CancellationToken ct = default)
+		=> await cache.RemoveAsync(CacheKeys.PriceAppliers.ConfigurationKey, token: ct);
 
 	private async Task<PriceApplierConfigurationSnapshot> GetConfigurationFromDbAsync(
 		CancellationToken ct = default)

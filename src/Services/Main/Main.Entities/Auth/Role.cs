@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
+using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Domain;
 
 namespace Main.Entities.Auth;
 
@@ -15,10 +15,7 @@ public class Role : AuditableEntity<Role, string>, ILinqEntity<Role, string>
 	{
 	}
 
-	private Role(string name)
-	{
-		Name = RoleNames.Normalize(name);
-	}
+	private Role(string name) => Name = RoleNames.Normalize(name);
 
 	[Validate]
 	public string Name { get; } = null!;
@@ -37,9 +34,10 @@ public class Role : AuditableEntity<Role, string>, ILinqEntity<Role, string>
 
 	public static Role Create(string name) => new(name);
 
-	public void SetDescription(string? description) => Description = description
-		.NullIfWhiteSpace()
-		?.EnsureMaxLength(255, RoleDescriptionMaxLengthMessage.Instance);
+	public void SetDescription(string? description)
+		=> Description = description
+			.NullIfWhiteSpace()
+			?.EnsureMaxLength(255, RoleDescriptionMaxLengthMessage.Instance);
 
 	public void AddPermission(string name)
 	{

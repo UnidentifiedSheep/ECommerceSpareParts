@@ -24,8 +24,7 @@ public sealed class SchemaLocalizer(IContextualLocalizer localizer) : ISchemaLoc
 	}
 
 	private FieldSchema Localize(FieldSchema field)
-	{
-		return field with
+		=> field with
 		{
 			Label = GetLocalizedOrDefault(field.LabelKey),
 			Description = GetLocalizedOrDefault(field.DescriptionKey),
@@ -33,18 +32,15 @@ public sealed class SchemaLocalizer(IContextualLocalizer localizer) : ISchemaLoc
 			DescriptionKey = null,
 			NestedSchema = field.NestedSchema is null ? null : Localize(field.NestedSchema)
 		};
-	}
 
 	private CsvColumnSchema Localize(CsvColumnSchema column)
-	{
-		return column with
+		=> column with
 		{
 			Label = GetLocalizedOrDefault(column.LabelKey),
 			Description = GetLocalizedOrDefault(column.DescriptionKey),
 			LabelKey = null,
 			DescriptionKey = null
 		};
-	}
 
 	private string? GetLocalizedOrDefault(string? key)
 	{

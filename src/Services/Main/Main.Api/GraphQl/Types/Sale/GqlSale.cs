@@ -15,15 +15,9 @@ public sealed record GqlSale
 {
 	private readonly SaleDto? _dto;
 
-	public GqlSale(Guid id)
-	{
-		Id = id;
-	}
+	public GqlSale(Guid id) => Id = id;
 
-	public GqlSale(SaleDto sale) : this(sale.Id)
-	{
-		_dto = sale;
-	}
+	public GqlSale(SaleDto sale) : this(sale.Id) => _dto = sale;
 
 	[GraphQLName("id")]
 	public Guid Id { get; }
@@ -31,75 +25,76 @@ public sealed record GqlSale
 	[GraphQLName("buyer")]
 	public async Task<GqlUser> GetBuyerAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetSaleAsync(loader, cancellationToken)).Buyer);
+		CancellationToken cancellationToken)
+		=> new((await GetSaleAsync(loader, cancellationToken)).Buyer);
 
 	[GraphQLName("organization")]
 	public async Task<GqlOrganization> GetOrganizationAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetSaleAsync(loader, cancellationToken)).Organization);
+		CancellationToken cancellationToken)
+		=> new((await GetSaleAsync(loader, cancellationToken)).Organization);
 
 	[GraphQLName("comment")]
 	public async Task<string?> GetCommentAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetSaleAsync(loader, cancellationToken)).Comment;
+		CancellationToken cancellationToken)
+		=> (await GetSaleAsync(loader, cancellationToken)).Comment;
 
 	[GraphQLName("saleDatetime")]
 	public async Task<DateTime> GetSaleDatetimeAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetSaleAsync(loader, cancellationToken)).SaleDatetime;
+		CancellationToken cancellationToken)
+		=> (await GetSaleAsync(loader, cancellationToken)).SaleDatetime;
 
 	[GraphQLName("transaction")]
 	[RequireAllPermissions(PermissionCodes.BALANCES_TRANSACTION_GET_ALL)]
 	public async Task<GqlTransaction> GetTransactionAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetSaleAsync(loader, cancellationToken)).TransactionId);
+		CancellationToken cancellationToken)
+		=> new((await GetSaleAsync(loader, cancellationToken)).TransactionId);
 
 	[GraphQLName("totalSum")]
 	public async Task<decimal> GetTotalSumAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetSaleAsync(loader, cancellationToken)).TotalSum;
+		CancellationToken cancellationToken)
+		=> (await GetSaleAsync(loader, cancellationToken)).TotalSum;
 
 	[GraphQLName("storage")]
 	public async Task<GqlStorage> GetStorageAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetSaleAsync(loader, cancellationToken)).StorageCode);
+		CancellationToken cancellationToken)
+		=> new((await GetSaleAsync(loader, cancellationToken)).StorageCode);
 
 	[GraphQLName("rowVersion")]
 	public async Task<uint> GetRowVersionAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetSaleAsync(loader, cancellationToken)).RowVersion;
+		CancellationToken cancellationToken)
+		=> (await GetSaleAsync(loader, cancellationToken)).RowVersion;
 
 	[GraphQLName("state")]
 	public async Task<SaleState> GetStateAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetSaleAsync(loader, cancellationToken)).State;
+		CancellationToken cancellationToken)
+		=> (await GetSaleAsync(loader, cancellationToken)).State;
 
 	[GraphQLName("currency")]
 	public async Task<GqlCurrency> GetCurrencyAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetSaleAsync(loader, cancellationToken)).Currency);
+		CancellationToken cancellationToken)
+		=> new((await GetSaleAsync(loader, cancellationToken)).Currency);
 
 	[GraphQLName("contents")]
 	[RequireAllPermissions(PermissionCodes.SALES_GET)]
 	public async Task<IReadOnlyList<GqlSaleContent>> GetContentsAsync(
 		ISaleContentsByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await loader.LoadAsync(Id, cancellationToken) ?? [])
-			.Select(content => new GqlSaleContent(content)).ToArray();
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
+			.Select(content => new GqlSaleContent(content))
+			.ToArray();
 
 	private async Task<SaleDto> GetSaleAsync(
 		ISaleByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		_dto ?? await loader.LoadAsync(Id, cancellationToken)
-		?? throw new SaleNotFoundException(Id);
+		CancellationToken cancellationToken)
+		=> _dto ?? await loader.LoadAsync(Id, cancellationToken)
+			?? throw new SaleNotFoundException(Id);
 }

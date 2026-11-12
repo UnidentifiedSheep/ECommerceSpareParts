@@ -12,19 +12,23 @@ public sealed class ProductWeightEventPartProvider : IProductEventPartProvider
 
 	public bool IsHeavyRequest => false;
 
-	public IQueryable<ProductEntity> Populate(IQueryable<ProductEntity> query) =>
-		query.Include(product => product.ProductWeight);
+	public IQueryable<ProductEntity> Populate(IQueryable<ProductEntity> query)
+		=> query.Include(product => product.ProductWeight);
 
-	public object Extract(IReadOnlyList<ProductEntity> products, DateTime updatedAt, IReadOnlyList<int> missingProductIds) =>
-		new ProductWeightUpdatedEvent
+	public object Extract(
+		IReadOnlyList<ProductEntity> products,
+		DateTime updatedAt,
+		IReadOnlyList<int> missingProductIds)
+		=> new ProductWeightUpdatedEvent
 		{
 			UpdatedAt = updatedAt,
 			Products = products.Select(product =>
-			{
-				var weight = product.ProductWeight;
-				return new ProductWeightSnapshot(
-					product.Id,
-					weight is null ? null : new ProductWeightData(weight.Weight, weight.Unit));
-			}).ToArray()
+				{
+					var weight = product.ProductWeight;
+					return new ProductWeightSnapshot(
+						product.Id,
+						weight is null ? null : new ProductWeightData(weight.Weight, weight.Unit));
+				})
+				.ToArray()
 		};
 }

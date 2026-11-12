@@ -14,10 +14,7 @@ public sealed record GetOrdersByIdsQuery : IQuery<GetOrdersByIdsResult>
 {
 	public GetOrdersByIdsQuery(Guid id) : this([id]) { }
 
-	public GetOrdersByIdsQuery(IEnumerable<Guid> ids)
-	{
-		Ids = ids.Distinct().ToArray();
-	}
+	public GetOrdersByIdsQuery(IEnumerable<Guid> ids) => Ids = ids.Distinct().ToArray();
 
 	public IReadOnlyList<Guid> Ids { get; }
 }

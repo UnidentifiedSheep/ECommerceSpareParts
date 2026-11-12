@@ -68,43 +68,35 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
 		string inputState,
 		int maxAttempts,
 		string cron)
-	{
-		return new JobSchedule(
+		=> new(
 			name,
 			description,
 			jobSystemName,
 			inputState,
 			maxAttempts,
 			cron);
-	}
 
 	public void AddScheduleRun(
 		Guid jobId,
 		DateTime scheduledAt,
 		DateTime queuedAt)
-	{
-		_runs.Add(
+		=> _runs.Add(
 			JobScheduleRun.Create(
 				Id,
 				jobId,
 				scheduledAt,
 				queuedAt));
-	}
 
 	public void SetName(string name)
-	{
-		Name = name
+		=> Name = name
 			.TrimSafe()
 			.EnsureNotNullOrWhiteSpace(JobScheduleNameRequiredMessage.Instance)
 			.EnsureMaxLength(NameMaxLength, JobScheduleNameMaxLengthMessage.Instance);
-	}
 
 	public void SetDescription(string? description)
-	{
-		Description = description
+		=> Description = description
 			.NullIfWhiteSpace()
 			?.EnsureMaxLength(DescriptionMaxLength, JobScheduleDescriptionMaxLengthMessage.Instance);
-	}
 
 	public void SetCron(string cron)
 	{
@@ -115,12 +107,14 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
 				throw new InvalidOperationException("Cron cannot be null or empty."));
 	}
 
-	public void SetInputState(string inputState) => InputState = inputState
-		.TrimSafe()
-		.EnsureNotNullOrWhiteSpace(JobScheduleInputStateRequiredMessage.Instance);
+	public void SetInputState(string inputState)
+		=> InputState = inputState
+			.TrimSafe()
+			.EnsureNotNullOrWhiteSpace(JobScheduleInputStateRequiredMessage.Instance);
 
-	public void SetMaxAttempts(int maxAttempts) => MaxAttempts =
-		maxAttempts.EnsureGreaterThan(0, JobMaxAttemptsMustBeGreaterThanZeroMessage.Instance);
+	public void SetMaxAttempts(int maxAttempts)
+		=> MaxAttempts =
+			maxAttempts.EnsureGreaterThan(0, JobMaxAttemptsMustBeGreaterThanZeroMessage.Instance);
 
 	public void SetNextRunAt(DateTime? nextRunAt) => NextRunAt = nextRunAt;
 

@@ -1,4 +1,3 @@
-using HotChocolate;
 using SchemaGeneration.Abstractions.Enums;
 using SchemaGeneration.Abstractions.Models;
 
@@ -6,7 +5,8 @@ namespace GraphQL.Common.Types.Schema;
 
 [GraphQLName("CsvColumnSchema")]
 public sealed record GqlCsvColumnSchema(
-	[property: GraphQLIgnore] CsvColumnSchema Column)
+	[property: GraphQLIgnore]
+	CsvColumnSchema Column)
 {
 	[GraphQLName("propertyName")]
 	public string PropertyName => Column.PropertyName;

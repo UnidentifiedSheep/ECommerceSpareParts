@@ -13,9 +13,7 @@ namespace Tests.HandlersTests.Organizations;
 public sealed class GetOrganizationTests : IntegrationTest
 {
 	public GetOrganizationTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UsersTestContext>();
-	}
+		=> RegisterBasicContext<UsersTestContext>();
 
 	[Fact]
 	public async Task GetOrganization_ById_ReturnsOrganization()

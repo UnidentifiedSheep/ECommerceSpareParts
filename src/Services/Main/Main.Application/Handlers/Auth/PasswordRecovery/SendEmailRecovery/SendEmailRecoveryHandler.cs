@@ -1,17 +1,17 @@
-﻿using Security.Core.Interfaces;
-using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Notifications;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
+using Main.Application.Notifications;
 using Main.Entities.User;
 using Main.Enums.Auth;
 using MediatR;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
+using Security.Core.Interfaces;
 
 namespace Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 

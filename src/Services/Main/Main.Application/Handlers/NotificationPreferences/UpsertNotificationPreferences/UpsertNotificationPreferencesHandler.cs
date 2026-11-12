@@ -9,7 +9,8 @@ using Notification.Core.Recipients;
 
 namespace Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record UpsertNotificationPreferencesCommand(
 	Guid UserId,
 	IReadOnlyCollection<UpsertUserNotificationPreferenceDto> Preferences) : ICommand;
@@ -27,13 +28,13 @@ public class UpsertNotificationPreferencesHandler(
 		var channels = request.Preferences.Select(x => x.ChannelName).ToList();
 
 		var preferences = (await repository.ListAsync(
-			Criteria<UserNotificationPreference>
-				.New()
-				.Where(x => x.UserId == request.UserId)
-				.Where(x =>  channels.Contains(x.ChannelName))
-				.Track()
-				.Build(),
-			cancellationToken))
+				Criteria<UserNotificationPreference>
+					.New()
+					.Where(x => x.UserId == request.UserId)
+					.Where(x => channels.Contains(x.ChannelName))
+					.Track()
+					.Build(),
+				cancellationToken))
 			.ToDictionary(x => x.ChannelName);
 
 		var toAdd = new List<UserNotificationPreference>();

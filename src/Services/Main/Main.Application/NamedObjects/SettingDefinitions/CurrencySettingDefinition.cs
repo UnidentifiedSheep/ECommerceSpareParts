@@ -19,8 +19,8 @@ public class CurrencySettingDefinition(ISettingsService settingsService)
 
 	public override ILocalizableMessage NameLocalizationMessage => CurrencySettingNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		CurrencySettingDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> CurrencySettingDescriptionMessage.Instance;
 
 	public override Type InputSettingType => typeof(CurrencySettingInputData);
 
@@ -40,8 +40,8 @@ public class CurrencySettingDefinition(ISettingsService settingsService)
 			cancellationToken);
 	}
 
-	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken) =>
-		(await SettingsService.GetOrDefault<CurrencySetting>(cancellationToken)).Json;
+	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
+		=> (await SettingsService.GetOrDefault<CurrencySetting>(cancellationToken)).Json;
 }
 
 public record CurrencySettingInputData

@@ -30,11 +30,11 @@ public class BuildCatalogueCandidatesLrt(
 
 	public override string SystemName => LrtSystemName;
 
-	public override ILocalizableMessage NameLocalizationMessage =>
-		LrtCatalogueCandidatesBuildNameMessage.Instance;
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtCatalogueCandidatesBuildNameMessage.Instance;
 
-	public override ILocalizableMessage DescriptionLocalizationMessage =>
-		LrtCatalogueCandidatesBuildDescriptionMessage.Instance;
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtCatalogueCandidatesBuildDescriptionMessage.Instance;
 
 	protected override async Task DoWork(NoneInputState inputState)
 	{
@@ -69,16 +69,17 @@ public class BuildCatalogueCandidatesLrt(
 			BatchTransactionSettings,
 			async (context, cancellationToken) =>
 			{
-				var supplierProducts = await context.GetRequiredService<ISupplierProductRepository>().ListAsync(
-					Criteria<SupplierProduct>
-						.New()
-						.Where(x => x.CatalogueCandidateId == null)
-						.Where(x => x.Id > lastProcessedId)
-						.OrderByAsc(x => x.Id)
-						.Track()
-						.Size(batchSize)
-						.Build(),
-					cancellationToken);
+				var supplierProducts = await context.GetRequiredService<ISupplierProductRepository>()
+					.ListAsync(
+						Criteria<SupplierProduct>
+							.New()
+							.Where(x => x.CatalogueCandidateId == null)
+							.Where(x => x.Id > lastProcessedId)
+							.OrderByAsc(x => x.Id)
+							.Track()
+							.Size(batchSize)
+							.Build(),
+						cancellationToken);
 
 				if (supplierProducts.Count == 0)
 					return new BatchResult(
@@ -88,7 +89,8 @@ public class BuildCatalogueCandidatesLrt(
 						0,
 						false);
 
-				var producerLookup = await context.GetRequiredService<IProducerLookupService>().Load(cancellationToken);
+				var producerLookup = await context.GetRequiredService<IProducerLookupService>()
+					.Load(cancellationToken);
 				var resolvedProducts = supplierProducts
 					.Select(x => new ResolvedSupplierProduct(
 						x,
@@ -103,14 +105,16 @@ public class BuildCatalogueCandidatesLrt(
 				var normalizedSkus = candidateGroups.Keys.Select(x => x.NormalizedValue).Distinct().ToList();
 				var producerIds = candidateGroups.Keys.Select(x => x.ProducerId).Distinct().ToList();
 
-				var persistedCandidates = (await context.GetRequiredService<IRepository<CatalogueCandidate, Guid>>().ListAsync(
-						Criteria<CatalogueCandidate>
-							.New()
-							.Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))
-							.Where(x => producerIds.Contains(x.ProducerId))
-							.Track()
-							.Build(),
-						cancellationToken))
+				var persistedCandidates = (await context
+						.GetRequiredService<IRepository<CatalogueCandidate, Guid>>()
+						.ListAsync(
+							Criteria<CatalogueCandidate>
+								.New()
+								.Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))
+								.Where(x => producerIds.Contains(x.ProducerId))
+								.Track()
+								.Build(),
+							cancellationToken))
 					.Where(x => candidateGroups.ContainsKey((x.Sku.NormalizedValue, x.ProducerId)))
 					.ToDictionary(x => (x.Sku.NormalizedValue, x.ProducerId));
 
