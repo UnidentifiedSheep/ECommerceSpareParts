@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Application.Common.Interfaces.Events;
 using Bogus;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Interfaces;
@@ -82,6 +83,9 @@ public abstract class TestBase : IAsyncLifetime, ITest
 			return (T)ctx;
 		throw new InvalidOperationException($"No context found for {typeof(T).Name}. Try register it first");
 	}
+
+	protected void DiscardPendingDomainEvents()
+		=> Scope.ServiceProvider.GetService<IDomainEventScope>()?.Flush();
 
 	protected virtual async Task InitializeBasicContexts()
 	{

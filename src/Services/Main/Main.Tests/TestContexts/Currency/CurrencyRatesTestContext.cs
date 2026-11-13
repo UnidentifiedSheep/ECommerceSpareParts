@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces.Settings;
+﻿using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Settings;
 using Main.Entities.Currency;
 using Main.Entities.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,8 @@ namespace Tests.TestContexts.Currency;
 public class CurrencyRatesTestContext(
 	UnifiedDbContext context,
 	CurrencyTestContext currencyTestContext,
-	ISettingsService settingsService) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
+	ISettingsService settingsService,
+	IDomainEventScope eventScope) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public CurrencyTestContext CurrencyTestContext => currencyTestContext;
 
@@ -53,5 +55,7 @@ public class CurrencyRatesTestContext(
 		}
 
 		await DbContext.SaveChangesAsync(cancellationToken);
+		// Setup data must not trigger domain events in the handler under test.
+		eventScope.Flush();
 	}
 }
