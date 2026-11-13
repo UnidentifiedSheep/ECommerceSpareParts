@@ -8,6 +8,7 @@ using Main.Api;
 using Main.Application.Models;
 using Main.Cache;
 using Main.Modules.Currency;
+using Main.Modules.Product;
 using Main.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -65,6 +66,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
 		ApplicationServiceProvider.AddApplicationLayer(services, null).AddLocan().AddPersistenceLayer();
 		services.AddModule<CurrencyModule>(new ConfigurationBuilder().Build());
+		services.AddModule<ProductModule>(new ConfigurationBuilder().Build());
 		services.AddSingleton<TestTimeProvider>();
 		services.AddSingleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>());
 		var passwordRules = new PasswordRules

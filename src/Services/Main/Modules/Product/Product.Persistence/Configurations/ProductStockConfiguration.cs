@@ -23,12 +23,6 @@ public sealed class ProductStockConfiguration : IEntityTypeConfiguration<Product
 
 		builder.HasIndex(stock => stock.ProductId, "product_stocks_product_id_idx");
 
-		builder.HasOne<Main.Entities.Storage.Storage>()
-			.WithMany()
-			.HasForeignKey(stock => stock.StorageCode)
-			.OnDelete(DeleteBehavior.Cascade)
-			.HasConstraintName("product_stocks_storage_code_fk");
-
 		builder.HasOne(stock => stock.Product)
 			.WithMany(e => e.Stocks)
 			.HasForeignKey(stock => stock.ProductId)

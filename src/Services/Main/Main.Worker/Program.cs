@@ -17,6 +17,7 @@ using Main.Application.Consumers;
 using Main.Cache;
 using Main.Modules.Currency;
 using Main.Modules.Currency.Application;
+using Main.Modules.Product;
 using Main.Persistence;
 using MassTransit;
 using Notification.Extensions;
@@ -74,6 +75,7 @@ builder
 	.AddEmailNotificationHostedService();
 
 builder.Services.AddModule<CurrencyModule>(builder.Configuration);
+builder.Services.AddModule<ProductModule>(builder.Configuration);
 
 builder.Services.AddLrtHostedServices();
 
