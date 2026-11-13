@@ -135,6 +135,7 @@ public class DeletePurchaseTests : IntegrationTest
 			purchaseTransaction,
 			logisticsTransaction);
 		await Context.SaveChangesAsync(CancellationToken);
+		DiscardPendingDomainEvents();
 
 		var storageContent = await new StorageContentBuilder(Faker)
 			.WithStorageCode(route.ToStorageCode)
@@ -143,6 +144,7 @@ public class DeletePurchaseTests : IntegrationTest
 			.WithCount(2)
 			.WithBuyPrice(10m)
 			.BuildAndAddToDb(Context, CancellationToken);
+		DiscardPendingDomainEvents();
 		var stock = await Context.Set<ProductStock>()
 			.SingleAsync(
 				item => item.ProductId == product.Id && item.StorageCode == storageContent.StorageCode,

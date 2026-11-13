@@ -375,6 +375,7 @@ public class EditSaleTests : IntegrationTest
 		stock.SetQuantity(stock.Quantity + count);
 
 		await Context.SaveChangesAsync();
+		DiscardPendingDomainEvents();
 		Context.ChangeTracker.Clear();
 	}
 }

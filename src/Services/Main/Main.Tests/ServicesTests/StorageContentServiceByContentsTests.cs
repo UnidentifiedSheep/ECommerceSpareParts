@@ -103,6 +103,7 @@ public class StorageContentServiceByContentsTests : IntegrationTest
 				CancellationToken);
 		stock.SetQuantity(stock.Quantity - originalFirstCount);
 		await Context.SaveChangesAsync(CancellationToken);
+		DiscardPendingDomainEvents();
 
 		var result = await Withdraw(
 			first.Id,

@@ -174,6 +174,7 @@ public class EditPurchaseTests : IntegrationTest
 				CancellationToken);
 		stock.SetQuantity(stock.Quantity + 8);
 		await Context.SaveChangesAsync(CancellationToken);
+		DiscardPendingDomainEvents();
 
 		await Scope.ServiceProvider
 			.GetRequiredService<IApplicationTransaction>()

@@ -138,6 +138,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 			.Build();
 		await Context.AddAsync(other, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
+		DiscardPendingDomainEvents();
 		var secondFact = SaleContentAnalytics.Create(
 			second.Id,
 			1m,
@@ -150,6 +151,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 			2m);
 		await Context.AddRangeAsync([secondFact, otherFact], CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
+		DiscardPendingDomainEvents();
 
 		var content = context.Sale.Contents.First();
 		var originalFact = content.Analytics;
@@ -230,6 +232,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		var remaining = NewContent();
 		sale.AddContent(remaining);
 		await Context.SaveChangesAsync(CancellationToken);
+		DiscardPendingDomainEvents();
 		await Context.AddAsync(
 			SaleContentAnalytics.Create(
 				remaining.Id,
@@ -238,6 +241,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 				1m),
 			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
+		DiscardPendingDomainEvents();
 		var removed = sale.Contents.First();
 
 		await Execute(async () =>

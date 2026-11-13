@@ -37,7 +37,8 @@ public class OrderTests
 		confirm.Should().Throw<InvalidInputException>();
 		cancel.Should().Throw<InvalidInputException>();
 		addItem.Should().Throw<InvalidInputException>();
-		updateFulfillment.Should().Throw<InvalidInputException>();
+		// Fulfillment can still be updated on a completed order (only cancelled/deleted orders are frozen).
+		updateFulfillment.Should().NotThrow();
 	}
 
 	[Fact]

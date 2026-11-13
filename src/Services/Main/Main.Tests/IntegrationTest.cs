@@ -15,6 +15,11 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 	private TestEnvironmentLease _environmentLease = null!;
 	protected IMediator Mediator { get; private set; } = null!;
 
+	// Saves made directly through the DbContext outside the event pipeline buffer their domain events;
+	// call this after such setup so the events are not dispatched by the next handler under test.
+	protected void DiscardPendingDomainEvents()
+		=> Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
+
 	public override async ValueTask InitializeAsync()
 	{
 		_environmentLease = await fixture.AcquireAsync();
