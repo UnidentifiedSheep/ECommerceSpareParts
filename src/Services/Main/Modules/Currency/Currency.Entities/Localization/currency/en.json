@@ -27,6 +27,8 @@
     "currency.setting.base.currency.name": "Base currency",
     "currency.setting.base.currency.description": "Currency used as the base for application exchange rates.",
     "currency.setting.rate.provider.name": "Exchange rate provider",
-    "currency.setting.rate.provider.description": "Provider used to update currency exchange rates."
+    "currency.setting.rate.provider.description": "Provider used to update currency exchange rates.",
+    "lrt.currency.rates.update.name": "Currency rate update",
+    "lrt.currency.rates.update.description": "Updates exchange rates."
   }
 }

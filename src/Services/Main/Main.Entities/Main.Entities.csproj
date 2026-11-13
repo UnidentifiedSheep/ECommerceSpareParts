@@ -14,6 +14,7 @@
         <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\Main.Enums\Main.Enums.csproj"/>
+        <ProjectReference Include="..\Modules\Currency\Currency.Entities\Currency.Entities.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

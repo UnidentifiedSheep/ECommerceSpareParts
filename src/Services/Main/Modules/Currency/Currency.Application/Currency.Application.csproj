@@ -4,10 +4,21 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Currency.Application</AssemblyName>
+        <RootNamespace>Main.Modules.Currency.Application</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Cache\Cache.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Integrations\ExchageRates\Integrations.ExchangeRate\Integrations.ExchangeRate.csproj"/>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Currency.Abstractions\Currency.Abstractions.csproj"/>
+        <ProjectReference Include="..\Currency.Entities\Currency.Entities.csproj"/>
     </ItemGroup>
 
 </Project>

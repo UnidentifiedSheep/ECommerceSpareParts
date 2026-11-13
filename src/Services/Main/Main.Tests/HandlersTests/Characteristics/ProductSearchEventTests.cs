@@ -10,6 +10,7 @@ using Main.Application.Products.Services;
 using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
 using Main.Enums;
+using Main.Modules.Currency.Persistence;
 using Main.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -220,7 +221,7 @@ public class ProductSearchEventTests : IntegrationTest
 			.UseNpgsql(Context.Database.GetDbConnection())
 			.AddInterceptors(counter)
 			.Options;
-		await using var queryContext = new UnifiedDbContext(options, [new MainDbContextModule()]);
+		await using var queryContext = new UnifiedDbContext(options, [new MainDbContextModule(), new CurrencyDbContextModule()]);
 		var provider = new ProductEventProvider(
 			new ReadRepository<Product, int>(queryContext),
 			Scope.ServiceProvider.GetServices<IProductEventPartProvider>());

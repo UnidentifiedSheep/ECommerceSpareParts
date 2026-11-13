@@ -53,8 +53,6 @@
     "lrt.product.synchronization.parts.description": "Определяет, какие данные товаров обновить.",
     "lrt.catalogue.candidates.synchronization.name": "Синхронизация кандидатов каталога",
     "lrt.catalogue.candidates.synchronization.description": "Обновляет кандидатов каталога в поиске.",
-    "lrt.currency.rates.update.name": "Обновление курсов валют",
-    "lrt.currency.rates.update.description": "Обновляет курсы валют.",
     "lrt.organization.approximate.balance.recalculate.name": "Перерасчёт приблизительных балансов организаций",
     "lrt.organization.approximate.balance.recalculate.description": "Пересчитывает приблизительные балансы организаций в базовой валюте.",
     "lrt.catalogue.candidates.build.name": "Формирование кандидатов каталога",

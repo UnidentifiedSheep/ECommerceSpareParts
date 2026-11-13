@@ -31,7 +31,7 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 		result.Should().NotBeNull();
 		AssertCurrency(result!, currency);
 
-		var cached = await GetCache().GetAsync<CurrencyDto>(CacheKeys.CurrencyCache.Currency(currency.Id));
+		var cached = await GetCache().GetAsync<CurrencyDto>(CurrencyCacheKeys.Currency(currency.Id));
 		cached.Should().BeEquivalentTo(result);
 	}
 
@@ -77,7 +77,7 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 		foreach (var currency in currencies)
 			AssertCurrency(result.Single(x => x.Id == currency.Id), currency);
 
-		var cachedIds = await GetCache().GetFromSetAsync(CacheKeys.CurrencyCache.AllCurrencies());
+		var cachedIds = await GetCache().GetFromSetAsync(CurrencyCacheKeys.AllCurrencies());
 		cachedIds.Select(int.Parse).Should().BeEquivalentTo(currencies.Select(x => x.Id));
 	}
 
@@ -135,7 +135,7 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 		await UpdateCurrencyName(currency.Id, "Invalidated all currency");
 
 		var result = await repository.GetCurrency(currency.Id, CancellationToken);
-		var cachedIds = await GetCache().GetFromSetAsync(CacheKeys.CurrencyCache.AllCurrencies());
+		var cachedIds = await GetCache().GetFromSetAsync(CurrencyCacheKeys.AllCurrencies());
 
 		result!.Name.Should().Be("Invalidated all currency");
 		cachedIds.Should().BeEmpty();
@@ -148,12 +148,12 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 
 	private async Task RemoveAllCachedCurrencies(IEnumerable<int> currencyIds)
 	{
-		await GetCache().RemoveKeyAsync(CacheKeys.CurrencyCache.AllCurrencies());
+		await GetCache().RemoveKeyAsync(CurrencyCacheKeys.AllCurrencies());
 		await Task.WhenAll(currencyIds.Select(RemoveCachedCurrency));
 	}
 
 	private async Task RemoveCachedCurrency(int currencyId)
-		=> await GetCache().RemoveKeyAsync(CacheKeys.CurrencyCache.Currency(currencyId));
+		=> await GetCache().RemoveKeyAsync(CurrencyCacheKeys.Currency(currencyId));
 
 	private async Task UpdateCurrencyName(int currencyId, string name)
 	{

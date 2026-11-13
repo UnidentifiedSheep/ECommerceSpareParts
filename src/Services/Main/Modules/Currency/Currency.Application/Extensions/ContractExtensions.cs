@@ -2,7 +2,7 @@
 
 namespace Main.Application.Extensions.Entities;
 
-public static class CurrencyExtensions
+public static class ContractExtensions
 {
 	public static Currency ToContract(this Main.Entities.Currency.Currency model)
 		=> new()

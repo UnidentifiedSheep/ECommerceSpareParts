@@ -30,6 +30,7 @@ public static class ServiceProvider
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
 			typeof(Product).Assembly,
+			typeof(Main.Entities.Currency.Currency).Assembly,
 			typeof(InAppNotification).Assembly,
 			typeof(JobSchedule).Assembly);
 		collection.AddNotificationPersistence<UnifiedDbContext>();

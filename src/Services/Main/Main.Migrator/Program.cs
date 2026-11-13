@@ -2,6 +2,7 @@ using Api.Common;
 using Common;
 using Main.Migrator;
 using Main.Migrator.DataSeeds;
+using Main.Modules.Currency.Persistence;
 using Main.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -34,6 +35,7 @@ builder.ConfigureServices((context, services) =>
 
 	//add db context
 	services.AddDbContextModule<MainDbContextModule>();
+	services.AddCurrencyPersistence();
 	services.AddDbContext<UnifiedDbContext>((sp, options) =>
 	{
 		var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;

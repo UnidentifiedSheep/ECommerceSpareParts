@@ -45,6 +45,10 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
+        <LocanResource Include="../Modules/Currency/Currency.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
         <LocanResource Include="../../../Infrastructure/Mailing/Mailing.Core/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>

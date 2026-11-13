@@ -22,6 +22,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
+        <ProjectReference Include="..\Modules\Currency\Currency.Persistence\Currency.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

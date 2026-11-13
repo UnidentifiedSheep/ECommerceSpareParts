@@ -31,15 +31,6 @@ public static class CacheKeys
 		public static string NotificationRecipients(Guid userId) => $"user:{userId}:notification:recipients";
 	}
 
-	public static class CurrencyCache
-	{
-		public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
-
-		public static string Currency(int currencyId) => $"currency:{currencyId}";
-
-		public static string AllCurrencies() => "currencies";
-	}
-
 	public static class OneTimeTokenCache
 	{
 		public static string OneTimeToken(OneTimeTokenPurpose purpose, Guid tokenId)

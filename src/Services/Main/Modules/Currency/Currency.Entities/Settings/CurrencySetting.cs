@@ -1,3 +1,4 @@
+using Main.Entities.Currency;
 ﻿using System.Text.Json.Serialization;
 using Domain.CommonEntities;
 using Domain.Interfaces;

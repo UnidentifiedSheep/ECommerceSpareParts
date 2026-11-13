@@ -1,6 +1,7 @@
 using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
+using Main.Entities.Currency;
 
 namespace Main.Application.Handlers.Currencies.CreateCurrency;
 

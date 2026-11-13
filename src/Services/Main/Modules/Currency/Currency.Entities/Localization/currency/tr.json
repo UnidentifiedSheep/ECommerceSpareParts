@@ -27,6 +27,8 @@
     "currency.setting.base.currency.name": "Temel para birimi",
     "currency.setting.base.currency.description": "Uygulama döviz kurları için temel alınan para birimi.",
     "currency.setting.rate.provider.name": "Döviz kuru sağlayıcısı",
-    "currency.setting.rate.provider.description": "Para birimi kurlarını güncellemek için kullanılan sağlayıcı."
+    "currency.setting.rate.provider.description": "Para birimi kurlarını güncellemek için kullanılan sağlayıcı.",
+    "lrt.currency.rates.update.name": "Döviz kuru güncelleme",
+    "lrt.currency.rates.update.description": "Döviz kurlarını günceller."
   }
 }

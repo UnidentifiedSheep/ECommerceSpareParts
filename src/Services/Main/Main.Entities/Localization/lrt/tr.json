@@ -53,8 +53,6 @@
     "lrt.product.synchronization.parts.description": "Hangi ürün verilerinin güncelleneceğini belirler.",
     "lrt.catalogue.candidates.synchronization.name": "Katalog adayı senkronizasyonu",
     "lrt.catalogue.candidates.synchronization.description": "Aramadaki katalog adaylarını günceller.",
-    "lrt.currency.rates.update.name": "Döviz kuru güncelleme",
-    "lrt.currency.rates.update.description": "Döviz kurlarını günceller.",
     "lrt.organization.approximate.balance.recalculate.name": "Kuruluş yaklaşık bakiye yeniden hesaplama",
     "lrt.organization.approximate.balance.recalculate.description": "Kuruluşların yaklaşık bakiyelerini temel para biriminde yeniden hesaplar.",
     "lrt.catalogue.candidates.build.name": "Katalog adaylarını oluşturma",

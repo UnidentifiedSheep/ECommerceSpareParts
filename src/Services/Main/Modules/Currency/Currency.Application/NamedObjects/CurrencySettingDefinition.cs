@@ -6,6 +6,7 @@ using Enums;
 using Exceptions;
 using Locan.Core.Interfaces;
 using Main.Entities;
+using Main.Entities.Currency;
 using Main.Entities.Settings;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;

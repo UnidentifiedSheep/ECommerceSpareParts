@@ -1,3 +1,4 @@
+using Application.Common.Host;
 using System.Reflection;
 using Abstractions;
 using Api.Common;
@@ -21,6 +22,8 @@ using Main.Api.GraphQl;
 using Main.Application;
 using Main.Application.Consumers;
 using Main.Cache;
+using Main.Modules.Currency;
+using Main.Modules.Currency.Application;
 using Main.Persistence;
 using MassTransit;
 using Persistence.Context;
@@ -62,7 +65,7 @@ var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-	x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
+	x.AddConsumers(Assembly.GetAssembly(typeof(Global)), CurrencyApplicationAssembly.Value);
 	x.AddConsumer<BackplaneConsumer>();
 	x.AddConsumer<JobStatusUpdatedConsumer>();
 	x.AddConsumer<SettingUpdatedConsumer>();
@@ -124,6 +127,8 @@ builder
 	.AddApplicationLayer(builder.Configuration)
 	.AddExchangeRates()
 	.AddMainNotifications();
+
+builder.Services.AddModule<CurrencyModule>(builder.Configuration);
 
 builder.Services.AddCarter(
 	new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly, typeof(JobEndPoints).Assembly),

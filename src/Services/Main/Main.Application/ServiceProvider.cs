@@ -63,7 +63,6 @@ public static class ServiceProvider
 		collection.AddSingleton<IJwtGenerator, JwtGenerator>();
 		collection.RegisterProjectionProviders<ProducerImportLrt>();
 
-		collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 		collection.AddScoped<IAppLinkProvider, AppLinkProvider>();
 		collection.AddScoped<IProductEventPublisher, ProductEventPublisher>();
 		collection.AddScoped<IProductEventProvider, ProductEventProvider>();
@@ -108,9 +107,6 @@ public static class ServiceProvider
 		collection.AddScoped<IStorageContentService, StorageContentService>();
 		collection.AddSingleton<IProducerLookupService, ProducerLookupService>();
 		collection.AddScoped<IProducerLookupLoader, ProducerLookupLoader>();
-		collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
-		collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
-		collection.AddSingleton<ICurrencyRateSnapshotProvider, CurrencyRateSnapshotProvider>();
 
 		collection.AddApplicationBase(
 			ServicesDefinitions.Main,

@@ -35,6 +35,7 @@
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\..\GraphQL.Common\GraphQL.Common.csproj"/>
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
+        <ProjectReference Include="..\Modules\Currency\Currency.Module\Currency.Module.csproj"/>
         <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
     </ItemGroup>
@@ -53,6 +54,10 @@
 
     <ItemGroup>
         <LocanResource Include="../Main.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Currency/Currency.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 

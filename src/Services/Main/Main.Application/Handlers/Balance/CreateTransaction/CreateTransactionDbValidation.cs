@@ -2,6 +2,7 @@
 using BulkValidation.Core.Enums;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
+using Main.Entities.Currency;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 

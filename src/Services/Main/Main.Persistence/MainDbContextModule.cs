@@ -46,7 +46,6 @@ public sealed class MainDbContextModule : IDbContextModule
 			.Entity<Setting>()
 			.HasDiscriminator(e => e.Key)
 			.HasValue<Setting>(nameof(Setting))
-			.HasValue<CurrencySetting>(CurrencySetting.SettingName)
 			.HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName)
 			.HasValue<StorageContentSetting>(StorageContentSetting.SettingName)
 			.HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)

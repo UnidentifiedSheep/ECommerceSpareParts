@@ -1,14 +1,17 @@
 using System.Globalization;
 using Api.Common;
+using Application.Common.Host;
 using Application.Common.Models.Options.S3;
 using Cache;
 using Locan.Hosting;
 using Main.Api;
 using Main.Application.Models;
 using Main.Cache;
+using Main.Modules.Currency;
 using Main.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -61,6 +64,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 			.CreateLogger();
 
 		ApplicationServiceProvider.AddApplicationLayer(services, null).AddLocan().AddPersistenceLayer();
+		services.AddModule<CurrencyModule>(new ConfigurationBuilder().Build());
 		services.AddSingleton<TestTimeProvider>();
 		services.AddSingleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>());
 		var passwordRules = new PasswordRules

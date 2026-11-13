@@ -19,26 +19,26 @@ public class CurrencyCacheRepository(
 {
 	public async Task<CurrencyDto?> GetCurrency(int id, CancellationToken cancellationToken = default)
 	{
-		var key = CacheKeys.CurrencyCache.Currency(id);
+		var key = CurrencyCacheKeys.Currency(id);
 		return await rawCache.GetOrSetAsync(
 			key,
 			() => GetCurrencyFromDb(id),
-			CacheKeys.CurrencyCache.Ttl);
+			CurrencyCacheKeys.Ttl);
 	}
 
 	public async Task<IReadOnlyList<CurrencyDto>> GetAllCurrencies(
 		CancellationToken cancellationToken = default)
 	{
-		var currenciesKey = CacheKeys.CurrencyCache.AllCurrencies();
+		var currenciesKey = CurrencyCacheKeys.AllCurrencies();
 		var allCurrencies = await rawCache.GetFromSetAsync(currenciesKey);
 
 		if (allCurrencies.Length != 0)
 			return (await rawCache.GetOrSetManyAsync(
 					allCurrencies.Select(int.Parse),
-					CacheKeys.CurrencyCache.Currency,
+					CurrencyCacheKeys.Currency,
 					currency => currency.Id,
 					GetMissingCurrenciesFromDb,
-					CacheKeys.CurrencyCache.Ttl))
+					CurrencyCacheKeys.Ttl))
 				.Select(x => x.Value)
 				.ToList();
 
@@ -51,16 +51,16 @@ public class CurrencyCacheRepository(
 	}
 
 	public Task InvalidateCurrency(int id, CancellationToken cancellationToken = default)
-		=> rawCache.RemoveKeyAsync(CacheKeys.CurrencyCache.Currency(id));
+		=> rawCache.RemoveKeyAsync(CurrencyCacheKeys.Currency(id));
 
 	public async Task InvalidateAllCurrencies(CancellationToken cancellationToken = default)
 	{
-		var currenciesKey = CacheKeys.CurrencyCache.AllCurrencies();
+		var currenciesKey = CurrencyCacheKeys.AllCurrencies();
 		var currencyIds = await rawCache.GetFromSetAsync(currenciesKey);
 
 		var keys = currencyIds
 			.Select(int.Parse)
-			.Select(CacheKeys.CurrencyCache.Currency)
+			.Select(CurrencyCacheKeys.Currency)
 			.Append(currenciesKey);
 
 		await rawCache.RemoveKeysAsync(keys);

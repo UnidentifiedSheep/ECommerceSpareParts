@@ -1,4 +1,5 @@
 ﻿using BulkValidation.Core.Configuration;
+using Main.Modules.Currency.Application.Configs;
 using Main.Entities;
 using Main.Entities.Exceptions;
 
@@ -54,24 +55,7 @@ public static class ValidationConfiguration
 		errors.For(ProducerAliasKeys.Alias)
 			.OnAlreadyExists(input => new ProducerAliasAlreadyTakenException(input.Values));
 
-		errors.For(CurrencyKeys.Id)
-			.OnMissing(input => new CurrencyNotFoundException(input.Values));
-
-		errors.For(CurrencyKeys.Code)
-			.OnMissing(input => new CurrencyCodeNotFoundException(string.Join(", ", input.Values)));
-
-		errors.For(CurrencyKeys.Code)
-			.OnAlreadyExists(input => new CurrencyCodeAlreadyTakenException(string.Join(", ", input.Values)));
-
-		errors.For(CurrencyKeys.Name)
-			.OnAlreadyExists(input => new CurrencyNameAlreadyTakenException(string.Join(", ", input.Values)));
-
-		errors.For(CurrencyKeys.ShortName)
-			.OnAlreadyExists(input
-				=> new CurrencyShortNameAlreadyTakenException(string.Join(", ", input.Values)));
-
-		errors.For(CurrencyKeys.CurrencySign)
-			.OnAlreadyExists(input => new CurrencySignAlreadyTakenException(string.Join(", ", input.Values)));
+		CurrencyValidationConfiguration.Configure(errors);
 
 		errors.For(PermissionKeys.Name)
 			.OnMissing(input => new PermissionNotFoundException(string.Join(", ", input.Values)));

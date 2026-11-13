@@ -1,3 +1,4 @@
+using Application.Common.Host;
 using System.Reflection;
 using Abstractions;
 using Api.Common;
@@ -14,6 +15,8 @@ using Main.Api;
 using Main.Application;
 using Main.Application.Consumers;
 using Main.Cache;
+using Main.Modules.Currency;
+using Main.Modules.Currency.Application;
 using Main.Persistence;
 using MassTransit;
 using Notification.Extensions;
@@ -70,6 +73,8 @@ builder
 	.AddInAppNotificationHostedService()
 	.AddEmailNotificationHostedService();
 
+builder.Services.AddModule<CurrencyModule>(builder.Configuration);
+
 builder.Services.AddLrtHostedServices();
 
 builder.Services.AddHostedService<StartupTaskHostedService>();
@@ -83,7 +88,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 	var uniqQueueName = $"queue-of-main-worker-{Environment.MachineName}";
 	hostBuilder.Services.AddMassTransit(x =>
 	{
-		x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
+		x.AddConsumers(Assembly.GetAssembly(typeof(Global)), CurrencyApplicationAssembly.Value);
 		x.AddConsumer<BackplaneConsumer>();
 		x.AddConsumer<SettingUpdatedConsumer>();
 

@@ -53,8 +53,6 @@
     "lrt.product.synchronization.parts.description": "Specifies which product data to update.",
     "lrt.catalogue.candidates.synchronization.name": "Catalogue candidate synchronization",
     "lrt.catalogue.candidates.synchronization.description": "Updates catalogue candidates in search.",
-    "lrt.currency.rates.update.name": "Currency rate update",
-    "lrt.currency.rates.update.description": "Updates exchange rates.",
     "lrt.organization.approximate.balance.recalculate.name": "Organization approximate balance recalculation",
     "lrt.organization.approximate.balance.recalculate.description": "Recalculates approximate organization balances in the base currency.",
     "lrt.catalogue.candidates.build.name": "Build catalogue candidates",
