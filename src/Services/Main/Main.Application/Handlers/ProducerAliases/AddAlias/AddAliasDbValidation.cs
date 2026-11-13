@@ -2,6 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Producer;
+using Main.Entities.Product;
 
 namespace Main.Application.Handlers.ProducerAliases.AddAlias;
 

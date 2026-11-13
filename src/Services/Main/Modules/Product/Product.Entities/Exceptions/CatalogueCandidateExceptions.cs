@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Exceptions.Base.Localized;
 
 namespace Main.Entities.Exceptions;

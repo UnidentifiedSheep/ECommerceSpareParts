@@ -2,6 +2,7 @@ using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
 using Main.Entities;
+using Main.Entities.Product;
 
 namespace Main.Application.Products.Queries.GetProductsByEan;
 

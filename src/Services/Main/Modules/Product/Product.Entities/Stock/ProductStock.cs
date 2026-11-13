@@ -27,7 +27,6 @@ public class ProductStock : Entity<ProductStock, (string, int)>, ILinqEntity<Pro
 	public string StorageCode { get; } = null!;
 	public int ProductId { get; }
 	public int Quantity { get; private set; }
-	public Storage Storage { get; private set; } = null!;
 	public Product.Product Product { get; private set; } = null!;
 
 	public static Expression<Func<ProductStock, (string, int)>> GetKeySelector()

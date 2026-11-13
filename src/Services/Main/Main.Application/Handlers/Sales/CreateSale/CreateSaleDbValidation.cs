@@ -2,6 +2,7 @@ using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Currency;
+using Main.Entities.Product;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 

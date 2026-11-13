@@ -5,6 +5,7 @@ using Locan.Core.Interfaces;
 using Main.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;
 using Main.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
 using Main.Entities;
+using Main.Entities.Product;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.EnrichCatalogue;

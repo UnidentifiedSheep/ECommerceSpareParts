@@ -2,6 +2,7 @@
 using Main.Modules.Currency.Application.Configs;
 using Main.Entities;
 using Main.Entities.Exceptions;
+using Main.Entities.Product;
 
 namespace Main.Application.Configs;
 

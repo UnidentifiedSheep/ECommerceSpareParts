@@ -13,6 +13,7 @@ using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
 using Main.Entities;
 using Main.Entities.Producer;
+using Main.Entities.Product;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;

@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Enums;
 using Exceptions.Base.Localized;
 

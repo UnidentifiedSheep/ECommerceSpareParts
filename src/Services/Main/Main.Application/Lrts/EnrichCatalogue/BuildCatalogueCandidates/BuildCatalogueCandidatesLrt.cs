@@ -9,6 +9,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities;
 using Main.Entities.Product.Enrichment;
+using Main.Entities.Product;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;

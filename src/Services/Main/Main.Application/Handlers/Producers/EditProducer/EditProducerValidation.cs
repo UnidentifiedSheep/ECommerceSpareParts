@@ -2,6 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Application.Handlers.Producers.BaseValidators;
 using Main.Entities;
+using Main.Entities.Product;
 
 namespace Main.Application.Handlers.Producers.EditProducer;
 

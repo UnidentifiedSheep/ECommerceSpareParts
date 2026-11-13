@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;

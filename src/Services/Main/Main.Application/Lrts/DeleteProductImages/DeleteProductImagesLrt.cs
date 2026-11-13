@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Locan.Core.Interfaces;
 using Main.Entities;
+using Main.Entities.Product;
 using Microsoft.Extensions.Logging;
 using S3.Core.Interfaces;
 

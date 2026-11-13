@@ -9,6 +9,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Application.Lrts.Base;
 using Main.Entities;
 using Main.Entities.Producer;
+using Main.Entities.Product;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;

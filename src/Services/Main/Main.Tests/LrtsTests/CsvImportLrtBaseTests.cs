@@ -10,6 +10,7 @@ using FluentAssertions;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
+using Main.Entities.Product;
 using Main.Application.Lrts.Base;
 using Main.Entities;
 using Microsoft.Extensions.DependencyInjection;
