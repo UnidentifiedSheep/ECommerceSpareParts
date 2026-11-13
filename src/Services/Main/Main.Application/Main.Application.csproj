@@ -38,6 +38,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\SSS\S3.Core\S3.Core.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Modules\Currency\Currency.Application\Currency.Application.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>
 

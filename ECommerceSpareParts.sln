@@ -195,6 +195,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pricing.Abstractions", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pricing.Module", "src\Services\Main\Modules\Pricing\Pricing.Module\Pricing.Module.csproj", "{7507D17C-55C4-4988-AB3A-67047C33EFA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.Abstractions", "src\Services\Main\Modules\Currency\Currency.Abstractions\Currency.Abstractions.csproj", "{A1C2D3E4-0001-4A10-9B01-C0DE0000A001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.Application", "src\Services\Main\Modules\Currency\Currency.Application\Currency.Application.csproj", "{A1C2D3E4-0002-4A10-9B01-C0DE0000A002}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -501,6 +505,14 @@ Global
 		{0B703AB3-4D56-4130-833A-A0EA88ABA4CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B703AB3-4D56-4130-833A-A0EA88ABA4CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B703AB3-4D56-4130-833A-A0EA88ABA4CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1C2D3E4-0001-4A10-9B01-C0DE0000A001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1C2D3E4-0001-4A10-9B01-C0DE0000A001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1C2D3E4-0001-4A10-9B01-C0DE0000A001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1C2D3E4-0001-4A10-9B01-C0DE0000A001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1C2D3E4-0002-4A10-9B01-C0DE0000A002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1C2D3E4-0002-4A10-9B01-C0DE0000A002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1C2D3E4-0002-4A10-9B01-C0DE0000A002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1C2D3E4-0002-4A10-9B01-C0DE0000A002}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7507D17C-55C4-4988-AB3A-67047C33EFA8} = {AB440548-2A40-4377-ACC7-F6DB18813520}
@@ -593,5 +605,7 @@ Global
 		{F1CA68C1-D450-4508-82FC-0006042962A1} = {AB440548-2A40-4377-ACC7-F6DB18813520}
 		{5F9FF53B-22FE-4651-8241-C861889F869F} = {AB440548-2A40-4377-ACC7-F6DB18813520}
 		{0B703AB3-4D56-4130-833A-A0EA88ABA4CB} = {AB440548-2A40-4377-ACC7-F6DB18813520}
+		{A1C2D3E4-0001-4A10-9B01-C0DE0000A001} = {AB440548-2A40-4377-ACC7-F6DB18813520}
+		{A1C2D3E4-0002-4A10-9B01-C0DE0000A002} = {AB440548-2A40-4377-ACC7-F6DB18813520}
 	EndGlobalSection
 EndGlobal

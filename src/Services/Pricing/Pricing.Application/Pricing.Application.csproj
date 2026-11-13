@@ -11,6 +11,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\..\Main\Modules\Currency\Currency.Application\Currency.Application.csproj"/>
         <ProjectReference Include="..\..\Main\Modules\Pricing\Pricing.Entities\Pricing.Entities.csproj"/>
     </ItemGroup>
 
