@@ -10,7 +10,21 @@ public static class ModuleServiceCollectionExtensions
 		IConfiguration configuration)
 		where TModule : ModuleBase, new()
 	{
-		new TModule().ConfigureServices(services, configuration);
+		var module = new TModule();
+		if (services.GetModuleCatalog().Add(module))
+			module.ConfigureServices(services, configuration);
+
 		return services;
+	}
+
+	public static ModuleCatalog GetModuleCatalog(this IServiceCollection services)
+	{
+		if (services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(ModuleCatalog))?
+				.ImplementationInstance is ModuleCatalog existing)
+			return existing;
+
+		var catalog = new ModuleCatalog();
+		services.AddSingleton(catalog);
+		return catalog;
 	}
 }

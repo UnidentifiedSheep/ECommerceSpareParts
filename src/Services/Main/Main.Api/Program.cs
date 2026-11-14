@@ -23,7 +23,6 @@ using Main.Application;
 using Main.Application.Consumers;
 using Main.Cache;
 using Main.Modules.Currency;
-using Main.Modules.Currency.Application;
 using Main.Modules.Product;
 using Main.Persistence;
 using MassTransit;
@@ -62,11 +61,16 @@ builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Main);
 builder.Services.AddPostgresHealthCheck().AddRedisHealthCheck();
 builder.Services.AddSignalR();
 
+builder.Services.AddModule<CurrencyModule>(builder.Configuration);
+builder.Services.AddModule<ProductModule>(builder.Configuration);
+
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-	x.AddConsumers(Assembly.GetAssembly(typeof(Global)), CurrencyApplicationAssembly.Value);
+	x.AddConsumers([
+		Assembly.GetAssembly(typeof(Global))!,
+		.. builder.Services.GetModuleCatalog().ConsumerAssemblies]);
 	x.AddConsumer<BackplaneConsumer>();
 	x.AddConsumer<JobStatusUpdatedConsumer>();
 	x.AddConsumer<SettingUpdatedConsumer>();
@@ -128,9 +132,6 @@ builder
 	.AddApplicationLayer(builder.Configuration)
 	.AddExchangeRates()
 	.AddMainNotifications();
-
-builder.Services.AddModule<CurrencyModule>(builder.Configuration);
-builder.Services.AddModule<ProductModule>(builder.Configuration);
 
 builder.Services.AddCarter(
 	new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly, typeof(JobEndPoints).Assembly),

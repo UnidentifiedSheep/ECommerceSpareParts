@@ -16,7 +16,6 @@ using Main.Application;
 using Main.Application.Consumers;
 using Main.Cache;
 using Main.Modules.Currency;
-using Main.Modules.Currency.Application;
 using Main.Modules.Product;
 using Main.Persistence;
 using MassTransit;
@@ -55,6 +54,9 @@ builder.AddLokiLogger(
 
 builder.Services.AddCommonWorkerInfrastructure(ServicesDefinitions.Main);
 
+builder.Services.AddModule<CurrencyModule>(builder.Configuration);
+builder.Services.AddModule<ProductModule>(builder.Configuration);
+
 AddMassTransit(builder);
 
 builder
@@ -74,9 +76,6 @@ builder
 	.AddInAppNotificationHostedService()
 	.AddEmailNotificationHostedService();
 
-builder.Services.AddModule<CurrencyModule>(builder.Configuration);
-builder.Services.AddModule<ProductModule>(builder.Configuration);
-
 builder.Services.AddLrtHostedServices();
 
 builder.Services.AddHostedService<StartupTaskHostedService>();
@@ -90,7 +89,9 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 	var uniqQueueName = $"queue-of-main-worker-{Environment.MachineName}";
 	hostBuilder.Services.AddMassTransit(x =>
 	{
-		x.AddConsumers(Assembly.GetAssembly(typeof(Global)), CurrencyApplicationAssembly.Value);
+		x.AddConsumers([
+			Assembly.GetAssembly(typeof(Global))!,
+			.. builder.Services.GetModuleCatalog().ConsumerAssemblies]);
 		x.AddConsumer<BackplaneConsumer>();
 		x.AddConsumer<SettingUpdatedConsumer>();
 
