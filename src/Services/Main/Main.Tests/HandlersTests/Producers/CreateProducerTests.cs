@@ -55,7 +55,7 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 	private NewProducerDto CreateDto()
 		=> new()
 		{
-			Name = Faker.Lorem.Word(), Description = Faker.Lorem.Sentence()
+			Name = Faker.Lorem.Word() + Faker.Random.AlphaNumeric(4), Description = Faker.Lorem.Sentence()
 		};
 }
 

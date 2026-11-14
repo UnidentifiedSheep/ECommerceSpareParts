@@ -6,6 +6,7 @@ using Main.Application.Models.Storage;
 using Main.Entities.Sale;
 using Main.Enums;
 using MediatR;
+using Main.Application.Extensions.Entities;
 
 namespace Main.Application.Services;
 
@@ -77,7 +78,7 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 		var toRestore = sale
 			.Contents
 			.SelectMany(content =>
-				content.Details.Select(detail => new RestoreContentItem(detail, content.ProductId)))
+				content.Details.Select(detail => detail.ToRestoreContentItem(content.ProductId)))
 			.ToList();
 
 		if (toRestore.Count == 0)

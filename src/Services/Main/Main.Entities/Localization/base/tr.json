@@ -1,15 +1,12 @@
 {
   "culture": "tr",
   "messages": {
-    "position.count.must.be.greater.than.zero": "Pozisyon adedi 0'dan büyük olmalıdır.",
     "email.must.be.valid": "E-posta adresi geçerli olmalıdır.",
     "login.must.not.be.empty": "Giriş adı boş olmamalıdır.",
     "login.min.length.5": "Giriş adı en az 5 karakter uzunluğunda olmalıdır.",
     "login.max.length.36": "Giriş adı en fazla 36 karakter uzunluğunda olmalıdır.",
     "login.cannot.contain.spaces": "Giriş adı boşluk içeremez.",
     "login.cannot.contain.at.sign": "Giriş adı @ karakterini içeremez.",
-    "price.must.be.positive": "Fiyat 0'dan büyük olmalıdır.",
-    "price.max.two.decimal.places": "Fiyat en fazla 2 ondalık basamak içerebilir.",
     "phone.number.required": "Telefon numarası zorunludur.",
     "phone.number.must.contain.digits": "Telefon numarası rakam içermelidir.",
     "phone.number.min.normalized.length": "Telefon numarası en az 7 rakam içermelidir.",

@@ -5,7 +5,6 @@ using Main.Entities.Product;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
 using Main.Persistence.Repositories.Sale;
-using Main.Persistence.Repositories.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Notification.Core.Entities;
@@ -14,6 +13,7 @@ using Persistence.Common;
 using Persistence.Context;
 using Persistence.Extensions;
 using UserRepository = Main.Persistence.Repositories.User.UserRepository;
+using Main.Entities.Storage;
 
 namespace Main.Persistence;
 
@@ -30,11 +30,11 @@ public static class ServiceProvider
 			typeof(Main.Entities.User.User).Assembly,
 			typeof(Product).Assembly,
 			typeof(Main.Entities.Currency.Currency).Assembly,
+			typeof(Main.Entities.Storage.StorageContent).Assembly,
 			typeof(InAppNotification).Assembly,
 			typeof(JobSchedule).Assembly);
 		collection.AddNotificationPersistence<UnifiedDbContext>();
 
-		collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
 		collection.AddScoped<IUserRepository, UserRepository>();
 		collection.AddScoped<ISaleRepository, SaleRepository>();
 

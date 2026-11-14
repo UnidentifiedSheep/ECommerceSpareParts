@@ -25,9 +25,8 @@ public static class NamedObjectDiRegistry
 		return services
 			.RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped)
 			.RegisterNamedObject<ChartDataSourceNamedObject>(objectsLifetime: ServiceLifetime.Scoped)
-			.RegisterNamedObject<StorageContentExtractPolicyBase>(objectsLifetime: ServiceLifetime.Singleton)
 			.RegisterNamedObject<IDocumentDefinition>(objectsLifetime: ServiceLifetime.Scoped)
 			.RegisterNamedObject<SettingDefinitionNamedObjectBase>(
-				typeof(StorageContentExtractPolicyBase).Assembly);
+				typeof(Global).Assembly);
 	}
 }

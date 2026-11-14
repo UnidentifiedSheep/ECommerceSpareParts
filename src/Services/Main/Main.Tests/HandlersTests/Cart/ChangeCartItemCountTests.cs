@@ -8,6 +8,7 @@ using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
+using Domain;
 
 namespace Tests.HandlersTests.Cart;
 

@@ -1,0 +1,8 @@
+﻿{
+  "culture": "ru",
+  "messages": {
+    "position.count.must.be.greater.than.zero": "Количество позиции должно быть больше 0.",
+    "price.must.be.positive": "Цена должна быть больше 0.",
+    "price.max.two.decimal.places": "Цена может содержать не более 2 знаков после запятой."
+  }
+}

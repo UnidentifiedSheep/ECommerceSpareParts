@@ -4,6 +4,7 @@ using Main.Migrator;
 using Main.Migrator.DataSeeds;
 using Main.Modules.Currency.Persistence;
 using Main.Modules.Product.Persistence;
+using Main.Modules.Storage.Persistence;
 using Main.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -38,6 +39,7 @@ builder.ConfigureServices((context, services) =>
 	services.AddDbContextModule<MainDbContextModule>();
 	services.AddCurrencyPersistence();
 	services.AddDbContextModule<ProductDbContextModule>();
+	services.AddDbContextModule<StorageDbContextModule>();
 	services.AddDbContext<UnifiedDbContext>((sp, options) =>
 	{
 		var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;

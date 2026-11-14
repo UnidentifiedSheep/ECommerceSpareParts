@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Main.Application.Handlers.BaseValidators;
+using Application.Common.Validators;
 using Main.Entities;
 using Main.Entities.Storage;
 

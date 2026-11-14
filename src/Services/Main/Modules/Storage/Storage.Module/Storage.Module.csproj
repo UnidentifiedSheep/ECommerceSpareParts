@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Storage.Module</AssemblyName>
+        <RootNamespace>Main.Modules.Storage</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Storage.Application\Storage.Application.csproj"/>
+        <ProjectReference Include="..\Storage.Persistence\Storage.Persistence.csproj"/>
+    </ItemGroup>
+
+</Project>

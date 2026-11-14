@@ -2,6 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Currency;
+using Main.Entities.Storage;
 
 namespace Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 

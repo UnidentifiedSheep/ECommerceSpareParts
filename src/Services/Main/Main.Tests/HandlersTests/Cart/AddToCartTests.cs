@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
+using Domain;
 
 namespace Tests.HandlersTests.Cart;
 

@@ -61,13 +61,6 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
 		builder.Property(e => e.ToStorageCode).HasMaxLength(128).HasColumnName("to_storage_name");
 
 		builder
-			.HasOne<Entities.User.User>()
-			.WithMany()
-			.HasForeignKey(d => d.CarrierId)
-			.OnDelete(DeleteBehavior.Cascade)
-			.HasConstraintName("storage_routes_users_id_fk");
-
-		builder
 			.HasOne(d => d.Currency)
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)

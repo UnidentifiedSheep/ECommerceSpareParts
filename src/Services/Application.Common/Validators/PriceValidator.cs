@@ -1,8 +1,8 @@
 using Application.Common.Extensions;
 using FluentValidation;
-using Main.Entities;
+using Domain;
 
-namespace Main.Application.Handlers.BaseValidators;
+namespace Application.Common.Validators;
 
 public class PriceValidator : AbstractValidator<decimal>
 {

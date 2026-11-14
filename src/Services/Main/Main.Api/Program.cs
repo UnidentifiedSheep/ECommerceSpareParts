@@ -24,6 +24,7 @@ using Main.Application.Consumers;
 using Main.Cache;
 using Main.Modules.Currency;
 using Main.Modules.Product;
+using Main.Modules.Storage;
 using Main.Persistence;
 using MassTransit;
 using Persistence.Context;
@@ -63,6 +64,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddModule<CurrencyModule>(builder.Configuration);
 builder.Services.AddModule<ProductModule>(builder.Configuration);
+builder.Services.AddModule<StorageModule>(builder.Configuration);
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 

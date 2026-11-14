@@ -3,6 +3,7 @@ using FluentValidation;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.BaseValidators;
 using Main.Entities;
+using Application.Common.Validators;
 
 namespace Main.Application.Handlers.Purchases.BaseValidators;
 

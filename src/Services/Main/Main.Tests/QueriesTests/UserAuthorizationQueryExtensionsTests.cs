@@ -7,6 +7,7 @@ using Main.Entities.Auth;
 using Main.Entities.User;
 using Main.Modules.Currency.Persistence;
 using Main.Modules.Product.Persistence;
+using Main.Modules.Storage.Persistence;
 using Main.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -136,5 +137,5 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 						options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 				.AddInterceptors(counter)
 				.Options,
-			[new MainDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule()]);
+			[new MainDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule()]);
 }
