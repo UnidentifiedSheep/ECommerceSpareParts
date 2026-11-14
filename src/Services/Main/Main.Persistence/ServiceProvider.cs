@@ -4,7 +4,6 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
-using Main.Persistence.Repositories.Product;
 using Main.Persistence.Repositories.Sale;
 using Main.Persistence.Repositories.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +34,6 @@ public static class ServiceProvider
 			typeof(JobSchedule).Assembly);
 		collection.AddNotificationPersistence<UnifiedDbContext>();
 
-		collection.AddScoped<IProductDeletionBlockerProvider, ProductDeletionBlockerProvider>();
 		collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
 		collection.AddScoped<IUserRepository, UserRepository>();
 		collection.AddScoped<ISaleRepository, SaleRepository>();

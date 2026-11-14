@@ -35,6 +35,9 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<IProducerLookupLoader, ProducerLookupLoader>();
 
 		services.AddScoped<IProductReferenceResolver, ProductReferenceResolver>();
+		services.AddScoped<IProductDeletionBlockerResolver, ProductDeletionBlockerResolver>();
+		services.AddScoped<IProductDeletionRule, ProductStockDeletionRule>();
+		services.AddScoped<IProductDeletionRule, ProductCompositionDeletionRule>();
 		services.AddScoped<IProductProvider, ProductProvider>();
 		services.AddScoped<IProductCacheInvalidator, ProductCacheInvalidator>();
 

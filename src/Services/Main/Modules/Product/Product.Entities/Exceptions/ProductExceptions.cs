@@ -1,3 +1,4 @@
+using Locan.Core.Interfaces;
 using Main.Entities.Product;
 using Exceptions.Base.Localized;
 using Main.Enums.Products;
@@ -79,17 +80,4 @@ public class ProductGroupNotFoundException(int id) : LocalizedNotFoundException(
 public class ProductGroupNameAlreadyExistsException() : LocalizedConflictException(
 	ProductGroupNormalizedNameAlreadyExistsMessage.Instance);
 
-public class ProductDeletionNotAllowedException(ProductDeletionBlocker blocker) : LocalizedConflictException(
-	blocker switch
-	{
-		ProductDeletionBlocker.Stock => ArticleDeletionStockMessage.Instance,
-		ProductDeletionBlocker.StorageContent => ArticleDeletionStorageContentMessage.Instance,
-		ProductDeletionBlocker.Sale => ArticleDeletionSaleMessage.Instance,
-		ProductDeletionBlocker.Purchase => ArticleDeletionPurchaseMessage.Instance,
-		ProductDeletionBlocker.Order => ArticleDeletionOrderMessage.Instance,
-		ProductDeletionBlocker.Composition => ArticleDeletionCompositionMessage.Instance,
-		_ => throw new ArgumentOutOfRangeException(nameof(blocker))
-	})
-{
-	public ProductDeletionBlocker Blocker { get; } = blocker;
-}
+public class ProductDeletionNotAllowedException(ILocalizableMessage message) : LocalizedConflictException(message);

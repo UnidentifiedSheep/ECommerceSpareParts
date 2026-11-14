@@ -26,6 +26,8 @@ using Main.Application.Services.Document;
 using Main.Application.Services.Document.Providers;
 using Main.Application.Services.Document.Sources;
 using Main.Application.Services.Logistics;
+using Main.Application.Services.ProductDeletion;
+using Main.Modules.Product.Abstractions;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Application.Services.PayloadProvider;
 using Main.Application.Services.Storage;
@@ -94,6 +96,10 @@ public static class ServiceProvider
 		collection.AddScoped<IVerificationPayloadProvider, VerificationPayloadProvider>();
 
 		collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
+		collection.AddScoped<IProductDeletionRule, StorageContentProductDeletionRule>();
+		collection.AddScoped<IProductDeletionRule, SaleContentProductDeletionRule>();
+		collection.AddScoped<IProductDeletionRule, PurchaseContentProductDeletionRule>();
+		collection.AddScoped<IProductDeletionRule, OrderItemProductDeletionRule>();
 		collection.AddScoped<IBalanceService, BalanceService>();
 		collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
 		collection.AddScoped<ISaleService, SaleService>();

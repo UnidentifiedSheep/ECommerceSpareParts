@@ -6,6 +6,7 @@ using Domain.Validation;
 using Main.Entities.DomainEvents.StorageContent;
 using Main.Entities.Exceptions;
 using Main.Enums;
+using Main.Entities.Product;
 
 namespace Main.Entities.Storage;
 

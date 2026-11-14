@@ -15,7 +15,6 @@ using Main.Entities.Order;
 using Main.Entities.Product;
 using Main.Entities.Product.Enrichment;
 using Main.Entities.Storage;
-using Main.Enums.Products;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -292,13 +291,13 @@ public class DeleteProductTests : IntegrationTest
 	}
 
 	[Theory]
-	[InlineData(ProductDeletionBlocker.Stock)]
-	[InlineData(ProductDeletionBlocker.StorageContent)]
-	[InlineData(ProductDeletionBlocker.Sale)]
-	[InlineData(ProductDeletionBlocker.Purchase)]
-	[InlineData(ProductDeletionBlocker.Order)]
-	[InlineData(ProductDeletionBlocker.Composition)]
-	public async Task ReferencedProduct_IsPreservedWithoutEventsOrCleanup(ProductDeletionBlocker blocker)
+	[InlineData(BlockerScenario.Stock)]
+	[InlineData(BlockerScenario.StorageContent)]
+	[InlineData(BlockerScenario.Sale)]
+	[InlineData(BlockerScenario.Purchase)]
+	[InlineData(BlockerScenario.Order)]
+	[InlineData(BlockerScenario.Composition)]
+	public async Task ReferencedProduct_IsPreservedWithoutEventsOrCleanup(BlockerScenario blocker)
 	{
 		await AddBlocker(blocker);
 		var image = ProductImage.Create(Product.Id, ".jpg");
@@ -313,9 +312,10 @@ public class DeleteProductTests : IntegrationTest
 		var action = () => Delete();
 
 		(await action.Should().ThrowAsync<ProductDeletionNotAllowedException>()).Which
-			.Blocker
+			.LocalizableMessage
+			.MessageKey
 			.Should()
-			.Be(blocker);
+			.Be(ExpectedMessageKey(blocker));
 		(await Context.Set<Product>()
 				.AsNoTracking()
 				.AnyAsync(item => item.Id == Product.Id, CancellationToken)).Should()
@@ -424,11 +424,33 @@ public class DeleteProductTests : IntegrationTest
 			.BeFalse();
 	}
 
-	private async Task AddBlocker(ProductDeletionBlocker blocker)
+	public enum BlockerScenario
+	{
+		Stock,
+		StorageContent,
+		Sale,
+		Purchase,
+		Order,
+		Composition
+	}
+
+	private static string ExpectedMessageKey(BlockerScenario scenario)
+		=> scenario switch
+		{
+			BlockerScenario.Stock => ArticleDeletionStockMessage.Key,
+			BlockerScenario.StorageContent => ArticleDeletionStorageContentMessage.Key,
+			BlockerScenario.Sale => ArticleDeletionSaleMessage.Key,
+			BlockerScenario.Purchase => ArticleDeletionPurchaseMessage.Key,
+			BlockerScenario.Order => ArticleDeletionOrderMessage.Key,
+			BlockerScenario.Composition => ArticleDeletionCompositionMessage.Key,
+			_ => throw new ArgumentOutOfRangeException(nameof(scenario))
+		};
+
+	private async Task AddBlocker(BlockerScenario blocker)
 	{
 		switch (blocker)
 		{
-			case ProductDeletionBlocker.Stock:
+			case BlockerScenario.Stock:
 				await Context.AddAsync(
 					ProductStock.Create(
 						StorageCode,
@@ -436,14 +458,14 @@ public class DeleteProductTests : IntegrationTest
 						1),
 					CancellationToken);
 				break;
-			case ProductDeletionBlocker.StorageContent:
+			case BlockerScenario.StorageContent:
 				await new StorageContentBuilder(Faker).WithStorageCode(StorageCode)
 					.WithCurrencyId(CurrencyId)
 					.WithProductIds(Product.Id)
 					.WithCount(0)
 					.BuildAndAddToDb(Context, CancellationToken);
 				break;
-			case ProductDeletionBlocker.Composition:
+			case BlockerScenario.Composition:
 				await Context.AddAsync(
 					ProductContent.Create(
 						Other.Id,
@@ -451,7 +473,7 @@ public class DeleteProductTests : IntegrationTest
 						1),
 					CancellationToken);
 				break;
-			case ProductDeletionBlocker.Order:
+			case BlockerScenario.Order:
 				var order = Order.CreateManual(
 					UserId,
 					UserId,
@@ -459,8 +481,8 @@ public class DeleteProductTests : IntegrationTest
 				order.AddItem(Product.Id, 1);
 				await Context.AddAsync(order, CancellationToken);
 				break;
-			case ProductDeletionBlocker.Sale:
-			case ProductDeletionBlocker.Purchase:
+			case BlockerScenario.Sale:
+			case BlockerScenario.Purchase:
 				// The storage record belongs to a different product: only the document blocks the target.
 				var storage = await new StorageContentBuilder(Faker).WithStorageCode(StorageCode)
 					.WithCurrencyId(CurrencyId)
@@ -474,7 +496,7 @@ public class DeleteProductTests : IntegrationTest
 					.WithCurrencyId(CurrencyId)
 					.WithAmount(10m)
 					.BuildAndAddToDb(Context, CancellationToken);
-				if (blocker == ProductDeletionBlocker.Sale)
+				if (blocker == BlockerScenario.Sale)
 				{
 					var content = new SaleContentBuilder(Faker).WithProductId(Product.Id)
 						.WithCurrencyId(CurrencyId)

@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Product.Enrichment;
@@ -21,7 +22,7 @@ public record DeleteProductCommand(int ProductId, uint RowVersion) : ICommand;
 
 public class DeleteProductHandler(
 	IProductRepository products,
-	IProductDeletionBlockerProvider deletionBlockers,
+	IProductDeletionBlockerResolver deletionBlockers,
 	IRepository<CatalogueCandidate, Guid> candidates,
 	IUnitOfWork unitOfWork) : ICommandHandler<DeleteProductCommand>
 {
