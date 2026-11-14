@@ -37,7 +37,7 @@ builder.ConfigureServices((context, services) =>
 	//add db context
 	services.AddDbContextModule<MainDbContextModule>();
 	services.AddCurrencyPersistence();
-	services.AddProductPersistence();
+	services.AddDbContextModule<ProductDbContextModule>();
 	services.AddDbContext<UnifiedDbContext>((sp, options) =>
 	{
 		var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;

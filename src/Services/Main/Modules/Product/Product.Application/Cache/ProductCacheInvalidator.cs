@@ -8,20 +8,20 @@ namespace Main.Cache;
 public sealed class ProductCacheInvalidator(ICache rawCache) : IProductCacheInvalidator
 {
 	public Task InvalidateProductAsync(int productId)
-		=> rawCache.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
+		=> rawCache.RemoveKeyAsync(ProductCacheKeys.Product(productId));
 
 	public Task InvalidateProductsAsync(IEnumerable<int> productIds)
-		=> rawCache.RemoveKeysAsync(productIds.Select(CacheKeys.ProductCache.Product));
+		=> rawCache.RemoveKeysAsync(productIds.Select(ProductCacheKeys.Product));
 
 	public Task InvalidateCrossesAsync(int productId)
 	{
-		var relationKey = CacheKeys.ProductCache.ProductCrossRelations(productId);
+		var relationKey = ProductCacheKeys.ProductCrossRelations(productId);
 		return rawCache.InvalidateByRelationsAsync(relationKey);
 	}
 
 	public async Task InvalidateCrossesAsync(IEnumerable<int> productIds)
 	{
-		var keys = productIds.Select(CacheKeys.ProductCache.ProductCrossRelations).ToList();
+		var keys = productIds.Select(ProductCacheKeys.ProductCrossRelations).ToList();
 
 		if (keys.Count != 0)
 			await rawCache.InvalidateByRelationsAsync(keys);

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Storage;
 
-// The stock row itself belongs to the Product module; the link to the storage table is owned by Main.
 public sealed class ProductStockStorageConfiguration : IEntityTypeConfiguration<ProductStock>
 {
 	public void Configure(EntityTypeBuilder<ProductStock> builder)

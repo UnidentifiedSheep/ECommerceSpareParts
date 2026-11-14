@@ -54,5 +54,5 @@ public class GetProductAsyncTests : IntegrationTest
 		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
+			.RemoveKeyAsync(ProductCacheKeys.Product(productId));
 }

@@ -15,11 +15,6 @@ public static class ModuleApplicationExtensions
 		typeof(IStreamRequestHandler<,>)
 	];
 
-	/// <summary>
-	///     Registers everything the host normally discovers by scanning its own application assembly
-	///     (MediatR handlers, validators, cache policies, projections) for a module assembly.
-	///     Pipeline behaviors are registered once by the host and are not duplicated here.
-	/// </summary>
 	public static IServiceCollection AddModuleApplication(
 		this IServiceCollection services,
 		Assembly assembly)
@@ -28,7 +23,7 @@ public static class ModuleApplicationExtensions
 
 		services.Scan(scan => scan
 			.FromAssemblies(assembly)
-			.AddClasses(classes => classes.AssignableToAny(MediatRHandlerTypes))
+			.AddClasses(classes => classes.AssignableToAny(MediatRHandlerTypes), publicOnly: false)
 			.AsImplementedInterfaces(type => type.IsGenericType &&
 				MediatRHandlerTypes.Contains(type.GetGenericTypeDefinition()))
 			.WithTransientLifetime());

@@ -43,7 +43,7 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
 
 		await cacheInvalidator.InvalidateCrossesAsync(productId);
 
-		var cacheExists = await CacheKeyExists(CacheKeys.ProductCache.ProductCrosses(productId));
+		var cacheExists = await CacheKeyExists(ProductCacheKeys.ProductCrosses(productId));
 		cacheExists.Should().BeFalse();
 
 		var relations = await GetRelations(productId);
@@ -66,7 +66,7 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
 
 		await cacheInvalidator.InvalidateCrossesAsync(crossProductId);
 
-		var cacheExists = await CacheKeyExists(CacheKeys.ProductCache.ProductCrosses(productId));
+		var cacheExists = await CacheKeyExists(ProductCacheKeys.ProductCrosses(productId));
 		cacheExists.Should().BeFalse();
 
 		var relations = await GetRelations(crossProductId);
@@ -84,7 +84,7 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
 		await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.RemoveKeyAsync(CacheKeys.ProductCache.ProductCrosses(productId));
+			.RemoveKeyAsync(ProductCacheKeys.ProductCrosses(productId));
 
 		await RemoveRelation(productId);
 	}
@@ -93,7 +93,7 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
 		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.RemoveKeyAsync(CacheKeys.ProductCache.ProductCrossRelations(productId));
+			.RemoveKeyAsync(ProductCacheKeys.ProductCrossRelations(productId));
 
 	private async Task<bool> CacheKeyExists(string key)
 		=> await Scope.ServiceProvider.GetRequiredService<ICache>().KeyExistsAsync(key);
@@ -102,5 +102,5 @@ public class InvalidateCrossesAsyncTests : IntegrationTest
 		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.GetFromSetAsync(CacheKeys.ProductCache.ProductCrossRelations(productId));
+			.GetFromSetAsync(ProductCacheKeys.ProductCrossRelations(productId));
 }

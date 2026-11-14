@@ -21,6 +21,7 @@ public record DeleteProductCommand(int ProductId, uint RowVersion) : ICommand;
 
 public class DeleteProductHandler(
 	IProductRepository products,
+	IProductDeletionBlockerProvider deletionBlockers,
 	IRepository<CatalogueCandidate, Guid> candidates,
 	IUnitOfWork unitOfWork) : ICommandHandler<DeleteProductCommand>
 {
@@ -39,7 +40,7 @@ public class DeleteProductHandler(
 
 		product.ValidateVersion(request.RowVersion);
 
-		if (await products.GetDeletionBlockerAsync(id, cancellationToken) is { } blocker)
+		if (await deletionBlockers.GetAsync(id, cancellationToken) is { } blocker)
 			throw new ProductDeletionNotAllowedException(blocker);
 
 		var candidate = await candidates.FirstOrDefaultAsync(

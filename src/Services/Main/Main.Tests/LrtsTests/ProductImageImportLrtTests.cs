@@ -117,7 +117,7 @@ public sealed class ProductImageImportLrtTests : CsvLrtIntegrationTest<ProductIm
 		var productId = TestContext.Products[0].Id;
 		await Scope.ServiceProvider
 			.GetRequiredService<ICache>()
-			.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
+			.RemoveKeyAsync(ProductCacheKeys.Product(productId));
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 		var cached = await provider.GetProductOrSetAsync(productId, CancellationToken);
 		cached.Images.Should().BeEmpty();

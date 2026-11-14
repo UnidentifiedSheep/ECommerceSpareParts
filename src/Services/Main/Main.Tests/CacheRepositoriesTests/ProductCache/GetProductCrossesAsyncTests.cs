@@ -131,7 +131,7 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 	{
 		var productId = TestContext.ProductCrosses[0].LeftProductId;
 		var repository = GetRepository();
-		var cacheKey = CacheKeys.ProductCache.ProductCrosses(productId);
+		var cacheKey = ProductCacheKeys.ProductCrosses(productId);
 
 		await RemoveCachedCrosses(productId);
 
@@ -141,19 +141,19 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 
 		var productRelations = await GetRelations(productId);
 		productRelations.Should().Contain(cacheKey);
-		var productRelationTtl = await GetTtl(CacheKeys.ProductCache.ProductCrossRelations(productId));
+		var productRelationTtl = await GetTtl(ProductCacheKeys.ProductCrossRelations(productId));
 		productRelationTtl.Should().NotBeNull();
 		productRelationTtl.Value.Should().BePositive();
-		productRelationTtl.Value.Should().BeLessThanOrEqualTo(CacheKeys.ProductCache.Ttl);
+		productRelationTtl.Value.Should().BeLessThanOrEqualTo(ProductCacheKeys.Ttl);
 
 		foreach (var crossId in result)
 		{
 			var crossRelations = await GetRelations(crossId);
 			crossRelations.Should().Contain(cacheKey);
-			var crossRelationTtl = await GetTtl(CacheKeys.ProductCache.ProductCrossRelations(crossId));
+			var crossRelationTtl = await GetTtl(ProductCacheKeys.ProductCrossRelations(crossId));
 			crossRelationTtl.Should().NotBeNull();
 			crossRelationTtl.Value.Should().BePositive();
-			crossRelationTtl.Value.Should().BeLessThanOrEqualTo(CacheKeys.ProductCache.Ttl);
+			crossRelationTtl.Value.Should().BeLessThanOrEqualTo(ProductCacheKeys.Ttl);
 		}
 	}
 
@@ -170,8 +170,8 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 	private async Task RemoveCachedCrosses(int productId)
 	{
 		var cache = Scope.ServiceProvider.GetRequiredService<ICache>();
-		var cacheKey = CacheKeys.ProductCache.ProductCrosses(productId);
-		var relationKey = CacheKeys.ProductCache.ProductCrossRelations(productId);
+		var cacheKey = ProductCacheKeys.ProductCrosses(productId);
+		var relationKey = ProductCacheKeys.ProductCrossRelations(productId);
 
 		await cache.RemoveKeyAsync(cacheKey);
 		await cache.RemoveKeyAsync(relationKey);
@@ -181,7 +181,7 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.GetFromSetAsync(CacheKeys.ProductCache.ProductCrossRelations(productId));
+			.GetFromSetAsync(ProductCacheKeys.ProductCrossRelations(productId));
 
 	private async Task<TimeSpan?> GetTtl(string key)
 	{

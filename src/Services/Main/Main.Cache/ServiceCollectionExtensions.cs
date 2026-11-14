@@ -8,8 +8,6 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddApplicationCache(this IServiceCollection services)
 	{
-		services.AddScoped<IProductProvider, ProductProvider>();
-		services.AddScoped<IProductCacheInvalidator, ProductCacheInvalidator>();
 		services.AddScoped<IDocumentLinkProvider, DocumentLinkProvider>();
 		services.AddScoped<IOneTimeTokenStore, OneTimeTokenStore>();
 		services.AddScoped<IRecipientProvider, RecipientProvider>();

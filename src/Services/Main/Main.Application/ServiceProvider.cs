@@ -53,7 +53,7 @@ public static class ServiceProvider
 
 		collection
 			.AddNamedObjects()
-			.AddLrtLayer(typeof(ProducerImportLrt).Assembly)
+			.AddLrtLayer(typeof(Global).Assembly)
 			.RegisterJobProviders<GenerateDocumentJobProvider>()
 			.AddFusionCache()
 			.WithRegisteredDistributedCache()
@@ -61,16 +61,9 @@ public static class ServiceProvider
 			.WithSystemTextJsonSerializer();
 
 		collection.AddSingleton<IJwtGenerator, JwtGenerator>();
-		collection.RegisterProjectionProviders<ProducerImportLrt>();
+		collection.RegisterProjectionProviders(typeof(Global).Assembly);
 
 		collection.AddScoped<IAppLinkProvider, AppLinkProvider>();
-		collection.AddScoped<IProductEventPublisher, ProductEventPublisher>();
-		collection.AddScoped<IProductEventProvider, ProductEventProvider>();
-		collection.AddScoped<IProductEventPartProvider, ProductCoreEventPartProvider>();
-		collection.AddScoped<IProductEventPartProvider, ProductCharacteristicsEventPartProvider>();
-		collection.AddScoped<IProductEventPartProvider, ProductDimensionsEventPartProvider>();
-		collection.AddScoped<IProductEventPartProvider, ProductWeightEventPartProvider>();
-		collection.AddScoped<IProductEventPartProvider, ProductStocksEventPartProvider>();
 
 		//order is important
 		collection.AddSingleton<IDocumentTemplateSource, S3DocumentTemplateSource>();
@@ -105,8 +98,6 @@ public static class ServiceProvider
 		collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
 		collection.AddScoped<ISaleService, SaleService>();
 		collection.AddScoped<IStorageContentService, StorageContentService>();
-		collection.AddSingleton<IProducerLookupService, ProducerLookupService>();
-		collection.AddScoped<IProducerLookupLoader, ProducerLookupLoader>();
 
 		collection.AddApplicationBase(
 			ServicesDefinitions.Main,

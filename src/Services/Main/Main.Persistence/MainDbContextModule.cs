@@ -52,6 +52,10 @@ public sealed class MainDbContextModule : IDbContextModule
 			.HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
 
 		modelBuilder.ApplyConfiguration(new EntityHistoryConfiguration());
+	}
+
+	public void PostConfigure(ModelBuilder modelBuilder)
+	{
 		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();
 

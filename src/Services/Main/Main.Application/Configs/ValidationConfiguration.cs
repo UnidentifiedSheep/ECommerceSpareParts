@@ -50,12 +50,6 @@ public static class ValidationConfiguration
 		errors.For(CartKeys.PK)
 			.OnAlreadyExists(input => new CartItemAlreadyExistsException(input.Values));
 
-		errors.For(ProducerAliasKeys.Alias)
-			.OnMissing(input => new ProducersAliasNotFoundException(string.Join(", ", input.Values)));
-
-		errors.For(ProducerAliasKeys.Alias)
-			.OnAlreadyExists(input => new ProducerAliasAlreadyTakenException(input.Values));
-
 		CurrencyValidationConfiguration.Configure(errors);
 
 		errors.For(PermissionKeys.Name)
@@ -69,38 +63,6 @@ public static class ValidationConfiguration
 
 		errors.For(StorageKeys.Code)
 			.OnAlreadyExists(input => new StorageCodeAlreadyTakenException(input.Values));
-
-		errors.For(ProductKeys.Id)
-			.OnMissing(input => input.IsBatch
-				? new ProductNotFoundException(input.Values)
-				: new ProductNotFoundException(input.Values[0]));
-
-		errors.For(ProductGroupKeys.NormalizedName)
-			.OnAlreadyExists(input => new ProductGroupNameAlreadyExistsException());
-
-		errors.For(ProducerKeys.Id)
-			.OnMissing(input => new ProducerNotFoundException(input.Values[0]));
-
-		errors.For(ProducerKeys.Name)
-			.OnMissing(input => new ProducerNameNotFoundException(input.Values));
-
-		errors.For(ProductEanKeys.PK)
-			.OnAlreadyExists(input
-				=> new ProductEanAlreadyExistsException(input.Values[0].ProductId, input.Values[0].Ean));
-
-		errors.For(ProducerSupplierMappingKeys.SupplierName)
-			.OnAlreadyExists(input => new ProducersSupplierMappingAlreadyExistsException(
-				input.Values[0].NormalizedName,
-				input.Values[0].Supplier));
-
-		errors.For(ProductCharacteristicKeys.CharacteristicId)
-			.OnAlreadyExists(input => new CharacteristicInUseException(input.Values[0]));
-
-		errors.For(CharacteristicKeys.Id)
-			.OnMissing(input => new CharacteristicNotFoundException(input.Values[0]));
-
-		errors.For(ProducerKeys.Name)
-			.OnAlreadyExists(input => new ProducerNameAlreadyTakenException(string.Join(", ", input.Values)));
 
 		errors.For(UserKeys.UserName.NormalizedValue)
 			.OnAlreadyExists(input => new UserNameAlreadyTakenException(input.Values[0]));
@@ -116,5 +78,7 @@ public static class ValidationConfiguration
 
 		errors.For(TransactionKeys.Id)
 			.OnMissing(input => new TransactionNotFoundException(input.Values[0]));
+
+		ProductValidationConfiguration.Configure(errors);
 	}
 }

@@ -90,7 +90,7 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
 		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
+			.RemoveKeyAsync(ProductCacheKeys.Product(productId));
 
 	private void AssertProduct(ProductDto dto, Product product)
 	{

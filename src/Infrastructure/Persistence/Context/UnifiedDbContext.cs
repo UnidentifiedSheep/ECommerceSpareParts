@@ -24,5 +24,6 @@ public sealed class UnifiedDbContext(
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		foreach (var module in _modules) module.Configure(modelBuilder);
+		foreach (var module in _modules) module.PostConfigure(modelBuilder);
 	}
 }

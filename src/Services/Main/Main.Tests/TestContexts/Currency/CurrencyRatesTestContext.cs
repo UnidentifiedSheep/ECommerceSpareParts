@@ -55,7 +55,6 @@ public class CurrencyRatesTestContext(
 		}
 
 		await DbContext.SaveChangesAsync(cancellationToken);
-		// Setup data must not trigger domain events in the handler under test.
 		eventScope.Flush();
 	}
 }

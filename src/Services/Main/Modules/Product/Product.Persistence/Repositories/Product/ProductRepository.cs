@@ -2,10 +2,7 @@ using Application.Common.Interfaces.Repositories;
 using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Product;
-using Main.Entities.Order;
 using Main.Entities.Product;
-using Main.Entities.Purchase;
-using Main.Entities.Sale;
 using Main.Entities.Storage;
 using Main.Enums.Products;
 using Main.Persistence.Context;
@@ -23,29 +20,6 @@ internal class ProductRepository(UnifiedDbContext context,
 	QueryExtensions extensions)
 	: LinqRepositoryBase<UnifiedDbContext, ProductEntity, int>(context, extensions), IProductRepository
 {
-	public Task<ProductDeletionBlocker?> GetDeletionBlockerAsync(
-		int productId,
-		CancellationToken cancellationToken = default)
-		=> Context.Set<ProductEntity>()
-			.AsNoTracking()
-			.Where(product => product.Id == productId)
-			.Select(product
-				=> Context.Set<ProductStock>()
-					.Any(stock => stock.ProductId == product.Id && stock.Quantity > 0) ?
-					(ProductDeletionBlocker?)ProductDeletionBlocker.Stock :
-					Context.Set<StorageContent>().Any(item => item.ProductId == productId) ?
-						ProductDeletionBlocker.StorageContent :
-						Context.Set<SaleContent>().Any(item => item.ProductId == productId) ?
-							ProductDeletionBlocker.Sale :
-							Context.Set<PurchaseContent>().Any(item => item.ProductId == productId) ?
-								ProductDeletionBlocker.Purchase :
-								Context.Set<OrderItem>().Any(item => item.ProductId == productId) ?
-									ProductDeletionBlocker.Order :
-									Context.Set<ProductContent>()
-										.Any(item => item.ChildProductId == productId) ?
-										ProductDeletionBlocker.Composition : null)
-			.SingleAsync(cancellationToken);
-
 	public async Task<IReadOnlyList<ProductEntity>> GetProductCrosses(
 		int productId,
 		Criteria<ProductEntity> criteria,
