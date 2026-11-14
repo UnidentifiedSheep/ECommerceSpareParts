@@ -7,6 +7,7 @@ using Main.Application.Products.Services;
 using Main.Application.Products.Services.EventParts;
 using Main.Application.Services;
 using Main.Cache;
+using Main.Modules.Product.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
 
@@ -33,6 +34,7 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<IProducerLookupService, ProducerLookupService>();
 		services.AddScoped<IProducerLookupLoader, ProducerLookupLoader>();
 
+		services.AddScoped<IProductReferenceResolver, ProductReferenceResolver>();
 		services.AddScoped<IProductProvider, ProductProvider>();
 		services.AddScoped<IProductCacheInvalidator, ProductCacheInvalidator>();
 
