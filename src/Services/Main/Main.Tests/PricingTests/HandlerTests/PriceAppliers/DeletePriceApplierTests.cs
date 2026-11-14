@@ -1,0 +1,104 @@
+using Domain.CommonEntities.Job;
+using FluentAssertions;
+using FluentValidation.TestHelper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Pricing.Application.Handlers.PriceApplier.DeletePriceApplier;
+using Pricing.Application.Interfaces.Cache;
+using Pricing.Application.Lrts.InvalidateStalePriceOptions;
+using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
+using Pricing.Entities.Exceptions;
+using Pricing.Entities.Pricing;
+using Pricing.Enums;
+using Tests.PricingTests.DataBuilders.PriceAppliers;
+using Tests.Abstractions.Test;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
+
+namespace Tests.PricingTests.HandlerTests.PriceAppliers;
+
+public class DeletePriceApplierTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+{
+	[Fact]
+	public async Task WithDynamicApplier_DeletesApplierAndInvalidatesConfiguration()
+	{
+		var existing = await new PriceApplierDataBuilder(Faker)
+			.WithState(PriceOfferSourceType.Supplier, 10)
+			.BuildAndAddToDb(Context);
+		var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
+		var initialConfiguration = await provider.GetConfigurationAsync(CancellationToken);
+
+		await Mediator.Send(new DeletePriceApplierCommand(existing.SystemName), CancellationToken);
+
+		var applierExists = await Context
+			.Set<PriceApplier>()
+			.AsNoTracking()
+			.AnyAsync(x => x.SystemName == existing.SystemName, CancellationToken);
+		var stateExists = await Context
+			.Set<PriceApplierState>()
+			.AsNoTracking()
+			.AnyAsync(x => x.PriceApplierSystemName == existing.SystemName, CancellationToken);
+		applierExists.Should().BeFalse();
+		stateExists.Should().BeFalse();
+
+		var updatedConfiguration = await provider.GetConfigurationAsync(CancellationToken);
+		updatedConfiguration.Appliers.Should().NotContain(x => x.SystemName == existing.SystemName);
+		updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);
+
+		var recalculationJobExists = await Context
+			.Set<Job>()
+			.AsNoTracking()
+			.AnyAsync(
+				x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName && x.NaturalKey != null,
+				CancellationToken);
+		recalculationJobExists.Should().BeTrue();
+	}
+
+	[Fact]
+	public async Task WithLocalApplier_ThrowsLocalPriceApplierCannotBeDeletedException()
+	{
+		var existing = await new PriceApplierDataBuilder(Faker)
+			.WithSystemName(nameof(MarkupApplier))
+			.AsLocal()
+			.WithState(
+				PriceOfferSourceType.Supplier,
+				0,
+				false)
+			.BuildAndAddToDb(Context);
+
+		var exception = await Assert.ThrowsAsync<LocalPriceApplierCannotBeDeletedException>(() =>
+			Mediator.Send(new DeletePriceApplierCommand(existing.SystemName), CancellationToken));
+
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.local.cannot.be.deleted");
+		var exists = await Context
+			.Set<PriceApplier>()
+			.AsNoTracking()
+			.AnyAsync(x => x.SystemName == existing.SystemName, CancellationToken);
+		exists.Should().BeTrue();
+	}
+
+	[Fact]
+	public async Task WithUnknownApplier_ThrowsPriceApplierNotFoundException()
+	{
+		var systemName = $"missing-{Faker.Random.Guid():N}";
+
+		var exception = await Assert.ThrowsAsync<PriceApplierNotFoundException>(() =>
+			Mediator.Send(new DeletePriceApplierCommand(systemName), CancellationToken));
+
+		exception.LocalizableMessage.MessageKey.Should().Be("price.applier.not.found");
+	}
+}
+
+public class
+	DeletePriceApplierValidationTests : ValidationTest<DeletePriceApplierValidation,
+	DeletePriceApplierCommand>
+{
+	[Fact]
+	public async Task WithEmptySystemName_FailsValidation()
+	{
+		var result = await ValidateAsync(new DeletePriceApplierCommand(""));
+		result.ShouldHaveValidationErrorFor(x => x.SystemName)
+			.WithErrorCode("price.applier.system.name.required")
+			.Only();
+	}
+}

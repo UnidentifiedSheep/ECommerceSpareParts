@@ -69,52 +69,6 @@
     depends_on:
       - opensearch
 
-  pricing-api:
-    image: pricing-api
-    build:
-      context: .
-      dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
-    expose:
-      - "8080"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    volumes:
-      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
-    environment:
-      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
-    networks:
-      - backend-network
-    depends_on:
-      - pgql
-      - redis
-      - rabbitmq
-    restart: unless-stopped
-  
-  pricing-worker:
-    image: pricing-worker
-    build:
-      context: .
-      dockerfile: src/Services/Pricing/Pricing.Worker/Dockerfile
-    volumes:
-      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
-    environment:
-      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
-    networks:
-      - backend-network
-    depends_on:
-      - pgql
-      - redis
-      - rabbitmq
-    restart: unless-stopped
-
   graphql-config:
     image: graphql-config
     pull_policy: build
@@ -163,7 +117,7 @@
     environment:
       POSTGRES_USER: ${PGQL_USER}
       POSTGRES_PASSWORD: ${PGQL_PASSWORD}
-      POSTGRES_MULTIPLE_DATABASES: main,analytics,pricing
+      POSTGRES_MULTIPLE_DATABASES: main,analytics
     volumes:
       - pg_data:/var/lib/postgresql
       - ./init:/docker-entrypoint-initdb.d

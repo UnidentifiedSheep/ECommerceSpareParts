@@ -25,6 +25,9 @@ using Main.Cache;
 using Main.Modules.Currency;
 using Main.Modules.Product;
 using Main.Modules.Storage;
+using Contracts.Analytics;
+using Pricing.Application.Consumers;
+using Pricing.Module;
 using Main.Persistence;
 using MassTransit;
 using Persistence.Context;
@@ -65,6 +68,7 @@ builder.Services.AddSignalR();
 builder.Services.AddModule<CurrencyModule>(builder.Configuration);
 builder.Services.AddModule<ProductModule>(builder.Configuration);
 builder.Services.AddModule<StorageModule>(builder.Configuration);
+builder.Services.AddModule<PricingModule>(builder.Configuration);
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
@@ -99,10 +103,12 @@ builder.Services.AddMassTransit(x =>
 				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 				ep.ConfigureConsumer<BackplaneConsumer>(context);
 				ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
+					ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
 				ep.Bind<BackplaneMessage>();
 				ep.Bind<ProducerLookupChangedEvent>();
+					ep.Bind<MarkupRangesRefreshRequestedEvent>();
 				ep
 					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
 					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
@@ -136,7 +142,10 @@ builder
 	.AddMainNotifications();
 
 builder.Services.AddCarter(
-	new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly, typeof(JobEndPoints).Assembly),
+	new DependencyContextAssemblyCatalog(
+		typeof(ProductsEndPoints).Assembly,
+		typeof(JobEndPoints).Assembly,
+		typeof(Pricing.Api.EndPoints.PriceEndPoints).Assembly),
 	c => c.WithEmptyValidators());
 
 builder.Services.AddGraphQlServices(serviceName);

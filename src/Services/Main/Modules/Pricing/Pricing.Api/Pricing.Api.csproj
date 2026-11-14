@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>Main.Modules.Pricing.Api</AssemblyName>
+        <RootNamespace>Pricing.Api</RootNamespace>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Microsoft.AspNetCore.Builder"/>
+        <Using Include="Microsoft.AspNetCore.Http"/>
+        <Using Include="Microsoft.AspNetCore.Routing"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Carter" Version="10.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\..\..\..\GraphQL.Common\GraphQL.Common.csproj"/>
+        <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

@@ -19,26 +19,6 @@ services:
       cache_to:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/search-api:buildcache,mode=max
 
-  pricing-api:
-    image: ${ARTIFACT_REGISTRY_HOST}/pricing-api:${IMAGE_TAG}
-    build:
-      tags:
-        - ${ARTIFACT_REGISTRY_HOST}/pricing-api:${IMAGE_TAG}
-      cache_from:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-api:buildcache
-      cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-api:buildcache,mode=max
-
-  pricing-worker:
-    image: ${ARTIFACT_REGISTRY_HOST}/pricing-worker:${IMAGE_TAG}
-    build:
-      tags:
-        - ${ARTIFACT_REGISTRY_HOST}/pricing-worker:${IMAGE_TAG}
-      cache_from:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-worker:buildcache
-      cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-worker:buildcache,mode=max
-
   gateway:
     image: ${ARTIFACT_REGISTRY_HOST}/gateway:${IMAGE_TAG}
     build:

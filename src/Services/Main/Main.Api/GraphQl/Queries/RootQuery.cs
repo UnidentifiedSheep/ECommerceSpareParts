@@ -1,6 +1,7 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.Analytics.Queries;
+using Pricing.Api.GraphQl.Queries;
 
 namespace Main.Api.GraphQl.Queries;
 
@@ -56,4 +57,10 @@ public sealed class RootQuery
 
 	[GraphQLName("currencies")]
 	public CurrencyQueries Currencies => new();
+
+	[GraphQLName("markupGroups")]
+	public MarkupGroupQueries MarkupGroups => new();
+
+	[GraphQLName("priceAppliers")]
+	public PriceApplierQueries PriceAppliers => new();
 }

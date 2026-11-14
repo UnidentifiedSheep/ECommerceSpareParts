@@ -31,6 +31,7 @@ public static class ServiceProvider
 			typeof(Product).Assembly,
 			typeof(Main.Entities.Currency.Currency).Assembly,
 			typeof(Main.Entities.Storage.StorageContent).Assembly,
+			typeof(Pricing.Entities.Offers.PriceOffer).Assembly,
 			typeof(InAppNotification).Assembly,
 			typeof(JobSchedule).Assembly);
 		collection.AddNotificationPersistence<UnifiedDbContext>();

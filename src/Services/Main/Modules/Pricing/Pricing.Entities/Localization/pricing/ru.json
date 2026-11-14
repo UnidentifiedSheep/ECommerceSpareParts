@@ -44,6 +44,8 @@
     "lrt.price.candidate.calculation.storage.code.description": "Код склада, для которого нужно рассчитать варианты цены.",
     "lrt.invalidate.stale.price.options.name": "Обновление устаревших вариантов цены",
     "lrt.invalidate.stale.price.options.description": "Обновляет устаревшие варианты цены.",
+    "lrt.resync.our.warehouse.offers.name": "Пересинхронизация предложений наших складов",
+    "lrt.resync.our.warehouse.offers.description": "Пересоздает ценовые предложения наших складов из остатков.",
     "pricing.product.id.must.be.positive": "Идентификатор товара должен быть положительным.",
     "pricing.currency.id.must.be.positive": "Идентификатор валюты должен быть положительным.",
     "pricing.storage.code.invalid": "Код склада должен содержать от 1 до 128 символов.",

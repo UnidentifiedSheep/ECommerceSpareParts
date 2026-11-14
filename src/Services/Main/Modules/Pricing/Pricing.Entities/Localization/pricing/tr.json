@@ -44,6 +44,8 @@
     "lrt.price.candidate.calculation.storage.code.description": "Fiyat adaylarının hesaplanacağı depo kodu.",
     "lrt.invalidate.stale.price.options.name": "Eski fiyat seçeneklerini güncelleme",
     "lrt.invalidate.stale.price.options.description": "Eski fiyat seçeneklerini günceller.",
+    "lrt.resync.our.warehouse.offers.name": "Depo tekliflerini yeniden eşitleme",
+    "lrt.resync.our.warehouse.offers.description": "Kendi depolarımızın fiyat tekliflerini stok içeriğinden yeniden oluşturur.",
     "pricing.product.id.must.be.positive": "Ürün kimliği pozitif olmalıdır.",
     "pricing.currency.id.must.be.positive": "Para birimi kimliği pozitif olmalıdır.",
     "pricing.storage.code.invalid": "Depo kodu 1 ile 128 karakter arasında olmalıdır.",

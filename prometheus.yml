@@ -15,13 +15,6 @@ scrape_configs:
         type: A
         port: 8080
 
-  - job_name: "pricing-api"
-    metrics_path: /metrics
-    dns_sd_configs:
-      - names: [ "tasks.pricing-api" ]
-        type: A
-        port: 8080
-
   - job_name: "analytics-api"
     metrics_path: /metrics
     dns_sd_configs:

@@ -25,6 +25,7 @@
         <ProjectReference Include="..\Modules\Currency\Currency.Persistence\Currency.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Product\Product.Persistence\Product.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Storage\Storage.Persistence\Storage.Persistence.csproj"/>
+        <ProjectReference Include="..\Modules\Pricing\Pricing.Persistence\Pricing.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

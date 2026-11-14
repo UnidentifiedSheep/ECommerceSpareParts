@@ -44,6 +44,10 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
+        <LocanResource Include="../Modules/Pricing/Pricing.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
         <LocanResource Include="../Modules/Storage/Storage.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>

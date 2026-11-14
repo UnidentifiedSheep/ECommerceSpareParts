@@ -11,7 +11,8 @@ public static class ServiceCollectionExtensions
 		services.AddCommonGraphQl(name)
 			.AddMutationType<RootMutation>()
 			.AddQueryType<RootQuery>()
-			.AddMainGraphQL();
+			.AddMainGraphQL()
+			.AddPricingGraphQL();
 
 		return services;
 	}

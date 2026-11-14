@@ -5,6 +5,7 @@ using Main.Migrator.DataSeeds;
 using Main.Modules.Currency.Persistence;
 using Main.Modules.Product.Persistence;
 using Main.Modules.Storage.Persistence;
+using Pricing.Persistence;
 using Main.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,7 @@ builder.ConfigureServices((context, services) =>
 	services.AddCurrencyPersistence();
 	services.AddDbContextModule<ProductDbContextModule>();
 	services.AddDbContextModule<StorageDbContextModule>();
+	services.AddDbContextModule<PricingDbContextModule>();
 	services.AddDbContext<UnifiedDbContext>((sp, options) =>
 	{
 		var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
@@ -68,6 +70,7 @@ builder.ConfigureServices((_, services) =>
 	services.AddScoped<ISeed<UnifiedDbContext>, UserSeed>();
 	services.AddScoped<ISeed<UnifiedDbContext>, SystemOrganizationSeed>();
 	services.AddScoped<ISeed<UnifiedDbContext>, CurrencySeed>();
+	services.AddScoped<ISeed<UnifiedDbContext>, MarkupGroupSeed>();
 	services.AddScoped<ISeed<UnifiedDbContext>, AdminSeed>();
 	services.AddScoped<ISeed<UnifiedDbContext>, ScheduledLrtSeed>();
 });

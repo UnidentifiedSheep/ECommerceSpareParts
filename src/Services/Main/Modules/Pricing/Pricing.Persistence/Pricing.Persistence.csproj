@@ -4,6 +4,8 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Pricing.Persistence</AssemblyName>
+        <RootNamespace>Pricing.Persistence</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,7 +25,7 @@
         <ProjectReference Include="..\..\..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\..\..\..\Persistence.Common\Persistence.Common.csproj"/>
-        <ProjectReference Include="..\..\..\..\Pricing\Pricing.Application\Pricing.Application.csproj"/>
+        <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj"/>
         <ProjectReference Include="..\Pricing.Entities\Pricing.Entities.csproj"/>
     </ItemGroup>
 

@@ -28,7 +28,8 @@ public class ModuleBoundariesTests
 	{
 		["Currency"] = [],
 		["Product"] = [],
-		["Storage"] = ["Currency", "Product"]
+		["Storage"] = ["Currency", "Product"],
+		["Pricing"] = ["Currency", "Product", "Storage"]
 	};
 
 	[Fact]

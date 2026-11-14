@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Main.Enums\Main.Enums.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core\Domain\Domain.csproj"/>
     </ItemGroup>
 
 </Project>

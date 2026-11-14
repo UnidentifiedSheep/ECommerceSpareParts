@@ -1,3 +1,4 @@
+using Application.Common.Services.Supplier;
 using Abstractions;
 using Application.Common;
 using Application.Common.Extensions;
@@ -109,6 +110,7 @@ public static class ServiceProvider
 			typeof(Global).Assembly);
 
 		collection.AddSingleton<IEmailValidator, EmailValidator>();
+		collection.AddScoped<ISupplierSettingSource, SupplierSettingSource>();
 
 		SortByConfig.Configure();
 		CursorConfig.Configure();

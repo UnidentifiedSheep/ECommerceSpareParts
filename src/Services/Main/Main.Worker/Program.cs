@@ -18,6 +18,9 @@ using Main.Cache;
 using Main.Modules.Currency;
 using Main.Modules.Product;
 using Main.Modules.Storage;
+using Contracts.Analytics;
+using Pricing.Application.Consumers;
+using Pricing.Module;
 using Main.Persistence;
 using MassTransit;
 using Notification.Extensions;
@@ -58,6 +61,7 @@ builder.Services.AddCommonWorkerInfrastructure(ServicesDefinitions.Main);
 builder.Services.AddModule<CurrencyModule>(builder.Configuration);
 builder.Services.AddModule<ProductModule>(builder.Configuration);
 builder.Services.AddModule<StorageModule>(builder.Configuration);
+builder.Services.AddModule<PricingModule>(builder.Configuration);
 
 AddMassTransit(builder);
 
@@ -126,8 +130,10 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
 					ep.ConfigureConsumer<BackplaneConsumer>(context);
 					ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
+					ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 					ep.Bind<BackplaneMessage>();
 					ep.Bind<ProducerLookupChangedEvent>();
+					ep.Bind<MarkupRangesRefreshRequestedEvent>();
 				});
 
 			cfg.ReceiveEndpoint(
@@ -142,6 +148,10 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 					ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
 					ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 					ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
+					ep.ConfigureConsumer<PricingCurrencyRatesChangedConsumer>(context);
+					ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
+					ep.ConfigureConsumer<ProductPriceOffersUpdatedConsumer>(context);
+					ep.ConfigureConsumer<ApplySupplierProductsConsumer>(context);
 				});
 		});
 	});

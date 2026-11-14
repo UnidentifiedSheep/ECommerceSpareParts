@@ -10,6 +10,7 @@ using Main.Cache;
 using Main.Modules.Currency;
 using Main.Modules.Product;
 using Main.Modules.Storage;
+using Pricing.Module;
 using Main.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +70,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddModule<CurrencyModule>(new ConfigurationBuilder().Build());
 		services.AddModule<ProductModule>(new ConfigurationBuilder().Build());
 		services.AddModule<StorageModule>(new ConfigurationBuilder().Build());
+		services.AddModule<PricingModule>(new ConfigurationBuilder().Build());
 		services.AddSingleton<TestTimeProvider>();
 		services.AddSingleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>());
 		var passwordRules = new PasswordRules

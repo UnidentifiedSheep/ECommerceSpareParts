@@ -1,4 +1,5 @@
 using HotChocolate;
+using Pricing.Api.GraphQl.Mutations;
 
 namespace Main.Api.GraphQl.Mutations;
 
@@ -43,4 +44,10 @@ public sealed class RootMutation
 
 	[GraphQLName("productEans")]
 	public ProductEanMutation ProductEans => new();
+
+	[GraphQLName("markupGroups")]
+	public MarkupGroupMutations MarkupGroups => new();
+
+	[GraphQLName("priceAppliers")]
+	public PriceApplierMutations PriceAppliers => new();
 }

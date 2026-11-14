@@ -44,6 +44,8 @@
     "lrt.price.candidate.calculation.storage.code.description": "Code of the storage for which price candidates should be calculated.",
     "lrt.invalidate.stale.price.options.name": "Update stale price options",
     "lrt.invalidate.stale.price.options.description": "Updates stale price options.",
+    "lrt.resync.our.warehouse.offers.name": "Resync our warehouse offers",
+    "lrt.resync.our.warehouse.offers.description": "Rebuilds price offers of our warehouses from storage contents.",
     "pricing.product.id.must.be.positive": "Product ID must be positive.",
     "pricing.currency.id.must.be.positive": "Currency ID must be positive.",
     "pricing.storage.code.invalid": "Storage code must contain between 1 and 128 characters.",

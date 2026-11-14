@@ -1,14 +1,13 @@
 using System.Text.Json.Serialization;
 using Application.Common.Static;
-using Internal.Integration.Core.Interfaces.Common;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Application.Common.Services.Supplier.Tmtr;
 
-public sealed class TmtrMainSettingProvider(IFusionCache cache, ICommonClient commonClient)
+public sealed class TmtrMainSettingProvider(IFusionCache cache, ISupplierSettingSource settingSource)
 	: MainSupplierSettingProvider<TmtrMainSettings>(
 		cache,
-		commonClient,
+		settingSource,
 		"TmtrSupplierSetting",
 		CacheKeys.SettingsCache.TmtrSettings);
 

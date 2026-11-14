@@ -1,0 +1,25 @@
+using Application.Common.Extensions;
+using Contracts.Supplier;
+using MassTransit;
+using MediatR;
+using Pricing.Application.Handlers.Pricing;
+
+namespace Pricing.Application.Consumers;
+
+public class ApplySupplierProductsConsumer(ISender sender) : IConsumer<SupplierProductsRequestedEvent>
+{
+	public async Task Consume(ConsumeContext<SupplierProductsRequestedEvent> context)
+	{
+		var supplier = context.Message.Supplier;
+		var storageCode = context.Message.RequestedStorageCode;
+		var products = context.Message.Products.Select(x => x.FromContract()).ToList();
+
+		await sender.Send(
+			new ApplySupplierProductsCommand(
+				context.Message.OccurredAt,
+				supplier,
+				storageCode,
+				products),
+			context.CancellationToken);
+	}
+}

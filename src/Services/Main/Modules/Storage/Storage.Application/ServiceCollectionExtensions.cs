@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
 			.RegisterNamedObject<SettingDefinitionNamedObjectBase>(assembly);
 
 		services.AddScoped<IStorageContentService, StorageContentService>();
+		services.AddScoped<IStorageContentSnapshotReader, StorageContentSnapshotReader>();
 		services.AddScoped<IProductDeletionRule, StorageContentProductDeletionRule>();
 
 		return services;

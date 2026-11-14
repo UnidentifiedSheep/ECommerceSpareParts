@@ -1,15 +1,13 @@
 using System.Text.Json;
-using Abstractions;
 using Application.Common.Static;
 using Integrations.Supplier.Enums;
-using Internal.Integration.Core.Interfaces.Common;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Application.Common.Services.Supplier;
 
 public abstract class MainSupplierSettingProvider<TSetting>(
 	IFusionCache cache,
-	ICommonClient commonClient,
+	ISupplierSettingSource settingSource,
 	string settingSystemName,
 	string cacheKey) where TSetting : class
 {
@@ -23,19 +21,16 @@ public abstract class MainSupplierSettingProvider<TSetting>(
 
 	private async Task<MainSupplierSettingResult<TSetting>> LoadAsync(CancellationToken cancellationToken)
 	{
-		var response = await commonClient.SettingNode.GetSetting(
-			ServicesDefinitions.Main,
-			settingSystemName,
-			cancellationToken);
+		var json = await settingSource.GetSettingJsonAsync(settingSystemName, cancellationToken);
 
-		if (!response.Success)
+		if (json is null)
 			return MainSupplierSettingResult<TSetting>.Failure(
 				SupplierUnavailableReason.SettingsUnavailable,
 				$"Unable to get {settingSystemName}");
 
 		try
 		{
-			var setting = JsonSerializer.Deserialize<TSetting>(response.ValueOrThrow);
+			var setting = JsonSerializer.Deserialize<TSetting>(json);
 
 			return setting is null
 				? MainSupplierSettingResult<TSetting>.Failure(
