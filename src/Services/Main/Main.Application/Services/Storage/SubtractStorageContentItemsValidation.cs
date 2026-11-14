@@ -2,6 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Application.Models.Storage;
 using Main.Entities;
+using Main.Entities.Storage;
 
 namespace Main.Application.Services.Storage;
 

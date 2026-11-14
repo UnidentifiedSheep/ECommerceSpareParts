@@ -17,6 +17,7 @@ public record GetStorageOwnersResult(IReadOnlyList<UserDto> Owners);
 
 public class GetStorageOwnersHandler(
 	IReadRepository<StorageOwner, (string, Guid)> repository,
+	IReadRepository<UserEntity, Guid> users,
 	IProjectionProvider<UserEntity, UserDto> projection)
 	: IQueryHandler<GetStorageOwnersQuery, GetStorageOwnersResult>
 {
@@ -24,11 +25,12 @@ public class GetStorageOwnersHandler(
 		GetStorageOwnersQuery request,
 		CancellationToken cancellationToken)
 	{
-		var result = await repository
+		var owners = repository.Query.Where(x => x.StorageCode == request.StorageCode);
+
+		var result = await users
 			.Query
-			.Where(x => x.StorageCode == request.StorageCode)
-			.OrderByDescending(x => x.UserId)
-			.Select(x => x.User)
+			.Where(user => owners.Any(owner => owner.UserId == user.Id))
+			.OrderByDescending(user => user.Id)
 			.Project(projection)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);

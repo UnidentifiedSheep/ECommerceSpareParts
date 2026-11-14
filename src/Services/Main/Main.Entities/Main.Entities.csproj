@@ -16,6 +16,7 @@
         <ProjectReference Include="..\Main.Enums\Main.Enums.csproj"/>
         <ProjectReference Include="..\Modules\Currency\Currency.Entities\Currency.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Product\Product.Entities\Product.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Storage\Storage.Entities\Storage.Entities.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

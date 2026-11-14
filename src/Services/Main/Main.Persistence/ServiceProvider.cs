@@ -27,7 +27,7 @@ public static class ServiceProvider
 			typeof(BasicEfRepository<,>),
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
-			typeof(Main.Entities.Storage.StorageContent).Assembly,
+			typeof(Main.Entities.User.User).Assembly,
 			typeof(Product).Assembly,
 			typeof(Main.Entities.Currency.Currency).Assembly,
 			typeof(InAppNotification).Assembly,

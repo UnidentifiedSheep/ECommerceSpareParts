@@ -25,8 +25,6 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>,
 	[ValidateTuple("PK")]
 	public Guid UserId { get; }
 
-	public User.User User { get; private set; } = null!;
-
 	public Storage Storage { get; private set; } = null!;
 
 	public static Expression<Func<StorageOwner, (string, Guid)>> GetKeySelector()

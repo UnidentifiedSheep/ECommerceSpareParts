@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Main.Entities.Storage;
 using Domain.CommonEntities;
 using Domain.Interfaces;
 using SchemaGeneration.Abstractions.Attributes;

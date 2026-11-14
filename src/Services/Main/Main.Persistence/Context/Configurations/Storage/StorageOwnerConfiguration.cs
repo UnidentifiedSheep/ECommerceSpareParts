@@ -24,7 +24,7 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
 		builder.Property(e => e.UserId).HasColumnName("user_id");
 
 		builder
-			.HasOne(d => d.User)
+			.HasOne<Main.Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.HasConstraintName("storage_owners_users_id_fk");

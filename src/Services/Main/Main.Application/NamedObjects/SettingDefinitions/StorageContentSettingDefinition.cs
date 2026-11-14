@@ -5,6 +5,7 @@ using Application.Common.NamedObject;
 using Exceptions;
 using Locan.Core.Interfaces;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
+using Main.Entities.Storage;
 using Main.Entities;
 using Main.Entities.Settings;
 using NamedObject.Core.Interfaces;

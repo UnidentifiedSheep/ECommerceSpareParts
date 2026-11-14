@@ -4,6 +4,7 @@ using Application.Common.Validators;
 using FluentValidation;
 using Main.Application.Handlers.BaseValidators;
 using Main.Entities;
+using Main.Entities.Storage;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
 

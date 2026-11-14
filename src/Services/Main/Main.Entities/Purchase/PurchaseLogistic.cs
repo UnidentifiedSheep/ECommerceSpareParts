@@ -4,6 +4,7 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 using Main.Entities.Balance;
+using Main.Entities.Storage;
 using Main.Enums;
 
 namespace Main.Entities.Purchase;
