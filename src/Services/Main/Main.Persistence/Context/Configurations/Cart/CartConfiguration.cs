@@ -32,7 +32,7 @@ public class CartConfiguration : IEntityTypeConfiguration<Entities.Cart.Cart>
 
 		builder
 			.HasOne<Entities.User.User>()
-			.WithMany(p => p.CartItems)
+			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.HasConstraintName("cart_users_id_fk");
 	}

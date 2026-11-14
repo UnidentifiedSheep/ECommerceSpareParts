@@ -3234,48 +3234,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("user_phones", "auth");
                 });
 
-            modelBuilder.Entity("Main.Entities.User.UserSearchHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Query")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("query");
-
-                    b.Property<DateTime>("SearchDateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("search_date_time");
-
-                    b.Property<string>("SearchPlace")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("search_place");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("user_search_history_pk");
-
-                    b.HasIndex("SearchDateTime")
-                        .HasDatabaseName("user_search_history_search_date_time_index");
-
-                    b.HasIndex("SearchPlace")
-                        .HasDatabaseName("user_search_history_search_place_index");
-
-                    b.HasIndex("UserId", "SearchPlace")
-                        .HasDatabaseName("user_search_history_user_id_search_place_index");
-
-                    b.ToTable("user_search_history", "public");
-                });
-
             modelBuilder.Entity("Main.Entities.User.UserVehicle", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4314,7 +4272,7 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("cart_product_id_fk");
 
                     b.HasOne("Main.Entities.User.User", null)
-                        .WithMany("CartItems")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -5035,7 +4993,7 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.User.UserNotificationPreference", b =>
                 {
                     b.HasOne("Main.Entities.User.User", null)
-                        .WithMany("NotificationPreferences")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -5054,26 +5012,14 @@ namespace Main.Migrator.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Main.Entities.User.UserSearchHistory", b =>
+            modelBuilder.Entity("Main.Entities.User.UserVehicle", b =>
                 {
                     b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("user_search_history_users_id_fk");
-                });
-
-            modelBuilder.Entity("Main.Entities.User.UserVehicle", b =>
-                {
-                    b.HasOne("Main.Entities.User.User", "User")
-                        .WithMany("Vehicles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("user_vehicles_users_id_fk");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Main.Persistence.ReadModels.UserSearchDocument", b =>
@@ -5245,11 +5191,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.User.User", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("Emails");
-
-                    b.Navigation("NotificationPreferences");
 
                     b.Navigation("Permissions");
 
@@ -5258,8 +5200,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Roles");
 
                     b.Navigation("UserInfo");
-
-                    b.Navigation("Vehicles");
                 });
 
             modelBuilder.Entity("Notification.Core.Entities.Notification", b =>

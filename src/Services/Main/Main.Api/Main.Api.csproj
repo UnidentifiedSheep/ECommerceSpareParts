@@ -37,6 +37,7 @@
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
         <ProjectReference Include="..\Modules\Currency\Currency.Module\Currency.Module.csproj"/>
         <ProjectReference Include="..\Modules\Product\Product.Module\Product.Module.csproj"/>
+        <ProjectReference Include="..\Modules\Identity\Identity.Module\Identity.Module.csproj"/>
         <ProjectReference Include="..\Modules\Storage\Storage.Module\Storage.Module.csproj"/>
         <ProjectReference Include="..\Modules\Pricing\Pricing.Module\Pricing.Module.csproj"/>
         <ProjectReference Include="..\Modules\Pricing\Pricing.Api\Pricing.Api.csproj"/>
@@ -74,6 +75,10 @@
                        CopyToOutput="true"/>
 
         <LocanResource Include="../Modules/Storage/Storage.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Identity/Identity.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 

@@ -20,7 +20,7 @@ public class UserNotificationPreferenceConfiguration : IEntityTypeConfiguration<
 
 		builder
 			.HasOne<Entities.User.User>()
-			.WithMany(user => user.NotificationPreferences)
+			.WithMany()
 			.HasForeignKey(e => e.UserId)
 			.OnDelete(DeleteBehavior.Cascade)
 			.HasConstraintName("user_notification_preferences_users_id_fk");

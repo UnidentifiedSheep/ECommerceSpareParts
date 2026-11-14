@@ -43,8 +43,8 @@ public class UserVehicleConfiguration : IEntityTypeConfiguration<UserVehicle>
 		builder.Property(e => e.Vin).HasMaxLength(50).HasColumnName("vin");
 
 		builder
-			.HasOne(e => e.User)
-			.WithMany(p => p.Vehicles)
+			.HasOne<Entities.User.User>()
+			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.HasConstraintName("user_vehicles_users_id_fk");
 	}

@@ -45,8 +45,6 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
 
 	public string? Comment { get; private set; }
 
-	public User User { get; private set; } = null!;
-
 	public static Expression<Func<UserVehicle, Guid>> GetKeySelector() => x => x.Id;
 
 	public static Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;

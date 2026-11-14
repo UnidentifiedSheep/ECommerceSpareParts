@@ -12,7 +12,6 @@ using Notification.Persistence;
 using Persistence.Common;
 using Persistence.Context;
 using Persistence.Extensions;
-using UserRepository = Main.Persistence.Repositories.User.UserRepository;
 using Main.Entities.Storage;
 
 namespace Main.Persistence;
@@ -28,6 +27,7 @@ public static class ServiceProvider
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
 			typeof(Main.Entities.User.User).Assembly,
+			typeof(Main.Entities.User.UserVehicle).Assembly,
 			typeof(Product).Assembly,
 			typeof(Main.Entities.Currency.Currency).Assembly,
 			typeof(Main.Entities.Storage.StorageContent).Assembly,
@@ -36,7 +36,6 @@ public static class ServiceProvider
 			typeof(JobSchedule).Assembly);
 		collection.AddNotificationPersistence<UnifiedDbContext>();
 
-		collection.AddScoped<IUserRepository, UserRepository>();
 		collection.AddScoped<ISaleRepository, SaleRepository>();
 
 		return collection;

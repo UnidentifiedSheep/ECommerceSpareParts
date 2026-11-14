@@ -1,5 +1,6 @@
 using Exceptions;
 using FluentAssertions;
+using Main.Entities.User;
 
 namespace Tests.Domain.User;
 
@@ -8,17 +9,20 @@ public class UserVehicleAggregateTests
 	[Fact]
 	public void AddUserVehicle_ValidData_AddsVehicle()
 	{
-		var user = Main.Entities.User.User.Create("test-user", "hash");
+		var userId = Guid.NewGuid();
+		var vehicles = new List<UserVehicle>();
 		var vehicleId = Guid.NewGuid();
 
-		user.AddUserVehicle(
+		vehicles.AddUserVehicle(
+			userId,
+			
 			vehicleId,
 			"a123bc",
 			"vin",
 			"comment");
 
-		user.Vehicles.Should().ContainSingle();
-		var vehicle = user.Vehicles.Single();
+		vehicles.Should().ContainSingle();
+		var vehicle = vehicles.Single();
 		vehicle.VehicleId.Should().Be(vehicleId);
 		vehicle.PlateNumber.Should().Be("A123BC");
 		vehicle.Vin.Should().Be("VIN");
@@ -28,53 +32,60 @@ public class UserVehicleAggregateTests
 	[Fact]
 	public void AddUserVehicle_DuplicatePlateNumber_Throws()
 	{
-		var user = Main.Entities.User.User.Create("test-user", "hash");
-		user.AddUserVehicle(Guid.NewGuid(), "a123bc");
+		var userId = Guid.NewGuid();
+		var vehicles = new List<UserVehicle>();
+		vehicles.AddUserVehicle(
+			userId,
+			Guid.NewGuid(),
+			"a123bc");
 
-		var act = () => user.AddUserVehicle(Guid.NewGuid(), " A123BC ");
+		var act = () => vehicles.AddUserVehicle(
+			userId,
+			Guid.NewGuid(),
+			" A123BC ");
 
 		act.Should().Throw<InvalidInputException>();
-		user.Vehicles.Should().ContainSingle();
+		vehicles.Should().ContainSingle();
 	}
 
 	[Fact]
 	public void AddUserVehicle_DuplicateVin_Throws()
 	{
-		var user = Main.Entities.User.User.Create("test-user", "hash");
-		user.AddUserVehicle(
+		var userId = Guid.NewGuid();
+		var vehicles = new List<UserVehicle>();
+		vehicles.AddUserVehicle(
+			userId,
+			
 			Guid.NewGuid(),
 			"a123bc",
 			"vin");
 
-		var act = () => user.AddUserVehicle(
+		var act = () => vehicles.AddUserVehicle(
+			userId,
+			
 			Guid.NewGuid(),
 			"b321ca",
 			" VIN ");
 
 		act.Should().Throw<InvalidInputException>();
-		user.Vehicles.Should().ContainSingle();
+		vehicles.Should().ContainSingle();
 	}
 
 	[Fact]
 	public void AddUserVehicle_NullVin_AllowsMultipleVehicles()
 	{
-		var user = Main.Entities.User.User.Create("test-user", "hash");
+		var userId = Guid.NewGuid();
+		var vehicles = new List<UserVehicle>();
 
-		user.AddUserVehicle(Guid.NewGuid(), "a123bc");
-		user.AddUserVehicle(Guid.NewGuid(), "b321ca");
+		vehicles.AddUserVehicle(
+			userId,
+			Guid.NewGuid(),
+			"a123bc");
+		vehicles.AddUserVehicle(
+			userId,
+			Guid.NewGuid(),
+			"b321ca");
 
-		user.Vehicles.Should().HaveCount(2);
-	}
-
-	[Fact]
-	public void RemoveUserVehicle_RemovesByVehicleId()
-	{
-		var user = Main.Entities.User.User.Create("test-user", "hash");
-		var vehicleId = Guid.NewGuid();
-		user.AddUserVehicle(vehicleId, "a123bc");
-
-		user.RemoveUserVehicle(vehicleId);
-
-		user.Vehicles.Should().BeEmpty();
+		vehicles.Should().HaveCount(2);
 	}
 }

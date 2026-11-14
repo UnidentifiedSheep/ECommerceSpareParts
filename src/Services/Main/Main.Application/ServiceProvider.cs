@@ -14,7 +14,6 @@ using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Interfaces.Services.Document;
-using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.JobProviders;
 using Main.Application.Lrts.ProducerImport;
 using Main.Application.Models.Options;
@@ -30,7 +29,6 @@ using Main.Application.Services.Logistics;
 using Main.Application.Services.ProductDeletion;
 using Main.Modules.Product.Abstractions;
 using Main.Application.Services.Logistics.PricingStrategies;
-using Main.Application.Services.PayloadProvider;
 using Main.Application.Services.Storage;
 using Main.Entities.Balance;
 using Microsoft.Extensions.Configuration;
@@ -63,10 +61,10 @@ public static class ServiceProvider
 			.WithRegisteredBackplane()
 			.WithSystemTextJsonSerializer();
 
-		collection.AddSingleton<IJwtGenerator, JwtGenerator>();
 		collection.RegisterProjectionProviders(typeof(Global).Assembly);
 
 		collection.AddScoped<IAppLinkProvider, AppLinkProvider>();
+		collection.AddScoped<IAuthLinkProvider>(provider => provider.GetRequiredService<IAppLinkProvider>());
 
 		//order is important
 		collection.AddSingleton<IDocumentTemplateSource, S3DocumentTemplateSource>();
@@ -93,8 +91,6 @@ public static class ServiceProvider
 		collection.AddScoped<ISaleAnalyticsSynchronizer, SaleAnalyticsSynchronizer>();
 		collection.AddScoped<ISaleContentAnalyticsCalculator, SaleContentAnalyticsCalculator>();
 
-		collection.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();
-		collection.AddScoped<IVerificationPayloadProvider, VerificationPayloadProvider>();
 
 		collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
 		collection.AddScoped<IProductDeletionRule, SaleContentProductDeletionRule>();
@@ -109,7 +105,6 @@ public static class ServiceProvider
 			configuration,
 			typeof(Global).Assembly);
 
-		collection.AddSingleton<IEmailValidator, EmailValidator>();
 		collection.AddScoped<ISupplierSettingSource, SupplierSettingSource>();
 
 		SortByConfig.Configure();

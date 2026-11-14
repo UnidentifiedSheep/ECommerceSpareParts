@@ -35,6 +35,7 @@
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Pricing\Pricing.Entities\Pricing.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
     </ItemGroup>
 
 </Project>

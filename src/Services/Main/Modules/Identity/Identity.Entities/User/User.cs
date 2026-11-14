@@ -1,0 +1,218 @@
+using System.Linq.Expressions;
+using System.Net;
+using BulkValidation.Core.Attributes;
+using Domain;
+using Domain.Interfaces;
+using Domain.Validation;
+using Exceptions;
+using Main.Entities.Auth;
+using Main.Entities.DomainEvents.User;
+using Main.Entities.Exceptions;
+using Main.Entities.User.ValueObjects;
+using Main.Enums;
+
+namespace Main.Entities.User;
+
+public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
+{
+	private readonly List<UserEmail> _emails = [];
+
+	private readonly List<UserPermission> _permissions = [];
+
+	private readonly List<UserPhone> _phones = [];
+
+	private readonly List<UserRole> _roles = [];
+
+	private User()
+	{
+	}
+
+	private User(UserName userName, string passwordHash)
+	{
+		Id = Guid.NewGuid();
+		UserName = userName;
+		PasswordHash = passwordHash;
+	}
+
+	[Validate]
+	public Guid Id { get; }
+
+	[ValidateComplex]
+	public UserName UserName { get; private set; } = null!;
+
+	public string PasswordHash { get; private set; } = null!;
+
+	public bool TwoFactorEnabled { get; private set; }
+
+	public DateTime? LockoutEnd { get; private set; }
+
+	public int AccessFailedCount { get; private set; }
+
+	public DateTime? LastLoginAt { get; private set; }
+
+	public UserInfo? UserInfo { get; private set; }
+
+	public IReadOnlyList<UserEmail> Emails => _emails;
+
+	public IReadOnlyList<UserPermission> Permissions => _permissions;
+
+	public IReadOnlyList<UserPhone> Phones => _phones;
+
+	public IReadOnlyList<UserRole> Roles => _roles;
+
+	public static Expression<Func<User, Guid>> GetKeySelector() => x => x.Id;
+
+	public static Expression<Func<User, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
+
+	public static User Create(UserName userName, string passwordHash) => new(userName, passwordHash);
+
+	public void EnableTwoFactor(bool enabled) => TwoFactorEnabled = enabled;
+
+	public void SetUserInfo(
+		string name,
+		string surname,
+		string? description)
+	{
+		if (UserInfo != null)
+			UserInfo.Update(
+				name,
+				surname,
+				description);
+		else
+			UserInfo = UserInfo.Create(
+				Id,
+				name,
+				surname,
+				description);
+	}
+
+	public void AddRole(string roleName)
+	{
+		if (_roles.Any(r => r.RoleName == RoleNames.Normalize(roleName)))
+			return;
+		_roles.Add(UserRole.Create(Id, roleName));
+	}
+
+	public void AddEmail(
+		Email email,
+		EmailType emailType,
+		bool isPrimary,
+		bool isConfirmed)
+	{
+		if (_emails.Any(x => x.Email.Value == email.Value))
+			throw new InvalidInputException(UserHaveDuplicateEmailMessage.Instance);
+		if (isPrimary && _emails.Any(x => x.IsPrimary))
+			throw new InvalidInputException(UserEmailPrimaryCountMessage.Instance);
+
+		var userEmail = UserEmail.Create(
+			Id,
+			email,
+			emailType);
+		userEmail.MakePrimary(isPrimary);
+		userEmail.Confirm(isConfirmed);
+		_emails.Add(userEmail);
+	}
+
+	public void AddEmail(
+		Email email,
+		EmailType emailType,
+		int maxEmailCount)
+	{
+		if (_emails.Count >= maxEmailCount)
+			throw new InvalidInputException(new UserMaxEmailCountMessage().WithCount(maxEmailCount));
+
+		AddEmail(
+			email,
+			emailType,
+			false,
+			false);
+	}
+
+	public void AddUserPhone(
+		string phoneNumber,
+		PhoneType phoneType,
+		bool isPrimary,
+		bool isConfirmed)
+	{
+		var normalizedPhone = UserPhone.ToNormalizedPhone(phoneNumber);
+		if (_phones.Any(x => x.NormalizedPhone == normalizedPhone))
+			throw new InvalidInputException(UserHaveDuplicatePhoneMessage.Instance);
+		if (isPrimary && _phones.Any(x => x.IsPrimary))
+			throw new InvalidInputException(UserPhonePrimaryCountMessage.Instance);
+
+		var userPhone = UserPhone.Create(
+			Id,
+			phoneNumber,
+			phoneType);
+		userPhone.MakePrimary(isPrimary);
+		userPhone.Confirm(isConfirmed);
+		_phones.Add(userPhone);
+	}
+
+	public void RemoveUserPhone(string phoneNumber)
+	{
+		var normalizedPhone = UserPhone.ToNormalizedPhone(phoneNumber);
+		_phones.RemoveAll(x => x.NormalizedPhone == normalizedPhone);
+	}
+
+	public void RemoveEmail(Email email, int minEmailCount)
+	{
+		var userEmail = _emails.SingleOrDefault(x => x.Email.Value == email.Value) ??
+			throw new UserEmailNotFoundException(email.Value);
+
+		if (userEmail.IsPrimary)
+			throw new InvalidInputException(UserEmailPrimaryCannotDeleteMessage.Instance);
+
+		if (_emails.Count - 1 < minEmailCount)
+			throw new InvalidInputException(new UserMinEmailCountMessage().WithCount(minEmailCount));
+
+		_emails.Remove(userEmail);
+	}
+
+	public void MakeEmailPrimary(Email email)
+	{
+		var userEmail = _emails.SingleOrDefault(x => x.Email.Value == email.Value) ??
+			throw new UserEmailNotFoundException(email.Value);
+
+		if (!userEmail.Confirmed)
+			throw new InvalidInputException(UserEmailPrimaryMustBeConfirmedMessage.Instance);
+
+		if (userEmail.IsPrimary)
+			return;
+
+		foreach (var currentPrimary in _emails.Where(x => x.IsPrimary))
+			currentPrimary.MakePrimary(false);
+
+		userEmail.MakePrimary();
+	}
+
+	public void SetPasswordHash(string passwordHash)
+		=> PasswordHash = passwordHash.EnsureNotNullOrWhiteSpace(() =>
+			new InvalidOperationException("Password hash must not be null or empty."));
+
+	public void Login(IPAddress? ipAddress, string? userAgent)
+	{
+		LastLoginAt = DateTime.UtcNow;
+		AddDomainEvent(
+			new UserLoggedInDomainEvent(
+				Id,
+				LastLoginAt.Value,
+				ipAddress,
+				userAgent));
+	}
+
+	public void Register()
+		=> AddDomainEvent(
+			new UserCreatedDomainEvent(
+				Id,
+				UserInfo!.Name,
+				UserInfo.Surname));
+
+	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(Id));
+
+	public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(Id));
+
+	public override void OnDeleted() => AddDomainEvent(new UserUpdatedDomainEvent(Id));
+
+	public override Guid GetId() => Id;
+}

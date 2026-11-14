@@ -15,8 +15,6 @@
     "lrt.expired.documents.removal.description": "Удаляет документы с истёкшим сроком хранения.",
     "lrt.service.task.run.name": "Запуск задачи сервиса",
     "lrt.service.task.run.description": "Запускает задачу в выбранном сервисе.",
-    "lrt.user.tokens.clear.expired.name": "Очистка просроченных токенов",
-    "lrt.user.tokens.clear.expired.description": "Удаляет токены пользователей с истёкшим сроком действия.",
     "lrt.markup.calculation.name": "Расчет наценок",
     "lrt.markup.calculation.description": "Рассчитывает рекомендуемые диапазоны наценок.",
     "markup.calculation.input.invalid": "Переданы некорректные входные данные для расчета наценки.",

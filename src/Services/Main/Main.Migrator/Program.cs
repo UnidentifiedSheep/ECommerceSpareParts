@@ -4,6 +4,7 @@ using Main.Migrator;
 using Main.Migrator.DataSeeds;
 using Main.Modules.Currency.Persistence;
 using Main.Modules.Product.Persistence;
+using Main.Modules.Identity.Persistence;
 using Main.Modules.Storage.Persistence;
 using Pricing.Persistence;
 using Main.Persistence;
@@ -40,6 +41,7 @@ builder.ConfigureServices((context, services) =>
 	services.AddDbContextModule<MainDbContextModule>();
 	services.AddCurrencyPersistence();
 	services.AddDbContextModule<ProductDbContextModule>();
+	services.AddDbContextModule<IdentityDbContextModule>();
 	services.AddDbContextModule<StorageDbContextModule>();
 	services.AddDbContextModule<PricingDbContextModule>();
 	services.AddDbContext<UnifiedDbContext>((sp, options) =>

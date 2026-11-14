@@ -15,8 +15,6 @@
     "lrt.expired.documents.removal.description": "Saklama süresi dolan belgeleri siler.",
     "lrt.service.task.run.name": "Servis görevi başlatma",
     "lrt.service.task.run.description": "Seçilen serviste bir görev çalıştırır.",
-    "lrt.user.tokens.clear.expired.name": "Süresi dolmuş tokenları temizleme",
-    "lrt.user.tokens.clear.expired.description": "Geçerlilik süresi dolmuş kullanıcı tokenlarını siler.",
     "lrt.markup.calculation.name": "Kâr marjı hesaplama",
     "lrt.markup.calculation.description": "Önerilen kâr marjı aralıklarını hesaplar.",
     "markup.calculation.input.invalid": "Geçersiz kâr marjı hesaplama verileri sağlandı.",
