@@ -1,26 +1,25 @@
 using Application.Common.Interfaces.Cache;
 using Application.Common.Interfaces.Repositories;
 using Cache.Extensions;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Static;
 using Main.Entities.User;
+using Main.Modules.Identity.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Notification.Core.Interfaces.Recipient;
 using Notification.Core.Recipients;
 
-namespace Main.Cache;
+namespace Main.Application.Services;
 
 public class RecipientProvider(
 	ICache cache,
 	IReadRepository<UserNotificationPreference, UserNotificationPreferenceKey> preferenceRepository,
-	IReadRepository<UserEmail, string> emailRepository
+	IUserEmailLookup emailLookup
 ) : IRecipientProvider
 {
 	public Task InvalidateUserRecipients(Guid userId)
-		=> cache.RemoveKeyAsync(CacheKeys.UserCache.NotificationRecipients(userId));
+		=> cache.RemoveKeyAsync(NotificationCacheKeys.NotificationRecipients(userId));
 
 	public Task InvalidateUsersRecipients(IEnumerable<Guid> userIds)
-		=> cache.RemoveKeysAsync(userIds.Select(CacheKeys.UserCache.NotificationRecipients));
+		=> cache.RemoveKeysAsync(userIds.Select(NotificationCacheKeys.NotificationRecipients));
 
 	public async Task<IReadOnlyCollection<INotificationRecipient>> ResolveAsync(
 		Guid userId,
@@ -76,10 +75,10 @@ public class RecipientProvider(
 
 		return cache.GetOrSetManyAsync(
 			userIds,
-			CacheKeys.UserCache.NotificationRecipients,
+			NotificationCacheKeys.NotificationRecipients,
 			entry => entry.UserId,
 			missingIds => LoadMissingAsync(missingIds, cancellationToken),
-			CacheKeys.UserCache.Ttl);
+			NotificationCacheKeys.Ttl);
 	}
 
 	private async Task<Dictionary<Guid, CachedNotificationRecipients>> LoadMissingAsync(
@@ -91,10 +90,7 @@ public class RecipientProvider(
 			.Where(preference => missingIds.Contains(preference.UserId) && preference.Enabled)
 			.ToListAsync(cancellationToken);
 
-		var emails = await emailRepository.Query
-			.AsNoTracking()
-			.Where(email => missingIds.Contains(email.UserId) && email.IsPrimary && email.Confirmed)
-			.ToListAsync(cancellationToken);
+		var emailsByUser = await emailLookup.GetPrimaryConfirmedEmailsAsync(missingIds, cancellationToken);
 
 		var channelsByUser = preferences
 			.GroupBy(preference => preference.UserId)
@@ -103,12 +99,6 @@ public class RecipientProvider(
 				group => group
 					.Select(preference => preference.ChannelName)
 					.ToList());
-
-		var emailsByUser = emails
-			.GroupBy(email => email.UserId)
-			.ToDictionary(
-				group => group.Key,
-				group => group.First().Email.Value);
 
 		var result = new Dictionary<Guid, CachedNotificationRecipients>(missingIds.Count);
 

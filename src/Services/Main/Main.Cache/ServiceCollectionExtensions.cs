@@ -10,7 +10,6 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddScoped<IDocumentLinkProvider, DocumentLinkProvider>();
 		services.AddScoped<IOneTimeTokenStore, OneTimeTokenStore>();
-		services.AddScoped<IRecipientProvider, RecipientProvider>();
 
 		return services;
 	}

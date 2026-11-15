@@ -17,12 +17,5 @@ public class UserNotificationPreferenceConfiguration : IEntityTypeConfiguration<
 		builder.Property(e => e.UserId).HasColumnName("user_id");
 		builder.Property(e => e.ChannelName).HasMaxLength(128).HasColumnName("channel_name");
 		builder.Property(e => e.Enabled).HasColumnName("enabled");
-
-		builder
-			.HasOne<Entities.User.User>()
-			.WithMany()
-			.HasForeignKey(e => e.UserId)
-			.OnDelete(DeleteBehavior.Cascade)
-			.HasConstraintName("user_notification_preferences_users_id_fk");
 	}
 }

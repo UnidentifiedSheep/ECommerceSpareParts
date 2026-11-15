@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
 			.RegisterNamedObject<ILrtNamedObject>(assembly);
 
 		services.AddScoped<IUserChecks, UserChecks>();
+		services.AddScoped<IUserEmailLookup, UserEmailLookup>();
 		services.AddSingleton<IJwtGenerator, JwtGenerator>();
 		services.AddSingleton<IEmailValidator, EmailValidator>();
 		services.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();

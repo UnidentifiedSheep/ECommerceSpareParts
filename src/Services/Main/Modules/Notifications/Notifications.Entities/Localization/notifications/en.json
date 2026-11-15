@@ -5,8 +5,6 @@
     "InAppChannel": "In-app",
     "notifications.channel.not.found": "Channel \"{ChannelName|string}\" not found.",
     "notifications.channel.duplicate": "Notification channels must not be repeated.",
-    "notifications.see.too.many": "You can mark at most 100 notifications as read at once.",
-    "notifications.document.generated.title": "Document ready",
-    "notifications.document.generated.text": "The document {DocumentName|string} is ready: {DocumentUrl|string}"
+    "notifications.see.too.many": "You can mark at most 100 notifications as read at once."
   }
 }

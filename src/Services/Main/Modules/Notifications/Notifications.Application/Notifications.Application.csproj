@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <AssemblyName>Main.Modules.Notifications.Application</AssemblyName>
+        <RootNamespace>Main.Modules.Notifications.Application</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>
+        <PackageReference Include="MassTransit" Version="8.5.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2"/>
+        <PackageReference Include="Scrutor" Version="7.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\..\Identity\Identity.Abstractions\Identity.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Cache\Cache.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Notifications\Notification.Core\Notification.Core.csproj"/>
+        <ProjectReference Include="..\Notifications.Entities\Notifications.Entities.csproj"/>
+    </ItemGroup>
+
+</Project>

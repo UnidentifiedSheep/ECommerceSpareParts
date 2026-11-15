@@ -1,6 +1,6 @@
 using Notification.Core.Interfaces.Recipient;
 
-namespace Main.Application.Interfaces.Cache;
+namespace Main.Application.Services;
 
 public interface IRecipientProvider : IRecipientResolver
 {

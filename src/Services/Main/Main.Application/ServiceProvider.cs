@@ -31,7 +31,6 @@ using Main.Entities.Balance;
 using Main.Modules.Organization.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Notification.Core.Interfaces.Recipient;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application;
@@ -72,9 +71,6 @@ public static class ServiceProvider
 		collection.AddSingleton<IDocumentTemplateCache, DocumentTemplateCache>();
 		collection.AddSingleton<IDocumentProvider, ExcelDocumentProvider>();
 		collection.AddSingleton<IDocumentTemplateResolver, DocumentTemplateResolver>();
-
-		collection.AddScoped<IRecipientResolver>(provider
-			=> provider.GetRequiredService<IRecipientProvider>());
 
 		collection.RegisterSettingsService();
 

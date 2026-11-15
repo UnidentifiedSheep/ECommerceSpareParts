@@ -1,12 +1,12 @@
 using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
+using Main.Modules.Identity.Abstractions;
 
 namespace Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 
-public class
-	UpsertNotificationPreferencesDbValidation : AbstractDbValidation<UpsertNotificationPreferencesCommand>
+public class UpsertNotificationPreferencesDbValidation(IUserChecks userChecks)
+	: AbstractDbValidation<UpsertNotificationPreferencesCommand>
 {
 	public override void Build(IValidationPlan plan, UpsertNotificationPreferencesCommand request)
-		=> plan.ValidateUserExistsId(request.UserId);
+		=> userChecks.Exists(plan, request.UserId);
 }

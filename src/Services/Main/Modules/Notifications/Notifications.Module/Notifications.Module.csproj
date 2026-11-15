@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Notifications.Module</AssemblyName>
+        <RootNamespace>Main.Modules.Notifications</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Notifications.Application\Notifications.Application.csproj"/>
+        <ProjectReference Include="..\Notifications.Persistence\Notifications.Persistence.csproj"/>
+    </ItemGroup>
+
+</Project>
