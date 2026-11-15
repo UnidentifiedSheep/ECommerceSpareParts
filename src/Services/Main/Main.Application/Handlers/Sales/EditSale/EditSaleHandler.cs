@@ -35,9 +35,8 @@ public record EditSaleCommand(
 	bool ForcePayment = false) : ICommand;
 
 public class EditSaleHandler(
-	ISender sender,
+	IFinanceTransfers transfers,
 	ISaleRepository saleRepository,
-	IOptions<SystemOptions> systemOptions,
 	ISaleService saleService,
 	IUnitOfWork unitOfWork) : ICommandHandler<EditSaleCommand>
 {
@@ -60,15 +59,16 @@ public class EditSaleHandler(
 
 		await ReverseSaleTransaction(sale, cancellationToken);
 
-		var transaction = await CreateSaleTransaction(
+		var totalSum = contentDtos.Sum(x => x.PriceWithDiscount * x.Count);
+		var transactionId = await CreateSaleTransaction(
 			sale.OrganizationId,
-			contentDtos.Sum(x => x.PriceWithDiscount * x.Count),
+			totalSum,
 			request.CurrencyId,
 			request.SaleDateTime,
 			request.ForcePayment,
 			cancellationToken);
 
-		sale.SetTransactionId(transaction.Id);
+		sale.SetTransactionId(transactionId);
 		sale.SetCurrency(request.CurrencyId);
 		sale.SetDateTime(request.SaleDateTime);
 		sale.SetComment(request.Comment);
@@ -79,37 +79,33 @@ public class EditSaleHandler(
 			false,
 			cancellationToken);
 
+		if (sale.CalculateTotal() != totalSum)
+			throw new InvalidOperationException("Sale total does not match the charged amount");
+
 		await unitOfWork.SaveChangesAsync(cancellationToken);
 
 		return Unit.Value;
 	}
 
-	private async Task ReverseSaleTransaction(Sale sale, CancellationToken cancellationToken)
-		=> await sender.Send(
-			new ReverseTransactionCommand(
-				sale.TransactionId,
-				TransactionReversalMode.System,
-				true),
-			cancellationToken);
+	private Task ReverseSaleTransaction(Sale sale, CancellationToken cancellationToken)
+		=> transfers.ReverseAsync(sale.TransactionId, cancellationToken);
 
-	private async Task<Transaction> CreateSaleTransaction(
+	private Task<Guid> CreateSaleTransaction(
 		Guid organizationId,
 		decimal amount,
 		int currencyId,
 		DateTime transactionDateTime,
 		bool forcePayment,
 		CancellationToken cancellationToken)
-		=> (await sender.Send(
-			new CreateTransactionCommand(
-				systemOptions.Value.SystemId,
-				organizationId,
-				amount,
-				currencyId,
-				transactionDateTime,
-				TransactionSourceType.Sale,
-				TransactionCreationMode.System,
-				forcePayment),
-			cancellationToken)).Transaction;
+		=> transfers.TransferAsync(
+			transfers.SystemOrganizationId,
+			organizationId,
+			amount,
+			currencyId,
+			transactionDateTime,
+			TransactionSourceType.Sale,
+			forcePayment,
+			cancellationToken);
 
 	private async Task UpdateContents(
 		Sale sale,

@@ -1,16 +1,12 @@
 using System.Data;
-using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Main.Application.Dtos.Sale;
-using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Sale;
 using Main.Enums;
 using Main.Enums.Balances;
-using MediatR;
-using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
@@ -33,8 +29,7 @@ public record CreateSaleCommand(
 public record CreateSaleResult(Guid SaleId);
 
 public class CreateSaleHandler(
-	ISender sender,
-	IOptions<SystemOptions> systemOptions,
+	IFinanceTransfers transfers,
 	IUnitOfWork unitOfWork,
 	ISaleService saleService) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
@@ -42,39 +37,35 @@ public class CreateSaleHandler(
 	{
 		var contents = request.Contents.ToList();
 
-		var systemId = systemOptions.Value.SystemId;
+		var systemId = transfers.SystemOrganizationId;
 
 		var totalSum = contents.Sum(x => x.DiscountedPrice * x.Count);
 
 		if (request.PayedSum > 0)
-			await sender.Send(
-				new CreateTransactionCommand(
-					request.OrganizationId,
-					systemId,
-					request.PayedSum.Value,
-					request.CurrencyId,
-					request.SaleDateTime,
-					TransactionSourceType.Manual,
-					TransactionCreationMode.System,
-					request.ForcePayment),
-				cancellationToken);
-
-		var saleTransaction = (await sender.Send(
-			new CreateTransactionCommand(
-				systemId,
+			await transfers.TransferAsync(
 				request.OrganizationId,
-				totalSum,
+				systemId,
+				request.PayedSum.Value,
 				request.CurrencyId,
 				request.SaleDateTime,
-				TransactionSourceType.Sale,
-				TransactionCreationMode.System,
-				request.ForcePayment),
-			cancellationToken)).Transaction;
+				TransactionSourceType.Manual,
+				request.ForcePayment,
+				cancellationToken);
+
+		var saleTransactionId = await transfers.TransferAsync(
+			systemId,
+			request.OrganizationId,
+			totalSum,
+			request.CurrencyId,
+			request.SaleDateTime,
+			TransactionSourceType.Sale,
+			request.ForcePayment,
+			cancellationToken);
 
 		var sale = Sale.Create(
 			request.UserId,
 			request.OrganizationId,
-			saleTransaction.Id,
+			saleTransactionId,
 			request.CurrencyId,
 			request.StorageCode,
 			request.SaleDateTime);
@@ -89,6 +80,9 @@ public class CreateSaleHandler(
 
 		foreach (var content in distributed)
 			sale.AddContent(content);
+
+		if (sale.CalculateTotal() != totalSum)
+			throw new InvalidOperationException("Sale total does not match the charged amount");
 
 		sale.Complete();
 

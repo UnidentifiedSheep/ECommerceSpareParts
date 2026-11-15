@@ -1,11 +1,9 @@
 using System.Data;
-using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
-using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Purchase;
@@ -13,7 +11,6 @@ using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
-using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
@@ -37,29 +34,27 @@ public record CreatePurchaseResult(Guid PurchaseId);
 
 public class CreatePurchaseHandler(
 	ISender sender,
-	IOptions<SystemOptions> systemOptions,
+	IFinanceTransfers transfers,
 	IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
 	public async Task<CreatePurchaseResult> Handle(
 		CreatePurchaseCommand request,
 		CancellationToken cancellationToken)
 	{
-		var systemId = systemOptions.Value.SystemId;
+		var systemId = transfers.SystemOrganizationId;
 
 		var purchaseContents = request.PurchaseContent.ToList();
 
 		var totalSum = purchaseContents.Sum(x => x.Price * x.Count);
 
-		var purchaseTransaction = (await sender.Send(
-			new CreateTransactionCommand(
-				request.SupplierOrganizationId,
-				systemId,
-				totalSum,
-				request.CurrencyId,
-				request.PurchaseDate,
-				TransactionSourceType.Purchase,
-				TransactionCreationMode.System),
-			cancellationToken)).Transaction;
+		var purchaseTransactionId = await transfers.TransferAsync(
+			request.SupplierOrganizationId,
+			systemId,
+			totalSum,
+			request.CurrencyId,
+			request.PurchaseDate,
+			TransactionSourceType.Purchase,
+			cancellationToken: cancellationToken);
 
 		var storageContents = await AddContentsToStorage(request, cancellationToken);
 
@@ -67,22 +62,20 @@ public class CreatePurchaseHandler(
 
 		var purchase = await CreatePurchase(
 			request,
-			purchaseTransaction.Id,
+			purchaseTransactionId,
 			purchaseContents,
 			storageContents,
 			cancellationToken);
 
 		if (request.PayedSum > 0)
-			await sender.Send(
-				new CreateTransactionCommand(
-					systemId,
-					request.SupplierOrganizationId,
-					request.PayedSum.Value,
-					request.CurrencyId,
-					request.PurchaseDate,
-					TransactionSourceType.Manual,
-					TransactionCreationMode.System,
-					request.ForcePayment),
+			await transfers.TransferAsync(
+				systemId,
+				request.SupplierOrganizationId,
+				request.PayedSum.Value,
+				request.CurrencyId,
+				request.PurchaseDate,
+				TransactionSourceType.Manual,
+				request.ForcePayment,
 				cancellationToken);
 
 		await unitOfWork.SaveChangesAsync(cancellationToken);

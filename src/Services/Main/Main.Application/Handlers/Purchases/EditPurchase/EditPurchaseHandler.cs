@@ -40,8 +40,8 @@ public record EditPurchaseCommand(
 
 public class EditPurchaseHandler(
 	ISender sender,
+	IFinanceTransfers transfers,
 	IRepository<Purchase, Guid> purchaseRepository,
-	IOptions<SystemOptions> systemOptions,
 	IRepository<StorageContent, int> storageContentRepository,
 	ICurrencyConverter currencyConverter,
 	IStorageContentService storageContentService,
@@ -56,7 +56,7 @@ public class EditPurchaseHandler(
 		await ReversePurchaseTransactions(purchase, cancellationToken);
 
 		var totalSum = contentDtos.Sum(x => x.Price * x.Count);
-		var purchaseTransaction = await CreateTransaction(
+		var purchaseTransactionId = await CreateTransaction(
 			purchase.SupplierOrganizationId,
 			GetSystemUserId(),
 			totalSum,
@@ -64,7 +64,7 @@ public class EditPurchaseHandler(
 			request.PurchaseDateTime,
 			cancellationToken);
 
-		purchase.SetTransactionId(purchaseTransaction.Id);
+		purchase.SetTransactionId(purchaseTransactionId);
 		purchase.SetCurrencyId(request.CurrencyId);
 		purchase.SetPurchaseDate(request.PurchaseDateTime);
 		purchase.SetComment(request.Comment);
@@ -78,7 +78,7 @@ public class EditPurchaseHandler(
 		return Unit.Value;
 	}
 
-	private Guid GetSystemUserId() => systemOptions.Value.SystemId;
+	private Guid GetSystemUserId() => transfers.SystemOrganizationId;
 
 	private Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
 		=> purchaseRepository.EnsureExistForUpdateAsync(
@@ -87,33 +87,24 @@ public class EditPurchaseHandler(
 			Criteria<Purchase>.New().Include(x => x.Contents),
 			cancellationToken);
 
-	private async Task ReversePurchaseTransactions(Purchase purchase, CancellationToken cancellationToken)
-	{
-		await sender.Send(
-			new ReverseTransactionCommand(
-				purchase.TransactionId,
-				TransactionReversalMode.System,
-				true),
-			cancellationToken);
-	}
+	private Task ReversePurchaseTransactions(Purchase purchase, CancellationToken cancellationToken)
+		=> transfers.ReverseAsync(purchase.TransactionId, cancellationToken);
 
-	private async Task<Transaction> CreateTransaction(
+	private Task<Guid> CreateTransaction(
 		Guid senderId,
 		Guid receiverId,
 		decimal amount,
 		int currencyId,
 		DateTime transactionDateTime,
 		CancellationToken cancellationToken)
-		=> (await sender.Send(
-			new CreateTransactionCommand(
-				senderId,
-				receiverId,
-				amount,
-				currencyId,
-				transactionDateTime,
-				TransactionSourceType.Purchase,
-				TransactionCreationMode.System),
-			cancellationToken)).Transaction;
+		=> transfers.TransferAsync(
+			senderId,
+			receiverId,
+			amount,
+			currencyId,
+			transactionDateTime,
+			TransactionSourceType.Purchase,
+			cancellationToken: cancellationToken);
 
 	private async Task UpdateContents(
 		Purchase purchase,

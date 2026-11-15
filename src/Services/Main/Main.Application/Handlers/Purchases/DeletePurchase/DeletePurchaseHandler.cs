@@ -25,7 +25,7 @@ public record DeletePurchaseCommand(Guid PurchaseId) : ICommand<Unit>;
 public class DeletePurchaseHandler(
 	IUnitOfWork unitOfWork,
 	IRepository<Purchase, Guid> repository,
-	ISender sender,
+	IFinanceTransfers transfers,
 	IStorageContentService storageContentService) : ICommandHandler<DeletePurchaseCommand, Unit>
 {
 	public async Task<Unit> Handle(DeletePurchaseCommand request, CancellationToken cancellationToken)
@@ -58,13 +58,6 @@ public class DeletePurchaseHandler(
 			token);
 	}
 
-	private async Task RevertTransactions(Purchase purchase, CancellationToken token)
-	{
-		await sender.Send(
-			new ReverseTransactionCommand(
-				purchase.TransactionId,
-				TransactionReversalMode.System,
-				true),
-			token);
-	}
+	private Task RevertTransactions(Purchase purchase, CancellationToken token)
+		=> transfers.ReverseAsync(purchase.TransactionId, token);
 }

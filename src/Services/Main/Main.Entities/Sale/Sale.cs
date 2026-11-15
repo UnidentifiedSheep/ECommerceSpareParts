@@ -87,6 +87,8 @@ public class Sale : AuditableEntity<Sale, Guid>,
 			storageCode,
 			saleDate);
 
+	public decimal CalculateTotal() => _contents.Sum(content => content.TotalSum);
+
 	public void SetComment(string? comment)
 		=> Comment =
 			comment.NullIfWhiteSpace()?.EnsureMaxLength(256, SaleCommentMaxMessage.Instance);

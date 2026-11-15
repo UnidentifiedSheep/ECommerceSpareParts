@@ -87,96 +87,24 @@ public class SaleService(ISender sender, IStorageContentService storageContentSe
 		await sender.Send(new RestoreContentCommand(toRestore, movementType), cancellationToken);
 	}
 
-	private List<SaleContent> DistributeDetails(
+	private static List<SaleContent> DistributeDetails(
 		IEnumerable<StorageLot> storageContentValues,
 		IEnumerable<SaleContentInput> saleContents)
-	{
-		var result = new List<(int OriginalIndex, SaleContent Content)>();
-
-		var storageByProduct = storageContentValues
-			.Select(x =>
-			{
-				if (x.Count <= 0)
-					throw new InvalidOperationException("Invalid taken quantity");
-
-				return new
-				{
-					x.ProductId,
-					Detail = SaleContentDetail.Create(
-						x.Id,
-						x.CurrencyId,
-						x.BuyPrice,
-						x.Count,
-						x.PurchaseDatetime)
-				};
-			})
-			.GroupBy(x => x.ProductId)
-			.ToDictionary(
-				g => g.Key,
-				g => g
-					.Select(x => x.Detail)
-					.OrderByDescending(d => d.Count)
-					.ThenByDescending(d => d.BuyPrice)
-					.ToList());
-
-		foreach (var contentInput in saleContents.OrderByDescending(x => x.Count))
-		{
-			var (originalIndex, productId, price, priceWithDiscount, count, comment) = contentInput;
-			if (!storageByProduct.TryGetValue(productId, out var storage))
-				throw new InvalidOperationException($"No storage for product {productId}");
-
-			var details = new List<SaleContentDetail>();
-			var leftToDistribute = count;
-
-			var i = 0;
-
-			while (leftToDistribute > 0 && i < storage.Count)
-			{
-				var detail = storage[i];
-
-				if (leftToDistribute >= detail.Count)
-				{
-					details.Add(detail);
-					leftToDistribute -= detail.Count;
-					storage.RemoveAt(i);
-				}
-				else
-				{
-					details.Add(
-						SaleContentDetail.Create(
-							detail.StorageContentId,
-							detail.CurrencyId,
-							detail.BuyPrice,
-							leftToDistribute,
-							detail.PurchaseDatetime));
-
-					storage[i] = SaleContentDetail.Create(
-						detail.StorageContentId,
-						detail.CurrencyId,
-						detail.BuyPrice,
-						detail.Count - leftToDistribute,
-						detail.PurchaseDatetime);
-
-					leftToDistribute = 0;
-				}
-			}
-
-			if (leftToDistribute != 0)
-				throw new InvalidOperationException("Unable to distribute details");
-
-			var content = SaleContent.Create(
-				productId,
-				price,
-				priceWithDiscount,
-				details);
-
-			content.SetComment(comment);
-
-			result.Add((originalIndex, content));
-		}
-
-		return result.OrderBy(x => x.OriginalIndex).Select(x => x.Content).ToList();
-	}
+		=> SaleContentAllocator.Distribute(
+			storageContentValues.Select(lot => new AllocationLot(
+				lot.Id,
+				lot.ProductId,
+				lot.CurrencyId,
+				lot.BuyPrice,
+				lot.Count,
+				lot.PurchaseDatetime)),
+			saleContents.Select(content => new AllocationLine(
+				content.OriginalIndex,
+				content.ProductId,
+				content.Price,
+				content.PriceWithDiscount,
+				content.Count,
+				content.Comment)));
 
 	private async Task<IReadOnlyList<StorageLot>> TakeFromStorage(
 		string storageCode,
