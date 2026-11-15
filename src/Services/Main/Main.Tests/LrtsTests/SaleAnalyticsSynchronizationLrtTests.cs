@@ -1,3 +1,4 @@
+using Main.Entities.Analytics;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
@@ -91,6 +92,11 @@ public class SaleAnalyticsSynchronizationLrtTests : IntegrationTest
 			.OrderBy(item => item.SaleContentId)
 			.FirstAsync(CancellationToken);
 		retained.Update(
+			retained.SaleId,
+			retained.OrganizationId,
+			retained.BuyerId,
+			retained.SaleDatetime,
+			retained.Count,
 			1m,
 			1m,
 			1m);

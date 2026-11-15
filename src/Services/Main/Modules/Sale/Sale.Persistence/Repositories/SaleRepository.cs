@@ -26,7 +26,5 @@ public class SaleRepository(UnifiedDbContext context, QueryExtensions extensions
 		=> QueryableExtensions.ForUpdate(Context.Set<Entities.Sale.Sale>().AsQueryable())
 			.Include(sale => sale.Contents)
 			.ThenInclude(content => content.Details)
-			.Include(sale => sale.Contents)
-			.ThenInclude(content => content.Analytics)
 			.AsSplitQuery();
 }

@@ -1,3 +1,4 @@
+using Main.Entities.Analytics;
 using Main.Entities.Balance;
 using Main.Entities.Organization;
 using Main.Entities.Product;
@@ -118,6 +119,11 @@ public class SaleTestContext(
 			await DbContext.AddAsync(
 				SaleContentAnalytics.Create(
 					content.Id,
+					Sale.Id,
+					Sale.OrganizationId,
+					Sale.UserId,
+					Sale.SaleDatetime,
+					content.Count,
 					content.OriginalPrice * content.Count,
 					content.TotalSum,
 					content.Details.Sum(detail => detail.BuyPrice * detail.Count)),

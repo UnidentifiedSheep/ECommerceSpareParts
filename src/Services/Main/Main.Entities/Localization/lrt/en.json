@@ -12,12 +12,6 @@
     "lrt.expired.documents.removal.name": "Expired document removal",
     "lrt.expired.documents.removal.description": "Removes documents whose retention period has expired.",
     "lrt.service.task.run.name": "Service task dispatch",
-    "lrt.service.task.run.description": "Runs a task in the selected service.",
-    "lrt.markup.calculation.name": "Markup calculation",
-    "lrt.markup.calculation.description": "Calculates recommended markup ranges.",
-    "markup.calculation.input.invalid": "Invalid markup calculation input data was provided.",
-    "markup.calculation.range.start.must.be.before.or.equal.end": "The markup calculation time range start must be less than or equal to the time range end.",
-    "lrt.sale.analytics.synchronization.name": "Synchronize sales analytics",
-    "lrt.sale.analytics.synchronization.description": "Recalculates sales analytics using historical exchange rates."
+    "lrt.service.task.run.description": "Runs a task in the selected service."
   }
 }

@@ -6,8 +6,6 @@ using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Validators;
 using Application.Common.Services.Currency;
 using Application.Common.Validators;
-using Main.Application.Analytics.Interfaces;
-using Main.Application.Analytics.Services;
 using Main.Application.Configs;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Services;
@@ -74,8 +72,6 @@ public static class ServiceProvider
 
 		collection.RegisterSettingsService();
 
-		collection.AddScoped<ISaleAnalyticsSynchronizer, SaleAnalyticsSynchronizer>();
-		collection.AddScoped<ISaleContentAnalyticsCalculator, SaleContentAnalyticsCalculator>();
 
 		collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
 

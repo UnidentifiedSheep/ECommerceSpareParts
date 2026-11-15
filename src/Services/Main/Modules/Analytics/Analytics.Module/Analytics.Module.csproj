@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Analytics.Module</AssemblyName>
+        <RootNamespace>Main.Modules.Analytics</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj"/>
+        <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj"/>
+    </ItemGroup>
+
+</Project>

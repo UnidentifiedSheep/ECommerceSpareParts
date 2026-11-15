@@ -4,6 +4,7 @@ using Main.Application.Analytics.Analyzers;
 using Main.Application.Analytics.Charts;
 using Main.Application.Interfaces.Services.Document;
 using Main.Application.NamedObjects;
+using Main.Modules.Analytics.Application;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,8 +24,12 @@ public static class NamedObjectDiRegistry
 			IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>, GetNamedObjectsHandler>();
 
 		return services
-			.RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped)
-			.RegisterNamedObject<ChartDataSourceNamedObject>(objectsLifetime: ServiceLifetime.Scoped)
+			.RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(
+				AnalyticsApplicationAssembly.Value,
+				objectsLifetime: ServiceLifetime.Scoped)
+			.RegisterNamedObject<ChartDataSourceNamedObject>(
+				AnalyticsApplicationAssembly.Value,
+				objectsLifetime: ServiceLifetime.Scoped)
 			.RegisterNamedObject<IDocumentDefinition>(objectsLifetime: ServiceLifetime.Scoped)
 			.RegisterNamedObject<SettingDefinitionNamedObjectBase>(
 				typeof(Global).Assembly);

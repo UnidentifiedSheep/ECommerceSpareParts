@@ -1,3 +1,4 @@
+using Main.Entities.Analytics;
 using FluentAssertions;
 using Main.Application.Analytics.Charts;
 using Main.Application.Analytics.Charts.SalesProfitOverTime;
@@ -44,6 +45,11 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 		var analytics = await Context.Set<SaleContentAnalytics>()
 			.SingleAsync(item => item.SaleContentId == content.Id, CancellationToken);
 		analytics.Update(
+			sale.Id,
+			sale.OrganizationId,
+			sale.UserId,
+			sale.SaleDatetime,
+			content.Count,
 			120m * content.Count,
 			90m * content.Count,
 			40m * content.Count);
@@ -138,6 +144,11 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 		await Context.AddAsync(
 			SaleContentAnalytics.Create(
 				content.Id,
+				second.Id,
+				second.OrganizationId,
+				second.UserId,
+				second.SaleDatetime,
+				content.Count,
 				120m,
 				90m,
 				40m),

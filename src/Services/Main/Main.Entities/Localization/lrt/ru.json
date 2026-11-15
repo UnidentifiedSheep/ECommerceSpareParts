@@ -12,12 +12,6 @@
     "lrt.expired.documents.removal.name": "Удаление просроченных документов",
     "lrt.expired.documents.removal.description": "Удаляет документы с истёкшим сроком хранения.",
     "lrt.service.task.run.name": "Запуск задачи сервиса",
-    "lrt.service.task.run.description": "Запускает задачу в выбранном сервисе.",
-    "lrt.markup.calculation.name": "Расчет наценок",
-    "lrt.markup.calculation.description": "Рассчитывает рекомендуемые диапазоны наценок.",
-    "markup.calculation.input.invalid": "Переданы некорректные входные данные для расчета наценки.",
-    "markup.calculation.range.start.must.be.before.or.equal.end": "Начало временного диапазона расчета наценки должно быть меньше или равно его концу.",
-    "lrt.sale.analytics.synchronization.name": "Синхронизация аналитики продаж",
-    "lrt.sale.analytics.synchronization.description": "Пересчитывает аналитику продаж по историческим курсам валют."
+    "lrt.service.task.run.description": "Запускает задачу в выбранном сервисе."
   }
 }

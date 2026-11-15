@@ -30,6 +30,7 @@ public static class ServiceProvider
 			typeof(Main.Entities.Sale.Sale).Assembly,
 			typeof(Main.Entities.Organization.Organization).Assembly,
 			typeof(Main.Entities.Balance.Transaction).Assembly,
+			typeof(Main.Entities.Analytics.SaleContentAnalytics).Assembly,
 			typeof(Main.Entities.Order.Order).Assembly,
 			typeof(Main.Entities.Cart.Cart).Assembly,
 			typeof(Main.Entities.User.UserNotificationPreference).Assembly,

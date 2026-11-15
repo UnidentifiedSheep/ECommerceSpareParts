@@ -12,12 +12,6 @@
     "lrt.expired.documents.removal.name": "Süresi dolmuş belgeleri kaldırma",
     "lrt.expired.documents.removal.description": "Saklama süresi dolan belgeleri siler.",
     "lrt.service.task.run.name": "Servis görevi başlatma",
-    "lrt.service.task.run.description": "Seçilen serviste bir görev çalıştırır.",
-    "lrt.markup.calculation.name": "Kâr marjı hesaplama",
-    "lrt.markup.calculation.description": "Önerilen kâr marjı aralıklarını hesaplar.",
-    "markup.calculation.input.invalid": "Geçersiz kâr marjı hesaplama verileri sağlandı.",
-    "markup.calculation.range.start.must.be.before.or.equal.end": "Kâr marjı hesaplama zaman aralığının başlangıcı, bitişinden önce veya bitişine eşit olmalıdır.",
-    "lrt.sale.analytics.synchronization.name": "Satış analitiğini eşitle",
-    "lrt.sale.analytics.synchronization.description": "Satış analitiğini geçmiş döviz kurlarıyla yeniden hesaplar."
+    "lrt.service.task.run.description": "Seçilen serviste bir görev çalıştırır."
   }
 }

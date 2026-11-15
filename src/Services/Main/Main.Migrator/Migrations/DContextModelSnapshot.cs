@@ -410,6 +410,62 @@ namespace Main.Migrator.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Main.Entities.Analytics.SaleContentAnalytics", b =>
+                {
+                    b.Property<int>("SaleContentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sale_content_id");
+
+                    b.Property<Guid>("BuyerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("buyer_id");
+
+                    b.Property<decimal>("CostInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cost_in_base_currency");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("integer")
+                        .HasColumnName("count");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_completed");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<decimal>("OriginalAmountInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("original_amount_in_base_currency");
+
+                    b.Property<decimal>("RevenueInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("revenue_in_base_currency");
+
+                    b.Property<DateTime>("SaleDatetime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sale_datetime");
+
+                    b.Property<Guid>("SaleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_id");
+
+                    b.HasKey("SaleContentId")
+                        .HasName("sale_content_analytics_pk");
+
+                    b.HasIndex(new[] { "BuyerId" }, "sale_content_analytics_buyer_id_index");
+
+                    b.HasIndex(new[] { "IsCompleted", "SaleDatetime" }, "sale_content_analytics_is_completed_sale_datetime_index");
+
+                    b.HasIndex(new[] { "OrganizationId" }, "sale_content_analytics_organization_id_index");
+
+                    b.HasIndex(new[] { "SaleId" }, "sale_content_analytics_sale_id_index");
+
+                    b.ToTable("sale_content_analytics", "public");
+                });
+
             modelBuilder.Entity("Main.Entities.Auth.Permission", b =>
                 {
                     b.Property<string>("Name")
@@ -2376,30 +2432,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("sale_content", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.SaleContentAnalytics", b =>
-                {
-                    b.Property<int>("SaleContentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("sale_content_id");
-
-                    b.Property<decimal>("CostInBaseCurrency")
-                        .HasColumnType("numeric")
-                        .HasColumnName("cost_in_base_currency");
-
-                    b.Property<decimal>("OriginalAmountInBaseCurrency")
-                        .HasColumnType("numeric")
-                        .HasColumnName("original_amount_in_base_currency");
-
-                    b.Property<decimal>("RevenueInBaseCurrency")
-                        .HasColumnType("numeric")
-                        .HasColumnName("revenue_in_base_currency");
-
-                    b.HasKey("SaleContentId")
-                        .HasName("sale_content_analytics_pk");
-
-                    b.ToTable("sale_content_analytics", "public");
-                });
-
             modelBuilder.Entity("Main.Entities.Sale.SaleContentDetail", b =>
                 {
                     b.Property<int>("Id")
@@ -3824,6 +3856,16 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Step");
                 });
 
+            modelBuilder.Entity("Main.Entities.Analytics.SaleContentAnalytics", b =>
+                {
+                    b.HasOne("Main.Entities.Sale.SaleContent", null)
+                        .WithOne()
+                        .HasForeignKey("Main.Entities.Analytics.SaleContentAnalytics", "SaleContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("sale_content_analytics_sale_content_id_fk");
+                });
+
             modelBuilder.Entity("Main.Entities.Auth.RolePermission", b =>
                 {
                     b.HasOne("Main.Entities.Auth.Permission", "Permission")
@@ -4419,18 +4461,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Sale");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.SaleContentAnalytics", b =>
-                {
-                    b.HasOne("Main.Entities.Sale.SaleContent", "Content")
-                        .WithOne("Analytics")
-                        .HasForeignKey("Main.Entities.Sale.SaleContentAnalytics", "SaleContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("sale_content_analytics_sale_content_id_fk");
-
-                    b.Navigation("Content");
-                });
-
             modelBuilder.Entity("Main.Entities.Sale.SaleContentDetail", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
@@ -4702,8 +4732,6 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Sale.SaleContent", b =>
                 {
-                    b.Navigation("Analytics");
-
                     b.Navigation("Details");
                 });
 

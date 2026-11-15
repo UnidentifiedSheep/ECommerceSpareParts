@@ -1,3 +1,4 @@
+using Main.Entities.Analytics;
 using FluentAssertions;
 using Main.Application.Analytics.Analyzers;
 using Main.Application.Analytics.Analyzers.Markup;
@@ -234,6 +235,11 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 			await Context.AddAsync(
 				SaleContentAnalytics.Create(
 					sample.Content.Id,
+					sample.Content.SaleId,
+					sample.Content.Sale.OrganizationId,
+					sample.Content.Sale.UserId,
+					sample.Content.Sale.SaleDatetime,
+					sample.Content.Count,
 					sample.Price,
 					sample.Price,
 					sample.Cost),

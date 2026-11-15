@@ -41,8 +41,6 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 
 	public decimal TotalSum { get; private set; }
 
-	public SaleContentAnalytics? Analytics { get; private set; }
-
 	public string? Comment { get; private set; }
 
 	public Sale Sale { get; private set; } = null!;
@@ -97,7 +95,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		ClearAndSetDetails(nextDetails);
 		TotalSum = DiscountedPrice * Count;
 		if (financialDataChanged)
-			InvalidateAnalytics();
+			NotifyFinancialInfoChanged();
 	}
 
 	private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)
@@ -121,27 +119,9 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 		NotifyUpdated(false);
 	}
 
-	public void UpdateAnalytics(
-		decimal originalAmount,
-		decimal revenue,
-		decimal cost)
-	{
-		if (Analytics is null)
-			Analytics = SaleContentAnalytics.Create(
-				Id,
-				originalAmount,
-				revenue,
-				cost);
-		else
-			Analytics.Update(
-				originalAmount,
-				revenue,
-				cost);
-	}
+	public void NotifyFinancialInfoChanged() => NotifyUpdated(true);
 
-	public void InvalidateAnalytics() => NotifyUpdated(true);
-
-	public override void OnCreated() => InvalidateAnalytics();
+	public override void OnCreated() => NotifyFinancialInfoChanged();
 
 
 	private void NotifyUpdated(bool financialInfoChanged)

@@ -6,6 +6,7 @@ using Main.Modules.Currency.Persistence;
 using Main.Modules.Product.Persistence;
 using Main.Modules.Identity.Persistence;
 using Main.Modules.Purchase.Persistence;
+using Main.Modules.Analytics.Persistence;
 using Main.Modules.Balance.Persistence;
 using Main.Modules.Cart.Persistence;
 using Main.Modules.Notifications.Persistence;
@@ -51,6 +52,7 @@ builder.ConfigureServices((context, services) =>
 	services.AddDbContextModule<IdentityDbContextModule>();
 	services.AddDbContextModule<PurchaseDbContextModule>();
 	services.AddDbContextModule<SaleDbContextModule>();
+	services.AddDbContextModule<AnalyticsDbContextModule>();
 	services.AddDbContextModule<BalanceDbContextModule>();
 	services.AddDbContextModule<CartDbContextModule>();
 	services.AddDbContextModule<NotificationsDbContextModule>();

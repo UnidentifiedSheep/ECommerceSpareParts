@@ -103,14 +103,14 @@ public class Sale : AuditableEntity<Sale, Guid>,
 	{
 		if (SaleDatetime == dateTime) return;
 		SaleDatetime = dateTime;
-		InvalidateAnalytics();
+		NotifyFinancialInfoChanged();
 	}
 
 	public void SetCurrency(int currencyId)
 	{
 		if (CurrencyId == currencyId) return;
 		CurrencyId = currencyId;
-		InvalidateAnalytics();
+		NotifyFinancialInfoChanged();
 	}
 
 
@@ -125,7 +125,7 @@ public class Sale : AuditableEntity<Sale, Guid>,
 			throw new InvalidOperationException("Cannot complete empty sale");
 
 		State = SaleState.Completed;
-		InvalidateAnalytics();
+		NotifyFinancialInfoChanged();
 	}
 
 	public void Delete()
@@ -134,12 +134,13 @@ public class Sale : AuditableEntity<Sale, Guid>,
 			return;
 
 		State = SaleState.Deleted;
+		NotifyFinancialInfoChanged();
 	}
 
-	private void InvalidateAnalytics()
+	private void NotifyFinancialInfoChanged()
 	{
 		foreach (var content in _contents)
-			content.InvalidateAnalytics();
+			content.NotifyFinancialInfoChanged();
 	}
 
 	public override void OnUpdated()

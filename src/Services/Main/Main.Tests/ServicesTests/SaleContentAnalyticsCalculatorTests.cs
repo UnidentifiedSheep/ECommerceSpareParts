@@ -1,5 +1,6 @@
 using FluentAssertions;
-using Main.Application.Analytics.Interfaces;
+using Main.Application.Analytics.Services;
+using Main.Modules.Sale.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Sale;
 using Tests.TestContainers.Combined;
@@ -52,16 +53,30 @@ public class SaleContentAnalyticsCalculatorTests : IntegrationTest
 			.Build();
 
 		var result = await Scope.ServiceProvider
-			.GetRequiredService<ISaleContentAnalyticsCalculator>()
+			.GetRequiredService<SaleContentAnalyticsCalculator>()
 			.CalculateAsync(
-				content,
-				rate.FromCurrencyId,
-				march,
+				new SaleContentSnapshot(
+					1,
+					Guid.NewGuid(),
+					Guid.NewGuid(),
+					Guid.NewGuid(),
+					march,
+					rate.FromCurrencyId,
+					true,
+					content.Count,
+					content.OriginalPrice,
+					content.TotalSum,
+					content.Details
+						.Select(detail => new SaleContentDetailSnapshot(
+							detail.CurrencyId,
+							detail.BuyPrice,
+							detail.Count,
+							detail.PurchaseDatetime))
+						.ToArray()),
 				CancellationToken);
 
 		result.OriginalAmount.Should().Be(120m);
 		result.Revenue.Should().Be(90m);
 		result.Cost.Should().Be(57m);
-		content.Analytics.Should().BeNull();
 	}
 }
