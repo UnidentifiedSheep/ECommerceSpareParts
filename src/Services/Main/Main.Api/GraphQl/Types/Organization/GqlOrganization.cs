@@ -55,13 +55,13 @@ public sealed record GqlOrganization
 	public async Task<GqlUser> GetOwnerAsync(
 		IOrganizationByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> new((await GetOrganizationAsync(loader, cancellationToken)).Owner.User);
+		=> new((await GetOrganizationAsync(loader, cancellationToken)).Owner.UserId);
 
 	[GraphQLName("approximateBalanceInBaseCurrency")]
 	public async Task<decimal?> GetApproximateBalanceInBaseCurrencyAsync(
-		IOrganizationByIdDataLoader loader,
+		IApproximateBalanceByOrganizationIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> (await GetOrganizationAsync(loader, cancellationToken)).ApproximateBalanceInBaseCurrency;
+		=> await loader.LoadAsync(Id, cancellationToken);
 
 	[GraphQLName("members")]
 	[RequireAllPermissions(PermissionCodes.ORGANIZATIONS_GET)]

@@ -1,6 +1,6 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Entities.Organization;
+using Main.Entities.Balance;
 
 namespace Tests.Domain.Balance;
 

@@ -27,10 +27,5 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Entities.Organ
 			.Navigation(x => x.Members)
 			.HasField("_members")
 			.UsePropertyAccessMode(PropertyAccessMode.Field);
-
-		builder
-			.Navigation(e => e.Balances)
-			.HasField("_balances")
-			.UsePropertyAccessMode(PropertyAccessMode.Field);
 	}
 }

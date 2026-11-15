@@ -1,4 +1,6 @@
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
+using Main.Modules.Identity.Abstractions;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Main.Application.Dtos.Emails;
@@ -23,7 +25,10 @@ public record CreateUserCommand(
 
 public record CreateUserResult(Guid UserId);
 
-public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager passwordManager)
+public class CreateUserHandler(
+	IUnitOfWork unitOfWork,
+	IPasswordManager passwordManager,
+	IDomainEventScope domainEventScope)
 	: ICommandHandler<CreateUserCommand, CreateUserResult>
 {
 	public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -57,7 +62,11 @@ public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager password
 				phone.IsPrimary,
 				phone.IsConfirmed);
 
-		user.Register();
+		domainEventScope.Add(
+			new UserRegistered(
+				user.Id,
+				request.UserInfo.Name,
+				request.UserInfo.Surname));
 
 		await unitOfWork.AddAsync(user, cancellationToken);
 		return new CreateUserResult(user.Id);

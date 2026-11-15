@@ -43,7 +43,7 @@ public class OrganizationMemberConfiguration : IEntityTypeConfiguration<Organiza
 			.HasConstraintName("organization_members_organizations_id_fk");
 
 		builder
-			.HasOne(x => x.User)
+			.HasOne<Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(x => x.UserId)
 			.OnDelete(DeleteBehavior.Restrict)

@@ -22,7 +22,4 @@ public record OrganizationDto
 
 	[JsonPropertyName("owner")]
 	public required OrganizationMemberDto Owner { get; init; }
-
-	[JsonPropertyName("approximateBalanceInBaseCurrency")]
-	public decimal? ApproximateBalanceInBaseCurrency { get; init; }
 }

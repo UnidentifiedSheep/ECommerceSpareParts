@@ -24,8 +24,6 @@ public class OrganizationMember : AuditableEntity<OrganizationMember, Organizati
 
 	public Organization Organization { get; private set; } = null!;
 
-	public User.User User { get; private set; } = null!;
-
 	public static Expression<Func<OrganizationMember, OrganizationMemberKey>> GetKeySelector()
 		=> x =>
 			new OrganizationMemberKey(x.OrganizationId, x.UserId);

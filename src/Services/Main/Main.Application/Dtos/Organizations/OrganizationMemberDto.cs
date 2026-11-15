@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Users;
 using Main.Enums.Organization;
 
 namespace Main.Application.Dtos.Organizations;
@@ -12,6 +11,6 @@ public record OrganizationMemberDto
 	[JsonPropertyName("role")]
 	public required OrganizationRole Role { get; init; }
 
-	[JsonPropertyName("user")]
-	public required UserDto User { get; init; }
+	[JsonPropertyName("userId")]
+	public required Guid UserId { get; init; }
 }

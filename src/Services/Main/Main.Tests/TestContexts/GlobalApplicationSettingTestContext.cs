@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Settings;
+using Main.Entities.Balance;
 using Main.Entities.Organization;
 using Main.Entities.Settings;
 using Main.Entities.User;

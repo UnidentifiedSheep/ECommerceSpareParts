@@ -5,15 +5,12 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Exceptions;
-using Main.Entities.Balance;
 using Main.Enums.Organization;
 
 namespace Main.Entities.Organization;
 
 public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Organization, Guid>
 {
-
-	private readonly List<OrganizationBalance> _balances = [];
 
 	private readonly List<OrganizationMember> _members = [];
 
@@ -48,10 +45,6 @@ public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Org
 	public string SystemName { get; private set; } = null!;
 
 	public IReadOnlyList<OrganizationMember> Members => _members;
-
-	public IReadOnlyList<OrganizationBalance> Balances => _balances;
-
-	public OrganizationFinancialProfile? FinancialProfile { get; private set; }
 
 	public static Expression<Func<Organization, Guid>> GetKeySelector() => x => x.Id;
 

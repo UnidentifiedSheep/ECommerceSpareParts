@@ -13,4 +13,11 @@ public static class TransactionDataLoaders
 		ISender sender,
 		CancellationToken cancellationToken)
 		=> (await sender.Send(new GetTransactionsByIdsQuery(keys), cancellationToken)).Transactions;
+
+	[DataLoader]
+	public static async Task<IReadOnlyDictionary<Guid, decimal>> GetApproximateBalanceByOrganizationIdAsync(
+		IReadOnlyList<Guid> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetApproximateBalancesByOrganizationIdsQuery(keys), cancellationToken)).Balances;
 }

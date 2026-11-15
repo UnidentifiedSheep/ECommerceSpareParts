@@ -7,8 +7,8 @@ using Application.Common.Querying;
 using Main.Application.Dtos.Organizations;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Organization;
-using Main.Entities.User;
 using Main.Enums.Organization;
+using Main.Modules.Identity.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Organizations.GetOrganizations;
@@ -26,8 +26,7 @@ public record GetOrganizationsResult(IReadOnlyList<OrganizationDto> Organization
 
 public class GetOrganizationsHandler(
 	IReadRepository<Organization, Guid> repository,
-	IUserRepository userRepository,
-	IReadRepository<User, Guid> userReadRepository,
+	IUserLookup userLookup,
 	IProjectionProvider<Organization, OrganizationDto> projection)
 	: IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
 {
@@ -35,6 +34,9 @@ public class GetOrganizationsHandler(
 		GetOrganizationsQuery request,
 		CancellationToken cancellationToken)
 	{
+		if (request.UserId.HasValue)
+			await userLookup.EnsureExistAsync([request.UserId.Value], cancellationToken);
+
 		var query = repository.Query.Where(x => x.Type != OrganizationType.System);
 
 		if (!request.ShowHidden)
@@ -53,7 +55,9 @@ public class GetOrganizationsHandler(
 		if (!string.IsNullOrWhiteSpace(searchTerm))
 		{
 			var pattern = $"%{searchTerm}%";
-			var matchingUsers = userRepository.SearchWithRank(userReadRepository.Query, searchTerm);
+			var matchingUserIds = (await userLookup.SearchAsync(searchTerm, 200, cancellationToken))
+				.Select(match => match.UserId)
+				.ToArray();
 			query = query
 				.Select(x => new
 				{
@@ -61,16 +65,13 @@ public class GetOrganizationsHandler(
 					OrganizationRank =
 						EF.Functions.TrigramsSimilarity(x.Name, searchTerm) +
 						EF.Functions.TrigramsSimilarity(x.SystemName, searchTerm),
-					MemberRank = matchingUsers
-						.Where(match => x.Members.Any(member => member.UserId == match.User.Id))
-						.Select(match => (float?)match.Rank)
-						.Max()
+					MemberMatches = x.Members.Any(member => matchingUserIds.Contains(member.UserId))
 				})
 				.Where(x =>
 					EF.Functions.ILike(x.Organization.Name, pattern) ||
-					EF.Functions.ILike(x.Organization.SystemName, pattern) || x.MemberRank.HasValue ||
+					EF.Functions.ILike(x.Organization.SystemName, pattern) || x.MemberMatches ||
 					x.OrganizationRank >= 0.3)
-				.OrderByDescending(x => x.OrganizationRank + (x.MemberRank ?? 0))
+				.OrderByDescending(x => x.OrganizationRank + (x.MemberMatches ? 1f : 0f))
 				.ThenBy(x => x.Organization.Id)
 				.Select(x => x.Organization);
 		}

@@ -201,13 +201,6 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 				userAgent));
 	}
 
-	public void Register()
-		=> AddDomainEvent(
-			new UserCreatedDomainEvent(
-				Id,
-				UserInfo!.Name,
-				UserInfo.Surname));
-
 	public override void OnCreated() => AddDomainEvent(new UserUpdatedDomainEvent(Id));
 
 	public override void OnUpdated() => AddDomainEvent(new UserUpdatedDomainEvent(Id));

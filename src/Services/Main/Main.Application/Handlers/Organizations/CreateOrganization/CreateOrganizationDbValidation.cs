@@ -9,6 +9,5 @@ public class CreateOrganizationDbValidation : AbstractDbValidation<CreateOrganiz
 {
 	public override void Build(IValidationPlan plan, CreateOrganizationCommand request)
 		=> plan
-			.ValidateUserExistsId(request.OwnerId)
 			.ValidateOrganizationNotExistsSystemName(Organization.NormalizeSystemName(request.SystemName));
 }

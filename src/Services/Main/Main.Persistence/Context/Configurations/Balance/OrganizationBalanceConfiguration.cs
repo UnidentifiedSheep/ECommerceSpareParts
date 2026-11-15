@@ -48,7 +48,7 @@ public class OrganizationBalanceConfiguration : IEntityTypeConfiguration<Organiz
 
 		builder
 			.HasOne<Entities.Organization.Organization>()
-			.WithMany(e => e.Balances)
+			.WithMany()
 			.HasForeignKey(d => d.OrganizationId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("organization_balances_organizations_id_fk");

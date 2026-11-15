@@ -1,4 +1,5 @@
 using Main.Entities.Auth;
+using Main.Entities.Balance;
 using Main.Entities.Organization;
 using Main.Entities.User;
 using Main.Enums.Organization;
@@ -27,8 +28,11 @@ public class SystemOrganizationSeed : ISeed<UnifiedDbContext>
 			.Set<Organization>()
 			.Where(x => systemUserIdSet.Contains(x.Id))
 			.Include(x => x.Members)
-			.Include(x => x.FinancialProfile)
 			.ToDictionaryAsync(x => x.Id);
+		var profiles = await context
+			.Set<OrganizationFinancialProfile>()
+			.Where(x => systemUserIdSet.Contains(x.OrganizationId))
+			.ToDictionaryAsync(x => x.OrganizationId);
 
 		foreach (var systemUserId in systemUserIds)
 		{
@@ -40,12 +44,12 @@ public class SystemOrganizationSeed : ISeed<UnifiedDbContext>
 			else
 				EnsureSystemOrganizationIsValid(organization, systemUserId);
 
-			if (organization.FinancialProfile is null)
+			if (!profiles.TryGetValue(systemUserId, out var profile))
 				await context
 					.Set<OrganizationFinancialProfile>()
 					.AddAsync(OrganizationFinancialProfile.Create(systemUserId, decimal.MinValue));
-			else if (organization.FinancialProfile.MinAllowedBalance != decimal.MinValue)
-				organization.FinancialProfile.SetMinAllowedBalance(decimal.MinValue);
+			else if (profile.MinAllowedBalance != decimal.MinValue)
+				profile.SetMinAllowedBalance(decimal.MinValue);
 		}
 
 		await context.SaveChangesAsync();

@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Entities.Organization;
+using Main.Entities.Balance;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Balance;

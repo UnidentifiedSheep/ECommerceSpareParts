@@ -29,7 +29,7 @@ public sealed class GetOrganizationTests : IntegrationTest
 		result.Organization.Type.Should().Be(OrganizationType.Business);
 		result.Organization.Owner.OrganizationId.Should().Be(organization.Id);
 		result.Organization.Owner.Role.Should().Be(OrganizationRole.Owner);
-		result.Organization.Owner.User.Id.Should().Be(owner.Id);
+		result.Organization.Owner.UserId.Should().Be(owner.Id);
 	}
 
 	[Fact]

@@ -5,7 +5,7 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Balances;
-using Main.Entities.Organization;
+using Main.Entities.Balance;
 
 namespace Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 

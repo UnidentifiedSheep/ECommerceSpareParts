@@ -1,4 +1,4 @@
-using Main.Entities.Organization;
+using Main.Entities.Balance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,7 +23,7 @@ public class
 
 		builder
 			.HasOne<Entities.Organization.Organization>()
-			.WithOne(e => e.FinancialProfile)
+			.WithOne()
 			.HasForeignKey<OrganizationFinancialProfile>(d => d.OrganizationId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("organization_financial_profile_organization_id_fk");

@@ -33,7 +33,7 @@ public class GetOrganizationsTests : IntegrationTest
 		result.Organizations[0].Id.Should().Be(expected.Id);
 		result.Organizations[0].Owner.OrganizationId.Should().Be(expected.Id);
 		result.Organizations[0].Owner.Role.Should().Be(OrganizationRole.Owner);
-		result.Organizations[0].Owner.User.Id.Should().Be(GetContext<UsersTestContext>().Users.First().Id);
+		result.Organizations[0].Owner.UserId.Should().Be(GetContext<UsersTestContext>().Users.First().Id);
 	}
 
 	[Fact]
@@ -208,14 +208,11 @@ public class GetOrganizationsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task GetOrganizations_MissingUser_ThrowsDbValidationException()
+	public async Task GetOrganizations_MissingUser_ThrowsUserNotFoundException()
 	{
 		var query = CreateQuery(userId: Guid.NewGuid());
 
-		var exception =
-			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
-
-		exception.Failures.Should().Contain(x => x.Error is UserNotFoundException);
+		await Assert.ThrowsAsync<UserNotFoundException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	[Fact]

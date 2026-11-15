@@ -27,9 +27,9 @@ public class GetOrganizationMembersTests : IntegrationTest
 
 		result.Members.Should().HaveCount(3);
 		result.Members.Should().OnlyContain(x => x.OrganizationId == organization.Id);
-		result.Members.Should().Contain(x => x.User.Id == users[0].Id && x.Role == OrganizationRole.Owner);
-		result.Members.Should().Contain(x => x.User.Id == users[1].Id && x.Role == OrganizationRole.Admin);
-		result.Members.Should().Contain(x => x.User.Id == users[2].Id && x.Role == OrganizationRole.Member);
+		result.Members.Should().Contain(x => x.UserId == users[0].Id && x.Role == OrganizationRole.Owner);
+		result.Members.Should().Contain(x => x.UserId == users[1].Id && x.Role == OrganizationRole.Admin);
+		result.Members.Should().Contain(x => x.UserId == users[2].Id && x.Role == OrganizationRole.Member);
 	}
 
 	[Fact]
@@ -55,9 +55,9 @@ public class GetOrganizationMembersTests : IntegrationTest
 		secondPage.Members.Should().ContainSingle();
 		firstPage
 			.Members
-			.Select(x => x.User.Id)
+			.Select(x => x.UserId)
 			.Should()
-			.NotIntersectWith(secondPage.Members.Select(x => x.User.Id));
+			.NotIntersectWith(secondPage.Members.Select(x => x.UserId));
 	}
 
 	[Fact]

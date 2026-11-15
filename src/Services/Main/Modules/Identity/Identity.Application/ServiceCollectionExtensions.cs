@@ -6,6 +6,7 @@ using Application.Common.Validators;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.Services;
+using Main.Modules.Identity.Abstractions;
 using Main.Application.Services.PayloadProvider;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
 			.AddModuleApplication(assembly)
 			.RegisterNamedObject<ILrtNamedObject>(assembly);
 
+		services.AddScoped<IUserLookup, UserLookup>();
 		services.AddSingleton<IJwtGenerator, JwtGenerator>();
 		services.AddSingleton<IEmailValidator, EmailValidator>();
 		services.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();

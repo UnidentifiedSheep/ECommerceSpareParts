@@ -38,20 +38,27 @@ public class BalanceService(
 		if (organizationIds.Count == 0)
 			return;
 
-		var organizationCriteria = Criteria<Organization>
+		var profileCriteria = Criteria<OrganizationFinancialProfile>
 			.New()
-			.Where(x => organizationIds.Contains(x.Id) && x.FinancialProfile != null)
-			.Include(x => x.FinancialProfile)
-			.Include(x => x.Balances)
+			.Where(x => organizationIds.Contains(x.OrganizationId))
+			.OrderByAsc(x => x.OrganizationId)
 			.Track()
 			.ForUpdate()
 			.Build();
-		var organizations = await organizationRepository.ListAsync(organizationCriteria, cancellationToken);
+		var profiles = await organizationFinancialProfileRepository.ListAsync(profileCriteria, cancellationToken);
+		var balancesCriteria = Criteria<OrganizationBalance>
+			.New()
+			.Where(x => organizationIds.Contains(x.OrganizationId))
+			.Build();
+		var balancesByOrganization = (await userBalanceRepository.ListAsync(balancesCriteria, cancellationToken))
+			.ToLookup(x => x.OrganizationId);
 
-		foreach (var organization in organizations)
+		foreach (var profile in profiles)
 		{
-			var balance = await SumBalanceInBaseCurrencyAsync(organization.Balances, cancellationToken);
-			organization.FinancialProfile!.SetApproximateBalance(
+			var balance = await SumBalanceInBaseCurrencyAsync(
+				balancesByOrganization[profile.OrganizationId],
+				cancellationToken);
+			profile.SetApproximateBalance(
 				Math.Round(
 					balance,
 					2,

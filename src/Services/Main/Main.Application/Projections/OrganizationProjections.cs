@@ -3,9 +3,7 @@ using Application.Common.Interfaces.Projections;
 using Attributes;
 using LinqKit;
 using Main.Application.Dtos.Organizations;
-using Main.Application.Dtos.Users;
 using Main.Entities.Organization;
-using Main.Entities.User;
 using Main.Enums.Organization;
 
 namespace Main.Application.Projections;
@@ -15,19 +13,13 @@ public sealed class
 	OrganizationMemberDtoProjectionProvider : ProjectionProviderBase<OrganizationMember,
 	OrganizationMemberDto>
 {
-	public OrganizationMemberDtoProjectionProvider(IProjectionProvider<User, UserDto> userProjection)
-	{
-		var userToDto = userProjection.Projection;
-
-		Projection = member => new OrganizationMemberDto
+	public override Expression<Func<OrganizationMember, OrganizationMemberDto>> Projection { get; } =
+		member => new OrganizationMemberDto
 		{
 			OrganizationId = member.OrganizationId,
 			Role = member.Role,
-			User = userToDto.Invoke(member.User)
+			UserId = member.UserId
 		};
-	}
-
-	public override Expression<Func<OrganizationMember, OrganizationMemberDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
@@ -46,10 +38,7 @@ public sealed class OrganizationDtoProjectionProvider : ProjectionProviderBase<O
 			SystemName = organization.SystemName,
 			IsHidden = organization.IsHidden,
 			Owner = memberToDto.Invoke(
-				organization.Members.Single(member => member.Role == OrganizationRole.Owner)),
-			ApproximateBalanceInBaseCurrency = organization.FinancialProfile == null
-				? null
-				: organization.FinancialProfile.ApproximateBalance
+				organization.Members.Single(member => member.Role == OrganizationRole.Owner))
 		};
 	}
 

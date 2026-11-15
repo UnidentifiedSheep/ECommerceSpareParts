@@ -14,7 +14,7 @@ public sealed record GqlOrganizationMember(
 	public GqlOrganization Organization => new(MemberDto.OrganizationId);
 
 	[GraphQLName("user")]
-	public GqlUser User => new(MemberDto.User);
+	public GqlUser User => new(MemberDto.UserId);
 
 	[GraphQLName("role")]
 	public OrganizationRole Role => MemberDto.Role;

@@ -5,7 +5,6 @@ using Main.Application.Dtos.Balances;
 using Main.Application.Interfaces.Services;
 using Main.Application.Projections;
 using Main.Entities.Balance;
-using Main.Entities.Organization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
@@ -21,7 +20,8 @@ public record GetOrganizationFinancialInfoResult
 }
 
 public class GetOrganizationFinancialInfoHandler(
-	IReadRepository<Organization, Guid> readRepository,
+	IReadRepository<OrganizationFinancialProfile, Guid> profileRepository,
+	IReadRepository<OrganizationBalance, UserBalanceKey> balanceRepository,
 	IBalanceService balanceService,
 	IProjectionProvider<OrganizationBalance, OrganizationBalanceDto> balanceProjection)
 	: IQueryHandler<GetOrganizationFinancialInfoQuery, GetOrganizationFinancialInfoResult>
@@ -30,23 +30,24 @@ public class GetOrganizationFinancialInfoHandler(
 		GetOrganizationFinancialInfoQuery request,
 		CancellationToken cancellationToken)
 	{
-		var organization = await readRepository
+		var profile = await profileRepository
 			.Query
-			.Where(x => x.Id == request.OrganizationId)
-			.Include(x => x.FinancialProfile)
-			.Include(x => x.Balances)
-			.ThenInclude(x => x.Currency)
-			.FirstAsync(cancellationToken);
+			.FirstOrDefaultAsync(x => x.OrganizationId == request.OrganizationId, cancellationToken);
+		var balances = await balanceRepository
+			.Query
+			.Where(x => x.OrganizationId == request.OrganizationId)
+			.Include(x => x.Currency)
+			.ToListAsync(cancellationToken);
 		var netPosition = await balanceService.GetBalanceInBaseCurrencyAsync(
-			organization.Id,
+			request.OrganizationId,
 			cancellationToken);
 
 		return new GetOrganizationFinancialInfoResult
 		{
-			FinancialProfile = organization.FinancialProfile is null
+			FinancialProfile = profile is null
 				? null
-				: OrganizationFinancialProfileDtoFactory.Create(organization.FinancialProfile, netPosition),
-			Balances = organization.Balances.Select(balanceProjection.ProjectionFunc).ToArray()
+				: OrganizationFinancialProfileDtoFactory.Create(profile, netPosition),
+			Balances = balances.Select(balanceProjection.ProjectionFunc).ToArray()
 		};
 	}
 }

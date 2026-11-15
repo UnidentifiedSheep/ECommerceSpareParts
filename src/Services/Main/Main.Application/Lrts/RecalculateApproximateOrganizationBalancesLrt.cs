@@ -4,7 +4,7 @@ using Attributes;
 using Locan.Core.Interfaces;
 using Main.Application.Interfaces.Services;
 using Main.Entities;
-using Main.Entities.Organization;
+using Main.Entities.Balance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
