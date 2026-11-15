@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Persistence.Interfaces;
 
 namespace Persistence.TransactionBuilder;
@@ -83,7 +84,7 @@ public class TransactionConfig(DbContext context, ITransactionExceptionClassifie
 				}
 				catch (Exception exception)
 				{
-					await transaction.RollbackAsync(CancellationToken.None);
+					await RollbackQuietlyAsync(transaction);
 					if (exception is OperationCanceledException ||
 						cancellationToken.IsCancellationRequested ||
 						attempt >= RetriesCount || !IsRetryable(exception))
@@ -105,6 +106,17 @@ public class TransactionConfig(DbContext context, ITransactionExceptionClassifie
 				return true;
 			},
 			cancellationToken);
+	}
+
+	private static async Task RollbackQuietlyAsync(IDbContextTransaction transaction)
+	{
+		try
+		{
+			await transaction.RollbackAsync(CancellationToken.None);
+		}
+		catch (InvalidOperationException)
+		{
+		}
 	}
 
 	private bool IsRetryable(Exception exception)

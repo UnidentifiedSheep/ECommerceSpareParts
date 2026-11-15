@@ -94,6 +94,28 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 		Context.Database.CurrentTransaction.Should().BeNull();
 	}
 
+	[Fact]
+	public async Task UnitOfWork_ActionFailsAfterTransactionCompleted_RethrowsTheOriginalErrorInsteadOfRollbackError()
+	{
+		var classifier = new Mock<ITransactionExceptionClassifier>();
+		classifier.Setup(value => value.Classify(It.IsAny<Exception>()))
+			.Returns((Exception value) => new TransactionError(value, TransactionErrorKind.None));
+		var unitOfWork = new EfUnitOfWorkBase(Context, classifier.Object);
+		var failure = new InvalidOperationException("business failure");
+
+		var exception = await Assert.ThrowsAsync<InvalidOperationException>(()
+			=> unitOfWork.ExecuteWithTransaction(
+				new TransactionalAttribute(),
+				async () =>
+				{
+					await Context.Database.ExecuteSqlRawAsync("ROLLBACK", CancellationToken);
+					throw failure;
+				},
+				CancellationToken));
+
+		exception.Should().BeSameAs(failure);
+	}
+
 	[Theory]
 	[InlineData(false)]
 	[InlineData(true)]
