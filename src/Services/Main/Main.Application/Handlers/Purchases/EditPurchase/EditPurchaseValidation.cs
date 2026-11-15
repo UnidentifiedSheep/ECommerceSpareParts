@@ -18,10 +18,5 @@ public class EditPurchaseValidation : AbstractValidator<EditPurchaseCommand>
 		RuleFor(x => x.PurchaseDateTime).SetValidator(new RecordDateValidator(datePolicy));
 
 		RuleFor(x => x.Content).SetValidator(new EditPurchaseDtoValidation());
-
-		RuleFor(x => x.StorageFrom)
-			.Must(x => x != null)
-			.When(x => x.WithLogistics)
-			.WithLocalizableError(PurchaseStorageFromRequiredWhenLogisticsMessage.Instance);
 	}
 }

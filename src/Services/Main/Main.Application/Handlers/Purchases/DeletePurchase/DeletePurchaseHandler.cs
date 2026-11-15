@@ -43,7 +43,7 @@ public class DeletePurchaseHandler(
 		=> await repository.EnsureExistForUpdateAsync(
 			id,
 			key => new PurchaseNotFoundException(key),
-			Criteria<Purchase>.New().Include(x => x.PurchaseLogistic).Include(x => x.Contents),
+			Criteria<Purchase>.New().Include(x => x.Contents),
 			cancellationToken);
 
 	private async Task SubtractStock(Purchase purchase, CancellationToken token)
@@ -66,13 +66,5 @@ public class DeletePurchaseHandler(
 				TransactionReversalMode.System,
 				true),
 			token);
-
-		if (purchase.PurchaseLogistic?.TransactionId != null)
-			await sender.Send(
-				new ReverseTransactionCommand(
-					purchase.PurchaseLogistic.TransactionId.Value,
-					TransactionReversalMode.System,
-					true),
-				token);
 	}
 }

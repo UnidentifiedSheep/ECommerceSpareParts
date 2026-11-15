@@ -29,8 +29,6 @@ public sealed class PurchaseMutations
 				input.Contents.Select(content => content.ToDto()).ToArray(),
 				input.Comment,
 				input.PayedSum,
-				input.WithLogistics ?? false,
-				input.StorageFrom,
 				input.ForcePayment ?? false),
 			cancellationToken);
 
@@ -50,9 +48,7 @@ public sealed class PurchaseMutations
 				input.PurchaseId,
 				input.CurrencyId,
 				input.Comment,
-				input.PurchaseDateTime,
-				input.WithLogistics ?? false,
-				input.StorageFrom),
+				input.PurchaseDateTime),
 			cancellationToken);
 
 		return new GqlPurchase(input.PurchaseId);

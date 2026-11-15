@@ -25,8 +25,4 @@ public sealed record GqlPurchaseContent([property: GraphQLIgnore]
 
 	[GraphQLName("product")]
 	public GqlProduct Product => new(Content.Product);
-
-	[GraphQLName("logistics")]
-	public GqlPurchaseContentLogistic? Logistics
-		=> Content.ContentLogistics is { } logistics ? new GqlPurchaseContentLogistic(logistics) : null;
 }

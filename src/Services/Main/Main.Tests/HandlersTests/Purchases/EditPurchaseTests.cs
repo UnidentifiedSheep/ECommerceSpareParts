@@ -65,9 +65,7 @@ public class EditPurchaseTests : IntegrationTest
 			purchase.Id,
 			currency.Id,
 			"edited purchase",
-			DateTime.UtcNow,
-			false,
-			null);
+			DateTime.UtcNow);
 
 		var publishedBefore = Broker.PublishedMessages.Count;
 		await Mediator.Send(editCommand, CancellationToken);
@@ -132,9 +130,7 @@ public class EditPurchaseTests : IntegrationTest
 			purchase.Id,
 			currency.Id,
 			null,
-			DateTime.UtcNow,
-			false,
-			null);
+			DateTime.UtcNow);
 
 		await Mediator.Send(editCommand, CancellationToken);
 
@@ -205,9 +201,7 @@ public class EditPurchaseTests : IntegrationTest
 				purchase.Id,
 				currency.Id,
 				null,
-				DateTime.UtcNow,
-				false,
-				null),
+				DateTime.UtcNow),
 			CancellationToken);
 
 		var updatedPurchaseContent =
@@ -224,121 +218,6 @@ public class EditPurchaseTests : IntegrationTest
 		updatedProductStockQuantity.Should().Be(3);
 	}
 
-	[Fact]
-	public async Task EditPurchase_WithLogistics_CreatesPurchaseLogistics()
-	{
-		var currency = GetContext<CurrencyTestContext>().Currencies[0];
-		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-		var purchase = PurchaseContext.Purchase;
-		var product = PurchaseContext.Product;
-		var content = purchase.Contents.Single();
-		await AddStorageOwner(route, PurchaseContext.Supplier.Id);
-
-		var editCommand = new EditPurchaseCommand(
-			[
-				new EditPurchaseDto
-				{
-					Id = content.Id,
-					ProductId = product.Id,
-					Count = 2,
-					Price = 10m,
-					CalculateLogistics = true
-				}
-			],
-			purchase.Id,
-			currency.Id,
-			null,
-			DateTime.UtcNow,
-			true,
-			route.FromStorageCode);
-
-		await Mediator.Send(editCommand, CancellationToken);
-
-		var updatedPurchase = await Context
-			.Set<Purchase>()
-			.Include(x => x.PurchaseLogistic)
-			.Include(x => x.Contents)
-			.ThenInclude(x => x.PurchaseContentLogistic)
-			.AsNoTracking()
-			.SingleAsync(CancellationToken);
-
-		updatedPurchase.PurchaseLogistic.Should().NotBeNull();
-		updatedPurchase.PurchaseLogistic!.RouteId.Should().Be(route.Id);
-		updatedPurchase.Contents.Single().PurchaseContentLogistic.Should().NotBeNull();
-
-		if (updatedPurchase.PurchaseLogistic.TransactionId is not null)
-		{
-			var logisticsTransaction = await Context
-				.Set<Transaction>()
-				.AsNoTracking()
-				.SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId, CancellationToken);
-
-			logisticsTransaction.SourceType.Should().Be(TransactionSourceType.Logistic);
-		}
-	}
-
-	[Fact]
-	public async Task EditPurchase_WhenLogisticsDisabled_ClearsPurchaseLogistics()
-	{
-		var currency = GetContext<CurrencyTestContext>().Currencies[0];
-		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-		var purchase = PurchaseContext.Purchase;
-		var product = PurchaseContext.Product;
-		var content = purchase.Contents.Single();
-		content.SetLogistic(
-			1m,
-			1m,
-			1m);
-		purchase.SetPurchaseLogistic(
-			route.Id,
-			route.CurrencyId,
-			route.PricingModel,
-			route.RouteType,
-			route.PriceKg,
-			route.PricePerM3,
-			route.PricePerOrder,
-			route.MinimumPrice,
-			null,
-			false);
-		await Context.SaveChangesAsync(CancellationToken);
-
-		await Mediator.Send(
-			new EditPurchaseCommand(
-				[
-					new EditPurchaseDto
-					{
-						Id = content.Id,
-						ProductId = product.Id,
-						Count = content.Count,
-						Price = content.Price,
-						CalculateLogistics = false
-					}
-				],
-				purchase.Id,
-				currency.Id,
-				null,
-				DateTime.UtcNow,
-				false,
-				null),
-			CancellationToken);
-
-		var updatedPurchase = await Context
-			.Set<Purchase>()
-			.Include(x => x.PurchaseLogistic)
-			.Include(x => x.Contents)
-			.ThenInclude(x => x.PurchaseContentLogistic)
-			.AsNoTracking()
-			.SingleAsync(CancellationToken);
-
-		updatedPurchase.PurchaseLogistic.Should().BeNull();
-		updatedPurchase.Contents.Single().PurchaseContentLogistic.Should().BeNull();
-	}
-
-	private async Task AddStorageOwner(StorageRoute route, Guid supplierId)
-	{
-		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, supplierId));
-		await Context.SaveChangesAsync();
-	}
 }
 
 public class EditPurchaseValidationTests : ValidationTest<EditPurchaseValidation, EditPurchaseCommand>
@@ -358,9 +237,7 @@ public class EditPurchaseValidationTests : ValidationTest<EditPurchaseValidation
 				Guid.NewGuid(),
 				1,
 				null,
-				DateTime.UtcNow,
-				false,
-				null));
+				DateTime.UtcNow));
 		result.ShouldHaveValidationErrorFor(x => x.Content)
 			.WithErrorCode(PurchaseContentDuplicateIdsNotAllowedMessage.Instance.MessageKey)
 			.WithCustomState(PurchaseContentDuplicateIdsNotAllowedMessage.Instance)

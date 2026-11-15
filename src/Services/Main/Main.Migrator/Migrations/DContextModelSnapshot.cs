@@ -2228,93 +2228,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("purchase_content", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseContentLogistic", b =>
-                {
-                    b.Property<int>("PurchaseContentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("purchase_content_id");
-
-                    b.Property<decimal>("AreaM3")
-                        .HasColumnType("numeric")
-                        .HasColumnName("area_m3");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price");
-
-                    b.Property<decimal>("WeightKg")
-                        .HasColumnType("numeric")
-                        .HasColumnName("weight_kg");
-
-                    b.HasKey("PurchaseContentId")
-                        .HasName("purchase_content_logistics_pk");
-
-                    b.ToTable("purchase_content_logistics", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseLogistic", b =>
-                {
-                    b.Property<Guid>("PurchaseId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("purchase_id");
-
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("currency_id");
-
-                    b.Property<decimal?>("MinimumPrice")
-                        .HasColumnType("numeric")
-                        .HasColumnName("minimum_price");
-
-                    b.Property<bool>("MinimumPriceApplied")
-                        .HasColumnType("boolean")
-                        .HasColumnName("minimum_price_applied");
-
-                    b.Property<decimal>("PriceKg")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_kg");
-
-                    b.Property<decimal>("PricePerM3")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_per_m3");
-
-                    b.Property<decimal>("PricePerOrder")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_per_order");
-
-                    b.Property<string>("PricingModel")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("pricing_model");
-
-                    b.Property<Guid>("RouteId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("route_id");
-
-                    b.Property<string>("RouteType")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("route_type");
-
-                    b.Property<Guid?>("TransactionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("transaction_id");
-
-                    b.HasKey("PurchaseId")
-                        .HasName("purchase_logistics_pk");
-
-                    b.HasIndex("CurrencyId");
-
-                    b.HasIndex("RouteId");
-
-                    b.HasIndex(new[] { "TransactionId" }, "purchase_logistics_transaction_id_uindex")
-                        .IsUnique();
-
-                    b.ToTable("purchase_logistics", "public");
-                });
-
             modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2795,155 +2708,6 @@ namespace Main.Migrator.Migrations
                         {
                             t.HasCheckConstraint("storage_content_locks_quantity_positive_ck", "quantity > 0");
                         });
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageOwner", b =>
-                {
-                    b.Property<string>("StorageCode")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("storage_name");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("StorageCode", "UserId")
-                        .HasName("storage_owners_pk");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storageowner_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storageowner_who_updated_idx");
-
-                    b.HasIndex(new[] { "UserId" }, "storage_owners_owner_id_index");
-
-                    b.ToTable("storage_owners", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageRoute", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<Guid?>("CarrierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("carrier_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("currency_id");
-
-                    b.Property<int>("DeliveryTimeMinutes")
-                        .HasColumnType("integer")
-                        .HasColumnName("delivery_time_minutes");
-
-                    b.Property<int>("DistanceM")
-                        .HasColumnType("integer")
-                        .HasColumnName("distance_m");
-
-                    b.Property<string>("FromStorageCode")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("from_storage_name");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
-                    b.Property<decimal>("MinimumPrice")
-                        .HasColumnType("numeric")
-                        .HasColumnName("minimum_price");
-
-                    b.Property<decimal>("PriceKg")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_kg");
-
-                    b.Property<decimal>("PricePerM3")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_per_m3");
-
-                    b.Property<decimal>("PricePerOrder")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_per_order");
-
-                    b.Property<string>("PricingModel")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("pricing_model");
-
-                    b.Property<string>("RouteType")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("route_type");
-
-                    b.Property<string>("ToStorageCode")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("to_storage_name");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("Id")
-                        .HasName("storage_routes_pk");
-
-                    b.HasIndex("ToStorageCode");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storageroute_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storageroute_who_updated_idx");
-
-                    b.HasIndex(new[] { "FromStorageCode", "ToStorageCode", "IsActive" }, "storage_from_to_active_uindex")
-                        .IsUnique()
-                        .HasFilter("(is_active = true)");
-
-                    b.HasIndex(new[] { "CarrierId" }, "storage_routes_carrier_id_index");
-
-                    b.HasIndex(new[] { "CurrencyId" }, "storage_routes_currency_id_index");
-
-                    b.ToTable("storage_routes", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.User.User", b =>
@@ -4702,50 +4466,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("StorageContent");
                 });
 
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseContentLogistic", b =>
-                {
-                    b.HasOne("Main.Entities.Purchase.PurchaseContent", null)
-                        .WithOne("PurchaseContentLogistic")
-                        .HasForeignKey("Main.Entities.Purchase.PurchaseContentLogistic", "PurchaseContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("purchase_content_logistics_purchase_content_id_fk");
-                });
-
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseLogistic", b =>
-                {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("purchase_logistics_currency_id_fk");
-
-                    b.HasOne("Main.Entities.Purchase.Purchase", null)
-                        .WithOne("PurchaseLogistic")
-                        .HasForeignKey("Main.Entities.Purchase.PurchaseLogistic", "PurchaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("purchase_logistics_purchase_id_fk");
-
-                    b.HasOne("Main.Entities.Storage.StorageRoute", null)
-                        .WithMany()
-                        .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("purchase_logistics_storage_routes_id_fk");
-
-                    b.HasOne("Main.Entities.Balance.Transaction", "Transaction")
-                        .WithOne()
-                        .HasForeignKey("Main.Entities.Purchase.PurchaseLogistic", "TransactionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("purchase_logistics_transactions_id_fk");
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("Transaction");
-                });
-
             modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", "Currency")
@@ -4915,57 +4635,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("storage_content_locks_storage_content_id_fk");
 
                     b.Navigation("StorageContent");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageOwner", b =>
-                {
-                    b.HasOne("Main.Entities.Storage.Storage", "Storage")
-                        .WithMany("Owners")
-                        .HasForeignKey("StorageCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("storage_owners_storages_name_fk");
-
-                    b.HasOne("Main.Entities.User.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("storage_owners_users_id_fk");
-
-                    b.Navigation("Storage");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageRoute", b =>
-                {
-                    b.HasOne("Main.Entities.User.User", null)
-                        .WithMany()
-                        .HasForeignKey("CarrierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("storage_routes_users_id_fk");
-
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("storage_routes_currency_id_fk");
-
-                    b.HasOne("Main.Entities.Storage.Storage", null)
-                        .WithMany()
-                        .HasForeignKey("FromStorageCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("storage_routes_storages_name_fk");
-
-                    b.HasOne("Main.Entities.Storage.Storage", null)
-                        .WithMany()
-                        .HasForeignKey("ToStorageCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("storage_routes_storages_name_fk_2");
-
-                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Main.Entities.User.UserEmail", b =>
@@ -5158,13 +4827,6 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
                 {
                     b.Navigation("Contents");
-
-                    b.Navigation("PurchaseLogistic");
-                });
-
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseContent", b =>
-                {
-                    b.Navigation("PurchaseContentLogistic");
                 });
 
             modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
@@ -5177,11 +4839,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Analytics");
 
                     b.Navigation("Details");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.Storage", b =>
-                {
-                    b.Navigation("Owners");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>

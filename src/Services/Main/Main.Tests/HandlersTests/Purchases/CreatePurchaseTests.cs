@@ -36,7 +36,7 @@ public class CreatePurchaseTests : IntegrationTest
 		RegisterBasicContext<ProductTestContext>();
 		RegisterBasicContext<CurrencyRatesTestContext>();
 		RegisterBasicContext<StorageTestContext>();
-		RegisterBasicContext<StorageRouteTestContext>();
+		RegisterBasicContext<UsersTestContext>();
 	}
 
 	private MessageBrokerStub Broker
@@ -49,67 +49,6 @@ public class CreatePurchaseTests : IntegrationTest
 		await base.InitializeAsync();
 
 		_supplier = await new SupplierUserBuilder(Faker).BuildAndAddToDb(Context);
-	}
-
-	[Fact]
-	public async Task CreatePurchase_WithoutLogistics_CreatesPurchaseAndStorageContents()
-	{
-		var currency = GetContext<CurrencyTestContext>().Currencies[0];
-		var storage = GetContext<StorageTestContext>().Storages.First();
-		var products = GetContext<ProductTestContext>().Products.Take(2).ToList();
-		var command = CreateCommand(
-			_supplier.Id,
-			currency.Id,
-			storage.Code,
-			false,
-			null,
-			products.Select((product, index) => NewContent(
-				product,
-				index + 1,
-				false)));
-
-		var publishedBefore = Broker.PublishedMessages.Count;
-		await Mediator.Send(command, CancellationToken);
-
-		var purchase = await Context
-			.Set<Purchase>()
-			.Include(x => x.Contents)
-			.Include(x => x.PurchaseLogistic)
-			.AsNoTracking()
-			.SingleAsync(CancellationToken);
-
-		purchase.SupplierUserId.Should().Be(_supplier.Id);
-		purchase.SupplierOrganizationId.Should().Be(_supplier.Id);
-		purchase.CurrencyId.Should().Be(currency.Id);
-		purchase.Storage.Should().Be(storage.Code);
-		purchase.State.Should().Be(PurchaseState.Completed);
-		purchase.Comment.Should().Be(command.Comment);
-		purchase.PurchaseLogistic.Should().BeNull();
-		purchase.Contents.Should().HaveCount(command.PurchaseContent.Count());
-
-		var storageContents =
-			await Context.Set<StorageContent>().AsNoTracking().ToListAsync(CancellationToken);
-		storageContents.Should().HaveCount(command.PurchaseContent.Count());
-		foreach (var item in command.PurchaseContent)
-			storageContents
-				.Should()
-				.Contain(x =>
-					x.ProductId == item.ProductId && x.Count == item.Count && x.BuyPrice == item.Price &&
-					x.CurrencyId == command.CurrencyId && x.StorageCode == command.StorageCode);
-
-		var purchaseTransaction = await Context
-			.Set<Transaction>()
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == purchase.TransactionId, CancellationToken);
-		purchaseTransaction.SenderId.Should().Be(_supplier.Id);
-		purchaseTransaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
-		purchaseTransaction.Amount.Should().Be(command.PurchaseContent.Sum(x => x.Price * x.Count));
-		purchaseTransaction.SourceType.Should().Be(TransactionSourceType.Purchase);
-
-		var published = Broker.PublishedMessages.Skip(publishedBefore).ToArray();
-		published.OfType<PurchaseCreatedEvent>().Should().ContainSingle().Which.Id.Should().Be(purchase.Id);
-		published.OfType<PurchaseUpdatedEvent>().Should().BeEmpty();
-		published.OfType<PurchaseDeletedEvent>().Should().BeEmpty();
 	}
 
 	[Fact]
@@ -153,13 +92,8 @@ public class CreatePurchaseTests : IntegrationTest
 			member.Id,
 			currency.Id,
 			storage.Code,
-			false,
-			null,
 			[
-				NewContent(
-					product,
-					1,
-					false)
+				NewContent(product, 1)
 			]);
 
 		var result = await Mediator.Send(command, CancellationToken);
@@ -173,66 +107,59 @@ public class CreatePurchaseTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task CreatePurchase_WithLogistics_CreatesPurchaseLogisticsAndContentLogistics()
+	public async Task CreatePurchase_CreatesPurchaseAndStorageContents()
 	{
 		var currency = GetContext<CurrencyTestContext>().Currencies[0];
-		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-		var product = GetContext<ProductTestContext>().Products.First();
-		await AddLogisticsDependencies(
-			product,
-			route,
-			_supplier.Id);
-
+		var storage = GetContext<StorageTestContext>().Storages.First();
+		var products = GetContext<ProductTestContext>().Products.Take(2).ToList();
 		var command = CreateCommand(
 			_supplier.Id,
 			currency.Id,
-			route.ToStorageCode,
-			true,
-			route.FromStorageCode,
-			[
-				NewContent(
-					product,
-					2,
-					true)
-			]);
+			storage.Code,
+			products.Select((product, index) => NewContent(
+				product,
+				index + 1)));
 
+		var publishedBefore = Broker.PublishedMessages.Count;
 		await Mediator.Send(command, CancellationToken);
 
 		var purchase = await Context
 			.Set<Purchase>()
-			.Include(x => x.PurchaseLogistic)
 			.Include(x => x.Contents)
-			.ThenInclude(x => x.PurchaseContentLogistic)
 			.AsNoTracking()
 			.SingleAsync(CancellationToken);
 
-		purchase.PurchaseLogistic.Should().NotBeNull();
-		purchase.PurchaseLogistic!.RouteId.Should().Be(route.Id);
-		purchase.PurchaseLogistic.CurrencyId.Should().Be(route.CurrencyId);
-		purchase.PurchaseLogistic.PricingModel.Should().Be(route.PricingModel);
-		purchase.PurchaseLogistic.RouteType.Should().Be(route.RouteType);
-		purchase.PurchaseLogistic.PriceKg.Should().Be(route.PriceKg);
-		purchase.PurchaseLogistic.PricePerM3.Should().Be(route.PricePerM3);
-		purchase.PurchaseLogistic.PricePerOrder.Should().Be(route.PricePerOrder);
-		purchase.PurchaseLogistic.MinimumPrice.Should().Be(route.MinimumPrice);
+		purchase.SupplierUserId.Should().Be(_supplier.Id);
+		purchase.SupplierOrganizationId.Should().Be(_supplier.Id);
+		purchase.CurrencyId.Should().Be(currency.Id);
+		purchase.Storage.Should().Be(storage.Code);
+		purchase.State.Should().Be(PurchaseState.Completed);
+		purchase.Comment.Should().Be(command.Comment);
+		purchase.Contents.Should().HaveCount(command.PurchaseContent.Count());
 
-		var content = purchase.Contents.Single();
-		content.PurchaseContentLogistic.Should().NotBeNull();
-		content.PurchaseContentLogistic!.WeightKg.Should().BeGreaterThan(0);
-		content.PurchaseContentLogistic.AreaM3.Should().BeGreaterThan(0);
-		content.PurchaseContentLogistic.Price.Should().BeGreaterThanOrEqualTo(0);
+		var storageContents =
+			await Context.Set<StorageContent>().AsNoTracking().ToListAsync(CancellationToken);
+		storageContents.Should().HaveCount(command.PurchaseContent.Count());
+		foreach (var item in command.PurchaseContent)
+			storageContents
+				.Should()
+				.Contain(x =>
+					x.ProductId == item.ProductId && x.Count == item.Count && x.BuyPrice == item.Price &&
+					x.CurrencyId == command.CurrencyId && x.StorageCode == command.StorageCode);
 
-		if (route.CarrierId is not null)
-		{
-			purchase.PurchaseLogistic.TransactionId.Should().NotBeNull();
-			var logisticsTransaction = await Context
-				.Set<Transaction>()
-				.AsNoTracking()
-				.SingleAsync(x => x.Id == purchase.PurchaseLogistic.TransactionId, CancellationToken);
-			logisticsTransaction.SenderId.Should().Be(route.CarrierId.Value);
-			logisticsTransaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
-			logisticsTransaction.SourceType.Should().Be(TransactionSourceType.Logistic);
-		}
+		var purchaseTransaction = await Context
+			.Set<Transaction>()
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == purchase.TransactionId, CancellationToken);
+		purchaseTransaction.SenderId.Should().Be(_supplier.Id);
+		purchaseTransaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
+		purchaseTransaction.Amount.Should().Be(command.PurchaseContent.Sum(x => x.Price * x.Count));
+		purchaseTransaction.SourceType.Should().Be(TransactionSourceType.Purchase);
+
+		var published = Broker.PublishedMessages.Skip(publishedBefore).ToArray();
+		published.OfType<PurchaseCreatedEvent>().Should().ContainSingle().Which.Id.Should().Be(purchase.Id);
+		published.OfType<PurchaseUpdatedEvent>().Should().BeEmpty();
+		published.OfType<PurchaseDeletedEvent>().Should().BeEmpty();
 	}
 
 	[Fact]
@@ -246,13 +173,8 @@ public class CreatePurchaseTests : IntegrationTest
 			_supplier.Id,
 			currency.Id,
 			storage.Code,
-			false,
-			null,
 			[
-				NewContent(
-					product,
-					1,
-					false)
+				NewContent(product, 1)
 			],
 			payedSum);
 
@@ -299,13 +221,8 @@ public class CreatePurchaseTests : IntegrationTest
 			_supplier.Id,
 			currency.Id,
 			storage.Code,
-			false,
-			null,
 			[
-				NewContent(
-					product,
-					1,
-					false)
+				NewContent(product, 1)
 			],
 			0m);
 
@@ -313,40 +230,6 @@ public class CreatePurchaseTests : IntegrationTest
 
 		var transactions = await Context.Set<Transaction>().AsNoTracking().ToListAsync(CancellationToken);
 		transactions.Should().HaveCount(1);
-	}
-
-	[Fact]
-	public async Task
-		CreatePurchase_WithLogisticsButNoContentMarkedForLogistics_DoesNotCreatePurchaseLogistic()
-	{
-		var currency = GetContext<CurrencyTestContext>().Currencies[0];
-		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-		var product = GetContext<ProductTestContext>().Products.First();
-		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
-		await Context.SaveChangesAsync(CancellationToken);
-
-		var command = CreateCommand(
-			_supplier.Id,
-			currency.Id,
-			route.ToStorageCode,
-			true,
-			route.FromStorageCode,
-			[
-				NewContent(
-					product,
-					1,
-					false)
-			]);
-
-		await Mediator.Send(command, CancellationToken);
-
-		var purchase = await Context
-			.Set<Purchase>()
-			.Include(x => x.PurchaseLogistic)
-			.AsNoTracking()
-			.SingleAsync(CancellationToken);
-
-		purchase.PurchaseLogistic.Should().BeNull();
 	}
 
 	[Fact]
@@ -424,96 +307,10 @@ public class CreatePurchaseTests : IntegrationTest
 		Assert.Contains(exception.Failures, failure => failure.Error is ProductNotFoundException);
 	}
 
-	[Fact]
-	public async Task CreatePurchase_WithLogisticsAndMissingStorageOwner_ThrowsDbValidationException()
-	{
-		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-		var command = CreateValidCommand() with
-		{
-			StorageCode = route.ToStorageCode,
-			WithLogistics = true,
-			StorageFrom = route.FromStorageCode
-		};
-
-		var exception =
-			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
-
-		exception.Failures[0].Error.Should().BeOfType<StorageOwnerNotFoundException>();
-	}
-
-	[Fact]
-	public async Task CreatePurchase_WithLogisticsAndMissingProductSize_ThrowsProductSizesNotFoundException()
-	{
-		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-		var product = GetContext<ProductTestContext>().Products.First();
-		Context.Set<ProductWeight>()
-			.Add(
-				ProductWeight.Create(
-					product.Id,
-					2m,
-					WeightUnit.Kilogram));
-		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
-		await Context.SaveChangesAsync(CancellationToken);
-
-		var command = CreateCommand(
-			_supplier.Id,
-			GetContext<CurrencyTestContext>().Currencies[0].Id,
-			route.ToStorageCode,
-			true,
-			route.FromStorageCode,
-			[
-				NewContent(
-					product,
-					1,
-					true)
-			]);
-
-		await Assert.ThrowsAsync<ProductSizesNotFoundException>(() => Mediator.Send(
-			command,
-			CancellationToken));
-	}
-
-	[Fact]
-	public async Task
-		CreatePurchase_WithLogisticsAndMissingProductWeight_ThrowsProductWeightNotFoundException()
-	{
-		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-		var product = GetContext<ProductTestContext>().Products.First();
-		Context.Set<ProductSize>()
-			.Add(
-				ProductSize.Create(
-					product.Id,
-					1m,
-					1m,
-					1m,
-					DimensionUnit.Meter));
-		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, _supplier.Id));
-		await Context.SaveChangesAsync(CancellationToken);
-
-		var command = CreateCommand(
-			_supplier.Id,
-			GetContext<CurrencyTestContext>().Currencies[0].Id,
-			route.ToStorageCode,
-			true,
-			route.FromStorageCode,
-			[
-				NewContent(
-					product,
-					1,
-					true)
-			]);
-
-		await Assert.ThrowsAsync<ProductWeightNotFoundException>(() => Mediator.Send(
-			command,
-			CancellationToken));
-	}
-
 	private CreatePurchaseCommand CreateCommand(
 		Guid supplierUserId,
 		int currencyId,
 		string storageCode,
-		bool withLogistics,
-		string? storageFrom,
 		IEnumerable<NewPurchaseContentDto> contents,
 		decimal? payedSum = null,
 		Guid? supplierOrganizationId = null)
@@ -525,9 +322,7 @@ public class CreatePurchaseTests : IntegrationTest
 			DateTime.UtcNow,
 			contents.ToList(),
 			Faker.Lorem.Sentence(),
-			payedSum,
-			withLogistics,
-			storageFrom);
+			payedSum);
 
 	private CreatePurchaseCommand CreateValidCommand()
 	{
@@ -539,51 +334,22 @@ public class CreatePurchaseTests : IntegrationTest
 			_supplier.Id,
 			currency.Id,
 			storage.Code,
-			false,
-			null,
 			[
-				NewContent(
-					product,
-					1,
-					false)
+				NewContent(product, 1)
 			]);
 	}
 
 	private static NewPurchaseContentDto NewContent(
 		Product product,
-		int count,
-		bool calculateLogistics)
+		int count)
 		=> new()
 		{
 			ProductId = product.Id,
 			Count = count,
 			Price = 10m + count,
-			CalculateLogistics = calculateLogistics,
 			Comment = $"content-{count}"
 		};
 
-	private async Task AddLogisticsDependencies(
-		Product product,
-		StorageRoute route,
-		Guid supplierId)
-	{
-		Context.Set<ProductSize>()
-			.Add(
-				ProductSize.Create(
-					product.Id,
-					1m,
-					1m,
-					1m,
-					DimensionUnit.Meter));
-		Context.Set<ProductWeight>()
-			.Add(
-				ProductWeight.Create(
-					product.Id,
-					2m,
-					WeightUnit.Kilogram));
-		Context.Set<StorageOwner>().Add(StorageOwner.Create(route.FromStorageCode, supplierId));
-		await Context.SaveChangesAsync();
-	}
 }
 
 public class CreatePurchaseValidationTests : ValidationTest<CreatePurchaseValidation, CreatePurchaseCommand>
@@ -604,11 +370,9 @@ public class CreatePurchaseValidationTests : ValidationTest<CreatePurchaseValida
 			DateTime.UtcNow,
 			[
 				new NewPurchaseContentDto
-					{ ProductId = 1, Count = 1, Price = 100m, CalculateLogistics = false }
+					{ ProductId = 1, Count = 1, Price = 100m }
 			],
 			null,
-			null,
-			false,
 			null);
 
 	[Fact]
@@ -700,15 +464,4 @@ public class CreatePurchaseValidationTests : ValidationTest<CreatePurchaseValida
 		result.ShouldHaveValidationErrorFor(x => x.SupplierOrganizationId);
 	}
 
-	[Fact]
-	public async Task CreatePurchase_WithLogisticsAndEmptyStorageFrom_FailsValidation()
-	{
-		var command = CreateValidCommand() with
-		{
-			WithLogistics = true, StorageFrom = null
-		};
-
-		var result = await ValidateAsync(command);
-		result.ShouldHaveValidationErrorFor(x => x.StorageFrom);
-	}
 }

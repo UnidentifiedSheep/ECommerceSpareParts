@@ -1,7 +1,6 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
-using Main.Entities.Storage;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
@@ -13,8 +12,5 @@ public class CreatePurchaseDbValidation : AbstractDbValidation<CreatePurchaseCom
 			.ValidateUserExistsId(request.SupplierUserId)
 			.ValidateOrganizationExistsId(request.SupplierOrganizationId)
 			.ValidateOrganizationMemberExistsPK((request.SupplierOrganizationId, request.SupplierUserId));
-
-		if (request is { WithLogistics: true, StorageFrom: not null })
-			plan.ValidateStorageOwnerExistsPK((request.StorageFrom, request.SupplierUserId));
 	}
 }

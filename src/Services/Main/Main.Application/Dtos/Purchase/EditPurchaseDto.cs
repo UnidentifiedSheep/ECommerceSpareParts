@@ -16,9 +16,6 @@ public record EditPurchaseDto
 	[JsonPropertyName("price")]
 	public decimal Price { get; init; }
 
-	[JsonPropertyName("calculateLogistics")]
-	public bool CalculateLogistics { get; init; }
-
 	[JsonPropertyName("comment")]
 	public string? Comment { get; init; }
 }

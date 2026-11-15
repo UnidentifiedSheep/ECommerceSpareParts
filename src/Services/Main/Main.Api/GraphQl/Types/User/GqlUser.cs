@@ -107,36 +107,6 @@ public record GqlUser
 			.ToArray();
 
 
-	[GraphQLName("storages")]
-	[RequireAllPermissions(PermissionCodes.USERS_STORAGES_GET)]
-	public async Task<IReadOnlyList<GqlStorage>> GetStoragesAsync(
-		IUserStoragesByIdDataLoader loader,
-		CancellationToken cancellationToken)
-		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
-			.Select(storage => new GqlStorage(storage))
-			.ToArray();
-
-	[GraphQLName("organizations")]
-	[RequireAllPermissions(PermissionCodes.ORGANIZATIONS_GET)]
-	public async Task<IReadOnlyList<GqlOrganization>> GetOrganizationsAsync(
-		GqlUserOrganizationsInput input,
-		ISender sender,
-		CancellationToken cancellationToken)
-	{
-		var result = await sender.Send(
-			new GetOrganizationsQuery(
-				input.Pagination,
-				input.SortBy.ToSortExpressions(),
-				input.SearchTerm,
-				Id,
-				input.Ids ?? [],
-				input.Types ?? [],
-				input.ShowHidden ?? false),
-			cancellationToken);
-
-		return result.Organizations.Select(organization => new GqlOrganization(organization)).ToArray();
-	}
-
 	[GraphQLName("roles")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<IReadOnlyList<GqlRole>> GetRolesAsync(

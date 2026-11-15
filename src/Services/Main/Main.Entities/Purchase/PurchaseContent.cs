@@ -45,8 +45,6 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
 
 	public Product.Product Product { get; private set; } = null!;
 
-	public PurchaseContentLogistic? PurchaseContentLogistic { get; private set; }
-
 	public StorageContent StorageContent { get; private set; } = null!;
 
 	public static Expression<Func<PurchaseContent, int>> GetKeySelector() => x => x.Id;
@@ -95,30 +93,6 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
 		=> Comment = comment
 			.NullIfWhiteSpace()
 			?.EnsureMaxLength(256, PurchaseContentCommentTooLongMessage.Instance);
-
-	public void SetLogistic(
-		decimal weightKg,
-		decimal areaM3,
-		decimal price)
-	{
-		if (PurchaseContentLogistic == null)
-			PurchaseContentLogistic = PurchaseContentLogistic.Create(
-				weightKg,
-				areaM3,
-				price);
-		else
-			PurchaseContentLogistic.Update(
-				weightKg,
-				areaM3,
-				price);
-	}
-
-	public PurchaseContentLogistic? ClearLogistic()
-	{
-		var logistic = PurchaseContentLogistic;
-		PurchaseContentLogistic = null;
-		return logistic;
-	}
 
 	private void CalculateTotalSum() => TotalSum = Price * Count;
 

@@ -79,15 +79,6 @@ public sealed record GqlPurchase
 			.Select(content => new GqlPurchaseContent(content))
 			.ToArray();
 
-	[GraphQLName("logistics")]
-	public async Task<GqlPurchaseLogistic?> GetLogisticsAsync(
-		IPurchaseByIdDataLoader loader,
-		CancellationToken cancellationToken)
-	{
-		var logistics = (await GetPurchaseAsync(loader, cancellationToken)).Logistics;
-		return logistics is null ? null : new GqlPurchaseLogistic(logistics);
-	}
-
 	private async Task<PurchaseDto> GetPurchaseAsync(
 		IPurchaseByIdDataLoader loader,
 		CancellationToken cancellationToken)

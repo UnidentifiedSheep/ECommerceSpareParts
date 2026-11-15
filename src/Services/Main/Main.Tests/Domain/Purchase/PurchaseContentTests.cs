@@ -91,25 +91,6 @@ public class PurchaseContentTests
 		item.Comment.Should().Be(expected);
 	}
 
-	[Fact]
-	public void SetLogistic_CreatesOrUpdates()
-	{
-		var item = Create();
-
-		item.SetLogistic(
-			1,
-			2,
-			3);
-		item.SetLogistic(
-			2,
-			3,
-			4);
-
-		item.PurchaseContentLogistic!.WeightKg.Should().Be(2);
-		item.PurchaseContentLogistic.AreaM3.Should().Be(3);
-		item.PurchaseContentLogistic.Price.Should().Be(4);
-	}
-
 	[Theory]
 	[InlineData(
 		3,
@@ -190,14 +171,9 @@ public class PurchaseContentTests
 		item.SetPrice(2m);
 		item.SetCount(3);
 		item.SetComment("test");
-		item.SetLogistic(
-			1,
-			2,
-			3);
 
 		item.TotalSum.Should().Be(6m);
 		item.Comment.Should().Be("test");
-		item.PurchaseContentLogistic.Should().NotBeNull();
 	}
 
 	private static PurchaseContent Create()

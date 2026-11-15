@@ -19,12 +19,10 @@ namespace Main.Application.Projections;
 public sealed class PurchaseDtoProjectionProvider : ProjectionProviderBase<Purchase, PurchaseDto>
 {
 	public PurchaseDtoProjectionProvider(
-		IProjectionProvider<PurchaseLogistic, PurchaseLogisticDto> logisticProjection,
 		IProjectionProvider<Currency, CurrencyDto> currencyProjection,
 		IProjectionProvider<User, UserDto> userProjection,
 		IProjectionProvider<Organization, OrganizationDto> organizationProjection)
 	{
-		var logisticToDto = logisticProjection.Projection;
 		var currencyToDto = currencyProjection.Projection;
 		var userToDto = userProjection.Projection;
 		var organizationToDto = organizationProjection.Projection;
@@ -34,7 +32,6 @@ public sealed class PurchaseDtoProjectionProvider : ProjectionProviderBase<Purch
 			Id = x.Id,
 			Comment = x.Comment,
 			Currency = currencyToDto.Invoke(x.Currency),
-			Logistics = x.PurchaseLogistic == null ? null : logisticToDto.Invoke(x.PurchaseLogistic),
 			PurchaseDatetime = x.PurchaseDatetime,
 			StorageCode = x.Storage,
 			Supplier = userToDto.Invoke(x.SupplierUser),
@@ -49,41 +46,12 @@ public sealed class PurchaseDtoProjectionProvider : ProjectionProviderBase<Purch
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class
-	PurchaseLogisticDtoProjectionProvider : ProjectionProviderBase<PurchaseLogistic, PurchaseLogisticDto>
-{
-	public PurchaseLogisticDtoProjectionProvider(
-		IProjectionProvider<Currency, CurrencyDto> currencyProjection)
-	{
-		var currencyToDto = currencyProjection.Projection;
-
-		Projection = x => new PurchaseLogisticDto
-		{
-			RouteId = x.RouteId,
-			TransactionId = x.TransactionId,
-			PricingModel = x.PricingModel,
-			Currency = currencyToDto.Invoke(x.Currency),
-			MinimumPrice = x.MinimumPrice,
-			MinimumPriceApplied = x.MinimumPriceApplied,
-			PriceKg = x.PriceKg,
-			PricePerM3 = x.PricePerM3,
-			PricePerOrder = x.PricePerOrder,
-			RouteType = x.RouteType
-		};
-	}
-
-	public override Expression<Func<PurchaseLogistic, PurchaseLogisticDto>> Projection { get; }
-}
-
-[Lifetime(Lifetime.Singleton)]
-public sealed class
 	PurchaseContentDtoProjectionProvider : ProjectionProviderBase<PurchaseContent, PurchaseContentDto>
 {
 	public PurchaseContentDtoProjectionProvider(
-		IProjectionProvider<Product, ProductDto> productProjection,
-		IProjectionProvider<PurchaseContentLogistic, PurchaseContentLogisticDto> contentLogisticProjection)
+		IProjectionProvider<Product, ProductDto> productProjection)
 	{
 		var productToDto = productProjection.Projection;
-		var contentLogisticToDto = contentLogisticProjection.Projection;
 
 		Projection = x => new PurchaseContentDto
 		{
@@ -92,26 +60,9 @@ public sealed class
 			Comment = x.Comment,
 			Price = x.Price,
 			TotalSum = x.TotalSum,
-			Product = productToDto.Invoke(x.Product),
-			ContentLogistics = x.PurchaseContentLogistic == null
-				? null
-				: contentLogisticToDto.Invoke(x.PurchaseContentLogistic)
+			Product = productToDto.Invoke(x.Product)
 		};
 	}
 
 	public override Expression<Func<PurchaseContent, PurchaseContentDto>> Projection { get; }
-}
-
-[Lifetime(Lifetime.Singleton)]
-public sealed class
-	PurchaseContentLogisticDtoProjectionProvider : ProjectionProviderBase<PurchaseContentLogistic,
-	PurchaseContentLogisticDto>
-{
-	public override Expression<Func<PurchaseContentLogistic, PurchaseContentLogisticDto>>
-		Projection { get; } = x => new PurchaseContentLogisticDto
-	{
-		WeightKg = x.WeightKg,
-		AreaM3 = x.AreaM3,
-		Price = x.Price
-	};
 }

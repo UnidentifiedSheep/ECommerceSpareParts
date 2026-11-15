@@ -22,7 +22,4 @@ public record PurchaseContentDto
 
 	[JsonPropertyName("product")]
 	public required ProductDto Product { get; init; }
-
-	[JsonPropertyName("logistics")]
-	public required PurchaseContentLogisticDto? ContentLogistics { get; init; }
 }

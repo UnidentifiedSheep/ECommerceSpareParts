@@ -61,7 +61,6 @@ public class StoragesEndPoints : ICarterModule
 		var storages = app.MapGroup("/storages").WithTags("Storages");
 
 		storages.MapStorageContentEndPoints();
-		storages.MapStorageOwnersEndPoints();
 
 		storages
 			.MapPost(

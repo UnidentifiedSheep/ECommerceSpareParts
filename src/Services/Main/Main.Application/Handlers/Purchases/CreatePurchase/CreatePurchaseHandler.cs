@@ -31,8 +31,6 @@ public record CreatePurchaseCommand(
 	IReadOnlyCollection<NewPurchaseContentDto> PurchaseContent,
 	string? Comment,
 	decimal? PayedSum,
-	bool WithLogistics,
-	string? StorageFrom,
 	bool ForcePayment = false) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(Guid PurchaseId);
@@ -40,7 +38,6 @@ public record CreatePurchaseResult(Guid PurchaseId);
 public class CreatePurchaseHandler(
 	ISender sender,
 	IOptions<SystemOptions> systemOptions,
-	IPurchaseLogisticsService purchaseLogisticsService,
 	IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
 	public async Task<CreatePurchaseResult> Handle(
@@ -69,7 +66,6 @@ public class CreatePurchaseHandler(
 		await unitOfWork.SaveChangesAsync(cancellationToken);
 
 		var purchase = await CreatePurchase(
-			systemId,
 			request,
 			purchaseTransaction.Id,
 			purchaseContents,
@@ -116,14 +112,12 @@ public class CreatePurchaseHandler(
 	}
 
 	private async Task<Purchase> CreatePurchase(
-		Guid systemId,
 		CreatePurchaseCommand request,
 		Guid transactionId,
 		IReadOnlyList<NewPurchaseContentDto> purchaseContents,
 		IReadOnlyList<StorageContent> storageContents,
 		CancellationToken cancellationToken)
 	{
-		List<PurchaseLogisticsItem> toCalculate = [];
 		var purchase = Purchase.Create(
 			request.SupplierUserId,
 			request.SupplierOrganizationId,
@@ -152,21 +146,7 @@ public class CreatePurchaseHandler(
 
 			purchase.AddContent(purchaseContent);
 
-			if (request.WithLogistics && content.CalculateLogistics)
-				toCalculate.Add(
-					new PurchaseLogisticsItem(
-						purchaseContent,
-						content.ProductId,
-						content.Count));
 		}
-
-		await purchaseLogisticsService.ApplyAsync(
-			purchase,
-			toCalculate,
-			request.StorageFrom,
-			request.PurchaseDate,
-			systemId,
-			cancellationToken);
 
 		purchase.Complete();
 		await unitOfWork.AddAsync(purchase, cancellationToken);

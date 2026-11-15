@@ -72,7 +72,6 @@ public class UsersEndPoints : ICarterModule
 		var users = app.MapGroup("/users").WithTags("Users");
 
 		users.MapUserInfoEndPoints();
-		users.MapUserStorageEndPoints();
 		users.MapUserPermissionEndPoints();
 		users.MapUserEmailEndPoints();
 		users.MapUserRoleEndPoints();

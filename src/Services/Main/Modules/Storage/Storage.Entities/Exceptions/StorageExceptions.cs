@@ -3,9 +3,6 @@ using Exceptions.Base.Localized;
 
 namespace Main.Entities.Exceptions;
 
-public class ChangeOfStorageTypeRestrictedException()
-	: LocalizedBadRequestException(StorageTypeChangeRestrictedMessage.Instance);
-
 public class NotEnoughCountOnStorageException : LocalizedBadRequestException
 {
 	public NotEnoughCountOnStorageException(
@@ -62,49 +59,6 @@ public class StorageNotFoundException(string code) : LocalizedNotFoundException(
 	{
 		Code = code
 	});
-
-public class StorageOwnerNotFoundException(Guid userId, string storageCode) : LocalizedNotFoundException(
-	new StorageNotFoundInUserMessage().WithStorageCode(storageCode),
-	new
-	{
-		UserId = userId, StorageCode = storageCode
-	});
-
-public class StorageRouteActiveExistsException(string from, string to) : LocalizedConflictException(
-	new ActiveStorageRouteExistsMessage().WithFrom(from).WithTo(to),
-	new
-	{
-		From = from, To = to
-	});
-
-public class StorageRouteNotFound : LocalizedNotFoundException
-{
-	public StorageRouteNotFound(string storageFrom, string storageTo) : base(
-		new StorageRouteNotFoundByNamesMessage().WithStorageFrom(storageFrom).WithStorageTo(storageTo),
-		new
-		{
-			StorageFrom = storageFrom, StorageTo = storageTo
-		})
-	{
-	}
-
-	public StorageRouteNotFound(Guid id) : base(
-		StorageRouteNotFoundByIdMessage.Instance,
-		new
-		{
-			Id = id
-		})
-	{
-	}
-}
-
-public class StorageOwnerAlreadyExistsException(object values) : LocalizedConflictException(
-	StorageAlreadyBelongsUserMessage.Instance,
-	values);
-
-public class StorageRouteAlreadyExistsException(object values) : LocalizedConflictException(
-	StorageRouteAlreadyExistsMessage.Instance,
-	values);
 
 public class StorageCodeAlreadyTakenException(object values) : LocalizedConflictException(
 	StorageCodeTakenMessage.Instance,

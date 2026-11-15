@@ -13,9 +13,6 @@ public record NewPurchaseContentDto
 	[JsonPropertyName("price")]
 	public required decimal Price { get; init; }
 
-	[JsonPropertyName("calculateLogistics")]
-	public required bool CalculateLogistics { get; init; }
-
 	[JsonPropertyName("comment")]
 	public string? Comment { get; init; }
 }

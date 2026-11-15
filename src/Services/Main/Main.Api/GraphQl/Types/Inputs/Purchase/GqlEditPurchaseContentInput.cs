@@ -18,9 +18,6 @@ public sealed record GqlEditPurchaseContentInput
 	[GraphQLName("price")]
 	public required decimal Price { get; init; }
 
-	[GraphQLName("calculateLogistics")]
-	public required bool CalculateLogistics { get; init; }
-
 	[GraphQLName("comment")]
 	public string? Comment { get; init; }
 
@@ -32,7 +29,6 @@ public sealed record GqlEditPurchaseContentInput
 			ProductId = ProductId,
 			Count = Count,
 			Price = Price,
-			CalculateLogistics = CalculateLogistics,
 			Comment = Comment
 		};
 }

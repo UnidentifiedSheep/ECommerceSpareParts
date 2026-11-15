@@ -27,11 +27,6 @@ public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
 
 		RuleFor(x => x.PurchaseDate).SetValidator(new RecordDateValidator(datePolicy));
 
-		RuleFor(x => x.StorageFrom)
-			.Must(x => x != null)
-			.When(x => x.WithLogistics)
-			.WithLocalizableError(PurchaseStorageFromRequiredWhenLogisticsMessage.Instance);
-
 		RuleFor(x => x.PayedSum)
 			.GreaterThanOrEqualTo(0)
 			.When(x => x.PayedSum != null)

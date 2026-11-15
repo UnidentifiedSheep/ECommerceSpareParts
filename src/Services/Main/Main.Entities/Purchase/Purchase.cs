@@ -59,8 +59,6 @@ public class Purchase : AuditableEntity<Purchase, Guid>,
 
 	public virtual Currency.Currency Currency { get; private set; } = null!;
 
-	public virtual PurchaseLogistic? PurchaseLogistic { get; private set; }
-
 	public virtual User.User SupplierUser { get; private set; } = null!;
 
 	public virtual Organization.Organization SupplierOrganization { get; private set; } = null!;
@@ -119,52 +117,6 @@ public class Purchase : AuditableEntity<Purchase, Guid>,
 			throw new InvalidOperationException("Invalid purchase id in purchase content");
 
 		_contents.Remove(content);
-	}
-
-	public void SetPurchaseLogistic(
-		Guid routeId,
-		int logisticsCurrencyId,
-		LogisticPricingType pricingModel,
-		RouteType routeType,
-		decimal priceKg,
-		decimal pricePerM3,
-		decimal pricePerOrder,
-		decimal? minimumPrice,
-		Guid? transactionId,
-		bool minimumPriceApplied)
-	{
-		if (PurchaseLogistic == null)
-			PurchaseLogistic = PurchaseLogistic.Create(
-				GetId(),
-				routeId,
-				logisticsCurrencyId,
-				transactionId,
-				pricingModel,
-				routeType,
-				priceKg,
-				pricePerM3,
-				pricePerOrder,
-				minimumPrice,
-				minimumPriceApplied);
-		else
-			PurchaseLogistic.Update(
-				routeId,
-				logisticsCurrencyId,
-				transactionId,
-				pricingModel,
-				routeType,
-				priceKg,
-				pricePerM3,
-				pricePerOrder,
-				minimumPrice,
-				minimumPriceApplied);
-	}
-
-	public PurchaseLogistic? ClearPurchaseLogistic()
-	{
-		var logistic = PurchaseLogistic;
-		PurchaseLogistic = null;
-		return logistic;
 	}
 
 	public void Complete() => State = PurchaseState.Completed;

@@ -36,18 +36,14 @@ public record EditPurchaseCommand(
 	Guid PurchaseId,
 	int CurrencyId,
 	string? Comment,
-	DateTime PurchaseDateTime,
-	bool WithLogistics,
-	string? StorageFrom) : ICommand;
+	DateTime PurchaseDateTime) : ICommand;
 
 public class EditPurchaseHandler(
 	ISender sender,
 	IRepository<Purchase, Guid> purchaseRepository,
-	IRepository<StorageOwner, (string, Guid)> storageOwnerRepository,
 	IOptions<SystemOptions> systemOptions,
 	IRepository<StorageContent, int> storageContentRepository,
 	ICurrencyConverter currencyConverter,
-	IPurchaseLogisticsService purchaseLogisticsService,
 	IStorageContentService storageContentService,
 	IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand>
 {
@@ -57,10 +53,6 @@ public class EditPurchaseHandler(
 		var purchase = await GetPurchase(purchaseId, cancellationToken);
 		var contentDtos = request.Content.ToList();
 
-		await EnsureStorageOwner(
-			purchase,
-			request,
-			cancellationToken);
 		await ReversePurchaseTransactions(purchase, cancellationToken);
 
 		var totalSum = contentDtos.Sum(x => x.Price * x.Count);
@@ -82,11 +74,6 @@ public class EditPurchaseHandler(
 			contentDtos,
 			request,
 			cancellationToken);
-		await UpdateLogistics(
-			purchase,
-			contentDtos,
-			request,
-			cancellationToken);
 
 		return Unit.Value;
 	}
@@ -97,22 +84,8 @@ public class EditPurchaseHandler(
 		=> purchaseRepository.EnsureExistForUpdateAsync(
 			purchaseId,
 			id => new PurchaseNotFoundException(id),
-			Criteria<Purchase>.New().Include(x => x.Contents).Include(x => x.PurchaseLogistic),
+			Criteria<Purchase>.New().Include(x => x.Contents),
 			cancellationToken);
-
-	private async Task EnsureStorageOwner(
-		Purchase purchase,
-		EditPurchaseCommand request,
-		CancellationToken cancellationToken)
-	{
-		if (request is not { WithLogistics: true, StorageFrom: not null })
-			return;
-
-		await storageOwnerRepository.EnsureExistAsync(
-			(request.StorageFrom, purchase.SupplierUserId),
-			_ => new StorageOwnerNotFoundException(purchase.SupplierUserId, request.StorageFrom),
-			ct: cancellationToken);
-	}
 
 	private async Task ReversePurchaseTransactions(Purchase purchase, CancellationToken cancellationToken)
 	{
@@ -122,14 +95,6 @@ public class EditPurchaseHandler(
 				TransactionReversalMode.System,
 				true),
 			cancellationToken);
-
-		if (purchase.PurchaseLogistic?.TransactionId is { } logisticsTransactionId)
-			await sender.Send(
-				new ReverseTransactionCommand(
-					logisticsTransactionId,
-					TransactionReversalMode.System,
-					true),
-				cancellationToken);
 	}
 
 	private async Task<Transaction> CreateTransaction(
@@ -227,9 +192,6 @@ public class EditPurchaseHandler(
 		PurchaseContent content,
 		ICollection<SubtractStorageContentItem> subtractions)
 	{
-		if (content.PurchaseContentLogistic is { } logistic)
-			unitOfWork.Remove(logistic);
-
 		subtractions.Add(new SubtractStorageContentItem(content.StorageContentId, content.Count));
 
 		purchase.RemoveContent(content);
@@ -335,32 +297,5 @@ public class EditPurchaseHandler(
 				dto.Price,
 				request.CurrencyId,
 				cancellationToken));
-	}
-
-	private async Task UpdateLogistics(
-		Purchase purchase,
-		IReadOnlyList<EditPurchaseDto> contentDtos,
-		EditPurchaseCommand request,
-		CancellationToken cancellationToken)
-	{
-		var toCalculate = purchase
-			.Contents
-			.Join(
-				contentDtos.Where(x => request.WithLogistics && x.CalculateLogistics),
-				purchaseContent => purchaseContent.ProductId,
-				dto => dto.ProductId,
-				(purchaseContent, dto) => new PurchaseLogisticsItem(
-					purchaseContent,
-					dto.ProductId,
-					dto.Count))
-			.ToList();
-
-		await purchaseLogisticsService.ApplyAsync(
-			purchase,
-			toCalculate,
-			request.StorageFrom,
-			request.PurchaseDateTime,
-			GetSystemUserId(),
-			cancellationToken);
 	}
 }

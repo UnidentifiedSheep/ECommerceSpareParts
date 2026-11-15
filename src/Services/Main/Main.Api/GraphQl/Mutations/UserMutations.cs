@@ -9,8 +9,6 @@ using Main.Application.Handlers.Auth.AddRolesToUser;
 using Main.Application.Handlers.Auth.EmailVerification;
 using Main.Application.Handlers.Auth.RemovePermissionsFromUser;
 using Main.Application.Handlers.Auth.RemoveRolesFromUser;
-using Main.Application.Handlers.StorageOwners.AddStorageToUser;
-using Main.Application.Handlers.StorageOwners.DeleteStorageFromUser;
 using Main.Application.Handlers.Users.AddEmailToUser;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Application.Handlers.Users.EditUserInfo;
@@ -157,30 +155,6 @@ public sealed class UserMutations
 			new RemovePermissionsFromUserCommand(input.UserId, input.Permissions),
 			cancellationToken);
 		return new GqlUser(result.UserId);
-	}
-
-	[GraphQLName("addStorage")]
-	[RequireAllPermissions(PermissionCodes.USERS_STORAGES_ADD)]
-	public async Task<GqlUser> AddStorageAsync(
-		GqlUserStorageInput input,
-		ISender sender,
-		CancellationToken cancellationToken)
-	{
-		await sender.Send(new AddStorageToUserCommand(input.UserId, input.StorageCode), cancellationToken);
-		return new GqlUser(input.UserId);
-	}
-
-	[GraphQLName("removeStorage")]
-	[RequireAllPermissions(PermissionCodes.USERS_STORAGES_DELETE)]
-	public async Task<GqlUser> RemoveStorageAsync(
-		GqlUserStorageInput input,
-		ISender sender,
-		CancellationToken cancellationToken)
-	{
-		await sender.Send(
-			new DeleteStorageFromUserCommand(input.UserId, input.StorageCode),
-			cancellationToken);
-		return new GqlUser(input.UserId);
 	}
 
 	[GraphQLName("requestMyEmailVerification")]

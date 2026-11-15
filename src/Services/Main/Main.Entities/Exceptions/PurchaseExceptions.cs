@@ -16,13 +16,6 @@ public class PurchaseContentNotFoundException(int id) : LocalizedNotFoundExcepti
 		Id = id
 	});
 
-public class PurchaseLogisticNotFoundException(string purchaseId) : LocalizedNotFoundException(
-	PurchaseLogisticsDataNotFoundMessage.Instance,
-	new
-	{
-		PurchaseId = purchaseId
-	});
-
 public class PurchaseNotFoundException(Guid id) : LocalizedNotFoundException(
 	PurchaseNotFoundMessage.Instance,
 	new

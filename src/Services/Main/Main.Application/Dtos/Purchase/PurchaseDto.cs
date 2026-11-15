@@ -33,7 +33,4 @@ public record PurchaseDto
 
 	[JsonPropertyName("totalSum")]
 	public required decimal TotalSum { get; init; }
-
-	[JsonPropertyName("logistics")]
-	public required PurchaseLogisticDto? Logistics { get; init; }
 }

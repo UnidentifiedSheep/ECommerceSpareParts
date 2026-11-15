@@ -1,0 +1,7 @@
+{
+  "culture": "ru",
+  "messages": {
+    "lrt.user.tokens.clear.expired.name": "Очистка просроченных токенов",
+    "lrt.user.tokens.clear.expired.description": "Удаляет токены пользователей с истёкшим сроком действия."
+  }
+}

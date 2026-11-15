@@ -29,12 +29,6 @@ public sealed record GqlCreatePurchaseInput
 	[GraphQLName("payedSum")]
 	public decimal? PayedSum { get; init; }
 
-	[GraphQLName("withLogistics")]
-	public bool? WithLogistics { get; init; }
-
-	[GraphQLName("storageFrom")]
-	public string? StorageFrom { get; init; }
-
 	[GraphQLName("forcePayment")]
 	public bool? ForcePayment { get; init; }
 }

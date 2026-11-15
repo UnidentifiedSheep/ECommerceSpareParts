@@ -20,7 +20,6 @@ public class EditStorageHandler(IRepository<Storage, string> repository) : IComm
 		var criteria = Criteria<Storage>
 			.New()
 			.Where(x => x.Code == request.StorageCode)
-			.Include(x => x.Owners)
 			.Track()
 			.Build();
 

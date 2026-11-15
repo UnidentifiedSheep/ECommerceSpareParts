@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "messages": {
+    "lrt.user.tokens.clear.expired.name": "Süresi dolmuş tokenları temizleme",
+    "lrt.user.tokens.clear.expired.description": "Geçerlilik süresi dolmuş kullanıcı tokenlarını siler."
+  }
+}

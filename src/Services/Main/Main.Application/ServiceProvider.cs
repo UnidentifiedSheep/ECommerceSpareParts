@@ -10,7 +10,6 @@ using Main.Application.Analytics.Interfaces;
 using Main.Application.Analytics.Services;
 using Main.Application.Configs;
 using Main.Application.Interfaces.Cache;
-using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Interfaces.Services.Document;
@@ -25,10 +24,8 @@ using Main.Application.Services.Currency;
 using Main.Application.Services.Document;
 using Main.Application.Services.Document.Providers;
 using Main.Application.Services.Document.Sources;
-using Main.Application.Services.Logistics;
 using Main.Application.Services.ProductDeletion;
 using Main.Modules.Product.Abstractions;
-using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Application.Services.Storage;
 using Main.Entities.Balance;
 using Microsoft.Extensions.Configuration;
@@ -80,24 +77,14 @@ public static class ServiceProvider
 
 		collection.RegisterSettingsService();
 
-		collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();
-		collection.AddSingleton<ILogisticsPricingStrategy, PerAreaAndWeight>();
-		collection.AddSingleton<ILogisticsPricingStrategy, PerAreaOrWeightPricing>();
-		collection.AddSingleton<ILogisticsPricingStrategy, PerAreaPricing>();
-		collection.AddSingleton<ILogisticsPricingStrategy, PerOrderPricing>();
-		collection.AddSingleton<ILogisticsPricingStrategy, PerWeightPricing>();
-		collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
-
 		collection.AddScoped<ISaleAnalyticsSynchronizer, SaleAnalyticsSynchronizer>();
 		collection.AddScoped<ISaleContentAnalyticsCalculator, SaleContentAnalyticsCalculator>();
-
 
 		collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
 		collection.AddScoped<IProductDeletionRule, SaleContentProductDeletionRule>();
 		collection.AddScoped<IProductDeletionRule, PurchaseContentProductDeletionRule>();
 		collection.AddScoped<IProductDeletionRule, OrderItemProductDeletionRule>();
 		collection.AddScoped<IBalanceService, BalanceService>();
-		collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
 		collection.AddScoped<ISaleService, SaleService>();
 
 		collection.AddApplicationBase(

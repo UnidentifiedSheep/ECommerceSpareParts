@@ -1,5 +1,4 @@
 using GreenDonut;
-using Main.Application.Dtos.Storage;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users;
 using MediatR;
@@ -37,11 +36,4 @@ public static class UserDataLoaders
 		ISender sender,
 		CancellationToken cancellationToken)
 		=> (await sender.Send(new GetUsersPhonesByIdsQuery(keys), cancellationToken)).Phones;
-
-	[DataLoader]
-	public static async Task<IReadOnlyDictionary<Guid, IReadOnlyList<StorageDto>>> GetUserStoragesByIdAsync(
-		IReadOnlyList<Guid> keys,
-		ISender sender,
-		CancellationToken cancellationToken)
-		=> (await sender.Send(new GetUsersStoragesByIdsQuery(keys), cancellationToken)).Storages;
 }

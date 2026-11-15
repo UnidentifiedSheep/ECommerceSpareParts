@@ -20,7 +20,7 @@ public class PurchaseTestContext(
 	UserContextTestContext userContext,
 	ProductTestContext productContext,
 	CurrencyTestContext currencyContext,
-	StorageRouteTestContext storageRouteContext)
+	StorageTestContext storageContext)
 	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public User Supplier { get; private set; } = null!;
@@ -33,7 +33,7 @@ public class PurchaseTestContext(
 
 	public static Type[] DependsOn { get; } =
 	[
-		typeof(ProductTestContext), typeof(CurrencyRatesTestContext), typeof(StorageRouteTestContext)
+		typeof(ProductTestContext), typeof(CurrencyRatesTestContext), typeof(StorageTestContext)
 	];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -69,7 +69,7 @@ public class PurchaseTestContext(
 		await DbContext.SaveChangesAsync(cancellationToken);
 
 		StorageContent = await new StorageContentBuilder(Faker)
-			.WithStorageCode(storageRouteContext.ActiveRoute.ToStorageCode)
+			.WithStorageCode(storageContext.Storages.Last().Code)
 			.WithProductIds(Product.Id)
 			.WithCurrencyId(currencyId)
 			.WithCount(2)
@@ -95,7 +95,7 @@ public class PurchaseTestContext(
 			.WithSupplierOrganizationId(Supplier.Id)
 			.WithCurrencyId(currencyId)
 			.WithTransactionId(transaction.Id)
-			.WithStorage(storageRouteContext.ActiveRoute.ToStorageCode)
+			.WithStorage(storageContext.Storages.Last().Code)
 			.WithContent(purchaseContent)
 			.BuildAndAddToDb(DbContext);
 	}

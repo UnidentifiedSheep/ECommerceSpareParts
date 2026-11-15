@@ -36,17 +36,11 @@ public record CreatePurchaseRequest
 	[JsonPropertyName("purchaseContent")]
 	public required IReadOnlyCollection<NewPurchaseContentDto> PurchaseContent { get; init; }
 
-	[JsonPropertyName("withLogistics")]
-	public required bool WithLogistics { get; init; }
-
 	[JsonPropertyName("comment")]
 	public string? Comment { get; init; }
 
 	[JsonPropertyName("payedSum")]
 	public decimal? PayedSum { get; init; }
-
-	[JsonPropertyName("storageFrom")]
-	public string? StorageFrom { get; init; }
 
 	[JsonPropertyName("forcePayment")]
 	public bool ForcePayment { get; init; }
@@ -62,16 +56,12 @@ public record EditPurchaseRequest(
 	IReadOnlyCollection<EditPurchaseDto> Content,
 	int CurrencyId,
 	string? Comment,
-	DateTime PurchaseDateTime,
-	bool WithLogistics,
-	string? StorageFrom);
+	DateTime PurchaseDateTime);
 
 public record GetPurchaseContentResponse
 {
 	public required IReadOnlyList<PurchaseContentDto> Content { get; init; }
 }
-
-public record GetPurchaseLogisticResponse(PurchaseLogisticDto PurchaseLogistic);
 
 public record GetPurchaseResponse(PurchaseDto Purchase);
 
@@ -120,8 +110,6 @@ public class PurchaseEndPoints : ICarterModule
 						request.PurchaseContent,
 						request.Comment,
 						request.PayedSum,
-						request.WithLogistics,
-						request.StorageFrom,
 						request.ForcePayment);
 					var result = await sender.Send(command, token);
 					var purchase = await sender.Send(new GetPurchaseQuery(result.PurchaseId, null), token);
@@ -172,9 +160,7 @@ public class PurchaseEndPoints : ICarterModule
 						purchaseId,
 						request.CurrencyId,
 						request.Comment,
-						request.PurchaseDateTime,
-						request.WithLogistics,
-						request.StorageFrom);
+						request.PurchaseDateTime);
 					await sender.Send(command, cancellationToken);
 					return Results.NoContent();
 				})
