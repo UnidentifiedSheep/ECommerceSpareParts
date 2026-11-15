@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Organization.Module</AssemblyName>
+        <RootNamespace>Main.Modules.Organization</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Organization.Application\Organization.Application.csproj"/>
+        <ProjectReference Include="..\Organization.Persistence\Organization.Persistence.csproj"/>
+    </ItemGroup>
+
+</Project>

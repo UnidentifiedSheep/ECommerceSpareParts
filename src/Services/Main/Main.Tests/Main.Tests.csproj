@@ -73,6 +73,10 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
+        <LocanResource Include="../Modules/Organization/Organization.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
         <LocanResource Include="../../../Infrastructure/Mailing/Mailing.Core/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>

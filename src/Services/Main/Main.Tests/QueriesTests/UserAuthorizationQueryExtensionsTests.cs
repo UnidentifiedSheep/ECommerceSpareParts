@@ -137,5 +137,5 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 						options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 				.AddInterceptors(counter)
 				.Options,
-			[new MainDbContextModule(), new Main.Modules.Identity.Persistence.IdentityDbContextModule(), new Main.Modules.Purchase.Persistence.PurchaseDbContextModule(), new Main.Modules.Sale.Persistence.SaleDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule(), new Pricing.Persistence.PricingDbContextModule()]);
+			[new MainDbContextModule(), new Main.Modules.Identity.Persistence.IdentityDbContextModule(), new Main.Modules.Purchase.Persistence.PurchaseDbContextModule(), new Main.Modules.Sale.Persistence.SaleDbContextModule(), new Main.Modules.Organization.Persistence.OrganizationDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule(), new Pricing.Persistence.PricingDbContextModule()]);
 }

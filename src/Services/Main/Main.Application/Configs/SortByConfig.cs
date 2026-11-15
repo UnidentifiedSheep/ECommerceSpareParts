@@ -20,14 +20,6 @@ public static class SortByConfig
 	{
 		ProductSortByConfig.Configure();
 
-		QueryableSortBy
-			.Value
-			.MapDefault<Organization, string>(x => x.Name)
-			.Map<Organization, Guid>("id", x => x.Id)
-			.Map<Organization, string>("name", x => x.Name)
-			.Map<Organization, string>("systemName", x => x.SystemName)
-			.Map<Organization, OrganizationType>("type", x => x.Type);
-
 		QueryableSortBy.Value
 			.MapDefault<Order, DateTime>(order => order.CreatedAt, true)
 			.Map<Order, Guid>("id", order => order.Id)

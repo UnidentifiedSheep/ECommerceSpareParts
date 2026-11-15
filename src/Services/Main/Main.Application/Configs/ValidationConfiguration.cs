@@ -11,17 +11,7 @@ public static class ValidationConfiguration
 {
 	public static void Configure(ValidationErrors errors)
 	{
-		errors.For(OrganizationKeys.Id)
-			.OnMissing(input => new OrganizationNotFoundException(input.Values[0]));
-
-		errors.For(OrganizationMemberKeys.PK)
-			.OnMissing(input => new OrganizationMemberNotFoundException(input.Values));
-
-		errors.For(OrganizationMemberKeys.PK)
-			.OnAlreadyExists(input => new OrganizationMemberAlreadyExistsException(input.Values));
-
-		errors.For(OrganizationKeys.SystemName)
-			.OnAlreadyExists(input => new OrganizationSystemNameAlreadyTakenException(input.Values));
+		OrganizationValidationConfiguration.Configure(errors);
 
 		errors.For(CartKeys.PK)
 			.OnMissing(input => new CartItemNotFoundException(input.Values[0].ProductId));

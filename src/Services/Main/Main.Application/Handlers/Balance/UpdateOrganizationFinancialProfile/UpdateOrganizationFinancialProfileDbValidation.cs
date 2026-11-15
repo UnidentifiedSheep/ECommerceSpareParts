@@ -1,4 +1,5 @@
 using Application.Common.Abstractions;
+using Main.Entities.Organization;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 

@@ -223,7 +223,7 @@ public class ProductSearchEventTests : IntegrationTest
 			.UseNpgsql(Context.Database.GetDbConnection())
 			.AddInterceptors(counter)
 			.Options;
-		await using var queryContext = new UnifiedDbContext(options, [new MainDbContextModule(), new Main.Modules.Identity.Persistence.IdentityDbContextModule(), new Main.Modules.Purchase.Persistence.PurchaseDbContextModule(), new Main.Modules.Sale.Persistence.SaleDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule(), new Pricing.Persistence.PricingDbContextModule()]);
+		await using var queryContext = new UnifiedDbContext(options, [new MainDbContextModule(), new Main.Modules.Identity.Persistence.IdentityDbContextModule(), new Main.Modules.Purchase.Persistence.PurchaseDbContextModule(), new Main.Modules.Sale.Persistence.SaleDbContextModule(), new Main.Modules.Organization.Persistence.OrganizationDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule(), new Pricing.Persistence.PricingDbContextModule()]);
 		var provider = new ProductEventProvider(
 			new ReadRepository<Product, int>(queryContext),
 			Scope.ServiceProvider.GetServices<IProductEventPartProvider>());

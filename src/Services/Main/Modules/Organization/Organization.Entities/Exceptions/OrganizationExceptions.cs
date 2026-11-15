@@ -1,0 +1,37 @@
+using Exceptions.Base.Localized;
+using Main.Entities.Organization;
+
+namespace Main.Entities.Exceptions;
+
+public class OrganizationNotFoundException : LocalizedNotFoundException
+{
+	public OrganizationNotFoundException(Guid organizationId) : base(
+		OrganizationNotFoundMessage.Instance,
+		new
+		{
+			OrganizationId = organizationId
+		})
+	{
+	}
+
+	public OrganizationNotFoundException(string systemName) : base(
+		OrganizationNotFoundMessage.Instance,
+		new
+		{
+			SystemName = systemName
+		})
+	{
+	}
+}
+
+public class OrganizationMemberNotFoundException(object values) : LocalizedBadRequestException(
+	OrganizationMemberNotFoundMessage.Instance,
+	values);
+
+public class OrganizationMemberAlreadyExistsException(object values) : LocalizedConflictException(
+	OrganizationMemberAlreadyExistsMessage.Instance,
+	values);
+
+public class OrganizationSystemNameAlreadyTakenException(object values) : LocalizedConflictException(
+	OrganizationSystemNameAlreadyExistsMessage.Instance,
+	values);

@@ -86,7 +86,6 @@ public static class ServiceProvider
 		collection.AddScoped<IProductDeletionRule, OrderItemProductDeletionRule>();
 		collection.AddScoped<IBalanceService, BalanceService>();
 		collection.AddScoped<IFinanceTransfers, FinanceTransfers>();
-		collection.AddScoped<IOrganizationChecks, OrganizationChecks>();
 
 		collection.AddApplicationBase(
 			ServicesDefinitions.Main,
