@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "messages": {
+    "lrt.organization.approximate.balance.recalculate.name": "Kuruluş yaklaşık bakiye yeniden hesaplama",
+    "lrt.organization.approximate.balance.recalculate.description": "Kuruluşların yaklaşık bakiyelerini temel para biriminde yeniden hesaplar."
+  }
+}

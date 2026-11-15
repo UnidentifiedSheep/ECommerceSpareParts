@@ -1,0 +1,7 @@
+{
+  "culture": "ru",
+  "messages": {
+    "lrt.organization.approximate.balance.recalculate.name": "Перерасчёт приблизительных балансов организаций",
+    "lrt.organization.approximate.balance.recalculate.description": "Пересчитывает приблизительные балансы организаций в базовой валюте."
+  }
+}

@@ -64,6 +64,10 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
+        <LocanResource Include="../Modules/Balance/Balance.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
         <LocanResource Include="../Modules/Organization/Organization.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>

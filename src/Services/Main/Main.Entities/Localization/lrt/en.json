@@ -1,8 +1,6 @@
 {
   "culture": "en",
   "messages": {
-    "lrt.organization.approximate.balance.recalculate.name": "Organization approximate balance recalculation",
-    "lrt.organization.approximate.balance.recalculate.description": "Recalculates approximate organization balances in the base currency.",
     "lrt.document.generation.name": "Document generation",
     "lrt.document.generation.description": "Creates a document from the selected template.",
     "lrt.document.generation.system.name.required": "Document type is required.",

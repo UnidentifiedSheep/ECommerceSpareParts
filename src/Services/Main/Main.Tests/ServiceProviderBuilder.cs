@@ -11,6 +11,7 @@ using Main.Modules.Currency;
 using Main.Modules.Product;
 using Main.Modules.Identity;
 using Main.Modules.Purchase;
+using Main.Modules.Balance;
 using Main.Modules.Organization;
 using Main.Modules.Sale;
 using Main.Modules.Storage;
@@ -76,6 +77,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddModule<IdentityModule>(new ConfigurationBuilder().Build());
 		services.AddModule<PurchaseModule>(new ConfigurationBuilder().Build());
 		services.AddModule<SaleModule>(new ConfigurationBuilder().Build());
+		services.AddModule<BalanceModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrganizationModule>(new ConfigurationBuilder().Build());
 		services.AddModule<StorageModule>(new ConfigurationBuilder().Build());
 		services.AddModule<PricingModule>(new ConfigurationBuilder().Build());

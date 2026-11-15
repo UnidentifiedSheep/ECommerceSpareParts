@@ -1,8 +1,6 @@
 {
   "culture": "ru",
   "messages": {
-    "lrt.organization.approximate.balance.recalculate.name": "Перерасчёт приблизительных балансов организаций",
-    "lrt.organization.approximate.balance.recalculate.description": "Пересчитывает приблизительные балансы организаций в базовой валюте.",
     "lrt.document.generation.name": "Генерация документа",
     "lrt.document.generation.description": "Создаёт документ по выбранному шаблону.",
     "lrt.document.generation.system.name.required": "Необходимо указать тип документа.",

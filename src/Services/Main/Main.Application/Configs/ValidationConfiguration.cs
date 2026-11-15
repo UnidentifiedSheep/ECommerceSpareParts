@@ -39,8 +39,7 @@ public static class ValidationConfiguration
 		errors.For(UserKeys.Id)
 			.OnMissing(input => new UserNotFoundException(input.Values[0]));
 
-		errors.For(TransactionKeys.Id)
-			.OnMissing(input => new TransactionNotFoundException(input.Values[0]));
+		BalanceValidationConfiguration.Configure(errors);
 
 		ProductValidationConfiguration.Configure(errors);
 

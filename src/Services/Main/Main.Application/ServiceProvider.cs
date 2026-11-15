@@ -28,7 +28,6 @@ using Main.Application.Services.ProductDeletion;
 using Main.Modules.Product.Abstractions;
 using Main.Application.Services.Storage;
 using Main.Entities.Balance;
-using Main.Modules.Balance.Abstractions;
 using Main.Modules.Organization.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -84,8 +83,6 @@ public static class ServiceProvider
 
 		collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
 		collection.AddScoped<IProductDeletionRule, OrderItemProductDeletionRule>();
-		collection.AddScoped<IBalanceService, BalanceService>();
-		collection.AddScoped<IFinanceTransfers, FinanceTransfers>();
 
 		collection.AddApplicationBase(
 			ServicesDefinitions.Main,

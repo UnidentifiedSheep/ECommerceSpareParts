@@ -1,8 +1,6 @@
 {
   "culture": "tr",
   "messages": {
-    "lrt.organization.approximate.balance.recalculate.name": "Kuruluş yaklaşık bakiye yeniden hesaplama",
-    "lrt.organization.approximate.balance.recalculate.description": "Kuruluşların yaklaşık bakiyelerini temel para biriminde yeniden hesaplar.",
     "lrt.document.generation.name": "Belge oluşturma",
     "lrt.document.generation.description": "Seçilen şablondan belge oluşturur.",
     "lrt.document.generation.system.name.required": "Belge türü gereklidir.",
