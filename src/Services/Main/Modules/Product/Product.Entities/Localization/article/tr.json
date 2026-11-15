@@ -51,7 +51,6 @@
     "article.deletion.storage.content": "Ürün silinemiyor: depo kayıtları var.",
     "article.deletion.sale": "Ürün silinemiyor: satış kayıtları var.",
     "article.deletion.purchase": "Ürün silinemiyor: satın alma kayıtları var.",
-    "article.deletion.order": "Ürün silinemiyor: sipariş kayıtları var.",
     "article.deletion.composition": "Ürün silinemiyor: başka bir ürünün bileşenidir."
   }
 }

@@ -1,5 +1,5 @@
 using Enums;
-using Main.Entities.Auth;
+using Extensions;
 using Main.Entities.Exceptions;
 using Main.Entities.Order;
 using Security.Core.Interfaces;
@@ -12,10 +12,10 @@ public static class OrderExtensions
 	{
 		if (!userContext.IsAuthenticated || userContext.UserIdOrNull is not { } userId)
 			throw new OrderReadAccessDeniedException();
-		if (userContext.Permissions.Contains(Permission.ToNormalizedPermission(PermissionCodes.ORDERS_GET)))
+		if (userContext.Permissions.Contains(PermissionCodes.ORDERS_GET.ToString().ToNormalizedPermission()))
 			return query;
 		if (!userContext.Permissions.Contains(
-				Permission.ToNormalizedPermission(PermissionCodes.ORDERS_GET_OWN)))
+				PermissionCodes.ORDERS_GET_OWN.ToString().ToNormalizedPermission()))
 			throw new OrderReadAccessDeniedException();
 		return query.Where(order => order.UserId == userId);
 	}

@@ -1,3 +1,4 @@
+using Main.Entities;
 using Main.Application.Services.ProductDeletion;
 using Main.Entities.Product;
 using Tests.TestContainers.Combined;
@@ -13,7 +14,7 @@ public class OrderItemProductDeletionRuleTests : ProductDeletionRuleTestsBase<Or
 
 	[Fact]
 	public async Task ProductInOrder_IsBlocked()
-		=> await ShouldBlock(GetContext<ProductTestContext>().Products[0].Id, ArticleDeletionOrderMessage.Key);
+		=> await ShouldBlock(GetContext<ProductTestContext>().Products[0].Id, OrderItemProductDeletionBlockedMessage.Key);
 
 	[Fact]
 	public async Task ProductNotInOrder_IsNotBlocked()

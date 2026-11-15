@@ -51,7 +51,6 @@
     "article.deletion.storage.content": "Cannot delete product: storage records exist.",
     "article.deletion.sale": "Cannot delete product: sales reference the product.",
     "article.deletion.purchase": "Cannot delete product: purchases reference the product.",
-    "article.deletion.order": "Cannot delete product: orders reference the product.",
     "article.deletion.composition": "Cannot delete product: another product contains it."
   }
 }

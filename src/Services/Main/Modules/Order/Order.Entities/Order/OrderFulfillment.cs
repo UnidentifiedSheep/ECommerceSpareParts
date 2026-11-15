@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Entities.Sale;
 
 namespace Main.Entities.Order;
 
@@ -14,17 +13,16 @@ public sealed class OrderFulfillment : Entity<OrderFulfillment, OrderFulfillment
 
 	private OrderFulfillment(
 		OrderItem orderItem,
-		SaleContent saleContent,
+		int saleContentId,
+		int saleContentProductId,
 		int quantity)
 	{
-		if (orderItem.ProductId != saleContent.ProductId)
+		if (orderItem.ProductId != saleContentProductId)
 			throw new InvalidOperationException("Products must match.");
 
 		OrderItem = orderItem;
 		OrderItemId = orderItem.Id;
-
-		SaleContent = saleContent;
-		SaleContentId = saleContent.Id;
+		SaleContentId = saleContentId;
 
 		SetCoveredQuantity(quantity);
 	}
@@ -33,7 +31,6 @@ public sealed class OrderFulfillment : Entity<OrderFulfillment, OrderFulfillment
 	public int CoveredQuantity { get; private set; }
 
 	public OrderItem OrderItem { get; private set; } = null!;
-	public SaleContent SaleContent { get; private set; } = null!;
 	public static Expression<Func<OrderFulfillment, OrderFulfillmentKey>> GetKeySelector()
 		=> x => new OrderFulfillmentKey(x.OrderItemId, x.SaleContentId);
 	public static Expression<Func<OrderFulfillment, bool>> GetEqualityExpression(OrderFulfillmentKey key)
@@ -41,11 +38,13 @@ public sealed class OrderFulfillment : Entity<OrderFulfillment, OrderFulfillment
 
 	public static OrderFulfillment Create(
 		OrderItem orderItem,
-		SaleContent saleContent,
+		int saleContentId,
+		int saleContentProductId,
 		int quantity)
 		=> new(
 			orderItem,
-			saleContent,
+			saleContentId,
+			saleContentProductId,
 			quantity);
 
 	private void SetCoveredQuantity(int coveredQuantity)

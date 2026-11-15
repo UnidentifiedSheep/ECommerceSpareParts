@@ -20,10 +20,5 @@ public sealed class OrderFulfillmentConfiguration : IEntityTypeConfiguration<Ord
 			.HasForeignKey(item => item.OrderItemId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("order_fulfillments_order_item_id_fk");
-		builder.HasOne(item => item.SaleContent)
-			.WithMany()
-			.HasForeignKey(item => item.SaleContentId)
-			.OnDelete(DeleteBehavior.Restrict)
-			.HasConstraintName("order_fulfillments_sale_content_id_fk");
 	}
 }

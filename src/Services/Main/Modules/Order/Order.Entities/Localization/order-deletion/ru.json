@@ -1,0 +1,6 @@
+{
+  "culture": "ru",
+  "messages": {
+    "order.item.product.deletion.blocked": "Нельзя удалить товар: товар используется в заказах."
+  }
+}

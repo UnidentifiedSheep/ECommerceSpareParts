@@ -34,13 +34,6 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 		builder.Property(e => e.SignedPrice).HasColumnName("signed_price");
 
 		builder
-			.HasOne<Entities.Product.Product>()
-			.WithMany()
-			.HasForeignKey(d => d.ProductId)
-			.OnDelete(DeleteBehavior.Restrict)
-			.HasConstraintName("order_items_products_id_fk");
-
-		builder
 			.HasOne(e => e.Order)
 			.WithMany(e => e.Items)
 			.HasForeignKey(d => d.OrderId)

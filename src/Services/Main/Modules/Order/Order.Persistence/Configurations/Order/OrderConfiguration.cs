@@ -47,34 +47,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
 		builder.Property(e => e.RowVersion).HasColumnName("xmin").IsRowVersion();
 
 		builder
-			.HasOne<Entities.Organization.Organization>()
-			.WithMany()
-			.HasForeignKey(e => e.OrganizationId)
-			.OnDelete(DeleteBehavior.Restrict)
-			.HasConstraintName("orders_organization_id_fk");
-
-		builder
-			.HasOne<Entities.Currency.Currency>()
-			.WithMany()
-			.HasForeignKey(d => d.CurrencyId)
-			.OnDelete(DeleteBehavior.Restrict)
-			.HasConstraintName("orders_currency_id_fk");
-
-		builder
-			.HasOne<Entities.User.User>()
-			.WithMany()
-			.HasForeignKey(d => d.UserId)
-			.OnDelete(DeleteBehavior.SetNull)
-			.HasConstraintName("orders_users_id_fk");
-
-		builder
-			.HasOne<Entities.User.User>()
-			.WithMany()
-			.HasForeignKey(e => e.ConfirmedByUserId)
-			.OnDelete(DeleteBehavior.SetNull)
-			.HasConstraintName("orders_confirmed_by_user_id_fk");
-
-		builder
 			.Navigation(e => e.Items)
 			.HasField("_items")
 			.UsePropertyAccessMode(PropertyAccessMode.Field);

@@ -1,3 +1,4 @@
+using Main.Entities;
 using FluentAssertions;
 using Locan.Core.Interfaces;
 using Main.Application.Services;
@@ -28,7 +29,7 @@ public class ProductDeletionBlockerResolverTests
 		{
 			new FakeRule(30, ArticleDeletionSaleMessage.Instance),
 			new FakeRule(10, ArticleDeletionStockMessage.Instance),
-			new FakeRule(20, ArticleDeletionOrderMessage.Instance)
+			new FakeRule(20, OrderItemProductDeletionBlockedMessage.Instance)
 		};
 
 		var result = await new ProductDeletionBlockerResolver(rules).GetAsync(1, TestContext.Current.CancellationToken);
@@ -39,7 +40,7 @@ public class ProductDeletionBlockerResolverTests
 	[Fact]
 	public async Task LaterRules_AreNotEvaluatedAfterBlocker()
 	{
-		var late = new FakeRule(20, ArticleDeletionOrderMessage.Instance);
+		var late = new FakeRule(20, OrderItemProductDeletionBlockedMessage.Instance);
 		var rules = new IProductDeletionRule[] { new FakeRule(10, ArticleDeletionStockMessage.Instance), late };
 
 		await new ProductDeletionBlockerResolver(rules).GetAsync(1, TestContext.Current.CancellationToken);

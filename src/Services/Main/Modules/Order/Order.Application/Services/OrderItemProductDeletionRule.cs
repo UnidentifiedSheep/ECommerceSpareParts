@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Repositories;
 using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Order;
-using Main.Entities.Product;
 using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +15,6 @@ public sealed class OrderItemProductDeletionRule(IReadRepository<OrderItem, int>
 		int productId,
 		CancellationToken cancellationToken = default)
 		=> await repository.Query.AnyAsync(item => item.ProductId == productId, cancellationToken)
-			? ArticleDeletionOrderMessage.Instance
+			? OrderItemProductDeletionBlockedMessage.Instance
 			: null;
 }
