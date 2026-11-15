@@ -36,7 +36,6 @@ public class GetOrganizationFinancialInfoHandler(
 		var balances = await balanceRepository
 			.Query
 			.Where(x => x.OrganizationId == request.OrganizationId)
-			.Include(x => x.Currency)
 			.ToListAsync(cancellationToken);
 		var netPosition = await balanceService.GetBalanceInBaseCurrencyAsync(
 			request.OrganizationId,

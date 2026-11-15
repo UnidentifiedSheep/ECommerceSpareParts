@@ -24,5 +24,5 @@ public sealed record GqlPurchaseContent([property: GraphQLIgnore]
 	public string? Comment => Content.Comment;
 
 	[GraphQLName("product")]
-	public GqlProduct Product => new(Content.Product);
+	public GqlProduct Product => new(Content.ProductId);
 }

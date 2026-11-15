@@ -25,8 +25,8 @@ public class GetSaleTests : IntegrationTest
 
 		result.Sale.Id.Should().Be(sale.Id);
 		result.Sale.TransactionId.Should().Be(sale.TransactionId);
-		result.Sale.Buyer.Id.Should().Be(SaleContext.Buyer.Id);
-		result.Sale.Currency.Id.Should().Be(sale.CurrencyId);
+		result.Sale.BuyerId.Should().Be(SaleContext.Buyer.Id);
+		result.Sale.CurrencyId.Should().Be(sale.CurrencyId);
 		result.Sale.StorageCode.Should().Be(sale.StorageCode);
 		result.Sale.State.Should().Be(sale.State);
 		result.Sale.RowVersion.Should().Be(sale.RowVersion);

@@ -2,38 +2,22 @@
 using Application.Common.Interfaces.Projections;
 using Attributes;
 using LinqKit;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Dtos.Organizations;
-using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Sale;
-using Main.Application.Dtos.Users;
-using Main.Entities.Currency;
-using Main.Entities.Organization;
-using Main.Entities.Product;
 using Main.Entities.Sale;
-using Main.Entities.User;
 
 namespace Main.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class SaleDtoProjectionProvider : ProjectionProviderBase<Sale, SaleDto>
 {
-	public SaleDtoProjectionProvider(
-		IProjectionProvider<User, UserDto> userProjection,
-		IProjectionProvider<Organization, OrganizationDto> organizationProjection,
-		IProjectionProvider<Currency, CurrencyDto> currencyProjection)
-	{
-		var userToDto = userProjection.Projection;
-		var organizationToDto = organizationProjection.Projection;
-		var currencyToDto = currencyProjection.Projection;
-
-		Projection = x => new SaleDto
+	public override Expression<Func<Sale, SaleDto>> Projection { get; } =
+		x => new SaleDto
 		{
 			Id = x.Id,
-			Buyer = userToDto.Invoke(x.User),
-			Organization = organizationToDto.Invoke(x.Organization),
+			BuyerId = x.UserId,
+			OrganizationId = x.OrganizationId,
 			Comment = x.Comment,
-			Currency = currencyToDto.Invoke(x.Currency),
+			CurrencyId = x.CurrencyId,
 			SaleDatetime = x.SaleDatetime,
 			StorageCode = x.StorageCode,
 			TotalSum = x.Transaction.Amount,
@@ -41,20 +25,13 @@ public sealed class SaleDtoProjectionProvider : ProjectionProviderBase<Sale, Sal
 			RowVersion = x.RowVersion,
 			State = x.State
 		};
-	}
-
-	public override Expression<Func<Sale, SaleDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class SaleContentDtoProjectionProvider : ProjectionProviderBase<SaleContent, SaleContentDto>
 {
-	public SaleContentDtoProjectionProvider(
-		IProjectionProvider<Product, ProductDto> productProjection)
-	{
-		var productToDto = productProjection.Projection;
-
-		Projection = x => new SaleContentDto
+	public override Expression<Func<SaleContent, SaleContentDto>> Projection { get; } =
+		x => new SaleContentDto
 		{
 			Id = x.Id,
 			Count = x.Count,
@@ -62,35 +39,25 @@ public sealed class SaleContentDtoProjectionProvider : ProjectionProviderBase<Sa
 			TotalSum = x.TotalSum,
 			OriginalPrice = x.OriginalPrice,
 			Comment = x.Comment,
-			Product = productToDto.Invoke(x.Product)
+			ProductId = x.ProductId
 		};
-	}
-
-	public override Expression<Func<SaleContent, SaleContentDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class
 	SaleContentDetailDtoProjectionProvider : ProjectionProviderBase<SaleContentDetail, SaleContentDetailDto>
 {
-	public SaleContentDetailDtoProjectionProvider(
-		IProjectionProvider<Currency, CurrencyDto> currencyProjection)
-	{
-		var currencyToDto = currencyProjection.Projection;
-
-		Projection = x => new SaleContentDetailDto
+	public override Expression<Func<SaleContentDetail, SaleContentDetailDto>> Projection { get; } =
+		x => new SaleContentDetailDto
 		{
 			Id = x.Id,
 			BuyPrice = x.BuyPrice,
 			Count = x.Count,
-			Currency = currencyToDto.Invoke(x.Currency),
+			CurrencyId = x.CurrencyId,
 			PurchaseDatetime = x.PurchaseDatetime,
 			SaleContentId = x.SaleContentId,
 			StorageContentId = x.StorageContentId
 		};
-	}
-
-	public override Expression<Func<SaleContentDetail, SaleContentDetailDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]

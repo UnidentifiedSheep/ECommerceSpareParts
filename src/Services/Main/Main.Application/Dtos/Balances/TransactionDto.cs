@@ -9,11 +9,11 @@ public record TransactionDto
 	[JsonPropertyName("id")]
 	public required Guid Id { get; init; }
 
-	[JsonPropertyName("sender")]
-	public required OrganizationDto Sender { get; init; }
+	[JsonPropertyName("senderId")]
+	public required Guid SenderId { get; init; }
 
-	[JsonPropertyName("receiver")]
-	public required OrganizationDto Receiver { get; init; }
+	[JsonPropertyName("receiverId")]
+	public required Guid ReceiverId { get; init; }
 
 	[JsonPropertyName("currencyId")]
 	public required int CurrencyId { get; init; }

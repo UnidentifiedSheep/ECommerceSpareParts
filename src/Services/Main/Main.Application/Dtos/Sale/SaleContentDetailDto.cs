@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Currencies;
 
 namespace Main.Application.Dtos.Sale;
 
@@ -14,8 +13,8 @@ public record SaleContentDetailDto
 	[JsonPropertyName("storageContentId")]
 	public required int StorageContentId { get; init; }
 
-	[JsonPropertyName("currency")]
-	public required CurrencyDto Currency { get; init; }
+	[JsonPropertyName("currencyId")]
+	public required int CurrencyId { get; init; }
 
 	[JsonPropertyName("buyPrice")]
 	public required decimal BuyPrice { get; init; }

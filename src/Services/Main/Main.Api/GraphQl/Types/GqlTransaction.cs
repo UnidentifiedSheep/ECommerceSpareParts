@@ -54,13 +54,13 @@ public sealed record GqlTransaction
 	public async Task<GqlOrganization> GetSenderAsync(
 		ITransactionByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> new((await GetTransactionAsync(loader, cancellationToken)).Sender);
+		=> new((await GetTransactionAsync(loader, cancellationToken)).SenderId);
 
 	[GraphQLName("receiver")]
 	public async Task<GqlOrganization> GetReceiverAsync(
 		ITransactionByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> new((await GetTransactionAsync(loader, cancellationToken)).Receiver);
+		=> new((await GetTransactionAsync(loader, cancellationToken)).ReceiverId);
 
 	[GraphQLName("currency")]
 	public async Task<GqlCurrency> GetCurrencyAsync(

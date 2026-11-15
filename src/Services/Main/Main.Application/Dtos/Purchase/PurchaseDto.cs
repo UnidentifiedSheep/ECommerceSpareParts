@@ -1,7 +1,4 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Dtos.Organizations;
-using Main.Application.Dtos.Users;
 
 namespace Main.Application.Dtos.Purchase;
 
@@ -10,14 +7,14 @@ public record PurchaseDto
 	[JsonPropertyName("id")]
 	public required Guid Id { get; init; }
 
-	[JsonPropertyName("supplier")]
-	public required UserDto Supplier { get; init; }
+	[JsonPropertyName("supplierId")]
+	public required Guid SupplierId { get; init; }
 
-	[JsonPropertyName("supplierOrganization")]
-	public required OrganizationDto SupplierOrganization { get; init; }
+	[JsonPropertyName("supplierOrganizationId")]
+	public required Guid SupplierOrganizationId { get; init; }
 
-	[JsonPropertyName("currency")]
-	public required CurrencyDto Currency { get; init; }
+	[JsonPropertyName("currencyId")]
+	public required int CurrencyId { get; init; }
 
 	[JsonPropertyName("comment")]
 	public required string? Comment { get; init; }

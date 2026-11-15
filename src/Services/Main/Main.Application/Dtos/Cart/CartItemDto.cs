@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Main.Application.Dtos.Product;
 
 namespace Main.Application.Dtos.Cart;
 
@@ -16,7 +15,4 @@ public record CartItemDto
 
 	[JsonPropertyName("updatedAt")]
 	public required DateTime? UpdatedAt { get; init; }
-
-	[JsonPropertyName("product")]
-	public required ProductDto Product { get; init; }
 }

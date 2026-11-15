@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Product;
 
 namespace Main.Application.Dtos.Purchase;
 
@@ -20,6 +19,6 @@ public record PurchaseContentDto
 	[JsonPropertyName("comment")]
 	public string? Comment { get; init; }
 
-	[JsonPropertyName("product")]
-	public required ProductDto Product { get; init; }
+	[JsonPropertyName("productId")]
+	public required int ProductId { get; init; }
 }

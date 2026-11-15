@@ -26,13 +26,13 @@ public sealed record GqlSale
 	public async Task<GqlUser> GetBuyerAsync(
 		ISaleByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> new((await GetSaleAsync(loader, cancellationToken)).Buyer);
+		=> new((await GetSaleAsync(loader, cancellationToken)).BuyerId);
 
 	[GraphQLName("organization")]
 	public async Task<GqlOrganization> GetOrganizationAsync(
 		ISaleByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> new((await GetSaleAsync(loader, cancellationToken)).Organization);
+		=> new((await GetSaleAsync(loader, cancellationToken)).OrganizationId);
 
 	[GraphQLName("comment")]
 	public async Task<string?> GetCommentAsync(
@@ -80,8 +80,13 @@ public sealed record GqlSale
 	[GraphQLName("currency")]
 	public async Task<GqlCurrency> GetCurrencyAsync(
 		ISaleByIdDataLoader loader,
+		ICurrencyByIdDataLoader currencyLoader,
 		CancellationToken cancellationToken)
-		=> new((await GetSaleAsync(loader, cancellationToken)).Currency);
+	{
+		var currencyId = (await GetSaleAsync(loader, cancellationToken)).CurrencyId;
+		return new GqlCurrency(await currencyLoader.LoadAsync(currencyId, cancellationToken)
+			?? throw new CurrencyNotFoundException(currencyId));
+	}
 
 	[GraphQLName("contents")]
 	[RequireAllPermissions(PermissionCodes.SALES_GET)]

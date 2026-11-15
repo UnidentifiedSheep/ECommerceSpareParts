@@ -1,7 +1,4 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Dtos.Organizations;
-using Main.Application.Dtos.Users;
 using Main.Enums;
 
 namespace Main.Application.Dtos.Sale;
@@ -11,11 +8,11 @@ public record SaleDto
 	[JsonPropertyName("id")]
 	public required Guid Id { get; init; }
 
-	[JsonPropertyName("buyer")]
-	public required UserDto Buyer { get; init; }
+	[JsonPropertyName("buyerId")]
+	public required Guid BuyerId { get; init; }
 
-	[JsonPropertyName("organization")]
-	public required OrganizationDto Organization { get; init; }
+	[JsonPropertyName("organizationId")]
+	public required Guid OrganizationId { get; init; }
 
 	[JsonPropertyName("comment")]
 	public string? Comment { get; init; }
@@ -39,6 +36,6 @@ public record SaleDto
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public required SaleState State { get; init; }
 
-	[JsonPropertyName("currency")]
-	public required CurrencyDto Currency { get; init; }
+	[JsonPropertyName("currencyId")]
+	public required int CurrencyId { get; init; }
 }

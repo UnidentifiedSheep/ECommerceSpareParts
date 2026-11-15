@@ -8,6 +8,6 @@ public record OrganizationBalanceDto
 	[JsonPropertyName("balance")]
 	public required decimal Balance { get; init; }
 
-	[JsonPropertyName("currency")]
-	public required CurrencyDto Currency { get; init; }
+	[JsonPropertyName("currencyId")]
+	public required int CurrencyId { get; init; }
 }

@@ -25,13 +25,13 @@ public sealed record GqlPurchase
 	public async Task<GqlUser> GetSupplierAsync(
 		IPurchaseByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> new((await GetPurchaseAsync(loader, cancellationToken)).Supplier);
+		=> new((await GetPurchaseAsync(loader, cancellationToken)).SupplierId);
 
 	[GraphQLName("supplierOrganization")]
 	public async Task<GqlOrganization> GetSupplierOrganizationAsync(
 		IPurchaseByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> new((await GetPurchaseAsync(loader, cancellationToken)).SupplierOrganization);
+		=> new((await GetPurchaseAsync(loader, cancellationToken)).SupplierOrganizationId);
 
 	[GraphQLName("comment")]
 	public async Task<string?> GetCommentAsync(
@@ -67,8 +67,13 @@ public sealed record GqlPurchase
 	[GraphQLName("currency")]
 	public async Task<GqlCurrency> GetCurrencyAsync(
 		IPurchaseByIdDataLoader loader,
+		ICurrencyByIdDataLoader currencyLoader,
 		CancellationToken cancellationToken)
-		=> new((await GetPurchaseAsync(loader, cancellationToken)).Currency);
+	{
+		var currencyId = (await GetPurchaseAsync(loader, cancellationToken)).CurrencyId;
+		return new GqlCurrency(await currencyLoader.LoadAsync(currencyId, cancellationToken)
+			?? throw new CurrencyNotFoundException(currencyId));
+	}
 
 	[GraphQLName("contents")]
 	[RequireAllPermissions(PermissionCodes.PURCHASE_GET)]

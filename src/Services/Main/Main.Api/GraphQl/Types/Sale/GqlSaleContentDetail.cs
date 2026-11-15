@@ -1,5 +1,7 @@
 using HotChocolate;
+using Main.Api.GraphQl.DataLoaders;
 using Main.Application.Dtos.Sale;
+using Main.Entities.Exceptions;
 
 namespace Main.Api.GraphQl.Types.Sale;
 
@@ -17,7 +19,11 @@ public sealed record GqlSaleContentDetail([property: GraphQLIgnore]
 	public int StorageContentId => Detail.StorageContentId;
 
 	[GraphQLName("currency")]
-	public GqlCurrency Currency => new(Detail.Currency);
+	public async Task<GqlCurrency> GetCurrencyAsync(
+		ICurrencyByIdDataLoader loader,
+		CancellationToken cancellationToken)
+		=> new(await loader.LoadAsync(Detail.CurrencyId, cancellationToken)
+			?? throw new CurrencyNotFoundException(Detail.CurrencyId));
 
 	[GraphQLName("buyPrice")]
 	public decimal BuyPrice => Detail.BuyPrice;

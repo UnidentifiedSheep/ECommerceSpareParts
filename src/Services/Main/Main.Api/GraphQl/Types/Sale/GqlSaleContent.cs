@@ -30,7 +30,7 @@ public sealed record GqlSaleContent([property: GraphQLIgnore]
 	public decimal DiscountedPrice => Content.DiscountedPrice;
 
 	[GraphQLName("product")]
-	public GqlProduct Product => new(Content.Product);
+	public GqlProduct Product => new(Content.ProductId);
 
 	[GraphQLName("details")]
 	[RequireAllPermissions(PermissionCodes.SALES_GET)]
