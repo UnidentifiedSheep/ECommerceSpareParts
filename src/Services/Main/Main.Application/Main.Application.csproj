@@ -22,7 +22,6 @@
 
     <ItemGroup>
         <Folder Include="Analytics\Interfaces\"/>
-        <Folder Include="Handlers\Auth\RemoveRoleFromUser\"/>
     </ItemGroup>
 
     <ItemGroup>
