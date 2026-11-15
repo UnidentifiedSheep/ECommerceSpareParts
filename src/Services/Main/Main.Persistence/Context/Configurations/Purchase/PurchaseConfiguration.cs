@@ -52,7 +52,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
 		builder.Property(e => e.TransactionId).HasColumnName("transaction_id");
 
 		builder
-			.HasOne(d => d.Currency)
+			.HasOne<Entities.Currency.Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
@@ -66,21 +66,21 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
 			.HasConstraintName("purchase_storages_name_fk");
 
 		builder
-			.HasOne(d => d.SupplierUser)
+			.HasOne<Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(d => d.SupplierUserId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("purchase_supplier_user_id_fk");
 
 		builder
-			.HasOne(d => d.SupplierOrganization)
+			.HasOne<Entities.Organization.Organization>()
 			.WithMany()
 			.HasForeignKey(d => d.SupplierOrganizationId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("purchase_supplier_organization_id_fk");
 
 		builder
-			.HasOne(d => d.Transaction)
+			.HasOne<Entities.Balance.Transaction>()
 			.WithMany()
 			.HasForeignKey(d => d.TransactionId)
 			.OnDelete(DeleteBehavior.Restrict)

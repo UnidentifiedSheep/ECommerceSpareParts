@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Main.Application.Dtos.Purchase;
+using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using Main.Entities.Purchase;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ public record GetPurchasesResult(IReadOnlyCollection<PurchaseDto> Purchases);
 
 public class GetPurchasesHandler(
 	IReadRepository<Purchase, Guid> repository,
+	IReadRepository<Product, int> productRepository,
 	IProjectionProvider<Purchase, PurchaseDto> projection)
 	: IQueryHandler<GetPurchasesQuery, GetPurchasesResult>
 {
@@ -60,7 +62,7 @@ public class GetPurchasesHandler(
 		return new GetPurchasesResult(purchases);
 	}
 
-	private static IQueryable<Purchase> ApplySearchTerm(IQueryable<Purchase> query, string searchTerm)
+	private IQueryable<Purchase> ApplySearchTerm(IQueryable<Purchase> query, string searchTerm)
 	{
 		var term = searchTerm.Trim();
 		var pattern = $"%{EscapePattern(term)}%";
@@ -77,13 +79,14 @@ public class GetPurchasesHandler(
 					content.Comment!,
 					pattern,
 					"\\") ||
-				EF.Functions.ILike(
-					content.Product.Name.Value,
-					pattern,
-					"\\") ||
-				normalizedSku.Length > 0 && EF.Functions.ILike(
-					content.Product.Sku.NormalizedValue,
-					skuPattern)));
+				productRepository.Query.Any(product => product.Id == content.ProductId &&
+					(EF.Functions.ILike(
+							product.Name.Value,
+							pattern,
+							"\\") ||
+						normalizedSku.Length > 0 && EF.Functions.ILike(
+							product.Sku.NormalizedValue,
+							skuPattern)))));
 	}
 
 	private static string EscapePattern(string value)

@@ -29,7 +29,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
 		builder.Property(e => e.StorageContentId).HasColumnName("storage_content_id");
 
 		builder
-			.HasOne<Entities.Currency.Currency>(e => e.Currency)
+			.HasOne<Entities.Currency.Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
@@ -42,7 +42,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
 			.HasConstraintName("sale_content_details_sale_content_id_fk");
 
 		builder
-			.HasOne<StorageContent>(e => e.StorageContent)
+			.HasOne<Entities.Storage.StorageContent>()
 			.WithMany()
 			.HasForeignKey(d => d.StorageContentId)
 			.OnDelete(DeleteBehavior.Restrict)

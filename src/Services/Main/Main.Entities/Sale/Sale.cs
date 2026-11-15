@@ -56,14 +56,6 @@ public class Sale : AuditableEntity<Sale, Guid>,
 
 	public SaleState State { get; private set; }
 
-	public User.User User { get; private set; } = null!;
-
-	public Organization.Organization Organization { get; private set; } = null!;
-
-	public Currency.Currency Currency { get; private set; } = null!;
-
-	public Transaction Transaction { get; private set; } = null!;
-
 	public IReadOnlyList<SaleContent> Contents => _contents;
 
 	public static Expression<Func<Sale, Guid>> GetKeySelector() => x => x.Id;

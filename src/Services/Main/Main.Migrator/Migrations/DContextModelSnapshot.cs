@@ -3975,7 +3975,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Balance.OrganizationBalance", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3988,8 +3988,6 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("organization_balances_organizations_id_fk");
-
-                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Main.Entities.Balance.OrganizationFinancialProfile", b =>
@@ -4011,7 +4009,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("transactions_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "Receiver")
+                    b.HasOne("Main.Entities.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4024,21 +4022,17 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("transactions_users_id_fk_4");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "Sender")
+                    b.HasOne("Main.Entities.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("transactions_sender_organization_id_fk");
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("Main.Entities.Cart.Cart", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "Product")
+                    b.HasOne("Main.Entities.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4051,8 +4045,6 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("cart_users_id_fk");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Main.Entities.Currency.CurrencyRate", b =>
@@ -4392,7 +4384,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4406,39 +4398,31 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("purchase_storages_name_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "SupplierOrganization")
+                    b.HasOne("Main.Entities.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("SupplierOrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("purchase_supplier_organization_id_fk");
 
-                    b.HasOne("Main.Entities.User.User", "SupplierUser")
+                    b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
                         .HasForeignKey("SupplierUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("purchase_supplier_user_id_fk");
 
-                    b.HasOne("Main.Entities.Balance.Transaction", "Transaction")
+                    b.HasOne("Main.Entities.Balance.Transaction", null)
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("purchase_transactions_id_fk");
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("SupplierOrganization");
-
-                    b.Navigation("SupplierUser");
-
-                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("Main.Entities.Purchase.PurchaseContent", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "Product")
+                    b.HasOne("Main.Entities.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4452,28 +4436,24 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("purchase_content_purchase_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.StorageContent", "StorageContent")
+                    b.HasOne("Main.Entities.Storage.StorageContent", null)
                         .WithOne()
                         .HasForeignKey("Main.Entities.Purchase.PurchaseContent", "StorageContentId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired()
                         .HasConstraintName("purchase_content_storage_content_id_fk");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("StorageContent");
                 });
 
             modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "Organization")
+                    b.HasOne("Main.Entities.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4487,32 +4467,24 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_storages_name_fk");
 
-                    b.HasOne("Main.Entities.Balance.Transaction", "Transaction")
+                    b.HasOne("Main.Entities.Balance.Transaction", null)
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_transactions_id_fk");
 
-                    b.HasOne("Main.Entities.User.User", "User")
+                    b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_user_id_fk");
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("Transaction");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Main.Entities.Sale.SaleContent", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "Product")
+                    b.HasOne("Main.Entities.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4525,8 +4497,6 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("sale_content_sale_id_fk");
-
-                    b.Navigation("Product");
 
                     b.Navigation("Sale");
                 });
@@ -4545,7 +4515,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Sale.SaleContentDetail", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4559,16 +4529,12 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_content_details_sale_content_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.StorageContent", "StorageContent")
+                    b.HasOne("Main.Entities.Storage.StorageContent", null)
                         .WithMany()
                         .HasForeignKey("StorageContentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_content_details_storage_content_id_fk");
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("StorageContent");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.ProductStock", b =>
@@ -4599,7 +4565,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("storage_content_base_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4619,8 +4585,6 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("storage_content_storages_name_fk");
-
-                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageContentLock", b =>

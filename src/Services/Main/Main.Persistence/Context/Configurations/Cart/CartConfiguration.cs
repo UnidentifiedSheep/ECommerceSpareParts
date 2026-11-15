@@ -25,7 +25,7 @@ public class CartConfiguration : IEntityTypeConfiguration<Entities.Cart.Cart>
 		builder.Property(e => e.Count).HasColumnName("count");
 
 		builder
-			.HasOne(d => d.Product)
+			.HasOne<Entities.Product.Product>()
 			.WithMany()
 			.HasForeignKey(d => d.ProductId)
 			.HasConstraintName("cart_product_id_fk");

@@ -41,7 +41,7 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
 		builder.Property(e => e.TotalSum).HasColumnName("total_sum");
 
 		builder
-			.HasOne(d => d.Product)
+			.HasOne<Entities.Product.Product>()
 			.WithMany()
 			.HasForeignKey(d => d.ProductId)
 			.OnDelete(DeleteBehavior.Restrict)
@@ -54,7 +54,7 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
 			.HasConstraintName("purchase_content_purchase_id_fk");
 
 		builder
-			.HasOne<StorageContent>(e => e.StorageContent)
+			.HasOne<Entities.Storage.StorageContent>()
 			.WithOne()
 			.HasForeignKey<PurchaseContent>(d => d.StorageContentId)
 			.OnDelete(DeleteBehavior.SetNull)

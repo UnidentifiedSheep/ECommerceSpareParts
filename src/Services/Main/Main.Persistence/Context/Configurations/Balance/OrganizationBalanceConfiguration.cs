@@ -40,7 +40,7 @@ public class OrganizationBalanceConfiguration : IEntityTypeConfiguration<Organiz
 		builder.Property(e => e.RowVersion).HasColumnName("xmin").IsRowVersion();
 
 		builder
-			.HasOne<Entities.Currency.Currency>(e => e.Currency)
+			.HasOne<Entities.Currency.Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)

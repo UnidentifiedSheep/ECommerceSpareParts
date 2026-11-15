@@ -49,21 +49,21 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 		builder.Property(x => x.RowVersion).HasColumnName("xmin").IsRowVersion();
 
 		builder
-			.HasOne(d => d.User)
+			.HasOne<Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("sale_user_id_fk");
 
 		builder
-			.HasOne(d => d.Organization)
+			.HasOne<Entities.Organization.Organization>()
 			.WithMany()
 			.HasForeignKey(d => d.OrganizationId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("sale_organizations_id_fk");
 
 		builder
-			.HasOne(d => d.Currency)
+			.HasOne<Entities.Currency.Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
@@ -77,7 +77,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 			.HasConstraintName("sale_storages_name_fk");
 
 		builder
-			.HasOne(d => d.Transaction)
+			.HasOne<Entities.Balance.Transaction>()
 			.WithMany()
 			.HasForeignKey(d => d.TransactionId)
 			.OnDelete(DeleteBehavior.Restrict)

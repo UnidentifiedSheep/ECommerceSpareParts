@@ -20,7 +20,7 @@ public sealed class PurchaseDtoProjectionProvider : ProjectionProviderBase<Purch
 			StorageCode = x.Storage,
 			SupplierId = x.SupplierUserId,
 			SupplierOrganizationId = x.SupplierOrganizationId,
-			TotalSum = x.Transaction.Amount,
+			TotalSum = x.Contents.Sum(content => content.TotalSum),
 			TransactionId = x.TransactionId
 		};
 }

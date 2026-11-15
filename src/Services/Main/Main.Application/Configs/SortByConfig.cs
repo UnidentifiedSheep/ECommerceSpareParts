@@ -32,7 +32,7 @@ public static class SortByConfig
 			.Value
 			.MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime, true)
 			.Map<Purchase, DateTime>("dateTime", x => x.PurchaseDatetime)
-			.Map<Purchase, decimal>("totalSum", x => x.Transaction.Amount)
+			.Map<Purchase, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
 			.Map<Purchase, Guid>("id", x => x.Id);
 
 		QueryableSortBy.Value
@@ -61,7 +61,7 @@ public static class SortByConfig
 			.Value
 			.MapDefault<Sale, DateTime>(x => x.SaleDatetime, true)
 			.Map<Sale, DateTime>("dateTime", x => x.SaleDatetime)
-			.Map<Sale, decimal>("totalSum", x => x.Transaction.Amount)
+			.Map<Sale, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
 			.Map<Sale, Guid>("id", x => x.Id);
 
 		QueryableSortBy

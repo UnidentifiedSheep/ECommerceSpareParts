@@ -73,10 +73,6 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
 	public bool IsCompletionProfileApplied => Status.HasFlag(TransactionStatus.CompletionProfileApplied);
 
-	public Organization.Organization Receiver { get; private set; } = null!;
-
-	public Organization.Organization Sender { get; private set; } = null!;
-
 	public static Expression<Func<Transaction, Guid>> GetKeySelector() => x => x.Id;
 
 	public static Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;

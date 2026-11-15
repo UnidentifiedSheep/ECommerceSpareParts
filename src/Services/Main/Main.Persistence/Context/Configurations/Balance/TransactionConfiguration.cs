@@ -107,14 +107,14 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 			.HasConstraintName("transactions_users_id_fk_4");
 
 		builder
-			.HasOne<Entities.Organization.Organization>(x => x.Receiver)
+			.HasOne<Entities.Organization.Organization>()
 			.WithMany()
 			.HasForeignKey(d => d.ReceiverId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("transactions_receiver_organization_id_fk");
 
 		builder
-			.HasOne<Entities.Organization.Organization>(x => x.Sender)
+			.HasOne<Entities.Organization.Organization>()
 			.WithMany()
 			.HasForeignKey(d => d.SenderId)
 			.OnDelete(DeleteBehavior.Restrict)

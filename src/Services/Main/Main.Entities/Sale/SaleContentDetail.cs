@@ -40,10 +40,6 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
 
 	public DateTime PurchaseDatetime { get; private set; }
 
-	public Currency.Currency Currency { get; private set; } = null!;
-
-	public StorageContent StorageContent { get; private set; } = null!;
-
 	public static Expression<Func<SaleContentDetail, int>> GetKeySelector() => x => x.Id;
 
 	public static Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key)

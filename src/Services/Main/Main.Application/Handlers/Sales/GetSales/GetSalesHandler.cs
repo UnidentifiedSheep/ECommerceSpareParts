@@ -5,7 +5,9 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Main.Application.Dtos.Sale;
+using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
+using Main.Entities.User;
 using Main.Entities.Sale;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +28,8 @@ public record GetSalesResult(IReadOnlyList<SaleDto> Sales);
 
 public class GetSalesHandler(
 	IReadRepository<Sale, Guid> repository,
+	IReadRepository<User, Guid> userRepository,
+	IReadRepository<Product, int> productRepository,
 	IProjectionProvider<Sale, SaleDto> projection) : IQueryHandler<GetSalesQuery, GetSalesResult>
 {
 	public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
@@ -62,7 +66,7 @@ public class GetSalesHandler(
 		return new GetSalesResult(result);
 	}
 
-	private static IQueryable<Sale> ApplySearchTerm(IQueryable<Sale> query, string searchTerm)
+	private IQueryable<Sale> ApplySearchTerm(IQueryable<Sale> query, string searchTerm)
 	{
 		var term = searchTerm.Trim();
 		var pattern = $"%{EscapePattern(term)}%";
@@ -74,22 +78,24 @@ public class GetSalesHandler(
 				document.Comment!,
 				pattern,
 				"\\") ||
-			EF.Functions.ILike(
-				document.User.UserName.Value,
-				pattern,
-				"\\") ||
+			userRepository.Query.Any(user => user.Id == document.UserId &&
+				EF.Functions.ILike(
+					user.UserName.Value,
+					pattern,
+					"\\")) ||
 			document.Contents.Any(content =>
 				EF.Functions.ILike(
 					content.Comment!,
 					pattern,
 					"\\") ||
-				EF.Functions.ILike(
-					content.Product.Name.Value,
-					pattern,
-					"\\") ||
-				normalizedSku.Length > 0 && EF.Functions.ILike(
-					content.Product.Sku.NormalizedValue,
-					skuPattern)));
+				productRepository.Query.Any(product => product.Id == content.ProductId &&
+					(EF.Functions.ILike(
+							product.Name.Value,
+							pattern,
+							"\\") ||
+						normalizedSku.Length > 0 && EF.Functions.ILike(
+							product.Sku.NormalizedValue,
+							skuPattern)))));
 	}
 
 	private static string EscapePattern(string value)

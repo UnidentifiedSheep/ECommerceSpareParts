@@ -30,8 +30,6 @@ public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid,
 
 	public int Count { get; private set; }
 
-	public Product.Product Product { get; private set; } = null!;
-
 	public static Expression<Func<Cart, (Guid, int)>> GetKeySelector()
 		=> x =>
 			ValueTuple.Create(x.UserId, x.ProductId);

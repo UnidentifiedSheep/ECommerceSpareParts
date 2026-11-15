@@ -27,8 +27,6 @@ public class OrganizationBalance : AuditableEntity<OrganizationBalance, UserBala
 
 	public uint RowVersion { get; private set; }
 
-	public Currency.Currency Currency { get; private set; } = null!;
-
 	public static Expression<Func<OrganizationBalance, UserBalanceKey>> GetKeySelector()
 		=> x =>
 			new UserBalanceKey(x.OrganizationId, x.CurrencyId);

@@ -20,7 +20,7 @@ public sealed class SaleDtoProjectionProvider : ProjectionProviderBase<Sale, Sal
 			CurrencyId = x.CurrencyId,
 			SaleDatetime = x.SaleDatetime,
 			StorageCode = x.StorageCode,
-			TotalSum = x.Transaction.Amount,
+			TotalSum = x.Contents.Sum(content => content.TotalSum),
 			TransactionId = x.TransactionId,
 			RowVersion = x.RowVersion,
 			State = x.State

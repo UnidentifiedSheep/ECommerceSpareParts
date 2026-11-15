@@ -57,14 +57,6 @@ public class Purchase : AuditableEntity<Purchase, Guid>,
 
 	public PurchaseState State { get; private set; }
 
-	public virtual Currency.Currency Currency { get; private set; } = null!;
-
-	public virtual User.User SupplierUser { get; private set; } = null!;
-
-	public virtual Organization.Organization SupplierOrganization { get; private set; } = null!;
-
-	public virtual Transaction Transaction { get; private set; } = null!;
-
 	public IReadOnlyCollection<PurchaseContent> Contents => _contents;
 
 	public static Expression<Func<Purchase, Guid>> GetKeySelector() => x => x.Id;

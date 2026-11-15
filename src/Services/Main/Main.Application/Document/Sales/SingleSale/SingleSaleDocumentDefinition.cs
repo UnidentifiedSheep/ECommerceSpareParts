@@ -6,7 +6,11 @@ using Locan.Core.Interfaces.Localizers;
 using Main.Application.Interfaces.Services.Document;
 using Main.Entities;
 using Main.Entities.Exceptions;
+using Main.Entities.Currency;
+using Main.Entities.Organization;
+using Main.Entities.Product;
 using Main.Entities.Sale;
+using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Documents;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +23,10 @@ public class SingleSaleDocumentDefinition(
 	IDocumentTemplateResolver templateResolver,
 	IS3Service s3Service,
 	IReadRepository<Sale, Guid> repository,
+	IReadRepository<User, Guid> userRepository,
+	IReadRepository<Currency, int> currencyRepository,
+	IReadRepository<Organization, Guid> organizationRepository,
+	IReadRepository<Product, int> productRepository,
 	ILocalizer localizer,
 	IOptions<S3BucketsOptions> options
 ) : DocumentDefinitionBase<
@@ -56,13 +64,25 @@ public class SingleSaleDocumentDefinition(
 				.Select(x => new SingleSaleDocumentSchema
 				{
 					Id = x.Id,
-					BuyerName = x.User.UserInfo == null
-						? "—"
-						: x.User.UserInfo.Name + " " + x.User.UserInfo.Surname,
+					BuyerName = userRepository.Query
+						.Where(user => user.Id == x.UserId)
+						.Select(user => user.UserInfo == null
+							? "—"
+							: user.UserInfo.Name + " " + user.UserInfo.Surname)
+						.FirstOrDefault()!,
 					Comment = x.Comment,
-					CurrencyCode = x.Currency.Code,
-					CurrencySign = x.Currency.CurrencySign,
-					OrganizationName = x.Organization.Name,
+					CurrencyCode = currencyRepository.Query
+						.Where(currency => currency.Id == x.CurrencyId)
+						.Select(currency => currency.Code)
+						.FirstOrDefault()!,
+					CurrencySign = currencyRepository.Query
+						.Where(currency => currency.Id == x.CurrencyId)
+						.Select(currency => currency.CurrencySign)
+						.FirstOrDefault()!,
+					OrganizationName = organizationRepository.Query
+						.Where(organization => organization.Id == x.OrganizationId)
+						.Select(organization => organization.Name)
+						.FirstOrDefault()!,
 					SaleDatetime = x.SaleDatetime,
 					State = x.State == SaleState.Draft ? draft :
 						x.State == SaleState.Completed ? completed :
@@ -77,13 +97,19 @@ public class SingleSaleDocumentDefinition(
 							OriginalPrice = z.OriginalPrice,
 							DiscountedPrice = z.DiscountedPrice,
 							ProductId = z.ProductId,
-							ProductName = z.Product.Name,
-							Sku = z.Product.Sku,
+							ProductName = productRepository.Query
+								.Where(product => product.Id == z.ProductId)
+								.Select(product => product.Name)
+								.FirstOrDefault()!,
+							Sku = productRepository.Query
+								.Where(product => product.Id == z.ProductId)
+								.Select(product => product.Sku)
+								.FirstOrDefault()!,
 							TotalSum = z.TotalSum
 						})
 						.ToList(),
 					TransactionId = x.TransactionId,
-					TotalSum = x.Transaction.Amount
+					TotalSum = x.Contents.Sum(content => content.TotalSum)
 				})
 				.FirstOrDefaultAsync(x => x.Id == saleId, token)
 			?? throw new SaleNotFoundException(saleId);
