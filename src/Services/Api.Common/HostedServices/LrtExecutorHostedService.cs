@@ -1,7 +1,5 @@
 ﻿using Application.Common.Interfaces.Lrt;
-using Application.Common.Models.Options;
 using Domain.CommonEntities.Job;
-using Microsoft.Extensions.Options;
 using NamedObject.Core.Interfaces;
 
 namespace Api.Common.HostedServices;
@@ -9,8 +7,8 @@ namespace Api.Common.HostedServices;
 public class LrtExecutorHostedService(
 	IServiceScopeFactory scopeFactory,
 	ILrtQuotaManager lrtQuotaManager,
-	ILogger<LrtExecutorHostedService> logger,
-	IOptionsMonitor<LrtExecutorOptions> options) : BackgroundService
+	IJobSignal jobSignal,
+	ILogger<LrtExecutorHostedService> logger) : BackgroundService
 {
 	private static readonly TimeSpan InitialLeaseDuration = TimeSpan.FromMinutes(5);
 
@@ -18,11 +16,10 @@ public class LrtExecutorHostedService(
 	{
 		while (!stoppingToken.IsCancellationRequested)
 		{
-			var currentValue = options.CurrentValue;
 			var jobStarted = await Iteration(stoppingToken);
 
 			if (!jobStarted)
-				await Task.Delay(currentValue.Delay, stoppingToken);
+				await jobSignal.WaitAsync(JobSignal.PollInterval, stoppingToken);
 		}
 	}
 

@@ -17,7 +17,7 @@ public class ExpiredJobsWiperHostedService(
 			var batchIsFull = await Iteration(currentValue, stoppingToken);
 
 			if (!batchIsFull)
-				await Task.Delay(currentValue.Delay, stoppingToken);
+				await Task.Delay(JobSignal.PollInterval, stoppingToken);
 		}
 	}
 

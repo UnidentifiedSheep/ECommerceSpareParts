@@ -11,6 +11,4 @@ public class LrtExecutorOptions
 
 	[Range(1, int.MaxValue)]
 	public int MaxExpiredLeaseFailBatchSize { get; set; } = 100;
-
-	public TimeSpan Delay { get; set; } = TimeSpan.FromSeconds(30);
 }

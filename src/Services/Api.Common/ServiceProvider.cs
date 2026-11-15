@@ -8,6 +8,7 @@ using Application.Common.Models.Options.S3;
 using Cache;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Persistence;
+using Persistence.Listening;
 using RabbitMq;
 using S3;
 using Security;
@@ -102,6 +103,9 @@ public static class ServiceProvider
 
 	public static IServiceCollection AddLrtHostedServices(this IServiceCollection serviceCollection)
 		=> serviceCollection
+			.AddChannelListening()
+			.AddSingleton<IJobSignal, JobSignal>()
+			.AddHostedService<JobNotificationListenerHostedService>()
 			.AddHostedService<LrtExecutorHostedService>()
 			.AddHostedService<ScheduledJobEnqueuerHostedService>()
 			.AddHostedService<ExpiredJobsWiperHostedService>();
