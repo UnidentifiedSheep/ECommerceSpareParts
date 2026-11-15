@@ -114,15 +114,16 @@ public class SaleAnalyticsSynchronizationLrtTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task Synchronize_SoftDeletedSale_PreservesItsFacts()
+	public async Task Synchronize_SoftDeletedSale_KeepsAmountsAndDeactivatesFacts()
 	{
 		var before = await Context.Set<SaleContentAnalytics>().AsNoTracking().SingleAsync(CancellationToken);
 		GetContext<SaleTestContext>().Sale.Delete();
 		await Context.SaveChangesAsync(CancellationToken);
 		var job = await Execute();
 		job.Status.Should().Be(JobStatus.Succeeded, job.ErrorMessage);
-		(await Context.Set<SaleContentAnalytics>().AsNoTracking().SingleAsync(CancellationToken)).Should()
-			.BeEquivalentTo(before);
+		var after = await Context.Set<SaleContentAnalytics>().AsNoTracking().SingleAsync(CancellationToken);
+		after.IsCompleted.Should().BeFalse();
+		after.Should().BeEquivalentTo(before, options => options.Excluding(item => item.IsCompleted));
 	}
 
 	private async Task<SaleContent> AddSales(bool invalidLast = false)

@@ -66,7 +66,7 @@ namespace Main.Migrator.Migrations
                     organization_id = s.organization_id,
                     buyer_id = s.user_id,
                     sale_datetime = s.sale_datetime,
-                    is_completed = (s.state = 1)
+                    is_completed = (s.state = 'Completed')
                 FROM public.sale_content c
                 JOIN public.sale s ON s.id = c.sale_id
                 WHERE a.sale_content_id = c.id;

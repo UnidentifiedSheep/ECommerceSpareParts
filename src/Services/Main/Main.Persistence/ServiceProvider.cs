@@ -33,6 +33,7 @@ public static class ServiceProvider
 			typeof(Main.Entities.Analytics.SaleContentAnalytics).Assembly,
 			typeof(Main.Entities.Order.Order).Assembly,
 			typeof(Main.Entities.Cart.Cart).Assembly,
+			typeof(Main.Entities.Documents.DocumentGenerationRequest).Assembly,
 			typeof(Main.Entities.User.UserNotificationPreference).Assembly,
 			typeof(Product).Assembly,
 			typeof(Main.Entities.Currency.Currency).Assembly,

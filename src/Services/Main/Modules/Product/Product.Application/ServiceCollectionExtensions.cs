@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
 
 		services.AddScoped<IProductCrosses, ProductCrosses>();
 		services.AddScoped<IProductSearch, ProductSearch>();
+		services.AddScoped<IProductNames, ProductNames>();
 		services.AddScoped<IProductEventPublisher, ProductEventPublisher>();
 		services.AddScoped<IProductEventProvider, ProductEventProvider>();
 		services.AddScoped<IProductEventPartProvider, ProductCoreEventPartProvider>();

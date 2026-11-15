@@ -19,9 +19,6 @@ using Main.Application.Products.Services;
 using Main.Application.Products.Services.EventParts;
 using Main.Application.Services;
 using Main.Application.Services.Currency;
-using Main.Application.Services.Document;
-using Main.Application.Services.Document.Providers;
-using Main.Application.Services.Document.Sources;
 using Main.Application.Services.ProductDeletion;
 using Main.Modules.Product.Abstractions;
 using Main.Application.Services.Storage;
@@ -50,7 +47,7 @@ public static class ServiceProvider
 		collection
 			.AddNamedObjects()
 			.AddLrtLayer(typeof(Global).Assembly)
-			.RegisterJobProviders<GenerateDocumentJobProvider>()
+			.RegisterJobProviders<DeleteProductImagesJobProvider>()
 			.AddFusionCache()
 			.WithRegisteredDistributedCache()
 			.WithRegisteredBackplane()
@@ -59,16 +56,8 @@ public static class ServiceProvider
 		collection.RegisterProjectionProviders(typeof(Global).Assembly);
 
 		collection.AddScoped<IAppLinkProvider, AppLinkProvider>();
+		collection.AddScoped<IDocumentUrlProvider>(provider => provider.GetRequiredService<IAppLinkProvider>());
 		collection.AddScoped<IAuthLinkProvider>(provider => provider.GetRequiredService<IAppLinkProvider>());
-
-		//order is important
-		collection.AddSingleton<IDocumentTemplateSource, S3DocumentTemplateSource>();
-		collection.AddSingleton<IDocumentTemplateSource, EmbeddedDocumentTemplateSource>();
-		collection.Decorate<IDocumentTemplateSource, CachedDocumentTemplateSource>();
-
-		collection.AddSingleton<IDocumentTemplateCache, DocumentTemplateCache>();
-		collection.AddSingleton<IDocumentProvider, ExcelDocumentProvider>();
-		collection.AddSingleton<IDocumentTemplateResolver, DocumentTemplateResolver>();
 
 		collection.RegisterSettingsService();
 

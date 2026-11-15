@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <LocanDefaultCulture>en</LocanDefaultCulture>
+        <AssemblyName>Main.Modules.Documents.Abstractions</AssemblyName>
+        <RootNamespace>Main.Application.Document</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Locan.Generator" Version="1.0.6"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\SSS\S3.Core\S3.Core.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\Main.Enums\Main.Enums.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <LocanResource Include="Localization/**/*.json"
+                       GenerateMessages="true"
+                       CopyToOutput="false"/>
+    </ItemGroup>
+
+</Project>

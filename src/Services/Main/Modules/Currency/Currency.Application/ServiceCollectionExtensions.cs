@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
 
 		services.AddScoped<ICurrencyChecks, CurrencyChecks>();
 		services.AddScoped<ICurrencyLookup, CurrencyLookup>();
+		services.AddScoped<ICurrencyDisplay, CurrencyDisplay>();
 		services.AddScoped<ICurrencyConverter, CurrencyConverter>();
 		services.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
 		services.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();

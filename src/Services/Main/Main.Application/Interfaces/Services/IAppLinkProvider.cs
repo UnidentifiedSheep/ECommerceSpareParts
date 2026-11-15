@@ -1,6 +1,5 @@
+using Main.Application.Interfaces.Services.Document;
+
 namespace Main.Application.Interfaces.Services;
 
-public interface IAppLinkProvider : IAuthLinkProvider
-{
-	Task<Uri> CreateDocumentUrlAsync(Guid requestId, CancellationToken cancellationToken = default);
-}
+public interface IAppLinkProvider : IAuthLinkProvider, IDocumentUrlProvider;

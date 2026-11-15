@@ -15,6 +15,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\Main.Enums\Main.Enums.csproj"/>
         <ProjectReference Include="..\Modules\Balance\Balance.Entities\Balance.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Documents\Documents.Entities\Documents.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Currency\Currency.Entities\Currency.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Product\Product.Entities\Product.Entities.csproj"/>

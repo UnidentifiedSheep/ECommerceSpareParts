@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<IOrganizationChecks, OrganizationChecks>();
 		services.AddScoped<IOrganizationLocks, OrganizationLocks>();
 		services.AddScoped<IOrganizationSearch, OrganizationSearch>();
+		services.AddScoped<IOrganizationNames, OrganizationNames>();
 
 		return services;
 	}

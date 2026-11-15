@@ -1,3 +1,6 @@
+using Application.Common.Interfaces.Lrt;
+using Application.Common.NamedObject;
+using NamedObject;
 using Application.Common.Host;
 using Main.Application.Analytics.Configs;
 using Main.Application.Analytics.Services;
@@ -11,7 +14,9 @@ public static class ServiceCollectionExtensions
 	{
 		AnalyticsCursorConfig.Configure();
 
-		services.AddModuleApplication(AnalyticsApplicationAssembly.Value);
+		services
+			.AddModuleApplication(AnalyticsApplicationAssembly.Value)
+			.RegisterNamedObject<ILrtNamedObject>(AnalyticsApplicationAssembly.Value);
 		services.AddScoped<SaleContentAnalyticsCalculator>();
 		services.AddScoped<SaleAnalyticsWriter>();
 

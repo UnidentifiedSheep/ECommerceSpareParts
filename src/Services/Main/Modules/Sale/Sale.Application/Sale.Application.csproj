@@ -23,6 +23,7 @@
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\..\Balance\Balance.Abstractions\Balance.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Currency\Currency.Abstractions\Currency.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Documents\Documents.Abstractions\Documents.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Identity\Identity.Abstractions\Identity.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Organization\Organization.Abstractions\Organization.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Product\Product.Abstractions\Product.Abstractions.csproj"/>

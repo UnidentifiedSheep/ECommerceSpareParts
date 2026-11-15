@@ -1,0 +1,9 @@
+{
+  "culture": "ru",
+  "messages": {
+    "document.request.type.name": "Формат документа",
+    "document.request.type.description": "Выберите формат создаваемого документа.",
+    "document.request.culture.name": "Язык документа",
+    "document.request.culture.description": "Язык создаваемого документа (en, ru или tr)."
+  }
+}

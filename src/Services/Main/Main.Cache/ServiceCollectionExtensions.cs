@@ -8,7 +8,6 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddApplicationCache(this IServiceCollection services)
 	{
-		services.AddScoped<IDocumentLinkProvider, DocumentLinkProvider>();
 		services.AddScoped<IOneTimeTokenStore, OneTimeTokenStore>();
 
 		return services;

@@ -3,6 +3,8 @@ using FluentAssertions;
 using Main.Application.Analytics.Analyzers;
 using Main.Application.Analytics.Analyzers.Markup;
 using Main.Entities.Sale;
+using Main.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Sale;
 using Tests.TestContainers.Combined;
@@ -231,9 +233,10 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	{
 		GetContext<SaleTestContext>().Sale.Delete();
 		await Context.SaveChangesAsync(CancellationToken);
+		await Context.Set<SaleContentAnalytics>().ExecuteDeleteAsync(CancellationToken);
 		foreach (var sample in _samples)
-			await Context.AddAsync(
-				SaleContentAnalytics.Create(
+		{
+			var row = SaleContentAnalytics.Create(
 					sample.Content.Id,
 					sample.Content.SaleId,
 					sample.Content.Sale.OrganizationId,
@@ -242,8 +245,12 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 					sample.Content.Count,
 					sample.Price,
 					sample.Price,
-					sample.Cost),
-				CancellationToken);
+					sample.Cost);
+			if (sample.Content.Sale.State == SaleState.Deleted)
+				row.Deactivate();
+			await Context.AddAsync(row, CancellationToken);
+		}
+
 		_samples.Clear();
 		await Context.SaveChangesAsync(CancellationToken);
 		var analyzer = Scope.ServiceProvider

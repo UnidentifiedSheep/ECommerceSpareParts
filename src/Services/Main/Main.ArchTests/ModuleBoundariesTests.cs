@@ -34,11 +34,12 @@ public class ModuleBoundariesTests
 		["Organization"] = ["Identity"],
 		["Analytics"] = ["Currency", "Sale"],
 		["Balance"] = ["Currency", "Identity", "Organization"],
+		["Documents"] = ["Identity"],
 		["Cart"] = ["Identity", "Product"],
 		["Notifications"] = ["Identity"],
 		["Order"] = ["Currency", "Identity", "Organization", "Product"],
 		["Purchase"] = ["Balance", "Currency", "Identity", "Organization", "Product", "Storage"],
-		["Sale"] = ["Balance", "Currency", "Identity", "Organization", "Product", "Storage"]
+		["Sale"] = ["Balance", "Currency", "Documents", "Identity", "Organization", "Product", "Storage"]
 	};
 
 	[Fact]

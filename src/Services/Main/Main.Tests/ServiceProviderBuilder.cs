@@ -14,6 +14,7 @@ using Main.Modules.Purchase;
 using Main.Modules.Analytics;
 using Main.Modules.Balance;
 using Main.Modules.Cart;
+using Main.Modules.Documents;
 using Main.Modules.Notifications;
 using Main.Modules.Order;
 using Main.Modules.Organization;
@@ -84,6 +85,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddModule<AnalyticsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<BalanceModule>(new ConfigurationBuilder().Build());
 		services.AddModule<CartModule>(new ConfigurationBuilder().Build());
+		services.AddModule<DocumentsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<NotificationsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrderModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrganizationModule>(new ConfigurationBuilder().Build());

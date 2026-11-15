@@ -1,3 +1,6 @@
+using Application.Common.Interfaces.Lrt;
+using Application.Common.NamedObject;
+using NamedObject;
 using Application.Common.Host;
 using Main.Application.Interfaces.Services;
 using Main.Application.Services;
@@ -10,7 +13,9 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddBalanceApplication(this IServiceCollection services)
 	{
-		services.AddModuleApplication(BalanceApplicationAssembly.Value);
+		services
+			.AddModuleApplication(BalanceApplicationAssembly.Value)
+			.RegisterNamedObject<ILrtNamedObject>(BalanceApplicationAssembly.Value);
 		services.AddScoped<IBalanceService, BalanceService>();
 		services.AddScoped<IFinanceTransfers, FinanceTransfers>();
 

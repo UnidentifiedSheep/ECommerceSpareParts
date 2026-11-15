@@ -81,6 +81,14 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
+        <LocanResource Include="../Modules/Documents/Documents.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Documents/Documents.Abstractions/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
         <LocanResource Include="../Modules/Cart/Cart.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>

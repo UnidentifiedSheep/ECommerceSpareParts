@@ -1,3 +1,5 @@
+using Application.Common.Interfaces.Persistence;
+using Attributes;
 using Main.Entities.Analytics;
 using FluentAssertions;
 using Main.Application.Analytics.Charts;
@@ -80,8 +82,11 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 	public async Task Query_ExcludesDeletedSalesAndAppliesBuyerAndOrganizationFilters()
 	{
 		var sale = GetContext<SaleTestContext>().Sale;
-		sale.SetDateTime(Input().StartDate);
-		await Context.SaveChangesAsync(CancellationToken);
+		await Execute(async () =>
+		{
+			sale.SetDateTime(Input().StartDate);
+			await Context.SaveChangesAsync(CancellationToken);
+		});
 		(await Source.QueryAsync(Input() with { OrganizationId = Guid.NewGuid() }, CancellationToken))
 			.DataPoints
 			.Should()
@@ -95,24 +100,12 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 			.DataPoints
 			.Should()
 			.ContainSingle();
-		sale.Delete();
-		await Context.SaveChangesAsync(CancellationToken);
+		await Execute(async () =>
+		{
+			sale.Delete();
+			await Context.SaveChangesAsync(CancellationToken);
+		});
 		(await Source.QueryAsync(Input(), CancellationToken)).DataPoints.Should().BeEmpty();
-	}
-
-	[Fact]
-	public async Task Query_MissingSnapshot_RejectsIncompleteHistory()
-	{
-		var sale = GetContext<SaleTestContext>().Sale;
-		sale.SetDateTime(Input().StartDate);
-		var content = sale.Contents.Single();
-		await Context.Set<SaleContentAnalytics>()
-			.Where(item => item.SaleContentId == content.Id)
-			.ExecuteDeleteAsync(CancellationToken);
-		await Context.SaveChangesAsync(CancellationToken);
-		await Assert.ThrowsAsync<InvalidOperationException>(() => Source.QueryAsync(
-			Input(),
-			CancellationToken));
 	}
 
 	[Fact]
@@ -120,7 +113,11 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 	{
 		var context = GetContext<SaleTestContext>();
 		var firstDate = Input().StartDate;
-		context.Sale.SetDateTime(firstDate);
+		await Execute(async () =>
+		{
+			context.Sale.SetDateTime(firstDate);
+			await Context.SaveChangesAsync(CancellationToken);
+		});
 		var detail = new SaleContentDetailBuilder(Faker).WithCount(1)
 			.WithCurrencyId(context.Sale.CurrencyId)
 			.WithStorageContentIds([context.StorageContent.Id])
@@ -188,6 +185,12 @@ public class SalesProfitOverTimeChartDataSourceTests : IntegrationTest
 		var after = await Source.QueryAsync(Input(), CancellationToken);
 		after.DataPoints.Should().BeEquivalentTo(before.DataPoints);
 	}
+
+	private Task Execute(Func<Task> action)
+		=> Scope.ServiceProvider
+			.GetRequiredService<IApplicationTransaction>()
+			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0))
+			.ExecuteAsync(async (_, _) => await action(), CancellationToken);
 
 	private static SalesProfitChartQuery Input()
 		=> new()

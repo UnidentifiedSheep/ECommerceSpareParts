@@ -1,16 +1,6 @@
 {
   "culture": "tr",
   "messages": {
-    "lrt.document.generation.name": "Belge oluşturma",
-    "lrt.document.generation.description": "Seçilen şablondan belge oluşturur.",
-    "lrt.document.generation.system.name.required": "Belge türü gereklidir.",
-    "lrt.document.generation.system.name.too.long": "Belge türü adı çok uzun.",
-    "lrt.document.generation.unknown.system.name": "İstenen belge türü kullanılamıyor.",
-    "lrt.document.generation.request.required": "Belge oluşturma isteği gereklidir.",
-    "lrt.document.generation.invalid.requester.id": "İstek sahibi kimliği boş olamaz.",
-    "lrt.document.generation.invalid.request": "Belge oluşturma isteği okunamadı.",
-    "lrt.expired.documents.removal.name": "Süresi dolmuş belgeleri kaldırma",
-    "lrt.expired.documents.removal.description": "Saklama süresi dolan belgeleri siler.",
     "lrt.service.task.run.name": "Servis görevi başlatma",
     "lrt.service.task.run.description": "Seçilen serviste bir görev çalıştırır."
   }
