@@ -4,7 +4,6 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
-using Main.Persistence.Repositories.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Notification.Core.Entities;
@@ -29,6 +28,7 @@ public static class ServiceProvider
 			typeof(Main.Entities.User.User).Assembly,
 			typeof(Main.Entities.User.UserVehicle).Assembly,
 			typeof(Main.Entities.Purchase.Purchase).Assembly,
+			typeof(Main.Entities.Sale.Sale).Assembly,
 			typeof(Product).Assembly,
 			typeof(Main.Entities.Currency.Currency).Assembly,
 			typeof(Main.Entities.Storage.StorageContent).Assembly,
@@ -37,7 +37,6 @@ public static class ServiceProvider
 			typeof(JobSchedule).Assembly);
 		collection.AddNotificationPersistence<UnifiedDbContext>();
 
-		collection.AddScoped<ISaleRepository, SaleRepository>();
 
 		return collection;
 	}

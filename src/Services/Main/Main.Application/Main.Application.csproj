@@ -43,6 +43,7 @@
         <ProjectReference Include="..\Modules\Identity\Identity.Application\Identity.Application.csproj"/>
         <ProjectReference Include="..\Modules\Balance\Balance.Abstractions\Balance.Abstractions.csproj"/>
         <ProjectReference Include="..\Modules\Purchase\Purchase.Application\Purchase.Application.csproj"/>
+        <ProjectReference Include="..\Modules\Sale\Sale.Application\Sale.Application.csproj"/>
         <ProjectReference Include="..\Modules\Organization\Organization.Abstractions\Organization.Abstractions.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>

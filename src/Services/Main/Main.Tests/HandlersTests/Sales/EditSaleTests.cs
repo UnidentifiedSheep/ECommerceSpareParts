@@ -222,7 +222,7 @@ public class EditSaleTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task EditSale_WhenContentProductChanged_ThrowsArticleDoesntMatchContentException()
+	public async Task EditSale_WhenContentProductChanged_ThrowsSaleContentProductMismatchException()
 	{
 		var sale = await ReloadSale();
 		var content = sale.Contents.Single();
@@ -244,7 +244,7 @@ public class EditSaleTests : IntegrationTest
 			sale.SaleDatetime,
 			sale.Comment);
 
-		await Assert.ThrowsAsync<ArticleDoesntMatchContentException>(() =>
+		await Assert.ThrowsAsync<SaleContentProductMismatchException>(() =>
 			Mediator.Send(command, CancellationToken));
 
 		var saleAfterFailedEdit = await ReloadSale();

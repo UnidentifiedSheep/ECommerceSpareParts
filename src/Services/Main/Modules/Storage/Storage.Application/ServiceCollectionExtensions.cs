@@ -5,6 +5,7 @@ using Main.Application.Interfaces.Services;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Application.Services.ProductDeletion;
 using Main.Application.Services.Storage;
+using Main.Modules.Storage.Abstractions;
 using Main.Modules.Product.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
 			.RegisterNamedObject<SettingDefinitionNamedObjectBase>(assembly);
 
 		services.AddScoped<IStorageContentService, StorageContentService>();
+		services.AddScoped<IStorageChecks, StorageChecks>();
 		services.AddScoped<IStorageContentSnapshotReader, StorageContentSnapshotReader>();
 		services.AddScoped<IProductDeletionRule, StorageContentProductDeletionRule>();
 

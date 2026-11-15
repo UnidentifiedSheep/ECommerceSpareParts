@@ -6,6 +6,7 @@ using Main.Modules.Currency.Persistence;
 using Main.Modules.Product.Persistence;
 using Main.Modules.Identity.Persistence;
 using Main.Modules.Purchase.Persistence;
+using Main.Modules.Sale.Persistence;
 using Main.Modules.Storage.Persistence;
 using Pricing.Persistence;
 using Main.Persistence;
@@ -44,6 +45,7 @@ builder.ConfigureServices((context, services) =>
 	services.AddDbContextModule<ProductDbContextModule>();
 	services.AddDbContextModule<IdentityDbContextModule>();
 	services.AddDbContextModule<PurchaseDbContextModule>();
+	services.AddDbContextModule<SaleDbContextModule>();
 	services.AddDbContextModule<StorageDbContextModule>();
 	services.AddDbContextModule<PricingDbContextModule>();
 	services.AddDbContext<UnifiedDbContext>((sp, options) =>

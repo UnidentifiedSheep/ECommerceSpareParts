@@ -19,6 +19,7 @@ using Main.Modules.Currency;
 using Main.Modules.Product;
 using Main.Modules.Identity;
 using Main.Modules.Purchase;
+using Main.Modules.Sale;
 using Main.Modules.Storage;
 using Contracts.Analytics;
 using Pricing.Application.Consumers;
@@ -64,6 +65,7 @@ builder.Services.AddModule<CurrencyModule>(builder.Configuration);
 builder.Services.AddModule<ProductModule>(builder.Configuration);
 builder.Services.AddModule<IdentityModule>(builder.Configuration);
 builder.Services.AddModule<PurchaseModule>(builder.Configuration);
+builder.Services.AddModule<SaleModule>(builder.Configuration);
 builder.Services.AddModule<StorageModule>(builder.Configuration);
 builder.Services.AddModule<PricingModule>(builder.Configuration);
 

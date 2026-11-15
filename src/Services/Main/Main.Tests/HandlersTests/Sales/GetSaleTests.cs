@@ -1,3 +1,4 @@
+using Main.Entities.Sale;
 using FluentAssertions;
 using FluentValidation.TestHelper;
 using Main.Application.Handlers.Sales.GetSale;

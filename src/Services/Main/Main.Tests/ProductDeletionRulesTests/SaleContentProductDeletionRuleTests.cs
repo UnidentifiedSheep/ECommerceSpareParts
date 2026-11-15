@@ -1,5 +1,5 @@
 using Main.Application.Services.ProductDeletion;
-using Main.Entities.Product;
+using Main.Entities.Sale;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
@@ -12,7 +12,7 @@ public class SaleContentProductDeletionRuleTests : ProductDeletionRuleTestsBase<
 
 	[Fact]
 	public async Task ProductInSale_IsBlocked()
-		=> await ShouldBlock(GetContext<SaleTestContext>().Product.Id, ArticleDeletionSaleMessage.Key);
+		=> await ShouldBlock(GetContext<SaleTestContext>().Product.Id, SaleContentProductDeletionBlockedMessage.Key);
 
 	[Fact]
 	public async Task ProductNotInSale_IsNotBlocked()

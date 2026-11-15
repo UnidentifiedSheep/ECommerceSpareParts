@@ -18,6 +18,7 @@
         <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Product\Product.Entities\Product.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Purchase\Purchase.Entities\Purchase.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Sale\Sale.Entities\Sale.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Storage\Storage.Entities\Storage.Entities.csproj"/>
     </ItemGroup>
 

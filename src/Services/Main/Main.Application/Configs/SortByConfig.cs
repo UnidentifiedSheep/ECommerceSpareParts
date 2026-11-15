@@ -52,13 +52,6 @@ public static class SortByConfig
 
 		QueryableSortBy
 			.Value
-			.MapDefault<Sale, DateTime>(x => x.SaleDatetime, true)
-			.Map<Sale, DateTime>("dateTime", x => x.SaleDatetime)
-			.Map<Sale, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
-			.Map<Sale, Guid>("id", x => x.Id);
-
-		QueryableSortBy
-			.Value
 			.MapDefault<SaleContent, DateTime>(x => x.Sale.SaleDatetime, true)
 			.Map<SaleContent, int>("saleContentId", x => x.Id)
 			.Map<SaleContent, string>("storageCode", x => x.Sale.StorageCode)
