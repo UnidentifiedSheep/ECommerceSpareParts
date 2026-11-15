@@ -77,6 +77,10 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
+        <LocanResource Include="../Modules/Cart/Cart.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
         <LocanResource Include="../Modules/Notifications/Notifications.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>

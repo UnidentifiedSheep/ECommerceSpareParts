@@ -13,11 +13,7 @@ public static class ValidationConfiguration
 	{
 		OrganizationValidationConfiguration.Configure(errors);
 
-		errors.For(CartKeys.PK)
-			.OnMissing(input => new CartItemNotFoundException(input.Values[0].ProductId));
-
-		errors.For(CartKeys.PK)
-			.OnAlreadyExists(input => new CartItemAlreadyExistsException(input.Values));
+		CartValidationConfiguration.Configure(errors);
 
 		CurrencyValidationConfiguration.Configure(errors);
 

@@ -23,17 +23,5 @@ public class CartConfiguration : IEntityTypeConfiguration<Entities.Cart.Cart>
 		builder.Property(e => e.ProductId).HasColumnName("product_id");
 
 		builder.Property(e => e.Count).HasColumnName("count");
-
-		builder
-			.HasOne<Entities.Product.Product>()
-			.WithMany()
-			.HasForeignKey(d => d.ProductId)
-			.HasConstraintName("cart_product_id_fk");
-
-		builder
-			.HasOne<Entities.User.User>()
-			.WithMany()
-			.HasForeignKey(d => d.UserId)
-			.HasConstraintName("cart_users_id_fk");
 	}
 }

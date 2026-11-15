@@ -32,6 +32,7 @@ public static class ServiceProvider
 			typeof(Main.Entities.Organization.Organization).Assembly,
 			typeof(Main.Entities.Balance.Transaction).Assembly,
 			typeof(Main.Entities.Order.Order).Assembly,
+			typeof(Main.Entities.Cart.Cart).Assembly,
 			typeof(Main.Entities.User.UserNotificationPreference).Assembly,
 			typeof(Product).Assembly,
 			typeof(Main.Entities.Currency.Currency).Assembly,

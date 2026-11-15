@@ -45,6 +45,7 @@
         <ProjectReference Include="..\Modules\Purchase\Purchase.Application\Purchase.Application.csproj"/>
         <ProjectReference Include="..\Modules\Sale\Sale.Application\Sale.Application.csproj"/>
         <ProjectReference Include="..\Modules\Balance\Balance.Application\Balance.Application.csproj"/>
+        <ProjectReference Include="..\Modules\Cart\Cart.Application\Cart.Application.csproj"/>
         <ProjectReference Include="..\Modules\Notifications\Notifications.Application\Notifications.Application.csproj"/>
         <ProjectReference Include="..\Modules\Order\Order.Application\Order.Application.csproj"/>
         <ProjectReference Include="..\Modules\Organization\Organization.Application\Organization.Application.csproj"/>

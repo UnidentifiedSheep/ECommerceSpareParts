@@ -12,6 +12,7 @@ using Main.Modules.Product;
 using Main.Modules.Identity;
 using Main.Modules.Purchase;
 using Main.Modules.Balance;
+using Main.Modules.Cart;
 using Main.Modules.Notifications;
 using Main.Modules.Order;
 using Main.Modules.Organization;
@@ -80,6 +81,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddModule<PurchaseModule>(new ConfigurationBuilder().Build());
 		services.AddModule<SaleModule>(new ConfigurationBuilder().Build());
 		services.AddModule<BalanceModule>(new ConfigurationBuilder().Build());
+		services.AddModule<CartModule>(new ConfigurationBuilder().Build());
 		services.AddModule<NotificationsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrderModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrganizationModule>(new ConfigurationBuilder().Build());
