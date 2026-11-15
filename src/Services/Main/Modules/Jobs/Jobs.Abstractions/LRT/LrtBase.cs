@@ -14,7 +14,7 @@ namespace Application.Common.LRT;
 
 public abstract class LrtBase<TInputState, TState>(
 	IApplicationTransactionFactory transactionService,
-	ILogger logger) : ILrtNamedObject<TInputState>
+	ILogger logger) : ILrtNamedObject<TInputState>, IQuotaBoundLrt
 	where TInputState : class, IInputState where TState : class
 {
 	private IApplicationTransactionContext? _activeTransactionContext;
@@ -55,6 +55,8 @@ public abstract class LrtBase<TInputState, TState>(
 	protected virtual TimeSpan LeaseDuration => TimeSpan.FromMinutes(5);
 
 	public abstract string SystemName { get; }
+
+	public virtual string QuotaSystemName => DefaultLrtQuota.SystemName;
 
 	public abstract ILocalizableMessage NameLocalizationMessage { get; }
 	public abstract ILocalizableMessage DescriptionLocalizationMessage { get; }

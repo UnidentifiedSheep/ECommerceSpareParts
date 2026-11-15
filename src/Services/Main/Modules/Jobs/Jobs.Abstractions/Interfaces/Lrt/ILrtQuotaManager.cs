@@ -8,8 +8,8 @@ public interface ILrtQuotaManager
 
 	int MaxQuota { get; }
 
-	ILrtQuota UseQuota(Guid holderId);
+	ILrtQuotaLease UseQuota(Guid holderId);
 
-	ValueTask<ILrtQuota> UseQuotaAsync(Guid holderId, CancellationToken cancellationToken = default);
-	bool TryUseQuota(Guid holderId, [NotNullWhen(true)] out ILrtQuota? quota);
+	ValueTask<ILrtQuotaLease> UseQuotaAsync(Guid holderId, CancellationToken cancellationToken = default);
+	bool TryUseQuota(Guid holderId, [NotNullWhen(true)] out ILrtQuotaLease? quota);
 }

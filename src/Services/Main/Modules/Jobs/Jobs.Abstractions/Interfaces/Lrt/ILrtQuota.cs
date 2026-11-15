@@ -1,6 +1,8 @@
+using NamedObject.Core.Interfaces;
+
 namespace Application.Common.Interfaces.Lrt;
 
-public interface ILrtQuota : IDisposable
+public interface ILrtQuota : INamedObject
 {
-	Guid HolderId { get; }
+	int MaxParallelPerWorker { get; }
 }

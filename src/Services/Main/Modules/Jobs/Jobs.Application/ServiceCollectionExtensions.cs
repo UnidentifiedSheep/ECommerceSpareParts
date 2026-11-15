@@ -26,7 +26,8 @@ public static class ServiceCollectionExtensions
 		services.AddCommonDomain<JobsDomain>();
 		services
 			.AddModuleApplication(assembly)
-			.RegisterNamedObject<ILrtNamedObject>(assembly);
+			.RegisterNamedObject<ILrtNamedObject>(assembly)
+			.RegisterNamedObject<ILrtQuota>(assembly, objectsLifetime: ServiceLifetime.Singleton);
 
 		services.TryAddSingleton(TimeProvider.System);
 		services.TryAddScoped<IOperationDatePolicy, OperationDatePolicy>();

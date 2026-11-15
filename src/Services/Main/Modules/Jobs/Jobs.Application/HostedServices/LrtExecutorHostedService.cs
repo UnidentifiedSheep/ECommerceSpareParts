@@ -76,7 +76,7 @@ public class LrtExecutorHostedService(
 	private async Task RunJobAndReleaseQuota(
 		Guid jobId,
 		string systemName,
-		ILrtQuota lrtQuota,
+		ILrtQuotaLease lrtQuota,
 		CancellationToken ct)
 	{
 		using (lrtQuota)

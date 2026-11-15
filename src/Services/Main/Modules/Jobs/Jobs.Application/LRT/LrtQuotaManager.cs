@@ -50,12 +50,12 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 		}
 	}
 
-	public ILrtQuota UseQuota(Guid holderId)
+	public ILrtQuotaLease UseQuota(Guid holderId)
 		=> TryUseQuota(holderId, out var quota)
 			? quota
 			: throw new InvalidOperationException("No available quota.");
 
-	public async ValueTask<ILrtQuota> UseQuotaAsync(
+	public async ValueTask<ILrtQuotaLease> UseQuotaAsync(
 		Guid holderId,
 		CancellationToken cancellationToken = default)
 	{
@@ -68,7 +68,7 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 			{
 				ThrowIfDisposed();
 				AddHolder(holderId);
-				return new LrtQuota(this, holderId);
+				return new LrtQuotaLease(this, holderId);
 			}
 			catch
 			{
@@ -80,7 +80,7 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 		}
 	}
 
-	public bool TryUseQuota(Guid holderId, [NotNullWhen(true)] out ILrtQuota? quota)
+	public bool TryUseQuota(Guid holderId, [NotNullWhen(true)] out ILrtQuotaLease? quota)
 	{
 		lock (_sync)
 		{
@@ -93,7 +93,7 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 				return false;
 
 			AddHolder(holderId);
-			quota = new LrtQuota(this, holderId);
+			quota = new LrtQuotaLease(this, holderId);
 			return true;
 		}
 	}
@@ -136,7 +136,7 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 
 	private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, nameof(LrtQuotaManager));
 
-	private sealed class LrtQuota(LrtQuotaManager manager, Guid holderId) : ILrtQuota
+	private sealed class LrtQuotaLease(LrtQuotaManager manager, Guid holderId) : ILrtQuotaLease
 	{
 		private int _disposed;
 

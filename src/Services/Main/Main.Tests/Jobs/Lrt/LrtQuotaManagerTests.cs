@@ -285,7 +285,7 @@ public class LrtQuotaManagerTests
 		results.Where(x => !x.Acquired).Should().OnlyContain(x => x.Quota == null);
 		manager.AvailableQuota.Should().Be(0);
 
-		foreach (var quota in results.Select(x => x.Quota).OfType<ILrtQuota>())
+		foreach (var quota in results.Select(x => x.Quota).OfType<ILrtQuotaLease>())
 			quota.Dispose();
 	}
 
@@ -304,14 +304,14 @@ public class LrtQuotaManagerTests
 				{
 					return new
 					{
-						Quota = (ILrtQuota?)manager.UseQuota(holderId), Exception = (Exception?)null
+						Quota = (ILrtQuotaLease?)manager.UseQuota(holderId), Exception = (Exception?)null
 					};
 				}
 				catch (Exception ex)
 				{
 					return new
 					{
-						Quota = (ILrtQuota?)null, Exception = (Exception?)ex
+						Quota = (ILrtQuotaLease?)null, Exception = (Exception?)ex
 					};
 				}
 			})));
@@ -320,7 +320,7 @@ public class LrtQuotaManagerTests
 		results.Count(x => x.Exception is InvalidOperationException).Should().Be(callsCount - maxQuota);
 		manager.AvailableQuota.Should().Be(0);
 
-		foreach (var quota in results.Select(x => x.Quota).OfType<ILrtQuota>())
+		foreach (var quota in results.Select(x => x.Quota).OfType<ILrtQuotaLease>())
 			quota.Dispose();
 	}
 
@@ -351,7 +351,7 @@ public class LrtQuotaManagerTests
 						return new
 						{
 							Acquired = false,
-							Quota = (ILrtQuota?)null,
+							Quota = (ILrtQuotaLease?)null,
 							Exception = (Exception?)ex
 						};
 					}
