@@ -21,7 +21,7 @@ internal sealed class DContext(DbContextOptions<DContext> options) : DbContext(o
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.ApplyConfiguration(new SettingConfiguration()).ApplyJobConfigurations();
+		modelBuilder.ApplyConfiguration(new SettingConfiguration());
 
 		modelBuilder
 			.Entity<Setting>()

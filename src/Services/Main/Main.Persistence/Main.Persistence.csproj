@@ -34,6 +34,7 @@
         <ProjectReference Include="..\..\Persistence.Common\Persistence.Common.csproj"/>
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Jobs\Jobs.Persistence\Jobs.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Pricing\Pricing.Entities\Pricing.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
     </ItemGroup>

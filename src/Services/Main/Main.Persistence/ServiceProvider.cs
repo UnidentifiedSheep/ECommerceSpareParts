@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Notification.Core.Entities;
 using Notification.Persistence;
+using Main.Modules.Jobs.Persistence;
 using Persistence.Common;
 using Persistence.Context;
 using Persistence.Extensions;
@@ -20,6 +21,7 @@ public static class ServiceProvider
 	public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
 	{
 		collection.AddDbContextModule<MainDbContextModule>();
+		collection.AddJobRepositories<UnifiedDbContext>();
 		collection.AddPersistenceBase<UnifiedDbContext>(
 			ValidationConfiguration.Configure,
 			typeof(BasicEfRepository<,>),

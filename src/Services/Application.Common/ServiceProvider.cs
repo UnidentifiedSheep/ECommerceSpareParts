@@ -1,23 +1,13 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Abstractions.Interfaces;
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
-using Application.Common.DomainEventHandlers.Jobs.JobStatusUpdated;
-using Application.Common.DomainEventHandlers.Jobs.JobStepFinished;
-using Application.Common.Domains;
 using Application.Common.Extensions;
-using Application.Common.Handlers.Jobs;
-using Application.Common.Handlers.Jobs.GetJobs;
-using Application.Common.Handlers.JobSchedules.GetSchedule;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.Services;
 using Application.Common.LRT;
-using Application.Common.Projections;
 using Application.Common.Services;
 using Application.Common.Services.Events;
-using Application.Common.Services.Job;
-using Domain.CommonEntities.Job.Events;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -76,51 +66,6 @@ public static class ServiceProvider
 					typeof(ApplicationTransactionBehavior<,>),
 					ServiceLifetime.Scoped);
 		});
-
-		return services;
-	}
-
-	public static IServiceCollection AddLrtLayer(this IServiceCollection services, Assembly? assembly = null)
-	{
-		assembly ??= Assembly.GetExecutingAssembly();
-		services.AddCommonDomain<JobsDomain>();
-		services
-			.RegisterNamedObject<ILrtNamedObject>(assembly)
-			.RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly)
-			.RegisterProjectionProviders<JobDtoProjectionProvider>();
-
-		services.TryAddSingleton(TimeProvider.System);
-		services.TryAddScoped<IOperationDatePolicy, OperationDatePolicy>();
-
-		services.AddScoped<IJobLeaseService, JobLeaseService>();
-		services.AddScoped<IJobCreationDispatcher, JobCreationDispatcher>();
-		services.AddScoped<IJobStepInputInitializer, JobStepInputInitializer>();
-		services.AddScoped<Func<IJobCreationDispatcher>>(serviceProvider =>
-			serviceProvider.GetRequiredService<IJobCreationDispatcher>);
-		services.AddScoped<IJobService, JobService>();
-		services.AddScoped<IJobScheduleService, JobScheduleService>();
-		services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();
-		services.AddScoped<
-			INotificationHandler<Batch<JobStepFinishedDomainEvent>>, ResumeMultiStepJobHandler>();
-		services.AddScoped<
-			INotificationHandler<Batch<JobStatusUpdatedDomainEvent>>, PublishJobStatusUpdatedEventHandler>();
-
-		services.AddScoped<
-			IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,
-			GetAllAvailableJobsHandler>();
-
-		services.AddScoped<IRequestHandler<GetJobsQuery, GetJobsResult>, GetJobsHandler>();
-
-		services.AddScoped<IRequestHandler<GetJobQuery, GetJobResult>, GetJobHandler>();
-
-		services.AddScoped<IRequestHandler<CreateJobCommand, CreateJobResult>, CreateJobHandler>();
-
-		services.AddScoped<IRequestHandler<GetJobStateQuery, GetJobStateResult>, GetJobStateHandler>();
-
-		services.AddScoped<IRequestHandler<GetScheduleQuery, GetScheduleResult>, GetScheduleHandler>();
-
-		services.AddScoped<
-			IRequestHandler<GetScheduleByIdQuery, GetScheduleByIdResult>, GetScheduleByIdHandler>();
 
 		return services;
 	}

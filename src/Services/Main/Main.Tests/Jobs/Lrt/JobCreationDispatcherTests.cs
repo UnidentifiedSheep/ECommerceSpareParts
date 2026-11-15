@@ -1,0 +1,340 @@
+using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces.Persistence;
+using Application.Common.LRT;
+using Domain.CommonEntities.Job;
+using Domain.CommonEnums;
+using FluentAssertions;
+using Locan.Core.Interfaces;
+using Locan.Core.LocalizableMessages;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NamedObject.Core.Interfaces;
+
+namespace Tests.Jobs.Lrt;
+
+public sealed class JobCreationDispatcherTests
+{
+	[Fact]
+	public void Create_SingleRunLrt_CreatesSingleRunJobWithValidatedState()
+	{
+		var lrt = new Mock<ILrtNamedObject>();
+		lrt.SetupGet(x => x.SystemName).Returns("single-run");
+		lrt.SetupGet(x => x.InputType).Returns(typeof(NoneInputState));
+		var dispatcher = CreateDispatcher("single-run", lrt.Object);
+
+		var job = dispatcher.Create(
+			"single-run",
+			"{}",
+			5);
+
+		job.Should().BeOfType<SingleRunJob>();
+		job.Status.Should().Be(JobStatus.Pending);
+		job.SystemName.Should().Be("single-run");
+		job.MaxAttempts.Should().Be(5);
+		job.State.Should().Be("{}");
+	}
+
+	[Fact]
+	public void Create_UniqueSingleRunLrt_SetsNaturalKey()
+	{
+		var lrt = CreateSingleRunLrt("single-run");
+		var dispatcher = CreateDispatcher(lrt);
+
+		var job = dispatcher.Create(
+			lrt.SystemName,
+			"{}",
+			5,
+			" product:42 ");
+
+		job.Should().BeOfType<SingleRunJob>();
+		job.NaturalKey.Should().Be("product:42");
+	}
+
+	[Fact]
+	public void Create_MultiStepLrt_CreatesTopologyWithBlockedSteps()
+	{
+		var lrt = new TestMultiStepLrt();
+		var stepLrt = CreateSingleRunLrt("step");
+		var dispatcher = CreateDispatcher(lrt, stepLrt);
+
+		var job = dispatcher.Create(
+			lrt.SystemName,
+			"{}",
+			4);
+
+		var multiStepJob = job.Should().BeOfType<MultiStepJob>().Subject;
+		multiStepJob.MaxAttempts.Should().Be(1);
+		multiStepJob.Steps.Should().ContainSingle().Which.Status.Should().Be(JobStatus.Blocked);
+		multiStepJob.Steps.Single().MaxAttempts.Should().Be(4);
+	}
+
+	[Fact]
+	public void Create_UniqueMultiStepLrt_SetsNaturalKeyOnlyOnRoot()
+	{
+		var lrt = new TestMultiStepLrt();
+		var stepLrt = CreateSingleRunLrt("step");
+		var dispatcher = CreateDispatcher(lrt, stepLrt);
+
+		var job = dispatcher.Create(
+			lrt.SystemName,
+			"{}",
+			4,
+			" workflow:42 ");
+
+		var multiStepJob = job.Should().BeOfType<MultiStepJob>().Subject;
+		multiStepJob.NaturalKey.Should().Be("workflow:42");
+		multiStepJob.Steps.Should().ContainSingle().Which.NaturalKey.Should().BeNull();
+	}
+
+	[Fact]
+	public void Create_NestedMultiStepLrt_CreatesNestedBlockedTopology()
+	{
+		var outer = new NestedMultiStepLrt("outer", "inner");
+		var inner = new NestedMultiStepLrt("inner", "leaf");
+		var leaf = CreateSingleRunLrt("leaf");
+		var dispatcher = CreateDispatcher(
+			outer,
+			inner,
+			leaf);
+
+		var job = dispatcher.Create(
+			outer.SystemName,
+			"{}",
+			3);
+
+		var outerJob = job.Should().BeOfType<MultiStepJob>().Subject;
+		var innerJob = outerJob
+			.Steps
+			.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.BeOfType<MultiStepJob>()
+			.Subject;
+		innerJob.Status.Should().Be(JobStatus.Blocked);
+		outerJob.MaxAttempts.Should().Be(1);
+		innerJob.MaxAttempts.Should().Be(3);
+		innerJob
+			.Steps
+			.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.BeOfType<SingleRunJob>()
+			.Which
+			.MaxAttempts
+			.Should()
+			.Be(3);
+	}
+
+	[Fact]
+	public void Create_UniqueNestedMultiStepLrt_DoesNotPropagateNaturalKeyToSteps()
+	{
+		var outer = new NestedMultiStepLrt("outer", "inner");
+		var inner = new NestedMultiStepLrt("inner", "leaf");
+		var leaf = CreateSingleRunLrt("leaf");
+		var dispatcher = CreateDispatcher(
+			outer,
+			inner,
+			leaf);
+
+		var job = dispatcher.Create(
+			outer.SystemName,
+			"{}",
+			3,
+			"workflow:42");
+
+		var outerJob = job.Should().BeOfType<MultiStepJob>().Subject;
+		var innerJob = outerJob
+			.Steps
+			.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.BeOfType<MultiStepJob>()
+			.Subject;
+
+		outerJob.NaturalKey.Should().Be("workflow:42");
+		innerJob.NaturalKey.Should().BeNull();
+		innerJob.Steps.Should().ContainSingle().Which.NaturalKey.Should().BeNull();
+	}
+
+	[Fact]
+	public void Create_CyclicMultiStepComposition_Throws()
+	{
+		var first = new NestedMultiStepLrt("first", "second");
+		var second = new NestedMultiStepLrt("second", "first");
+		var dispatcher = CreateDispatcher(first, second);
+
+		var act = () => dispatcher.Create(
+			first.SystemName,
+			"{}",
+			3);
+
+		act.Should().Throw<InvalidOperationException>().WithMessage("*cycle*first*");
+	}
+
+	[Fact]
+	public void Create_DeferredInput_DoesNotEvaluateFactory()
+	{
+		var calls = 0;
+		var workflow = CreateWorkflow(builder => builder.AddStep(
+			"step",
+			_ =>
+			{
+				calls++;
+				return new NoneInputState();
+			}));
+		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
+
+		var job = (MultiStepJob)dispatcher.Create(
+			workflow.SystemName,
+			"{}",
+			3);
+
+		calls.Should().Be(0);
+		job.Steps.Should().ContainSingle().Which.InputInitialized.Should().BeFalse();
+	}
+
+	[Fact]
+	public void Create_RepeatedLrtWithExplicitKeys_CreatesDistinctSteps()
+	{
+		var workflow = CreateWorkflow(builder =>
+		{
+			builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "first");
+			builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "second");
+		});
+		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
+
+		var job = (MultiStepJob)dispatcher.Create(
+			workflow.SystemName,
+			"{}",
+			3);
+
+		job.Steps.Select(x => x.StepKey).Should().Equal("first", "second");
+	}
+
+	[Fact]
+	public void Create_DuplicateStepKey_ThrowsBeforePersistingTopology()
+	{
+		var workflow = CreateWorkflow(builder =>
+		{
+			builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "same");
+			builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "same");
+		});
+		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
+
+		var action = () => dispatcher.Create(
+			workflow.SystemName,
+			"{}",
+			3);
+
+		action.Should().Throw<InvalidOperationException>().WithMessage("*Duplicate*same*");
+	}
+
+	[Fact]
+	public void Create_CyclicDependencies_Throws()
+	{
+		var workflow = CreateWorkflow(builder =>
+		{
+			var first = builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "first");
+			var second = builder.AddStep(
+				"step",
+				new NoneInputState(),
+				key: "second");
+			builder.AddDependency(first, second);
+			builder.AddDependency(second, first);
+		});
+		var dispatcher = CreateDispatcher(workflow, CreateSingleRunLrt("step"));
+
+		var action = () => dispatcher.Create(
+			workflow.SystemName,
+			"{}",
+			3);
+
+		action.Should().Throw<InvalidOperationException>().WithMessage("*cycle*");
+	}
+
+	private static IMultiStepLrt CreateWorkflow(Action<IMultiStepJobBuilder> configure)
+	{
+		var lrt = new Mock<IMultiStepLrt>();
+		lrt.SetupGet(x => x.SystemName).Returns("workflow");
+		lrt.SetupGet(x => x.InputType).Returns(typeof(NoneInputState));
+		lrt.Setup(x => x.ConfigureSteps(It.IsAny<IMultiStepJobBuilder>())).Callback(configure);
+		return lrt.Object;
+	}
+
+	private static JobCreationDispatcher CreateDispatcher(string systemName, ILrtNamedObject lrt)
+	{
+		var registry = new Mock<INamedObjectRegistry<ILrtNamedObject>>();
+		registry.Setup(x => x.GetBySystemName(systemName)).Returns(lrt);
+		return new JobCreationDispatcher(registry.Object);
+	}
+
+	private static JobCreationDispatcher CreateDispatcher(params ILrtNamedObject[] lrts)
+	{
+		var registry = new Mock<INamedObjectRegistry<ILrtNamedObject>>();
+		registry
+			.Setup(x => x.GetBySystemName(It.IsAny<string>()))
+			.Returns((string name) => lrts.Single(x => x.SystemName == name));
+		return new JobCreationDispatcher(registry.Object);
+	}
+
+	private static ILrtNamedObject CreateSingleRunLrt(string systemName)
+	{
+		var lrt = new Mock<ILrtNamedObject>();
+		lrt.SetupGet(x => x.SystemName).Returns(systemName);
+		lrt.SetupGet(x => x.InputType).Returns(typeof(NoneInputState));
+		return lrt.Object;
+	}
+
+	private sealed class TestMultiStepLrt : MultiStepLrtBase<NoneInputState, NoneInputState>
+	{
+		public TestMultiStepLrt() : base(
+			Mock.Of<IApplicationTransactionFactory>(),
+			Mock.Of<ILogger>())
+		{
+		}
+
+		public override string SystemName => nameof(TestMultiStepLrt);
+
+		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-name");
+
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-description");
+
+		protected internal override void ConfigureSteps(IMultiStepJobBuilder builder)
+			=> builder.AddStep("step", new NoneInputState());
+	}
+
+	private sealed class NestedMultiStepLrt(string systemName, string childSystemName)
+		: MultiStepLrtBase<NoneInputState, NoneInputState>(
+			Mock.Of<IApplicationTransactionFactory>(),
+			Mock.Of<ILogger>())
+	{
+		public override string SystemName => systemName;
+
+		public override ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-name");
+
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-description");
+
+		protected internal override void ConfigureSteps(IMultiStepJobBuilder builder)
+			=> builder.AddStep(childSystemName, new NoneInputState());
+	}
+}

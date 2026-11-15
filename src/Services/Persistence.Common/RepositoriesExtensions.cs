@@ -10,7 +10,6 @@ using Marten;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Persistence.Common.Jobs;
 using Persistence.DbValidator;
 using Persistence.Extensions;
 using Persistence.Interceptors;
@@ -86,7 +85,6 @@ public static class RepositoriesExtensions
 			readRepositoryType,
 			entitiesAssemblies);
 
-		services.AddJobRepositories<TContext>();
 
 		services.AddScoped(typeof(IReadRepository<,>), readRepositoryType);
 
@@ -152,15 +150,5 @@ public static class RepositoriesExtensions
 		}
 
 		return null;
-	}
-
-	public static IServiceCollection AddJobRepositories<TContext>(this IServiceCollection services)
-		where TContext : DbContext
-	{
-		services.AddScoped<PendingUniqueJobFilter<TContext>>();
-		services.AddScoped<IJobRepository, JobRepository<TContext>>();
-		services.AddScoped<IRepository<Job, Guid>>(sp => sp.GetRequiredService<IJobRepository>());
-
-		return services;
 	}
 }

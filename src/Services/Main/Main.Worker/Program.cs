@@ -23,6 +23,8 @@ using Main.Modules.Analytics;
 using Main.Modules.Balance;
 using Main.Modules.Cart;
 using Main.Modules.Documents;
+using Main.Modules.Jobs;
+using Main.Modules.Jobs.Application;
 using Main.Modules.Notifications;
 using Main.Modules.Order;
 using Main.Modules.Organization;
@@ -56,8 +58,7 @@ builder
 	.AddJwtOptions()
 	.AddS3Options()
 	.AddS3BucketOptions()
-	.AddLrtOptions()
-	.AddScheduledJobEnqueuerOptions()
+	.AddJobsOptions()
 	.AddSystemOptions()
 	.AddSecretEncryptionOptions();
 
@@ -77,6 +78,7 @@ builder.Services.AddModule<AnalyticsModule>(builder.Configuration);
 builder.Services.AddModule<BalanceModule>(builder.Configuration);
 builder.Services.AddModule<CartModule>(builder.Configuration);
 builder.Services.AddModule<DocumentsModule>(builder.Configuration);
+builder.Services.AddModule<JobsModule>(builder.Configuration);
 builder.Services.AddModule<NotificationsModule>(builder.Configuration);
 builder.Services.AddModule<OrderModule>(builder.Configuration);
 builder.Services.AddModule<OrganizationModule>(builder.Configuration);
@@ -102,7 +104,7 @@ builder
 	.AddInAppNotificationHostedService()
 	.AddEmailNotificationHostedService();
 
-builder.Services.AddLrtHostedServices();
+builder.Services.AddJobsHostedServices();
 
 builder.Services.AddHostedService<StartupTaskHostedService>();
 

@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Lrt;
 using System.Globalization;
 using Api.Common;
 using Application.Common.Host;
@@ -15,6 +16,7 @@ using Main.Modules.Analytics;
 using Main.Modules.Balance;
 using Main.Modules.Cart;
 using Main.Modules.Documents;
+using Main.Modules.Jobs;
 using Main.Modules.Notifications;
 using Main.Modules.Order;
 using Main.Modules.Organization;
@@ -86,11 +88,13 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddModule<BalanceModule>(new ConfigurationBuilder().Build());
 		services.AddModule<CartModule>(new ConfigurationBuilder().Build());
 		services.AddModule<DocumentsModule>(new ConfigurationBuilder().Build());
+		services.AddModule<JobsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<NotificationsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrderModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrganizationModule>(new ConfigurationBuilder().Build());
 		services.AddModule<StorageModule>(new ConfigurationBuilder().Build());
 		services.AddModule<PricingModule>(new ConfigurationBuilder().Build());
+		services.AddSingleton<ILrtNamedObject, JobScheduleTestLrt>();
 		services.AddSingleton<TestTimeProvider>();
 		services.AddSingleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>());
 		var passwordRules = new PasswordRules

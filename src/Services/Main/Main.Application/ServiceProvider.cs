@@ -3,6 +3,9 @@ using Abstractions;
 using Application.Common;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Lrt;
+using Application.Common.NamedObject;
+using NamedObject;
 using Application.Common.Interfaces.Validators;
 using Application.Common.Services.Currency;
 using Application.Common.Validators;
@@ -46,7 +49,7 @@ public static class ServiceProvider
 
 		collection
 			.AddNamedObjects()
-			.AddLrtLayer(typeof(Global).Assembly)
+			.RegisterNamedObject<ILrtNamedObject>(typeof(Global).Assembly)
 			.RegisterJobProviders<DeleteProductImagesJobProvider>()
 			.AddFusionCache()
 			.WithRegisteredDistributedCache()

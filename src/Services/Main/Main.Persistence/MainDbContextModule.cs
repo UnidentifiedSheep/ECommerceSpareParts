@@ -32,7 +32,6 @@ public sealed class MainDbContextModule : IDbContextModule
 		modelBuilder
 			.ApplyConfigurationsFromAssembly(typeof(MainDbContextModule).Assembly)
 			.ApplyConfiguration(new SettingConfiguration())
-			.ApplyJobConfigurations()
 			.AddNotifications();
 
 		modelBuilder

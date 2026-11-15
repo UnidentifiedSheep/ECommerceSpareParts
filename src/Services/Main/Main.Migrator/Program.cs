@@ -10,6 +10,7 @@ using Main.Modules.Analytics.Persistence;
 using Main.Modules.Balance.Persistence;
 using Main.Modules.Cart.Persistence;
 using Main.Modules.Documents.Persistence;
+using Main.Modules.Jobs.Persistence;
 using Main.Modules.Notifications.Persistence;
 using Main.Modules.Order.Persistence;
 using Main.Modules.Organization.Persistence;
@@ -57,6 +58,7 @@ builder.ConfigureServices((context, services) =>
 	services.AddDbContextModule<BalanceDbContextModule>();
 	services.AddDbContextModule<CartDbContextModule>();
 	services.AddDbContextModule<DocumentsDbContextModule>();
+	services.AddDbContextModule<JobsDbContextModule>();
 	services.AddDbContextModule<NotificationsDbContextModule>();
 	services.AddDbContextModule<OrderDbContextModule>();
 	services.AddDbContextModule<OrganizationDbContextModule>();

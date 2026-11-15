@@ -40,7 +40,6 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 				typeof(ApplicationServiceProvider).Assembly,
 				typeof(CacheBehavior<,>),
 				typeof(DbValidationBehavior<,>))
-			.AddLrtLayer()
 			.RegisterSettingsService();
 
 		services.AddScoped<AuditableEntitySaveChangesInterceptor>();
@@ -54,14 +53,12 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 		});
 
 		services.AddLocan();
-		services.AddJobRepositories<DContext>();
 		services.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
 		services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
 		services.AddUnitOfWork<DContext>();
 		services.AddScoped<IUserContext, UserContextMock>();
 		services.AddScoped<MessageBrokerStub>();
 		services.AddScoped<IPublishEndpoint>(sp => sp.GetRequiredService<MessageBrokerStub>());
-		services.AddSingleton<ILrtNamedObject, JobScheduleTestLrt>();
 		services.AddSingleton<TestTimeProvider>();
 		services.Replace(
 			ServiceDescriptor.Singleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>()));

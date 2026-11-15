@@ -26,15 +26,16 @@ public class ModuleBoundariesTests
 
 	private static readonly Dictionary<string, string[]> AllowedModuleDependencies = new()
 	{
-		["Identity"] = [],
-		["Currency"] = [],
-		["Product"] = [],
+		["Identity"] = ["Jobs"],
+		["Currency"] = ["Jobs"],
+		["Product"] = ["Jobs"],
 		["Storage"] = ["Currency", "Product"],
-		["Pricing"] = ["Currency", "Product", "Storage"],
+		["Pricing"] = ["Currency", "Product", "Storage", "Jobs"],
 		["Organization"] = ["Identity"],
-		["Analytics"] = ["Currency", "Sale"],
-		["Balance"] = ["Currency", "Identity", "Organization"],
-		["Documents"] = ["Identity"],
+		["Analytics"] = ["Currency", "Sale", "Jobs"],
+		["Balance"] = ["Currency", "Identity", "Organization", "Jobs"],
+		["Jobs"] = [],
+		["Documents"] = ["Identity", "Jobs"],
 		["Cart"] = ["Identity", "Product"],
 		["Notifications"] = ["Identity"],
 		["Order"] = ["Currency", "Identity", "Organization", "Product"],
