@@ -34,13 +34,4 @@ public class IdentityModuleLocalizationTests(CombinedContainerFixture fixture) :
 		localizer.TryGet(LrtUserTokensClearExpiredNameMessage.Instance, out var text).Should().BeTrue();
 		text.Should().NotBeNullOrWhiteSpace();
 	}
-
-	[Fact]
-	public void VehicleMessages_AreStillResolvedFromMainResources()
-	{
-		var localizer = Scope.ServiceProvider.GetRequiredService<IContextualLocalizer>();
-
-		localizer.TryGet(UserHaveDuplicateVehiclePlateNumberMessage.Instance, out var text).Should().BeTrue();
-		text.Should().NotBeNullOrWhiteSpace();
-	}
 }

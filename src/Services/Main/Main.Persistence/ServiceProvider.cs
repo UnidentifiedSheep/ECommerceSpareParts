@@ -26,7 +26,6 @@ public static class ServiceProvider
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
 			typeof(Main.Entities.User.User).Assembly,
-			typeof(Main.Entities.User.UserVehicle).Assembly,
 			typeof(Main.Entities.Purchase.Purchase).Assembly,
 			typeof(Main.Entities.Sale.Sale).Assembly,
 			typeof(Main.Entities.Organization.Organization).Assembly,

@@ -2998,86 +2998,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("user_phones", "auth");
                 });
 
-            modelBuilder.Entity("Main.Entities.User.UserVehicle", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("comment");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("PlateNumber")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("plate_number");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("vehicle_id");
-
-                    b.Property<string>("Vin")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("vin");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("Id")
-                        .HasName("user_vehicles_pk");
-
-                    b.HasIndex("Comment")
-                        .HasDatabaseName("user_vehicles_comment_index");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Comment"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Comment"), new[] { "gin_trgm_ops" });
-
-                    b.HasIndex("PlateNumber")
-                        .IsUnique()
-                        .HasDatabaseName("user_vehicles_plate_number_uindex");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("user_vehicles_user_id_index");
-
-                    b.HasIndex("VehicleId")
-                        .HasDatabaseName("user_vehicles_vehicle_id_index");
-
-                    b.HasIndex("Vin")
-                        .IsUnique()
-                        .HasDatabaseName("user_vehicles_vin_uindex");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.uservehicle_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.uservehicle_who_updated_idx");
-
-                    b.ToTable("user_vehicles", "public");
-                });
-
             modelBuilder.Entity("Main.Persistence.ReadModels.UserSearchDocument", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -4122,7 +4042,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("order_fulfillments_order_item_id_fk");
 
-                    b.HasOne("Main.Entities.Sale.SaleContent", "SaleContent")
+                    b.HasOne("Main.Entities.Sale.SaleContent", null)
                         .WithMany()
                         .HasForeignKey("SaleContentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4130,8 +4050,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("order_fulfillments_sale_content_id_fk");
 
                     b.Navigation("OrderItem");
-
-                    b.Navigation("SaleContent");
                 });
 
             modelBuilder.Entity("Main.Entities.Order.OrderItem", b =>
@@ -4641,16 +4559,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("user_phones_user_id_fkey");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Main.Entities.User.UserVehicle", b =>
-                {
-                    b.HasOne("Main.Entities.User.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("user_vehicles_users_id_fk");
                 });
 
             modelBuilder.Entity("Main.Persistence.ReadModels.UserSearchDocument", b =>
