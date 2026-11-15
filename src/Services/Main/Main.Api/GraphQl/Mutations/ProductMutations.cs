@@ -4,6 +4,13 @@ using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Products.Commands;
+using Main.Application.Products.Commands.AddProductContent;
+using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
+using Main.Application.Products.Commands.RemoveProductContent;
+using Main.Application.Products.Commands.SetProductContentQuantity;
+using Main.Application.Products.Commands.SetProductSizes;
+using Main.Application.Products.Commands.SetProductWeight;
+using Main.Application.Products.Commands.UpsertCharacteristics;
 using Main.Application.Products.Commands.CreateProducts;
 using Main.Application.Products.Commands.PatchProduct;
 using MediatR;
@@ -50,6 +57,154 @@ public sealed class ProductMutations
 	{
 		await sender.Send(
 			new DeleteProductCommand(input.ProductId, input.RowVersion),
+			cancellationToken);
+		return true;
+	}
+
+	[GraphQLName("setSize")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_SIZES_CREATE)]
+	public async Task<GqlProduct> SetSizeAsync(
+		GqlSetProductSizeInput input,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(
+			new SetProductSizesCommand(
+				input.ProductId,
+				input.Length,
+				input.Width,
+				input.Height,
+				input.Unit),
+			cancellationToken);
+		return new GqlProduct(input.ProductId);
+	}
+
+	[GraphQLName("deleteSize")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_SIZES_DELETE)]
+	public async Task<GqlProduct> DeleteSizeAsync(
+		int productId,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(new DeleteArticleSizesCommand(productId), cancellationToken);
+		return new GqlProduct(productId);
+	}
+
+	[GraphQLName("setWeight")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_WEIGHT_CREATE)]
+	public async Task<GqlProduct> SetWeightAsync(
+		GqlSetProductWeightInput input,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(
+			new SetProductWeightCommand(input.ProductId, input.Weight, input.Unit),
+			cancellationToken);
+		return new GqlProduct(input.ProductId);
+	}
+
+	[GraphQLName("deleteWeight")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_WEIGHT_DELETE)]
+	public async Task<GqlProduct> DeleteWeightAsync(
+		int productId,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(new DeleteProductWeightCommand(productId), cancellationToken);
+		return new GqlProduct(productId);
+	}
+
+	[GraphQLName("upsertCharacteristics")]
+	[RequireAllPermissions(
+		PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
+		PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE)]
+	public async Task<bool> UpsertCharacteristicsAsync(
+		IReadOnlyCollection<GqlUpsertProductCharacteristicInput> items,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(
+			new UpsertCharacteristicsCommand(items.Select(item => item.ToDto()).ToArray()),
+			cancellationToken);
+		return true;
+	}
+
+	[GraphQLName("deleteCharacteristic")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE)]
+	public async Task<GqlProduct> DeleteCharacteristicAsync(
+		int productId,
+		int characteristicId,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(new DeleteCharacteristicsCommand(productId, characteristicId), cancellationToken);
+		return new GqlProduct(productId);
+	}
+
+	[GraphQLName("addContent")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_CONTENT_CREATE)]
+	public async Task<GqlProduct> AddContentAsync(
+		int productId,
+		IReadOnlyCollection<GqlProductContentItemInput> items,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(
+			new AddProductContentCommand(
+				productId,
+				items.ToDictionary(item => item.ChildProductId, item => item.Quantity)),
+			cancellationToken);
+		return new GqlProduct(productId);
+	}
+
+	[GraphQLName("removeContent")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_CONTENT_DELETE)]
+	public async Task<GqlProduct> RemoveContentAsync(
+		int productId,
+		int childProductId,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(new RemoveProductContentCommand(productId, childProductId), cancellationToken);
+		return new GqlProduct(productId);
+	}
+
+	[GraphQLName("setContentCount")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_CONTENT_EDIT)]
+	public async Task<GqlProduct> SetContentCountAsync(
+		int productId,
+		int childProductId,
+		int quantity,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(
+			new SetProductsContentCountCommand(productId, childProductId, quantity),
+			cancellationToken);
+		return new GqlProduct(productId);
+	}
+
+	[GraphQLName("removeImage")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_IMAGES_DELETE)]
+	public async Task<GqlProduct> RemoveImageAsync(
+		int productId,
+		string imagePath,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(new RemoveProductImageCommand(productId, imagePath), cancellationToken);
+		return new GqlProduct(productId);
+	}
+
+	[GraphQLName("createCrosses")]
+	[RequireAllPermissions(PermissionCodes.ARTICLE_CROSSES_CREATE)]
+	public async Task<bool> CreateCrossesAsync(
+		IReadOnlyCollection<GqlProductLinkageInput> linkages,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		await sender.Send(
+			new MakeLinkageBetweenProductsCommand(linkages.Select(linkage => linkage.ToDto()).ToArray()),
 			cancellationToken);
 		return true;
 	}

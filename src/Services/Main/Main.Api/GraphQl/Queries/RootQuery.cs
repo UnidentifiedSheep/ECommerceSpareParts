@@ -17,6 +17,9 @@ public sealed class RootQuery
 	[GraphQLName("roles")]
 	public RoleQueries Roles => new();
 
+	[GraphQLName("options")]
+	public OptionQueries Options => new();
+
 	[GraphQLName("organizations")]
 	public OrganizationQueries Organizations => new();
 
@@ -48,6 +51,12 @@ public sealed class RootQuery
 	[GraphQLName("producers")]
 	[Shareable]
 	public ProducerQueries Producer => new();
+
+	[GraphQLName("storages")]
+	public StorageQueries Storages => new();
+
+	[GraphQLName("uploads")]
+	public UploadQueries Uploads => new();
 
 	[GraphQLName("storageContents")]
 	public StorageContentQueries StorageContent => new();

@@ -18,6 +18,18 @@ public sealed class RootMutation
 	[GraphQLName("currencies")]
 	public CurrencyMutations Currencies => new();
 
+	[GraphQLName("producers")]
+	public ProducerMutations Producers => new();
+
+	[GraphQLName("storages")]
+	public StorageMutations Storages => new();
+
+	[GraphQLName("uploads")]
+	public UploadMutations Uploads => new();
+
+	[GraphQLName("storageContents")]
+	public StorageContentMutations StorageContents => new();
+
 	[GraphQLName("organizations")]
 	public OrganizationMutations Organizations => new();
 

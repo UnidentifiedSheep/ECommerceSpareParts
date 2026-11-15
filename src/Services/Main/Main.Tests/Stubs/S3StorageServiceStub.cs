@@ -57,12 +57,17 @@ public sealed class S3StorageServiceStub : IS3Service
 					eTag)));
 	}
 
-	public Task<string> UploadFileAsync(
+	public async Task<string> UploadFileAsync(
 		string bucketName,
 		Stream stream,
 		string keyName,
 		string contentType)
-		=> throw new NotSupportedException();
+	{
+		using var buffer = new MemoryStream();
+		await stream.CopyToAsync(buffer);
+		_files[(bucketName, keyName)] = buffer.ToArray();
+		return keyName;
+	}
 
 	public async Task<DeleteObjectResult> DeleteFileAsync(
 		string bucketName,
