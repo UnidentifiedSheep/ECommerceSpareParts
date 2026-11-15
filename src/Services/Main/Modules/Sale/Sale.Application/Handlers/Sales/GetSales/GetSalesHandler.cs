@@ -5,11 +5,10 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Main.Application.Dtos.Sale;
-using Main.Entities.Product;
-using Main.Entities.Product.ValueObjects;
-using Main.Entities.User;
 using Main.Entities.Sale;
 using Main.Enums;
+using Main.Modules.Identity.Abstractions;
+using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Sales.GetSales;
@@ -28,8 +27,8 @@ public record GetSalesResult(IReadOnlyList<SaleDto> Sales);
 
 public class GetSalesHandler(
 	IReadRepository<Sale, Guid> repository,
-	IReadRepository<User, Guid> userRepository,
-	IReadRepository<Product, int> productRepository,
+	IUserSearch userSearch,
+	IProductSearch productSearch,
 	IProjectionProvider<Sale, SaleDto> projection) : IQueryHandler<GetSalesQuery, GetSalesResult>
 {
 	public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
@@ -69,35 +68,15 @@ public class GetSalesHandler(
 	private IQueryable<Sale> ApplySearchTerm(IQueryable<Sale> query, string searchTerm)
 	{
 		var term = searchTerm.Trim();
-		var pattern = $"%{EscapePattern(term)}%";
-		var normalizedSku = Sku.ToNormalized(term);
-		var skuPattern = $"%{normalizedSku}%";
+		var pattern = LikePattern.Contains(term);
+		var productIds = productSearch.MatchingIds(term);
+		var userIds = userSearch.MatchingIds(term);
 
-		return query.Where(document =>
-			EF.Functions.ILike(
-				document.Comment!,
-				pattern,
-				"\\") ||
-			userRepository.Query.Any(user => user.Id == document.UserId &&
-				EF.Functions.ILike(
-					user.UserName.Value,
-					pattern,
-					"\\")) ||
-			document.Contents.Any(content =>
-				EF.Functions.ILike(
-					content.Comment!,
-					pattern,
-					"\\") ||
-				productRepository.Query.Any(product => product.Id == content.ProductId &&
-					(EF.Functions.ILike(
-							product.Name.Value,
-							pattern,
-							"\\") ||
-						normalizedSku.Length > 0 && EF.Functions.ILike(
-							product.Sku.NormalizedValue,
-							skuPattern)))));
+		return query.Where(sale =>
+			EF.Functions.ILike(sale.Comment!, pattern, "\\") ||
+			userIds.Contains(sale.UserId) ||
+			sale.Contents.Any(content =>
+				EF.Functions.ILike(content.Comment!, pattern, "\\") ||
+				productIds.Contains(content.ProductId)));
 	}
-
-	private static string EscapePattern(string value)
-		=> value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }

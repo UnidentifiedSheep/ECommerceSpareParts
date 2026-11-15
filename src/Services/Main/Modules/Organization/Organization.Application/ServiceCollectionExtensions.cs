@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
 		services.AddModuleApplication(OrganizationApplicationAssembly.Value);
 		services.AddScoped<IOrganizationChecks, OrganizationChecks>();
 		services.AddScoped<IOrganizationLocks, OrganizationLocks>();
+		services.AddScoped<IOrganizationSearch, OrganizationSearch>();
 
 		return services;
 	}

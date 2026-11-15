@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
 			.RegisterNamedObject<ILrtNamedObject>(assembly);
 
 		services.AddScoped<IProductCrosses, ProductCrosses>();
+		services.AddScoped<IProductSearch, ProductSearch>();
 		services.AddScoped<IProductEventPublisher, ProductEventPublisher>();
 		services.AddScoped<IProductEventProvider, ProductEventProvider>();
 		services.AddScoped<IProductEventPartProvider, ProductCoreEventPartProvider>();

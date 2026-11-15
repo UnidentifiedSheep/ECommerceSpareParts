@@ -5,10 +5,9 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Main.Application.Dtos.Organizations;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.Organization;
-using Main.Entities.User;
 using Main.Enums.Organization;
+using Main.Modules.Identity.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Organizations.GetOrganizations;
@@ -26,8 +25,7 @@ public record GetOrganizationsResult(IReadOnlyList<OrganizationDto> Organization
 
 public class GetOrganizationsHandler(
 	IReadRepository<Organization, Guid> repository,
-	IUserRepository userRepository,
-	IReadRepository<User, Guid> userReadRepository,
+	IUserSearch userSearch,
 	IProjectionProvider<Organization, OrganizationDto> projection)
 	: IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
 {
@@ -53,7 +51,7 @@ public class GetOrganizationsHandler(
 		if (!string.IsNullOrWhiteSpace(searchTerm))
 		{
 			var pattern = $"%{searchTerm}%";
-			var matchingUsers = userRepository.SearchWithRank(userReadRepository.Query, searchTerm);
+			var matchingUsers = userSearch.MatchWithRank(searchTerm);
 			query = query
 				.Select(x => new
 				{
@@ -62,7 +60,7 @@ public class GetOrganizationsHandler(
 						EF.Functions.TrigramsSimilarity(x.Name, searchTerm) +
 						EF.Functions.TrigramsSimilarity(x.SystemName, searchTerm),
 					MemberRank = matchingUsers
-						.Where(match => x.Members.Any(member => member.UserId == match.User.Id))
+						.Where(match => x.Members.Any(member => member.UserId == match.UserId))
 						.Select(match => (float?)match.Rank)
 						.Max()
 				})

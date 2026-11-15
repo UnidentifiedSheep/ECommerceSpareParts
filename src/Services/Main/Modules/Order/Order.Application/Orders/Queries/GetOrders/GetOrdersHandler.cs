@@ -7,11 +7,10 @@ using Application.Common.Querying;
 using Main.Application.Orders.Dtos;
 using Main.Application.Orders.Extensions;
 using Main.Entities.Order;
-using Main.Entities.Organization;
-using Main.Entities.Product;
-using Main.Entities.Product.ValueObjects;
-using Main.Entities.User;
 using Main.Enums.Orders;
+using Main.Modules.Identity.Abstractions;
+using Main.Modules.Organization.Abstractions;
+using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Security.Core.Interfaces;
 
@@ -34,9 +33,9 @@ public sealed record GetOrdersResult(IReadOnlyList<OrderDto> Orders);
 
 public sealed class GetOrdersHandler(
 	IReadRepository<Order, Guid> repository,
-	IReadRepository<Organization, Guid> organizations,
-	IReadRepository<User, Guid> users,
-	IReadRepository<Product, int> products,
+	IOrganizationSearch organizationSearch,
+	IUserSearch userSearch,
+	IProductSearch productSearch,
 	IProjectionProvider<Order, OrderDto> projection,
 	IUserContext userContext) : IQueryHandler<GetOrdersQuery, GetOrdersResult>
 {
@@ -80,40 +79,14 @@ public sealed class GetOrdersHandler(
 	private IQueryable<Order> ApplySearchTerm(IQueryable<Order> query, string searchTerm)
 	{
 		var term = searchTerm.Trim();
-		var pattern = $"%{EscapePattern(term)}%";
-		var normalizedSku = Sku.ToNormalized(term);
-		var skuPattern = $"%{EscapePattern(normalizedSku)}%";
 		var isId = Guid.TryParse(term, out var id);
-
-		var matchingOrganizations = organizations.Query
-			.Where(organization => EF.Functions.ILike(
-				organization.Name,
-				pattern,
-				"\\"))
-			.Select(organization => organization.Id);
-		var matchingUsers = users.Query
-			.Where(user => EF.Functions.ILike(
-				user.UserName.Value,
-				pattern,
-				"\\"))
-			.Select(user => user.Id);
-		var matchingProducts = products.Query
-			.Where(product => EF.Functions.ILike(
-					product.Name.Value,
-					pattern,
-					"\\") ||
-				normalizedSku.Length > 0 && EF.Functions.ILike(
-					product.Sku.NormalizedValue,
-					skuPattern,
-					"\\"))
-			.Select(product => product.Id);
+		var matchingOrganizations = organizationSearch.MatchingIds(term);
+		var matchingUsers = userSearch.MatchingIds(term);
+		var matchingProducts = productSearch.MatchingIds(term);
 
 		return query.Where(order => isId && order.Id == id ||
 			matchingOrganizations.Contains(order.OrganizationId) ||
 			order.UserId.HasValue && matchingUsers.Contains(order.UserId.Value) ||
 			order.Items.Any(item => !item.IsDeleted && matchingProducts.Contains(item.ProductId)));
 	}
-
-	private static string EscapePattern(string value)
-		=> value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }

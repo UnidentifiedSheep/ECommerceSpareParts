@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
 
 		services.AddScoped<IUserChecks, UserChecks>();
 		services.AddScoped<IUserEmailLookup, UserEmailLookup>();
+		services.AddScoped<IUserSearch, UserSearch>();
 		services.AddSingleton<IJwtGenerator, JwtGenerator>();
 		services.AddSingleton<IEmailValidator, EmailValidator>();
 		services.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();

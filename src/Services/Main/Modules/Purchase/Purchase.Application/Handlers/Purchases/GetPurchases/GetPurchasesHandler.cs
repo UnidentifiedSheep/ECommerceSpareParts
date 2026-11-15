@@ -5,9 +5,8 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Main.Application.Dtos.Purchase;
-using Main.Entities.Product;
-using Main.Entities.Product.ValueObjects;
 using Main.Entities.Purchase;
+using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Purchases.GetPurchases;
@@ -25,7 +24,7 @@ public record GetPurchasesResult(IReadOnlyCollection<PurchaseDto> Purchases);
 
 public class GetPurchasesHandler(
 	IReadRepository<Purchase, Guid> repository,
-	IReadRepository<Product, int> productRepository,
+	IProductSearch productSearch,
 	IProjectionProvider<Purchase, PurchaseDto> projection)
 	: IQueryHandler<GetPurchasesQuery, GetPurchasesResult>
 {
@@ -65,30 +64,13 @@ public class GetPurchasesHandler(
 	private IQueryable<Purchase> ApplySearchTerm(IQueryable<Purchase> query, string searchTerm)
 	{
 		var term = searchTerm.Trim();
-		var pattern = $"%{EscapePattern(term)}%";
-		var normalizedSku = Sku.ToNormalized(term);
-		var skuPattern = $"%{normalizedSku}%";
+		var pattern = LikePattern.Contains(term);
+		var productIds = productSearch.MatchingIds(term);
 
-		return query.Where(document =>
-			EF.Functions.ILike(
-				document.Comment!,
-				pattern,
-				"\\") ||
-			document.Contents.Any(content =>
-				EF.Functions.ILike(
-					content.Comment!,
-					pattern,
-					"\\") ||
-				productRepository.Query.Any(product => product.Id == content.ProductId &&
-					(EF.Functions.ILike(
-							product.Name.Value,
-							pattern,
-							"\\") ||
-						normalizedSku.Length > 0 && EF.Functions.ILike(
-							product.Sku.NormalizedValue,
-							skuPattern)))));
+		return query.Where(purchase =>
+			EF.Functions.ILike(purchase.Comment!, pattern, "\\") ||
+			purchase.Contents.Any(content =>
+				EF.Functions.ILike(content.Comment!, pattern, "\\") ||
+				productIds.Contains(content.ProductId)));
 	}
-
-	private static string EscapePattern(string value)
-		=> value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }
