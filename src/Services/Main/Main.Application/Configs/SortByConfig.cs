@@ -28,13 +28,6 @@ public static class SortByConfig
 			.Map<Organization, string>("systemName", x => x.SystemName)
 			.Map<Organization, OrganizationType>("type", x => x.Type);
 
-		QueryableSortBy
-			.Value
-			.MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime, true)
-			.Map<Purchase, DateTime>("dateTime", x => x.PurchaseDatetime)
-			.Map<Purchase, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
-			.Map<Purchase, Guid>("id", x => x.Id);
-
 		QueryableSortBy.Value
 			.MapDefault<Order, DateTime>(order => order.CreatedAt, true)
 			.Map<Order, Guid>("id", order => order.Id)

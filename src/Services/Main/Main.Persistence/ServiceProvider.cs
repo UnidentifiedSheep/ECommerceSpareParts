@@ -28,6 +28,7 @@ public static class ServiceProvider
 			typeof(ReadRepository<,>),
 			typeof(Main.Entities.User.User).Assembly,
 			typeof(Main.Entities.User.UserVehicle).Assembly,
+			typeof(Main.Entities.Purchase.Purchase).Assembly,
 			typeof(Product).Assembly,
 			typeof(Main.Entities.Currency.Currency).Assembly,
 			typeof(Main.Entities.Storage.StorageContent).Assembly,

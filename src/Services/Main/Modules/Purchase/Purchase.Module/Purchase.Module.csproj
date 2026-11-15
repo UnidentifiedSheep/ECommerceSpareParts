@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Purchase.Module</AssemblyName>
+        <RootNamespace>Main.Modules.Purchase</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Purchase.Application\Purchase.Application.csproj"/>
+        <ProjectReference Include="..\Purchase.Persistence\Purchase.Persistence.csproj"/>
+    </ItemGroup>
+
+</Project>

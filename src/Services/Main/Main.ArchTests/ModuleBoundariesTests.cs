@@ -30,7 +30,10 @@ public class ModuleBoundariesTests
 		["Currency"] = [],
 		["Product"] = [],
 		["Storage"] = ["Currency", "Product"],
-		["Pricing"] = ["Currency", "Product", "Storage"]
+		["Pricing"] = ["Currency", "Product", "Storage"],
+		["Organization"] = [],
+		["Balance"] = [],
+		["Purchase"] = ["Balance", "Currency", "Identity", "Organization", "Product", "Storage"]
 	};
 
 	[Fact]

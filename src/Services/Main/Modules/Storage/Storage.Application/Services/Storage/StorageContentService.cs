@@ -1,9 +1,15 @@
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentValidation;
 using LinqKit;
+using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
+using Main.Application.Handlers.StorageContents.AddContent;
+using Main.Application.Handlers.StorageContents.RestoreContent;
+using Main.Application.Models;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models.Storage;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
@@ -11,6 +17,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Settings;
 using Main.Entities.Storage;
 using Main.Enums;
+using MediatR;
 using NamedObject.Core.Interfaces;
 
 namespace Main.Application.Services.Storage;
@@ -22,6 +29,8 @@ public sealed class StorageContentService(
 	IValidator<IReadOnlyCollection<SubtractStorageContentItem>> contentValidator,
 	IValidator<IReadOnlyCollection<SubtractProductFromStorageItem>> productValidator,
 	IUnitOfWork unitOfWork,
+	ISender sender,
+	ICurrencyConverter currencyConverter,
 	TimeProvider timeProvider) : IStorageContentService
 {
 	public async Task<IReadOnlyList<StorageLot>> SubtractByProductsAsync(
@@ -71,6 +80,89 @@ public sealed class StorageContentService(
 
 		return affected;
 	}
+
+	public async Task<IReadOnlyList<StoredLot>> AddAsync(
+		IReadOnlyCollection<NewStorageLot> lots,
+		string storageCode,
+		StorageMovementType movementType,
+		CancellationToken cancellationToken = default)
+	{
+		var result = await sender.Send(
+			new AddContentCommand(
+				lots.Select(lot => new NewStorageContentDto
+					{
+						ProductId = lot.ProductId,
+						CurrencyId = lot.CurrencyId,
+						BuyPrice = lot.BuyPrice,
+						Count = lot.Count,
+						PurchaseDate = lot.PurchaseDate
+					})
+					.ToArray(),
+				storageCode,
+				movementType),
+			cancellationToken);
+
+		return result.StorageContents.Select(ToStoredLot).ToArray();
+	}
+
+	public async Task RestoreAsync(
+		IReadOnlyCollection<RestoreStorageLot> lots,
+		StorageMovementType movementType,
+		CancellationToken cancellationToken = default)
+		=> await sender.Send(
+			new RestoreContentCommand(
+				lots.Select(lot => new RestoreContentItem(
+						lot.StorageContentId,
+						lot.ProductId,
+						lot.CurrencyId,
+						lot.BuyPrice,
+						lot.Count))
+					.ToArray(),
+				movementType),
+			cancellationToken);
+
+	public async Task<IReadOnlyDictionary<int, StoredLot>> LockAsync(
+		IReadOnlyCollection<int> storageContentIds,
+		CancellationToken cancellationToken = default)
+	{
+		var contents = await repository.EnsureExistsForUpdateAsync(
+			storageContentIds,
+			missing => new StorageContentNotFoundException(missing[0]),
+			Criteria<StorageContent>.New().OrderByAsc(content => content.Id),
+			cancellationToken);
+
+		return contents.ToDictionary(pair => pair.Key, pair => ToStoredLot(pair.Value));
+	}
+
+	public async Task UpdatePurchaseInfoAsync(
+		int storageContentId,
+		int currencyId,
+		DateTime purchaseDate,
+		decimal buyPrice,
+		CancellationToken cancellationToken = default)
+	{
+		var contents = await repository.EnsureExistsForUpdateAsync(
+			[storageContentId],
+			missing => new StorageContentNotFoundException(missing[0]),
+			Criteria<StorageContent>.New(),
+			cancellationToken);
+		var content = contents[storageContentId];
+
+		content.SetCurrencyId(currencyId);
+		content.SetPurchaseDate(purchaseDate);
+		content.SetBuyPrice(
+			buyPrice,
+			await currencyConverter.ConvertToBaseAsync(buyPrice, currencyId, cancellationToken));
+	}
+
+	private static StoredLot ToStoredLot(StorageContent content)
+		=> new(
+			content.Id,
+			content.ProductId,
+			content.Count,
+			content.CurrencyId,
+			content.BuyPrice,
+			content.PurchaseDatetime);
 
 	public async Task<IReadOnlyList<StorageLot>> SubtractByContentsAsync(
 		IReadOnlyCollection<SubtractStorageContentItem> items,

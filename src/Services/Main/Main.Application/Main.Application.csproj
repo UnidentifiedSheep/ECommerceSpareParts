@@ -41,6 +41,9 @@
         <ProjectReference Include="..\Modules\Product\Product.Application\Product.Application.csproj"/>
         <ProjectReference Include="..\Modules\Storage\Storage.Application\Storage.Application.csproj"/>
         <ProjectReference Include="..\Modules\Identity\Identity.Application\Identity.Application.csproj"/>
+        <ProjectReference Include="..\Modules\Balance\Balance.Abstractions\Balance.Abstractions.csproj"/>
+        <ProjectReference Include="..\Modules\Purchase\Purchase.Application\Purchase.Application.csproj"/>
+        <ProjectReference Include="..\Modules\Organization\Organization.Abstractions\Organization.Abstractions.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>
 

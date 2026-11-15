@@ -17,4 +17,26 @@ public interface IStorageContentService
 		IReadOnlyCollection<SubtractStorageContentItem> items,
 		StorageMovementType movementType,
 		CancellationToken cancellationToken = default);
+
+	Task<IReadOnlyList<StoredLot>> AddAsync(
+		IReadOnlyCollection<NewStorageLot> lots,
+		string storageCode,
+		StorageMovementType movementType,
+		CancellationToken cancellationToken = default);
+
+	Task RestoreAsync(
+		IReadOnlyCollection<RestoreStorageLot> lots,
+		StorageMovementType movementType,
+		CancellationToken cancellationToken = default);
+
+	Task<IReadOnlyDictionary<int, StoredLot>> LockAsync(
+		IReadOnlyCollection<int> storageContentIds,
+		CancellationToken cancellationToken = default);
+
+	Task UpdatePurchaseInfoAsync(
+		int storageContentId,
+		int currencyId,
+		DateTime purchaseDate,
+		decimal buyPrice,
+		CancellationToken cancellationToken = default);
 }

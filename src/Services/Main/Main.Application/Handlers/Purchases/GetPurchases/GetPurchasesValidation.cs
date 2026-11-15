@@ -1,3 +1,4 @@
+using Main.Entities.Purchase;
 using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;

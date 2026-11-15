@@ -4,6 +4,7 @@ using Attributes;
 using Domain.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Modules.Balance.Abstractions;
 using Main.Entities.Exceptions;
 using Main.Enums;
 using MediatR;

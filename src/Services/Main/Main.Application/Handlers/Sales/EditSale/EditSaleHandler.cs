@@ -10,6 +10,7 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Modules.Balance.Abstractions;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;

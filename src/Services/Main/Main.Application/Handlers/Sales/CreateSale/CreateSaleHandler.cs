@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Main.Application.Dtos.Sale;
 using Main.Application.Interfaces.Services;
+using Main.Modules.Balance.Abstractions;
 using Main.Entities.Sale;
 using Main.Enums;
 using Main.Enums.Balances;
