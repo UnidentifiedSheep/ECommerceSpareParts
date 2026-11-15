@@ -6,7 +6,7 @@ using Application.Common.Models;
 using Application.Common.Querying;
 using Main.Application.Dtos.Sale;
 using Main.Application.Extensions.QueryExtensions;
-using Main.Application.Products.Interfaces;
+using Main.Modules.Product.Abstractions;
 using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +26,7 @@ public record GetProductSaleHistoryResult(IReadOnlyList<ProductSaleHistoryDto> H
 public class GetProductSaleHistoryHandler(
 	IReadRepository<SaleContent, int> repository,
 	IProjectionProvider<SaleContent, ProductSaleHistoryDto> projectionProvider,
-	IProductProvider productProvider)
+	IProductCrosses productCrosses)
 	: IQueryHandler<GetProductSaleHistoryQuery, GetProductSaleHistoryResult>
 {
 	public async Task<GetProductSaleHistoryResult> Handle(
@@ -36,7 +36,7 @@ public class GetProductSaleHistoryHandler(
 		var productIds = new List<int> { request.ProductId };
 		if (request.ShowCrosses)
 			productIds.AddRange(
-				await productProvider.GetProductCrossesAsync(request.ProductId, cancellationToken));
+				await productCrosses.GetCrossIdsAsync(request.ProductId, cancellationToken));
 
 		var query = repository.Query
 			.CompletedSales()

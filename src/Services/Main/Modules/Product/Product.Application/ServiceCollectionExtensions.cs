@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
 			.AddModuleApplication(assembly)
 			.RegisterNamedObject<ILrtNamedObject>(assembly);
 
+		services.AddScoped<IProductCrosses, ProductCrosses>();
 		services.AddScoped<IProductEventPublisher, ProductEventPublisher>();
 		services.AddScoped<IProductEventProvider, ProductEventProvider>();
 		services.AddScoped<IProductEventPartProvider, ProductCoreEventPartProvider>();
