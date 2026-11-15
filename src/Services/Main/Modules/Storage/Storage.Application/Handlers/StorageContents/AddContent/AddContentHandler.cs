@@ -4,13 +4,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Dtos.Storage;
-using Main.Entities.Currency;
 using Main.Entities.Exceptions;
-using Main.Entities.Settings;
 using Main.Entities.Storage;
+using Main.Modules.Currency.Abstractions;
 using Main.Enums;
 
 namespace Main.Application.Handlers.StorageContents.AddContent;
@@ -29,24 +27,12 @@ public record AddContentResult(IReadOnlyList<StorageContent> StorageContents);
 
 public class AddContentHandler(
 	ICurrencyConverter converter,
-	ISettingsService settingsService,
-	IRepository<Currency, int> currencyRepository,
+	ICurrencyLookup currencyLookup,
 	IUnitOfWork unitOfWork) : ICommandHandler<AddContentCommand, AddContentResult>
 {
 	public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
 	{
-		var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken)).Data
-			.BaseCurrencyId;
-
-		var currencyIds = new HashSet<int>();
-
-		foreach (var item in request.StorageContent)
-			currencyIds.Add(item.CurrencyId);
-
-		var currencies = await currencyRepository.EnsureExistsAsync(
-			currencyIds,
-			nf => new CurrencyNotFoundException(nf),
-			cancellationToken);
+		var baseCurrencyId = await currencyLookup.GetBaseCurrencyIdAsync(cancellationToken);
 
 		var storageContents = new List<StorageContent>();
 
@@ -65,7 +51,6 @@ public class AddContentHandler(
 				item.PurchaseDate);
 
 			content.SetCount(item.Count, request.MovementType);
-			content.AssignCurrency(currencies[item.CurrencyId]);
 			storageContents.Add(content);
 		}
 

@@ -8,4 +8,8 @@
         <RootNamespace>Main.Modules.Currency.Abstractions</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>
+    </ItemGroup>
+
 </Project>

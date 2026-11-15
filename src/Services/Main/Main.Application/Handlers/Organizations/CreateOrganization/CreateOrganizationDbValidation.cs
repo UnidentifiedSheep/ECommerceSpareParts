@@ -2,12 +2,16 @@ using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Organization;
+using Main.Modules.Identity.Abstractions;
 
 namespace Main.Application.Handlers.Organizations.CreateOrganization;
 
-public class CreateOrganizationDbValidation : AbstractDbValidation<CreateOrganizationCommand>
+public class CreateOrganizationDbValidation(IUserChecks userChecks)
+	: AbstractDbValidation<CreateOrganizationCommand>
 {
 	public override void Build(IValidationPlan plan, CreateOrganizationCommand request)
-		=> plan
-			.ValidateOrganizationNotExistsSystemName(Organization.NormalizeSystemName(request.SystemName));
+	{
+		userChecks.Exists(plan, request.OwnerId);
+		plan.ValidateOrganizationNotExistsSystemName(Organization.NormalizeSystemName(request.SystemName));
+	}
 }

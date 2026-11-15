@@ -3,7 +3,7 @@ using MassTransit;
 using MediatR;
 using Pricing.Application.Dtos.Markup;
 using Pricing.Application.Handlers.Markup.UpsertMarkupGroup;
-using Pricing.Application.Interfaces.Cache;
+using Main.Modules.Currency.Abstractions;
 
 namespace Pricing.Application.Consumers;
 

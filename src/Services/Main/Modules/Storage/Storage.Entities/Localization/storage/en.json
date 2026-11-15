@@ -38,6 +38,8 @@
     "storage.content.setting.description": "Controls how stock is selected and removed from storage content.",
     "storage.content.setting.input.invalid": "Invalid storage content settings data was provided.",
     "storage.content.setting.extraction.policy.name": "Stock extraction policy",
-    "storage.content.setting.extraction.policy.description": "Policy used to choose which storage content items are consumed first."
+    "storage.content.setting.extraction.policy.description": "Policy used to choose which storage content items are consumed first.",
+    "storage.content.product.id.greater.than.zero": "Article id must be greater than 0.",
+    "storage.content.product.deletion.blocked": "Cannot delete product: storage records exist."
   }
 }

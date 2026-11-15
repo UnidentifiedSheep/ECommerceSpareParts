@@ -725,6 +725,54 @@ namespace Main.Migrator.Migrations
                     b.ToTable("organization_balances", "public");
                 });
 
+            modelBuilder.Entity("Main.Entities.Balance.OrganizationFinancialProfile", b =>
+                {
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<decimal>("ApproximateBalance")
+                        .HasColumnType("numeric")
+                        .HasColumnName("approximate_balance");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("MinAllowedBalance")
+                        .HasColumnType("numeric")
+                        .HasColumnName("min_allowed_balance");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("OrganizationId")
+                        .HasName("organization_financial_profile_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("main.entities.balance.organizationfinancialprofile_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("main.entities.balance.organizationfinancialprofile_who_updated_idx");
+
+                    b.ToTable("organization_financial_profile", "public");
+                });
+
             modelBuilder.Entity("Main.Entities.Balance.Transaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1316,54 +1364,6 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("main.entities.organization.organization_who_updated_idx");
 
                     b.ToTable("organizations", "auth");
-                });
-
-            modelBuilder.Entity("Main.Entities.Organization.OrganizationFinancialProfile", b =>
-                {
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("organization_id");
-
-                    b.Property<decimal>("ApproximateBalance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("approximate_balance");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<decimal>("MinAllowedBalance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("min_allowed_balance");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("OrganizationId")
-                        .HasName("organization_financial_profile_pk");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.organization.organizationfinancialprofile_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.organization.organizationfinancialprofile_who_updated_idx");
-
-                    b.ToTable("organization_financial_profile", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Organization.OrganizationMember", b =>
@@ -3983,13 +3983,23 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("user_balances_currency_id_fk");
 
                     b.HasOne("Main.Entities.Organization.Organization", null)
-                        .WithMany("Balances")
+                        .WithMany()
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("organization_balances_organizations_id_fk");
 
                     b.Navigation("Currency");
+                });
+
+            modelBuilder.Entity("Main.Entities.Balance.OrganizationFinancialProfile", b =>
+                {
+                    b.HasOne("Main.Entities.Organization.Organization", null)
+                        .WithOne()
+                        .HasForeignKey("Main.Entities.Balance.OrganizationFinancialProfile", "OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("organization_financial_profile_organization_id_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Balance.Transaction", b =>
@@ -4151,16 +4161,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Main.Entities.Organization.OrganizationFinancialProfile", b =>
-                {
-                    b.HasOne("Main.Entities.Organization.Organization", null)
-                        .WithOne("FinancialProfile")
-                        .HasForeignKey("Main.Entities.Organization.OrganizationFinancialProfile", "OrganizationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("organization_financial_profile_organization_id_fk");
-                });
-
             modelBuilder.Entity("Main.Entities.Organization.OrganizationMember", b =>
                 {
                     b.HasOne("Main.Entities.Organization.Organization", "Organization")
@@ -4170,7 +4170,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("organization_members_organizations_id_fk");
 
-                    b.HasOne("Main.Entities.User.User", "User")
+                    b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4178,8 +4178,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("organization_members_users_id_fk");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Main.Entities.Producer.ProducerAlias", b =>
@@ -4785,10 +4783,6 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Organization.Organization", b =>
                 {
-                    b.Navigation("Balances");
-
-                    b.Navigation("FinancialProfile");
-
                     b.Navigation("Members");
                 });
 

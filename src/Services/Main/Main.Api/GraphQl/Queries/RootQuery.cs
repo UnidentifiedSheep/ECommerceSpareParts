@@ -14,6 +14,9 @@ public sealed class RootQuery
 	[GraphQLName("users")]
 	public UserQueries Users => new();
 
+	[GraphQLName("roles")]
+	public RoleQueries Roles => new();
+
 	[GraphQLName("organizations")]
 	public OrganizationQueries Organizations => new();
 

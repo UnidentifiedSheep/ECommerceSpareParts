@@ -42,7 +42,6 @@ public static class ServiceCollectionExtensions
 		services.RegisterJobProviders(assembly);
 
 		services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
-		services.AddScoped<ICurrencyLookup, CurrencyLookup>();
 		services.AddScoped<IPriceApplierProvider, PriceApplierProvider>();
 
 		services.AddSingleton<IMarkupContainer, MarkupContainer>();

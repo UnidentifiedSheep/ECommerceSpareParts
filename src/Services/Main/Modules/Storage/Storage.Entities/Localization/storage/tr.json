@@ -38,6 +38,8 @@
     "storage.content.setting.description": "Stokların depo içeriğinden nasıl seçileceğini ve düşüleceğini yönetir.",
     "storage.content.setting.input.invalid": "Geçersiz depo içeriği ayarları verisi sağlandı.",
     "storage.content.setting.extraction.policy.name": "Stok düşme politikası",
-    "storage.content.setting.extraction.policy.description": "Hangi depo içeriği öğelerinin önce tüketileceğini belirleyen politika."
+    "storage.content.setting.extraction.policy.description": "Hangi depo içeriği öğelerinin önce tüketileceğini belirleyen politika.",
+    "storage.content.product.id.greater.than.zero": "Ürün kimliği 0'dan büyük olmalıdır.",
+    "storage.content.product.deletion.blocked": "Ürün silinemiyor: depo kayıtları var."
   }
 }

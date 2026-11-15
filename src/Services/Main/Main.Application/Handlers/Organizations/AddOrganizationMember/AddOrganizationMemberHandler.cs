@@ -5,7 +5,6 @@ using Attributes;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization;
 using Main.Enums.Organization;
-using Main.Modules.Identity.Abstractions;
 using MediatR;
 
 namespace Main.Application.Handlers.Organizations.AddOrganizationMember;
@@ -15,13 +14,12 @@ namespace Main.Application.Handlers.Organizations.AddOrganizationMember;
 public record AddOrganizationMemberCommand(Guid OrganizationId, Guid UserId, OrganizationRole Role)
 	: ICommand;
 
-public class AddOrganizationMemberHandler(IRepository<Organization, Guid> repository, IUserLookup userLookup)
+public class AddOrganizationMemberHandler(IRepository<Organization, Guid> repository)
 	: ICommandHandler<AddOrganizationMemberCommand>
 {
 	public async Task<Unit> Handle(AddOrganizationMemberCommand request, CancellationToken cancellationToken)
 	{
 		var organization = await GetOrganization(request.OrganizationId, cancellationToken);
-		await userLookup.EnsureExistAsync([request.UserId], cancellationToken);
 		organization.AddMember(request.UserId, request.Role);
 
 		return Unit.Value;

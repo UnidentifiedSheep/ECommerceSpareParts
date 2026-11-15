@@ -17,7 +17,7 @@ using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
-using Main.Api.EndPoints.Products;
+using Main.Api.EndPoints;
 using Main.Api.GraphQl;
 using Main.Application;
 using Main.Application.Consumers;
@@ -145,9 +145,8 @@ builder
 
 builder.Services.AddCarter(
 	new DependencyContextAssemblyCatalog(
-		typeof(ProductsEndPoints).Assembly,
-		typeof(JobEndPoints).Assembly,
-		typeof(Pricing.Api.EndPoints.PriceEndPoints).Assembly),
+		typeof(AuthEndPoints).Assembly,
+		typeof(JobEndPoints).Assembly),
 	c => c.WithEmptyValidators());
 
 builder.Services.AddGraphQlServices(serviceName);

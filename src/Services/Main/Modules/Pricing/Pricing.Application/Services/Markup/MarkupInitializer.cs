@@ -2,7 +2,7 @@ using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Microsoft.EntityFrameworkCore;
-using Pricing.Application.Interfaces.Cache;
+using Main.Modules.Currency.Abstractions;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Settings;

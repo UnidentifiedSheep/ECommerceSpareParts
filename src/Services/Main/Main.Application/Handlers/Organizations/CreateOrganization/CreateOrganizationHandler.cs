@@ -2,7 +2,6 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Main.Entities.Organization;
-using Main.Modules.Identity.Abstractions;
 
 namespace Main.Application.Handlers.Organizations.CreateOrganization;
 
@@ -13,15 +12,13 @@ public record CreateOrganizationCommand(Guid OwnerId, string Name, string System
 
 public record CreateOrganizationResult(Guid OrganizationId);
 
-public class CreateOrganizationHandler(IUnitOfWork unitOfWork, IUserLookup userLookup)
+public class CreateOrganizationHandler(IUnitOfWork unitOfWork)
 	: ICommandHandler<CreateOrganizationCommand, CreateOrganizationResult>
 {
 	public async Task<CreateOrganizationResult> Handle(
 		CreateOrganizationCommand request,
 		CancellationToken cancellationToken)
 	{
-		await userLookup.EnsureExistAsync([request.OwnerId], cancellationToken);
-
 		var organization = Organization.CreateBusiness(
 			request.Name,
 			request.SystemName,

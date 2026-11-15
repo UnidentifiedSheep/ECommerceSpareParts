@@ -1,12 +1,12 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
-using Main.Entities.Currency;
+using Main.Modules.Currency.Abstractions;
 
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
 
-public class RestoreContentDbValidation : AbstractDbValidation<RestoreContentCommand>
+public class RestoreContentDbValidation(ICurrencyChecks currencyChecks)
+	: AbstractDbValidation<RestoreContentCommand>
 {
 	public override void Build(IValidationPlan plan, RestoreContentCommand request)
-		=> plan.ValidateCurrencyExistsId(request.ContentDetails.Select(x => x.CurrencyId).Distinct());
+		=> currencyChecks.Exists(plan, request.ContentDetails.Select(x => x.CurrencyId).Distinct());
 }

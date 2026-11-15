@@ -41,11 +41,8 @@ use row locking and optimistic concurrency to prevent conflicting quantity chang
 | Prefix | Purpose |
 | --- | --- |
 | `/main/storages` | Warehouses and stock. |
-| `/main/purchases` | Incoming stock operations. |
-| `/main/sales` | Outgoing stock operations. |
-| `/main/products/reservations` | Product reservations and their history. |
-
-Exact request schemas and permissions are available at <http://localhost:8080/docs>.
+Purchases, sales, and transactions are GraphQL-only. Warehouses and stock lots keep REST endpoints under `/main/storages`.
+Product reservations are exposed through GraphQL.
 
 ## Pricing Integration
 

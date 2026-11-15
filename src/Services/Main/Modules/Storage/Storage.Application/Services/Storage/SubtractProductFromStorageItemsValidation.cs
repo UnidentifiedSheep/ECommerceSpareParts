@@ -2,7 +2,6 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Application.Models.Storage;
 using Main.Entities;
-using Main.Entities.Product;
 using Main.Entities.Storage;
 
 namespace Main.Application.Services.Storage;
@@ -22,7 +21,7 @@ public sealed class
 					.WithLocalizableError(StorageContentCountGreaterThanZeroMessage.Instance);
 				item.RuleFor(value => value.ProductId)
 					.GreaterThan(0)
-					.WithLocalizableError(ArticleIdGreaterThanZeroMessage.Instance);
+					.WithLocalizableError(StorageContentProductIdGreaterThanZeroMessage.Instance);
 				item.RuleFor(value => value.StorageCode)
 					.NotEmpty()
 					.WithLocalizableError(StorageNameNotEmptyMessage.Instance);

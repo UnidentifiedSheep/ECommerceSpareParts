@@ -1,7 +1,6 @@
 using Application.Common.Interfaces.Repositories;
 using Locan.Core.Interfaces;
 using Main.Entities.Storage;
-using Main.Entities.Product;
 using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +14,6 @@ public sealed class StorageContentProductDeletionRule(IReadRepository<StorageCon
 		int productId,
 		CancellationToken cancellationToken = default)
 		=> await repository.Query.AnyAsync(item => item.ProductId == productId, cancellationToken)
-			? ArticleDeletionStorageContentMessage.Instance
+			? StorageContentProductDeletionBlockedMessage.Instance
 			: null;
 }

@@ -1,6 +1,8 @@
 using HotChocolate;
+using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Product;
 using Main.Application.Dtos.Storage;
+using Main.Entities.Exceptions;
 
 namespace Main.Api.GraphQl.Types;
 
@@ -25,7 +27,11 @@ public sealed record GqlStorageContent(
 	public uint RowVersion => Content.RowVersion;
 
 	[GraphQLName("currency")]
-	public GqlCurrency Currency => new(Content.Currency);
+	public async Task<GqlCurrency> GetCurrencyAsync(
+		ICurrencyByIdDataLoader loader,
+		CancellationToken cancellationToken)
+		=> new(await loader.LoadAsync(Content.CurrencyId, cancellationToken)
+			?? throw new CurrencyNotFoundException(Content.CurrencyId));
 
 	[GraphQLName("storage")]
 	public GqlStorage Storage => new(Content.StorageCode);

@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Currencies;
 
 namespace Main.Application.Dtos.Storage;
 
@@ -26,6 +25,6 @@ public record StorageContentDto
 	[JsonPropertyName("rowVersion")]
 	public required uint RowVersion { get; init; }
 
-	[JsonPropertyName("currency")]
-	public required CurrencyDto Currency { get; init; }
+	[JsonPropertyName("currencyId")]
+	public required int CurrencyId { get; init; }
 }

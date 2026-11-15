@@ -38,6 +38,8 @@
     "storage.content.setting.description": "Управляет тем, как позиции выбираются и списываются из содержимого склада.",
     "storage.content.setting.input.invalid": "Переданы некорректные данные настроек содержимого склада.",
     "storage.content.setting.extraction.policy.name": "Политика списания со склада",
-    "storage.content.setting.extraction.policy.description": "Политика, определяющая какие позиции содержимого склада будут списываться первыми."
+    "storage.content.setting.extraction.policy.description": "Политика, определяющая какие позиции содержимого склада будут списываться первыми.",
+    "storage.content.product.id.greater.than.zero": "Идентификатор артикула должен быть больше 0.",
+    "storage.content.product.deletion.blocked": "Нельзя удалить товар: существуют складские записи."
   }
 }

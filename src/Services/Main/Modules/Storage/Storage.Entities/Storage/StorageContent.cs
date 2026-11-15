@@ -6,7 +6,6 @@ using Domain.Validation;
 using Main.Entities.DomainEvents.StorageContent;
 using Main.Entities.Exceptions;
 using Main.Enums;
-using Main.Entities.Product;
 
 namespace Main.Entities.Storage;
 
@@ -57,8 +56,6 @@ public class StorageContent : AuditableEntity<StorageContent, int, StorageConten
 	public int CurrencyId { get; private set; }
 
 	public DateTime PurchaseDatetime { get; private set; }
-
-	public Currency.Currency Currency { get; private set; } = null!;
 
 	public IReadOnlyCollection<StorageContentLock> Locks => _locks;
 
@@ -190,12 +187,6 @@ public class StorageContent : AuditableEntity<StorageContent, int, StorageConten
 	public override void OnCreated() => AddDomainEvent(new StorageContentUpdatedDomainEvent(this, false));
 
 	public void SetCurrencyId(int currencyId) => CurrencyId = currencyId;
-
-	public void AssignCurrency(Currency.Currency currency)
-	{
-		CurrencyId = currency.Id;
-		Currency = currency;
-	}
 
 	public void SetBaseCurrencyId(int baseCurrencyId) => BaseCurrencyId = baseCurrencyId;
 

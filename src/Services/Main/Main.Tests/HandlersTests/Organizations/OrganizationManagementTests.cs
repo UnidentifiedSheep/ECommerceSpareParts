@@ -51,14 +51,17 @@ public class OrganizationManagementTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task CreateOrganization_MissingOwner_ThrowsUserNotFoundException()
+	public async Task CreateOrganization_MissingOwner_ThrowsDbValidationException()
 	{
 		var command = new CreateOrganizationCommand(
 			Guid.NewGuid(),
 			"New organization",
 			$"new-organization-{Guid.NewGuid():N}");
 
-		await Assert.ThrowsAsync<UserNotFoundException>(() => Mediator.Send(command, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command, CancellationToken));
+
+		exception.Failures.Should().Contain(x => x.Error is UserNotFoundException);
 	}
 
 	[Fact]

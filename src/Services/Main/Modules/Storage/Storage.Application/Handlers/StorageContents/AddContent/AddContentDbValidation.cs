@@ -1,17 +1,19 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
-using Main.Entities.Currency;
-using Main.Entities.Product;
 using Main.Entities.Storage;
+using Main.Modules.Currency.Abstractions;
+using Main.Modules.Product.Abstractions;
 
 namespace Main.Application.Handlers.StorageContents.AddContent;
 
-public class AddContentDbValidation : AbstractDbValidation<AddContentCommand>
+public class AddContentDbValidation(ICurrencyChecks currencyChecks, IProductChecks productChecks)
+	: AbstractDbValidation<AddContentCommand>
 {
 	public override void Build(IValidationPlan plan, AddContentCommand request)
-		=> plan
-			.ValidateStorageExistsCode(request.StorageCode)
-			.ValidateCurrencyExistsId(request.StorageContent.Select(x => x.CurrencyId))
-			.ValidateProductExistsId(request.StorageContent.Select(x => x.ProductId).Distinct());
+	{
+		plan.ValidateStorageExistsCode(request.StorageCode);
+		currencyChecks.Exists(plan, request.StorageContent.Select(x => x.CurrencyId));
+		productChecks.Exists(plan, request.StorageContent.Select(x => x.ProductId).Distinct());
+	}
 }

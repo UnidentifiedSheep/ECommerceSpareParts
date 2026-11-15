@@ -92,6 +92,23 @@ public class ModuleBoundariesTests
 	}
 
 	[Fact]
+	public void Modules_ReferenceOtherModulesOnlyThroughAbstractions()
+	{
+		var violations = SolutionLayout.ModuleAssemblies
+			.SelectMany(assembly => assembly.References
+				.Where(reference => reference.StartsWith("Main.Modules."))
+				.Where(reference =>
+				{
+					var parts = reference.Split('.');
+					return parts[2] != assembly.Module && parts[3] != "Abstractions";
+				})
+				.Select(reference => $"{assembly.Name} -> {reference}"))
+			.ToList();
+
+		violations.Should().BeEmpty("modules may use other modules only through their Abstractions");
+	}
+
+	[Fact]
 	public void SharedAssemblies_DoNotReferenceMainOrModules()
 	{
 		string[] shared = ["Application.Common", "Domain", "Exceptions", "Extensions", "Persistence.Common", "Persistence"];

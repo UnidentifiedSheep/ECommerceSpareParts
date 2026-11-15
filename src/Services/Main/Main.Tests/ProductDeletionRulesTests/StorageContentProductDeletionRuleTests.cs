@@ -1,3 +1,4 @@
+using Main.Entities.Storage;
 using Main.Application.Services.ProductDeletion;
 using Main.Entities.Product;
 using Tests.TestContainers.Combined;
@@ -14,7 +15,7 @@ public class StorageContentProductDeletionRuleTests : ProductDeletionRuleTestsBa
 	public async Task ProductWithStorageContent_IsBlocked()
 		=> await ShouldBlock(
 			GetContext<StorageContentTestContext>().StorageContents.First().ProductId,
-			ArticleDeletionStorageContentMessage.Key);
+			StorageContentProductDeletionBlockedMessage.Key);
 
 	[Fact]
 	public async Task ProductWithoutStorageContent_IsNotBlocked()

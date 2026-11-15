@@ -1,11 +1,11 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
-using Main.Entities.Currency;
+using Main.Modules.Currency.Abstractions;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
 
-public class EditStorageContentDbValidation : AbstractDbValidation<EditStorageContentCommand>
+public class EditStorageContentDbValidation(ICurrencyChecks currencyChecks)
+	: AbstractDbValidation<EditStorageContentCommand>
 {
 	public override void Build(IValidationPlan plan, EditStorageContentCommand request)
 	{
@@ -17,6 +17,6 @@ public class EditStorageContentDbValidation : AbstractDbValidation<EditStorageCo
 			.ToArray();
 
 		if (currencyIds.Length != 0)
-			plan.ValidateCurrencyExistsId(currencyIds);
+			currencyChecks.Exists(plan, currencyIds);
 	}
 }

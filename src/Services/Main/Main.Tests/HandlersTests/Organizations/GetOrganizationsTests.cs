@@ -208,11 +208,14 @@ public class GetOrganizationsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task GetOrganizations_MissingUser_ThrowsUserNotFoundException()
+	public async Task GetOrganizations_MissingUser_ThrowsDbValidationException()
 	{
 		var query = CreateQuery(userId: Guid.NewGuid());
 
-		await Assert.ThrowsAsync<UserNotFoundException>(() => Mediator.Send(query, CancellationToken));
+		var exception =
+			await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query, CancellationToken));
+
+		exception.Failures.Should().Contain(x => x.Error is UserNotFoundException);
 	}
 
 	[Fact]
