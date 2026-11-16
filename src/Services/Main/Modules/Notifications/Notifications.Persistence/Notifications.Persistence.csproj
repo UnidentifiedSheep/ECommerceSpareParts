@@ -10,9 +10,9 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
-        <ProjectReference Include="..\..\..\..\..\Infrastructure\Notifications\Notification.Persistence\Notification.Persistence.csproj"/>
         <ProjectReference Include="..\..\..\..\Persistence.Common\Persistence.Common.csproj"/>
         <ProjectReference Include="..\Notifications.Application\Notifications.Application.csproj"/>
+        <ProjectReference Include="..\Notifications.Abstractions\Notifications.Abstractions.csproj"/>
         <ProjectReference Include="..\Notifications.Entities\Notifications.Entities.csproj"/>
     </ItemGroup>
 

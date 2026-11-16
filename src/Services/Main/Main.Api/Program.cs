@@ -1,3 +1,4 @@
+using Notification.Extensions;
 using Application.Common.Host;
 using System.Reflection;
 using Abstractions;
@@ -165,7 +166,7 @@ builder
 	.AddCommonLayer()
 	.AddS3()
 	.AddExchangeRates()
-	.AddMainNotifications();
+	.UseEmailNotifications();
 
 builder.Services.AddCarter(
 	new DependencyContextAssemblyCatalog(

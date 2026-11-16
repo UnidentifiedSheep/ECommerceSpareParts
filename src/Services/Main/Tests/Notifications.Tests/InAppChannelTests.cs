@@ -9,9 +9,9 @@ using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
 using Notification.Interfaces;
 using Notification.Renderers;
-using Notification.Tests.TestSupport;
+using Notifications.Tests.TestSupport;
 
-namespace Notification.Tests;
+namespace Notifications.Tests;
 
 public class InAppChannelTests
 {

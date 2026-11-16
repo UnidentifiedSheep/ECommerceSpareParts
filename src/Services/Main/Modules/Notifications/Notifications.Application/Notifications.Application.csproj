@@ -12,7 +12,15 @@
     <ItemGroup>
         <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>
         <PackageReference Include="MassTransit" Version="8.5.8"/>
+        <PackageReference Include="MailKit" Version="4.17.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.9"/>
+        <PackageReference Include="Polly.Core" Version="8.7.0"/>
+        <PackageReference Include="RazorLight" Version="2.3.1"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2"/>
         <PackageReference Include="Scrutor" Version="7.0.0"/>
     </ItemGroup>
@@ -23,7 +31,8 @@
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\..\Identity\Identity.Abstractions\Identity.Abstractions.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\Cache\Cache.csproj"/>
-        <ProjectReference Include="..\..\..\..\..\Infrastructure\Notifications\Notification.Core\Notification.Core.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\NamedObjects\NamedObject\NamedObject.csproj"/>
+        <ProjectReference Include="..\Notifications.Abstractions\Notifications.Abstractions.csproj"/>
         <ProjectReference Include="..\Notifications.Entities\Notifications.Entities.csproj"/>
     </ItemGroup>
 

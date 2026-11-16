@@ -1,5 +1,7 @@
 using Main.Modules.Identity.Application.Configs;
 using Application.Common.Host;
+using Main.Application.Notifications;
+using Notification.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Validators;
 using Application.Common.Validators;
@@ -33,6 +35,16 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddIdentityApplication(this IServiceCollection services)
 	{
 		services.AddValidationErrors(IdentityValidationConfiguration.Configure);
+
+		services.AddNotification<PasswordResetNotification, PasswordResetNotificationData>(
+			"PasswordReset",
+			model => new PasswordResetNotification(model));
+		services.AddNotification<EmailVerificationNotification, EmailVerificationNotificationData>(
+			"EmailVerification",
+			model => new EmailVerificationNotification(model));
+		services.AddNotification<UserLoggedInNotification, UserLoggedInNotificationData>(
+			"UserLoggedIn",
+			model => new UserLoggedInNotification(model));
 
 		var assembly = IdentityApplicationAssembly.Value;
 

@@ -1,7 +1,7 @@
 using Notification.Core.Interfaces;
 using Notification.Core.Recipients;
 
-namespace Notification.Tests.TestSupport;
+namespace Notifications.Tests.TestSupport;
 
 internal sealed class RecordingInAppObserver(
 	Exception? error = null,

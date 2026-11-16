@@ -23,7 +23,7 @@ public class ModuleBoundariesTests
 
 	private static readonly Dictionary<string, string[]> AllowedModuleDependencies = new()
 	{
-		["Identity"] = ["Jobs", "Platform"],
+		["Identity"] = ["Jobs", "Notifications", "Platform"],
 		["Currency"] = ["Jobs", "Platform"],
 		["Product"] = ["Jobs"],
 		["Storage"] = ["Currency", "Platform", "Product"],
@@ -35,7 +35,7 @@ public class ModuleBoundariesTests
 		["Platform"] = [],
 		["Suppliers"] = ["Platform"],
 		["Uploads"] = [],
-		["Documents"] = ["Identity", "Jobs", "Platform"],
+		["Documents"] = ["Identity", "Jobs", "Notifications", "Platform"],
 		["Cart"] = ["Identity", "Product"],
 		["Notifications"] = ["Identity"],
 		["Order"] = ["Currency", "Identity", "Organization", "Product"],

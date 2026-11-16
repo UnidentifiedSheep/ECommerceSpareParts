@@ -1,6 +1,8 @@
 using Main.Modules.Documents.Application.Configs;
 using Application.Common.Extensions;
 using Application.Common.Host;
+using Main.Application.Notifications;
+using Notification.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Services.Document;
@@ -34,6 +36,9 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddDocumentsApplication(this IServiceCollection services)
 	{
 		DocumentsSortByConfig.Configure();
+		services.AddNotification<DocumentGeneratedNotification, DocumentGeneratedNotificationData>(
+			DocumentGeneratedNotification.NotificationSystemName,
+			model => new DocumentGeneratedNotification(model));
 		services.RegisterNamedObject<IDocumentDefinition>(objectsLifetime: ServiceLifetime.Scoped);
 
 		var assembly = DocumentsApplicationAssembly.Value;

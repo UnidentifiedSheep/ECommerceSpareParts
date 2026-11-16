@@ -7,7 +7,7 @@ using Notification.Core.Interfaces.Notification;
 using Notification.Core.Interfaces.Recipient;
 using Notification.Core.Recipients;
 
-namespace Notification.Tests;
+namespace Notifications.Tests;
 
 public class NotificationServiceTests
 {

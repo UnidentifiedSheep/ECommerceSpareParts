@@ -1,4 +1,3 @@
-using Notification.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
@@ -8,6 +7,5 @@ public sealed class NotificationsDbContextModule : IDbContextModule
 {
 	public void Configure(ModelBuilder modelBuilder)
 		=> modelBuilder
-			.ApplyConfigurationsFromAssembly(typeof(NotificationsDbContextModule).Assembly)
-			.AddNotifications();
+			.ApplyConfigurationsFromAssembly(typeof(NotificationsDbContextModule).Assembly);
 }

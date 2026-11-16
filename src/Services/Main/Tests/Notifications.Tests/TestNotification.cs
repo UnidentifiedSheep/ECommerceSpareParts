@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Notification.Core.Interfaces.Notification;
 
-namespace Notification.Tests;
+namespace Notifications.Tests;
 
 public class TestNotification : INotification<TestNotificationData>
 {

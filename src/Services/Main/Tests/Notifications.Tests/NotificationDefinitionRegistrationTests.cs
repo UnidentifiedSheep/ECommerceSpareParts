@@ -5,7 +5,7 @@ using Notification.Core.Interfaces.Notification;
 using Notification.Extensions;
 using Notification.Renderers;
 
-namespace Notification.Tests;
+namespace Notifications.Tests;
 
 public class NotificationDefinitionRegistrationTests
 {

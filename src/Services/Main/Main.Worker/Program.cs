@@ -104,7 +104,7 @@ builder
 	.AddWorkerSecurityLayer()
 	.AddPasswordServices()
 	.AddExchangeRates()
-	.AddMainNotifications()
+	.UseEmailNotifications()
 	.AddInAppNotificationHostedService()
 	.AddEmailNotificationHostedService();
 

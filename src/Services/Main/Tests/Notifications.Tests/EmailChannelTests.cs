@@ -8,7 +8,7 @@ using Notification.Core.Recipients;
 using Notification.Interfaces;
 using Notification.Renderers;
 
-namespace Notification.Tests;
+namespace Notifications.Tests;
 
 public class EmailChannelTests
 {

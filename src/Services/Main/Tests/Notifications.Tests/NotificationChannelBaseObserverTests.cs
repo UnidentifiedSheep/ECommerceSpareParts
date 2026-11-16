@@ -3,10 +3,10 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Recipients;
-using Notification.Tests.TestSupport;
+using Notifications.Tests.TestSupport;
 using Tests.Stubs;
 
-namespace Notification.Tests;
+namespace Notifications.Tests;
 
 public class NotificationChannelBaseObserverTests
 {

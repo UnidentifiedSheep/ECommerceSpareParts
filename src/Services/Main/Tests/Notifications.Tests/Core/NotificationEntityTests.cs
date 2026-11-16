@@ -1,7 +1,7 @@
 using Notification.Core.Enums;
 using NotificationEntity = Notification.Core.Entities.Notification;
 
-namespace Notification.Tests.Core;
+namespace Notifications.Tests.Core;
 
 public class NotificationEntityTests
 {
