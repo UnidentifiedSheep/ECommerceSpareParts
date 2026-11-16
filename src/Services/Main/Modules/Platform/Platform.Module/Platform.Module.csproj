@@ -12,6 +12,7 @@
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Platform.Application\Platform.Application.csproj"/>
         <ProjectReference Include="..\Platform.Persistence\Platform.Persistence.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -21,6 +21,7 @@
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Currency.Abstractions\Currency.Abstractions.csproj"/>
         <ProjectReference Include="..\Currency.Entities\Currency.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
 </Project>

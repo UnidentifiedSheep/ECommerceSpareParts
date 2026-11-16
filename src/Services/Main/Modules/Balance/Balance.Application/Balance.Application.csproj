@@ -27,6 +27,7 @@
         <ProjectReference Include="..\..\Organization\Organization.Abstractions\Organization.Abstractions.csproj"/>
         <ProjectReference Include="..\Balance.Abstractions\Balance.Abstractions.csproj"/>
         <ProjectReference Include="..\Balance.Entities\Balance.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
 </Project>

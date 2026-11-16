@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "messages": {
+    "operation.date.cannot.be.in.future": "The operation date cannot be in the future.",
+    "operation.date.too.old": "The operation date is too old."
+  }
+}

@@ -13,6 +13,7 @@
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Suppliers.Application\Suppliers.Application.csproj"/>
         <ProjectReference Include="..\Suppliers.Persistence\Suppliers.Persistence.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
 </Project>

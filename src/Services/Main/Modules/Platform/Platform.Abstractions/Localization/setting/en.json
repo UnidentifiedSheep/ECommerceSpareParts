@@ -1,0 +1,6 @@
+{
+  "culture": "en",
+  "messages": {
+    "setting.not.found": "Failed to find setting {Name|string}."
+  }
+}

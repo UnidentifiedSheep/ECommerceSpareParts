@@ -1,0 +1,7 @@
+{
+  "culture": "ru",
+  "messages": {
+    "operation.date.cannot.be.in.future": "Дата операции не может быть в будущем.",
+    "operation.date.too.old": "Дата операции слишком старая."
+  }
+}

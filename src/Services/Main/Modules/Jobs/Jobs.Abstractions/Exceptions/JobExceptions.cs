@@ -1,3 +1,4 @@
+using Main.Entities;
 using Exceptions.Base.Localized;
 
 namespace Application.Common.Exceptions;

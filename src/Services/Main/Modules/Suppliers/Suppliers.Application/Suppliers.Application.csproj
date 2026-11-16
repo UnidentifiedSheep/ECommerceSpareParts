@@ -23,6 +23,7 @@
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\..\Platform\Platform.Abstractions\Platform.Abstractions.csproj"/>
         <ProjectReference Include="..\Suppliers.Entities\Suppliers.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
 </Project>

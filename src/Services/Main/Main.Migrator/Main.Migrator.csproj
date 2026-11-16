@@ -42,9 +42,9 @@
         <ProjectReference Include="..\Modules\Organization\Organization.Persistence\Organization.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Storage\Storage.Persistence\Storage.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Pricing\Pricing.Persistence\Pricing.Persistence.csproj"/>
-            <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Organization\Organization.Entities\Organization.Entities.csproj"/>
-</ItemGroup>
+    </ItemGroup>
 
     <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">

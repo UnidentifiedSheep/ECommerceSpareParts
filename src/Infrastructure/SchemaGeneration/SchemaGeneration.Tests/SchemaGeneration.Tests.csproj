@@ -21,7 +21,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Services\Test.Common\Test.Common.csproj"/>
         <ProjectReference Include="..\SchemaGeneration\SchemaGeneration.csproj"/>
-            <ProjectReference Include="..\..\..\Services\Main\Modules\Documents\Documents.Entities\Documents.Entities.csproj"/>
-</ItemGroup>
+        <ProjectReference Include="..\..\..\Services\Main\Modules\Documents\Documents.Entities\Documents.Entities.csproj"/>
+    </ItemGroup>
 
 </Project>

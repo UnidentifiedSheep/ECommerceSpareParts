@@ -25,6 +25,7 @@
         <ProjectReference Include="..\..\Sale\Sale.Abstractions\Sale.Abstractions.csproj"/>
         <ProjectReference Include="..\Analytics.Abstractions\Analytics.Abstractions.csproj"/>
         <ProjectReference Include="..\Analytics.Entities\Analytics.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
 </Project>

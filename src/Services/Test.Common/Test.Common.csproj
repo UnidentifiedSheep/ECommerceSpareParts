@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -48,10 +48,15 @@
         <ProjectReference Include="..\..\Infrastructure\Lrt\Lrt.Core\Lrt.Core.csproj"/>
         <ProjectReference Include="..\GraphQL.Common\GraphQL.Common.csproj"/>
         <ProjectReference Include="..\Persistence.Common\Persistence.Common.csproj"/>
+        <ProjectReference Include="..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <LocanResource Include="../Application.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules.Common/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 

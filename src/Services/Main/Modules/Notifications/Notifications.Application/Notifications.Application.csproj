@@ -34,6 +34,7 @@
         <ProjectReference Include="..\..\..\..\..\Infrastructure\NamedObjects\NamedObject\NamedObject.csproj"/>
         <ProjectReference Include="..\Notifications.Abstractions\Notifications.Abstractions.csproj"/>
         <ProjectReference Include="..\Notifications.Entities\Notifications.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
 </Project>

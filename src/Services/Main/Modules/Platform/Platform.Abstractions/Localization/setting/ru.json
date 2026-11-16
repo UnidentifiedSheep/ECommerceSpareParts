@@ -1,0 +1,6 @@
+{
+  "culture": "ru",
+  "messages": {
+    "setting.not.found": "Не удалось найти настройку {Name}."
+  }
+}

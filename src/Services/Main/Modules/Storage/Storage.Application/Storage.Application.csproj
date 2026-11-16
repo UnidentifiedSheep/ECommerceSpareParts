@@ -27,6 +27,7 @@
         <ProjectReference Include="..\..\Product\Product.Abstractions\Product.Abstractions.csproj"/>
         <ProjectReference Include="..\Storage.Abstractions\Storage.Abstractions.csproj"/>
         <ProjectReference Include="..\Storage.Entities\Storage.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
 </Project>

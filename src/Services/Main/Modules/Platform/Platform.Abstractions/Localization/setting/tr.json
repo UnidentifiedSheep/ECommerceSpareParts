@@ -1,0 +1,6 @@
+{
+  "culture": "tr",
+  "messages": {
+    "setting.not.found": "Ayar {Name} bulunamadı."
+  }
+}

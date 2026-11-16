@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "messages": {
+    "operation.date.cannot.be.in.future": "İşlem tarihi gelecekte olamaz.",
+    "operation.date.too.old": "İşlem tarihi çok eski."
+  }
+}

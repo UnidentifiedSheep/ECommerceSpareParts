@@ -76,6 +76,14 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
+        <LocanResource Include="../Modules/Platform/Platform.Abstractions/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../../Modules.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
         <LocanResource Include="../Modules/Suppliers/Suppliers.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
@@ -129,5 +137,6 @@
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\Main.Api\Main.Api.csproj"/>
         <ProjectReference Include="..\Persistence.Relations\Persistence.Relations.csproj"/>
+        <ProjectReference Include="..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 </Project>
