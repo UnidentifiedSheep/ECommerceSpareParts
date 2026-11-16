@@ -1,3 +1,4 @@
+using Enums;
 using System.Net;
 using Application.Common.Models.Options.S3;
 using Main.Application.Interfaces.Services.Document;

@@ -1,3 +1,4 @@
+using Api.Common.EndPoints.Internal;
 using Carter;
 
 namespace Main.Api.EndPoints.Internal;
@@ -11,5 +12,6 @@ public class InternalEndPoints : ICarterModule
 			.AddInternalAuthEndPoints()
 			.AddInternalProducerEndPoints()
 			.AddInternalProductsEndPoints()
-			.AddInternalCurrencyEndPoints();
+			.AddInternalCurrencyEndPoints()
+			.AddInternalSettingEndPoints();
 }

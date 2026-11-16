@@ -19,9 +19,8 @@ using Integrations.ExchangeRate.Di;
 using Main.Api;
 using Main.Api.EndPoints;
 using Main.Api.GraphQl;
-using Main.Application;
 using Main.Application.Consumers;
-using Main.Cache;
+using Cache.OneTimeTokens;
 using Main.Modules.Currency;
 using Main.Modules.Product;
 using Main.Modules.Identity;
@@ -31,6 +30,8 @@ using Main.Modules.Balance;
 using Main.Modules.Cart;
 using Main.Modules.Documents;
 using Main.Modules.Jobs;
+using Main.Modules.Platform;
+using Main.Modules.Uploads;
 using Main.Modules.Notifications;
 using Main.Modules.Order;
 using Main.Modules.Organization;
@@ -39,14 +40,14 @@ using Main.Modules.Storage;
 using Contracts.Analytics;
 using Pricing.Application.Consumers;
 using Pricing.Module;
-using Main.Persistence;
+using Persistence.Common;
+using Persistence.Relations;
 using MassTransit;
 using Persistence.Context;
 using RabbitMq.Extensions;
 using S3;
 using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
-using Global = Main.Application.Global;
 
 const string serviceName = "Main";
 var builder = WebApplication.CreateBuilder(args);
@@ -86,6 +87,8 @@ builder.Services.AddModule<BalanceModule>(builder.Configuration);
 builder.Services.AddModule<CartModule>(builder.Configuration);
 builder.Services.AddModule<DocumentsModule>(builder.Configuration);
 builder.Services.AddModule<JobsModule>(builder.Configuration);
+builder.Services.AddModule<PlatformModule>(builder.Configuration);
+builder.Services.AddModule<UploadsModule>(builder.Configuration);
 builder.Services.AddModule<NotificationsModule>(builder.Configuration);
 builder.Services.AddModule<OrderModule>(builder.Configuration);
 builder.Services.AddModule<OrganizationModule>(builder.Configuration);
@@ -97,7 +100,6 @@ var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
 	x.AddConsumers([
-		Assembly.GetAssembly(typeof(Global))!,
 		.. builder.Services.GetModuleCatalog().ConsumerAssemblies]);
 	x.AddConsumer<BackplaneConsumer>();
 	x.AddConsumer<JobStatusUpdatedConsumer>();
@@ -150,16 +152,16 @@ builder.Services.AddMassTransit(x =>
 
 builder
 	.Services
-	.AddPersistenceLayer()
+	.AddPersistenceCore()
+	.AddRelationsPersistence()
 	.AddCacheLayer("main")
-	.AddApplicationCache()
+	.AddOneTimeTokens()
 	.AddJsonSigner()
 	.AddSecretEncryptor()
 	.AddFullSecurityLayer()
 	.AddEComAuth(builder.Configuration)
 	.AddCommonLayer()
 	.AddS3()
-	.AddApplicationLayer(builder.Configuration)
 	.AddExchangeRates()
 	.AddMainNotifications();
 

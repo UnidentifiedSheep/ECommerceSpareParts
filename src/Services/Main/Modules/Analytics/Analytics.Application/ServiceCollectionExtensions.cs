@@ -1,5 +1,8 @@
+using Main.Application.Analytics.Charts;
+using Main.Application.Analytics.Analyzers;
+using Main.Application.Analytics;
+using NamedObject.Core.Interfaces;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.NamedObject;
 using NamedObject;
 using Application.Common.Host;
 using Main.Application.Analytics.Configs;
@@ -12,6 +15,10 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddAnalyticsApplication(this IServiceCollection services)
 	{
+		services.AddSingleton<INamedObjectGroupRegistry, AnalyticsNamedObjectGroupRegistry>();
+		services.RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(AnalyticsApplicationAssembly.Value);
+		services.RegisterNamedObject<ChartDataSourceNamedObject>(AnalyticsApplicationAssembly.Value);
+
 		AnalyticsCursorConfig.Configure();
 
 		services

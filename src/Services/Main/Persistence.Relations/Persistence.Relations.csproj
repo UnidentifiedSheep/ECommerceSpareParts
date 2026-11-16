@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <AssemblyName>Persistence.Relations</AssemblyName>
+        <RootNamespace>Persistence.Relations</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
+        <ProjectReference Include="..\..\Persistence.Common\Persistence.Common.csproj"/>
+        <ProjectReference Include="..\Modules\Analytics\Analytics.Entities\Analytics.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Balance\Balance.Entities\Balance.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Cart\Cart.Entities\Cart.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Currency\Currency.Entities\Currency.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Documents\Documents.Entities\Documents.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Notifications\Notifications.Entities\Notifications.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Order\Order.Entities\Order.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Organization\Organization.Entities\Organization.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Platform\Platform.Entities\Platform.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Pricing\Pricing.Entities\Pricing.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Product\Product.Entities\Product.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Purchase\Purchase.Entities\Purchase.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Sale\Sale.Entities\Sale.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Storage\Storage.Entities\Storage.Entities.csproj"/>
+    </ItemGroup>
+
+</Project>

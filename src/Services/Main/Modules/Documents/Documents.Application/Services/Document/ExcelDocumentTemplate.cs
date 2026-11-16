@@ -1,3 +1,4 @@
+using Enums;
 using ClosedXML.Report;
 using Main.Application.Interfaces.Services.Document;
 using Main.Enums.Documents;

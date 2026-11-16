@@ -30,6 +30,7 @@
         <ProjectReference Include="..\..\Storage\Storage.Abstractions\Storage.Abstractions.csproj"/>
         <ProjectReference Include="..\Sale.Abstractions\Sale.Abstractions.csproj"/>
         <ProjectReference Include="..\Sale.Entities\Sale.Entities.csproj"/>
-    </ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Core\Enums\Enums.csproj"/>
+</ItemGroup>
 
 </Project>

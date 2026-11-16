@@ -1,3 +1,4 @@
+using Enums;
 using GraphQL.Common.Types.Schema;
 using HotChocolate;
 using Main.Application.Dtos.Documents;

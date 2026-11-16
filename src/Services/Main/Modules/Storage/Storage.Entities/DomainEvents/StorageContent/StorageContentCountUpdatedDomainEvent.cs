@@ -1,3 +1,4 @@
+using Enums;
 using Domain.Interfaces.Events;
 using Main.Enums;
 

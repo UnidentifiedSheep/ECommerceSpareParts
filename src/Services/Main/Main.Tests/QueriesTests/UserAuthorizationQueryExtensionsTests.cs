@@ -8,7 +8,9 @@ using Main.Entities.User;
 using Main.Modules.Currency.Persistence;
 using Main.Modules.Product.Persistence;
 using Main.Modules.Storage.Persistence;
-using Main.Persistence;
+using Persistence.Common;
+using Persistence.Common.Repositories;
+using Persistence.Relations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Context;
@@ -137,5 +139,5 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 						options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 				.AddInterceptors(counter)
 				.Options,
-			[new MainDbContextModule(), new Main.Modules.Identity.Persistence.IdentityDbContextModule(), new Main.Modules.Purchase.Persistence.PurchaseDbContextModule(), new Main.Modules.Sale.Persistence.SaleDbContextModule(), new Main.Modules.Organization.Persistence.OrganizationDbContextModule(), new Main.Modules.Balance.Persistence.BalanceDbContextModule(), new Main.Modules.Analytics.Persistence.AnalyticsDbContextModule(), new Main.Modules.Order.Persistence.OrderDbContextModule(), new Main.Modules.Notifications.Persistence.NotificationsDbContextModule(), new Main.Modules.Cart.Persistence.CartDbContextModule(), new Main.Modules.Documents.Persistence.DocumentsDbContextModule(), new Main.Modules.Jobs.Persistence.JobsDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule(), new Pricing.Persistence.PricingDbContextModule()]);
+			[new CoreDbContextModule(), new RelationsDbContextModule(), new Main.Modules.Identity.Persistence.IdentityDbContextModule(), new Main.Modules.Purchase.Persistence.PurchaseDbContextModule(), new Main.Modules.Sale.Persistence.SaleDbContextModule(), new Main.Modules.Organization.Persistence.OrganizationDbContextModule(), new Main.Modules.Balance.Persistence.BalanceDbContextModule(), new Main.Modules.Analytics.Persistence.AnalyticsDbContextModule(), new Main.Modules.Order.Persistence.OrderDbContextModule(), new Main.Modules.Notifications.Persistence.NotificationsDbContextModule(), new Main.Modules.Cart.Persistence.CartDbContextModule(), new Main.Modules.Documents.Persistence.DocumentsDbContextModule(), new Main.Modules.Jobs.Persistence.JobsDbContextModule(), new Main.Modules.Platform.Persistence.PlatformDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule(), new Pricing.Persistence.PricingDbContextModule()]);
 }

@@ -97,7 +97,7 @@ public static class RepositoriesExtensions
 		return services;
 	}
 
-	private static void AddRepositories(
+	internal static void AddRepositories(
 		IServiceCollection services,
 		Type repositoryType,
 		Type linqRepositoryType,

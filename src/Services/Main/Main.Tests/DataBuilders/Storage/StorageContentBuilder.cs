@@ -1,4 +1,5 @@
-﻿using Bogus;
+﻿using Enums;
+using Bogus;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Enums;

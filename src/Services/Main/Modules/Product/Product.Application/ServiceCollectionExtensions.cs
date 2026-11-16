@@ -1,3 +1,5 @@
+using Main.Application.Configs;
+using Application.Common.Extensions;
 using Application.Common.Host;
 using Application.Common.Interfaces.Lrt;
 using Main.Application.Interfaces.Cache;
@@ -17,11 +19,15 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddProductApplication(this IServiceCollection services)
 	{
+		services.AddValidationErrors(ProductValidationConfiguration.Configure);
+		ProductSortByConfig.Configure();
+
 		var assembly = ProductApplicationAssembly.Value;
 
 		services
 			.AddModuleApplication(assembly)
-			.RegisterNamedObject<ILrtNamedObject>(assembly);
+			.RegisterNamedObject<ILrtNamedObject>(assembly)
+			.RegisterJobProviders(assembly);
 
 		services.AddScoped<IProductCrosses, ProductCrosses>();
 		services.AddScoped<IProductSearch, ProductSearch>();

@@ -1,3 +1,4 @@
+using Enums;
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;

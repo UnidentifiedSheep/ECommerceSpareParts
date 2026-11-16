@@ -1,3 +1,4 @@
+using Enums;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Main.Application.Interfaces.Services.Document;

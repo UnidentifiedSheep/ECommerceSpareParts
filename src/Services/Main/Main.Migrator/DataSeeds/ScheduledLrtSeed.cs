@@ -6,7 +6,7 @@ using Cronos;
 using Domain.CommonEntities.Job;
 using Main.Application.Lrts;
 using Main.Application.Lrts.RemoveExpiredDocuments;
-using Main.Application.Lrts.RunServiceTask;
+using Main.Modules.Jobs.Application.LRT.RunServiceTask;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 using Persistence.Interfaces;

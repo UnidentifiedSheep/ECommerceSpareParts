@@ -1,3 +1,4 @@
+using Persistence.Common;
 using Main.Application.Interfaces.Persistence;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddProductPersistence(this IServiceCollection services)
 	{
-		services.AddDbContextModule<ProductDbContextModule>();
+		services.AddDbContextModule<ProductDbContextModule>().AddEntities(typeof(Main.Entities.Product.Product).Assembly);
 
 		services.AddDbContext<BulkProductContext>((serviceProvider, options) =>
 			options.UseNpgsql(

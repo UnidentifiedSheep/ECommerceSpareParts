@@ -7,13 +7,10 @@ public class ModuleBoundariesTests
 {
 	private static readonly string[] HostAssemblies =
 	[
-		"Main.Application",
-		"Main.Persistence",
-		"Main.Cache",
+		"Persistence.Relations",
 		"Main.Api",
 		"Main.Worker",
-		"Main.Migrator",
-		"Main.Entities"
+		"Main.Migrator"
 	];
 
 	private static readonly Dictionary<string, string[]> ForbiddenLayerReferences = new()
@@ -26,16 +23,18 @@ public class ModuleBoundariesTests
 
 	private static readonly Dictionary<string, string[]> AllowedModuleDependencies = new()
 	{
-		["Identity"] = ["Jobs"],
-		["Currency"] = ["Jobs"],
+		["Identity"] = ["Jobs", "Platform"],
+		["Currency"] = ["Jobs", "Platform"],
 		["Product"] = ["Jobs"],
-		["Storage"] = ["Currency", "Product"],
-		["Pricing"] = ["Currency", "Product", "Storage", "Jobs"],
+		["Storage"] = ["Currency", "Platform", "Product"],
+		["Pricing"] = ["Currency", "Product", "Storage", "Jobs", "Platform"],
 		["Organization"] = ["Identity"],
 		["Analytics"] = ["Currency", "Sale", "Jobs"],
 		["Balance"] = ["Currency", "Identity", "Organization", "Jobs"],
 		["Jobs"] = [],
-		["Documents"] = ["Identity", "Jobs"],
+		["Platform"] = [],
+		["Uploads"] = [],
+		["Documents"] = ["Identity", "Jobs", "Platform"],
 		["Cart"] = ["Identity", "Product"],
 		["Notifications"] = ["Identity"],
 		["Order"] = ["Currency", "Identity", "Organization", "Product"],

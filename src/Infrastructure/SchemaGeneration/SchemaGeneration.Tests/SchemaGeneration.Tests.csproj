@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -21,6 +21,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Services\Test.Common\Test.Common.csproj"/>
         <ProjectReference Include="..\SchemaGeneration\SchemaGeneration.csproj"/>
-    </ItemGroup>
+            <ProjectReference Include="..\..\..\Services\Main\Modules\Documents\Documents.Entities\Documents.Entities.csproj"/>
+</ItemGroup>
 
 </Project>

@@ -1,3 +1,4 @@
+using Persistence.Context;
 using Application.Common.Interfaces.Repositories;
 using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ namespace Main.Modules.Jobs.Persistence;
 public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddJobsPersistence(this IServiceCollection services)
-		=> services.AddDbContextModule<JobsDbContextModule>();
+		=> services.AddDbContextModule<JobsDbContextModule>().AddEntities(typeof(Domain.CommonEntities.Job.JobSchedule).Assembly).AddJobRepositories<UnifiedDbContext>();
 
 	public static IServiceCollection AddJobRepositories<TContext>(this IServiceCollection services)
 		where TContext : DbContext

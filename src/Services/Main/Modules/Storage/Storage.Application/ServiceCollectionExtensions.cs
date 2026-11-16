@@ -1,3 +1,5 @@
+using NamedObject.Core.Interfaces;
+using Main.Application.Configs;
 using Application.Common.Host;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.NamedObject;
@@ -16,6 +18,11 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddStorageApplication(this IServiceCollection services)
 	{
+		services.AddSingleton<INamedObjectGroupRegistry, StorageNamedObjectGroupRegistry>();
+
+		services.AddValidationErrors(StorageValidationConfiguration.Configure);
+		StorageSortByConfig.Configure();
+
 		var assembly = StorageApplicationAssembly.Value;
 
 		services

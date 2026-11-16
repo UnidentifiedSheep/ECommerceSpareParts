@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Dtos.Uploads;
+using Main.Modules.Uploads.Application.Dtos;
 
 namespace Main.Api.GraphQl.Types;
 

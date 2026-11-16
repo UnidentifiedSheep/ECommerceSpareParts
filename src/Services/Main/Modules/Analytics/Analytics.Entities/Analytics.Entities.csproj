@@ -22,7 +22,6 @@
         <ProjectReference Include="..\..\..\..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Core\Extensions\Extensions.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
-        <ProjectReference Include="..\..\..\Main.Enums\Main.Enums.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

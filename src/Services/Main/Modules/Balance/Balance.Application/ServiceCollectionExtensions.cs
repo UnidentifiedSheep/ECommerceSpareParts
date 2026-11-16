@@ -1,5 +1,6 @@
+using Main.Entities.Balance;
+using Main.Application.Configs;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.NamedObject;
 using NamedObject;
 using Application.Common.Host;
 using Main.Application.Interfaces.Services;
@@ -13,6 +14,9 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddBalanceApplication(this IServiceCollection services)
 	{
+		services.AddValidationErrors(BalanceValidationConfiguration.Configure);
+		services.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
+
 		services
 			.AddModuleApplication(BalanceApplicationAssembly.Value)
 			.RegisterNamedObject<ILrtNamedObject>(BalanceApplicationAssembly.Value);

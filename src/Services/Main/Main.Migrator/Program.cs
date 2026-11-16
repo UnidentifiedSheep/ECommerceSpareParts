@@ -11,13 +11,15 @@ using Main.Modules.Balance.Persistence;
 using Main.Modules.Cart.Persistence;
 using Main.Modules.Documents.Persistence;
 using Main.Modules.Jobs.Persistence;
+using Main.Modules.Platform.Persistence;
 using Main.Modules.Notifications.Persistence;
 using Main.Modules.Order.Persistence;
 using Main.Modules.Organization.Persistence;
 using Main.Modules.Sale.Persistence;
 using Main.Modules.Storage.Persistence;
 using Pricing.Persistence;
-using Main.Persistence;
+using Persistence.Common;
+using Persistence.Relations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,7 +50,8 @@ builder.ConfigureServices((context, services) =>
 	seedingRequested = seedValue == true;
 
 	//add db context
-	services.AddDbContextModule<MainDbContextModule>();
+	services.AddDbContextModule<CoreDbContextModule>();
+	services.AddDbContextModule<RelationsDbContextModule>();
 	services.AddCurrencyPersistence();
 	services.AddDbContextModule<ProductDbContextModule>();
 	services.AddDbContextModule<IdentityDbContextModule>();
@@ -59,6 +62,7 @@ builder.ConfigureServices((context, services) =>
 	services.AddDbContextModule<CartDbContextModule>();
 	services.AddDbContextModule<DocumentsDbContextModule>();
 	services.AddDbContextModule<JobsDbContextModule>();
+	services.AddDbContextModule<PlatformDbContextModule>();
 	services.AddDbContextModule<NotificationsDbContextModule>();
 	services.AddDbContextModule<OrderDbContextModule>();
 	services.AddDbContextModule<OrganizationDbContextModule>();

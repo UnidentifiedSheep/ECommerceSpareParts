@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -21,14 +21,18 @@
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
-        <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
+        <ProjectReference Include="..\Persistence.Relations\Persistence.Relations.csproj"/>
         <ProjectReference Include="..\Modules\Currency\Currency.Persistence\Currency.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Product\Product.Persistence\Product.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Identity\Identity.Persistence\Identity.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Purchase\Purchase.Persistence\Purchase.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Sale\Sale.Persistence\Sale.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Documents\Documents.Persistence\Documents.Persistence.csproj"/>
+        <ProjectReference Include="..\Modules\Platform\Platform.Persistence\Platform.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Jobs\Jobs.Persistence\Jobs.Persistence.csproj"/>
+        <ProjectReference Include="..\Modules\Jobs\Jobs.Application\Jobs.Application.csproj"/>
+        <ProjectReference Include="..\Modules\Currency\Currency.Application\Currency.Application.csproj"/>
+        <ProjectReference Include="..\Modules\Documents\Documents.Application\Documents.Application.csproj"/>
         <ProjectReference Include="..\Modules\Analytics\Analytics.Persistence\Analytics.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Balance\Balance.Persistence\Balance.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Cart\Cart.Persistence\Cart.Persistence.csproj"/>
@@ -37,7 +41,9 @@
         <ProjectReference Include="..\Modules\Organization\Organization.Persistence\Organization.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Storage\Storage.Persistence\Storage.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Pricing\Pricing.Persistence\Pricing.Persistence.csproj"/>
-    </ItemGroup>
+            <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Organization\Organization.Entities\Organization.Entities.csproj"/>
+</ItemGroup>
 
     <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">

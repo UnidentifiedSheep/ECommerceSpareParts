@@ -1,3 +1,4 @@
+using Persistence.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
 using Pricing.Application.Interfaces.Persistence;
@@ -9,7 +10,7 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddPricingPersistence(this IServiceCollection services)
 	{
-		services.AddDbContextModule<PricingDbContextModule>();
+		services.AddDbContextModule<PricingDbContextModule>().AddEntities(typeof(Pricing.Entities.Offers.PriceOffer).Assembly);
 
 		services.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
 		services.AddScoped<IProductPriceOptionRepository, ProductPriceOptionRepository>();

@@ -1,3 +1,4 @@
+using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.Purchases;
 using Main.Entities.Balance;

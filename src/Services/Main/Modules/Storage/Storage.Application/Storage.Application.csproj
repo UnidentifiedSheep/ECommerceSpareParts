@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Platform\Platform.Abstractions\Platform.Abstractions.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>

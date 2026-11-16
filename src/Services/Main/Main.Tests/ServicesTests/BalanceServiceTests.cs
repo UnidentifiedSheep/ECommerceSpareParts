@@ -1,3 +1,4 @@
+using Enums;
 using Exceptions;
 using FluentAssertions;
 using Main.Application.Interfaces.Services;

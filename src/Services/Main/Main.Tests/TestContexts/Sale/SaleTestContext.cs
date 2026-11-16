@@ -1,3 +1,4 @@
+using Enums;
 using Main.Entities.Analytics;
 using Main.Entities.Balance;
 using Main.Entities.Organization;

@@ -1,20 +1,16 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Application.Common.Abstractions;
-using Application.Common.DomainEventHandlers.Settings.SettingUpdated;
-using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.History;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Settings;
 using Application.Common.Models;
 using Application.Common.Services;
 using Application.Common.Services.Events;
 using Application.Common.Services.History;
 using Application.Common.Services.Persistence;
-using Application.Common.Services.Settings;
 using Domain.CommonEntities.Events;
 using FluentValidation;
 using MediatR;
@@ -28,24 +24,6 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection RegisterIdCollector(this IServiceCollection collection)
 	{
 		collection.AddScoped<IIdsCollector, IdsCollector>();
-		return collection;
-	}
-
-	public static IServiceCollection RegisterSettingsService(this IServiceCollection collection)
-	{
-		collection.AddSingleton<ISettingsContainer, SettingsContainer>();
-		collection.AddScoped<ISettingsService, SettingsService>();
-		collection.AddScoped<
-			INotificationHandler<Batch<SettingUpdatedDomainEvent>>, PublishSettingUpdatedEventHandler>();
-
-		collection.TryAddScoped<
-			IRequestHandler<UpdateSettingCommand, UpdateSettingResult>, UpdateSettingHandler>();
-
-		collection.TryAddScoped<IRequestHandler<GetSettingsQuery, GetSettingsResult>, GetSettingsHandler>();
-
-		collection.TryAddScoped<
-			IRequestHandler<GetRawSettingQuery, GetRawSettingResult>, GetRawSettingHandler>();
-
 		return collection;
 	}
 

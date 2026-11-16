@@ -39,8 +39,7 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 				null,
 				typeof(ApplicationServiceProvider).Assembly,
 				typeof(CacheBehavior<,>),
-				typeof(DbValidationBehavior<,>))
-			.RegisterSettingsService();
+				typeof(DbValidationBehavior<,>));
 
 		services.AddScoped<AuditableEntitySaveChangesInterceptor>();
 		services.AddScoped<DomainEventFlusherSaveChangesInterceptor>();

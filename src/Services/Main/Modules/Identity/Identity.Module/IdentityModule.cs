@@ -14,6 +14,7 @@ public sealed class IdentityModule : ModuleBase
 	public override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddIdentityApplication();
+		services.AddIdentityLinks(configuration);
 		services.AddIdentityPersistence();
 	}
 }

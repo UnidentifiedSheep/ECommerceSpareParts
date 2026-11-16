@@ -14,6 +14,7 @@ public sealed class DocumentsModule : ModuleBase
 	public override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDocumentsApplication();
+		services.AddDocumentLinks(configuration);
 		services.AddDocumentsPersistence();
 	}
 }

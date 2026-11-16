@@ -1,3 +1,4 @@
+using Enums;
 using System.Collections.Frozen;
 using Main.Application.Interfaces.Services.Document;
 using Main.Enums.Documents;

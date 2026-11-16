@@ -12,9 +12,8 @@ using Contracts.Producer;
 using Contracts.Settings;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
-using Main.Application;
 using Main.Application.Consumers;
-using Main.Cache;
+using Cache.OneTimeTokens;
 using Main.Modules.Currency;
 using Main.Modules.Product;
 using Main.Modules.Identity;
@@ -24,6 +23,7 @@ using Main.Modules.Balance;
 using Main.Modules.Cart;
 using Main.Modules.Documents;
 using Main.Modules.Jobs;
+using Main.Modules.Platform;
 using Main.Modules.Jobs.Application;
 using Main.Modules.Notifications;
 using Main.Modules.Order;
@@ -33,7 +33,8 @@ using Main.Modules.Storage;
 using Contracts.Analytics;
 using Pricing.Application.Consumers;
 using Pricing.Module;
-using Main.Persistence;
+using Persistence.Common;
+using Persistence.Relations;
 using MassTransit;
 using Notification.Extensions;
 using Persistence.Context;
@@ -79,6 +80,7 @@ builder.Services.AddModule<BalanceModule>(builder.Configuration);
 builder.Services.AddModule<CartModule>(builder.Configuration);
 builder.Services.AddModule<DocumentsModule>(builder.Configuration);
 builder.Services.AddModule<JobsModule>(builder.Configuration);
+builder.Services.AddModule<PlatformModule>(builder.Configuration);
 builder.Services.AddModule<NotificationsModule>(builder.Configuration);
 builder.Services.AddModule<OrderModule>(builder.Configuration);
 builder.Services.AddModule<OrganizationModule>(builder.Configuration);
@@ -89,14 +91,14 @@ AddMassTransit(builder);
 
 builder
 	.Services
-	.AddPersistenceLayer()
+	.AddPersistenceCore()
+	.AddRelationsPersistence()
 	.AddCacheLayer("main")
-	.AddApplicationCache()
+	.AddOneTimeTokens()
 	.AddJsonSigner()
 	.AddSecretEncryptor()
 	.AddCommonLayer()
 	.AddS3()
-	.AddApplicationLayer(builder.Configuration)
 	.AddWorkerSecurityLayer()
 	.AddPasswordServices()
 	.AddExchangeRates()
@@ -118,8 +120,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 	hostBuilder.Services.AddMassTransit(x =>
 	{
 		x.AddConsumers([
-			Assembly.GetAssembly(typeof(Global))!,
-			.. builder.Services.GetModuleCatalog().ConsumerAssemblies]);
+				.. builder.Services.GetModuleCatalog().ConsumerAssemblies]);
 		x.AddConsumer<BackplaneConsumer>();
 		x.AddConsumer<SettingUpdatedConsumer>();
 

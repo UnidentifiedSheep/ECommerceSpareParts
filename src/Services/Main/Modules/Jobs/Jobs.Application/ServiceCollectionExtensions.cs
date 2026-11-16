@@ -1,3 +1,4 @@
+using Main.Modules.Jobs.Application.Configs;
 using Application.Common.Domains;
 using Application.Common.Extensions;
 using Application.Common.Host;
@@ -5,7 +6,6 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Services;
 using Application.Common.LRT;
 using Application.Common.Models.Options;
-using Application.Common.NamedObject;
 using Application.Common.Projections;
 using Application.Common.Services;
 using Application.Common.Services.Job;
@@ -22,6 +22,8 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddJobsApplication(this IServiceCollection services)
 	{
+		JobsSortByConfig.Configure();
+
 		var assembly = JobsApplicationAssembly.Value;
 
 		services.AddCommonDomain<JobsDomain>();

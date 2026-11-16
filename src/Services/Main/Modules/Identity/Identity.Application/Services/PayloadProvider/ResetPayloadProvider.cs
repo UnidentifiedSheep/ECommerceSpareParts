@@ -1,7 +1,6 @@
-using Main.Application.Interfaces.Cache;
+using Application.Common.Interfaces.Cache;
 using Main.Application.Interfaces.Services.PayloadProvider;
 using Main.Application.Models.Auth;
-using Main.Enums;
 using Main.Enums.Auth;
 
 namespace Main.Application.Services.PayloadProvider;
@@ -16,7 +15,7 @@ public class ResetPayloadProvider(IOneTimeTokenStore oneTimeTokenStore) : IReset
 		};
 
 		await oneTimeTokenStore.StoreAsync(
-			OneTimeTokenPurpose.Reset,
+			OneTimeTokenPurposes.Reset,
 			payload.Id,
 			TimeSpan.FromMinutes(15));
 		return payload;
@@ -24,6 +23,6 @@ public class ResetPayloadProvider(IOneTimeTokenStore oneTimeTokenStore) : IReset
 
 	public Task<bool> IsTokenValid(Guid tokenId)
 		=> oneTimeTokenStore.ConsumeAsync(
-			OneTimeTokenPurpose.Reset,
+			OneTimeTokenPurposes.Reset,
 			tokenId);
 }

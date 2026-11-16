@@ -1,3 +1,4 @@
+using Enums;
 using Bogus;
 using Main.Entities.Balance;
 using Main.Enums.Balances;

@@ -9,9 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Main.Enums\Main.Enums.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Core\Domain\Domain.csproj"/>
-    </ItemGroup>
+            <ProjectReference Include="..\Storage.Entities\Storage.Entities.csproj"/>
+</ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>

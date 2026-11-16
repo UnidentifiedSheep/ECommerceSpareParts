@@ -1,3 +1,4 @@
+using Persistence.Common;
 using Main.Application.Interfaces.Persistence;
 using Main.Persistence.Repositories.Sale;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +10,7 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddSalePersistence(this IServiceCollection services)
 	{
-		services.AddDbContextModule<SaleDbContextModule>();
+		services.AddDbContextModule<SaleDbContextModule>().AddEntities(typeof(Main.Entities.Sale.Sale).Assembly);
 		services.AddScoped<ISaleRepository, SaleRepository>();
 
 		return services;

@@ -1,3 +1,4 @@
+using Enums;
 using FluentAssertions;
 using FluentValidation.TestHelper;
 using Main.Application.Handlers.Balance.ReverseTransaction;

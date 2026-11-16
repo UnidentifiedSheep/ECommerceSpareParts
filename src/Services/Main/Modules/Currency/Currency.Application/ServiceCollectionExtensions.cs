@@ -1,3 +1,4 @@
+using Main.Modules.Currency.Application.Configs;
 using Application.Common.Host;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Lrt;
@@ -18,6 +19,8 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddCurrencyApplication(this IServiceCollection services)
 	{
+		services.AddValidationErrors(CurrencyValidationConfiguration.Configure);
+
 		var assembly = CurrencyApplicationAssembly.Value;
 
 		services

@@ -1,0 +1,25 @@
+﻿using Application.Common.Interfaces.Cqrs;
+using Application.Common.Models.Options.S3;
+using MediatR;
+using Microsoft.Extensions.Options;
+using S3.Core.Interfaces;
+
+namespace Main.Modules.Uploads.Application.Handlers;
+
+public record CompleteUploadCommand(string FileName) : ICommand;
+
+public class CompleteUploadHandler(
+	IS3Service s3Service,
+	IOptions<S3BucketsOptions> bucketsOptions)
+	: ICommandHandler<CompleteUploadCommand>
+{
+	public async Task<Unit> Handle(CompleteUploadCommand request, CancellationToken cancellationToken)
+	{
+		await s3Service.CompletePresignedUploadUrl(
+			bucketsOptions.Value.Uploads.Name,
+			request.FileName,
+			cancellationToken);
+
+		return Unit.Value;
+	}
+}

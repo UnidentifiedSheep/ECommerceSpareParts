@@ -1,3 +1,4 @@
+using Enums;
 using Contracts;
 using Exceptions;
 using FluentAssertions;

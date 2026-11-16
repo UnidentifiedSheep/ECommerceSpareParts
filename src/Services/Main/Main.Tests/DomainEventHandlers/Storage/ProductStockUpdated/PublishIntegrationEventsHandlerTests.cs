@@ -1,3 +1,4 @@
+using Enums;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;

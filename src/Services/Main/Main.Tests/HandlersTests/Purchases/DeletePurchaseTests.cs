@@ -1,3 +1,4 @@
+using Enums;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Contracts;

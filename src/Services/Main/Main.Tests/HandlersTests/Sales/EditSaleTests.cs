@@ -1,3 +1,4 @@
+using Enums;
 using Main.Entities.Analytics;
 using Contracts;
 using Exceptions;

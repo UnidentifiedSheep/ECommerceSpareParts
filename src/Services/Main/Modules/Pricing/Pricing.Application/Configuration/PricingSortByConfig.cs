@@ -1,0 +1,15 @@
+using Application.Common.Querying;
+using Pricing.Entities.Offers;
+
+namespace Pricing.Application.Configuration;
+
+public static class PricingSortByConfig
+{
+	public static void Configure()
+	{
+		QueryableSortBy
+			.Value
+			.MapDefault<ProductPriceOption, decimal>(x => x.Score, true)
+			.Map<ProductPriceOption, decimal>("score", x => x.Score);
+	}
+}

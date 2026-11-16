@@ -11,6 +11,8 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddOrganizationApplication(this IServiceCollection services)
 	{
+		services.AddValidationErrors(OrganizationValidationConfiguration.Configure);
+
 		OrganizationSortByConfig.Configure();
 
 		services.AddModuleApplication(OrganizationApplicationAssembly.Value);

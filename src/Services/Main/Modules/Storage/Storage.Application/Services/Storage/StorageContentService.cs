@@ -1,3 +1,4 @@
+using Enums;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;

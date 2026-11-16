@@ -2,7 +2,7 @@ using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Upload;
-using Main.Application.Handlers.Uploads;
+using Main.Modules.Uploads.Application.Handlers;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

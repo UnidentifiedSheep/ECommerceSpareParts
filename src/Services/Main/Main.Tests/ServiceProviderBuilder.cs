@@ -8,7 +8,7 @@ using Cache;
 using Locan.Hosting;
 using Main.Api;
 using Main.Application.Models;
-using Main.Cache;
+using Cache.OneTimeTokens;
 using Main.Modules.Currency;
 using Main.Modules.Product;
 using Main.Modules.Identity;
@@ -18,13 +18,15 @@ using Main.Modules.Balance;
 using Main.Modules.Cart;
 using Main.Modules.Documents;
 using Main.Modules.Jobs;
+using Main.Modules.Platform;
 using Main.Modules.Notifications;
 using Main.Modules.Order;
 using Main.Modules.Organization;
 using Main.Modules.Sale;
 using Main.Modules.Storage;
 using Pricing.Module;
-using Main.Persistence;
+using Persistence.Common;
+using Persistence.Relations;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -47,7 +49,6 @@ using Tests.Interfaces.ServiceProvider;
 using Tests.Stubs;
 using Tests.TestContexts;
 using ZiggyCreatures.Caching.Fusion.Backplane;
-using ApplicationServiceProvider = Main.Application.ServiceProvider;
 
 namespace Tests;
 
@@ -79,7 +80,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 			.Console(formatProvider: CultureInfo.InvariantCulture)
 			.CreateLogger();
 
-		ApplicationServiceProvider.AddApplicationLayer(services, null).AddLocan().AddPersistenceLayer();
+		services.AddLocan();
 		services.AddModule<CurrencyModule>(new ConfigurationBuilder().Build());
 		services.AddModule<ProductModule>(new ConfigurationBuilder().Build());
 		services.AddModule<IdentityModule>(new ConfigurationBuilder().Build());
@@ -90,11 +91,13 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddModule<CartModule>(new ConfigurationBuilder().Build());
 		services.AddModule<DocumentsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<JobsModule>(new ConfigurationBuilder().Build());
+		services.AddModule<PlatformModule>(new ConfigurationBuilder().Build());
 		services.AddModule<NotificationsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrderModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrganizationModule>(new ConfigurationBuilder().Build());
 		services.AddModule<StorageModule>(new ConfigurationBuilder().Build());
 		services.AddModule<PricingModule>(new ConfigurationBuilder().Build());
+		services.AddPersistenceCore().AddRelationsPersistence();
 		services.AddSingleton<ILrtNamedObject, JobScheduleTestLrt>();
 		services.AddSingleton<ILrtNamedObject, QuotaTestLrt>();
 		services.AddLrtQuota(QuotaTestLrt.QuotaName, 1);
@@ -168,7 +171,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services
 			.AddJsonSigner()
 			.AddCacheLayer("test")
-			.AddApplicationCache()
+			.AddOneTimeTokens()
 			.AddFullSecurityLayer(passwordRules)
 			.AddCommonLayer();
 

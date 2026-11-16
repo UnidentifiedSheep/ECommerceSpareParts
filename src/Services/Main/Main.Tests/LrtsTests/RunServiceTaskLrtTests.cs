@@ -7,7 +7,7 @@ using Contracts.Tasks;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.RunServiceTask;
+using Main.Modules.Jobs.Application.LRT.RunServiceTask;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Tests.Stubs;

@@ -1,3 +1,4 @@
+using Enums;
 using System.Text.Json.Serialization;
 using Main.Enums.Balances;
 

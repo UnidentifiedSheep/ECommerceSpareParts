@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddPricingApplication(this IServiceCollection services)
 	{
 		var assembly = typeof(Global).Assembly;
-		SortByConfig.Configure();
+		PricingSortByConfig.Configure();
 
 		services
 			.AddModuleApplication(assembly)

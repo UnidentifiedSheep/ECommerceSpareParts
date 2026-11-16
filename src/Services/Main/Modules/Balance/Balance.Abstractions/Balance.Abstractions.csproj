@@ -9,7 +9,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Main.Enums\Main.Enums.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Balance.Entities\Balance.Entities.csproj"/>
     </ItemGroup>
 
 </Project>
