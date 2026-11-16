@@ -20,6 +20,7 @@
         <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\..\Analytics\Analytics.Abstractions\Analytics.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Currency\Currency.Abstractions\Currency.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Product\Product.Abstractions\Product.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Storage\Storage.Abstractions\Storage.Abstractions.csproj"/>

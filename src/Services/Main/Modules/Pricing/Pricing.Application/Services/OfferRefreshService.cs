@@ -1,7 +1,7 @@
+using Main.Modules.Product.Abstractions;
+using Pricing.Application.Events;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Events;
-using Contracts.Pricing;
-using Contracts.Supplier;
 using Enums;
 using Integrations.Supplier.Models;
 using Microsoft.Extensions.Logging;

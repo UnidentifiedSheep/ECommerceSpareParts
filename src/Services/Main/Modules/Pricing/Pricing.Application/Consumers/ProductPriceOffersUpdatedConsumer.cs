@@ -1,4 +1,4 @@
-using Contracts.Pricing;
+using Pricing.Application.Events;
 using MassTransit;
 using MediatR;
 using Pricing.Application.Dtos.Price;

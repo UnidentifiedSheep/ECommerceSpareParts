@@ -1,5 +1,5 @@
-using Contracts.Analytics;
-using Contracts.Currency;
+using Main.Modules.Currency.Abstractions;
+using Pricing.Application.Events;
 using MassTransit;
 
 namespace Pricing.Application.Consumers;

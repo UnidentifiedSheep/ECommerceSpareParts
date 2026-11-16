@@ -1,4 +1,4 @@
-namespace Contracts.Currency;
+namespace Main.Modules.Currency.Abstractions;
 
 public record CurrencyRateChangedEvent
 {

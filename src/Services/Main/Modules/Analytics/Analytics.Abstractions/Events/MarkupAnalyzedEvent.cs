@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Contracts.Analytics;
+namespace Main.Modules.Analytics.Abstractions;
 
 public record MarkupAnalyzedEvent
 {

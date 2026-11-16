@@ -1,3 +1,4 @@
+using Pricing.Application.Events;
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
@@ -5,7 +6,6 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Analytics;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Entities;

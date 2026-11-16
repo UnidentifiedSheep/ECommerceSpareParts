@@ -1,4 +1,4 @@
-using Contracts.Currency;
+using Main.Modules.Currency.Abstractions;
 using Main.Application.Interfaces.Services.Currency;
 using MassTransit;
 

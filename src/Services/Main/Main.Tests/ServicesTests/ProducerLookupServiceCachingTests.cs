@@ -1,3 +1,4 @@
+using Main.Modules.Product.Application.Events;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
@@ -125,7 +126,7 @@ public sealed class ProducerLookupServiceCachingTests : IntegrationTest
 		var publisher = (MessageBrokerStub)transaction.Context.Publisher;
 		publisher.PublishedMessagesOfType<ProducerLookupChangedEvent>().Should().ContainSingle();
 		await new ProducerLookupChangedConsumer(service).Consume(
-			Mock.Of<ConsumeContext<ProducerLookupChangedEvent>>());
+			Mock.Of<ConsumeContext<Batch<ProducerLookupChangedEvent>>>());
 		var after = await service.Load(CancellationToken);
 		after.Should().NotBeSameAs(before);
 		before.ResolveId("Snapshot Original").Should().Be(producer.Id);

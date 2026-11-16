@@ -1,10 +1,10 @@
+using Pricing.Application.Events;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Services;
 using Application.Common.LRT;
 using Attributes;
-using Contracts.Analytics;
 using Main.Application.Interfaces.Services.Currency;
 using MassTransit;
 using Pricing.Application.Interfaces.Markup;

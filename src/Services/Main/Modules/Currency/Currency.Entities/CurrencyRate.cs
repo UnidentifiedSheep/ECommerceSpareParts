@@ -4,7 +4,7 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Currency;
 
-public class CurrencyRate : AuditableEntity<CurrencyRate, int>, ILinqEntity<CurrencyRate, int>
+public class CurrencyRate : AuditableEntity<CurrencyRate, int>, ILinqEntity<CurrencyRate, int>, IGenerateAutomaticDomainEvents
 {
 	private CurrencyRate() { }
 

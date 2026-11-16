@@ -1,9 +1,6 @@
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Contracts.Currency;
-using Main.Application.Extensions.Entities;
 using Main.Entities.Currency;
 
 namespace Main.Application.Handlers.Currencies.CreateCurrency;
@@ -18,7 +15,7 @@ public record CreateCurrencyCommand(
 
 public record CreateCurrencyResult(int Id);
 
-public class CreateCurrencyHandler(IUnitOfWork unitOfWork, IIntegrationEventScope integrationEventScope)
+public class CreateCurrencyHandler(IUnitOfWork unitOfWork)
 	: ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
 {
 	public async Task<CreateCurrencyResult> Handle(
@@ -31,12 +28,6 @@ public class CreateCurrencyHandler(IUnitOfWork unitOfWork, IIntegrationEventScop
 			request.CurrencySign,
 			request.Code);
 		await unitOfWork.AddAsync(model, cancellationToken);
-
-		integrationEventScope.Add(
-			new CurrencyCreatedEvent
-			{
-				Currency = model.ToContract()
-			});
 
 		return new CreateCurrencyResult(model.Id);
 	}

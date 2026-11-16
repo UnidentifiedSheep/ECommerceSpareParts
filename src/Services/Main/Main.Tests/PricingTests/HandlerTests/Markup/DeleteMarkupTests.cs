@@ -1,6 +1,6 @@
+using Pricing.Application.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Settings;
-using Contracts.Analytics;
 using FluentAssertions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -1,7 +1,7 @@
+using Pricing.Application.Events;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Application.Common.Interfaces.Settings;
-using Contracts.Analytics;
 using Exceptions;
 using FluentAssertions;
 using Moq;

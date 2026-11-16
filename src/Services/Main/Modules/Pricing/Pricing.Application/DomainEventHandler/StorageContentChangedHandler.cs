@@ -1,8 +1,8 @@
+using Pricing.Application.Events;
 using System.Globalization;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
-using Contracts.Pricing;
 using Main.Modules.Storage.Abstractions.Events;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities.Offers;

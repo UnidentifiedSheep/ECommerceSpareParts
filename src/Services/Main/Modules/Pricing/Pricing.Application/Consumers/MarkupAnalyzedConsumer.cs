@@ -1,4 +1,4 @@
-using Contracts.Analytics;
+using Main.Modules.Analytics.Abstractions;
 using MassTransit;
 using MediatR;
 using Pricing.Application.Dtos.Markup;

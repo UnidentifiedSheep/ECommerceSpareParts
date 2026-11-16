@@ -27,7 +27,7 @@ public class ModuleBoundariesTests
 		["Currency"] = ["Jobs", "Platform"],
 		["Product"] = ["Jobs"],
 		["Storage"] = ["Currency", "Platform", "Product"],
-		["Pricing"] = ["Currency", "Product", "Storage", "Jobs", "Platform"],
+		["Pricing"] = ["Analytics", "Currency", "Product", "Storage", "Jobs", "Platform"],
 		["Organization"] = ["Identity"],
 		["Analytics"] = ["Currency", "Sale", "Jobs"],
 		["Balance"] = ["Currency", "Identity", "Organization", "Jobs"],

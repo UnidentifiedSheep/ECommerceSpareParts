@@ -1,10 +1,10 @@
+using Pricing.Application.Events;
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Analytics;
 using Enums;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Markup;

@@ -1,3 +1,4 @@
+using Main.Modules.Product.Application.Events;
 using System.Text.Json;
 using Contracts.Producer;
 using Domain.CommonEnums;

@@ -1,5 +1,5 @@
+using Main.Modules.Product.Abstractions;
 using Application.Common.Extensions;
-using Contracts.Supplier;
 using MassTransit;
 using MediatR;
 using Pricing.Application.Handlers.Pricing;

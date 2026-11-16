@@ -1,6 +1,6 @@
 using Contracts.Interfaces;
 
-namespace Contracts.Producer;
+namespace Main.Modules.Product.Application.Events;
 
 public sealed record ProducerLookupChangedEvent : IKeyedEvent
 {

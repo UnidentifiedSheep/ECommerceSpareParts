@@ -1,3 +1,6 @@
+using Main.Modules.Currency.Abstractions;
+using Main.Modules.Product.Application.Events;
+using Pricing.Application.Events;
 using Application.Common.Host;
 using System.Reflection;
 using Abstractions;
@@ -31,7 +34,6 @@ using Main.Modules.Order;
 using Main.Modules.Organization;
 using Main.Modules.Sale;
 using Main.Modules.Storage;
-using Contracts.Analytics;
 using Pricing.Application.Consumers;
 using Pricing.Module;
 using Persistence.Common;
@@ -155,9 +157,11 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
 					ep.ConfigureConsumer<BackplaneConsumer>(context);
 					ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
+					ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 					ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 					ep.Bind<BackplaneMessage>();
 					ep.Bind<ProducerLookupChangedEvent>();
+					ep.Bind<CurrencyRateChangedEvent>();
 					ep.Bind<MarkupRangesRefreshRequestedEvent>();
 				});
 
@@ -170,8 +174,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 					ep.ConcurrentMessageLimit = 4;
 					ep.PrefetchCount = 1;
 
-					ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
-					ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 					ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
 					ep.ConfigureConsumer<PricingCurrencyRatesChangedConsumer>(context);
 					ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);

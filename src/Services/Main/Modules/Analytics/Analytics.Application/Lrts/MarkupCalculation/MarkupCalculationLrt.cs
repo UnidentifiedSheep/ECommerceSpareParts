@@ -1,7 +1,7 @@
+using Main.Modules.Analytics.Abstractions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
-using Contracts.Analytics;
 using Locan.Core.Interfaces;
 using Main.Application.Analytics.Analyzers;
 using Main.Application.Analytics.Analyzers.Markup;

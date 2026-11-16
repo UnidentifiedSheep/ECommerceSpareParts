@@ -1,3 +1,4 @@
+using Main.Modules.Product.Application.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Models.Options.S3;
 using Attributes;

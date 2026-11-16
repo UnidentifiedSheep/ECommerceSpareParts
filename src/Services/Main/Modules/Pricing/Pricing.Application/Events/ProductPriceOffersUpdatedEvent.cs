@@ -1,6 +1,6 @@
 using Contracts.Interfaces;
 
-namespace Contracts.Pricing;
+namespace Pricing.Application.Events;
 
 public record ProductPriceOffersUpdatedEvent : IKeyedEvent
 {

@@ -1,6 +1,6 @@
 using Contracts.Models.Supplier;
 
-namespace Contracts.Supplier;
+namespace Main.Modules.Product.Abstractions;
 
 public record SupplierProductsRequestedEvent
 {

@@ -1,3 +1,4 @@
+using Main.Modules.Product.Application.Events;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;

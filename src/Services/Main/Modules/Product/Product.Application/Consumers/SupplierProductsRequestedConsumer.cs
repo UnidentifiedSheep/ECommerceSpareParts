@@ -1,4 +1,4 @@
-using Contracts.Supplier;
+using Main.Modules.Product.Abstractions;
 using Main.Application.Handlers.ProductEnrichment;
 using MassTransit;
 using MediatR;

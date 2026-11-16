@@ -6,7 +6,7 @@ using Domain.Validation;
 
 namespace Main.Entities.Currency;
 
-public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
+public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>, IGenerateAutomaticDomainEvents
 {
 	private readonly List<CurrencyRate> _ratesFrom = [];
 

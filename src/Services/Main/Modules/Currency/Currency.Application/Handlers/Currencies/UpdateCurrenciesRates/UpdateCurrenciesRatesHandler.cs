@@ -1,8 +1,6 @@
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Currency;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Entities.Settings;
 using MediatR;
@@ -17,7 +15,6 @@ public record UpdateCurrenciesRatesCommand : ICommand;
 public class UpdateCurrenciesRatesHandler(
 	ILogger<UpdateCurrenciesRatesCommand> logger,
 	ICurrencyRateUpdater updater,
-	IIntegrationEventScope integrationEventScope,
 	ISettingsService settingsService) : ICommandHandler<UpdateCurrenciesRatesCommand>
 {
 	public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
@@ -28,13 +25,6 @@ public class UpdateCurrenciesRatesHandler(
 
 		if (result.NotFound.Count > 0)
 			logger.LogWarning("Missing rates: {@Currencies}", result.NotFound);
-
-		if (result.Changed.Count > 0)
-			integrationEventScope.Add(
-				new CurrencyRateChangedEvent
-				{
-					Rates = result.Changed
-				});
 
 		return Unit.Value;
 	}

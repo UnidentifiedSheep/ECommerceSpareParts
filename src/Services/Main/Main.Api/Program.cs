@@ -1,3 +1,6 @@
+using Main.Modules.Currency.Abstractions;
+using Main.Modules.Product.Application.Events;
+using Pricing.Application.Events;
 using Notification.Extensions;
 using Application.Common.Host;
 using System.Reflection;
@@ -39,7 +42,6 @@ using Main.Modules.Order;
 using Main.Modules.Organization;
 using Main.Modules.Sale;
 using Main.Modules.Storage;
-using Contracts.Analytics;
 using Pricing.Application.Consumers;
 using Pricing.Module;
 using Persistence.Common;
@@ -130,25 +132,17 @@ builder.Services.AddMassTransit(x =>
 				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 				ep.ConfigureConsumer<BackplaneConsumer>(context);
 				ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
-					ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
+				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+				ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
 				ep.Bind<BackplaneMessage>();
 				ep.Bind<ProducerLookupChangedEvent>();
-					ep.Bind<MarkupRangesRefreshRequestedEvent>();
+				ep.Bind<CurrencyRateChangedEvent>();
+				ep.Bind<MarkupRangesRefreshRequestedEvent>();
 				ep
 					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
 					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
-			});
-
-		cfg.ReceiveEndpoint(
-			"main-queue",
-			ep =>
-			{
-				ep.Durable = true;
-
-				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-				ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
 			});
 	});
 });
