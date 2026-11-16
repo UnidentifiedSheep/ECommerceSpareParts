@@ -1,7 +1,7 @@
 using Enums;
 using FluentAssertions;
 using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;

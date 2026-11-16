@@ -4,7 +4,7 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Product;
+namespace Main.Entities.Product.Product;
 
 public class ProductCharacteristic : Entity<ProductCharacteristic, (int, int)>,
 	ILinqEntity<ProductCharacteristic, (int, int)>,

@@ -1,9 +1,8 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Product;
 
-namespace Main.Application.Products.Commands.CreateProducts;
+namespace Main.Modules.Product.Application.Products.Commands.CreateProducts;
 
 public class CreateProductsDbValidation : AbstractDbValidation<CreateProductsCommand>
 {

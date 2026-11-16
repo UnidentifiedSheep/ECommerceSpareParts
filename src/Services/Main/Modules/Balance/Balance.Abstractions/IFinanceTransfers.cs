@@ -1,5 +1,4 @@
 using Enums;
-using Main.Enums.Balances;
 
 namespace Main.Modules.Balance.Abstractions;
 

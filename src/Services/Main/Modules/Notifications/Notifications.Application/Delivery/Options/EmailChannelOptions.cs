@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MailKit.Security;
 
-namespace Notification.Options;
+namespace Main.Modules.Notifications.Application.Delivery.Options;
 
 public record EmailChannelOptions : ChannelOptionsBase
 {

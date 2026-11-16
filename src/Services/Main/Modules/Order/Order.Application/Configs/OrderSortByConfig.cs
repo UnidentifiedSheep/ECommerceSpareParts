@@ -1,25 +1,24 @@
 using Application.Common.Querying;
-using Main.Entities.Order;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Order.Application.Configs;
 
 public static class OrderSortByConfig
 {
 	public static void Configure()
 		=> QueryableSortBy.Value
-			.MapDefault<Order, DateTime>(order => order.CreatedAt, true)
-			.Map<Order, Guid>("id", order => order.Id)
-			.Map<Order, DateTime>("createdAt", order => order.CreatedAt)
-			.Map<Order, DateTime>("updatedAt", order => order.UpdatedAt)
-			.Map<Order, DateTime?>("confirmedAt", order => order.ConfirmedAt)
-			.Map<Order, int>(
+			.MapDefault<Entities.Order.Order.Order, DateTime>(order => order.CreatedAt, true)
+			.Map<Entities.Order.Order.Order, Guid>("id", order => order.Id)
+			.Map<Entities.Order.Order.Order, DateTime>("createdAt", order => order.CreatedAt)
+			.Map<Entities.Order.Order.Order, DateTime>("updatedAt", order => order.UpdatedAt)
+			.Map<Entities.Order.Order.Order, DateTime?>("confirmedAt", order => order.ConfirmedAt)
+			.Map<Entities.Order.Order.Order, int>(
 				"status",
 				order => order.Status == OrderStatus.Pending ? (int)OrderStatus.Pending :
 					order.Status == OrderStatus.Confirmed ? (int)OrderStatus.Confirmed :
 					order.Status == OrderStatus.Completed ? (int)OrderStatus.Completed :
 					(int)OrderStatus.Cancelled)
-			.Map<Order, int>(
+			.Map<Entities.Order.Order.Order, int>(
 				"fulfillmentStatus",
 				order =>
 					order.FulfillmentStatus == OrderFulfillmentStatus.NotAvailable ?
@@ -27,5 +26,5 @@ public static class OrderSortByConfig
 						order.FulfillmentStatus == OrderFulfillmentStatus.PartiallyAvailable ?
 							(int)OrderFulfillmentStatus.PartiallyAvailable :
 							(int)OrderFulfillmentStatus.FullyAvailable)
-			.Map<Order, OrderSource>("source", order => order.Source);
+			.Map<Entities.Order.Order.Order, OrderSource>("source", order => order.Source);
 }

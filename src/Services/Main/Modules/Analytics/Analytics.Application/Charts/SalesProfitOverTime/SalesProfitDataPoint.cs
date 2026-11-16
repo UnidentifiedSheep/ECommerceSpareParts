@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
-using Main.Application.Analytics.Interfaces.ChartData;
+using Main.Modules.Analytics.Abstractions.Interfaces.ChartData;
 using SchemaGeneration.Abstractions.Attributes;
 
-namespace Main.Application.Analytics.Charts.SalesProfitOverTime;
+namespace Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
 
 public sealed record SalesProfitDataPoint : IChartDataPoint
 {

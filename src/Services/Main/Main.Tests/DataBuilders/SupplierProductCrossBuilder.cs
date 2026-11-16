@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;

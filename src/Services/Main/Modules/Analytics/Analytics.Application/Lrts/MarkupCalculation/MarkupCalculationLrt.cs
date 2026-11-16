@@ -1,15 +1,15 @@
-using Main.Modules.Analytics.Abstractions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
-using Main.Application.Analytics.Analyzers;
-using Main.Application.Analytics.Analyzers.Markup;
 using Main.Entities;
+using Main.Modules.Analytics.Abstractions.Analyzers;
+using Main.Modules.Analytics.Abstractions.Analyzers.Markup;
+using Main.Modules.Analytics.Abstractions.Events;
 using Microsoft.Extensions.Logging;
 using NamedObject.Core.Interfaces;
 
-namespace Main.Application.Analytics.Lrts.MarkupCalculation;
+namespace Main.Modules.Analytics.Application.Lrts.MarkupCalculation;
 
 public class MarkupCalculationLrt(
 	IApplicationTransactionFactory transactionService,

@@ -1,9 +1,9 @@
 using System.Collections.Frozen;
 using Enums;
-using Main.Application.Interfaces.Services;
-using ProducerEntity = Main.Entities.Producer.Producer;
+using Main.Modules.Product.Application.Interfaces.Services;
+using ProducerEntity = Main.Entities.Product.Producer.Producer;
 
-namespace Main.Application.Models.Producer;
+namespace Main.Modules.Product.Application.Models.Producer;
 
 public class ProducerLookup(
 	IReadOnlyDictionary<string, int> producerNamesToIds,

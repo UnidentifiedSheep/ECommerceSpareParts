@@ -1,8 +1,8 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Analytics.Charts.SalesProfitOverTime;
-using Main.Application.Analytics.Queries;
-using Main.Entities.Exceptions.Analytics;
+using Main.Entities.Analytics.Exceptions;
+using Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
+using Main.Modules.Analytics.Application.Queries;
 using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Analytics;

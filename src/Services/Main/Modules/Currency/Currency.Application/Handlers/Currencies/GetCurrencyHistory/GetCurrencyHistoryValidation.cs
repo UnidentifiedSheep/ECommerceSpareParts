@@ -1,7 +1,7 @@
 ﻿using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Currencies.GetCurrencyHistory;
+namespace Main.Modules.Currency.Application.Handlers.Currencies.GetCurrencyHistory;
 
 public class GetCurrencyHistoryValidation : AbstractValidator<GetCurrencyHistoryQuery>
 {

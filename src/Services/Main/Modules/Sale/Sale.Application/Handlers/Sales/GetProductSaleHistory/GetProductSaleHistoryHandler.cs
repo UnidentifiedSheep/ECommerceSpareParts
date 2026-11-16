@@ -4,13 +4,13 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Sale;
-using Main.Application.Extensions.QueryExtensions;
+using Main.Entities.Sale.Sale;
 using Main.Modules.Product.Abstractions;
-using Main.Entities.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Sales.GetProductSaleHistory;
+namespace Main.Modules.Sale.Application.Handlers.Sales.GetProductSaleHistory;
 
 public record GetProductSaleHistoryQuery(
 	int ProductId,

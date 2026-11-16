@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using MediatR;
 
-namespace Main.Application.Products.Commands.CreateProductEan;
+namespace Main.Modules.Product.Application.Products.Commands.CreateProductEan;
 
 [AutoSave]
 [Transactional]

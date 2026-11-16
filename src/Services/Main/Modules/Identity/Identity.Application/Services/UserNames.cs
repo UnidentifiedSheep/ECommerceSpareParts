@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Repositories;
 using Main.Entities.User;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Identity.Application.Services;
 
 public sealed class UserNames(IReadRepository<User, Guid> users) : IUserNames
 {

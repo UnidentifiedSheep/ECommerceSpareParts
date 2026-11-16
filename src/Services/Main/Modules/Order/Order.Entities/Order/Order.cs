@@ -3,9 +3,9 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 using Exceptions;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
 
-namespace Main.Entities.Order;
+namespace Main.Entities.Order.Order;
 
 public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>, IVersionable<uint>
 {

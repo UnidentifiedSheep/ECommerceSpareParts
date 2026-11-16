@@ -2,11 +2,11 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
 using MediatR;
 
-namespace Main.Application.Products.Commands;
+namespace Main.Modules.Product.Application.Products.Commands;
 
 [AutoSave]
 [Transactional]

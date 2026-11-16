@@ -2,8 +2,9 @@
 using Exceptions;
 using FluentAssertions;
 using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
 using Main.Entities.Organization;
-using Main.Enums.Balances;
 
 namespace Tests.Domain.Balance;
 

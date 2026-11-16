@@ -1,5 +1,6 @@
 using Application.Common.Querying;
 using Main.Entities.Documents;
+using Main.Entities.Documents.Documents;
 
 namespace Main.Modules.Documents.Application.Configs;
 

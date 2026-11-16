@@ -1,6 +1,6 @@
 using Notification.Core.Interfaces.Notification;
 
-namespace Notification.Interfaces;
+namespace Main.Modules.Notifications.Application.Delivery.Interfaces;
 
 public interface INotificationRenderer<in TNotification>
 {

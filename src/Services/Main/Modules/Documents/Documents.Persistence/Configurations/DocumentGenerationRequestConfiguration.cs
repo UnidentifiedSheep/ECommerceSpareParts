@@ -1,8 +1,8 @@
-using Main.Entities.Documents;
+using Main.Entities.Documents.Documents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Documents;
+namespace Main.Modules.Documents.Persistence.Configurations;
 
 public sealed class DocumentGenerationRequestConfiguration
 	: IEntityTypeConfiguration<DocumentGenerationRequest>

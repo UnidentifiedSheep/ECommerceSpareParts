@@ -1,8 +1,8 @@
-using Main.Entities.Sale;
+using Main.Entities.Sale.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Sale;
+namespace Main.Modules.Sale.Persistence.Configurations;
 
 public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
 {
@@ -42,7 +42,7 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
 		builder.Property(e => e.TotalSum).HasColumnName("total_sum");
 
 		builder
-			.HasOne<Entities.Sale.Sale>(e => e.Sale)
+			.HasOne<Entities.Sale.Sale.Sale>(e => e.Sale)
 			.WithMany(p => p.Contents)
 			.HasForeignKey(d => d.SaleId)
 			.HasConstraintName("sale_content_sale_id_fk");

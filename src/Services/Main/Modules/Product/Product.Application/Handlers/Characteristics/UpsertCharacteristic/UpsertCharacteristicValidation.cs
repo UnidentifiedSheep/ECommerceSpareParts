@@ -1,9 +1,9 @@
 using Application.Common.Extensions;
 using FluentValidation;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
 
-namespace Main.Application.Handlers.Characteristics.UpsertCharacteristic;
+namespace Main.Modules.Product.Application.Handlers.Characteristics.UpsertCharacteristic;
 
 public class UpsertCharacteristicValidation : AbstractValidator<UpsertCharacteristicCommand>
 {

@@ -1,3 +1,4 @@
+using Main.Entities.Product.Stock;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;

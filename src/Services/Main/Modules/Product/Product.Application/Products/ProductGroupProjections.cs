@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 
-namespace Main.Application.Products;
+namespace Main.Modules.Product.Application.Products;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProductGroupDtoProjectionProvider : ProjectionProviderBase<ProductGroup, ProductGroupDto>

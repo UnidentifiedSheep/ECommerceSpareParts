@@ -1,27 +1,26 @@
-using Enums;
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
+using Enums;
 using FluentValidation;
 using LinqKit;
-using Main.Application.Dtos.Storage;
-using Main.Application.Extensions;
-using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Application.Handlers.StorageContents.RestoreContent;
-using Main.Application.Models;
-using Main.Application.Interfaces.Services;
-using Main.Application.Models.Storage;
-using Main.Application.NamedObjects.StorageContentExtractPolicies;
-using Main.Entities.Exceptions;
-using Main.Entities.Settings;
-using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Exceptions;
+using Main.Entities.Storage.Settings;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Models;
+using Main.Modules.Storage.Application.Dtos.Storage;
+using Main.Modules.Storage.Application.Extensions;
+using Main.Modules.Storage.Application.Handlers.StorageContents.AddContent;
+using Main.Modules.Storage.Application.Handlers.StorageContents.RestoreContent;
+using Main.Modules.Storage.Application.Models;
+using Main.Modules.Storage.Application.NamedObjects.StorageContentExtractPolicies;
 using MediatR;
 using NamedObject.Core.Interfaces;
 
-namespace Main.Application.Services.Storage;
+namespace Main.Modules.Storage.Application.Services.Storage;
 
 public sealed class StorageContentService(
 	IRepository<StorageContent, int> repository,

@@ -1,9 +1,11 @@
 using Application.Common.Models;
-using Main.Application.Dtos.Storage;
-using Main.Application.Handlers.Storages.EditStorage;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
+using Main.Entities.Storage.Exceptions;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Dtos.Storage;
+using Main.Modules.Storage.Application.Handlers.Storages.EditStorage;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

@@ -1,4 +1,4 @@
-namespace Main.Application.Models;
+namespace Main.Modules.Storage.Application.Models;
 
 public record RestoreContentItem(
 	int StorageContentId,

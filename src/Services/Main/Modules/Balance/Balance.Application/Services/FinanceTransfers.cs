@@ -1,14 +1,13 @@
-using Enums;
 using Abstractions.Models.Options;
-using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Application.Handlers.Balance.ReverseTransaction;
-using Main.Application.Interfaces.Services;
+using Enums;
+using Main.Entities.Balance.Enums.Balances;
 using Main.Modules.Balance.Abstractions;
-using Main.Enums.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
+using Main.Modules.Balance.Application.Handlers.Balance.ReverseTransaction;
 using MediatR;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Balance.Application.Services;
 
 public sealed class FinanceTransfers(ISender sender, IOptions<SystemOptions> systemOptions) : IFinanceTransfers
 {

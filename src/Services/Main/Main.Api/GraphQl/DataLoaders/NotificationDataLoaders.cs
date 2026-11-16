@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Users;
-using Main.Application.Handlers.Notifications;
+using Main.Modules.Notifications.Application.Dtos;
+using Main.Modules.Notifications.Application.Handlers.Notifications;
 using MediatR;
 using Security.Core.Interfaces;
 

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Purchase;
+namespace Main.Modules.Purchase.Application.Dtos.Purchase;
 
 public record PurchaseContentDto
 {

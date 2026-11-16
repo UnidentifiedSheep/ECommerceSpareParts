@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Dtos.NotificationPreference;
+using Main.Modules.Notifications.Application.Dtos.NotificationPreference;
 
 namespace Main.Api.GraphQl.Types.Notification;
 

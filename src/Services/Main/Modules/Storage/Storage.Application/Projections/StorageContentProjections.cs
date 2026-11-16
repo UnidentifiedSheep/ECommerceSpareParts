@@ -1,11 +1,10 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using LinqKit;
-using Main.Application.Dtos.Storage;
-using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Dtos.Storage;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Storage.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class

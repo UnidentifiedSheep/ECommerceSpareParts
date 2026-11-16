@@ -1,7 +1,7 @@
-﻿using Main.Entities.Storage;
+﻿using Main.Entities.Storage.Storage;
 using NamedObject.Core.Base;
 
-namespace Main.Application.NamedObjects.StorageContentExtractPolicies;
+namespace Main.Modules.Storage.Application.NamedObjects.StorageContentExtractPolicies;
 
 public abstract class StorageContentExtractPolicyBase : LocalizableNameObject
 {

@@ -4,7 +4,7 @@ using Application.Common.Validators;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Orders.Queries.GetOrders;
+namespace Main.Modules.Order.Application.Orders.Queries.GetOrders;
 
 public sealed class GetOrdersValidation : AbstractValidator<GetOrdersQuery>
 {

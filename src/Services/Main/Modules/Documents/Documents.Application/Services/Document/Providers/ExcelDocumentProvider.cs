@@ -1,8 +1,7 @@
 using Enums;
-using Main.Application.Interfaces.Services.Document;
-using Main.Enums.Documents;
+using Main.Application.Document.Interfaces.Document;
 
-namespace Main.Application.Services.Document.Providers;
+namespace Main.Modules.Documents.Application.Services.Document.Providers;
 
 public sealed class ExcelDocumentProvider : IDocumentProvider
 {

@@ -1,8 +1,8 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 
-namespace Main.Application.Handlers.StorageContents.EditContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.EditContent;
 
 public class EditStorageContentDbValidation(ICurrencyChecks currencyChecks)
 	: AbstractDbValidation<EditStorageContentCommand>

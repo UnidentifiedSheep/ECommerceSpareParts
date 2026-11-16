@@ -1,8 +1,8 @@
-using Main.Modules.Currency.Abstractions;
-using Main.Application.Interfaces.Services.Currency;
+using Main.Modules.Currency.Abstractions.Events;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using MassTransit;
 
-namespace Main.Application.Consumers;
+namespace Main.Modules.Currency.Application.Consumers;
 
 public class CurrencyRatesChangedConsumer(ICurrencyRateSnapshotProvider rates)
 	: IConsumer<CurrencyRateChangedEvent>

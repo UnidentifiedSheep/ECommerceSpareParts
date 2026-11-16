@@ -1,8 +1,9 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 
-namespace Application.Common.LRT;
+namespace Main.Modules.Jobs.Application.LRT;
 
 public sealed class LrtQuotaCatalog(
 	IServiceScopeFactory scopeFactory,

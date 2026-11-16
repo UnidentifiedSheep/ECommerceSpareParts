@@ -2,12 +2,12 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.NotificationPreference;
 using Main.Entities.User;
+using Main.Modules.Notifications.Application.Dtos.NotificationPreference;
 using MediatR;
 using Notification.Core.Recipients;
 
-namespace Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
+namespace Main.Modules.Notifications.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 
 [Transactional]
 [AutoSave]

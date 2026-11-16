@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Settings;
 using Contracts.Settings;
 using FluentAssertions;
+using Main.Entities.Suppliers.Settings.Supplier;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Main.Entities.Settings.Supplier;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
 

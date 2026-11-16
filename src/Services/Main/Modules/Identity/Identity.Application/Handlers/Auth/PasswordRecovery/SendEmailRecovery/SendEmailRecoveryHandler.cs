@@ -2,18 +2,18 @@
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
-using Main.Application.Interfaces.Services.PayloadProvider;
-using Main.Application.Notifications;
+using Main.Entities.Enums.Auth;
 using Main.Entities.User;
-using Main.Enums.Auth;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
+using Main.Modules.Identity.Application.Interfaces.Services;
+using Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
+using Main.Modules.Identity.Application.Notifications;
 using MediatR;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
+namespace Main.Modules.Identity.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 
 [Transactional]
 [AutoSave]

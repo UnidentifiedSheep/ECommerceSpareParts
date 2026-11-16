@@ -1,14 +1,14 @@
+using Application.Common;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
-using Main.Application.Analytics.Services;
-using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities;
+using Main.Modules.Analytics.Application.Services;
 using Main.Modules.Sale.Abstractions;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Analytics.Lrts.SaleAnalyticsSynchronization;
+namespace Main.Modules.Analytics.Application.Lrts.SaleAnalyticsSynchronization;
 
 public class SaleAnalyticsSynchronizationLrt(IApplicationTransactionFactory transactions,
 	ILogger<SaleAnalyticsSynchronizationLrt> logger)

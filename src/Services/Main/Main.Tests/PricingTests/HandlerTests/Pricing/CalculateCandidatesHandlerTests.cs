@@ -8,13 +8,13 @@ using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.PriceCandidates;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
-using Pricing.Enums;
-using Tests.PricingTests.DataBuilders.Offers;
 using Tests.Extensions;
+using Tests.PricingTests.DataBuilders.Offers;
 using Tests.TestContainers.Combined;
 
-namespace Tests.PricingTests.HandlerTests.PriceCalculation;
+namespace Tests.PricingTests.HandlerTests.Pricing;
 
 public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {

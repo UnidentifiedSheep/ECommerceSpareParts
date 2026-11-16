@@ -1,9 +1,9 @@
-using Main.Application.Analytics.Interfaces.ChartData;
+using Main.Modules.Analytics.Abstractions.Interfaces.ChartData;
 using NamedObject.Core.Base;
 using SchemaGeneration.Abstractions;
 using SchemaGeneration.Abstractions.Models;
 
-namespace Main.Application.Analytics.Charts;
+namespace Main.Modules.Analytics.Abstractions.Charts;
 
 public abstract class ChartDataSourceNamedObject : LocalizableNameObject
 {

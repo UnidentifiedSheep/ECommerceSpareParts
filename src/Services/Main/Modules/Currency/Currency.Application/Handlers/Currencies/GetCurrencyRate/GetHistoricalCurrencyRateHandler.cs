@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Currency;
+using Main.Modules.Currency.Abstractions.Interfaces;
 
-namespace Main.Application.Handlers.Currencies.GetCurrencyRate;
+namespace Main.Modules.Currency.Application.Handlers.Currencies.GetCurrencyRate;
 
 public sealed record GetHistoricalCurrencyRateQuery(int CurrencyId, DateTimeOffset ForDate)
 	: IQuery<GetCurrencyRateResult>;

@@ -1,10 +1,13 @@
 using Enums;
 using Application.Common.Services;
-using Main.Application.Dtos.Storage;
-using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Stock;
 using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Exceptions;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Dtos.Storage;
+using Main.Modules.Storage.Application.Handlers.StorageContents.AddContent;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

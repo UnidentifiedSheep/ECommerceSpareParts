@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Auth.GetRoles;
+namespace Main.Modules.Identity.Application.Handlers.Auth.GetRoles;
 
 public class GetRolesValidation : AbstractValidator<GetRolesQuery>
 {

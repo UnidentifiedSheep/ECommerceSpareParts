@@ -1,14 +1,14 @@
 using Application.Common.Interfaces.Persistence;
 using Attributes;
+using Main.Entities.Notification;
+using Main.Modules.Notifications.Application.Delivery.Interfaces;
 using Microsoft.Extensions.Logging;
 using Notification.Core;
-using Notification.Core.Entities;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
-using Notification.Interfaces;
 
-namespace Notification.Channels;
+namespace Main.Modules.Notifications.Application.Delivery.Channels;
 
 public class InAppChannel(
 	INotificationRenderer<ITextNotification> renderer,

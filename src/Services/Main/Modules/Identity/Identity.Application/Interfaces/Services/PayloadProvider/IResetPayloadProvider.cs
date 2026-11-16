@@ -1,7 +1,7 @@
-using Main.Application.Models.Auth;
-using Main.Enums.Auth;
+using Main.Entities.Enums.Auth;
+using Main.Modules.Identity.Application.Models.Auth;
 
-namespace Main.Application.Interfaces.Services.PayloadProvider;
+namespace Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
 
 public interface IResetPayloadProvider
 {

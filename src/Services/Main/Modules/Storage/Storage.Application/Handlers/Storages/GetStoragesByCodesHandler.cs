@@ -2,11 +2,10 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Storage;
-using Main.Entities.Storage;
+using Main.Modules.Storage.Application.Dtos.Storage;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Storages;
+namespace Main.Modules.Storage.Application.Handlers.Storages;
 
 public record GetStoragesByCodesQuery : IQuery<GetStoragesByCodesResult>
 {
@@ -23,8 +22,8 @@ public record GetStoragesByCodesQuery : IQuery<GetStoragesByCodesResult>
 public record GetStoragesByCodesResult(IReadOnlyList<StorageDto> Storages);
 
 public class GetStoragesByCodesHandler(
-	IReadRepository<Storage, string> repository,
-	IProjectionProvider<Storage, StorageDto> projection)
+	IReadRepository<Entities.Storage.Storage.Storage, string> repository,
+	IProjectionProvider<Entities.Storage.Storage.Storage, StorageDto> projection)
 	: IQueryHandler<GetStoragesByCodesQuery, GetStoragesByCodesResult>
 {
 	public async Task<GetStoragesByCodesResult> Handle(

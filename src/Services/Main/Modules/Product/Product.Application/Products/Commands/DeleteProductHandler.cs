@@ -4,14 +4,13 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Interfaces.Services;
 using MediatR;
 
-namespace Main.Application.Products.Commands;
+namespace Main.Modules.Product.Application.Products.Commands;
 
 [Transactional(
 	IsolationLevel.Serializable,
@@ -30,7 +29,7 @@ public class DeleteProductHandler(
 	{
 		var id = request.ProductId;
 		var product = await products.FirstOrDefaultAsync(
-				Criteria<Product>.New()
+				Criteria<Entities.Product.Product.Product>.New()
 					.Where(item => item.Id == id)
 					.Include(item => item.Images)
 					.Track()

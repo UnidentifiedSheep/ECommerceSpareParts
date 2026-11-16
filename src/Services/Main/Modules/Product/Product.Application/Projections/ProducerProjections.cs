@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using Main.Application.Dtos.Producer;
-using Main.Application.Dtos.Producer.Aliases;
-using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Dtos.Producer.Aliases;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Product.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class ProducerDtoProjectionProvider : ProjectionProviderBase<Producer, ProducerDto>

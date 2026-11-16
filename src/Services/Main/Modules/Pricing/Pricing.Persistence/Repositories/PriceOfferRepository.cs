@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 using Persistence.Repository;
 using Pricing.Application.Interfaces.Persistence;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
-using Pricing.Enums;
 using Security.Core.Interfaces;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
 

@@ -2,9 +2,9 @@ using Application.Common.Abstractions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Main.Entities.DomainEvents.User;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Events;
 
-namespace Main.Application.DomainEventHandlers.User.UserEmailUpdated;
+namespace Main.Modules.Identity.Application.DomainEventHandlers.User.UserEmailUpdated;
 
 public class PublishUserEmailChangedHandler(IDomainEventScope eventScope)
 	: BatchableDomainEventHandler<UserEmailUpdatedDomainEvent>

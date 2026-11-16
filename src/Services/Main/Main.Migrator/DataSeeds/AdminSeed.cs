@@ -1,7 +1,8 @@
 using Main.Entities.Auth;
+using Main.Entities.Enums;
 using Main.Entities.Organization;
+using Main.Entities.Organization.Organization;
 using Main.Entities.User;
-using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 using Persistence.Interfaces;

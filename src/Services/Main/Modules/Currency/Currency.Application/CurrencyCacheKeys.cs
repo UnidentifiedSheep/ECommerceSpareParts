@@ -1,4 +1,4 @@
-namespace Main.Application.Static;
+namespace Main.Modules.Currency.Application;
 
 public static class CurrencyCacheKeys
 {

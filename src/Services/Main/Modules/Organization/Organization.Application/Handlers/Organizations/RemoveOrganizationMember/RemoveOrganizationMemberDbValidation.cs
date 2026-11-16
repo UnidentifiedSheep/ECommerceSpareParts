@@ -1,9 +1,8 @@
 using Application.Common.Abstractions;
-using Main.Entities.Organization;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
+using Main.Entities.Organization;
 
-namespace Main.Application.Handlers.Organizations.RemoveOrganizationMember;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.RemoveOrganizationMember;
 
 public class RemoveOrganizationMemberDbValidation : AbstractDbValidation<RemoveOrganizationMemberCommand>
 {

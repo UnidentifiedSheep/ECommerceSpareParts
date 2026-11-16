@@ -1,9 +1,11 @@
 using Main.Entities.Analytics;
 using FluentAssertions;
-using Main.Application.Analytics.Analyzers;
-using Main.Application.Analytics.Analyzers.Markup;
 using Main.Entities.Sale;
-using Main.Enums;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Analytics.Abstractions.Analyzers;
+using Main.Modules.Analytics.Abstractions.Analyzers.Markup;
+using Main.Modules.Analytics.Application.Analyzers.Markup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Sale;

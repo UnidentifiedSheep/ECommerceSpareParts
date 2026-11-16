@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Domain.CommonEntities;
 using Domain.Interfaces;
 
-namespace Main.Entities.Settings.Supplier;
+namespace Main.Entities.Suppliers.Settings.Supplier;
 
 public class TmtrSupplierSetting : Setting<TmtrSupplierSettingData>, ISetting<TmtrSupplierSetting>
 {

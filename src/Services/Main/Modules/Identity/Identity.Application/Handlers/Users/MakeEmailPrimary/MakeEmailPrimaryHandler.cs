@@ -2,13 +2,13 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
-using Main.Application.Extensions;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Extensions;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
 using MediatR;
 
-namespace Main.Application.Handlers.Users.MakeEmailPrimary;
+namespace Main.Modules.Identity.Application.Handlers.Users.MakeEmailPrimary;
 
 [Transactional]
 [AutoSave]

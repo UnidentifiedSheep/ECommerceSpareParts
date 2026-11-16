@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
-using Application.Common.Handlers.Settings;
 using Enums;
+using Main.Modules.Platform.Application.Handlers.Settings;
 using MediatR;
 
-namespace Api.Common.EndPoints.Internal;
+namespace Main.Api.Settings;
 
 public record InternalGetRawSettingResponse
 {

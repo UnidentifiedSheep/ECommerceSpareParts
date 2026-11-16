@@ -1,11 +1,11 @@
 using Application.Common.Interfaces.Cache;
 using Cache.Extensions;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Models.Documents;
-using Main.Entities.Exceptions;
+using Main.Application.Document.Models;
+using Main.Entities.Documents.Exceptions;
+using Main.Modules.Documents.Application.Interfaces;
 using S3.Core.Interfaces;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Documents.Application.Services;
 
 public sealed class DocumentLinkProvider(ICache cache, IS3Service s3Service) : IDocumentLinkProvider
 {

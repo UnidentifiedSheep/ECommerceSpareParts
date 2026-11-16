@@ -2,7 +2,7 @@ using Application.Common.Validators;
 using FluentValidation;
 using Main.Entities.User;
 
-namespace Main.Application.Handlers.Users.GetUsers;
+namespace Main.Modules.Identity.Application.Handlers.Users.GetUsers;
 
 public class GetUsersValidation : AbstractValidator<GetUsersQuery>
 {

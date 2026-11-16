@@ -5,9 +5,9 @@ using Application.Common.Interfaces.Repositories;
 using Contracts.Models.CatalogueCandidate;
 using Contracts.ProductEnrichment;
 using Microsoft.EntityFrameworkCore;
-using Candidate = Main.Entities.Product.Enrichment.CatalogueCandidate;
+using Candidate = Main.Entities.Product.Product.Enrichment.CatalogueCandidate;
 
-namespace Main.Application.DomainEventHandlers.CatalogueCandidate;
+namespace Main.Modules.Product.Application.DomainEventHandlers.CatalogueCandidate;
 
 internal static class CatalogueCandidateInternalService
 {

@@ -1,7 +1,7 @@
 using HotChocolate;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Dtos.Organizations;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Modules.Organization.Application.Dtos.Organizations;
 
 namespace Main.Api.GraphQl.Types.Organization;
 

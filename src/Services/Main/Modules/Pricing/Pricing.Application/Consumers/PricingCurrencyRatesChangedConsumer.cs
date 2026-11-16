@@ -1,5 +1,6 @@
-using Main.Application.Interfaces.Services.Currency;
 using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Events;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using MassTransit;
 using Pricing.Application.Interfaces.Markup;
 

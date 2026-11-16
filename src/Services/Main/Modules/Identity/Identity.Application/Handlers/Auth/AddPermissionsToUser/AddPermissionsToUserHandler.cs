@@ -7,7 +7,7 @@ using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using TransactionErrorKind = Enums.TransactionErrorKind;
 
-namespace Main.Application.Handlers.Auth.AddPermissionsToUser;
+namespace Main.Modules.Identity.Application.Handlers.Auth.AddPermissionsToUser;
 
 [Transactional(
 	retryDelayMs: 20,

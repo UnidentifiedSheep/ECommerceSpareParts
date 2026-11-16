@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.User;

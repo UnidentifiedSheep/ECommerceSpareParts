@@ -4,11 +4,11 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Enums;
-using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
+namespace Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
 
 public record GetProducerSupplierMappingsQuery(
 	int ProducerId,

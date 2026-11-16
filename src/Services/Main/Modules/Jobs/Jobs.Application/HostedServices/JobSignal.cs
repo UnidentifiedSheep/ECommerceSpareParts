@@ -1,9 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 
-namespace Api.Common.HostedServices;
+namespace Main.Modules.Jobs.Application.HostedServices;
 
 public interface IJobSignal
 {

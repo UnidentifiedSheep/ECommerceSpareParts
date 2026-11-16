@@ -4,10 +4,10 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Balances;
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Modules.Balance.Application.Dtos.Balances;
 
-namespace Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
+namespace Main.Modules.Balance.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 
 [AutoSave]
 [Transactional(

@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using Main.Application.Dtos.Users;
-using Notification.Core.Entities;
+using Main.Entities.Notification;
+using Main.Modules.Notifications.Application.Dtos;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Notifications.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class InAppNotificationDtoProjectionProvider

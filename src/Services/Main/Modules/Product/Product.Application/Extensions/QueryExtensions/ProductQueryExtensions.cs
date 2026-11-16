@@ -1,23 +1,22 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Projections;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Extensions.QueryExtensions;
+namespace Main.Modules.Product.Application.Extensions.QueryExtensions;
 
 public static class ProductQueryExtensions
 {
 	public static IQueryable<ProductDto> SelectProductDto(
-		this IQueryable<Product> query,
-		IProjectionProvider<Product, ProductDto> projection)
+		this IQueryable<Entities.Product.Product.Product> query,
+		IProjectionProvider<Entities.Product.Product.Product, ProductDto> projection)
 		=> query.Project(projection);
 
 	public static Task<ProductDto?> FirstProductDtoAsync(
-		this IQueryable<Product> query,
-		IProjectionProvider<Product, ProductDto> projection,
-		Expression<Func<Product, bool>>? predicate = null,
+		this IQueryable<Entities.Product.Product.Product> query,
+		IProjectionProvider<Entities.Product.Product.Product, ProductDto> projection,
+		Expression<Func<Entities.Product.Product.Product, bool>>? predicate = null,
 		CancellationToken cancellationToken = default)
 		=> query
 			.WithPredicate(predicate)
@@ -25,17 +24,17 @@ public static class ProductQueryExtensions
 			.FirstOrDefaultAsync(cancellationToken);
 
 	public static Task<Dictionary<int, ProductDto>> DictionaryProductDto(
-		this IQueryable<Product> query,
-		IProjectionProvider<Product, ProductDto> projection,
-		Expression<Func<Product, bool>>? predicate = null,
+		this IQueryable<Entities.Product.Product.Product> query,
+		IProjectionProvider<Entities.Product.Product.Product, ProductDto> projection,
+		Expression<Func<Entities.Product.Product.Product, bool>>? predicate = null,
 		CancellationToken cancellationToken = default)
 		=> query
 			.WithPredicate(predicate)
 			.SelectProductDto(projection)
 			.ToDictionaryAsync(x => x.Id, cancellationToken);
 
-	private static IQueryable<Product> WithPredicate(
-		this IQueryable<Product> query,
-		Expression<Func<Product, bool>>? predicate)
+	private static IQueryable<Entities.Product.Product.Product> WithPredicate(
+		this IQueryable<Entities.Product.Product.Product> query,
+		Expression<Func<Entities.Product.Product.Product, bool>>? predicate)
 		=> predicate == null ? query : query.Where(predicate);
 }

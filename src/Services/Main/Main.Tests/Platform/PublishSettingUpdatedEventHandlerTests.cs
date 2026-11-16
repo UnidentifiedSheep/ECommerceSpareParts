@@ -1,9 +1,9 @@
 using Abstractions.Interfaces;
-using Application.Common.DomainEventHandlers.Settings.SettingUpdated;
 using Application.Common.Services.Events;
 using Contracts.Settings;
 using Domain.CommonEntities.Events;
 using FluentAssertions;
+using Main.Modules.Platform.Application.DomainEventHandlers.Settings.SettingUpdated;
 
 namespace Tests.Platform;
 

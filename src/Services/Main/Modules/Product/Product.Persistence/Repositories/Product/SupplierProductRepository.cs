@@ -1,13 +1,13 @@
 using EFCore.BulkExtensions;
 using Enums;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 using Persistence.Repository;
 using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 
-namespace Main.Persistence.Repositories.Product;
+namespace Main.Modules.Product.Persistence.Repositories.Product;
 
 public class SupplierProductRepository(UnifiedDbContext context, QueryExtensions extensions)
 	: LinqRepositoryBase<UnifiedDbContext, SupplierProduct, int>(context, extensions),

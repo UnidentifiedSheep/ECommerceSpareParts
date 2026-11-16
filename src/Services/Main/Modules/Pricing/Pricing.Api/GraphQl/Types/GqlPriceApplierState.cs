@@ -1,6 +1,6 @@
 using HotChocolate;
 using Pricing.Application.Dtos.PriceApplier;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Api.GraphQl.Types;
 

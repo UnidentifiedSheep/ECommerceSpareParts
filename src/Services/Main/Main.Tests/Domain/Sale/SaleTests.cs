@@ -1,8 +1,9 @@
 using Exceptions;
 using FluentAssertions;
 using Main.Entities.Sale;
-using Main.Enums;
-using DomainSale = Main.Entities.Sale.Sale;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Sale;
+using DomainSale = Main.Entities.Sale.Sale.Sale;
 
 namespace Tests.Domain.Sale;
 

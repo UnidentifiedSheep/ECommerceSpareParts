@@ -1,19 +1,19 @@
 using EFCore.BulkExtensions;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 using Persistence.Repository;
 using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 
-namespace Main.Persistence.Repositories.Producer;
+namespace Main.Modules.Product.Persistence.Repositories.Producer;
 
 public class ProducerRepository(UnifiedDbContext context, QueryExtensions extensions)
-	: LinqRepositoryBase<UnifiedDbContext, Entities.Producer.Producer, int>(context, extensions),
+	: LinqRepositoryBase<UnifiedDbContext, Entities.Product.Producer.Producer, int>(context, extensions),
 		IProducerRepository
 {
 	public Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default)
-		=> Context.Set<Entities.Product.Product>()
+		=> Context.Set<Entities.Product.Product.Product>()
 			.AsNoTracking()
 			.AnyAsync(x => x.ProducerId == producerId, cancellationToken);
 

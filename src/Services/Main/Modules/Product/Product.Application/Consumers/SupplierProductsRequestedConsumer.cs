@@ -1,9 +1,9 @@
-using Main.Modules.Product.Abstractions;
-using Main.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Abstractions.Events;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
 using MassTransit;
 using MediatR;
 
-namespace Main.Application.Consumers;
+namespace Main.Modules.Product.Application.Consumers;
 
 public class SupplierProductsRequestedConsumer(ISender sender) : IConsumer<SupplierProductsRequestedEvent>
 {

@@ -1,7 +1,6 @@
 using Enums;
-using Main.Enums.Documents;
 
-namespace Main.Application.Interfaces.Services.Document;
+namespace Main.Application.Document.Interfaces.Document;
 
 public interface IDocumentProvider
 {

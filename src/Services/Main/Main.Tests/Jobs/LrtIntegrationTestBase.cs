@@ -1,12 +1,15 @@
+using Application.Common;
 using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Tests.Abstractions.Test;
 using Tests.Interfaces.ServiceProvider;
 
-namespace Tests.Abstractions.Test;
+namespace Tests.Jobs;
 
 public abstract class
 	LrtIntegrationTestBase<TLrt, TSp, TArgs, TContext> : IntegrationTestBase<TSp, TArgs, TContext>

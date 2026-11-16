@@ -1,9 +1,8 @@
 using Application.Common.Extensions;
-using Main.Entities.Organization;
 using FluentValidation;
-using Main.Entities;
+using Main.Entities.Organization;
 
-namespace Main.Application.Handlers.Organizations.AddOrganizationMember;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.AddOrganizationMember;
 
 public class AddOrganizationMemberValidation : AbstractValidator<AddOrganizationMemberCommand>
 {

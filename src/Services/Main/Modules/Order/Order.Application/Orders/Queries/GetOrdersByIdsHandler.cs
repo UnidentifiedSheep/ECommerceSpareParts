@@ -2,13 +2,12 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Orders.Dtos;
-using Main.Application.Orders.Extensions;
-using Main.Entities.Order;
+using Main.Modules.Order.Application.Orders.Dtos;
+using Main.Modules.Order.Application.Orders.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Orders.Queries;
+namespace Main.Modules.Order.Application.Orders.Queries;
 
 public sealed record GetOrdersByIdsQuery : IQuery<GetOrdersByIdsResult>
 {
@@ -22,8 +21,8 @@ public sealed record GetOrdersByIdsQuery : IQuery<GetOrdersByIdsResult>
 public sealed record GetOrdersByIdsResult(IReadOnlyDictionary<Guid, OrderDto> Orders);
 
 public sealed class GetOrdersByIdsHandler(
-	IReadRepository<Order, Guid> repository,
-	IProjectionProvider<Order, OrderDto> projection,
+	IReadRepository<Entities.Order.Order.Order, Guid> repository,
+	IProjectionProvider<Entities.Order.Order.Order, OrderDto> projection,
 	IUserContext userContext)
 	: IQueryHandler<GetOrdersByIdsQuery, GetOrdersByIdsResult>
 {

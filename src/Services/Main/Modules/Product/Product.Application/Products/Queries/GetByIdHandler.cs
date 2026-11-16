@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces.Cqrs;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Interfaces;
 
-namespace Main.Application.Products.Queries;
+namespace Main.Modules.Product.Application.Products.Queries;
 
 public record GetProductByIdQuery(int ProductId) : IQuery<GetByIdResult>;
 

@@ -1,5 +1,5 @@
-using Main.Application.Configs;
 using Application.Common.Host;
+using Main.Modules.Cart.Application.Configs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Main.Modules.Cart.Application;

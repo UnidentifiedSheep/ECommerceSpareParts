@@ -3,11 +3,12 @@ using Application.Common.Querying;
 using Enums;
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Orders.Queries;
-using Main.Application.Orders.Queries.GetOrders;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
+using Main.Entities.Order.Exceptions;
+using Main.Modules.Order.Application.Orders.Queries;
+using Main.Modules.Order.Application.Orders.Queries.GetOrders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;
@@ -15,8 +16,8 @@ using Tests.Abstractions.Test;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Order;
-using DomainOrder = Main.Entities.Order.Order;
-using Product = Main.Entities.Product.Product;
+using DomainOrder = Main.Entities.Order.Order.Order;
+using Product = Main.Entities.Product.Product.Product;
 
 namespace Tests.HandlersTests.Orders;
 

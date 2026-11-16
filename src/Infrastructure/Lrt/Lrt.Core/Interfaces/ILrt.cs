@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Interfaces.Lrt;
+﻿namespace Application.Common.Interfaces;
 
 public interface ILrt
 {

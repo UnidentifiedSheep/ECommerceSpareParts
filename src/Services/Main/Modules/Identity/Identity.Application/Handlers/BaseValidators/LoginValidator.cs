@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.BaseValidators;
+namespace Main.Modules.Identity.Application.Handlers.BaseValidators;
 
 public class LoginValidator : AbstractValidator<string>
 {

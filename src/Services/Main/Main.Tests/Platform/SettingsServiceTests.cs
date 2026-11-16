@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
-using Application.Common.Services.Settings;
 using Attributes;
 using Domain.CommonEntities;
 using FluentAssertions;
+using Main.Modules.Platform.Application.Services.Settings;
 using Moq;
 
 namespace Tests.Platform;

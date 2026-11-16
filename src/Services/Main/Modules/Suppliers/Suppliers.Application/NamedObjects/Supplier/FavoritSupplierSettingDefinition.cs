@@ -5,12 +5,12 @@ using Application.Common.NamedObject;
 using Exceptions;
 using Locan.Core.Interfaces;
 using Main.Entities;
-using Main.Entities.Settings.Supplier;
+using Main.Entities.Suppliers.Settings.Supplier;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 using Security.Core.Interfaces;
 
-namespace Main.Modules.Suppliers.Application.NamedObjects;
+namespace Main.Modules.Suppliers.Application.NamedObjects.Supplier;
 
 public class FavoritSupplierSettingDefinition(
 	ISettingsService settingsService,

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Enums;
+using Main.Entities.Enums;
 
-namespace Main.Application.Dtos.Users;
+namespace Main.Modules.Identity.Application.Dtos.Users;
 
 public record UserPhoneDto
 {

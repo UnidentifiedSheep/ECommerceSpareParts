@@ -4,7 +4,7 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Cart;
+namespace Main.Entities.Cart.Cart;
 
 public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid, int)>
 {

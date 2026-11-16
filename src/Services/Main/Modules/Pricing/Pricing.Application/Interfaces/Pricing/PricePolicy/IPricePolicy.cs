@@ -1,6 +1,6 @@
 using Pricing.Application.Models.Pricing.MarketInfo;
 using Pricing.Application.Models.Pricing.PriceCandidates;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Application.Interfaces.Pricing.PricePolicy;
 

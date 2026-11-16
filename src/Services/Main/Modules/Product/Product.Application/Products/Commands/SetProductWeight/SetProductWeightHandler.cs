@@ -3,10 +3,10 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums.Units;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using MediatR;
 
-namespace Main.Application.Products.Commands.SetProductWeight;
+namespace Main.Modules.Product.Application.Products.Commands.SetProductWeight;
 
 [AutoSave]
 [Transactional]

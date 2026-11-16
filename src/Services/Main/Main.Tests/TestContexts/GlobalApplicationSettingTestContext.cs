@@ -1,7 +1,9 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
 using Main.Entities.Organization;
-using Main.Entities.Settings;
+using Main.Entities.Organization.Organization;
+using Main.Entities.Platform.Settings;
 using Main.Entities.User;
 using Persistence.Context;
 using Tests.Abstractions;

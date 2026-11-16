@@ -1,13 +1,13 @@
-using Enums;
 using System.Net;
-using Application.Common.Models.Options.S3;
-using Main.Application.Interfaces.Services.Document;
-using Main.Enums.Documents;
+using Enums;
+using Main.Application.Document.Interfaces.Document;
+using Main.Entities.Documents.Enums.Documents;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
 using S3.Core.Models;
+using S3.Core.Options;
 
-namespace Main.Application.Services.Document.Sources;
+namespace Main.Modules.Documents.Application.Services.Document.Sources;
 
 public class S3DocumentTemplateSource(
 	IS3Service s3Storage,

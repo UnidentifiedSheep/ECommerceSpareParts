@@ -3,7 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
 
 namespace Main.Api.GraphQl.Types.Sale;
 

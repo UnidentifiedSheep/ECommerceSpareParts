@@ -1,11 +1,11 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Querying;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.User;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Identity.Application.Services;
 
 public sealed class UserSearch(IReadRepository<User, Guid> users, IUserRepository userRepository) : IUserSearch
 {

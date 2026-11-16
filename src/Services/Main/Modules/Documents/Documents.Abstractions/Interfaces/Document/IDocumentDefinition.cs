@@ -1,9 +1,8 @@
 using Enums;
 using Locan.Core.Interfaces;
-using Main.Enums.Documents;
 using NamedObject.Core.Interfaces;
 
-namespace Main.Application.Interfaces.Services.Document;
+namespace Main.Application.Document.Interfaces.Document;
 
 public interface IDocumentDefinition<in TRequest, TResponse> : IDocumentDefinition
 	where TRequest : IDocumentRequest

@@ -2,12 +2,12 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Extensions;
 
-namespace Main.Application.Handlers.Users.EditUserInfo;
+namespace Main.Modules.Identity.Application.Handlers.Users.EditUserInfo;
 
 [Transactional]
 [AutoSave]

@@ -1,20 +1,17 @@
-using Enums;
 using System.Data;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Interfaces.Services;
+using Enums;
+using Main.Entities.Purchase.Exceptions;
 using Main.Modules.Balance.Abstractions;
-using Main.Application.Models.Storage;
-using Main.Entities.Exceptions;
-using Main.Entities.Purchase;
-using Main.Enums;
-using Main.Enums.Balances;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Models;
 using MediatR;
 
-namespace Main.Application.Handlers.Purchases.DeletePurchase;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.DeletePurchase;
 
 [AutoSave]
 [Transactional(
@@ -25,7 +22,7 @@ public record DeletePurchaseCommand(Guid PurchaseId) : ICommand<Unit>;
 
 public class DeletePurchaseHandler(
 	IUnitOfWork unitOfWork,
-	IRepository<Purchase, Guid> repository,
+	IRepository<Entities.Purchase.Purchase.Purchase, Guid> repository,
 	IFinanceTransfers transfers,
 	IStorageContentService storageContentService) : ICommandHandler<DeletePurchaseCommand, Unit>
 {
@@ -40,14 +37,14 @@ public class DeletePurchaseHandler(
 		return Unit.Value;
 	}
 
-	private async Task<Purchase> GetPurchase(Guid id, CancellationToken cancellationToken)
+	private async Task<Entities.Purchase.Purchase.Purchase> GetPurchase(Guid id, CancellationToken cancellationToken)
 		=> await repository.EnsureExistForUpdateAsync(
 			id,
 			key => new PurchaseNotFoundException(key),
-			Criteria<Purchase>.New().Include(x => x.Contents),
+			Criteria<Entities.Purchase.Purchase.Purchase>.New().Include(x => x.Contents),
 			cancellationToken);
 
-	private async Task SubtractStock(Purchase purchase, CancellationToken token)
+	private async Task SubtractStock(Entities.Purchase.Purchase.Purchase purchase, CancellationToken token)
 	{
 		var items =
 			purchase.Contents
@@ -59,6 +56,6 @@ public class DeletePurchaseHandler(
 			token);
 	}
 
-	private Task RevertTransactions(Purchase purchase, CancellationToken token)
+	private Task RevertTransactions(Entities.Purchase.Purchase.Purchase purchase, CancellationToken token)
 		=> transfers.ReverseAsync(purchase.TransactionId, token);
 }

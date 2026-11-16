@@ -1,4 +1,4 @@
-﻿using Main.Entities.Producer;
+﻿using Main.Entities.Product.Producer;
 using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;

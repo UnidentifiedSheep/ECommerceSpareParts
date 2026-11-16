@@ -1,35 +1,37 @@
+using Main.Entities.Balance.Balance;
+using Main.Entities.Organization.Organization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations;
+namespace Persistence.Relations.Configurations;
 
-public sealed class TransactionRelationsConfiguration : IEntityTypeConfiguration<Entities.Balance.Transaction>
+public sealed class TransactionRelationsConfiguration : IEntityTypeConfiguration<Transaction>
 {
-	public void Configure(EntityTypeBuilder<Entities.Balance.Transaction> builder)
+	public void Configure(EntityTypeBuilder<Transaction> builder)
 	{
 		builder
-			.HasOne<Entities.Currency.Currency>()
+			.HasOne<Main.Entities.Currency.Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("transactions_currency_id_fk");
 
 		builder
-			.HasOne<Entities.User.User>()
+			.HasOne<Main.Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(d => d.ReversedBy)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("transactions_users_id_fk_4");
 
 		builder
-			.HasOne<Entities.Organization.Organization>()
+			.HasOne<Organization>()
 			.WithMany()
 			.HasForeignKey(d => d.ReceiverId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("transactions_receiver_organization_id_fk");
 
 		builder
-			.HasOne<Entities.Organization.Organization>()
+			.HasOne<Organization>()
 			.WithMany()
 			.HasForeignKey(d => d.SenderId)
 			.OnDelete(DeleteBehavior.Restrict)
@@ -38,19 +40,19 @@ public sealed class TransactionRelationsConfiguration : IEntityTypeConfiguration
 }
 
 public sealed class OrganizationBalanceRelationsConfiguration
-	: IEntityTypeConfiguration<Entities.Balance.OrganizationBalance>
+	: IEntityTypeConfiguration<OrganizationBalance>
 {
-	public void Configure(EntityTypeBuilder<Entities.Balance.OrganizationBalance> builder)
+	public void Configure(EntityTypeBuilder<OrganizationBalance> builder)
 	{
 		builder
-			.HasOne<Entities.Currency.Currency>()
+			.HasOne<Main.Entities.Currency.Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("user_balances_currency_id_fk");
 
 		builder
-			.HasOne<Entities.Organization.Organization>()
+			.HasOne<Organization>()
 			.WithMany()
 			.HasForeignKey(d => d.OrganizationId)
 			.OnDelete(DeleteBehavior.Restrict)
@@ -59,13 +61,13 @@ public sealed class OrganizationBalanceRelationsConfiguration
 }
 
 public sealed class OrganizationFinancialProfileRelationsConfiguration
-	: IEntityTypeConfiguration<Entities.Balance.OrganizationFinancialProfile>
+	: IEntityTypeConfiguration<OrganizationFinancialProfile>
 {
-	public void Configure(EntityTypeBuilder<Entities.Balance.OrganizationFinancialProfile> builder)
+	public void Configure(EntityTypeBuilder<OrganizationFinancialProfile> builder)
 		=> builder
-			.HasOne<Entities.Organization.Organization>()
+			.HasOne<Organization>()
 			.WithOne()
-			.HasForeignKey<Entities.Balance.OrganizationFinancialProfile>(d => d.OrganizationId)
+			.HasForeignKey<OrganizationFinancialProfile>(d => d.OrganizationId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("organization_financial_profile_organization_id_fk");
 }

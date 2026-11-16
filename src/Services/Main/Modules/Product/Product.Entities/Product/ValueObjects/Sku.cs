@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Domain.Validation;
 using Exceptions;
 
-namespace Main.Entities.Product.ValueObjects;
+namespace Main.Entities.Product.Product.ValueObjects;
 
 public partial record Sku
 {

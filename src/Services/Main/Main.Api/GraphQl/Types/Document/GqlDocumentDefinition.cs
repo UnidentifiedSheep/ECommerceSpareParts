@@ -1,8 +1,7 @@
 using Enums;
 using GraphQL.Common.Types.Schema;
 using HotChocolate;
-using Main.Application.Dtos.Documents;
-using Main.Enums.Documents;
+using Main.Modules.Documents.Application.Dtos.Documents;
 
 namespace Main.Api.GraphQl.Types.Document;
 

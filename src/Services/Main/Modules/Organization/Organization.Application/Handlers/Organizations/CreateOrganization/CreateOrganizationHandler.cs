@@ -1,9 +1,8 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Entities.Organization;
 
-namespace Main.Application.Handlers.Organizations.CreateOrganization;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.CreateOrganization;
 
 [Transactional]
 [AutoSave]
@@ -19,7 +18,7 @@ public class CreateOrganizationHandler(IUnitOfWork unitOfWork)
 		CreateOrganizationCommand request,
 		CancellationToken cancellationToken)
 	{
-		var organization = Organization.CreateBusiness(
+		var organization = Entities.Organization.Organization.Organization.CreateBusiness(
 			request.Name,
 			request.SystemName,
 			request.OwnerId);

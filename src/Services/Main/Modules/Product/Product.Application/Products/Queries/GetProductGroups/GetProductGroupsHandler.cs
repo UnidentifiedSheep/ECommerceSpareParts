@@ -4,11 +4,11 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries.GetProductGroups;
+namespace Main.Modules.Product.Application.Products.Queries.GetProductGroups;
 
 public record GetProductGroupsQuery(string? SearchTerm,
 	IReadOnlyCollection<SortExpression>? SortBy,

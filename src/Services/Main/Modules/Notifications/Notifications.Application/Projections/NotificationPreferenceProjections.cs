@@ -3,10 +3,10 @@ using Application.Common.Interfaces.Projections;
 using Attributes;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
-using Main.Application.Dtos.NotificationPreference;
 using Main.Entities.User;
+using Main.Modules.Notifications.Application.Dtos.NotificationPreference;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Notifications.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserNotificationPreferenceProjectionProvider(

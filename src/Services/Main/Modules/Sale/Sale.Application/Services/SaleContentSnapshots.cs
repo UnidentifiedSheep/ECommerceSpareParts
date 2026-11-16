@@ -1,14 +1,14 @@
-using Main.Entities.Sale;
-using Main.Enums;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Sale;
 using Main.Modules.Sale.Abstractions;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Sale.Application.Services;
 
 public static class SaleContentSnapshots
 {
 	public static SaleContentSnapshot From(SaleContent content) => From(content, content.Sale);
 
-	public static SaleContentSnapshot From(SaleContent content, Sale sale)
+	public static SaleContentSnapshot From(SaleContent content, Entities.Sale.Sale.Sale sale)
 		=> new(
 			content.Id,
 			content.SaleId,

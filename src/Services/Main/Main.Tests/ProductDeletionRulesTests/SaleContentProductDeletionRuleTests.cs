@@ -1,5 +1,5 @@
-using Main.Application.Services.ProductDeletion;
 using Main.Entities.Sale;
+using Main.Modules.Sale.Application.Services.ProductDeletion;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 

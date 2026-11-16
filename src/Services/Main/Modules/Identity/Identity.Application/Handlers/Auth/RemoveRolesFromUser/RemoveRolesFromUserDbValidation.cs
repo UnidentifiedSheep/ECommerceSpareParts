@@ -2,7 +2,7 @@ using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Auth.RemoveRolesFromUser;
+namespace Main.Modules.Identity.Application.Handlers.Auth.RemoveRolesFromUser;
 
 public sealed class RemoveRolesFromUserDbValidation : AbstractDbValidation<RemoveRolesFromUserCommand>
 {

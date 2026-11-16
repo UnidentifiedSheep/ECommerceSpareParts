@@ -2,15 +2,15 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Product;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.DomainEvents.Product;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
-using Main.Enums.Products;
+using Main.Entities.Product.DomainEvents.Product;
+using Main.Entities.Product.Enums.Products;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 using MediatR;
 
-namespace Main.Application.Products.Commands.MakeLinkageBetweenArticles;
+namespace Main.Modules.Product.Application.Products.Commands.MakeLinkageBetweenArticles;
 
 [AutoSave]
 [Transactional]
@@ -45,7 +45,7 @@ public class MakeLinkageBetweenProductsHandler(
 		CancellationToken cancellationToken = default)
 	{
 		List<int> productIds = [linkage.ProductId, linkage.CrossProductId];
-		var criteria = Criteria<Product>.New().Where(x => productIds.Contains(x.Id)).Track(false).Build();
+		var criteria = Criteria<Entities.Product.Product.Product>.New().Where(x => productIds.Contains(x.Id)).Track(false).Build();
 
 		var lrArticles = await repository.ListAsync(criteria, cancellationToken);
 
@@ -122,7 +122,7 @@ public class MakeLinkageBetweenProductsHandler(
 
 	private async Task<HashSet<int>> GetCrossIds(int productId, CancellationToken ct)
 	{
-		var criteria = Criteria<Product>.New().Track(false).Build();
+		var criteria = Criteria<Entities.Product.Product.Product>.New().Track(false).Build();
 		return (await repository.GetProductCrosses(
 				productId,
 				criteria,

@@ -1,11 +1,11 @@
 using Application.Common.Interfaces.Repositories;
 using Domain.CommonEntities.Job;
+using Main.Modules.Jobs.Persistence.Jobs;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Common.Jobs;
 using Persistence.Repository;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
 
-namespace Persistence.Common;
+namespace Main.Modules.Jobs.Persistence;
 
 internal sealed class JobRepository<TContext>(
 	TContext context,

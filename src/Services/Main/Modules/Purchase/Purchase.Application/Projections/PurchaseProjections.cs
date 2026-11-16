@@ -1,16 +1,15 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using LinqKit;
-using Main.Application.Dtos.Purchase;
-using Main.Entities.Purchase;
+using Main.Entities.Purchase.Purchase;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Purchase.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class PurchaseDtoProjectionProvider : ProjectionProviderBase<Purchase, PurchaseDto>
+public sealed class PurchaseDtoProjectionProvider : ProjectionProviderBase<Entities.Purchase.Purchase.Purchase, PurchaseDto>
 {
-	public override Expression<Func<Purchase, PurchaseDto>> Projection { get; } =
+	public override Expression<Func<Entities.Purchase.Purchase.Purchase, PurchaseDto>> Projection { get; } =
 		x => new PurchaseDto
 		{
 			Id = x.Id,

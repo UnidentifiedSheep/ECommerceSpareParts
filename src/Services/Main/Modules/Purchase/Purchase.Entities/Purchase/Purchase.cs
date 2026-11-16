@@ -5,9 +5,9 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Exceptions;
-using Main.Enums;
+using Main.Entities.Purchase.Enums;
 
-namespace Main.Entities.Purchase;
+namespace Main.Entities.Purchase.Purchase;
 
 public class Purchase : AuditableEntity<Purchase, Guid>,
 	ILinqEntity<Purchase, Guid>,

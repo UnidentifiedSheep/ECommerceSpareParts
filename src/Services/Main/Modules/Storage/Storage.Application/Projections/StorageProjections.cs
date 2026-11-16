@@ -1,16 +1,14 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using LinqKit;
-using Main.Application.Dtos.Storage;
-using Main.Entities.Storage;
+using Main.Modules.Storage.Application.Dtos.Storage;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Storage.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class StorageDtoProjectionProvider : ProjectionProviderBase<Storage, StorageDto>
+public sealed class StorageDtoProjectionProvider : ProjectionProviderBase<Entities.Storage.Storage.Storage, StorageDto>
 {
-	public override Expression<Func<Storage, StorageDto>> Projection { get; } = x => new StorageDto
+	public override Expression<Func<Entities.Storage.Storage.Storage, StorageDto>> Projection { get; } = x => new StorageDto
 	{
 		Code = x.Code,
 		Location = x.Location,

@@ -1,11 +1,11 @@
 using Enums;
-using Main.Application.Dtos.Sale;
-using Main.Application.Interfaces.Services;
-using Main.Application.Models.Storage;
-using Main.Entities.Sale;
-using Main.Enums;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Interfaces.Services;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Models;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Sale.Application.Services;
 
 public class SaleService(IStorageContentService storageContentService) : ISaleService
 {
@@ -68,7 +68,7 @@ public class SaleService(IStorageContentService storageContentService) : ISaleSe
 	}
 
 	public async Task RestoreContents(
-		Sale sale,
+		Entities.Sale.Sale.Sale sale,
 		StorageMovementType movementType,
 		CancellationToken cancellationToken = default)
 	{

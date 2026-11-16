@@ -1,9 +1,8 @@
 using Application.Common.Abstractions;
-using Main.Entities.Organization;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
+using Main.Entities.Organization;
 
-namespace Main.Application.Handlers.Organizations.ChangeOrganizationMemberRole;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.ChangeOrganizationMemberRole;
 
 public class
 	ChangeOrganizationMemberRoleDbValidation : AbstractDbValidation<ChangeOrganizationMemberRoleCommand>

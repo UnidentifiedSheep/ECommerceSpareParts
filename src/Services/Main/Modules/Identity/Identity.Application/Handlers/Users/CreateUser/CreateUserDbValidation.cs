@@ -4,7 +4,7 @@ using Main.Entities;
 using Main.Entities.Auth;
 using Main.Entities.User.ValueObjects;
 
-namespace Main.Application.Handlers.Users.CreateUser;
+namespace Main.Modules.Identity.Application.Handlers.Users.CreateUser;
 
 public class CreateUserDbValidation : AbstractDbValidation<CreateUserCommand>
 {

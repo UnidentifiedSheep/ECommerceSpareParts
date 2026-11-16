@@ -1,6 +1,7 @@
 using FluentAssertions;
-using Main.Application.Handlers.Balance;
 using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Modules.Balance.Application.Handlers.Balance;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.Balance;
 using Tests.Extensions;

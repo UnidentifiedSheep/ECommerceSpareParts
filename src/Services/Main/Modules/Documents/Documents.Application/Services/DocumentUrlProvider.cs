@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Links;
-using Main.Application.Interfaces.Services.Document;
-using Main.Application.Models.Options;
+using Main.Application.Document.Interfaces.Document;
+using Main.Modules.Documents.Application.Models.Options;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Documents.Application.Services;
 
 public sealed class DocumentUrlProvider(
 	IAppLinkBuilder linkBuilder,

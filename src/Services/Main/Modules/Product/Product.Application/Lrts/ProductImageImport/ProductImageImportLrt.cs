@@ -1,22 +1,22 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Enums;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Lrts.Base;
-using Main.Entities;
-using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
+using Main.Entities.Product.DomainEvents.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Lrts.Base;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Lrts.ProductImageImport;
+namespace Main.Modules.Product.Application.Lrts.ProductImageImport;
 
 public class ProductImageImportLrt(
 	IS3Service s3Service,

@@ -1,4 +1,4 @@
-namespace Main.Application.Models.Product;
+namespace Main.Modules.Product.Application.Models.Product;
 
 public sealed record ProductGroupAssignment(
 	string NormalizedSku,

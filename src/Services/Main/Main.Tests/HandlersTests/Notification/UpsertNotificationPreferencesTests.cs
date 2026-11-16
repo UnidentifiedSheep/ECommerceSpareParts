@@ -1,9 +1,9 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Dtos.NotificationPreference;
-using Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 using Main.Entities;
 using Main.Entities.User;
+using Main.Modules.Notifications.Application.Dtos.NotificationPreference;
+using Main.Modules.Notifications.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 using Microsoft.EntityFrameworkCore;
 using Notification.Core.Recipients;
 using Tests.Abstractions.Test;

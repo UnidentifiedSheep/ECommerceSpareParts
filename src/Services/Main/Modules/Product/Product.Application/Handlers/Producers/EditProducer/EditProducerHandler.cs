@@ -1,11 +1,11 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Main.Application.Dtos.Producer;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 
-namespace Main.Application.Handlers.Producers.EditProducer;
+namespace Main.Modules.Product.Application.Handlers.Producers.EditProducer;
 
 [AutoSave]
 [Transactional]

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Product.SupplierReferences;
+namespace Main.Modules.Product.Application.Dtos.Product.SupplierReferences;
 
 public record ResolvedSupplierProductReferenceDto
 {

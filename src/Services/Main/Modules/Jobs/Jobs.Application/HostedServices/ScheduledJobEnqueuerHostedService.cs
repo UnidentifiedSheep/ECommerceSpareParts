@@ -1,11 +1,11 @@
+using Application.Common.Interfaces.Services;
+using Main.Modules.Jobs.Application.Models.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Application.Common.Interfaces.Services;
-using Application.Common.Models.Options;
 using Microsoft.Extensions.Options;
 
-namespace Api.Common.HostedServices;
+namespace Main.Modules.Jobs.Application.HostedServices;
 
 public class ScheduledJobEnqueuerHostedService(
 	IServiceScopeFactory scopeFactory,

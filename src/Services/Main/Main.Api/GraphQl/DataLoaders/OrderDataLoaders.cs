@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Orders.Dtos;
-using Main.Application.Orders.Queries;
+using Main.Modules.Order.Application.Orders.Dtos;
+using Main.Modules.Order.Application.Orders.Queries;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

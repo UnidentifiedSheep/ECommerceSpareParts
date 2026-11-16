@@ -2,9 +2,9 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Entities.DomainEvents.Product;
+using Main.Entities.Product.DomainEvents.Product;
 
-namespace Main.Entities.Product;
+namespace Main.Entities.Product.Product;
 
 public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<ProductImage, (int, string)>
 {

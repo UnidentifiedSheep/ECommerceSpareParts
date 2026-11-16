@@ -1,8 +1,8 @@
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Producer;
+namespace Main.Modules.Product.Persistence.Configurations.Producer;
 
 public class ProducerSupplierMappingConfiguration : IEntityTypeConfiguration<ProducerSupplierMapping>
 {
@@ -36,7 +36,7 @@ public class ProducerSupplierMappingConfiguration : IEntityTypeConfiguration<Pro
 			.HasName("producer_supplier_mappings_supplier_name_key");
 
 		builder
-			.HasOne<Entities.Producer.Producer>()
+			.HasOne<Entities.Product.Producer.Producer>()
 			.WithMany(e => e.SupplierMappings)
 			.HasForeignKey(d => d.ProducerId)
 			.OnDelete(DeleteBehavior.Restrict)

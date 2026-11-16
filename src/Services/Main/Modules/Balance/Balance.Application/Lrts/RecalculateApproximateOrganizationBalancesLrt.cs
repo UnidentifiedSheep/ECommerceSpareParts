@@ -1,14 +1,15 @@
+using Application.Common;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
-using Main.Application.Interfaces.Services;
 using Main.Entities;
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Modules.Balance.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts;
+namespace Main.Modules.Balance.Application.Lrts;
 
 public sealed class RecalculateApproximateOrganizationBalancesLrt(
 	IApplicationTransactionFactory transactionService,

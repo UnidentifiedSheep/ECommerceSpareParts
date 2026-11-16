@@ -1,7 +1,7 @@
 using Application.Common.Dtos;
 using Application.Common.Exceptions;
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
@@ -12,7 +12,7 @@ using Domain.CommonEntities.Job;
 using FluentValidation;
 using NamedObject.Core.Interfaces;
 
-namespace Application.Common.Services.Job;
+namespace Main.Modules.Jobs.Application.Services.Job;
 
 public class JobScheduleService(
 	IApplicationTransaction transactionService,

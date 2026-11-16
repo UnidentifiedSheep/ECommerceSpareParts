@@ -6,7 +6,7 @@ using Domain.Interfaces;
 using Domain.Validation;
 using Extensions;
 
-namespace Main.Entities.Product;
+namespace Main.Entities.Product.Product;
 
 public class Characteristic : Entity<Characteristic, int>, ILinqEntity<Characteristic, int>
 {

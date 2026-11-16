@@ -5,7 +5,7 @@ using Locan.Core.Interfaces.Localizers;
 using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions;
 
-namespace Application.Common.Handlers.Settings;
+namespace Main.Modules.Platform.Application.Handlers.Settings;
 
 public record GetSettingsQuery : IQuery<GetSettingsResult>;
 

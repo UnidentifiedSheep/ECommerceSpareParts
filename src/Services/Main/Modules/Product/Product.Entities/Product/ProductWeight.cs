@@ -4,9 +4,9 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 using Enums.Units;
-using Main.Entities.DomainEvents.Product;
+using Main.Entities.Product.DomainEvents.Product;
 
-namespace Main.Entities.Product;
+namespace Main.Entities.Product.Product;
 
 public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeight, int>
 {

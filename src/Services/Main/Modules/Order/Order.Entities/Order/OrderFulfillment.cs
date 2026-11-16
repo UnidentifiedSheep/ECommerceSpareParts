@@ -3,7 +3,7 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Order;
+namespace Main.Entities.Order.Order;
 
 public sealed class OrderFulfillment : Entity<OrderFulfillment, OrderFulfillmentKey>,
 	ILinqEntity<OrderFulfillment, OrderFulfillmentKey>

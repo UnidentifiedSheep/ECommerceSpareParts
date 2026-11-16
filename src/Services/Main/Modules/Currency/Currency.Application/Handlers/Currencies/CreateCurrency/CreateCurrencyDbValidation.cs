@@ -1,9 +1,8 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Currency;
 
-namespace Main.Application.Handlers.Currencies.CreateCurrency;
+namespace Main.Modules.Currency.Application.Handlers.Currencies.CreateCurrency;
 
 public class CreateCurrencyDbValidation : AbstractDbValidation<CreateCurrencyCommand>
 {

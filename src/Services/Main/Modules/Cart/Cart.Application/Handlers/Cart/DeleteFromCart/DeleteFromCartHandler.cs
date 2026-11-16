@@ -2,17 +2,17 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions;
+using Main.Entities.Cart.Exceptions;
 using MediatR;
 
-namespace Main.Application.Handlers.Cart.DeleteFromCart;
+namespace Main.Modules.Cart.Application.Handlers.Cart.DeleteFromCart;
 
 [AutoSave]
 [Transactional]
 public record DeleteFromCartCommand(Guid UserId, int ProductId) : ICommand;
 
 public class DeleteFromCartHandler(
-	IRepository<Entities.Cart.Cart, (Guid, int)> repository,
+	IRepository<Entities.Cart.Cart.Cart, (Guid, int)> repository,
 	IUnitOfWork unitOfWork) : ICommandHandler<DeleteFromCartCommand>
 {
 	public async Task<Unit> Handle(DeleteFromCartCommand request, CancellationToken cancellationToken)

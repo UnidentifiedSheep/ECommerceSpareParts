@@ -1,6 +1,6 @@
 using Enums;
 using Integrations.Supplier.Models;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Application.Models;
 

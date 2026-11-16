@@ -1,14 +1,13 @@
-using Enums;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Domain.Validation;
 using FluentValidation;
-using Main.Application.Document;
-using Main.Application.Interfaces.Services.Document;
+using Main.Application.Document.Document;
+using Main.Application.Document.Interfaces.Document;
 using Main.Entities;
 using NamedObject.Core.Interfaces;
 
-namespace Main.Application.Handlers.Documents.CreateGenerationRequest;
+namespace Main.Modules.Documents.Application.Handlers.Documents.CreateGenerationRequest;
 
 public class CreateGenerationRequestValidation : AbstractValidator<CreateGenerationRequestCommand>
 {

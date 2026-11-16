@@ -1,4 +1,4 @@
-namespace Main.Application.Analytics.Analyzers.Markup;
+namespace Main.Modules.Analytics.Abstractions.Analyzers.Markup;
 
 public sealed record MarkupRangeDraft(
 	decimal FromCost,

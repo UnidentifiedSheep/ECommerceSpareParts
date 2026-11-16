@@ -1,10 +1,10 @@
-using Api.Common.HostedServices;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Models.Lrt;
+using Main.Modules.Jobs.Application.HostedServices;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 
-namespace Application.Common.LRT;
+namespace Main.Modules.Jobs.Application.LRT;
 
 public sealed class LrtQuotaRegistry : INamedObjectRegistry<ILrtQuotaManager>, IDisposable
 {

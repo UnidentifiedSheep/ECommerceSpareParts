@@ -1,13 +1,13 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Enums;
-using Main.Application.Dtos.Emails;
-using Main.Application.Dtos.Users;
-using Main.Application.Handlers.Users.CreateUser;
-using Main.Enums;
+using Main.Entities.Enums;
+using Main.Modules.Identity.Application.Dtos.Emails;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Handlers.Users.CreateUser;
 using MediatR;
 
-namespace Main.Application.Handlers.Auth.Register;
+namespace Main.Modules.Identity.Application.Handlers.Auth.Register;
 
 [Transactional]
 public record RegisterCommand(

@@ -4,7 +4,7 @@ using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Interfaces.Recipient;
 
-namespace Notification;
+namespace Main.Modules.Notifications.Application.Delivery;
 
 public abstract class NotificationChannelBase<TNotification, TDestination, TDestinationReceipt>(
 	IEnumerable<IChannelDeliveryObserver<TDestinationReceipt, TDestination>> observers,

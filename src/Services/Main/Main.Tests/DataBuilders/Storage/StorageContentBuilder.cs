@@ -1,8 +1,9 @@
 ﻿using Enums;
 using Bogus;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Storage;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Storage;

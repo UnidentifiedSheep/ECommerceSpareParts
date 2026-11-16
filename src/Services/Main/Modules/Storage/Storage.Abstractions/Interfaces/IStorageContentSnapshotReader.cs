@@ -1,6 +1,6 @@
 using Main.Modules.Storage.Abstractions.Events;
 
-namespace Main.Application.Interfaces.Services;
+namespace Main.Modules.Storage.Abstractions.Interfaces;
 
 public interface IStorageContentSnapshotReader
 {

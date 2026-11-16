@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Application.Common.Handlers.Jobs.GetJobs;
+namespace Main.Modules.Jobs.Application.Handlers.Jobs.GetJobs;
 
 public class GetJobsValidation : AbstractValidator<GetJobsQuery>
 {

@@ -1,4 +1,4 @@
-namespace Main.Application.Models.Options;
+namespace Main.Modules.Identity.Application.Models.Options;
 
 public class UserPhoneOptions
 {

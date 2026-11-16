@@ -3,12 +3,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ProductEnrichment;
+namespace Main.Modules.Product.Application.Handlers.ProductEnrichment;
 
 [Transactional]
 [AutoSave]
@@ -56,7 +55,7 @@ public class AddCandidateToCatalogueHandler(
 			})
 			.ToListAsync(cancellationToken)).ToLookup(x => x.Id, x => x.Name);
 
-		var toAdd = new Dictionary<Guid, Product>(request.Items.Count);
+		var toAdd = new Dictionary<Guid, Entities.Product.Product.Product>(request.Items.Count);
 		var productIds = new Dictionary<Guid, int>();
 
 		foreach (var item in request.Items)

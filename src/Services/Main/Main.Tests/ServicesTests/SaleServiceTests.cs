@@ -1,8 +1,8 @@
 using FluentAssertions;
-using Main.Application.Dtos.Sale;
-using Main.Application.Interfaces.Services;
-using Main.Application.Models.Storage;
-using Main.Application.Services;
+using Main.Modules.Sale.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Services;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Models;
 using Moq;
 
 namespace Tests.ServicesTests;

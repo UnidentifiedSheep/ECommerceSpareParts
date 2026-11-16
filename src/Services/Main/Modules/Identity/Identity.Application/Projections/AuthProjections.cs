@@ -3,10 +3,10 @@ using Application.Common.Interfaces.Projections;
 using Attributes;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
-using Main.Application.Dtos.Auth;
 using Main.Entities.Auth;
+using Main.Modules.Identity.Application.Dtos.Auth;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Identity.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class RoleDtoProjectionProvider(IContextualLocalizer localizer)

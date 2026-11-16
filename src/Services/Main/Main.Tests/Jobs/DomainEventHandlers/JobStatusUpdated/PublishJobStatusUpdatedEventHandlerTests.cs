@@ -1,10 +1,10 @@
 using Abstractions.Interfaces;
-using Application.Common.DomainEventHandlers.Jobs.JobStatusUpdated;
 using Application.Common.Services.Events;
 using Contracts.Job;
 using Domain.CommonEntities.Job.Events;
 using Domain.CommonEnums;
 using FluentAssertions;
+using Main.Modules.Jobs.Application.DomainEventHandlers.Jobs.JobStatusUpdated;
 
 namespace Tests.Jobs.DomainEventHandlers.JobStatusUpdated;
 

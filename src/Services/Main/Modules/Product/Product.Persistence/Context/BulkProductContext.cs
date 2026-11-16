@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Persistence.Context;
+namespace Main.Modules.Product.Persistence.Context;
 
 internal sealed class BulkProductContext(DbContextOptions<BulkProductContext> options) : DbContext(options)
 {

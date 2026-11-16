@@ -1,8 +1,8 @@
-﻿using Main.Entities.Product;
+﻿using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Product;
+namespace Main.Modules.Product.Persistence.Configurations.Product;
 
 public class ProductWeightConfiguration : IEntityTypeConfiguration<ProductWeight>
 {
@@ -19,7 +19,7 @@ public class ProductWeightConfiguration : IEntityTypeConfiguration<ProductWeight
 		builder.Property(e => e.Unit).HasMaxLength(24).HasColumnName("unit");
 
 		builder
-			.HasOne<Entities.Product.Product>()
+			.HasOne<Entities.Product.Product.Product>()
 			.WithOne(e => e.ProductWeight)
 			.HasForeignKey<ProductWeight>(d => d.ProductId)
 			.OnDelete(DeleteBehavior.Cascade)

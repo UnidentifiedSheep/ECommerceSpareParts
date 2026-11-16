@@ -1,6 +1,6 @@
 using Application.Common.Interfaces.Links;
 
-namespace Main.Application.Models.Options;
+namespace Main.Modules.Documents.Application.Models.Options;
 
 public sealed class DocumentLinksOptions
 {

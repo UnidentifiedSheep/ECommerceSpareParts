@@ -2,11 +2,11 @@
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries;
+namespace Main.Modules.Product.Application.Products.Queries;
 
 public record GetProductsContentsQuery : IQuery<GetProductsContentsResult>
 {
@@ -24,7 +24,7 @@ public record GetProductsContentsResult(Dictionary<int, List<ProductContentDto>>
 
 public class GetProductsContentsHandler(
 	IReadRepository<ProductContent, (int, int)> repository,
-	IProjectionProvider<Product, ProductDto> productProjection)
+	IProjectionProvider<Entities.Product.Product.Product, ProductDto> productProjection)
 	: IQueryHandler<GetProductsContentsQuery, GetProductsContentsResult>
 {
 	public async Task<GetProductsContentsResult> Handle(

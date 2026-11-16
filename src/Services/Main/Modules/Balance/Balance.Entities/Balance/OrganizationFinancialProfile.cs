@@ -2,7 +2,7 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Balance;
+namespace Main.Entities.Balance.Balance;
 
 public class OrganizationFinancialProfile : AuditableEntity<OrganizationFinancialProfile, Guid>,
 	IVersionable<uint>

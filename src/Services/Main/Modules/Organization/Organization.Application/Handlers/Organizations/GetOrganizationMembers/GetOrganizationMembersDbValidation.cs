@@ -1,9 +1,8 @@
 using Application.Common.Abstractions;
-using Main.Entities.Organization;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
+using Main.Entities.Organization;
 
-namespace Main.Application.Handlers.Organizations.GetOrganizationMembers;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
 
 public class GetOrganizationMembersDbValidation : AbstractDbValidation<GetOrganizationMembersQuery>
 {

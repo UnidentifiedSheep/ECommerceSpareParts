@@ -1,6 +1,6 @@
 using Domain.Interfaces.Events;
 
-namespace Main.Entities.DomainEvents.ProductStock;
+namespace Main.Entities.Product.DomainEvents.ProductStock;
 
 public record ProductStockUpdatedDomainEvent(string StorageCode, int ProductId)
 	: IBatchableDomainEvent, IKeyedDomainEvent

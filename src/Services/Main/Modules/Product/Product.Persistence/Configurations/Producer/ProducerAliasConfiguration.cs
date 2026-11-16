@@ -1,8 +1,8 @@
-﻿using Main.Entities.Producer;
+﻿using Main.Entities.Product.Producer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Producer;
+namespace Main.Modules.Product.Persistence.Configurations.Producer;
 
 public class ProducerAliasConfiguration : IEntityTypeConfiguration<ProducerAlias>
 {
@@ -25,7 +25,7 @@ public class ProducerAliasConfiguration : IEntityTypeConfiguration<ProducerAlias
 		builder.Property(e => e.Alias).HasMaxLength(64).HasColumnName("other_name");
 
 		builder
-			.HasOne<Entities.Producer.Producer>()
+			.HasOne<Entities.Product.Producer.Producer>()
 			.WithMany(x => x.Aliases)
 			.HasForeignKey(d => d.ProducerId)
 			.HasConstraintName("producers_other_names_producer_id_fk");

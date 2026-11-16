@@ -1,8 +1,8 @@
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Microsoft.EntityFrameworkCore;
 using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Settings;

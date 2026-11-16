@@ -1,14 +1,14 @@
 using EFCore.ComplexIndexes;
 using EFCore.ComplexIndexes.PostgreSQL;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.Product.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Product;
+namespace Main.Modules.Product.Persistence.Configurations.Product;
 
-public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Product>
+public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Product.Product>
 {
-	public void Configure(EntityTypeBuilder<Entities.Product.Product> builder)
+	public void Configure(EntityTypeBuilder<Entities.Product.Product.Product> builder)
 	{
 		builder.HasKey(e => e.Id).HasName("products_id_pk");
 
@@ -94,7 +94,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 		builder
 			.HasOne(p => p.Pair)
 			.WithOne()
-			.HasForeignKey<Entities.Product.Product>(p => p.PairId)
+			.HasForeignKey<Entities.Product.Product.Product>(p => p.PairId)
 			.OnDelete(DeleteBehavior.SetNull);
 
 		builder

@@ -4,12 +4,12 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Enums;
-using Main.Application.Dtos.Balances;
-using Main.Entities.Balance;
-using Main.Enums.Balances;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Modules.Balance.Application.Dtos.Balances;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Balance.GetTransactions;
+namespace Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
 
 public record GetTransactionsQuery(
 	RangeModel<DateTime> DateRange,

@@ -4,11 +4,12 @@ using Domain.Validation;
 using Locan.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Analytics;
-using Main.Enums;
+using Main.Entities.Analytics.Enums;
+using Main.Modules.Analytics.Abstractions.Charts;
 using Microsoft.EntityFrameworkCore;
 using SchemaGeneration.Abstractions;
 
-namespace Main.Application.Analytics.Charts.SalesProfitOverTime;
+namespace Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
 
 public sealed class SalesProfitOverTimeChartDataSource(
 	IReadRepository<SaleContentAnalytics, int> repository,

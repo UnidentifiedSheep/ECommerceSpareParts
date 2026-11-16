@@ -1,18 +1,18 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Models.Users;
 using Main.Entities.Auth;
+using Main.Entities.Enums;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
-using Main.Enums;
-using Main.Persistence.DatabaseObjects;
-using Main.Persistence.ReadModels;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
+using Main.Modules.Identity.Application.Models.Users;
+using Main.Modules.Identity.Persistence.DatabaseObjects;
+using Main.Modules.Identity.Persistence.ReadModels;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 using Persistence.Interfaces;
 using Persistence.Repository;
 
-namespace Main.Persistence.Repositories.User;
+namespace Main.Modules.Identity.Persistence.Repositories;
 
 public class UserRepository(UnifiedDbContext context, IQueryableExtensions extensions)
 	: LinqRepositoryBase<UnifiedDbContext, Entities.User.User, Guid>(context, extensions), IUserRepository

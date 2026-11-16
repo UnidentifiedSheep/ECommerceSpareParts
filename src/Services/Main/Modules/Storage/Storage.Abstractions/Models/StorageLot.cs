@@ -1,4 +1,4 @@
-﻿namespace Main.Application.Models.Storage;
+﻿namespace Main.Modules.Storage.Abstractions.Models;
 
 public record StorageLot(
 	int Id,

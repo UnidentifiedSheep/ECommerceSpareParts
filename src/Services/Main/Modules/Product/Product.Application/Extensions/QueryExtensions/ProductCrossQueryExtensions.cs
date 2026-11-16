@@ -1,10 +1,10 @@
-﻿using Main.Entities.Product;
+﻿using Main.Entities.Product.Product;
 
-namespace Main.Application.Extensions.QueryExtensions;
+namespace Main.Modules.Product.Application.Extensions.QueryExtensions;
 
 public static class ProductCrossQueryExtensions
 {
-	public static IQueryable<Product> GetCrosses(this IQueryable<ProductCross> query, int productId)
+	public static IQueryable<Entities.Product.Product.Product> GetCrosses(this IQueryable<ProductCross> query, int productId)
 	{
 		var left = query.Where(c => c.RightProductId == productId).Select(c => c.LeftProduct);
 

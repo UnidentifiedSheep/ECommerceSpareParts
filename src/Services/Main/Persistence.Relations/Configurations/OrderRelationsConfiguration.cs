@@ -1,35 +1,39 @@
+using Main.Entities.Order.Order;
+using Main.Entities.Organization.Organization;
+using Main.Entities.Product.Product;
+using Main.Entities.Sale.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations;
+namespace Persistence.Relations.Configurations;
 
-public sealed class OrderRelationsConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
+public sealed class OrderRelationsConfiguration : IEntityTypeConfiguration<Order>
 {
-	public void Configure(EntityTypeBuilder<Entities.Order.Order> builder)
+	public void Configure(EntityTypeBuilder<Order> builder)
 	{
 		builder
-			.HasOne<Entities.Organization.Organization>()
+			.HasOne<Organization>()
 			.WithMany()
 			.HasForeignKey(e => e.OrganizationId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("orders_organization_id_fk");
 
 		builder
-			.HasOne<Entities.Currency.Currency>()
+			.HasOne<Main.Entities.Currency.Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("orders_currency_id_fk");
 
 		builder
-			.HasOne<Entities.User.User>()
+			.HasOne<Main.Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.OnDelete(DeleteBehavior.SetNull)
 			.HasConstraintName("orders_users_id_fk");
 
 		builder
-			.HasOne<Entities.User.User>()
+			.HasOne<Main.Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(e => e.ConfirmedByUserId)
 			.OnDelete(DeleteBehavior.SetNull)
@@ -37,22 +41,22 @@ public sealed class OrderRelationsConfiguration : IEntityTypeConfiguration<Entit
 	}
 }
 
-public sealed class OrderItemRelationsConfiguration : IEntityTypeConfiguration<Entities.Order.OrderItem>
+public sealed class OrderItemRelationsConfiguration : IEntityTypeConfiguration<OrderItem>
 {
-	public void Configure(EntityTypeBuilder<Entities.Order.OrderItem> builder)
+	public void Configure(EntityTypeBuilder<OrderItem> builder)
 		=> builder
-			.HasOne<Entities.Product.Product>()
+			.HasOne<Product>()
 			.WithMany()
 			.HasForeignKey(d => d.ProductId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("order_items_products_id_fk");
 }
 
-public sealed class OrderFulfillmentRelationsConfiguration : IEntityTypeConfiguration<Entities.Order.OrderFulfillment>
+public sealed class OrderFulfillmentRelationsConfiguration : IEntityTypeConfiguration<OrderFulfillment>
 {
-	public void Configure(EntityTypeBuilder<Entities.Order.OrderFulfillment> builder)
+	public void Configure(EntityTypeBuilder<OrderFulfillment> builder)
 		=> builder
-			.HasOne<Entities.Sale.SaleContent>()
+			.HasOne<SaleContent>()
 			.WithMany()
 			.HasForeignKey(item => item.SaleContentId)
 			.OnDelete(DeleteBehavior.Restrict)

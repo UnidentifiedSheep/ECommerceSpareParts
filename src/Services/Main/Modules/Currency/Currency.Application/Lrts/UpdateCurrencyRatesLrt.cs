@@ -1,13 +1,13 @@
+using Application.Common;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Locan.Core.Interfaces;
-using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
-using Main.Entities;
 using Main.Entities.Currency;
+using Main.Modules.Currency.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts;
+namespace Main.Modules.Currency.Application.Lrts;
 
 public class UpdateCurrencyRatesLrt(
 	IApplicationTransactionFactory transactionService,

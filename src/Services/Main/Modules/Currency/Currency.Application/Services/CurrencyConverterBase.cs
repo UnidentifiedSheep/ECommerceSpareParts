@@ -1,7 +1,7 @@
-using Application.Common.Interfaces.Currency;
-using Application.Common.Models.Currency;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Currency.Abstractions.Models;
 
-namespace Application.Common.Services.Currency;
+namespace Main.Modules.Currency.Application.Services;
 
 public abstract class CurrencyConverterBase : ICurrencyConverter
 {

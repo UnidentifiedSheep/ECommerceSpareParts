@@ -1,8 +1,7 @@
 using Enums;
 using Exceptions.Base.Localized;
-using Main.Enums.Balances;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Balance.Exceptions;
 
 public class BadTransactionStatusException(string status) : LocalizedBadRequestException(
 	new TransactionInvalidStatusForDeletionMessage().WithStatus(status),

@@ -4,7 +4,7 @@ using Locan.Core.Interfaces.Localizers;
 using Main.Entities;
 using Notification.Core.Interfaces.Notification;
 
-namespace Main.Application.Notifications;
+namespace Main.Modules.Identity.Application.Notifications;
 
 public class PasswordResetNotification : INotification<PasswordResetNotificationData>
 {

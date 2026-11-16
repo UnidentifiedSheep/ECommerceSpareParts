@@ -1,9 +1,9 @@
+using Main.Modules.Notifications.Application.Delivery;
+using Main.Modules.Notifications.Application.Delivery.Renderers;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
 using Notification.Core.Interfaces.Notification;
-using Notification.Extensions;
-using Notification.Renderers;
 
 namespace Notifications.Tests;
 

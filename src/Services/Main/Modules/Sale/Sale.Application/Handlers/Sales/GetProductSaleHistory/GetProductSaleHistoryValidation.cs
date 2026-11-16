@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Sales.GetProductSaleHistory;
+namespace Main.Modules.Sale.Application.Handlers.Sales.GetProductSaleHistory;
 
 public class GetProductSaleHistoryValidation : AbstractValidator<GetProductSaleHistoryQuery>
 {

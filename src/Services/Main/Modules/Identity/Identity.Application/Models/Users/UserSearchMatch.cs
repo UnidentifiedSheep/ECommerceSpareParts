@@ -1,6 +1,6 @@
 using Main.Entities.User;
 
-namespace Main.Application.Models.Users;
+namespace Main.Modules.Identity.Application.Models.Users;
 
 public sealed record UserSearchMatch
 {

@@ -1,5 +1,5 @@
 using Notification.Core.Interfaces.Notification;
 
-namespace Notification.Renderers;
+namespace Main.Modules.Notifications.Application.Delivery.Renderers;
 
 public sealed record NotificationContent(string Text, string Title = "") : INotificationContent;

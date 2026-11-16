@@ -1,6 +1,7 @@
 ﻿using Exceptions;
 using FluentAssertions;
 using Main.Entities.Cart;
+using Main.Entities.Cart.Cart;
 
 namespace Tests.Domain;
 

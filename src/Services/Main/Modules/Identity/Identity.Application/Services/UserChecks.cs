@@ -1,8 +1,8 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Identity.Application.Services;
 
 public sealed class UserChecks : IUserChecks
 {

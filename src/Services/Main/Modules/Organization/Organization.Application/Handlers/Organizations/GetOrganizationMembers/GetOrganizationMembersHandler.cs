@@ -3,11 +3,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Organizations;
-using Main.Entities.Organization;
+using Main.Entities.Organization.Organization;
+using Main.Modules.Organization.Application.Dtos.Organizations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Organizations.GetOrganizationMembers;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
 
 public record GetOrganizationMembersQuery(Guid OrganizationId, Pagination Pagination)
 	: IQuery<GetOrganizationMembersResult>;

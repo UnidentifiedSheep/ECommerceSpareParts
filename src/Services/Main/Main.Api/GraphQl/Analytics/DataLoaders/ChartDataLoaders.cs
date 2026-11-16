@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Analytics.Dtos.Charts;
-using Main.Application.Analytics.Queries;
+using Main.Modules.Analytics.Application.Dtos.Charts;
+using Main.Modules.Analytics.Application.Queries;
 using MediatR;
 
 namespace Main.Api.GraphQl.Analytics.DataLoaders;

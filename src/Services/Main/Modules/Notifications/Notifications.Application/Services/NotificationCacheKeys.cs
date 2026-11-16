@@ -1,4 +1,4 @@
-namespace Main.Application.Services;
+namespace Main.Modules.Notifications.Application.Services;
 
 internal static class NotificationCacheKeys
 {

@@ -2,11 +2,11 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries;
+namespace Main.Modules.Product.Application.Products.Queries;
 
 public sealed record GetProductGroupsByIdsQuery : IQuery<GetProductGroupsByIdsResult>
 {

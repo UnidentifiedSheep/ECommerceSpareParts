@@ -3,14 +3,14 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Services;
 using Attributes;
-using Main.Application.Interfaces.Services.Document;
-using Main.Application.Lrts.GenerateDocument;
 using Extensions;
-using Main.Entities.Documents;
-using Main.Entities.Exceptions;
+using Main.Application.Document.Interfaces.Document;
+using Main.Entities.Documents.Documents;
+using Main.Entities.Documents.Exceptions;
+using Main.Modules.Documents.Application.Lrts.GenerateDocument;
 using NamedObject.Core.Interfaces;
 
-namespace Main.Application.Handlers.Documents.CreateGenerationRequest;
+namespace Main.Modules.Documents.Application.Handlers.Documents.CreateGenerationRequest;
 
 [Transactional]
 [AutoSave]

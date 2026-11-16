@@ -1,12 +1,12 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Main.Application.Interfaces.Services.Currency;
-using Main.Entities.Settings;
+using Main.Entities.Currency.Settings;
+using Main.Modules.Currency.Application.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
+namespace Main.Modules.Currency.Application.Handlers.Currencies.UpdateCurrenciesRates;
 
 [Transactional]
 [AutoSave]

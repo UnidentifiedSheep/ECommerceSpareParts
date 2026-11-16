@@ -4,7 +4,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Product.Enrichment;
+namespace Main.Entities.Product.Product.Enrichment;
 
 public class SupplierProductName : Entity<SupplierProductName, int>, ILinqEntity<SupplierProductName, int>
 {

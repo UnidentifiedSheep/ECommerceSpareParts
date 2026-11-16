@@ -1,6 +1,6 @@
+using Main.Modules.Identity.Application.Interfaces.Persistence;
+using Main.Modules.Identity.Persistence.Repositories;
 using Persistence.Common;
-using Main.Application.Interfaces.Persistence;
-using Main.Persistence.Repositories.User;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
 

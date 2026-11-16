@@ -1,11 +1,11 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
 using MediatR;
 
-namespace Main.Application.Products.Commands.SetProductContentQuantity;
+namespace Main.Modules.Product.Application.Products.Commands.SetProductContentQuantity;
 
 [AutoSave]
 [Transactional]

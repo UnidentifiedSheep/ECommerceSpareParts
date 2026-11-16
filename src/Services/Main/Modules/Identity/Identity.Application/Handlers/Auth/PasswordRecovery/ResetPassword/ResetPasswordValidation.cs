@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using Main.Application.Handlers.BaseValidators;
+using Main.Modules.Identity.Application.Handlers.BaseValidators;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
+namespace Main.Modules.Identity.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
 
 public class ResetPasswordValidation : AbstractValidator<ResetPasswordCommand>
 {

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Application.Common.Interfaces.Persistence;
+using Main.Modules.Notifications.Application.Delivery;
 using Moq;
 using NamedObject.Core.Interfaces;
 using Notification.Core;
@@ -36,12 +37,12 @@ public class NotificationServiceTests
 			model => new TestNotification(model));
 		var definitions = new Mock<INamedObjectRegistry<INotificationDefinition>>();
 		definitions.Setup(x => x.GetBySystemName(notification.SystemName)).Returns(definition);
-		Notification.Core.Entities.Notification? stored = null;
+		Main.Entities.Notification.Notification? stored = null;
 		var unitOfWork = new Mock<IUnitOfWork>();
 		unitOfWork.Setup(x => x.AddRangeAsync(
-				It.IsAny<IEnumerable<Notification.Core.Entities.Notification>>(),
+				It.IsAny<IEnumerable<Main.Entities.Notification.Notification>>(),
 				It.IsAny<CancellationToken>()))
-			.Callback<IEnumerable<Notification.Core.Entities.Notification>, CancellationToken>((items, _) =>
+			.Callback<IEnumerable<Main.Entities.Notification.Notification>, CancellationToken>((items, _) =>
 				stored = Assert.Single(items))
 			.Returns(Task.CompletedTask);
 		var resolver = new Mock<IRecipientResolver>(MockBehavior.Strict);
@@ -58,7 +59,7 @@ public class NotificationServiceTests
 			TestContext.Current.CancellationToken);
 
 		var delivery =
-			Assert.Single(Assert.IsType<Notification.Core.Entities.Notification>(stored).Deliveries);
+			Assert.Single(Assert.IsType<Main.Entities.Notification.Notification>(stored).Deliveries);
 		Assert.DoesNotContain("$recipient", delivery.RecipientJson);
 		var deserialized = inApp
 			? (INotificationRecipient?)JsonSerializer.Deserialize<InAppRecipient>(delivery.RecipientJson!)

@@ -1,6 +1,6 @@
-using Main.Application.Dtos.Currencies;
+using Main.Modules.Currency.Application.Dtos;
 
-namespace Main.Application.Interfaces.Cache;
+namespace Main.Modules.Currency.Application.Interfaces;
 
 public interface ICurrencyCacheRepository
 {

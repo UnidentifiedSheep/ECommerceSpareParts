@@ -4,12 +4,11 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
 using Exceptions;
-using Main.Application.Orders.Dtos;
 using Main.Entities;
-using Main.Entities.Exceptions;
-using Main.Entities.Order;
+using Main.Entities.Order.Exceptions;
+using Main.Modules.Order.Application.Orders.Dtos;
 
-namespace Main.Application.Orders.Commands.UpsertOrder;
+namespace Main.Modules.Order.Application.Orders.Commands.UpsertOrder;
 
 [AutoSave]
 [Transactional(retryDelayMs: 10, retryCount: 2)]
@@ -19,7 +18,7 @@ public record UpsertOrderCommand(
 public record UpsertOrderResult(Guid OrderId);
 
 public class UpsertOrderHandler(
-	IRepository<Order, Guid> repository,
+	IRepository<Entities.Order.Order.Order, Guid> repository,
 	IUnitOfWork unitOfWork
 ) : ICommandHandler<UpsertOrderCommand, UpsertOrderResult>
 {
@@ -38,7 +37,7 @@ public class UpsertOrderHandler(
 		return new UpsertOrderResult(order.Id);
 	}
 
-	private static void ProcessItems(UpsertOrderDto dto, Order order)
+	private static void ProcessItems(UpsertOrderDto dto, Entities.Order.Order.Order order)
 	{
 		var existingItems = order.Items.Where(item => !item.IsDeleted).ToDictionary(x => x.Id);
 		var requestedIds =
@@ -69,17 +68,17 @@ public class UpsertOrderHandler(
 			order.RemoveItem(item);
 	}
 
-	private async Task<Order> GetOrder(UpsertOrderDto dto, CancellationToken ct)
+	private async Task<Entities.Order.Order.Order> GetOrder(UpsertOrderDto dto, CancellationToken ct)
 	{
 		var order = dto.Id.HasValue
 			? await repository.FirstOrDefaultAsync(
-				Criteria<Order>.New()
+				Criteria<Entities.Order.Order.Order>.New()
 					.Where(x => x.Id == dto.Id.Value)
 					.Track()
 					.Include(x => x.Items)
 					.Build(),
 				ct) ?? throw new OrderNotFoundException(dto.Id.Value)
-			: Order.CreateManual(
+			: Entities.Order.Order.Order.CreateManual(
 				dto.OrganizationId,
 				dto.UserId,
 				dto.CurrencyId);

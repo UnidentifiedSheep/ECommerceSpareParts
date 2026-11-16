@@ -1,8 +1,9 @@
 using Domain.CommonEnums;
 using Enums.Units;
 using FluentAssertions;
-using Main.Application.Lrts.ProductWeightImport;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.ProductWeightImport;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

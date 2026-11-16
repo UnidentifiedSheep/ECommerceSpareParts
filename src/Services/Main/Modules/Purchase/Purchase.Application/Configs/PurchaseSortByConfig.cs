@@ -1,15 +1,14 @@
 using Application.Common.Querying;
-using Main.Entities.Purchase;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Purchase.Application.Configs;
 
 public static class PurchaseSortByConfig
 {
 	public static void Configure()
 		=> QueryableSortBy
 			.Value
-			.MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime, true)
-			.Map<Purchase, DateTime>("dateTime", x => x.PurchaseDatetime)
-			.Map<Purchase, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
-			.Map<Purchase, Guid>("id", x => x.Id);
+			.MapDefault<Entities.Purchase.Purchase.Purchase, DateTime>(x => x.PurchaseDatetime, true)
+			.Map<Entities.Purchase.Purchase.Purchase, DateTime>("dateTime", x => x.PurchaseDatetime)
+			.Map<Entities.Purchase.Purchase.Purchase, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
+			.Map<Entities.Purchase.Purchase.Purchase, Guid>("id", x => x.Id);
 }

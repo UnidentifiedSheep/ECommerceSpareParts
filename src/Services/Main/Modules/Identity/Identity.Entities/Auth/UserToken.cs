@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Enums;
+using Main.Entities.Enums;
 
 namespace Main.Entities.Auth;
 

@@ -3,12 +3,12 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Exceptions;
-using Main.Application.Dtos.Documents;
 using Main.Entities;
-using Main.Entities.Documents;
+using Main.Entities.Documents.Documents;
+using Main.Modules.Documents.Application.Dtos.Documents;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Documents;
+namespace Main.Modules.Documents.Application.Handlers.Documents;
 
 public sealed record GetDocumentsByIdsQuery : IQuery<GetDocumentsByIdsResult>
 {

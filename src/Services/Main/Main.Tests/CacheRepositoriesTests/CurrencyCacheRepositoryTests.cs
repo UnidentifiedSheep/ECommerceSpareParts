@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Static;
 using Main.Entities.Currency;
+using Main.Modules.Currency.Application;
+using Main.Modules.Currency.Application.Dtos;
+using Main.Modules.Currency.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;

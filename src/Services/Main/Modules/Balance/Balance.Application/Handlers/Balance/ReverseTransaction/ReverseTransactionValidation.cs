@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Balance.ReverseTransaction;
+namespace Main.Modules.Balance.Application.Handlers.Balance.ReverseTransaction;
 
 public class ReverseTransactionValidation : AbstractValidator<ReverseTransactionCommand>
 {

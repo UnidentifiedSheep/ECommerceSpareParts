@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Cqrs;
-using Main.Application.Dtos.Product.References;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.Product.ValueObjects;
+using Main.Modules.Product.Application.Dtos.Product.References;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Interfaces.Services;
 
-namespace Main.Application.Products.Queries;
+namespace Main.Modules.Product.Application.Products.Queries;
 
 public record ResolveProductReferencesQuery(IReadOnlyCollection<ProductReferenceDto> References)
 	: IQuery<ResolveProductReferencesResult>;

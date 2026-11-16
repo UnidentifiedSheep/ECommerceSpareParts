@@ -1,6 +1,6 @@
 using Main.Entities;
-using Main.Application.Services.ProductDeletion;
 using Main.Entities.Product;
+using Main.Modules.Order.Application.Services;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Order;

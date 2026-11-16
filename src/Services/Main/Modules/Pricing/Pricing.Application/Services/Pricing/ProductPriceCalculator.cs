@@ -6,8 +6,8 @@ using Pricing.Application.Interfaces.Pricing.PricePolicy;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.MarketInfo;
 using Pricing.Application.Models.Pricing.PriceCandidates;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Settings;
-using Pricing.Enums;
 
 namespace Pricing.Application.Services.Pricing;
 

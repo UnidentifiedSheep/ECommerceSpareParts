@@ -1,6 +1,6 @@
-using Main.Enums;
+using Main.Entities.Product.Enums;
 
-namespace Main.Application.Products.Interfaces;
+namespace Main.Modules.Product.Application.Products.Interfaces;
 
 public interface IProductEventProvider
 {

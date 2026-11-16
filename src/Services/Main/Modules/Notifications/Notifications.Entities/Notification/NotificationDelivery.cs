@@ -2,9 +2,8 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
-using Notification.Core.Enums;
 
-namespace Notification.Core.Entities;
+namespace Main.Entities.Notification;
 
 public sealed class NotificationDelivery :
 	Entity<NotificationDelivery, NotificationDeliveryKey>,

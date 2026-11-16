@@ -1,11 +1,10 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Organization;
 using Main.Modules.Organization.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Organization.Application.Services;
 
-public sealed class OrganizationNames(IReadRepository<Organization, Guid> organizations) : IOrganizationNames
+public sealed class OrganizationNames(IReadRepository<Entities.Organization.Organization.Organization, Guid> organizations) : IOrganizationNames
 {
 	public async Task<IReadOnlyDictionary<Guid, string>> GetAsync(
 		IReadOnlyCollection<Guid> organizationIds,

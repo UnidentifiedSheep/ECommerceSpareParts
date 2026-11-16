@@ -3,7 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Document;
 using Main.Api.GraphQl.Types.Inputs.Document;
-using Main.Application.Handlers.Documents.CreateGenerationRequest;
+using Main.Modules.Documents.Application.Handlers.Documents.CreateGenerationRequest;
 using MediatR;
 using Security.Core.Interfaces;
 

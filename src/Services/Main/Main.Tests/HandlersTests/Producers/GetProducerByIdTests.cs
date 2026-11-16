@@ -1,6 +1,7 @@
 using FluentAssertions;
-using Main.Application.Handlers.Producers;
 using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Handlers.Producers;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;

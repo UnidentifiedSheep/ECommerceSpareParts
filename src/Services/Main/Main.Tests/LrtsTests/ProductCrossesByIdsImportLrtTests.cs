@@ -1,7 +1,8 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.ProductCrossesByIdsImport;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.ProductCrossesByIdsImport;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

@@ -1,10 +1,11 @@
 using Application.Common.Interfaces.Repositories;
 using Locan.Core.Interfaces;
 using Main.Entities.Purchase;
+using Main.Entities.Purchase.Purchase;
 using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services.ProductDeletion;
+namespace Main.Modules.Purchase.Application.Services.ProductDeletion;
 
 public sealed class PurchaseContentProductDeletionRule(IReadRepository<PurchaseContent, int> repository) : IProductDeletionRule
 {

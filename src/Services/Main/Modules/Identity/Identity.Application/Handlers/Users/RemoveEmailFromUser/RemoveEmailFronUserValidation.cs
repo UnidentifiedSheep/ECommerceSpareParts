@@ -1,8 +1,8 @@
-using Application.Common.Interfaces.Validators;
 using FluentValidation;
-using Main.Application.Handlers.BaseValidators;
+using Main.Modules.Identity.Application.Validators;
+using EmailValidator = Main.Modules.Identity.Application.Handlers.BaseValidators.EmailValidator;
 
-namespace Main.Application.Handlers.Users.RemoveEmailFromUser;
+namespace Main.Modules.Identity.Application.Handlers.Users.RemoveEmailFromUser;
 
 public class RemoveEmailFronUserValidation : AbstractValidator<RemoveEmailFromUserCommand>
 {

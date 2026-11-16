@@ -1,4 +1,4 @@
-namespace Main.Application.Services;
+namespace Main.Modules.Documents.Application.Services;
 
 internal static class DocumentCacheKeys
 {

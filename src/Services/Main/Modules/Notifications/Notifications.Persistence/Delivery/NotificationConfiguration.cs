@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NotificationEntity = Notification.Core.Entities.Notification;
+using NotificationEntity = Main.Entities.Notification.Notification;
 
-namespace Notification.Persistence;
+namespace Main.Modules.Notifications.Persistence.Delivery;
 
-public class NotificationConfiguration : IEntityTypeConfiguration<NotificationEntity>
+public class NotificationConfiguration : IEntityTypeConfiguration<Entities.Notification.Notification>
 {
 	public void Configure(EntityTypeBuilder<NotificationEntity> builder)
 	{

@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Producers.GetProducers;
+using Main.Modules.Product.Application.Handlers.Producers.GetProducers;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;

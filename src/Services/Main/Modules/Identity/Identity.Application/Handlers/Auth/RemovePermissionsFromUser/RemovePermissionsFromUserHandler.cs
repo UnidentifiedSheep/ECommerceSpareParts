@@ -6,7 +6,7 @@ using Extensions;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 
-namespace Main.Application.Handlers.Auth.RemovePermissionsFromUser;
+namespace Main.Modules.Identity.Application.Handlers.Auth.RemovePermissionsFromUser;
 
 [Transactional(retryDelayMs: 20, retryCount: 2)]
 [AutoSave]

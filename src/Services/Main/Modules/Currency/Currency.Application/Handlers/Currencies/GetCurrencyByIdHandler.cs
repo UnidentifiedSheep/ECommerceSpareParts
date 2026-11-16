@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cqrs;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Interfaces.Cache;
-using Main.Entities.Exceptions;
+using Main.Entities.Currency;
+using Main.Modules.Currency.Application.Dtos;
+using Main.Modules.Currency.Application.Interfaces;
 
-namespace Main.Application.Handlers.Currencies;
+namespace Main.Modules.Currency.Application.Handlers.Currencies;
 
 public record GetCurrencyByIdQuery(int Id) : IQuery<GetCurrencyByIdResult>;
 

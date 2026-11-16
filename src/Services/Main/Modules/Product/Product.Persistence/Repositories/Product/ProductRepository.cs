@@ -1,24 +1,22 @@
 using Application.Common.Interfaces.Repositories;
 using EFCore.BulkExtensions;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Models.Product;
-using Main.Entities.Product;
-using Main.Entities.Storage;
-using Main.Enums.Products;
-using Main.Persistence.Context;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Models.Product;
+using Main.Modules.Product.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Persistence.Context;
 using Persistence.Repository;
 using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
-using ProductEntity = Main.Entities.Product.Product;
+using ProductEntity = Main.Entities.Product.Product.Product;
 
-namespace Main.Persistence.Repositories.Product;
+namespace Main.Modules.Product.Persistence.Repositories.Product;
 
 internal class ProductRepository(UnifiedDbContext context,
 	BulkProductContext bulkContext,
 	QueryExtensions extensions)
-	: LinqRepositoryBase<UnifiedDbContext, ProductEntity, int>(context, extensions), IProductRepository
+	: LinqRepositoryBase<UnifiedDbContext, ProductEntity.Product, int>(context, extensions), IProductRepository
 {
 	public async Task<IReadOnlyList<ProductEntity>> GetProductCrosses(
 		int productId,

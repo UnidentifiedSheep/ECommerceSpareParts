@@ -1,5 +1,5 @@
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.PriceCandidates;

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Enums;
 
-namespace Main.Application.Dtos.Product.Enrichment;
+namespace Main.Modules.Product.Application.Dtos.Product.Enrichment;
 
 public record SupplierProductDto
 {

@@ -7,6 +7,7 @@ using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.HandlersTests.Products;
 

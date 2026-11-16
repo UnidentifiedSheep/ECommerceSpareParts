@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Order;
+namespace Main.Modules.Order.Persistence.Configurations.Order;
 
-public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
+public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order.Order>
 {
-	public void Configure(EntityTypeBuilder<Entities.Order.Order> builder)
+	public void Configure(EntityTypeBuilder<Entities.Order.Order.Order> builder)
 	{
 		builder.ToTable("orders", "public");
 

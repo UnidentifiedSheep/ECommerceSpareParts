@@ -5,7 +5,7 @@ using Attributes;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 
-namespace Main.Application.Handlers.Auth.RemoveRolesFromUser;
+namespace Main.Modules.Identity.Application.Handlers.Auth.RemoveRolesFromUser;
 
 [Transactional(retryDelayMs: 20, retryCount: 2)]
 [AutoSave]

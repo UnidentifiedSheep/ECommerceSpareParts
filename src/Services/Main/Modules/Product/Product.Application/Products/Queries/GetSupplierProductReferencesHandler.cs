@@ -1,18 +1,17 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Enums;
-using Main.Application.Dtos.Product.SupplierReferences;
-using Main.Entities.Product;
+using Main.Modules.Product.Application.Dtos.Product.SupplierReferences;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries;
+namespace Main.Modules.Product.Application.Products.Queries;
 
 public record GetSupplierProductReferencesQuery(IReadOnlyCollection<int> ProductIds, Supplier Supplier)
 	: IQuery<GetSupplierProductReferencesResult>;
 
 public record GetSupplierProductReferencesResult(IReadOnlyList<ResolvedSupplierProductReferenceDto> Products);
 
-public class GetSupplierProductReferencesHandler(IReadRepository<Product, int> repository)
+public class GetSupplierProductReferencesHandler(IReadRepository<Entities.Product.Product.Product, int> repository)
 	: IQueryHandler<GetSupplierProductReferencesQuery, GetSupplierProductReferencesResult>
 {
 	public async Task<GetSupplierProductReferencesResult> Handle(

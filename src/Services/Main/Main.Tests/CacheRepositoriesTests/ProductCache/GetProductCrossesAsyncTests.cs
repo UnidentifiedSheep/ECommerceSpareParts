@@ -1,8 +1,9 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Products.Interfaces;
-using Main.Application.Static;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Static;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using Tests.TestContainers.Combined;

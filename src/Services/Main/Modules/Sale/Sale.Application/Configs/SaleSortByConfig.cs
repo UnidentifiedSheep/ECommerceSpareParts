@@ -1,7 +1,7 @@
 using Application.Common.Querying;
-using Main.Entities.Sale;
+using Main.Entities.Sale.Sale;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Sale.Application.Configs;
 
 public static class SaleSortByConfig
 {
@@ -9,10 +9,10 @@ public static class SaleSortByConfig
 	{
 		QueryableSortBy
 			.Value
-			.MapDefault<Sale, DateTime>(x => x.SaleDatetime, true)
-			.Map<Sale, DateTime>("dateTime", x => x.SaleDatetime)
-			.Map<Sale, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
-			.Map<Sale, Guid>("id", x => x.Id);
+			.MapDefault<Entities.Sale.Sale.Sale, DateTime>(x => x.SaleDatetime, true)
+			.Map<Entities.Sale.Sale.Sale, DateTime>("dateTime", x => x.SaleDatetime)
+			.Map<Entities.Sale.Sale.Sale, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
+			.Map<Entities.Sale.Sale.Sale, Guid>("id", x => x.Id);
 
 		QueryableSortBy
 			.Value

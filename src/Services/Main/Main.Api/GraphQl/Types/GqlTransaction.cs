@@ -6,10 +6,11 @@ using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.Purchase;
 using Main.Api.GraphQl.Types.Sale;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Dtos.Balances;
-using Main.Application.Handlers.Currencies;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Entities.Balance.Exceptions;
 using Main.Entities.Exceptions;
-using Main.Enums.Balances;
+using Main.Modules.Balance.Application.Dtos.Balances;
+using Main.Modules.Currency.Application.Handlers.Currencies;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types;

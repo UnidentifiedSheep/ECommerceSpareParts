@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Notification.Core.Interfaces.Notification;
 
-namespace Notification;
+namespace Main.Modules.Notifications.Application.Delivery;
 
 public sealed class NotificationSerializer : INotificationSerializer
 {

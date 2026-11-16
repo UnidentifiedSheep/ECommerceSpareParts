@@ -1,9 +1,11 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Dtos.Organizations;
-using Main.Application.Handlers.Organizations.UpdateOrganization;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization;
+using Main.Entities.Organization.Exceptions;
+using Main.Entities.Organization.Organization;
+using Main.Modules.Organization.Application.Dtos.Organizations;
+using Main.Modules.Organization.Application.Handlers.Organizations.UpdateOrganization;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Organization;

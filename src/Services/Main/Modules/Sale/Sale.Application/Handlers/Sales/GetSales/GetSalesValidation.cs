@@ -1,10 +1,9 @@
-using Main.Entities.Sale;
 using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
-using Main.Entities;
+using Main.Entities.Sale;
 
-namespace Main.Application.Handlers.Sales.GetSales;
+namespace Main.Modules.Sale.Application.Handlers.Sales.GetSales;
 
 public class GetSalesValidation : AbstractValidator<GetSalesQuery>
 {

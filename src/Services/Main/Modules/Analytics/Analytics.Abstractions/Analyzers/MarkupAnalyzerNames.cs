@@ -1,4 +1,4 @@
-namespace Main.Application.Analytics.Analyzers;
+namespace Main.Modules.Analytics.Abstractions.Analyzers;
 
 public static class MarkupAnalyzerNames
 {

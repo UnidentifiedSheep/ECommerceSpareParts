@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
-using Main.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Dtos.Users;
 
-namespace Main.Application.Interfaces.Services;
+namespace Main.Modules.Identity.Application.Interfaces.Services;
 
 public interface IJwtGenerator
 {

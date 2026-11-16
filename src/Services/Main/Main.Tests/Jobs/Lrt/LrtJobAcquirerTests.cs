@@ -3,6 +3,7 @@ using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
+using Main.Modules.Jobs.Application.LRT;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 using Tests.Stubs;

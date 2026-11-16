@@ -1,9 +1,8 @@
 using Application.Common.Extensions;
-using Main.Entities.Purchase;
 using FluentValidation;
-using Main.Entities;
+using Main.Entities.Purchase;
 
-namespace Main.Application.Handlers.Purchases.DeletePurchase;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.DeletePurchase;
 
 public class DeletePurchaseValidation : AbstractValidator<DeletePurchaseCommand>
 {

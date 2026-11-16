@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
-using Application.Common.Interfaces.Validators;
 
-namespace Application.Common.Validators;
+namespace Main.Modules.Identity.Application.Validators;
 
 public partial class EmailValidator : IEmailValidator
 {

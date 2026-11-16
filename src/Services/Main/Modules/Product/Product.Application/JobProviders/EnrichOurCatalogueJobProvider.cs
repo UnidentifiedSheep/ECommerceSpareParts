@@ -1,11 +1,11 @@
 using System.Text.Json;
+using Application.Common;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
 using Attributes;
 using Domain.CommonEntities.Job;
-using Main.Application.Lrts.EnrichCatalogue;
+using Main.Modules.Product.Application.Lrts.EnrichCatalogue;
 
-namespace Main.Application.JobProviders;
+namespace Main.Modules.Product.Application.JobProviders;
 
 [Lifetime(Lifetime.Scoped)]
 public sealed class EnrichOurCatalogueJobProvider(

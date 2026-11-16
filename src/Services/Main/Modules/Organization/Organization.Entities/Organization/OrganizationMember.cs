@@ -2,9 +2,9 @@ using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
 
-namespace Main.Entities.Organization;
+namespace Main.Entities.Organization.Organization;
 
 public class OrganizationMember : AuditableEntity<OrganizationMember, OrganizationMemberKey>,
 	ILinqEntity<OrganizationMember, OrganizationMemberKey>

@@ -2,7 +2,7 @@ using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Auth.AddPermissionsToUser;
+namespace Main.Modules.Identity.Application.Handlers.Auth.AddPermissionsToUser;
 
 public sealed class AddPermissionsToUserDbValidation : AbstractDbValidation<AddPermissionsToUserCommand>
 {

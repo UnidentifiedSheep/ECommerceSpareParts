@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Enums.Units;
 
-namespace Main.Application.Dtos.Product;
+namespace Main.Modules.Product.Application.Dtos.Product;
 
 public record ProductSizeDto
 {

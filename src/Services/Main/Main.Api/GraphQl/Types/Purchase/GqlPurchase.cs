@@ -4,8 +4,10 @@ using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Dtos.Purchase;
+using Main.Entities.Currency;
 using Main.Entities.Exceptions;
+using Main.Entities.Purchase.Exceptions;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 
 namespace Main.Api.GraphQl.Types.Purchase;
 

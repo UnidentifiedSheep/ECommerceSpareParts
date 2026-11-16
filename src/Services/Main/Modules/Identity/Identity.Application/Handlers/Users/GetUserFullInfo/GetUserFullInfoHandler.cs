@@ -2,13 +2,13 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions.QueryExtensions;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Extensions.QueryExtensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Users.GetUserFullInfo;
+namespace Main.Modules.Identity.Application.Handlers.Users.GetUserFullInfo;
 
 public record GetUserFullInfoQuery(Guid UserId) : IQuery<GetUserFullInfoResult>;
 

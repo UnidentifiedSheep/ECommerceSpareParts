@@ -6,6 +6,7 @@ using HotChocolate.Types;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Product;
+using Main.Entities.Currency;
 using Main.Entities.Exceptions;
 using MediatR;
 using Pricing.Api.GraphQl.DataLoaders;

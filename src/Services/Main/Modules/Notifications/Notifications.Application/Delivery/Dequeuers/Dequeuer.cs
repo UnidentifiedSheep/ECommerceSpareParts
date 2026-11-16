@@ -3,6 +3,7 @@ using System.Text.Json;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
+using Main.Modules.Notifications.Application.Delivery.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,12 +11,11 @@ using NamedObject.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Interfaces.Recipient;
 using Notification.Core.Interfaces.Repositories;
-using Notification.Options;
-using DeliveryEntity = Notification.Core.Entities.NotificationDelivery;
+using DeliveryEntity = Main.Entities.Notification.NotificationDelivery;
 using NotificationRequest = Notification.Core.NotificationDelivery;
 using SendResult = Notification.Core.SendResult;
 
-namespace Notification.Dequeuers;
+namespace Main.Modules.Notifications.Application.Delivery.Dequeuers;
 
 public class Dequeuer<TRecipient>(
 	string systemName,

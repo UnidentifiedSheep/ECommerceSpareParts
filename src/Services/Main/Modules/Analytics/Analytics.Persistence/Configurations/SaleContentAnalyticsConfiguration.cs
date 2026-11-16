@@ -2,7 +2,7 @@ using Main.Entities.Analytics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Analytics;
+namespace Main.Modules.Analytics.Persistence.Configurations;
 
 public sealed class SaleContentAnalyticsConfiguration : IEntityTypeConfiguration<SaleContentAnalytics>
 {

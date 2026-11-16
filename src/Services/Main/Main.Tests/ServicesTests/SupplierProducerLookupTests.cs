@@ -1,7 +1,7 @@
 using Enums;
 using FluentAssertions;
-using Main.Application.Interfaces.Services;
-using Main.Application.Models.Producer;
+using Main.Modules.Product.Application.Interfaces.Services;
+using Main.Modules.Product.Application.Models.Producer;
 
 namespace Tests.ServicesTests;
 

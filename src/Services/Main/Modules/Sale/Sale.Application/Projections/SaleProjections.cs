@@ -1,16 +1,15 @@
 ﻿using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using LinqKit;
-using Main.Application.Dtos.Sale;
-using Main.Entities.Sale;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Sale.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class SaleDtoProjectionProvider : ProjectionProviderBase<Sale, SaleDto>
+public sealed class SaleDtoProjectionProvider : ProjectionProviderBase<Entities.Sale.Sale.Sale, SaleDto>
 {
-	public override Expression<Func<Sale, SaleDto>> Projection { get; } =
+	public override Expression<Func<Entities.Sale.Sale.Sale, SaleDto>> Projection { get; } =
 		x => new SaleDto
 		{
 			Id = x.Id,

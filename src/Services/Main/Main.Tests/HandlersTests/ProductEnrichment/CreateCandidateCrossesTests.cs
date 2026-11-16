@@ -1,11 +1,13 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 using Main.Entities;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
-using Main.Entities.Product.Enrichment;
-using Main.Enums.Products;
+using Main.Entities.Product.Enums.Products;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

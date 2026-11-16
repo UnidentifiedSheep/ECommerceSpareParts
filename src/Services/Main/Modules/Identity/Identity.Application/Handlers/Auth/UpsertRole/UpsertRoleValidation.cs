@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Auth.UpsertRole;
+namespace Main.Modules.Identity.Application.Handlers.Auth.UpsertRole;
 
 public class UpsertRoleValidation : AbstractValidator<UpsertRoleCommand>
 {

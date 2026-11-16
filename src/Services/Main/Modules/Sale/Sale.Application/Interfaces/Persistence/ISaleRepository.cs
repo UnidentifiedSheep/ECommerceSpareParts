@@ -1,13 +1,12 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Sale;
 
-namespace Main.Application.Interfaces.Persistence;
+namespace Main.Modules.Sale.Application.Interfaces.Persistence;
 
-public interface ISaleRepository : IRepository<Sale, Guid>
+public interface ISaleRepository : IRepository<Entities.Sale.Sale.Sale, Guid>
 {
-	Task<Sale?> GetFullSaleForUpdate(Guid id, CancellationToken cancellationToken = default);
+	Task<Entities.Sale.Sale.Sale?> GetFullSaleForUpdate(Guid id, CancellationToken cancellationToken = default);
 
-	Task<IReadOnlyList<Sale>> GetFullSalesForUpdate(
+	Task<IReadOnlyList<Entities.Sale.Sale.Sale>> GetFullSalesForUpdate(
 		IReadOnlyCollection<Guid> ids,
 		CancellationToken cancellationToken = default);
 }

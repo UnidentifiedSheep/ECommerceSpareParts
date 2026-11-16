@@ -2,11 +2,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Application.Dtos.Product.Enrichment;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Dtos.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ProductEnrichment;
+namespace Main.Modules.Product.Application.Handlers.ProductEnrichment;
 
 public record GetSupplierProductCrossesBatchQuery : IQuery<GetSupplierProductCrossesBatchResult>
 {

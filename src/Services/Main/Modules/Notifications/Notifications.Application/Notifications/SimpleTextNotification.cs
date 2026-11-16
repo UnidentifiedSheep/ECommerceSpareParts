@@ -1,6 +1,6 @@
 using Notification.Core.Interfaces.Notification;
 
-namespace Main.Application.Notifications;
+namespace Main.Modules.Notifications.Application.Notifications;
 
 public class SimpleTextNotification(string text) : ITextNotification
 {

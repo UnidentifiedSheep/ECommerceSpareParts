@@ -1,10 +1,9 @@
 using Application.Common.Extensions;
 using FluentValidation;
-using Main.Application.Models.Storage;
-using Main.Entities;
 using Main.Entities.Storage;
+using Main.Modules.Storage.Abstractions.Models;
 
-namespace Main.Application.Services.Storage;
+namespace Main.Modules.Storage.Application.Services.Storage;
 
 public sealed class
 	SubtractProductFromStorageItemsValidation : AbstractValidator<

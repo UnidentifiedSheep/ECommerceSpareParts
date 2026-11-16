@@ -1,5 +1,5 @@
-using Api.Common.EndPoints.Internal;
 using Carter;
+using Main.Api.Settings;
 
 namespace Main.Api.EndPoints.Internal;
 

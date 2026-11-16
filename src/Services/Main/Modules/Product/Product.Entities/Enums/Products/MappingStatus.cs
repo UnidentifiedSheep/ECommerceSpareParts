@@ -1,4 +1,4 @@
-namespace Main.Enums.Products;
+namespace Main.Entities.Product.Enums.Products;
 
 public enum MappingStatus
 {

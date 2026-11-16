@@ -1,14 +1,14 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Models.Options.S3;
 using Attributes;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Products.Commands.MapImgsToProduct;
+namespace Main.Modules.Product.Application.Products.Commands.MapImgsToProduct;
 
 [AutoSave]
 [Transactional]

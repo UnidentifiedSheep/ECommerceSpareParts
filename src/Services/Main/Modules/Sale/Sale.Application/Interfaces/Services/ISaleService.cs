@@ -1,10 +1,9 @@
 using Enums;
-using Main.Application.Dtos.Sale;
-using Main.Application.Models.Storage;
-using Main.Entities.Sale;
-using Main.Enums;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
+using Main.Modules.Storage.Abstractions.Models;
 
-namespace Main.Application.Interfaces.Services;
+namespace Main.Modules.Sale.Application.Interfaces.Services;
 
 public interface ISaleService
 {
@@ -29,7 +28,7 @@ public interface ISaleService
 		CancellationToken cancellationToken = default);
 
 	Task RestoreContents(
-		Sale sale,
+		Entities.Sale.Sale.Sale sale,
 		StorageMovementType movementType,
 		CancellationToken cancellationToken = default);
 }

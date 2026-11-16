@@ -1,5 +1,5 @@
 using Domain.CommonEntities;
-using Main.Entities.Settings;
+using Main.Entities.Currency.Settings;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 

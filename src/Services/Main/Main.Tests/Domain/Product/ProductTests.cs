@@ -1,6 +1,8 @@
 using FluentAssertions;
+using Main.Entities.Product.Product.ValueObjects;
 using Main.Entities.Product.ValueObjects;
-using ProductDomain = Main.Entities.Product.Product;
+using ProductDomain = Main.Entities.Product.Product.Product;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.Domain.Product;
 

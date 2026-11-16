@@ -1,11 +1,11 @@
 using EFCore.ComplexIndexes;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ProducerEntity = Main.Entities.Producer.Producer;
-using ProductEntity = Main.Entities.Product.Product;
+using ProducerEntity = Main.Entities.Product.Producer.Producer;
+using ProductEntity = Main.Entities.Product.Product.Product;
 
-namespace Main.Persistence.Context.Configurations.Product.Enrichment;
+namespace Main.Modules.Product.Persistence.Configurations.Product.Enrichment;
 
 public class CatalogueCandidateConfiguration : IEntityTypeConfiguration<CatalogueCandidate>
 {

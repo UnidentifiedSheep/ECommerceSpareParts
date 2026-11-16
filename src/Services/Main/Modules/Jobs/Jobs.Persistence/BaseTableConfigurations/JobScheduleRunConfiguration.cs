@@ -2,7 +2,7 @@ using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Persistence.Common.BaseTableConfigurations;
+namespace Main.Modules.Jobs.Persistence.BaseTableConfigurations;
 
 public class JobScheduleRunConfiguration : IEntityTypeConfiguration<JobScheduleRun>
 {

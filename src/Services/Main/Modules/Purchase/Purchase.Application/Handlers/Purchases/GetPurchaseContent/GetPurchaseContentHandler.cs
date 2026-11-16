@@ -2,19 +2,19 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Application.Dtos.Purchase;
-using Main.Entities.Exceptions;
-using Main.Entities.Purchase;
+using Main.Entities.Purchase.Exceptions;
+using Main.Entities.Purchase.Purchase;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Purchases.GetPurchaseContent;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.GetPurchaseContent;
 
 public record GetPurchaseContentQuery(Guid Id) : IQuery<GetPurchaseContentResult>;
 
 public record GetPurchaseContentResult(IReadOnlyList<PurchaseContentDto> Content);
 
 public class GetPurchaseContentHandler(
-	IReadRepository<Purchase, Guid> repository,
+	IReadRepository<Entities.Purchase.Purchase.Purchase, Guid> repository,
 	IProjectionProvider<PurchaseContent, PurchaseContentDto> contentProjection)
 	: IQueryHandler<GetPurchaseContentQuery, GetPurchaseContentResult>
 {

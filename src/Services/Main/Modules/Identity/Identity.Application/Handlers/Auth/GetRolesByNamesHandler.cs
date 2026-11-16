@@ -2,11 +2,11 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Auth;
 using Main.Entities.Auth;
+using Main.Modules.Identity.Application.Dtos.Auth;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Auth;
+namespace Main.Modules.Identity.Application.Handlers.Auth;
 
 public sealed record GetRolesByNamesQuery : IQuery<GetRolesByNamesResult>
 {

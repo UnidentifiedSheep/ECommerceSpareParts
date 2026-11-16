@@ -5,12 +5,13 @@ using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Dtos.Organizations;
-using Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
-using Main.Application.Handlers.Balance.GetTransactions;
-using Main.Application.Handlers.Organizations.GetOrganizationMembers;
 using Main.Entities.Exceptions;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Exceptions;
+using Main.Modules.Balance.Application.Handlers.Balance.GetOrganizationFinancialInfo;
+using Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
+using Main.Modules.Organization.Application.Dtos.Organizations;
+using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types.Organization;

@@ -1,7 +1,7 @@
-﻿using Main.Application.Models.Currency;
-using Main.Entities.Settings;
+﻿using Main.Entities.Currency.Settings;
+using Main.Modules.Currency.Application.Models.Currency;
 
-namespace Main.Application.Interfaces.Services.Currency;
+namespace Main.Modules.Currency.Application.Interfaces;
 
 public interface ICurrencyRateUpdater
 {

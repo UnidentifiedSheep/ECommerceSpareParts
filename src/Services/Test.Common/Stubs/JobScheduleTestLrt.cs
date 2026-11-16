@@ -1,4 +1,4 @@
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
 

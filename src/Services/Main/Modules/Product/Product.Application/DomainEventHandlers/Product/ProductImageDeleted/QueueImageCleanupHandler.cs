@@ -1,13 +1,13 @@
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Services;
-using Application.Common.Models.Options.S3;
 using Application.Common.Services.Events;
-using Main.Application.Lrts.DeleteProductImages;
-using Main.Entities.DomainEvents.Product;
+using Main.Entities.Product.DomainEvents.Product;
+using Main.Modules.Product.Application.Lrts.DeleteProductImages;
 using Microsoft.Extensions.Options;
+using S3.Core.Options;
 
-namespace Main.Application.DomainEventHandlers.Product.ProductImageDeleted;
+namespace Main.Modules.Product.Application.DomainEventHandlers.Product.ProductImageDeleted;
 
 public class QueueImageCleanupHandler(
 	IJobService jobService,

@@ -1,8 +1,8 @@
-﻿using Main.Entities.Product;
+﻿using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Product;
+namespace Main.Modules.Product.Persistence.Configurations.Product;
 
 public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
 {
@@ -24,7 +24,7 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
 		builder.Property(e => e.StorageKey).HasColumnName("storage_key").HasMaxLength(255);
 
 		builder
-			.HasOne<Entities.Product.Product>()
+			.HasOne<Entities.Product.Product.Product>()
 			.WithMany(p => p.Images)
 			.HasForeignKey(x => x.ProductId)
 			.OnDelete(DeleteBehavior.Cascade)

@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Purchase;
-using Main.Application.Handlers.Purchases;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
+using Main.Modules.Purchase.Application.Handlers.Purchases;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

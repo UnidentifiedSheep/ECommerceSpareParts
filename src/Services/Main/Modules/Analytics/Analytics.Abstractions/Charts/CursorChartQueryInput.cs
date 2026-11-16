@@ -2,11 +2,11 @@ using System.Text.Json.Serialization;
 using Application.Common;
 using Application.Common.Models;
 using Domain.Validation;
-using Main.Application.Analytics.Interfaces.ChartData;
+using Main.Modules.Analytics.Abstractions.Interfaces.ChartData;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.Analytics.Charts;
+namespace Main.Modules.Analytics.Abstractions.Charts;
 
 public abstract record CursorChartQueryInput<TCursor> : ICursorChartQueryInput<TCursor> where TCursor : struct
 {

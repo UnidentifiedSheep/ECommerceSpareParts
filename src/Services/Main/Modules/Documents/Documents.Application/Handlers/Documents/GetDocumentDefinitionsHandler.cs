@@ -1,13 +1,12 @@
-using Enums;
 using Application.Common.Interfaces.Cqrs;
+using Enums;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Dtos.Documents;
-using Main.Application.Interfaces.Services.Document;
-using Main.Enums.Documents;
+using Main.Application.Document.Interfaces.Document;
+using Main.Modules.Documents.Application.Dtos.Documents;
 using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions;
 
-namespace Main.Application.Handlers.Documents;
+namespace Main.Modules.Documents.Application.Handlers.Documents;
 
 public sealed record GetDocumentDefinitionsQuery : IQuery<GetDocumentDefinitionsResult>;
 

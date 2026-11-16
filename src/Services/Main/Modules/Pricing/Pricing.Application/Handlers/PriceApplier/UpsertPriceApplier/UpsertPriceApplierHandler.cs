@@ -9,8 +9,8 @@ using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Entities;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Pricing;
-using Pricing.Enums;
 
 namespace Pricing.Application.Handlers.PriceApplier.UpsertPriceApplier;
 

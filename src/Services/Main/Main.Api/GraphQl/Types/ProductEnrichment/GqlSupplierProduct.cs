@@ -2,7 +2,7 @@ using Enums;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Application.Dtos.Product.Enrichment;
+using Main.Modules.Product.Application.Dtos.Product.Enrichment;
 
 namespace Main.Api.GraphQl.Types.ProductEnrichment;
 

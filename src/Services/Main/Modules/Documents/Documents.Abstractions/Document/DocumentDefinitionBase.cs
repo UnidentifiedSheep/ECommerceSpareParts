@@ -1,15 +1,14 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Application.Common.Models.Options.S3;
 using Enums;
 using Locan.Core.Interfaces;
-using Main.Application.Interfaces.Services.Document;
-using Main.Enums.Documents;
+using Main.Application.Document.Interfaces.Document;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Document;
+namespace Main.Application.Document.Document;
 
 public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 	IDocumentTemplateResolver templateResolver,

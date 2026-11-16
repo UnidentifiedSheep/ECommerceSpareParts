@@ -3,14 +3,13 @@ using Application.Common.Interfaces.Projections;
 using Attributes;
 using Contracts.Models.CatalogueCandidate;
 using LinqKit;
-using Main.Application.Dtos.Producer;
-using Main.Application.Dtos.Product;
-using Main.Application.Dtos.Product.Enrichment;
-using Main.Entities.Product;
-using Main.Entities.Product.Enrichment;
-using ProducerEntity = Main.Entities.Producer.Producer;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Dtos.Product.Enrichment;
+using ProducerEntity = Main.Entities.Product.Producer.Producer;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Product.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class
@@ -56,7 +55,7 @@ public sealed class
 {
 	public CatalogueCandidateReviewDtoProjectionProvider(
 		IProjectionProvider<ProducerEntity, ProducerDto> producerProjection,
-		IProjectionProvider<Product, ProductDto> productProjection,
+		IProjectionProvider<Entities.Product.Product.Product, ProductDto> productProjection,
 		IProjectionProvider<SupplierProduct, SupplierProductDto> supplierProductProjection)
 	{
 		var producerToDto = producerProjection.Projection;

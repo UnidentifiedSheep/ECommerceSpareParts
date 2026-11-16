@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Settings;
-using Main.Application.Interfaces.Cache;
-using Main.Entities.Settings;
-using Main.Modules.Currency.Abstractions;
+using Main.Entities.Currency.Settings;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Currency.Application.Interfaces;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Currency.Application.Services;
 
 public sealed class CurrencyLookup(
 	ICurrencyCacheRepository currencies,

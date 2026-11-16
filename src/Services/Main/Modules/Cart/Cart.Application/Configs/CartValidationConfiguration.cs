@@ -1,8 +1,8 @@
 using BulkValidation.Core.Configuration;
 using Main.Entities.Cart;
-using Main.Entities.Exceptions;
+using Main.Entities.Cart.Exceptions;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Cart.Application.Configs;
 
 public static class CartValidationConfiguration
 {

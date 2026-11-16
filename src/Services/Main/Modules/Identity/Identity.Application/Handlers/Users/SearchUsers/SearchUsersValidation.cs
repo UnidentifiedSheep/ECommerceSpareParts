@@ -3,7 +3,7 @@ using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Users.SearchUsers;
+namespace Main.Modules.Identity.Application.Handlers.Users.SearchUsers;
 
 public sealed class SearchUsersValidation : AbstractValidator<SearchUsersQuery>
 {

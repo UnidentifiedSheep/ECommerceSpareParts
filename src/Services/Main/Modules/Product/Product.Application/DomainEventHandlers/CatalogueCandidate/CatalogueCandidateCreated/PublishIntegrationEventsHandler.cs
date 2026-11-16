@@ -5,15 +5,15 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Services.Events;
 using Contracts.Models.CatalogueCandidate;
 using Domain.Events;
-using Candidate = Main.Entities.Product.Enrichment.CatalogueCandidate;
+using Candidate = Main.Entities.Product.Product.Enrichment.CatalogueCandidate;
 
-namespace Main.Application.DomainEventHandlers.CatalogueCandidate.CatalogueCandidateCreated;
+namespace Main.Modules.Product.Application.DomainEventHandlers.CatalogueCandidate.CatalogueCandidateCreated;
 
 internal sealed class PublishIntegrationEventsHandler(
 	IIntegrationEventScope integrationEventScope,
 	IProjectionProvider<Candidate, CatalogueCandidateContractDto> projection,
 	IReadRepository<Candidate, Guid> repository)
-	: BatchableDomainEventHandler<EntityCreatedDomainEvent<Candidate>>
+	: BatchableDomainEventHandler<EntityCreatedDomainEvent<Entities.Product.Product.Enrichment.CatalogueCandidate>>
 {
 	public override Task Handle(
 		Batch<EntityCreatedDomainEvent<Candidate>> notification,

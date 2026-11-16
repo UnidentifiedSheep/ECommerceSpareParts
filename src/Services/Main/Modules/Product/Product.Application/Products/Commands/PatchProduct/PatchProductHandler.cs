@@ -1,12 +1,12 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Main.Application.Dtos.Product;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 using MediatR;
 
-namespace Main.Application.Products.Commands.PatchProduct;
+namespace Main.Modules.Product.Application.Products.Commands.PatchProduct;
 
 [Transactional]
 [AutoSave]

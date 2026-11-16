@@ -1,15 +1,14 @@
+using Application.Common;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.LRT;
 using Contracts.Producer;
 using Locan.Core.Interfaces;
-using Main.Application.Lrts.Base.Synchronization;
-using Main.Entities;
-using Main.Entities.Producer;
 using Main.Entities.Product;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Lrts.Base.Synchronization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts;
+namespace Main.Modules.Product.Application.Lrts;
 
 public class ProducerSynchronizationLrt(
 	IApplicationTransactionFactory transactionService,

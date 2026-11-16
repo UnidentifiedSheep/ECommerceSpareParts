@@ -1,16 +1,15 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
 using Domain.Events;
-using Main.Application.Interfaces.Cache;
-using Main.Entities.Currency;
+using Main.Modules.Currency.Application.Interfaces;
 
-namespace Main.Application.DomainEventHandlers.CurrencyCreated;
+namespace Main.Modules.Currency.Application.DomainEventHandlers.CurrencyCreated;
 
 public sealed class InvalidateCacheHandler(ICurrencyCacheRepository cacheRepository)
-	: BatchableDomainEventHandler<EntityCreatedDomainEvent<Currency>>
+	: BatchableDomainEventHandler<EntityCreatedDomainEvent<Entities.Currency.Currency>>
 {
 	public override async Task Handle(
-		Batch<EntityCreatedDomainEvent<Currency>> notification,
+		Batch<EntityCreatedDomainEvent<Entities.Currency.Currency>> notification,
 		CancellationToken cancellationToken)
 		=> await cacheRepository.InvalidateAllCurrencies(cancellationToken);
 }

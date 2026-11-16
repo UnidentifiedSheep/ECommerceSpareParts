@@ -1,7 +1,7 @@
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -10,14 +10,14 @@ using Pricing.Application.Handlers.Pricing;
 using Pricing.Application.Handlers.Pricing.GetRecommendedPrice;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
 using Pricing.Entities.Settings;
-using Pricing.Enums;
-using Tests.PricingTests.DataBuilders.Offers;
 using Tests.Extensions;
+using Tests.PricingTests.DataBuilders.Offers;
 using Tests.TestContainers.Combined;
 
-namespace Tests.PricingTests.HandlerTests.PriceCalculation;
+namespace Tests.PricingTests.HandlerTests.Pricing;
 
 public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {

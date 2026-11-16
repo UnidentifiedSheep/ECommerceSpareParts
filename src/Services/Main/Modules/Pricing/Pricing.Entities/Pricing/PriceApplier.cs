@@ -4,7 +4,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Pricing.Entities.DomainEvents;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Entities.Pricing;
 

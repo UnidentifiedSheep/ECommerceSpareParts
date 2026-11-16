@@ -1,9 +1,8 @@
-using Enums;
 using System.Text.Json.Serialization;
-using Main.Enums.Documents;
+using Enums;
 using SchemaGeneration.Abstractions.Models;
 
-namespace Main.Application.Dtos.Documents;
+namespace Main.Modules.Documents.Application.Dtos.Documents;
 
 public sealed record DocumentDefinitionDto
 {

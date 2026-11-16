@@ -3,7 +3,7 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Notification.Core.Entities;
+namespace Main.Entities.Notification;
 
 public sealed class Notification : Entity<Notification, int>, ILinqEntity<Notification, int>
 {

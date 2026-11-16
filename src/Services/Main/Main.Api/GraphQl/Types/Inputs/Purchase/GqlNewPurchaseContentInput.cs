@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Dtos.Purchase;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 
 namespace Main.Api.GraphQl.Types.Inputs.Purchase;
 

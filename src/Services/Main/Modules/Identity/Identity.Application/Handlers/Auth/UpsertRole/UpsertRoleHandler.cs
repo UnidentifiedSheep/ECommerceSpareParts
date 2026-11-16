@@ -5,7 +5,7 @@ using Attributes;
 using Main.Entities.Auth;
 using MediatR;
 
-namespace Main.Application.Handlers.Auth.UpsertRole;
+namespace Main.Modules.Identity.Application.Handlers.Auth.UpsertRole;
 
 [AutoSave]
 [Transactional]

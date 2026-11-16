@@ -4,10 +4,10 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 using Enums;
-using Main.Entities.DomainEvents.CatalogueCandidate;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.DomainEvents.CatalogueCandidate;
+using Main.Entities.Product.Product.ValueObjects;
 
-namespace Main.Entities.Product.Enrichment;
+namespace Main.Entities.Product.Product.Enrichment;
 
 public class SupplierProduct : AuditableEntity<SupplierProduct, int>, ILinqEntity<SupplierProduct, int>
 {

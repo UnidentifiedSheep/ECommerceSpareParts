@@ -1,11 +1,9 @@
 using Application.Common.Abstractions;
-using Main.Entities.Sale;
 using BulkValidation.Core.Interfaces;
-
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Main.Modules.Product.Abstractions;
 
-namespace Main.Application.Handlers.Sales.EditSale;
+namespace Main.Modules.Sale.Application.Handlers.Sales.EditSale;
 
 public class EditSaleDbValidation(ICurrencyChecks currencyChecks, IProductChecks productChecks)
 	: AbstractDbValidation<EditSaleCommand>

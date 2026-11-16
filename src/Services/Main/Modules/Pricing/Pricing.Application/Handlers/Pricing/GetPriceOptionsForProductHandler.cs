@@ -1,18 +1,18 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Models;
 using Application.Common.Querying;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
 using Pricing.Entities.Settings;
-using Pricing.Enums;
 
 namespace Pricing.Application.Handlers.Pricing;
 

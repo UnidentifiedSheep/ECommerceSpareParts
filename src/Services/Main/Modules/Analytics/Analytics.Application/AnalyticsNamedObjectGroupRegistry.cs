@@ -1,8 +1,8 @@
-using Main.Application.Analytics.Analyzers;
-using Main.Application.Analytics.Charts;
+using Main.Modules.Analytics.Abstractions.Analyzers;
+using Main.Modules.Analytics.Abstractions.Charts;
 using NamedObject.Core.Base;
 
-namespace Main.Application.Analytics;
+namespace Main.Modules.Analytics.Application;
 
 public class AnalyticsNamedObjectGroupRegistry : NamedObjectGroupRegistryBase
 {

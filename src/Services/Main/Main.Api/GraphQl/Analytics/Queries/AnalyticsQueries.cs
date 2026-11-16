@@ -3,7 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Analytics.DataLoaders;
 using Main.Api.GraphQl.Analytics.Types;
-using Main.Application.Analytics.Queries;
+using Main.Modules.Analytics.Application.Queries;
 using MediatR;
 
 namespace Main.Api.GraphQl.Analytics.Queries;

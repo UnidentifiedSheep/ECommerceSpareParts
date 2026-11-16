@@ -1,8 +1,10 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProductEnrichment;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;

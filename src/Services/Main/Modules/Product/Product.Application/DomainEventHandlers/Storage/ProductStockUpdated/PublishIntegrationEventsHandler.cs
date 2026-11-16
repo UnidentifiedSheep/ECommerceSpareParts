@@ -4,11 +4,11 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Services.Events;
 using Contracts.Storage;
 using LinqKit;
-using Main.Entities.DomainEvents.ProductStock;
-using Main.Entities.Storage;
+using Main.Entities.Product.DomainEvents.ProductStock;
+using Main.Entities.Product.Stock;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.DomainEventHandlers.Storage.ProductStockUpdated;
+namespace Main.Modules.Product.Application.DomainEventHandlers.Storage.ProductStockUpdated;
 
 public class PublishIntegrationEventsHandler(
 	IReadRepository<ProductStock, (string, int)> repository,

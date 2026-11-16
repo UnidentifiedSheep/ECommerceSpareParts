@@ -1,6 +1,6 @@
 using Main.Entities.Storage;
-using Main.Application.Services.ProductDeletion;
 using Main.Entities.Product;
+using Main.Modules.Storage.Application.Services.ProductDeletion;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 

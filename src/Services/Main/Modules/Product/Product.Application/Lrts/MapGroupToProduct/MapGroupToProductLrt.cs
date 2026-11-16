@@ -1,25 +1,25 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
-using Main.Application.Lrts.Base;
-using Main.Application.Models.Producer;
-using Main.Application.Models.Product;
-using Main.Application.Products.Interfaces;
-using Main.Entities;
 using Main.Entities.Product;
-using Main.Entities.Product.ValueObjects;
-using Main.Enums;
+using Main.Entities.Product.Enums;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Product.ValueObjects;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Interfaces.Services;
+using Main.Modules.Product.Application.Lrts.Base;
+using Main.Modules.Product.Application.Models.Producer;
+using Main.Modules.Product.Application.Models.Product;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Lrts.MapGroupToProduct;
+namespace Main.Modules.Product.Application.Lrts.MapGroupToProduct;
 
 public class MapGroupToProductLrt(
 	IS3Service s3Service,

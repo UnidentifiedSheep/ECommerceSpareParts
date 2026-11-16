@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Storage;
+namespace Main.Modules.Storage.Persistence.Configurations;
 
-public class StorageConfiguration : IEntityTypeConfiguration<Entities.Storage.Storage>
+public class StorageConfiguration : IEntityTypeConfiguration<Entities.Storage.Storage.Storage>
 {
-	public void Configure(EntityTypeBuilder<Entities.Storage.Storage> builder)
+	public void Configure(EntityTypeBuilder<Entities.Storage.Storage.Storage> builder)
 	{
 		builder.ToTable("storages", "public");
 

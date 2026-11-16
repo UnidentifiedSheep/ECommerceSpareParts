@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
 
 namespace Main.Api.GraphQl.Types.Inputs.Sale;
 

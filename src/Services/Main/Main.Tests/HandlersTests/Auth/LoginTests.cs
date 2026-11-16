@@ -2,12 +2,12 @@ using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using FluentAssertions;
-using Main.Application.Handlers.Auth;
-using Main.Application.Interfaces.Services;
-using Main.Application.Notifications;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Handlers.Auth;
+using Main.Modules.Identity.Application.Interfaces.Services;
+using Main.Modules.Identity.Application.Notifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;
@@ -146,7 +146,7 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == token.UserId, CancellationToken);
 		user.LastLoginAt.Should().BeOnOrAfter(before).And.BeOnOrBefore(DateTime.UtcNow);
-		var notification = await Context.Set<global::Notification.Core.Entities.Notification>()
+		var notification = await Context.Set<global::Main.Entities.Notification.Notification>()
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.UserId == user.Id && x.NotificationSystemName == "UserLoggedIn",

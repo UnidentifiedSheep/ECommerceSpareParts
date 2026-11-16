@@ -2,12 +2,11 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Organizations;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Modules.Organization.Application.Dtos.Organizations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Organizations;
+namespace Main.Modules.Organization.Application.Handlers.Organizations;
 
 public sealed record GetOrganizationsByIdsQuery : IQuery<GetOrganizationsByIdsResult>
 {
@@ -22,8 +21,8 @@ public sealed record GetOrganizationsByIdsResult(
 	IReadOnlyDictionary<Guid, OrganizationDto> Organizations);
 
 public sealed class GetOrganizationsByIdsHandler(
-	IReadRepository<Organization, Guid> repository,
-	IProjectionProvider<Organization, OrganizationDto> projection)
+	IReadRepository<Entities.Organization.Organization.Organization, Guid> repository,
+	IProjectionProvider<Entities.Organization.Organization.Organization, OrganizationDto> projection)
 	: IQueryHandler<GetOrganizationsByIdsQuery, GetOrganizationsByIdsResult>
 {
 	public async Task<GetOrganizationsByIdsResult> Handle(

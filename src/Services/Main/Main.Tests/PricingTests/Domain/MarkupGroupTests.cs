@@ -2,7 +2,7 @@ using Exceptions;
 using FluentAssertions;
 using Pricing.Entities;
 
-namespace Tests.PricingTests.DomainTests;
+namespace Tests.PricingTests.Domain;
 
 public sealed class MarkupGroupTests
 {

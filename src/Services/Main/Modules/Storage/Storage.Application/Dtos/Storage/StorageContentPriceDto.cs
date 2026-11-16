@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Storage;
+namespace Main.Modules.Storage.Application.Dtos.Storage;
 
 public record StorageContentPriceDto
 {

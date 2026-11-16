@@ -1,6 +1,6 @@
 using NpgsqlTypes;
 
-namespace Main.Persistence.DatabaseObjects;
+namespace Main.Modules.Identity.Persistence.DatabaseObjects;
 
 public static class UserSearchDbFunctions
 {

@@ -1,8 +1,8 @@
-using Main.Entities.Storage;
+using Main.Entities.Product.Stock;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Storage;
+namespace Main.Modules.Product.Persistence.Configurations;
 
 public sealed class ProductStockConfiguration : IEntityTypeConfiguration<ProductStock>
 {

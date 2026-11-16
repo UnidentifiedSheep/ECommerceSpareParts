@@ -1,4 +1,3 @@
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
@@ -6,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Pricing.Application.Handlers.Markup;
 using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Pricing.Application.Services.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Settings;

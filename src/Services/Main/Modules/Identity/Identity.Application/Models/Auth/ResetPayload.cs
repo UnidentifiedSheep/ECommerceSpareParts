@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Main.Enums.Auth;
+using Main.Entities.Enums.Auth;
 
-namespace Main.Application.Models.Auth;
+namespace Main.Modules.Identity.Application.Models.Auth;
 
 public record ResetPayload
 {

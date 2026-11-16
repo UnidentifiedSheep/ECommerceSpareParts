@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using Main.Application.Dtos.Documents;
-using Main.Entities.Documents;
+using Main.Entities.Documents.Documents;
+using Main.Modules.Documents.Application.Dtos.Documents;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Documents.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class DocumentGenerationRequestDtoProjectionProvider

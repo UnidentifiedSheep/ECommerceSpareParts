@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Products.Interfaces;
-using Main.Application.Static;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Static;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

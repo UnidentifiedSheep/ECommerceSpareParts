@@ -1,13 +1,15 @@
 using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.LRT;
 using Application.Common.Models.Lrt;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using NamedObject.Core.Interfaces;
 
-namespace Application.Common.LRT;
+namespace Main.Modules.Jobs.Application.LRT;
 
 public sealed class JobStepInputInitializer(
 	INamedObjectRegistry<ILrtNamedObject> registry

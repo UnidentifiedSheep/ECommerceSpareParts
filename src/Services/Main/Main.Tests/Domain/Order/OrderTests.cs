@@ -1,7 +1,7 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Enums.Orders;
-using DomainOrder = Main.Entities.Order.Order;
+using Main.Entities.Order.Enums.Orders;
+using DomainOrder = Main.Entities.Order.Order.Order;
 
 namespace Tests.Domain.Order;
 

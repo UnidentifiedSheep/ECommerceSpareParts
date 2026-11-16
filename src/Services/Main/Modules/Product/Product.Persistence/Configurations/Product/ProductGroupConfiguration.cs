@@ -1,8 +1,8 @@
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Product;
+namespace Main.Modules.Product.Persistence.Configurations.Product;
 
 public class ProductGroupConfiguration : IEntityTypeConfiguration<ProductGroup>
 {

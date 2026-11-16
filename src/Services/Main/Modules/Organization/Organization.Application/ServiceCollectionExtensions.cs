@@ -1,8 +1,8 @@
 using Application.Common.Host;
 using Main.Entities.Organization;
-using Main.Application.Configs;
-using Main.Application.Services;
 using Main.Modules.Organization.Abstractions;
+using Main.Modules.Organization.Application.Configs;
+using Main.Modules.Organization.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Main.Modules.Organization.Application;

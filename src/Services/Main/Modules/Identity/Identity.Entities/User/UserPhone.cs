@@ -6,7 +6,7 @@ using Domain.Interfaces;
 using Domain.Validation;
 using Extensions;
 using Main.Entities.DomainEvents.User;
-using Main.Enums;
+using Main.Entities.Enums;
 
 namespace Main.Entities.User;
 

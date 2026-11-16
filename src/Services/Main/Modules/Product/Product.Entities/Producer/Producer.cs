@@ -1,12 +1,11 @@
-using Main.Entities.Product;
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Entities.DomainEvents.Producer;
+using Main.Entities.Product.DomainEvents.Producer;
 
-namespace Main.Entities.Producer;
+namespace Main.Entities.Product.Producer;
 
 public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, int>
 {

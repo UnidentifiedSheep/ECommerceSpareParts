@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Orders.Dtos;
+namespace Main.Modules.Order.Application.Orders.Dtos;
 
 public record UpsertOrderDto
 {

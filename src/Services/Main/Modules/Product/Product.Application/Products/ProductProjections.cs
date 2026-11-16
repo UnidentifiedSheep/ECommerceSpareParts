@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
-using Application.Common.Models.Options.S3;
 using Attributes;
 using LinqKit;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 using Microsoft.Extensions.Options;
+using S3.Core.Options;
 
-namespace Main.Application.Products;
+namespace Main.Modules.Product.Application.Products;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Product, ProductDto>
+public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Entities.Product.Product.Product, ProductDto>
 {
 	public ProductDtoProjectionProvider(IOptions<S3BucketsOptions> bucketsOptions)
 	{
@@ -31,7 +31,7 @@ public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Produc
 		};
 	}
 
-	public override Expression<Func<Product, ProductDto>> Projection { get; }
+	public override Expression<Func<Entities.Product.Product.Product, ProductDto>> Projection { get; }
 }
 
 [Lifetime(Lifetime.Singleton)]

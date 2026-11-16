@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
+namespace Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
 
 public class GetProducerSupplierMappingsValidation : AbstractValidator<GetProducerSupplierMappingsQuery>
 {

@@ -1,6 +1,6 @@
-using Main.Application.Models.Documents;
+using Main.Application.Document.Models;
 
-namespace Main.Application.Interfaces.Cache;
+namespace Main.Modules.Documents.Application.Interfaces;
 
 public interface IDocumentLinkProvider
 {

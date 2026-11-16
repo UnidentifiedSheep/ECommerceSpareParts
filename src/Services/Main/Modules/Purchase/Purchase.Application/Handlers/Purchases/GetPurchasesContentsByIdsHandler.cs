@@ -2,11 +2,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Application.Dtos.Purchase;
-using Main.Entities.Purchase;
+using Main.Entities.Purchase.Purchase;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Purchases;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases;
 
 public sealed record GetPurchasesContentsByIdsQuery : IQuery<GetPurchasesContentsByIdsResult>
 {

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Auth;
+namespace Main.Modules.Identity.Persistence.Configurations.Auth;
 
 public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
 {

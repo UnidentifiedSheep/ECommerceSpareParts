@@ -1,8 +1,8 @@
 using Enums;
-using Main.Application.Interfaces.Services.Document;
-using Main.Enums.Documents;
+using Main.Application.Document.Interfaces.Document;
+using Main.Entities.Documents.Enums.Documents;
 
-namespace Main.Application.Services.Document.Sources;
+namespace Main.Modules.Documents.Application.Services.Document.Sources;
 
 public sealed class EmbeddedDocumentTemplateSource : IDocumentTemplateSource
 {

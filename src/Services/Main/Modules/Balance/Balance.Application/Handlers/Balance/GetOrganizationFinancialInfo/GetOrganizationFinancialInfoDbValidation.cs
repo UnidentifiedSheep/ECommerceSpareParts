@@ -2,7 +2,7 @@ using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Modules.Organization.Abstractions;
 
-namespace Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
+namespace Main.Modules.Balance.Application.Handlers.Balance.GetOrganizationFinancialInfo;
 
 public class GetOrganizationFinancialInfoDbValidation(IOrganizationChecks organizationChecks)
 	: AbstractDbValidation<GetOrganizationFinancialInfoQuery>

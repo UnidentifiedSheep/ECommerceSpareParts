@@ -1,11 +1,12 @@
 using Pricing.Application.Events;
 using System.Globalization;
+using Application.Common;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
-using Main.Application.Interfaces.Services;
+using Main.Modules.Storage.Abstractions.Interfaces;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities;

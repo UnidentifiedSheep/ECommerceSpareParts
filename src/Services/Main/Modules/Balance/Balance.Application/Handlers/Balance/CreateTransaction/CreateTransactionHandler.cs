@@ -1,16 +1,16 @@
-using Enums;
 using System.Data;
 using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Application.Interfaces.Services;
-using Main.Entities.Balance;
-using Main.Entities.Exceptions;
-using Main.Enums.Balances;
+using Enums;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Entities.Balance.Exceptions;
+using Main.Modules.Balance.Application.Interfaces;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Handlers.Balance.CreateTransaction;
+namespace Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
 
 [AutoSave]
 [Transactional(

@@ -4,7 +4,7 @@ using Domain.CommonEntities.Job;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Documents;
+namespace Main.Entities.Documents.Documents;
 
 public sealed class DocumentGenerationRequest
 	: Entity<DocumentGenerationRequest, Guid>, ILinqEntity<DocumentGenerationRequest, Guid>

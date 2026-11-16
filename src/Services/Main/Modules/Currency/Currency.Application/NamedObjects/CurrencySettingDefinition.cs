@@ -5,13 +5,12 @@ using Application.Common.NamedObject;
 using Enums;
 using Exceptions;
 using Locan.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Currency;
-using Main.Entities.Settings;
+using Main.Entities.Currency.Settings;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.NamedObjects.SettingDefinitions;
+namespace Main.Modules.Currency.Application.NamedObjects;
 
 public class CurrencySettingDefinition(ISettingsService settingsService)
 	: SettingDefinitionNamedObjectBase<CurrencySetting>(settingsService)

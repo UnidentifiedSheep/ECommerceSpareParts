@@ -2,11 +2,10 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Organizations;
-using Main.Entities.Exceptions;
-using Main.Entities.Organization;
+using Main.Entities.Organization.Exceptions;
+using Main.Modules.Organization.Application.Dtos.Organizations;
 
-namespace Main.Application.Handlers.Organizations.UpdateOrganization;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.UpdateOrganization;
 
 [Transactional]
 [AutoSave]
@@ -15,7 +14,7 @@ public record UpdateOrganizationCommand(Guid OrganizationId, PatchOrganizationDt
 
 public record UpdateOrganizationResult(Guid OrganizationId);
 
-public class UpdateOrganizationHandler(IRepository<Organization, Guid> repository)
+public class UpdateOrganizationHandler(IRepository<Entities.Organization.Organization.Organization, Guid> repository)
 	: ICommandHandler<UpdateOrganizationCommand, UpdateOrganizationResult>
 {
 	public async Task<UpdateOrganizationResult> Handle(

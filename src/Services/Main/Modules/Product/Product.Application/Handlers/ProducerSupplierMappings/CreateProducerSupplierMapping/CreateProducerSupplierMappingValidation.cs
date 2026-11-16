@@ -1,9 +1,8 @@
 ﻿using Application.Common.Extensions;
 using FluentValidation;
-using Main.Entities;
 using Main.Entities.Product;
 
-namespace Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
+namespace Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
 
 public class CreateProducerSupplierMappingValidation : AbstractValidator<CreateProducerSupplierMappingCommand>
 {

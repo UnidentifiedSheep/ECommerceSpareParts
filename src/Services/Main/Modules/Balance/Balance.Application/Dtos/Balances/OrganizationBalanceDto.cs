@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Balances;
+namespace Main.Modules.Balance.Application.Dtos.Balances;
 
 public record OrganizationBalanceDto
 {

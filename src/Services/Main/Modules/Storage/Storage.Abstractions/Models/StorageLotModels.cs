@@ -1,4 +1,4 @@
-namespace Main.Application.Models.Storage;
+namespace Main.Modules.Storage.Abstractions.Models;
 
 public record NewStorageLot(int ProductId, int CurrencyId, decimal BuyPrice, int Count, DateTime PurchaseDate);
 

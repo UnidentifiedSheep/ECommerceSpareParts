@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Enums;
 
-namespace Main.Application.Dtos.Producer.SupplierMappings;
+namespace Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
 
 public record NewProducerSupplierMapping
 {

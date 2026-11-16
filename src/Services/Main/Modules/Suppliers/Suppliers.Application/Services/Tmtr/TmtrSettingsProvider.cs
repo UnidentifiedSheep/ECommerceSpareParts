@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Settings;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Settings;
-using Main.Entities.Settings.Supplier;
+using Main.Entities.Suppliers.Settings.Supplier;
 
 namespace Main.Modules.Suppliers.Application.Services.Tmtr;
 

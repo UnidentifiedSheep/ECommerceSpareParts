@@ -1,10 +1,11 @@
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Handlers.Currencies;
-using Main.Application.Interfaces.Cache;
+using Main.Entities.Currency;
+using Main.Entities.Currency.Settings;
 using Main.Entities.Exceptions;
-using Main.Entities.Settings;
+using Main.Modules.Currency.Application.Dtos;
+using Main.Modules.Currency.Application.Handlers.Currencies;
+using Main.Modules.Currency.Application.Interfaces;
 using Moq;
 
 namespace Tests.HandlersTests.Currencies;

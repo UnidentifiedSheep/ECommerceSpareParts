@@ -1,8 +1,8 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Handlers.Users.MakeEmailPrimary;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Handlers.Users.MakeEmailPrimary;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.User;
 using Tests.Extensions;

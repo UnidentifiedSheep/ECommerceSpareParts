@@ -1,6 +1,5 @@
 using Application.Common.Consumer;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
+using Application.Common.Interfaces;
 using Contracts.Tasks;
 using FluentAssertions;
 using Locan.Core.Interfaces;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NamedObject;
 using NamedObject.Core.Interfaces;
+using NoneInputState = Application.Common.NoneInputState;
 
 namespace Tests.Tests.Tasks;
 

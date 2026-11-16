@@ -1,11 +1,11 @@
 using Application.Common.Interfaces.Projections;
 using Enums;
 using FluentAssertions;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions.QueryExtensions;
 using Main.Entities.Auth;
 using Main.Entities.User;
 using Main.Modules.Currency.Persistence;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Extensions.QueryExtensions;
 using Main.Modules.Product.Persistence;
 using Main.Modules.Storage.Persistence;
 using Persistence.Common;

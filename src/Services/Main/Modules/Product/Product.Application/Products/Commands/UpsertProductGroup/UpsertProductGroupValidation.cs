@@ -1,9 +1,9 @@
 using Application.Common.Extensions;
 using FluentValidation;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
 
-namespace Main.Application.Products.Commands.UpsertProductGroup;
+namespace Main.Modules.Product.Application.Products.Commands.UpsertProductGroup;
 
 public class UpsertProductGroupValidation : AbstractValidator<UpsertProductGroupCommand>
 {

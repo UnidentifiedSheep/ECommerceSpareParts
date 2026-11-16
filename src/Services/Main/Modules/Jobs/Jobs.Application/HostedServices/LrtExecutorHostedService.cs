@@ -1,12 +1,12 @@
+using Application.Common.Interfaces;
+using Application.Common.Interfaces.Lrt;
+using Main.Modules.Jobs.Application.LRT;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
-using Domain.CommonEntities.Job;
 using NamedObject.Core.Interfaces;
 
-namespace Api.Common.HostedServices;
+namespace Main.Modules.Jobs.Application.HostedServices;
 
 public class LrtExecutorHostedService(
 	IServiceScopeFactory scopeFactory,

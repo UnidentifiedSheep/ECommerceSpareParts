@@ -1,10 +1,10 @@
 ﻿using Bogus;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Storage;
 
-public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Storage>(faker)
+public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Storage.Storage>(faker)
 {
 	public string? Code { get; private set; }
 
@@ -38,9 +38,9 @@ public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Sto
 		return this;
 	}
 
-	public override Main.Entities.Storage.Storage Build()
+	public override Main.Entities.Storage.Storage.Storage Build()
 	{
-		var storage = Main.Entities.Storage.Storage.Create(
+		var storage = Main.Entities.Storage.Storage.Storage.Create(
 			Code ?? Faker.Lorem.Letter(7),
 			Type ?? Faker.PickRandom<StorageType>());
 

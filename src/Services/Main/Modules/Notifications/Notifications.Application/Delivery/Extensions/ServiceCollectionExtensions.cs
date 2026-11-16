@@ -1,14 +1,13 @@
+using Main.Modules.Notifications.Application.Delivery.Channels;
+using Main.Modules.Notifications.Application.Delivery.Channels.Email;
+using Main.Modules.Notifications.Application.Delivery.Interfaces;
+using Main.Modules.Notifications.Application.Delivery.Renderers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
-using Notification.Channels;
-using Notification.Channels.Email;
-using Notification.Core;
 using Notification.Core.Interfaces.Notification;
-using Notification.Interfaces;
-using Notification.Renderers;
 
-namespace Notification.Extensions;
+namespace Main.Modules.Notifications.Application.Delivery.Extensions;
 
 public static class ServiceCollectionExtensions
 {

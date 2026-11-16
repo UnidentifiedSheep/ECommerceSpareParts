@@ -1,12 +1,11 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Querying;
-using Main.Entities.Organization;
 using Main.Modules.Organization.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Organization.Application.Services;
 
-public sealed class OrganizationSearch(IReadRepository<Organization, Guid> organizations) : IOrganizationSearch
+public sealed class OrganizationSearch(IReadRepository<Entities.Organization.Organization.Organization, Guid> organizations) : IOrganizationSearch
 {
 	public IQueryable<Guid> MatchingIds(string term)
 	{

@@ -1,4 +1,4 @@
-namespace Application.Common.Interfaces.Currency;
+namespace Main.Modules.Currency.Abstractions.Interfaces;
 
 public interface ICurrencyRatesProvider
 {

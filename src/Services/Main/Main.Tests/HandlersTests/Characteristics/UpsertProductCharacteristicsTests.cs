@@ -1,10 +1,12 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using FluentAssertions;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Commands.UpsertCharacteristics;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Commands.UpsertCharacteristics;
 using Moq;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

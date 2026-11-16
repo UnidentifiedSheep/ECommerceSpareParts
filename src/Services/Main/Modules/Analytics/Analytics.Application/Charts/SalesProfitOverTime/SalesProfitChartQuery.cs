@@ -1,11 +1,12 @@
 using System.Text.Json.Serialization;
 using Domain.Validation;
 using Main.Entities;
-using Main.Enums;
+using Main.Entities.Analytics.Enums;
+using Main.Modules.Analytics.Abstractions.Charts;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.Analytics.Charts.SalesProfitOverTime;
+namespace Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
 
 public sealed record SalesProfitChartQuery : CursorChartQueryInput<DateTime>
 {

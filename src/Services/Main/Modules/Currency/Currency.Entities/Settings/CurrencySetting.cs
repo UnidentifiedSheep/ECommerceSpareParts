@@ -1,12 +1,11 @@
-using Main.Entities.Currency;
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Domain.CommonEntities;
 using Domain.Interfaces;
 using Enums;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Entities.Settings;
+namespace Main.Entities.Currency.Settings;
 
 public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySetting>
 {

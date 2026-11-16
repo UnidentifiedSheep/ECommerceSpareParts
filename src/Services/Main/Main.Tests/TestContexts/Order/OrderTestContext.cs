@@ -1,6 +1,7 @@
+using Main.Entities.Order.Enums.Orders;
 using Main.Entities.Organization;
+using Main.Entities.Organization.Organization;
 using Main.Entities.User;
-using Main.Enums.Orders;
 using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Order;
@@ -9,7 +10,7 @@ using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.Interfaces;
 using Tests.TestContexts.Currency;
-using DomainOrder = Main.Entities.Order.Order;
+using DomainOrder = Main.Entities.Order.Order.Order;
 
 namespace Tests.TestContexts.Order;
 

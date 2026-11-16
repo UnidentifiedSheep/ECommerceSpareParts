@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Currency;
+namespace Main.Modules.Currency.Persistence.Configurations;
 
 public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.Currency>
 {

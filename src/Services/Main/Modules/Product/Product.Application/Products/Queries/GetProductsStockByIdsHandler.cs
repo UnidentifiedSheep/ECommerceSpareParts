@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Storage;
+using Main.Entities.Product.Stock;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries;
+namespace Main.Modules.Product.Application.Products.Queries;
 
 public record GetProductsStockByIdsQuery : IQuery<GetProductsStockByIdsResult>
 {

@@ -1,9 +1,8 @@
 using Application.Common.Extensions;
 using FluentValidation;
-using Main.Entities;
 using Main.Entities.Storage;
 
-namespace Main.Application.Handlers.Storages.CreateStorage;
+namespace Main.Modules.Storage.Application.Handlers.Storages.CreateStorage;
 
 public class CreateStorageValidation : AbstractValidator<CreateStorageCommand>
 {

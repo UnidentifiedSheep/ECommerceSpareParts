@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.Auth;
-using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
+using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Enums;
+using Main.Modules.Identity.Application.Handlers.Auth;
+using Main.Modules.Identity.Application.Interfaces.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

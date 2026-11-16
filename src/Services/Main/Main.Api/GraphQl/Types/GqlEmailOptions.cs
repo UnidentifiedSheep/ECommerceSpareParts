@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Models.Options;
+using Main.Modules.Identity.Application.Models.Options;
 
 namespace Main.Api.GraphQl.Types;
 

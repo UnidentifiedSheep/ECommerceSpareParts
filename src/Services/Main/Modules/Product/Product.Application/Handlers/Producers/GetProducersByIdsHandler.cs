@@ -2,12 +2,12 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Producer;
-using Main.Entities.Exceptions;
-using Main.Entities.Producer;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Producers;
+namespace Main.Modules.Product.Application.Handlers.Producers;
 
 public sealed record GetProducersByIdsQuery : IQuery<GetProducersByIdsResult>
 {

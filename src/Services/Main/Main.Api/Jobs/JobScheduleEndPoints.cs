@@ -2,14 +2,14 @@ using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Application.Common.Dtos;
-using Application.Common.Handlers.JobSchedules.GetSchedule;
 using Application.Common.Interfaces.Services;
 using Application.Common.Models;
 using Enums;
+using Main.Modules.Jobs.Application.Handlers.JobSchedules.GetSchedule;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Common.EndPoints;
+namespace Main.Api.Jobs;
 
 public record GetJobSchedulesRequest : SortablePaginationQueryModel
 {

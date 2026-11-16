@@ -1,9 +1,9 @@
 using Contracts.Products;
-using Main.Application.Products.Interfaces;
-using Main.Enums;
-using ProductEntity = Main.Entities.Product.Product;
+using Main.Entities.Product.Enums;
+using Main.Modules.Product.Application.Products.Interfaces;
+using ProductEntity = Main.Entities.Product.Product.Product;
 
-namespace Main.Application.Products.Services.EventParts;
+namespace Main.Modules.Product.Application.Products.Services.EventParts;
 
 public sealed class ProductCoreEventPartProvider : IProductEventPartProvider
 {

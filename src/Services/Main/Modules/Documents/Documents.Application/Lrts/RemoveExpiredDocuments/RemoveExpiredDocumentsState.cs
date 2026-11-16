@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Lrts.RemoveExpiredDocuments;
+namespace Main.Modules.Documents.Application.Lrts.RemoveExpiredDocuments;
 
 public record RemoveExpiredDocumentsState
 {

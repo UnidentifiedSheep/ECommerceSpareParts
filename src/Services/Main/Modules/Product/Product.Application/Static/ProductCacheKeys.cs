@@ -1,4 +1,4 @@
-namespace Main.Application.Static;
+namespace Main.Modules.Product.Application.Static;
 
 public static class ProductCacheKeys
 {

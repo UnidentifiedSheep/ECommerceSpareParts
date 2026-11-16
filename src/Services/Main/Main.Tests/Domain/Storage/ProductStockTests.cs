@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Main.Entities.Product.Stock;
 using Main.Entities.Storage;
 
 namespace Tests.Domain.Storage;

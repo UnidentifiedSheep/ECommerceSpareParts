@@ -1,9 +1,10 @@
 using Domain.CommonEnums;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Application.Dtos.Documents;
-using Main.Application.Interfaces.Cache;
+using Main.Entities.Documents.Exceptions;
 using Main.Entities.Exceptions;
+using Main.Modules.Documents.Application.Dtos.Documents;
+using Main.Modules.Documents.Application.Interfaces;
 
 namespace Main.Api.GraphQl.Types.Document;
 

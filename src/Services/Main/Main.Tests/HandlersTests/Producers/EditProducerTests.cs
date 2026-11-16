@@ -1,8 +1,8 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Dtos.Producer;
-using Main.Application.Handlers.Producers.EditProducer;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Handlers.Producers.EditProducer;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

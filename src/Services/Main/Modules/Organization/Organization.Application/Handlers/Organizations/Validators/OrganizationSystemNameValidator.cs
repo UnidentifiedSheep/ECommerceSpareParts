@@ -1,9 +1,8 @@
 using Application.Common.Extensions;
-using Main.Entities.Organization;
 using FluentValidation;
-using Main.Entities;
+using Main.Entities.Organization;
 
-namespace Main.Application.Handlers.Organizations.Validators;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.Validators;
 
 public class OrganizationSystemNameValidator : AbstractValidator<string>
 {

@@ -1,10 +1,12 @@
 using Exceptions;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Orders.Commands.ChangeOrderStatus;
 using Main.Entities.Exceptions;
 using Main.Entities.Order;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
+using Main.Entities.Order.Exceptions;
+using Main.Entities.Order.Order;
+using Main.Modules.Order.Application.Orders.Commands.ChangeOrderStatus;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

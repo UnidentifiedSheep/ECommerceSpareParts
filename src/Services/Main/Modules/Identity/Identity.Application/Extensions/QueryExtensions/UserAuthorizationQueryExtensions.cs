@@ -2,11 +2,11 @@ using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Application.Dtos.Users;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Dtos.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Extensions.QueryExtensions;
+namespace Main.Modules.Identity.Application.Extensions.QueryExtensions;
 
 public static class UserAuthorizationQueryExtensions
 {

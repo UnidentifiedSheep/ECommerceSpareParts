@@ -1,5 +1,5 @@
 using Application.Common.Querying;
-using Notification.Core.Entities;
+using Main.Entities.Notification;
 
 namespace Main.Modules.Notifications.Application.Configs;
 

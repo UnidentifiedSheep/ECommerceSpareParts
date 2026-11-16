@@ -1,20 +1,22 @@
+using Main.Entities.Cart.Cart;
+using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations;
+namespace Persistence.Relations.Configurations;
 
-public sealed class CartRelationsConfiguration : IEntityTypeConfiguration<Entities.Cart.Cart>
+public sealed class CartRelationsConfiguration : IEntityTypeConfiguration<Cart>
 {
-	public void Configure(EntityTypeBuilder<Entities.Cart.Cart> builder)
+	public void Configure(EntityTypeBuilder<Cart> builder)
 	{
 		builder
-			.HasOne<Entities.Product.Product>()
+			.HasOne<Product>()
 			.WithMany()
 			.HasForeignKey(d => d.ProductId)
 			.HasConstraintName("cart_product_id_fk");
 
 		builder
-			.HasOne<Entities.User.User>()
+			.HasOne<Main.Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.HasConstraintName("cart_users_id_fk");

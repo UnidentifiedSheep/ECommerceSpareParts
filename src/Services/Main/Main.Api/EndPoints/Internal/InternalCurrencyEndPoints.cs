@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
-using Main.Application.Handlers.Currencies.GetCurrencyRate;
+using Main.Modules.Currency.Application.Handlers.Currencies.GetCurrencyRate;
 using MediatR;
 
 namespace Main.Api.EndPoints.Internal;

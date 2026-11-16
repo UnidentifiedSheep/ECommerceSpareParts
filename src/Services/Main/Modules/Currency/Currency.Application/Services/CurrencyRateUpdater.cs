@@ -1,16 +1,15 @@
-﻿using Application.Common.Interfaces.Currency;
-using Application.Common.Interfaces.Persistence;
+﻿using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Models.Currency;
 using Integrations.ExchangeRate.Interfaces;
-using Main.Application.Interfaces.Services.Currency;
-using Main.Application.Models.Currency;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
-using Main.Entities.Settings;
+using Main.Entities.Currency.Settings;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Currency.Abstractions.Models;
+using Main.Modules.Currency.Application.Interfaces;
+using Main.Modules.Currency.Application.Models.Currency;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services.Currency;
+namespace Main.Modules.Currency.Application.Services;
 
 public class CurrencyRateUpdater(
 	IExchangeRateClientFactory clientFactory,

@@ -1,14 +1,16 @@
+using Main.Entities.Product.Product;
+using Main.Entities.Sale.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations;
+namespace Persistence.Relations.Configurations;
 
-public sealed class SaleContentRelationsConfiguration : IEntityTypeConfiguration<Entities.Sale.SaleContent>
+public sealed class SaleContentRelationsConfiguration : IEntityTypeConfiguration<SaleContent>
 {
-	public void Configure(EntityTypeBuilder<Entities.Sale.SaleContent> builder)
+	public void Configure(EntityTypeBuilder<SaleContent> builder)
 	{
 		builder
-			.HasOne<Entities.Product.Product>()
+			.HasOne<Product>()
 			.WithMany()
 			.HasForeignKey(d => d.ProductId)
 			.OnDelete(DeleteBehavior.Restrict)

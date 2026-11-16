@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Repositories;
 using Main.Entities.User;
 using RoleEnum = Enums.Role;
 
-namespace Main.Application.Extensions;
+namespace Main.Modules.Identity.Application.Extensions;
 
 internal static class UserRoleFilter
 {

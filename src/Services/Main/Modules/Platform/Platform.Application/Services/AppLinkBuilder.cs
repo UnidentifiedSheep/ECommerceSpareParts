@@ -2,9 +2,9 @@ using Application.Common.Interfaces.Links;
 using Application.Common.Interfaces.Settings;
 using Exceptions;
 using Main.Entities;
-using Main.Entities.Settings;
+using Main.Entities.Platform.Settings;
 
-namespace Application.Common.Services.Links;
+namespace Main.Modules.Platform.Application.Services;
 
 public sealed class AppLinkBuilder(ISettingsService settingsService) : IAppLinkBuilder
 {

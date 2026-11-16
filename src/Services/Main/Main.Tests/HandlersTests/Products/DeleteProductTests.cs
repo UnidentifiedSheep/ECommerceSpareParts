@@ -7,13 +7,16 @@ using Contracts.Products;
 using Domain.CommonEntities.Job;
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Lrts.DeleteProductImages;
-using Main.Application.Products.Commands;
-using Main.Application.Products.Interfaces;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Entities.Product.Stock;
 using Main.Entities.Storage;
+using Main.Modules.Product.Application.Lrts.DeleteProductImages;
+using Main.Modules.Product.Application.Products.Commands;
+using Main.Modules.Product.Application.Products.Interfaces;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +69,7 @@ public class DeleteProductTests : IntegrationTest
 					Product.Id,
 					Other.Id,
 					2),
-				Main.Entities.Cart.Cart.Create(
+				Main.Entities.Cart.Cart.Cart.Create(
 					UserId,
 					Product.Id,
 					1)
@@ -91,7 +94,7 @@ public class DeleteProductTests : IntegrationTest
 		(await Exists<ProductSize>(item => item.ProductId == id)).Should().BeFalse();
 		(await Exists<ProductWeight>(item => item.ProductId == id)).Should().BeFalse();
 		(await Exists<ProductContent>(item => item.ParentProductId == id)).Should().BeFalse();
-		(await Exists<Main.Entities.Cart.Cart>(item => item.ProductId == id)).Should().BeFalse();
+		(await Exists<Main.Entities.Cart.Cart.Cart>(item => item.ProductId == id)).Should().BeFalse();
 		(await Context.Set<ProductImage>().AsNoTracking().ToListAsync(CancellationToken)).Should()
 			.ContainSingle()
 			.Which

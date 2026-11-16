@@ -1,7 +1,7 @@
 using Main.Entities.User;
 using Role = Enums.Role;
 
-namespace Main.Application.Extensions.Entities;
+namespace Main.Modules.Identity.Application.Extensions.Entities;
 
 public static class UserExtensions
 {

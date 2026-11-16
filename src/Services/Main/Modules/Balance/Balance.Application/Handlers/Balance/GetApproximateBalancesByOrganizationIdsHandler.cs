@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Balance;
+namespace Main.Modules.Balance.Application.Handlers.Balance;
 
 public sealed record GetApproximateBalancesByOrganizationIdsQuery : IQuery<GetApproximateBalancesByOrganizationIdsResult>
 {

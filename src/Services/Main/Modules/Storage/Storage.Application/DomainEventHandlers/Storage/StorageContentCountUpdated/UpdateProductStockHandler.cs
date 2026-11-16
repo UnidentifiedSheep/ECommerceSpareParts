@@ -1,9 +1,9 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
-using Main.Entities.DomainEvents.StorageContent;
+using Main.Entities.Storage.DomainEvents.StorageContent;
 using Main.Modules.Product.Abstractions;
 
-namespace Main.Application.DomainEventHandlers.Storage.StorageContentCountUpdated;
+namespace Main.Modules.Storage.Application.DomainEventHandlers.Storage.StorageContentCountUpdated;
 
 public class UpdateProductStockHandler(IProductStockWriter stockWriter)
 	: BatchableDomainEventHandler<StorageContentCountUpdatedDomainEvent>

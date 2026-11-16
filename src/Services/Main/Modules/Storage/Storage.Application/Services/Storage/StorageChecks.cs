@@ -1,8 +1,8 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities.Storage;
-using Main.Modules.Storage.Abstractions;
+using Main.Modules.Storage.Abstractions.Interfaces;
 
-namespace Main.Application.Services.Storage;
+namespace Main.Modules.Storage.Application.Services.Storage;
 
 public sealed class StorageChecks : IStorageChecks
 {

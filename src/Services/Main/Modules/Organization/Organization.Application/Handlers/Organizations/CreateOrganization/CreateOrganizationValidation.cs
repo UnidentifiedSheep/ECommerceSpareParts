@@ -1,8 +1,7 @@
 using FluentValidation;
-using Main.Entities.Organization;
-using Main.Application.Handlers.Organizations.Validators;
+using Main.Modules.Organization.Application.Handlers.Organizations.Validators;
 
-namespace Main.Application.Handlers.Organizations.CreateOrganization;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.CreateOrganization;
 
 public class CreateOrganizationValidation : AbstractValidator<CreateOrganizationCommand>
 {

@@ -1,12 +1,12 @@
-using Enums;
 using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
-using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Enums.Balances;
+using Enums;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
 using MediatR;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Handlers.Balance;
+namespace Main.Modules.Balance.Application.Handlers.Balance;
 
 public record CreateSystemTransactionCommand(
 	Guid OrganizationId,

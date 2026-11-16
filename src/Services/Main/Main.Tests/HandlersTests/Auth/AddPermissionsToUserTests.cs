@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Handlers.Auth.AddPermissionsToUser;
 using Main.Entities.Auth;
+using Main.Modules.Identity.Application.Handlers.Auth.AddPermissionsToUser;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Application.Products.Commands.MapImgsToProduct;
+using Main.Modules.Product.Application.Products.Commands.MapImgsToProduct;
 using MediatR;
 
 namespace Main.Api.EndPoints;

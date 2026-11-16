@@ -1,8 +1,8 @@
-﻿using Main.Entities.Product;
+﻿using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Product;
+namespace Main.Modules.Product.Persistence.Configurations.Product;
 
 public class ProductCharacteristicConfiguration : IEntityTypeConfiguration<ProductCharacteristic>
 {
@@ -16,7 +16,7 @@ public class ProductCharacteristicConfiguration : IEntityTypeConfiguration<Produ
 		builder.Property(e => e.ProductId).HasColumnName("product_id");
 		builder.Property(e => e.CharacteristicId).HasColumnName("characteristic_id");
 		builder.Property(e => e.Value).HasMaxLength(128).HasColumnName("value");
-		builder.HasOne<Entities.Product.Product>()
+		builder.HasOne<Entities.Product.Product.Product>()
 			.WithMany(p => p.Characteristics)
 			.HasForeignKey(x => x.ProductId)
 			.OnDelete(DeleteBehavior.Cascade)

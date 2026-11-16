@@ -2,10 +2,10 @@
 using Enums;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
-using Main.Application.Dtos.Auth;
 using Main.Entities.Auth;
+using Main.Modules.Identity.Application.Dtos.Auth;
 
-namespace Main.Application.Handlers.Auth.GetPermissions;
+namespace Main.Modules.Identity.Application.Handlers.Auth.GetPermissions;
 
 public record GetPermissionsQuery : IQuery<GetPermissionsResult>;
 

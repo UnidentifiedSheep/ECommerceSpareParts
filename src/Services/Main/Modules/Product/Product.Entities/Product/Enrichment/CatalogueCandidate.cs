@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
-using Main.Entities.DomainEvents.CatalogueCandidate;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.DomainEvents.CatalogueCandidate;
+using Main.Entities.Product.Product.ValueObjects;
 
-namespace Main.Entities.Product.Enrichment;
+namespace Main.Entities.Product.Product.Enrichment;
 
 public class CatalogueCandidate : AuditableEntity<CatalogueCandidate, Guid>,
 	ILinqEntity<CatalogueCandidate, Guid>,

@@ -2,11 +2,10 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Sale;
-using Main.Entities.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Sales;
+namespace Main.Modules.Sale.Application.Handlers.Sales;
 
 public sealed record GetSalesByIdsQuery : IQuery<GetSalesByIdsResult>
 {
@@ -20,8 +19,8 @@ public sealed record GetSalesByIdsQuery : IQuery<GetSalesByIdsResult>
 public sealed record GetSalesByIdsResult(IReadOnlyDictionary<Guid, SaleDto> Sales);
 
 public sealed class GetSalesByIdsHandler(
-	IReadRepository<Sale, Guid> repository,
-	IProjectionProvider<Sale, SaleDto> projection)
+	IReadRepository<Entities.Sale.Sale.Sale, Guid> repository,
+	IProjectionProvider<Entities.Sale.Sale.Sale, SaleDto> projection)
 	: IQueryHandler<GetSalesByIdsQuery, GetSalesByIdsResult>
 {
 	public async Task<GetSalesByIdsResult> Handle(

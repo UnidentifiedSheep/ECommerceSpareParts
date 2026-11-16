@@ -1,7 +1,7 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Handlers.Users.RemoveEmailFromUser;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Handlers.Users.RemoveEmailFromUser;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.User;
 using Tests.Extensions;

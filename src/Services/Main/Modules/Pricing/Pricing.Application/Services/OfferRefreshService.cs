@@ -4,12 +4,13 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Events;
 using Enums;
 using Integrations.Supplier.Models;
+using Main.Modules.Product.Abstractions.Events;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
-using Pricing.Enums;
 
 namespace Pricing.Application.Services;
 

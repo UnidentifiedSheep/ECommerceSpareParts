@@ -1,9 +1,8 @@
-using Enums;
 using System.Collections.Frozen;
-using Main.Application.Interfaces.Services.Document;
-using Main.Enums.Documents;
+using Enums;
+using Main.Application.Document.Interfaces.Document;
 
-namespace Main.Application.Services.Document;
+namespace Main.Modules.Documents.Application.Services.Document;
 
 public sealed class DocumentTemplateResolver(
 	IEnumerable<IDocumentProvider> providers,

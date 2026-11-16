@@ -1,4 +1,4 @@
-using NotificationDeliveryEntity = Notification.Core.Entities.NotificationDelivery;
+using NotificationDeliveryEntity = Main.Entities.Notification.NotificationDelivery;
 
 namespace Notification.Core.Interfaces.Repositories;
 

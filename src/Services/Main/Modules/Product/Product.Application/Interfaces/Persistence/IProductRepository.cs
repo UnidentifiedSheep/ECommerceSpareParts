@@ -1,15 +1,14 @@
 ﻿using Application.Common.Interfaces.Repositories;
-using Main.Application.Models.Product;
-using Main.Entities.Product;
-using Main.Enums.Products;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Models.Product;
 
-namespace Main.Application.Interfaces.Persistence;
+namespace Main.Modules.Product.Application.Interfaces.Persistence;
 
-public interface IProductRepository : IRepository<Product, int>
+public interface IProductRepository : IRepository<Entities.Product.Product.Product, int>
 {
-	Task<IReadOnlyList<Product>> GetProductCrosses(
+	Task<IReadOnlyList<Entities.Product.Product.Product>> GetProductCrosses(
 		int productId,
-		Criteria<Product> criteria,
+		Criteria<Entities.Product.Product.Product> criteria,
 		CancellationToken cancellationToken = default);
 
 	Task<HashSet<(string NormalizedSku, int ProducerId)>> GetExistingProductKeys(
@@ -29,7 +28,7 @@ public interface IProductRepository : IRepository<Product, int>
 		CancellationToken cancellationToken = default);
 
 	Task<IReadOnlyList<int>> InsertProductsOnConflictDoNothingAsync(
-		IReadOnlyCollection<Product> products,
+		IReadOnlyCollection<Entities.Product.Product.Product> products,
 		CancellationToken cancellationToken = default);
 
 	Task InsertProductEansOnConflictDoNothingAsync(

@@ -1,7 +1,6 @@
 using Exceptions.Base.Localized;
-using Main.Entities.Sale;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Sale.Exceptions;
 
 public class SaleContentNotFoundException(int id) : LocalizedBadRequestException(
 	SaleContentNotFoundMessage.Instance,

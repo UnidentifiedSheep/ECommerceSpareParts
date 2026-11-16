@@ -4,12 +4,11 @@ using Attributes;
 using Domain.Extensions;
 using Exceptions;
 using Main.Entities;
-using Main.Entities.Exceptions;
-using Main.Entities.Order;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
+using Main.Entities.Order.Exceptions;
 using MediatR;
 
-namespace Main.Application.Orders.Commands.ChangeOrderStatus;
+namespace Main.Modules.Order.Application.Orders.Commands.ChangeOrderStatus;
 
 [Transactional]
 [AutoSave]
@@ -20,7 +19,7 @@ public record ChangeOrderStatusCommand(
 	uint RowVersion) : ICommand;
 
 public class ChangeOrderStatusHandler(
-	IRepository<Order, Guid> repository
+	IRepository<Entities.Order.Order.Order, Guid> repository
 ) : ICommandHandler<ChangeOrderStatusCommand>
 {
 	public async Task<Unit> Handle(ChangeOrderStatusCommand request, CancellationToken cancellationToken)

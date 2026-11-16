@@ -1,14 +1,13 @@
-using Enums;
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Entities.DomainEvents.StorageContent;
-using Main.Entities.Exceptions;
-using Main.Enums;
+using Enums;
+using Main.Entities.Storage.DomainEvents.StorageContent;
+using Main.Entities.Storage.Exceptions;
 
-namespace Main.Entities.Storage;
+namespace Main.Entities.Storage.Storage;
 
 public class StorageContent : AuditableEntity<StorageContent, int, StorageContentMetadata>,
 	ILinqEntity<StorageContent, int>,

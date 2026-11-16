@@ -1,7 +1,7 @@
 using Bogus;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
 using Tests.Abstractions;
-using DomainOrder = Main.Entities.Order.Order;
+using DomainOrder = Main.Entities.Order.Order.Order;
 
 namespace Tests.DataBuilders.Order;
 

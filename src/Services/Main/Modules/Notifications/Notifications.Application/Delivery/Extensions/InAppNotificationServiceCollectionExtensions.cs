@@ -1,15 +1,15 @@
+using Main.Modules.Notifications.Application.Delivery.Channels;
+using Main.Modules.Notifications.Application.Delivery.Dequeuers;
+using Main.Modules.Notifications.Application.Delivery.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NamedObject;
-using Notification.Channels;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
-using Notification.Dequeuers;
-using Notification.Options;
 
-namespace Notification.Extensions;
+namespace Main.Modules.Notifications.Application.Delivery.Extensions;
 
 public static class InAppNotificationServiceCollectionExtensions
 {

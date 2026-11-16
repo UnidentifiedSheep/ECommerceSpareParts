@@ -1,13 +1,13 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Exceptions;
-using Main.Application.Analytics.Charts;
-using Main.Application.Analytics.Interfaces.ChartData;
 using Main.Entities;
-using Main.Entities.Exceptions.Analytics;
+using Main.Entities.Analytics.Exceptions;
+using Main.Modules.Analytics.Abstractions.Charts;
+using Main.Modules.Analytics.Abstractions.Interfaces.ChartData;
 using NamedObject.Core.Interfaces;
 
-namespace Main.Application.Analytics.Queries;
+namespace Main.Modules.Analytics.Application.Queries;
 
 public sealed record QueryChartDataSourceQuery(string SystemName, string QueryInputJson)
 	: IQuery<QueryChartDataSourceResult>;

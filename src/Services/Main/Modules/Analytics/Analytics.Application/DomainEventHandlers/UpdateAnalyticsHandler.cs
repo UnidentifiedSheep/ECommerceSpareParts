@@ -1,9 +1,9 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
-using Main.Application.Analytics.Services;
+using Main.Modules.Analytics.Application.Services;
 using Main.Modules.Sale.Abstractions;
 
-namespace Main.Application.Analytics.DomainEventHandlers;
+namespace Main.Modules.Analytics.Application.DomainEventHandlers;
 
 public sealed class UpdateAnalyticsHandler(SaleAnalyticsWriter writer)
 	: BatchableDomainEventHandler<SaleContentChanged>

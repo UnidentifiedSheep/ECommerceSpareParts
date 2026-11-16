@@ -1,10 +1,10 @@
-using Application.Common.DomainEventHandlers.Jobs.JobStepFinished;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Services.Events;
 using Domain.CommonEntities.Job;
 using Domain.CommonEntities.Job.Events;
 using Domain.CommonEnums;
 using FluentAssertions;
+using Main.Modules.Jobs.Application.DomainEventHandlers.Jobs.JobStepFinished;
 using Moq;
 
 namespace Tests.Jobs.DomainEventHandlers.JobStepFinished;

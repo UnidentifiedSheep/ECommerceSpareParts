@@ -2,7 +2,7 @@ using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Auth;
+namespace Main.Modules.Identity.Persistence.Configurations.Auth;
 
 public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermission>
 {

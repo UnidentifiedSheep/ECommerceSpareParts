@@ -2,6 +2,7 @@
 using Application.Common.Interfaces.Lrt;
 using Application.Common.LRT;
 using FluentAssertions;
+using Main.Modules.Jobs.Application.LRT;
 
 namespace Tests.Jobs.Lrt;
 

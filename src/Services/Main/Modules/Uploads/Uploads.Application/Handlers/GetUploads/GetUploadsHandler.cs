@@ -1,9 +1,9 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Models;
-using Application.Common.Models.Options.S3;
 using Main.Modules.Uploads.Application.Dtos;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
 namespace Main.Modules.Uploads.Application.Handlers.GetUploads;
 

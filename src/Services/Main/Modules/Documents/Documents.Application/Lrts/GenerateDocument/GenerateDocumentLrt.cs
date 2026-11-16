@@ -7,18 +7,17 @@ using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Document;
-using Main.Application.Interfaces.Services;
-using Main.Application.Interfaces.Services.Document;
-using Main.Application.Notifications;
+using Main.Application.Document.Document;
+using Main.Application.Document.Interfaces.Document;
 using Main.Entities;
-using Main.Entities.Documents;
+using Main.Entities.Documents.Documents;
+using Main.Modules.Documents.Application.Notifications;
 using Microsoft.Extensions.Logging;
 using NamedObject.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
 
-namespace Main.Application.Lrts.GenerateDocument;
+namespace Main.Modules.Documents.Application.Lrts.GenerateDocument;
 
 public class GenerateDocumentLrt(
 	IApplicationTransactionFactory transactionService,

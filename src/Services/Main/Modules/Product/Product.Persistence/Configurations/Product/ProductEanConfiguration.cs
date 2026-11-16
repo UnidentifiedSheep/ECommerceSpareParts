@@ -1,8 +1,8 @@
-﻿using Main.Entities.Product;
+﻿using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Product;
+namespace Main.Modules.Product.Persistence.Configurations.Product;
 
 public class ProductEanConfiguration : IEntityTypeConfiguration<ProductEan>
 {
@@ -22,7 +22,7 @@ public class ProductEanConfiguration : IEntityTypeConfiguration<ProductEan>
 		builder.Property(e => e.Ean).HasColumnName("ean").HasMaxLength(14).IsRequired();
 
 		builder
-			.HasOne<Entities.Product.Product>()
+			.HasOne<Entities.Product.Product.Product>()
 			.WithMany(p => p.Eans)
 			.HasForeignKey(x => x.ProductId)
 			.OnDelete(DeleteBehavior.Cascade)

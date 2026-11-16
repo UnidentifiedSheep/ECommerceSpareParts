@@ -1,8 +1,8 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities.Currency;
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Currency.Application.Services;
 
 public sealed class CurrencyChecks : ICurrencyChecks
 {

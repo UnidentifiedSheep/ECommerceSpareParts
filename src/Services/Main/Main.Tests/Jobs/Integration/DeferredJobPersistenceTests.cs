@@ -1,4 +1,6 @@
 using System.Text.Json;
+using Application.Common;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
@@ -6,6 +8,7 @@ using Attributes;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
+using Main.Modules.Jobs.Application.LRT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

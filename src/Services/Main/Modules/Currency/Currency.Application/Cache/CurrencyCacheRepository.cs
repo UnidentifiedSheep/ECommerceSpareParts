@@ -4,18 +4,16 @@ using Application.Common.Interfaces.Cache;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Cache.Extensions;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Static;
-using Main.Entities.Currency;
+using Main.Modules.Currency.Application.Dtos;
+using Main.Modules.Currency.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Cache;
+namespace Main.Modules.Currency.Application.Cache;
 
 public class CurrencyCacheRepository(
 	ICache rawCache,
-	IReadRepository<Currency, int> repository,
-	IProjectionProvider<Currency, CurrencyDto> projection) : ICurrencyCacheRepository
+	IReadRepository<Entities.Currency.Currency, int> repository,
+	IProjectionProvider<Entities.Currency.Currency, CurrencyDto> projection) : ICurrencyCacheRepository
 {
 	public async Task<CurrencyDto?> GetCurrency(int id, CancellationToken cancellationToken = default)
 	{

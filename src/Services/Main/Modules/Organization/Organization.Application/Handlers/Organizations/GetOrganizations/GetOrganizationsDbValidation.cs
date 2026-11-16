@@ -1,8 +1,8 @@
 using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
 
-namespace Main.Application.Handlers.Organizations.GetOrganizations;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
 
 public class GetOrganizationsDbValidation(IUserChecks userChecks) : AbstractDbValidation<GetOrganizationsQuery>
 {

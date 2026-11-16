@@ -1,6 +1,6 @@
-using Main.Application.Analytics.Interfaces.ChartData;
+using Main.Modules.Analytics.Abstractions.Interfaces.ChartData;
 
-namespace Main.Application.Analytics.Charts;
+namespace Main.Modules.Analytics.Abstractions.Charts;
 
 public sealed record ChartDataResult(IReadOnlyList<IChartDataPoint> DataPoints, string? NextCursor);
 

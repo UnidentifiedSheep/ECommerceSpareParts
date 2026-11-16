@@ -1,8 +1,9 @@
 using Application.Common.Models;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Products.Queries.GetProductsByEan;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Products.Queries.GetProductsByEan;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

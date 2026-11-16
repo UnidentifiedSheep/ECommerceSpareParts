@@ -3,21 +3,21 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Validators;
 using Attributes;
 using Exceptions.Base;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions;
-using Main.Application.Extensions.QueryExtensions;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Extensions;
+using Main.Modules.Identity.Application.Extensions.QueryExtensions;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
+using Main.Modules.Identity.Application.Interfaces.Services;
+using Main.Modules.Identity.Application.Validators;
 using Security.Core.Interfaces;
 using Role = Enums.Role;
 
-namespace Main.Application.Handlers.Auth;
+namespace Main.Modules.Identity.Application.Handlers.Auth;
 
 [Transactional]
 [AutoSave]

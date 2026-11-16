@@ -2,7 +2,7 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Main.Application.Models;
+namespace Main.Modules.Identity.Application.Models;
 
 public record JwtOptions
 {

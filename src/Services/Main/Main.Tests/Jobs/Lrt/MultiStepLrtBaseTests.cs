@@ -1,3 +1,5 @@
+using Application.Common;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
@@ -9,6 +11,7 @@ using Domain.CommonEnums;
 using FluentAssertions;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
+using Main.Modules.Jobs.Application.LRT;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NamedObject.Core.Interfaces;

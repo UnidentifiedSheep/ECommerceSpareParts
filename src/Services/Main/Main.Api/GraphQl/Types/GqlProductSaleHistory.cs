@@ -2,8 +2,8 @@ using HotChocolate;
 using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.Product;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Dtos.Sale;
-using Main.Application.Handlers.Currencies;
+using Main.Modules.Currency.Application.Handlers.Currencies;
+using Main.Modules.Sale.Application.Dtos.Sale;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types;

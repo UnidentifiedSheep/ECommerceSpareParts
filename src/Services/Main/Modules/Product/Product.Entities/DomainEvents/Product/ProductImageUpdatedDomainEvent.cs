@@ -1,6 +1,6 @@
 using Domain.Interfaces.Events;
 
-namespace Main.Entities.DomainEvents.Product;
+namespace Main.Entities.Product.DomainEvents.Product;
 
 public record ProductImageUpdatedDomainEvent(int ProductId) : IBatchableDomainEvent, IKeyedDomainEvent
 {

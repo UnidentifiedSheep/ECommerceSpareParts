@@ -1,4 +1,4 @@
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Contracts.Tasks;
 using MassTransit;
 using NamedObject.Core.Interfaces;

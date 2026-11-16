@@ -1,4 +1,4 @@
-namespace Main.Enums;
+namespace Main.Entities.Analytics.Enums;
 
 public enum TimeGranularity
 {

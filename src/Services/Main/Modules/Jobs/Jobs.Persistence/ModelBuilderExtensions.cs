@@ -1,3 +1,4 @@
+using Main.Modules.Jobs.Persistence.BaseTableConfigurations;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Common.BaseTableConfigurations;
 

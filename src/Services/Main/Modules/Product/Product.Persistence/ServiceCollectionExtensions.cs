@@ -1,13 +1,13 @@
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Persistence.Context;
 using Persistence.Common;
-using Main.Application.Interfaces.Persistence;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Context;
 using Persistence.Extensions;
-using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
-using ProductRepository = Main.Persistence.Repositories.Product.ProductRepository;
-using SupplierProductRepository = Main.Persistence.Repositories.Product.SupplierProductRepository;
+using ProducerRepository = Main.Modules.Product.Persistence.Repositories.Producer.ProducerRepository;
+using ProductRepository = Main.Modules.Product.Persistence.Repositories.Product.ProductRepository;
+using SupplierProductRepository = Main.Modules.Product.Persistence.Repositories.Product.SupplierProductRepository;
 
 namespace Main.Modules.Product.Persistence;
 
@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddProductPersistence(this IServiceCollection services)
 	{
-		services.AddDbContextModule<ProductDbContextModule>().AddEntities(typeof(Main.Entities.Product.Product).Assembly);
+		services.AddDbContextModule<ProductDbContextModule>().AddEntities(typeof(Entities.Product.Product.Product).Assembly);
 
 		services.AddDbContext<BulkProductContext>((serviceProvider, options) =>
 			options.UseNpgsql(

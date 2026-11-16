@@ -6,7 +6,7 @@ using Attributes;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 
-namespace Application.Common.LRT;
+namespace Main.Modules.Jobs.Application.LRT;
 
 public class JobLeaseService(IApplicationTransaction transactionService) : IJobLeaseService
 {

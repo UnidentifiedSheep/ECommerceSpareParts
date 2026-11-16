@@ -1,7 +1,8 @@
 using Enums;
 using Bogus;
 using Main.Entities.Balance;
-using Main.Enums.Balances;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Balance;

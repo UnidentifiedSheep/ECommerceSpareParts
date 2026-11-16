@@ -1,7 +1,7 @@
 using FluentValidation;
-using Main.Application.Handlers.Producers.BaseValidators;
+using Main.Modules.Product.Application.Handlers.Producers.BaseValidators;
 
-namespace Main.Application.Handlers.ProducerAliases.AddAlias;
+namespace Main.Modules.Product.Application.Handlers.ProducerAliases.AddAlias;
 
 public class AddAliasValidation : AbstractValidator<AddAliasCommand>
 {

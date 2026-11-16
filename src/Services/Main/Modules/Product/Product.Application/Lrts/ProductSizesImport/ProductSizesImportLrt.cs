@@ -1,19 +1,19 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Enums.Units;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Lrts.Base;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.Base;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Lrts.ProductSizesImport;
+namespace Main.Modules.Product.Application.Lrts.ProductSizesImport;
 
 public class ProductSizesImportLrt(
 	IS3Service s3Service,
@@ -97,10 +97,10 @@ public class ProductSizesImportLrt(
 			{
 				var products = await context
 					.Repositories
-					.Get<Product, int>()
+					.Get<Entities.Product.Product.Product, int>()
 					.FindByIdsAsync(
 						productIds,
-						Criteria<Product>.New().Include(x => x.ProductSize).Track().Build(),
+						Criteria<Entities.Product.Product.Product>.New().Include(x => x.ProductSize).Track().Build(),
 						cancellationToken);
 
 				var newSizes = new Dictionary<int, ProductSize>();

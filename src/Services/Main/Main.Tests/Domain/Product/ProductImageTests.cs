@@ -2,6 +2,7 @@
 using Exceptions;
 using FluentAssertions;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
 
 namespace Tests.Domain.Product;
 

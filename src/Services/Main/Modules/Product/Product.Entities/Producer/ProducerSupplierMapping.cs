@@ -3,9 +3,9 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Enums;
-using Main.Entities.DomainEvents.Producer;
+using Main.Entities.Product.DomainEvents.Producer;
 
-namespace Main.Entities.Producer;
+namespace Main.Entities.Product.Producer;
 
 public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>,
 	ILinqEntity<ProducerSupplierMapping, int>

@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Notifications.GetNotifications;
+namespace Main.Modules.Notifications.Application.Handlers.Notifications.GetNotifications;
 
 public class GetNotificationsValidation : AbstractValidator<GetNotificationsQuery>
 {

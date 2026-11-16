@@ -1,9 +1,8 @@
 using System.Globalization;
 using System.Text;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
-using Application.Common.Models.Options.S3;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
@@ -13,8 +12,9 @@ using Locan.Core.Interfaces.Localizers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Lrts.Base;
+namespace Main.Modules.Product.Application.Lrts.Base;
 
 public abstract class CsvImportLrtBase<TInputState, TState, TCsvRow, TBatchItem>(
 	IOptions<S3BucketsOptions> bucketsOptions,

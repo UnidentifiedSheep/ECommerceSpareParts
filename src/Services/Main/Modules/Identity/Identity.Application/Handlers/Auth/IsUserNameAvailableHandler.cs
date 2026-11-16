@@ -4,7 +4,7 @@ using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Auth;
+namespace Main.Modules.Identity.Application.Handlers.Auth;
 
 public record IsUserNameAvailableQuery(string UserName) : IQuery<IsUserNameAvailableResult>;
 

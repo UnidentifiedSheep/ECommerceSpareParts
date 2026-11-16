@@ -1,17 +1,16 @@
-using Enums;
 using System.Data;
-using Main.Entities.Sale;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Domain.Extensions;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
+using Enums;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Exceptions;
 using Main.Modules.Balance.Abstractions;
-using Main.Entities.Exceptions;
-using Main.Enums;
+using Main.Modules.Sale.Application.Interfaces.Persistence;
+using Main.Modules.Sale.Application.Interfaces.Services;
 using MediatR;
 
-namespace Main.Application.Handlers.Sales;
+namespace Main.Modules.Sale.Application.Handlers.Sales;
 
 [AutoSave]
 [Transactional(

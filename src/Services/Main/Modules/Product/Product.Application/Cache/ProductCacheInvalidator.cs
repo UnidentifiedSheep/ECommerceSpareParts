@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cache;
 using Cache.Extensions;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Static;
+using Main.Modules.Product.Application.Interfaces.Cache;
+using Main.Modules.Product.Application.Static;
 
-namespace Main.Cache;
+namespace Main.Modules.Product.Application.Cache;
 
 public sealed class ProductCacheInvalidator(ICache rawCache) : IProductCacheInvalidator
 {

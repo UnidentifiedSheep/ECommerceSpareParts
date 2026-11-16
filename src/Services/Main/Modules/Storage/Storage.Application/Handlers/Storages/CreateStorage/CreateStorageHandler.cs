@@ -1,10 +1,9 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
 
-namespace Main.Application.Handlers.Storages.CreateStorage;
+namespace Main.Modules.Storage.Application.Handlers.Storages.CreateStorage;
 
 [AutoSave]
 [Transactional]
@@ -23,7 +22,7 @@ public class CreateStorageHandler(IUnitOfWork unitOfWork)
 		CreateStorageCommand request,
 		CancellationToken cancellationToken)
 	{
-		var storage = Storage.Create(request.Code, request.Type);
+		var storage = Entities.Storage.Storage.Storage.Create(request.Code, request.Type);
 		storage.SetDescription(request.Description);
 		storage.SetLocation(request.Location);
 

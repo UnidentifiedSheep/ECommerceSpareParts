@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using Application.Common.Models;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
 
-namespace Main.Application.Dtos.Storage;
+namespace Main.Modules.Storage.Application.Dtos.Storage;
 
 public record PatchStorageDto
 {

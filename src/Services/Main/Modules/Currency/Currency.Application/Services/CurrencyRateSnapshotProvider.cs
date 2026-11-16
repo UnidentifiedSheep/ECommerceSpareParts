@@ -4,14 +4,13 @@ using System.Data;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Main.Application.Interfaces.Services.Currency;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
-using Main.Entities.Settings;
-using Main.Modules.Currency.Abstractions;
+using Main.Entities.Currency.Settings;
+using Main.Modules.Currency.Abstractions.Events;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services.Currency;
+namespace Main.Modules.Currency.Application.Services;
 
 public sealed class CurrencyRateSnapshotProvider(
 	IApplicationTransactionFactory transactionFactory

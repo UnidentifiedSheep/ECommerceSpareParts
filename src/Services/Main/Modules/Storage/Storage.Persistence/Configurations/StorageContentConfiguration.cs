@@ -1,8 +1,8 @@
-﻿using Main.Entities.Storage;
+﻿using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Storage;
+namespace Main.Modules.Storage.Persistence.Configurations;
 
 public class StorageContentConfiguration : IEntityTypeConfiguration<StorageContent>
 {
@@ -59,7 +59,7 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
 		builder.Property(e => e.RowVersion).HasColumnName("xmin").IsRowVersion();
 
 		builder
-			.HasOne<Entities.Storage.Storage>()
+			.HasOne<Entities.Storage.Storage.Storage>()
 			.WithMany()
 			.HasForeignKey(d => d.StorageCode)
 			.OnDelete(DeleteBehavior.Restrict)

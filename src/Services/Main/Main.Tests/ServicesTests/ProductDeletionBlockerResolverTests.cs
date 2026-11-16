@@ -1,9 +1,9 @@
 using Main.Entities;
 using FluentAssertions;
 using Locan.Core.Interfaces;
-using Main.Application.Services;
 using Main.Entities.Product;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Product.Application.Services;
 
 namespace Tests.ServicesTests;
 

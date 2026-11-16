@@ -3,7 +3,7 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Product;
+namespace Main.Entities.Product.Product;
 
 public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<ProductContent, (int, int)>
 {

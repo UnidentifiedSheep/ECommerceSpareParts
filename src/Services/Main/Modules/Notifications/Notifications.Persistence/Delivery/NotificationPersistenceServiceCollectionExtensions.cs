@@ -1,12 +1,12 @@
+using Main.Modules.Notifications.Persistence.Delivery.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Notification.Core.Interfaces.Repositories;
-using Notification.Persistence.Repositories;
 using Persistence.Interfaces;
 using Persistence.Services;
 
-namespace Notification.Persistence;
+namespace Main.Modules.Notifications.Persistence.Delivery;
 
 public static class ServiceCollectionExtensions
 {

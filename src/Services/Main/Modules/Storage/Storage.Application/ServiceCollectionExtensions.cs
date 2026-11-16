@@ -1,14 +1,14 @@
 using NamedObject.Core.Interfaces;
-using Main.Application.Configs;
 using Application.Common.Host;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Application.Common.NamedObject;
-using Main.Application.Interfaces.Services;
-using Main.Application.NamedObjects.StorageContentExtractPolicies;
-using Main.Application.Services.ProductDeletion;
-using Main.Application.Services.Storage;
 using Main.Modules.Storage.Abstractions;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Application.Configs;
+using Main.Modules.Storage.Application.NamedObjects.StorageContentExtractPolicies;
+using Main.Modules.Storage.Application.Services.ProductDeletion;
+using Main.Modules.Storage.Application.Services.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
 

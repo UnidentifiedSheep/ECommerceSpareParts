@@ -1,9 +1,7 @@
-using Locan.Core.Interfaces;
-using Main.Entities.Product;
 using Exceptions.Base.Localized;
-using Main.Enums.Products;
+using Locan.Core.Interfaces;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Product.Exceptions;
 
 public class ProductCharacteristicsNotFoundException(int id, int characteristicId)
 	: LocalizedNotFoundException(

@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Settings;
 using Main.Entities.Currency;
-using Main.Entities.Settings;
+using Main.Entities.Currency.Settings;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 using Tests.Abstractions;

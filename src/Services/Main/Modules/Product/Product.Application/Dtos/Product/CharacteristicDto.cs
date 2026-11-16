@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Product;
+namespace Main.Modules.Product.Application.Dtos.Product;
 
 public record CharacteristicDto
 {

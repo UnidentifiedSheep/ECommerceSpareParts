@@ -1,6 +1,6 @@
 using GraphQL.Common.Types;
 using HotChocolate;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
 
 namespace Main.Api.GraphQl.Types.Inputs.Order;
 

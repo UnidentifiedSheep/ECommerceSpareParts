@@ -1,11 +1,10 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Sale;
 using Main.Modules.Sale.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Sale.Application.Services;
 
-public sealed class SaleSnapshots(IReadRepository<Sale, Guid> sales) : ISaleSnapshots
+public sealed class SaleSnapshots(IReadRepository<Entities.Sale.Sale.Sale, Guid> sales) : ISaleSnapshots
 {
 	public async Task<SaleSnapshotsPage> GetPageAsync(
 		Guid? afterSaleId,

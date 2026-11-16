@@ -1,9 +1,10 @@
 using Main.Entities.Sale;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Handlers.Sales.GetSale;
 using Main.Entities;
 using Main.Entities.Exceptions;
+using Main.Entities.Sale.Exceptions;
+using Main.Modules.Sale.Application.Handlers.Sales.GetSale;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;

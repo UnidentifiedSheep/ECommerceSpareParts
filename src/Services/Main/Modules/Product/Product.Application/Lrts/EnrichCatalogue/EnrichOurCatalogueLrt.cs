@@ -1,14 +1,14 @@
+using Application.Common;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Locan.Core.Interfaces;
-using Main.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;
-using Main.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Modules.Product.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;
+using Main.Modules.Product.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts.EnrichCatalogue;
+namespace Main.Modules.Product.Application.Lrts.EnrichCatalogue;
 
 public class EnrichOurCatalogueLrt(
 	IApplicationTransactionFactory transactionService,

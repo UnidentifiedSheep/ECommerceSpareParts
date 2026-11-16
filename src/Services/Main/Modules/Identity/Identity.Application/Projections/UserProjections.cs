@@ -2,10 +2,10 @@ using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
 using LinqKit;
-using Main.Application.Dtos.Users;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Dtos.Users;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Identity.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class UserDtoProjectionProvider : ProjectionProviderBase<User, UserDto>

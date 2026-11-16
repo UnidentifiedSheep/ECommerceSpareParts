@@ -4,14 +4,13 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Sale;
-using Main.Entities.Sale;
-using Main.Enums;
-using Main.Modules.Identity.Abstractions;
+using Main.Entities.Sale.Enums;
+using Main.Modules.Identity.Abstractions.Interfaces;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Sale.Application.Dtos.Sale;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Sales.GetSales;
+namespace Main.Modules.Sale.Application.Handlers.Sales.GetSales;
 
 public record GetSalesQuery(
 	RangeModel<DateTime> DateRange,
@@ -26,10 +25,10 @@ public record GetSalesQuery(
 public record GetSalesResult(IReadOnlyList<SaleDto> Sales);
 
 public class GetSalesHandler(
-	IReadRepository<Sale, Guid> repository,
+	IReadRepository<Entities.Sale.Sale.Sale, Guid> repository,
 	IUserSearch userSearch,
 	IProductSearch productSearch,
-	IProjectionProvider<Sale, SaleDto> projection) : IQueryHandler<GetSalesQuery, GetSalesResult>
+	IProjectionProvider<Entities.Sale.Sale.Sale, SaleDto> projection) : IQueryHandler<GetSalesQuery, GetSalesResult>
 {
 	public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
 	{
@@ -65,7 +64,7 @@ public class GetSalesHandler(
 		return new GetSalesResult(result);
 	}
 
-	private IQueryable<Sale> ApplySearchTerm(IQueryable<Sale> query, string searchTerm)
+	private IQueryable<Entities.Sale.Sale.Sale> ApplySearchTerm(IQueryable<Entities.Sale.Sale.Sale> query, string searchTerm)
 	{
 		var term = searchTerm.Trim();
 		var pattern = LikePattern.Contains(term);

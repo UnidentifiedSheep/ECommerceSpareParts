@@ -1,16 +1,16 @@
 using System.Text.Json.Serialization;
-using Main.Entities;
+using Main.Application.Document.Document;
 using Main.Entities.Sale;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.Document.Sales.SingleSale;
+namespace Main.Modules.Sale.Application.Document.Sales.SingleSale;
 
 public sealed record SingleSaleDocumentRequest : DocumentRequestBase
 {
 	[JsonPropertyName("saleId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity(nameof(Sale), "id")]
+	[SchemaDependsOnEntity(nameof(Entities.Sale.Sale.Sale), "id")]
 	[SchemaFieldLabel(SaleDocumentSingleRequestSaleIdNameMessage.Key)]
 	[SchemaFieldDescription(SaleDocumentSingleRequestSaleIdDescriptionMessage.Key)]
 	public required Guid SaleId { get; init; }

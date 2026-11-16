@@ -4,11 +4,11 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Documents;
-using Main.Entities.Documents;
+using Main.Entities.Documents.Documents;
+using Main.Modules.Documents.Application.Dtos.Documents;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Documents.SearchDocuments;
+namespace Main.Modules.Documents.Application.Handlers.Documents.SearchDocuments;
 
 public record SearchDocumentsQuery(
 	Guid? RequesterId,

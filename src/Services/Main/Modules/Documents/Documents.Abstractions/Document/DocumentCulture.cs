@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Main.Application.Document;
+namespace Main.Application.Document.Document;
 
 public static class DocumentCulture
 {

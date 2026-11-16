@@ -1,7 +1,7 @@
 using FluentAssertions;
-using Main.Application.Handlers.Auth.RemovePermissionsFromUser;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
+using Main.Modules.Identity.Application.Handlers.Auth.RemovePermissionsFromUser;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

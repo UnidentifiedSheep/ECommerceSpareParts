@@ -1,4 +1,4 @@
-namespace Pricing.Enums;
+namespace Pricing.Entities.Enums;
 
 public enum PriceOfferSource
 {

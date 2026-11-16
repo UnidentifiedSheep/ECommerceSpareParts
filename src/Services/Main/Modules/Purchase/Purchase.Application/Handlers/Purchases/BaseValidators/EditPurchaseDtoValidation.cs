@@ -1,11 +1,10 @@
 using Application.Common.Extensions;
-using Main.Entities.Purchase;
-using FluentValidation;
-using Main.Application.Dtos.Purchase;
-using Main.Entities;
 using Application.Common.Validators;
+using FluentValidation;
+using Main.Entities.Purchase;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 
-namespace Main.Application.Handlers.Purchases.BaseValidators;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.BaseValidators;
 
 public class EditPurchaseDtoValidation : AbstractValidator<IReadOnlyCollection<EditPurchaseDto>>
 {

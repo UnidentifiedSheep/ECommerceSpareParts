@@ -5,8 +5,8 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Notification;
 using Main.Api.GraphQl.Types.Notification;
-using Main.Application.Handlers.NotificationPreferences;
-using Main.Application.Handlers.Notifications.GetNotifications;
+using Main.Modules.Notifications.Application.Handlers.NotificationPreferences;
+using Main.Modules.Notifications.Application.Handlers.Notifications.GetNotifications;
 using MediatR;
 using Security.Core.Interfaces;
 

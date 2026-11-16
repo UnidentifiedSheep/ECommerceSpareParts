@@ -1,6 +1,6 @@
 using NamedObject.Core.Interfaces;
 
-namespace Application.Common.Interfaces.Lrt;
+namespace Application.Common.Interfaces;
 
 public interface ILrtNamedObject : ILrt, ILrtDescriptor, ILocalizableNamedObject;
 

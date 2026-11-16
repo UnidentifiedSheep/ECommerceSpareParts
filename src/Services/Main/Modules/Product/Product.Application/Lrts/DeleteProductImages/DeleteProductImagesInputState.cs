@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 
-namespace Main.Application.Lrts.DeleteProductImages;
+namespace Main.Modules.Product.Application.Lrts.DeleteProductImages;
 
 public record DeleteProductImagesInputState : IInputState
 {

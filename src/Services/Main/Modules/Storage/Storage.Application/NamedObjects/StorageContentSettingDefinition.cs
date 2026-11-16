@@ -4,15 +4,14 @@ using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Exceptions;
 using Locan.Core.Interfaces;
-using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Storage;
-using Main.Entities;
-using Main.Entities.Settings;
+using Main.Entities.Storage.Settings;
+using Main.Modules.Storage.Application.NamedObjects.StorageContentExtractPolicies;
 using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.NamedObjects.SettingDefinitions;
+namespace Main.Modules.Storage.Application.NamedObjects;
 
 public class StorageContentSettingDefinition(
 	ISettingsService settingsService,

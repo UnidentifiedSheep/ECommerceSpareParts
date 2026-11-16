@@ -1,5 +1,5 @@
 
-namespace Main.Entities.Balance;
+namespace Main.Entities.Balance.Balance;
 
 public interface ITransactionFinancialProfileService
 {

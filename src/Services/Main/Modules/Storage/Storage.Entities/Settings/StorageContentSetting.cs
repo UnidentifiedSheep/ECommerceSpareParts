@@ -1,11 +1,10 @@
 ﻿using System.Text.Json.Serialization;
-using Main.Entities.Storage;
 using Domain.CommonEntities;
 using Domain.Interfaces;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Entities.Settings;
+namespace Main.Entities.Storage.Settings;
 
 public class StorageContentSetting : Setting<StorageContentSettingData>, ISetting<StorageContentSetting>
 {

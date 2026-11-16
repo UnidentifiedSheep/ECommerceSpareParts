@@ -1,7 +1,7 @@
 using Application.Common.Querying;
-using Main.Application.Analytics.Charts.SalesProfitOverTime;
+using Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
 
-namespace Main.Application.Analytics.Configs;
+namespace Main.Modules.Analytics.Application.Configs;
 
 public static class AnalyticsCursorConfig
 {

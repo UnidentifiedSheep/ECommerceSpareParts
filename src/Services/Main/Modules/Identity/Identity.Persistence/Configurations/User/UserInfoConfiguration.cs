@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.User;
+namespace Main.Modules.Identity.Persistence.Configurations.User;
 
 public class UserInfoConfiguration : IEntityTypeConfiguration<UserInfo>
 {

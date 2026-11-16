@@ -1,4 +1,4 @@
-namespace Notification.Core.Enums;
+namespace Main.Entities.Notification;
 
 public enum DeliveryStatus
 {

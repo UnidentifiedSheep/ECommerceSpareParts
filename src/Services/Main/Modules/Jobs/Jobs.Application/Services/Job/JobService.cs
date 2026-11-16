@@ -9,7 +9,7 @@ using Attributes;
 using Domain.CommonEntities.Job;
 using JobEntity = Domain.CommonEntities.Job.Job;
 
-namespace Application.Common.Services.Job;
+namespace Main.Modules.Jobs.Application.Services.Job;
 
 public class JobService(
 	IApplicationTransaction transactionService,

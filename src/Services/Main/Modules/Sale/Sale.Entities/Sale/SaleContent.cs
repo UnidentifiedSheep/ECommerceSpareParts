@@ -3,9 +3,9 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Entities.DomainEvents.Sale;
+using Main.Entities.Sale.DomainEvents;
 
-namespace Main.Entities.Sale;
+namespace Main.Entities.Sale.Sale;
 
 public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, int>
 {

@@ -1,8 +1,8 @@
+using Main.Modules.Notifications.Application.Delivery.Interfaces;
 using Notification.Core.Interfaces.Notification;
-using Notification.Interfaces;
 using RazorLight;
 
-namespace Notification.Renderers;
+namespace Main.Modules.Notifications.Application.Delivery.Renderers;
 
 public class HtmlNotificationRenderer(
 	IRazorLightEngine engine) : INotificationRenderer<INotification>

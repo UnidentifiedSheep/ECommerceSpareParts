@@ -1,8 +1,8 @@
-using Application.Common.Interfaces.Validators;
 using FluentValidation;
-using Main.Application.Handlers.BaseValidators;
+using Main.Modules.Identity.Application.Validators;
+using EmailValidator = Main.Modules.Identity.Application.Handlers.BaseValidators.EmailValidator;
 
-namespace Main.Application.Handlers.Users.AddEmailToUser;
+namespace Main.Modules.Identity.Application.Handlers.Users.AddEmailToUser;
 
 public class AddEmailToUserValidation : AbstractValidator<AddEmailToUserCommand>
 {

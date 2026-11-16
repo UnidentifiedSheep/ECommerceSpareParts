@@ -1,9 +1,8 @@
-using FluentValidation;
-using Main.Entities.Purchase;
-using Main.Application.Dtos.Purchase;
 using Application.Common.Validators;
+using FluentValidation;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 
-namespace Main.Application.Handlers.Purchases.BaseValidators;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.BaseValidators;
 
 public class NewPurchaseContentValidation : AbstractValidator<NewPurchaseContentDto>
 {

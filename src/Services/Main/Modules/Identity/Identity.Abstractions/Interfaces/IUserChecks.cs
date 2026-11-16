@@ -1,6 +1,6 @@
 using BulkValidation.Core.Interfaces;
 
-namespace Main.Modules.Identity.Abstractions;
+namespace Main.Modules.Identity.Abstractions.Interfaces;
 
 public interface IUserChecks
 {

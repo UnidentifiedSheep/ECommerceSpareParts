@@ -1,4 +1,4 @@
-using Main.Persistence.DatabaseObjects;
+using Main.Modules.Identity.Persistence.DatabaseObjects;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 

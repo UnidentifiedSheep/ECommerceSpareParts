@@ -1,6 +1,7 @@
 using FluentAssertions;
-using Main.Application.Handlers.Currencies.GetCurrencyRate;
+using Main.Entities.Currency;
 using Main.Entities.Exceptions;
+using Main.Modules.Currency.Application.Handlers.Currencies.GetCurrencyRate;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Currency;
 

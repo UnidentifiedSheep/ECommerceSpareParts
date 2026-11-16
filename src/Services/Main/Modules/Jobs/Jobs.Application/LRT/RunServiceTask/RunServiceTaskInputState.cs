@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 
 namespace Main.Modules.Jobs.Application.LRT.RunServiceTask;

@@ -1,4 +1,4 @@
-namespace Main.Enums.Auth;
+namespace Main.Entities.Enums.Auth;
 
 public enum VerificationType
 {

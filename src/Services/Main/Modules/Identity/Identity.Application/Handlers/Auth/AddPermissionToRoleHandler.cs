@@ -5,7 +5,7 @@ using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using MediatR;
 
-namespace Main.Application.Handlers.Auth;
+namespace Main.Modules.Identity.Application.Handlers.Auth;
 
 [Transactional]
 [AutoSave]

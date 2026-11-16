@@ -1,6 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
-using Main.Application.Dtos.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 
 namespace Main.Api.GraphQl.Types.Product;
 

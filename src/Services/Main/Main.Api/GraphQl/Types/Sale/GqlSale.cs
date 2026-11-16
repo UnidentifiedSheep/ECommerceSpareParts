@@ -4,9 +4,11 @@ using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Dtos.Sale;
+using Main.Entities.Currency;
 using Main.Entities.Exceptions;
-using Main.Enums;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Exceptions;
+using Main.Modules.Sale.Application.Dtos.Sale;
 
 namespace Main.Api.GraphQl.Types.Sale;
 

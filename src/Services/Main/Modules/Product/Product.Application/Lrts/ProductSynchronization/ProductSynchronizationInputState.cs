@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
-using Application.Common.Interfaces.Lrt;
-using Main.Enums;
+using Application.Common.Interfaces;
+using Main.Entities.Product.Enums;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.Lrts.ProductSynchronization;
+namespace Main.Modules.Product.Application.Lrts.ProductSynchronization;
 
 public sealed record ProductSynchronizationInputState : IInputState
 {

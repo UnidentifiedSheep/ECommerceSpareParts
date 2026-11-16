@@ -1,15 +1,15 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using Main.Application.Orders.Dtos;
-using Main.Entities.Order;
+using Main.Entities.Order.Order;
+using Main.Modules.Order.Application.Orders.Dtos;
 
-namespace Main.Application.Orders;
+namespace Main.Modules.Order.Application.Orders;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class OrderDtoProjectionProvider : ProjectionProviderBase<Order, OrderDto>
+public sealed class OrderDtoProjectionProvider : ProjectionProviderBase<Entities.Order.Order.Order, OrderDto>
 {
-	public override Expression<Func<Order, OrderDto>> Projection { get; } = order => new OrderDto
+	public override Expression<Func<Entities.Order.Order.Order, OrderDto>> Projection { get; } = order => new OrderDto
 	{
 		Id = order.Id,
 		OrganizationId = order.OrganizationId,

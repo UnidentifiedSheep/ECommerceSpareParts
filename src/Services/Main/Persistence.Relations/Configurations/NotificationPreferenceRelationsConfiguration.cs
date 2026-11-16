@@ -1,14 +1,15 @@
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations;
+namespace Persistence.Relations.Configurations;
 
 public sealed class NotificationPreferenceRelationsConfiguration
-	: IEntityTypeConfiguration<Entities.User.UserNotificationPreference>
+	: IEntityTypeConfiguration<UserNotificationPreference>
 {
-	public void Configure(EntityTypeBuilder<Entities.User.UserNotificationPreference> builder)
+	public void Configure(EntityTypeBuilder<Main.Entities.User.UserNotificationPreference> builder)
 		=> builder
-			.HasOne<Entities.User.User>()
+			.HasOne<Main.Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(e => e.UserId)
 			.OnDelete(DeleteBehavior.Cascade)

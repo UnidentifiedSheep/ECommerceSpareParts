@@ -1,19 +1,18 @@
-using Enums;
 using System.Data;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Attributes;
 using Domain.Extensions;
-using Main.Application.Dtos.Storage;
-using Main.Application.Extensions;
-using Main.Entities.Storage;
-using Main.Enums;
+using Enums;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Storage.Application.Dtos.Storage;
+using Main.Modules.Storage.Application.Extensions;
 using MediatR;
 
-namespace Main.Application.Handlers.StorageContents.EditContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.EditContent;
 
 [AutoSave]
 [Transactional(

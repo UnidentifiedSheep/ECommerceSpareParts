@@ -1,6 +1,6 @@
 using GraphQL.Common.Types;
 using HotChocolate;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
 
 namespace Main.Api.GraphQl.Types.Inputs.Storage;
 

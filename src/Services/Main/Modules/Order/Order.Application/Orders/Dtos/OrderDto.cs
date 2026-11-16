@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
 
-namespace Main.Application.Orders.Dtos;
+namespace Main.Modules.Order.Application.Orders.Dtos;
 
 public sealed record OrderDto
 {

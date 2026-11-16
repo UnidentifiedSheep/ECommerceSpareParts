@@ -1,7 +1,7 @@
-﻿using FluentValidation;
-using Application.Common.Validators;
+﻿using Application.Common.Validators;
+using FluentValidation;
 
-namespace Main.Application.Handlers.Cart.ChangeCartItemCount;
+namespace Main.Modules.Cart.Application.Handlers.Cart.ChangeCartItemCount;
 
 public class ChangeCartItemCountValidation : AbstractValidator<ChangeCartItemCountCommand>
 {

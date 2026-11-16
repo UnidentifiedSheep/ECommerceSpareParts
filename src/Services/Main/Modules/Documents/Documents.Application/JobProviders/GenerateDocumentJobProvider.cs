@@ -2,9 +2,9 @@ using System.Text.Json;
 using Application.Common.Interfaces.Lrt;
 using Attributes;
 using Domain.CommonEntities.Job;
-using Main.Application.Lrts.GenerateDocument;
+using Main.Modules.Documents.Application.Lrts.GenerateDocument;
 
-namespace Main.Application.JobProviders;
+namespace Main.Modules.Documents.Application.JobProviders;
 
 [Lifetime(Lifetime.Singleton)]
 public class GenerateDocumentJobProvider : IJobProvider<GenerateDocumentLrt, GenerateDocumentInputState>

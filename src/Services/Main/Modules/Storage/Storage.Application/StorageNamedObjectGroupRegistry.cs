@@ -1,5 +1,4 @@
-using Main.Application.NamedObjects.StorageContentExtractPolicies;
-using Main.Application.NamedObjects.StorageContentExtractPolicies;
+using Main.Modules.Storage.Application.NamedObjects.StorageContentExtractPolicies;
 using NamedObject.Core.Base;
 
 namespace Main.Modules.Storage.Application;

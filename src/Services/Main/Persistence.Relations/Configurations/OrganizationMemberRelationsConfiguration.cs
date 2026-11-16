@@ -1,15 +1,15 @@
-using Main.Entities.Organization;
+using Main.Entities.Organization.Organization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations;
+namespace Persistence.Relations.Configurations;
 
 public sealed class OrganizationMemberRelationsConfiguration : IEntityTypeConfiguration<OrganizationMember>
 {
 	public void Configure(EntityTypeBuilder<OrganizationMember> builder)
 	{
 		builder
-			.HasOne<Entities.User.User>()
+			.HasOne<Main.Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(x => x.UserId)
 			.OnDelete(DeleteBehavior.Restrict)

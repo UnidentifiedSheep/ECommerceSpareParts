@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries.GetProductsEans;
+namespace Main.Modules.Product.Application.Products.Queries.GetProductsEans;
 
 public record GetProductsEansQuery : IQuery<GetProductsEansResult>
 {

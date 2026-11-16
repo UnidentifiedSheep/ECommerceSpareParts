@@ -4,9 +4,9 @@ namespace Notification.Core.Interfaces.Notification;
 
 public interface INotificationDefinition : INamedObject
 {
-	INotification FromEntity(Entities.Notification entity);
+	INotification FromEntity(Main.Entities.Notification.Notification entity);
 
-	Entities.Notification ToEntity(
+	Main.Entities.Notification.Notification ToEntity(
 		Guid userId,
 		INotification notification);
 }
@@ -14,9 +14,9 @@ public interface INotificationDefinition : INamedObject
 public interface INotificationDefinition<TNotification> : INotificationDefinition
 	where TNotification : INotification
 {
-	new TNotification FromEntity(Entities.Notification entity);
+	new TNotification FromEntity(Main.Entities.Notification.Notification entity);
 
-	Entities.Notification ToEntity(
+	Main.Entities.Notification.Notification ToEntity(
 		Guid userId,
 		TNotification notification);
 }

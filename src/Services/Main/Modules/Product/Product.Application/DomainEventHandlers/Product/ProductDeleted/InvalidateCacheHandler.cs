@@ -1,9 +1,9 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
-using Main.Application.Interfaces.Cache;
-using Main.Entities.DomainEvents.Product;
+using Main.Entities.Product.DomainEvents.Product;
+using Main.Modules.Product.Application.Interfaces.Cache;
 
-namespace Main.Application.DomainEventHandlers.Product.ProductDeleted;
+namespace Main.Modules.Product.Application.DomainEventHandlers.Product.ProductDeleted;
 
 public class InvalidateCacheHandler(
 	IProductCacheInvalidator productCacheInvalidator

@@ -1,10 +1,10 @@
 using Contracts.Storage;
-using Main.Application.Products.Interfaces;
-using Main.Enums;
+using Main.Entities.Product.Enums;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using ProductEntity = Main.Entities.Product.Product;
+using ProductEntity = Main.Entities.Product.Product.Product;
 
-namespace Main.Application.Products.Services.EventParts;
+namespace Main.Modules.Product.Application.Products.Services.EventParts;
 
 public sealed class ProductStocksEventPartProvider : IProductEventPartProvider
 {

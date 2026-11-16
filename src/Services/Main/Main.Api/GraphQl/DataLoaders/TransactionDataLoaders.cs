@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Balances;
-using Main.Application.Handlers.Balance;
+using Main.Modules.Balance.Application.Dtos.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

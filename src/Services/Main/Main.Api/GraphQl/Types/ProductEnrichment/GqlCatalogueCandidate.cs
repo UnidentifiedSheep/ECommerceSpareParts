@@ -3,8 +3,9 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Producer;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Dtos.Product.Enrichment;
 using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Product.Enrichment;
 
 namespace Main.Api.GraphQl.Types.ProductEnrichment;
 

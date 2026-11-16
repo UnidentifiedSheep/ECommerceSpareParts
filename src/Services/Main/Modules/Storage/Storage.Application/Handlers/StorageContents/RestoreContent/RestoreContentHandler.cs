@@ -1,16 +1,15 @@
-using Enums;
 using System.Data;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Models;
-using Main.Entities.Exceptions;
-using Main.Entities.Storage;
-using Main.Enums;
+using Enums;
+using Main.Entities.Storage.Exceptions;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Models;
 using MediatR;
 
-namespace Main.Application.Handlers.StorageContents.RestoreContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.RestoreContent;
 
 [AutoSave]
 [Transactional(

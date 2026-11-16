@@ -3,16 +3,16 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions.Base;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions.QueryExtensions;
-using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
+using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Enums;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Extensions.QueryExtensions;
+using Main.Modules.Identity.Application.Interfaces.Services;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Auth;
+namespace Main.Modules.Identity.Application.Handlers.Auth;
 
 [Transactional(retryDelayMs: 10, retryCount: 2)]
 [AutoSave]

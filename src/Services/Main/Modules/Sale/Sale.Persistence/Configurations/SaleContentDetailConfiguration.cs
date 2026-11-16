@@ -1,8 +1,8 @@
-using Main.Entities.Sale;
+using Main.Entities.Sale.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Sale;
+namespace Main.Modules.Sale.Persistence.Configurations;
 
 public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleContentDetail>
 {

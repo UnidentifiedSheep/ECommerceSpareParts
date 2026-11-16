@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Main.Application.Handlers.Characteristics.DeleteCharacteristic;
+namespace Main.Modules.Product.Application.Handlers.Characteristics.DeleteCharacteristic;
 
 public class DeleteCharacteristicValidation : AbstractValidator<DeleteCharacteristicCommand>
 {

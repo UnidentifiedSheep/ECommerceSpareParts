@@ -1,12 +1,12 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Notifications;
 using Main.Entities.DomainEvents.User;
+using Main.Modules.Identity.Application.Notifications;
 using Notification.Core;
 using Notification.Core.Interfaces.Notification;
 
-namespace Main.Application.DomainEventHandlers.User.UserLoggedIn;
+namespace Main.Modules.Identity.Application.DomainEventHandlers.User.UserLoggedIn;
 
 public class SendLoginNotificationEmailHandler(
 	INotificationService notificationService,

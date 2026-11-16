@@ -3,11 +3,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Producer;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Producers.GetProducers;
+namespace Main.Modules.Product.Application.Handlers.Producers.GetProducers;
 
 public record GetProducersQuery(string? SearchTerm, IReadOnlyCollection<int> Ids, Pagination Pagination)
 	: IQuery<GetProducersResult>;

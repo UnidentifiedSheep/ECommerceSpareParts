@@ -3,12 +3,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Storage;
-using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
+using Main.Modules.Storage.Application.Dtos.Storage;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Storages.GetStorage;
+namespace Main.Modules.Storage.Application.Handlers.Storages.GetStorage;
 
 public record GetStoragesQuery(Pagination Pagination, string? SearchTerm, StorageType? Type)
 	: IQuery<GetStoragesResult>;
@@ -16,8 +15,8 @@ public record GetStoragesQuery(Pagination Pagination, string? SearchTerm, Storag
 public record GetStoragesResult(IReadOnlyList<StorageDto> Storages);
 
 public class GetStoragesHandler(
-	IReadRepository<Storage, string> repository,
-	IProjectionProvider<Storage, StorageDto> projection) : IQueryHandler<GetStoragesQuery, GetStoragesResult>
+	IReadRepository<Entities.Storage.Storage.Storage, string> repository,
+	IProjectionProvider<Entities.Storage.Storage.Storage, StorageDto> projection) : IQueryHandler<GetStoragesQuery, GetStoragesResult>
 {
 	public async Task<GetStoragesResult> Handle(GetStoragesQuery request, CancellationToken cancellationToken)
 	{

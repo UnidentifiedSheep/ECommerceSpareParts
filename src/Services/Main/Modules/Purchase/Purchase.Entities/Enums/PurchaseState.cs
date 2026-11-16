@@ -1,4 +1,4 @@
-﻿namespace Main.Enums;
+﻿namespace Main.Entities.Purchase.Enums;
 
 public enum PurchaseState
 {

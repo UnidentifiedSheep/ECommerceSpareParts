@@ -2,20 +2,19 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Purchase;
-using Main.Entities.Exceptions;
-using Main.Entities.Purchase;
+using Main.Entities.Purchase.Exceptions;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Purchases.GetPurchase;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.GetPurchase;
 
 public record GetPurchaseQuery(Guid? PurchaseId, Guid? TransactionId) : IQuery<GetPurchaseResult>;
 
 public record GetPurchaseResult(PurchaseDto Purchase);
 
 public class GetPurchaseHandler(
-	IReadRepository<Purchase, Guid> repository,
-	IProjectionProvider<Purchase, PurchaseDto> projection)
+	IReadRepository<Entities.Purchase.Purchase.Purchase, Guid> repository,
+	IProjectionProvider<Entities.Purchase.Purchase.Purchase, PurchaseDto> projection)
 	: IQueryHandler<GetPurchaseQuery, GetPurchaseResult>
 {
 	public async Task<GetPurchaseResult> Handle(GetPurchaseQuery request, CancellationToken cancellationToken)

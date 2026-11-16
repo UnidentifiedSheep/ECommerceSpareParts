@@ -1,9 +1,9 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
-using Main.Application.Services;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Events;
+using Main.Modules.Notifications.Application.Services;
 
-namespace Main.Application.DomainEventHandlers.User.UserEmailUpdated;
+namespace Main.Modules.Notifications.Application.DomainEventHandlers.UserEmailUpdated;
 
 public class InvalidateCacheHandler(IRecipientProvider recipientProvider)
 	: BatchableDomainEventHandler<UserEmailChanged>

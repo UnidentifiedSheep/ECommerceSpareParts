@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Common.Models.Options;
+namespace Main.Modules.Jobs.Application.Models.Options;
 
 public record ScheduledJobEnqueuerOptions
 {

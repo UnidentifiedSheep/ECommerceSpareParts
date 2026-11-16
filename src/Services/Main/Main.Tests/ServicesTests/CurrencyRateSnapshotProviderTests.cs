@@ -1,13 +1,13 @@
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
-using Main.Application.Interfaces.Services.Currency;
-using Main.Application.Services.Currency;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
 using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Events;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Currency.Application.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

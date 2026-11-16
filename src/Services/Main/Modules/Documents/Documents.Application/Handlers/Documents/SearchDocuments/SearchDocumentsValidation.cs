@@ -3,7 +3,7 @@ using Application.Common.Validators;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Documents.SearchDocuments;
+namespace Main.Modules.Documents.Application.Handlers.Documents.SearchDocuments;
 
 public class SearchDocumentsValidation : AbstractValidator<SearchDocumentsQuery>
 {

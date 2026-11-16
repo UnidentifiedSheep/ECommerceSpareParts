@@ -5,7 +5,7 @@ using MediatR;
 using Pricing.Api.GraphQl.Types;
 using Pricing.Application.Handlers.PriceApplier;
 using Pricing.Application.Handlers.PriceApplier.GetPriceAppliers;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Api.GraphQl.Queries;
 

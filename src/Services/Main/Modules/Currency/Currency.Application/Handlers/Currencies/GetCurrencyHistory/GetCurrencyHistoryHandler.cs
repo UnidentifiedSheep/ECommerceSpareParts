@@ -2,11 +2,11 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Currencies;
 using Main.Entities.Currency;
+using Main.Modules.Currency.Application.Dtos;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Currencies.GetCurrencyHistory;
+namespace Main.Modules.Currency.Application.Handlers.Currencies.GetCurrencyHistory;
 
 public record GetCurrencyHistoryQuery(int CurrencyId, Pagination Pagination)
 	: IQuery<GetCurrencyHistoryResult>;

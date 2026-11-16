@@ -1,10 +1,9 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Main.Modules.Organization.Abstractions;
 
-namespace Main.Application.Handlers.Balance.CreateTransaction;
+namespace Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
 
 public class CreateTransactionDbValidation(IOrganizationChecks organizationChecks, ICurrencyChecks currencyChecks)
 	: AbstractDbValidation<CreateTransactionCommand>

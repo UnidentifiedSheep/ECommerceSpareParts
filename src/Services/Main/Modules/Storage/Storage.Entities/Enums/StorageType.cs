@@ -1,4 +1,4 @@
-﻿namespace Main.Enums;
+﻿namespace Main.Entities.Storage.Enums;
 
 public enum StorageType
 {

@@ -2,11 +2,13 @@ using Main.Entities.Analytics;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using FluentAssertions;
-using Main.Application.Analytics.Services;
-using Main.Application.Services;
-using Main.Application.Interfaces.Services.Currency;
+using Main.Entities.Currency;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Analytics.Application.Services;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Sale.Application.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Sale;
@@ -116,7 +118,7 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 					DateTimeKind.Utc));
 			await Context.SaveChangesAsync(CancellationToken);
 		}));
-		(await Context.Set<Main.Entities.Sale.Sale>()
+		(await Context.Set<Main.Entities.Sale.Sale.Sale>()
 				.AsNoTracking()
 				.SingleAsync(item => item.Id == sale.Id, CancellationToken)).CurrencyId
 			.Should()

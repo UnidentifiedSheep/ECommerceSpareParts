@@ -5,7 +5,7 @@ using Domain;
 using Domain.CommonEntities.Job;
 using FluentValidation;
 
-namespace Application.Common.Validators;
+namespace Main.Modules.Jobs.Application.Validators;
 
 public sealed class PatchJobScheduleDtoValidator : AbstractValidator<PatchJobScheduleDto>
 {

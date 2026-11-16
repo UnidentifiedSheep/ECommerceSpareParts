@@ -1,11 +1,11 @@
 ﻿using Application.Common.Dtos;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Lrt;
 using Locan.Core.Interfaces.Localizers;
 using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions;
 
-namespace Application.Common.Handlers.Jobs;
+namespace Main.Modules.Jobs.Application.Handlers.Jobs;
 
 public sealed record GetAllAvailableJobsQuery : IQuery<GetAllAvailableJobsResult>;
 

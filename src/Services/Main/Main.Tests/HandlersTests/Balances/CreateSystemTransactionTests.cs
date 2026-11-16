@@ -1,9 +1,10 @@
 using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.Balance;
 using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
 using Main.Entities.Organization;
-using Main.Enums.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

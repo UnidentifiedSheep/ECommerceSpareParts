@@ -1,10 +1,10 @@
 using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Main.Modules.Organization.Abstractions;
 using Main.Modules.Product.Abstractions;
 
-namespace Main.Application.Orders.Commands.UpsertOrder;
+namespace Main.Modules.Order.Application.Orders.Commands.UpsertOrder;
 
 public class UpsertOrderDbValidation(
 	IOrganizationChecks organizationChecks,

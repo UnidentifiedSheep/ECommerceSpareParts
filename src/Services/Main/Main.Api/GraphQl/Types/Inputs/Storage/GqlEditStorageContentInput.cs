@@ -1,6 +1,6 @@
 using GraphQL.Common.Types;
 using HotChocolate;
-using Main.Application.Dtos.Storage;
+using Main.Modules.Storage.Application.Dtos.Storage;
 
 namespace Main.Api.GraphQl.Types.Inputs.Storage;
 

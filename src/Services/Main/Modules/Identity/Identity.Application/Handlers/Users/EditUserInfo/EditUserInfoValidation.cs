@@ -1,7 +1,7 @@
 using FluentValidation;
-using Main.Application.Handlers.BaseValidators;
+using Main.Modules.Identity.Application.Handlers.BaseValidators;
 
-namespace Main.Application.Handlers.Users.EditUserInfo;
+namespace Main.Modules.Identity.Application.Handlers.Users.EditUserInfo;
 
 public class EditUserInfoValidation : AbstractValidator<EditUserInfoCommand>
 {

@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ProducerAliases;
+namespace Main.Modules.Product.Application.Handlers.ProducerAliases;
 
 public record GetProducersAliasesQuery : IQuery<GetProducersAliasesResult>
 {

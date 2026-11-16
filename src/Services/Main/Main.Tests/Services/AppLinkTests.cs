@@ -1,9 +1,11 @@
 using Application.Common.Interfaces.Links;
 using Application.Common.Interfaces.Settings;
-using Application.Common.Services.Links;
-using Main.Application.Models.Options;
-using Main.Application.Services;
-using Main.Entities.Settings;
+using Main.Entities.Platform.Settings;
+using Main.Modules.Documents.Application.Models.Options;
+using Main.Modules.Documents.Application.Services;
+using Main.Modules.Identity.Application.Models.Options;
+using Main.Modules.Identity.Application.Services;
+using Main.Modules.Platform.Application.Services;
 using Microsoft.Extensions.Options;
 using Moq;
 

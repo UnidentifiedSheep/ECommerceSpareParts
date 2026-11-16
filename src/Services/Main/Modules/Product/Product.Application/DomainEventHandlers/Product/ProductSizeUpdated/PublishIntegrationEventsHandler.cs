@@ -1,10 +1,10 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
-using Main.Application.Products.Interfaces;
-using Main.Entities.DomainEvents.Product;
-using Main.Enums;
+using Main.Entities.Product.DomainEvents.Product;
+using Main.Entities.Product.Enums;
+using Main.Modules.Product.Application.Products.Interfaces;
 
-namespace Main.Application.DomainEventHandlers.Product.ProductSizeUpdated;
+namespace Main.Modules.Product.Application.DomainEventHandlers.Product.ProductSizeUpdated;
 
 public class PublishIntegrationEventsHandler(IProductEventPublisher eventPublisher)
 	: BatchableDomainEventHandler<ProductSizeUpdatedDomainEvent>

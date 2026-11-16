@@ -2,12 +2,12 @@ using Application.Common.Interfaces.Cache;
 using Application.Common.Interfaces.Repositories;
 using Cache.Extensions;
 using Main.Entities.User;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Notification.Core.Interfaces.Recipient;
 using Notification.Core.Recipients;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Notifications.Application.Services;
 
 public class RecipientProvider(
 	ICache cache,

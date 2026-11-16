@@ -1,6 +1,6 @@
 using Enums;
 using FluentAssertions;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 
 namespace Tests.Domain.Producer;
 

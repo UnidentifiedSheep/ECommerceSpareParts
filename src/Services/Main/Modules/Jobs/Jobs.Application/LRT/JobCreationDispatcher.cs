@@ -1,10 +1,12 @@
 using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.LRT;
 using Application.Common.Models.Lrt;
 using Domain.CommonEntities.Job;
 using NamedObject.Core.Interfaces;
 
-namespace Application.Common.LRT;
+namespace Main.Modules.Jobs.Application.LRT;
 
 public sealed class JobCreationDispatcher(INamedObjectRegistry<ILrtNamedObject> registry)
 	: IJobCreationDispatcher

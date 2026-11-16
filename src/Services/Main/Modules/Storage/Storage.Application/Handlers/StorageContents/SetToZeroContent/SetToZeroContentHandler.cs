@@ -1,15 +1,14 @@
-using Enums;
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
-using Main.Application.Extensions;
-using Main.Entities.Storage;
-using Main.Enums;
+using Enums;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Extensions;
 using MediatR;
 
-namespace Main.Application.Handlers.StorageContents.SetToZeroContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.SetToZeroContent;
 
 [AutoSave]
 [Transactional(

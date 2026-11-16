@@ -1,6 +1,6 @@
 using Application.Common.Host;
-using Main.Application.Configs;
-using Main.Application.Services.ProductDeletion;
+using Main.Modules.Order.Application.Configs;
+using Main.Modules.Order.Application.Services;
 using Main.Modules.Product.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 

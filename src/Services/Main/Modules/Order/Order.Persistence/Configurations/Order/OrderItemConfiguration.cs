@@ -1,8 +1,8 @@
-using Main.Entities.Order;
+using Main.Entities.Order.Order;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Order;
+namespace Main.Modules.Order.Persistence.Configurations.Order;
 
 public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 {

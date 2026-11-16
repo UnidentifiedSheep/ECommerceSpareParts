@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
@@ -6,6 +7,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Context;
 using Tests.Abstractions.Test;
+using Tests.Jobs;
 using Tests.TestContainers.Combined;
 
 namespace Tests;

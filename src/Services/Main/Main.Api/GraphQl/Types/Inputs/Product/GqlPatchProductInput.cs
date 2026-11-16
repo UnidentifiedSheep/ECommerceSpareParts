@@ -1,6 +1,6 @@
 using GraphQL.Common.Types;
 using HotChocolate;
-using Main.Application.Dtos.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 
 namespace Main.Api.GraphQl.Types.Inputs.Product;
 

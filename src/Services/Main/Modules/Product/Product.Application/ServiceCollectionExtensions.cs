@@ -1,15 +1,16 @@
-using Main.Application.Configs;
 using Application.Common.Extensions;
 using Application.Common.Host;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Interfaces.Services;
-using Main.Application.Products.Interfaces;
-using Main.Application.Products.Services;
-using Main.Application.Products.Services.EventParts;
-using Main.Application.Services;
-using Main.Cache;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Product.Application.Cache;
+using Main.Modules.Product.Application.Configs;
+using Main.Modules.Product.Application.Interfaces.Cache;
+using Main.Modules.Product.Application.Interfaces.Services;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Products.Services;
+using Main.Modules.Product.Application.Products.Services.EventParts;
+using Main.Modules.Product.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
 

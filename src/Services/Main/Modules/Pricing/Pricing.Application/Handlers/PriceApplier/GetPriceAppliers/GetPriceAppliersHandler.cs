@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Application.Handlers.PriceApplier.GetPriceAppliers;
 

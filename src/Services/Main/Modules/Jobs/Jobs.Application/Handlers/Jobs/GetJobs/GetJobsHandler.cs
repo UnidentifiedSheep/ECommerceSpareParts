@@ -9,7 +9,7 @@ using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Common.Handlers.Jobs.GetJobs;
+namespace Main.Modules.Jobs.Application.Handlers.Jobs.GetJobs;
 
 public record GetJobsQuery(
 	Pagination Pagination,

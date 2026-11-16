@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Lrts.Base;
+namespace Main.Modules.Product.Application.Lrts.Base;
 
 public interface ICsvImportInputState
 {

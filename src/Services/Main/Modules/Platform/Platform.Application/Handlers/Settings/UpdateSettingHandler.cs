@@ -2,7 +2,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.NamedObject;
 using NamedObject.Core.Interfaces;
 
-namespace Application.Common.Handlers.Settings;
+namespace Main.Modules.Platform.Application.Handlers.Settings;
 
 public record UpdateSettingCommand(string SettingName, string Json) : ICommand<UpdateSettingResult>;
 

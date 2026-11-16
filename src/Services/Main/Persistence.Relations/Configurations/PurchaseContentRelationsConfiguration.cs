@@ -1,23 +1,26 @@
+using Main.Entities.Product.Product;
+using Main.Entities.Purchase.Purchase;
+using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations;
+namespace Persistence.Relations.Configurations;
 
-public sealed class PurchaseContentRelationsConfiguration : IEntityTypeConfiguration<Entities.Purchase.PurchaseContent>
+public sealed class PurchaseContentRelationsConfiguration : IEntityTypeConfiguration<PurchaseContent>
 {
-	public void Configure(EntityTypeBuilder<Entities.Purchase.PurchaseContent> builder)
+	public void Configure(EntityTypeBuilder<PurchaseContent> builder)
 	{
 		builder
-			.HasOne<Entities.Product.Product>()
+			.HasOne<Product>()
 			.WithMany()
 			.HasForeignKey(d => d.ProductId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("purchase_content_products_id_fk");
 
 		builder
-			.HasOne<Entities.Storage.StorageContent>()
+			.HasOne<StorageContent>()
 			.WithOne()
-			.HasForeignKey<Entities.Purchase.PurchaseContent>(d => d.StorageContentId)
+			.HasForeignKey<PurchaseContent>(d => d.StorageContentId)
 			.OnDelete(DeleteBehavior.SetNull)
 			.HasConstraintName("purchase_content_storage_content_id_fk");
 	}

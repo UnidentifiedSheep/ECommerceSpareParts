@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Repositories;
 using Main.Entities.Analytics;
 using Main.Modules.Sale.Abstractions;
 
-namespace Main.Application.Analytics.Services;
+namespace Main.Modules.Analytics.Application.Services;
 
 public sealed class SaleAnalyticsWriter(
 	SaleContentAnalyticsCalculator calculator,

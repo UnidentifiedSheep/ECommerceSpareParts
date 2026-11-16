@@ -1,12 +1,12 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Auth;
-using Main.Application.Handlers.Auth.GetPermissions;
 using Main.Entities.Auth;
+using Main.Modules.Identity.Application.Dtos.Auth;
+using Main.Modules.Identity.Application.Handlers.Auth.GetPermissions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Auth;
+namespace Main.Modules.Identity.Application.Handlers.Auth;
 
 public sealed record GetRolesPermissionsByNamesQuery : IQuery<GetRolesPermissionsByNamesResult>
 {

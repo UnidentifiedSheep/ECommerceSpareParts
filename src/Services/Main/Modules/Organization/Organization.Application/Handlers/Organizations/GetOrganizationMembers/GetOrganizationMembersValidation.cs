@@ -1,8 +1,7 @@
 using Application.Common.Validators;
-using Main.Entities.Organization;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Organizations.GetOrganizationMembers;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
 
 public class GetOrganizationMembersValidation : AbstractValidator<GetOrganizationMembersQuery>
 {

@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
 
-namespace Main.Entities.Storage;
+namespace Main.Entities.Storage.Storage;
 
 public class StorageContentLock : AuditableEntity<StorageContentLock, Guid>,
 	ILinqEntity<StorageContentLock, Guid>,

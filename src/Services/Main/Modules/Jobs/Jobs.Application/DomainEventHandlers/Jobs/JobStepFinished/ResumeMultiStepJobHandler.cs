@@ -5,7 +5,7 @@ using Domain.CommonEntities.Job;
 using Domain.CommonEntities.Job.Events;
 using Domain.CommonEnums;
 
-namespace Application.Common.DomainEventHandlers.Jobs.JobStepFinished;
+namespace Main.Modules.Jobs.Application.DomainEventHandlers.Jobs.JobStepFinished;
 
 public sealed class ResumeMultiStepJobHandler(IRepository<Job, Guid> jobRepository)
 	: BatchableDomainEventHandler<JobStepFinishedDomainEvent>

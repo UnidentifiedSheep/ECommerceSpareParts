@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Organization;
+namespace Main.Modules.Organization.Persistence.Configurations;
 
-public class OrganizationConfiguration : IEntityTypeConfiguration<Entities.Organization.Organization>
+public class OrganizationConfiguration : IEntityTypeConfiguration<Entities.Organization.Organization.Organization>
 {
-	public void Configure(EntityTypeBuilder<Entities.Organization.Organization> builder)
+	public void Configure(EntityTypeBuilder<Entities.Organization.Organization.Organization> builder)
 	{
 		builder.ToTable("organizations", "auth");
 

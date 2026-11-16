@@ -1,13 +1,13 @@
 using System.Net.Sockets;
 using MailKit.Net.Smtp;
+using Main.Modules.Notifications.Application.Delivery.Options;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Notification.Core;
-using Notification.Options;
 using Polly;
 using Polly.Retry;
 
-namespace Notification.Channels.Email;
+namespace Main.Modules.Notifications.Application.Delivery.Channels.Email;
 
 public interface IEmailSender
 {

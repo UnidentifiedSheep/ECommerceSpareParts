@@ -1,16 +1,16 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions.QueryExtensions;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Extensions.QueryExtensions;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
+using Main.Modules.Identity.Application.Interfaces.Services;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Auth;
+namespace Main.Modules.Identity.Application.Handlers.Auth;
 
 public record InternalServiceLoginCommand(string Service, string ServiceSecret)
 	: ICommand<InternalServiceLoginResult>;

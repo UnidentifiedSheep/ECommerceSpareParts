@@ -1,7 +1,7 @@
 using FluentAssertions;
+using Main.Entities.Enums;
 using Main.Entities.User;
-using Main.Enums;
-using Main.Persistence.DatabaseObjects;
+using Main.Modules.Identity.Persistence.DatabaseObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

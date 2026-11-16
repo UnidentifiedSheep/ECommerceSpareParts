@@ -1,17 +1,17 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
-using Main.Modules.Identity.Abstractions;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Application.Dtos.Emails;
-using Main.Application.Dtos.Users;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Abstractions.Events;
+using Main.Modules.Identity.Application.Dtos.Emails;
+using Main.Modules.Identity.Application.Dtos.Users;
 using Security.Core.Interfaces;
 using Role = Enums.Role;
 
-namespace Main.Application.Handlers.Users.CreateUser;
+namespace Main.Modules.Identity.Application.Handlers.Users.CreateUser;
 
 [AutoSave]
 [Transactional]

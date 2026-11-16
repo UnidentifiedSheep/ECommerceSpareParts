@@ -1,9 +1,9 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
 using Main.Modules.Organization.Abstractions;
 
-namespace Main.Application.Handlers.Purchases.CreatePurchase;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.CreatePurchase;
 
 public class CreatePurchaseDbValidation(IUserChecks userChecks, IOrganizationChecks organizationChecks)
 	: AbstractDbValidation<CreatePurchaseCommand>

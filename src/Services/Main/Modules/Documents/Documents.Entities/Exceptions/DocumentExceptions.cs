@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Documents.Exceptions;
 
 public class DocumentGenerationRequestNotFoundException(Guid requestId) : LocalizedNotFoundException(
 	DocumentGenerationRequestNotFoundMessage.Instance,

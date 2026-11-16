@@ -4,8 +4,8 @@ using Application.Common.Querying;
 using Extensions;
 using MediatR;
 using Pricing.Application.Dtos.Price;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Settings;
-using Pricing.Enums;
 
 namespace Pricing.Application.Handlers.Pricing.GetRecommendedPrice;
 

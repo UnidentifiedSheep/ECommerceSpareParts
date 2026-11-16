@@ -1,6 +1,6 @@
 using Locan.Core.Interfaces;
 
-namespace Main.Application.Interfaces.Services;
+namespace Main.Modules.Product.Application.Interfaces.Services;
 
 public interface IProductDeletionBlockerResolver
 {

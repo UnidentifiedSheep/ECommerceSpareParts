@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 using MediatR;
 
-namespace Main.Application.Handlers.ProducerAliases.AddAlias;
+namespace Main.Modules.Product.Application.Handlers.ProducerAliases.AddAlias;
 
 [AutoSave]
 [Transactional]

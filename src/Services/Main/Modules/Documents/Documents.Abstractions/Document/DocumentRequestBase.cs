@@ -1,12 +1,11 @@
-using Enums;
 using System.Text.Json.Serialization;
-using Main.Application.Interfaces.Services.Document;
+using Enums;
+using Main.Application.Document.Interfaces.Document;
 using Main.Entities;
-using Main.Enums.Documents;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.Document;
+namespace Main.Application.Document.Document;
 
 public abstract record DocumentRequestBase : IDocumentRequest
 {

@@ -1,7 +1,7 @@
-using Main.Entities.Sale;
-using Main.Enums;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Sale;
 
-namespace Main.Application.Extensions.QueryExtensions;
+namespace Main.Modules.Sale.Application.Extensions;
 
 public static class SaleQueryExtensions
 {

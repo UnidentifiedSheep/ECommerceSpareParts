@@ -1,14 +1,15 @@
+using Main.Entities.Documents.Documents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations;
+namespace Persistence.Relations.Configurations;
 
 public sealed class DocumentGenerationRequestRelationsConfiguration
-	: IEntityTypeConfiguration<Entities.Documents.DocumentGenerationRequest>
+	: IEntityTypeConfiguration<DocumentGenerationRequest>
 {
-	public void Configure(EntityTypeBuilder<Entities.Documents.DocumentGenerationRequest> builder)
+	public void Configure(EntityTypeBuilder<DocumentGenerationRequest> builder)
 		=> builder
-			.HasOne<Entities.User.User>()
+			.HasOne<Main.Entities.User.User>()
 			.WithMany()
 			.HasForeignKey(request => request.RequesterId)
 			.OnDelete(DeleteBehavior.SetNull)

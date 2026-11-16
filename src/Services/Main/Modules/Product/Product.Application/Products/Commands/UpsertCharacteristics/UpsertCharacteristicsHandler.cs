@@ -2,11 +2,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 using MediatR;
 
-namespace Main.Application.Products.Commands.UpsertCharacteristics;
+namespace Main.Modules.Product.Application.Products.Commands.UpsertCharacteristics;
 
 [AutoSave]
 [Transactional]

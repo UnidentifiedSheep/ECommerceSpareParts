@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces.Cqrs;
-using Application.Common.Models.Options.S3;
 using MediatR;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
 namespace Main.Modules.Uploads.Application.Handlers;
 

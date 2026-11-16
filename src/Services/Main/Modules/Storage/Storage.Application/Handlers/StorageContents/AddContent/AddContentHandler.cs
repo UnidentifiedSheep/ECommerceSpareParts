@@ -1,18 +1,13 @@
-using Enums;
 using System.Data;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Storage;
-using Main.Entities.Exceptions;
-using Main.Entities.Storage;
-using Main.Modules.Currency.Abstractions;
-using Main.Enums;
+using Enums;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Storage.Application.Dtos.Storage;
 
-namespace Main.Application.Handlers.StorageContents.AddContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.AddContent;
 
 [AutoSave]
 [Transactional(

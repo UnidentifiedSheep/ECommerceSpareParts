@@ -1,9 +1,8 @@
 using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Product;
 
-namespace Main.Application.Handlers.Characteristics.DeleteCharacteristic;
+namespace Main.Modules.Product.Application.Handlers.Characteristics.DeleteCharacteristic;
 
 public sealed class DeleteCharacteristicDbValidation : AbstractDbValidation<DeleteCharacteristicCommand>
 {

@@ -1,16 +1,13 @@
-using Enums;
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Application.Dtos.Sale;
-using Main.Application.Interfaces.Services;
+using Enums;
 using Main.Modules.Balance.Abstractions;
-using Main.Entities.Sale;
-using Main.Enums;
-using Main.Enums.Balances;
+using Main.Modules.Sale.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Interfaces.Services;
 
-namespace Main.Application.Handlers.Sales.CreateSale;
+namespace Main.Modules.Sale.Application.Handlers.Sales.CreateSale;
 
 [Transactional(
 	IsolationLevel.ReadCommitted,
@@ -64,7 +61,7 @@ public class CreateSaleHandler(
 			request.ForcePayment,
 			cancellationToken);
 
-		var sale = Sale.Create(
+		var sale = Entities.Sale.Sale.Sale.Create(
 			request.UserId,
 			request.OrganizationId,
 			saleTransactionId,

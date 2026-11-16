@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Interfaces.Services;
-using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
 using Main.Modules.Storage.Abstractions.Events;
+using Main.Modules.Storage.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services.Storage;
+namespace Main.Modules.Storage.Application.Services.Storage;
 
 public sealed class StorageContentSnapshotReader(IReadRepository<StorageContent, int> repository)
 	: IStorageContentSnapshotReader

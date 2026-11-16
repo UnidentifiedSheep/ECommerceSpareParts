@@ -1,10 +1,9 @@
 using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
-using Main.Entities;
 using Main.Entities.Product;
 
-namespace Main.Application.Products.Queries.GetProductsByEan;
+namespace Main.Modules.Product.Application.Products.Queries.GetProductsByEan;
 
 public class GetProductsByEanValidation : AbstractValidator<GetProductsByEanQuery>
 {

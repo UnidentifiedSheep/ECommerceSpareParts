@@ -1,9 +1,8 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Entities.Currency;
 
-namespace Main.Application.Handlers.Currencies.CreateCurrency;
+namespace Main.Modules.Currency.Application.Handlers.Currencies.CreateCurrency;
 
 [AutoSave]
 [Transactional]
@@ -22,7 +21,7 @@ public class CreateCurrencyHandler(IUnitOfWork unitOfWork)
 		CreateCurrencyCommand request,
 		CancellationToken cancellationToken)
 	{
-		var model = Currency.Create(
+		var model = Entities.Currency.Currency.Create(
 			request.Name,
 			request.ShortName,
 			request.CurrencySign,

@@ -1,7 +1,7 @@
-using Main.Application.Products.Interfaces;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Product.Application.Products.Interfaces;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Product.Application.Services;
 
 public sealed class ProductCrosses(IProductProvider productProvider) : IProductCrosses
 {

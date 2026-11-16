@@ -1,11 +1,13 @@
 using Enums;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Entities;
 using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Entities.Balance.Exceptions;
 using Main.Entities.Exceptions;
-using Main.Enums.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance.ReverseTransaction;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Balance;

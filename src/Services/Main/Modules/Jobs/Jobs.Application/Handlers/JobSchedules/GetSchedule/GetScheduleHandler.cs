@@ -8,7 +8,7 @@ using Application.Common.Querying;
 using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Common.Handlers.JobSchedules.GetSchedule;
+namespace Main.Modules.Jobs.Application.Handlers.JobSchedules.GetSchedule;
 
 public record GetScheduleQuery(
 	IEnumerable<string> JobSystemNames,

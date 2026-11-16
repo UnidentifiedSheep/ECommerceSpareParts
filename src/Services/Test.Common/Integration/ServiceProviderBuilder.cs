@@ -2,7 +2,6 @@ using Abstractions.Interfaces;
 using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Locan.Hosting;
 using MassTransit;

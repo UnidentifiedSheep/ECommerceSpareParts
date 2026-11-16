@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
-using Application.Common.LRT;
 
-namespace Main.Application.Lrts.Base.Synchronization;
+namespace Application.Common.LRT;
 
 public sealed record SynchronizationState<TId> : NoneInputState where TId : struct
 {

@@ -1,11 +1,11 @@
+using Main.Modules.Notifications.Application.Delivery.Interfaces;
 using Microsoft.Extensions.Logging;
 using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
-using Notification.Interfaces;
 
-namespace Notification.Channels.Email;
+namespace Main.Modules.Notifications.Application.Delivery.Channels.Email;
 
 public class EmailChannel(
 	INotificationRenderer<INotification> renderer,

@@ -1,5 +1,8 @@
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Stock;
 using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
 using Main.Entities.User;
 using Persistence.Context;
 using Tests.Abstractions;
@@ -11,7 +14,7 @@ using Tests.Extensions;
 using Tests.Interfaces;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
-using DomainPurchase = Main.Entities.Purchase.Purchase;
+using DomainPurchase = Main.Entities.Purchase.Purchase.Purchase;
 
 namespace Tests.TestContexts.Purchase;
 

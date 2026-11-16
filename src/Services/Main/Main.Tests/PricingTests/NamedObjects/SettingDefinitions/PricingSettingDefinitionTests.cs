@@ -1,15 +1,15 @@
-using Pricing.Application.Events;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Application.Common.Interfaces.Settings;
 using Exceptions;
 using FluentAssertions;
 using Moq;
+using Pricing.Application.Events;
 using Pricing.Application.NamedObjects.SettingDefinitions;
 using Pricing.Entities.Settings;
 using Tests.Stubs;
 
-namespace Tests.PricingTests.NamedObjectTests.SettingDefinitions;
+namespace Tests.PricingTests.NamedObjects.SettingDefinitions;
 
 public class PricingSettingDefinitionTests
 {

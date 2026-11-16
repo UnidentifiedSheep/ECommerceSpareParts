@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Enums;
+using Main.Entities.Sale.Enums;
 
-namespace Main.Application.Dtos.Sale;
+namespace Main.Modules.Sale.Application.Dtos.Sale;
 
 public record SaleDto
 {

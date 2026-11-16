@@ -1,7 +1,7 @@
 using System.Globalization;
 using Application.Common.Interfaces.Cqrs;
 
-namespace Main.Application.Handlers.Auth.GetPermissions;
+namespace Main.Modules.Identity.Application.Handlers.Auth.GetPermissions;
 
 public class GetPermissionsCachePolicy : ICachePolicy<GetPermissionsQuery>
 {

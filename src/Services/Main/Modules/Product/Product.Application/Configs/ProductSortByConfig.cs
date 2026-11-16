@@ -1,9 +1,8 @@
-using Application.Common.Extensions;
 using Application.Common.Querying;
-using Main.Entities.Producer;
-using Main.Entities.Product;
+using Main.Entities.Product.Producer;
+using Main.Entities.Product.Product;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Product.Application.Configs;
 
 public static class ProductSortByConfig
 {
@@ -11,15 +10,15 @@ public static class ProductSortByConfig
 	{
 		QueryableSortBy
 			.Value
-			.MapDefault<Product, int>(x => x.Id)
-			.Map<Product, int>("id", x => x.Id)
-			.Map<Product, string>("sku", x => x.Sku.NormalizedValue)
-			.Map<Product, string>("name", x => x.Name.Value)
-			.Map<Product, string>("producerName", x => x.Producer.Name)
-			.Map<Product, string>("indicator", x => x.Indicator!.Value!)
-			.Map<Product, long>("popularity", x => x.Popularity)
-			.Map<Product, long>("count", x => x.Stocks.Sum(stock => (long)stock.Quantity))
-			.MapParameterized<Product, string, long>(
+			.MapDefault<Entities.Product.Product.Product, int>(x => x.Id)
+			.Map<Entities.Product.Product.Product, int>("id", x => x.Id)
+			.Map<Entities.Product.Product.Product, string>("sku", x => x.Sku.NormalizedValue)
+			.Map<Entities.Product.Product.Product, string>("name", x => x.Name.Value)
+			.Map<Entities.Product.Product.Product, string>("producerName", x => x.Producer.Name)
+			.Map<Entities.Product.Product.Product, string>("indicator", x => x.Indicator!.Value!)
+			.Map<Entities.Product.Product.Product, long>("popularity", x => x.Popularity)
+			.Map<Entities.Product.Product.Product, long>("count", x => x.Stocks.Sum(stock => (long)stock.Quantity))
+			.MapParameterized<Entities.Product.Product.Product, string, long>(
 				"count",
 				(product, storage) => product.Stocks
 					.Where(stock => stock.StorageCode == storage)

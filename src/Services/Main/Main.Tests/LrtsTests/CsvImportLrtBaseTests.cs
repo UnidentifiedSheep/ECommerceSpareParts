@@ -1,9 +1,9 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEnums;
 using FluentAssertions;
@@ -11,14 +11,16 @@ using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
 using Main.Entities.Product;
-using Main.Application.Lrts.Base;
 using Main.Entities;
+using Main.Modules.Product.Application.Lrts.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 using SchemaGeneration.Abstractions.Attributes;
 using Tests.Abstractions.Test;
+using Tests.Jobs;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
 

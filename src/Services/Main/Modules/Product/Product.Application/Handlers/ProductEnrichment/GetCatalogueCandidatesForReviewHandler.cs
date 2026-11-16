@@ -3,12 +3,12 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Product.Enrichment;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Dtos.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
-using ProductSku = Main.Entities.Product.ValueObjects.Sku;
+using ProductSku = Main.Entities.Product.Product.ValueObjects.Sku;
 
-namespace Main.Application.Handlers.ProductEnrichment;
+namespace Main.Modules.Product.Application.Handlers.ProductEnrichment;
 
 public record GetCatalogueCandidatesForReviewQuery(int? ProductId, string? Sku, Pagination Pagination)
 	: IQuery<GetCatalogueCandidatesForReviewResult>;

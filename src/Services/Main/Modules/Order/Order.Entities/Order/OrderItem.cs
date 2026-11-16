@@ -3,9 +3,9 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
 
-namespace Main.Entities.Order;
+namespace Main.Entities.Order.Order;
 
 public class OrderItem : Entity<OrderItem, int>, ILinqEntity<OrderItem, int>
 {

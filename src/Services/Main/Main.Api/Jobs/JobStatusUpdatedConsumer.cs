@@ -3,7 +3,7 @@ using Contracts.Job;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Api.Common.Consumers;
+namespace Main.Api.Jobs;
 
 public class JobStatusUpdatedConsumer(IHubContext<JobHub> hubContext) : IConsumer<JobStatusUpdatedEvent>
 {

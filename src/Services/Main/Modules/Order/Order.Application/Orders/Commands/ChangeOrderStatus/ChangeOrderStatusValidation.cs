@@ -1,9 +1,9 @@
 using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
 
-namespace Main.Application.Orders.Commands.ChangeOrderStatus;
+namespace Main.Modules.Order.Application.Orders.Commands.ChangeOrderStatus;
 
 public sealed class ChangeOrderStatusValidation : AbstractValidator<ChangeOrderStatusCommand>
 {

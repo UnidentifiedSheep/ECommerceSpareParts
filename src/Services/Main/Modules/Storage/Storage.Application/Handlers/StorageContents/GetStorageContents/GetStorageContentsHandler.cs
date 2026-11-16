@@ -4,11 +4,11 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Storage;
-using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Dtos.Storage;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.StorageContents.GetStorageContents;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.GetStorageContents;
 
 public sealed record GetStorageContentsQuery(
 	int? ProductId,

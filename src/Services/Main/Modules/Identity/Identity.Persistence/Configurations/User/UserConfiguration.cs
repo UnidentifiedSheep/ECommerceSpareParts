@@ -3,7 +3,7 @@ using EFCore.ComplexIndexes.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.User;
+namespace Main.Modules.Identity.Persistence.Configurations.User;
 
 public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
 {

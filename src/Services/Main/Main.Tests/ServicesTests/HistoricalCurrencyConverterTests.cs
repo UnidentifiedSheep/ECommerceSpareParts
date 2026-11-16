@@ -1,7 +1,7 @@
-using Application.Common.Interfaces.Currency;
 using FluentAssertions;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Currency;

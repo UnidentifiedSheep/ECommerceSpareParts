@@ -1,9 +1,8 @@
 ﻿using Application.Common.Extensions;
 using FluentValidation;
-using Main.Entities;
 using Main.Entities.Product;
 
-namespace Main.Application.Products.Commands.SetProductSizes;
+namespace Main.Modules.Product.Application.Products.Commands.SetProductSizes;
 
 public class SetProductSizesValidation : AbstractValidator<SetProductSizesCommand>
 {

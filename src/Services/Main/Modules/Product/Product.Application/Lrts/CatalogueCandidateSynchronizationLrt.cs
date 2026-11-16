@@ -1,18 +1,17 @@
+using Application.Common;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Projections;
-using Application.Common.LRT;
 using Contracts.Models.CatalogueCandidate;
 using Contracts.ProductEnrichment;
 using Locan.Core.Interfaces;
-using Main.Application.Lrts.Base.Synchronization;
-using Main.Entities;
-using Main.Entities.Product.Enrichment;
 using Main.Entities.Product;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Lrts.Base.Synchronization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts;
+namespace Main.Modules.Product.Application.Lrts;
 
 public sealed class CatalogueCandidateSynchronizationLrt(
 	IApplicationTransactionFactory transactionService,

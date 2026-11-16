@@ -2,11 +2,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions;
-using Main.Entities.Producer;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
 using MediatR;
 
-namespace Main.Application.Handlers.ProducerAliases;
+namespace Main.Modules.Product.Application.Handlers.ProducerAliases;
 
 [AutoSave]
 [Transactional]

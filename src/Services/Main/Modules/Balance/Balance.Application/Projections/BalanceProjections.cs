@@ -1,11 +1,10 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
-using LinqKit;
-using Main.Application.Dtos.Balances;
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Modules.Balance.Application.Dtos.Balances;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Balance.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class TransactionDtoProjectionProvider : ProjectionProviderBase<Transaction, TransactionDto>

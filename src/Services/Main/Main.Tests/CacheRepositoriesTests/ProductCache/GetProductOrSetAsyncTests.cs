@@ -1,8 +1,9 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Products.Interfaces;
-using Main.Application.Static;
 using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Static;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders;
 using Tests.Extensions;

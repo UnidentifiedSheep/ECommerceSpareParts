@@ -1,6 +1,4 @@
-using Main.Entities.Product;
-
-namespace Main.Persistence.Context;
+namespace Main.Modules.Product.Persistence.Context;
 
 // Flat representation of public.products used only by EFCore.BulkExtensions.
 internal sealed class BulkProduct
@@ -23,7 +21,7 @@ internal sealed class BulkProduct
 	public Guid? WhoCreated { get; init; }
 	public Guid? WhoUpdated { get; init; }
 
-	public static BulkProduct FromProduct(Product product)
+	public static BulkProduct FromProduct(Entities.Product.Product.Product product)
 		=> new()
 		{
 			PairId = product.PairId,

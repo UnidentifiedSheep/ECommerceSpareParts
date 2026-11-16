@@ -4,7 +4,7 @@ using Main.Entities;
 using Main.Entities.Auth;
 using Role = Enums.Role;
 
-namespace Main.Application.Handlers.Auth.RemoveRolesFromUser;
+namespace Main.Modules.Identity.Application.Handlers.Auth.RemoveRolesFromUser;
 
 public sealed class RemoveRolesFromUserValidation : AbstractValidator<RemoveRolesFromUserCommand>
 {

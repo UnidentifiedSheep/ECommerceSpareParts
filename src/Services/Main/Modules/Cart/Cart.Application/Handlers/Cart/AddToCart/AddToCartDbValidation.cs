@@ -1,10 +1,10 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities.Cart;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
 using Main.Modules.Product.Abstractions;
 
-namespace Main.Application.Handlers.Cart.AddToCart;
+namespace Main.Modules.Cart.Application.Handlers.Cart.AddToCart;
 
 public class AddToCartDbValidation(IUserChecks userChecks, IProductChecks productChecks)
 	: AbstractDbValidation<AddToCartCommand>

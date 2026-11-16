@@ -1,12 +1,12 @@
+using Main.Modules.Notifications.Application.Delivery.Channels.Email;
+using Main.Modules.Notifications.Application.Delivery.Interfaces;
+using Main.Modules.Notifications.Application.Delivery.Renderers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Notification.Channels.Email;
 using Notification.Core;
 using Notification.Core.Interfaces;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
-using Notification.Interfaces;
-using Notification.Renderers;
 
 namespace Notifications.Tests;
 

@@ -2,11 +2,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Application.Dtos.Sale;
-using Main.Entities.Sale;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Sales;
+namespace Main.Modules.Sale.Application.Handlers.Sales;
 
 public sealed record GetSaleContentDetailsByIdsQuery : IQuery<GetSaleContentDetailsByIdsResult>
 {

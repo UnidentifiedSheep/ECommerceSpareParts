@@ -1,7 +1,8 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProducerAliases.AddAlias;
 using Main.Entities.Exceptions;
-using Main.Entities.Producer;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Handlers.ProducerAliases.AddAlias;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;

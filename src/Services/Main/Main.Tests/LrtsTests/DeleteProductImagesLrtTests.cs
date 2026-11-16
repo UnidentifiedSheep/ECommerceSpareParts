@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.DeleteProductImages;
+using Main.Modules.Product.Application.Lrts.DeleteProductImages;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;

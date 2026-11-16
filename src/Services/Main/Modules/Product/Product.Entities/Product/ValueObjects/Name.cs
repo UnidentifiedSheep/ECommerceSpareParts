@@ -1,6 +1,6 @@
 ﻿using Domain.Validation;
 
-namespace Main.Entities.Product.ValueObjects;
+namespace Main.Entities.Product.Product.ValueObjects;
 
 public record Name
 {

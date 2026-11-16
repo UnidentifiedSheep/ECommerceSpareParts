@@ -2,19 +2,18 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Exceptions;
 using MediatR;
 
-namespace Main.Application.Handlers.Organizations.AddOrganizationMember;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.AddOrganizationMember;
 
 [Transactional]
 [AutoSave]
 public record AddOrganizationMemberCommand(Guid OrganizationId, Guid UserId, OrganizationRole Role)
 	: ICommand;
 
-public class AddOrganizationMemberHandler(IRepository<Organization, Guid> repository)
+public class AddOrganizationMemberHandler(IRepository<Entities.Organization.Organization.Organization, Guid> repository)
 	: ICommandHandler<AddOrganizationMemberCommand>
 {
 	public async Task<Unit> Handle(AddOrganizationMemberCommand request, CancellationToken cancellationToken)
@@ -25,10 +24,10 @@ public class AddOrganizationMemberHandler(IRepository<Organization, Guid> reposi
 		return Unit.Value;
 	}
 
-	private Task<Organization> GetOrganization(Guid organizationId, CancellationToken cancellationToken)
+	private Task<Entities.Organization.Organization.Organization> GetOrganization(Guid organizationId, CancellationToken cancellationToken)
 		=> repository.EnsureExistForUpdateAsync(
 			organizationId,
 			id => new OrganizationNotFoundException(id),
-			Criteria<Organization>.New().Include(x => x.Members),
+			Criteria<Entities.Organization.Organization.Organization>.New().Include(x => x.Members),
 			cancellationToken);
 }

@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
 
-namespace Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
+namespace Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
 
 [AutoSave]
 [Transactional(retryDelayMs: 20, retryCount: 2)]

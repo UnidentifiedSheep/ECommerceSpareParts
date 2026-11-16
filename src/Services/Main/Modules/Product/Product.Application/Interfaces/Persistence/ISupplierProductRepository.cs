@@ -1,8 +1,8 @@
 using Application.Common.Interfaces.Repositories;
 using Enums;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
 
-namespace Main.Application.Interfaces.Persistence;
+namespace Main.Modules.Product.Application.Interfaces.Persistence;
 
 public interface ISupplierProductRepository : IRepository<SupplierProduct, int>
 {

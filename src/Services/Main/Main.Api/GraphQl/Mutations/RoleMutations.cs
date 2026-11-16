@@ -3,8 +3,8 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Auth;
 using Main.Api.GraphQl.Types.Inputs.Role;
-using Main.Application.Handlers.Auth;
-using Main.Application.Handlers.Auth.UpsertRole;
+using Main.Modules.Identity.Application.Handlers.Auth;
+using Main.Modules.Identity.Application.Handlers.Auth.UpsertRole;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

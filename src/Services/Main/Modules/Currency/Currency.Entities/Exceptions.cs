@@ -1,7 +1,6 @@
-using Main.Entities.Currency;
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Currency;
 
 public class CurrencyNotFoundException : LocalizedNotFoundException
 {

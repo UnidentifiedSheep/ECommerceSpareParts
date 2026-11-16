@@ -3,11 +3,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries.GetCharacteristics;
+namespace Main.Modules.Product.Application.Products.Queries.GetCharacteristics;
 
 public record GetCharacteristicsQuery(int ProductId, Pagination Pagination)
 	: IQuery<GetCharacteristicsResult>;

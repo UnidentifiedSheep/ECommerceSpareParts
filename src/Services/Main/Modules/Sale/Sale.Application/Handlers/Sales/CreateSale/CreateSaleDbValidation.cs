@@ -1,14 +1,12 @@
 using Application.Common.Abstractions;
-using Main.Entities.Sale;
 using BulkValidation.Core.Interfaces;
-
-using Main.Modules.Currency.Abstractions;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Identity.Abstractions.Interfaces;
 using Main.Modules.Organization.Abstractions;
 using Main.Modules.Product.Abstractions;
-using Main.Modules.Storage.Abstractions;
+using Main.Modules.Storage.Abstractions.Interfaces;
 
-namespace Main.Application.Handlers.Sales.CreateSale;
+namespace Main.Modules.Sale.Application.Handlers.Sales.CreateSale;
 
 public class CreateSaleDbValidation(
 	ICurrencyChecks currencyChecks,

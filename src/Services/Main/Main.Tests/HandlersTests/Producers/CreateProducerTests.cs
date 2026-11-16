@@ -1,9 +1,10 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Dtos.Producer;
-using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Entities.Exceptions;
-using Main.Entities.Producer;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Handlers.Producers.CreateProducer;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;

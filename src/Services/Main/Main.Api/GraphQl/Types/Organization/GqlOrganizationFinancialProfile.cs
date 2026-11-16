@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Dtos.Balances;
+using Main.Modules.Balance.Application.Dtos.Balances;
 
 namespace Main.Api.GraphQl.Types.Organization;
 

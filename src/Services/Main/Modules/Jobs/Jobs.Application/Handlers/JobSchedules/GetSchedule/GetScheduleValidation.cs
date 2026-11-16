@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Application.Common.Handlers.JobSchedules.GetSchedule;
+namespace Main.Modules.Jobs.Application.Handlers.JobSchedules.GetSchedule;
 
 public class GetScheduleValidation : AbstractValidator<GetScheduleQuery>
 {

@@ -2,13 +2,13 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Users;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
+using Main.Modules.Identity.Application.Dtos.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Users.GetUserEmail;
+namespace Main.Modules.Identity.Application.Handlers.Users.GetUserEmail;
 
 public record GetUserEmailQuery(Guid UserId, string Email) : IQuery<GetUserEmailResult>;
 

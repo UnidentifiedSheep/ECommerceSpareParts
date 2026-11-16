@@ -2,19 +2,18 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Organizations;
-using Main.Entities.Exceptions;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Exceptions;
+using Main.Modules.Organization.Application.Dtos.Organizations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Organizations;
+namespace Main.Modules.Organization.Application.Handlers.Organizations;
 
 public record GetOrganizationQuery : IQuery<GetOrganizationResult>
 {
 
 	public GetOrganizationQuery(string systemName)
-		=> SystemName = Organization.NormalizeSystemName(systemName);
+		=> SystemName = Entities.Organization.Organization.Organization.NormalizeSystemName(systemName);
 
 	public GetOrganizationQuery(Guid id) => Id = id;
 
@@ -26,8 +25,8 @@ public record GetOrganizationQuery : IQuery<GetOrganizationResult>
 public record GetOrganizationResult(OrganizationDto Organization);
 
 public class GetOrganizationHandler(
-	IReadRepository<Organization, Guid> repository,
-	IProjectionProvider<Organization, OrganizationDto> projection)
+	IReadRepository<Entities.Organization.Organization.Organization, Guid> repository,
+	IProjectionProvider<Entities.Organization.Organization.Organization, OrganizationDto> projection)
 	: IQueryHandler<GetOrganizationQuery, GetOrganizationResult>
 {
 	public async Task<GetOrganizationResult> Handle(

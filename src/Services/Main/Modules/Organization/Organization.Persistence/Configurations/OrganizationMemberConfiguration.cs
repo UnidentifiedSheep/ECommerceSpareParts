@@ -1,9 +1,9 @@
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Organization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Organization;
+namespace Main.Modules.Organization.Persistence.Configurations;
 
 public class OrganizationMemberConfiguration : IEntityTypeConfiguration<OrganizationMember>
 {

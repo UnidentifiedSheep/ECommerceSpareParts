@@ -3,11 +3,10 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Product;
-using Main.Entities.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries.GetProductsByEan;
+namespace Main.Modules.Product.Application.Products.Queries.GetProductsByEan;
 
 public record GetProductsByEanQuery(string Ean, Pagination Pagination)
 	: IQuery<GetProductsByEanResult>;
@@ -15,8 +14,8 @@ public record GetProductsByEanQuery(string Ean, Pagination Pagination)
 public record GetProductsByEanResult(IReadOnlyList<ProductDto> Products);
 
 public class GetProductsByEanHandler(
-	IReadRepository<Product, int> repository,
-	IProjectionProvider<Product, ProductDto> projection)
+	IReadRepository<Entities.Product.Product.Product, int> repository,
+	IProjectionProvider<Entities.Product.Product.Product, ProductDto> projection)
 	: IQueryHandler<GetProductsByEanQuery, GetProductsByEanResult>
 {
 	public async Task<GetProductsByEanResult> Handle(

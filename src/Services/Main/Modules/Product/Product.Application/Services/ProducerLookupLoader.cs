@@ -2,12 +2,12 @@ using System.Data;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Interfaces.Services;
-using Main.Application.Models.Producer;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Interfaces.Services;
+using Main.Modules.Product.Application.Models.Producer;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Product.Application.Services;
 
 public sealed class ProducerLookupLoader(
 	IReadRepository<Producer, int> producerReadRepository,

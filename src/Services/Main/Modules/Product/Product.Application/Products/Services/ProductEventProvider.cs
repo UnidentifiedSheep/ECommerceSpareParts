@@ -1,13 +1,12 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Products.Interfaces;
-using Main.Entities.Product;
-using Main.Enums;
+using Main.Entities.Product.Enums;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Services;
+namespace Main.Modules.Product.Application.Products.Services;
 
 public sealed class ProductEventProvider(
-	IReadRepository<Product, int> productRepository,
+	IReadRepository<Entities.Product.Product.Product, int> productRepository,
 	IEnumerable<IProductEventPartProvider> partProviders) : IProductEventProvider
 {
 	public async Task<IReadOnlyList<object>> GetEventsAsync(

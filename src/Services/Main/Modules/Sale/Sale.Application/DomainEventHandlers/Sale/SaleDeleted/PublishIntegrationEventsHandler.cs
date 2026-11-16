@@ -3,12 +3,12 @@ using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Contracts;
 using Domain.Events;
-using SaleEntity = Main.Entities.Sale.Sale;
+using SaleEntity = Main.Entities.Sale.Sale.Sale;
 
-namespace Main.Application.DomainEventHandlers.Sale.SaleDeleted;
+namespace Main.Modules.Sale.Application.DomainEventHandlers.Sale.SaleDeleted;
 
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
-	: BatchableDomainEventHandler<EntityDeletedDomainEvent<SaleEntity, Guid>>
+	: BatchableDomainEventHandler<EntityDeletedDomainEvent<SaleEntity.Sale, Guid>>
 {
 	public override Task Handle(
 		Batch<EntityDeletedDomainEvent<SaleEntity, Guid>> notification,

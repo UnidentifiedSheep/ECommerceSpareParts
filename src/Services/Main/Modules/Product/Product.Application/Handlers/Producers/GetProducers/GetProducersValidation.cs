@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Producers.GetProducers;
+namespace Main.Modules.Product.Application.Handlers.Producers.GetProducers;
 
 public class GetProducersValidation : AbstractValidator<GetProducersQuery>
 {

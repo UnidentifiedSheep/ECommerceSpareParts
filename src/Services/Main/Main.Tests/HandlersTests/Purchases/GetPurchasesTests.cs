@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Purchases.GetPurchases;
+using Main.Modules.Purchase.Application.Handlers.Purchases.GetPurchases;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Purchase;
 

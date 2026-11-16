@@ -1,13 +1,15 @@
 using FluentAssertions;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using Main.Entities.Product.ValueObjects;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.Persistence;
 

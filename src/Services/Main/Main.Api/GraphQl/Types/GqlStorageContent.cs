@@ -1,8 +1,9 @@
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Dtos.Storage;
+using Main.Entities.Currency;
 using Main.Entities.Exceptions;
+using Main.Modules.Storage.Application.Dtos.Storage;
 
 namespace Main.Api.GraphQl.Types;
 

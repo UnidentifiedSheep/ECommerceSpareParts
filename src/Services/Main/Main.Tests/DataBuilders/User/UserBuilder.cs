@@ -1,6 +1,6 @@
 using Bogus;
+using Main.Entities.Enums;
 using Main.Entities.User.ValueObjects;
-using Main.Enums;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.User;

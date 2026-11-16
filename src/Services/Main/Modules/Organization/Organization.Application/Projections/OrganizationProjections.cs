@@ -2,11 +2,11 @@ using System.Linq.Expressions;
 using Application.Common.Interfaces.Projections;
 using Attributes;
 using LinqKit;
-using Main.Application.Dtos.Organizations;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Organization;
+using Main.Modules.Organization.Application.Dtos.Organizations;
 
-namespace Main.Application.Projections;
+namespace Main.Modules.Organization.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class
@@ -23,7 +23,7 @@ public sealed class
 }
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class OrganizationDtoProjectionProvider : ProjectionProviderBase<Organization, OrganizationDto>
+public sealed class OrganizationDtoProjectionProvider : ProjectionProviderBase<Entities.Organization.Organization.Organization, OrganizationDto>
 {
 	public OrganizationDtoProjectionProvider(
 		IProjectionProvider<OrganizationMember, OrganizationMemberDto> memberProjection)
@@ -42,5 +42,5 @@ public sealed class OrganizationDtoProjectionProvider : ProjectionProviderBase<O
 		};
 	}
 
-	public override Expression<Func<Organization, OrganizationDto>> Projection { get; }
+	public override Expression<Func<Entities.Organization.Organization.Organization, OrganizationDto>> Projection { get; }
 }

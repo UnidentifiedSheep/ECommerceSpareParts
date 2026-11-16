@@ -1,8 +1,8 @@
-using Main.Application.Interfaces.Services;
 using Main.Modules.Product.Application.Events;
+using Main.Modules.Product.Application.Interfaces.Services;
 using MassTransit;
 
-namespace Main.Application.Consumers;
+namespace Main.Modules.Product.Application.Consumers;
 
 public sealed class ProducerLookupChangedConsumer(IProducerLookupService lookup)
 	: IConsumer<Batch<ProducerLookupChangedEvent>>

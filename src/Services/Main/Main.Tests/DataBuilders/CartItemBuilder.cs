@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Main.Entities.Cart;
+using Main.Entities.Cart.Cart;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;

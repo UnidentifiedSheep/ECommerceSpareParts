@@ -2,17 +2,16 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions;
-using Main.Entities.Storage;
+using Main.Entities.Storage.Exceptions;
 using MediatR;
 
-namespace Main.Application.Handlers.Storages.DeleteStorage;
+namespace Main.Modules.Storage.Application.Handlers.Storages.DeleteStorage;
 
 [AutoSave]
 [Transactional]
 public record DeleteStorageCommand(string StorageCode) : ICommand;
 
-public class DeleteStorageHandler(IRepository<Storage, string> repository, IUnitOfWork unitOfWork)
+public class DeleteStorageHandler(IRepository<Entities.Storage.Storage.Storage, string> repository, IUnitOfWork unitOfWork)
 	: ICommandHandler<DeleteStorageCommand>
 {
 	public async Task<Unit> Handle(DeleteStorageCommand request, CancellationToken cancellationToken)

@@ -1,18 +1,18 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
-using Application.Common.Domains;
 using Application.Common.Dtos;
-using Application.Common.Handlers.Jobs;
-using Application.Common.Handlers.Jobs.GetJobs;
 using Application.Common.Interfaces.Services;
 using Carter;
 using Domain.CommonEnums;
 using Enums;
+using Main.Modules.Jobs.Application.Domains;
+using Main.Modules.Jobs.Application.Handlers.Jobs;
+using Main.Modules.Jobs.Application.Handlers.Jobs.GetJobs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Common.EndPoints;
+namespace Main.Api.Jobs;
 
 public record GetAvailableJobsResponse
 {

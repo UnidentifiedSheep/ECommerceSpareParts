@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using Api.Common.HostedServices;
 using Application.Common.Interfaces.Lrt;
+using Main.Modules.Jobs.Application.HostedServices;
 
-namespace Application.Common.LRT;
+namespace Main.Modules.Jobs.Application.LRT;
 
 public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 {

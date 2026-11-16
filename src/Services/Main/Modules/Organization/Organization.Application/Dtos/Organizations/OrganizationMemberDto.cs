@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
 
-namespace Main.Application.Dtos.Organizations;
+namespace Main.Modules.Organization.Application.Dtos.Organizations;
 
 public record OrganizationMemberDto
 {

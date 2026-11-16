@@ -1,9 +1,9 @@
 using Application.Common.Host;
 using Application.Common.Interfaces.Links;
 using Application.Common.Interfaces.Settings;
-using Application.Common.Services.Links;
-using Application.Common.Services.Settings;
 using Application.Common.NamedObject;
+using Main.Modules.Platform.Application.Services;
+using Main.Modules.Platform.Application.Services.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
 using ZiggyCreatures.Caching.Fusion;

@@ -1,8 +1,8 @@
 using Exceptions;
 using FluentAssertions;
 using Main.Entities.DomainEvents.User;
+using Main.Entities.Enums;
 using Main.Entities.Exceptions;
-using Main.Enums;
 
 namespace Tests.Domain.User;
 

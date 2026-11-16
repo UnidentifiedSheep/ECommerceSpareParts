@@ -3,12 +3,12 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.Organization;
-using Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
-using Main.Application.Handlers.Organizations.AddOrganizationMember;
-using Main.Application.Handlers.Organizations.ChangeOrganizationMemberRole;
-using Main.Application.Handlers.Organizations.CreateOrganization;
-using Main.Application.Handlers.Organizations.RemoveOrganizationMember;
-using Main.Application.Handlers.Organizations.UpdateOrganization;
+using Main.Modules.Balance.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
+using Main.Modules.Organization.Application.Handlers.Organizations.AddOrganizationMember;
+using Main.Modules.Organization.Application.Handlers.Organizations.ChangeOrganizationMemberRole;
+using Main.Modules.Organization.Application.Handlers.Organizations.CreateOrganization;
+using Main.Modules.Organization.Application.Handlers.Organizations.RemoveOrganizationMember;
+using Main.Modules.Organization.Application.Handlers.Organizations.UpdateOrganization;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

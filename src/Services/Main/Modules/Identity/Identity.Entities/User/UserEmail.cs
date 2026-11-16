@@ -3,8 +3,8 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Main.Entities.DomainEvents.User;
+using Main.Entities.Enums;
 using Main.Entities.User.ValueObjects;
-using Main.Enums;
 
 namespace Main.Entities.User;
 

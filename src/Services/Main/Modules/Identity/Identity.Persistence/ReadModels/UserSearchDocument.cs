@@ -1,7 +1,7 @@
 using Main.Entities.User;
 using NpgsqlTypes;
 
-namespace Main.Persistence.ReadModels;
+namespace Main.Modules.Identity.Persistence.ReadModels;
 
 internal sealed class UserSearchDocument
 {

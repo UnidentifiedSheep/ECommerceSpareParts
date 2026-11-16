@@ -1,10 +1,10 @@
 using Enums;
-using Main.Application.Dtos.Product.References;
-using Main.Application.Products.Queries;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Product.Application.Dtos.Product.References;
+using Main.Modules.Product.Application.Products.Queries;
 using MediatR;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Product.Application.Services;
 
 public sealed class ProductReferenceResolver(ISender sender) : IProductReferenceResolver
 {

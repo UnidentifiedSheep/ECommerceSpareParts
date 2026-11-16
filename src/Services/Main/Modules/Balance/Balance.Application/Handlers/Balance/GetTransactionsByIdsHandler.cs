@@ -2,11 +2,11 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Balances;
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Modules.Balance.Application.Dtos.Balances;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Balance;
+namespace Main.Modules.Balance.Application.Handlers.Balance;
 
 public sealed record GetTransactionsByIdsQuery : IQuery<GetTransactionsByIdsResult>
 {

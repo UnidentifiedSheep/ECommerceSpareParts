@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Main.Entities.Notification;
 using MediatR;
-using Notification.Core.Entities;
 
-namespace Main.Application.Handlers.Notifications.SeeNotifications;
+namespace Main.Modules.Notifications.Application.Handlers.Notifications.SeeNotifications;
 
 [Transactional]
 [AutoSave]

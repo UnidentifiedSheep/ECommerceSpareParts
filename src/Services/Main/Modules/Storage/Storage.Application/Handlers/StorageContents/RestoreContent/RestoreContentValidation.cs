@@ -1,10 +1,9 @@
 using Application.Common.Extensions;
-using FluentValidation;
 using Application.Common.Validators;
-using Main.Entities;
+using FluentValidation;
 using Main.Entities.Storage;
 
-namespace Main.Application.Handlers.StorageContents.RestoreContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.RestoreContent;
 
 public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
 {

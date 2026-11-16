@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Dtos.Producer;
 
-namespace Main.Application.Dtos.Product.Enrichment;
+namespace Main.Modules.Product.Application.Dtos.Product.Enrichment;
 
 public record CatalogueCandidateReviewDto
 {

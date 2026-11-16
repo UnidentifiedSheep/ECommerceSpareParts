@@ -2,11 +2,11 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Users;
+using Main.Entities.Notification;
+using Main.Modules.Notifications.Application.Dtos;
 using Microsoft.EntityFrameworkCore;
-using Notification.Core.Entities;
 
-namespace Main.Application.Handlers.Notifications;
+namespace Main.Modules.Notifications.Application.Handlers.Notifications;
 
 public record GetNotificationsByIdsQuery : IQuery<GetNotificationsByIdsResult>
 {

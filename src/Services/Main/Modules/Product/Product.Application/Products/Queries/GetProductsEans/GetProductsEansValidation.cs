@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Main.Application.Products.Queries.GetProductsEans;
+namespace Main.Modules.Product.Application.Products.Queries.GetProductsEans;
 
 public class GetProductsEansValidation : AbstractValidator<GetProductsEansQuery>
 {

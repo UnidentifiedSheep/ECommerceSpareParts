@@ -2,13 +2,13 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Orders.Dtos;
-using Main.Application.Orders.Extensions;
-using Main.Entities.Order;
+using Main.Entities.Order.Order;
+using Main.Modules.Order.Application.Orders.Dtos;
+using Main.Modules.Order.Application.Orders.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Orders.Queries;
+namespace Main.Modules.Order.Application.Orders.Queries;
 
 public sealed record GetOrderItemsByOrderIdsQuery : IQuery<GetOrderItemsByOrderIdsResult>
 {
@@ -24,7 +24,7 @@ public sealed record GetOrderItemsByOrderIdsResult(
 
 public sealed class GetOrderItemsByOrderIdsHandler(
 	IReadRepository<OrderItem, int> repository,
-	IReadRepository<Order, Guid> orders,
+	IReadRepository<Entities.Order.Order.Order, Guid> orders,
 	IProjectionProvider<OrderItem, OrderItemDto> projection,
 	IUserContext userContext)
 	: IQueryHandler<GetOrderItemsByOrderIdsQuery, GetOrderItemsByOrderIdsResult>

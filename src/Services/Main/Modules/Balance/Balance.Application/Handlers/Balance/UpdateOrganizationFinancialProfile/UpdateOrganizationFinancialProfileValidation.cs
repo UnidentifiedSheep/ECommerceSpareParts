@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
+namespace Main.Modules.Balance.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 
 public class
 	UpdateOrganizationFinancialProfileValidation : AbstractValidator<

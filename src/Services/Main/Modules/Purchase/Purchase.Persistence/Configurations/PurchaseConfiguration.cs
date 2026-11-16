@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Purchase;
+namespace Main.Modules.Purchase.Persistence.Configurations;
 
-public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.Purchase>
+public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.Purchase.Purchase>
 {
-	public void Configure(EntityTypeBuilder<Entities.Purchase.Purchase> builder)
+	public void Configure(EntityTypeBuilder<Entities.Purchase.Purchase.Purchase> builder)
 	{
 		builder.ToTable("purchase", "public");
 

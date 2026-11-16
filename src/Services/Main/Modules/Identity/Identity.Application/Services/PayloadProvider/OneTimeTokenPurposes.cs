@@ -1,4 +1,4 @@
-namespace Main.Application.Services.PayloadProvider;
+namespace Main.Modules.Identity.Application.Services.PayloadProvider;
 
 public static class OneTimeTokenPurposes
 {

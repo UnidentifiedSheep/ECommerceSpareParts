@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Entities.Organization;
 using Application.Common.Models;
 
-namespace Main.Application.Dtos.Organizations;
+namespace Main.Modules.Organization.Application.Dtos.Organizations;
 
 public record PatchOrganizationDto
 {

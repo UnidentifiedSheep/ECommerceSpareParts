@@ -1,13 +1,14 @@
-using Main.Entities.Storage;
+using Main.Entities.Product.Stock;
+using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Storage;
+namespace Persistence.Relations.Configurations;
 
 public sealed class ProductStockStorageConfiguration : IEntityTypeConfiguration<ProductStock>
 {
 	public void Configure(EntityTypeBuilder<ProductStock> builder)
-		=> builder.HasOne<Entities.Storage.Storage>()
+		=> builder.HasOne<Storage>()
 			.WithMany()
 			.HasForeignKey(stock => stock.StorageCode)
 			.OnDelete(DeleteBehavior.Cascade)

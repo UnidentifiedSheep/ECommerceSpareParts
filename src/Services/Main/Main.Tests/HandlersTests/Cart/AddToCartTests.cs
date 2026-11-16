@@ -1,6 +1,5 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Handlers.Cart.AddToCart;
 using Main.Entities;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
@@ -10,6 +9,10 @@ using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Domain;
+using Main.Entities.Cart.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Modules.Cart.Application.Handlers.Cart.AddToCart;
 
 namespace Tests.HandlersTests.Cart;
 
@@ -47,7 +50,7 @@ public class AddToCartTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var cartItem = await Context
-			.Set<Main.Entities.Cart.Cart>()
+			.Set<Main.Entities.Cart.Cart.Cart>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id, CancellationToken);
 		Assert.NotNull(cartItem);
@@ -97,7 +100,7 @@ public class AddToCartTests : IntegrationTest
 				CancellationToken));
 
 		exception.Failures.Should().ContainSingle(failure => failure.Error is ProductNotFoundException);
-		(await Context.Set<Main.Entities.Cart.Cart>()
+		(await Context.Set<Main.Entities.Cart.Cart.Cart>()
 				.AnyAsync(item => item.UserId == user.Id, CancellationToken)).Should()
 			.BeFalse();
 	}

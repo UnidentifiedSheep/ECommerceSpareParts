@@ -1,8 +1,8 @@
 using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
 
-namespace Main.Application.Handlers.Documents.CreateGenerationRequest;
+namespace Main.Modules.Documents.Application.Handlers.Documents.CreateGenerationRequest;
 
 public class CreateGenerationRequestDbValidation(IUserChecks userChecks)
 	: AbstractDbValidation<CreateGenerationRequestCommand>

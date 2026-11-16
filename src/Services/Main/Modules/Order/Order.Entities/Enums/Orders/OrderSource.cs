@@ -1,4 +1,4 @@
-namespace Main.Enums.Orders;
+namespace Main.Entities.Order.Enums.Orders;
 
 public enum OrderSource
 {

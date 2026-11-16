@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Users.GetUserFullInfo;
+namespace Main.Modules.Identity.Application.Handlers.Users.GetUserFullInfo;
 
 public class GetUserFullInfoDbValidation : AbstractDbValidation<GetUserFullInfoQuery>
 {

@@ -1,8 +1,8 @@
-﻿using Main.Entities.Purchase;
+﻿using Main.Entities.Purchase.Purchase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Purchase;
+namespace Main.Modules.Purchase.Persistence.Configurations;
 
 public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseContent>
 {
@@ -40,7 +40,7 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
 		builder.Property(e => e.TotalSum).HasColumnName("total_sum");
 
 		builder
-			.HasOne<Entities.Purchase.Purchase>()
+			.HasOne<Entities.Purchase.Purchase.Purchase>()
 			.WithMany(p => p.Contents)
 			.HasForeignKey(d => d.PurchaseId)
 			.HasConstraintName("purchase_content_purchase_id_fk");

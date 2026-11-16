@@ -1,9 +1,10 @@
 using Application.Common.Models;
 using Application.Common.Querying;
 using FluentAssertions;
-using Main.Application.Products.Interfaces;
-using Main.Application.Products.Queries.GetProductCrosses;
+using Main.Entities.Product.Stock;
 using Main.Entities.Storage;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Products.Queries.GetProductCrosses;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

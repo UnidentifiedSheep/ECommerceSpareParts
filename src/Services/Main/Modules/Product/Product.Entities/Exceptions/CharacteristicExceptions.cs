@@ -1,7 +1,6 @@
-using Main.Entities.Product;
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Product.Exceptions;
 
 public class CharacteristicNotFoundException(int id) : LocalizedNotFoundException(
 	CharacteristicNotFoundMessage.Instance,

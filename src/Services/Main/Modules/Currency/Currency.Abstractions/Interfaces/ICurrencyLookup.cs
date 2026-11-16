@@ -1,4 +1,4 @@
-namespace Main.Modules.Currency.Abstractions;
+namespace Main.Modules.Currency.Abstractions.Interfaces;
 
 public interface ICurrencyLookup
 {

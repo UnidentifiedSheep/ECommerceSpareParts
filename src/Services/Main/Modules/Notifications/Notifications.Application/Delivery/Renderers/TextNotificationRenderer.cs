@@ -1,7 +1,7 @@
+using Main.Modules.Notifications.Application.Delivery.Interfaces;
 using Notification.Core.Interfaces.Notification;
-using Notification.Interfaces;
 
-namespace Notification.Renderers;
+namespace Main.Modules.Notifications.Application.Delivery.Renderers;
 
 public class TextNotificationRenderer : INotificationRenderer<ITextNotification>
 {

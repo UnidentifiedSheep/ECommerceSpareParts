@@ -1,5 +1,5 @@
 using Enums;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Application.Extensions;
 

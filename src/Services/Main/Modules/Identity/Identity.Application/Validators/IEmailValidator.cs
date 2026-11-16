@@ -1,4 +1,4 @@
-namespace Application.Common.Interfaces.Validators;
+namespace Main.Modules.Identity.Application.Validators;
 
 public interface IEmailValidator
 {

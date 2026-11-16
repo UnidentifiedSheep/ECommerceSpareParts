@@ -1,15 +1,13 @@
 using Main.Modules.Currency.Application.Configs;
 using Application.Common.Host;
-using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.NamedObject;
-using Application.Common.Services.Currency;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Interfaces.Services.Currency;
-using Main.Application.Services;
-using Main.Application.Services.Currency;
 using Main.Modules.Currency.Abstractions;
-using Main.Cache;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Currency.Application.Cache;
+using Main.Modules.Currency.Application.Interfaces;
+using Main.Modules.Currency.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
 

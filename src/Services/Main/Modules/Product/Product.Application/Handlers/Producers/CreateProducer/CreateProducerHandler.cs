@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Application.Dtos.Producer;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer;
 
-namespace Main.Application.Handlers.Producers.CreateProducer;
+namespace Main.Modules.Product.Application.Handlers.Producers.CreateProducer;
 
 [AutoSave]
 [Transactional]

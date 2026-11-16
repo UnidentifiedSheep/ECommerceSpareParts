@@ -7,9 +7,8 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Auth;
 using Main.Api.GraphQl.Types.Inputs.User;
 using Main.Api.GraphQl.Types.Organization;
-using Main.Application.Dtos.Users;
-using Main.Application.Handlers.Organizations.GetOrganizations;
 using Main.Entities.Exceptions;
+using Main.Modules.Identity.Application.Dtos.Users;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types.User;

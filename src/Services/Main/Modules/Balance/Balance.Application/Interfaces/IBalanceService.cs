@@ -1,6 +1,6 @@
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
 
-namespace Main.Application.Interfaces.Services;
+namespace Main.Modules.Balance.Application.Interfaces;
 
 public interface IBalanceService
 {

@@ -1,7 +1,7 @@
 ﻿using Main.Entities.Auth;
 using Role = Enums.Role;
 
-namespace Main.Application.Extensions;
+namespace Main.Modules.Identity.Application.Extensions;
 
 public static class RoleExtensions
 {

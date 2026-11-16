@@ -1,8 +1,7 @@
 using Enums;
-using Main.Application.Models.Storage;
-using Main.Enums;
+using Main.Modules.Storage.Abstractions.Models;
 
-namespace Main.Application.Interfaces.Services;
+namespace Main.Modules.Storage.Abstractions.Interfaces;
 
 public interface IStorageContentService
 {

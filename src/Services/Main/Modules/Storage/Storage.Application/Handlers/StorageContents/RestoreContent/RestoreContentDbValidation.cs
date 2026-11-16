@@ -1,8 +1,8 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 
-namespace Main.Application.Handlers.StorageContents.RestoreContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.RestoreContent;
 
 public class RestoreContentDbValidation(ICurrencyChecks currencyChecks)
 	: AbstractDbValidation<RestoreContentCommand>

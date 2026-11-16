@@ -1,6 +1,6 @@
 using Bogus;
-using Main.Entities.Producer;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Producer;
+using Main.Entities.Product.Product.Enrichment;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;

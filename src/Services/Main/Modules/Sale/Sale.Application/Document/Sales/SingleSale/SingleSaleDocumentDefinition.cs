@@ -1,28 +1,27 @@
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Models.Options.S3;
 using Enums;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Interfaces.Services.Document;
-using Main.Entities;
-using Main.Entities.Exceptions;
+using Main.Application.Document.Document;
+using Main.Application.Document.Interfaces.Document;
 using Main.Entities.Sale;
-using Main.Enums;
-using Main.Enums.Documents;
-using Main.Modules.Currency.Abstractions;
-using Main.Modules.Identity.Abstractions;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Exceptions;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Identity.Abstractions.Interfaces;
 using Main.Modules.Organization.Abstractions;
 using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Document.Sales.SingleSale;
+namespace Main.Modules.Sale.Application.Document.Sales.SingleSale;
 
 public class SingleSaleDocumentDefinition(
 	IDocumentTemplateResolver templateResolver,
 	IS3Service s3Service,
-	IReadRepository<Sale, Guid> repository,
+	IReadRepository<Entities.Sale.Sale.Sale, Guid> repository,
 	IUserNames userNames,
 	ICurrencyDisplay currencyDisplay,
 	IOrganizationNames organizationNames,

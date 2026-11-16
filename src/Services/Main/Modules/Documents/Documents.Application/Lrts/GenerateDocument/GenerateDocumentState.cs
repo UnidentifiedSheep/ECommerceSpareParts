@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 
-namespace Main.Application.Lrts.GenerateDocument;
+namespace Main.Modules.Documents.Application.Lrts.GenerateDocument;
 
 public record GenerateDocumentState
 {

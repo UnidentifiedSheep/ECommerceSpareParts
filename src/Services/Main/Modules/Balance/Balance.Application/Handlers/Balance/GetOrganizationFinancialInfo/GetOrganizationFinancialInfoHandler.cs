@@ -1,13 +1,13 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Balances;
-using Main.Application.Interfaces.Services;
-using Main.Application.Projections;
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Modules.Balance.Application.Dtos.Balances;
+using Main.Modules.Balance.Application.Interfaces;
+using Main.Modules.Balance.Application.Projections;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
+namespace Main.Modules.Balance.Application.Handlers.Balance.GetOrganizationFinancialInfo;
 
 public record GetOrganizationFinancialInfoQuery(Guid OrganizationId)
 	: IQuery<GetOrganizationFinancialInfoResult>;

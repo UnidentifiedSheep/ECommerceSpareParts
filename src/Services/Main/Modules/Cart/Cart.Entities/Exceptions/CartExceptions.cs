@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Cart.Exceptions;
 
 public class CartItemNotFoundException(int articleId) : LocalizedNotFoundException(
 	CartItemNotFoundMessage.Instance,

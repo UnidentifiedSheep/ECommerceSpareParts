@@ -1,12 +1,13 @@
 using Enums;
 using FluentAssertions;
-using Main.Application.Dtos.Product.References;
-using Main.Application.Products.Queries;
 using Main.Entities.Product.ValueObjects;
+using Main.Modules.Product.Application.Dtos.Product.References;
+using Main.Modules.Product.Application.Products.Queries;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.HandlersTests.Products;
 

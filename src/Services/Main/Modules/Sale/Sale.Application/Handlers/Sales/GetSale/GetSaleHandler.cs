@@ -2,20 +2,19 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Sale;
-using Main.Entities.Exceptions;
-using Main.Entities.Sale;
+using Main.Entities.Sale.Exceptions;
+using Main.Modules.Sale.Application.Dtos.Sale;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Sales.GetSale;
+namespace Main.Modules.Sale.Application.Handlers.Sales.GetSale;
 
 public record GetSaleQuery(Guid? SaleId, Guid? TransactionId) : IQuery<GetSaleResult>;
 
 public record GetSaleResult(SaleDto Sale);
 
 public class GetSaleHandler(
-	IReadRepository<Sale, Guid> repository,
-	IProjectionProvider<Sale, SaleDto> projection) : IQueryHandler<GetSaleQuery, GetSaleResult>
+	IReadRepository<Entities.Sale.Sale.Sale, Guid> repository,
+	IProjectionProvider<Entities.Sale.Sale.Sale, SaleDto> projection) : IQueryHandler<GetSaleQuery, GetSaleResult>
 {
 	public async Task<GetSaleResult> Handle(GetSaleQuery request, CancellationToken cancellationToken)
 	{

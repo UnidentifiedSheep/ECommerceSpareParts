@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Exceptions;
 using Main.Entities;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.Analytics.Lrts.MarkupCalculation;
+namespace Main.Modules.Analytics.Application.Lrts.MarkupCalculation;
 
 public record MarkupCalculationState : MarkupCalculationInputState;
 

@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Locan.Core.Interfaces;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using Main.Modules.Product.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders;

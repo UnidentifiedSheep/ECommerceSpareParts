@@ -1,9 +1,11 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Organizations.GetOrganizationMembers;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Exceptions;
+using Main.Entities.Organization.Organization;
+using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Organization;
 using Tests.Extensions;

@@ -7,7 +7,7 @@ using Attributes;
 using Domain.CommonEntities;
 using Domain.Interfaces;
 
-namespace Application.Common.Services.Settings;
+namespace Main.Modules.Platform.Application.Services.Settings;
 
 public class SettingsService(
 	IRepository<Setting, string> repository,

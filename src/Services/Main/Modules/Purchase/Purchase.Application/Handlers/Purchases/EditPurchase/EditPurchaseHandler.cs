@@ -1,23 +1,19 @@
-using Enums;
 using System.Data;
-using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Purchase;
-using Main.Application.Interfaces.Services;
+using Enums;
+using Main.Entities.Purchase.Exceptions;
+using Main.Entities.Purchase.Purchase;
 using Main.Modules.Balance.Abstractions;
-using Main.Application.Models.Storage;
-using Main.Entities.Exceptions;
-using Main.Entities.Purchase;
-using Main.Enums;
-using Main.Enums.Balances;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Models;
 using MediatR;
-using Microsoft.Extensions.Options;
 
-namespace Main.Application.Handlers.Purchases.EditPurchase;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.EditPurchase;
 
 [AutoSave]
 [Transactional(
@@ -33,7 +29,7 @@ public record EditPurchaseCommand(
 
 public class EditPurchaseHandler(
 	IFinanceTransfers transfers,
-	IRepository<Purchase, Guid> purchaseRepository,
+	IRepository<Entities.Purchase.Purchase.Purchase, Guid> purchaseRepository,
 	IStorageContentService storageContentService,
 	IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand>
 {
@@ -70,14 +66,14 @@ public class EditPurchaseHandler(
 
 	private Guid GetSystemUserId() => transfers.SystemOrganizationId;
 
-	private Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
+	private Task<Entities.Purchase.Purchase.Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
 		=> purchaseRepository.EnsureExistForUpdateAsync(
 			purchaseId,
 			id => new PurchaseNotFoundException(id),
-			Criteria<Purchase>.New().Include(x => x.Contents),
+			Criteria<Entities.Purchase.Purchase.Purchase>.New().Include(x => x.Contents),
 			cancellationToken);
 
-	private Task ReversePurchaseTransactions(Purchase purchase, CancellationToken cancellationToken)
+	private Task ReversePurchaseTransactions(Entities.Purchase.Purchase.Purchase purchase, CancellationToken cancellationToken)
 		=> transfers.ReverseAsync(purchase.TransactionId, cancellationToken);
 
 	private Task<Guid> CreateTransaction(
@@ -97,7 +93,7 @@ public class EditPurchaseHandler(
 			cancellationToken: cancellationToken);
 
 	private async Task UpdateContents(
-		Purchase purchase,
+		Entities.Purchase.Purchase.Purchase purchase,
 		IReadOnlyList<EditPurchaseDto> contentDtos,
 		EditPurchaseCommand request,
 		CancellationToken cancellationToken)
@@ -166,7 +162,7 @@ public class EditPurchaseHandler(
 	}
 
 	private void RemoveContent(
-		Purchase purchase,
+		Entities.Purchase.Purchase.Purchase purchase,
 		PurchaseContent content,
 		ICollection<SubtractStorageContentItem> subtractions)
 	{
@@ -177,7 +173,7 @@ public class EditPurchaseHandler(
 	}
 
 	private async Task AddContent(
-		Purchase purchase,
+		Entities.Purchase.Purchase.Purchase purchase,
 		List<EditPurchaseDto> newContents,
 		CancellationToken cancellationToken)
 	{

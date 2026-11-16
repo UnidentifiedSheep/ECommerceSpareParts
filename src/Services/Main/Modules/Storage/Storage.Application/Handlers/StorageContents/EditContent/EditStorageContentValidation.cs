@@ -2,11 +2,9 @@ using Application.Common.Extensions;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Application.Common.Validators;
-using Main.Entities;
 using Main.Entities.Storage;
 
-namespace Main.Application.Handlers.StorageContents.EditContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.EditContent;
 
 public class EditStorageContentValidation : AbstractValidator<EditStorageContentCommand>
 {

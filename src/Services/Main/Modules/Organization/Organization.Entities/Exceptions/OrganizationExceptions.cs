@@ -1,7 +1,6 @@
 using Exceptions.Base.Localized;
-using Main.Entities.Organization;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Organization.Exceptions;
 
 public class OrganizationNotFoundException : LocalizedNotFoundException
 {

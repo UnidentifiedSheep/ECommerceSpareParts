@@ -1,7 +1,7 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts;
 using Main.Entities.Auth;
+using Main.Modules.Identity.Application.Lrts;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.User;
 using Tests.Extensions;

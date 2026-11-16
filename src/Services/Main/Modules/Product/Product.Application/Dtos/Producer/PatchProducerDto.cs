@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Application.Common.Models;
 
-namespace Main.Application.Dtos.Producer;
+namespace Main.Modules.Product.Application.Dtos.Producer;
 
 public record PatchProducerDto
 {

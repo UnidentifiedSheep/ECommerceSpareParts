@@ -1,13 +1,12 @@
 using Application.Common.Interfaces.Persistence;
 using Locan.Core.Interfaces;
-using Main.Application.Lrts.Base.Synchronization;
-using Main.Application.Products.Interfaces;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Modules.Product.Application.Lrts.Base.Synchronization;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts.ProductSynchronization;
+namespace Main.Modules.Product.Application.Lrts.ProductSynchronization;
 
 public sealed class ProductSynchronizationLrt(
 	IApplicationTransactionFactory transactionService,
@@ -31,7 +30,7 @@ public sealed class ProductSynchronizationLrt(
 		int batchSize,
 		CancellationToken cancellationToken)
 	{
-		var query = TransactionContext.Repositories.GetForRead<Product, int>().Query;
+		var query = TransactionContext.Repositories.GetForRead<Entities.Product.Product.Product, int>().Query;
 		if (lastProcessedId is { } id)
 			query = query.Where(x => x.Id > id);
 

@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 
-namespace Main.Entities.Product.Enrichment;
+namespace Main.Entities.Product.Product.Enrichment;
 
 public class SupplierProductCross : Entity<SupplierProductCross, SupplierProductCrossKey>,
 	ILinqEntity<SupplierProductCross, SupplierProductCrossKey>

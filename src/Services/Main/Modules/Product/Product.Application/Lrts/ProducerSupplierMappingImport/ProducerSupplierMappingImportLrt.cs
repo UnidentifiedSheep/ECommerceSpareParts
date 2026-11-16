@@ -1,25 +1,23 @@
-using Main.Modules.Product.Application.Events;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Models.Options.S3;
 using Attributes;
-using Contracts.Producer;
 using CsvHelper.Configuration.Attributes;
 using Domain.Extensions;
 using Enums;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
-using Main.Application.Lrts.Base;
-using Main.Application.Models.Producer;
-using Main.Entities;
-using Main.Entities.Producer;
 using Main.Entities.Product;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Events;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Interfaces.Services;
+using Main.Modules.Product.Application.Lrts.Base;
+using Main.Modules.Product.Application.Models.Producer;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Lrts.ProducerSupplierMappingImport;
+namespace Main.Modules.Product.Application.Lrts.ProducerSupplierMappingImport;
 
 public class ProducerSupplierMappingImportLrt(
 	IS3Service s3Service,

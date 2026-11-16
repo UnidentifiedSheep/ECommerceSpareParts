@@ -1,8 +1,8 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Application.Dtos.Auth;
 using Main.Entities.Exceptions;
+using Main.Modules.Identity.Application.Dtos.Auth;
 using Security.Authorization;
 
 namespace Main.Api.GraphQl.Types.Auth;

@@ -1,15 +1,15 @@
+using Application.Common;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities;
-using Main.Entities.Product.Enrichment;
 using Main.Entities.Product;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
+namespace Main.Modules.Product.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
 
 public class MapCatalogueCandidatesToProductsLrt(
 	IApplicationTransactionFactory transactionService,

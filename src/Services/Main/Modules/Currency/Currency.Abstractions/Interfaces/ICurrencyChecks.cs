@@ -1,6 +1,6 @@
 using BulkValidation.Core.Interfaces;
 
-namespace Main.Modules.Currency.Abstractions;
+namespace Main.Modules.Currency.Abstractions.Interfaces;
 
 public interface ICurrencyChecks
 {

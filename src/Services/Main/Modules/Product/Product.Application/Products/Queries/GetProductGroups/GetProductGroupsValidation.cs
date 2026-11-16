@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Products.Queries.GetProductGroups;
+namespace Main.Modules.Product.Application.Products.Queries.GetProductGroups;
 
 public class GetProductGroupsValidation : AbstractValidator<GetProductGroupsQuery>
 {

@@ -1,12 +1,12 @@
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
-using Main.Entities.Exceptions;
-using Main.Enums.Products;
+using Main.Entities.Product.Enums.Products;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Commands.MakeLinkageBetweenArticles;
 using MediatR;
 
-namespace Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
+namespace Main.Modules.Product.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 
 [Transactional]
 [AutoSave]

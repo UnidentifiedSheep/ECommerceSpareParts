@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Analytics.Charts.SalesProfitOverTime;
-using Main.Application.Analytics.Queries;
+using Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
+using Main.Modules.Analytics.Application.Queries;
 using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Analytics;

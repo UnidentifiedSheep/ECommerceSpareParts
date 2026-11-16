@@ -1,3 +1,4 @@
+using Application.Common;
 using Main.Entities.Analytics;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
@@ -5,10 +6,10 @@ using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Analytics.Lrts.SaleAnalyticsSynchronization;
-using Main.Application.Interfaces.Services.Currency;
-using Main.Application.Lrts.Base.Synchronization;
 using Main.Entities.Sale;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Analytics.Application.Lrts.SaleAnalyticsSynchronization;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

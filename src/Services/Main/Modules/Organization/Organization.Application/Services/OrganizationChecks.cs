@@ -1,9 +1,8 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities.Organization;
-using Main.Entities;
 using Main.Modules.Organization.Abstractions;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Organization.Application.Services;
 
 public sealed class OrganizationChecks : IOrganizationChecks
 {

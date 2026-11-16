@@ -1,6 +1,6 @@
 using Enums;
 using HotChocolate;
-using Main.Application.Dtos.Producer.SupplierMappings;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
 
 namespace Main.Api.GraphQl.Types.Producer;
 

@@ -1,9 +1,8 @@
 using Application.Common.Extensions;
 using FluentValidation;
-using Main.Entities;
 using Main.Entities.Product;
 
-namespace Main.Application.Handlers.Producers.BaseValidators;
+namespace Main.Modules.Product.Application.Handlers.Producers.BaseValidators;
 
 public class ProducerDescriptionValidator : AbstractValidator<string?>
 {

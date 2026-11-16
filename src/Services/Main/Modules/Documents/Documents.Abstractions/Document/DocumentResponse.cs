@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Application.Interfaces.Services.Document;
+using Main.Application.Document.Interfaces.Document;
 
-namespace Main.Application.Document;
+namespace Main.Application.Document.Document;
 
 public record DocumentResponse : IDocumentResponse
 {

@@ -3,9 +3,9 @@ using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Domain.Events;
 using Main.Entities.Currency;
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Events;
 
-namespace Main.Application.DomainEventHandlers.CurrencyRateCreated;
+namespace Main.Modules.Currency.Application.DomainEventHandlers.CurrencyRateCreated;
 
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
 	: BatchableDomainEventHandler<EntityCreatedDomainEvent<CurrencyRate>>

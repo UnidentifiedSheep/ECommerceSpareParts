@@ -4,7 +4,7 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Product;
+namespace Main.Entities.Product.Product;
 
 public class ProductEan : Entity<ProductEan, ProductEanKey>, ILinqEntity<ProductEan, ProductEanKey>
 {

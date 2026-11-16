@@ -1,8 +1,9 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Lrts.ProductContentImport;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Lrts.ProductContentImport;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;

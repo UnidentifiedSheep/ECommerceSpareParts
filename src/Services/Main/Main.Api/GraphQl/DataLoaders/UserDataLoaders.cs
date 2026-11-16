@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Users;
-using Main.Application.Handlers.Users;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Handlers.Users;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

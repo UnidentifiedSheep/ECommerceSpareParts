@@ -1,5 +1,5 @@
-using Main.Application.Services.ProductDeletion;
 using Main.Entities.Purchase;
+using Main.Modules.Purchase.Application.Services.ProductDeletion;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Purchase;
 

@@ -1,7 +1,7 @@
 ﻿using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Products.Queries.GetCharacteristics;
+namespace Main.Modules.Product.Application.Products.Queries.GetCharacteristics;
 
 public class GetCharacteristicsValidation : AbstractValidator<GetCharacteristicsQuery>
 {

@@ -1,18 +1,18 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Lrts.Base;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Lrts.CharacteristicImport;
+namespace Main.Modules.Product.Application.Lrts.CharacteristicImport;
 
 public sealed class CharacteristicImportLrt(
 	IS3Service s3Service,

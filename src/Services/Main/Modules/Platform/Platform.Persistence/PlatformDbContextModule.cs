@@ -1,5 +1,5 @@
 using Domain.CommonEntities;
-using Main.Entities.Settings;
+using Main.Entities.Platform.Settings;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Common.BaseTableConfigurations;
 using Persistence.Interfaces;

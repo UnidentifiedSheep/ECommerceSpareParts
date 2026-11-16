@@ -4,10 +4,9 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Exceptions;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
 
-namespace Main.Entities.Storage;
+namespace Main.Entities.Storage.Storage;
 
 public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, string>
 {

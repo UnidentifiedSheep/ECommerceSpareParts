@@ -1,10 +1,9 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
-using Main.Entities.Producer;
 using Main.Entities.Product;
+using Main.Entities.Product.Producer;
 
-namespace Main.Application.Handlers.ProducerAliases.AddAlias;
+namespace Main.Modules.Product.Application.Handlers.ProducerAliases.AddAlias;
 
 public class AddAliasDbValidation : AbstractDbValidation<AddAliasCommand>
 {

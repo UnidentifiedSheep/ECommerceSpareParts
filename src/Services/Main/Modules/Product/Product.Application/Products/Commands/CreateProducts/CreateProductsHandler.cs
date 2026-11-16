@@ -2,13 +2,12 @@
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Exceptions;
-using Main.Application.Dtos.Product;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities;
 using Main.Entities.Product;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.Product.ValueObjects;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 
-namespace Main.Application.Products.Commands.CreateProducts;
+namespace Main.Modules.Product.Application.Products.Commands.CreateProducts;
 
 [AutoSave]
 [Transactional]
@@ -31,11 +30,11 @@ public class CreateProductsHandler(IProductRepository productRepository, IUnitOf
 		if (existingKeys.Count > 0)
 			throw new InvalidInputException(ArticleCreateArticlesDuplicateMessage.Instance);
 
-		var products = new List<Product>();
+		var products = new List<Entities.Product.Product.Product>();
 
 		foreach (var @new in request.NewProducts)
 		{
-			var product = Product.Create(
+			var product = Entities.Product.Product.Product.Create(
 				@new.Sku,
 				@new.Name,
 				@new.ProducerId,

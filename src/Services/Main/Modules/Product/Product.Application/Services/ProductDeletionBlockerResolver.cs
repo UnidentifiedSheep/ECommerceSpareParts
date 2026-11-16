@@ -1,8 +1,8 @@
 using Locan.Core.Interfaces;
-using Main.Application.Interfaces.Services;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Product.Application.Interfaces.Services;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Product.Application.Services;
 
 public sealed class ProductDeletionBlockerResolver(IEnumerable<IProductDeletionRule> rules)
 	: IProductDeletionBlockerResolver

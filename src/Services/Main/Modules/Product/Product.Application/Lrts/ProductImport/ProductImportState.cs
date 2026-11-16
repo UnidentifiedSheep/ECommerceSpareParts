@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
-using Application.Common.Interfaces.Lrt;
-using Main.Application.Lrts.Base;
+using Application.Common.Interfaces;
+using Main.Modules.Product.Application.Lrts.Base;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
-namespace Main.Application.Lrts.ProductImport;
+namespace Main.Modules.Product.Application.Lrts.ProductImport;
 
 public record ProductImportState : ProductImportInputState, ICsvImportState<ProductImportState>
 {

@@ -5,7 +5,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
 
-namespace Main.Entities.Purchase;
+namespace Main.Entities.Purchase.Purchase;
 
 public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<PurchaseContent, int>
 {

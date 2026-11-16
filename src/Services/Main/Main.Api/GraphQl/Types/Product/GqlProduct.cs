@@ -6,12 +6,13 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Producer;
-using Main.Application.Dtos.Product;
-using Main.Application.Handlers.Sales.GetProductSaleHistory;
-using Main.Application.Handlers.StorageContents.GetProductStorageContents;
-using Main.Application.Products.Queries;
-using Main.Application.Products.Queries.GetProductCrosses;
 using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Queries.GetProductCrosses;
+using Main.Modules.Sale.Application.Handlers.Sales.GetProductSaleHistory;
+using Main.Modules.Storage.Application.Handlers.StorageContents.GetProductStorageContents;
+using Main.Modules.Storage.Application.Products.Queries;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types.Product;

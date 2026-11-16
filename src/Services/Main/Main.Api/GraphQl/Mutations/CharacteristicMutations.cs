@@ -3,8 +3,8 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Handlers.Characteristics.DeleteCharacteristic;
-using Main.Application.Handlers.Characteristics.UpsertCharacteristic;
+using Main.Modules.Product.Application.Handlers.Characteristics.DeleteCharacteristic;
+using Main.Modules.Product.Application.Handlers.Characteristics.UpsertCharacteristic;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

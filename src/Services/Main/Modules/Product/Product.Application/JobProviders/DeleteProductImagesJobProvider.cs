@@ -2,9 +2,9 @@ using System.Text.Json;
 using Application.Common.Interfaces.Lrt;
 using Attributes;
 using Domain.CommonEntities.Job;
-using Main.Application.Lrts.DeleteProductImages;
+using Main.Modules.Product.Application.Lrts.DeleteProductImages;
 
-namespace Main.Application.JobProviders;
+namespace Main.Modules.Product.Application.JobProviders;
 
 [Lifetime(Lifetime.Singleton)]
 public class

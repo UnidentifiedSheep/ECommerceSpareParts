@@ -1,7 +1,7 @@
 using FluentValidation;
-using Main.Application.Handlers.Producers.BaseValidators;
+using Main.Modules.Product.Application.Handlers.Producers.BaseValidators;
 
-namespace Main.Application.Handlers.Producers.CreateProducer;
+namespace Main.Modules.Product.Application.Handlers.Producers.CreateProducer;
 
 public class CreateProducerValidation : AbstractValidator<CreateProducerCommand>
 {

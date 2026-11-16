@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Repositories;
 using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Common.Handlers.Jobs;
+namespace Main.Modules.Jobs.Application.Handlers.Jobs;
 
 public record GetJobStateQuery(Guid JobId) : IQuery<GetJobStateResult>;
 

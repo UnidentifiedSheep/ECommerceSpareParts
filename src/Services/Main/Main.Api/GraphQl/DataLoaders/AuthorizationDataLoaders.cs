@@ -1,7 +1,7 @@
 using GreenDonut;
-using Main.Application.Dtos.Auth;
-using Main.Application.Handlers.Auth;
-using Main.Application.Handlers.Auth.GetPermissions;
+using Main.Modules.Identity.Application.Dtos.Auth;
+using Main.Modules.Identity.Application.Handlers.Auth;
+using Main.Modules.Identity.Application.Handlers.Auth.GetPermissions;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

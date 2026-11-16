@@ -1,8 +1,8 @@
 using BulkValidation.Core.Configuration;
 using Main.Entities.Balance;
-using Main.Entities.Exceptions;
+using Main.Entities.Balance.Exceptions;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Balance.Application.Configs;
 
 public static class BalanceValidationConfiguration
 {

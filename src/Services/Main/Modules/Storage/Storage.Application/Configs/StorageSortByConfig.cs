@@ -1,9 +1,8 @@
-using Application.Common.Extensions;
 using Application.Common.Querying;
-using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
+using Main.Entities.Storage.Storage;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Storage.Application.Configs;
 
 public static class StorageSortByConfig
 {

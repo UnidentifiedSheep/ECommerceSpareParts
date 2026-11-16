@@ -1,14 +1,14 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Models.Options.S3;
 using Attributes;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
 using MediatR;
 using Microsoft.Extensions.Options;
+using S3.Core.Options;
 
-namespace Main.Application.Products.Commands;
+namespace Main.Modules.Product.Application.Products.Commands;
 
 [Transactional]
 [AutoSave]

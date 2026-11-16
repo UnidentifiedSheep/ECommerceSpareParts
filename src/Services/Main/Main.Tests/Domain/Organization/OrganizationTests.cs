@@ -1,7 +1,7 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Enums.Organization;
-using OrganizationDomain = Main.Entities.Organization.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using OrganizationDomain = Main.Entities.Organization.Organization.Organization;
 
 namespace Tests.Domain.Organization;
 

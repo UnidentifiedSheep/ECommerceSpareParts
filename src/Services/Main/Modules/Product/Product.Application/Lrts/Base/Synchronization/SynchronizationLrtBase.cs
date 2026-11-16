@@ -1,10 +1,10 @@
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts.Base.Synchronization;
+namespace Main.Modules.Product.Application.Lrts.Base.Synchronization;
 
 public abstract class SynchronizationLrtBase<TInputState, TId, TEvent>(
 	IApplicationTransactionFactory transactionService,

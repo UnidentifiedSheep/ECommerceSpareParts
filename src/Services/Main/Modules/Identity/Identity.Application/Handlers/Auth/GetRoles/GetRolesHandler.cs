@@ -3,11 +3,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Auth;
 using Main.Entities.Auth;
+using Main.Modules.Identity.Application.Dtos.Auth;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Auth.GetRoles;
+namespace Main.Modules.Identity.Application.Handlers.Auth.GetRoles;
 
 public record GetRolesQuery(string? SearchTerm, Pagination Pagination) : IQuery<GetRolesResult>;
 

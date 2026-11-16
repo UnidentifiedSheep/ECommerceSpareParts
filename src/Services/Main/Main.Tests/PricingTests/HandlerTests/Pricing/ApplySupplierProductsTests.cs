@@ -7,7 +7,7 @@ using Pricing.Application.Handlers.Pricing;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Entities.Offers;
 
-namespace Tests.PricingTests.HandlerTests.PriceCalculation;
+namespace Tests.PricingTests.HandlerTests.Pricing;
 
 public sealed class ApplySupplierProductsTests
 {

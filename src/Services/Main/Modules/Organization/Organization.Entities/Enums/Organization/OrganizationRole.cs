@@ -1,4 +1,4 @@
-namespace Main.Enums.Organization;
+namespace Main.Entities.Organization.Enums.Organization;
 
 public enum OrganizationRole
 {

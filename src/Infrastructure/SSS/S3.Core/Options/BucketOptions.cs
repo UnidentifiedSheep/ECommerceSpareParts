@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Common.Models.Options.S3;
+namespace S3.Core.Options;
 
 public record BucketOptions
 {

@@ -1,7 +1,7 @@
-using Main.Application.Analytics.Analyzers.Markup;
+using Main.Modules.Analytics.Abstractions.Analyzers.Markup;
 using NamedObject.Core.Base;
 
-namespace Main.Application.Analytics.Analyzers;
+namespace Main.Modules.Analytics.Abstractions.Analyzers;
 
 public abstract class MarkupAnalyzerNamedObjectBase : LocalizableNameObject
 {

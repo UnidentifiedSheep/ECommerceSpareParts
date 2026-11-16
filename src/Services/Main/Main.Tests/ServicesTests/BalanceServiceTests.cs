@@ -1,10 +1,10 @@
 using Enums;
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
 using Main.Entities.Organization;
-using Main.Enums.Balances;
+using Main.Modules.Balance.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Balance;

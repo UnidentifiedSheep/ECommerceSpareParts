@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Domain.CommonEnums;
 
-namespace Main.Application.Dtos.Documents;
+namespace Main.Modules.Documents.Application.Dtos.Documents;
 
 public record DocumentGenerationRequestDto
 {

@@ -1,10 +1,9 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Organization;
 using Main.Modules.Organization.Abstractions;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Organization.Application.Services;
 
-public sealed class OrganizationLocks(IRepository<Organization, Guid> repository) : IOrganizationLocks
+public sealed class OrganizationLocks(IRepository<Entities.Organization.Organization.Organization, Guid> repository) : IOrganizationLocks
 {
 	public async Task LockExistingAsync(
 		IReadOnlyCollection<Guid> organizationIds,
@@ -12,7 +11,7 @@ public sealed class OrganizationLocks(IRepository<Organization, Guid> repository
 	{
 		var ids = organizationIds.ToArray();
 		var organizations = await repository.ListAsync(
-			Criteria<Organization>
+			Criteria<Entities.Organization.Organization.Organization>
 				.New()
 				.Where(x => ids.Contains(x.Id))
 				.OrderByAsc(x => x.Id)

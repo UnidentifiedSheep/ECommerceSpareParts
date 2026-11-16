@@ -1,6 +1,6 @@
 using Exceptions;
 
-namespace Main.Entities.Balance;
+namespace Main.Entities.Balance.Balance;
 
 public class TransactionFinancialProfileService : ITransactionFinancialProfileService
 {

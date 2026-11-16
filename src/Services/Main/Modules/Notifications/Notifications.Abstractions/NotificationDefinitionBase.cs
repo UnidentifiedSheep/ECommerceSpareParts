@@ -22,7 +22,7 @@ public sealed class NotificationDefinitionBase<TNotification, TModel>(
 			? systemName
 			: throw new ArgumentException("Notification system name must not be empty.", nameof(systemName));
 
-	public TNotification FromEntity(Entities.Notification entity)
+	public TNotification FromEntity(Main.Entities.Notification.Notification entity)
 	{
 		ArgumentNullException.ThrowIfNull(entity);
 		EnsureCanHandle(entity.NotificationSystemName);
@@ -31,20 +31,20 @@ public sealed class NotificationDefinitionBase<TNotification, TModel>(
 		return _createNotification(model);
 	}
 
-	public Entities.Notification ToEntity(Guid userId, TNotification notification)
+	public Main.Entities.Notification.Notification ToEntity(Guid userId, TNotification notification)
 	{
 		ArgumentNullException.ThrowIfNull(notification);
 		EnsureCanHandle(notification.SystemName);
 
-		return Entities.Notification.Create(
+		return Main.Entities.Notification.Notification.Create(
 			userId,
 			SystemName,
 			_serializer.Serialize(notification));
 	}
 
-	INotification INotificationDefinition.FromEntity(Entities.Notification entity) => FromEntity(entity);
+	INotification INotificationDefinition.FromEntity(Main.Entities.Notification.Notification entity) => FromEntity(entity);
 
-	Entities.Notification INotificationDefinition.ToEntity(Guid userId, INotification notification)
+	Main.Entities.Notification.Notification INotificationDefinition.ToEntity(Guid userId, INotification notification)
 	{
 		ArgumentNullException.ThrowIfNull(notification);
 

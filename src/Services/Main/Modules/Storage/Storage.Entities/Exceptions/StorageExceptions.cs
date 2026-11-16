@@ -1,7 +1,6 @@
-using Main.Entities.Storage;
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Storage.Exceptions;
 
 public class NotEnoughCountOnStorageException : LocalizedBadRequestException
 {

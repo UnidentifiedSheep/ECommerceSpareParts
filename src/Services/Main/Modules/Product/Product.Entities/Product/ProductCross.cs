@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
-using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
 
-namespace Main.Entities.Product;
+namespace Main.Entities.Product.Product;
 
 public class ProductCross : Entity<ProductCross, (int, int)>, ILinqEntity<ProductCross, (int, int)>
 {

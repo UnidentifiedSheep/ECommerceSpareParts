@@ -1,6 +1,6 @@
 using Application.Common.Interfaces.Repositories;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
-using Pricing.Enums;
 
 namespace Pricing.Application.Interfaces.Persistence;
 

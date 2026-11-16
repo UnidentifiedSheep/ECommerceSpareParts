@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Enums.Products;
+using Main.Entities.Product.Enums.Products;
 
 namespace Main.Api.GraphQl.Types.Inputs.CatalogueCandidate;
 

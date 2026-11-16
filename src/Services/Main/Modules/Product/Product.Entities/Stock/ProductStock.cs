@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
-using Main.Entities.DomainEvents.ProductStock;
+using Main.Entities.Product.DomainEvents.ProductStock;
 
-namespace Main.Entities.Storage;
+namespace Main.Entities.Product.Stock;
 
 public class ProductStock : Entity<ProductStock, (string, int)>, ILinqEntity<ProductStock, (string, int)>
 {

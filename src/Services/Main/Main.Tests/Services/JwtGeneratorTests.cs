@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using FluentAssertions;
-using Main.Application.Dtos.Users;
-using Main.Application.Models;
-using Main.Application.Services;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Models;
+using Main.Modules.Identity.Application.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 

@@ -1,10 +1,9 @@
 using Application.Common.Extensions;
-using Main.Entities.Organization;
 using FluentValidation;
-using Main.Application.Handlers.Organizations.Validators;
-using Main.Entities;
+using Main.Entities.Organization;
+using Main.Modules.Organization.Application.Handlers.Organizations.Validators;
 
-namespace Main.Application.Handlers.Organizations.UpdateOrganization;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.UpdateOrganization;
 
 public class UpdateOrganizationValidation : AbstractValidator<UpdateOrganizationCommand>
 {

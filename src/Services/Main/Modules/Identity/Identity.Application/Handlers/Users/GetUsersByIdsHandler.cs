@@ -2,12 +2,12 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Users;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Dtos.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Users;
+namespace Main.Modules.Identity.Application.Handlers.Users;
 
 public sealed record GetUsersByIdsQuery : IQuery<GetUsersByIdsResult>
 {

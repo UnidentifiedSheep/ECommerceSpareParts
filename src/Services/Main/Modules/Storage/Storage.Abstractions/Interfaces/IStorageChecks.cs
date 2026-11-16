@@ -1,6 +1,6 @@
 using BulkValidation.Core.Interfaces;
 
-namespace Main.Modules.Storage.Abstractions;
+namespace Main.Modules.Storage.Abstractions.Interfaces;
 
 public interface IStorageChecks
 {

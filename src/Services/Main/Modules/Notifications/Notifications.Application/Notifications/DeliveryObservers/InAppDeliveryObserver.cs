@@ -3,7 +3,7 @@ using Contracts;
 using Notification.Core.Interfaces;
 using Notification.Core.Recipients;
 
-namespace Main.Application.Notifications.DeliveryObservers;
+namespace Main.Modules.Notifications.Application.Notifications.DeliveryObservers;
 
 public class InAppDeliveryObserver(
 	IIntegrationEventScope eventScope

@@ -1,8 +1,7 @@
-using Application.Common.Interfaces.Currency;
-using Main.Application.Interfaces.Services.Currency;
-using Main.Entities.Exceptions;
+using Main.Entities.Currency;
+using Main.Modules.Currency.Abstractions.Interfaces;
 
-namespace Main.Application.Services.Currency;
+namespace Main.Modules.Currency.Application.Services;
 
 public class CurrencyRatesProvider(
 	ICurrencyRateSnapshotProvider history) : ICurrencyRatesProvider

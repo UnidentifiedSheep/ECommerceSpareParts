@@ -3,12 +3,12 @@ using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Contracts.ProductEnrichment;
 using Domain.Events;
-using Candidate = Main.Entities.Product.Enrichment.CatalogueCandidate;
+using Candidate = Main.Entities.Product.Product.Enrichment.CatalogueCandidate;
 
-namespace Main.Application.DomainEventHandlers.CatalogueCandidate.CatalogueCandidateDeleted;
+namespace Main.Modules.Product.Application.DomainEventHandlers.CatalogueCandidate.CatalogueCandidateDeleted;
 
 public class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
-	: BatchableDomainEventHandler<EntityDeletedDomainEvent<Candidate, Guid>>
+	: BatchableDomainEventHandler<EntityDeletedDomainEvent<Entities.Product.Product.Enrichment.CatalogueCandidate, Guid>>
 {
 	public override Task Handle(
 		Batch<EntityDeletedDomainEvent<Candidate, Guid>> notification,

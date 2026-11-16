@@ -1,8 +1,8 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Currency.Application.Services;
 
 public sealed class CurrencyDisplay(IReadRepository<Main.Entities.Currency.Currency, int> currencies) : ICurrencyDisplay
 {

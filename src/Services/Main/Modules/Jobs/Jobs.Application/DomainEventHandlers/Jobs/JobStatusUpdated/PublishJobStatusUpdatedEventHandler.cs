@@ -5,7 +5,7 @@ using Application.Common.Services.Events;
 using Contracts.Job;
 using Domain.CommonEntities.Job.Events;
 
-namespace Application.Common.DomainEventHandlers.Jobs.JobStatusUpdated;
+namespace Main.Modules.Jobs.Application.DomainEventHandlers.Jobs.JobStatusUpdated;
 
 public sealed class PublishJobStatusUpdatedEventHandler(
 	IServiceDefinition serviceDefinition,

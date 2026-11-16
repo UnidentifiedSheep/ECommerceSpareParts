@@ -2,9 +2,11 @@ using Application.Common.Interfaces.Repositories;
 using Locan.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Analytics;
+using Main.Modules.Analytics.Abstractions.Analyzers;
+using Main.Modules.Analytics.Abstractions.Analyzers.Markup;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Analytics.Analyzers.Markup;
+namespace Main.Modules.Analytics.Application.Analyzers.Markup;
 
 public class MarkupRangeAnalyzer(IReadRepository<SaleContentAnalytics, int> repository) : MarkupAnalyzerNamedObjectBase
 {

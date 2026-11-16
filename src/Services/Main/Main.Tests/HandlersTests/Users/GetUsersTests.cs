@@ -1,9 +1,9 @@
 using Application.Common.Models;
 using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.Users.GetUsers;
+using Main.Entities.Enums;
 using Main.Entities.User;
-using Main.Enums;
+using Main.Modules.Identity.Application.Handlers.Users.GetUsers;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;

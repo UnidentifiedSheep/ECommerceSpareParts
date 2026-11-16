@@ -1,8 +1,8 @@
-﻿using Main.Entities.Product;
+﻿using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Product;
+namespace Main.Modules.Product.Persistence.Configurations.Product;
 
 public class ProductSizeConfiguration : IEntityTypeConfiguration<ProductSize>
 {
@@ -21,7 +21,7 @@ public class ProductSizeConfiguration : IEntityTypeConfiguration<ProductSize>
 		builder.Property(e => e.Width).HasColumnName("width");
 
 		builder
-			.HasOne<Entities.Product.Product>()
+			.HasOne<Entities.Product.Product.Product>()
 			.WithOne(e => e.ProductSize)
 			.HasForeignKey<ProductSize>(d => d.ProductId)
 			.OnDelete(DeleteBehavior.Cascade)

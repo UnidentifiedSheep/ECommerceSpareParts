@@ -1,6 +1,7 @@
 using FluentAssertions;
-using Main.Application.Products.Queries;
 using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Products.Queries;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;

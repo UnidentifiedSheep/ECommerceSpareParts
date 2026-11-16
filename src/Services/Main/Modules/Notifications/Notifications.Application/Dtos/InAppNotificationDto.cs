@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Users;
+namespace Main.Modules.Notifications.Application.Dtos;
 
 public record InAppNotificationDto
 {

@@ -3,7 +3,7 @@ using Pricing.Application.Interfaces.Pricing.PricePolicy;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.MarketInfo;
 using Pricing.Application.Models.Pricing.PriceCandidates;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Application.Services.Pricing.PricePolicies;
 

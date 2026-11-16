@@ -1,5 +1,5 @@
+using Main.Entities.Notification;
 using Main.Entities.User;
-using Notification.Core.Entities;
 using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;

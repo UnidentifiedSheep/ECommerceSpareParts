@@ -1,4 +1,4 @@
-namespace Main.Application.Interfaces.Cache;
+namespace Main.Modules.Product.Application.Interfaces.Cache;
 
 public interface IProductCacheInvalidator
 {

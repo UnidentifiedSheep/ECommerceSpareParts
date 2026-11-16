@@ -4,17 +4,16 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Orders.Dtos;
-using Main.Application.Orders.Extensions;
-using Main.Entities.Order;
-using Main.Enums.Orders;
-using Main.Modules.Identity.Abstractions;
+using Main.Entities.Order.Enums.Orders;
+using Main.Modules.Identity.Abstractions.Interfaces;
+using Main.Modules.Order.Application.Orders.Dtos;
+using Main.Modules.Order.Application.Orders.Extensions;
 using Main.Modules.Organization.Abstractions;
 using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Orders.Queries.GetOrders;
+namespace Main.Modules.Order.Application.Orders.Queries.GetOrders;
 
 public sealed record GetOrdersQuery(
 	RangeModel<DateTime> DateRange,
@@ -32,11 +31,11 @@ public sealed record GetOrdersQuery(
 public sealed record GetOrdersResult(IReadOnlyList<OrderDto> Orders);
 
 public sealed class GetOrdersHandler(
-	IReadRepository<Order, Guid> repository,
+	IReadRepository<Entities.Order.Order.Order, Guid> repository,
 	IOrganizationSearch organizationSearch,
 	IUserSearch userSearch,
 	IProductSearch productSearch,
-	IProjectionProvider<Order, OrderDto> projection,
+	IProjectionProvider<Entities.Order.Order.Order, OrderDto> projection,
 	IUserContext userContext) : IQueryHandler<GetOrdersQuery, GetOrdersResult>
 {
 	public async Task<GetOrdersResult> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
@@ -76,7 +75,7 @@ public sealed class GetOrdersHandler(
 		return new GetOrdersResult(orders);
 	}
 
-	private IQueryable<Order> ApplySearchTerm(IQueryable<Order> query, string searchTerm)
+	private IQueryable<Entities.Order.Order.Order> ApplySearchTerm(IQueryable<Entities.Order.Order.Order> query, string searchTerm)
 	{
 		var term = searchTerm.Trim();
 		var isId = Guid.TryParse(term, out var id);

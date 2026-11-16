@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Sales.GetSales;
+using Main.Modules.Sale.Application.Handlers.Sales.GetSales;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 

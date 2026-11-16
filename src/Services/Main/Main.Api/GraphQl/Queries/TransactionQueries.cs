@@ -6,7 +6,7 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Transaction;
-using Main.Application.Handlers.Balance.GetTransactions;
+using Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

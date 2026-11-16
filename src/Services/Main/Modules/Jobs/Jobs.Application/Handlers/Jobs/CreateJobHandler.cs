@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Services;
 using Application.Common.Models;
 using Attributes;
 
-namespace Application.Common.Handlers.Jobs;
+namespace Main.Modules.Jobs.Application.Handlers.Jobs;
 
 [Transactional]
 [AutoSave]

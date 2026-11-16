@@ -4,9 +4,9 @@ using Application.Common.NamedObject;
 using Exceptions;
 using Locan.Core.Interfaces;
 using Main.Entities;
-using Main.Entities.Settings;
+using Main.Entities.Platform.Settings;
 
-namespace Main.Application.NamedObjects.SettingDefinitions;
+namespace Main.Modules.Platform.Application.NamedObjects;
 
 public class GlobalApplicationSettingDefinition(ISettingsService settingsService)
 	: SettingDefinitionNamedObjectBase<GlobalApplicationSetting>(settingsService)

@@ -2,7 +2,7 @@ using Abstractions;
 using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

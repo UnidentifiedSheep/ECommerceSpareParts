@@ -1,9 +1,9 @@
 using Application.Common.Extensions;
+using Application.Common.Validators;
 using FluentValidation;
 using Main.Entities;
-using Application.Common.Validators;
 
-namespace Main.Application.Orders.Commands.UpsertOrder;
+namespace Main.Modules.Order.Application.Orders.Commands.UpsertOrder;
 
 public class UpsertOrderValidation : AbstractValidator<UpsertOrderCommand>
 {

@@ -3,12 +3,12 @@ using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Contracts;
 using Domain.Events;
-using PurchaseEntity = Main.Entities.Purchase.Purchase;
+using PurchaseEntity = Main.Entities.Purchase.Purchase.Purchase;
 
-namespace Main.Application.DomainEventHandlers.Purchase.PurchaseCreated;
+namespace Main.Modules.Purchase.Application.DomainEventHandlers.Purchase.PurchaseCreated;
 
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
-	: BatchableDomainEventHandler<EntityCreatedDomainEvent<PurchaseEntity>>
+	: BatchableDomainEventHandler<EntityCreatedDomainEvent<PurchaseEntity.Purchase>>
 {
 	public override Task Handle(
 		Batch<EntityCreatedDomainEvent<PurchaseEntity>> notification,

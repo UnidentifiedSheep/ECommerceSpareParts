@@ -1,17 +1,15 @@
-using Enums;
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Application.Dtos.Purchase;
-using Main.Application.Interfaces.Services;
+using Enums;
+using Main.Entities.Purchase.Purchase;
 using Main.Modules.Balance.Abstractions;
-using Main.Application.Models.Storage;
-using Main.Entities.Purchase;
-using Main.Enums;
-using Main.Enums.Balances;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Models;
 
-namespace Main.Application.Handlers.Purchases.CreatePurchase;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.CreatePurchase;
 
 [AutoSave]
 [Transactional(
@@ -100,14 +98,14 @@ public class CreatePurchaseHandler(
 			cancellationToken);
 	}
 
-	private async Task<Purchase> CreatePurchase(
+	private async Task<Entities.Purchase.Purchase.Purchase> CreatePurchase(
 		CreatePurchaseCommand request,
 		Guid transactionId,
 		IReadOnlyList<NewPurchaseContentDto> purchaseContents,
 		IReadOnlyList<StoredLot> storageContents,
 		CancellationToken cancellationToken)
 	{
-		var purchase = Purchase.Create(
+		var purchase = Entities.Purchase.Purchase.Purchase.Create(
 			request.SupplierUserId,
 			request.SupplierOrganizationId,
 			request.CurrencyId,

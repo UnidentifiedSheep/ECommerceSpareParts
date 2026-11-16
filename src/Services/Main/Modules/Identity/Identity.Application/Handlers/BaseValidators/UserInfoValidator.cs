@@ -1,9 +1,9 @@
 using Application.Common.Extensions;
 using FluentValidation;
-using Main.Application.Dtos.Users;
 using Main.Entities;
+using Main.Modules.Identity.Application.Dtos.Users;
 
-namespace Main.Application.Handlers.BaseValidators;
+namespace Main.Modules.Identity.Application.Handlers.BaseValidators;
 
 public class UserInfoValidator : AbstractValidator<UserInfoDto>
 {

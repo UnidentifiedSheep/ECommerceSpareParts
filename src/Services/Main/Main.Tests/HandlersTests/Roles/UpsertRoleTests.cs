@@ -1,7 +1,7 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Handlers.Auth.UpsertRole;
 using Main.Entities.Auth;
+using Main.Modules.Identity.Application.Handlers.Auth.UpsertRole;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Auth;

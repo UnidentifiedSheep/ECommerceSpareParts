@@ -1,10 +1,10 @@
 using Persistence.Context;
 using Application.Common.Interfaces.Repositories;
 using Domain.CommonEntities.Job;
+using Main.Modules.Jobs.Persistence.Jobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Common;
-using Persistence.Common.Jobs;
 using Persistence.Extensions;
 
 namespace Main.Modules.Jobs.Persistence;

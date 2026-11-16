@@ -6,7 +6,7 @@ using Attributes;
 using CronExpressionDescriptor;
 using Domain.CommonEntities.Job;
 
-namespace Application.Common.Projections;
+namespace Main.Modules.Jobs.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
 public sealed class JobDtoProjectionProvider : ProjectionProviderBase<Job, JobDto>

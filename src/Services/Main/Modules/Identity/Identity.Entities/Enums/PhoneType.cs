@@ -1,4 +1,4 @@
-namespace Main.Enums;
+namespace Main.Entities.Enums;
 
 public enum PhoneType
 {

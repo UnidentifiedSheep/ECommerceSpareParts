@@ -1,4 +1,6 @@
-namespace Main.Application.Analytics.Analyzers.Markup;
+using Main.Modules.Analytics.Abstractions.Analyzers.Markup;
+
+namespace Main.Modules.Analytics.Application.Analyzers.Markup;
 
 public sealed class MarkupBucketBuilder
 {

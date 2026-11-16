@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cqrs;
-using Main.Application.Notifications;
+using Main.Modules.Notifications.Application.Notifications;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
 
-namespace Main.Application.Handlers.Notifications;
+namespace Main.Modules.Notifications.Application.Handlers.Notifications;
 
 public record SendNotificationCommand(Guid UserId, string Text) : ICommand<SendNotificationResult>;
 

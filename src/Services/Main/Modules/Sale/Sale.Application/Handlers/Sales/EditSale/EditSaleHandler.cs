@@ -1,23 +1,20 @@
-using Enums;
 using System.Data;
-using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Domain.Extensions;
-using Main.Application.Dtos.Sale;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
+using Enums;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Exceptions;
+using Main.Entities.Sale.Sale;
 using Main.Modules.Balance.Abstractions;
-using Main.Entities.Exceptions;
-using Main.Entities.Sale;
-using Main.Enums;
-using Main.Enums.Balances;
+using Main.Modules.Sale.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Interfaces.Persistence;
+using Main.Modules.Sale.Application.Interfaces.Services;
 using MediatR;
-using Microsoft.Extensions.Options;
 
-namespace Main.Application.Handlers.Sales.EditSale;
+namespace Main.Modules.Sale.Application.Handlers.Sales.EditSale;
 
 [AutoSave]
 [Transactional(
@@ -86,7 +83,7 @@ public class EditSaleHandler(
 		return Unit.Value;
 	}
 
-	private Task ReverseSaleTransaction(Sale sale, CancellationToken cancellationToken)
+	private Task ReverseSaleTransaction(Entities.Sale.Sale.Sale sale, CancellationToken cancellationToken)
 		=> transfers.ReverseAsync(sale.TransactionId, cancellationToken);
 
 	private Task<Guid> CreateSaleTransaction(
@@ -107,7 +104,7 @@ public class EditSaleHandler(
 			cancellationToken);
 
 	private async Task UpdateContents(
-		Sale sale,
+		Entities.Sale.Sale.Sale sale,
 		IReadOnlyList<EditSaleContentDto> contentDtos,
 		bool sellFromOtherStorages,
 		CancellationToken cancellationToken)
@@ -160,7 +157,7 @@ public class EditSaleHandler(
 		content.SetComment(dto.Comment);
 	}
 
-	private void RemoveContent(Sale sale, SaleContent content)
+	private void RemoveContent(Entities.Sale.Sale.Sale sale, SaleContent content)
 	{
 		sale.RemoveContent(content);
 		unitOfWork.Remove(content);

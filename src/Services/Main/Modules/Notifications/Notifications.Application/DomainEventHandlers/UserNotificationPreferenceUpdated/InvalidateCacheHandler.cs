@@ -1,9 +1,9 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
-using Main.Application.Services;
-using Main.Entities.DomainEvents.User;
+using Main.Entities.DomainEvents;
+using Main.Modules.Notifications.Application.Services;
 
-namespace Main.Application.DomainEventHandlers.User.UserNotificationPreferenceUpdated;
+namespace Main.Modules.Notifications.Application.DomainEventHandlers.UserNotificationPreferenceUpdated;
 
 public class InvalidateCacheHandler(IRecipientProvider recipientProvider)
 	: BatchableDomainEventHandler<UserNotificationPreferenceUpdatedDomainEvent>

@@ -1,8 +1,8 @@
 ﻿using Locan.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
 
-namespace Main.Application.NamedObjects.StorageContentExtractPolicies;
+namespace Main.Modules.Storage.Application.NamedObjects.StorageContentExtractPolicies;
 
 public class FifoStorageContentExtractPolicy : StorageContentExtractPolicyBase
 {

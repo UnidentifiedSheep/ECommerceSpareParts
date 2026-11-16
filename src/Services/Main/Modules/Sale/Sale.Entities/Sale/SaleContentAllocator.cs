@@ -1,4 +1,4 @@
-namespace Main.Entities.Sale;
+namespace Main.Entities.Sale.Sale;
 
 public sealed record AllocationLot(
 	int StorageContentId,

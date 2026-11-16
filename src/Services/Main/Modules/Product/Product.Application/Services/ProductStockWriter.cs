@@ -1,13 +1,12 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
-using Main.Entities.Storage;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Stock;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Product.Application.Interfaces.Persistence;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Product.Application.Services;
 
 public sealed class ProductStockWriter(
 	IProductRepository productRepository,
@@ -40,7 +39,7 @@ public sealed class ProductStockWriter(
 		{
 			var products = await productRepository.FindByIdsAsync(
 				missingProductIds,
-				Criteria<Product>.New().OrderByAsc(product => product.Id).ForUpdate().Build(),
+				Criteria<Entities.Product.Product.Product>.New().OrderByAsc(product => product.Id).ForUpdate().Build(),
 				cancellationToken);
 			missingProductIds.EnsureAllExists(
 				products.Keys,

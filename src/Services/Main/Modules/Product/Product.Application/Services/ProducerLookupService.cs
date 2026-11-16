@@ -1,7 +1,7 @@
-using Main.Application.Interfaces.Services;
+using Main.Modules.Product.Application.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Product.Application.Services;
 
 public sealed class ProducerLookupService(IServiceScopeFactory scopeFactory)
 	: IProducerLookupService, IDisposable

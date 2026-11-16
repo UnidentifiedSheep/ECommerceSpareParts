@@ -1,7 +1,8 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Entities.DomainEvents.Sale;
 using Main.Entities.Sale;
+using Main.Entities.Sale.DomainEvents;
+using Main.Entities.Sale.Sale;
 
 namespace Tests.Domain.Sale;
 
@@ -196,9 +197,9 @@ public class SaleContentTests
 		content.FlushDomainEvents().Should().BeEmpty();
 	}
 
-	private static Main.Entities.Sale.Sale AttachToSale(SaleContent content)
+	private static Main.Entities.Sale.Sale.Sale AttachToSale(SaleContent content)
 	{
-		var sale = Main.Entities.Sale.Sale.Create(
+		var sale = Main.Entities.Sale.Sale.Sale.Create(
 			Guid.NewGuid(),
 			Guid.NewGuid(),
 			Guid.NewGuid(),

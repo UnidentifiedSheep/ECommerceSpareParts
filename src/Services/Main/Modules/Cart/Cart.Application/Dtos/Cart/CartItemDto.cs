@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Cart;
+namespace Main.Modules.Cart.Application.Dtos.Cart;
 
 public record CartItemDto
 {

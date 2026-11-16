@@ -1,5 +1,6 @@
 using Main.Modules.Product.Abstractions;
 using Application.Common.Extensions;
+using Main.Modules.Product.Abstractions.Events;
 using MassTransit;
 using MediatR;
 using Pricing.Application.Handlers.Pricing;

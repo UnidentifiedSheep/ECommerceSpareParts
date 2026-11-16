@@ -1,7 +1,7 @@
-﻿using FluentValidation;
-using Application.Common.Validators;
+﻿using Application.Common.Validators;
+using FluentValidation;
 
-namespace Main.Application.Handlers.Cart.AddToCart;
+namespace Main.Modules.Cart.Application.Handlers.Cart.AddToCart;
 
 public class AddToCartValidation : AbstractValidator<AddToCartCommand>
 {

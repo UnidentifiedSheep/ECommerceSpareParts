@@ -2,11 +2,11 @@ using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
-using Main.Entities.DomainEvents.Product;
-using Main.Entities.Product.ValueObjects;
-using Main.Entities.Storage;
+using Main.Entities.Product.DomainEvents.Product;
+using Main.Entities.Product.Product.ValueObjects;
+using Main.Entities.Product.Stock;
 
-namespace Main.Entities.Product;
+namespace Main.Entities.Product.Product;
 
 public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>, IVersionable<uint>
 {

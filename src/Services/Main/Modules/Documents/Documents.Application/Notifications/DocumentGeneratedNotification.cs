@@ -5,7 +5,7 @@ using Locan.Core.Interfaces.Localizers;
 using Main.Entities;
 using Notification.Core.Interfaces.Notification;
 
-namespace Main.Application.Notifications;
+namespace Main.Modules.Documents.Application.Notifications;
 
 public sealed class DocumentGeneratedNotification(DocumentGeneratedNotificationData model)
 	: INotification<DocumentGeneratedNotificationData>, ITextNotification

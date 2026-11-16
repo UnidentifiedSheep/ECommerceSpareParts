@@ -1,8 +1,7 @@
-using Main.Entities.Product;
 using Enums;
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Product.Exceptions;
 
 public class CannotDeleteProducerWithArticlesException()
 	: LocalizedBadRequestException(ProducerWithArticlesCannotBeDeletedMessage.Instance);

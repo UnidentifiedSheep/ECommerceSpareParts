@@ -2,7 +2,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.BaseValidators;
+namespace Main.Modules.Identity.Application.Handlers.BaseValidators;
 
 public class PasswordValidator : AbstractValidator<string>
 {

@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Notifications.SeeNotifications;
+namespace Main.Modules.Notifications.Application.Handlers.Notifications.SeeNotifications;
 
 public class SeeNotificationsValidation : AbstractValidator<SeeNotificationsCommand>
 {

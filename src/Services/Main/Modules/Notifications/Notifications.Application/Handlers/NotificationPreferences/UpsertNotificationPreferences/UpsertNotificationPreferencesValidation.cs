@@ -3,7 +3,7 @@ using FluentValidation;
 using Main.Entities;
 using Notification.Core.Recipients;
 
-namespace Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
+namespace Main.Modules.Notifications.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 
 public class UpsertNotificationPreferencesValidation : AbstractValidator<UpsertNotificationPreferencesCommand>
 {

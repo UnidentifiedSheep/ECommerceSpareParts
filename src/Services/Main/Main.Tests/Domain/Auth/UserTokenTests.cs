@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Main.Entities.Auth;
-using Main.Enums;
+using Main.Entities.Enums;
 
 namespace Tests.Domain.Auth;
 

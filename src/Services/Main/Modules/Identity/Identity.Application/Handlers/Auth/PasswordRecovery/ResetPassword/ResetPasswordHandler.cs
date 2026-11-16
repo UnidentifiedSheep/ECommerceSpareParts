@@ -1,16 +1,16 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services.PayloadProvider;
-using Main.Application.Models.Auth;
+using Main.Entities.Enums.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Enums.Auth;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
+using Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
+using Main.Modules.Identity.Application.Models.Auth;
 using MediatR;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
+namespace Main.Modules.Identity.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
 
 [Transactional]
 [AutoSave]

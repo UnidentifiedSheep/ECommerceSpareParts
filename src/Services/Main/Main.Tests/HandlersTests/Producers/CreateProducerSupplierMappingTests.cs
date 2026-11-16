@@ -1,9 +1,10 @@
 using Enums;
 using FluentAssertions;
-using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
 using Main.Entities.Exceptions;
-using Main.Entities.Producer;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
+using Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;

@@ -1,6 +1,5 @@
 using BulkValidation.Core.Configuration;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 
 namespace Main.Modules.Currency.Application.Configs;
 

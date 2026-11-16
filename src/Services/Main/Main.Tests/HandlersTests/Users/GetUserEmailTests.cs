@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Handlers.Users.GetUserEmail;
 using Main.Entities.Exceptions;
+using Main.Modules.Identity.Application.Handlers.Users.GetUserEmail;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 

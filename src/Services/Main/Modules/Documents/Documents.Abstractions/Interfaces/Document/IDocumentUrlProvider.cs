@@ -1,4 +1,4 @@
-namespace Main.Application.Interfaces.Services.Document;
+namespace Main.Application.Document.Interfaces.Document;
 
 public interface IDocumentUrlProvider
 {

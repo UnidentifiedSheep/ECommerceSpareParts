@@ -1,10 +1,11 @@
 using Bogus;
 using Main.Entities.Sale;
+using Main.Entities.Sale.Sale;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Sale;
 
-public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(faker)
+public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale.Sale>(faker)
 {
 	private readonly List<SaleContent> _contents = [];
 
@@ -73,10 +74,10 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
 		return this;
 	}
 
-	public override Main.Entities.Sale.Sale Build()
+	public override Main.Entities.Sale.Sale.Sale Build()
 	{
 		var userId = UserId ?? Guid.NewGuid();
-		var sale = Main.Entities.Sale.Sale.Create(
+		var sale = Main.Entities.Sale.Sale.Sale.Create(
 			userId,
 			OrganizationId ?? userId,
 			TransactionId ?? Guid.NewGuid(),

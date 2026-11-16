@@ -7,7 +7,7 @@ using Application.Common.Interfaces.Repositories;
 using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Common.Handlers.JobSchedules.GetSchedule;
+namespace Main.Modules.Jobs.Application.Handlers.JobSchedules.GetSchedule;
 
 public record GetScheduleByIdQuery(Guid ScheduleId) : IQuery<GetScheduleByIdResult>;
 

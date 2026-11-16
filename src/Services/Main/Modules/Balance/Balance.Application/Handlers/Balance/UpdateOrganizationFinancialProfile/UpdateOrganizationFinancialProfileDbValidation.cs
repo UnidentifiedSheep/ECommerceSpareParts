@@ -2,7 +2,7 @@ using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Modules.Organization.Abstractions;
 
-namespace Main.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
+namespace Main.Modules.Balance.Application.Handlers.Balance.UpdateOrganizationFinancialProfile;
 
 public class UpdateOrganizationFinancialProfileDbValidation(IOrganizationChecks organizationChecks)
 	: AbstractDbValidation<UpdateOrganizationFinancialProfileCommand>

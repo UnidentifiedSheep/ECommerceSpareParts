@@ -1,5 +1,6 @@
 using Api.Common.HostedServices;
 using FluentAssertions;
+using Main.Modules.Jobs.Application.HostedServices;
 
 namespace Tests.Jobs.Lrt;
 

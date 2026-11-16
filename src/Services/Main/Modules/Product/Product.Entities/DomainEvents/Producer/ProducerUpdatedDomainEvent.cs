@@ -1,6 +1,6 @@
 using Domain.Interfaces.Events;
 
-namespace Main.Entities.DomainEvents.Producer;
+namespace Main.Entities.Product.DomainEvents.Producer;
 
 public record ProducerUpdatedDomainEvent(int ProducerId) : IKeyedDomainEvent, IBatchableDomainEvent
 {

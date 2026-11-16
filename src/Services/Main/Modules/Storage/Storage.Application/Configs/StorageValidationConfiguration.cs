@@ -1,8 +1,8 @@
 using BulkValidation.Core.Configuration;
-using Main.Entities.Exceptions;
 using Main.Entities.Storage;
+using Main.Entities.Storage.Exceptions;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Storage.Application.Configs;
 
 public static class StorageValidationConfiguration
 {

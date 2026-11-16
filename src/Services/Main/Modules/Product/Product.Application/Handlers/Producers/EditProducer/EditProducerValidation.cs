@@ -1,10 +1,9 @@
 using Application.Common.Extensions;
 using FluentValidation;
-using Main.Application.Handlers.Producers.BaseValidators;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Modules.Product.Application.Handlers.Producers.BaseValidators;
 
-namespace Main.Application.Handlers.Producers.EditProducer;
+namespace Main.Modules.Product.Application.Handlers.Producers.EditProducer;
 
 public class EditProducerValidation : AbstractValidator<EditProducerCommand>
 {

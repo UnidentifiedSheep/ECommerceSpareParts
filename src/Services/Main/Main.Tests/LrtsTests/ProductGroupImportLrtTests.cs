@@ -1,7 +1,8 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.ProductGroupImport;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.ProductGroupImport;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;

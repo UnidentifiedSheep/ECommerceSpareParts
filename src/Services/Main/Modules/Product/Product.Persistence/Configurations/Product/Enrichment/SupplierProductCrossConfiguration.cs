@@ -1,8 +1,8 @@
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Product.Enrichment;
+namespace Main.Modules.Product.Persistence.Configurations.Product.Enrichment;
 
 public class SupplierProductCrossConfiguration : IEntityTypeConfiguration<SupplierProductCross>
 {

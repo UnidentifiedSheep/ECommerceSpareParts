@@ -1,5 +1,5 @@
 using Application.Common.Interfaces.Domains;
 
-namespace Application.Common.Domains;
+namespace Main.Modules.Jobs.Application.Domains;
 
 public sealed class JobsDomain : ICommonDomain;

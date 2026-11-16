@@ -1,5 +1,5 @@
+using Main.Entities.Enums;
 using Main.Entities.User;
-using Main.Enums;
 using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.User;

@@ -1,14 +1,14 @@
 using Application.Common.Interfaces.Persistence;
 using Attributes;
+using Main.Entities.Notification;
+using Main.Modules.Notifications.Application.Delivery.Channels;
+using Main.Modules.Notifications.Application.Delivery.Interfaces;
+using Main.Modules.Notifications.Application.Delivery.Renderers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Notification.Channels;
 using Notification.Core;
-using Notification.Core.Entities;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Recipients;
-using Notification.Interfaces;
-using Notification.Renderers;
 using Notifications.Tests.TestSupport;
 
 namespace Notifications.Tests;

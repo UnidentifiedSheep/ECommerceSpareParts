@@ -1,5 +1,5 @@
-using Notification.Core.Enums;
-using NotificationEntity = Notification.Core.Entities.Notification;
+using Main.Entities.Notification;
+using NotificationEntity = Main.Entities.Notification.Notification;
 
 namespace Notifications.Tests.Core;
 

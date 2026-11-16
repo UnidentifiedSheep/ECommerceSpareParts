@@ -2,21 +2,21 @@
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Cache.Extensions;
-using Main.Application.Dtos.Product;
-using Main.Application.Extensions.QueryExtensions;
-using Main.Application.Products.Interfaces;
-using Main.Application.Static;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Extensions.QueryExtensions;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Static;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Cache;
+namespace Main.Modules.Product.Application.Cache;
 
 public class ProductProvider(
 	ICache rawCache,
 	IReadRepository<ProductCross, (int, int)> crossesReadRepository,
-	IReadRepository<Product, int> productReadRepository,
-	IProjectionProvider<Product, ProductDto> productProjection) : IProductProvider
+	IReadRepository<Entities.Product.Product.Product, int> productReadRepository,
+	IProjectionProvider<Entities.Product.Product.Product, ProductDto> productProjection) : IProductProvider
 {
 	public async Task<ProductDto> GetProductOrSetAsync(
 		int productId,

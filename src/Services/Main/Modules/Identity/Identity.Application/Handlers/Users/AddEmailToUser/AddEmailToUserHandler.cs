@@ -2,17 +2,17 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
-using Main.Application.Extensions;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Models.Options;
+using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
-using Main.Enums;
+using Main.Modules.Identity.Application.Extensions;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
+using Main.Modules.Identity.Application.Models.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Handlers.Users.AddEmailToUser;
+namespace Main.Modules.Identity.Application.Handlers.Users.AddEmailToUser;
 
 [Transactional]
 [AutoSave]

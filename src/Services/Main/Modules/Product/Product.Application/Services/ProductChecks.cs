@@ -2,7 +2,7 @@ using BulkValidation.Core.Interfaces;
 using Main.Entities.Product;
 using Main.Modules.Product.Abstractions;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Product.Application.Services;
 
 public sealed class ProductChecks : IProductChecks
 {

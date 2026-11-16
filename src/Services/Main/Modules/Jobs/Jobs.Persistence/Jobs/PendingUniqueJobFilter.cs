@@ -3,7 +3,7 @@ using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Persistence.Common.Jobs;
+namespace Main.Modules.Jobs.Persistence.Jobs;
 
 internal sealed class PendingUniqueJobFilter<TContext>(TContext context) where TContext : DbContext
 {

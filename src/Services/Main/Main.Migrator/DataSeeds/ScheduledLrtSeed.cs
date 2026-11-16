@@ -1,11 +1,14 @@
 using System.Text.Json;
 using Abstractions;
+using Application.Common;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.LRT;
 using Cronos;
 using Domain.CommonEntities.Job;
-using Main.Application.Lrts;
-using Main.Application.Lrts.RemoveExpiredDocuments;
+using Main.Modules.Currency.Application.Lrts;
+using Main.Modules.Documents.Application.Lrts.RemoveExpiredDocuments;
+using Main.Modules.Identity.Application.Lrts;
 using Main.Modules.Jobs.Application.LRT.RunServiceTask;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;

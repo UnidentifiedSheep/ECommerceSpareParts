@@ -1,10 +1,11 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
 using Main.Entities;
 using Main.Entities.Product;
-using Main.Enums.Products;
+using Main.Entities.Product.Enums.Products;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Commands.MakeLinkageBetweenArticles;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

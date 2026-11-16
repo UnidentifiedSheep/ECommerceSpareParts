@@ -4,7 +4,7 @@ using Enums;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Balance.GetTransactions;
+namespace Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
 
 public class GetTransactionsValidation : AbstractValidator<GetTransactionsQuery>
 {

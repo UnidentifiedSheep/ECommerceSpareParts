@@ -1,6 +1,6 @@
-using Application.Common.Models.Currency;
+using Main.Modules.Currency.Abstractions.Models;
 
-namespace Application.Common.Interfaces.Currency;
+namespace Main.Modules.Currency.Abstractions.Interfaces;
 
 public interface ICurrencyConverter
 {

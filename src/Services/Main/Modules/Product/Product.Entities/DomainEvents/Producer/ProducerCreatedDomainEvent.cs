@@ -1,5 +1,5 @@
 using Domain.Interfaces.Events;
 
-namespace Main.Entities.DomainEvents.Producer;
+namespace Main.Entities.Product.DomainEvents.Producer;
 
-public record ProducerCreatedDomainEvent(Entities.Producer.Producer Producer) : IBatchableDomainEvent;
+public record ProducerCreatedDomainEvent(Entities.Product.Producer.Producer Producer) : IBatchableDomainEvent;

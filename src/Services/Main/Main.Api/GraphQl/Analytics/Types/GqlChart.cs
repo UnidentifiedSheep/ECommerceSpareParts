@@ -4,8 +4,8 @@ using GraphQL.Common.Attributes;
 using GraphQL.Common.Types.Schema;
 using HotChocolate;
 using HotChocolate.Types;
-using Main.Application.Analytics.Dtos.Charts;
-using Main.Application.Analytics.Queries;
+using Main.Modules.Analytics.Application.Dtos.Charts;
+using Main.Modules.Analytics.Application.Queries;
 using MediatR;
 
 namespace Main.Api.GraphQl.Analytics.Types;

@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Producer;
+namespace Main.Modules.Product.Persistence.Configurations.Producer;
 
-public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.Producer>
+public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Product.Producer.Producer>
 {
-	public void Configure(EntityTypeBuilder<Entities.Producer.Producer> builder)
+	public void Configure(EntityTypeBuilder<Entities.Product.Producer.Producer> builder)
 	{
 		builder.ToTable("producer", "public");
 

@@ -1,10 +1,10 @@
 using FluentAssertions;
-using Main.Application.Handlers.Auth.EmailVerification;
-using Main.Application.Interfaces.Services.PayloadProvider;
-using Main.Application.Models.Auth;
+using Main.Entities.Enums.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Enums.Auth;
+using Main.Modules.Identity.Application.Handlers.Auth.EmailVerification;
+using Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
+using Main.Modules.Identity.Application.Models.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;

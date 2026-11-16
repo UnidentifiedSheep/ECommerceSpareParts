@@ -1,12 +1,11 @@
 using Application.Common.Extensions;
-using Main.Entities.Sale;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Main.Application.Handlers.Sales.BaseValidators;
-using Main.Entities;
+using Main.Entities.Sale;
+using Main.Modules.Sale.Application.Handlers.Sales.BaseValidators;
 
-namespace Main.Application.Handlers.Sales.EditSale;
+namespace Main.Modules.Sale.Application.Handlers.Sales.EditSale;
 
 public class EditSaleValidation : AbstractValidator<EditSaleCommand>
 {

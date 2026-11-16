@@ -1,7 +1,7 @@
 using Application.Common.Host;
-using Main.Application.Configs;
-using Main.Application.Services.ProductDeletion;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Purchase.Application.Configs;
+using Main.Modules.Purchase.Application.Services.ProductDeletion;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Main.Modules.Purchase.Application;

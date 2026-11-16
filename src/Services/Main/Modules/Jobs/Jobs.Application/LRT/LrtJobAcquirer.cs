@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Lrt;
 using Domain.CommonEntities.Job;
 
-namespace Application.Common.LRT;
+namespace Main.Modules.Jobs.Application.LRT;
 
 public sealed record AcquiredJob(Job Job, ILrtQuotaLease Lease);
 

@@ -3,9 +3,9 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Sale;
 using Main.Api.GraphQl.Types.Sale;
-using Main.Application.Handlers.Sales;
-using Main.Application.Handlers.Sales.CreateSale;
-using Main.Application.Handlers.Sales.EditSale;
+using Main.Modules.Sale.Application.Handlers.Sales;
+using Main.Modules.Sale.Application.Handlers.Sales.CreateSale;
+using Main.Modules.Sale.Application.Handlers.Sales.EditSale;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

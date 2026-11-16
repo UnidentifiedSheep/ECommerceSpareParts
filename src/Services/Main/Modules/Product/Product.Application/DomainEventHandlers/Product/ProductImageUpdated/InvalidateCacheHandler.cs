@@ -1,9 +1,9 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
-using Main.Application.Interfaces.Cache;
-using Main.Entities.DomainEvents.Product;
+using Main.Entities.Product.DomainEvents.Product;
+using Main.Modules.Product.Application.Interfaces.Cache;
 
-namespace Main.Application.DomainEventHandlers.Product.ProductImageUpdated;
+namespace Main.Modules.Product.Application.DomainEventHandlers.Product.ProductImageUpdated;
 
 public class InvalidateCacheHandler(IProductCacheInvalidator productCacheInvalidator)
 	: BatchableDomainEventHandler<ProductImageUpdatedDomainEvent>

@@ -1,9 +1,8 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Storage;
 
-namespace Main.Application.Handlers.Storages.CreateStorage;
+namespace Main.Modules.Storage.Application.Handlers.Storages.CreateStorage;
 
 public class CreateStorageDbValidation : AbstractDbValidation<CreateStorageCommand>
 {

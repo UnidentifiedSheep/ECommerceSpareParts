@@ -1,5 +1,4 @@
 using FluentValidation.TestHelper;
-using Main.Application.Handlers.Cart.ChangeCartItemCount;
 using Main.Entities;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +8,14 @@ using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Domain;
+using Main.Entities.Cart.Exceptions;
+using Main.Modules.Cart.Application.Handlers.Cart.ChangeCartItemCount;
 
 namespace Tests.HandlersTests.Cart;
 
 public class ChangeCartItemCountTests : IntegrationTest
 {
-	private Main.Entities.Cart.Cart _cartItem = null!;
+	private Main.Entities.Cart.Cart.Cart _cartItem = null!;
 
 	public ChangeCartItemCountTests(CombinedContainerFixture fixture) : base(fixture)
 	{
@@ -43,7 +44,7 @@ public class ChangeCartItemCountTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var cartItem = await Context.Set<Main.Entities.Cart.Cart>()
+		var cartItem = await Context.Set<Main.Entities.Cart.Cart.Cart>()
 			.FirstOrDefaultAsync(
 				x => x.UserId == command.UserId && x.ProductId == command.ProductId,
 				CancellationToken);

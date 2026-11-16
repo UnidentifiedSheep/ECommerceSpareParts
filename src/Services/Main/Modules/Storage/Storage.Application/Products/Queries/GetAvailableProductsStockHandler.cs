@@ -1,11 +1,11 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
+using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries;
+namespace Main.Modules.Storage.Application.Products.Queries;
 
 public record GetAvailableProductsStockQuery : IQuery<GetAvailableProductsStockResult>
 {

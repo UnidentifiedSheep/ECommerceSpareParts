@@ -1,12 +1,12 @@
+using Application.Common;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Locan.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Product;
 using Microsoft.Extensions.Logging;
 using S3.Core.Interfaces;
 
-namespace Main.Application.Lrts.DeleteProductImages;
+namespace Main.Modules.Product.Application.Lrts.DeleteProductImages;
 
 public class DeleteProductImagesLrt(
 	IApplicationTransactionFactory transactions,

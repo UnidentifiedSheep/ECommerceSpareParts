@@ -1,9 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Persistence.Listening;
 
-namespace Api.Common.HostedServices;
+namespace Main.Modules.Jobs.Application.HostedServices;
 
 public class JobNotificationListenerHostedService(
 	IChannelListenerFactory listeners,

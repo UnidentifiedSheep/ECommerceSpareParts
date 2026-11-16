@@ -1,19 +1,19 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Enums.Units;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Lrts.Base;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.Base;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Lrts.ProductWeightImport;
+namespace Main.Modules.Product.Application.Lrts.ProductWeightImport;
 
 public class ProductWeightImportLrt(
 	IS3Service s3Service,
@@ -84,10 +84,10 @@ public class ProductWeightImportLrt(
 			async (context, cancellationToken) =>
 			{
 				var products = await context.Repositories
-					.Get<Product, int>()
+					.Get<Entities.Product.Product.Product, int>()
 					.FindByIdsAsync(
 						productIds,
-						Criteria<Product>.New()
+						Criteria<Entities.Product.Product.Product>.New()
 							.Include(x => x.ProductWeight)
 							.Track()
 							.Build(),

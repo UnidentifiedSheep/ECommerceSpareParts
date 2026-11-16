@@ -1,13 +1,13 @@
-using Enums;
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
+using Enums;
 using Exceptions;
-using Main.Enums.Balances;
+using Main.Entities.Balance.Enums.Balances;
 
-namespace Main.Entities.Balance;
+namespace Main.Entities.Balance.Balance;
 
 public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Transaction, Guid>
 {

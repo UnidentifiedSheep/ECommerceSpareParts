@@ -1,8 +1,8 @@
-﻿using Main.Entities.Balance;
+﻿using Main.Entities.Balance.Balance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Balance;
+namespace Main.Modules.Balance.Persistence.Configurations.Balance;
 
 public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 {

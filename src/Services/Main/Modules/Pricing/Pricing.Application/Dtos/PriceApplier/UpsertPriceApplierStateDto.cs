@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Application.Dtos.PriceApplier;
 

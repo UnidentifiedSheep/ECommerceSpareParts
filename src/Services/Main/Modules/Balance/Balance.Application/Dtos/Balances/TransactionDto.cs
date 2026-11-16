@@ -1,8 +1,8 @@
-using Enums;
 using System.Text.Json.Serialization;
-using Main.Enums.Balances;
+using Enums;
+using Main.Entities.Balance.Enums.Balances;
 
-namespace Main.Application.Dtos.Balances;
+namespace Main.Modules.Balance.Application.Dtos.Balances;
 
 public record TransactionDto
 {

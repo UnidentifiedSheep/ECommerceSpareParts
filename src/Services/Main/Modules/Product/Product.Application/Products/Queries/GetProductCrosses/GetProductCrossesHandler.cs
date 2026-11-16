@@ -3,13 +3,12 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Interfaces;
-using Main.Entities.Product;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.Product.ValueObjects;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Products.Queries.GetProductCrosses;
+namespace Main.Modules.Product.Application.Products.Queries.GetProductCrosses;
 
 public sealed record GetProductCrossesQuery(
 	int ProductId,
@@ -21,7 +20,7 @@ public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses);
 
 public class GetProductCrossesHandler(
 	IProductProvider productProvider,
-	IReadRepository<Product, int> productsRepository)
+	IReadRepository<Entities.Product.Product.Product, int> productsRepository)
 	: IQueryHandler<GetProductCrossesQuery, GetProductCrossesResult>
 {
 	public async Task<GetProductCrossesResult> Handle(

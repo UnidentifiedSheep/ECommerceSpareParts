@@ -2,22 +2,21 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Storage;
-using Main.Entities.Exceptions;
-using Main.Entities.Storage;
+using Main.Entities.Storage.Exceptions;
+using Main.Modules.Storage.Application.Dtos.Storage;
 using MediatR;
 
-namespace Main.Application.Handlers.Storages.EditStorage;
+namespace Main.Modules.Storage.Application.Handlers.Storages.EditStorage;
 
 [AutoSave]
 [Transactional]
 public record EditStorageCommand(string StorageCode, PatchStorageDto EditStorage) : ICommand;
 
-public class EditStorageHandler(IRepository<Storage, string> repository) : ICommandHandler<EditStorageCommand>
+public class EditStorageHandler(IRepository<Entities.Storage.Storage.Storage, string> repository) : ICommandHandler<EditStorageCommand>
 {
 	public async Task<Unit> Handle(EditStorageCommand request, CancellationToken cancellationToken)
 	{
-		var criteria = Criteria<Storage>
+		var criteria = Criteria<Entities.Storage.Storage.Storage>
 			.New()
 			.Where(x => x.Code == request.StorageCode)
 			.Track()

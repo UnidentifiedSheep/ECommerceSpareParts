@@ -1,12 +1,11 @@
 using Application.Common.Extensions;
-using Main.Entities.Purchase;
 using Application.Common.Services;
 using Application.Common.Validators;
 using FluentValidation;
-using Main.Application.Handlers.Purchases.BaseValidators;
-using Main.Entities;
+using Main.Entities.Purchase;
+using Main.Modules.Purchase.Application.Handlers.Purchases.BaseValidators;
 
-namespace Main.Application.Handlers.Purchases.EditPurchase;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.EditPurchase;
 
 public class EditPurchaseValidation : AbstractValidator<EditPurchaseCommand>
 {

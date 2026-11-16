@@ -1,6 +1,6 @@
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 
-namespace Application.Common.LRT;
+namespace Application.Common;
 
 public record NoneInputState : IInputState
 {

@@ -3,14 +3,14 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Extensions;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Role = Enums.Role;
 
-namespace Main.Application.Handlers.Users.SearchUsers;
+namespace Main.Modules.Identity.Application.Handlers.Users.SearchUsers;
 
 public sealed record SearchUsersQuery(
 	string SearchTerm,

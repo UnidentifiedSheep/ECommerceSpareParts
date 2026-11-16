@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions;
+namespace Main.Entities.Order.Exceptions;
 
 public sealed class OrderNotFoundException(Guid id) : LocalizedNotFoundException(
 	OrderNotFoundMessage.Instance,

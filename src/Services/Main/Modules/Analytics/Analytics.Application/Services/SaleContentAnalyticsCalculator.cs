@@ -1,8 +1,8 @@
-using Application.Common.Interfaces.Currency;
-using Main.Application.Analytics.Models;
+using Main.Modules.Analytics.Application.Models;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Main.Modules.Sale.Abstractions;
 
-namespace Main.Application.Analytics.Services;
+namespace Main.Modules.Analytics.Application.Services;
 
 public sealed class SaleContentAnalyticsCalculator(ICurrencyConverter converter)
 {

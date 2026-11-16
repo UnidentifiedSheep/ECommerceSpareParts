@@ -1,16 +1,16 @@
-using Application.Common.Interfaces.Validators;
 using Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Locan.Core.Interfaces;
-using Main.Application.Handlers.BaseValidators;
-using Main.Application.Models.Options;
 using Main.Entities;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Handlers.BaseValidators;
+using Main.Modules.Identity.Application.Models.Options;
+using Main.Modules.Identity.Application.Validators;
 using Microsoft.Extensions.Options;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Users.CreateUser;
+namespace Main.Modules.Identity.Application.Handlers.Users.CreateUser;
 
 public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 {

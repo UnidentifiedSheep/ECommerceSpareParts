@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Users;
+namespace Main.Modules.Identity.Application.Dtos.Users;
 
 public record UserInfoDto
 {

@@ -1,5 +1,5 @@
 using Pricing.Application.Dtos.PriceApplier;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Application.Interfaces.Pricing.PriceApplier;
 

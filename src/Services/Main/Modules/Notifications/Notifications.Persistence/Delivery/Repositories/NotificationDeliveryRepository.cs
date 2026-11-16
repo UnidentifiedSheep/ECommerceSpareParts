@@ -1,10 +1,9 @@
+using Main.Entities.Notification;
 using Microsoft.EntityFrameworkCore;
-using Notification.Core.Entities;
-using Notification.Core.Enums;
 using Notification.Core.Interfaces.Repositories;
 using Persistence.Interfaces;
 
-namespace Notification.Persistence.Repositories;
+namespace Main.Modules.Notifications.Persistence.Delivery.Repositories;
 
 public class NotificationDeliveryRepository<TContext>(
 	TContext context,

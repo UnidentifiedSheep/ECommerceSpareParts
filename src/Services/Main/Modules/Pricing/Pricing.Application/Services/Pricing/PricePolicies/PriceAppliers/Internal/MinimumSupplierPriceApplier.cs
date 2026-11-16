@@ -1,5 +1,5 @@
-using Application.Common.Interfaces.Currency;
 using Locan.Core.Interfaces;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Pricing;
 using Pricing.Entities;

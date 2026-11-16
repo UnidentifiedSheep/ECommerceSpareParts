@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Cqrs;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Analytics.Charts;
-using Main.Application.Analytics.Dtos.Charts;
+using Main.Modules.Analytics.Abstractions.Charts;
+using Main.Modules.Analytics.Application.Dtos.Charts;
 using NamedObject.Core.Interfaces;
 
-namespace Main.Application.Analytics.Queries;
+namespace Main.Modules.Analytics.Application.Queries;
 
 public sealed record GetChartsQuery : IQuery<GetChartsResult>;
 

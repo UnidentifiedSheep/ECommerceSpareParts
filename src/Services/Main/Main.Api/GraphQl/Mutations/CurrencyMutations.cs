@@ -3,9 +3,9 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Currency;
-using Main.Application.Handlers.Currencies;
-using Main.Application.Handlers.Currencies.CreateCurrency;
-using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
+using Main.Modules.Currency.Application.Handlers.Currencies;
+using Main.Modules.Currency.Application.Handlers.Currencies.CreateCurrency;
+using Main.Modules.Currency.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

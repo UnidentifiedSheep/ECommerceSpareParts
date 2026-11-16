@@ -1,22 +1,21 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Models.Options.S3;
 using Attributes;
 using CsvHelper.Configuration.Attributes;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services;
-using Main.Application.Lrts.Base;
-using Main.Application.Models.Producer;
-using Main.Application.Products.Interfaces;
-using Main.Entities;
 using Main.Entities.Product;
-using Main.Enums;
+using Main.Entities.Product.Enums;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Interfaces.Services;
+using Main.Modules.Product.Application.Lrts.Base;
+using Main.Modules.Product.Application.Models.Producer;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 
-namespace Main.Application.Lrts.ProductImport;
+namespace Main.Modules.Product.Application.Lrts.ProductImport;
 
 public class ProductImportLrt(
 	IS3Service s3Service,
@@ -25,7 +24,7 @@ public class ProductImportLrt(
 	ILogger<ProductImportLrt> logger,
 	IContextualLocalizer stringLocalizer)
 	: CsvImportLrtBase<ProductImportInputState, ProductImportState, ProductImportLrt.ProductCsvDto,
-		Product>(
+		Entities.Product.Product.Product>(
 		bucketsOptions,
 		transactionService,
 		logger,
@@ -57,7 +56,7 @@ public class ProductImportLrt(
 		ProductCsvDto row,
 		ProductImportState state,
 		List<CsvImportError> errors,
-		out Product item)
+		out Entities.Product.Product.Product item)
 	{
 		item = null!;
 		try
@@ -73,7 +72,7 @@ public class ProductImportLrt(
 				return false;
 			}
 
-			item = Product.Create(
+			item = Entities.Product.Product.Product.Create(
 				row.Sku,
 				row.Name,
 				producerId.Value,
@@ -91,7 +90,7 @@ public class ProductImportLrt(
 	}
 
 	protected override Task SaveBatchAsync(
-		IReadOnlyList<(int idx, Product item)> products,
+		IReadOnlyList<(int idx, Entities.Product.Product.Product item)> products,
 		ProductImportState state,
 		CsvImportCheckpoint checkpoint,
 		List<CsvImportError> errors)
@@ -105,7 +104,7 @@ public class ProductImportLrt(
 			CancellationToken);
 
 	protected override async Task ProcessBatch(
-		IReadOnlyList<(int idx, Product item)> products,
+		IReadOnlyList<(int idx, Entities.Product.Product.Product item)> products,
 		ProductImportState state,
 		List<CsvImportError> errors)
 	{

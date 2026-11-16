@@ -2,11 +2,10 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Purchase;
-using Main.Entities.Purchase;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Purchases;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases;
 
 public sealed record GetPurchasesByIdsQuery : IQuery<GetPurchasesByIdsResult>
 {
@@ -20,8 +19,8 @@ public sealed record GetPurchasesByIdsQuery : IQuery<GetPurchasesByIdsResult>
 public sealed record GetPurchasesByIdsResult(IReadOnlyDictionary<Guid, PurchaseDto> Purchases);
 
 public sealed class GetPurchasesByIdsHandler(
-	IReadRepository<Purchase, Guid> repository,
-	IProjectionProvider<Purchase, PurchaseDto> projection)
+	IReadRepository<Entities.Purchase.Purchase.Purchase, Guid> repository,
+	IProjectionProvider<Entities.Purchase.Purchase.Purchase, PurchaseDto> projection)
 	: IQueryHandler<GetPurchasesByIdsQuery, GetPurchasesByIdsResult>
 {
 	public async Task<GetPurchasesByIdsResult> Handle(

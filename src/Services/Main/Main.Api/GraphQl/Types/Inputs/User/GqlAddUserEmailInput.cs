@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Enums;
+using Main.Entities.Enums;
 
 namespace Main.Api.GraphQl.Types.Inputs.User;
 

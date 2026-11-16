@@ -1,8 +1,8 @@
 using BulkValidation.Core.Configuration;
-using Main.Entities.Exceptions;
 using Main.Entities.Product;
+using Main.Entities.Product.Exceptions;
 
-namespace Main.Application.Configs;
+namespace Main.Modules.Product.Application.Configs;
 
 public static class ProductValidationConfiguration
 {

@@ -1,10 +1,9 @@
 using Application.Common.Abstractions;
-using Main.Entities.Organization;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
-using Main.Modules.Identity.Abstractions;
+using Main.Entities.Organization;
+using Main.Modules.Identity.Abstractions.Interfaces;
 
-namespace Main.Application.Handlers.Organizations.AddOrganizationMember;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.AddOrganizationMember;
 
 public class AddOrganizationMemberDbValidation(IUserChecks userChecks)
 	: AbstractDbValidation<AddOrganizationMemberCommand>

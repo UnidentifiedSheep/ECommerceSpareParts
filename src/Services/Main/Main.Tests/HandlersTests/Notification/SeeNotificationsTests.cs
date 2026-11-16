@@ -1,9 +1,9 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Handlers.Notifications.SeeNotifications;
 using Main.Entities;
+using Main.Entities.Notification;
+using Main.Modules.Notifications.Application.Handlers.Notifications.SeeNotifications;
 using Microsoft.EntityFrameworkCore;
-using Notification.Core.Entities;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

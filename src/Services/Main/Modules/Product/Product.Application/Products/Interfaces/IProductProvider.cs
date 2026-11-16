@@ -1,6 +1,6 @@
-﻿using Main.Application.Dtos.Product;
+﻿using Main.Modules.Product.Application.Dtos.Product;
 
-namespace Main.Application.Products.Interfaces;
+namespace Main.Modules.Product.Application.Products.Interfaces;
 
 public interface IProductProvider
 {

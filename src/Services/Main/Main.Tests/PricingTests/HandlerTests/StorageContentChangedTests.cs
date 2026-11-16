@@ -1,12 +1,12 @@
 using Enums;
 using FluentAssertions;
-using Main.Application.Dtos.Storage;
-using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Dtos.Storage;
+using Main.Modules.Storage.Application.Handlers.StorageContents.AddContent;
 using Microsoft.EntityFrameworkCore;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
-using Pricing.Enums;
 using Tests.DataBuilders.Storage;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

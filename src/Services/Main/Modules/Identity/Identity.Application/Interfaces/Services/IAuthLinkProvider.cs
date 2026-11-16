@@ -1,4 +1,4 @@
-namespace Main.Application.Interfaces.Services;
+namespace Main.Modules.Identity.Application.Interfaces.Services;
 
 public interface IAuthLinkProvider
 {

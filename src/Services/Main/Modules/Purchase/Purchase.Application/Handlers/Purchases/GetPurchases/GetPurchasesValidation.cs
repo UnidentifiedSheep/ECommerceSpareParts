@@ -1,10 +1,9 @@
-using Main.Entities.Purchase;
 using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
-using Main.Entities;
+using Main.Entities.Purchase;
 
-namespace Main.Application.Handlers.Purchases.GetPurchases;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.GetPurchases;
 
 public class GetPurchasesValidation : AbstractValidator<GetPurchasesQuery>
 {

@@ -1,8 +1,8 @@
-using Main.Persistence.ReadModels;
+using Main.Modules.Identity.Persistence.ReadModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.User;
+namespace Main.Modules.Identity.Persistence.Configurations.User;
 
 internal sealed class UserSearchDocumentConfiguration : IEntityTypeConfiguration<UserSearchDocument>
 {

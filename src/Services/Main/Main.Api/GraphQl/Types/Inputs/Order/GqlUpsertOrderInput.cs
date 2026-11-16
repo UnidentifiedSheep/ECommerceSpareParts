@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Orders.Dtos;
+using Main.Modules.Order.Application.Orders.Dtos;
 
 namespace Main.Api.GraphQl.Types.Inputs.Order;
 

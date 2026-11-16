@@ -1,6 +1,6 @@
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Events;
 
-namespace Main.Application.Interfaces.Services.Currency;
+namespace Main.Modules.Currency.Abstractions.Interfaces;
 
 public interface ICurrencyRateSnapshotProvider
 {

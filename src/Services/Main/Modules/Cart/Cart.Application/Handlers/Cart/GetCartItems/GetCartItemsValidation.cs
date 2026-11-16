@@ -1,7 +1,7 @@
 ﻿using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Cart.GetCartItems;
+namespace Main.Modules.Cart.Application.Handlers.Cart.GetCartItems;
 
 public class GetCartItemsValidation : AbstractValidator<GetCartItemsQuery>
 {

@@ -1,11 +1,11 @@
 using Application.Common.Abstractions;
 using Application.Common.Services.Events;
 using Domain.Events;
-using Main.Application.Products.Interfaces;
-using Main.Entities.Product;
-using Main.Enums;
+using Main.Entities.Product.Enums;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Products.Interfaces;
 
-namespace Main.Application.DomainEventHandlers.Product.ProductCharacteristicCreated;
+namespace Main.Modules.Product.Application.DomainEventHandlers.Product.ProductCharacteristicCreated;
 
 public class PublishIntegrationEventsHandler(IProductEventPublisher eventPublisher)
 	: BatchableDomainEventHandler<EntityCreatedDomainEvent<ProductCharacteristic>>

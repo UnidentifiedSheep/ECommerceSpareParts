@@ -5,7 +5,7 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Storage;
-using Main.Application.Handlers.Storages.GetStorage;
+using Main.Modules.Storage.Application.Handlers.Storages.GetStorage;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

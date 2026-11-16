@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 
 namespace Application.Common.Extensions;
 

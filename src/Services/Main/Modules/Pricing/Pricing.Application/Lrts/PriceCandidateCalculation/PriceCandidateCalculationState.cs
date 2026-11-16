@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
 using Pricing.Entities;
 using SchemaGeneration.Abstractions.Attributes;

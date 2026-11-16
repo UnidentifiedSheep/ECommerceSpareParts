@@ -3,7 +3,7 @@ using Application.Common.Services;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
-using Pricing.Enums;
+using Pricing.Entities.Enums;
 
 namespace Pricing.Application.Models.Pricing;
 

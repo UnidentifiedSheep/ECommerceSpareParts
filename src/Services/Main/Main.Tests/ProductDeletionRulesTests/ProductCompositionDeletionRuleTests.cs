@@ -1,5 +1,6 @@
-using Main.Application.Services;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Services;
 using Tests.TestContainers.Combined;
 
 namespace Tests.ProductDeletionRulesTests;

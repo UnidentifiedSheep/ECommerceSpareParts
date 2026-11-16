@@ -1,8 +1,8 @@
+using Main.Entities.Notification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Notification.Core.Entities;
 
-namespace Notification.Persistence;
+namespace Main.Modules.Notifications.Persistence.Delivery;
 
 public class NotificationDeliveryConfiguration : IEntityTypeConfiguration<NotificationDelivery>
 {

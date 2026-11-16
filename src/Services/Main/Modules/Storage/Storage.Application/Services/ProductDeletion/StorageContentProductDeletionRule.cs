@@ -1,10 +1,11 @@
 using Application.Common.Interfaces.Repositories;
 using Locan.Core.Interfaces;
 using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
 using Main.Modules.Product.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Services.ProductDeletion;
+namespace Main.Modules.Storage.Application.Services.ProductDeletion;
 
 public sealed class StorageContentProductDeletionRule(IReadRepository<StorageContent, int> repository) : IProductDeletionRule
 {

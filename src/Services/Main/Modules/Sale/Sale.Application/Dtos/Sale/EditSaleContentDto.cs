@@ -1,4 +1,4 @@
-namespace Main.Application.Dtos.Sale;
+namespace Main.Modules.Sale.Application.Dtos.Sale;
 
 public class EditSaleContentDto
 {

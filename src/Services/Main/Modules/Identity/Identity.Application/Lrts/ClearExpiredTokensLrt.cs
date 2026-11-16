@@ -1,3 +1,4 @@
+using Application.Common;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
@@ -7,7 +8,7 @@ using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Lrts;
+namespace Main.Modules.Identity.Application.Lrts;
 
 public class ClearExpiredTokensLrt(
 	IApplicationTransactionFactory transactionService,

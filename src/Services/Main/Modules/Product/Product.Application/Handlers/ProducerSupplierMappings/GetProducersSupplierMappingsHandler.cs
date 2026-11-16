@@ -2,11 +2,11 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ProducerSupplierMappings;
+namespace Main.Modules.Product.Application.Handlers.ProducerSupplierMappings;
 
 public record GetProducersSupplierMappingsQuery(IReadOnlyCollection<int> ProducerIds)
 	: IQuery<GetProducersSupplierMappingsResult>;

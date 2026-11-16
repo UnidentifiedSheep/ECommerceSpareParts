@@ -1,5 +1,5 @@
-using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
+using Application.Common;
+using Application.Common.Interfaces;
 using Locan.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

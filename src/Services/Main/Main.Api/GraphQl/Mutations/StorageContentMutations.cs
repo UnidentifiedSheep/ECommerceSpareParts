@@ -3,11 +3,10 @@ using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Storage;
-using Main.Application.Dtos.Storage;
-using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Application.Handlers.StorageContents.EditContent;
-using Main.Application.Handlers.StorageContents.SetToZeroContent;
-using Main.Enums;
+using Main.Modules.Storage.Application.Dtos.Storage;
+using Main.Modules.Storage.Application.Handlers.StorageContents.AddContent;
+using Main.Modules.Storage.Application.Handlers.StorageContents.EditContent;
+using Main.Modules.Storage.Application.Handlers.StorageContents.SetToZeroContent;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

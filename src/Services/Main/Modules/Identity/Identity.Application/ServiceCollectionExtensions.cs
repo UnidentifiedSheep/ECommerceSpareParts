@@ -1,19 +1,22 @@
 using Main.Modules.Identity.Application.Configs;
 using Application.Common.Host;
-using Main.Application.Notifications;
-using Notification.Extensions;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.Validators;
 using Application.Common.Validators;
-using Main.Application.Interfaces.Services;
-using Main.Application.Interfaces.Services.PayloadProvider;
-using Main.Application.Services;
-using Main.Application.Models.Options;
 using Main.Modules.Identity.Abstractions;
+using Main.Modules.Identity.Abstractions.Interfaces;
+using Main.Modules.Identity.Application.Interfaces.Services;
+using Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
+using Main.Modules.Identity.Application.Models.Options;
+using Main.Modules.Identity.Application.Notifications;
+using Main.Modules.Identity.Application.Services;
+using Main.Modules.Identity.Application.Services.PayloadProvider;
+using Main.Modules.Identity.Application.Validators;
 using Microsoft.Extensions.Configuration;
-using Main.Application.Services.PayloadProvider;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
+using Notification.Core;
+using EmailValidator = Main.Modules.Identity.Application.Validators.EmailValidator;
 
 namespace Main.Modules.Identity.Application;
 

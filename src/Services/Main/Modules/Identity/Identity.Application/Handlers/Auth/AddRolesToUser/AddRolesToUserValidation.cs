@@ -4,7 +4,7 @@ using Main.Entities;
 using Main.Entities.Auth;
 using Role = Enums.Role;
 
-namespace Main.Application.Handlers.Auth.AddRolesToUser;
+namespace Main.Modules.Identity.Application.Handlers.Auth.AddRolesToUser;
 
 public sealed class AddRolesToUserValidation : AbstractValidator<AddRolesToUserCommand>
 {

@@ -1,9 +1,9 @@
-using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
+using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Storage;
+namespace Main.Modules.Storage.Persistence.Configurations;
 
 public sealed class StorageContentLockConfiguration : IEntityTypeConfiguration<StorageContentLock>
 {

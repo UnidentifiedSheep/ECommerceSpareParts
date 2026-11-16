@@ -1,8 +1,8 @@
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Models.Users;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Models.Users;
 
-namespace Main.Application.Interfaces.Persistence;
+namespace Main.Modules.Identity.Application.Interfaces.Persistence;
 
 public interface IUserRepository : IRepository<User, Guid>
 {

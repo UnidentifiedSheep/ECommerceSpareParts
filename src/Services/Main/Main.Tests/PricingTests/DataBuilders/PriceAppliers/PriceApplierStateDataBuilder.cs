@@ -1,6 +1,6 @@
 using Bogus;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Pricing;
-using Pricing.Enums;
 using Tests.Abstractions;
 
 namespace Tests.PricingTests.DataBuilders.PriceAppliers;

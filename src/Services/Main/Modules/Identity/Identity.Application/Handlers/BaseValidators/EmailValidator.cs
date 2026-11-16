@@ -1,10 +1,10 @@
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Validators;
 using FluentValidation;
-using Main.Application.Dtos.Emails;
 using Main.Entities;
+using Main.Modules.Identity.Application.Dtos.Emails;
+using Main.Modules.Identity.Application.Validators;
 
-namespace Main.Application.Handlers.BaseValidators;
+namespace Main.Modules.Identity.Application.Handlers.BaseValidators;
 
 public class EmailDtoValidator : AbstractValidator<EmailDto>
 {

@@ -1,9 +1,9 @@
 using GreenDonut;
-using Main.Application.Dtos.Producer;
-using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Application.Handlers.ProducerAliases;
-using Main.Application.Handlers.Producers;
-using Main.Application.Handlers.ProducerSupplierMappings;
+using Main.Modules.Product.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
+using Main.Modules.Product.Application.Handlers.ProducerAliases;
+using Main.Modules.Product.Application.Handlers.Producers;
+using Main.Modules.Product.Application.Handlers.ProducerSupplierMappings;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

@@ -2,7 +2,7 @@ using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Auth.RemovePermissionsFromUser;
+namespace Main.Modules.Identity.Application.Handlers.Auth.RemovePermissionsFromUser;
 
 public sealed class
 	RemovePermissionsFromUserDbValidation : AbstractDbValidation<RemovePermissionsFromUserCommand>

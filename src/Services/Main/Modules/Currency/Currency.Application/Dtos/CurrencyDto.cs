@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Currencies;
+namespace Main.Modules.Currency.Application.Dtos;
 
 public record CurrencyDto
 {

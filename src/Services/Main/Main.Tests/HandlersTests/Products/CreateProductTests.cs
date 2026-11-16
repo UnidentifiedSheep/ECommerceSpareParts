@@ -1,10 +1,11 @@
 using Exceptions;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Commands.CreateProducts;
 using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Commands.CreateProducts;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

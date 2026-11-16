@@ -1,12 +1,12 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Application.Common.Dtos;
-using Application.Common.Handlers.Settings;
 using Carter;
 using Enums;
+using Main.Modules.Platform.Application.Handlers.Settings;
 using MediatR;
 
-namespace Api.Common.EndPoints;
+namespace Main.Api.Settings;
 
 public record GetSettingsResponse
 {

@@ -1,6 +1,6 @@
 using GraphQL.Common.Types;
 using HotChocolate;
-using Main.Enums;
+using Main.Entities.Sale.Enums;
 
 namespace Main.Api.GraphQl.Types.Inputs.Sale;
 

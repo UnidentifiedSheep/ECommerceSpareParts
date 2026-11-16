@@ -1,14 +1,15 @@
+using Application.Common;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
 using Locan.Core.Interfaces;
 using Main.Entities;
-using Main.Entities.Documents;
+using Main.Entities.Documents.Documents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using S3.Core.Interfaces;
 
-namespace Main.Application.Lrts.RemoveExpiredDocuments;
+namespace Main.Modules.Documents.Application.Lrts.RemoveExpiredDocuments;
 
 public class RemoveExpiredDocumentsLrt(
 	IApplicationTransactionFactory transactionService,

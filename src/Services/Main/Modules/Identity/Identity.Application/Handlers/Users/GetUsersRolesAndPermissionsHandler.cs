@@ -1,11 +1,11 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions.QueryExtensions;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Extensions.QueryExtensions;
 
-namespace Main.Application.Handlers.Users;
+namespace Main.Modules.Identity.Application.Handlers.Users;
 
 public sealed record GetUsersRolesAndPermissionsQuery : IQuery<GetUsersRolesAndPermissionsResult>
 {

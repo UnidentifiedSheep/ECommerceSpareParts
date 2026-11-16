@@ -1,8 +1,9 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Application.Dtos.Producer;
 using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Producer;
 
 namespace Main.Api.GraphQl.Types.Producer;
 

@@ -9,10 +9,10 @@ using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.MarketInfo;
 using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Application.Services.Pricing;
+using Pricing.Entities.Enums;
 using Pricing.Entities.Settings;
-using Pricing.Enums;
 
-namespace Tests.PricingTests.Services.PriceCalculation;
+namespace Tests.PricingTests.Services.Pricing;
 
 public class ProductPriceCalculatorTests
 {

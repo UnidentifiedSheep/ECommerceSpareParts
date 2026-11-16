@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using SchemaGeneration.Abstractions.Models;
 
-namespace Main.Application.Analytics.Dtos.Charts;
+namespace Main.Modules.Analytics.Application.Dtos.Charts;
 
 public sealed record ChartDto
 {

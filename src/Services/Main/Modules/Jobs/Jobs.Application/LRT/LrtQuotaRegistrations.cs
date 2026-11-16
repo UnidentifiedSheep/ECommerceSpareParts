@@ -1,9 +1,9 @@
 using Application.Common.Extensions;
-using Application.Common.Models.Options;
+using Main.Modules.Jobs.Application.Models.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Application.Common.LRT;
+namespace Main.Modules.Jobs.Application.LRT;
 
 public static class LrtQuotaRegistrations
 {

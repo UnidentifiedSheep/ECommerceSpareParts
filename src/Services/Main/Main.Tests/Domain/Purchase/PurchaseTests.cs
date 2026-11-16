@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Main.Entities.Purchase;
-using Main.Enums;
-using DomainPurchase = Main.Entities.Purchase.Purchase;
+using Main.Entities.Purchase.Enums;
+using Main.Entities.Purchase.Purchase;
+using DomainPurchase = Main.Entities.Purchase.Purchase.Purchase;
 
 namespace Tests.Domain.Purchase;
 

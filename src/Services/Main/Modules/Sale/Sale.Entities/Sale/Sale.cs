@@ -3,9 +3,9 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Enums;
+using Main.Entities.Sale.Enums;
 
-namespace Main.Entities.Sale;
+namespace Main.Entities.Sale.Sale;
 
 public class Sale : AuditableEntity<Sale, Guid>,
 	ILinqEntity<Sale, Guid>,

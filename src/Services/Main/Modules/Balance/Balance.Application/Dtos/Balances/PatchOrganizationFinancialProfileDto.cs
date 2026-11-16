@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Application.Common.Models;
 
-namespace Main.Application.Dtos.Balances;
+namespace Main.Modules.Balance.Application.Dtos.Balances;
 
 public record PatchOrganizationFinancialProfileDto
 {

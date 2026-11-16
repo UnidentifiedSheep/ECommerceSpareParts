@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using Main.Application.Handlers.BaseValidators;
+using Main.Modules.Identity.Application.Handlers.BaseValidators;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Auth.ChangePassword;
+namespace Main.Modules.Identity.Application.Handlers.Auth.ChangePassword;
 
 public class ChangePasswordValidation : AbstractValidator<ChangePasswordCommand>
 {

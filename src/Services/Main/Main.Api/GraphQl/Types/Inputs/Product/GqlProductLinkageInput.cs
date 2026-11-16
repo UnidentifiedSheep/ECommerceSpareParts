@@ -1,6 +1,6 @@
 using HotChocolate;
-using Main.Application.Dtos.Product;
-using Main.Enums.Products;
+using Main.Entities.Product.Enums.Products;
+using Main.Modules.Product.Application.Dtos.Product;
 
 namespace Main.Api.GraphQl.Types.Inputs.Product;
 

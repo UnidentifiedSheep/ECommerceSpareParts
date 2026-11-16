@@ -4,7 +4,7 @@ using Application.Common.Validators;
 using FluentValidation;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Balance.CreateTransaction;
+namespace Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
 
 public class CreateTransactionValidation : AbstractValidator<CreateTransactionCommand>
 {

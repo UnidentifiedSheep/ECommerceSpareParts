@@ -1,7 +1,7 @@
 using HotChocolate;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Orders.Dtos;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
+using Main.Modules.Order.Application.Orders.Dtos;
 
 namespace Main.Api.GraphQl.Types.Order;
 

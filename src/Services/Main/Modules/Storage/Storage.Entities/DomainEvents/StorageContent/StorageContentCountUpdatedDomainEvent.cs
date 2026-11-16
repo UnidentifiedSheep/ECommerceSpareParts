@@ -1,8 +1,7 @@
-using Enums;
 using Domain.Interfaces.Events;
-using Main.Enums;
+using Enums;
 
-namespace Main.Entities.DomainEvents.StorageContent;
+namespace Main.Entities.Storage.DomainEvents.StorageContent;
 
 public record StorageContentCountUpdatedDomainEvent(
 	int ProductId,

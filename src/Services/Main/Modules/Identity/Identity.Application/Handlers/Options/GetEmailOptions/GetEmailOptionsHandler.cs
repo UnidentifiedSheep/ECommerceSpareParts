@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces.Cqrs;
-using Main.Application.Models.Options;
+using Main.Modules.Identity.Application.Models.Options;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Handlers.Options.GetEmailOptions;
+namespace Main.Modules.Identity.Application.Handlers.Options.GetEmailOptions;
 
 public record GetEmailOptionsQuery : IQuery<GetEmailOptionsResult>;
 

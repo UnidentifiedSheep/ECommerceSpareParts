@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
-using Main.Entities.DomainEvents.User;
+using Main.Entities.DomainEvents;
 
 namespace Main.Entities.User;
 

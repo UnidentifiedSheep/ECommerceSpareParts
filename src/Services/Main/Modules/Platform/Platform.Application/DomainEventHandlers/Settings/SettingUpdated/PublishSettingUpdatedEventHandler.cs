@@ -5,7 +5,7 @@ using Application.Common.Services.Events;
 using Contracts.Settings;
 using Domain.CommonEntities.Events;
 
-namespace Application.Common.DomainEventHandlers.Settings.SettingUpdated;
+namespace Main.Modules.Platform.Application.DomainEventHandlers.Settings.SettingUpdated;
 
 public sealed class PublishSettingUpdatedEventHandler(
 	IServiceDefinition serviceDefinition,

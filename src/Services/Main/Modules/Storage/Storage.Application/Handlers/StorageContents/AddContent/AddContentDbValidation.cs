@@ -1,11 +1,10 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Storage;
-using Main.Modules.Currency.Abstractions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Main.Modules.Product.Abstractions;
 
-namespace Main.Application.Handlers.StorageContents.AddContent;
+namespace Main.Modules.Storage.Application.Handlers.StorageContents.AddContent;
 
 public class AddContentDbValidation(ICurrencyChecks currencyChecks, IProductChecks productChecks)
 	: AbstractDbValidation<AddContentCommand>

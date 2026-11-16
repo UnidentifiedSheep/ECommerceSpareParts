@@ -1,9 +1,8 @@
 using System.Text.Json.Serialization;
-using Main.Entities;
 using Main.Entities.Sale;
 using SchemaGeneration.Abstractions.Attributes;
 
-namespace Main.Application.Document.Sales.SingleSale;
+namespace Main.Modules.Sale.Application.Document.Sales.SingleSale;
 
 public sealed record SingleSaleDocumentSchema
 {

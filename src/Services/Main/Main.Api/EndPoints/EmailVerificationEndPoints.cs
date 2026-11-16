@@ -1,5 +1,5 @@
 using Carter;
-using Main.Application.Handlers.Auth.EmailVerification;
+using Main.Modules.Identity.Application.Handlers.Auth.EmailVerification;
 using MediatR;
 
 namespace Main.Api.EndPoints;

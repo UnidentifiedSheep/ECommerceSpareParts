@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using Enums;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;

@@ -4,13 +4,12 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Organizations;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
-using Main.Modules.Identity.Abstractions;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Modules.Identity.Abstractions.Interfaces;
+using Main.Modules.Organization.Application.Dtos.Organizations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Organizations.GetOrganizations;
+namespace Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
 
 public record GetOrganizationsQuery(
 	Pagination Pagination,
@@ -24,9 +23,9 @@ public record GetOrganizationsQuery(
 public record GetOrganizationsResult(IReadOnlyList<OrganizationDto> Organizations);
 
 public class GetOrganizationsHandler(
-	IReadRepository<Organization, Guid> repository,
+	IReadRepository<Entities.Organization.Organization.Organization, Guid> repository,
 	IUserSearch userSearch,
-	IProjectionProvider<Organization, OrganizationDto> projection)
+	IProjectionProvider<Entities.Organization.Organization.Organization, OrganizationDto> projection)
 	: IQueryHandler<GetOrganizationsQuery, GetOrganizationsResult>
 {
 	public async Task<GetOrganizationsResult> Handle(

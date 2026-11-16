@@ -4,12 +4,11 @@ using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Common.Querying;
-using Main.Application.Dtos.Purchase;
-using Main.Entities.Purchase;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Purchases.GetPurchases;
+namespace Main.Modules.Purchase.Application.Handlers.Purchases.GetPurchases;
 
 public record GetPurchasesQuery(
 	RangeModel<DateTime> DateRange,
@@ -23,9 +22,9 @@ public record GetPurchasesQuery(
 public record GetPurchasesResult(IReadOnlyCollection<PurchaseDto> Purchases);
 
 public class GetPurchasesHandler(
-	IReadRepository<Purchase, Guid> repository,
+	IReadRepository<Entities.Purchase.Purchase.Purchase, Guid> repository,
 	IProductSearch productSearch,
-	IProjectionProvider<Purchase, PurchaseDto> projection)
+	IProjectionProvider<Entities.Purchase.Purchase.Purchase, PurchaseDto> projection)
 	: IQueryHandler<GetPurchasesQuery, GetPurchasesResult>
 {
 	public async Task<GetPurchasesResult> Handle(
@@ -61,7 +60,7 @@ public class GetPurchasesHandler(
 		return new GetPurchasesResult(purchases);
 	}
 
-	private IQueryable<Purchase> ApplySearchTerm(IQueryable<Purchase> query, string searchTerm)
+	private IQueryable<Entities.Purchase.Purchase.Purchase> ApplySearchTerm(IQueryable<Entities.Purchase.Purchase.Purchase> query, string searchTerm)
 	{
 		var term = searchTerm.Trim();
 		var pattern = LikePattern.Contains(term);

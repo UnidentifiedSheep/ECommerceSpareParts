@@ -1,10 +1,10 @@
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
-using Main.Entities.DomainEvents.StorageContent;
+using Main.Entities.Storage.DomainEvents.StorageContent;
 using Main.Modules.Storage.Abstractions.Events;
 
-namespace Main.Application.DomainEventHandlers.Storage.StorageContentUpdated;
+namespace Main.Modules.Storage.Application.DomainEventHandlers.Storage.StorageContentUpdated;
 
 public class PublishStorageContentChangedHandler(IDomainEventScope domainEventScope)
 	: BatchableDomainEventHandler<StorageContentUpdatedDomainEvent>

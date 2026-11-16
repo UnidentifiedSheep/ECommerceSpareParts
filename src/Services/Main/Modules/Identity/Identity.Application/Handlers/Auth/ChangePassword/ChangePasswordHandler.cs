@@ -1,13 +1,13 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
 using MediatR;
 using Security.Core.Interfaces;
 
-namespace Main.Application.Handlers.Auth.ChangePassword;
+namespace Main.Modules.Identity.Application.Handlers.Auth.ChangePassword;
 
 [AutoSave]
 [Transactional]

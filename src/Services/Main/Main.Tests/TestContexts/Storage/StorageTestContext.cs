@@ -1,4 +1,4 @@
-﻿using Main.Enums;
+﻿using Main.Entities.Storage.Enums;
 using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Storage;
@@ -8,7 +8,7 @@ namespace Tests.TestContexts.Storage;
 
 public class StorageTestContext(UnifiedDbContext ctx) : TestContextBase<UnifiedDbContext>(ctx)
 {
-	public IReadOnlyCollection<Main.Entities.Storage.Storage> Storages { get; private set; } = null!;
+	public IReadOnlyCollection<Main.Entities.Storage.Storage.Storage> Storages { get; private set; } = null!;
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
 		=> Storages = await BuilderExtensions.BuildManyCombinedAndAddToDb(

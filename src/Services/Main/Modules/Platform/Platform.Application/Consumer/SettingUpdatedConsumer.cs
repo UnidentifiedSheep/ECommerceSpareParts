@@ -2,7 +2,7 @@
 using Contracts.Settings;
 using MassTransit;
 
-namespace Application.Common.Consumer;
+namespace Main.Modules.Platform.Application.Consumer;
 
 public class SettingUpdatedConsumer(ISettingsService settingsService) : IConsumer<SettingUpdatedEvent>
 {

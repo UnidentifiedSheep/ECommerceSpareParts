@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Analytics.Services;
+using Main.Modules.Analytics.Application.Services;
 using Main.Modules.Sale.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Sale;

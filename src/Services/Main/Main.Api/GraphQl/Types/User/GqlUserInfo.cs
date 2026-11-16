@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Dtos.Users;
 
 namespace Main.Api.GraphQl.Types.User;
 

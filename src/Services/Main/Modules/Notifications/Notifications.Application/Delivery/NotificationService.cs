@@ -4,9 +4,9 @@ using NamedObject.Core.Interfaces;
 using Notification.Core;
 using Notification.Core.Interfaces.Notification;
 using Notification.Core.Interfaces.Recipient;
-using NotificationEntity = Notification.Core.Entities.Notification;
+using NotificationEntity = Main.Entities.Notification.Notification;
 
-namespace Notification;
+namespace Main.Modules.Notifications.Application.Delivery;
 
 public class NotificationService(
 	IRecipientResolver recipientResolver,

@@ -1,9 +1,8 @@
 using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Main.Entities;
 using Main.Entities.Product;
 
-namespace Main.Application.Products.Commands.CreateProductEan;
+namespace Main.Modules.Product.Application.Products.Commands.CreateProductEan;
 
 public class CreateProductEanDbValidation : AbstractDbValidation<CreateProductEanCommand>
 {

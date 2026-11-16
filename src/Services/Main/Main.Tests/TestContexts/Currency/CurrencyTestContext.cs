@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Enums;
-using Main.Entities.Settings;
+using Main.Entities.Currency.Settings;
 using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Currency;

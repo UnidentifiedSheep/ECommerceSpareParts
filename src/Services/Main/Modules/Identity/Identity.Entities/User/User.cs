@@ -7,9 +7,9 @@ using Domain.Validation;
 using Exceptions;
 using Main.Entities.Auth;
 using Main.Entities.DomainEvents.User;
+using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.User.ValueObjects;
-using Main.Enums;
 
 namespace Main.Entities.User;
 

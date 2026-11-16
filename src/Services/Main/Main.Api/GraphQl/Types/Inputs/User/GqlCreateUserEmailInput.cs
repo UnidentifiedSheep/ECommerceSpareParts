@@ -1,6 +1,6 @@
 using HotChocolate;
-using Main.Application.Dtos.Emails;
-using Main.Enums;
+using Main.Entities.Enums;
+using Main.Modules.Identity.Application.Dtos.Emails;
 
 namespace Main.Api.GraphQl.Types.Inputs.User;
 

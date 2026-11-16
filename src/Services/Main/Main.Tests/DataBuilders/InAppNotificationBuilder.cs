@@ -1,5 +1,5 @@
 using Bogus;
-using Notification.Core.Entities;
+using Main.Entities.Notification;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;

@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Cart;
+namespace Main.Modules.Cart.Persistence.Configurations.Cart;
 
-public class CartConfiguration : IEntityTypeConfiguration<Entities.Cart.Cart>
+public class CartConfiguration : IEntityTypeConfiguration<Entities.Cart.Cart.Cart>
 {
-	public void Configure(EntityTypeBuilder<Entities.Cart.Cart> builder)
+	public void Configure(EntityTypeBuilder<Entities.Cart.Cart.Cart> builder)
 	{
 		builder.ToTable("cart", "public");
 

@@ -1,13 +1,13 @@
 using Abstractions.Models.Options;
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Interfaces.Services;
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
+using Main.Modules.Balance.Application.Interfaces;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Main.Modules.Organization.Abstractions;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Services;
+namespace Main.Modules.Balance.Application.Services;
 
 public class BalanceService(
 	IRepository<OrganizationBalance, UserBalanceKey> userBalanceRepository,

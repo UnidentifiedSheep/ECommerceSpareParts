@@ -1,11 +1,10 @@
-using Main.Modules.Product.Application.Events;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
-using Contracts.Producer;
-using Main.Entities.DomainEvents.Producer;
+using Main.Entities.Product.DomainEvents.Producer;
+using Main.Modules.Product.Application.Events;
 
-namespace Main.Application.DomainEventHandlers.Producer.ProducerSupplierMappingChanged;
+namespace Main.Modules.Product.Application.DomainEventHandlers.Producer.ProducerSupplierMappingChanged;
 
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEvents)
 	: BatchableDomainEventHandler<ProducerSupplierMappingChangedDomainEvent>

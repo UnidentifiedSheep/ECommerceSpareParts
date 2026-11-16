@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.Sale;
+namespace Main.Modules.Sale.Persistence.Configurations;
 
-public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
+public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale.Sale>
 {
-	public void Configure(EntityTypeBuilder<Entities.Sale.Sale> builder)
+	public void Configure(EntityTypeBuilder<Entities.Sale.Sale.Sale> builder)
 	{
 		builder.ToTable("sale", "public");
 

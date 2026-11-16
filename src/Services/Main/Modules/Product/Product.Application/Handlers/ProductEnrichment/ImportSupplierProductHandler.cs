@@ -1,21 +1,21 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using Application.Common;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Services;
-using Application.Common.LRT;
 using Attributes;
 using Contracts.Models.Supplier;
 using Enums;
-using Main.Application.Interfaces.Persistence;
-using Main.Application.Lrts.EnrichCatalogue;
-using Main.Entities.Product.Enrichment;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Entities.Product.Product.ValueObjects;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Main.Modules.Product.Application.Lrts.EnrichCatalogue;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Main.Application.Handlers.ProductEnrichment;
+namespace Main.Modules.Product.Application.Handlers.ProductEnrichment;
 
 [AutoSave]
 [Transactional(

@@ -4,8 +4,8 @@ using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.CatalogueCandidate;
 using Main.Api.GraphQl.Types.Product;
 using Main.Api.GraphQl.Types.ProductEnrichment;
-using Main.Application.Handlers.ProductEnrichment;
-using Main.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;
