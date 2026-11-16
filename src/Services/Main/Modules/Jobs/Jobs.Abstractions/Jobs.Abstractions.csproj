@@ -19,6 +19,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Core\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Lrt\Lrt.Core\Lrt.Core.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
     </ItemGroup>

@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Application.Common.Interfaces.Lrt;
+using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using NamedObject.Core.Interfaces;
 
@@ -9,7 +10,7 @@ namespace Api.Common.HostedServices;
 
 public class LrtExecutorHostedService(
 	IServiceScopeFactory scopeFactory,
-	ILrtQuotaManager lrtQuotaManager,
+	LrtQuotaCatalog quotaCatalog,
 	IJobSignal jobSignal,
 	ILogger<LrtExecutorHostedService> logger) : BackgroundService
 {
@@ -17,6 +18,8 @@ public class LrtExecutorHostedService(
 
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
+		quotaCatalog.Validate();
+
 		while (!stoppingToken.IsCancellationRequested)
 		{
 			var jobStarted = await Iteration(stoppingToken);
@@ -31,34 +34,16 @@ public class LrtExecutorHostedService(
 		try
 		{
 			await using var scope = scopeFactory.CreateAsyncScope();
-			var leaseService = scope.ServiceProvider.GetRequiredService<IJobLeaseService>();
+			var acquirer = scope.ServiceProvider.GetRequiredService<LrtJobAcquirer>();
 
-			var quota = await lrtQuotaManager.UseQuotaAsync(Guid.NewGuid(), ct);
-			Job? job;
-
-			try
-			{
-				job = await leaseService.TryAcquireJobAsync(
-					quota.HolderId,
-					InitialLeaseDuration,
-					ct);
-			}
-			catch
-			{
-				quota.Dispose();
-				throw;
-			}
-
-			if (job == null)
-			{
-				quota.Dispose();
+			var acquired = await acquirer.TryAcquireAsync(Guid.NewGuid(), InitialLeaseDuration, ct);
+			if (acquired is null)
 				return false;
-			}
 
 			_ = RunJobAndReleaseQuota(
-				job.Id,
-				job.SystemName,
-				quota,
+				acquired.Job.Id,
+				acquired.Job.SystemName,
+				acquired.Lease,
 				ct);
 			return true;
 		}

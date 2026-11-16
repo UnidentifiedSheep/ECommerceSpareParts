@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.LRT;
-using Application.Common.Models.Options;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
 
 namespace Tests.Jobs.Lrt;
 
@@ -380,12 +378,6 @@ public class LrtQuotaManagerTests
 
 	private static LrtQuotaManager CreateManager(Func<int> maxParallelPerWorker)
 	{
-		var options = Options.Create(
-			new LrtExecutorOptions
-			{
-				MaxParallelPerWorker = maxParallelPerWorker()
-			});
-
-		return new LrtQuotaManager(options);
+		return new LrtQuotaManager("test-group", maxParallelPerWorker());
 	}
 }

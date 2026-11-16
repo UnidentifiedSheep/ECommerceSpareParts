@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using Api.Common.HostedServices;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.Models.Options;
-using Microsoft.Extensions.Options;
 
 namespace Application.Common.LRT;
 
@@ -9,17 +8,24 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 {
 	private readonly HashSet<Guid> _holders = [];
 
+	private readonly IJobSignal? _releaseSignal;
+
 	private readonly SemaphoreSlim _semaphore;
 
 	private readonly Lock _sync = new();
 
 	private bool _disposed;
 
-	public LrtQuotaManager(IOptions<LrtExecutorOptions> options)
+	public LrtQuotaManager(string systemName, int maxQuota, IJobSignal? releaseSignal = null)
 	{
-		MaxQuota = Math.Max(0, options.Value.MaxParallelPerWorker);
+		ArgumentException.ThrowIfNullOrWhiteSpace(systemName);
+		SystemName = systemName;
+		MaxQuota = Math.Max(0, maxQuota);
+		_releaseSignal = releaseSignal;
 		_semaphore = new SemaphoreSlim(MaxQuota, Math.Max(1, MaxQuota));
 	}
+
+	public string SystemName { get; }
 
 	public bool IsQuotaAvailable => AvailableQuota > 0;
 
@@ -124,14 +130,21 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 
 	private void ReleaseQuota(Guid holderId)
 	{
+		var released = false;
 		lock (_sync)
 		{
 			if (_disposed)
 				return;
 
 			if (_holders.Remove(holderId))
+			{
 				_semaphore.Release();
+				released = true;
+			}
 		}
+
+		if (released)
+			_releaseSignal?.Notify();
 	}
 
 	private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, nameof(LrtQuotaManager));

@@ -56,7 +56,7 @@ public abstract class LrtBase<TInputState, TState>(
 
 	public abstract string SystemName { get; }
 
-	public virtual string QuotaSystemName => DefaultLrtQuota.SystemName;
+	public virtual string? QuotaSystemName => null;
 
 	public abstract ILocalizableMessage NameLocalizationMessage { get; }
 	public abstract ILocalizableMessage DescriptionLocalizationMessage { get; }

@@ -13,6 +13,7 @@ using Api.Common.HostedServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NamedObject;
+using NamedObject.Core.Interfaces;
 using Persistence.Listening;
 
 namespace Main.Modules.Jobs.Application;
@@ -26,8 +27,7 @@ public static class ServiceCollectionExtensions
 		services.AddCommonDomain<JobsDomain>();
 		services
 			.AddModuleApplication(assembly)
-			.RegisterNamedObject<ILrtNamedObject>(assembly)
-			.RegisterNamedObject<ILrtQuota>(assembly, objectsLifetime: ServiceLifetime.Singleton);
+			.RegisterNamedObject<ILrtNamedObject>(assembly);
 
 		services.TryAddSingleton(TimeProvider.System);
 		services.TryAddScoped<IOperationDatePolicy, OperationDatePolicy>();
@@ -39,7 +39,12 @@ public static class ServiceCollectionExtensions
 			serviceProvider.GetRequiredService<IJobCreationDispatcher>);
 		services.AddScoped<IJobService, JobService>();
 		services.AddScoped<IJobScheduleService, JobScheduleService>();
-		services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();
+		services.AddDefaultLrtQuotas();
+		services.AddSingleton<LrtQuotaRegistry>();
+		services.AddSingleton<INamedObjectRegistry<ILrtQuotaManager>>(provider
+			=> provider.GetRequiredService<LrtQuotaRegistry>());
+		services.AddSingleton<LrtQuotaCatalog>();
+		services.AddScoped<LrtJobAcquirer>();
 
 		return services;
 	}

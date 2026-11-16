@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using System.Globalization;
 using Api.Common;
@@ -95,6 +96,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddModule<StorageModule>(new ConfigurationBuilder().Build());
 		services.AddModule<PricingModule>(new ConfigurationBuilder().Build());
 		services.AddSingleton<ILrtNamedObject, JobScheduleTestLrt>();
+		services.AddSingleton<ILrtNamedObject, QuotaTestLrt>();
+		services.AddLrtQuota(QuotaTestLrt.QuotaName, 1);
 		services.AddSingleton<TestTimeProvider>();
 		services.AddSingleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>());
 		var passwordRules = new PasswordRules

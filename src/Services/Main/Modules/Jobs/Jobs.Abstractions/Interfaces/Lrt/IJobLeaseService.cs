@@ -9,6 +9,12 @@ public interface IJobLeaseService
 		TimeSpan leaseDuration,
 		CancellationToken ct);
 
+	Task<Job?> TryAcquireJobAsync(
+		Guid holderId,
+		TimeSpan leaseDuration,
+		IReadOnlyCollection<string> systemNames,
+		CancellationToken ct);
+
 	Task<List<Job>> FailExpiredJobsWithoutAttempts(int maxBatchSize, CancellationToken ct);
 
 	Task<List<Job>> CancelExpiredJobs(int maxBatchSize, CancellationToken ct);
