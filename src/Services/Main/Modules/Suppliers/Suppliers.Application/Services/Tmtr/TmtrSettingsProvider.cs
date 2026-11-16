@@ -1,18 +1,15 @@
+using Application.Common.Interfaces.Settings;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Settings;
+using Main.Entities.Settings.Supplier;
 
-namespace Application.Common.Services.Supplier.Tmtr;
+namespace Main.Modules.Suppliers.Application.Services.Tmtr;
 
-public class TmtrSettingsProvider(TmtrMainSettingProvider settingsProvider)
-	: ISupplierSettingsProvider<TmtrSettings>
+public class TmtrSettingsProvider(ISettingsService settingsService) : ISupplierSettingsProvider<TmtrSettings>
 {
 	public async Task<TmtrSettings> GetSettingsAsync(CancellationToken cancellationToken = default)
 	{
-		var result = await settingsProvider.GetAsync(cancellationToken);
-		if (!result.IsSuccess)
-			throw new InvalidOperationException(result.Message ?? "Unable to get TMTR settings.");
-
-		var settings = result.Setting!;
+		var settings = (await settingsService.GetOrDefault<TmtrSupplierSetting>(cancellationToken)).Data;
 		if (settings.GuaranteedDeliveryOffsetDays < 0)
 			throw new InvalidOperationException("TMTR guaranteed delivery offset cannot be negative.");
 

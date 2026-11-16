@@ -1,12 +1,14 @@
+using Application.Common.Interfaces.Settings;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;
+using Main.Entities.Settings.Supplier;
 using Security.Core.Interfaces;
 
-namespace Application.Common.Services.Supplier.Favorite;
+namespace Main.Modules.Suppliers.Application.Services.Favorite;
 
 public class FavoriteConnectionProvider(
-	FavoriteMainSettingProvider settingsProvider,
+	ISettingsService settingsService,
 	ISecretEncryptor secretEncryptor) : IConnectionProvider<FavoritConnection>
 {
 	public async Task<FavoritConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
@@ -26,13 +28,7 @@ public class FavoriteConnectionProvider(
 	public async Task<ConnectionCheck<FavoritConnection>> CheckConnectionAsync(
 		CancellationToken cancellationToken = default)
 	{
-		var result = await settingsProvider.GetAsync(cancellationToken);
-		if (!result.IsSuccess)
-			return Unavailable(
-				result.Reason ?? SupplierUnavailableReason.SettingsUnavailable,
-				result.Message ?? "Unable to get Favorit settings");
-
-		var settings = result.Setting!;
+		var settings = (await settingsService.GetOrDefault<FavoritSupplierSetting>(cancellationToken)).Data;
 		if (!settings.IsEnabled)
 			return Unavailable(SupplierUnavailableReason.Disabled, "Favorit integration is disabled");
 

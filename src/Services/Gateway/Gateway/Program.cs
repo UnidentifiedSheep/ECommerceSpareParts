@@ -210,8 +210,7 @@ void MapDocs(WebApplication application)
 			var services = new Dictionary<string, string>
 			{
 				[ServicesDefinitions.Main.ServiceName] = "/main/swagger/v1/swagger.json",
-				[ServicesDefinitions.Search.ServiceName] = "/search/swagger/v1/swagger.json",
-				[ServicesDefinitions.Pricing.ServiceName] = "/pricing/swagger/v1/swagger.json"
+				[ServicesDefinitions.Search.ServiceName] = "/search/swagger/v1/swagger.json"
 			};
 
 			if (!services.TryGetValue(service, out var swaggerPath))
@@ -255,10 +254,6 @@ void MapDocs(WebApplication application)
 				.AddDocument(
 					ServicesDefinitions.Search.ServiceName,
 					"Search API",
-					"/docs/openapi/search.json")
-				.AddDocument(
-					ServicesDefinitions.Pricing.ServiceName,
-					"Pricing API",
-					"/docs/openapi/pricing.json");
+					"/docs/openapi/search.json");
 		});
 }

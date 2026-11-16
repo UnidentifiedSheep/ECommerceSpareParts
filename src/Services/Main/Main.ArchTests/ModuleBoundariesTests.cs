@@ -33,6 +33,7 @@ public class ModuleBoundariesTests
 		["Balance"] = ["Currency", "Identity", "Organization", "Jobs"],
 		["Jobs"] = [],
 		["Platform"] = [],
+		["Suppliers"] = ["Platform"],
 		["Uploads"] = [],
 		["Documents"] = ["Identity", "Jobs", "Platform"],
 		["Cart"] = ["Identity", "Product"],

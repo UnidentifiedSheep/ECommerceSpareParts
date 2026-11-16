@@ -11,7 +11,6 @@ public static class ServiceOptionsExtensions
 		=> serviceDefinition switch
 		{
 			Main => options.Main,
-			Pricing => options.Pricing,
 			Search => options.Search,
 			_ => throw new InvalidOperationException("This service definition is not supported.")
 		};

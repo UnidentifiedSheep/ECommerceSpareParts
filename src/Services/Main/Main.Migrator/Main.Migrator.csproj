@@ -29,6 +29,7 @@
         <ProjectReference Include="..\Modules\Sale\Sale.Persistence\Sale.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Documents\Documents.Persistence\Documents.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Platform\Platform.Persistence\Platform.Persistence.csproj"/>
+        <ProjectReference Include="..\Modules\Suppliers\Suppliers.Persistence\Suppliers.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Jobs\Jobs.Persistence\Jobs.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Jobs\Jobs.Application\Jobs.Application.csproj"/>
         <ProjectReference Include="..\Modules\Currency\Currency.Application\Currency.Application.csproj"/>

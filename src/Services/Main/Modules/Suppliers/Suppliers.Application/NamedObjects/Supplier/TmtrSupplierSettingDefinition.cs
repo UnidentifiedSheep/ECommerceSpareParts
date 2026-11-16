@@ -10,7 +10,7 @@ using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 using Security.Core.Interfaces;
 
-namespace Main.Application.NamedObjects.SettingDefinitions.Supplier;
+namespace Main.Modules.Suppliers.Application.NamedObjects;
 
 public class TmtrSupplierSettingDefinition(ISettingsService settingsService, ISecretEncryptor secretEncryptor)
 	: SettingDefinitionNamedObjectBase<TmtrSupplierSetting>(settingsService)

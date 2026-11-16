@@ -1,12 +1,14 @@
+using Application.Common.Interfaces.Settings;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;
+using Main.Entities.Settings.Supplier;
 using Security.Core.Interfaces;
 
-namespace Application.Common.Services.Supplier.Tmtr;
+namespace Main.Modules.Suppliers.Application.Services.Tmtr;
 
 public class TmtrConnectionProvider(
-	TmtrMainSettingProvider settingsProvider,
+	ISettingsService settingsService,
 	ISecretEncryptor secretEncryptor) : IConnectionProvider<TmtrConnection>
 {
 	public async Task<TmtrConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
@@ -26,13 +28,7 @@ public class TmtrConnectionProvider(
 	public async Task<ConnectionCheck<TmtrConnection>> CheckConnectionAsync(
 		CancellationToken cancellationToken = default)
 	{
-		var result = await settingsProvider.GetAsync(cancellationToken);
-		if (!result.IsSuccess)
-			return Unavailable(
-				result.Reason ?? SupplierUnavailableReason.SettingsUnavailable,
-				result.Message ?? "Unable to get TMTR settings");
-
-		var settings = result.Setting!;
+		var settings = (await settingsService.GetOrDefault<TmtrSupplierSetting>(cancellationToken)).Data;
 		if (!settings.IsEnabled)
 			return Unavailable(SupplierUnavailableReason.Disabled, "TMTR integration is disabled");
 

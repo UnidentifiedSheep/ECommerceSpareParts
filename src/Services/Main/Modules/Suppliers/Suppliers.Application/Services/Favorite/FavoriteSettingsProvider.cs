@@ -1,7 +1,7 @@
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Settings;
 
-namespace Application.Common.Services.Supplier.Favorite;
+namespace Main.Modules.Suppliers.Application.Services.Favorite;
 
 public class FavoriteSettingsProvider : ISupplierSettingsProvider<FavoriteSettings>
 {

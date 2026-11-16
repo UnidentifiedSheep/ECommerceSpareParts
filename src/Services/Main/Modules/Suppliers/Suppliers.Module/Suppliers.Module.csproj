@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Suppliers.Module</AssemblyName>
+        <RootNamespace>Main.Modules.Suppliers</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Integrations\Suppliers\Integrations.Supplier.DI\Integrations.Supplier.DI.csproj"/>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Suppliers.Application\Suppliers.Application.csproj"/>
+        <ProjectReference Include="..\Suppliers.Persistence\Suppliers.Persistence.csproj"/>
+    </ItemGroup>
+
+</Project>

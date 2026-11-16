@@ -1,6 +1,5 @@
 using Domain.CommonEntities;
 using Main.Entities.Settings;
-using Main.Entities.Settings.Supplier;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Common.BaseTableConfigurations;
 using Persistence.Interfaces;
@@ -17,8 +16,6 @@ public sealed class PlatformDbContextModule : IDbContextModule
 			.Entity<Setting>()
 			.HasDiscriminator(e => e.Key)
 			.HasValue<Setting>(nameof(Setting))
-			.HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName)
-			.HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)
-			.HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
+			.HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName);
 	}
 }

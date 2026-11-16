@@ -16,7 +16,6 @@ public class GetAggregatedAvailableJobsHandler(ICommonClient commonClient)
 	private static readonly IServiceDefinition[] Services =
 	[
 		ServicesDefinitions.Main,
-		ServicesDefinitions.Pricing,
 		ServicesDefinitions.Search
 	];
 

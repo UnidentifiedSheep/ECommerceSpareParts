@@ -3,8 +3,6 @@ using Application.Common.Interfaces.Links;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Services.Links;
 using Application.Common.Services.Settings;
-using Application.Common.Services.Supplier;
-using Main.Modules.Platform.Application.Services;
 using Application.Common.NamedObject;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
@@ -28,7 +26,6 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<ISettingsContainer, SettingsContainer>();
 		services.AddScoped<ISettingsService, SettingsService>();
 		services.AddScoped<IAppLinkBuilder, AppLinkBuilder>();
-		services.AddScoped<ISupplierSettingSource, SupplierSettingSource>();
 
 		return services;
 	}

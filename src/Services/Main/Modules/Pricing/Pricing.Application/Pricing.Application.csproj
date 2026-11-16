@@ -16,6 +16,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Platform\Platform.Abstractions\Platform.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Jobs\Jobs.Abstractions\Jobs.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Integrations\Suppliers\Integrations.Supplier\Integrations.Supplier.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>

@@ -19,6 +19,7 @@ using Main.Modules.Cart;
 using Main.Modules.Documents;
 using Main.Modules.Jobs;
 using Main.Modules.Platform;
+using Main.Modules.Suppliers;
 using Main.Modules.Notifications;
 using Main.Modules.Order;
 using Main.Modules.Organization;
@@ -92,6 +93,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddModule<DocumentsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<JobsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<PlatformModule>(new ConfigurationBuilder().Build());
+		services.AddModule<SuppliersModule>(new ConfigurationBuilder().Build());
 		services.AddModule<NotificationsModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrderModule>(new ConfigurationBuilder().Build());
 		services.AddModule<OrganizationModule>(new ConfigurationBuilder().Build());

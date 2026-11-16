@@ -40,6 +40,7 @@
         <ProjectReference Include="..\Modules\Purchase\Purchase.Module\Purchase.Module.csproj"/>
         <ProjectReference Include="..\Modules\Sale\Sale.Module\Sale.Module.csproj"/>
         <ProjectReference Include="..\Modules\Platform\Platform.Module\Platform.Module.csproj"/>
+        <ProjectReference Include="..\Modules\Suppliers\Suppliers.Module\Suppliers.Module.csproj"/>
         <ProjectReference Include="..\Modules\Uploads\Uploads.Module\Uploads.Module.csproj"/>
         <ProjectReference Include="..\Modules\Jobs\Jobs.Module\Jobs.Module.csproj"/>
         <ProjectReference Include="..\Modules\Analytics\Analytics.Module\Analytics.Module.csproj"/>
@@ -117,6 +118,10 @@
                        CopyToOutput="true"/>
 
         <LocanResource Include="../Modules/Platform/Platform.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Suppliers/Suppliers.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
