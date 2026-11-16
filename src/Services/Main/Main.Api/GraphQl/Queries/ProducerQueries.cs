@@ -1,8 +1,8 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Api.GraphQl.Types.Producer;
 using Main.Api.GraphQl.Types.Inputs.Producer;
+using Main.Api.GraphQl.Types.Producer;
 using Main.Modules.Product.Application.Dtos.Producer;
 using Main.Modules.Product.Application.Handlers.Producers.GetProducers;
 using MediatR;
@@ -38,7 +38,10 @@ public sealed class ProducerQueries
 		ISender sender,
 		CancellationToken ct)
 		=> (await sender.Send(
-				new GetProducersQuery(input.SearchTerm, input.Ids ?? [], input.Pagination),
+				new GetProducersQuery(
+					input.SearchTerm,
+					input.Ids ?? [],
+					input.Pagination),
 				ct))
 			.Producers
 			.Select(producer => new GqlProducer(producer))

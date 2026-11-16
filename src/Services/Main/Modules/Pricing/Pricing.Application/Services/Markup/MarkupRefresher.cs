@@ -3,7 +3,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Services;
-using Application.Common.LRT;
 using Attributes;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Lrts.InvalidateStalePriceOptions;

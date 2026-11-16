@@ -5,21 +5,33 @@ using Contracts.Storage;
 using Domain.Events;
 using Enums.Units;
 using FluentAssertions;
-using Main.Entities.Product;
 using Main.Entities.Product.DomainEvents.Product;
 using Main.Entities.Product.Enums;
 using Main.Entities.Product.Product;
+using Main.Modules.Analytics.Persistence;
+using Main.Modules.Balance.Persistence;
+using Main.Modules.Cart.Persistence;
 using Main.Modules.Currency.Persistence;
+using Main.Modules.Documents.Persistence;
+using Main.Modules.Identity.Persistence;
+using Main.Modules.Jobs.Persistence;
+using Main.Modules.Notifications.Persistence;
+using Main.Modules.Order.Persistence;
+using Main.Modules.Organization.Persistence;
+using Main.Modules.Platform.Persistence;
 using Main.Modules.Product.Application.Products.Interfaces;
 using Main.Modules.Product.Application.Products.Services;
 using Main.Modules.Product.Persistence;
+using Main.Modules.Purchase.Persistence;
+using Main.Modules.Sale.Persistence;
 using Main.Modules.Storage.Persistence;
-using Persistence.Common;
-using Persistence.Common.Repositories;
-using Persistence.Relations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Common;
+using Persistence.Common.Repositories;
 using Persistence.Context;
+using Persistence.Relations;
+using Pricing.Persistence;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.Persistence.Interceptors;
@@ -204,21 +216,21 @@ public class ProductSearchEventTests : IntegrationTest
 					"100"),
 				CancellationToken);
 		await Context.Set<ProductSize>()
-		.AddAsync(
-			ProductSize.Create(
-				product.Id,
-				10,
-				20,
-				30,
-				DimensionUnit.Millimeter),
-			CancellationToken);
+			.AddAsync(
+				ProductSize.Create(
+					product.Id,
+					10,
+					20,
+					30,
+					DimensionUnit.Millimeter),
+				CancellationToken);
 		await Context.Set<ProductWeight>()
-		.AddAsync(
-			ProductWeight.Create(
-				product.Id,
-				2,
-				WeightUnit.Kilogram),
-			CancellationToken);
+			.AddAsync(
+				ProductWeight.Create(
+					product.Id,
+					2,
+					WeightUnit.Kilogram),
+				CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var counter = new QueryCounter();
@@ -226,7 +238,16 @@ public class ProductSearchEventTests : IntegrationTest
 			.UseNpgsql(Context.Database.GetDbConnection())
 			.AddInterceptors(counter)
 			.Options;
-		await using var queryContext = new UnifiedDbContext(options, [new CoreDbContextModule(), new RelationsDbContextModule(), new Main.Modules.Identity.Persistence.IdentityDbContextModule(), new Main.Modules.Purchase.Persistence.PurchaseDbContextModule(), new Main.Modules.Sale.Persistence.SaleDbContextModule(), new Main.Modules.Organization.Persistence.OrganizationDbContextModule(), new Main.Modules.Balance.Persistence.BalanceDbContextModule(), new Main.Modules.Analytics.Persistence.AnalyticsDbContextModule(), new Main.Modules.Order.Persistence.OrderDbContextModule(), new Main.Modules.Notifications.Persistence.NotificationsDbContextModule(), new Main.Modules.Cart.Persistence.CartDbContextModule(), new Main.Modules.Documents.Persistence.DocumentsDbContextModule(), new Main.Modules.Jobs.Persistence.JobsDbContextModule(), new Main.Modules.Platform.Persistence.PlatformDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule(), new Pricing.Persistence.PricingDbContextModule()]);
+		await using var queryContext = new UnifiedDbContext(
+			options,
+			[
+				new CoreDbContextModule(), new RelationsDbContextModule(), new IdentityDbContextModule(),
+				new PurchaseDbContextModule(), new SaleDbContextModule(), new OrganizationDbContextModule(),
+				new BalanceDbContextModule(), new AnalyticsDbContextModule(), new OrderDbContextModule(),
+				new NotificationsDbContextModule(), new CartDbContextModule(), new DocumentsDbContextModule(),
+				new JobsDbContextModule(), new PlatformDbContextModule(), new CurrencyDbContextModule(),
+				new ProductDbContextModule(), new StorageDbContextModule(), new PricingDbContextModule()
+			]);
 		var provider = new ProductEventProvider(
 			new ReadRepository<Product, int>(queryContext),
 			Scope.ServiceProvider.GetServices<IProductEventPartProvider>());

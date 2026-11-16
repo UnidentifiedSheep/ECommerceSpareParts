@@ -32,7 +32,10 @@ public class SaleAnalyticsSynchronizationLrt(IApplicationTransactionFactory tran
 				async (context, ct) =>
 				{
 					var page = await context.GetRequiredService<ISaleSnapshots>()
-						.GetPageAsync(State.LastProcessedId, BatchSize, ct);
+						.GetPageAsync(
+							State.LastProcessedId,
+							BatchSize,
+							ct);
 					if (page.SalesCount == 0) return 0;
 
 					await context.GetRequiredService<SaleAnalyticsWriter>().WriteAsync(page.Contents, ct);

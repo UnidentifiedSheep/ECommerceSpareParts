@@ -5,7 +5,6 @@ using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.User;
-using Main.Entities.Exceptions;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Exceptions;
 using Main.Modules.Balance.Application.Handlers.Balance.GetOrganizationFinancialInfo;

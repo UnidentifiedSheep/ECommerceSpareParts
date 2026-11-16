@@ -21,7 +21,11 @@ public sealed class LrtJobAcquirer(LrtQuotaCatalog catalog, IJobLeaseService lea
 		if (allowed.Length == 0)
 			return null;
 
-		var job = await leaseService.TryAcquireJobAsync(holderId, leaseDuration, allowed, cancellationToken);
+		var job = await leaseService.TryAcquireJobAsync(
+			holderId,
+			leaseDuration,
+			allowed,
+			cancellationToken);
 		if (job is null)
 			return null;
 

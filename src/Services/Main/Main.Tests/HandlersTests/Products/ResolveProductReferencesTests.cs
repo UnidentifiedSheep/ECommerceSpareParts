@@ -1,6 +1,5 @@
 using Enums;
 using FluentAssertions;
-using Main.Entities.Product.ValueObjects;
 using Main.Modules.Product.Application.Dtos.Product.References;
 using Main.Modules.Product.Application.Products.Queries;
 using Tests.DataBuilders;
@@ -93,19 +92,19 @@ public sealed class ResolveProductReferencesTests : IntegrationTest
 			CancellationToken);
 
 		result.Products
-		.Select(product => product.ProductId)
-		.Should()
-		.Equal(
-			mapped.Id,
-			direct.Id,
-			direct.Id);
+			.Select(product => product.ProductId)
+			.Should()
+			.Equal(
+				mapped.Id,
+				direct.Id,
+				direct.Id);
 		result.Products
-		.Select(product => product.ProducerId)
-		.Should()
-		.Equal(
-			producers[1].Id,
-			producers[0].Id,
-			producers[0].Id);
+			.Select(product => product.ProducerId)
+			.Should()
+			.Equal(
+				producers[1].Id,
+				producers[0].Id,
+				producers[0].Id);
 	}
 
 	[Fact]
@@ -138,19 +137,19 @@ public sealed class ResolveProductReferencesTests : IntegrationTest
 			CancellationToken);
 
 		result.Products
-		.Select(product => product.ProductId)
-		.Should()
-		.Equal(
-			first.Id,
-			second.Id,
-			null);
+			.Select(product => product.ProductId)
+			.Should()
+			.Equal(
+				first.Id,
+				second.Id,
+				null);
 		result.Products
-		.Select(product => product.ProducerId)
-		.Should()
-		.Equal(
-			producers[0].Id,
-			producers[1].Id,
-			null);
+			.Select(product => product.ProducerId)
+			.Should()
+			.Equal(
+				producers[0].Id,
+				producers[1].Id,
+				null);
 	}
 
 	[Fact]
@@ -197,27 +196,27 @@ public sealed class ResolveProductReferencesTests : IntegrationTest
 		var result = await Mediator.Send(new ResolveProductReferencesQuery(references), CancellationToken);
 
 		result.Products
-		.Select(item => item.ProductId)
-		.Should()
-		.Equal(
-			product.Id,
-			null,
-			null,
-			product.Id,
-			null,
-			null,
-			null);
+			.Select(item => item.ProductId)
+			.Should()
+			.Equal(
+				product.Id,
+				null,
+				null,
+				product.Id,
+				null,
+				null,
+				null);
 		result.Products
-		.Select(item => item.ProducerId)
-		.Should()
-		.Equal(
-			producer.Id,
-			null,
-			producer.Id,
-			producer.Id,
-			producer.Id,
-			null,
-			producer.Id);
+			.Select(item => item.ProducerId)
+			.Should()
+			.Equal(
+				producer.Id,
+				null,
+				producer.Id,
+				producer.Id,
+				producer.Id,
+				null,
+				producer.Id);
 		result.Products
 			.Select(item => (item.Sku, item.ProducerName, item.Supplier))
 			.Should()

@@ -23,7 +23,9 @@ public class StorageModuleLocalizationTests(CombinedContainerFixture fixture) : 
 	{
 		var localizer = Scope.ServiceProvider.GetRequiredService<IContextualLocalizer>();
 
-		localizer.TryGet(StorageContentSettingExtractionPolicyNameMessage.Instance, out var text).Should().BeTrue();
+		localizer.TryGet(StorageContentSettingExtractionPolicyNameMessage.Instance, out var text)
+			.Should()
+			.BeTrue();
 		text.Should().NotBeNullOrWhiteSpace();
 	}
 

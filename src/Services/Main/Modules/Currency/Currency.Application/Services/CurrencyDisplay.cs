@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Currency.Application.Services;
 
-public sealed class CurrencyDisplay(IReadRepository<Main.Entities.Currency.Currency, int> currencies) : ICurrencyDisplay
+public sealed class CurrencyDisplay(IReadRepository<Entities.Currency.Currency, int> currencies)
+	: ICurrencyDisplay
 {
 	public async Task<CurrencyDisplayInfo?> GetAsync(
 		int currencyId,

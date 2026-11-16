@@ -1,6 +1,5 @@
-using Main.Entities.Analytics;
 using FluentAssertions;
-using Main.Entities.Sale;
+using Main.Entities.Analytics;
 using Main.Entities.Sale.Enums;
 using Main.Entities.Sale.Sale;
 using Main.Modules.Analytics.Abstractions.Analyzers;
@@ -239,15 +238,15 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 		foreach (var sample in _samples)
 		{
 			var row = SaleContentAnalytics.Create(
-					sample.Content.Id,
-					sample.Content.SaleId,
-					sample.Content.Sale.OrganizationId,
-					sample.Content.Sale.UserId,
-					sample.Content.Sale.SaleDatetime,
-					sample.Content.Count,
-					sample.Price,
-					sample.Price,
-					sample.Cost);
+				sample.Content.Id,
+				sample.Content.SaleId,
+				sample.Content.Sale.OrganizationId,
+				sample.Content.Sale.UserId,
+				sample.Content.Sale.SaleDatetime,
+				sample.Content.Count,
+				sample.Price,
+				sample.Price,
+				sample.Cost);
 			if (sample.Content.Sale.State == SaleState.Deleted)
 				row.Deactivate();
 			await Context.AddAsync(row, CancellationToken);

@@ -14,46 +14,22 @@ public class JobLeaseService(IApplicationTransaction transactionService) : IJobL
 		Guid holderId,
 		TimeSpan leaseDuration,
 		CancellationToken ct)
-		=> AcquireAsync(holderId, leaseDuration, null, ct);
+		=> AcquireAsync(
+			holderId,
+			leaseDuration,
+			null,
+			ct);
 
 	public Task<Job?> TryAcquireJobAsync(
 		Guid holderId,
 		TimeSpan leaseDuration,
 		IReadOnlyCollection<string> systemNames,
 		CancellationToken ct)
-		=> AcquireAsync(holderId, leaseDuration, systemNames, ct);
-
-	private async Task<Job?> AcquireAsync(
-		Guid holderId,
-		TimeSpan leaseDuration,
-		IReadOnlyCollection<string>? systemNames,
-		CancellationToken ct)
-		=> await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3))
-			.ExecuteAsync(
-				async (context, cancellationToken) =>
-				{
-					var repository = context.Repositories.Get<Job, Guid>();
-					var now = DateTime.UtcNow;
-					var names = systemNames?.ToArray();
-					var criteria = GetCriteriaBase(1)
-						.Where(x =>
-							(x.Status == JobStatus.Pending ||
-								(x.Status == JobStatus.Locked || x.Status == JobStatus.Processing) &&
-								x.LeaseExpiresAt != null && x.LeaseExpiresAt <= now && x.Attempts < x.MaxAttempts) &&
-							(names == null || names.Contains(x.SystemName)))
-						.Build();
-
-					var job = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
-
-					if (job == null)
-						return null;
-
-					job.AcquireLease(holderId, leaseDuration);
-
-					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-					return job;
-				},
-				ct);
+		=> AcquireAsync(
+			holderId,
+			leaseDuration,
+			systemNames,
+			ct);
 
 	public async Task<List<Job>> FailExpiredJobsWithoutAttempts(int maxBatchSize, CancellationToken ct)
 		=> await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3))
@@ -98,6 +74,39 @@ public class JobLeaseService(IApplicationTransaction transactionService) : IJobL
 
 					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
 					return jobs;
+				},
+				ct);
+
+	private async Task<Job?> AcquireAsync(
+		Guid holderId,
+		TimeSpan leaseDuration,
+		IReadOnlyCollection<string>? systemNames,
+		CancellationToken ct)
+		=> await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3))
+			.ExecuteAsync(
+				async (context, cancellationToken) =>
+				{
+					var repository = context.Repositories.Get<Job, Guid>();
+					var now = DateTime.UtcNow;
+					var names = systemNames?.ToArray();
+					var criteria = GetCriteriaBase(1)
+						.Where(x =>
+							(x.Status == JobStatus.Pending ||
+								(x.Status == JobStatus.Locked || x.Status == JobStatus.Processing) &&
+								x.LeaseExpiresAt != null && x.LeaseExpiresAt <= now &&
+								x.Attempts < x.MaxAttempts) &&
+							(names == null || names.Contains(x.SystemName)))
+						.Build();
+
+					var job = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
+
+					if (job == null)
+						return null;
+
+					job.AcquireLease(holderId, leaseDuration);
+
+					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+					return job;
 				},
 				ct);
 

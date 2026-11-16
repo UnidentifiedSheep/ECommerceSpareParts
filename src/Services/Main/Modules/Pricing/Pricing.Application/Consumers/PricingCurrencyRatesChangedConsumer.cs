@@ -1,4 +1,3 @@
-using Main.Modules.Currency.Abstractions;
 using Main.Modules.Currency.Abstractions.Events;
 using Main.Modules.Currency.Abstractions.Interfaces;
 using MassTransit;

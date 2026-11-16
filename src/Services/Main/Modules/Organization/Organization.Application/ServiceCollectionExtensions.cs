@@ -1,5 +1,4 @@
 using Application.Common.Host;
-using Main.Entities.Organization;
 using Main.Modules.Organization.Abstractions;
 using Main.Modules.Organization.Application.Configs;
 using Main.Modules.Organization.Application.Services;

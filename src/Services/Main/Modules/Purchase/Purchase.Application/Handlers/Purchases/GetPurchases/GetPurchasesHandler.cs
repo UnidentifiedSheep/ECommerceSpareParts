@@ -60,16 +60,24 @@ public class GetPurchasesHandler(
 		return new GetPurchasesResult(purchases);
 	}
 
-	private IQueryable<Entities.Purchase.Purchase.Purchase> ApplySearchTerm(IQueryable<Entities.Purchase.Purchase.Purchase> query, string searchTerm)
+	private IQueryable<Entities.Purchase.Purchase.Purchase> ApplySearchTerm(
+		IQueryable<Entities.Purchase.Purchase.Purchase> query,
+		string searchTerm)
 	{
 		var term = searchTerm.Trim();
 		var pattern = LikePattern.Contains(term);
 		var productIds = productSearch.MatchingIds(term);
 
 		return query.Where(purchase =>
-			EF.Functions.ILike(purchase.Comment!, pattern, "\\") ||
+			EF.Functions.ILike(
+				purchase.Comment!,
+				pattern,
+				"\\") ||
 			purchase.Contents.Any(content =>
-				EF.Functions.ILike(content.Comment!, pattern, "\\") ||
+				EF.Functions.ILike(
+					content.Comment!,
+					pattern,
+					"\\") ||
 				productIds.Contains(content.ProductId)));
 	}
 }

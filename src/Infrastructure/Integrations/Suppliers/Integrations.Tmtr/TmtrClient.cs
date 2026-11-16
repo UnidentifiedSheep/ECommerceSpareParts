@@ -3,7 +3,6 @@ using Abstractions.Models.Options;
 using Integrations.Client.Core;
 using Integrations.Common;
 using Integrations.Supplier.Connections;
-using Integrations.Supplier.Interfaces;
 using Integrations.Tmtr.Requests;
 using Integrations.Tmtr.Responses;
 

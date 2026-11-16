@@ -7,14 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Identity.Application.Services;
 
-public sealed class UserSearch(IReadRepository<User, Guid> users, IUserRepository userRepository) : IUserSearch
+public sealed class UserSearch(IReadRepository<User, Guid> users, IUserRepository userRepository)
+	: IUserSearch
 {
 	public IQueryable<Guid> MatchingIds(string term)
 	{
 		var pattern = LikePattern.Contains(term.Trim());
 
 		return users.Query
-			.Where(user => EF.Functions.ILike(user.UserName.Value, pattern, "\\"))
+			.Where(user => EF.Functions.ILike(
+				user.UserName.Value,
+				pattern,
+				"\\"))
 			.Select(user => user.Id);
 	}
 

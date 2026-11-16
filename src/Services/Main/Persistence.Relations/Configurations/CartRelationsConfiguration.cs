@@ -1,5 +1,6 @@
 using Main.Entities.Cart.Cart;
 using Main.Entities.Product.Product;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,7 +17,7 @@ public sealed class CartRelationsConfiguration : IEntityTypeConfiguration<Cart>
 			.HasConstraintName("cart_product_id_fk");
 
 		builder
-			.HasOne<Main.Entities.User.User>()
+			.HasOne<User>()
 			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.HasConstraintName("cart_users_id_fk");

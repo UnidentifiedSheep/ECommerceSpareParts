@@ -1,11 +1,9 @@
-using Main.Modules.Analytics.Abstractions;
 using Main.Modules.Analytics.Abstractions.Events;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using MassTransit;
 using MediatR;
 using Pricing.Application.Dtos.Markup;
 using Pricing.Application.Handlers.Markup.UpsertMarkupGroup;
-using Main.Modules.Currency.Abstractions;
-using Main.Modules.Currency.Abstractions.Interfaces;
 
 namespace Pricing.Application.Consumers;
 

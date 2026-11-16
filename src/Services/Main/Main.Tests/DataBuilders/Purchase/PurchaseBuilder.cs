@@ -1,5 +1,4 @@
 using Bogus;
-using Main.Entities.Storage;
 using Tests.Abstractions;
 using DomainPurchase = Main.Entities.Purchase.Purchase.Purchase;
 using PurchaseContent = Main.Entities.Purchase.Purchase.PurchaseContent;

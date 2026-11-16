@@ -1,8 +1,6 @@
 using Enums;
 using FluentAssertions;
-using Main.Entities.Balance;
 using Main.Entities.Balance.Balance;
-using Main.Entities.Sale;
 using Main.Entities.Sale.Sale;
 using Main.Modules.Sale.Application.Handlers.Sales;
 using Tests.DataBuilders.Balance;

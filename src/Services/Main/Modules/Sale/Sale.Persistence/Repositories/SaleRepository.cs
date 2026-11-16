@@ -7,7 +7,8 @@ using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 namespace Main.Modules.Sale.Persistence.Repositories;
 
 public class SaleRepository(UnifiedDbContext context, QueryExtensions extensions)
-	: LinqRepositoryBase<UnifiedDbContext, Entities.Sale.Sale.Sale, Guid>(context, extensions), ISaleRepository
+	: LinqRepositoryBase<UnifiedDbContext, Entities.Sale.Sale.Sale, Guid>(context, extensions),
+		ISaleRepository
 {
 	public Task<Entities.Sale.Sale.Sale?> GetFullSaleForUpdate(
 		Guid id,

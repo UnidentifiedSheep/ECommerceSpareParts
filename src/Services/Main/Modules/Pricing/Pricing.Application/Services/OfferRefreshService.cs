@@ -1,11 +1,10 @@
-using Main.Modules.Product.Abstractions;
-using Pricing.Application.Events;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Events;
 using Enums;
 using Integrations.Supplier.Models;
 using Main.Modules.Product.Abstractions.Events;
 using Microsoft.Extensions.Logging;
+using Pricing.Application.Events;
 using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;

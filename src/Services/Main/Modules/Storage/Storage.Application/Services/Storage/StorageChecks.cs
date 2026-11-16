@@ -6,5 +6,6 @@ namespace Main.Modules.Storage.Application.Services.Storage;
 
 public sealed class StorageChecks : IStorageChecks
 {
-	public IValidationPlan Exists(IValidationPlan plan, string storageCode) => plan.ValidateStorageExistsCode(storageCode);
+	public IValidationPlan Exists(IValidationPlan plan, string storageCode)
+		=> plan.ValidateStorageExistsCode(storageCode);
 }

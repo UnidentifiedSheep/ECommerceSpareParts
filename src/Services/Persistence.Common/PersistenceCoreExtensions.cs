@@ -21,7 +21,9 @@ public static class PersistenceCoreExtensions
 		return services;
 	}
 
-	public static IServiceCollection AddEntities(this IServiceCollection services, params Assembly[] assemblies)
+	public static IServiceCollection AddEntities(
+		this IServiceCollection services,
+		params Assembly[] assemblies)
 	{
 		var tracker = services.GetEntityAssemblyTracker();
 		var fresh = assemblies.Where(tracker.Add).ToArray();
@@ -40,7 +42,8 @@ public static class PersistenceCoreExtensions
 
 	private static HashSet<Assembly> GetEntityAssemblyTracker(this IServiceCollection services)
 	{
-		if (services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(EntityAssemblyTracker))?
+		if (services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(EntityAssemblyTracker))
+				?
 				.ImplementationInstance is EntityAssemblyTracker existing)
 			return existing.Assemblies;
 

@@ -11,7 +11,8 @@ public record GetSupplierProductReferencesQuery(IReadOnlyCollection<int> Product
 
 public record GetSupplierProductReferencesResult(IReadOnlyList<ResolvedSupplierProductReferenceDto> Products);
 
-public class GetSupplierProductReferencesHandler(IReadRepository<Entities.Product.Product.Product, int> repository)
+public class GetSupplierProductReferencesHandler(
+	IReadRepository<Entities.Product.Product.Product, int> repository)
 	: IQueryHandler<GetSupplierProductReferencesQuery, GetSupplierProductReferencesResult>
 {
 	public async Task<GetSupplierProductReferencesResult> Handle(

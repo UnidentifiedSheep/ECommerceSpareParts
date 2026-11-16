@@ -15,7 +15,7 @@ using Persistence.Repository;
 namespace Main.Modules.Identity.Persistence.Repositories;
 
 public class UserRepository(UnifiedDbContext context, IQueryableExtensions extensions)
-	: LinqRepositoryBase<UnifiedDbContext, Entities.User.User, Guid>(context, extensions), IUserRepository
+	: LinqRepositoryBase<UnifiedDbContext, User, Guid>(context, extensions), IUserRepository
 {
 	public async Task RevokeRefreshTokensAsync(
 		Guid userId,
@@ -28,14 +28,14 @@ public class UserRepository(UnifiedDbContext context, IQueryableExtensions exten
 					.SetProperty(token => token.RevokeReason, reason),
 				cancellationToken);
 
-	public IQueryable<Entities.User.User> Search(
-		IQueryable<Entities.User.User> query,
+	public IQueryable<User> Search(
+		IQueryable<User> query,
 		string searchTerm)
 		=> SearchWithRank(query, searchTerm)
 			.Select(match => match.User);
 
 	public IQueryable<UserSearchMatch> SearchWithRank(
-		IQueryable<Entities.User.User> query,
+		IQueryable<User> query,
 		string searchTerm)
 	{
 		var normalized = searchTerm.Trim();
@@ -61,13 +61,13 @@ public class UserRepository(UnifiedDbContext context, IQueryableExtensions exten
 			.ThenBy(match => match.User.Id);
 	}
 
-	public Task<Entities.User.User?> GetUserByPrimaryEmailAsync(
+	public Task<User?> GetUserByPrimaryEmailAsync(
 		string email,
-		Criteria<Entities.User.User>? criteria = null,
+		Criteria<User>? criteria = null,
 		CancellationToken cancellationToken = default)
 	{
 		Email normalizedEmail = email;
-		var query = Context.Set<Entities.User.User>()
+		var query = Context.Set<User>()
 			.Where(x => x.Emails.Any(z => z.Email == normalizedEmail && z.IsPrimary));
 
 		if (criteria != null)
@@ -76,10 +76,10 @@ public class UserRepository(UnifiedDbContext context, IQueryableExtensions exten
 		return query.FirstOrDefaultAsync(cancellationToken);
 	}
 
-	public Task<Entities.User.User?> GetUserByLoginAsync(
+	public Task<User?> GetUserByLoginAsync(
 		string login,
 		bool isEmail,
-		Criteria<Entities.User.User>? criteria = null,
+		Criteria<User>? criteria = null,
 		CancellationToken cancellationToken = default)
 	{
 		if (isEmail)
@@ -89,7 +89,7 @@ public class UserRepository(UnifiedDbContext context, IQueryableExtensions exten
 				cancellationToken);
 
 		var normalizedUserName = UserName.ToNormalized(login);
-		var query = Context.Set<Entities.User.User>()
+		var query = Context.Set<User>()
 			.Where(x => x.UserName.NormalizedValue == normalizedUserName);
 
 		if (criteria != null)

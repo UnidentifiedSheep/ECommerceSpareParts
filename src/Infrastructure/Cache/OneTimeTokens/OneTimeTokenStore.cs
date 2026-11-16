@@ -4,8 +4,14 @@ namespace Cache.OneTimeTokens;
 
 public class OneTimeTokenStore(ICache cache) : IOneTimeTokenStore
 {
-	public Task StoreAsync(string purpose, Guid tokenId, TimeSpan ttl)
-		=> cache.SetAsync(Key(purpose, tokenId), tokenId, ttl);
+	public Task StoreAsync(
+		string purpose,
+		Guid tokenId,
+		TimeSpan ttl)
+		=> cache.SetAsync(
+			Key(purpose, tokenId),
+			tokenId,
+			ttl);
 
 	public async Task<bool> ConsumeAsync(string purpose, Guid tokenId)
 	{

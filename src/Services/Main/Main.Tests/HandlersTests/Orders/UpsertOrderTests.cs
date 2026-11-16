@@ -4,7 +4,6 @@ using FluentAssertions;
 using FluentValidation.TestHelper;
 using Main.Entities;
 using Main.Entities.Auth;
-using Main.Entities.Order;
 using Main.Entities.Order.Enums.Orders;
 using Main.Entities.Order.Order;
 using Main.Modules.Order.Application.Orders.Commands.UpsertOrder;

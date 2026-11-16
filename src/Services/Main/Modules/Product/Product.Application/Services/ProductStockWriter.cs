@@ -39,7 +39,10 @@ public sealed class ProductStockWriter(
 		{
 			var products = await productRepository.FindByIdsAsync(
 				missingProductIds,
-				Criteria<Entities.Product.Product.Product>.New().OrderByAsc(product => product.Id).ForUpdate().Build(),
+				Criteria<Entities.Product.Product.Product>.New()
+					.OrderByAsc(product => product.Id)
+					.ForUpdate()
+					.Build(),
 				cancellationToken);
 			missingProductIds.EnsureAllExists(
 				products.Keys,

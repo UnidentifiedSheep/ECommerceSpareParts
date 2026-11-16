@@ -25,7 +25,10 @@ public sealed class SaleAnalyticsWriter(
 			.ToArray();
 		var ids = latest.Select(snapshot => snapshot.SaleContentId).ToArray();
 		var existing = (await repository.ListAsync(
-				Criteria<SaleContentAnalytics>.New().Where(item => ids.Contains(item.SaleContentId)).Track().Build(),
+				Criteria<SaleContentAnalytics>.New()
+					.Where(item => ids.Contains(item.SaleContentId))
+					.Track()
+					.Build(),
 				cancellationToken))
 			.ToDictionary(item => item.SaleContentId);
 

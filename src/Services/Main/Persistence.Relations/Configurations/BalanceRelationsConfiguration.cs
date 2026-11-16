@@ -1,5 +1,7 @@
 using Main.Entities.Balance.Balance;
+using Main.Entities.Currency;
 using Main.Entities.Organization.Organization;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,14 +12,14 @@ public sealed class TransactionRelationsConfiguration : IEntityTypeConfiguration
 	public void Configure(EntityTypeBuilder<Transaction> builder)
 	{
 		builder
-			.HasOne<Main.Entities.Currency.Currency>()
+			.HasOne<Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("transactions_currency_id_fk");
 
 		builder
-			.HasOne<Main.Entities.User.User>()
+			.HasOne<User>()
 			.WithMany()
 			.HasForeignKey(d => d.ReversedBy)
 			.OnDelete(DeleteBehavior.Restrict)
@@ -45,7 +47,7 @@ public sealed class OrganizationBalanceRelationsConfiguration
 	public void Configure(EntityTypeBuilder<OrganizationBalance> builder)
 	{
 		builder
-			.HasOne<Main.Entities.Currency.Currency>()
+			.HasOne<Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)

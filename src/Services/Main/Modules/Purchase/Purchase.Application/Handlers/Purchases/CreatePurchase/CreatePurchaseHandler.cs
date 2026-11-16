@@ -83,8 +83,7 @@ public class CreatePurchaseHandler(
 	private async Task<IReadOnlyList<StoredLot>> AddContentsToStorage(
 		CreatePurchaseCommand request,
 		CancellationToken cancellationToken)
-	{
-		return await storageContentService.AddAsync(
+		=> await storageContentService.AddAsync(
 			request.PurchaseContent
 				.Select(x => new NewStorageLot(
 					x.ProductId,
@@ -96,7 +95,6 @@ public class CreatePurchaseHandler(
 			request.StorageCode,
 			StorageMovementType.Purchase,
 			cancellationToken);
-	}
 
 	private async Task<Entities.Purchase.Purchase.Purchase> CreatePurchase(
 		CreatePurchaseCommand request,

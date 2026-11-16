@@ -1,6 +1,5 @@
 using Bogus;
 using Enums.Units;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Tests.Abstractions;
 

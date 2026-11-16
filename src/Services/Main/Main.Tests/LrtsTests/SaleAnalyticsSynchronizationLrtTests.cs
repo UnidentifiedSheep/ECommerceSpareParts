@@ -1,12 +1,11 @@
 using Application.Common;
-using Main.Entities.Analytics;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Entities.Sale;
+using Main.Entities.Analytics;
 using Main.Entities.Sale.Sale;
 using Main.Modules.Analytics.Application.Lrts.SaleAnalyticsSynchronization;
 using Main.Modules.Currency.Abstractions.Interfaces;

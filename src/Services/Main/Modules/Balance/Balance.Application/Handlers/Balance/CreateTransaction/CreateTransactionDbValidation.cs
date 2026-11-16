@@ -5,7 +5,8 @@ using Main.Modules.Organization.Abstractions;
 
 namespace Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
 
-public class CreateTransactionDbValidation(IOrganizationChecks organizationChecks, ICurrencyChecks currencyChecks)
+public class CreateTransactionDbValidation(IOrganizationChecks organizationChecks,
+	ICurrencyChecks currencyChecks)
 	: AbstractDbValidation<CreateTransactionCommand>
 {
 	public override void Build(IValidationPlan plan, CreateTransactionCommand request)

@@ -40,7 +40,9 @@ public sealed class StorageContentMutations
 			new EditStorageContentCommand(
 				items.ToDictionary(
 					item => item.Id,
-					item => new ModelWithRowVersion<PatchStorageContentDto, uint>(item.ToDto(), item.RowVersion))),
+					item => new ModelWithRowVersion<PatchStorageContentDto, uint>(
+						item.ToDto(),
+						item.RowVersion))),
 			cancellationToken);
 		return true;
 	}

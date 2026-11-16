@@ -1,7 +1,6 @@
 ﻿using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Persistence.Common.BaseTableConfigurations;
 
 namespace Persistence.Common;
 

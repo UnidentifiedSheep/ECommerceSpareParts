@@ -9,7 +9,8 @@ public record IsOrganizationSystemNameAvailableQuery(string SystemName)
 
 public record IsOrganizationSystemNameAvailableResult(bool IsAvailable);
 
-public class IsOrganizationSystemNameAvailableHandler(IReadRepository<Entities.Organization.Organization.Organization, Guid> repository)
+public class IsOrganizationSystemNameAvailableHandler(
+	IReadRepository<Entities.Organization.Organization.Organization, Guid> repository)
 	: IQueryHandler<IsOrganizationSystemNameAvailableQuery, IsOrganizationSystemNameAvailableResult>
 {
 
@@ -18,7 +19,8 @@ public class IsOrganizationSystemNameAvailableHandler(IReadRepository<Entities.O
 		CancellationToken cancellationToken)
 	{
 		var any = await repository.Query.AnyAsync(
-			x => x.SystemName == Entities.Organization.Organization.Organization.NormalizeSystemName(request.SystemName),
+			x => x.SystemName ==
+				Entities.Organization.Organization.Organization.NormalizeSystemName(request.SystemName),
 			cancellationToken);
 
 		return new IsOrganizationSystemNameAvailableResult(!any);

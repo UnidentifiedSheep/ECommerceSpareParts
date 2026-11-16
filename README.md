@@ -10,7 +10,7 @@ analytics.
 | Service     | Responsibility                                                         |
 |-------------|------------------------------------------------------------------------|
 | `Gateway`   | Public YARP reverse proxy and aggregated API documentation.            |
-| `Main`      | Catalog, users, WMS, purchases, sales, and files.           |
+| `Main`      | Catalog, users, WMS, purchases, sales, and files.                      |
 | `Pricing`   | Supplier/internal offers, markup rules, price generation, and ranking. |
 | `Search`    | Product and producer search backed by OpenSearch.                      |
 | `Analytics` | Metrics, sale analysis, and automatic markup generation.               |

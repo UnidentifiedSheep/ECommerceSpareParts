@@ -9,21 +9,22 @@ namespace Main.Modules.Order.Application.Orders;
 [Lifetime(Lifetime.Singleton)]
 public sealed class OrderDtoProjectionProvider : ProjectionProviderBase<Entities.Order.Order.Order, OrderDto>
 {
-	public override Expression<Func<Entities.Order.Order.Order, OrderDto>> Projection { get; } = order => new OrderDto
-	{
-		Id = order.Id,
-		OrganizationId = order.OrganizationId,
-		UserId = order.UserId,
-		CurrencyId = order.CurrencyId,
-		Source = order.Source,
-		Status = order.Status,
-		RowVersion = order.RowVersion,
-		FulfillmentStatus = order.FulfillmentStatus,
-		ConfirmedByUserId = order.ConfirmedByUserId,
-		ConfirmedAt = order.ConfirmedAt,
-		CreatedAt = order.CreatedAt,
-		UpdatedAt = order.UpdatedAt
-	};
+	public override Expression<Func<Entities.Order.Order.Order, OrderDto>> Projection { get; } = order
+		=> new OrderDto
+		{
+			Id = order.Id,
+			OrganizationId = order.OrganizationId,
+			UserId = order.UserId,
+			CurrencyId = order.CurrencyId,
+			Source = order.Source,
+			Status = order.Status,
+			RowVersion = order.RowVersion,
+			FulfillmentStatus = order.FulfillmentStatus,
+			ConfirmedByUserId = order.ConfirmedByUserId,
+			ConfirmedAt = order.ConfirmedAt,
+			CreatedAt = order.CreatedAt,
+			UpdatedAt = order.UpdatedAt
+		};
 }
 
 [Lifetime(Lifetime.Singleton)]

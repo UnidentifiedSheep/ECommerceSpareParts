@@ -9,7 +9,8 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Modules.Balance.Application.Services;
 
-public sealed class FinanceTransfers(ISender sender, IOptions<SystemOptions> systemOptions) : IFinanceTransfers
+public sealed class FinanceTransfers(ISender sender, IOptions<SystemOptions> systemOptions)
+	: IFinanceTransfers
 {
 	public Guid SystemOrganizationId => systemOptions.Value.SystemId;
 

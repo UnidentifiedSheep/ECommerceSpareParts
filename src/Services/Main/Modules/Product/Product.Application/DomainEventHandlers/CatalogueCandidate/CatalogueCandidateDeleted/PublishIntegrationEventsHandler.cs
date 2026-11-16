@@ -8,7 +8,7 @@ using Candidate = Main.Entities.Product.Product.Enrichment.CatalogueCandidate;
 namespace Main.Modules.Product.Application.DomainEventHandlers.CatalogueCandidate.CatalogueCandidateDeleted;
 
 public class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
-	: BatchableDomainEventHandler<EntityDeletedDomainEvent<Entities.Product.Product.Enrichment.CatalogueCandidate, Guid>>
+	: BatchableDomainEventHandler<EntityDeletedDomainEvent<Candidate, Guid>>
 {
 	public override Task Handle(
 		Batch<EntityDeletedDomainEvent<Candidate, Guid>> notification,

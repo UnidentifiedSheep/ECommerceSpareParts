@@ -60,7 +60,8 @@ public class ModuleBoundariesTests
 				.Select(reference => $"{assembly.Name} -> {reference}"))
 			.ToList();
 
-		violations.Should().BeEmpty("modules must depend only on shared/common projects, never on the Main host");
+		violations.Should()
+			.BeEmpty("modules must depend only on shared/common projects, never on the Main host");
 	}
 
 	[Fact]
@@ -121,16 +122,19 @@ public class ModuleBoundariesTests
 	[Fact]
 	public void SharedAssemblies_DoNotReferenceMainOrModules()
 	{
-		string[] shared = ["Application.Common", "Domain", "Exceptions", "Extensions", "Persistence.Common", "Persistence"];
+		string[] shared =
+			["Application.Common", "Domain", "Exceptions", "Extensions", "Persistence.Common", "Persistence"];
 
 		var violations = shared
 			.Select(SolutionLayout.LoadByName)
 			.SelectMany(assembly => assembly.GetReferencedAssemblies()
-				.Where(reference => reference.Name!.StartsWith("Main.") || reference.Name.StartsWith("Pricing."))
+				.Where(reference
+					=> reference.Name!.StartsWith("Main.") || reference.Name.StartsWith("Pricing."))
 				.Select(reference => $"{assembly.GetName().Name} -> {reference.Name}"))
 			.ToList();
 
-		violations.Should().BeEmpty("shared building blocks must not know about concrete services or modules");
+		violations.Should()
+			.BeEmpty("shared building blocks must not know about concrete services or modules");
 	}
 
 	[Fact]
@@ -145,13 +149,17 @@ public class ModuleBoundariesTests
 					.That()
 					.ResideInNamespaceStartingWith("Main.Entities")
 					.ShouldNot()
-					.HaveDependencyOnAny("MassTransit", "Microsoft.EntityFrameworkCore", "Application.Common")
+					.HaveDependencyOnAny(
+						"MassTransit",
+						"Microsoft.EntityFrameworkCore",
+						"Application.Common")
 					.GetResult()
 			})
 			.Where(x => !x.Result.IsSuccessful)
 			.Select(x => $"{x.Name}: {string.Join(", ", x.Result.FailingTypeNames ?? [])}")
 			.ToList();
 
-		failing.Should().BeEmpty("domain entities must stay free of application and infrastructure frameworks");
+		failing.Should()
+			.BeEmpty("domain entities must stay free of application and infrastructure frameworks");
 	}
 }

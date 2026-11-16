@@ -16,7 +16,10 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 
 	private bool _disposed;
 
-	public LrtQuotaManager(string systemName, int maxQuota, IJobSignal? releaseSignal = null)
+	public LrtQuotaManager(
+		string systemName,
+		int maxQuota,
+		IJobSignal? releaseSignal = null)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(systemName);
 		SystemName = systemName;
@@ -24,8 +27,6 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 		_releaseSignal = releaseSignal;
 		_semaphore = new SemaphoreSlim(MaxQuota, Math.Max(1, MaxQuota));
 	}
-
-	public string SystemName { get; }
 
 	public bool IsQuotaAvailable => AvailableQuota > 0;
 
@@ -41,6 +42,8 @@ public sealed class LrtQuotaManager : ILrtQuotaManager, IDisposable
 			_semaphore.Dispose();
 		}
 	}
+
+	public string SystemName { get; }
 
 	public int MaxQuota { get; }
 

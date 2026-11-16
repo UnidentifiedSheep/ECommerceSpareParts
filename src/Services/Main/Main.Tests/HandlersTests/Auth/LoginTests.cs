@@ -146,7 +146,7 @@ public class LoginTests(CombinedContainerFixture fixture) : IntegrationTest(fixt
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == token.UserId, CancellationToken);
 		user.LastLoginAt.Should().BeOnOrAfter(before).And.BeOnOrBefore(DateTime.UtcNow);
-		var notification = await Context.Set<global::Main.Entities.Notification.Notification>()
+		var notification = await Context.Set<Main.Entities.Notification.Notification>()
 			.AsNoTracking()
 			.SingleAsync(
 				x => x.UserId == user.Id && x.NotificationSystemName == "UserLoggedIn",

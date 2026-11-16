@@ -9,7 +9,8 @@ namespace Main.Modules.Notifications;
 
 public sealed class NotificationsModule : ModuleBase
 {
-	public override IReadOnlyCollection<Assembly> ConsumerAssemblies => [NotificationsApplicationAssembly.Value];
+	public override IReadOnlyCollection<Assembly> ConsumerAssemblies
+		=> [NotificationsApplicationAssembly.Value];
 
 	public override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 	{

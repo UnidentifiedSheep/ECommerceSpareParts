@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Main.Entities.Sale;
 using Main.Entities.Sale.Sale;
 
 namespace Tests.Domain.Sale;

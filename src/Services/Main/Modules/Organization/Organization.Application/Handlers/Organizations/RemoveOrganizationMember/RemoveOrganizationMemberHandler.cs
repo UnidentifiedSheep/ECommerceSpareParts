@@ -11,7 +11,8 @@ namespace Main.Modules.Organization.Application.Handlers.Organizations.RemoveOrg
 [Transactional]
 public record RemoveOrganizationMemberCommand(Guid OrganizationId, Guid UserId) : ICommand;
 
-public class RemoveOrganizationMemberHandler(IRepository<Entities.Organization.Organization.Organization, Guid> repository)
+public class RemoveOrganizationMemberHandler(
+	IRepository<Entities.Organization.Organization.Organization, Guid> repository)
 	: ICommandHandler<RemoveOrganizationMemberCommand>
 {
 	public async Task<Unit> Handle(

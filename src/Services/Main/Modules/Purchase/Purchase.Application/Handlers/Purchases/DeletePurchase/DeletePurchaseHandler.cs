@@ -37,7 +37,9 @@ public class DeletePurchaseHandler(
 		return Unit.Value;
 	}
 
-	private async Task<Entities.Purchase.Purchase.Purchase> GetPurchase(Guid id, CancellationToken cancellationToken)
+	private async Task<Entities.Purchase.Purchase.Purchase> GetPurchase(
+		Guid id,
+		CancellationToken cancellationToken)
 		=> await repository.EnsureExistForUpdateAsync(
 			id,
 			key => new PurchaseNotFoundException(key),

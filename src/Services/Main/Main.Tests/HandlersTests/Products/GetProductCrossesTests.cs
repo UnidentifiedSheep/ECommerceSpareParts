@@ -2,7 +2,6 @@ using Application.Common.Models;
 using Application.Common.Querying;
 using FluentAssertions;
 using Main.Entities.Product.Stock;
-using Main.Entities.Storage;
 using Main.Modules.Product.Application.Products.Interfaces;
 using Main.Modules.Product.Application.Products.Queries.GetProductCrosses;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,12 +65,12 @@ public sealed class GetProductCrossesTests : IntegrationTest
 			ids[0],
 			10);
 		Context.Set<ProductStock>()
-		.AddRange(
-			stock,
-			ProductStock.Create(
-				storage.Code,
-				ids[1],
-				5));
+			.AddRange(
+				stock,
+				ProductStock.Create(
+					storage.Code,
+					ids[1],
+					5));
 		await Context.SaveChangesAsync(CancellationToken);
 		var item = new GetProductCrossesQuery(
 			productId,
@@ -94,11 +93,11 @@ public sealed class GetProductCrossesTests : IntegrationTest
 		var (productId, ids) = await LoadCrosses();
 		var storage = GetContext<StorageTestContext>().Storages.First();
 		Context.Set<ProductStock>()
-		.Add(
-			ProductStock.Create(
-				storage.Code,
-				ids[^1],
-				5));
+			.Add(
+				ProductStock.Create(
+					storage.Code,
+					ids[^1],
+					5));
 		await Context.SaveChangesAsync(CancellationToken);
 		var item = new GetProductCrossesQuery(
 			productId,

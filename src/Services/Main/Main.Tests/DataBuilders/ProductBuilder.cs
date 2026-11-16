@@ -1,9 +1,7 @@
 ﻿using Bogus;
-using Main.Entities.Product;
 using Main.Entities.Product.Producer;
 using Main.Entities.Product.Product;
 using Main.Entities.Product.Product.ValueObjects;
-using Main.Entities.Product.ValueObjects;
 using Tests.Abstractions;
 using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 

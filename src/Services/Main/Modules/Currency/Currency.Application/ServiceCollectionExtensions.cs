@@ -1,11 +1,9 @@
-using Main.Modules.Currency.Application.Configs;
 using Application.Common.Host;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Lrt;
 using Application.Common.NamedObject;
-using Main.Modules.Currency.Abstractions;
 using Main.Modules.Currency.Abstractions.Interfaces;
 using Main.Modules.Currency.Application.Cache;
+using Main.Modules.Currency.Application.Configs;
 using Main.Modules.Currency.Application.Interfaces;
 using Main.Modules.Currency.Application.Services;
 using Microsoft.Extensions.DependencyInjection;

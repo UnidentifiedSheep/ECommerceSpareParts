@@ -42,9 +42,12 @@ public sealed class NotificationDefinitionBase<TNotification, TModel>(
 			_serializer.Serialize(notification));
 	}
 
-	INotification INotificationDefinition.FromEntity(Main.Entities.Notification.Notification entity) => FromEntity(entity);
+	INotification INotificationDefinition.FromEntity(Main.Entities.Notification.Notification entity)
+		=> FromEntity(entity);
 
-	Main.Entities.Notification.Notification INotificationDefinition.ToEntity(Guid userId, INotification notification)
+	Main.Entities.Notification.Notification INotificationDefinition.ToEntity(
+		Guid userId,
+		INotification notification)
 	{
 		ArgumentNullException.ThrowIfNull(notification);
 

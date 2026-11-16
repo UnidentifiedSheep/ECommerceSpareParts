@@ -1,6 +1,5 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Lrts.ProductGroupImport;
 using Microsoft.EntityFrameworkCore;
@@ -65,12 +64,12 @@ public sealed class ProductGroupImportLrtTests(CombinedContainerFixture fixture)
 		var state = execution.GetState<ProductGroupImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(5);
 		state.Errors
-		.Select(error => error.RowIdx)
-		.Should()
-		.Equal(
-			1,
-			2,
-			3);
+			.Select(error => error.RowIdx)
+			.Should()
+			.Equal(
+				1,
+				2,
+				3);
 		state.Errors.Should().OnlyContain(error => !string.IsNullOrWhiteSpace(error.Message));
 
 		var groups = await Context.Set<ProductGroup>().AsNoTracking().ToListAsync(CancellationToken);

@@ -1,20 +1,14 @@
-using Enums;
 using Application.Common.Services;
 using Contracts;
-using Enums.Units;
+using Enums;
 using FluentAssertions;
-using Main.Entities.Balance;
 using Main.Entities.Balance.Balance;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 using Main.Entities.Organization.Exceptions;
-using Main.Entities.Product;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
-using Main.Entities.Purchase;
 using Main.Entities.Purchase.Enums;
 using Main.Entities.Purchase.Purchase;
-using Main.Entities.Storage;
 using Main.Entities.Storage.Exceptions;
 using Main.Entities.Storage.Storage;
 using Main.Entities.User;
@@ -357,7 +351,6 @@ public class CreatePurchaseTests : IntegrationTest
 			Price = 10m + count,
 			Comment = $"content-{count}"
 		};
-
 }
 
 public class CreatePurchaseValidationTests : ValidationTest<CreatePurchaseValidation, CreatePurchaseCommand>
@@ -471,5 +464,4 @@ public class CreatePurchaseValidationTests : ValidationTest<CreatePurchaseValida
 		var result = await ValidateAsync(command);
 		result.ShouldHaveValidationErrorFor(x => x.SupplierOrganizationId);
 	}
-
 }

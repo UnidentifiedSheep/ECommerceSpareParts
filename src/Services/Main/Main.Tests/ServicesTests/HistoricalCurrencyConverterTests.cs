@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 using Main.Modules.Currency.Abstractions.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
@@ -117,8 +116,8 @@ public class HistoricalCurrencyConverterTests : IntegrationTest
 
 	private Task SetHistory(CurrencyRate rate, params (DateTime Date, decimal Rate)[] rows)
 		=> GetContext<CurrencyRatesTestContext>()
-		.SetHistoryAsync(
-			rate,
-			rows,
-			CancellationToken);
+			.SetHistoryAsync(
+				rate,
+				rows,
+				CancellationToken);
 }

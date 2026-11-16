@@ -7,7 +7,8 @@ using Main.Modules.Purchase.Application.Dtos.Purchase;
 namespace Main.Modules.Purchase.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class PurchaseDtoProjectionProvider : ProjectionProviderBase<Entities.Purchase.Purchase.Purchase, PurchaseDto>
+public sealed class
+	PurchaseDtoProjectionProvider : ProjectionProviderBase<Entities.Purchase.Purchase.Purchase, PurchaseDto>
 {
 	public override Expression<Func<Entities.Purchase.Purchase.Purchase, PurchaseDto>> Projection { get; } =
 		x => new PurchaseDto

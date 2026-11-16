@@ -1,15 +1,13 @@
+using Domain;
 using FluentValidation.TestHelper;
-using Main.Entities;
-using Main.Entities.Exceptions;
+using Main.Entities.Cart.Exceptions;
+using Main.Modules.Cart.Application.Handlers.Cart.ChangeCartItemCount;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
-using Domain;
-using Main.Entities.Cart.Exceptions;
-using Main.Modules.Cart.Application.Handlers.Cart.ChangeCartItemCount;
 
 namespace Tests.HandlersTests.Cart;
 

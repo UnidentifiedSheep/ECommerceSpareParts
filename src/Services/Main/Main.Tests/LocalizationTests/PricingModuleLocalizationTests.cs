@@ -24,7 +24,9 @@ public class PricingModuleLocalizationTests(CombinedContainerFixture fixture) : 
 
 		localizer.TryGet(LrtResyncOurWarehouseOffersNameMessage.Instance, out var name).Should().BeTrue();
 		name.Should().NotBeNullOrWhiteSpace();
-		localizer.TryGet(LrtResyncOurWarehouseOffersDescriptionMessage.Instance, out var description).Should().BeTrue();
+		localizer.TryGet(LrtResyncOurWarehouseOffersDescriptionMessage.Instance, out var description)
+			.Should()
+			.BeTrue();
 		description.Should().NotBeNullOrWhiteSpace();
 	}
 }

@@ -2,7 +2,6 @@ using Application.Common.Interfaces.Settings;
 using FluentAssertions;
 using Main.Entities.Currency;
 using Main.Entities.Currency.Settings;
-using Main.Entities.Exceptions;
 using Main.Modules.Currency.Application.Dtos;
 using Main.Modules.Currency.Application.Handlers.Currencies;
 using Main.Modules.Currency.Application.Interfaces;

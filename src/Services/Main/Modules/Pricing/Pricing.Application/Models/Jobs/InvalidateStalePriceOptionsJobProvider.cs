@@ -1,6 +1,5 @@
 using Application.Common;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
 using Attributes;
 using Domain.CommonEntities.Job;
 using Pricing.Application.Lrts.InvalidateStalePriceOptions;

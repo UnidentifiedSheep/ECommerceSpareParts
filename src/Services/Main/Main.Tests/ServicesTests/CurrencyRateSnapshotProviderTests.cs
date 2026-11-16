@@ -3,8 +3,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
-using Main.Modules.Currency.Abstractions;
 using Main.Modules.Currency.Abstractions.Events;
 using Main.Modules.Currency.Abstractions.Interfaces;
 using Main.Modules.Currency.Application.Services;
@@ -227,14 +225,25 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 			[(Start, 2m)],
 			CancellationToken);
 		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(2m);
-		var change = new CurrencyRateChange(Rate.FromCurrencyId, Rate.ToCurrencyId, 4m, Start.AddDays(10));
+		var change = new CurrencyRateChange(
+			Rate.FromCurrencyId,
+			Rate.ToCurrencyId,
+			4m,
+			Start.AddDays(10));
 
 		await Provider.Apply([change], CancellationToken);
 		await Provider.Apply([change], CancellationToken);
 
 		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(4m);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(10), CancellationToken))
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken)).Should()
+			.Be(2m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start.AddDays(10),
+				CancellationToken))
 			.Should()
 			.Be(4m);
 	}
@@ -249,11 +258,20 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(6m);
 
 		await Provider.Apply(
-			[new CurrencyRateChange(Rate.FromCurrencyId, Rate.ToCurrencyId, 4m, Start.AddDays(5))],
+			[
+				new CurrencyRateChange(
+					Rate.FromCurrencyId,
+					Rate.ToCurrencyId,
+					4m,
+					Start.AddDays(5))
+			],
 			CancellationToken);
 
 		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(6m);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(5), CancellationToken))
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start.AddDays(5),
+				CancellationToken))
 			.Should()
 			.Be(4m);
 	}

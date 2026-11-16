@@ -37,7 +37,8 @@ public static class ValidationErrorsServiceCollectionExtensions
 
 	public static ValidationErrorsRegistry GetValidationErrorsRegistry(this IServiceCollection services)
 	{
-		if (services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(ValidationErrorsRegistry))?
+		if (services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(ValidationErrorsRegistry))
+				?
 				.ImplementationInstance is ValidationErrorsRegistry existing)
 			return existing;
 

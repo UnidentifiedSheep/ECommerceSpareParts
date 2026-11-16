@@ -11,6 +11,7 @@ public class CreateOrganizationDbValidation(IUserChecks userChecks)
 	public override void Build(IValidationPlan plan, CreateOrganizationCommand request)
 	{
 		userChecks.Exists(plan, request.OwnerId);
-		plan.ValidateOrganizationNotExistsSystemName(Entities.Organization.Organization.Organization.NormalizeSystemName(request.SystemName));
+		plan.ValidateOrganizationNotExistsSystemName(
+			Entities.Organization.Organization.Organization.NormalizeSystemName(request.SystemName));
 	}
 }

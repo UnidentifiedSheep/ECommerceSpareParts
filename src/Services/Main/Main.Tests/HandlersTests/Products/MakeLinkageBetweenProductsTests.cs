@@ -1,6 +1,5 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Product.Enums.Products;
 using Main.Entities.Product.Product;

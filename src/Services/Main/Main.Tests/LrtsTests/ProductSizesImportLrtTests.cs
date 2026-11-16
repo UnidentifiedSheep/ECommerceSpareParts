@@ -1,7 +1,6 @@
 using Domain.CommonEnums;
 using Enums.Units;
 using FluentAssertions;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Lrts.ProductSizesImport;
 using Microsoft.EntityFrameworkCore;
@@ -22,13 +21,13 @@ public sealed class ProductSizesImportLrtTests : CsvLrtIntegrationTest<ProductSi
 	{
 		var products = TestContext.Products.Take(2).ToArray();
 		Context.Set<ProductSize>()
-		.Add(
-			ProductSize.Create(
-				products[0].Id,
-				1,
-				1,
-				1,
-				DimensionUnit.Meter));
+			.Add(
+				ProductSize.Create(
+					products[0].Id,
+					1,
+					1,
+					1,
+					DimensionUnit.Meter));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -122,13 +121,13 @@ public sealed class ProductSizesImportLrtTests : CsvLrtIntegrationTest<ProductSi
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductSizesImportState>();
 		state.Errors
-		.Select(x => x.RowIdx)
-		.Should()
-		.Equal(
-			1,
-			2,
-			3,
-			4);
+			.Select(x => x.RowIdx)
+			.Should()
+			.Equal(
+				1,
+				2,
+				3,
+				4);
 		(await Context.Set<ProductSize>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
 	}
 }

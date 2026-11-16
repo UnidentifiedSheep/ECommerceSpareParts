@@ -4,7 +4,6 @@ using Application.Common.Interfaces.Repositories;
 using BulkValidation.Core.Configuration;
 using BulkValidation.Pgsql.Extensions;
 using Domain;
-using Domain.CommonEntities.Job;
 using Domain.Interfaces;
 using Marten;
 using Microsoft.EntityFrameworkCore;

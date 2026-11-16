@@ -1,7 +1,6 @@
 using Exceptions;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Dtos.Product;

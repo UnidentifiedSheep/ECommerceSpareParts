@@ -1,6 +1,5 @@
 using Main.Entities.Auth;
 using Main.Entities.Enums;
-using Main.Entities.Organization;
 using Main.Entities.Organization.Organization;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;

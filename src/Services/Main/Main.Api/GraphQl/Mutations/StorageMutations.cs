@@ -44,7 +44,10 @@ public sealed class StorageMutations
 
 	[GraphQLName("delete")]
 	[RequireAllPermissions(PermissionCodes.STORAGES_DELETE)]
-	public async Task<bool> DeleteAsync(string code, ISender sender, CancellationToken cancellationToken)
+	public async Task<bool> DeleteAsync(
+		string code,
+		ISender sender,
+		CancellationToken cancellationToken)
 	{
 		await sender.Send(new DeleteStorageCommand(code), cancellationToken);
 		return true;

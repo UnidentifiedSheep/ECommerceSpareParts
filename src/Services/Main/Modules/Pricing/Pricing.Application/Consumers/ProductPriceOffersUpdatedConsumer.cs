@@ -1,7 +1,7 @@
-using Pricing.Application.Events;
 using MassTransit;
 using MediatR;
 using Pricing.Application.Dtos.Price;
+using Pricing.Application.Events;
 using Pricing.Application.Handlers.Pricing;
 
 namespace Pricing.Application.Consumers;

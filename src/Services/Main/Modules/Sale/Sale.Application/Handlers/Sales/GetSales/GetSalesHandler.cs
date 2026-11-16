@@ -28,7 +28,8 @@ public class GetSalesHandler(
 	IReadRepository<Entities.Sale.Sale.Sale, Guid> repository,
 	IUserSearch userSearch,
 	IProductSearch productSearch,
-	IProjectionProvider<Entities.Sale.Sale.Sale, SaleDto> projection) : IQueryHandler<GetSalesQuery, GetSalesResult>
+	IProjectionProvider<Entities.Sale.Sale.Sale, SaleDto> projection)
+	: IQueryHandler<GetSalesQuery, GetSalesResult>
 {
 	public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
 	{
@@ -64,7 +65,9 @@ public class GetSalesHandler(
 		return new GetSalesResult(result);
 	}
 
-	private IQueryable<Entities.Sale.Sale.Sale> ApplySearchTerm(IQueryable<Entities.Sale.Sale.Sale> query, string searchTerm)
+	private IQueryable<Entities.Sale.Sale.Sale> ApplySearchTerm(
+		IQueryable<Entities.Sale.Sale.Sale> query,
+		string searchTerm)
 	{
 		var term = searchTerm.Trim();
 		var pattern = LikePattern.Contains(term);
@@ -72,10 +75,16 @@ public class GetSalesHandler(
 		var userIds = userSearch.MatchingIds(term);
 
 		return query.Where(sale =>
-			EF.Functions.ILike(sale.Comment!, pattern, "\\") ||
+			EF.Functions.ILike(
+				sale.Comment!,
+				pattern,
+				"\\") ||
 			userIds.Contains(sale.UserId) ||
 			sale.Contents.Any(content =>
-				EF.Functions.ILike(content.Comment!, pattern, "\\") ||
+				EF.Functions.ILike(
+					content.Comment!,
+					pattern,
+					"\\") ||
 				productIds.Contains(content.ProductId)));
 	}
 }

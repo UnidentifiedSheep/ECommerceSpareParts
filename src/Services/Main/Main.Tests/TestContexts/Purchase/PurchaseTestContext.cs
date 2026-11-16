@@ -1,7 +1,5 @@
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Entities.Product.Stock;
-using Main.Entities.Storage;
 using Main.Entities.Storage.Storage;
 using Main.Entities.User;
 using Persistence.Context;

@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Storage.Application.Services.ProductDeletion;
 
-public sealed class StorageContentProductDeletionRule(IReadRepository<StorageContent, int> repository) : IProductDeletionRule
+public sealed class StorageContentProductDeletionRule(IReadRepository<StorageContent, int> repository)
+	: IProductDeletionRule
 {
 	public int Order => 20;
 

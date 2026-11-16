@@ -14,7 +14,8 @@ public record UpdateOrganizationCommand(Guid OrganizationId, PatchOrganizationDt
 
 public record UpdateOrganizationResult(Guid OrganizationId);
 
-public class UpdateOrganizationHandler(IRepository<Entities.Organization.Organization.Organization, Guid> repository)
+public class UpdateOrganizationHandler(
+	IRepository<Entities.Organization.Organization.Organization, Guid> repository)
 	: ICommandHandler<UpdateOrganizationCommand, UpdateOrganizationResult>
 {
 	public async Task<UpdateOrganizationResult> Handle(

@@ -62,10 +62,10 @@ public class QueryableSortBy
 		{
 			var type = typeof(TArgument);
 			var value = TypeDescriptor.GetConverter(type)
-			.ConvertFrom(
-				null,
-				CultureInfo.InvariantCulture,
-				argument);
+				.ConvertFrom(
+					null,
+					CultureInfo.InvariantCulture,
+					argument);
 			if (type.IsEnum && (value is null || !Enum.IsDefined(type, value)))
 				throw new ArgumentException($"Unknown {type.Name} value '{argument}'.");
 			return (TArgument)value!;

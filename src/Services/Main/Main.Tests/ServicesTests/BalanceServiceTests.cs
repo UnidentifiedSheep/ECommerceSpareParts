@@ -1,9 +1,7 @@
 using Enums;
 using Exceptions;
 using FluentAssertions;
-using Main.Entities.Balance;
 using Main.Entities.Balance.Balance;
-using Main.Entities.Organization;
 using Main.Modules.Balance.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

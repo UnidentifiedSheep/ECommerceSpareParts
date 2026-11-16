@@ -45,12 +45,14 @@ public class BalanceService(
 			.Track()
 			.ForUpdate()
 			.Build();
-		var profiles = await organizationFinancialProfileRepository.ListAsync(profileCriteria, cancellationToken);
+		var profiles =
+			await organizationFinancialProfileRepository.ListAsync(profileCriteria, cancellationToken);
 		var balancesCriteria = Criteria<OrganizationBalance>
 			.New()
 			.Where(x => organizationIds.Contains(x.OrganizationId))
 			.Build();
-		var balancesByOrganization = (await userBalanceRepository.ListAsync(balancesCriteria, cancellationToken))
+		var balancesByOrganization =
+			(await userBalanceRepository.ListAsync(balancesCriteria, cancellationToken))
 			.ToLookup(x => x.OrganizationId);
 
 		foreach (var profile in profiles)

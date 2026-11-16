@@ -58,10 +58,11 @@ public sealed class AppLinkTests
 	[Fact]
 	public async Task Builder_RejectsTemplateMissingPlaceholder()
 	{
-		var act = () => CreateBuilder().CreateAsync(
-			"reports/current",
-			new Dictionary<string, string> { ["requestId"] = "1" },
-			TestContext.Current.CancellationToken);
+		var act = () => CreateBuilder()
+			.CreateAsync(
+				"reports/current",
+				new Dictionary<string, string> { ["requestId"] = "1" },
+				TestContext.Current.CancellationToken);
 
 		await Assert.ThrowsAsync<InvalidOperationException>(act);
 	}

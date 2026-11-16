@@ -203,12 +203,12 @@ public sealed class ProductStocksSnapshotConsumerTests(SearchContainerFixture fi
 			CancellationToken);
 
 		result.Hits
-		.Select(item => item.Document.Id)
-		.Should()
-		.Equal(
-			902,
-			903,
-			901);
+			.Select(item => item.Document.Id)
+			.Should()
+			.Equal(
+				902,
+				903,
+				901);
 	}
 
 	[Theory]
@@ -315,12 +315,12 @@ public sealed class ProductStocksSnapshotConsumerTests(SearchContainerFixture fi
 			CancellationToken);
 
 		result.Hits
-		.Select(item => item.Document.Id)
-		.Should()
-		.Equal(
-			902,
-			901,
-			903);
+			.Select(item => item.Document.Id)
+			.Should()
+			.Equal(
+				902,
+				901,
+				903);
 	}
 
 	[Theory]

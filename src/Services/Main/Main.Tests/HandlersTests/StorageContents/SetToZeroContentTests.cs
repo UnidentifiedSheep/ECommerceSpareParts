@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Main.Entities.Exceptions;
 using Main.Entities.Storage.Exceptions;
 using Main.Modules.Storage.Application.Handlers.StorageContents.SetToZeroContent;
 using Tests.Extensions;

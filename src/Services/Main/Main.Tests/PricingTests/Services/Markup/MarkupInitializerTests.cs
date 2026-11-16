@@ -1,16 +1,15 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Pricing.Application.Handlers.Markup;
-using Main.Modules.Currency.Abstractions;
-using Main.Modules.Currency.Abstractions.Interfaces;
 using Pricing.Application.Services.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
-using Tests.PricingTests.DataBuilders.Markup;
 using Tests.Extensions;
+using Tests.PricingTests.DataBuilders.Markup;
 using Tests.TestContainers.Combined;
 using MarkupModel = Pricing.Application.Models.Markup;
 

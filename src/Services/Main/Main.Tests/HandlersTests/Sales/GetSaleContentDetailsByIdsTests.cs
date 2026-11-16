@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Main.Entities.Sale;
 using Main.Entities.Sale.Sale;
 using Main.Modules.Sale.Application.Handlers.Sales;
 using Tests.DataBuilders.Sale;

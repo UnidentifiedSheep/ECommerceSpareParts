@@ -9,7 +9,6 @@ using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Locan.Core.Interfaces.Localizers;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Interfaces.Persistence;
 using Main.Modules.Product.Application.Lrts.ProductCharacteristicsImport;
@@ -66,10 +65,10 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var size = Characteristic.Create("Размер детали");
 		var material = Characteristic.Create("Material");
 		Context.Set<Characteristic>()
-		.AddRange(
-			color,
-			size,
-			material);
+			.AddRange(
+				color,
+				size,
+				material);
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.Set<ProductCharacteristic>()
 			.AddRange(
@@ -299,10 +298,10 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var execution = await ExecuteCsv(
 			"ProductId,Characteristic,Value",
 			Enumerable.Range(1, 4)
-			.Select(value => CsvRow(
-				productId,
-				"COLOR",
-				value.ToString("D4", CultureInfo.InvariantCulture))),
+				.Select(value => CsvRow(
+					productId,
+					"COLOR",
+					value.ToString("D4", CultureInfo.InvariantCulture))),
 			fileName => new ProductCharacteristicsImportInputState { FileName = fileName });
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
@@ -410,11 +409,11 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var color = await new CharacteristicBuilder(Faker).WithName("Color")
 			.BuildAndAddToDb(Context, CancellationToken);
 		Context.Set<ProductCharacteristic>()
-		.Add(
-			ProductCharacteristic.Create(
-				products[0].Id,
-				color.Id,
-				"Old"));
+			.Add(
+				ProductCharacteristic.Create(
+					products[0].Id,
+					color.Id,
+					"Old"));
 		await Context.SaveChangesAsync(CancellationToken);
 		var broker = Broker;
 		SetPublisher(broker, _ => true);
@@ -455,11 +454,11 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var color = await new CharacteristicBuilder(Faker).WithName("Color")
 			.BuildAndAddToDb(Context, CancellationToken);
 		Context.Set<ProductCharacteristic>()
-		.Add(
-			ProductCharacteristic.Create(
-				products[3].Id,
-				color.Id,
-				"Old"));
+			.Add(
+				ProductCharacteristic.Create(
+					products[3].Id,
+					color.Id,
+					"Old"));
 		await Context.SaveChangesAsync(CancellationToken);
 		var broker = Broker;
 		var failed = false;
@@ -476,10 +475,10 @@ public sealed class ProductCharacteristicsImportLrtTests : CsvLrtIntegrationTest
 		var committedPrefix = "ProductId,Characteristic,Value\n" + string.Join(
 			"\n",
 			products.Take(3)
-			.Select(product => CsvRow(
-				product.Id,
-				"Color",
-				"Committed"))) + "\n";
+				.Select(product => CsvRow(
+					product.Id,
+					"Color",
+					"Committed"))) + "\n";
 		var content = committedPrefix +
 			CsvRow(
 				products[3].Id,

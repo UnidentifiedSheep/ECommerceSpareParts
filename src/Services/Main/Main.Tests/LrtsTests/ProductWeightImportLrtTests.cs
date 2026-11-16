@@ -1,7 +1,6 @@
 using Domain.CommonEnums;
 using Enums.Units;
 using FluentAssertions;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Lrts.ProductWeightImport;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +21,11 @@ public sealed class ProductWeightImportLrtTests : CsvLrtIntegrationTest<ProductW
 	{
 		var products = TestContext.Products.Take(2).ToArray();
 		Context.Set<ProductWeight>()
-		.Add(
-			ProductWeight.Create(
-				products[0].Id,
-				1,
-				WeightUnit.Kilogram));
+			.Add(
+				ProductWeight.Create(
+					products[0].Id,
+					1,
+					WeightUnit.Kilogram));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -139,10 +138,10 @@ public sealed class ProductWeightImportLrtTests : CsvLrtIntegrationTest<ProductW
 		var execution = await ExecuteCsv(
 			"ProductId,Unit,Weight",
 			Enumerable.Range(1, 1001)
-			.Select(weight => CsvRow(
-				productId,
-				"Kilogram",
-				weight)),
+				.Select(weight => CsvRow(
+					productId,
+					"Kilogram",
+					weight)),
 			fileName => new ProductWeightImportInputState { FileName = fileName });
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);

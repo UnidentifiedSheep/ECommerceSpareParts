@@ -1,6 +1,5 @@
-using Enums;
 using Bogus;
-using Main.Entities.Balance;
+using Enums;
 using Main.Entities.Balance.Balance;
 using Main.Entities.Balance.Enums.Balances;
 using Tests.Abstractions;

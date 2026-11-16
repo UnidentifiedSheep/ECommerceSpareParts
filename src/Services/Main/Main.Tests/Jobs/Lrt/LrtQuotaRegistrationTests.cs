@@ -1,7 +1,5 @@
-using Api.Common.HostedServices;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
 using Application.Common.Models.Lrt;
 using FluentAssertions;
 using Main.Modules.Jobs.Application.HostedServices;
@@ -21,7 +19,8 @@ public class LrtQuotaRegistrationTests(CombinedContainerFixture fixture) : Integ
 	public void DefaultQuota_IsRegisteredAndUsesWorkerLimit()
 	{
 		var quotas = Scope.ServiceProvider.GetRequiredService<INamedObjectRegistry<ILrtQuotaManager>>();
-		var limit = Scope.ServiceProvider.GetRequiredService<IOptions<LrtExecutorOptions>>().Value
+		var limit = Scope.ServiceProvider.GetRequiredService<IOptions<LrtExecutorOptions>>()
+			.Value
 			.MaxParallelPerWorker;
 
 		var manager = quotas.GetBySystemName(LrtQuotaRegistrations.Default);
@@ -49,7 +48,10 @@ public class LrtQuotaRegistrationTests(CombinedContainerFixture fixture) : Integ
 
 		act.Should().NotThrow();
 		catalog.ManagersByLrt[QuotaTestLrt.LrtName].SystemName.Should().Be(QuotaTestLrt.QuotaName);
-		catalog.ManagersByLrt[JobScheduleTestLrt.LrtName].SystemName.Should().Be(LrtQuotaRegistrations.Default);
+		catalog.ManagersByLrt[JobScheduleTestLrt.LrtName]
+			.SystemName
+			.Should()
+			.Be(LrtQuotaRegistrations.Default);
 	}
 
 	[Fact]

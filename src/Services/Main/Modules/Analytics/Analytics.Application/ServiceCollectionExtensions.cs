@@ -1,6 +1,3 @@
-using NamedObject.Core.Interfaces;
-using Application.Common.Interfaces.Lrt;
-using NamedObject;
 using Application.Common.Host;
 using Application.Common.Interfaces;
 using Main.Modules.Analytics.Abstractions.Analyzers;
@@ -8,6 +5,8 @@ using Main.Modules.Analytics.Abstractions.Charts;
 using Main.Modules.Analytics.Application.Configs;
 using Main.Modules.Analytics.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
+using NamedObject;
+using NamedObject.Core.Interfaces;
 
 namespace Main.Modules.Analytics.Application;
 

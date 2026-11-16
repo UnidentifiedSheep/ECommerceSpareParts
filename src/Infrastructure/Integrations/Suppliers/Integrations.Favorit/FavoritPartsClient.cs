@@ -4,7 +4,6 @@ using Integrations.Common;
 using Integrations.Favorit.Requests;
 using Integrations.Favorit.Responses;
 using Integrations.Supplier.Connections;
-using Integrations.Supplier.Interfaces;
 
 namespace Integrations.Favorit;
 

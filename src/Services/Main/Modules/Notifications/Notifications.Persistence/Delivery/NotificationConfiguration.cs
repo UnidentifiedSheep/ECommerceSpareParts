@@ -4,7 +4,7 @@ using NotificationEntity = Main.Entities.Notification.Notification;
 
 namespace Main.Modules.Notifications.Persistence.Delivery;
 
-public class NotificationConfiguration : IEntityTypeConfiguration<Entities.Notification.Notification>
+public class NotificationConfiguration : IEntityTypeConfiguration<NotificationEntity>
 {
 	public void Configure(EntityTypeBuilder<NotificationEntity> builder)
 	{

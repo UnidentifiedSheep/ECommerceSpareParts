@@ -1,6 +1,6 @@
 using Main.Entities.Storage.Storage;
-using Persistence.Common;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Common;
 using Persistence.Extensions;
 
 namespace Main.Modules.Storage.Persistence;

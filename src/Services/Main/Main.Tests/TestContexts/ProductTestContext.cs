@@ -1,5 +1,4 @@
-﻿using Main.Entities.Product;
-using Main.Entities.Product.Product;
+﻿using Main.Entities.Product.Product;
 using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;

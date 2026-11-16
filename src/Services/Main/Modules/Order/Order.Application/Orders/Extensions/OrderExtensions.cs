@@ -7,7 +7,9 @@ namespace Main.Modules.Order.Application.Orders.Extensions;
 
 public static class OrderExtensions
 {
-	public static IQueryable<Entities.Order.Order.Order> WhereReadableBy(this IQueryable<Entities.Order.Order.Order> query, IUserContext userContext)
+	public static IQueryable<Entities.Order.Order.Order> WhereReadableBy(
+		this IQueryable<Entities.Order.Order.Order> query,
+		IUserContext userContext)
 	{
 		if (!userContext.IsAuthenticated || userContext.UserIdOrNull is not { } userId)
 			throw new OrderReadAccessDeniedException();

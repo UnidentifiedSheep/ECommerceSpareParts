@@ -1,7 +1,5 @@
 using FluentAssertions;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
-using Main.Entities.Product.ValueObjects;
 using Main.Modules.Product.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

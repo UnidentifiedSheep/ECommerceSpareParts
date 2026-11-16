@@ -1,4 +1,3 @@
-
 namespace Integrations.Common;
 
 public record ConnectionCheck<TConnection>(
@@ -10,4 +9,6 @@ public record ConnectionCheck<TConnection>(
 	Reason,
 	Message);
 
-public record ConnectionCheck(bool CanUse, ConnectionUnavailableReason? Reason = null, string? Message = null);
+public record ConnectionCheck(bool CanUse,
+	ConnectionUnavailableReason? Reason = null,
+	string? Message = null);

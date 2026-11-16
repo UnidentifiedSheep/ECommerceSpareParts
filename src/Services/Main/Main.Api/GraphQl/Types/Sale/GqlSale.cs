@@ -5,7 +5,6 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.User;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 using Main.Entities.Sale.Enums;
 using Main.Entities.Sale.Exceptions;
 using Main.Modules.Sale.Application.Dtos.Sale;
@@ -86,7 +85,8 @@ public sealed record GqlSale
 		CancellationToken cancellationToken)
 	{
 		var currencyId = (await GetSaleAsync(loader, cancellationToken)).CurrencyId;
-		return new GqlCurrency(await currencyLoader.LoadAsync(currencyId, cancellationToken)
+		return new GqlCurrency(
+			await currencyLoader.LoadAsync(currencyId, cancellationToken)
 			?? throw new CurrencyNotFoundException(currencyId));
 	}
 

@@ -1,4 +1,3 @@
-using Main.Modules.Product.Abstractions;
 using Application.Common.Extensions;
 using Main.Modules.Product.Abstractions.Events;
 using MassTransit;

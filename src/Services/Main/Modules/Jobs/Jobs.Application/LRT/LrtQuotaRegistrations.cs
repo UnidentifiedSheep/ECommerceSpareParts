@@ -12,5 +12,6 @@ public static class LrtQuotaRegistrations
 	public static IServiceCollection AddDefaultLrtQuotas(this IServiceCollection services)
 		=> services.AddLrtQuota(
 			Default,
-			provider => provider.GetRequiredService<IOptions<LrtExecutorOptions>>().Value.MaxParallelPerWorker);
+			provider => provider.GetRequiredService<IOptions<LrtExecutorOptions>>()
+				.Value.MaxParallelPerWorker);
 }

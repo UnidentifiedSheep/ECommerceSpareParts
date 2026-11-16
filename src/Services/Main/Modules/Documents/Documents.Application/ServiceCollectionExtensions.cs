@@ -1,9 +1,8 @@
-using Main.Modules.Documents.Application.Configs;
 using Application.Common.Extensions;
 using Application.Common.Host;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Lrt;
 using Main.Application.Document.Interfaces.Document;
+using Main.Modules.Documents.Application.Configs;
 using Main.Modules.Documents.Application.Interfaces;
 using Main.Modules.Documents.Application.Models.Options;
 using Main.Modules.Documents.Application.Notifications;
@@ -15,13 +14,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
 using Notification.Core;
-using Scrutor;
 
 namespace Main.Modules.Documents.Application;
 
 public static class ServiceCollectionExtensions
 {
-	public static IServiceCollection AddDocumentLinks(this IServiceCollection services, IConfiguration configuration)
+	public static IServiceCollection AddDocumentLinks(
+		this IServiceCollection services,
+		IConfiguration configuration)
 	{
 		services.AddOptions<DocumentLinksOptions>()
 			.Bind(configuration.GetSection(DocumentLinksOptions.SectionName))

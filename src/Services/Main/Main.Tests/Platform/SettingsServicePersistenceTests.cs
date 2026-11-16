@@ -18,7 +18,14 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 	private ISettingsContainer SettingsContainer
 		=> Scope.ServiceProvider.GetRequiredService<ISettingsContainer>();
 
-	private MessageBrokerStub MessageBroker => (MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+	private MessageBrokerStub MessageBroker
+		=> (MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+
+	private List<SettingUpdatedEvent> TmtrEvents
+		=> MessageBroker
+			.PublishedMessagesOfType<SettingUpdatedEvent>()
+			.Where(item => item.Key == TmtrSupplierSetting.SettingName)
+			.ToList();
 
 	[Fact]
 	public async Task LoadAsync_EmptyDatabase_MarksContainerAsLoaded()
@@ -52,7 +59,8 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 
 		await SettingsService.SetSetting(setting, CancellationToken);
 
-		var persisted = await Context.Set<TmtrSupplierSetting>().AsNoTracking().SingleAsync(CancellationToken);
+		var persisted =
+			await Context.Set<TmtrSupplierSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.BaseUrl.Should().Be(Url(10));
 		SettingsContainer.Get<TmtrSupplierSetting>().Should().BeSameAs(setting);
 		AssertPublishedEvent(Create(10).Json);
@@ -67,7 +75,8 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 
 		await SettingsService.SetSetting(replacement, CancellationToken);
 
-		var persisted = await Context.Set<TmtrSupplierSetting>().AsNoTracking().SingleAsync(CancellationToken);
+		var persisted =
+			await Context.Set<TmtrSupplierSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.BaseUrl.Should().Be(Url(20));
 		SettingsContainer.Get<TmtrSupplierSetting>().Should().BeSameAs(replacement);
 		AssertPublishedEvent(Create(20).Json);
@@ -105,7 +114,8 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		var result = await SettingsService.GetOrDefault<TmtrSupplierSetting>(CancellationToken);
 
 		result.Data.Should().Be(TmtrSupplierSetting.Default.Data);
-		var persisted = await Context.Set<TmtrSupplierSetting>().AsNoTracking().SingleAsync(CancellationToken);
+		var persisted =
+			await Context.Set<TmtrSupplierSetting>().AsNoTracking().SingleAsync(CancellationToken);
 		persisted.Data.Should().Be(TmtrSupplierSetting.Default.Data);
 		SettingsContainer.Get<TmtrSupplierSetting>().Should().BeSameAs(result);
 		AssertPublishedEvent(TmtrSupplierSetting.Default.Json);
@@ -155,12 +165,6 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 		(await Context.Set<TmtrSupplierSetting>().CountAsync(CancellationToken)).Should().Be(0);
 		TmtrEvents.Should().BeEmpty();
 	}
-
-	private List<SettingUpdatedEvent> TmtrEvents
-		=> MessageBroker
-			.PublishedMessagesOfType<SettingUpdatedEvent>()
-			.Where(item => item.Key == TmtrSupplierSetting.SettingName)
-			.ToList();
 
 	private static string Url(int value) => $"https://app-{value}.example";
 

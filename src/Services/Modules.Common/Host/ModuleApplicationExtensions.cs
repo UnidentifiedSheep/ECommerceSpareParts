@@ -23,7 +23,7 @@ public static class ModuleApplicationExtensions
 
 		services.Scan(scan => scan
 			.FromAssemblies(assembly)
-			.AddClasses(classes => classes.AssignableToAny(MediatRHandlerTypes), publicOnly: false)
+			.AddClasses(classes => classes.AssignableToAny(MediatRHandlerTypes), false)
 			.AsImplementedInterfaces(type => type.IsGenericType &&
 				MediatRHandlerTypes.Contains(type.GetGenericTypeDefinition()))
 			.WithTransientLifetime());

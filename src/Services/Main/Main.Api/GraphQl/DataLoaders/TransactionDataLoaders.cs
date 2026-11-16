@@ -19,5 +19,6 @@ public static class TransactionDataLoaders
 		IReadOnlyList<Guid> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-		=> (await sender.Send(new GetApproximateBalancesByOrganizationIdsQuery(keys), cancellationToken)).Balances;
+		=> (await sender.Send(new GetApproximateBalancesByOrganizationIdsQuery(keys), cancellationToken))
+			.Balances;
 }

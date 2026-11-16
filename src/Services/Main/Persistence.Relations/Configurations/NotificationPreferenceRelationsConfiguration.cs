@@ -7,9 +7,9 @@ namespace Persistence.Relations.Configurations;
 public sealed class NotificationPreferenceRelationsConfiguration
 	: IEntityTypeConfiguration<UserNotificationPreference>
 {
-	public void Configure(EntityTypeBuilder<Main.Entities.User.UserNotificationPreference> builder)
+	public void Configure(EntityTypeBuilder<UserNotificationPreference> builder)
 		=> builder
-			.HasOne<Main.Entities.User.User>()
+			.HasOne<User>()
 			.WithMany()
 			.HasForeignKey(e => e.UserId)
 			.OnDelete(DeleteBehavior.Cascade)

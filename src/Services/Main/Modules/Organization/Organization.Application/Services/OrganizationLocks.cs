@@ -3,7 +3,8 @@ using Main.Modules.Organization.Abstractions;
 
 namespace Main.Modules.Organization.Application.Services;
 
-public sealed class OrganizationLocks(IRepository<Entities.Organization.Organization.Organization, Guid> repository) : IOrganizationLocks
+public sealed class OrganizationLocks(
+	IRepository<Entities.Organization.Organization.Organization, Guid> repository) : IOrganizationLocks
 {
 	public async Task LockExistingAsync(
 		IReadOnlyCollection<Guid> organizationIds,

@@ -15,7 +15,8 @@ public record ApplySupplierProductsCommand(
 
 public record ApplySupplierProductsResult(IReadOnlyList<PriceOffer> CreatedOffers);
 
-public class ApplySupplierProductsHandler(IOfferRefreshService refreshService, IProductReferenceResolver referenceResolver)
+public class ApplySupplierProductsHandler(IOfferRefreshService refreshService,
+	IProductReferenceResolver referenceResolver)
 	: ICommandHandler<ApplySupplierProductsCommand, ApplySupplierProductsResult>
 {
 	public async Task<ApplySupplierProductsResult> Handle(
@@ -73,7 +74,10 @@ public class ApplySupplierProductsHandler(IOfferRefreshService refreshService, I
 		CancellationToken cancellationToken)
 	{
 		var references = dict.Keys
-			.Select(key => new ProductReference(key.Number, key.Brand, supplier))
+			.Select(key => new ProductReference(
+				key.Number,
+				key.Brand,
+				supplier))
 			.ToArray();
 		var resolved = await referenceResolver.ResolveAsync(references, cancellationToken);
 

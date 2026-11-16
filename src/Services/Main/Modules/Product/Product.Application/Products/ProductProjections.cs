@@ -10,7 +10,8 @@ using S3.Core.Options;
 namespace Main.Modules.Product.Application.Products;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class ProductDtoProjectionProvider : ProjectionProviderBase<Entities.Product.Product.Product, ProductDto>
+public sealed class
+	ProductDtoProjectionProvider : ProjectionProviderBase<Entities.Product.Product.Product, ProductDto>
 {
 	public ProductDtoProjectionProvider(IOptions<S3BucketsOptions> bucketsOptions)
 	{

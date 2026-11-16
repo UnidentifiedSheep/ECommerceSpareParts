@@ -14,9 +14,9 @@ using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers.Internal;
 using Pricing.Entities.Enums;
 using Pricing.Entities.Pricing;
-using Tests.PricingTests.DataBuilders.PriceAppliers;
 using Tests.Abstractions.Test;
 using Tests.Extensions;
+using Tests.PricingTests.DataBuilders.PriceAppliers;
 using Tests.TestContainers.Combined;
 
 namespace Tests.PricingTests.HandlerTests.PriceAppliers;

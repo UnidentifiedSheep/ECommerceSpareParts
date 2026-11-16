@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Sale.Application.Services.ProductDeletion;
 
-public sealed class SaleContentProductDeletionRule(IReadRepository<SaleContent, int> repository) : IProductDeletionRule
+public sealed class SaleContentProductDeletionRule(IReadRepository<SaleContent, int> repository)
+	: IProductDeletionRule
 {
 	public int Order => 30;
 

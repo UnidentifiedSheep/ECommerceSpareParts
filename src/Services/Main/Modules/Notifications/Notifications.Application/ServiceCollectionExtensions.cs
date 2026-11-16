@@ -1,5 +1,5 @@
-using Main.Modules.Notifications.Application.Configs;
 using Application.Common.Host;
+using Main.Modules.Notifications.Application.Configs;
 using Main.Modules.Notifications.Application.Delivery.Extensions;
 using Main.Modules.Notifications.Application.Notifications.DeliveryObservers;
 using Main.Modules.Notifications.Application.Services;

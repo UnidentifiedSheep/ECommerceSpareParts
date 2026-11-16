@@ -1,6 +1,5 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Interfaces.Persistence;
 using Main.Modules.Product.Application.Lrts.ProductContentImport;
@@ -132,11 +131,11 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 	{
 		var products = TestContext.Products.Take(3).ToArray();
 		Context.Set<ProductContent>()
-		.Add(
-			ProductContent.Create(
-				products[0].Id,
-				products[1].Id,
-				2));
+			.Add(
+				ProductContent.Create(
+					products[0].Id,
+					products[1].Id,
+					2));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var execution = await ExecuteCsv(
@@ -178,11 +177,11 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 	{
 		var products = TestContext.Products.Take(3).ToArray();
 		Context.Set<ProductContent>()
-		.Add(
-			ProductContent.Create(
-				products[0].Id,
-				products[1].Id,
-				2));
+			.Add(
+				ProductContent.Create(
+					products[0].Id,
+					products[1].Id,
+					2));
 		await Context.SaveChangesAsync(CancellationToken);
 		var repository = Scope.ServiceProvider.GetRequiredService<IProductRepository>();
 
@@ -218,10 +217,10 @@ public sealed class ProductContentImportLrtTests : CsvLrtIntegrationTest<Product
 		var execution = await ExecuteCsv(
 			"ParentId,ChildId,Quantity",
 			Enumerable.Range(1, 1001)
-			.Select(quantity => CsvRow(
-				products[0].Id,
-				products[1].Id,
-				quantity)),
+				.Select(quantity => CsvRow(
+					products[0].Id,
+					products[1].Id,
+					quantity)),
 			fileName => new ProductContentImportInputState { FileName = fileName });
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);

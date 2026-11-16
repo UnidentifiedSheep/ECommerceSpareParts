@@ -1,4 +1,3 @@
-using Pricing.Application.Events;
 using System.Data;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
@@ -8,6 +7,7 @@ using Attributes;
 using Enums;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Markup;
+using Pricing.Application.Events;
 using Pricing.Entities;
 using Pricing.Entities.Exceptions.Markup;
 

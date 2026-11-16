@@ -4,7 +4,6 @@ using Enums;
 using Exceptions;
 using FluentAssertions;
 using Main.Entities.Auth;
-using Main.Entities.Exceptions;
 using Main.Entities.Order.Enums.Orders;
 using Main.Entities.Order.Exceptions;
 using Main.Modules.Order.Application.Orders.Queries;

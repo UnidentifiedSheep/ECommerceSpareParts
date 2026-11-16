@@ -11,7 +11,9 @@ public static class SaleSortByConfig
 			.Value
 			.MapDefault<Entities.Sale.Sale.Sale, DateTime>(x => x.SaleDatetime, true)
 			.Map<Entities.Sale.Sale.Sale, DateTime>("dateTime", x => x.SaleDatetime)
-			.Map<Entities.Sale.Sale.Sale, decimal>("totalSum", x => x.Contents.Sum(content => content.TotalSum))
+			.Map<Entities.Sale.Sale.Sale, decimal>(
+				"totalSum",
+				x => x.Contents.Sum(content => content.TotalSum))
 			.Map<Entities.Sale.Sale.Sale, Guid>("id", x => x.Id);
 
 		QueryableSortBy

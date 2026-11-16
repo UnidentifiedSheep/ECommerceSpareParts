@@ -1,14 +1,12 @@
-using Main.Modules.Product.Application.Events;
 using System.Text.Json;
-using Contracts.Producer;
 using Domain.CommonEnums;
 using Enums;
 using FluentAssertions;
 using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Events;
 using Main.Modules.Product.Application.Lrts.ProducerSupplierMappingImport;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.Jobs;

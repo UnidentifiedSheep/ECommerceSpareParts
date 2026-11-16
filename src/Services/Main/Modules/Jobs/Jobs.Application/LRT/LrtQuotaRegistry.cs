@@ -30,6 +30,12 @@ public sealed class LrtQuotaRegistry : INamedObjectRegistry<ILrtQuotaManager>, I
 		_managers = managers;
 	}
 
+	public void Dispose()
+	{
+		foreach (var manager in _managers.Values.OfType<IDisposable>())
+			manager.Dispose();
+	}
+
 	public IReadOnlyCollection<ILrtQuotaManager> All => _managers.Values.ToList();
 
 	public ILrtQuotaManager GetBySystemName(string systemName)
@@ -37,16 +43,10 @@ public sealed class LrtQuotaRegistry : INamedObjectRegistry<ILrtQuotaManager>, I
 			? manager
 			: throw new KeyNotFoundException($"LRT quota '{systemName}' not found");
 
-	public ILrtQuotaManager? TryGetBySystemName(string systemName)
-		=> _managers.GetValueOrDefault(systemName);
+	public ILrtQuotaManager? TryGetBySystemName(string systemName) => _managers.GetValueOrDefault(systemName);
 
-	public void Dispose()
-	{
-		foreach (var manager in _managers.Values.OfType<IDisposable>())
-			manager.Dispose();
-	}
-
-	INamedObject? INamedObjectRegistry.TryGetBySystemName(string systemName) => TryGetBySystemName(systemName);
+	INamedObject? INamedObjectRegistry.TryGetBySystemName(string systemName)
+		=> TryGetBySystemName(systemName);
 
 	IReadOnlyCollection<INamedObject> INamedObjectRegistry.All => All;
 

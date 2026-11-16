@@ -12,6 +12,9 @@ public class CreatePurchaseDbValidation(IUserChecks userChecks, IOrganizationChe
 	{
 		userChecks.Exists(plan, request.SupplierUserId);
 		organizationChecks.Exists(plan, request.SupplierOrganizationId);
-		organizationChecks.MemberExists(plan, request.SupplierOrganizationId, request.SupplierUserId);
+		organizationChecks.MemberExists(
+			plan,
+			request.SupplierOrganizationId,
+			request.SupplierUserId);
 	}
 }

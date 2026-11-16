@@ -60,10 +60,10 @@ public sealed class OrderBuilder(Faker faker) : BuilderBase<DomainOrder>(faker)
 		{
 			var built = item.WithOrder(order).Build();
 			order.AddItem(built.ProductId, built.Count)
-			.AssignPrice(
-				built.SignedPrice,
-				built.UnitPrice,
-				built.PriceOrigin);
+				.AssignPrice(
+					built.SignedPrice,
+					built.UnitPrice,
+					built.PriceOrigin);
 		}
 
 		return order;

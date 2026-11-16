@@ -5,7 +5,8 @@ using Tests.TestContainers.Combined;
 
 namespace Tests.ProductDeletionRulesTests;
 
-public class ProductCompositionDeletionRuleTests : ProductDeletionRuleTestsBase<ProductCompositionDeletionRule>
+public class
+	ProductCompositionDeletionRuleTests : ProductDeletionRuleTestsBase<ProductCompositionDeletionRule>
 {
 	public ProductCompositionDeletionRuleTests(CombinedContainerFixture fixture) : base(fixture)
 	{
@@ -31,7 +32,12 @@ public class ProductCompositionDeletionRuleTests : ProductDeletionRuleTestsBase<
 	{
 		var parent = await CreateUnreferencedProduct();
 		var child = await CreateUnreferencedProduct();
-		await Context.AddAsync(ProductContent.Create(parent.Id, child.Id, 1), CancellationToken);
+		await Context.AddAsync(
+			ProductContent.Create(
+				parent.Id,
+				child.Id,
+				1),
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		return (parent, child);

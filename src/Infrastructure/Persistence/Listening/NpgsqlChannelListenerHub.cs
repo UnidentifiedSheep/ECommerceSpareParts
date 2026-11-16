@@ -17,12 +17,35 @@ public sealed class NpgsqlChannelListenerHub(IOptions<DatabaseOptions> options,
 	private readonly Dictionary<string, List<Subscription>> _channels = new(StringComparer.Ordinal);
 	private readonly Lock _gate = new();
 	private readonly CancellationTokenSource _stop = new();
-	private Task? _loop;
-	private CancellationTokenSource? _waitSource;
 	private bool _changed;
 	private bool _disposed;
+	private Task? _loop;
+	private CancellationTokenSource? _waitSource;
 
-	public async Task<IChannelListener> ListenAsync(string channel, CancellationToken cancellationToken = default)
+	public async ValueTask DisposeAsync()
+	{
+		Task? loop;
+		List<Subscription> subscriptions;
+		lock (_gate)
+		{
+			if (_disposed) return;
+			_disposed = true;
+			loop = _loop;
+			subscriptions = _channels.Values.SelectMany(x => x).ToList();
+		}
+
+		await _stop.CancelAsync();
+		if (loop is not null)
+			await Task.WhenAny(loop, Task.Delay(TimeSpan.FromSeconds(5)));
+
+		foreach (var subscription in subscriptions)
+			subscription.Complete();
+		_stop.Dispose();
+	}
+
+	public async Task<IChannelListener> ListenAsync(
+		string channel,
+		CancellationToken cancellationToken = default)
 	{
 		ChannelNames.Validate(channel);
 		var subscription = new Subscription(this, channel);
@@ -51,27 +74,6 @@ public sealed class NpgsqlChannelListenerHub(IOptions<DatabaseOptions> options,
 		}
 
 		return subscription;
-	}
-
-	public async ValueTask DisposeAsync()
-	{
-		Task? loop;
-		List<Subscription> subscriptions;
-		lock (_gate)
-		{
-			if (_disposed) return;
-			_disposed = true;
-			loop = _loop;
-			subscriptions = _channels.Values.SelectMany(x => x).ToList();
-		}
-
-		await _stop.CancelAsync();
-		if (loop is not null)
-			await Task.WhenAny(loop, Task.Delay(TimeSpan.FromSeconds(5)));
-
-		foreach (var subscription in subscriptions)
-			subscription.Complete();
-		_stop.Dispose();
 	}
 
 	private async Task RunAsync()
@@ -129,7 +131,7 @@ public sealed class NpgsqlChannelListenerHub(IOptions<DatabaseOptions> options,
 				if (isOpened)
 					return;
 
-				await WaitForChangeAsync(connection: null, ct);
+				await WaitForChangeAsync(null, ct);
 				continue;
 			}
 
@@ -141,13 +143,19 @@ public sealed class NpgsqlChannelListenerHub(IOptions<DatabaseOptions> options,
 
 			foreach (var channel in listening.Where(x => !desired.Contains(x)).ToArray())
 			{
-				await ExecuteAsync(connection, $"UNLISTEN {ChannelNames.Quote(channel)}", ct);
+				await ExecuteAsync(
+					connection,
+					$"UNLISTEN {ChannelNames.Quote(channel)}",
+					ct);
 				listening.Remove(channel);
 			}
 
 			foreach (var channel in desired.Where(x => !listening.Contains(x)).ToArray())
 			{
-				await ExecuteAsync(connection, $"LISTEN {ChannelNames.Quote(channel)}", ct);
+				await ExecuteAsync(
+					connection,
+					$"LISTEN {ChannelNames.Quote(channel)}",
+					ct);
 				listening.Add(channel);
 			}
 
@@ -193,7 +201,10 @@ public sealed class NpgsqlChannelListenerHub(IOptions<DatabaseOptions> options,
 		}
 	}
 
-	private static async Task ExecuteAsync(NpgsqlConnection connection, string sql, CancellationToken ct)
+	private static async Task ExecuteAsync(
+		NpgsqlConnection connection,
+		string sql,
+		CancellationToken ct)
 	{
 		await using var command = new NpgsqlCommand(sql, connection);
 		await command.ExecuteNonQueryAsync(ct);
@@ -222,27 +233,34 @@ public sealed class NpgsqlChannelListenerHub(IOptions<DatabaseOptions> options,
 	private void Remove(Subscription subscription)
 	{
 		lock (_gate)
+		{
 			if (_channels.TryGetValue(subscription.Channel, out var list))
 			{
 				list.Remove(subscription);
 				if (list.Count == 0)
 					_channels.Remove(subscription.Channel);
 			}
+		}
 
 		Wake();
 	}
 
 	private sealed class Subscription : IChannelListener
 	{
-		private readonly Channel<ChannelNotification> _queue = System.Threading.Channels.Channel.CreateBounded<ChannelNotification>(
-			new BoundedChannelOptions(SubscriptionCapacity)
-			{
-				FullMode = BoundedChannelFullMode.DropOldest,
-				SingleReader = true
-			});
 
 		private readonly NpgsqlChannelListenerHub _hub;
-		private readonly TaskCompletionSource _ready = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+		private readonly Channel<ChannelNotification> _queue =
+			System.Threading.Channels.Channel.CreateBounded<ChannelNotification>(
+				new BoundedChannelOptions(SubscriptionCapacity)
+				{
+					FullMode = BoundedChannelFullMode.DropOldest,
+					SingleReader = true
+				});
+
+		private readonly TaskCompletionSource
+			_ready = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
 		private int _disposed;
 
 		public Subscription(NpgsqlChannelListenerHub hub, string channel)
@@ -255,7 +273,8 @@ public sealed class NpgsqlChannelListenerHub(IOptions<DatabaseOptions> options,
 
 		public string Channel { get; }
 
-		public IAsyncEnumerable<ChannelNotification> ReadAllAsync(CancellationToken cancellationToken = default)
+		public IAsyncEnumerable<ChannelNotification> ReadAllAsync(
+			CancellationToken cancellationToken = default)
 			=> _queue.Reader.ReadAllAsync(cancellationToken);
 
 		public ValueTask DisposeAsync()

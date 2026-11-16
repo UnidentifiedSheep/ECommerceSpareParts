@@ -1,7 +1,6 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Entities.Exceptions;
 using Main.Entities.Product.Exceptions;
 using Main.Modules.Product.Application.Dtos.Producer;
 

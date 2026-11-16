@@ -1,5 +1,4 @@
 ﻿using Main.Entities.Cart.Exceptions;
-using Main.Entities.Exceptions;
 using Main.Modules.Cart.Application.Handlers.Cart.DeleteFromCart;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;

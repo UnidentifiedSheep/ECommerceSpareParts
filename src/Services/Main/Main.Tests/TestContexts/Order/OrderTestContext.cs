@@ -1,5 +1,4 @@
 using Main.Entities.Order.Enums.Orders;
-using Main.Entities.Organization;
 using Main.Entities.Organization.Organization;
 using Main.Entities.User;
 using Persistence.Context;

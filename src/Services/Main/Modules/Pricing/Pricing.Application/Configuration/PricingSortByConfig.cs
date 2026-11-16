@@ -6,10 +6,8 @@ namespace Pricing.Application.Configuration;
 public static class PricingSortByConfig
 {
 	public static void Configure()
-	{
-		QueryableSortBy
+		=> QueryableSortBy
 			.Value
 			.MapDefault<ProductPriceOption, decimal>(x => x.Score, true)
 			.Map<ProductPriceOption, decimal>("score", x => x.Score);
-	}
 }

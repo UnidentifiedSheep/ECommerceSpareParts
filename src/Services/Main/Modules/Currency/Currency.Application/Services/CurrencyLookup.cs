@@ -11,7 +11,10 @@ public sealed class CurrencyLookup(
 {
 	public async Task<int?> GetCurrencyIdAsync(string code, CancellationToken cancellationToken = default)
 		=> (await currencies.GetAllCurrencies(cancellationToken))
-			.FirstOrDefault(x => string.Equals(x.Code, code, StringComparison.OrdinalIgnoreCase))
+			.FirstOrDefault(x => string.Equals(
+				x.Code,
+				code,
+				StringComparison.OrdinalIgnoreCase))
 			?.Id;
 
 	public async Task<int> GetBaseCurrencyIdAsync(CancellationToken cancellationToken = default)

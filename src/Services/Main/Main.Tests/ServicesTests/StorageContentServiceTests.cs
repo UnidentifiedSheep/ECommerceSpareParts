@@ -1,14 +1,12 @@
-using Enums;
 using System.Diagnostics;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Attributes;
+using Enums;
 using FluentAssertions;
-using Main.Entities.Exceptions;
 using Main.Entities.Product.Stock;
-using Main.Entities.Storage;
 using Main.Entities.Storage.Enums;
 using Main.Entities.Storage.Exceptions;
 using Main.Entities.Storage.Storage;
@@ -87,11 +85,11 @@ public class StorageContentServiceTests : IntegrationTest
 			new SubtractStorageContentItem(second.Id, 3));
 
 		result.Select(lot => (lot.Id, lot.Count))
-		.Should()
-		.Equal(
-			(first.Id, 1),
-			(second.Id, 3),
-			(second.Id, 2));
+			.Should()
+			.Equal(
+				(first.Id, 1),
+				(second.Id, 3),
+				(second.Id, 2));
 		(await Count(first)).Should().Be(0);
 		(await Count(second)).Should().Be(0);
 	}
@@ -288,11 +286,11 @@ public class StorageContentServiceTests : IntegrationTest
 		var result = await Mediator.Send(new GetAvailableProductsStockQuery(keys), CancellationToken);
 
 		keys.Select(key => result.Stocks[key])
-		.Should()
-		.Equal(
-			3,
-			2,
-			0);
+			.Should()
+			.Equal(
+				3,
+				2,
+				0);
 	}
 
 	[Fact]

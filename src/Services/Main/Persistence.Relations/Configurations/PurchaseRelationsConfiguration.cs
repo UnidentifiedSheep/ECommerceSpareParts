@@ -1,7 +1,9 @@
 using Main.Entities.Balance.Balance;
+using Main.Entities.Currency;
 using Main.Entities.Organization.Organization;
 using Main.Entities.Purchase.Purchase;
 using Main.Entities.Storage.Storage;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,14 +14,14 @@ public sealed class PurchaseRelationsConfiguration : IEntityTypeConfiguration<Pu
 	public void Configure(EntityTypeBuilder<Purchase> builder)
 	{
 		builder
-			.HasOne<Main.Entities.Currency.Currency>()
+			.HasOne<Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("purchase_currency_id_fk");
 
 		builder
-			.HasOne<Main.Entities.User.User>()
+			.HasOne<User>()
 			.WithMany()
 			.HasForeignKey(d => d.SupplierUserId)
 			.OnDelete(DeleteBehavior.Restrict)

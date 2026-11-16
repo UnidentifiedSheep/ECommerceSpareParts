@@ -4,7 +4,6 @@ using Exceptions;
 using FluentAssertions;
 using Main.Entities.Enums;
 using Main.Entities.Exceptions;
-using Main.Entities.Organization;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Organization;
 using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
@@ -140,10 +139,10 @@ public class GetOrganizationsTests : IntegrationTest
 		}
 
 		organizations.Should()
-		.Equal(
-			strongOrganizations[0].Id,
-			strongOrganizations[1].Id,
-			weak.Id);
+			.Equal(
+				strongOrganizations[0].Id,
+				strongOrganizations[1].Id,
+				weak.Id);
 		var last = await Mediator.Send(
 			CreateQuery(
 				"космонавтов",
@@ -160,12 +159,12 @@ public class GetOrganizationsTests : IntegrationTest
 				sortBy: ["name_desc"]),
 			CancellationToken);
 		customSort.Organizations
-		.Select(organization => organization.Id)
-		.Should()
-		.Equal(
-			weak.Id,
-			second.Id,
-			first.Id);
+			.Select(organization => organization.Id)
+			.Should()
+			.Equal(
+				weak.Id,
+				second.Id,
+				first.Id);
 	}
 
 	[Fact]

@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 using Main.Modules.Currency.Application.Handlers.Currencies.GetCurrencyRate;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Currency;
@@ -62,10 +61,10 @@ public class GetHistoricalCurrencyRateTests : IntegrationTest
 	{
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
 		await GetContext<CurrencyRatesTestContext>()
-		.SetHistoryAsync(
-			rate,
-			[],
-			CancellationToken);
+			.SetHistoryAsync(
+				rate,
+				[],
+				CancellationToken);
 		var id = rate.FromCurrencyId;
 		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() => Mediator.Send(
 			new GetHistoricalCurrencyRateQuery(

@@ -66,14 +66,18 @@ public class EditPurchaseHandler(
 
 	private Guid GetSystemUserId() => transfers.SystemOrganizationId;
 
-	private Task<Entities.Purchase.Purchase.Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
+	private Task<Entities.Purchase.Purchase.Purchase> GetPurchase(
+		Guid purchaseId,
+		CancellationToken cancellationToken)
 		=> purchaseRepository.EnsureExistForUpdateAsync(
 			purchaseId,
 			id => new PurchaseNotFoundException(id),
 			Criteria<Entities.Purchase.Purchase.Purchase>.New().Include(x => x.Contents),
 			cancellationToken);
 
-	private Task ReversePurchaseTransactions(Entities.Purchase.Purchase.Purchase purchase, CancellationToken cancellationToken)
+	private Task ReversePurchaseTransactions(
+		Entities.Purchase.Purchase.Purchase purchase,
+		CancellationToken cancellationToken)
 		=> transfers.ReverseAsync(purchase.TransactionId, cancellationToken);
 
 	private Task<Guid> CreateTransaction(

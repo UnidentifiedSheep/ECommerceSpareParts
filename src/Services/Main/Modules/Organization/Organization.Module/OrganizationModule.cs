@@ -9,7 +9,8 @@ namespace Main.Modules.Organization;
 
 public sealed class OrganizationModule : ModuleBase
 {
-	public override IReadOnlyCollection<Assembly> ConsumerAssemblies => [OrganizationApplicationAssembly.Value];
+	public override IReadOnlyCollection<Assembly> ConsumerAssemblies
+		=> [OrganizationApplicationAssembly.Value];
 
 	public override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 	{

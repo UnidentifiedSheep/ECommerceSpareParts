@@ -32,7 +32,10 @@ public sealed class StorageQueries
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new GetStoragesQuery(input.Pagination, input.SearchTerm, input.Type),
+			new GetStoragesQuery(
+				input.Pagination,
+				input.SearchTerm,
+				input.Type),
 			cancellationToken);
 
 		return result.Storages.Select(storage => new GqlStorage(storage)).ToArray();

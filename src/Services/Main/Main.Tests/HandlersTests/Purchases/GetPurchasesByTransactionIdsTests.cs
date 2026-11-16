@@ -1,8 +1,6 @@
 using Enums;
 using FluentAssertions;
-using Main.Entities.Balance;
 using Main.Entities.Balance.Balance;
-using Main.Entities.Purchase;
 using Main.Entities.Purchase.Purchase;
 using Main.Modules.Purchase.Application.Handlers.Purchases;
 using Tests.DataBuilders.Balance;

@@ -13,7 +13,8 @@ namespace Main.Modules.Organization.Application.Handlers.Organizations.ChangeOrg
 public record ChangeOrganizationMemberRoleCommand(Guid OrganizationId, Guid UserId, OrganizationRole Role)
 	: ICommand;
 
-public class ChangeOrganizationMemberRoleHandler(IRepository<Entities.Organization.Organization.Organization, Guid> repository)
+public class ChangeOrganizationMemberRoleHandler(
+	IRepository<Entities.Organization.Organization.Organization, Guid> repository)
 	: ICommandHandler<ChangeOrganizationMemberRoleCommand>
 {
 	public async Task<Unit> Handle(
@@ -26,7 +27,9 @@ public class ChangeOrganizationMemberRoleHandler(IRepository<Entities.Organizati
 		return Unit.Value;
 	}
 
-	private Task<Entities.Organization.Organization.Organization> GetOrganization(Guid organizationId, CancellationToken cancellationToken)
+	private Task<Entities.Organization.Organization.Organization> GetOrganization(
+		Guid organizationId,
+		CancellationToken cancellationToken)
 		=> repository.EnsureExistForUpdateAsync(
 			organizationId,
 			id => new OrganizationNotFoundException(id),

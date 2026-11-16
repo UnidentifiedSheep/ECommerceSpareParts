@@ -7,7 +7,6 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Product;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 using MediatR;
 using Pricing.Api.GraphQl.DataLoaders;
 using Pricing.Api.GraphQl.Types;
@@ -72,7 +71,10 @@ public sealed class GqlPriceOfferExtensions
 		[Parent] GqlPriceOffer offer,
 		ICurrencyByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> PricingCurrency.LoadAsync(offer.CurrencyId, loader, cancellationToken);
+		=> PricingCurrency.LoadAsync(
+			offer.CurrencyId,
+			loader,
+			cancellationToken);
 }
 
 [ExtendObjectType<GqlPriceOption>]
@@ -83,7 +85,10 @@ public sealed class GqlPriceOptionExtensions
 		[Parent] GqlPriceOption option,
 		ICurrencyByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> PricingCurrency.LoadAsync(option.CurrencyId, loader, cancellationToken);
+		=> PricingCurrency.LoadAsync(
+			option.CurrencyId,
+			loader,
+			cancellationToken);
 }
 
 [ExtendObjectType<GqlPriceRecommendation>]
@@ -94,7 +99,10 @@ public sealed class GqlPriceRecommendationExtensions
 		[Parent] GqlPriceRecommendation recommendation,
 		ICurrencyByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> PricingCurrency.LoadAsync(recommendation.CurrencyId, loader, cancellationToken);
+		=> PricingCurrency.LoadAsync(
+			recommendation.CurrencyId,
+			loader,
+			cancellationToken);
 }
 
 [ExtendObjectType<GqlMarkupGroup>]
@@ -118,6 +126,7 @@ internal static class PricingCurrency
 		int currencyId,
 		ICurrencyByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> new(await loader.LoadAsync(currencyId, cancellationToken)
+		=> new(
+			await loader.LoadAsync(currencyId, cancellationToken)
 			?? throw new CurrencyNotFoundException(currencyId));
 }

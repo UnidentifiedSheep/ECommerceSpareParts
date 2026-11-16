@@ -1,5 +1,4 @@
 using Application.Common.Querying;
-using Main.Entities.Documents;
 using Main.Entities.Documents.Documents;
 
 namespace Main.Modules.Documents.Application.Configs;
@@ -7,8 +6,7 @@ namespace Main.Modules.Documents.Application.Configs;
 public static class DocumentsSortByConfig
 {
 	public static void Configure()
-	{
-		QueryableSortBy
+		=> QueryableSortBy
 			.Value
 			.MapDefault<DocumentGenerationRequest, DateTime>(x => x.CreatedAt, true)
 			.Map<DocumentGenerationRequest, Guid>("requestId", x => x.RequestId)
@@ -18,5 +16,4 @@ public static class DocumentsSortByConfig
 			.Map<DocumentGenerationRequest, DateTime>("createdAt", x => x.CreatedAt)
 			.Map<DocumentGenerationRequest, DateTime?>("generatedAt", x => x.GeneratedAt)
 			.Map<DocumentGenerationRequest, DateTime?>("expiresAt", x => x.ExpiresAt);
-	}
 }

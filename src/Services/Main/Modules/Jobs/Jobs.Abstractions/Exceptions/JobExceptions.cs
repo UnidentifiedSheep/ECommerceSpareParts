@@ -1,5 +1,5 @@
-using Main.Entities;
 using Exceptions.Base.Localized;
+using Main.Entities;
 
 namespace Application.Common.Exceptions;
 

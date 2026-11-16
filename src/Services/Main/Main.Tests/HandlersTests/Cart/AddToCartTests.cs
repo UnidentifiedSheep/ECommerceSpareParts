@@ -1,18 +1,16 @@
+using Domain;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Entities;
+using Main.Entities.Cart.Exceptions;
 using Main.Entities.Exceptions;
-using Main.Entities.Product;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
 using Main.Entities.User;
+using Main.Modules.Cart.Application.Handlers.Cart.AddToCart;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
-using Domain;
-using Main.Entities.Cart.Exceptions;
-using Main.Entities.Product.Exceptions;
-using Main.Entities.Product.Product;
-using Main.Modules.Cart.Application.Handlers.Cart.AddToCart;
 
 namespace Tests.HandlersTests.Cart;
 

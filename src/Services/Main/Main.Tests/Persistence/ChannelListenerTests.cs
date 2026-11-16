@@ -31,7 +31,10 @@ public class ChannelListenerTests(CombinedContainerFixture fixture) : Integratio
 		await using var listener = await hub.ListenAsync("tests_payload", CancellationToken);
 		var notifier = new NpgsqlChannelNotifier(Options());
 
-		await notifier.NotifyAsync("tests_payload", "hello", CancellationToken);
+		await notifier.NotifyAsync(
+			"tests_payload",
+			"hello",
+			CancellationToken);
 
 		var received = await ReadAsync(listener, 2);
 		received.Should().Contain(x => !x.IsResync && x.Payload == "hello");
@@ -46,11 +49,18 @@ public class ChannelListenerTests(CombinedContainerFixture fixture) : Integratio
 		await using var other = await hub.ListenAsync("tests_other", CancellationToken);
 		var notifier = new NpgsqlChannelNotifier(Options());
 
-		await notifier.NotifyAsync("tests_shared", "one", CancellationToken);
+		await notifier.NotifyAsync(
+			"tests_shared",
+			"one",
+			CancellationToken);
 
 		(await ReadAsync(first, 2)).Should().Contain(x => x.Payload == "one");
 		(await ReadAsync(second, 2)).Should().Contain(x => x.Payload == "one");
-		(await ReadAsync(other, 2, TimeSpan.FromSeconds(1))).Should().NotContain(x => x.Payload == "one");
+		(await ReadAsync(
+				other,
+				2,
+				TimeSpan.FromSeconds(1))).Should()
+			.NotContain(x => x.Payload == "one");
 		(await CountListenerConnectionsAsync()).Should().Be(1);
 	}
 
@@ -64,9 +74,15 @@ public class ChannelListenerTests(CombinedContainerFixture fixture) : Integratio
 		await WaitUntilAsync(async () => await CountListenerConnectionsAsync() == 0);
 		(await CountListenerConnectionsAsync()).Should().Be(0);
 		var notifier = new NpgsqlChannelNotifier(Options());
-		await notifier.NotifyAsync("tests_unlisten", "ignored", CancellationToken);
+		await notifier.NotifyAsync(
+			"tests_unlisten",
+			"ignored",
+			CancellationToken);
 
-		var remaining = await ReadAsync(listener, 5, TimeSpan.FromSeconds(1));
+		var remaining = await ReadAsync(
+			listener,
+			5,
+			TimeSpan.FromSeconds(1));
 		remaining.Should().NotContain(x => x.Payload == "ignored");
 	}
 
@@ -79,9 +95,15 @@ public class ChannelListenerTests(CombinedContainerFixture fixture) : Integratio
 
 		await TerminateListenerConnectionsAsync();
 
-		var resync = await ReadAsync(listener, 1, TimeSpan.FromSeconds(30));
+		var resync = await ReadAsync(
+			listener,
+			1,
+			TimeSpan.FromSeconds(30));
 		resync.Should().ContainSingle().Which.IsResync.Should().BeTrue();
-		await new NpgsqlChannelNotifier(Options()).NotifyAsync("tests_reconnect", "after", CancellationToken);
+		await new NpgsqlChannelNotifier(Options()).NotifyAsync(
+			"tests_reconnect",
+			"after",
+			CancellationToken);
 		(await ReadAsync(listener, 2)).Should().Contain(x => x.Payload == "after");
 	}
 
@@ -102,7 +124,10 @@ public class ChannelListenerTests(CombinedContainerFixture fixture) : Integratio
 		var channel = "tests \"quoted\"; DROP TABLE x";
 		await using var listener = await hub.ListenAsync(channel, CancellationToken);
 
-		await new NpgsqlChannelNotifier(Options()).NotifyAsync(channel, "safe", CancellationToken);
+		await new NpgsqlChannelNotifier(Options()).NotifyAsync(
+			channel,
+			"safe",
+			CancellationToken);
 
 		(await ReadAsync(listener, 2)).Should().Contain(x => x.Payload == "safe");
 	}

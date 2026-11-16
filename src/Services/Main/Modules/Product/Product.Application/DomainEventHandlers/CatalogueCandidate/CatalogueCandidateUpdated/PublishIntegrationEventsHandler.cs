@@ -13,7 +13,7 @@ internal sealed class PublishIntegrationEventsHandler(
 	IIntegrationEventScope integrationEventScope,
 	IProjectionProvider<Candidate, CatalogueCandidateContractDto> projection,
 	IReadRepository<Candidate, Guid> repository)
-	: BatchableDomainEventHandler<EntityUpdatedDomainEvent<Entities.Product.Product.Enrichment.CatalogueCandidate, Guid>>
+	: BatchableDomainEventHandler<EntityUpdatedDomainEvent<Candidate, Guid>>
 {
 	public override Task Handle(
 		Batch<EntityUpdatedDomainEvent<Candidate, Guid>> notification,

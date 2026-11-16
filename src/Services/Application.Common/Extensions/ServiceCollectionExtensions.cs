@@ -11,11 +11,8 @@ using Application.Common.Services;
 using Application.Common.Services.Events;
 using Application.Common.Services.History;
 using Application.Common.Services.Persistence;
-using Domain.CommonEntities.Events;
 using FluentValidation;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Application.Common.Extensions;
 

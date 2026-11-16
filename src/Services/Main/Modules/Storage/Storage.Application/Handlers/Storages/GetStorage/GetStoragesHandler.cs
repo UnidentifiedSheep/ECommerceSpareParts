@@ -16,7 +16,8 @@ public record GetStoragesResult(IReadOnlyList<StorageDto> Storages);
 
 public class GetStoragesHandler(
 	IReadRepository<Entities.Storage.Storage.Storage, string> repository,
-	IProjectionProvider<Entities.Storage.Storage.Storage, StorageDto> projection) : IQueryHandler<GetStoragesQuery, GetStoragesResult>
+	IProjectionProvider<Entities.Storage.Storage.Storage, StorageDto> projection)
+	: IQueryHandler<GetStoragesQuery, GetStoragesResult>
 {
 	public async Task<GetStoragesResult> Handle(GetStoragesQuery request, CancellationToken cancellationToken)
 	{

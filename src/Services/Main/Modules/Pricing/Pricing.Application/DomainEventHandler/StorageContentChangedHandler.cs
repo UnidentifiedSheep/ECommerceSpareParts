@@ -1,9 +1,9 @@
-using Pricing.Application.Events;
 using System.Globalization;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Events;
 using Application.Common.Services.Events;
 using Main.Modules.Storage.Abstractions.Events;
+using Pricing.Application.Events;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities.Offers;
 
@@ -13,7 +13,9 @@ public sealed class StorageContentChangedHandler(
 	IPriceOfferRepository offerRepository,
 	IIntegrationEventScope integrationEventScope) : BatchableDomainEventHandler<StorageContentChanged>
 {
-	public override async Task Handle(Batch<StorageContentChanged> notification, CancellationToken cancellationToken)
+	public override async Task Handle(
+		Batch<StorageContentChanged> notification,
+		CancellationToken cancellationToken)
 	{
 		var latest = notification
 			.Items

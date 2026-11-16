@@ -8,9 +8,7 @@ using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Locan.Core.Interfaces.Localizers;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
-using Main.Entities.Product.ValueObjects;
 using Main.Modules.Product.Application.Lrts.MapGroupToProduct;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -265,17 +263,17 @@ public sealed class
 		var committedPrefix = "Sku,Producer,ProductGroup\n" + string.Join(
 			"\n",
 			products.Take(3)
-			.Select(product => CsvRow(
-				product.Sku.Value,
-				producer.Name,
-				brakes.Name))) + "\n";
+				.Select(product => CsvRow(
+					product.Sku.Value,
+					producer.Name,
+					brakes.Name))) + "\n";
 		var content = committedPrefix + string.Join(
 			"\n",
 			products.Skip(3)
-			.Select(product => CsvRow(
-				product.Sku.Value,
-				producer.Name,
-				filters.Name)));
+				.Select(product => CsvRow(
+					product.Sku.Value,
+					producer.Name,
+					filters.Name)));
 		var storage = Scope.ServiceProvider.GetRequiredService<S3StorageServiceStub>();
 		storage.SetFile(
 			"uploads",

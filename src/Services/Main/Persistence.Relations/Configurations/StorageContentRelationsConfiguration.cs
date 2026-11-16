@@ -1,3 +1,4 @@
+using Main.Entities.Currency;
 using Main.Entities.Product.Product;
 using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -17,14 +18,14 @@ public sealed class StorageContentRelationsConfiguration : IEntityTypeConfigurat
 			.HasConstraintName("storage_content_products_id_fk");
 
 		builder
-			.HasOne<Main.Entities.Currency.Currency>()
+			.HasOne<Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("storage_content_currency_id_fk");
 
 		builder
-			.HasOne<Main.Entities.Currency.Currency>()
+			.HasOne<Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.BaseCurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)

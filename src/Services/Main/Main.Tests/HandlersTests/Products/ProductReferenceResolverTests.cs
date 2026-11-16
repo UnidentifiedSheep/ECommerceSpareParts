@@ -1,6 +1,5 @@
 using Enums;
 using FluentAssertions;
-using Main.Entities.Product.ValueObjects;
 using Main.Modules.Product.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders;
@@ -23,7 +22,10 @@ public sealed class ProductReferenceResolverTests : IntegrationTest
 		var product = await new ProductBuilder(Faker).WithProducerId(producer.Id)
 			.WithSku(new Sku("AB-123"))
 			.BuildAndAddToDb(Context, CancellationToken);
-		var reference = new ProductReference(" ab 123 ", $" {producer.Name.ToLowerInvariant()} ", null);
+		var reference = new ProductReference(
+			" ab 123 ",
+			$" {producer.Name.ToLowerInvariant()} ",
+			null);
 
 		var result = await Resolver().ResolveAsync([reference], CancellationToken);
 
@@ -40,7 +42,12 @@ public sealed class ProductReferenceResolverTests : IntegrationTest
 
 	[Fact]
 	public async Task GetSupplierReferences_WithoutIds_ReturnsEmpty()
-		=> (await Resolver().GetSupplierReferencesAsync([], Supplier.Armtek, CancellationToken)).Should().BeEmpty();
+		=> (await Resolver()
+			.GetSupplierReferencesAsync(
+				[],
+				Supplier.Armtek,
+				CancellationToken)).Should()
+			.BeEmpty();
 
 	private IProductReferenceResolver Resolver()
 		=> Scope.ServiceProvider.GetRequiredService<IProductReferenceResolver>();

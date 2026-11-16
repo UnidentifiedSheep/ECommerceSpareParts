@@ -14,7 +14,9 @@ public class CreateIndividualOrganizationHandler(IUnitOfWork unitOfWork)
 	{
 		foreach (var item in notification.Items)
 			await unitOfWork.AddAsync(
-				Entities.Organization.Organization.Organization.CreateIndividual($"{item.Name} {item.Surname}", item.UserId),
+				Entities.Organization.Organization.Organization.CreateIndividual(
+					$"{item.Name} {item.Surname}",
+					item.UserId),
 				cancellationToken);
 	}
 }

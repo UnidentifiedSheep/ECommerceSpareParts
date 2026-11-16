@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Main.Entities.Storage;
 using Main.Entities.Storage.Storage;
 using Main.Modules.Storage.Application.Products.Queries;
 using Microsoft.Extensions.DependencyInjection;

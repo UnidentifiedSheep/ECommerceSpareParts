@@ -1,6 +1,5 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Entities.Sale;
 using Main.Entities.Sale.DomainEvents;
 using Main.Entities.Sale.Sale;
 

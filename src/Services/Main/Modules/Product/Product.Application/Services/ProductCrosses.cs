@@ -5,6 +5,8 @@ namespace Main.Modules.Product.Application.Services;
 
 public sealed class ProductCrosses(IProductProvider productProvider) : IProductCrosses
 {
-	public Task<IReadOnlyList<int>> GetCrossIdsAsync(int productId, CancellationToken cancellationToken = default)
+	public Task<IReadOnlyList<int>> GetCrossIdsAsync(
+		int productId,
+		CancellationToken cancellationToken = default)
 		=> productProvider.GetProductCrossesAsync(productId, cancellationToken);
 }

@@ -1,8 +1,6 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using FluentAssertions;
-using Main.Entities.Exceptions;
-using Main.Entities.Product;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Dtos.Product;

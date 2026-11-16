@@ -6,7 +6,13 @@ internal static class SolutionLayout
 {
 	public static readonly string RepositoryRoot = FindRepositoryRoot();
 
-	public static string ModulesRoot => Path.Combine(RepositoryRoot, "src", "Services", "Main", "Modules");
+	public static string ModulesRoot
+		=> Path.Combine(
+			RepositoryRoot,
+			"src",
+			"Services",
+			"Main",
+			"Modules");
 
 	public static IReadOnlyList<ModuleAssembly> ModuleAssemblies { get; } = LoadModuleAssemblies();
 
@@ -16,7 +22,8 @@ internal static class SolutionLayout
 	private static string FindRepositoryRoot()
 	{
 		var directory = new DirectoryInfo(AppContext.BaseDirectory);
-		while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ECommerceSpareParts.sln")))
+		while (directory is not null &&
+				!File.Exists(Path.Combine(directory.FullName, "ECommerceSpareParts.sln")))
 			directory = directory.Parent;
 
 		return directory?.FullName ?? throw new InvalidOperationException("Solution root was not found.");
@@ -30,7 +37,10 @@ internal static class SolutionLayout
 			.Select(name =>
 			{
 				var parts = name.Split('.');
-				return new ModuleAssembly(parts[2], parts[3], LoadByName(name));
+				return new ModuleAssembly(
+					parts[2],
+					parts[3],
+					LoadByName(name));
 			})
 			.ToList();
 }

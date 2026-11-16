@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
 using FluentAssertions;
 using Main.Modules.Jobs.Application.LRT;
 
@@ -378,7 +377,5 @@ public class LrtQuotaManagerTests
 		=> CreateManager(() => maxParallelPerWorker);
 
 	private static LrtQuotaManager CreateManager(Func<int> maxParallelPerWorker)
-	{
-		return new LrtQuotaManager("test-group", maxParallelPerWorker());
-	}
+		=> new("test-group", maxParallelPerWorker());
 }

@@ -1,9 +1,8 @@
 using Application.Common.Interfaces.Settings;
 using Enums;
 using Integrations.Supplier.Models;
-using Pricing.Application.Extensions;
-using Main.Modules.Currency.Abstractions;
 using Main.Modules.Currency.Abstractions.Interfaces;
+using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models;
 using Pricing.Entities.Offers;

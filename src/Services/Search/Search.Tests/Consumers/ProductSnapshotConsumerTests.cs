@@ -176,7 +176,7 @@ public sealed class ProductSnapshotConsumerTests(SearchContainerFixture fixture)
 					{
 						UpdatedAt = updatedAt.AddSeconds(1),
 						Products =
- [
+						[
 							new ProductWeightSnapshot(903, new ProductWeightData(2, WeightUnit.Kilogram))
 						]
 					}));

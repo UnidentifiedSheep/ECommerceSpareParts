@@ -23,7 +23,8 @@ public sealed class
 }
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class OrganizationDtoProjectionProvider : ProjectionProviderBase<Entities.Organization.Organization.Organization, OrganizationDto>
+public sealed class OrganizationDtoProjectionProvider : ProjectionProviderBase<
+	Entities.Organization.Organization.Organization, OrganizationDto>
 {
 	public OrganizationDtoProjectionProvider(
 		IProjectionProvider<OrganizationMember, OrganizationMemberDto> memberProjection)
@@ -42,5 +43,6 @@ public sealed class OrganizationDtoProjectionProvider : ProjectionProviderBase<E
 		};
 	}
 
-	public override Expression<Func<Entities.Organization.Organization.Organization, OrganizationDto>> Projection { get; }
+	public override Expression<Func<Entities.Organization.Organization.Organization, OrganizationDto>>
+		Projection { get; }
 }

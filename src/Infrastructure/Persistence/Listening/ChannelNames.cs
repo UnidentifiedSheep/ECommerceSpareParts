@@ -1,3 +1,4 @@
+using System.Text;
 using Npgsql;
 
 namespace Persistence.Listening;
@@ -9,7 +10,7 @@ internal static class ChannelNames
 	public static string Validate(string channel)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(channel);
-		if (System.Text.Encoding.UTF8.GetByteCount(channel) > MaxLength)
+		if (Encoding.UTF8.GetByteCount(channel) > MaxLength)
 			throw new ArgumentException(
 				$"Channel name must not exceed {MaxLength} bytes.",
 				nameof(channel));
@@ -17,5 +18,6 @@ internal static class ChannelNames
 		return channel;
 	}
 
-	public static string Quote(string channel) => new NpgsqlCommandBuilder().QuoteIdentifier(Validate(channel));
+	public static string Quote(string channel)
+		=> new NpgsqlCommandBuilder().QuoteIdentifier(Validate(channel));
 }

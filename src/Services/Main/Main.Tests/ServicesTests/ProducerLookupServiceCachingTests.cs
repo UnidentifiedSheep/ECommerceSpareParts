@@ -1,12 +1,11 @@
-using Main.Modules.Product.Application.Events;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Contracts.Producer;
 using Enums;
 using FluentAssertions;
 using Main.Entities.Product.Producer;
 using Main.Modules.Product.Application.Consumers;
+using Main.Modules.Product.Application.Events;
 using Main.Modules.Product.Application.Interfaces.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;

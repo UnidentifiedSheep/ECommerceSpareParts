@@ -1,7 +1,6 @@
 using Application.Common;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
 
@@ -13,8 +12,6 @@ public sealed class QuotaTestLrt : ILrtNamedObject<NoneInputState>, IQuotaBoundL
 	public const string QuotaName = "test-isolated-quota";
 
 	public string SystemName => LrtName;
-
-	public string QuotaSystemName => QuotaName;
 
 	public ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-quota-lrt.name");
 
@@ -30,4 +27,6 @@ public sealed class QuotaTestLrt : ILrtNamedObject<NoneInputState>, IQuotaBoundL
 		Guid leaseHolderId,
 		CancellationToken cancellationToken = default)
 		=> Task.CompletedTask;
+
+	public string QuotaSystemName => QuotaName;
 }

@@ -1,9 +1,7 @@
 using System.Text.Json;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Lrt;
 using Main.Modules.Product.Application.Lrts.Base;
 using Microsoft.Extensions.DependencyInjection;
-using Tests.Abstractions.Test;
 using Tests.Jobs;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;

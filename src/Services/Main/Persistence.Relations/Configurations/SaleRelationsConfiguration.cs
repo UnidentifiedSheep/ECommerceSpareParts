@@ -1,7 +1,9 @@
 using Main.Entities.Balance.Balance;
+using Main.Entities.Currency;
 using Main.Entities.Organization.Organization;
 using Main.Entities.Sale.Sale;
 using Main.Entities.Storage.Storage;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,7 +14,7 @@ public sealed class SaleRelationsConfiguration : IEntityTypeConfiguration<Sale>
 	public void Configure(EntityTypeBuilder<Sale> builder)
 	{
 		builder
-			.HasOne<Main.Entities.User.User>()
+			.HasOne<User>()
 			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.OnDelete(DeleteBehavior.Restrict)
@@ -26,7 +28,7 @@ public sealed class SaleRelationsConfiguration : IEntityTypeConfiguration<Sale>
 			.HasConstraintName("sale_organizations_id_fk");
 
 		builder
-			.HasOne<Main.Entities.Currency.Currency>()
+			.HasOne<Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)

@@ -1,6 +1,4 @@
 using FluentAssertions;
-using Main.Entities.Exceptions;
-using Main.Entities.Organization;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Exceptions;
 using Main.Entities.Organization.Organization;

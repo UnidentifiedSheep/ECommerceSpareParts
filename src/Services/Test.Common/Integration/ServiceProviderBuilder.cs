@@ -1,14 +1,12 @@
 using Abstractions.Interfaces;
 using Application.Common;
 using Application.Common.Behaviors;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Locan.Hosting;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Persistence.Common;
 using Persistence.Extensions;
 using Persistence.Interceptors;
 using Security.Core.Interfaces;

@@ -36,7 +36,10 @@ public class LrtExecutorHostedService(
 			await using var scope = scopeFactory.CreateAsyncScope();
 			var acquirer = scope.ServiceProvider.GetRequiredService<LrtJobAcquirer>();
 
-			var acquired = await acquirer.TryAcquireAsync(Guid.NewGuid(), InitialLeaseDuration, ct);
+			var acquired = await acquirer.TryAcquireAsync(
+				Guid.NewGuid(),
+				InitialLeaseDuration,
+				ct);
 			if (acquired is null)
 				return false;
 

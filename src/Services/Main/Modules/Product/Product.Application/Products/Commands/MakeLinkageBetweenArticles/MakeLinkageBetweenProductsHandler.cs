@@ -45,7 +45,10 @@ public class MakeLinkageBetweenProductsHandler(
 		CancellationToken cancellationToken = default)
 	{
 		List<int> productIds = [linkage.ProductId, linkage.CrossProductId];
-		var criteria = Criteria<Entities.Product.Product.Product>.New().Where(x => productIds.Contains(x.Id)).Track(false).Build();
+		var criteria = Criteria<Entities.Product.Product.Product>.New()
+			.Where(x => productIds.Contains(x.Id))
+			.Track(false)
+			.Build();
 
 		var lrArticles = await repository.ListAsync(criteria, cancellationToken);
 

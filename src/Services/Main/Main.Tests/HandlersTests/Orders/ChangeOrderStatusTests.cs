@@ -1,8 +1,6 @@
 using Exceptions;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Entities.Exceptions;
-using Main.Entities.Order;
 using Main.Entities.Order.Enums.Orders;
 using Main.Entities.Order.Exceptions;
 using Main.Entities.Order.Order;

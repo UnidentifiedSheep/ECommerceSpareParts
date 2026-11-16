@@ -13,7 +13,8 @@ namespace Main.Modules.Organization.Application.Handlers.Organizations.AddOrgani
 public record AddOrganizationMemberCommand(Guid OrganizationId, Guid UserId, OrganizationRole Role)
 	: ICommand;
 
-public class AddOrganizationMemberHandler(IRepository<Entities.Organization.Organization.Organization, Guid> repository)
+public class AddOrganizationMemberHandler(
+	IRepository<Entities.Organization.Organization.Organization, Guid> repository)
 	: ICommandHandler<AddOrganizationMemberCommand>
 {
 	public async Task<Unit> Handle(AddOrganizationMemberCommand request, CancellationToken cancellationToken)
@@ -24,7 +25,9 @@ public class AddOrganizationMemberHandler(IRepository<Entities.Organization.Orga
 		return Unit.Value;
 	}
 
-	private Task<Entities.Organization.Organization.Organization> GetOrganization(Guid organizationId, CancellationToken cancellationToken)
+	private Task<Entities.Organization.Organization.Organization> GetOrganization(
+		Guid organizationId,
+		CancellationToken cancellationToken)
 		=> repository.EnsureExistForUpdateAsync(
 			organizationId,
 			id => new OrganizationNotFoundException(id),

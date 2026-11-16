@@ -41,7 +41,10 @@ public sealed class ProducerMutations
 
 	[GraphQLName("delete")]
 	[RequireAllPermissions(PermissionCodes.PRODUCERS_DELETE)]
-	public async Task<bool> DeleteAsync(int id, ISender sender, CancellationToken cancellationToken)
+	public async Task<bool> DeleteAsync(
+		int id,
+		ISender sender,
+		CancellationToken cancellationToken)
 	{
 		await sender.Send(new DeleteProducerCommand(id), cancellationToken);
 		return true;

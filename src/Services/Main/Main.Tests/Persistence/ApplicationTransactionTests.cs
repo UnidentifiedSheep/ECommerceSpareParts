@@ -3,7 +3,6 @@ using Application.Common.Models.Persistence;
 using Attributes;
 using Enums;
 using FluentAssertions;
-using Main.Entities.Product;
 using Main.Entities.Product.Producer;
 using Main.Entities.Product.Product;
 using Microsoft.EntityFrameworkCore;
@@ -96,7 +95,8 @@ public sealed class ApplicationTransactionTests(CombinedContainerFixture fixture
 	}
 
 	[Fact]
-	public async Task UnitOfWork_ActionFailsAfterTransactionCompleted_RethrowsTheOriginalErrorInsteadOfRollbackError()
+	public async Task
+		UnitOfWork_ActionFailsAfterTransactionCompleted_RethrowsTheOriginalErrorInsteadOfRollbackError()
 	{
 		var classifier = new Mock<ITransactionExceptionClassifier>();
 		classifier.Setup(value => value.Classify(It.IsAny<Exception>()))

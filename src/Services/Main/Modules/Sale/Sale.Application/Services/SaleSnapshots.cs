@@ -24,7 +24,8 @@ public sealed class SaleSnapshots(IReadRepository<Entities.Sale.Sale.Sale, Guid>
 			.ToListAsync(cancellationToken);
 
 		return new SaleSnapshotsPage(
-			page.SelectMany(sale => sale.Contents.Select(content => SaleContentSnapshots.From(content, sale))).ToArray(),
+			page.SelectMany(sale => sale.Contents.Select(content => SaleContentSnapshots.From(content, sale)))
+				.ToArray(),
 			page.Count == 0 ? null : page[^1].Id,
 			page.Count);
 	}

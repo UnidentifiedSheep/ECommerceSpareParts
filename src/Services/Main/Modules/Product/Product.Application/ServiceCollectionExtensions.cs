@@ -1,7 +1,6 @@
 using Application.Common.Extensions;
 using Application.Common.Host;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Lrt;
 using Main.Modules.Product.Abstractions;
 using Main.Modules.Product.Application.Cache;
 using Main.Modules.Product.Application.Configs;

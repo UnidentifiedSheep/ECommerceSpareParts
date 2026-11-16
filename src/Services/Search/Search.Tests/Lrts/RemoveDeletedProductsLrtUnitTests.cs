@@ -61,10 +61,10 @@ public sealed class RemoveDeletedProductsLrtUnitTests
 
 		var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
 			Create(repository.Object)
-			.ExecuteAsync(
-				Guid.Empty,
-				Guid.Empty,
-				TestContext.Current.CancellationToken));
+				.ExecuteAsync(
+					Guid.Empty,
+					Guid.Empty,
+					TestContext.Current.CancellationToken));
 
 		exception.Should().BeSameAs(failure);
 	}
@@ -84,10 +84,10 @@ public sealed class RemoveDeletedProductsLrtUnitTests
 
 		await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
 			Create(repository.Object)
-			.ExecuteAsync(
-				Guid.Empty,
-				Guid.Empty,
-				cancellation.Token));
+				.ExecuteAsync(
+					Guid.Empty,
+					Guid.Empty,
+					cancellation.Token));
 
 		repository.Verify(
 			value => value.DeleteDeletedBefore(

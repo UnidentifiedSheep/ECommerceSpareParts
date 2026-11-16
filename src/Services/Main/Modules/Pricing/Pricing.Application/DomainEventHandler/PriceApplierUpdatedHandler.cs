@@ -2,7 +2,6 @@ using Application.Common;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Services;
-using Application.Common.LRT;
 using Application.Common.Services.Events;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Lrts.InvalidateStalePriceOptions;

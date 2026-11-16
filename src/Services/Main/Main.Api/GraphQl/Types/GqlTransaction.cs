@@ -8,7 +8,6 @@ using Main.Api.GraphQl.Types.Sale;
 using Main.Api.GraphQl.Types.User;
 using Main.Entities.Balance.Enums.Balances;
 using Main.Entities.Balance.Exceptions;
-using Main.Entities.Exceptions;
 using Main.Modules.Balance.Application.Dtos.Balances;
 using Main.Modules.Currency.Application.Handlers.Currencies;
 using MediatR;

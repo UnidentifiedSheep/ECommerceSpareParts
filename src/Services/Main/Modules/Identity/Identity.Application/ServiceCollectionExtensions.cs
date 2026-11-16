@@ -1,10 +1,7 @@
-using Main.Modules.Identity.Application.Configs;
 using Application.Common.Host;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.Validators;
-using Main.Modules.Identity.Abstractions;
 using Main.Modules.Identity.Abstractions.Interfaces;
+using Main.Modules.Identity.Application.Configs;
 using Main.Modules.Identity.Application.Interfaces.Services;
 using Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
 using Main.Modules.Identity.Application.Models.Options;
@@ -22,7 +19,9 @@ namespace Main.Modules.Identity.Application;
 
 public static class ServiceCollectionExtensions
 {
-	public static IServiceCollection AddIdentityLinks(this IServiceCollection services, IConfiguration configuration)
+	public static IServiceCollection AddIdentityLinks(
+		this IServiceCollection services,
+		IConfiguration configuration)
 	{
 		services.AddOptions<IdentityLinksOptions>()
 			.Bind(configuration.GetSection(IdentityLinksOptions.SectionName))

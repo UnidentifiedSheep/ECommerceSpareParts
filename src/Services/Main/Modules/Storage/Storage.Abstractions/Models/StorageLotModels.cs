@@ -1,6 +1,10 @@
 namespace Main.Modules.Storage.Abstractions.Models;
 
-public record NewStorageLot(int ProductId, int CurrencyId, decimal BuyPrice, int Count, DateTime PurchaseDate);
+public record NewStorageLot(int ProductId,
+	int CurrencyId,
+	decimal BuyPrice,
+	int Count,
+	DateTime PurchaseDate);
 
 public record StoredLot(
 	int Id,
@@ -10,4 +14,8 @@ public record StoredLot(
 	decimal BuyPrice,
 	DateTime PurchaseDatetime);
 
-public record RestoreStorageLot(int StorageContentId, int ProductId, int CurrencyId, decimal BuyPrice, int Count);
+public record RestoreStorageLot(int StorageContentId,
+	int ProductId,
+	int CurrencyId,
+	decimal BuyPrice,
+	int Count);

@@ -1,6 +1,5 @@
 ﻿using Exceptions;
 using FluentAssertions;
-using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Product.Product;
 

@@ -1,6 +1,5 @@
 ﻿using Exceptions;
 using FluentAssertions;
-using Main.Entities.Product.ValueObjects;
 using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.Domain.Product;

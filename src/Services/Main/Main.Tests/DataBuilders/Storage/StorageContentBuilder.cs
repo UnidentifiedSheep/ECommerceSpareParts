@@ -1,8 +1,6 @@
-﻿using Enums;
-using Bogus;
-using Main.Entities.Product;
+﻿using Bogus;
+using Enums;
 using Main.Entities.Product.Product;
-using Main.Entities.Storage;
 using Main.Entities.Storage.Storage;
 using Tests.Abstractions;
 

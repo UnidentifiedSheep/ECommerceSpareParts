@@ -1,56 +1,51 @@
-using Main.Modules.Currency.Abstractions;
-using Main.Modules.Product.Application.Events;
-using Pricing.Application.Events;
-using Application.Common.Host;
-using System.Reflection;
 using Abstractions;
 using Api.Common;
-using Api.Common.EndPoints;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
-using Application.Common.Consumer;
+using Application.Common.Host;
 using Cache;
+using Cache.OneTimeTokens;
 using Carter;
 using Contracts.Job;
-using Contracts.Producer;
 using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
 using Main.Api.EndPoints;
 using Main.Api.GraphQl;
-using Cache.OneTimeTokens;
 using Main.Api.Jobs;
-using Main.Modules.Currency;
-using Main.Modules.Product;
-using Main.Modules.Identity;
-using Main.Modules.Purchase;
 using Main.Modules.Analytics;
 using Main.Modules.Balance;
 using Main.Modules.Cart;
+using Main.Modules.Currency;
 using Main.Modules.Currency.Abstractions.Events;
 using Main.Modules.Currency.Application.Consumers;
 using Main.Modules.Documents;
+using Main.Modules.Identity;
 using Main.Modules.Jobs;
-using Main.Modules.Platform;
-using Main.Modules.Suppliers;
-using Main.Modules.Uploads;
 using Main.Modules.Notifications;
 using Main.Modules.Notifications.Application.Delivery.Extensions;
 using Main.Modules.Order;
 using Main.Modules.Organization;
+using Main.Modules.Platform;
 using Main.Modules.Platform.Application.Consumer;
+using Main.Modules.Product;
 using Main.Modules.Product.Application.Consumers;
+using Main.Modules.Product.Application.Events;
+using Main.Modules.Purchase;
 using Main.Modules.Sale;
 using Main.Modules.Storage;
-using Pricing.Application.Consumers;
-using Pricing.Module;
-using Persistence.Common;
-using Persistence.Relations;
+using Main.Modules.Suppliers;
+using Main.Modules.Uploads;
 using MassTransit;
+using Persistence.Common;
 using Persistence.Context;
+using Persistence.Relations;
+using Pricing.Application.Consumers;
+using Pricing.Application.Events;
+using Pricing.Module;
 using RabbitMq.Extensions;
 using S3;
 using Security.Extensions;
@@ -107,8 +102,10 @@ var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-	x.AddConsumers([
-		.. builder.Services.GetModuleCatalog().ConsumerAssemblies]);
+	x.AddConsumers(
+	[
+		.. builder.Services.GetModuleCatalog().ConsumerAssemblies
+	]);
 	x.AddConsumer<BackplaneConsumer>();
 	x.AddConsumer<JobStatusUpdatedConsumer>();
 	x.AddConsumer<SettingUpdatedConsumer>();

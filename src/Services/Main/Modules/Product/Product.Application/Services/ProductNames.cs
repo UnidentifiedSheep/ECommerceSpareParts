@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Product.Application.Services;
 
-public sealed class ProductNames(IReadRepository<Entities.Product.Product.Product, int> products) : IProductNames
+public sealed class ProductNames(IReadRepository<Entities.Product.Product.Product, int> products)
+	: IProductNames
 {
 	public async Task<IReadOnlyDictionary<int, ProductDisplayName>> GetAsync(
 		IReadOnlyCollection<int> productIds,

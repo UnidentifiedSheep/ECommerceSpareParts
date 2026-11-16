@@ -26,7 +26,9 @@ public class JobNotificationListenerHostedService(
 			}
 			catch (Exception ex)
 			{
-				logger.LogWarning(ex, "Job notification listener failed. Falling back to polling and retrying.");
+				logger.LogWarning(
+					ex,
+					"Job notification listener failed. Falling back to polling and retrying.");
 				await Task.Delay(RetryDelay, stoppingToken);
 			}
 	}

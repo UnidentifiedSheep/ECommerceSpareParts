@@ -1,12 +1,12 @@
 using Main.Entities.Storage;
-using Main.Entities.Product;
 using Main.Modules.Storage.Application.Services.ProductDeletion;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
 namespace Tests.ProductDeletionRulesTests;
 
-public class StorageContentProductDeletionRuleTests : ProductDeletionRuleTestsBase<StorageContentProductDeletionRule>
+public class
+	StorageContentProductDeletionRuleTests : ProductDeletionRuleTestsBase<StorageContentProductDeletionRule>
 {
 	public StorageContentProductDeletionRuleTests(CombinedContainerFixture fixture) : base(fixture)
 		=> RegisterBasicContext<StorageContentTestContext>();

@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Locan.Core.Interfaces;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,10 +23,16 @@ public abstract class ProductDeletionRuleTestsBase<TRule> : IntegrationTest wher
 			.CheckAsync(productId, CancellationToken);
 
 	protected async Task ShouldBlock(int productId, string messageKey)
-		=> (await Check(productId)).Should().NotBeNull().And.Subject.As<ILocalizableMessage>().MessageKey.Should().Be(messageKey);
+		=> (await Check(productId)).Should()
+			.NotBeNull()
+			.And
+			.Subject
+			.As<ILocalizableMessage>()
+			.MessageKey
+			.Should()
+			.Be(messageKey);
 
-	protected async Task ShouldNotBlock(int productId)
-		=> (await Check(productId)).Should().BeNull();
+	protected async Task ShouldNotBlock(int productId) => (await Check(productId)).Should().BeNull();
 
 	protected Task<Product> CreateUnreferencedProduct()
 		=> new ProductBuilder(Faker).WithProducerId(GetContext<ProductTestContext>().Products[0].ProducerId)

@@ -98,7 +98,10 @@ public sealed class ProductMutations
 		CancellationToken cancellationToken)
 	{
 		await sender.Send(
-			new SetProductWeightCommand(input.ProductId, input.Weight, input.Unit),
+			new SetProductWeightCommand(
+				input.ProductId,
+				input.Weight,
+				input.Unit),
 			cancellationToken);
 		return new GqlProduct(input.ProductId);
 	}
@@ -179,7 +182,10 @@ public sealed class ProductMutations
 		CancellationToken cancellationToken)
 	{
 		await sender.Send(
-			new SetProductsContentCountCommand(productId, childProductId, quantity),
+			new SetProductsContentCountCommand(
+				productId,
+				childProductId,
+				quantity),
 			cancellationToken);
 		return new GqlProduct(productId);
 	}

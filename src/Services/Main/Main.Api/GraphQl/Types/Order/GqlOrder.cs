@@ -3,7 +3,6 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.User;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 using Main.Entities.Order.Enums.Orders;
 using Main.Entities.Order.Exceptions;
 using Main.Modules.Order.Application.Orders.Dtos;

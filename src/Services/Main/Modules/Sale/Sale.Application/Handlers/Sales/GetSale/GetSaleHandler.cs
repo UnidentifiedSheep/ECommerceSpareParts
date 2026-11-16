@@ -14,7 +14,8 @@ public record GetSaleResult(SaleDto Sale);
 
 public class GetSaleHandler(
 	IReadRepository<Entities.Sale.Sale.Sale, Guid> repository,
-	IProjectionProvider<Entities.Sale.Sale.Sale, SaleDto> projection) : IQueryHandler<GetSaleQuery, GetSaleResult>
+	IProjectionProvider<Entities.Sale.Sale.Sale, SaleDto> projection)
+	: IQueryHandler<GetSaleQuery, GetSaleResult>
 {
 	public async Task<GetSaleResult> Handle(GetSaleQuery request, CancellationToken cancellationToken)
 	{

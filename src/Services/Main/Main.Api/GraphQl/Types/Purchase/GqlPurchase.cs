@@ -5,7 +5,6 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Organization;
 using Main.Api.GraphQl.Types.User;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
 using Main.Entities.Purchase.Exceptions;
 using Main.Modules.Purchase.Application.Dtos.Purchase;
 
@@ -73,7 +72,8 @@ public sealed record GqlPurchase
 		CancellationToken cancellationToken)
 	{
 		var currencyId = (await GetPurchaseAsync(loader, cancellationToken)).CurrencyId;
-		return new GqlCurrency(await currencyLoader.LoadAsync(currencyId, cancellationToken)
+		return new GqlCurrency(
+			await currencyLoader.LoadAsync(currencyId, cancellationToken)
 			?? throw new CurrencyNotFoundException(currencyId));
 	}
 

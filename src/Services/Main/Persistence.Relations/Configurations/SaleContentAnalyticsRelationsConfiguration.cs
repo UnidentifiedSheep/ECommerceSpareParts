@@ -8,11 +8,11 @@ namespace Persistence.Relations.Configurations;
 public sealed class SaleContentAnalyticsRelationsConfiguration
 	: IEntityTypeConfiguration<SaleContentAnalytics>
 {
-	public void Configure(EntityTypeBuilder<Main.Entities.Analytics.SaleContentAnalytics> builder)
+	public void Configure(EntityTypeBuilder<SaleContentAnalytics> builder)
 		=> builder
 			.HasOne<SaleContent>()
 			.WithOne()
-			.HasForeignKey<Main.Entities.Analytics.SaleContentAnalytics>(item => item.SaleContentId)
+			.HasForeignKey<SaleContentAnalytics>(item => item.SaleContentId)
 			.OnDelete(DeleteBehavior.Cascade)
 			.HasConstraintName("sale_content_analytics_sale_content_id_fk");
 }

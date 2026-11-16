@@ -78,4 +78,5 @@ public class ProductGroupNotFoundException(int id) : LocalizedNotFoundException(
 public class ProductGroupNameAlreadyExistsException() : LocalizedConflictException(
 	ProductGroupNormalizedNameAlreadyExistsMessage.Instance);
 
-public class ProductDeletionNotAllowedException(ILocalizableMessage message) : LocalizedConflictException(message);
+public class ProductDeletionNotAllowedException(ILocalizableMessage message)
+	: LocalizedConflictException(message);

@@ -1,6 +1,6 @@
 using Application.Common.Extensions;
-using FluentValidation;
 using Domain;
+using FluentValidation;
 
 namespace Application.Common.Validators;
 

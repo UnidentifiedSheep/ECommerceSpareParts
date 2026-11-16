@@ -1,10 +1,9 @@
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Entities.Analytics;
 using FluentAssertions;
+using Main.Entities.Analytics;
 using Main.Entities.Analytics.Enums;
 using Main.Entities.Currency;
-using Main.Entities.Sale;
 using Main.Modules.Analytics.Abstractions.Charts;
 using Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
 using Microsoft.EntityFrameworkCore;

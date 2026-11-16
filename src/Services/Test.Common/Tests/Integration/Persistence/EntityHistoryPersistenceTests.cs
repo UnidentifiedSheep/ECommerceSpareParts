@@ -32,9 +32,12 @@ public sealed class EntityHistoryPersistenceTests(CombinedContainerFixture fixtu
 			new EntityHistoryReason("InventoryCorrection")
 		};
 		using (var changes = JsonDocument.Parse("""{"Count":{"old":15,"new":10}}"""))
+		{
 			history = new EntityHistoryBuilder().WithChanges(changes.RootElement)
 				.WithReasons(reasons)
 				.Build();
+		}
+
 		reasons[0] = new EntityHistoryReason("ChangedByCaller");
 
 		Context.Add(history);

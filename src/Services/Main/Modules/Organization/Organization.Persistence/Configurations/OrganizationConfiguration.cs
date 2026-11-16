@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Modules.Organization.Persistence.Configurations;
 
-public class OrganizationConfiguration : IEntityTypeConfiguration<Entities.Organization.Organization.Organization>
+public class
+	OrganizationConfiguration : IEntityTypeConfiguration<Entities.Organization.Organization.Organization>
 {
 	public void Configure(EntityTypeBuilder<Entities.Organization.Organization.Organization> builder)
 	{

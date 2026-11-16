@@ -46,12 +46,12 @@ public sealed class QueryableSortByTests
 		bool descending,
 		string? argument)
 		=> SortExpression.Parse(text)
-		.Should()
-		.Be(
-			new SortExpression(
-				field,
-				descending,
-				argument));
+			.Should()
+			.Be(
+				new SortExpression(
+					field,
+					descending,
+					argument));
 
 	[Theory]
 	[InlineData("count__desc")]
@@ -135,12 +135,12 @@ public sealed class QueryableSortByTests
 		var input = new GqlSortBy { Field = "count", IsDescending = true, Argument = "Main_Warehouse" };
 
 		new[] { input }.ToSortExpressions()
-		.Should()
-		.Equal(
-			new SortExpression(
-				"count",
-				true,
-				"Main_Warehouse"));
+			.Should()
+			.Equal(
+				new SortExpression(
+					"count",
+					true,
+					"Main_Warehouse"));
 	}
 
 	private sealed record Item(int Id, IReadOnlyList<Stock> Stocks);

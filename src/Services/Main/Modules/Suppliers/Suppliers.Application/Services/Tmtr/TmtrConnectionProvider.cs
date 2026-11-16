@@ -1,7 +1,6 @@
-using Integrations.Common;
 using Application.Common.Interfaces.Settings;
+using Integrations.Common;
 using Integrations.Supplier.Connections;
-using Integrations.Supplier.Interfaces;
 using Main.Entities.Suppliers.Settings.Supplier;
 using Security.Core.Interfaces;
 

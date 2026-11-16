@@ -1,4 +1,3 @@
-
 namespace Integrations.Common;
 
 public interface IConnectionProvider<TModel> : IConnectionProvider

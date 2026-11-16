@@ -75,7 +75,9 @@ public sealed class GetOrdersHandler(
 		return new GetOrdersResult(orders);
 	}
 
-	private IQueryable<Entities.Order.Order.Order> ApplySearchTerm(IQueryable<Entities.Order.Order.Order> query, string searchTerm)
+	private IQueryable<Entities.Order.Order.Order> ApplySearchTerm(
+		IQueryable<Entities.Order.Order.Order> query,
+		string searchTerm)
 	{
 		var term = searchTerm.Trim();
 		var isId = Guid.TryParse(term, out var id);

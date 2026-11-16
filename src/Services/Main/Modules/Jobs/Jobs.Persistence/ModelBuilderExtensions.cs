@@ -1,6 +1,5 @@
 using Main.Modules.Jobs.Persistence.BaseTableConfigurations;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Common.BaseTableConfigurations;
 
 namespace Main.Modules.Jobs.Persistence;
 

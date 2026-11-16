@@ -14,7 +14,10 @@ public class UpsertOrderDbValidation(
 	public override void Build(IValidationPlan plan, UpsertOrderCommand request)
 	{
 		if (request.Order.UserId != null)
-			organizationChecks.MemberExists(plan, request.Order.OrganizationId, request.Order.UserId.Value);
+			organizationChecks.MemberExists(
+				plan,
+				request.Order.OrganizationId,
+				request.Order.UserId.Value);
 		else
 			organizationChecks.Exists(plan, request.Order.OrganizationId);
 

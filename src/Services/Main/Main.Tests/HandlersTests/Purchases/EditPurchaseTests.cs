@@ -1,17 +1,14 @@
-using Enums;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Services;
 using Attributes;
 using Contracts;
+using Enums;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Entities;
-using Main.Entities.Balance;
 using Main.Entities.Balance.Balance;
 using Main.Entities.Product.Stock;
 using Main.Entities.Purchase;
 using Main.Entities.Purchase.Purchase;
-using Main.Entities.Storage;
 using Main.Entities.Storage.Storage;
 using Main.Modules.Purchase.Application.Dtos.Purchase;
 using Main.Modules.Purchase.Application.Handlers.Purchases.EditPurchase;
@@ -26,7 +23,6 @@ using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Purchase;
-using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.Purchases;
 
@@ -220,7 +216,6 @@ public class EditPurchaseTests : IntegrationTest
 		updatedStorageContent.Count.Should().Be(3);
 		updatedProductStockQuantity.Should().Be(3);
 	}
-
 }
 
 public class EditPurchaseValidationTests : ValidationTest<EditPurchaseValidation, EditPurchaseCommand>

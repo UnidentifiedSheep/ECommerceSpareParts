@@ -7,13 +7,11 @@ using Contracts.Products;
 using Domain.CommonEntities.Job;
 using Exceptions;
 using FluentAssertions;
-using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
 using Main.Entities.Product.Product.Enrichment;
 using Main.Entities.Product.Stock;
-using Main.Entities.Storage;
 using Main.Modules.Product.Application.Lrts.DeleteProductImages;
 using Main.Modules.Product.Application.Products.Commands;
 using Main.Modules.Product.Application.Products.Interfaces;
@@ -45,7 +43,9 @@ public class DeleteProductTests : IntegrationTest
 	private Guid UserId => GetContext<UserContextTestContext>().SystemUser.Id;
 	private string StorageCode => GetContext<StorageTestContext>().Storages.First().Code;
 	private S3StorageServiceStub S3 => Sp.GetRequiredService<S3StorageServiceStub>();
-	private MessageBrokerStub Publisher => (MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+
+	private MessageBrokerStub Publisher
+		=> (MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
 	[Fact]
 	public async Task UnusedProduct_DeletesDependentsAndQueuesImagesWithoutDeletingFiles()
@@ -248,7 +248,12 @@ public class DeleteProductTests : IntegrationTest
 	[Fact]
 	public async Task ReferencedProduct_IsPreservedWithoutEventsOrCleanup()
 	{
-		await Context.AddAsync(ProductStock.Create(StorageCode, Product.Id, 1), CancellationToken);
+		await Context.AddAsync(
+			ProductStock.Create(
+				StorageCode,
+				Product.Id,
+				1),
+			CancellationToken);
 		var image = ProductImage.Create(Product.Id, ".jpg");
 		await Context.AddAsync(image, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);

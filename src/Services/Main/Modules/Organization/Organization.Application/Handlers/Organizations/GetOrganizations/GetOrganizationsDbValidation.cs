@@ -4,7 +4,8 @@ using Main.Modules.Identity.Abstractions.Interfaces;
 
 namespace Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
 
-public class GetOrganizationsDbValidation(IUserChecks userChecks) : AbstractDbValidation<GetOrganizationsQuery>
+public class GetOrganizationsDbValidation(IUserChecks userChecks)
+	: AbstractDbValidation<GetOrganizationsQuery>
 {
 	public override void Build(IValidationPlan plan, GetOrganizationsQuery request)
 	{

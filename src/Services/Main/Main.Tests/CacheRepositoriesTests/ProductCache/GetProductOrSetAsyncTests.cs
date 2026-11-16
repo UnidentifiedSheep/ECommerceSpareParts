@@ -1,6 +1,5 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Entities.Exceptions;
 using Main.Entities.Product.Exceptions;
 using Main.Modules.Product.Application.Products.Interfaces;
 using Main.Modules.Product.Application.Static;

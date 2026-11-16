@@ -17,7 +17,9 @@ public static class ProductSortByConfig
 			.Map<Entities.Product.Product.Product, string>("producerName", x => x.Producer.Name)
 			.Map<Entities.Product.Product.Product, string>("indicator", x => x.Indicator!.Value!)
 			.Map<Entities.Product.Product.Product, long>("popularity", x => x.Popularity)
-			.Map<Entities.Product.Product.Product, long>("count", x => x.Stocks.Sum(stock => (long)stock.Quantity))
+			.Map<Entities.Product.Product.Product, long>(
+				"count",
+				x => x.Stocks.Sum(stock => (long)stock.Quantity))
 			.MapParameterized<Entities.Product.Product.Product, string, long>(
 				"count",
 				(product, storage) => product.Stocks

@@ -9,10 +9,11 @@ namespace Main.Modules.Currency;
 
 public sealed class CurrencyModule : ModuleBase
 {
-	public override IReadOnlyCollection<Assembly> ConsumerAssemblies =>
-	[
-		CurrencyApplicationAssembly.Value
-	];
+	public override IReadOnlyCollection<Assembly> ConsumerAssemblies
+		=>
+		[
+			CurrencyApplicationAssembly.Value
+		];
 
 	public override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 	{

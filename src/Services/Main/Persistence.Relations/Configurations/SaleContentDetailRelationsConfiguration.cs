@@ -1,3 +1,4 @@
+using Main.Entities.Currency;
 using Main.Entities.Sale.Sale;
 using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ public sealed class SaleContentDetailRelationsConfiguration : IEntityTypeConfigu
 	public void Configure(EntityTypeBuilder<SaleContentDetail> builder)
 	{
 		builder
-			.HasOne<Main.Entities.Currency.Currency>()
+			.HasOne<Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)

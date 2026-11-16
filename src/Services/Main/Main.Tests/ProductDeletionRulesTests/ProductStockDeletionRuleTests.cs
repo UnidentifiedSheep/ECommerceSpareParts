@@ -1,6 +1,5 @@
 using Main.Entities.Product;
 using Main.Entities.Product.Stock;
-using Main.Entities.Storage;
 using Main.Modules.Product.Application.Services;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;

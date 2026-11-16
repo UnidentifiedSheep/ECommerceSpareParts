@@ -12,7 +12,8 @@ namespace Main.Modules.Storage.Application.Handlers.Storages.EditStorage;
 [Transactional]
 public record EditStorageCommand(string StorageCode, PatchStorageDto EditStorage) : ICommand;
 
-public class EditStorageHandler(IRepository<Entities.Storage.Storage.Storage, string> repository) : ICommandHandler<EditStorageCommand>
+public class EditStorageHandler(IRepository<Entities.Storage.Storage.Storage, string> repository)
+	: ICommandHandler<EditStorageCommand>
 {
 	public async Task<Unit> Handle(EditStorageCommand request, CancellationToken cancellationToken)
 	{

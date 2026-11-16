@@ -1,5 +1,4 @@
 using Bogus;
-using Main.Entities.Purchase;
 using Main.Entities.Purchase.Purchase;
 using Tests.Abstractions;
 

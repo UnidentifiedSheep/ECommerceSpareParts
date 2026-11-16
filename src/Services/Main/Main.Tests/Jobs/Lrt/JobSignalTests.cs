@@ -1,4 +1,3 @@
-using Api.Common.HostedServices;
 using FluentAssertions;
 using Main.Modules.Jobs.Application.HostedServices;
 
@@ -51,7 +50,8 @@ public class JobSignalTests
 		using var source = new CancellationTokenSource();
 		await source.CancelAsync();
 
-		await Assert.ThrowsAnyAsync<OperationCanceledException>(
-			() => signal.WaitAsync(TimeSpan.FromSeconds(30), source.Token));
+		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => signal.WaitAsync(
+			TimeSpan.FromSeconds(30),
+			source.Token));
 	}
 }

@@ -42,10 +42,7 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
 			.EnsureMinLength(6, StorageCodeMinLengthMessage.Instance)
 			.EnsureMaxLength(128, StorageCodeMaxLengthMessage.Instance);
 
-	public void SetType(StorageType type)
-	{
-		Type = type;
-	}
+	public void SetType(StorageType type) => Type = type;
 
 	public void SetDescription(string? description)
 		=> Description = description

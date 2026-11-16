@@ -85,7 +85,10 @@ public class SaleService(IStorageContentService storageContentService) : ISaleSe
 		if (toRestore.Count == 0)
 			return;
 
-		await storageContentService.RestoreAsync(toRestore, movementType, cancellationToken);
+		await storageContentService.RestoreAsync(
+			toRestore,
+			movementType,
+			cancellationToken);
 	}
 
 	private static List<SaleContent> DistributeDetails(

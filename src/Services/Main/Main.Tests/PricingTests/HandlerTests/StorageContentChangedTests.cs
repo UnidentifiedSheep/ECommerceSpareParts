@@ -1,6 +1,5 @@
 using Enums;
 using FluentAssertions;
-using Main.Entities.Storage;
 using Main.Entities.Storage.Storage;
 using Main.Modules.Storage.Application.Dtos.Storage;
 using Main.Modules.Storage.Application.Handlers.StorageContents.AddContent;
@@ -31,7 +30,10 @@ public sealed class StorageContentChangedTests : IntegrationTest
 		var contents = NewContents(storage.Code, 3);
 
 		await Mediator.Send(
-			new AddContentCommand(contents, storage.Code, StorageMovementType.StorageContentAddition),
+			new AddContentCommand(
+				contents,
+				storage.Code,
+				StorageMovementType.StorageContentAddition),
 			CancellationToken);
 
 		var storageContents = await Context.Set<StorageContent>()

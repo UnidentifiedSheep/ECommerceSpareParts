@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Product.Application.Services;
 
-public sealed class ProductSearch(IReadRepository<Entities.Product.Product.Product, int> products) : IProductSearch
+public sealed class ProductSearch(IReadRepository<Entities.Product.Product.Product, int> products)
+	: IProductSearch
 {
 	public IQueryable<int> MatchingIds(string term)
 	{
@@ -16,8 +17,14 @@ public sealed class ProductSearch(IReadRepository<Entities.Product.Product.Produ
 		var skuPattern = LikePattern.Contains(normalizedSku);
 
 		return products.Query
-			.Where(product => EF.Functions.ILike(product.Name.Value, pattern, "\\") ||
-				normalizedSku.Length > 0 && EF.Functions.ILike(product.Sku.NormalizedValue, skuPattern, "\\"))
+			.Where(product => EF.Functions.ILike(
+					product.Name.Value,
+					pattern,
+					"\\") ||
+				normalizedSku.Length > 0 && EF.Functions.ILike(
+					product.Sku.NormalizedValue,
+					skuPattern,
+					"\\"))
 			.Select(product => product.Id);
 	}
 }

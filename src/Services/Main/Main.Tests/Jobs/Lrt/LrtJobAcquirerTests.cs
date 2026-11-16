@@ -1,5 +1,4 @@
 using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
@@ -18,7 +17,11 @@ public class LrtJobAcquirerTests(CombinedContainerFixture fixture) : Integration
 	[Fact]
 	public async Task NoPendingJobs_ReturnsNull()
 	{
-		var acquired = await Acquirer().TryAcquireAsync(Guid.NewGuid(), Lease, CancellationToken);
+		var acquired = await Acquirer()
+		.TryAcquireAsync(
+			Guid.NewGuid(),
+			Lease,
+			CancellationToken);
 
 		acquired.Should().BeNull();
 	}
@@ -29,7 +32,11 @@ public class LrtJobAcquirerTests(CombinedContainerFixture fixture) : Integration
 		var isolated = await AddJob(QuotaTestLrt.LrtName);
 		await AddJob(JobScheduleTestLrt.LrtName);
 
-		var acquired = await Acquirer().TryAcquireAsync(Guid.NewGuid(), Lease, CancellationToken);
+		var acquired = await Acquirer()
+		.TryAcquireAsync(
+			Guid.NewGuid(),
+			Lease,
+			CancellationToken);
 
 		acquired.Should().NotBeNull();
 		acquired.Job.Id.Should().Be(isolated.Id);
@@ -43,7 +50,11 @@ public class LrtJobAcquirerTests(CombinedContainerFixture fixture) : Integration
 		var other = await AddJob(JobScheduleTestLrt.LrtName);
 		using var held = Quotas().GetBySystemName(QuotaTestLrt.QuotaName).UseQuota(Guid.NewGuid());
 
-		var acquired = await Acquirer().TryAcquireAsync(Guid.NewGuid(), Lease, CancellationToken);
+		var acquired = await Acquirer()
+		.TryAcquireAsync(
+			Guid.NewGuid(),
+			Lease,
+			CancellationToken);
 
 		acquired.Should().NotBeNull();
 		acquired.Job.Id.Should().Be(other.Id);
@@ -57,11 +68,17 @@ public class LrtJobAcquirerTests(CombinedContainerFixture fixture) : Integration
 		var job = await AddJob(QuotaTestLrt.LrtName);
 		using var held = Quotas().GetBySystemName(QuotaTestLrt.QuotaName).UseQuota(Guid.NewGuid());
 
-		var acquired = await Acquirer().TryAcquireAsync(Guid.NewGuid(), Lease, CancellationToken);
+		var acquired = await Acquirer()
+		.TryAcquireAsync(
+			Guid.NewGuid(),
+			Lease,
+			CancellationToken);
 
 		acquired.Should().BeNull();
 		Context.ChangeTracker.Clear();
-		(await Context.Set<Job>().FindAsync([job.Id], CancellationToken))!.Status.Should().Be(JobStatus.Pending);
+		(await Context.Set<Job>().FindAsync([job.Id], CancellationToken))!.Status
+			.Should()
+			.Be(JobStatus.Pending);
 	}
 
 	[Fact]
@@ -70,7 +87,11 @@ public class LrtJobAcquirerTests(CombinedContainerFixture fixture) : Integration
 		await AddJob(QuotaTestLrt.LrtName);
 		var manager = Quotas().GetBySystemName(QuotaTestLrt.QuotaName);
 
-		var acquired = await Acquirer().TryAcquireAsync(Guid.NewGuid(), Lease, CancellationToken);
+		var acquired = await Acquirer()
+		.TryAcquireAsync(
+			Guid.NewGuid(),
+			Lease,
+			CancellationToken);
 
 		acquired.Should().NotBeNull();
 		manager.AvailableQuota.Should().Be(0);
@@ -83,7 +104,11 @@ public class LrtJobAcquirerTests(CombinedContainerFixture fixture) : Integration
 	{
 		await AddJob("unknown-lrt-name");
 
-		var acquired = await Acquirer().TryAcquireAsync(Guid.NewGuid(), Lease, CancellationToken);
+		var acquired = await Acquirer()
+		.TryAcquireAsync(
+			Guid.NewGuid(),
+			Lease,
+			CancellationToken);
 
 		acquired.Should().BeNull();
 	}
@@ -95,7 +120,10 @@ public class LrtJobAcquirerTests(CombinedContainerFixture fixture) : Integration
 
 	private async Task<Job> AddJob(string systemName)
 	{
-		var job = SingleRunJob.Create(systemName, "{}", 1);
+		var job = SingleRunJob.Create(
+			systemName,
+			"{}",
+			1);
 		await Context.AddAsync(job, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		return job;

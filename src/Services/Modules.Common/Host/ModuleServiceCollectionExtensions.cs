@@ -19,7 +19,8 @@ public static class ModuleServiceCollectionExtensions
 
 	public static ModuleCatalog GetModuleCatalog(this IServiceCollection services)
 	{
-		if (services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(ModuleCatalog))?
+		if (services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(ModuleCatalog))
+				?
 				.ImplementationInstance is ModuleCatalog existing)
 			return existing;
 

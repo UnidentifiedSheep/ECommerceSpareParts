@@ -1,12 +1,10 @@
 using System.Text.Json;
 using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
-using Api.Common.HostedServices;
 using Api.Common.Models.Options;
 using Cache;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Persistence;
-using Persistence.Listening;
 using RabbitMq;
 using S3;
 using S3.Core.Options;

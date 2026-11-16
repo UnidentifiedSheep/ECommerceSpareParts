@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Pricing.Application.Handlers.Markup;
-using Tests.PricingTests.DataBuilders.Markup;
 using Tests.Extensions;
+using Tests.PricingTests.DataBuilders.Markup;
 using Tests.TestContainers.Combined;
 
 namespace Tests.PricingTests.HandlerTests.Markup;

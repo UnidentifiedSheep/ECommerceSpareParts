@@ -17,7 +17,8 @@ public sealed class ProductReferenceResolver(ISender sender) : IProductReference
 				references
 					.Select(reference => new ProductReferenceDto
 					{
-						Sku = reference.Sku, ProducerName = reference.ProducerName, Supplier = reference.Supplier
+						Sku = reference.Sku, ProducerName = reference.ProducerName,
+						Supplier = reference.Supplier
 					})
 					.ToArray()),
 			cancellationToken);

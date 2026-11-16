@@ -2,8 +2,6 @@ using Application.Common.Interfaces.Events;
 using Application.Common.Models;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Entities;
-using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;

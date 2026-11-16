@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Analytics.Application.Analyzers.Markup;
 
-public class MarkupRangeAnalyzer(IReadRepository<SaleContentAnalytics, int> repository) : MarkupAnalyzerNamedObjectBase
+public class MarkupRangeAnalyzer(IReadRepository<SaleContentAnalytics, int> repository)
+	: MarkupAnalyzerNamedObjectBase
 {
 	private const int BatchSize = 1000;
 

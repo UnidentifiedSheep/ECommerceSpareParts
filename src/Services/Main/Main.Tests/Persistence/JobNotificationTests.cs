@@ -13,7 +13,10 @@ public class JobNotificationTests(CombinedContainerFixture fixture) : Integratio
 	{
 		await using var listener = await OpenListenerAsync();
 
-		var job = SingleRunJob.Create("NotificationTest", "{}", 1);
+		var job = SingleRunJob.Create(
+			"NotificationTest",
+			"{}",
+			1);
 		await Context.AddAsync(job, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
@@ -25,7 +28,10 @@ public class JobNotificationTests(CombinedContainerFixture fixture) : Integratio
 	[Fact]
 	public async Task LeasingJob_DoesNotNotify()
 	{
-		var job = SingleRunJob.Create("NotificationTest", "{}", 1);
+		var job = SingleRunJob.Create(
+			"NotificationTest",
+			"{}",
+			1);
 		await Context.AddAsync(job, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 

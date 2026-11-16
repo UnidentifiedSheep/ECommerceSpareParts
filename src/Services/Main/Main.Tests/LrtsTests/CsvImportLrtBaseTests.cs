@@ -2,7 +2,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEnums;
@@ -11,7 +10,6 @@ using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
 using Main.Entities.Product;
-using Main.Entities;
 using Main.Modules.Product.Application.Lrts.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,7 +17,6 @@ using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
 using S3.Core.Options;
 using SchemaGeneration.Abstractions.Attributes;
-using Tests.Abstractions.Test;
 using Tests.Jobs;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
@@ -90,12 +87,12 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<TestCsvImportState>();
 		state.ProcessedLines
-		.Should()
-		.Equal(
-			1,
-			2,
-			3,
-			4);
+			.Should()
+			.Equal(
+				1,
+				2,
+				3,
+				4);
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Checkpoint!.Offset.Should().Be(Encoding.UTF8.GetByteCount(content));
 		state.Checkpoint.RawHeader.Should().Be("\uFEFFValue\n");
@@ -146,12 +143,12 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<TestCsvImportState>();
 		state.ProcessedLines
-		.Should()
-		.Equal(
-			1,
-			2,
-			3,
-			4);
+			.Should()
+			.Equal(
+				1,
+				2,
+				3,
+				4);
 		state.Checkpoint!.RawHeader.Should().Be("\"Val,ue\"\n");
 		storage.GetDownloadOffsets(UploadsBucket, fileName)
 			.Should()

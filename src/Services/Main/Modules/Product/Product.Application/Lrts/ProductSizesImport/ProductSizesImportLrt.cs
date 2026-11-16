@@ -100,7 +100,10 @@ public class ProductSizesImportLrt(
 					.Get<Entities.Product.Product.Product, int>()
 					.FindByIdsAsync(
 						productIds,
-						Criteria<Entities.Product.Product.Product>.New().Include(x => x.ProductSize).Track().Build(),
+						Criteria<Entities.Product.Product.Product>.New()
+							.Include(x => x.ProductSize)
+							.Track()
+							.Build(),
 						cancellationToken);
 
 				var newSizes = new Dictionary<int, ProductSize>();

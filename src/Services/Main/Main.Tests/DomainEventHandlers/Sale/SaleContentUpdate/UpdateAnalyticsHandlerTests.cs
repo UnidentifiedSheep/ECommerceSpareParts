@@ -1,10 +1,8 @@
-using Main.Entities.Analytics;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using FluentAssertions;
+using Main.Entities.Analytics;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
-using Main.Entities.Sale;
 using Main.Entities.Sale.Sale;
 using Main.Modules.Analytics.Application.Services;
 using Main.Modules.Currency.Abstractions.Interfaces;
@@ -96,10 +94,10 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		var originalCurrency = sale.CurrencyId;
 		var rate = GetContext<CurrencyRatesTestContext>().Rates.First();
 		await GetContext<CurrencyRatesTestContext>()
-		.SetHistoryAsync(
-			rate,
-			[],
-			CancellationToken);
+			.SetHistoryAsync(
+				rate,
+				[],
+				CancellationToken);
 		await Scope.ServiceProvider
 			.GetRequiredService<ICurrencyRateSnapshotProvider>()
 			.Reload(CancellationToken);
@@ -144,8 +142,16 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		await Context.AddAsync(other, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		DiscardPendingDomainEvents();
-		var secondFact = Fact(second, 1m, 1m, 1m);
-		var otherFact = Fact(other.Contents.Single(), 2m, 2m, 2m);
+		var secondFact = Fact(
+			second,
+			1m,
+			1m,
+			1m);
+		var otherFact = Fact(
+			other.Contents.Single(),
+			2m,
+			2m,
+			2m);
 		await Context.AddRangeAsync([secondFact, otherFact], CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		DiscardPendingDomainEvents();
@@ -233,7 +239,11 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 		DiscardPendingDomainEvents();
 		await Context.AddAsync(
-			Fact(remaining, 1m, 1m, 1m),
+			Fact(
+				remaining,
+				1m,
+				1m,
+				1m),
 			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		DiscardPendingDomainEvents();
@@ -283,7 +293,11 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		sale.AddContent(second);
 		await Context.SaveChangesAsync(CancellationToken);
 		await Context.AddAsync(
-			Fact(second, 1m, 1m, 1m),
+			Fact(
+				second,
+				1m,
+				1m,
+				1m),
 			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
@@ -309,7 +323,11 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		sale.AddContent(remaining);
 		await Context.SaveChangesAsync(CancellationToken);
 		await Context.AddAsync(
-			Fact(remaining, 1m, 1m, 1m),
+			Fact(
+				remaining,
+				1m,
+				1m,
+				1m),
 			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
@@ -326,7 +344,11 @@ public class UpdateAnalyticsHandlerTests : IntegrationTest
 		fact.RevenueInBaseCurrency.Should().Be(remaining.TotalSum);
 	}
 
-	private static SaleContentAnalytics Fact(SaleContent content, decimal original, decimal revenue, decimal cost)
+	private static SaleContentAnalytics Fact(
+		SaleContent content,
+		decimal original,
+		decimal revenue,
+		decimal cost)
 		=> SaleContentAnalytics.Create(
 			content.Id,
 			content.SaleId,

@@ -1,7 +1,6 @@
 using Enums;
 using FluentAssertions;
 using Main.Entities.Auth;
-using Main.Entities.Exceptions;
 using Main.Entities.Order.Exceptions;
 using Main.Modules.Order.Application.Orders.Queries;
 using Microsoft.Extensions.DependencyInjection;

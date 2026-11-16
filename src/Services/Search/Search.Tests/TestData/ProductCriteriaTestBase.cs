@@ -19,11 +19,11 @@ public abstract class ProductCriteriaTestBase(SearchContainerFixture fixture) : 
 			new ProductSnapshot[]
 				{
 					new()
- {
+					{
 						Id = 101, Sku = "OIL-101", Name = "Oil filter", ProducerId = 42, ProductGroupId = 7
 					},
 					new()
- {
+					{
 						Id = 102, Sku = "AIR-102", Name = "Air filter", ProducerId = 42, ProductGroupId = 7
 					},
 					new()

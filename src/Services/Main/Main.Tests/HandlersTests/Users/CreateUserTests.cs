@@ -2,7 +2,6 @@ using FluentAssertions;
 using Main.Entities.Auth;
 using Main.Entities.Enums;
 using Main.Entities.Exceptions;
-using Main.Entities.Organization;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Organization;
 using Main.Entities.User;

@@ -6,7 +6,8 @@ using Main.Modules.Cart.Application.Dtos.Cart;
 namespace Main.Modules.Cart.Application.Projections;
 
 [Lifetime(Lifetime.Singleton)]
-public sealed class CartItemDtoProjectionProvider : ProjectionProviderBase<Entities.Cart.Cart.Cart, CartItemDto>
+public sealed class
+	CartItemDtoProjectionProvider : ProjectionProviderBase<Entities.Cart.Cart.Cart, CartItemDto>
 {
 	public override Expression<Func<Entities.Cart.Cart.Cart, CartItemDto>> Projection { get; } =
 		x => new CartItemDto

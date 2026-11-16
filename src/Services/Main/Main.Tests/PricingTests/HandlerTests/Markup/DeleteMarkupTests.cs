@@ -1,16 +1,16 @@
-using Pricing.Application.Events;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Pricing.Application.Events;
 using Pricing.Application.Handlers.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Exceptions.Markup;
 using Pricing.Entities.Settings;
-using Tests.PricingTests.DataBuilders.Markup;
 using Tests.Extensions;
+using Tests.PricingTests.DataBuilders.Markup;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
 

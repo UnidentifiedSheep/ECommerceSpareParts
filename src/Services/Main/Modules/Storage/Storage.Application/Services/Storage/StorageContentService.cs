@@ -152,17 +152,11 @@ public sealed class StorageContentService(
 		content.SetPurchaseDate(purchaseDate);
 		content.SetBuyPrice(
 			buyPrice,
-			await currencyConverter.ConvertToBaseAsync(buyPrice, currencyId, cancellationToken));
+			await currencyConverter.ConvertToBaseAsync(
+				buyPrice,
+				currencyId,
+				cancellationToken));
 	}
-
-	private static StoredLot ToStoredLot(StorageContent content)
-		=> new(
-			content.Id,
-			content.ProductId,
-			content.Count,
-			content.CurrencyId,
-			content.BuyPrice,
-			content.PurchaseDatetime);
 
 	public async Task<IReadOnlyList<StorageLot>> SubtractByContentsAsync(
 		IReadOnlyCollection<SubtractStorageContentItem> items,
@@ -227,6 +221,15 @@ public sealed class StorageContentService(
 
 		return affected;
 	}
+
+	private static StoredLot ToStoredLot(StorageContent content)
+		=> new(
+			content.Id,
+			content.ProductId,
+			content.Count,
+			content.CurrencyId,
+			content.BuyPrice,
+			content.PurchaseDatetime);
 
 	private Task<List<StorageContent>> LoadByProductsForUpdateAsync(
 		IEnumerable<(int ProductId, string StorageCode)> selections,

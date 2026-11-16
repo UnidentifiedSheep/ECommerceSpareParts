@@ -1,6 +1,5 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Entities.Product;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Lrts.ProductCrossesByIdsImport;
 using Microsoft.EntityFrameworkCore;
@@ -67,11 +66,11 @@ public sealed class ProductCrossesByIdsImportLrtTests : CsvLrtIntegrationTest<Pr
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var errors = execution.GetState<ProductCrossesByIdsImportState>().Errors;
 		errors.Select(x => x.RowIdx)
-		.Should()
-		.Equal(
-			1,
-			2,
-			3);
+			.Should()
+			.Equal(
+				1,
+				2,
+				3);
 		(await Context.Set<ProductCross>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
 	}
 }

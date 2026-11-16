@@ -1,4 +1,3 @@
-using Pricing.Application.Events;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
@@ -6,6 +5,7 @@ using Application.Common.NamedObject;
 using Exceptions;
 using Locan.Core.Interfaces;
 using MassTransit;
+using Pricing.Application.Events;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
 using SchemaGeneration.Abstractions.Attributes;

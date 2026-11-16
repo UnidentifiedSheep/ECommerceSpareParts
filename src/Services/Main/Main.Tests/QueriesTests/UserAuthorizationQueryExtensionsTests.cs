@@ -3,17 +3,30 @@ using Enums;
 using FluentAssertions;
 using Main.Entities.Auth;
 using Main.Entities.User;
+using Main.Modules.Analytics.Persistence;
+using Main.Modules.Balance.Persistence;
+using Main.Modules.Cart.Persistence;
 using Main.Modules.Currency.Persistence;
+using Main.Modules.Documents.Persistence;
 using Main.Modules.Identity.Application.Dtos.Users;
 using Main.Modules.Identity.Application.Extensions.QueryExtensions;
+using Main.Modules.Identity.Persistence;
+using Main.Modules.Jobs.Persistence;
+using Main.Modules.Notifications.Persistence;
+using Main.Modules.Order.Persistence;
+using Main.Modules.Organization.Persistence;
+using Main.Modules.Platform.Persistence;
 using Main.Modules.Product.Persistence;
+using Main.Modules.Purchase.Persistence;
+using Main.Modules.Sale.Persistence;
 using Main.Modules.Storage.Persistence;
-using Persistence.Common;
-using Persistence.Common.Repositories;
-using Persistence.Relations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Common;
+using Persistence.Common.Repositories;
 using Persistence.Context;
+using Persistence.Relations;
+using Pricing.Persistence;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.Persistence.Interceptors;
@@ -139,5 +152,12 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 						options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 				.AddInterceptors(counter)
 				.Options,
-			[new CoreDbContextModule(), new RelationsDbContextModule(), new Main.Modules.Identity.Persistence.IdentityDbContextModule(), new Main.Modules.Purchase.Persistence.PurchaseDbContextModule(), new Main.Modules.Sale.Persistence.SaleDbContextModule(), new Main.Modules.Organization.Persistence.OrganizationDbContextModule(), new Main.Modules.Balance.Persistence.BalanceDbContextModule(), new Main.Modules.Analytics.Persistence.AnalyticsDbContextModule(), new Main.Modules.Order.Persistence.OrderDbContextModule(), new Main.Modules.Notifications.Persistence.NotificationsDbContextModule(), new Main.Modules.Cart.Persistence.CartDbContextModule(), new Main.Modules.Documents.Persistence.DocumentsDbContextModule(), new Main.Modules.Jobs.Persistence.JobsDbContextModule(), new Main.Modules.Platform.Persistence.PlatformDbContextModule(), new CurrencyDbContextModule(), new ProductDbContextModule(), new StorageDbContextModule(), new Pricing.Persistence.PricingDbContextModule()]);
+			[
+				new CoreDbContextModule(), new RelationsDbContextModule(), new IdentityDbContextModule(),
+				new PurchaseDbContextModule(), new SaleDbContextModule(), new OrganizationDbContextModule(),
+				new BalanceDbContextModule(), new AnalyticsDbContextModule(), new OrderDbContextModule(),
+				new NotificationsDbContextModule(), new CartDbContextModule(), new DocumentsDbContextModule(),
+				new JobsDbContextModule(), new PlatformDbContextModule(), new CurrencyDbContextModule(),
+				new ProductDbContextModule(), new StorageDbContextModule(), new PricingDbContextModule()
+			]);
 }

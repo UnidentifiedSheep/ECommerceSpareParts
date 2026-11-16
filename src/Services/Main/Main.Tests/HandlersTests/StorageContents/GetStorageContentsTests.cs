@@ -1,7 +1,6 @@
 using Application.Common.Models;
 using Application.Common.Querying;
 using Exceptions;
-using Main.Entities.Storage;
 using Main.Entities.Storage.Storage;
 using Main.Modules.Storage.Application.Handlers.StorageContents.GetStorageContents;
 using Tests.Abstractions.Test;

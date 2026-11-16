@@ -1,4 +1,3 @@
-using Application.Common.Validators;
 using Exceptions;
 using FluentAssertions;
 using FluentValidation.TestHelper;

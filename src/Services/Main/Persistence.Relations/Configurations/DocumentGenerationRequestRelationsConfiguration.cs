@@ -1,4 +1,5 @@
 using Main.Entities.Documents.Documents;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,7 +10,7 @@ public sealed class DocumentGenerationRequestRelationsConfiguration
 {
 	public void Configure(EntityTypeBuilder<DocumentGenerationRequest> builder)
 		=> builder
-			.HasOne<Main.Entities.User.User>()
+			.HasOne<User>()
 			.WithMany()
 			.HasForeignKey(request => request.RequesterId)
 			.OnDelete(DeleteBehavior.SetNull)

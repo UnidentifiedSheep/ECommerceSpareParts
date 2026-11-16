@@ -7,9 +7,7 @@ namespace Main.Modules.Storage.Application.Configs;
 public static class StorageSortByConfig
 {
 	public static void Configure()
-	{
-
-		QueryableSortBy
+		=> QueryableSortBy
 			.Value
 			.MapDefault<StorageContent, int>(x => x.Id)
 			.Map<StorageContent, int>("id", x => x.Id)
@@ -27,5 +25,4 @@ public static class StorageSortByConfig
 						.Where(item => item.State == StorageContentLockState.Active &&
 							(item.ExpiresAt == null || item.ExpiresAt > DateTime.UtcNow))
 						.Sum(item => (long)item.Quantity)));
-	}
 }

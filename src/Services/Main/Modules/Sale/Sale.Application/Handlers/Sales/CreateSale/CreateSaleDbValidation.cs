@@ -21,7 +21,10 @@ public class CreateSaleDbValidation(
 		productChecks.Exists(plan, request.Contents.Select(content => content.ProductId));
 		userChecks.Exists(plan, request.UserId);
 		organizationChecks.Exists(plan, request.OrganizationId);
-		organizationChecks.MemberExists(plan, request.OrganizationId, request.UserId);
+		organizationChecks.MemberExists(
+			plan,
+			request.OrganizationId,
+			request.UserId);
 		storageChecks.Exists(plan, request.StorageCode);
 	}
 }

@@ -1,6 +1,6 @@
-using Main.Entities;
 using FluentAssertions;
 using Locan.Core.Interfaces;
+using Main.Entities;
 using Main.Entities.Product;
 using Main.Modules.Product.Abstractions;
 using Main.Modules.Product.Application.Services;
@@ -32,7 +32,9 @@ public class ProductDeletionBlockerResolverTests
 			new FakeRule(20, OrderItemProductDeletionBlockedMessage.Instance)
 		};
 
-		var result = await new ProductDeletionBlockerResolver(rules).GetAsync(1, TestContext.Current.CancellationToken);
+		var result = await new ProductDeletionBlockerResolver(rules).GetAsync(
+			1,
+			TestContext.Current.CancellationToken);
 
 		result!.MessageKey.Should().Be(ArticleDeletionStockMessage.Key);
 	}
@@ -41,7 +43,8 @@ public class ProductDeletionBlockerResolverTests
 	public async Task LaterRules_AreNotEvaluatedAfterBlocker()
 	{
 		var late = new FakeRule(20, OrderItemProductDeletionBlockedMessage.Instance);
-		var rules = new IProductDeletionRule[] { new FakeRule(10, ArticleDeletionStockMessage.Instance), late };
+		var rules = new IProductDeletionRule[]
+			{ new FakeRule(10, ArticleDeletionStockMessage.Instance), late };
 
 		await new ProductDeletionBlockerResolver(rules).GetAsync(1, TestContext.Current.CancellationToken);
 
@@ -54,7 +57,9 @@ public class ProductDeletionBlockerResolverTests
 
 		public int Order => order;
 
-		public Task<ILocalizableMessage?> CheckAsync(int productId, CancellationToken cancellationToken = default)
+		public Task<ILocalizableMessage?> CheckAsync(
+			int productId,
+			CancellationToken cancellationToken = default)
 		{
 			Calls++;
 			return Task.FromResult(message);

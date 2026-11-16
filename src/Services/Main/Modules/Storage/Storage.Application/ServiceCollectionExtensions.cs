@@ -1,8 +1,6 @@
-using NamedObject.Core.Interfaces;
 using Application.Common.Host;
 using Application.Common.Interfaces;
 using Application.Common.NamedObject;
-using Main.Modules.Storage.Abstractions;
 using Main.Modules.Product.Abstractions;
 using Main.Modules.Storage.Abstractions.Interfaces;
 using Main.Modules.Storage.Application.Configs;
@@ -11,6 +9,7 @@ using Main.Modules.Storage.Application.Services.ProductDeletion;
 using Main.Modules.Storage.Application.Services.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
+using NamedObject.Core.Interfaces;
 
 namespace Main.Modules.Storage.Application;
 

@@ -1,5 +1,6 @@
-using Persistence.Common;
+using Domain.CommonEntities;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Common;
 using Persistence.Extensions;
 
 namespace Main.Modules.Platform.Persistence;
@@ -7,5 +8,5 @@ namespace Main.Modules.Platform.Persistence;
 public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddPlatformPersistence(this IServiceCollection services)
-		=> services.AddDbContextModule<PlatformDbContextModule>().AddEntities(typeof(Domain.CommonEntities.Setting).Assembly);
+		=> services.AddDbContextModule<PlatformDbContextModule>().AddEntities(typeof(Setting).Assembly);
 }

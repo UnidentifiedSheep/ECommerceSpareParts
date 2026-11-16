@@ -2,8 +2,6 @@ using System.Text.Json;
 using Abstractions;
 using Application.Common;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
 using Cronos;
 using Domain.CommonEntities.Job;
 using Main.Modules.Currency.Application.Lrts;

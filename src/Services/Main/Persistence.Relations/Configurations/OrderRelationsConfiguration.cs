@@ -1,7 +1,9 @@
+using Main.Entities.Currency;
 using Main.Entities.Order.Order;
 using Main.Entities.Organization.Organization;
 using Main.Entities.Product.Product;
 using Main.Entities.Sale.Sale;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,21 +21,21 @@ public sealed class OrderRelationsConfiguration : IEntityTypeConfiguration<Order
 			.HasConstraintName("orders_organization_id_fk");
 
 		builder
-			.HasOne<Main.Entities.Currency.Currency>()
+			.HasOne<Currency>()
 			.WithMany()
 			.HasForeignKey(d => d.CurrencyId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("orders_currency_id_fk");
 
 		builder
-			.HasOne<Main.Entities.User.User>()
+			.HasOne<User>()
 			.WithMany()
 			.HasForeignKey(d => d.UserId)
 			.OnDelete(DeleteBehavior.SetNull)
 			.HasConstraintName("orders_users_id_fk");
 
 		builder
-			.HasOne<Main.Entities.User.User>()
+			.HasOne<User>()
 			.WithMany()
 			.HasForeignKey(e => e.ConfirmedByUserId)
 			.OnDelete(DeleteBehavior.SetNull)

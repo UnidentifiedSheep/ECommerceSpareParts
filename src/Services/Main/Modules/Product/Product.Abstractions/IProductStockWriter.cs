@@ -4,5 +4,7 @@ public sealed record ProductStockDelta(string StorageCode, int ProductId, int De
 
 public interface IProductStockWriter
 {
-	Task ApplyAsync(IReadOnlyCollection<ProductStockDelta> deltas, CancellationToken cancellationToken = default);
+	Task ApplyAsync(
+		IReadOnlyCollection<ProductStockDelta> deltas,
+		CancellationToken cancellationToken = default);
 }
