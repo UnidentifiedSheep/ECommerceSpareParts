@@ -1,6 +1,6 @@
+using Integrations.Common;
 using Application.Common.Interfaces.Settings;
 using Integrations.Supplier.Connections;
-using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;
 using Main.Entities.Settings.Supplier;
 using Security.Core.Interfaces;
@@ -30,20 +30,20 @@ public class TmtrConnectionProvider(
 	{
 		var settings = (await settingsService.GetOrDefault<TmtrSupplierSetting>(cancellationToken)).Data;
 		if (!settings.IsEnabled)
-			return Unavailable(SupplierUnavailableReason.Disabled, "TMTR integration is disabled");
+			return Unavailable(ConnectionUnavailableReason.Disabled, "TMTR integration is disabled");
 
 		if (string.IsNullOrWhiteSpace(settings.BaseUrl))
-			return Unavailable(SupplierUnavailableReason.InvalidConfiguration, "TMTR BaseUrl is empty");
+			return Unavailable(ConnectionUnavailableReason.InvalidConfiguration, "TMTR BaseUrl is empty");
 
 		if (string.IsNullOrWhiteSpace(settings.AuthData?.Login))
-			return Unavailable(SupplierUnavailableReason.InvalidConfiguration, "TMTR login is empty");
+			return Unavailable(ConnectionUnavailableReason.InvalidConfiguration, "TMTR login is empty");
 
 		if (string.IsNullOrWhiteSpace(settings.AuthData.EncryptedPassword))
-			return Unavailable(SupplierUnavailableReason.InvalidConfiguration, "TMTR password is empty");
+			return Unavailable(ConnectionUnavailableReason.InvalidConfiguration, "TMTR password is empty");
 
 		if (!secretEncryptor.TryDecrypt(settings.AuthData.EncryptedPassword, out var password))
 			return Unavailable(
-				SupplierUnavailableReason.InvalidConfiguration,
+				ConnectionUnavailableReason.InvalidConfiguration,
 				"TMTR password cannot be decrypted");
 
 		return new ConnectionCheck<TmtrConnection>(
@@ -57,7 +57,7 @@ public class TmtrConnectionProvider(
 	}
 
 	private static ConnectionCheck<TmtrConnection> Unavailable(
-		SupplierUnavailableReason reason,
+		ConnectionUnavailableReason reason,
 		string message)
 		=> new(
 			false,

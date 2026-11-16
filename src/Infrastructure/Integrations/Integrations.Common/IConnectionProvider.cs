@@ -1,6 +1,5 @@
-using Integrations.Supplier.Connections;
 
-namespace Integrations.Supplier.Interfaces;
+namespace Integrations.Common;
 
 public interface IConnectionProvider<TModel> : IConnectionProvider
 {

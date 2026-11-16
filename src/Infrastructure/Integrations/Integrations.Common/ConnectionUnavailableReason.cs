@@ -1,6 +1,6 @@
-namespace Integrations.Supplier.Enums;
+namespace Integrations.Common;
 
-public enum SupplierUnavailableReason
+public enum ConnectionUnavailableReason
 {
 	Disabled,
 

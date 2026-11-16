@@ -1,6 +1,6 @@
+using Integrations.Common;
 using Application.Common.Interfaces.Settings;
 using Integrations.Supplier.Connections;
-using Integrations.Supplier.Enums;
 using Integrations.Supplier.Interfaces;
 using Main.Entities.Settings.Supplier;
 using Security.Core.Interfaces;
@@ -30,17 +30,17 @@ public class FavoriteConnectionProvider(
 	{
 		var settings = (await settingsService.GetOrDefault<FavoritSupplierSetting>(cancellationToken)).Data;
 		if (!settings.IsEnabled)
-			return Unavailable(SupplierUnavailableReason.Disabled, "Favorit integration is disabled");
+			return Unavailable(ConnectionUnavailableReason.Disabled, "Favorit integration is disabled");
 
 		if (string.IsNullOrWhiteSpace(settings.BaseUrl))
-			return Unavailable(SupplierUnavailableReason.InvalidConfiguration, "Favorit BaseUrl is empty");
+			return Unavailable(ConnectionUnavailableReason.InvalidConfiguration, "Favorit BaseUrl is empty");
 
 		if (string.IsNullOrWhiteSpace(settings.EncryptedApiKey))
-			return Unavailable(SupplierUnavailableReason.InvalidConfiguration, "Favorit ApiKey is empty");
+			return Unavailable(ConnectionUnavailableReason.InvalidConfiguration, "Favorit ApiKey is empty");
 
 		if (!secretEncryptor.TryDecrypt(settings.EncryptedApiKey, out var apiKey))
 			return Unavailable(
-				SupplierUnavailableReason.InvalidConfiguration,
+				ConnectionUnavailableReason.InvalidConfiguration,
 				"Favorit ApiKey cannot be decrypted");
 
 		return new ConnectionCheck<FavoritConnection>(
@@ -52,7 +52,7 @@ public class FavoriteConnectionProvider(
 	}
 
 	private static ConnectionCheck<FavoritConnection> Unavailable(
-		SupplierUnavailableReason reason,
+		ConnectionUnavailableReason reason,
 		string message)
 		=> new(
 			false,
