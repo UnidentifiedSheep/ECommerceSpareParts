@@ -47,6 +47,7 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<IMarkupContainer, MarkupContainer>();
 		services.AddScoped<IMarkupCalculator, MarkupCalculator>();
 		services.AddScoped<IMarkupInitializer, MarkupInitializer>();
+		services.AddScoped<IMarkupRefresher, MarkupRefresher>();
 		services.AddScoped<IPriceApplierService, PriceApplierService>();
 
 		services.AddScoped<ISupplierOfferRequestMarkerService, SupplierOfferRequestMarkerService>();

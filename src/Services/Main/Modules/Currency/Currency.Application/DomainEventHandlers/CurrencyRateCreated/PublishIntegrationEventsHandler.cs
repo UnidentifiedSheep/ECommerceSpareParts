@@ -17,10 +17,14 @@ public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integ
 		integrationEventScope.Add(
 			new CurrencyRateChangedEvent
 			{
-				Rates = notification
+				Changes = notification
 					.Items
-					.GroupBy(x => x.Entity.FromCurrencyId)
-					.ToDictionary(x => x.Key, x => x.Last().Entity.Rate)
+					.Select(x => new CurrencyRateChange(
+						x.Entity.FromCurrencyId,
+						x.Entity.ToCurrencyId,
+						x.Entity.Rate,
+						x.Entity.CreatedAt))
+					.ToList()
 			});
 		return Task.CompletedTask;
 	}

@@ -133,6 +133,7 @@ builder.Services.AddMassTransit(x =>
 				ep.ConfigureConsumer<BackplaneConsumer>(context);
 				ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
 				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+				ep.ConfigureConsumer<PricingCurrencyRatesChangedConsumer>(context);
 				ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 

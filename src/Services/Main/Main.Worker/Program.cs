@@ -158,6 +158,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 					ep.ConfigureConsumer<BackplaneConsumer>(context);
 					ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
 					ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+					ep.ConfigureConsumer<PricingCurrencyRatesChangedConsumer>(context);
 					ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 					ep.Bind<BackplaneMessage>();
 					ep.Bind<ProducerLookupChangedEvent>();
@@ -175,7 +176,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 					ep.PrefetchCount = 1;
 
 					ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
-					ep.ConfigureConsumer<PricingCurrencyRatesChangedConsumer>(context);
 					ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
 					ep.ConfigureConsumer<ProductPriceOffersUpdatedConsumer>(context);
 					ep.ConfigureConsumer<ApplySupplierProductsConsumer>(context);

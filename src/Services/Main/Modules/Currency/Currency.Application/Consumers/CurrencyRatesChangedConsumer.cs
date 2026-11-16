@@ -8,5 +8,5 @@ public class CurrencyRatesChangedConsumer(ICurrencyRateSnapshotProvider rates)
 	: IConsumer<CurrencyRateChangedEvent>
 {
 	public Task Consume(ConsumeContext<CurrencyRateChangedEvent> context)
-		=> rates.Reload(context.CancellationToken);
+		=> rates.Apply(context.Message.Changes, context.CancellationToken);
 }

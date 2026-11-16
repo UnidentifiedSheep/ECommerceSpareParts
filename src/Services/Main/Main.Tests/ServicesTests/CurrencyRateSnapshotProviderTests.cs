@@ -7,6 +7,7 @@ using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Services.Currency;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
+using Main.Modules.Currency.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -215,6 +216,45 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 				Rate.FromCurrencyId,
 				Start,
 				CancellationToken)).Should()
+			.Be(4m);
+	}
+
+	[Fact]
+	public async Task Apply_AppendsChangeToLoadedSnapshotWithoutReadingDatabase()
+	{
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m)],
+			CancellationToken);
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(2m);
+		var change = new CurrencyRateChange(Rate.FromCurrencyId, Rate.ToCurrencyId, 4m, Start.AddDays(10));
+
+		await Provider.Apply([change], CancellationToken);
+		await Provider.Apply([change], CancellationToken);
+
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(4m);
+		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
+		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(10), CancellationToken))
+			.Should()
+			.Be(4m);
+	}
+
+	[Fact]
+	public async Task Apply_InsertsOutOfOrderChangeIntoHistory()
+	{
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m), (Start.AddDays(10), 6m)],
+			CancellationToken);
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(6m);
+
+		await Provider.Apply(
+			[new CurrencyRateChange(Rate.FromCurrencyId, Rate.ToCurrencyId, 4m, Start.AddDays(5))],
+			CancellationToken);
+
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(6m);
+		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(5), CancellationToken))
+			.Should()
 			.Be(4m);
 	}
 

@@ -1,39 +1,12 @@
-using Pricing.Application.Events;
-using Application.Common.Extensions;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Services;
-using Application.Common.LRT;
-using Attributes;
-using Main.Application.Interfaces.Services.Currency;
 using MassTransit;
+using Pricing.Application.Events;
 using Pricing.Application.Interfaces.Markup;
-using Pricing.Application.Lrts.InvalidateStalePriceOptions;
 
 namespace Pricing.Application.Consumers;
 
-public class MarkupRangesRefreshRequestedConsumer(
-	ICurrencyRateSnapshotProvider rates,
-	IMarkupInitializer markupInitializer,
-	IApplicationTransaction transactionService,
-	IJobService jobService,
-	IJobProvider<InvalidateStalePriceOptionsLrt, NoneInputState> jobProvider)
+public class MarkupRangesRefreshRequestedConsumer(IMarkupRefresher markupRefresher)
 	: IConsumer<MarkupRangesRefreshRequestedEvent>
 {
-	public async Task Consume(ConsumeContext<MarkupRangesRefreshRequestedEvent> context)
-	{
-		await rates.Reload(context.CancellationToken);
-		await markupInitializer.Initialize(context.CancellationToken);
-
-		await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3))
-			.ExecuteAsync(
-				async (transactionContext, ct) =>
-				{
-					var job = jobProvider.Create(new NoneInputState());
-					var addedIds = await jobService.TryEnqueueJobsAsync([job], ct);
-					if (addedIds.Count != 0)
-						await transactionContext.UnitOfWork.SaveChangesAsync(ct);
-				},
-				context.CancellationToken);
-	}
+	public Task Consume(ConsumeContext<MarkupRangesRefreshRequestedEvent> context)
+		=> markupRefresher.Refresh(context.CancellationToken);
 }

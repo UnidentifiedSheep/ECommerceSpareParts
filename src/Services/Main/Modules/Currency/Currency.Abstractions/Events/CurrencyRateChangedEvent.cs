@@ -2,5 +2,7 @@ namespace Main.Modules.Currency.Abstractions;
 
 public record CurrencyRateChangedEvent
 {
-	public Dictionary<int, decimal> Rates { get; init; } = [];
+	public IReadOnlyList<CurrencyRateChange> Changes { get; init; } = [];
 }
+
+public record CurrencyRateChange(int CurrencyId, int BaseCurrencyId, decimal Rate, DateTime CreatedAt);

@@ -8,6 +8,7 @@ using Main.Application.Interfaces.Services.Currency;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
 using Main.Entities.Settings;
+using Main.Modules.Currency.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Services.Currency;
@@ -64,7 +65,49 @@ public sealed class CurrencyRateSnapshotProvider(
 		}
 	}
 
+	public async Task Apply(IReadOnlyCollection<CurrencyRateChange> changes, CancellationToken token)
+	{
+		if (changes.Count == 0) return;
+
+		await _lock.WaitAsync(token);
+		try
+		{
+			var snapshot = Volatile.Read(ref _snapshot);
+			if (snapshot is null) return;
+
+			if (changes.Any(x => x.BaseCurrencyId != snapshot.BaseCurrencyId))
+			{
+				Volatile.Write(ref _snapshot, await LoadRates(token));
+				return;
+			}
+
+			var history = snapshot.History.ToDictionary();
+			foreach (var change in changes)
+			{
+				var key = (change.CurrencyId, change.BaseCurrencyId);
+				var rates = history.TryGetValue(key, out var existing) ? existing : [];
+				history[key] = Insert(rates, new Info(change.Rate, change.CreatedAt));
+			}
+
+			Volatile.Write(
+				ref _snapshot,
+				snapshot with { History = history.ToFrozenDictionary() });
+		}
+		finally
+		{
+			_lock.Release();
+		}
+	}
+
 	public void Dispose() => _lock.Dispose();
+
+	private static ImmutableArray<Info> Insert(ImmutableArray<Info> rates, Info info)
+	{
+		var index = rates.BinarySearch(info, RateComparer);
+		return index >= 0
+			? rates.SetItem(index, info)
+			: rates.Insert(~index, info);
+	}
 
 	private static decimal GetNearestRate(
 		ImmutableArray<Info> rates,
