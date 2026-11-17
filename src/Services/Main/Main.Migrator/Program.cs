@@ -53,7 +53,7 @@ builder.ConfigureServices((context, services) =>
 	//add db context
 	services.AddDbContextModule<CoreDbContextModule>();
 	services.AddDbContextModule<RelationsDbContextModule>();
-	services.AddCurrencyPersistence();
+	services.AddDbContextModule<CurrencyDbContextModule>();
 	services.AddDbContextModule<ProductDbContextModule>();
 	services.AddDbContextModule<IdentityDbContextModule>();
 	services.AddDbContextModule<PurchaseDbContextModule>();

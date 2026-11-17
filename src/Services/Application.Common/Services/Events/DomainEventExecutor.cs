@@ -8,7 +8,7 @@ namespace Application.Common.Services.Events;
 public sealed class DomainEventExecutor(
 	IDomainEventScope eventScope,
 	IPublisher publisher,
-	IDomainEventCollector collector,
+	IDomainEventCollector? collector = null,
 	IUnitOfWork? unitOfWork = null) : IDomainEventExecutor
 {
 	private const int MaxDispatchRounds = 10;
@@ -64,7 +64,7 @@ public sealed class DomainEventExecutor(
 	{
 		for (var round = 0; round < MaxDispatchRounds; round++)
 		{
-			if (beforeSave) collector.Collect();
+			if (beforeSave) collector?.Collect();
 			var events = beforeSave ? eventScope.FlushBeforeSave() : eventScope.Flush();
 			if (events.Count == 0)
 				return;

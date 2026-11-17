@@ -1,4 +1,3 @@
-using System.Data;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -14,10 +13,7 @@ public class SettingsService(
 	IApplicationTransaction transactionService,
 	ISettingsContainer settingsContainer) : ISettingsService
 {
-	private static readonly TransactionalAttribute TransactionSettings = new(
-		IsolationLevel.ReadCommitted,
-		20,
-		3);
+	private static readonly TransactionalAttribute TransactionSettings = TransactionalAttribute.RetryOnConflict(20, 3);
 
 	public async Task LoadAsync(CancellationToken cancellationToken = default)
 	{

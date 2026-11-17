@@ -17,7 +17,7 @@ public sealed class RoleQueries
 	[Lookup]
 	[RequireAllPermissions(PermissionCodes.ROLES_GET)]
 	public async Task<GqlRole?> GetByNameAsync(
-		string name,
+		[Is("systemName")] string name,
 		IRoleByNameDataLoader loader,
 		CancellationToken cancellationToken)
 	{

@@ -67,6 +67,28 @@ public sealed class SettingsServicePersistenceTests(CombinedContainerFixture fix
 	}
 
 	[Fact]
+	public async Task SetSetting_ConcurrentInsertOfMissingSetting_DoesNotFailOnDuplicateKey()
+	{
+		var start = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		var tasks = Enumerable.Range(1, 8)
+			.Select(async index =>
+			{
+				await using var scope = Sp.CreateAsyncScope();
+				var service = scope.ServiceProvider.GetRequiredService<ISettingsService>();
+				await start.Task;
+				await service.SetSetting(Create(index), CancellationToken);
+			})
+			.ToList();
+
+		start.SetResult();
+		await Task.WhenAll(tasks);
+
+		(await Context.Set<TmtrSupplierSetting>().AsNoTracking().CountAsync(CancellationToken))
+			.Should()
+			.Be(1);
+	}
+
+	[Fact]
 	public async Task SetSetting_ExistingSetting_UpdatesWithoutDuplicateAndCachesInput()
 	{
 		await AddAsync(10);
