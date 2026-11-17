@@ -28,7 +28,7 @@ public class GetOrganizationsByIdsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task KnownHiddenOrganization_IsReturnedWhileSystemOrganizationIsExcluded()
+	public async Task HiddenAndSystemOrganizations_AreBothReturned()
 	{
 		var hiddenId = TestContext.HiddenOrganization.Id;
 		var systemId = GetContext<UserContextTestContext>().SystemUser.Id;
@@ -37,7 +37,7 @@ public class GetOrganizationsByIdsTests : IntegrationTest
 			new GetOrganizationsByIdsQuery([hiddenId, systemId]),
 			CancellationToken);
 
-		result.Organizations.Keys.Should().Equal(hiddenId);
+		result.Organizations.Keys.Should().BeEquivalentTo([hiddenId, systemId]);
 	}
 
 	[Fact]

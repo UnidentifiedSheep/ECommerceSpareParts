@@ -1,4 +1,5 @@
 using Enums;
+using Main.Entities.Organization.Enums.Organization;
 using GraphQL.Common.Attributes;
 using GraphQL.Common.Extensions;
 using HotChocolate;
@@ -23,7 +24,9 @@ public sealed class OrganizationQueries
 		CancellationToken cancellationToken)
 	{
 		var organization = await loader.LoadAsync(id, cancellationToken);
-		return organization is null ? null : new GqlOrganization(organization);
+		return organization is null || organization.Type == OrganizationType.System
+			? null
+			: new GqlOrganization(organization);
 	}
 
 	[GraphQLName("bySystemName")]
