@@ -64,4 +64,25 @@ public sealed class AnalyticsQueries
 		var result = await sender.Send(new GetAnalyticsRunByIdQuery(id), cancellationToken);
 		return result.Run is null ? null : new GqlAnalyticsRun(result.Run);
 	}
+
+	[GraphQLName("analyses")]
+	[RequireAllPermissions(PermissionCodes.CHARTS_GET)]
+	public async Task<IReadOnlyList<GqlAnalysis>> GetAnalysesAsync(
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetAnalysesQuery(), cancellationToken)).Analyses
+			.Select(analysis => new GqlAnalysis(analysis))
+			.ToArray();
+
+	[GraphQLName("analysis")]
+	[RequireAllPermissions(PermissionCodes.CHARTS_GET)]
+	public async Task<GqlAnalysis?> GetAnalysisAsync(
+		string systemName,
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var analysis = (await sender.Send(new GetAnalysesQuery(), cancellationToken)).Analyses
+			.FirstOrDefault(item => string.Equals(item.SystemName, systemName, StringComparison.OrdinalIgnoreCase));
+		return analysis is null ? null : new GqlAnalysis(analysis);
+	}
 }

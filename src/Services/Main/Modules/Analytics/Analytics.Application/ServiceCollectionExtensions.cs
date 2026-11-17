@@ -1,5 +1,6 @@
 using Application.Common.Host;
 using Application.Common.Interfaces;
+using Main.Modules.Analytics.Abstractions.Analyses;
 using Main.Modules.Analytics.Abstractions.Analyzers;
 using Main.Modules.Analytics.Abstractions.Charts;
 using Main.Modules.Analytics.Abstractions.Interfaces;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<INamedObjectGroupRegistry, AnalyticsNamedObjectGroupRegistry>();
 		services.RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(AnalyticsApplicationAssembly.Value);
 		services.RegisterNamedObject<ChartDataSourceNamedObject>(AnalyticsApplicationAssembly.Value);
+		services.RegisterNamedObject<AnalysisNamedObject>(AnalyticsApplicationAssembly.Value);
 
 		AnalyticsCursorConfig.Configure();
 

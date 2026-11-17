@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using Main.Entities.Analytics;
+using Main.Modules.Analytics.Application.Analyses;
 using Main.Modules.Analytics.Abstractions.Models;
 using Main.Modules.Analytics.Application.Models;
 
@@ -9,9 +10,9 @@ namespace Main.Modules.Analytics.Application.Services;
 
 public static class AbcXyzRunFactory
 {
-	public const string AnalysisType = "AbcXyz";
+	public const string AnalysisType = AbcXyzAnalysis.Name;
 
-	public const int SchemaVersion = 1;
+	public const int SchemaVersion = AbcXyzAnalysis.Version;
 
 	public static AbcXyzRunDraft Create(
 		AbcXyzParameters parameters,

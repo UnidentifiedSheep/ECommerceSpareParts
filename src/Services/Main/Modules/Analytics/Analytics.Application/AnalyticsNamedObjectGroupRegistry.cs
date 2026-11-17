@@ -1,3 +1,4 @@
+using Main.Modules.Analytics.Abstractions.Analyses;
 using Main.Modules.Analytics.Abstractions.Analyzers;
 using Main.Modules.Analytics.Abstractions.Charts;
 using NamedObject.Core.Base;
@@ -10,5 +11,6 @@ public class AnalyticsNamedObjectGroupRegistry : NamedObjectGroupRegistryBase
 	{
 		Register<MarkupAnalyzerNamedObjectBase>("MarkupAnalyzer");
 		Register<ChartDataSourceNamedObject>("ChartData");
+		Register<AnalysisNamedObject>("Analysis");
 	}
 }
