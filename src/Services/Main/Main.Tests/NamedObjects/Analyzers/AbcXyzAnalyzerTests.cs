@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Main.Entities.Analytics;
+using Main.Modules.Analytics.Abstractions.Interfaces;
 using Main.Modules.Analytics.Abstractions.Models;
 using Main.Modules.Analytics.Application.Analyzers.AbcXyz;
 using Main.Modules.Analytics.Application.Models;
@@ -184,7 +185,7 @@ public sealed class AbcXyzAnalyzerTests : IntegrationTest
 	private async Task<AbcXyzAnalysisResult> Analyze(AbcXyzParameters parameters)
 	{
 		await Flush();
-		var analyzer = Scope.ServiceProvider.GetRequiredService<AbcXyzAnalyzer>();
+		var analyzer = Scope.ServiceProvider.GetRequiredService<IAbcXyzAnalyzer>();
 		return await analyzer.AnalyzeAsync(parameters, CancellationToken);
 	}
 

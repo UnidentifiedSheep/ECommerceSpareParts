@@ -26,7 +26,7 @@ public sealed class AbcXyzDataReader(
 	{
 		var from = parameters.From;
 		var to = parameters.EndExclusive();
-		var months = parameters.Months?.Select(month => (int)month).ToArray() ?? [];
+		var months = parameters.Months?.Select(month => (int)month).ToList() ?? [];
 
 		var rows = analytics.Query
 			.Where(row => row.IsCompleted && row.SaleDatetime >= from && row.SaleDatetime < to);
@@ -35,7 +35,7 @@ public sealed class AbcXyzDataReader(
 			rows = rows.Where(row => row.OrganizationId == organizationId);
 		if (parameters.BuyerId is { } buyerId)
 			rows = rows.Where(row => row.BuyerId == buyerId);
-		if (months.Length > 0)
+		if (months.Count > 0)
 			rows = rows.Where(row => months.Contains(row.SaleDatetime.Month));
 
 		return rows
@@ -58,7 +58,7 @@ public sealed class AbcXyzDataReader(
 				Year = group.Key.Year,
 				Month = group.Key.Month,
 				Quantity = group.Sum(row => (decimal)row.Count),
-				Revenue = group.Sum(row => row.RevenueInBaseCurrency)
+				Revenue = Math.Round(group.Sum(row => row.RevenueInBaseCurrency), 12)
 			});
 	}
 

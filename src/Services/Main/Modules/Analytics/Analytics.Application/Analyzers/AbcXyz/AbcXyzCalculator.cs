@@ -1,9 +1,10 @@
 using Main.Modules.Analytics.Abstractions.Models;
+using Main.Modules.Analytics.Application.Interfaces;
 using Main.Modules.Analytics.Application.Models;
 
 namespace Main.Modules.Analytics.Application.Analyzers.AbcXyz;
 
-public sealed class AbcXyzCalculator
+public sealed class AbcXyzCalculator : IAbcXyzCalculator
 {
 	private const int Scale = 10;
 
@@ -27,7 +28,9 @@ public sealed class AbcXyzCalculator
 		}
 
 		var ordered = series
-			.Select(pair => (ProductId: pair.Key, Series: pair.Value,
+			.Select(pair => (
+				ProductId: pair.Key,
+				Series: pair.Value,
 				Value: parameters.AbcMetric == AnalysisMetric.Revenue
 					? pair.Value.TotalRevenue
 					: pair.Value.TotalQuantity))
@@ -112,12 +115,10 @@ public sealed class AbcXyzCalculator
 	{
 		var cells = new List<AbcXyzCell>();
 		foreach (var abc in Enum.GetValues<AbcClass>())
+		foreach (var xyz in Enum.GetValues<XyzClass>().Select(x => (XyzClass?)x).Append(null))
 		{
-			foreach (var xyz in Enum.GetValues<XyzClass>().Select(x => (XyzClass?)x).Append(null))
-			{
-				var matching = items.Where(item => item.AbcClass == abc && item.XyzClass == xyz).ToList();
-				cells.Add(new AbcXyzCell(abc, xyz, matching.Count, matching.Sum(item => item.Value)));
-			}
+			var matching = items.Where(item => item.AbcClass == abc && item.XyzClass == xyz).ToList();
+			cells.Add(new AbcXyzCell(abc, xyz, matching.Count, matching.Sum(item => item.Value)));
 		}
 
 		return new AbcXyzSummary(items.Count, periodsCount, total, cells);
