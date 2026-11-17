@@ -8,7 +8,7 @@ using PurchaseEntity = Main.Entities.Purchase.Purchase.Purchase;
 namespace Main.Modules.Purchase.Application.DomainEventHandlers.Purchase.PurchaseCreated;
 
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
-	: BatchableDomainEventHandler<EntityCreatedDomainEvent<PurchaseEntity.Purchase>>
+	: BatchableDomainEventHandler<EntityCreatedDomainEvent<PurchaseEntity>>
 {
 	public override Task Handle(
 		Batch<EntityCreatedDomainEvent<PurchaseEntity>> notification,

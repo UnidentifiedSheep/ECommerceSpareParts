@@ -22,7 +22,7 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 	[Fact]
 	public async Task CreateCurrency_WithDuplicateData_ThrowsErrors()
 	{
-		var created = await new CurrencyBuilder(Faker).BuildAndAddToDb(Context);
+		var created = await new CurrencyBuilder(Faker).BuildAndAddToDb(Context, CancellationToken);
 
 		var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(
 			new CreateCurrencyCommand(
@@ -74,7 +74,7 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
 	{
 		var currency = await new CurrencyBuilder(Faker).WithShortName("TT")
 			.WithSign("!")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var command = new CreateCurrencyCommand(
 			field == "shortName" ? $" {currency.ShortName} " : "QQ",
 			field == "name" ? $" {currency.Name} " : "Another currency",

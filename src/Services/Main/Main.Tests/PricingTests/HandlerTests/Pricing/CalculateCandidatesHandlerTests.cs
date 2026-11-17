@@ -55,7 +55,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
 				"markup-v1",
 				"appliers-v1",
 				Guid.NewGuid())
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var updatedSettingsVersion = Guid.NewGuid();
 		var handler = CreateHandler(
 			Result(
@@ -86,7 +86,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
 				"markup-v1",
 				"appliers-v1",
 				existingSettingsVersion)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var handler = CreateHandler(
 			Result(
 				"markup-v2",

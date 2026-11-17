@@ -64,7 +64,7 @@ public class GetOrganizationsTests : IntegrationTest
 			.WithOwnerId(users[0].Id)
 			.WithName("Member organization")
 			.WithMember(member.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(CreateQuery("Distinctive Membername"), CancellationToken);
 

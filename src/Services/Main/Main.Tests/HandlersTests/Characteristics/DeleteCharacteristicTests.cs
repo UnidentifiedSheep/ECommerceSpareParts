@@ -21,8 +21,8 @@ public class DeleteCharacteristicTests : IntegrationTest
 	[Fact]
 	public async Task ExistingCharacteristic_RemovesOnlyRequestedCharacteristic()
 	{
-		var existing = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context);
-		var other = await new CharacteristicBuilder(Faker).WithName("Size").BuildAndAddToDb(Context);
+		var existing = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context, CancellationToken);
+		var other = await new CharacteristicBuilder(Faker).WithName("Size").BuildAndAddToDb(Context, CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		await Mediator.Send(new DeleteCharacteristicCommand(existing.Id), CancellationToken);
@@ -43,7 +43,7 @@ public class DeleteCharacteristicTests : IntegrationTest
 	[Fact]
 	public async Task CharacteristicUsedByProduct_ThrowsConflictAndPreservesData()
 	{
-		var existing = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context);
+		var existing = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context, CancellationToken);
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var link = ProductCharacteristic.Create(
 			productId,
@@ -70,8 +70,8 @@ public class DeleteCharacteristicTests : IntegrationTest
 	[Fact]
 	public async Task CharacteristicUsedByProduct_DoesNotPreventDeletingAnotherCharacteristic()
 	{
-		var used = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context);
-		var unused = await new CharacteristicBuilder(Faker).WithName("Size").BuildAndAddToDb(Context);
+		var used = await new CharacteristicBuilder(Faker).WithName("Color").BuildAndAddToDb(Context, CancellationToken);
+		var unused = await new CharacteristicBuilder(Faker).WithName("Size").BuildAndAddToDb(Context, CancellationToken);
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		await Context.Set<ProductCharacteristic>()
 			.AddAsync(

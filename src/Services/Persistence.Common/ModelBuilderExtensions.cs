@@ -1,4 +1,4 @@
-﻿using Domain.Interfaces;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -47,6 +47,7 @@ public static class ModelBuilderExtensions
 				continue;
 
 			var builder = modelBuilder.Entity(entityType.ClrType);
+			var tableName = (entityType.GetTableName() ?? entityType.ClrType.Name).ToLowerInvariant();
 
 			builder.Property(nameof(IAuditable.CreatedAt)).HasColumnName("created_at");
 
@@ -58,11 +59,11 @@ public static class ModelBuilderExtensions
 
 			builder
 				.HasIndex(nameof(IAuditable.WhoUpdated))
-				.HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_updated_idx");
+				.HasDatabaseName($"{tableName}_who_updated_idx");
 
 			builder
 				.HasIndex(nameof(IAuditable.WhoCreated))
-				.HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_created_idx");
+				.HasDatabaseName($"{tableName}_who_created_idx");
 		}
 
 		return modelBuilder;

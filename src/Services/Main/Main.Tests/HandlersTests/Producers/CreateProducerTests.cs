@@ -39,7 +39,7 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 	[InlineData(" BOSCH ")]
 	public async Task DuplicateNormalizedName_ReturnsLocalizedConflict(string name)
 	{
-		await new ProducerBuilder(Faker).WithName("Bosch").BuildAndAddToDb(Context);
+		await new ProducerBuilder(Faker).WithName("Bosch").BuildAndAddToDb(Context, CancellationToken);
 
 		var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
 			Mediator.Send(new CreateProducerCommand(CreateDto() with { Name = name }), CancellationToken));

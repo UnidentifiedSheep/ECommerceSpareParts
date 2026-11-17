@@ -61,7 +61,7 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 				PriceOfferSourceType.Supplier,
 				50,
 				false)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(new GetPriceApplierQuery(applier.SystemName), CancellationToken);
 
@@ -85,7 +85,7 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 				PriceOfferSourceType.Supplier,
 				999,
 				false)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(new GetPriceApplierQuery(nameof(MarkupApplier)), CancellationToken);
 
@@ -118,16 +118,16 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 	{
 		var enabledDynamic = await new PriceApplierDataBuilder(Faker)
 			.WithState(PriceOfferSourceType.Supplier, 50)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var disabledDynamic = await new PriceApplierDataBuilder(Faker)
 			.WithState(
 				PriceOfferSourceType.Supplier,
 				60,
 				false)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var otherUsageDynamic = await new PriceApplierDataBuilder(Faker)
 			.WithState(PriceOfferSourceType.OurWarehouse, 70)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		await new PriceApplierDataBuilder(Faker)
 			.WithSystemName(nameof(MarkupApplier))
 			.AsLocal()
@@ -135,7 +135,7 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 				PriceOfferSourceType.Supplier,
 				0,
 				false)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetPriceAppliersQuery(PriceOfferSourceType.Supplier),
@@ -177,7 +177,7 @@ public class GetPriceAppliersTests(CombinedContainerFixture fixture) : Integrati
 			.WithSystemName(nameof(MarkupApplier))
 			.AsLocal()
 			.WithState(PriceOfferSourceType.OurWarehouse, 0)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetPriceAppliersQuery(PriceOfferSourceType.Supplier),

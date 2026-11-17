@@ -26,11 +26,11 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.Armtek)
 			.WithSupplierProducerName("Armtek producer")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(anotherProducer.Id)
 			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(
@@ -53,11 +53,11 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 		var expected = await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.FavoritParts)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(
@@ -78,11 +78,11 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 		await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.FavoritParts)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(

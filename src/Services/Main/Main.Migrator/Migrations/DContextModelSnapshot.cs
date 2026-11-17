@@ -191,10 +191,10 @@ namespace Main.Migrator.Migrations
                         .HasName("jobs_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.job.singlerunjob_who_created_idx");
+                        .HasDatabaseName("jobs_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.job.singlerunjob_who_updated_idx");
+                        .HasDatabaseName("jobs_who_updated_idx");
 
                     b.HasIndex(new[] { "CreatedAt" }, "jobs_created_at_idx");
 
@@ -292,10 +292,10 @@ namespace Main.Migrator.Migrations
                         .HasName("job_schedules_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.job.jobschedule_who_created_idx");
+                        .HasDatabaseName("job_schedules_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.job.jobschedule_who_updated_idx");
+                        .HasDatabaseName("job_schedules_who_updated_idx");
 
                     b.HasIndex(new[] { "Enabled", "NextRunAt", "Id" }, "job_schedules_enabled_next_run_at_id_idx");
 
@@ -398,10 +398,10 @@ namespace Main.Migrator.Migrations
                         .HasName("settings_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("pricing.entities.settings.pricingsetting_who_created_idx");
+                        .HasDatabaseName("settings_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("pricing.entities.settings.pricingsetting_who_updated_idx");
+                        .HasDatabaseName("settings_who_updated_idx");
 
                     b.ToTable("settings", "public");
 
@@ -492,10 +492,10 @@ namespace Main.Migrator.Migrations
                         .HasName("permissions_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.permission_who_created_idx");
+                        .HasDatabaseName("permissions_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.permission_who_updated_idx");
+                        .HasDatabaseName("permissions_who_updated_idx");
 
                     b.ToTable("permissions", "auth");
                 });
@@ -531,10 +531,10 @@ namespace Main.Migrator.Migrations
                     b.HasKey("Name");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.role_who_created_idx");
+                        .HasDatabaseName("roles_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.role_who_updated_idx");
+                        .HasDatabaseName("roles_who_updated_idx");
 
                     b.ToTable("roles", "auth");
                 });
@@ -591,10 +591,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("IX_user_permissions_permission");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.userpermission_who_created_idx");
+                        .HasDatabaseName("user_permissions_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.userpermission_who_updated_idx");
+                        .HasDatabaseName("user_permissions_who_updated_idx");
 
                     b.ToTable("user_permissions", "auth");
                 });
@@ -632,10 +632,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("IX_user_roles_role_id");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.userrole_who_created_idx");
+                        .HasDatabaseName("user_roles_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.userrole_who_updated_idx");
+                        .HasDatabaseName("user_roles_who_updated_idx");
 
                     b.ToTable("user_roles", "auth");
                 });
@@ -712,10 +712,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("user_tokens_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.usertoken_who_created_idx");
+                        .HasDatabaseName("user_tokens_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.usertoken_who_updated_idx");
+                        .HasDatabaseName("user_tokens_who_updated_idx");
 
                     b.ToTable("user_tokens", "auth");
                 });
@@ -769,10 +769,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("organization_balances_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.balance.organizationbalance_who_created_idx");
+                        .HasDatabaseName("organization_balances_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.balance.organizationbalance_who_updated_idx");
+                        .HasDatabaseName("organization_balances_who_updated_idx");
 
                     b.HasIndex("CurrencyId", "OrganizationId")
                         .IsUnique()
@@ -821,10 +821,10 @@ namespace Main.Migrator.Migrations
                         .HasName("organization_financial_profile_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.balance.organizationfinancialprofile_who_created_idx");
+                        .HasDatabaseName("organization_financial_profile_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.balance.organizationfinancialprofile_who_updated_idx");
+                        .HasDatabaseName("organization_financial_profile_who_updated_idx");
 
                     b.ToTable("organization_financial_profile", "public");
                 });
@@ -907,10 +907,10 @@ namespace Main.Migrator.Migrations
                         .HasName("transactions_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.balance.transaction_who_created_idx");
+                        .HasDatabaseName("transactions_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.balance.transaction_who_updated_idx");
+                        .HasDatabaseName("transactions_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "IX_transactions_currency_id");
 
@@ -973,10 +973,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("cart_product_id_idx");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.cart.cart_who_created_idx");
+                        .HasDatabaseName("cart_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.cart.cart_who_updated_idx");
+                        .HasDatabaseName("cart_who_updated_idx");
 
                     b.ToTable("cart", "public");
                 });
@@ -1075,10 +1075,10 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("ToCurrencyId");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.currency.currencyrate_who_created_idx");
+                        .HasDatabaseName("currency_rates_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.currency.currencyrate_who_updated_idx");
+                        .HasDatabaseName("currency_rates_who_updated_idx");
 
                     b.HasIndex("FromCurrencyId", "ToCurrencyId", "CreatedAt", "Id")
                         .HasDatabaseName("currency_rates_pair_date_idx");
@@ -1209,10 +1209,10 @@ namespace Main.Migrator.Migrations
                         .HasName("orders_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.order.order_who_created_idx");
+                        .HasDatabaseName("orders_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.order.order_who_updated_idx");
+                        .HasDatabaseName("orders_who_updated_idx");
 
                     b.HasIndex(new[] { "ConfirmedByUserId" }, "orders_confirmed_by_user_id_index");
 
@@ -1352,10 +1352,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("organizations_system_name_uindex");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.organization.organization_who_created_idx");
+                        .HasDatabaseName("organizations_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.organization.organization_who_updated_idx");
+                        .HasDatabaseName("organizations_who_updated_idx");
 
                     b.ToTable("organizations", "auth");
                 });
@@ -1399,10 +1399,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("organization_members_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.organization.organizationmember_who_created_idx");
+                        .HasDatabaseName("organization_members_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.organization.organizationmember_who_updated_idx");
+                        .HasDatabaseName("organization_members_who_updated_idx");
 
                     b.HasIndex("OrganizationId", "Role")
                         .IsUnique()
@@ -1461,10 +1461,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("producer_name_uindex");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.producer.producer_who_created_idx");
+                        .HasDatabaseName("producer_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.producer.producer_who_updated_idx");
+                        .HasDatabaseName("producer_who_updated_idx");
 
                     b.ToTable("producer", "public");
                 });
@@ -1626,10 +1626,10 @@ namespace Main.Migrator.Migrations
                         .HasFilter("product_id IS NOT NULL");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.product.enrichment.cataloguecandidate_who_created_idx");
+                        .HasDatabaseName("catalogue_candidates_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.product.enrichment.cataloguecandidate_who_updated_idx");
+                        .HasDatabaseName("catalogue_candidates_who_updated_idx");
 
                     b.ToTable("catalogue_candidates", "catalogue_enrichment");
 
@@ -1704,10 +1704,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("supplier_products_catalogue_candidate_id_idx");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.product.enrichment.supplierproduct_who_created_idx");
+                        .HasDatabaseName("supplier_products_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.product.enrichment.supplierproduct_who_updated_idx");
+                        .HasDatabaseName("supplier_products_who_updated_idx");
 
                     b.ToTable("supplier_products", "catalogue_enrichment");
 
@@ -1863,10 +1863,10 @@ namespace Main.Migrator.Migrations
                         .HasName("products_id_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.product.product_who_created_idx");
+                        .HasDatabaseName("products_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.product.product_who_updated_idx");
+                        .HasDatabaseName("products_who_updated_idx");
 
                     b.HasIndex(new[] { "CategoryId" }, "products_category_id_index");
 
@@ -2139,10 +2139,10 @@ namespace Main.Migrator.Migrations
                         .HasName("purchase_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.purchase.purchase_who_created_idx");
+                        .HasDatabaseName("purchase_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.purchase.purchase_who_updated_idx");
+                        .HasDatabaseName("purchase_who_updated_idx");
 
                     b.HasIndex(new[] { "Comment" }, "purchase_comment_index");
 
@@ -2290,10 +2290,10 @@ namespace Main.Migrator.Migrations
                         .HasName("sale_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.sale.sale_who_created_idx");
+                        .HasDatabaseName("sale_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.sale.sale_who_updated_idx");
+                        .HasDatabaseName("sale_who_updated_idx");
 
                     b.HasIndex(new[] { "Comment" }, "sale_comment_index");
 
@@ -2484,10 +2484,10 @@ namespace Main.Migrator.Migrations
                         .HasName("storages_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storage_who_created_idx");
+                        .HasDatabaseName("storages_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storage_who_updated_idx");
+                        .HasDatabaseName("storages_who_updated_idx");
 
                     b.HasIndex(new[] { "Description" }, "storages_description_index");
 
@@ -2586,10 +2586,10 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("BaseCurrencyId");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storagecontent_who_created_idx");
+                        .HasDatabaseName("storage_content_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storagecontent_who_updated_idx");
+                        .HasDatabaseName("storage_content_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "storage_content_currency_id_index");
 
@@ -2659,10 +2659,10 @@ namespace Main.Migrator.Migrations
                         .HasName("storage_content_locks_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storagecontentlock_who_created_idx");
+                        .HasDatabaseName("storage_content_locks_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storagecontentlock_who_updated_idx");
+                        .HasDatabaseName("storage_content_locks_who_updated_idx");
 
                     b.HasIndex(new[] { "StorageContentId" }, "storage_content_locks_active_content_idx")
                         .HasFilter("state = 'Active'");
@@ -2750,10 +2750,10 @@ namespace Main.Migrator.Migrations
                         .HasName("users_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.user_who_created_idx");
+                        .HasDatabaseName("users_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.user_who_updated_idx");
+                        .HasDatabaseName("users_who_updated_idx");
 
                     b.ToTable("users", "auth");
                 });
@@ -2810,10 +2810,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("user_emails_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.useremail_who_created_idx");
+                        .HasDatabaseName("user_emails_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.useremail_who_updated_idx");
+                        .HasDatabaseName("user_emails_who_updated_idx");
 
                     b.HasIndex("UserId", "IsPrimary")
                         .IsUnique()
@@ -2951,10 +2951,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("user_phones_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.userphone_who_created_idx");
+                        .HasDatabaseName("user_phones_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.userphone_who_updated_idx");
+                        .HasDatabaseName("user_phones_who_updated_idx");
 
                     b.HasIndex(new[] { "NormalizedPhone" }, "user_phones_normalized_phone_index");
 
@@ -3309,10 +3309,10 @@ namespace Main.Migrator.Migrations
                         .HasName("markup_group_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("pricing.entities.markupgroup_who_created_idx");
+                        .HasDatabaseName("markup_group_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("pricing.entities.markupgroup_who_updated_idx");
+                        .HasDatabaseName("markup_group_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "IX_markup_group_currency_id");
 
@@ -3455,10 +3455,10 @@ namespace Main.Migrator.Migrations
                         .HasName("price_offer_source_source_key_uq");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("pricing.entities.offers.priceoffer_who_created_idx");
+                        .HasDatabaseName("price_offers_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("pricing.entities.offers.priceoffer_who_updated_idx");
+                        .HasDatabaseName("price_offers_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "price_offer_currency_id_index");
 
@@ -3575,10 +3575,10 @@ namespace Main.Migrator.Migrations
                         .HasName("product_price_option_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("pricing.entities.offers.productpriceoption_who_created_idx");
+                        .HasDatabaseName("product_price_options_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("pricing.entities.offers.productpriceoption_who_updated_idx");
+                        .HasDatabaseName("product_price_options_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "product_price_option_currency_id_index");
 
@@ -3622,10 +3622,10 @@ namespace Main.Migrator.Migrations
                         .HasName("price_appliers_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("pricing.entities.pricing.priceapplier_who_created_idx");
+                        .HasDatabaseName("price_appliers_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("pricing.entities.pricing.priceapplier_who_updated_idx");
+                        .HasDatabaseName("price_appliers_who_updated_idx");
 
                     b.ToTable("price_appliers", "public");
                 });
@@ -3668,10 +3668,10 @@ namespace Main.Migrator.Migrations
                         .HasName("price_applier_states_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("pricing.entities.pricing.priceapplierstate_who_created_idx");
+                        .HasDatabaseName("price_applier_states_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("pricing.entities.pricing.priceapplierstate_who_updated_idx");
+                        .HasDatabaseName("price_applier_states_who_updated_idx");
 
                     b.HasIndex(new[] { "Usage", "Order" }, "price_applier_states_enabled_usage_order_uq")
                         .IsUnique()

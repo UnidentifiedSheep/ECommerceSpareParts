@@ -16,7 +16,7 @@ namespace Main.Modules.Product.Persistence.Repositories.Product;
 internal class ProductRepository(UnifiedDbContext context,
 	BulkProductContext bulkContext,
 	QueryExtensions extensions)
-	: LinqRepositoryBase<UnifiedDbContext, ProductEntity.Product, int>(context, extensions),
+	: LinqRepositoryBase<UnifiedDbContext, ProductEntity, int>(context, extensions),
 		IProductRepository
 {
 	public async Task<IReadOnlyList<ProductEntity>> GetProductCrosses(

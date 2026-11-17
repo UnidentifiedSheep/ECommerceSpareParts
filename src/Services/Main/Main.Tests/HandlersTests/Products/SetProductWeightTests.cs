@@ -45,7 +45,7 @@ public class SetProductWeightTests : IntegrationTest
 			.WithProductId(product.Id)
 			.WithWeight(2m)
 			.WithUnit(WeightUnit.Kilogram)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = new SetProductWeightCommand(
 			product.Id,

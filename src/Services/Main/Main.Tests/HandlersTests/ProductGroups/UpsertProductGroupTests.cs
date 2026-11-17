@@ -38,7 +38,7 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 	{
 		var existing = await new ProductGroupBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var result = await Mediator.Send(
@@ -62,7 +62,7 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 	{
 		var existing = await new ProductGroupBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var result = await Mediator.Send(
@@ -80,7 +80,7 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 	{
 		await new ProductGroupBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var act = () => Mediator.Send(
 			new UpsertProductGroupCommand(null, "  BRAKE PADS  "),
@@ -101,10 +101,10 @@ public class UpsertProductGroupTests(CombinedContainerFixture fixture) : Integra
 	{
 		var existing = await new ProductGroupBuilder(Faker)
 			.WithName("Brake Pads")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var other = await new ProductGroupBuilder(Faker)
 			.WithName("Oil Filters")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		Context.ChangeTracker.Clear();
 
 		var act = () => Mediator.Send(

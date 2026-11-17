@@ -36,7 +36,7 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 	[Fact]
 	public async Task UpsertRole_ValidDescription_UpdatesRole()
 	{
-		var role = await new RoleBuilder(Faker).BuildAndAddToDb(Context);
+		var role = await new RoleBuilder(Faker).BuildAndAddToDb(Context, CancellationToken);
 		var command = new UpsertRoleCommand(role.Name, "New description");
 
 		var act = () => Mediator.Send(command);

@@ -43,12 +43,12 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 		var mappedSupplierProduct = SupplierTestContext.SupplierProducts[1];
 		var additionalSource = await new SupplierProductBuilder(Faker)
 			.WithNamesCount(2)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		candidate.AddSupplierProduct(additionalSource);
 		await Context.SaveChangesAsync(CancellationToken);
 		await new SupplierProductCrossBuilder(Faker)
 			.WithSupplierProducts(additionalSource, mappedSupplierProduct)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetCatalogueCandidateCrossesQuery([candidate.Id]),
@@ -96,7 +96,7 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 	{
 		var candidate = await new CatalogueCandidateBuilder(Faker)
 			.WithProducerId(CatalogueTestContext.Candidates[0].ProducerId)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetCatalogueCandidateCrossesQuery([candidate.Id]),

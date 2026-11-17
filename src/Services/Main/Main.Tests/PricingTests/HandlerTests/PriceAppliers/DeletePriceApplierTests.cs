@@ -24,7 +24,7 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 	{
 		var existing = await new PriceApplierDataBuilder(Faker)
 			.WithState(PriceOfferSourceType.Supplier, 10)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
 		var initialConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 
@@ -64,7 +64,7 @@ public class DeletePriceApplierTests(CombinedContainerFixture fixture) : Integra
 				PriceOfferSourceType.Supplier,
 				0,
 				false)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var exception = await Assert.ThrowsAsync<LocalPriceApplierCannotBeDeletedException>(() =>
 			Mediator.Send(new DeletePriceApplierCommand(existing.SystemName), CancellationToken));

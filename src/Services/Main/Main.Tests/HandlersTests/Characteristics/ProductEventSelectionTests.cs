@@ -42,7 +42,7 @@ public class ProductEventSelectionTests : IntegrationTest
 	{
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var characteristic =
-			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
+			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context, CancellationToken);
 		await Context.Set<ProductCharacteristic>()
 			.AddAsync(
 				ProductCharacteristic.Create(

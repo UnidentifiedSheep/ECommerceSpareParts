@@ -53,7 +53,7 @@ public class AddAliasToProducerTests : IntegrationTest
 		var producer = TestContext.Producers[0];
 		var existing = await new ProducerAliasBuilder(Faker)
 			.WithProducerId(producer.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = new AddAliasCommand(producer.Id, existing.Alias);
 		var exception =
@@ -67,7 +67,7 @@ public class AddAliasToProducerTests : IntegrationTest
 	{
 		var existing = await new ProducerAliasBuilder(Faker)
 			.WithProducerId(TestContext.Producers[0].Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = new AddAliasCommand(TestContext.Producers[1].Id, existing.Alias);
 

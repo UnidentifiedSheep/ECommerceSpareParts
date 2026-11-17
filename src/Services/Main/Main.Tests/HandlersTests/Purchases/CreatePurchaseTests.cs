@@ -60,7 +60,7 @@ public class CreatePurchaseTests : IntegrationTest
 			.WithOwnerId(_supplier.Id)
 			.WithName("Supplier organization")
 			.WithSystemName($"supplier-{Guid.NewGuid():N}")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = CreateValidCommand() with
 		{

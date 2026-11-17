@@ -80,7 +80,7 @@ public class ProductSearchEventTests : IntegrationTest
 	{
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var characteristic =
-			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
+			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context, CancellationToken);
 		var link = ProductCharacteristic.Create(
 			productId,
 			characteristic.Id,
@@ -122,7 +122,7 @@ public class ProductSearchEventTests : IntegrationTest
 	{
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var characteristic =
-			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
+			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context, CancellationToken);
 		var link = ProductCharacteristic.Create(
 			productId,
 			characteristic.Id,
@@ -207,7 +207,7 @@ public class ProductSearchEventTests : IntegrationTest
 	{
 		var product = GetContext<ProductTestContext>().Products[0];
 		var characteristic =
-			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
+			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context, CancellationToken);
 		await Context.Set<ProductCharacteristic>()
 			.AddAsync(
 				ProductCharacteristic.Create(

@@ -61,7 +61,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 	{
 		var existing = await new PriceApplierDataBuilder(Faker)
 			.WithState(PriceOfferSourceType.Supplier, 10)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		const string newDslLogic = """{"*":[{"var":"salePrice"},2]}""";
 		var command = new UpsertPriceApplierCommand(
 			existing.SystemName,
@@ -94,7 +94,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var existing = await new PriceApplierDataBuilder(Faker)
 			.WithState(PriceOfferSourceType.Supplier, 10)
 			.WithState(PriceOfferSourceType.OurWarehouse, 20)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var command = new UpsertPriceApplierCommand(
 			existing.SystemName,
 			"Dynamic price rule",
@@ -142,7 +142,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.WithSystemName(nameof(PriceRoundingApplier))
 			.AsLocal()
 			.WithState(PriceOfferSourceType.Supplier, 100_000)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var command = new UpsertPriceApplierCommand(
 			existing.SystemName,
 			null,
@@ -173,7 +173,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 			.AsLocal()
 			.WithState(PriceOfferSourceType.Supplier, 0)
 			.WithState(PriceOfferSourceType.OurWarehouse, 0)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var command = new UpsertPriceApplierCommand(
 			existing.SystemName,
 			null,
@@ -304,7 +304,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 	{
 		var existing = await new PriceApplierDataBuilder(Faker)
 			.WithSystemName(nameof(MarkupApplier))
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var command = new UpsertPriceApplierCommand(
 			existing.SystemName,
 			null,
@@ -322,7 +322,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 	{
 		await new PriceApplierDataBuilder(Faker)
 			.WithState(PriceOfferSourceType.Supplier, 10)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var command = new UpsertPriceApplierCommand(
 			$"dynamic-{Faker.Random.Guid():N}",
 			"Dynamic price rule",
@@ -340,7 +340,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 	{
 		await new PriceApplierDataBuilder(Faker)
 			.WithState(PriceOfferSourceType.Supplier, 10)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var systemName = $"dynamic-{Faker.Random.Guid():N}";
 		var command = new UpsertPriceApplierCommand(
 			systemName,
@@ -365,7 +365,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 				PriceOfferSourceType.Supplier,
 				10,
 				false)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var systemName = $"dynamic-{Faker.Random.Guid():N}";
 		var command = new UpsertPriceApplierCommand(
 			systemName,
@@ -387,7 +387,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 	{
 		await new PriceApplierDataBuilder(Faker)
 			.WithState(PriceOfferSourceType.Supplier, 10)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var systemName = $"dynamic-{Faker.Random.Guid():N}";
 		var command = new UpsertPriceApplierCommand(
 			systemName,
@@ -443,7 +443,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 		var existing = await new PriceApplierDataBuilder(Faker)
 			.WithName("Original rule")
 			.WithState(PriceOfferSourceType.Supplier, 10)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
 		var initialConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 
@@ -475,7 +475,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
 				PriceOfferSourceType.Supplier,
 				0,
 				false)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
 		var initialConfiguration = await provider.GetConfigurationAsync(CancellationToken);
 

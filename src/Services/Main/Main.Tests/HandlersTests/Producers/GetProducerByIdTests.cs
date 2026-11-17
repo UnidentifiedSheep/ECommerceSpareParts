@@ -15,7 +15,7 @@ public class GetProducerByIdTests(CombinedContainerFixture fixture) : Integratio
 		var producer = await new ProducerBuilder(Faker)
 			.WithName("Requested producer")
 			.WithDescription("Requested description")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(new GetProducersByIdsQuery(producer.Id), CancellationToken);
 

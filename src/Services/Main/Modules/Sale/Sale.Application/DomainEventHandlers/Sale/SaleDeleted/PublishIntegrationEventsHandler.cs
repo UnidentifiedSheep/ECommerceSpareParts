@@ -8,7 +8,7 @@ using SaleEntity = Main.Entities.Sale.Sale.Sale;
 namespace Main.Modules.Sale.Application.DomainEventHandlers.Sale.SaleDeleted;
 
 public sealed class PublishIntegrationEventsHandler(IIntegrationEventScope integrationEventScope)
-	: BatchableDomainEventHandler<EntityDeletedDomainEvent<SaleEntity.Sale, Guid>>
+	: BatchableDomainEventHandler<EntityDeletedDomainEvent<SaleEntity, Guid>>
 {
 	public override Task Handle(
 		Batch<EntityDeletedDomainEvent<SaleEntity, Guid>> notification,

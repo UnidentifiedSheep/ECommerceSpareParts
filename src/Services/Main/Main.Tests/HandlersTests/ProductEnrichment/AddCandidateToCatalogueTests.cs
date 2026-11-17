@@ -45,12 +45,12 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 	{
 		var existingProduct = await new ProductBuilder(Faker)
 			.WithProducerId(TestContext.Producers[0].Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var mappedCandidate = await new CatalogueCandidateBuilder(Faker)
 			.WithSku("BATCH-MAPPED")
 			.WithProducerId(TestContext.Producers[0].Id)
 			.WithProductId(existingProduct.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var newCandidate = await CreateCandidate("BATCH-NEW", "New product");
 
 		await Mediator.Send(
