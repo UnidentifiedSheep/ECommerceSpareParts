@@ -36,6 +36,8 @@ public class AnalyticsRun : Entity<AnalyticsRun, Guid>, ILinqEntity<AnalyticsRun
 
 	public bool IsPinned { get; private set; }
 
+	public DateTime CreatedAt { get; private set; }
+
 	public IReadOnlyCollection<AnalyticsRunItem> Items => _items;
 
 	public static Expression<Func<AnalyticsRun, Guid>> GetKeySelector() => item => item.Id;
@@ -72,7 +74,8 @@ public class AnalyticsRun : Entity<AnalyticsRun, Guid>, ILinqEntity<AnalyticsRun
 			PeriodStart = periodStart,
 			PeriodEnd = periodEnd,
 			JobId = jobId,
-			CreatedBy = createdBy
+			CreatedBy = createdBy,
+			CreatedAt = DateTime.UtcNow
 		};
 	}
 

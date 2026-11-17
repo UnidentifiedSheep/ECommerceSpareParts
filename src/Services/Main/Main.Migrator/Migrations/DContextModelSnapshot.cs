@@ -422,6 +422,10 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("analysis_type");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
@@ -471,6 +475,8 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "AnalysisType", "ParametersHash" }, "analytics_runs_analysis_type_parameters_hash_index");
 
                     b.HasIndex(new[] { "AnalysisType", "PeriodEnd" }, "analytics_runs_analysis_type_period_end_index");
+
+                    b.HasIndex(new[] { "CreatedAt" }, "analytics_runs_created_at_index");
 
                     b.HasIndex(new[] { "JobId" }, "analytics_runs_job_id_index");
 

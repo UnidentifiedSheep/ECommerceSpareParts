@@ -1,4 +1,5 @@
 using HotChocolate;
+using Main.Api.GraphQl.Analytics.Mutations;
 using Pricing.Api.GraphQl.Mutations;
 
 namespace Main.Api.GraphQl.Mutations;
@@ -6,6 +7,9 @@ namespace Main.Api.GraphQl.Mutations;
 [GraphQLName("Mutation")]
 public sealed class RootMutation
 {
+	[GraphQLName("analytics")]
+	public AnalyticsMutations Analytics => new();
+
 	[GraphQLName("orders")]
 	public OrderMutations Orders => new();
 

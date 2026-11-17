@@ -22,7 +22,9 @@ public sealed class AnalyticsRunConfiguration : IEntityTypeConfiguration<Analyti
 		builder.Property(item => item.JobId).HasColumnName("job_id");
 		builder.Property(item => item.CreatedBy).HasColumnName("created_by");
 		builder.Property(item => item.IsPinned).HasColumnName("is_pinned");
+		builder.Property(item => item.CreatedAt).HasColumnName("created_at");
 		builder.HasIndex(item => item.JobId, "analytics_runs_job_id_index");
+		builder.HasIndex(item => item.CreatedAt, "analytics_runs_created_at_index");
 		builder.HasIndex(
 			item => new
 			{
