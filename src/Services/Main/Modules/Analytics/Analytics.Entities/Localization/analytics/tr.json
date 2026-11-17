@@ -42,6 +42,14 @@
     "chart.sales.profit.query.organization.id.name": "Kuruluş",
     "chart.sales.profit.point.revenue.description": "Temel para birimindeki satış geliri.",
     "lrt.sale.analytics.synchronization.name": "Satış analitiğini eşitle",
-    "lrt.sale.analytics.synchronization.description": "Satış analitiğini geçmiş döviz kurlarıyla yeniden hesaplar."
+    "lrt.sale.analytics.synchronization.description": "Satış analitiğini geçmiş döviz kurlarıyla yeniden hesaplar.",
+    "abc.xyz.parameters.period.start.invalid": "Dönem başlangıcı, bir ayın ilk günü 00:00 UTC olmalıdır.",
+    "abc.xyz.parameters.period.end.invalid": "Dönem bitişi, bir ayın ilk günü 00:00 UTC olmalıdır.",
+    "abc.xyz.parameters.period.start.must.not.be.after.end": "Dönem başlangıcı dönem bitişinden sonra olmamalıdır.",
+    "abc.xyz.parameters.months.invalid": "Seçilen aylar desteklenmeyen bir değer içeriyor.",
+    "abc.xyz.parameters.metric.invalid": "Seçilen analiz metriği desteklenmiyor.",
+    "abc.xyz.parameters.shares.invalid": "ABC payları pozitif olmalı ve toplamları 1'i geçmemelidir.",
+    "abc.xyz.parameters.coefficients.invalid": "XYZ katsayıları 0 < X < Y koşulunu sağlamalıdır.",
+    "abc.xyz.parameters.min.periods.invalid": "Asgari dönem sayısı en az 2 olmalıdır."
   }
 }

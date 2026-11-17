@@ -42,6 +42,14 @@
     "chart.sales.profit.query.organization.id.name": "Organization",
     "chart.sales.profit.point.revenue.description": "Sales revenue in the base currency.",
     "lrt.sale.analytics.synchronization.name": "Synchronize sales analytics",
-    "lrt.sale.analytics.synchronization.description": "Recalculates sales analytics using historical exchange rates."
+    "lrt.sale.analytics.synchronization.description": "Recalculates sales analytics using historical exchange rates.",
+    "abc.xyz.parameters.period.start.invalid": "Period start must be the first day of a month at 00:00 UTC.",
+    "abc.xyz.parameters.period.end.invalid": "Period end must be the first day of a month at 00:00 UTC.",
+    "abc.xyz.parameters.period.start.must.not.be.after.end": "Period start must not be later than period end.",
+    "abc.xyz.parameters.months.invalid": "Selected months contain an unsupported value.",
+    "abc.xyz.parameters.metric.invalid": "The selected analysis metric is not supported.",
+    "abc.xyz.parameters.shares.invalid": "ABC shares must be positive and their sum must not exceed 1.",
+    "abc.xyz.parameters.coefficients.invalid": "XYZ coefficients must satisfy 0 < X < Y.",
+    "abc.xyz.parameters.min.periods.invalid": "Minimum periods must be at least 2."
   }
 }

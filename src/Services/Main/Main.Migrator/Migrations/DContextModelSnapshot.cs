@@ -410,6 +410,119 @@ namespace Main.Migrator.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Main.Entities.Analytics.AnalyticsRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AnalysisType")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("analysis_type");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<bool>("IsPinned")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_pinned");
+
+                    b.Property<int>("ItemsCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("items_count");
+
+                    b.Property<Guid?>("JobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id");
+
+                    b.Property<string>("Parameters")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("parameters");
+
+                    b.Property<string>("ParametersHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("parameters_hash");
+
+                    b.Property<DateTime?>("PeriodEnd")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("period_end");
+
+                    b.Property<DateTime?>("PeriodStart")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("period_start");
+
+                    b.Property<int>("SchemaVersion")
+                        .HasColumnType("integer")
+                        .HasColumnName("schema_version");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("summary");
+
+                    b.HasKey("Id")
+                        .HasName("analytics_runs_pk");
+
+                    b.HasIndex(new[] { "AnalysisType", "ParametersHash" }, "analytics_runs_analysis_type_parameters_hash_index");
+
+                    b.HasIndex(new[] { "AnalysisType", "PeriodEnd" }, "analytics_runs_analysis_type_period_end_index");
+
+                    b.HasIndex(new[] { "JobId" }, "analytics_runs_job_id_index");
+
+                    b.ToTable("analytics_runs", "public");
+                });
+
+            modelBuilder.Entity("Main.Entities.Analytics.AnalyticsRunItem", b =>
+                {
+                    b.Property<Guid>("RunId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("run_id");
+
+                    b.Property<string>("SubjectKey")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("subject_key");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("data");
+
+                    b.Property<int?>("Rank")
+                        .HasColumnType("integer")
+                        .HasColumnName("rank");
+
+                    b.Property<string>("Segments")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("segments");
+
+                    b.Property<decimal?>("Share")
+                        .HasColumnType("numeric")
+                        .HasColumnName("share");
+
+                    b.Property<decimal?>("Value")
+                        .HasColumnType("numeric")
+                        .HasColumnName("value");
+
+                    b.HasKey("RunId", "SubjectKey")
+                        .HasName("analytics_run_items_pk");
+
+                    b.HasIndex(new[] { "RunId", "Rank" }, "analytics_run_items_run_id_rank_index");
+
+                    b.HasIndex(new[] { "Segments" }, "analytics_run_items_segments_index");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Segments" }, "analytics_run_items_segments_index"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Segments" }, "analytics_run_items_segments_index"), new[] { "jsonb_path_ops" });
+
+                    b.ToTable("analytics_run_items", "public");
+                });
+
             modelBuilder.Entity("Main.Entities.Analytics.SaleContentAnalytics", b =>
                 {
                     b.Property<int>("SaleContentId")
@@ -720,7 +833,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("user_tokens", "auth");
                 });
 
-            modelBuilder.Entity("Main.Entities.Balance.OrganizationBalance", b =>
+            modelBuilder.Entity("Main.Entities.Balance.Balance.OrganizationBalance", b =>
                 {
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
@@ -781,7 +894,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("organization_balances", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Balance.OrganizationFinancialProfile", b =>
+            modelBuilder.Entity("Main.Entities.Balance.Balance.OrganizationFinancialProfile", b =>
                 {
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
@@ -829,7 +942,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("organization_financial_profile", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Balance.Transaction", b =>
+            modelBuilder.Entity("Main.Entities.Balance.Balance.Transaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -936,7 +1049,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("transactions", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Cart.Cart", b =>
+            modelBuilder.Entity("Main.Entities.Cart.Cart.Cart", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -1086,7 +1199,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("currency_rates", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Documents.DocumentGenerationRequest", b =>
+            modelBuilder.Entity("Main.Entities.Documents.Documents.DocumentGenerationRequest", b =>
                 {
                     b.Property<Guid>("RequestId")
                         .HasColumnType("uuid")
@@ -1142,7 +1255,117 @@ namespace Main.Migrator.Migrations
                     b.ToTable("document_generation_requests", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Order.Order", b =>
+            modelBuilder.Entity("Main.Entities.Notification.InAppNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("SeenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("seen_at");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("in_app_notifications_pk");
+
+                    b.HasIndex(new[] { "UserId", "CreateAt" }, "in_app_notifications_user_id_created_at_idx");
+
+                    b.ToTable("in_app_notifications", "notification");
+                });
+
+            modelBuilder.Entity("Main.Entities.Notification.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("model");
+
+                    b.Property<string>("NotificationSystemName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("notification_system_name");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("notifications_pk");
+
+                    b.HasIndex(new[] { "UserId", "CreateAt" }, "notifications_user_id_created_at_idx");
+
+                    b.ToTable("notifications", "notification");
+                });
+
+            modelBuilder.Entity("Main.Entities.Notification.NotificationDelivery", b =>
+                {
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("notification_id");
+
+                    b.Property<string>("ChannelSystemName")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("channel_system_name");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("delivered_at");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<string>("RecipientJson")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("recipient_json");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.HasKey("NotificationId", "ChannelSystemName")
+                        .HasName("notification_deliveries_pk");
+
+                    b.HasIndex(new[] { "ChannelSystemName", "Status", "NotificationId" }, "notification_deliveries_channel_status_notification_id_idx");
+
+                    b.ToTable("notification_deliveries", "notification");
+                });
+
+            modelBuilder.Entity("Main.Entities.Order.Order.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
@@ -1229,7 +1452,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("orders", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Order.OrderFulfillment", b =>
+            modelBuilder.Entity("Main.Entities.Order.Order.OrderFulfillment", b =>
                 {
                     b.Property<int>("OrderItemId")
                         .HasColumnType("integer")
@@ -1251,7 +1474,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("order_fulfillments", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Order.OrderItem", b =>
+            modelBuilder.Entity("Main.Entities.Order.Order.OrderItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1299,7 +1522,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("order_items", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Organization.Organization", b =>
+            modelBuilder.Entity("Main.Entities.Organization.Organization.Organization", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1360,7 +1583,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("organizations", "auth");
                 });
 
-            modelBuilder.Entity("Main.Entities.Organization.OrganizationMember", b =>
+            modelBuilder.Entity("Main.Entities.Organization.Organization.OrganizationMember", b =>
                 {
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
@@ -1412,7 +1635,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("organization_members", "auth");
                 });
 
-            modelBuilder.Entity("Main.Entities.Producer.Producer", b =>
+            modelBuilder.Entity("Main.Entities.Product.Producer.Producer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1469,7 +1692,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("producer", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Producer.ProducerAlias", b =>
+            modelBuilder.Entity("Main.Entities.Product.Producer.ProducerAlias", b =>
                 {
                     b.Property<string>("Alias")
                         .HasMaxLength(64)
@@ -1495,7 +1718,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("producers_aliases", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Producer.ProducerSupplierMapping", b =>
+            modelBuilder.Entity("Main.Entities.Product.Producer.ProducerSupplierMapping", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1537,7 +1760,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("producer_supplier_mappings", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Characteristic", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Characteristic", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1567,7 +1790,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("characteristics", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.CatalogueCandidate", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.CatalogueCandidate", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1598,7 +1821,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Sku", "Main.Entities.Product.Enrichment.CatalogueCandidate.Sku#Sku", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Sku", "Main.Entities.Product.Product.Enrichment.CatalogueCandidate.Sku#Sku", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1636,7 +1859,7 @@ namespace Main.Migrator.Migrations
                     b.HasAnnotation("CustomIndex:CompositeIndexes", "[{\"paths\":[\"Sku.NormalizedValue\",\"ProducerId\"],\"unique\":true,\"name\":\"catalogue_candidates_sku_producer_uidx\"}]");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.SupplierProduct", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.SupplierProduct", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1677,7 +1900,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Sku", "Main.Entities.Product.Enrichment.SupplierProduct.Sku#Sku", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Sku", "Main.Entities.Product.Product.Enrichment.SupplierProduct.Sku#Sku", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1714,7 +1937,7 @@ namespace Main.Migrator.Migrations
                     b.HasAnnotation("CustomIndex:CompositeIndexes", "[{\"paths\":[\"Supplier\",\"Producer\",\"Sku.NormalizedValue\"],\"unique\":true,\"name\":\"supplier_products_supplier_producer_sku_uidx\"}]");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.SupplierProductCross", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.SupplierProductCross", b =>
                 {
                     b.Property<int>("LeftId")
                         .HasColumnType("integer")
@@ -1733,7 +1956,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("supplier_product_crosses", "catalogue_enrichment");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.SupplierProductName", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.SupplierProductName", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1762,7 +1985,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("supplier_product_names", "catalogue_enrichment");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Product", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1829,7 +2052,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Name", "Main.Entities.Product.Product.Name#Name", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Name", "Main.Entities.Product.Product.Product.Name#Name", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1840,7 +2063,7 @@ namespace Main.Migrator.Migrations
                                 .HasColumnName("name");
                         });
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Sku", "Main.Entities.Product.Product.Sku#Sku", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Sku", "Main.Entities.Product.Product.Product.Sku#Sku", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1884,7 +2107,7 @@ namespace Main.Migrator.Migrations
                     b.HasAnnotation("CustomIndex:CompositeIndexes", "[{\"paths\":[\"Sku.NormalizedValue\",\"ProducerId\"],\"unique\":true,\"name\":\"products_normalized_sku_producer_id_index\"}]");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductCharacteristic", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductCharacteristic", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer")
@@ -1912,7 +2135,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_characteristics", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductContent", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductContent", b =>
                 {
                     b.Property<int>("ParentProductId")
                         .HasColumnType("integer")
@@ -1935,7 +2158,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_contents", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductCross", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductCross", b =>
                 {
                     b.Property<int>("LeftProductId")
                         .HasColumnType("integer")
@@ -1954,7 +2177,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_crosses", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductEan", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductEan", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer")
@@ -1971,7 +2194,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_eans", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductGroup", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2001,7 +2224,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_groups", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductImage", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductImage", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer")
@@ -2021,7 +2244,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_images", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductSize", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductSize", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer")
@@ -2055,7 +2278,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_sizes", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductWeight", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductWeight", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer")
@@ -2077,7 +2300,33 @@ namespace Main.Migrator.Migrations
                     b.ToTable("product_weights", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
+            modelBuilder.Entity("Main.Entities.Product.Stock.ProductStock", b =>
+                {
+                    b.Property<string>("StorageCode")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("storage_code");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.HasKey("StorageCode", "ProductId")
+                        .HasName("product_stocks_pk");
+
+                    b.HasIndex(new[] { "ProductId" }, "product_stocks_product_id_idx");
+
+                    b.ToTable("product_stocks", "public", t =>
+                        {
+                            t.HasCheckConstraint("product_stocks_quantity_nonnegative_ck", "quantity >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("Main.Entities.Purchase.Purchase.Purchase", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
@@ -2166,7 +2415,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("purchase", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseContent", b =>
+            modelBuilder.Entity("Main.Entities.Purchase.Purchase.PurchaseContent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2222,7 +2471,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("purchase_content", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
+            modelBuilder.Entity("Main.Entities.Sale.Sale.Sale", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
@@ -2317,7 +2566,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("sale", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.SaleContent", b =>
+            modelBuilder.Entity("Main.Entities.Sale.Sale.SaleContent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2370,7 +2619,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("sale_content", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.SaleContentDetail", b =>
+            modelBuilder.Entity("Main.Entities.Sale.Sale.SaleContentDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2415,33 +2664,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("sale_content_details", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Storage.ProductStock", b =>
-                {
-                    b.Property<string>("StorageCode")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("storage_code");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer")
-                        .HasColumnName("product_id");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("quantity");
-
-                    b.HasKey("StorageCode", "ProductId")
-                        .HasName("product_stocks_pk");
-
-                    b.HasIndex(new[] { "ProductId" }, "product_stocks_product_id_idx");
-
-                    b.ToTable("product_stocks", "public", t =>
-                        {
-                            t.HasCheckConstraint("product_stocks_quantity_nonnegative_ck", "quantity >= 0");
-                        });
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.Storage", b =>
+            modelBuilder.Entity("Main.Entities.Storage.Storage.Storage", b =>
                 {
                     b.Property<string>("Code")
                         .HasMaxLength(128)
@@ -2504,7 +2727,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("storages", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
+            modelBuilder.Entity("Main.Entities.Storage.Storage.StorageContent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2569,7 +2792,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Metadata", "Main.Entities.Storage.StorageContent.Metadata#StorageContentMetadata", b1 =>
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Metadata", "Main.Entities.Storage.Storage.StorageContent.Metadata#StorageContentMetadata", b1 =>
                         {
                             b1.IsRequired();
 
@@ -2605,7 +2828,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("storage_content", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Storage.StorageContentLock", b =>
+            modelBuilder.Entity("Main.Entities.Storage.Storage.StorageContentLock", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
@@ -2968,7 +3191,7 @@ namespace Main.Migrator.Migrations
                     b.ToTable("user_phones", "auth");
                 });
 
-            modelBuilder.Entity("Main.Persistence.ReadModels.UserSearchDocument", b =>
+            modelBuilder.Entity("Main.Modules.Identity.Persistence.ReadModels.UserSearchDocument", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -3156,116 +3379,6 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("Created");
 
                     b.ToTable("OutboxState", "msg");
-                });
-
-            modelBuilder.Entity("Notification.Core.Entities.InAppNotification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("SeenAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("seen_at");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("in_app_notifications_pk");
-
-                    b.HasIndex(new[] { "UserId", "CreateAt" }, "in_app_notifications_user_id_created_at_idx");
-
-                    b.ToTable("in_app_notifications", "notification");
-                });
-
-            modelBuilder.Entity("Notification.Core.Entities.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Model")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("model");
-
-                    b.Property<string>("NotificationSystemName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("notification_system_name");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("notifications_pk");
-
-                    b.HasIndex(new[] { "UserId", "CreateAt" }, "notifications_user_id_created_at_idx");
-
-                    b.ToTable("notifications", "notification");
-                });
-
-            modelBuilder.Entity("Notification.Core.Entities.NotificationDelivery", b =>
-                {
-                    b.Property<int>("NotificationId")
-                        .HasColumnType("integer")
-                        .HasColumnName("notification_id");
-
-                    b.Property<string>("ChannelSystemName")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("channel_system_name");
-
-                    b.Property<int>("Attempts")
-                        .HasColumnType("integer")
-                        .HasColumnName("attempts");
-
-                    b.Property<DateTime?>("DeliveredAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("delivered_at");
-
-                    b.Property<string>("Error")
-                        .HasColumnType("text")
-                        .HasColumnName("error");
-
-                    b.Property<string>("RecipientJson")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("recipient_json");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("status");
-
-                    b.HasKey("NotificationId", "ChannelSystemName")
-                        .HasName("notification_deliveries_pk");
-
-                    b.HasIndex(new[] { "ChannelSystemName", "Status", "NotificationId" }, "notification_deliveries_channel_status_notification_id_idx");
-
-                    b.ToTable("notification_deliveries", "notification");
                 });
 
             modelBuilder.Entity("Pricing.Entities.MarkupGroup", b =>
@@ -3694,35 +3807,35 @@ namespace Main.Migrator.Migrations
                     b.HasDiscriminator().HasValue("job");
                 });
 
-            modelBuilder.Entity("Main.Entities.Settings.CurrencySetting", b =>
+            modelBuilder.Entity("Main.Entities.Currency.Settings.CurrencySetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("CurrencySetting");
                 });
 
-            modelBuilder.Entity("Main.Entities.Settings.GlobalApplicationSetting", b =>
+            modelBuilder.Entity("Main.Entities.Platform.Settings.GlobalApplicationSetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("GlobalApplicationSetting");
                 });
 
-            modelBuilder.Entity("Main.Entities.Settings.StorageContentSetting", b =>
+            modelBuilder.Entity("Main.Entities.Storage.Settings.StorageContentSetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("StorageContentSetting");
                 });
 
-            modelBuilder.Entity("Main.Entities.Settings.Supplier.FavoritSupplierSetting", b =>
+            modelBuilder.Entity("Main.Entities.Suppliers.Settings.Supplier.FavoritSupplierSetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("FavoritSupplierSetting");
                 });
 
-            modelBuilder.Entity("Main.Entities.Settings.Supplier.TmtrSupplierSetting", b =>
+            modelBuilder.Entity("Main.Entities.Suppliers.Settings.Supplier.TmtrSupplierSetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
@@ -3794,9 +3907,21 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Step");
                 });
 
+            modelBuilder.Entity("Main.Entities.Analytics.AnalyticsRunItem", b =>
+                {
+                    b.HasOne("Main.Entities.Analytics.AnalyticsRun", "Run")
+                        .WithMany("Items")
+                        .HasForeignKey("RunId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("analytics_run_items_run_id_fk");
+
+                    b.Navigation("Run");
+                });
+
             modelBuilder.Entity("Main.Entities.Analytics.SaleContentAnalytics", b =>
                 {
-                    b.HasOne("Main.Entities.Sale.SaleContent", null)
+                    b.HasOne("Main.Entities.Sale.Sale.SaleContent", null)
                         .WithOne()
                         .HasForeignKey("Main.Entities.Analytics.SaleContentAnalytics", "SaleContentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3873,7 +3998,7 @@ namespace Main.Migrator.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Main.Entities.Balance.OrganizationBalance", b =>
+            modelBuilder.Entity("Main.Entities.Balance.Balance.OrganizationBalance", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
@@ -3882,7 +4007,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("user_balances_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", null)
+                    b.HasOne("Main.Entities.Organization.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3890,17 +4015,17 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("organization_balances_organizations_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Balance.OrganizationFinancialProfile", b =>
+            modelBuilder.Entity("Main.Entities.Balance.Balance.OrganizationFinancialProfile", b =>
                 {
-                    b.HasOne("Main.Entities.Organization.Organization", null)
+                    b.HasOne("Main.Entities.Organization.Organization.Organization", null)
                         .WithOne()
-                        .HasForeignKey("Main.Entities.Balance.OrganizationFinancialProfile", "OrganizationId")
+                        .HasForeignKey("Main.Entities.Balance.Balance.OrganizationFinancialProfile", "OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("organization_financial_profile_organization_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Balance.Transaction", b =>
+            modelBuilder.Entity("Main.Entities.Balance.Balance.Transaction", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
@@ -3909,7 +4034,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("transactions_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", null)
+                    b.HasOne("Main.Entities.Organization.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3922,7 +4047,7 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("transactions_users_id_fk_4");
 
-                    b.HasOne("Main.Entities.Organization.Organization", null)
+                    b.HasOne("Main.Entities.Organization.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3930,9 +4055,9 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("transactions_sender_organization_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Cart.Cart", b =>
+            modelBuilder.Entity("Main.Entities.Cart.Cart.Cart", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3966,11 +4091,11 @@ namespace Main.Migrator.Migrations
                     b.Navigation("ToCurrency");
                 });
 
-            modelBuilder.Entity("Main.Entities.Documents.DocumentGenerationRequest", b =>
+            modelBuilder.Entity("Main.Entities.Documents.Documents.DocumentGenerationRequest", b =>
                 {
                     b.HasOne("Domain.CommonEntities.Job.Job", "Job")
                         .WithOne()
-                        .HasForeignKey("Main.Entities.Documents.DocumentGenerationRequest", "JobId")
+                        .HasForeignKey("Main.Entities.Documents.Documents.DocumentGenerationRequest", "JobId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("document_generation_requests_job_fk");
@@ -3984,7 +4109,19 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Job");
                 });
 
-            modelBuilder.Entity("Main.Entities.Order.Order", b =>
+            modelBuilder.Entity("Main.Entities.Notification.NotificationDelivery", b =>
+                {
+                    b.HasOne("Main.Entities.Notification.Notification", "Notification")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("notification_deliveries_notification_id_fk");
+
+                    b.Navigation("Notification");
+                });
+
+            modelBuilder.Entity("Main.Entities.Order.Order.Order", b =>
                 {
                     b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
@@ -3999,7 +4136,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("orders_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", null)
+                    b.HasOne("Main.Entities.Organization.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4013,16 +4150,16 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("orders_users_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Order.OrderFulfillment", b =>
+            modelBuilder.Entity("Main.Entities.Order.Order.OrderFulfillment", b =>
                 {
-                    b.HasOne("Main.Entities.Order.OrderItem", "OrderItem")
+                    b.HasOne("Main.Entities.Order.Order.OrderItem", "OrderItem")
                         .WithMany()
                         .HasForeignKey("OrderItemId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("order_fulfillments_order_item_id_fk");
 
-                    b.HasOne("Main.Entities.Sale.SaleContent", null)
+                    b.HasOne("Main.Entities.Sale.Sale.SaleContent", null)
                         .WithMany()
                         .HasForeignKey("SaleContentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4032,16 +4169,16 @@ namespace Main.Migrator.Migrations
                     b.Navigation("OrderItem");
                 });
 
-            modelBuilder.Entity("Main.Entities.Order.OrderItem", b =>
+            modelBuilder.Entity("Main.Entities.Order.Order.OrderItem", b =>
                 {
-                    b.HasOne("Main.Entities.Order.Order", "Order")
+                    b.HasOne("Main.Entities.Order.Order.Order", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("order_items_orders_id_fk");
 
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4051,9 +4188,9 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Main.Entities.Organization.OrganizationMember", b =>
+            modelBuilder.Entity("Main.Entities.Organization.Organization.OrganizationMember", b =>
                 {
-                    b.HasOne("Main.Entities.Organization.Organization", "Organization")
+                    b.HasOne("Main.Entities.Organization.Organization.Organization", "Organization")
                         .WithMany("Members")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4070,9 +4207,9 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Organization");
                 });
 
-            modelBuilder.Entity("Main.Entities.Producer.ProducerAlias", b =>
+            modelBuilder.Entity("Main.Entities.Product.Producer.ProducerAlias", b =>
                 {
-                    b.HasOne("Main.Entities.Producer.Producer", null)
+                    b.HasOne("Main.Entities.Product.Producer.Producer", null)
                         .WithMany("Aliases")
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4080,9 +4217,9 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("producers_other_names_producer_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Producer.ProducerSupplierMapping", b =>
+            modelBuilder.Entity("Main.Entities.Product.Producer.ProducerSupplierMapping", b =>
                 {
-                    b.HasOne("Main.Entities.Producer.Producer", null)
+                    b.HasOne("Main.Entities.Product.Producer.Producer", null)
                         .WithMany("SupplierMappings")
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4090,18 +4227,18 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("producer_supplier_mappings_producer_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.CatalogueCandidate", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.CatalogueCandidate", b =>
                 {
-                    b.HasOne("Main.Entities.Producer.Producer", "Producer")
+                    b.HasOne("Main.Entities.Product.Producer.Producer", "Producer")
                         .WithMany()
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("catalogue_candidates_producer_id_fk");
 
-                    b.HasOne("Main.Entities.Product.Product", "Product")
+                    b.HasOne("Main.Entities.Product.Product.Product", "Product")
                         .WithOne()
-                        .HasForeignKey("Main.Entities.Product.Enrichment.CatalogueCandidate", "ProductId")
+                        .HasForeignKey("Main.Entities.Product.Product.Enrichment.CatalogueCandidate", "ProductId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("catalogue_candidates_product_id_fk");
 
@@ -4110,9 +4247,9 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.SupplierProduct", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.SupplierProduct", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Enrichment.CatalogueCandidate", "CatalogueCandidate")
+                    b.HasOne("Main.Entities.Product.Product.Enrichment.CatalogueCandidate", "CatalogueCandidate")
                         .WithMany("SupplierProducts")
                         .HasForeignKey("CatalogueCandidateId")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -4121,16 +4258,16 @@ namespace Main.Migrator.Migrations
                     b.Navigation("CatalogueCandidate");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.SupplierProductCross", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.SupplierProductCross", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Enrichment.SupplierProduct", "Left")
+                    b.HasOne("Main.Entities.Product.Product.Enrichment.SupplierProduct", "Left")
                         .WithMany()
                         .HasForeignKey("LeftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("supplier_product_crosses_left_product_id_fk");
 
-                    b.HasOne("Main.Entities.Product.Enrichment.SupplierProduct", "Right")
+                    b.HasOne("Main.Entities.Product.Product.Enrichment.SupplierProduct", "Right")
                         .WithMany()
                         .HasForeignKey("RightId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4142,9 +4279,9 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Right");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.SupplierProductName", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.SupplierProductName", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Enrichment.SupplierProduct", "SupplierProduct")
+                    b.HasOne("Main.Entities.Product.Product.Enrichment.SupplierProduct", "SupplierProduct")
                         .WithMany("Names")
                         .HasForeignKey("SupplierProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4154,21 +4291,21 @@ namespace Main.Migrator.Migrations
                     b.Navigation("SupplierProduct");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Product", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Product", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "Pair")
+                    b.HasOne("Main.Entities.Product.Product.Product", "Pair")
                         .WithOne()
-                        .HasForeignKey("Main.Entities.Product.Product", "PairId")
+                        .HasForeignKey("Main.Entities.Product.Product.Product", "PairId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Main.Entities.Producer.Producer", "Producer")
+                    b.HasOne("Main.Entities.Product.Producer.Producer", "Producer")
                         .WithMany()
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("producer_id_fk");
 
-                    b.HasOne("Main.Entities.Product.ProductGroup", "ProductGroup")
+                    b.HasOne("Main.Entities.Product.Product.ProductGroup", "ProductGroup")
                         .WithMany()
                         .HasForeignKey("ProductGroupId")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -4181,16 +4318,16 @@ namespace Main.Migrator.Migrations
                     b.Navigation("ProductGroup");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductCharacteristic", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductCharacteristic", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Characteristic", "Characteristic")
+                    b.HasOne("Main.Entities.Product.Product.Characteristic", "Characteristic")
                         .WithMany()
                         .HasForeignKey("CharacteristicId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("product_characteristics_characteristic_id_fk");
 
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany("Characteristics")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4200,16 +4337,16 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Characteristic");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductContent", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductContent", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "ChildProduct")
+                    b.HasOne("Main.Entities.Product.Product.Product", "ChildProduct")
                         .WithMany()
                         .HasForeignKey("ChildProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("product_contents_child_fk");
 
-                    b.HasOne("Main.Entities.Product.Product", "ParentProduct")
+                    b.HasOne("Main.Entities.Product.Product.Product", "ParentProduct")
                         .WithMany()
                         .HasForeignKey("ParentProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4221,15 +4358,15 @@ namespace Main.Migrator.Migrations
                     b.Navigation("ParentProduct");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductCross", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductCross", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "LeftProduct")
+                    b.HasOne("Main.Entities.Product.Product.Product", "LeftProduct")
                         .WithMany()
                         .HasForeignKey("LeftProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Main.Entities.Product.Product", "RightProduct")
+                    b.HasOne("Main.Entities.Product.Product.Product", "RightProduct")
                         .WithMany()
                         .HasForeignKey("RightProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4240,9 +4377,9 @@ namespace Main.Migrator.Migrations
                     b.Navigation("RightProduct");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductEan", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductEan", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany("Eans")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4250,9 +4387,9 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("product_eans_product_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductImage", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductImage", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany("Images")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4260,27 +4397,46 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("product_images_product_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductSize", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductSize", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithOne("ProductSize")
-                        .HasForeignKey("Main.Entities.Product.ProductSize", "ProductId")
+                        .HasForeignKey("Main.Entities.Product.Product.ProductSize", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("product_sizes_products_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.ProductWeight", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.ProductWeight", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithOne("ProductWeight")
-                        .HasForeignKey("Main.Entities.Product.ProductWeight", "ProductId")
+                        .HasForeignKey("Main.Entities.Product.Product.ProductWeight", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("product_weight_products_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
+            modelBuilder.Entity("Main.Entities.Product.Stock.ProductStock", b =>
+                {
+                    b.HasOne("Main.Entities.Product.Product.Product", "Product")
+                        .WithMany("Stocks")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("product_stocks_product_id_fk");
+
+                    b.HasOne("Main.Entities.Storage.Storage.Storage", null)
+                        .WithMany()
+                        .HasForeignKey("StorageCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("product_stocks_storage_code_fk");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Main.Entities.Purchase.Purchase.Purchase", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
@@ -4289,14 +4445,14 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("purchase_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.Storage", null)
+                    b.HasOne("Main.Entities.Storage.Storage.Storage", null)
                         .WithMany()
                         .HasForeignKey("Storage")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("purchase_storages_name_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", null)
+                    b.HasOne("Main.Entities.Organization.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("SupplierOrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4310,7 +4466,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("purchase_supplier_user_id_fk");
 
-                    b.HasOne("Main.Entities.Balance.Transaction", null)
+                    b.HasOne("Main.Entities.Balance.Balance.Transaction", null)
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4318,31 +4474,31 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("purchase_transactions_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseContent", b =>
+            modelBuilder.Entity("Main.Entities.Purchase.Purchase.PurchaseContent", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("purchase_content_products_id_fk");
 
-                    b.HasOne("Main.Entities.Purchase.Purchase", null)
+                    b.HasOne("Main.Entities.Purchase.Purchase.Purchase", null)
                         .WithMany("Contents")
                         .HasForeignKey("PurchaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("purchase_content_purchase_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.StorageContent", null)
+                    b.HasOne("Main.Entities.Storage.Storage.StorageContent", null)
                         .WithOne()
-                        .HasForeignKey("Main.Entities.Purchase.PurchaseContent", "StorageContentId")
+                        .HasForeignKey("Main.Entities.Purchase.Purchase.PurchaseContent", "StorageContentId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired()
                         .HasConstraintName("purchase_content_storage_content_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
+            modelBuilder.Entity("Main.Entities.Sale.Sale.Sale", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
@@ -4351,21 +4507,21 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", null)
+                    b.HasOne("Main.Entities.Organization.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_organizations_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.Storage", null)
+                    b.HasOne("Main.Entities.Storage.Storage.Storage", null)
                         .WithMany()
                         .HasForeignKey("StorageCode")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_storages_name_fk");
 
-                    b.HasOne("Main.Entities.Balance.Transaction", null)
+                    b.HasOne("Main.Entities.Balance.Balance.Transaction", null)
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4380,16 +4536,16 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("sale_user_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.SaleContent", b =>
+            modelBuilder.Entity("Main.Entities.Sale.Sale.SaleContent", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_content_products_id_fk");
 
-                    b.HasOne("Main.Entities.Sale.Sale", "Sale")
+                    b.HasOne("Main.Entities.Sale.Sale.Sale", "Sale")
                         .WithMany("Contents")
                         .HasForeignKey("SaleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4399,7 +4555,7 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Sale");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.SaleContentDetail", b =>
+            modelBuilder.Entity("Main.Entities.Sale.Sale.SaleContentDetail", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
@@ -4408,14 +4564,14 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_content_details_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Sale.SaleContent", null)
+                    b.HasOne("Main.Entities.Sale.Sale.SaleContent", null)
                         .WithMany("Details")
                         .HasForeignKey("SaleContentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("sale_content_details_sale_content_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.StorageContent", null)
+                    b.HasOne("Main.Entities.Storage.Storage.StorageContent", null)
                         .WithMany()
                         .HasForeignKey("StorageContentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4423,26 +4579,7 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("sale_content_details_storage_content_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Storage.ProductStock", b =>
-                {
-                    b.HasOne("Main.Entities.Product.Product", "Product")
-                        .WithMany("Stocks")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("product_stocks_product_id_fk");
-
-                    b.HasOne("Main.Entities.Storage.Storage", null)
-                        .WithMany()
-                        .HasForeignKey("StorageCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("product_stocks_storage_code_fk");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
+            modelBuilder.Entity("Main.Entities.Storage.Storage.StorageContent", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
@@ -4458,14 +4595,14 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("storage_content_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Product.Product", null)
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("storage_content_products_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.Storage", null)
+                    b.HasOne("Main.Entities.Storage.Storage.Storage", null)
                         .WithMany()
                         .HasForeignKey("StorageCode")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4473,9 +4610,9 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("storage_content_storages_name_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Storage.StorageContentLock", b =>
+            modelBuilder.Entity("Main.Entities.Storage.Storage.StorageContentLock", b =>
                 {
-                    b.HasOne("Main.Entities.Storage.StorageContent", "StorageContent")
+                    b.HasOne("Main.Entities.Storage.Storage.StorageContent", "StorageContent")
                         .WithMany("Locks")
                         .HasForeignKey("StorageContentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4529,11 +4666,11 @@ namespace Main.Migrator.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Main.Persistence.ReadModels.UserSearchDocument", b =>
+            modelBuilder.Entity("Main.Modules.Identity.Persistence.ReadModels.UserSearchDocument", b =>
                 {
                     b.HasOne("Main.Entities.User.User", "User")
                         .WithOne()
-                        .HasForeignKey("Main.Persistence.ReadModels.UserSearchDocument", "UserId")
+                        .HasForeignKey("Main.Modules.Identity.Persistence.ReadModels.UserSearchDocument", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("user_search_users_id_fk");
@@ -4551,18 +4688,6 @@ namespace Main.Migrator.Migrations
                         .WithMany()
                         .HasForeignKey("InboxMessageId", "InboxConsumerId")
                         .HasPrincipalKey("MessageId", "ConsumerId");
-                });
-
-            modelBuilder.Entity("Notification.Core.Entities.NotificationDelivery", b =>
-                {
-                    b.HasOne("Notification.Core.Entities.Notification", "Notification")
-                        .WithMany("Deliveries")
-                        .HasForeignKey("NotificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("notification_deliveries_notification_id_fk");
-
-                    b.Navigation("Notification");
                 });
 
             modelBuilder.Entity("Pricing.Entities.MarkupRange", b =>
@@ -4604,6 +4729,11 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Runs");
                 });
 
+            modelBuilder.Entity("Main.Entities.Analytics.AnalyticsRun", b =>
+                {
+                    b.Navigation("Items");
+                });
+
             modelBuilder.Entity("Main.Entities.Auth.Role", b =>
                 {
                     b.Navigation("RolePermissions");
@@ -4616,34 +4746,39 @@ namespace Main.Migrator.Migrations
                     b.Navigation("RatesTo");
                 });
 
-            modelBuilder.Entity("Main.Entities.Order.Order", b =>
+            modelBuilder.Entity("Main.Entities.Notification.Notification", b =>
+                {
+                    b.Navigation("Deliveries");
+                });
+
+            modelBuilder.Entity("Main.Entities.Order.Order.Order", b =>
                 {
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("Main.Entities.Organization.Organization", b =>
+            modelBuilder.Entity("Main.Entities.Organization.Organization.Organization", b =>
                 {
                     b.Navigation("Members");
                 });
 
-            modelBuilder.Entity("Main.Entities.Producer.Producer", b =>
+            modelBuilder.Entity("Main.Entities.Product.Producer.Producer", b =>
                 {
                     b.Navigation("Aliases");
 
                     b.Navigation("SupplierMappings");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.CatalogueCandidate", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.CatalogueCandidate", b =>
                 {
                     b.Navigation("SupplierProducts");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Enrichment.SupplierProduct", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Enrichment.SupplierProduct", b =>
                 {
                     b.Navigation("Names");
                 });
 
-            modelBuilder.Entity("Main.Entities.Product.Product", b =>
+            modelBuilder.Entity("Main.Entities.Product.Product.Product", b =>
                 {
                     b.Navigation("Characteristics");
 
@@ -4658,22 +4793,22 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Stocks");
                 });
 
-            modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
+            modelBuilder.Entity("Main.Entities.Purchase.Purchase.Purchase", b =>
                 {
                     b.Navigation("Contents");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
+            modelBuilder.Entity("Main.Entities.Sale.Sale.Sale", b =>
                 {
                     b.Navigation("Contents");
                 });
 
-            modelBuilder.Entity("Main.Entities.Sale.SaleContent", b =>
+            modelBuilder.Entity("Main.Entities.Sale.Sale.SaleContent", b =>
                 {
                     b.Navigation("Details");
                 });
 
-            modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
+            modelBuilder.Entity("Main.Entities.Storage.Storage.StorageContent", b =>
                 {
                     b.Navigation("Locks");
                 });
@@ -4689,11 +4824,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Roles");
 
                     b.Navigation("UserInfo");
-                });
-
-            modelBuilder.Entity("Notification.Core.Entities.Notification", b =>
-                {
-                    b.Navigation("Deliveries");
                 });
 
             modelBuilder.Entity("Pricing.Entities.MarkupGroup", b =>

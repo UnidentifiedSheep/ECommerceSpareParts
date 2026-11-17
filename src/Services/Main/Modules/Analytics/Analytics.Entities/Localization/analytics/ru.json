@@ -42,6 +42,14 @@
     "chart.sales.profit.query.organization.id.name": "Организация",
     "chart.sales.profit.point.revenue.description": "Выручка от продаж в базовой валюте.",
     "lrt.sale.analytics.synchronization.name": "Синхронизация аналитики продаж",
-    "lrt.sale.analytics.synchronization.description": "Пересчитывает аналитику продаж по историческим курсам валют."
+    "lrt.sale.analytics.synchronization.description": "Пересчитывает аналитику продаж по историческим курсам валют.",
+    "abc.xyz.parameters.period.start.invalid": "Начало периода должно быть первым днем месяца в 00:00 UTC.",
+    "abc.xyz.parameters.period.end.invalid": "Конец периода должен быть первым днем месяца в 00:00 UTC.",
+    "abc.xyz.parameters.period.start.must.not.be.after.end": "Начало периода не должно быть позже конца периода.",
+    "abc.xyz.parameters.months.invalid": "Среди выбранных месяцев есть неподдерживаемое значение.",
+    "abc.xyz.parameters.metric.invalid": "Выбранная метрика анализа не поддерживается.",
+    "abc.xyz.parameters.shares.invalid": "Доли ABC должны быть положительными, а их сумма не должна превышать 1.",
+    "abc.xyz.parameters.coefficients.invalid": "Коэффициенты XYZ должны удовлетворять условию 0 < X < Y.",
+    "abc.xyz.parameters.min.periods.invalid": "Минимальное количество периодов должно быть не меньше 2."
   }
 }
